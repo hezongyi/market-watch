@@ -1,4 +1,5 @@
 from datetime import UTC, datetime
+from decimal import Decimal
 
 import pytest
 from alerts import history_versions as history
@@ -110,16 +111,64 @@ def test_month_windows_and_fixed_past_cutoff():
     assert history.month_end(at) == int(datetime(2024, 3, 1, tzinfo=UTC).timestamp() * 1000)
 
 
-def test_precision_metadata_failure_is_quarantined_without_advancing_or_retrying(database):
-    ident, _ = create(database)
+def test_excess_price_precision_is_rounded_and_published(database):
+    ident, instrument = create(database)
     history.import_page(Adapter([batch(rows=(minute(close="1.111111"),),
         checkpoint=120000)]), version_id=ident)
     with database.begin() as db:
         version = db.get(HistoryVersion, ident)
+        assert version.status == "published"
+        assert version.manifest["price_precision"] == 5
+        assert version.manifest["price_rule_version"]
+        assert list(history.snapshot_rows(db, ident))[0]["close"] == "1.11111"
+        assert db.scalar(select(Bar).where(Bar.instrument_id == instrument)).close == Decimal("1.11111")
+
+
+def test_legacy_version_without_price_rule_keeps_raw_history_behavior(database):
+    ident, instrument = create(database)
+    with database.begin() as db:
+        db.get(HistoryVersion, ident).manifest = {}
+    history.import_page(Adapter([batch(rows=(minute(close="1.111110"),), checkpoint=120000)]),
+                        version_id=ident)
+    with database.begin() as db:
+        version = db.get(HistoryVersion, ident)
+        assert version.status == "published"
+        assert "price_rule_version" not in version.manifest
+        assert list(history.snapshot_rows(db, ident))[0]["close"] == "1.111110"
+        assert db.scalar(select(Bar).where(Bar.instrument_id == instrument)).close == Decimal("1.11111")
+
+
+@pytest.mark.parametrize("initial_status", ["pending", "retrying"])
+def test_legacy_import_cannot_round_before_rule_activation(database, initial_status):
+    ident, _ = create(database)
+    with database.begin() as db:
+        version = db.get(HistoryVersion, ident)
+        version.manifest = {}
+        version.status = initial_status
+    history.import_page(Adapter([batch(rows=(minute(close="1.111111"),), checkpoint=120000)]),
+                        version_id=ident)
+    with database.begin() as db:
+        version = db.get(HistoryVersion, ident)
         assert version.status == "configuration_error"
         assert version.error == "price_precision_overflow"
-        assert version.cursor == version.start
-        assert not version.lease_token and not version.lease_until
-        assert db.scalar(select(HistoryChunk)) is None
+        assert version.cursor == 0 and not version.lease_token
+        assert version.manifest == {}
         assert db.scalar(select(Bar)) is None
-    assert not history.import_page(Adapter([]), version_id=ident)
+        assert db.scalar(select(HistoryChunk)) is None
+
+
+def test_import_uses_frozen_version_precision_for_all_business_views(database):
+    from alerts.history_artifacts import artifact_tick, read_artifact
+
+    ident, instrument = create(database)
+    with database.begin() as db:
+        version = db.get(HistoryVersion, ident)
+        version.manifest = {**version.manifest, "price_precision": 6}
+    history.import_page(Adapter([batch(rows=(minute(close="1.1111114"),), checkpoint=120000)]),
+                        version_id=ident)
+    while artifact_tick(ident):
+        pass
+    with database.begin() as db:
+        assert db.scalar(select(Bar).where(Bar.instrument_id == instrument)).close == Decimal("1.111111")
+        assert list(history.snapshot_rows(db, ident))[0]["close"] == "1.111111"
+        assert read_artifact(db, ident, "M1")[0]["close"] == "1.111111"

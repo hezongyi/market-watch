@@ -22,6 +22,7 @@ from .storage import (
     HistoryReclamation,
     HistoryRun,
     HistoryVersion,
+    Instrument,
     MarketDataset,
     now_ms,
     transaction,
@@ -135,7 +136,7 @@ def create_run(db, dataset_id, *, kind="update", start=None, end=None, request_i
         min(left, plan.target_start, parent.start if parent else left),
         max(right, parent.end if parent else right))
     version = db.get(HistoryVersion, ident)
-    version.manifest = {"maintenance": {"parent_version": parent.id if parent else None,
+    version.manifest = {**(version.manifest or {}), "maintenance": {"parent_version": parent.id if parent else None,
         "refresh_start": left, "refresh_end": right, "kind": kind, "timeframes": plan.timeframes}}
     db.add(HistoryRun(version_id=ident, dataset_id=dataset_id, request_id=request_id,
         request_hash=digest, kind=kind, parent_version_id=parent.id if parent else None,
@@ -259,6 +260,25 @@ def task_control(db, version_id, action):
     else:
         if version.status == "cancelled":
             raise ValueError("已取消任务请重新提交维护；原任务记录保留")
+        if version.error == "price_precision_overflow" and action != "retry":
+            raise ValueError("价格精度规则需通过显式重试启用")
+        if action == "retry" and version.error == "price_precision_overflow":
+            if version.lease_token or version.lease_until > now_ms():
+                raise ValueError("价格精度规则只能在任务无有效写入租约时启用")
+            from .market_datasets import PRICE_RULE_VERSION, price_rule
+
+            dataset = db.get(MarketDataset, version.dataset_id)
+            instrument = db.get(Instrument, dataset.instrument_id)
+            existing = version.manifest or {}
+            price_rule(existing)
+            version.manifest = {**existing,
+                "price_precision": instrument.precision,
+                "price_rule_version": PRICE_RULE_VERSION,
+                "price_rule_activation": {
+                    "reason": "explicit_retry_of_price_precision_overflow",
+                    "previous_error": "price_precision_overflow",
+                    "activated_at": now_ms(),
+                }}
         if version.lease_until > now_ms() and run.desired_state != "running":
             raise ValueError("任务仍在安全停止中，请稍后恢复")
         run.desired_state = "running"

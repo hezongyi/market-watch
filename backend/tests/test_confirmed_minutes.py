@@ -108,3 +108,26 @@ def test_composite_logs_changed_inputs_and_keeps_previous_price_evidence(databas
     with pytest.raises(ValueError, match="immutable"):
         with database.begin() as db:
             db.get(CompositeInputEvent, event_id).input_manifest = {}
+
+
+def test_composite_input_view_rounds_shared_source_per_target_precision(database, monkeypatch):
+    catalog = prepare(database, monkeypatch)
+    publish(database)
+    with database.begin() as db:
+        mapping = save_mapping(db, identity().key, catalog, PROOF)
+        composite = first_use(db, identity().key, mapping.id)
+        revision = db.get(CompositeRevision, composite.active_revision_id)
+        seam = revision.seam
+        from alerts.market_contracts import DatasetIdentity
+        from alerts.storage import MarketDataset
+
+        target = DatasetIdentity.model_validate(db.get(MarketDataset, mapping.target_dataset_id).identity)
+        source_batch = batch(identity=target, window_start=seam - 60000, window_end=seam + 120000,
+            checkpoint=seam + 120000, observed_at=100, volume_kind="price_count", volume_unit="quotes",
+            rows=(minute(seam - 60000, volume="2"), minute(seam, volume="2", close="1.111111")))
+        recorded = store.record(db, source_batch)
+        apply_minutes(db, recorded)
+        source = db.get(SourceMinuteRevision, recorded["minutes"][1]["revision_id"])
+        view = list(rows(db, revision.id, seam, seam + 60000))[0]
+        assert source.data["close"] == "1.111111"
+        assert view["close"] == "1.11111"

@@ -1,0 +1,237 @@
+{
+  "date": "2026-10-10",
+  "status": "read-only production measurement; prospective compression estimate, not implemented storage",
+  "environment": "unraid production; read-only; compression estimates in memory",
+  "units": "bytes; MB=1000000 bytes; GB=1000000000 bytes",
+  "database_bytes": 3883615011,
+  "tables": [
+    {
+      "name": "candles",
+      "total_bytes": 2487803904,
+      "table_bytes": 1106067456,
+      "index_bytes": 1381736448
+    },
+    {
+      "name": "market_source_blobs",
+      "total_bytes": 87531520,
+      "table_bytes": 87367680,
+      "index_bytes": 163840
+    },
+    {
+      "name": "market_source_fetches",
+      "total_bytes": 565248,
+      "table_bytes": 401408,
+      "index_bytes": 163840
+    },
+    {
+      "name": "market_history_chunks",
+      "total_bytes": 1392640,
+      "table_bytes": 933888,
+      "index_bytes": 458752
+    },
+    {
+      "name": "market_history_artifact_blocks",
+      "total_bytes": 98058240,
+      "table_bytes": 96690176,
+      "index_bytes": 1368064
+    }
+  ],
+  "source_blobs": {
+    "blobs": 1135,
+    "gzip_payload_bytes": 83223972,
+    "stored_content_bytes": 83224011
+  },
+  "history_chunks": {
+    "chunks": 1315,
+    "referencing_raw_blob": 1315,
+    "inline_payload_bytes": 0
+  },
+  "tasks": [
+    {
+      "symbol": "GBPUSD",
+      "task": "e3cbf344-d1c4-4200-bffe-5f11d8a8a569",
+      "prefix": {
+        "chunks": 320,
+        "observations": 1400295,
+        "queried_minutes": "1976508.000000000000",
+        "unique_raw_gzip_bytes": 21242446
+      },
+      "work_table": {
+        "m1_rows": 1400295,
+        "avg_row_bytes": "173.4837587794000550",
+        "live_row_bytes": 242928440
+      },
+      "samples": [
+        {
+          "kind": "prefix",
+          "rows": 0,
+          "raw_gzip_bytes": 22,
+          "processed_gzip_bytes": 22,
+          "changed_rows": 0,
+          "reuse_raw_if_values_unchanged": true
+        },
+        {
+          "kind": "prefix",
+          "rows": 5000,
+          "raw_gzip_bytes": 74449,
+          "processed_gzip_bytes": 74545,
+          "changed_rows": 0,
+          "reuse_raw_if_values_unchanged": true
+        },
+        {
+          "kind": "prefix",
+          "rows": 5000,
+          "raw_gzip_bytes": 72852,
+          "processed_gzip_bytes": 73019,
+          "changed_rows": 0,
+          "reuse_raw_if_values_unchanged": true
+        },
+        {
+          "kind": "prefix",
+          "rows": 5000,
+          "raw_gzip_bytes": 77233,
+          "processed_gzip_bytes": 77436,
+          "changed_rows": 0,
+          "reuse_raw_if_values_unchanged": true
+        },
+        {
+          "kind": "prefix",
+          "rows": 5000,
+          "raw_gzip_bytes": 81053,
+          "processed_gzip_bytes": 81345,
+          "changed_rows": 0,
+          "reuse_raw_if_values_unchanged": true
+        },
+        {
+          "kind": "prefix",
+          "rows": 5000,
+          "raw_gzip_bytes": 73676,
+          "processed_gzip_bytes": 73903,
+          "changed_rows": 0,
+          "reuse_raw_if_values_unchanged": true
+        },
+        {
+          "kind": "prefix",
+          "rows": 1778,
+          "raw_gzip_bytes": 26274,
+          "processed_gzip_bytes": 26322,
+          "changed_rows": 0,
+          "reuse_raw_if_values_unchanged": true
+        },
+        {
+          "kind": "prefix",
+          "rows": 5000,
+          "raw_gzip_bytes": 73023,
+          "processed_gzip_bytes": 73195,
+          "changed_rows": 0,
+          "reuse_raw_if_values_unchanged": true
+        },
+        {
+          "kind": "failed_page",
+          "rows": 5000,
+          "raw_gzip_bytes": 74196,
+          "processed_gzip_bytes": 74290,
+          "changed_rows": 21,
+          "reuse_raw_if_values_unchanged": false
+        }
+      ]
+    },
+    {
+      "symbol": "EURUSD",
+      "task": "aa4588c3-8952-4983-b1a6-a0c63d4616c3",
+      "prefix": {
+        "chunks": 320,
+        "observations": 1404010,
+        "queried_minutes": "1984383.000000000000",
+        "unique_raw_gzip_bytes": 20997397
+      },
+      "work_table": {
+        "m1_rows": 1692217,
+        "avg_row_bytes": "173.2013849287650461",
+        "live_row_bytes": 293094328
+      },
+      "samples": [
+        {
+          "kind": "prefix",
+          "rows": 0,
+          "raw_gzip_bytes": 22,
+          "processed_gzip_bytes": 22,
+          "changed_rows": 0,
+          "reuse_raw_if_values_unchanged": true
+        },
+        {
+          "kind": "prefix",
+          "rows": 5000,
+          "raw_gzip_bytes": 70757,
+          "processed_gzip_bytes": 70845,
+          "changed_rows": 0,
+          "reuse_raw_if_values_unchanged": true
+        },
+        {
+          "kind": "prefix",
+          "rows": 5000,
+          "raw_gzip_bytes": 74546,
+          "processed_gzip_bytes": 74683,
+          "changed_rows": 0,
+          "reuse_raw_if_values_unchanged": true
+        },
+        {
+          "kind": "prefix",
+          "rows": 5000,
+          "raw_gzip_bytes": 76534,
+          "processed_gzip_bytes": 76746,
+          "changed_rows": 0,
+          "reuse_raw_if_values_unchanged": true
+        },
+        {
+          "kind": "prefix",
+          "rows": 5000,
+          "raw_gzip_bytes": 80559,
+          "processed_gzip_bytes": 80802,
+          "changed_rows": 0,
+          "reuse_raw_if_values_unchanged": true
+        },
+        {
+          "kind": "prefix",
+          "rows": 5000,
+          "raw_gzip_bytes": 73185,
+          "processed_gzip_bytes": 73413,
+          "changed_rows": 0,
+          "reuse_raw_if_values_unchanged": true
+        },
+        {
+          "kind": "prefix",
+          "rows": 5000,
+          "raw_gzip_bytes": 75178,
+          "processed_gzip_bytes": 75439,
+          "changed_rows": 0,
+          "reuse_raw_if_values_unchanged": true
+        },
+        {
+          "kind": "prefix",
+          "rows": 5000,
+          "raw_gzip_bytes": 73368,
+          "processed_gzip_bytes": 73535,
+          "changed_rows": 0,
+          "reuse_raw_if_values_unchanged": true
+        },
+        {
+          "kind": "failed_page",
+          "rows": 5000,
+          "raw_gzip_bytes": 71179,
+          "processed_gzip_bytes": 71185,
+          "changed_rows": 57,
+          "reuse_raw_if_values_unchanged": false
+        }
+      ]
+    }
+  ],
+  "estimation": {
+    "additional_processed_m1_bytes_per_million_approx": 15000000,
+    "full_duplicate_of_existing_prefix_gzip_bytes_approx": 42000000,
+    "physical_database_growth_for_full_duplicate_approx": 45000000,
+    "sample_strategy": "8 prefix chunks per task spaced every 40 chunks plus actual failed page",
+    "reuse_policy": "reuse original content when OHLC numeric values are unchanged; extra processed content only for pages with numeric changes",
+    "excluded": "remaining historical acquisition; new fixed M1/high-period artifacts; indexes not yet specified; WAL, backup, temporary storage"
+  }
+}
