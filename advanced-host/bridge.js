@@ -2031,7 +2031,8 @@ addEventListener("message", async (e) => {
       if(event.result_epoch) entry.result_epoch=event.result_epoch;
       if(event.sequence<=entry.sequence) return;
       entry.sequence=event.sequence;
-      if(event.type==='quotes') quote.cb(event.quotes.map(({s,v})=>({s,n:entry.ticker,v})));
+      if(event.type==='quotes') quote.cb(event.quotes.map(({s,v})=>chartQuotePresentation(
+        {s,n:entry.ticker,v},symbolPresentations.get(decode(entry.ticker).symbol))));
       if(event.type==='reset') {
         entry.generation=++marketGeneration;entry.sequence=0;
         send({type:'market-subscribe',args:{client:clientId,listener:entry.listener,generation:entry.generation,

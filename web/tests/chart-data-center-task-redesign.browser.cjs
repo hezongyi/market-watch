@@ -234,7 +234,8 @@ fs.mkdirSync(out, { recursive: true });
     await list.evaluate((n) => (n.scrollTop = 0));
     const actions = [];
     let actionFailure = false,
-      delayControl = false;
+      delayControl = false,
+      workerFailure = "";
     const control = async (route) => {
       const id = new URL(route.request().url()).pathname.split("/").at(-2),
         action = route.request().postDataJSON().action;
@@ -264,7 +265,13 @@ fs.mkdirSync(out, { recursive: true });
         retry: "pending",
       }[action];
       task.controllable = task.status !== "cancelled";
-      return route.fulfill({ json: task });
+      const confirmed = structuredClone(task);
+      if (workerFailure && ["resume", "retry"].includes(action)) {
+        task.status = workerFailure;
+        task.error = workerFailure === "configuration_error" ? "unauthorized" : "rate_limited";
+        workerFailure = "";
+      }
+      return route.fulfill({ json: confirmed });
     };
     await p.route("**/api/market-data/tasks/*/control", control);
     delayControl = true;
@@ -342,6 +349,24 @@ fs.mkdirSync(out, { recursive: true });
     record(
       "retry failure remains local and can retry; configuration errors expose safe reason and inline handling instructions without deleted-page links",
     );
+    // Control is accepted, then the worker fails before the next ID poll.
+    await retry.getByRole("button", {name:"暂停任务",exact:true}).click();
+    await expect(retry.getByRole("button", {name:"恢复任务",exact:true})).toBeVisible({timeout:15000});
+    workerFailure = "retrying";
+    await retry.getByRole("button", {name:"恢复任务",exact:true}).click();
+    await expect(retry.getByRole("button", {name:"重试失败范围",exact:true})).toBeEnabled({timeout:15000});
+    workerFailure = "configuration_error";
+    await retry.getByRole("button", {name:"重试失败范围",exact:true}).click();
+    await retry.getByRole("button", {name:"查看任务详情",exact:true}).click();
+    await expect(panel().getByRole("button", {name:"重试失败范围",exact:true})).toBeEnabled({timeout:15000});
+    await expect(panel().getByRole("button", {name:"取消任务",exact:true})).toBeEnabled();
+    await p.keyboard.press("Escape");
+    await close(); await open();
+    await rows().nth(3).getByRole("button", {name:"查看任务详情",exact:true}).click();
+    await expect(panel().getByRole("button", {name:"重试失败范围",exact:true})).toBeEnabled();
+    await expect(panel().getByRole("button", {name:"取消任务",exact:true})).toBeEnabled();
+    await p.keyboard.press("Escape");
+    record("accepted resume/retry followed by immediate worker failure keeps retry/cancel enabled across reopening");
     delayNext = true;
     const query = dc().getByRole("searchbox", {
       name: "搜索品种",

@@ -310,6 +310,12 @@ type ActionState = { busy: string; awaiting: string; error: string };
 const actionStates = new Map<string, ActionState>();
 const actionEvents = new EventTarget();
 const idleAction: ActionState = { busy: "", awaiting: "", error: "" };
+function controlConfirmed(task: Task, action: string) {
+  if (action === "pause") return task.status === "paused" || task.status === "cancelled" || task.status === "published";
+  if (action === "cancel") return task.status === "cancelled";
+  return ["resume", "retry"].includes(action) && task.desired_state === "running" &&
+    ["pending", "running", "deriving", "retrying", "configuration_error", "published"].includes(task.status);
+}
 function setTaskAction(id: string, changes: Partial<ActionState>) {
   actionStates.set(id, { ...(actionStates.get(id) || idleAction), ...changes });
   actionEvents.dispatchEvent(new Event("change"));
@@ -335,20 +341,17 @@ export function TaskActions({
   const [confirming, confirm] = useState(false);
   const actionLock = useActionLock();
   useEffect(() => {
-    if (
-      (awaiting === "pause" && task.status === "paused") ||
-      (awaiting === "resume" &&
-        ["pending", "running", "deriving"].includes(task.status)) ||
-      (awaiting === "retry" && ["pending", "running"].includes(task.status))
-    )
+    if (controlConfirmed(task, awaiting))
       setTaskAction(task.id, { awaiting: "" });
-  }, [awaiting, task.status]);
+  }, [awaiting, task.status, task.desired_state]);
   async function action(value: string) {
     if (actionStates.get(task.id)?.busy || !actionLock.acquire()) return;
     setTaskAction(task.id, { busy: value, error: "" });
     try {
-      await api(`/market-data/tasks/${task.id}/control`, { action: value });
-      setTaskAction(task.id, { awaiting: value });
+      const result = await api<Task>(`/market-data/tasks/${task.id}/control`, { action: value });
+      // The reply confirms resume/retry even if the worker fails again before
+      // polling observes pending. Pause/cancel still wait for a safe stop.
+      setTaskAction(task.id, { awaiting: controlConfirmed(result, value) ? "" : value });
       confirm(false);
       onDone();
     } catch (error) {
@@ -362,13 +365,7 @@ export function TaskActions({
     return compact ? null : <p>此记录已结束，保留记录供核查。</p>;
   const unsettled =
     stopping(task) ||
-    (!!awaiting &&
-      !(awaiting === "pause" && task.status === "paused") &&
-      !(
-        awaiting === "resume" &&
-        ["pending", "running", "deriving"].includes(task.status)
-      ) &&
-      !(awaiting === "retry" && ["pending", "running"].includes(task.status)));
+    (!!awaiting && !controlConfirmed(task, awaiting));
   const disabled = !!busy || unsettled;
   const control =
     task.status === "paused"
