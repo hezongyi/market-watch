@@ -390,6 +390,47 @@ def test_quote_refreshes_share_poll_bucket_without_stalling_new_chart_pages(data
     provider._CACHE.clear()
 
 
+def test_quote_page_keeps_last_successful_m1_when_refresh_fails(monkeypatch):
+    provider._CACHE.clear()
+    provider._QUOTE_LAST.clear()
+    calls = [0]
+
+    def fetch(meta, frame, before, count, **kwargs):
+        calls[0] += 1
+        if calls[0] == 1:
+            return {"bars": [{"start": 120000, "end": 180000, "close": "1.25"}], "as_of": 190000}
+        raise RuntimeError("upstream unavailable")
+
+    monkeypatch.setattr(provider, "native_page", fetch)
+    monkeypatch.setattr(provider, "now_ms", lambda: 200000)
+    first = provider.quote_page(META)
+    assert first["fetch_status"] == "ok" and first["read_at"] == 190000
+    provider._CACHE.clear()
+    monkeypatch.setattr(provider, "now_ms", lambda: 220000)
+    failed = provider.quote_page(META)
+    assert failed["bars"][0]["close"] == "1.25"
+    assert failed["fetch_status"] == "fetch_failed" and failed["read_at"] == 220000
+    assert failed["as_of"] == 190000
+    provider._QUOTE_LAST.clear()
+    provider._CACHE.clear()
+
+
+def test_quote_fallback_cannot_cross_account_without_a_calendar_profile(monkeypatch):
+    provider._QUOTE_LAST.clear()
+    monkeypatch.setattr(settings, "oanda_account_id", "fixture-account-A")
+    monkeypatch.setattr(provider, "cached_page", lambda *a, **kw: {
+        "bars": [{"start": 120000, "end": 180000, "close": "1.25"}], "as_of": 190000,
+    })
+    provider.quote_page(META)
+    monkeypatch.setattr(settings, "oanda_account_id", "fixture-account-B")
+    def failed(*args, **kwargs):
+        raise RuntimeError("fixture unavailable")
+    monkeypatch.setattr(provider, "cached_page", failed)
+    with pytest.raises(RuntimeError):
+        provider.quote_page(META)
+    provider._QUOTE_LAST.clear()
+
+
 def test_earliest_probe_uses_positive_epoch_and_does_not_write_managed_data(database):
     meta = {**META, "id": "OANDA:EARLIEST_TEST", "symbol": "EUR_GBP"}
     provider._EARLIEST.clear()
@@ -589,3 +630,19 @@ def test_provider_quotes_use_previous_complete_native_close(database, monkeypatc
             assert value["lp"] == 120 and "ch" not in value
     finally:
         api_module.app.dependency_overrides.clear()
+def test_successful_quote_page_cache_uses_actual_observation_identity(monkeypatch):
+    from alerts import provider_chart
+
+    provider_chart._CACHE.clear()
+    calls = []
+    def page(meta, *args, **kwargs):
+        calls.append(meta["source_identity"]["account_scope"])
+        return {"bars": [{"close": str(len(calls))}]}
+    monkeypatch.setattr(provider_chart, "native_page", page)
+    meta = {"source": "oanda", "id": "OANDA:EUR_USD", "symbol": "EUR_USD",
+            "basis": "bid", "calendar": "ny17", "native_parameters": {}}
+    identity = {"source": "oanda", "channel": "v20", "environment": "practice",
+                "provider_symbol": "EUR_USD", "account_scope": "account-a"}
+    first = provider_chart.cached_page({**meta, "source_identity": identity}, "M1", 100000, 1, quote=True)
+    second = provider_chart.cached_page({**meta, "source_identity": {**identity, "account_scope": "account-b"}}, "M1", 100000, 1, quote=True)
+    assert len(calls) == 2 and first["bars"] != second["bars"]
