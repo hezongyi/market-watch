@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { time } from "./types";
 import { useSnapshot } from "./useSnapshot";
 
@@ -29,6 +30,13 @@ const labels: Record<string, string> = {
 
 /** Reads stored status only. Viewing the data center never creates live demand. */
 export function LiveProviderStatus() {
+  const [expanded, setExpanded] = useState(() => !window.matchMedia("(max-height:650px)").matches);
+  useEffect(() => {
+    const media = window.matchMedia("(max-height:650px)");
+    const resize = () => setExpanded(!media.matches);
+    media.addEventListener("change", resize);
+    return () => media.removeEventListener("change", resize);
+  }, []);
   const snapshot = useSnapshot<{ provider: Provider; datasets: Live[] }>(
     "/market-data/live/status",
   );
@@ -36,8 +44,8 @@ export function LiveProviderStatus() {
   const rows = snapshot.data?.datasets ?? [];
   const connected = !!snapshot.data && !snapshot.error;
   return (
-    <section className="panel" aria-label="OANDA Practice 实时状态">
-      <strong>OANDA Practice 实时状态</strong>
+    <details className="panel dc-live-provider-status" aria-label="OANDA Practice 实时状态" open={expanded} onToggle={event => setExpanded(event.currentTarget.open)}>
+      <summary>OANDA Practice 实时状态{provider?.error ? ` · ${labels[provider.error] ?? "连接暂不可用"}` : ""}</summary>
       <div role="status" aria-atomic="true">
         {!connected && <p>状态连接正在恢复；已有历史仍可查看。</p>}
         {provider?.error && (
@@ -68,6 +76,6 @@ export function LiveProviderStatus() {
           </p>
         ))}
       </div>
-    </section>
+    </details>
   );
 }

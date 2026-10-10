@@ -95,6 +95,13 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
       await center().getByLabel('搜索品种', { exact: true }).fill('EURUSD');
       await center().getByRole('button', { name: '可用', exact: true }).click();
       if (await filter.isVisible()) await filter.click();
+      expect(await center().locator('.dc-market-list').evaluate(node=>node.clientHeight)).toBeGreaterThan(64);
+      const status = center().locator('.dc-live-provider-status');
+      await status.locator('summary').click();
+      await expect(status).toHaveAttribute('open','');
+      await expect(status.getByRole('status')).toBeVisible();
+      await status.locator('summary').click();
+      await expect(status).not.toHaveAttribute('open','');
       const action = center().getByRole('button', { name: '打开图表', exact: true }).first();
       await action.scrollIntoViewIfNeeded();
       await expect(action).toBeInViewport();
@@ -151,7 +158,7 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
       await screenshot(`browser-zoom200-platform-${width}.png`);
       await native().getByRole('button', { name: '关闭数据中心' }).click();
       await expect(native().getByRole('button', { name: '数据中心', exact: true })).toBeFocused();
-      await host().evaluate(() => dataCenter.open('/market-data/datasets/new?source=dukascopy&symbol=EUR%2FUSD'));
+      await host().evaluate(() => dataCenter.open('/market-data/datasets/new?source=dukascopy&symbol=EURUSD'));
       await expect(center().locator('.dc-create-selection')).toContainText('EURUSD');
       await expect(center().getByRole('button', {name:'创建并开始准备历史',exact:true})).toBeInViewport();
       expect(await center().locator('.dc-create-page').evaluate(n=>n.scrollWidth<=n.clientWidth+1)).toBe(true);
@@ -184,6 +191,7 @@ const report = { environment: 'Ubuntu Docker; Chrome tabs.setZoom real browser z
     report.passed = true;
   } catch (error) {
     report.errors.push(error.message);
+    if(native()) report.geometry=await native().evaluate(()=>({viewport:{width:innerWidth,height:innerHeight},nodes:[...document.querySelectorAll(".dc-window,.dc-window-nav,.dc-window-content,.dc-window-footer,.dc-market-title,.dc-market-search,.dc-market-tabs,.dc-market-table-head,.dc-market-list,.dc-market-row,.dc-window-content>.panel")].map(n=>({name:n.className,box:n.getBoundingClientRect().toJSON(),scrollTop:n.scrollTop}))})).catch(()=>null);
     throw error;
   } finally {
     page.off('pageerror',onError);
