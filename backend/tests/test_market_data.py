@@ -860,7 +860,7 @@ def test_rate_limited_source_does_not_hold_other_source_in_queue(database, monke
         for index in range(20):
             db.add(ImportJob(instrument_id="EURUSD", start=60000, end=120000,
                              cursor=60000, priority=100, next_at=index))
-        db.add(Instrument(id="TEST_OTHER", label="Test", symbol="TEST", source="other",
+        db.add(Instrument(id="TEST_OTHER", label="Test", symbol="BTCUSDT", source="binance",
                           basis="mid", calendar="utc0", precision=2))
         db.add(ImportJob(instrument_id="TEST_OTHER", start=60000, end=120000,
                          cursor=60000, priority=100, next_at=100))
@@ -871,7 +871,7 @@ def test_rate_limited_source_does_not_hold_other_source_in_queue(database, monke
         raise ValueError("test stops after dispatch")
 
     assert market.import_once(chart_only=True, fetcher=fetch)
-    assert fetched == ["other"]
+    assert fetched == ["binance"]
 
 
 def test_foreground_history_is_dispatched_before_older_weekly_job(database, monkeypatch):

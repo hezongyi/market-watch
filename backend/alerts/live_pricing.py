@@ -209,6 +209,9 @@ def session_states(identities, *, now=None):
 
 def park_closed(ownership, identities, seconds, *, now=None):
     stamp = now_ms() if now is None else now
+    if identities and any(row['market_session'] != 'closed'
+                          for row in session_states(identities, now=stamp).values()):
+        raise ValueError('A closed-market pause requires verified source session evidence')
     with transaction() as db:
         owner = lock_owner(db, ownership, now=stamp)
         if owner.error == 'unauthorized':
@@ -221,6 +224,8 @@ def park_closed(ownership, identities, seconds, *, now=None):
             state = db.get(LiveState, identity.key)
             state.connection, state.ready, state.error = 'closed', False, None
             state.revision += 1
+            inst = db.get(Instrument, db.get(MarketDataset, identity.key).instrument_id)
+            inst.quality, inst.error = 'waiting', None
 
 
 def lock_owner(db, ownership, epoch=None, *, now=None):

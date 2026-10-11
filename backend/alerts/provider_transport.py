@@ -1,13 +1,17 @@
 """Provider HTTP pools and bounded idle transport maintenance, without market policy."""
 
+import logging
+import ssl
 import threading
 import time
 import weakref
 from contextlib import ExitStack, contextmanager, nullcontext
+from contextvars import ContextVar
 
 import httpx
 
 from .config import settings
+from .provider_deadline import deadline_transport, request_deadline
 
 ORIGINS = {'oanda': 'https://api-fxpractice.oanda.com',
            'binance': 'https://data-api.binance.vision',
@@ -19,6 +23,100 @@ _RETIRED = []
 _STOP = threading.Event()
 _THREADS = []
 IDLE_SECONDS = 20
+TIMINGS = ContextVar("provider_acquisition_timings", default=None)
+
+
+def record_timing(name, started):
+    timings = TIMINGS.get()
+    if timings is not None:
+        timings[name] = timings.get(name, 0) + (time.monotonic() - started) * 1000
+
+
+def retryable_network_error(error):
+    if not isinstance(error, (httpx.ConnectError, httpx.TimeoutException,
+                              httpx.ReadError, httpx.RemoteProtocolError)):
+        return False
+    seen = set()
+    current = error
+    while current and id(current) not in seen:
+        seen.add(id(current))
+        if isinstance(current, ssl.SSLCertVerificationError) or "CERTIFICATE_VERIFY_FAILED" in str(current):
+            return False
+        current = current.__cause__ or current.__context__
+    return True
+
+
+def error_detail(error):
+    """Network failures carry a classification, never an upstream URL or credential."""
+    if isinstance(error, httpx.HTTPStatusError):
+        return f"{type(error).__name__}: HTTP {error.response.status_code}"
+    if isinstance(error, httpx.TransportError):
+        if not retryable_network_error(error) and isinstance(error, httpx.ConnectError):
+            category = "certificate_verification"
+        elif "UNEXPECTED_EOF_WHILE_READING" in str(error):
+            category = "tls_eof"
+        else:
+            category = "network_failure"
+        return f"{type(error).__name__}: {category}"
+    return str(error)[:600] or type(error).__name__
+
+
+def binance_get(client, url, *, params, deadline, headers=None):
+    """At most two read-only attempts; every attempt reacquires the shared lane."""
+    from .market_resources import request_slot
+
+    for attempt in range(2):
+        phase = "slot"
+        route = "proxy" if settings.effective_binance_proxy else "direct"
+        phases = {}
+        def trace(name, info):
+            nonlocal phase
+            stage, _, event = name.rpartition(".")
+            if event == "started":
+                phase = stage
+                phases[stage] = time.monotonic()
+            elif event in ("complete", "failed") and stage in phases:
+                record_timing("network_" + stage.replace(".", "_"), phases.pop(stage))
+        started = time.monotonic()
+        current = client
+        try:
+            with request_slot("binance", deadline=deadline):
+                record_timing("upstream_slot", started)
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise TimeoutError("Binance 请求超过时间预算")
+                with activity(client) as current, request_deadline(deadline):
+                    timings = TIMINGS.get()
+                    attempt_record = {"attempt": attempt + 1}
+                    if timings is not None:
+                        timings.setdefault("candles_attempts", []).append(attempt_record)
+                    http_started = time.monotonic()
+                    try:
+                        response = current.get(url, params=params, headers=headers,
+                            timeout=httpx.Timeout(min(7, remaining), connect=min(5, remaining)),
+                            extensions={"trace": trace})
+                        attempt_record["status"] = response.status_code
+                    except httpx.TransportError as error:
+                        attempt_record["error"] = type(error).__name__
+                        record_timing("failure_" + type(error).__name__, http_started)
+                        raise
+                    finally:
+                        record_timing("upstream_http", http_started)
+            if response.status_code in (502, 503, 504) and not attempt and deadline-time.monotonic() > .25:
+                time.sleep(.25)
+                continue
+            response.raise_for_status()
+            return response
+        except httpx.TransportError as error:
+            if retryable_network_error(error):
+                discard_client(current)
+            logging.getLogger(__name__).warning(
+                "binance_transport_failed type=%s phase=%s route=%s attempt=%s elapsed_ms=%s",
+                type(error).__name__, phase, route, attempt+1, round((time.monotonic()-started)*1000))
+            if attempt or not retryable_network_error(error) or deadline-time.monotonic() <= .25:
+                raise
+            time.sleep(.25)
+    raise RuntimeError("Binance 请求重试耗尽")
 
 
 def pooled_client(source):
@@ -39,12 +137,12 @@ def client_for_key(key):
 def state_for_key(key):
     # Callers hold _LOCK so assignment and activity reservation are atomic.
     if key not in _CLIENTS:
-        capacity = 2 if key[2] == 'chart' else 1
+        capacity = 2 if key[2] in ('chart', 'pricing') else 1
+        limits = httpx.Limits(max_connections=capacity, max_keepalive_connections=capacity,
+                             keepalive_expiry=60)
         _CLIENTS[key] = {
-            'client': httpx.Client(timeout=7, proxy=key[1] or None, trust_env=False,
-                                 limits=httpx.Limits(max_connections=capacity,
-                                                    max_keepalive_connections=capacity,
-                                                    keepalive_expiry=60)),
+            'client': httpx.Client(timeout=7, trust_env=False, limits=limits,
+                                 transport=deadline_transport(proxy=key[1] or None, limits=limits)),
             'last_maintained': time.monotonic(), 'active': 0,
         }
         _KEYS[_CLIENTS[key]['client']] = key
@@ -79,6 +177,16 @@ def discard_client(client):
             # Retain an empty replacement so idle maintenance can reestablish
             # transport after a startup/heartbeat failure without a chart read.
             state_for_key(key)
+    close_retired()
+
+
+def retire_client(client):
+    """Retire an owned pool without creating an unused replacement on shutdown."""
+    with _LOCK:
+        key = _KEYS.get(client)
+        state = _CLIENTS.pop(key, None)
+        if state:
+            _RETIRED.append(state)
     close_retired()
 
 

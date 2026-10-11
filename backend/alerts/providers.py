@@ -1,11 +1,13 @@
 """Public market-only Binance adapter. Quotes and historical candles use one market."""
 
+import time
 from datetime import datetime
 
 import httpx
 
 from .config import settings
 from .market_resources import request_slot
+from .provider_transport import binance_get, pooled_client
 from .storage import now_ms
 from .volume import encoded
 
@@ -14,81 +16,74 @@ def fetch_binance(symbol="BTCUSDT", start=None, end=None, mode="live", client=No
     if symbol != "BTCUSDT":
         raise ValueError("Unsupported Binance market")
     base = "https://data-api.binance.vision/api/v3"
-    owns = client is None
-    client = client or httpx.Client(timeout=15, proxy=settings.effective_binance_proxy or None, trust_env=False)
-    try:
-        if mode == "quote":
-            with request_slot("binance"):
-                response = client.get(base + "/trades", params={"symbol": symbol, "limit": 100})
-            response.raise_for_status()
-            data = response.json()
-            return {
-                "rows": [
-                    {"timestamp": r["time"], "bidPrice": r["price"], "askPrice": r["price"]}
-                    for r in data
-                ],
-                "source": "binance",
-                "basis": "last",
-            }
-        left = (
-            int(datetime.fromisoformat(start.replace("Z", "+00:00")).timestamp() * 1000)
-            if start
-            else now_ms() - 120 * 60_000
-        )
-        right = (
-            int(datetime.fromisoformat(end.replace("Z", "+00:00")).timestamp() * 1000)
-            if end
-            else now_ms()
-        )
-        cursor = left
-        rows = []
-        while cursor < right:
-            with request_slot("binance"):
-                response = client.get(
-                    base + "/klines",
-                params={
-                    "symbol": symbol,
-                    "interval": "1m",
-                    "startTime": cursor,
-                    "endTime": right - 1,
-                    "limit": 1000,
-                },
-            )
-            response.raise_for_status()
-            batch = response.json()
-            if not isinstance(batch, list):
-                raise ValueError("Invalid exchange response")
-            if not batch:
-                break
-            for r in batch:
-                if left <= r[0] < right:
-                    rows.append(
-                        {"timestamp": r[0], "open": r[1], "high": r[2], "low": r[3], "close": r[4], "volume": encoded(r[5] if len(r) > 5 else None)}
-                    )
-            next_cursor = int(batch[-1][0]) + 60_000
-            if next_cursor <= cursor:
-                raise ValueError("Provider cursor did not advance")
-            cursor = next_cursor
-            if len(batch) < 1000:
-                break
+    client = client or pooled_client("binance")
+    deadline = time.monotonic() + 15
+    if mode == "quote":
+        response = binance_get(client, base + "/trades", params={"symbol": symbol, "limit": 100}, deadline=deadline)
+        data = response.json()
         return {
+            "rows": [
+                {"timestamp": r["time"], "bidPrice": r["price"], "askPrice": r["price"]}
+                for r in data
+            ],
             "source": "binance",
             "basis": "last",
-            "instrument": symbol,
-            "rows": rows,
-            "window_start": left,
-            "window_end": right,
-            "coverage": [
-                {
-                    "start": left,
-                    "end": min(right, (now_ms() - 5000) // 60000 * 60000),
-                    "returned": len(rows),
-                }
-            ],
         }
-    finally:
-        if owns:
-            client.close()
+    left = (
+        int(datetime.fromisoformat(start.replace("Z", "+00:00")).timestamp() * 1000)
+        if start
+        else now_ms() - 120 * 60_000
+    )
+    right = (
+        int(datetime.fromisoformat(end.replace("Z", "+00:00")).timestamp() * 1000)
+        if end
+        else now_ms()
+    )
+    cursor = left
+    rows = []
+    while cursor < right:
+        response = binance_get(
+            client, base + "/klines",
+            params={
+                "symbol": symbol,
+                "interval": "1m",
+                "startTime": cursor,
+                "endTime": right - 1,
+                "limit": 1000,
+            },
+            deadline=deadline,
+        )
+        batch = response.json()
+        if not isinstance(batch, list):
+            raise ValueError("Invalid exchange response")
+        if not batch:
+            break
+        for r in batch:
+            if left <= r[0] < right:
+                rows.append(
+                    {"timestamp": r[0], "open": r[1], "high": r[2], "low": r[3], "close": r[4], "volume": encoded(r[5] if len(r) > 5 else None)}
+                )
+        next_cursor = int(batch[-1][0]) + 60_000
+        if next_cursor <= cursor:
+            raise ValueError("Provider cursor did not advance")
+        cursor = next_cursor
+        if len(batch) < 1000:
+            break
+    return {
+        "source": "binance",
+        "basis": "last",
+        "instrument": symbol,
+        "rows": rows,
+        "window_start": left,
+        "window_end": right,
+        "coverage": [
+            {
+                "start": left,
+                "end": min(right, (now_ms() - 5000) // 60000 * 60000),
+                "returned": len(rows),
+            }
+        ],
+    }
 
 
 def fetch_oanda(symbol, start=None, end=None, mode="live", client=None):

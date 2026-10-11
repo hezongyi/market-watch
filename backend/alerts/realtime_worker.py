@@ -22,15 +22,13 @@ def main():
         clients = {
             "oanda": stack.enter_context(httpx.Client(timeout=15,
                 proxy=settings.oanda_proxy or None, trust_env=False)),
-            "binance": stack.enter_context(httpx.Client(timeout=15,
-                proxy=settings.effective_binance_proxy or None, trust_env=False)),
         }
 
         def fetch(source, symbol, start=None, end=None, mode="live"):
             provider = {"oanda": fetch_oanda, "binance": fetch_binance}.get(source)
             if provider is None:
                 return fetch_source(source, symbol, start, end, mode=mode)
-            return provider(symbol, start, end, mode=mode, client=clients[source])
+            return provider(symbol, start, end, mode=mode, client=clients.get(source))
 
         while True:
             started = time.monotonic()

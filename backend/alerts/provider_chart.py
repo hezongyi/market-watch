@@ -6,7 +6,6 @@ import threading
 import time
 from collections import OrderedDict
 from concurrent.futures import Future
-from contextvars import ContextVar
 from datetime import UTC, timedelta
 from decimal import Decimal
 from zoneinfo import ZoneInfo
@@ -19,7 +18,17 @@ from .config import settings
 from .domain import Calendar, session_bounds
 from .provider_capabilities import SOURCES, versions
 from .provider_capabilities import frames as source_frames
-from .provider_transport import activity, discard_client, pooled_client, warm_connections
+from .provider_deadline import request_deadline
+from .provider_transport import (
+    TIMINGS,
+    activity,
+    binance_get,
+    discard_client,
+    pooled_client,
+    record_timing,
+    retryable_network_error,
+    warm_connections,
+)
 from .provider_transport import close_clients as close_clients
 from .storage import Instrument, MarketCatalog, MarketDataset, instant, ms, now_ms, transaction
 from .volume import encoded
@@ -38,13 +47,6 @@ _LOCK = threading.Lock()
 _CACHE = OrderedDict()
 _INFLIGHT = {}
 _QUOTE_LAST = OrderedDict()
-TIMINGS = ContextVar("provider_acquisition_timings", default=None)
-
-
-def record_timing(name, started):
-    timings = TIMINGS.get()
-    if timings is not None:
-        timings[name] = timings.get(name, 0) + (time.monotonic() - started) * 1000
 # Independent slots: an older chart page cannot occupy the latest-candle slot.
 # Worker-wide realtime reservations are enforced by the maintenance scheduler.
 _HISTORY_SLOTS = {source: threading.BoundedSemaphore(1) for source in SOURCES}
@@ -153,14 +155,22 @@ def label(start, frame, calendar):
 
 
 def _request(client, url, *, params, headers=None, deadline):
-    for attempt in range(3):
+    source = "oanda" if "oanda.com" in url else "binance"
+    if source == "binance":
+        response = binance_get(client, url, params=params, headers=headers, deadline=deadline)
+        decode_started = time.monotonic()
+        with request_deadline(deadline):
+            payload = response.json()
+        record_timing("upstream_decode", decode_started)
+        return payload
+    max_attempts = 3 if source == "oanda" else 2
+    for attempt in range(max_attempts):
         remaining = deadline - time.monotonic()
         if remaining <= 0:
             raise TimeoutError("平台请求超过时间预算")
         try:
             from .market_resources import request_slot
 
-            source = "oanda" if "oanda.com" in url else "binance"
             slot_started = time.monotonic()
             with request_slot(source, deadline=deadline):
                 record_timing("upstream_slot", slot_started)
@@ -176,7 +186,7 @@ def _request(client, url, *, params, headers=None, deadline):
                     elif event in ("complete", "failed") and stage in phases:
                         record_timing("network_" + stage.replace(".", "_"), phases.pop(stage))
                 try:
-                    with activity(client) as client:
+                    with activity(client) as client, request_deadline(deadline):
                         timings = TIMINGS.get()
                         if timings is not None:
                             attempts = timings.setdefault("candles_attempts", [])
@@ -194,17 +204,21 @@ def _request(client, url, *, params, headers=None, deadline):
                     raise
                 finally:
                     record_timing("upstream_http", http_started)
-            if response.status_code not in (429, 502, 503, 504) or attempt == 2:
+            if (response.status_code not in (429, 502, 503, 504) or attempt == max_attempts-1
+                    or source == "binance" and response.status_code == 429):
                 response.raise_for_status()
                 decode_started = time.monotonic()
                 payload = response.json()
                 record_timing("upstream_decode", decode_started)
                 return payload
-        except (httpx.ConnectError, httpx.TimeoutException) as error:
+        except httpx.TransportError as error:
             record_timing("failure_" + type(error).__name__, http_started)
-            if isinstance(error, (httpx.ConnectError, httpx.ConnectTimeout, httpx.PoolTimeout)):
+            if not retryable_network_error(error) or (
+                    source == "oanda" and not isinstance(error, (httpx.ConnectError, httpx.TimeoutException))):
+                raise
+            if source == "binance" or isinstance(error, (httpx.ConnectError, httpx.ConnectTimeout, httpx.PoolTimeout)):
                 discard_client(client)
-            if attempt == 2:
+            if attempt == max_attempts-1:
                 raise
         # A bounded retry leaves failure distinguishable from a history boundary.
         remaining = deadline - time.monotonic()

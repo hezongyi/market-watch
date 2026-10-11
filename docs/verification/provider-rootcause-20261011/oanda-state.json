@@ -1,0 +1,129 @@
+{
+  "at": 1791690746985,
+  "database_read_only": true,
+  "routing": {
+    "target_in_desired": true,
+    "desired_symbols": [
+      "EUR_USD",
+      "XAU_USD"
+    ],
+    "session_states": {
+      "XAU_USD": {
+        "market_session": "unknown",
+        "next_session_at": null,
+        "calendar_verified": false
+      },
+      "EUR_USD": {
+        "market_session": "unknown",
+        "next_session_at": null,
+        "calendar_verified": false
+      }
+    }
+  },
+  "provider_status": {
+    "source": "oanda",
+    "environment": "practice",
+    "authentication_hold": false,
+    "error": "unavailable",
+    "next_probe_at": 1791686321543,
+    "configured": true,
+    "collection_recorded": true,
+    "connection_started_at": 1791686618079,
+    "authentication_probe_at": null,
+    "error_observed_at": null
+  },
+  "live_states": [
+    {
+      "dataset_id": "7fd3d31e7c7c0e43be3df53eb494e5e2c8fc4d0e408f6b213049e6c09e0cf764",
+      "epoch": 403,
+      "connection": "recovering",
+      "heartbeat_at": 1791690743534,
+      "confirmed_end": 1791579600000,
+      "ready": false,
+      "error": "m1_late",
+      "received_at": 1791589965214,
+      "quote_tradeable": "false",
+      "quote_source_time": "1791579545269"
+    }
+  ],
+  "target_bars": [
+    {
+      "timeframe": "M1",
+      "latest_end": 1791579600000
+    }
+  ],
+  "recent_health": [
+    {
+      "at": 1791686618375,
+      "kind": "pricing_connection",
+      "state": "recovering",
+      "error": null
+    },
+    {
+      "at": 1791686253332,
+      "kind": "pricing_health",
+      "state": "unavailable",
+      "error": "unavailable"
+    },
+    {
+      "at": 1791684263711,
+      "kind": "pricing_connection",
+      "state": "recovering",
+      "error": null
+    },
+    {
+      "at": 1791684206810,
+      "kind": "pricing_health",
+      "state": "unavailable",
+      "error": "timeout"
+    },
+    {
+      "at": 1791684191042,
+      "kind": "pricing_connection",
+      "state": "recovering",
+      "error": null
+    },
+    {
+      "at": 1791684122891,
+      "kind": "pricing_health",
+      "state": "unavailable",
+      "error": "timeout"
+    },
+    {
+      "at": 1791684107118,
+      "kind": "pricing_connection",
+      "state": "recovering",
+      "error": null
+    },
+    {
+      "at": 1791684055856,
+      "kind": "pricing_health",
+      "state": "unavailable",
+      "error": "timeout"
+    },
+    {
+      "at": 1791684040023,
+      "kind": "pricing_connection",
+      "state": "recovering",
+      "error": null
+    },
+    {
+      "at": 1791683977647,
+      "kind": "pricing_health",
+      "state": "unavailable",
+      "error": "timeout"
+    },
+    {
+      "at": 1791683961387,
+      "kind": "pricing_connection",
+      "state": "recovering",
+      "error": null
+    },
+    {
+      "at": 1791683588255,
+      "kind": "pricing_health",
+      "state": "unavailable",
+      "error": "timeout"
+    }
+  ]
+}
