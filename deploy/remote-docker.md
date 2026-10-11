@@ -1,5 +1,11 @@
 # Unraid 生产部署与升级
 
+## 当前正式生产：v1.20.0（2026-10-11）
+
+PR #38 已合并，附注标签 v1.20.0 指向 `73356b7`。当前生产为 unraid `192.168.7.33` 的独立 project `market-watch`，根目录 `/mnt/user/appdata/market-watch`，active-release `releases/v1.20.0-73356b7`。四类镜像在 Ubuntu 按 purpose=release 独立构建，生产固定实际 Image ID，Yahoo 默认启用；schema 保持 `ar45_market_stream`，12 个常驻服务运行、API healthy、备份实际恢复通过。
+
+网站 `https://trade.kookvv.com:8443/`，图表来源 `https://charts.kookvv.com:8443/`。在生产根目录执行 `./tools/docker-compose -p market-watch -f compose.release.yaml up -d --no-build` 启动，`stop` 停止。完整来源、验证、回滚与登录态验收边界见 [v1.20.0 交付](../docs/native-alert-v1.20.0-production-delivery.md) 及 [生产清单](releases/v1.20.0-production.json)。下面旧版本的路径、状态及命令保留为历史记录。
+
 ## 后续正式发布：Yahoo 默认开启
 
 用户要求后续每次生产部署保持 Yahoo 启用。新发布使用根目录 `compose.production.yaml` 作为 standalone 模板，固定四类发布镜像，保留私有代理和数据库配置，生成生产 `compose.release.yaml`。全部 11 个后端服务展开后必须为 `ALERTS_YAHOO_ENABLED=true`，部署后再次核对实际 Settings 与 Yahoo 读取；无需附加 Yahoo overlay。详见 [Yahoo 部署规则](../docs/yahoo-enable-delivery-20261010.md)。历史 release 文件是当时证据，不能直接拿其 Yahoo 关闭状态作为新版本默认值。

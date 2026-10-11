@@ -1,0 +1,11 @@
+{
+  "writers_stopped": "2026-10-11T01:53:42Z",
+  "switched": "2026-10-11T01:59:14Z",
+  "writer_pause_seconds": 332.0,
+  "first_attempt": "Read-only snapshot file was unreadable in private bind mount; automatic recovery restored v1.18.0. Snapshot preflight passed after switching to stdin.",
+  "final_attempt": "Actual Ubuntu restore verified before switch; migration and all table counts verified; API healthy.",
+  "schema": "ar45_market_stream",
+  "no_schema_change": true,
+  "actual_application_rollback_to_v118_after_initial_preflight_failure": true,
+  "database_rollback_or_restore_in_production": false
+}
