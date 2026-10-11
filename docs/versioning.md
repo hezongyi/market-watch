@@ -2,7 +2,7 @@
 
 ## v1.20.0 原生图表告警 UI
 
-发布已执行：PR #38 合并提交 `73356b7`，不可移动附注标签已推送。Ubuntu 四类正式构建已部署 unraid，数据库备份实际恢复和用户设置指纹核验通过；登录态生产 UI 验收仍等待现有密码。生产来源、固定镜像 ID、回滚和验证边界见 [生产交付](native-alert-v1.20.0-production-delivery.md)。
+发布已执行：PR #38 合并提交 `73356b7`，不可移动附注标签已推送。Ubuntu 四类正式构建已部署 unraid，数据库备份实际恢复和用户设置指纹核验通过；用户提供密码后的登录态检查发现既有布局首次事件解绑异常，原生告警未初始化；v1.20.1 补丁正在处理。生产来源、固定镜像 ID、回滚和验证边界见 [生产交付](native-alert-v1.20.0-production-delivery.md)。
 
 PR #38 新增兼容的原生告警侧栏与窗口，采用次版本 1.20.0，包含已合入 main 的 v1.19.0 商品状态、报价与日历功能。同步 Python/web/锁文件根版本和 CHANGELOG；受测应用源码为 `c77f67c`，后续 `2d79f38` 仅归档证据，发布整理仅改版本及本记录。两个 P2 与一个 P3 已修复，两轴独立复核无剩余阻断；最终 Ubuntu Docker API/web/chart/workers 均验证 clean `c77f67c` 应用源码，见 [复核记录](verification/native-alert-ui/review-fixes/README.md)。用户已授权合并、推 tag 和 unraid 正式生产部署；以最终 main 合并提交创建不可移动附注标签 v1.20.0，另行构建 purpose=release 镜像并记录固定 ID。无新增依赖或 schema 变更，生产 Yahoo 默认启用；备份实际恢复与生产验证以本次生产清单为准。
 
