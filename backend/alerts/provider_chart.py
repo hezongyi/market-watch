@@ -208,11 +208,12 @@ def _request(client, url, *, params, headers=None, deadline):
                 payload = response.json()
                 record_timing("upstream_decode", decode_started)
                 return payload
-        except (httpx.ConnectError, httpx.TimeoutException) as error:
+        except httpx.TransportError as error:
             record_timing("failure_" + type(error).__name__, http_started)
-            if not retryable_network_error(error):
+            if not retryable_network_error(error) or (
+                    source == "oanda" and not isinstance(error, (httpx.ConnectError, httpx.TimeoutException))):
                 raise
-            if isinstance(error, (httpx.ConnectError, httpx.ConnectTimeout, httpx.PoolTimeout)):
+            if source == "binance" or isinstance(error, (httpx.ConnectError, httpx.ConnectTimeout, httpx.PoolTimeout)):
                 discard_client(client)
             if attempt == max_attempts-1:
                 raise

@@ -131,3 +131,23 @@ def test_binance_native_chart_does_not_retry_protected_failures(failure):
         with pytest.raises(httpx.HTTPError):
             _request(client, 'https://data-api.binance.vision/api/v3/klines', params={}, deadline=time.monotonic()+3)
     assert len(requests) == 1
+
+
+@pytest.mark.parametrize('error_type', [httpx.ReadError, httpx.RemoteProtocolError, httpx.ReadTimeout])
+def test_binance_native_chart_rotates_pool_for_retryable_read_failure(monkeypatch, error_type):
+    import time
+
+    from alerts.provider_chart import _request
+
+    requests, discarded = [], []
+    def receive(request):
+        requests.append(request)
+        if len(requests) == 1:
+            raise error_type('controlled', request=request)
+        return httpx.Response(200, json=[])
+    monkeypatch.setattr('alerts.provider_chart.discard_client', discarded.append)
+    with httpx.Client(transport=httpx.MockTransport(receive)) as client:
+        assert _request(client, 'https://data-api.binance.vision/api/v3/klines', params={},
+                        deadline=time.monotonic()+3) == []
+        assert discarded == [client]
+    assert len(requests) == 2
