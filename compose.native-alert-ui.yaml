@@ -1,0 +1,124 @@
+# Ubuntu local Docker only; credentials and TLS material live outside Git.
+name: mw-native-alert-ui-runtime
+services:
+  pg:
+    image: postgres:14-bookworm
+    environment:
+      POSTGRES_DB: native_alert_ui
+      POSTGRES_USER: native_alert_ui
+      POSTGRES_PASSWORD: ${MW_NATIVE_ALERT_UI_DB_PASSWORD:?Run prepare_native_alert_ui_acceptance.py}
+    volumes: ["native-alert-ui-runtime-pg:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U native_alert_ui"]
+      interval: 2s
+      retries: 30
+  migrate:
+    build: .
+    image: market-watch-api:native-alert-ui-runtime
+    command: ["alembic", "upgrade", "head"]
+    env_file:
+      - path: /tmp/mw-native-alert-ui-runtime/api.env
+        format: raw
+    depends_on:
+      pg: {condition: service_healthy}
+  api:
+    image: market-watch-api:native-alert-ui-runtime
+    env_file:
+      - path: /tmp/mw-native-alert-ui-runtime/api.env
+        format: raw
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/readyz')"]
+      interval: 3s
+      retries: 30
+  market-worker:
+    image: market-watch-api:native-alert-ui-runtime
+    command: ["python", "-m", "alerts.market", "--instrument", "BTCUSDT"]
+    env_file:
+      - path: /tmp/mw-native-alert-ui-runtime/api.env
+        format: raw
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  market-stream-worker:
+    image: market-watch-api:native-alert-ui-runtime
+    command: ["python", "-m", "alerts.market_stream_worker"]
+    env_file:
+      - path: /tmp/mw-native-alert-ui-runtime/api.env
+        format: raw
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  history-worker:
+    image: market-watch-api:native-alert-ui-runtime
+    command: ["python", "-m", "alerts.native_history_loads"]
+    env_file:
+      - path: /tmp/mw-native-alert-ui-runtime/api.env
+        format: raw
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  managed-history-worker:
+    image: market-watch-api:native-alert-ui-runtime
+    command: ["python", "-m", "alerts.chart_history_worker"]
+    env_file:
+      - path: /tmp/mw-native-alert-ui-runtime/api.env
+        format: raw
+    depends_on:
+      api: {condition: service_healthy}
+  aggregation-worker:
+    image: market-watch-api:native-alert-ui-runtime
+    command: ["python", "-m", "alerts.chart_aggregation_worker"]
+    env_file:
+      - path: /tmp/mw-native-alert-ui-runtime/api.env
+        format: raw
+    depends_on:
+      api: {condition: service_healthy}
+  web:
+    build:
+      context: ./web
+      args:
+        VITE_ADVANCED_CHART_ORIGIN: https://127.0.0.1:19644
+    image: market-watch-web:native-alert-ui-runtime
+    depends_on: [api]
+  chart-origin:
+    build:
+      context: .
+      dockerfile: advanced-host/Dockerfile
+    image: market-watch-chart-origin:native-alert-ui-runtime
+  tls:
+    image: nginx:1.28-alpine
+    ports: ["127.0.0.1:19643:443", "127.0.0.1:19644:444"]
+    volumes:
+      - /tmp/mw-native-alert-ui-runtime/tls.conf:/etc/nginx/conf.d/default.conf:ro
+      - /tmp/mw-native-alert-ui-runtime/cert.pem:/certs/cert.pem:ro
+      - /tmp/mw-native-alert-ui-runtime/key.pem:/certs/key.pem:ro
+    depends_on: [web, chart-origin]
+  notification-sink:
+    profiles: [notification-test]
+    image: market-watch-api:native-alert-ui-runtime
+    command: ["python", "/fixture/notification_sink.py"]
+    volumes:
+      - ./docs/verification/chart-alerts/notification_sink.py:/fixture/notification_sink.py:ro
+    networks: [notification-fixture]
+    environment:
+      SINK_INITIAL_FAILURES: "1"
+  notification-worker:
+    profiles: [notification-test]
+    image: market-watch-api:native-alert-ui-runtime
+    command: ["python", "-m", "alerts.notify"]
+    env_file:
+      - path: /tmp/mw-native-alert-ui-runtime/api.env
+        format: raw
+    environment:
+      ALERTS_DELIVERY_ENABLED: "true"
+      ALERTS_NTFY_URL: http://notification-sink:8080
+      ALERTS_NTFY_TOPIC: native-alert-ui-runtime-fixture
+      ALERTS_NTFY_TOKEN: ""
+    networks: [default, notification-fixture]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      notification-sink: {condition: service_started}
+volumes:
+  native-alert-ui-runtime-pg:
+networks:
+  notification-fixture:
+    internal: true

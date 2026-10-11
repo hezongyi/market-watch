@@ -14,7 +14,8 @@ const pending = new Map();
 // Use public native dialogs. The widget has no public non-modal toast API.
 // Keep acknowledged conditions deduplicated until the parent clears them.
 const acknowledgedNotices = new Set();
-let activeNotices = [], noticeDialogOpen = false, chartMenu, indicatorPicker, alertBridge, dataCenter;
+let activeNotices = [], noticeDialogOpen = false, chartMenu, indicatorPicker, alertBridge, alertUI, alertUISession, alertUIDraft, alertUIWorkspace, alertUIAttach, dataCenter;
+let invalidateAlertUI = () => {};
 function showNextNotice() {
   if (!ready || noticeDialogOpen) return;
   const notice = activeNotices.find(entry => !acknowledgedNotices.has(entry.key));
@@ -1711,6 +1712,32 @@ function boot(
   nativeMode = true;
   nativeReadonly = readonly;
   let currentNativeWorkspace = workspace;
+  let attachingAlerts = 0, alertAttachQueue = Promise.resolve(), alertUIStopped = false;
+  invalidateAlertUI = () => {
+    attachingAlerts++;
+    alertUI?.destroy(); alertUI = undefined;
+  };
+  // Serialize private widgetbar mutations. A cancelled attach must finish and
+  // restore its shell before a newer session can install another one.
+  alertUIAttach = () => {
+    if (alertUIStopped || loading || !ready || String(currentNativeWorkspace?.id) !== alertUIWorkspace) return Promise.resolve();
+    const attempt = ++attachingAlerts, session = alertUISession, workspaceId = alertUIWorkspace;
+    alertAttachQueue = alertAttachQueue.then(async () => {
+    if (attempt !== attachingAlerts || alertUIStopped) return;
+    alertUI?.destroy(); alertUI = undefined;
+    try {
+      const instance = await MWNativeAlerts.attach({widget, scope: {workspace_id: workspaceId, session}, readonly,
+        initialDraft: alertUIDraft,
+        persistDraft: draft => send({type:'chart-alert-ui-draft', workspace_id: workspaceId, session, draft}),
+        bridge: alertBridge, request: query => request(query, 'chart-alert-ui-rpc', () => attempt === attachingAlerts && session === alertUISession),
+        report: error => send({type:'error', error:String(error)})});
+      if (attempt !== attachingAlerts || session !== alertUISession || alertUIStopped) {instance.destroy();return;}
+      alertUI = instance; instance.theme(widget.getTheme());
+    } catch (error) {if (attempt === attachingAlerts && !alertUIStopped) send({type:'error', error:'原生告警接入失败：' + String(error)});}
+    });
+    return alertAttachQueue;
+  };
+  addEventListener('pagehide', () => {alertUIStopped = true; invalidateAlertUI();}, {once:true});
   alertBridge?.destroy();
   alertBridge = chartAlertBridge({getWidget:()=>widget,getWorkspace:()=>currentNativeWorkspace,
     getEpoch:()=>workspaceEpoch,isLoading:()=>loading||!ready,readonly,
@@ -1718,7 +1745,10 @@ function boot(
     calculationOrigin:(ticker,res)=>alertCalculationOrigins.get(ticker+'|'+res) ??
       (MWSeries.decode(ticker).series_kind === "managed" ? managedSessions.get(MWSeries.decode(ticker).symbol+'|'+res)?.start : null),
     compositeRevision:(ticker,res)=>alertCompositeRevisions.get(MWSeries.encode(MWSeries.decode(ticker).symbol,'composite')+'|'+res) ?? null,
-    rpc:query=>request(query,"chart-alert-rpc"),send,
+    rpc:query=>request(query,"chart-alert-rpc"),send: message => {
+      if (message.type === 'chart-alert-association') alertUI?.association(message.alert_id, message.text);
+      else send(message);
+    },
     fail:error=>send({type:"error",error:String(error)})});
   alertBridge.reset(chartState || {});
   const layouts = nativeWorkspaces(
@@ -1732,6 +1762,7 @@ function boot(
     (row) => {
       currentNativeWorkspace = row;
       savedDoc = { ...row.document, nativeName: row.name };
+      if (!alertUI) void alertUIAttach();
     },
   );
   // Preserve native/user bar spacing across interval changes. History load
@@ -2032,7 +2063,7 @@ function boot(
           send({ type: "error", error: String(e) }),
           grid, [
             {label: "守望主页", run: () => send({type: "workspace-action", action: "home"})},
-            {label: "告警与日志", run: () => send({type:"chart-alert-open"})},
+            {label: "告警与日志", run: () => alertUI?.open()},
             {label: "历史数据容量", run: () => send({type:"history-capacity-open",usage:MWNativeNavigation.diagnostics().resident})},
             ...(!readonly ? [{label: "保存样式", title: "保存图表样式模板", run: async () => {
               try {
@@ -2079,7 +2110,9 @@ function boot(
     ready = true;
     loading = false;
     send({ type: "theme-changed", theme: widget.getTheme() });
+    alertUI?.theme(widget.getTheme());
     widget.subscribe("chart_theme_changed", (name, standard, onlyActive) => {
+      alertUI?.theme(widget.getTheme());
       send({ type: "theme-changed", theme: widget.getTheme() });
       if (!standard && !readonly) {
         prefs.templates.getChartTemplateContent(name)
@@ -2149,6 +2182,7 @@ function boot(
       );
     };
     widget.subscribe("chart_load_requested", () => {
+      invalidateAlertUI();
       barRangeMapping.suspend();
       send({type: "viewport-notice", key: "*", text: ""});
       edgeGuard?.dispose();
@@ -2208,6 +2242,7 @@ function boot(
       bindActiveChartEvent();
       compactQuote?.refresh();
       alertBridge.refresh();
+      if (!alertUI) await alertUIAttach();
     });
     rangeGuard = rangeSyncLoadingGuard(widget);
     bindEdgeSync();
@@ -2235,6 +2270,7 @@ function boot(
     const undoChanged = command => {if(command?.affectsState()) markWorkspaceDirty();};
     undoStack.onChange().subscribe(null,undoChanged);
     addEventListener('pagehide',()=>undoStack.onChange().unsubscribe(null,undoChanged),{once:true});
+    await alertUIAttach();
     send({ type: "ready" });
     clearInterval(progressivePoll);
     demandReporter?.dispose();
@@ -2262,6 +2298,17 @@ addEventListener("message", async (e) => {
     return;
   const m = e.data;
   if (m.type === "data-center-open" && ready && !loading && typeof m.location === "string" && m.location.length <= 4000) { dataCenter?.open(m.location); return; }
+  if (m.type === 'chart-alert-ui-scope') {
+    if (typeof m.session !== 'string' || typeof m.workspace_id !== 'string') return;
+    alertUISession = m.session; alertUIDraft = m.draft; alertUIWorkspace = m.workspace_id;
+    invalidateAlertUI();
+    // The workspace result may still be in flight. Attach is gated by its ID;
+    // Save As retries from onSaved, layout loads retry from chart_loaded.
+    void alertUIAttach?.();
+    return;
+  }
+  if (m.type === 'chart-alert-ui-context') {alertUI?.context(m.context); return;}
+  if (m.type === 'chart-alert-ui-open') {alertUI?.open(); return;}
   if (m.type === "chart-alert-create" && ready && !loading) {void alertBridge?.create(); return;}
   if (m.type === "chart-alert-drawing-action" && typeof m.alert_id === "string" && ["retry","restore"].includes(m.action) && ready && !loading) {void alertBridge?.drawingAction(m.alert_id,m.action); return;}
   if (m.type === "chart-alert-rows" && Array.isArray(m.rows)) {alertBridge?.setRows(m.rows); return;}
@@ -2395,6 +2442,9 @@ addEventListener("message", async (e) => {
   } else if (m.type === "cancel-history") {
     MWNativeNavigation.cancelAll();
   } else if (m.type === "init" && !widget) {
+    alertUISession = m.alert_ui_session;
+    alertUIDraft = m.alert_ui_draft;
+    alertUIWorkspace = String(m.workspace?.id);
     MWNativeNavigation.setCapabilities(m.history_capabilities);
     globalThis.MW_HISTORY_CAPABILITIES=m.history_capabilities;
     boot(m.document, m.readonly, m.catalog, m.preferences, m.workspace, m.initial_symbol);
@@ -2410,6 +2460,8 @@ addEventListener("message", async (e) => {
 send({ type: "loaded" });
 
 addEventListener("pagehide", () => {
+  alertUI?.destroy();
+  alertBridge?.destroy();
   compactQuote?.dispose();
   widget?.unsubscribe?.("activeChartChanged", refreshQuotePresentation);
   for (const [api, changed] of timezoneBindings) api.onTimezoneChanged().unsubscribe(null, changed);

@@ -1,0 +1,217 @@
+{
+  "recorded_at": "2026-10-11T01:29:41.718618+00:00",
+  "host": "Ubuntu quant-server",
+  "os": "Ubuntu 22.04.5 LTS",
+  "project": "mw-native-alert-ui-runtime",
+  "task": "mw-native-alert-ui-runtime",
+  "application_source_commit": "c77f67cde53fd1b95d4147b50ee4e6ecb3074a69",
+  "addresses": {
+    "app": "https://localhost:19643/",
+    "chart": "https://127.0.0.1:19644/"
+  },
+  "containers": [
+    {
+      "name": "mw-native-alert-ui-runtime-notification-worker-1",
+      "service": "notification-worker",
+      "image_id": "sha256:23b3a6e14151dca4bd0ad119a4265ea0528a2616086dd3c5a5664d4e6cbe28fe",
+      "state": "running",
+      "build_labels": {
+        "io.market-watch.built-at": "2026-10-11T01:27:14.854833+00:00",
+        "io.market-watch.commit": "c77f67cde53fd1b95d4147b50ee4e6ecb3074a69",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "2026-10-18T01:27:14.854833+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-native-alert-ui-runtime",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-native-alert-ui-runtime"
+      }
+    },
+    {
+      "name": "mw-native-alert-ui-runtime-web-1",
+      "service": "web",
+      "image_id": "sha256:9a7eeaaea6d9b15a5ffa9d4a638c9fe0a309d2f1243fb4d87c5086648c634769",
+      "state": "running",
+      "build_labels": {
+        "io.market-watch.built-at": "2026-10-11T01:24:29.750638+00:00",
+        "io.market-watch.commit": "c77f67cde53fd1b95d4147b50ee4e6ecb3074a69",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "2026-10-18T01:24:29.750638+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-native-alert-ui-runtime",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-native-alert-ui-runtime"
+      }
+    },
+    {
+      "name": "mw-native-alert-ui-runtime-managed-history-worker-1",
+      "service": "managed-history-worker",
+      "image_id": "sha256:23b3a6e14151dca4bd0ad119a4265ea0528a2616086dd3c5a5664d4e6cbe28fe",
+      "state": "running",
+      "build_labels": {
+        "io.market-watch.built-at": "2026-10-11T01:27:14.854833+00:00",
+        "io.market-watch.commit": "c77f67cde53fd1b95d4147b50ee4e6ecb3074a69",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "2026-10-18T01:27:14.854833+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-native-alert-ui-runtime",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-native-alert-ui-runtime"
+      }
+    },
+    {
+      "name": "mw-native-alert-ui-runtime-aggregation-worker-1",
+      "service": "aggregation-worker",
+      "image_id": "sha256:23b3a6e14151dca4bd0ad119a4265ea0528a2616086dd3c5a5664d4e6cbe28fe",
+      "state": "running",
+      "build_labels": {
+        "io.market-watch.built-at": "2026-10-11T01:27:14.854833+00:00",
+        "io.market-watch.commit": "c77f67cde53fd1b95d4147b50ee4e6ecb3074a69",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "2026-10-18T01:27:14.854833+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-native-alert-ui-runtime",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-native-alert-ui-runtime"
+      }
+    },
+    {
+      "name": "mw-native-alert-ui-runtime-market-worker-1",
+      "service": "market-worker",
+      "image_id": "sha256:23b3a6e14151dca4bd0ad119a4265ea0528a2616086dd3c5a5664d4e6cbe28fe",
+      "state": "running",
+      "build_labels": {
+        "io.market-watch.built-at": "2026-10-11T01:27:14.854833+00:00",
+        "io.market-watch.commit": "c77f67cde53fd1b95d4147b50ee4e6ecb3074a69",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "2026-10-18T01:27:14.854833+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-native-alert-ui-runtime",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-native-alert-ui-runtime"
+      }
+    },
+    {
+      "name": "mw-native-alert-ui-runtime-history-worker-1",
+      "service": "history-worker",
+      "image_id": "sha256:23b3a6e14151dca4bd0ad119a4265ea0528a2616086dd3c5a5664d4e6cbe28fe",
+      "state": "running",
+      "build_labels": {
+        "io.market-watch.built-at": "2026-10-11T01:27:14.854833+00:00",
+        "io.market-watch.commit": "c77f67cde53fd1b95d4147b50ee4e6ecb3074a69",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "2026-10-18T01:27:14.854833+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-native-alert-ui-runtime",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-native-alert-ui-runtime"
+      }
+    },
+    {
+      "name": "mw-native-alert-ui-runtime-api-1",
+      "service": "api",
+      "image_id": "sha256:23b3a6e14151dca4bd0ad119a4265ea0528a2616086dd3c5a5664d4e6cbe28fe",
+      "state": "running",
+      "health": "healthy",
+      "build_labels": {
+        "io.market-watch.built-at": "2026-10-11T01:27:14.854833+00:00",
+        "io.market-watch.commit": "c77f67cde53fd1b95d4147b50ee4e6ecb3074a69",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "2026-10-18T01:27:14.854833+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-native-alert-ui-runtime",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-native-alert-ui-runtime"
+      }
+    },
+    {
+      "name": "mw-native-alert-ui-runtime-market-stream-worker-1",
+      "service": "market-stream-worker",
+      "image_id": "sha256:23b3a6e14151dca4bd0ad119a4265ea0528a2616086dd3c5a5664d4e6cbe28fe",
+      "state": "running",
+      "build_labels": {
+        "io.market-watch.built-at": "2026-10-11T01:27:14.854833+00:00",
+        "io.market-watch.commit": "c77f67cde53fd1b95d4147b50ee4e6ecb3074a69",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "2026-10-18T01:27:14.854833+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-native-alert-ui-runtime",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-native-alert-ui-runtime"
+      }
+    },
+    {
+      "name": "mw-native-alert-ui-runtime-notification-sink-1",
+      "service": "notification-sink",
+      "image_id": "sha256:23b3a6e14151dca4bd0ad119a4265ea0528a2616086dd3c5a5664d4e6cbe28fe",
+      "state": "running",
+      "build_labels": {
+        "io.market-watch.built-at": "2026-10-11T01:27:14.854833+00:00",
+        "io.market-watch.commit": "c77f67cde53fd1b95d4147b50ee4e6ecb3074a69",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "2026-10-18T01:27:14.854833+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-native-alert-ui-runtime",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-native-alert-ui-runtime"
+      }
+    },
+    {
+      "name": "mw-native-alert-ui-runtime-migrate-1",
+      "service": "migrate",
+      "image_id": "sha256:23b3a6e14151dca4bd0ad119a4265ea0528a2616086dd3c5a5664d4e6cbe28fe",
+      "state": "exited",
+      "exit_code": 0,
+      "build_labels": {
+        "io.market-watch.built-at": "2026-10-11T01:27:14.854833+00:00",
+        "io.market-watch.commit": "c77f67cde53fd1b95d4147b50ee4e6ecb3074a69",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "2026-10-18T01:27:14.854833+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-native-alert-ui-runtime",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-native-alert-ui-runtime"
+      }
+    },
+    {
+      "name": "mw-native-alert-ui-runtime-chart-origin-1",
+      "service": "chart-origin",
+      "image_id": "sha256:0a3655a01b32d3713f0a55af418af6f31f20583623f2af38bc930db2946d1801",
+      "state": "running",
+      "build_labels": {
+        "io.market-watch.built-at": "2026-10-11T01:23:49.499638+00:00",
+        "io.market-watch.commit": "c77f67cde53fd1b95d4147b50ee4e6ecb3074a69",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "2026-10-18T01:23:49.499638+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-native-alert-ui-runtime",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-native-alert-ui-runtime"
+      }
+    },
+    {
+      "name": "mw-native-alert-ui-runtime-tls-1",
+      "service": "tls",
+      "image_id": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "state": "running",
+      "build_labels": {}
+    },
+    {
+      "name": "mw-native-alert-ui-runtime-pg-1",
+      "service": "pg",
+      "image_id": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "state": "running",
+      "health": "healthy",
+      "build_labels": {}
+    }
+  ],
+  "api_version": "1.19.0",
+  "readyz": {
+    "status": "ready",
+    "time": 1791682183911
+  },
+  "migration_head": "ar45_market_stream",
+  "http_status": {
+    "https://localhost:19643/": "200",
+    "https://127.0.0.1:19644/": "200"
+  }
+}

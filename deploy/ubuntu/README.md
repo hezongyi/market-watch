@@ -25,6 +25,8 @@ mw-docker build --repo . --component web --tag market-watch-web:issue-42 \
   --build-arg VITE_ADVANCED_CHART_ORIGIN=https://localhost:17444
 ```
 
+chart 默认使用仓库根目录 context 和 `advanced-host/Dockerfile`，以编译共享告警 UI；显式 `--context`/`--file` 仍可覆盖默认值。旧版独立图表工作树可指定 `--context advanced-host --file advanced-host/Dockerfile`。
+
 默认将本机已有基础镜像临时导出为OCI输入，按digest交给BuildKit；构建结束删除临时输入，不长期保留镜像tar。这样无需再次访问Docker Hub。基础镜像缺失时明确失败，先在Ubuntu导入/拉取；网络可用时可显式使用`--base-source registry`。ARG形式的FROM和inline Dockerfile需使用registry模式。
 
 `--purpose`可选development、acceptance、release、rollback。开发/验收默认保留7天（`--retain-days`），正式/回滚版本永不由自动清理删除。任务记录有明确结束状态，没结束的任务即使过期也不会清理。标签包含task、project、commit、工作树dirty状态、built-at、expires-at；标签不含凭据。现有镜像标签若属于其他任务、正式/回滚用途或未登记归属，拒绝覆盖，需选择新的任务标签。构建参数不可传密码或token。

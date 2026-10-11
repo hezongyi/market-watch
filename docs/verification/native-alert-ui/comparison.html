@@ -1,0 +1,70 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Market Watch 告警参考图对照</title>
+<style>body{margin:0;padding:24px;color:#dedede;background:#151515;font:15px/1.6 system-ui,sans-serif}main{max-width:1280px;margin:auto}h1{font-size:26px}h2{font-size:19px;margin:0}p{max-width:960px}small{color:#aaa}article{padding:22px;margin:24px 0;background:#202020;border:1px solid #424242;border-radius:8px;scroll-margin:24px}.pair{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:16px}figure{margin:0;min-width:0}figcaption{margin-bottom:8px;color:#aaa}img{max-width:100%;height:auto;display:block}a{color:#86b9ff}@media(max-width:760px){body{padding:12px}.pair{grid-template-columns:1fr}}</style>
+<main><h1>原生告警 UI · 17 张参考图对照</h1><p>Ubuntu 无头 Chromium，2744×890、DPR 1、真实 v31.1.0 许可库、模拟行情与父页面 API。本页截图证明界面与交互接入；真实 Docker 实例的另行验收结果见 README。两侧等尺寸裁剪保留原始像素，点击可查看 PNG。参考不是同一行情、数据或库功能集，没有计算像素相似百分比。</p><p>完整截图及复用/验证记录见 <a href="README.md">README.md</a>。已实现范围：右侧入口、列表、日志、创建/编辑、消息和通知。邮件、Webhook、多条件及预设未新增。</p><article id="scene-1"><h2>01 · 右键入口</h2>
+<p>保留原生菜单与点击价格；主站交易、订单等其他菜单不在范围内。</p><small>Snipaste_2026-10-05_06-43-41.png → context-native-menu.png · 裁剪 380×474，原始像素</small>
+<div class="pair"><figure><figcaption>参考</figcaption><a href="comparison/01-reference.png"><img loading="lazy" src="comparison/01-reference.png" alt="右键入口参考"></a></figure>
+<figure><figcaption>实施</figcaption><a href="comparison/01-actual.png"><img loading="lazy" src="comparison/01-actual.png" alt="右键入口实施"></a></figure></div></article>
+<article id="scene-2"><h2>02 · 创建</h2>
+<p>480px 原生窗口、两列条件与摘要。现有行情/判定选项保留在高级区；无多条件。</p><small>Snipaste_2026-10-05_06-44-12.png → create-initial.png · 裁剪 544×620，原始像素</small>
+<div class="pair"><figure><figcaption>参考</figcaption><a href="comparison/02-reference.png"><img loading="lazy" src="comparison/02-reference.png" alt="创建参考"></a></figure>
+<figure><figcaption>实施</figcaption><a href="comparison/02-actual.png"><img loading="lazy" src="comparison/02-actual.png" alt="创建实施"></a></figure></div></article>
+<article id="scene-3"><h2>03 · 条件关系</h2>
+<p>真实 Select/Listbox；关系仅展示现有上穿、下穿、区间等能力。</p><small>Snipaste_2026-10-05_06-44-26.png → condition-native-menu.png · 裁剪 544×620，原始像素</small>
+<div class="pair"><figure><figcaption>参考</figcaption><a href="comparison/03-reference.png"><img loading="lazy" src="comparison/03-reference.png" alt="条件关系参考"></a></figure>
+<figure><figcaption>实施</figcaption><a href="comparison/03-actual.png"><img loading="lazy" src="comparison/03-actual.png" alt="条件关系实施"></a></figure></div></article>
+<article id="scene-4"><h2>04 · 触发次数</h2>
+<p>真实 Select；仅一次或有限次数，未把截图的“每次”解释为无限触发。</p><small>Snipaste_2026-10-05_06-44-49.png → trigger-native-menu.png · 裁剪 544×620，原始像素</small>
+<div class="pair"><figure><figcaption>参考</figcaption><a href="comparison/04-reference.png"><img loading="lazy" src="comparison/04-reference.png" alt="触发次数参考"></a></figure>
+<figure><figcaption>实施</figcaption><a href="comparison/04-actual.png"><img loading="lazy" src="comparison/04-actual.png" alt="触发次数实施"></a></figure></div></article>
+<article id="scene-5"><h2>05 · 到期</h2>
+<p>真实 PopupMenu 提供现有日期快捷项；高级区使用浏览器 datetime-local 日期输入。</p><small>Snipaste_2026-10-05_06-45-03.png → expiry-native-menu.png · 裁剪 544×620，原始像素</small>
+<div class="pair"><figure><figcaption>参考</figcaption><a href="comparison/05-reference.png"><img loading="lazy" src="comparison/05-reference.png" alt="到期参考"></a></figure>
+<figure><figcaption>实施</figcaption><a href="comparison/05-actual.png"><img loading="lazy" src="comparison/05-actual.png" alt="到期实施"></a></figure></div></article>
+<article id="scene-6"><h2>06 · 通知</h2>
+<p>真实 Checkbox；只展示网页及既有 ntfy，保留迟到事件语义。</p><small>Snipaste_2026-10-05_06-45-20.png → notifications-dark.png · 裁剪 544×620，原始像素</small>
+<div class="pair"><figure><figcaption>参考</figcaption><a href="comparison/06-reference.png"><img loading="lazy" src="comparison/06-reference.png" alt="通知参考"></a></figure>
+<figure><figcaption>实施</figcaption><a href="comparison/06-actual.png"><img loading="lazy" src="comparison/06-actual.png" alt="通知实施"></a></figure></div></article>
+<article id="scene-7"><h2>07 · 消息</h2>
+<p>真实 InputControl/Textarea/Button；应用只更新草稿，取消还原子页。占位符为现有集合。</p><small>Snipaste_2026-10-05_06-45-37.png → message-dark.png · 裁剪 544×620，原始像素</small>
+<div class="pair"><figure><figcaption>参考</figcaption><a href="comparison/07-reference.png"><img loading="lazy" src="comparison/07-reference.png" alt="消息参考"></a></figure>
+<figure><figcaption>实施</figcaption><a href="comparison/07-actual.png"><img loading="lazy" src="comparison/07-actual.png" alt="消息实施"></a></figure></div></article>
+<article id="scene-8"><h2>08 · 列表</h2>
+<p>真实侧栏与拖宽；自有两行业务内容，显示实际健康状态和数量。</p><small>Snipaste_2026-10-05_06-45-55.png → sidebar-dark.png · 裁剪 410×700，原始像素</small>
+<div class="pair"><figure><figcaption>参考</figcaption><a href="comparison/08-reference.png"><img loading="lazy" src="comparison/08-reference.png" alt="列表参考"></a></figure>
+<figure><figcaption>实施</figcaption><a href="comparison/08-actual.png"><img loading="lazy" src="comparison/08-actual.png" alt="列表实施"></a></figure></div></article>
+<article id="scene-9"><h2>09 · 排序</h2>
+<p>真实 PopupMenu/MenuItem/Separator；排序字段对应已有列表数据。</p><small>Snipaste_2026-10-05_06-46-12.png → sort-native-menu.png · 裁剪 410×700，原始像素</small>
+<div class="pair"><figure><figcaption>参考</figcaption><a href="comparison/09-reference.png"><img loading="lazy" src="comparison/09-reference.png" alt="排序参考"></a></figure>
+<figure><figcaption>实施</figcaption><a href="comparison/09-actual.png"><img loading="lazy" src="comparison/09-actual.png" alt="排序实施"></a></figure></div></article>
+<article id="scene-10"><h2>10 · 列表更多</h2>
+<p>真实 PopupMenu；筛选与状态操作使用现有语义，无清空业务。</p><small>Snipaste_2026-10-05_06-46-22.png → more-native-menu.png · 裁剪 410×700，原始像素</small>
+<div class="pair"><figure><figcaption>参考</figcaption><a href="comparison/10-reference.png"><img loading="lazy" src="comparison/10-reference.png" alt="列表更多参考"></a></figure>
+<figure><figcaption>实施</figcaption><a href="comparison/10-actual.png"><img loading="lazy" src="comparison/10-actual.png" alt="列表更多实施"></a></figure></div></article>
+<article id="scene-11"><h2>11 · 日志</h2>
+<p>按日分组的自有业务内容；保留证据、迟到和投递状态。</p><small>Snipaste_2026-10-05_06-46-31.png → log-compact.png · 裁剪 410×700，原始像素</small>
+<div class="pair"><figure><figcaption>参考</figcaption><a href="comparison/11-reference.png"><img loading="lazy" src="comparison/11-reference.png" alt="日志参考"></a></figure>
+<figure><figcaption>实施</figcaption><a href="comparison/11-actual.png"><img loading="lazy" src="comparison/11-actual.png" alt="日志实施"></a></figure></div></article>
+<article id="scene-12"><h2>12 · 日志更多</h2>
+<p>真实 PopupMenu；独立日志排序/筛选，未新增日志删除接口。</p><small>Snipaste_2026-10-05_06-46-43.png → log-native-menu.png · 裁剪 410×700，原始像素</small>
+<div class="pair"><figure><figcaption>参考</figcaption><a href="comparison/12-reference.png"><img loading="lazy" src="comparison/12-reference.png" alt="日志更多参考"></a></figure>
+<figure><figcaption>实施</figcaption><a href="comparison/12-actual.png"><img loading="lazy" src="comparison/12-actual.png" alt="日志更多实施"></a></figure></div></article>
+<article id="scene-13"><h2>13 · 悬停与详情</h2>
+<p>原生容器内的自有操作和展开详情；没有复制官网 tooltip 的全部展示。</p><small>ScreenShot_2026-10-05_064716_832.png → sidebar-hover.png · 裁剪 659×359，原始像素</small>
+<div class="pair"><figure><figcaption>参考</figcaption><a href="comparison/13-reference.png"><img loading="lazy" src="comparison/13-reference.png" alt="悬停与详情参考"></a></figure>
+<figure><figcaption>实施</figcaption><a href="comparison/13-actual.png"><img loading="lazy" src="comparison/13-actual.png" alt="悬停与详情实施"></a></figure></div></article>
+<article id="scene-14"><h2>14 · 搜索</h2>
+<p>按需展开的 HTML 搜索输入，键盘可达；搜索尚未使用供应商 InputControl。</p><small>ScreenShot_2026-10-05_064741_323.png → search-dark.png · 裁剪 343×255，原始像素</small>
+<div class="pair"><figure><figcaption>参考</figcaption><a href="comparison/14-reference.png"><img loading="lazy" src="comparison/14-reference.png" alt="搜索参考"></a></figure>
+<figure><figcaption>实施</figcaption><a href="comparison/14-actual.png"><img loading="lazy" src="comparison/14-actual.png" alt="搜索实施"></a></figure></div></article>
+<article id="scene-15"><h2>15 · 日志选中</h2>
+<p>选中行展开现有证据，确认通知不改变告警生命周期；没有新增日志删除。</p><small>ScreenShot_2026-10-05_064754_265.png → log-dark.png · 裁剪 420×249，原始像素</small>
+<div class="pair"><figure><figcaption>参考</figcaption><a href="comparison/15-reference.png"><img loading="lazy" src="comparison/15-reference.png" alt="日志选中参考"></a></figure>
+<figure><figcaption>实施</figcaption><a href="comparison/15-actual.png"><img loading="lazy" src="comparison/15-actual.png" alt="日志选中实施"></a></figure></div></article>
+<article id="scene-16"><h2>16 · 编辑</h2>
+<p>原生窗口/输入/按钮；底部删除调用既有 archive，不物理删除规则。</p><small>ScreenShot_2026-10-05_064822_495.png → edit-dark.png · 裁剪 580×527，原始像素</small>
+<div class="pair"><figure><figcaption>参考</figcaption><a href="comparison/16-reference.png"><img loading="lazy" src="comparison/16-reference.png" alt="编辑参考"></a></figure>
+<figure><figcaption>实施</figcaption><a href="comparison/16-actual.png"><img loading="lazy" src="comparison/16-actual.png" alt="编辑实施"></a></figure></div></article>
+<article id="scene-17"><h2>17 · 编辑预设边界</h2>
+<p>只对照窗口与删除位置。预设保存、重置菜单属于范围外，未实现或伪装。</p><small>ScreenShot_2026-10-05_064832_420.png → edit-dark.png · 裁剪 598×550，原始像素</small>
+<div class="pair"><figure><figcaption>参考</figcaption><a href="comparison/17-reference.png"><img loading="lazy" src="comparison/17-reference.png" alt="编辑预设边界参考"></a></figure>
+<figure><figcaption>实施</figcaption><a href="comparison/17-actual.png"><img loading="lazy" src="comparison/17-actual.png" alt="编辑预设边界实施"></a></figure></div></article></main></html>

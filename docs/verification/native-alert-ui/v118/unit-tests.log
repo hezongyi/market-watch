@@ -1,0 +1,84 @@
+TAP version 13
+# Unified native callbacks: generation/order fences, authoritative extremes, quote delivery and no polling passed
+# Subtest: web/tests/advanced-market-stream.cjs
+ok 1 - web/tests/advanced-market-stream.cjs
+  ---
+  duration_ms: 130.945368
+  type: 'test'
+  ...
+# Subtest: UI bridge rejects URLs, methods, forged sessions and workspace association before API work
+ok 2 - UI bridge rejects URLs, methods, forged sessions and workspace association before API work
+  ---
+  duration_ms: 9.656945
+  type: 'test'
+  ...
+# Subtest: read, capability, create, edit, lifecycle and ack have bounded allowed routes
+ok 3 - read, capability, create, edit, lifecycle and ack have bounded allowed routes
+  ---
+  duration_ms: 0.899801
+  type: 'test'
+  ...
+# Subtest: workspace change suppresses delayed response and refuses subsequent calls
+ok 4 - workspace change suppresses delayed response and refuses subsequent calls
+  ---
+  duration_ms: 14.519131
+  type: 'test'
+  ...
+# Subtest: drag previews do not write; mouse up serializes successive versions
+ok 5 - drag previews do not write; mouse up serializes successive versions
+  ---
+  duration_ms: 65.670804
+  type: 'test'
+  ...
+# Subtest: timeout queries committed version; failures preserve position until explicit restore
+ok 6 - timeout queries committed version; failures preserve position until explicit restore
+  ---
+  duration_ms: 51.58072
+  type: 'test'
+  ...
+# Subtest: explicit removal pauses; symbol, interval and layout changes never pause
+ok 7 - explicit removal pauses; symbol, interval and layout changes never pause
+  ---
+  duration_ms: 64.367555
+  type: 'test'
+  ...
+# Subtest: source changes fence drawing edits and menu contexts are captured at open
+ok 8 - source changes fence drawing edits and menu contexts are captured at open
+  ---
+  duration_ms: 31.436578
+  type: 'test'
+  ...
+# Subtest: style changes preserve the rule when serialized geometry order or price formatting differs
+ok 9 - style changes preserve the rule when serialized geometry order or price formatting differs
+  ---
+  duration_ms: 31.440119
+  type: 'test'
+  ...
+# Subtest: native history events submit restored geometry without resuming a paused alert
+ok 10 - native history events submit restored geometry without resuming a paused alert
+  ---
+  duration_ms: 57.120861
+  type: 'test'
+  ...
+# Subtest: price-axis presentation changes cannot silently replace the saved coordinate system
+ok 11 - price-axis presentation changes cannot silently replace the saved coordinate system
+  ---
+  duration_ms: 40.70487
+  type: 'test'
+  ...
+# Toolbar: destroyed/replaced model, feature disabled, repeated lifetimes passed
+# Subtest: web/tests/native-toolbar-lifetime.cjs
+ok 4 - web/tests/native-toolbar-lifetime.cjs
+  ---
+  duration_ms: 552.804854
+  type: 'test'
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 713.249278

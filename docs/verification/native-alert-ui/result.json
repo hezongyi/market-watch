@@ -1,0 +1,39 @@
+{
+  "scope": "Ubuntu browser probe; real ZIP library; synthetic data; no deployed instance",
+  "cases": [
+    "Custom content mounted in genuine widgetbar page alongside existing native pages",
+    "Real native drag handle changes sidebar width",
+    "Switch to existing object tree and back",
+    "Native same-tab collapse and reopen",
+    "Public native notice dialog shell renders",
+    "Native layout recreation destroys old renderer and mounts one new instance"
+  ],
+  "errors": [],
+  "integration": {
+    "pages": [
+      "base",
+      "alerts",
+      "data-window",
+      "object_tree"
+    ],
+    "nativeTabRenderer": "at"
+  },
+  "nativeTabs": "",
+  "resize": {
+    "before": {
+      "width": 346,
+      "page": "alerts",
+      "minimized": false
+    },
+    "after": {
+      "width": 438.5,
+      "page": "alerts",
+      "minimized": false
+    }
+  },
+  "lifecycle": {
+    "constructed": 2,
+    "destroyed": 1
+  },
+  "passed": true
+}

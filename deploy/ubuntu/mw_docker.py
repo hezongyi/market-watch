@@ -241,7 +241,14 @@ def build(docker, args):
     context = (
         Path(args.context).resolve()
         if args.context
-        else (repo / {"api": ".", "web": "web", "chart": "advanced-host"}[args.component])
+        else (repo / {"api": ".", "web": "web", "chart": "."}[args.component])
+    )
+    file = (
+        Path(args.file).resolve()
+        if args.file
+        else repo / "advanced-host/Dockerfile"
+        if args.component == "chart" and not args.context
+        else context / "Dockerfile"
     )
     cmd = [
         "buildx",
@@ -254,13 +261,12 @@ def build(docker, args):
         "--tag",
         args.tag,
     ]
-    if args.file:
-        cmd += ["--file", str(Path(args.file).resolve())]
+    if args.file or file != context / "Dockerfile":
+        cmd += ["--file", str(file)]
     for k, v in labels.items():
         cmd += ["--label", k + "=" + v]
     for v in args.build_arg:
         cmd += ["--build-arg", v]
-    file = Path(args.file).resolve() if args.file else context / "Dockerfile"
     with base_contexts(docker, [file], args.base_source) as bases:
         for ref, source in bases.items():
             cmd += ["--build-context", ref + "=" + source]

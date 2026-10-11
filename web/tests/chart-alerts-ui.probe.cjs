@@ -122,7 +122,7 @@ const output =
   });
   try {
     await page.goto("https://chart-alert-ui.invalid/");
-    await page.getByRole("button", { name: "创建告警", exact: true }).click();
+    await page.getByRole("button", { name: "创建告警", exact: true }).first().click();
     const dialog = page.getByRole("dialog");
     await dialog.waitFor();
     assert.equal(await dialog.getByLabel("触发次数").inputValue(), "1");
@@ -131,7 +131,7 @@ const output =
       "100",
     );
     await dialog.getByLabel("触发次数").selectOption("2");
-    await dialog.getByRole("button", { name: /消息与通知/ }).click();
+    await dialog.getByRole("button", { name: "消息", exact: true }).click();
     await dialog.getByLabel("消息正文").fill("观察 {symbol}");
     await dialog.getByRole("button", { name: "应用到草稿" }).click();
     assert.equal(
@@ -148,7 +148,8 @@ const output =
       .waitFor();
     assert.equal(await dialog.getByLabel("触发次数").inputValue(), "2");
     await dialog.getByRole("button", { name: "取消（保留草稿）" }).click();
-    await page.getByRole("button", { name: "恢复草稿" }).click();
+    await page.getByRole("button", { name: "更多选项" }).click();
+    await page.getByRole("menuitem", { name: "恢复草稿" }).click();
     assert.equal(await dialog.getByLabel("触发次数").inputValue(), "2");
     await dialog.getByRole("button", { name: "创建告警", exact: true }).click();
     await dialog.waitFor({ state: "hidden" });
@@ -156,7 +157,7 @@ const output =
     assert.equal(creations.length, 2);
     assert.equal(creations[0].body.request_id, creations[1].body.request_id);
     assert.equal(creations[1].body.config.message, "观察 {symbol}");
-    await page.getByText("等待数据 / 预热：等待行情").waitFor();
+    await page.getByText("等待数据 / 预热", {exact:true}).waitFor();
     report.cases.push(
       "failed save and cancellation preserve draft and idempotent request; warming displayed accurately",
     );
@@ -164,11 +165,14 @@ const output =
     await page.getByRole("button", { name: "恢复", exact: true }).waitFor();
     await page.getByRole("button", { name: "恢复", exact: true }).click();
     await page.getByRole("button", { name: "暂停", exact: true }).waitFor();
-    await page.getByRole("button", { name: "复制为草稿" }).click();
+    await page.getByRole("button", { name: /行操作/ }).click();
+    await page.getByRole("menuitem", { name: "复制为草稿" }).click();
+    await dialog.getByRole("button", {name:"消息",exact:true}).click();
     assert.match(
-      await dialog.getByLabel("名称", { exact: true }).inputValue(),
+      await dialog.getByLabel("警报名称", { exact: true }).inputValue(),
       /副本$/,
     );
+    await dialog.getByRole("button", {name:"返回",exact:true}).click();
     await dialog.getByRole("button", { name: "取消（保留草稿）" }).click();
     assert.equal(rows.length, 1);
     events.push({
@@ -193,15 +197,14 @@ const output =
       },
     });
     await page.getByRole("tab", { name: /日志/ }).click();
-    await page
-      .getByRole("button", { name: "确认此事件" })
-      .waitFor({ timeout: 8000 });
+    await page.locator(".alert-event-day .alert-row-summary").waitFor({timeout:8000});
+    await page.locator(".alert-event-day .alert-row-summary").click();
     await page.getByRole("button", { name: "确认此事件" }).click();
     await page.getByRole("button", { name: "已确认", exact: true }).waitFor();
     report.cases.push(
       "pause/resume lifecycle; copy remains draft; event acknowledgement independent",
     );
-    await page.getByRole("tab", { name: /告警 \(/ }).click();
+    await page.getByRole("tab", { name: "警报",exact:true }).click();
     await page.screenshot({ path: output.replace(/\.json$/, ".dark.png") });
     await page.evaluate(() => setProbeTheme("light"));
     await page.screenshot({ path: output.replace(/\.json$/, ".light.png") });

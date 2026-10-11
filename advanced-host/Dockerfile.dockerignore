@@ -1,0 +1,18 @@
+# Root context for the shared React alert renderer. Explicit source allowlist.
+*
+!advanced-host/
+!advanced-host/*.js
+!advanced-host/*.mjs
+!advanced-host/*.css
+!advanced-host/*.html
+!advanced-host/nginx.conf
+!advanced-host/Dockerfile
+!advanced-host/charting_library/
+!advanced-host/charting_library/**
+!web/
+!web/package.json
+!web/package-lock.json
+!web/src/
+!web/src/**
+!web/scripts/
+!web/scripts/build-alert-ui.mjs

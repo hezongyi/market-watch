@@ -740,6 +740,11 @@ function chartAlertBridge({
     drawingEvent,
     drawingAction,
     geometry,
+    currentInstrument: () => {
+      if (disposed || isLoading()) return null;
+      const identity = MWSeries.decode(getWidget().activeChart().symbol());
+      return {instrument: identity.symbol, series_kind: identity.series_kind};
+    },
     diagnostics: () => ({
       charts: chartList().map((chart) => chartIdentity(chart)),
       rows: rows.map((row) => ({ id: row.id, version: row.version })),
