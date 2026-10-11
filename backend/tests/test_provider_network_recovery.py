@@ -51,6 +51,7 @@ def failing_tls_proxy(monkeypatch):
 def test_binance_rotates_failed_connect_pool_and_retries_with_new_socket(failing_tls_proxy, monkeypatch, caplog):
     proxy, connections = failing_tls_proxy
     monkeypatch.setattr(settings, 'binance_proxy', proxy)
+    monkeypatch.setattr(settings, 'binance_connection_mode', 'configured')
     from alerts.market_resources import lane
     # Real lane-local pool, synthetic quota seam to count both reservations.
     slots = []

@@ -22,6 +22,7 @@ def test_composite_never_reaches_ordinary_supplier(database, monkeypatch, demand
             inst.enabled = False
         db.add(Instrument(id=ident, label="Composite", source="composite", symbol="EURUSD",
             basis="bid", calendar="ny17", precision=5, enabled=demand == "enabled"))
+        db.flush()
         if demand == "chart":
             db.add(MarketDemand(id="chart", instrument_id=ident, expires=now + 60000))
         elif demand == "plan":
