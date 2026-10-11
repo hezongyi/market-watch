@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "environment": "Ubuntu independent Docker mw-provider-fix-20261011",
+  "app": "https://192.168.7.232:19819",
+  "chart": "https://192-168-7-232.sslip.io:19820",
+  "checks": [
+    "Acceptance administrator login and independent workspace created",
+    "Licensed chart ready using actual Binance M1 in independent PostgreSQL",
+    "Data center and source status read actual isolated API"
+  ],
+  "expected_unconfigured_sources": [
+    {
+      "path": "/api/market-data/resolve",
+      "status": 422,
+      "args": {
+        "instrument": "EURUSD",
+        "series_kind": "provider",
+        "timeframe": "M1"
+      }
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "status": 422,
+      "args": {
+        "instrument": "XAUUSD",
+        "series_kind": "provider",
+        "timeframe": "M1"
+      }
+    }
+  ],
+  "errors": [],
+  "http_errors": [],
+  "credential_leaks": [],
+  "symbol": "MWP:BTCUSDT",
+  "logout_verified": true
+}
