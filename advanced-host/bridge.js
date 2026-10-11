@@ -217,10 +217,18 @@ function bindTimezoneEvents() {
   }
 }
 const timezoneBindings = new Map();
+let activeChartEventWidget;
+function unbindActiveChartEvent() {
+  if (!activeChartEventWidget) return;
+  activeChartEventWidget.unsubscribe("activeChartChanged", refreshQuotePresentation);
+  activeChartEventWidget = undefined;
+}
 function bindActiveChartEvent() {
   if (!widget?.subscribe) return;
-  widget.unsubscribe?.("activeChartChanged", refreshQuotePresentation);
+  if (activeChartEventWidget === widget) return;
+  unbindActiveChartEvent();
   widget.subscribe("activeChartChanged", refreshQuotePresentation);
+  activeChartEventWidget = widget;
 }
 
 function marketQuery(ticker, res) {
@@ -1917,6 +1925,7 @@ function boot(
   globalThis.MWBarRangeMapping = barRangeMapping;
   globalThis.MWChartMaximize?.dispose();
   globalThis.MWChartMaximize = undefined;
+  unbindActiveChartEvent();
   widget = new TradingView.widget({
     context_menu:{items_processor:(items,factory,params)=>alertBridge.menu(items,factory,params)},
     save_load_adapter: { ...prefs.templates, ...layouts },
@@ -2463,7 +2472,7 @@ addEventListener("pagehide", () => {
   alertUI?.destroy();
   alertBridge?.destroy();
   compactQuote?.dispose();
-  widget?.unsubscribe?.("activeChartChanged", refreshQuotePresentation);
+  unbindActiveChartEvent();
   for (const [api, changed] of timezoneBindings) api.onTimezoneChanged().unsubscribe(null, changed);
   timezoneBindings.clear();
   globalThis.MWChartMaximize?.dispose();barRangeMapping?.dispose();syncCoordinator?.dispose();
