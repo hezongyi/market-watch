@@ -21,6 +21,29 @@ m = module("mw_docker")
 guard = module("docker_guard")
 
 
+class BuildDefaultsTests(unittest.TestCase):
+    def test_default_component_sources_and_dockerfile(self):
+        for component, directory, dockerfile in (
+            ("api", ROOT, ROOT / "Dockerfile"),
+            ("web", ROOT / "web", ROOT / "web/Dockerfile"),
+            ("chart", ROOT, ROOT / "advanced-host/Dockerfile"),
+        ):
+            with self.subTest(component=component):
+                args = SimpleNamespace(repo=str(ROOT), component=component, context=None,
+                                       file=None, task="mw-test", tag="mw-test:build", build_arg=[], base_source="local")
+                docker = mock.Mock()
+                with mock.patch.object(m, "labels_for", return_value={}), \
+                     mock.patch.object(m, "check_build_tag"), \
+                     mock.patch.object(m, "base_contexts") as bases:
+                    bases.return_value.__enter__.return_value = {}
+                    m.build(docker, args)
+                cmd = docker.run.call_args.args
+                self.assertEqual(cmd[-1], str(directory))
+                selected = Path(cmd[cmd.index("--file") + 1]) if "--file" in cmd else directory / "Dockerfile"
+                self.assertEqual(selected, dockerfile)
+                bases.assert_called_once_with(docker, [dockerfile], "local")
+
+
 class ImageSafetyTests(unittest.TestCase):
     def setUp(self):
         self.at = dt.datetime(2026, 10, 7, tzinfo=dt.timezone.utc)

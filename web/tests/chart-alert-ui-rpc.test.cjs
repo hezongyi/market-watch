@@ -47,7 +47,7 @@ test("UI bridge rejects URLs, methods, forged sessions and workspace association
     await assert.rejects(chartAlertUiRequest(value, scope, () => true, api));
   assert.equal(calls, 0);
 });
-test("read, capability, create, edit, lifecycle and ack have bounded allowed routes", async () => {
+test("read, capability, geometry, create, edit, lifecycle and ack have bounded allowed routes", async () => {
   const calls = [];
   const api = async (path, body) => {
     calls.push({ path, body });
@@ -57,6 +57,7 @@ test("read, capability, create, edit, lifecycle and ack have bounded allowed rou
     query("/chart-alerts"),
     query("/chart-alerts/events"),
     query("/chart-alerts/capabilities", { instrument: "EURUSD" }),
+    query("/chart-alerts/geometry", { instrument: "EURUSD", points: [] }),
     query("/chart-alerts", {
       config: { association: { workspace_id: "workspace-one" } },
     }),
@@ -68,7 +69,7 @@ test("read, capability, create, edit, lifecycle and ack have bounded allowed rou
       (await chartAlertUiRequest(value, scope, () => true, api)).ok,
       true,
     );
-  assert.equal(calls.length, 7);
+  assert.equal(calls.length, 8);
 });
 test("workspace change suppresses delayed response and refuses subsequent calls", async () => {
   let current = true,

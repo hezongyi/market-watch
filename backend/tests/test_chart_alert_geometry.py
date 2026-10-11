@@ -88,6 +88,42 @@ def test_authenticated_geometry_and_capability_api(database, monkeypatch):
         assert response.status_code == 200 and response.json()["points"][1]["index"] == 2
 
 
+def test_timeframe_remapping_keeps_saved_drawing_monitoring(database, monkeypatch):
+    from alerts import api as api_module
+    from alerts.chart_alert_worker import evaluate
+    from alerts.storage import ChartAlert
+    from fastapi.testclient import TestClient
+    from test_chart_alert_api import login
+
+    with database.begin() as db:
+        for frame, step, count in (("H1", 3_600_000, 8), ("H4", 14_400_000, 3)):
+            for index in range(count):
+                db.add(Bar(instrument_id="BTCUSDT", timeframe=frame,
+                           start=index * step, end=(index + 1) * step,
+                           open=Decimal(11), high=Decimal(11), low=Decimal(11),
+                           close=Decimal(11), complete=True))
+    with TestClient(api_module.app) as client:
+        login(client, monkeypatch)
+        points = [{"time": 0, "price": "10"}, {"time": 14_400_000, "price": "12"}]
+        original = client.post("/api/chart-alerts/geometry", json=query(
+            timeframe="H1", points=points, extend_right=True).model_dump(mode="json"))
+        mapped = client.post("/api/chart-alerts/geometry", json=query(
+            timeframe="H4", points=points, extend_right=True).model_dump(mode="json"))
+        assert original.status_code == mapped.status_code == 200
+        assert [point["index"] for point in original.json()["points"]] == [0, 4]
+        assert [point["index"] for point in mapped.json()["points"]] == [0, 1]
+        for name, line, expected in (("old", original.json(), "blocked"),
+                                     ("remapped", mapped.json(), "ready")):
+            cfg = config(timeframe="H4", condition={"relation": "cross_up",
+                         "right": {"kind": "line", "line": line}})
+            saved = client.post("/api/chart-alerts", json={
+                "request_id": name, "config": cfg.model_dump(mode="json")})
+            assert saved.status_code == 201
+            with database.begin() as db:
+                evaluate(db, saved.json()["id"], now=43_200_001)
+                assert db.get(ChartAlert, saved.json()["id"]).health == expected
+
+
 def test_managed_daily_points_use_native_trading_date_labels(database):
     from datetime import datetime, timezone
 

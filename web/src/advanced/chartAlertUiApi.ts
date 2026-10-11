@@ -32,6 +32,7 @@ export async function chartAlertUiRequest(
   const writePath =
     q.path === "/chart-alerts" ||
     q.path === "/chart-alerts/capabilities" ||
+    q.path === "/chart-alerts/geometry" ||
     new RegExp(`^/chart-alerts/${uuid}/(edit|lifecycle)$`).test(q.path) ||
     new RegExp(`^/notifications/${uuid}/ack$`).test(q.path);
   if (!(write ? writePath : readPath)) throw Error("不允许的告警界面操作");

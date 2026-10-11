@@ -23,6 +23,7 @@ import {
   type AlertRow,
   type Capabilities,
   type IndicatorSpec,
+  type LineGeometry,
   type Operand,
 } from "./chartAlerts";
 
@@ -143,6 +144,9 @@ export function ChartAlertDialog({
     submitting = useRef(false);
   const [native, setNative] = useState<NativeAlertDialogHandle | null>(null);
   const nativeRef = useRef<NativeAlertDialogHandle | null>(null);
+  const mappedGeometry = useRef<{ key: string; line: LineGeometry } | null>(
+    null,
+  );
   useEffect(() => {
     mounted.current = true;
     if (nativeDialog) {
@@ -229,11 +233,48 @@ export function ChartAlertDialog({
     submitting.current = true;
     setError("");
     try {
+      let config = draft;
+      const line = draft.condition.right?.line;
+      if (draft.condition.right?.kind === "line" && line) {
+        // Bar indices belong to a market/period. Recompute them from timestamps
+        // before saving, including after a source or timeframe change.
+        const query = {
+          instrument: draft.instrument,
+          source: draft.source,
+          series_kind: draft.series_kind,
+          timeframe: draft.timeframe,
+          published: draft.published ?? false,
+          ...(draft.composite_revision_id
+            ? { composite_revision_id: draft.composite_revision_id }
+            : {}),
+          kind: line.kind,
+          scale: line.scale,
+          extend_left: line.extend_left,
+          extend_right: line.extend_right,
+          points: line.points.map(({ time, price }) => ({ time, price })),
+        };
+        const key = JSON.stringify(query);
+        const mapped =
+          mappedGeometry.current?.key === key
+            ? mappedGeometry.current.line
+            : await request<LineGeometry>("/chart-alerts/geometry", query);
+        if (!mounted.current) return;
+        // A retry after an uncertain save must reuse the same configuration.
+        mappedGeometry.current = { key, line: mapped };
+        config = {
+          ...draft,
+          condition: {
+            ...draft.condition,
+            right: { kind: "line", line: mapped },
+          },
+        };
+        setDraft(config);
+      }
       const saved = await request<AlertRow>(
         editing ? `/chart-alerts/${editing.id}/edit` : "/chart-alerts",
         editing
-          ? { version: editing.version, config: draft }
-          : { request_id: requestId, config: draft },
+          ? { version: editing.version, config }
+          : { request_id: requestId, config },
       );
       if (mounted.current) onSaved(saved);
     } catch (e) {
@@ -270,9 +311,10 @@ export function ChartAlertDialog({
   }, [native, page, busy]);
   const formRef = useRef<HTMLFormElement>(null);
   const pageTrigger = useRef<HTMLButtonElement | null>(null);
+  const returning = useRef(false);
   function returnToCondition() {
+    returning.current = true;
     setPage("condition");
-    setTimeout(() => pageTrigger.current?.focus(), 0);
   }
   function openPage(
     value: "message" | "notifications",
@@ -289,13 +331,21 @@ export function ChartAlertDialog({
   useEffect(() => {
     if (native) {
       native.recenter();
-      setTimeout(
-        () =>
+      const restore = returning.current && page === "condition";
+      returning.current = false;
+      const timer = setTimeout(() => {
+        if (restore)
+          formRef.current
+            ?.querySelector<HTMLButtonElement>(
+              `[aria-label="${pageTrigger.current?.getAttribute("aria-label")}"]`,
+            )
+            ?.focus();
+        else
           formRef.current
             ?.querySelector<HTMLElement>("input,select,textarea,button")
-            ?.focus(),
-        0,
-      );
+            ?.focus();
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [page, native]);
   const compareTarget = (

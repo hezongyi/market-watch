@@ -18,12 +18,14 @@ builder默认选中可以防止普通构建继续使用legacy builder，但不�
 ```bash
 mw-docker build --repo . --component api --tag market-watch-api:issue-42 \
   --task mw-issue42 --project mw-issue42 --purpose acceptance
-mw-docker build --repo . --component chart --context . --file advanced-host/Dockerfile --tag market-watch-chart-origin:issue-42 \
+mw-docker build --repo . --component chart --tag market-watch-chart-origin:issue-42 \
   --task mw-issue42 --project mw-issue42 --purpose acceptance
 mw-docker build --repo . --component web --tag market-watch-web:issue-42 \
   --task mw-issue42 --project mw-issue42 --purpose acceptance \
   --build-arg VITE_ADVANCED_CHART_ORIGIN=https://localhost:17444
 ```
+
+chart 默认使用仓库根目录 context 和 `advanced-host/Dockerfile`，以编译共享告警 UI；显式 `--context`/`--file` 仍可覆盖默认值。旧版独立图表工作树可指定 `--context advanced-host --file advanced-host/Dockerfile`。
 
 默认将本机已有基础镜像临时导出为OCI输入，按digest交给BuildKit；构建结束删除临时输入，不长期保留镜像tar。这样无需再次访问Docker Hub。基础镜像缺失时明确失败，先在Ubuntu导入/拉取；网络可用时可显式使用`--base-source registry`。ARG形式的FROM和inline Dockerfile需使用registry模式。
 

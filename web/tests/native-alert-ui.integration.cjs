@@ -56,6 +56,7 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
     rows = [],
     events = [];
   let rejectCreate = true;
+  let rejectGeometry = false;
   let releaseCreate;
   const heldCreate = new Promise((resolve) => {
     releaseCreate = resolve;
@@ -105,6 +106,29 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
         modes: ["close", "intrabar"],
         indicators: ["SMA", "EMA", "RSI", "MACD"],
       });
+    if (u.pathname === "/api/chart-alerts/geometry") {
+      if (rejectGeometry) {
+        rejectGeometry = false;
+        return reply({ detail: "画线端点未匹配实际 K 线" }, 422);
+      }
+      assert.ok(
+        body.points.every(
+          (point) => Object.keys(point).sort().join() === "price,time",
+        ),
+      );
+      const step = body.timeframe === "H4" ? 14_400_000 : 3_600_000;
+      return reply({
+        kind: body.kind,
+        scale: body.scale,
+        extend_left: body.extend_left,
+        extend_right: body.extend_right,
+        mapping_version: "bar-index-v1",
+        points: body.points.map((point) => ({
+          ...point,
+          index: (point.time - body.points[0].time) / step,
+        })),
+      });
+    }
     if (u.pathname === "/api/chart-alerts/events") return reply(events);
     if (u.pathname === "/api/chart-alerts" && req.method() === "GET")
       return reply(rows.filter((row) => row.status !== "archived"));
@@ -272,6 +296,9 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
     await dialog.getByLabel("警报名称").fill("欧元突破");
     await dialog.getByLabel("消息正文").fill("观察 {symbol}");
     await dialog.getByRole("button", { name: "应用到草稿" }).click();
+    await chart.waitForFunction(
+      () => document.activeElement?.getAttribute("aria-label") === "消息",
+    );
     assert.equal(
       writes.filter((write) => write.path === "/api/chart-alerts").length,
       0,
@@ -279,6 +306,9 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
     await dialog.getByRole("button", { name: "消息", exact: true }).click();
     await dialog.getByLabel("消息正文").fill("取消的正文");
     await dialog.getByRole("button", { name: "取消", exact: true }).click();
+    await chart.waitForFunction(
+      () => document.activeElement?.getAttribute("aria-label") === "消息",
+    );
     await dialog.getByRole("button", { name: "消息", exact: true }).click();
     assert.equal(
       await dialog.getByLabel("消息正文").inputValue(),
@@ -286,6 +316,9 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
     );
     await page.screenshot({ path: path.join(output, "message-dark.png") });
     await dialog.getByRole("button", { name: "返回", exact: true }).click();
+    await chart.waitForFunction(
+      () => document.activeElement?.getAttribute("aria-label") === "消息",
+    );
     await dialog.getByRole("button", { name: "通知", exact: true }).click();
     await dialog.getByLabel("已有 ntfy 推送通道").click();
     await chart.waitForFunction(() =>
@@ -298,6 +331,9 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
       path: path.join(output, "notifications-dark.png"),
     });
     await dialog.getByRole("button", { name: "应用到草稿" }).click();
+    await chart.waitForFunction(
+      () => document.activeElement?.getAttribute("aria-label") === "通知",
+    );
     await dialog.getByRole("button", { name: "触发次数", exact: true }).click();
     await page.screenshot({
       path: path.join(output, "trigger-native-menu.png"),
@@ -470,6 +506,14 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
     await dialog.getByRole("button", { name: "消息", exact: true }).click();
     await page.keyboard.press("Escape");
     await dialog.getByLabel("比较值", { exact: true }).waitFor();
+    await chart.waitForFunction(
+      () => document.activeElement?.getAttribute("aria-label") === "消息",
+    );
+    await dialog.getByRole("button", { name: "通知", exact: true }).click();
+    await page.keyboard.press("Escape");
+    await chart.waitForFunction(
+      () => document.activeElement?.getAttribute("aria-label") === "通知",
+    );
     await page.keyboard.press("Tab");
     assert.equal(
       await chart.evaluate(
@@ -591,6 +635,69 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
     );
     report.cases.push(
       "Real native controls preserve range, two indicator operands and drawing snapshot creation",
+    );
+    await host.evaluate(() =>
+      ui.context({
+        request_id: crypto.randomUUID(),
+        instrument: "EURUSD",
+        series_kind: "managed",
+        source: "fixture",
+        timeframe: "H1",
+        published: true,
+        association: {
+          workspace_id: "fixture",
+          chart_id: "chart-0",
+          chart_index: 0,
+          generation: "1:0",
+          object_id: "trend-0",
+          object_kind: "drawing",
+        },
+        line: {
+          kind: "trend_line",
+          scale: "linear",
+          extend_left: false,
+          extend_right: true,
+          mapping_version: "bar-index-v1",
+          points: [
+            { time: 1_800_000_000_000, price: "1.12", index: 0 },
+            { time: 1_800_014_400_000, price: "1.13", index: 4 },
+          ],
+        },
+      }),
+    );
+    await dialog.waitFor();
+    await dialog
+      .locator(".alert-advanced-options")
+      .evaluate((node) => (node.open = true));
+    await choose("判定周期", "H4");
+    rejectGeometry = true;
+    const beforeLineSave = rows.length;
+    await dialog.getByRole("button", { name: "创建告警", exact: true }).click();
+    await dialog.getByText(/画线端点未匹配实际 K 线/).waitFor();
+    assert.equal(
+      rows.length,
+      beforeLineSave,
+      "Failed remapping must not save a rule",
+    );
+    assert.equal(
+      await dialog
+        .getByRole("button", { name: "判定周期", exact: true })
+        .textContent(),
+      "H4",
+    );
+    await dialog.getByRole("button", { name: "创建告警", exact: true }).click();
+    await dialog.waitFor({ state: "detached" });
+    assert.equal(rows.at(-1).config.timeframe, "H4");
+    assert.deepEqual(
+      rows
+        .at(-1)
+        .config.condition.right.line.points.map((point) => point.index),
+      [0, 1],
+    );
+    assert.equal(rows.at(-1).config.association, null);
+    report.remappedConfig = rows.at(-1).config;
+    report.cases.push(
+      "Drawing timeframe change remaps endpoints before save; mapping failure retains the draft and prevents writes",
     );
     const primary = chart
       .locator(".chart-alert-card")
