@@ -25,7 +25,7 @@ OANDA 未用生产凭据或创建第二 pricing stream；开市恢复是隔离�
 默认观察列表 EURUSD/XAUUSD 的 422 仅表示本独立实例未配置 OANDA 凭据，已单独记录；
 没有将其当成真实 OANDA 验收。本目录不含密码、env、证书私钥、原账户 ID
 或许可图表库。私密操作材料在 `/tmp/mw-provider-fix-20261011/`（0700）。
-启动/停止该独立 project（不是生产）：
+启动/停止该独立 project（不是生产；以下为退役前操作记录，已结束 task 不复用）：
 
 ```bash
 cd /home/quant/repos/market-watch-provider-rootcause-20261011
@@ -34,7 +34,9 @@ sg docker -c 'docker compose --env-file /tmp/mw-provider-fix-20261011/acceptance
 ```
 
 验收结束按本任务 project 精确 `mw-docker retire`，先预览，再备份及真实恢复校验后退役；
-进行中尚未退役。PR、双轴复审、正式备份恢复、tag 与生产验证在后续发布阶段记录。
+已于 2026-10-11 完成退役。PR、双轴复审、正式备份恢复、tag、生产验证及资源收口
+见 [生产发布记录](production/README.md)。上述验收网址已停止开放，正式网站为
+<https://trade.kookvv.com:8443/>。
 
 ## PR 固定 head 首轮复审修复
 

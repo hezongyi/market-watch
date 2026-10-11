@@ -1,0 +1,76 @@
+{
+  "status": "released_and_resources_retired",
+  "version": "1.20.2",
+  "implementation_pr": 40,
+  "all_runtime_errors_fixed": false,
+  "known_issue": "market_data_demand_pkey concurrent first insert; separate atomic upsert followup",
+  "requirements": [
+    {
+      "number": 1,
+      "requirement": "普通采集与历史任务排除组合/注册数据集",
+      "status": "完成",
+      "evidence": "../README.md; application 253d055 routing/PG tests"
+    },
+    {
+      "number": 2,
+      "requirement": "保留组合固定需求与映射，精确清理错误",
+      "status": "完成",
+      "evidence": "provider-production-verification.json; historical audit 1823 unchanged, repair +1"
+    },
+    {
+      "number": 3,
+      "requirement": "Binance 统一配置/直连，其他代理保留",
+      "status": "完成",
+      "evidence": "release manifest; production direct and Yahoo actual upstream"
+    },
+    {
+      "number": 4,
+      "requirement": "两个只读尝试，共享额度/预算，TLS/认证/限流保护",
+      "status": "完成但保留底层预算边界",
+      "evidence": "110 installed tests; code review; synchronous DNS/multi-address limit disclosed"
+    },
+    {
+      "number": 5,
+      "requirement": "OANDA REST 故障池轮换，保持原调度和流所有权",
+      "status": "完成",
+      "evidence": "110 installed tests and production source/worker read"
+    },
+    {
+      "number": 6,
+      "requirement": "有限账户绑定 SG 会话、到期 unknown、独立报价/M1门槛",
+      "status": "完成当前会话验证，未来开市证据待观察",
+      "evidence": "provider-production-verification.json; profile expires 2026-10-18T00:00:00Z"
+    },
+    {
+      "number": 7,
+      "requirement": "Ubuntu 隔离 Docker/PG 和 mw-docker 验收",
+      "status": "完成",
+      "evidence": "../README.md; 110 installed network, 30 real PG, Binance 6 cold + 6 reuse and 149 M1"
+    },
+    {
+      "number": 8,
+      "requirement": "PR 双轴复审、合并、新 tag、clean 正式镜像",
+      "status": "完成",
+      "evidence": "PR #40 merged; tag d8d5f0b; release-product-match.json; Standards 0 / Spec 0 blockers"
+    },
+    {
+      "number": 9,
+      "requirement": "正式备份在 Ubuntu 实际恢复、配置/数据保留",
+      "status": "完成",
+      "evidence": "release manifest; 86 tables, 10 fingerprints, account/notification matching"
+    },
+    {
+      "number": 10,
+      "requirement": "正式 HTTPS/行情/会话/worker 验证及本轮资源退役",
+      "status": "完成发布与退役，保留已知独立并发缺陷",
+      "evidence": "README.md; resource-closure.json; first browser 500 retained, following two passes"
+    }
+  ],
+  "product_review": {
+    "fixed_head": "253d0550813a5b262e23fd714b4fab4f2df6f812",
+    "baseline": "0cebcf5",
+    "standards_findings": 0,
+    "spec_unresolved_blockers": 0,
+    "pr_review_comment": "https://github.com/hezongyi/market-watch/pull/40#issuecomment-6105681103"
+  }
+}
