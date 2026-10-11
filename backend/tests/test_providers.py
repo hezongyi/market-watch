@@ -37,7 +37,11 @@ def test_binance_proxy_applies_to_maintenance_and_native_charts(monkeypatch, ove
         fetch_binance(mode="quote")
         provider_chart.pooled_client("binance")
         assert len(calls) == 1  # Both use the same lane pool.
-        assert all(call["proxy"] == expected and call["trust_env"] is False for call in calls)
+        assert all(call["trust_env"] is False for call in calls)
+        proxy_url = getattr(calls[0]["transport"]._pool, "_proxy_url", None)
+        assert (proxy_url is None) == (expected is None)
+        if proxy_url is not None:
+            assert proxy_url.host.decode() == httpx.URL(expected).host
     finally:
         provider_chart.close_clients()
 

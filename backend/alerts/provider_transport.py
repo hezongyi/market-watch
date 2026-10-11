@@ -6,10 +6,12 @@ import threading
 import time
 import weakref
 from contextlib import ExitStack, contextmanager, nullcontext
+from contextvars import ContextVar
 
 import httpx
 
 from .config import settings
+from .provider_deadline import deadline_transport, request_deadline
 
 ORIGINS = {'oanda': 'https://api-fxpractice.oanda.com',
            'binance': 'https://data-api.binance.vision',
@@ -21,6 +23,13 @@ _RETIRED = []
 _STOP = threading.Event()
 _THREADS = []
 IDLE_SECONDS = 20
+TIMINGS = ContextVar("provider_acquisition_timings", default=None)
+
+
+def record_timing(name, started):
+    timings = TIMINGS.get()
+    if timings is not None:
+        timings[name] = timings.get(name, 0) + (time.monotonic() - started) * 1000
 
 
 def retryable_network_error(error):
@@ -52,28 +61,50 @@ def error_detail(error):
     return str(error)[:600] or type(error).__name__
 
 
-def binance_get(client, url, *, params, deadline):
+def binance_get(client, url, *, params, deadline, headers=None):
     """At most two read-only attempts; every attempt reacquires the shared lane."""
     from .market_resources import request_slot
 
     for attempt in range(2):
         phase = "slot"
         route = "proxy" if settings.effective_binance_proxy else "direct"
+        phases = {}
         def trace(name, info):
             nonlocal phase
-            if name.endswith(".started"):
-                phase = name.rsplit(".", 1)[0]
+            stage, _, event = name.rpartition(".")
+            if event == "started":
+                phase = stage
+                phases[stage] = time.monotonic()
+            elif event in ("complete", "failed") and stage in phases:
+                record_timing("network_" + stage.replace(".", "_"), phases.pop(stage))
         started = time.monotonic()
         current = client
         try:
             with request_slot("binance", deadline=deadline):
+                record_timing("upstream_slot", started)
                 remaining = deadline - time.monotonic()
                 if remaining <= 0:
                     raise TimeoutError("Binance 请求超过时间预算")
-                with activity(client) as current:
-                    response = current.get(url, params=params,
-                        timeout=httpx.Timeout(min(7, remaining), connect=min(5, remaining)),
-                        extensions={"trace": trace})
+                with activity(client) as current, request_deadline(deadline):
+                    timings = TIMINGS.get()
+                    attempt_record = {"attempt": attempt + 1}
+                    if timings is not None:
+                        timings.setdefault("candles_attempts", []).append(attempt_record)
+                    http_started = time.monotonic()
+                    try:
+                        response = current.get(url, params=params, headers=headers,
+                            timeout=httpx.Timeout(min(7, remaining), connect=min(5, remaining)),
+                            extensions={"trace": trace})
+                        attempt_record["status"] = response.status_code
+                    except httpx.TransportError as error:
+                        attempt_record["error"] = type(error).__name__
+                        record_timing("failure_" + type(error).__name__, http_started)
+                        raise
+                    finally:
+                        record_timing("upstream_http", http_started)
+            if response.status_code in (502, 503, 504) and not attempt and deadline-time.monotonic() > .25:
+                time.sleep(.25)
+                continue
             response.raise_for_status()
             return response
         except httpx.TransportError as error:
@@ -107,11 +138,11 @@ def state_for_key(key):
     # Callers hold _LOCK so assignment and activity reservation are atomic.
     if key not in _CLIENTS:
         capacity = 2 if key[2] in ('chart', 'pricing') else 1
+        limits = httpx.Limits(max_connections=capacity, max_keepalive_connections=capacity,
+                             keepalive_expiry=60)
         _CLIENTS[key] = {
-            'client': httpx.Client(timeout=7, proxy=key[1] or None, trust_env=False,
-                                 limits=httpx.Limits(max_connections=capacity,
-                                                    max_keepalive_connections=capacity,
-                                                    keepalive_expiry=60)),
+            'client': httpx.Client(timeout=7, trust_env=False, limits=limits,
+                                 transport=deadline_transport(proxy=key[1] or None, limits=limits)),
             'last_maintained': time.monotonic(), 'active': 0,
         }
         _KEYS[_CLIENTS[key]['client']] = key

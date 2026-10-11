@@ -35,3 +35,13 @@ sg docker -c 'docker compose --env-file /tmp/mw-provider-fix-20261011/acceptance
 
 验收结束按本任务 project 精确 `mw-docker retire`，先预览，再备份及真实恢复校验后退役；
 进行中尚未退役。PR、双轴复审、正式备份恢复、tag 与生产验证在后续发布阶段记录。
+
+## PR 固定 head 首轮复审修复
+
+Standards 无文档规范违反，提示两条 Binance 重试路径可能重复；Spec 发现总预算不能
+限制持续缓慢响应。真实 socket 每 0.12 秒返回一字节，0.2 秒预算仍约 0.5 秒成功。
+新增两入口红回归后，通过线程局部绝对 deadline 包装 HTTPcore 连接、TLS 和每次
+读写，完成响应后再次拒绝迟到结果；不通过关闭其他读者连接或残留看门狗线程中断。
+HTTPX 0.28/httpcore 1.0.9 在 lock 中固定，backend 集成使用私有 pool seam，需随依赖
+升级复验。原生 Binance 与普通入口现共用请求、额度、重试和诊断策略。
+111 项来源/图表/池/OANDA 流回归通过（19 PG 条件跳过，另有真实 PG 56 通过证据）。

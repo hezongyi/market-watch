@@ -146,9 +146,51 @@ def test_binance_native_chart_rotates_pool_for_retryable_read_failure(monkeypatc
         if len(requests) == 1:
             raise error_type('controlled', request=request)
         return httpx.Response(200, json=[])
-    monkeypatch.setattr('alerts.provider_chart.discard_client', discarded.append)
+    monkeypatch.setattr('alerts.provider_transport.discard_client', discarded.append)
     with httpx.Client(transport=httpx.MockTransport(receive)) as client:
         assert _request(client, 'https://data-api.binance.vision/api/v3/klines', params={},
                         deadline=time.monotonic()+3) == []
         assert discarded == [client]
     assert len(requests) == 2
+
+
+@pytest.mark.parametrize('entry', ['ordinary', 'native'])
+def test_absolute_deadline_stops_real_socket_drip_response(entry):
+    import time
+
+    from alerts.provider_chart import _request
+    from alerts.provider_deadline import deadline_transport
+
+    class Drip(BaseHTTPRequestHandler):
+        def log_message(self, *_):
+            pass
+        def do_GET(self):
+            self.send_response(200)
+            self.send_header('Content-Length', '5')
+            self.end_headers()
+            try:
+                for byte in b' [ ] ':
+                    self.wfile.write(bytes([byte]))
+                    self.wfile.flush()
+                    time.sleep(.12)
+            except (BrokenPipeError, ConnectionResetError):
+                pass
+    server = ThreadingHTTPServer(('127.0.0.1', 0), Drip)
+    server.daemon_threads = True
+    thread = threading.Thread(target=server.serve_forever, kwargs={'poll_interval': .01})
+    thread.start()
+    try:
+        backend = deadline_transport(proxy=None, limits=httpx.Limits(max_connections=1))
+        with httpx.Client(transport=backend, trust_env=False) as client:
+            start = time.monotonic()
+            with pytest.raises((httpx.ReadTimeout, TimeoutError)):
+                url = f'http://127.0.0.1:{server.server_port}/'
+                if entry == 'ordinary':
+                    transport.binance_get(client, url, params={}, deadline=start+.2)
+                else:
+                    _request(client, url, params={}, deadline=start+.2)
+            assert time.monotonic()-start < .4
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+        server.server_close()
