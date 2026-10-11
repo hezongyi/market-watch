@@ -7,12 +7,12 @@ import pytest
 import test_market_collection_routing as routing
 from alerts import live_pricing as live
 from alerts.config import settings
+from alerts.market_contracts import RequestResult
 from alerts.storage import Instrument, LiveState, MarketDataset, PricingOwner
-from test_provider_postgres import provider_pg as _provider_pg
-
 from test_live_pricing import candles, quote
 from test_market_contracts import minute
 from test_oanda_recovery import profile
+from test_provider_postgres import provider_pg as _provider_pg
 
 provider_pg = _provider_pg
 
@@ -92,6 +92,7 @@ def test_closed_boundary_open_recovery_requires_current_m1_on_postgres(provider_
             observed_at=at,
             rows=(),
             checkpoint=cutoff,
+            result=RequestResult(status="empty_success"),
         ),
         now=at,
     )
