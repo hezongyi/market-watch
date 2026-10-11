@@ -1,14 +1,14 @@
-PASS actual Python calendar scope preserved 
-PASS native details ready 
+PASS actual Python calendar scope preserved
+PASS native details ready
 PASS native quote timezone Asia/Shanghai
 PASS native quote timezone America/New_York
 PASS native quote timezone exchange
 PASS native quote timezone Etc/UTC
-PASS active chart/timezone switch 
-PASS stream failure reaches native details 
-PASS native stream recovery and old generation rejection 
-PASS failed quote row retains native observation 
-PASS fixed history native failure warning 
+PASS active chart/timezone switch
+PASS stream failure reaches native details
+PASS native stream recovery and old generation rejection
+PASS failed quote row retains native observation
+PASS fixed history native failure warning
 PASS native controlled quote state unknown
 PASS native controlled quote state no time
 PASS native controlled quote state read failure
@@ -16,7 +16,7 @@ PASS native controlled quote state reopened waiting
 PASS native controlled quote state closure conflict
 PASS native controlled quote state precise event
 PASS native controlled quote state fixed history
-PASS rapid quote subscription replacement 
+PASS rapid quote subscription replacement
 PASS details responsive 375
 PASS details responsive 768
 PASS details responsive 1440
@@ -29,24 +29,24 @@ PASS calendar native responsive 1440
 PASS calendar native responsive 375
 PASS calendar native responsive 768
 PASS calendar native responsive 1440
-PASS calendar keyboard disclosure 
-PASS actual Chrome browser zoom 
-PASS native details actual 200% zoom 
+PASS calendar keyboard disclosure
+PASS actual Chrome browser zoom
+PASS native details actual 200% zoom
 [DEBUG-period] {"resolution":"1","min":0,"max":634,"count":635,"gaps":[]}
 [DEBUG-period] {"resolution":"1","min":0,"max":634,"count":635,"gaps":[]}
-PASS native period ready 
-PASS native period ready 
+PASS native period ready
+PASS native period ready
 [DEBUG-period] {"resolution":"60","min":0,"max":634,"count":525,"gaps":[]}
 [DEBUG-period] {"resolution":"240","min":0,"max":9069,"count":9070,"gaps":[]}
 [DEBUG-period] {"resolution":"240","min":0,"max":9069,"count":9070,"gaps":[]}
-PASS native period ready 
+PASS native period ready
 [DEBUG-period] {"resolution":"240","min":0,"max":9069,"count":8960,"gaps":[]}
 [DEBUG-period] {"resolution":"1D","min":0,"max":36069,"count":36070,"gaps":[]}
 [DEBUG-period] {"resolution":"1D","min":0,"max":36069,"count":36070,"gaps":[]}
-PASS native period ready 
-PASS native period ready 
-PASS native period ready 
-PASS rapid native symbol selection quote identity 
+PASS native period ready
+PASS native period ready
+PASS native period ready
+PASS rapid native symbol selection quote identity
 AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
 + actual - expected
 
