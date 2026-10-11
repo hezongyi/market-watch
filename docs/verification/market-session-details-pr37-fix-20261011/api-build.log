@@ -1,0 +1,108 @@
+#0 building with "market-watch-ubuntu" instance using docker-container driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 754B done
+#1 DONE 0.0s
+
+#2 [context python:3.11-slim-bookworm] load metadata for docker.io/library/python:3.11-slim-bookworm@sha256:2410faa698c7ac9bcfb9848ba6143a705d971e871dc92e5df40362a74117d375
+#2 DONE 0.0s
+
+#3 [context node:22-bookworm-slim] load metadata for docker.io/library/node:22-bookworm-slim@sha256:89b30bf5b6a8d1d0c7f0b1b77e12794a81924120740a724cd73bb270d3528f6c
+#3 DONE 0.1s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 284B done
+#4 DONE 0.0s
+
+#5 [context python:3.11-slim-bookworm] OCI load from client
+#5 resolve docker.io/library/python:3.11-slim-bookworm@sha256:2410faa698c7ac9bcfb9848ba6143a705d971e871dc92e5df40362a74117d375 0.0s done
+#5 DONE 0.0s
+
+#6 [context node:22-bookworm-slim] OCI load from client
+#6 resolve docker.io/library/node:22-bookworm-slim@sha256:89b30bf5b6a8d1d0c7f0b1b77e12794a81924120740a724cd73bb270d3528f6c 0.0s done
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 61.51kB 0.2s done
+#7 DONE 0.2s
+
+#8 [adapter 1/5] WORKDIR /adapter
+#8 CACHED
+
+#9 [adapter 2/5] COPY adapters/dukascopy/package*.json ./
+#9 CACHED
+
+#10 [adapter 3/5] RUN npm ci --omit=dev
+#10 CACHED
+
+#11 [adapter 4/5] COPY adapters/dukascopy/probe.mjs ./
+#11 CACHED
+
+#12 [stage-1  2/12] WORKDIR /app
+#12 CACHED
+
+#13 [stage-1  1/12] COPY --from=adapter /usr/local/bin/node /usr/local/bin/node
+#13 CACHED
+
+#14 [stage-1  3/12] COPY pyproject.toml requirements.lock ./
+#14 CACHED
+
+#15 [stage-1  4/12] RUN pip install --no-cache-dir -r requirements.lock
+#15 CACHED
+
+#16 [stage-1  5/12] COPY backend ./backend
+#16 DONE 0.2s
+
+#17 [stage-1  6/12] COPY migrations ./migrations
+#17 DONE 0.1s
+
+#18 [stage-1  7/12] COPY alembic.ini ./
+#18 DONE 0.0s
+
+#19 [stage-1  8/12] COPY scripts/volume_backfill.py ./scripts/volume_backfill.py
+#19 DONE 0.1s
+
+#20 [stage-1  9/12] RUN pip install --no-cache-dir --no-deps .
+#20 0.916 Processing /app
+#20 0.921   Installing build dependencies: started
+#20 4.474   Installing build dependencies: finished with status 'done'
+#20 4.475   Getting requirements to build wheel: started
+#20 4.834   Getting requirements to build wheel: finished with status 'done'
+#20 4.837   Preparing metadata (pyproject.toml): started
+#20 5.387   Preparing metadata (pyproject.toml): finished with status 'done'
+#20 5.392 Building wheels for collected packages: market-watch
+#20 5.394   Building wheel for market-watch (pyproject.toml): started
+#20 6.103   Building wheel for market-watch (pyproject.toml): finished with status 'done'
+#20 6.106   Created wheel for market-watch: filename=market_watch-1.18.1-py3-none-any.whl size=834063 sha256=88003436f72a6553333f5b6e2e42ef37d03c97b0084dd389db776ef40399b76d
+#20 6.107   Stored in directory: /tmp/pip-ephem-wheel-cache-p9kp7gan/wheels/57/0f/98/bb57b2b57b95807699b822a35c022f139d38a02c27922f27ce
+#20 6.112 Successfully built market-watch
+#20 6.112 Installing collected packages: market-watch
+#20 7.551 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+#20 7.552 Successfully installed market-watch-1.18.1
+#20 8.034 
+#20 8.034 [notice] A new release of pip is available: 24.0 -> 26.2.1
+#20 8.034 [notice] To update, run: pip install --upgrade pip
+#20 DONE 8.4s
+
+#21 [stage-1 10/12] COPY --from=adapter /adapter ./adapters/dukascopy
+#21 DONE 0.4s
+
+#22 [stage-1 11/12] RUN useradd --uid 10001 --create-home app
+#22 DONE 0.3s
+
+#23 exporting to oci image format
+#23 exporting layers
+#23 exporting layers 1.0s done
+#23 exporting manifest sha256:51166316bb867a2b64d2e691278eea7b371ea6ddb6f20145b00e01658c11de19
+#23 exporting manifest sha256:51166316bb867a2b64d2e691278eea7b371ea6ddb6f20145b00e01658c11de19 0.0s done
+#23 exporting config sha256:e1c260f2a3bf747ebe2a5bdc3afeee04faca48e158113f4fd447acc665860637 0.0s done
+#23 sending tarball
+#23 ...
+
+#24 importing to docker
+#24 DONE 0.0s
+
+#23 exporting to oci image format
+#23 sending tarball 15.2s done
+#23 DONE 16.2s
+{"task": "mw-pr37-fix-20261011", "tag": "market-watch-api:pr37-fix-20261011", "builder": "market-watch-ubuntu"}

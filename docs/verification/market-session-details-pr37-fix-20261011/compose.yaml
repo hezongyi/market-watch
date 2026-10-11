@@ -1,0 +1,58 @@
+services:
+  pg:
+    image: postgres:14-bookworm
+    env_file: [/tmp/mw-pr37-fix-20261011/pg.env]
+    volumes: [pg-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U acceptance -d session_details]
+      interval: 3s
+      retries: 20
+  api:
+    image: market-watch-api:pr37-fix-20261011
+    env_file:
+      - path: /tmp/mw-pr37-fix-20261011/acceptance.env
+        format: raw
+    command: [python, /fixture/runtime.py, api]
+    volumes: [./fixture-runtime.py:/fixture/runtime.py:ro]
+    depends_on:
+      pg: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/readyz',timeout=3)"]
+      interval: 3s
+      timeout: 4s
+      retries: 20
+  native-history-worker:
+    image: market-watch-api:pr37-fix-20261011
+    env_file:
+      - path: /tmp/mw-pr37-fix-20261011/acceptance.env
+        format: raw
+    command: [python, /fixture/runtime.py, native]
+    volumes: [./fixture-runtime.py:/fixture/runtime.py:ro]
+    depends_on:
+      api: {condition: service_healthy}
+  market-stream-worker:
+    image: market-watch-api:pr37-fix-20261011
+    env_file:
+      - path: /tmp/mw-pr37-fix-20261011/acceptance.env
+        format: raw
+    command: [python, /fixture/runtime.py, stream]
+    volumes: [./fixture-runtime.py:/fixture/runtime.py:ro]
+    depends_on:
+      api: {condition: service_healthy}
+  web:
+    image: market-watch-web:pr37-fix-20261011
+    depends_on:
+      api: {condition: service_healthy}
+  chart-origin:
+    image: market-watch-chart-origin:pr37-fix-20261011
+    depends_on: [web]
+  tls:
+    image: nginx:1.28-alpine
+    ports: [127.0.0.1:17443:443, 127.0.0.1:17444:444]
+    volumes:
+      - /tmp/mw-pr37-fix-20261011/tls.conf:/etc/nginx/conf.d/default.conf:ro
+      - /tmp/mw-pr37-fix-20261011/cert.pem:/certs/cert.pem:ro
+      - /tmp/mw-pr37-fix-20261011/key.pem:/certs/key.pem:ro
+    depends_on: [web, chart-origin]
+volumes:
+  pg-data:
