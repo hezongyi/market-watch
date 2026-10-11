@@ -16,7 +16,7 @@ from .history_request_evidence import snapshot as read_snapshot
 from .history_request_evidence import start as start_read
 from .history_sources import HistoryConfigurationError, HistorySources, history_identity, page_end
 from .market_contracts import DatasetIdentity, failed_request
-from .market_datasets import PricePrecisionError, register_dataset
+from .market_datasets import PRICE_RULE_VERSION, PricePrecisionError, version_price_rows, register_dataset
 from .market_resources import cooldown, lane
 from .source_history_store import AcquisitionBusy, raw_chunk, shared_page, store_blob
 from .source_registry import collection_identity
@@ -48,7 +48,11 @@ def create_version(db, dataset_id, start, end):
     history_identity(dataset.identity)
     if not 0 <= start < end <= (now_ms() - 5000) // 60000 * 60000 or start % 60000 or end % 60000:
         raise ValueError("Historical version requires fixed past UTC minute boundaries")
-    version = HistoryVersion(dataset_id=dataset_id, start=start, end=end, cursor=start)
+    dataset_row = db.get(MarketDataset, dataset_id)
+    instrument = db.get(Instrument, dataset_row.instrument_id)
+    version = HistoryVersion(dataset_id=dataset_id, start=start, end=end, cursor=start,
+                             manifest={"price_precision": instrument.precision,
+                                       "price_rule_version": PRICE_RULE_VERSION})
     db.add(version)
     db.flush()
     return version.id
@@ -121,6 +125,11 @@ def publish(db, version):
         raise ValueError("Historical query partition is incomplete")
     dataset = db.get(MarketDataset, version.dataset_id)
     instrument = db.get(Instrument, dataset.instrument_id)
+    existing = version.manifest or {}
+    price_manifest = {}
+    if existing.get("price_rule_version") and "price_precision" in existing:
+        price_manifest = {"price_precision": existing["price_precision"],
+                          "price_rule_version": existing["price_rule_version"]}
     version.manifest = {
         "dataset_version": version.id, "identity": dataset.identity,
         "start": version.start, "end": version.end,
@@ -130,6 +139,9 @@ def publish(db, version):
         "coverage": "observed_only; unobserved intervals remain unknown",
         "checksum": checksum.hexdigest(), "chunks": manifest_chunks,
         "request_evidence": read_snapshot(db, version.id),
+        **price_manifest,
+        **({"price_rule_activation": version.manifest["price_rule_activation"]}
+           if version.manifest.get("price_rule_activation") else {}),
         **({"provenance": version.manifest["provenance"]} if version.manifest.get("provenance") else {}),
         **({"maintenance": version.manifest["maintenance"]} if version.manifest.get("maintenance") else {}),
     }
@@ -237,7 +249,7 @@ def import_page(adapter, *, version_id=None):
             from .market import ingest
 
             ingest(db, db.get(Instrument, dataset.instrument_id), batch.ingestion_payload(),
-                   defer_aggregation=True)
+                   defer_aggregation=True, price_manifest=version.manifest or {})
             content_id, checksum = store_blob(db, collection_identity(raw_identity).key, content)
             db.add(HistoryChunk(version_id=ident, start=start, end=checkpoint,
                 observed_at=batch.observed_at, count=len(batch.rows),
@@ -280,9 +292,9 @@ def import_page(adapter, *, version_id=None):
             result = batch.result if batch and not batch.result.successful else failed_request(error, observed_at=now_ms())
             metadata_failure = isinstance(error, PricePrecisionError)
             configuration_failure = isinstance(error, HistoryConfigurationError)
-            version.error = "price_precision_overflow" if metadata_failure else (
-                "history_source_configuration" if configuration_failure else
-                result.status if result else "invalid_payload")
+            version.error = ("price_precision_overflow" if metadata_failure else
+                             "history_source_configuration" if configuration_failure else
+                             result.status if result else "invalid_payload")
             finish_read(db.get(HistoryReadAttempt, read_id), version.error, batch=batch,
                         read_kind=evidence.get("read_kind"))
             version.next_at = (result.retry_at if result and result.retry_at else
@@ -349,7 +361,8 @@ def snapshot_rows(db, ident, *, start=None, end=None):
         HistoryChunk.start < right, HistoryChunk.end > left).order_by(HistoryChunk.start)
     for chunk in db.scalars(query.execution_options(yield_per=1)):
         raw = raw_chunk(db, chunk)
-        for row in json.loads(raw):
+        rows = version_price_rows(json.loads(raw), version.manifest)
+        for row in rows:
             if left <= row["timestamp"] < right:
                 yield row
 

@@ -64,10 +64,10 @@ def derive_version(db, original_id, destination_dataset, *, quarantine_reason=No
     ident = create_version(db, destination_dataset, parent.start, parent.end)
     version = db.get(HistoryVersion, ident)
     version.status = "deriving"
-    version.manifest = {"provenance": {"derived_from_version": parent.id,
+    version.manifest = {**(version.manifest or {}), "provenance": {"derived_from_version": parent.id,
         "original_identity": original.identity, "original_cursor": parent.cursor,
         "copied_minutes": 0, "copied_chunks": 0, "original_prefix_checksum": hashlib.sha256(b"").hexdigest(),
-        "method": "verified immutable original chunks; no price rounding or source substitution"}}
+        "method": "verified immutable original chunks; target version price rule; no source substitution"}}
     return ident
 
 
@@ -105,11 +105,11 @@ def derive_page(ident):
             window_start=source.start, window_end=source.end, observed_at=source.observed_at,
             result=RequestResult(status=source.result), rows=tuple(json.loads(raw)),
             checkpoint=source.end, volume_kind=dataset.volume_kind, volume_unit=dataset.volume_unit).ingestion_payload()
-        validate_ingestion(db, inst, payload)
+        payload = {**payload, "rows": [row.model_dump() for row in validate_ingestion(db, inst, payload, price_manifest=version.manifest or {}).rows]}
         if len(payload["rows"]) != source.count:
             raise ValueError("Original row count mismatch")
-        # Destination series is new. Copy exact original JSON, never a newer
-        # staging revision, and use bounded ordinary inserts in this transaction.
+        # Reconstruct destination business prices from original source JSON,
+        # never from a newer staging revision or already rounded parent rows.
         values = [{"instrument_id": inst.id, "timeframe": "M1", "start": row["timestamp"],
             "end": row["timestamp"] + 60000,
             **{key: Decimal(row[key]) for key in ("open", "high", "low", "close")},
@@ -139,7 +139,8 @@ def derive_page(ident):
         for checksum in db.scalars(select(HistoryChunk.checksum).where(HistoryChunk.version_id == version.id)
                                    .order_by(HistoryChunk.start)):
             digest.update(checksum.encode())
-        version.manifest = {"provenance": {**proof, "copied_chunks": proof["copied_chunks"] + 1,
+        version.manifest = {**(version.manifest or {}), "provenance": {**proof,
+            "copied_chunks": proof["copied_chunks"] + 1,
             "copied_minutes": proof["copied_minutes"] + source.count,
             "original_prefix_checksum": digest.hexdigest()}}
         return True
