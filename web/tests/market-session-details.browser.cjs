@@ -54,7 +54,12 @@ const record=report.cases.push.bind(report.cases);report.cases.push=item=>{conso
     const frame = await (async()=>{for(let i=0;i<120;i++) {const f=page.frames().find(f=>f.url().startsWith("https://127.0.0.1:17444/"));if(f)return f;await page.waitForTimeout(500);}throw Error("missing chart origin");})();
     await frame.waitForFunction(()=>typeof ready!=="undefined" && ready && !loading && widget.activeChart().dataReady(),null,{timeout:120000});
     await frame.evaluate(()=>{globalThis.sessionNavigationErrors=[];
-      addEventListener("mw-navigation-error",event=>sessionNavigationErrors.push(event.detail?.message || String(event.detail)));});
+      globalThis.sessionNavigationCancellations=[];
+      addEventListener("mw-navigation-error",event=>{
+        const message=event.detail?.message || String(event.detail);
+        if(event.detail?.code === "HISTORY_CANCELLED") sessionNavigationCancellations.push(message);
+        else sessionNavigationErrors.push(message);
+      });});
     const ui = frame.childFrames()[0]; assert.ok(ui,"native frame");
     await frame.evaluate(async()=> {const bar=await widget.widgetbar();bar.changeWidgetBarVisibility(true);bar.showPage("watchlist_details_news");});
     const quote = (await post("market-data/quotes",{symbols:[ticker]}))[0];
@@ -267,6 +272,7 @@ const record=report.cases.push.bind(report.cases);report.cases.push=item=>{conso
     await rapidPage.close();
     await page.waitForTimeout(1000);
     report.navigationErrors=await frame.evaluate(()=>sessionNavigationErrors);
+    report.navigationCancellations=await frame.evaluate(()=>sessionNavigationCancellations);
     assert.deepEqual(report.navigationErrors,[]);
     assert.deepEqual(report.errors,[]);
     fs.writeFileSync(OUT+"/browser.json",JSON.stringify(report,null,2));
