@@ -1,0 +1,26 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.16, pytest-9.1.1, pluggy-1.6.0
+rootdir: /app
+configfile: pyproject.toml
+plugins: anyio-4.15.1, platformdirs-4.12.2, asyncio-1.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 237 items
+
+backend/tests/test_market_calendar.py .....................              [  8%]
+backend/tests/test_quote_session_contract.py ......                      [ 11%]
+backend/tests/test_market_data.py ...................................... [ 27%]
+.........                                                                [ 31%]
+backend/tests/test_provider_chart.py ................................... [ 45%]
+........................                                                 [ 56%]
+backend/tests/test_composite_quotes.py .................                 [ 63%]
+backend/tests/test_series_access.py ......                               [ 65%]
+backend/tests/test_live_session.py ....                                  [ 67%]
+backend/tests/test_market_stream_quotes.py ..........                    [ 71%]
+backend/tests/test_history_artifacts.py ..........                       [ 75%]
+backend/tests/test_history_versions.py ..........                        [ 80%]
+backend/tests/test_market_datasets.py .................................. [ 94%]
+....                                                                     [ 96%]
+backend/tests/test_history_derivation.py ...                             [ 97%]
+backend/tests/test_composite_chart.py ......                             [100%]
+
+======================== 237 passed in 61.28s (0:01:01) ========================

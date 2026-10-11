@@ -45,10 +45,10 @@ function PeriodRow({period: p}: {period: Period}) {
   </div>;
 }
 
-type Version = {id: string; status: string; start: number; end: number; published_at: number | null; payload_available?: boolean; manifest?: {rows?: number; unknown_minutes?: number}};
+type Version = {id: string; status: string; start: number; end: number; published_at: number | null; payload_available?: boolean; manifest?: {rows?: number; unknown_minutes?: number; price_precision?: number; price_rule_version?: string}};
 type Coverage = {start:number;end:number;observed_at:number;observed_minutes:number;unknown_minutes:number;confirmed_closed_minutes:number;conflict_minutes:number;observed_intervals:number[][];unknown_intervals:number[][];confirmed_closed_intervals:number[][];conflict_intervals:number[][];session_evidence:{source:string;kind:string;applicability?:string}[]};
 const readKinds:Record<string,string> = {supplier_request:"上游请求",shared_cache:"共享缓存",parent_reuse:"父版本复用",shared_wait:"等待共享读取",pending:"尚未读取"};
-const readResults:Record<string,string> = {data:"返回数据",empty_success:"成功空响应",inherited:"继承父版本",timeout:"超时",rate_limited:"请求限流",unauthorized:"授权异常",unavailable:"来源不可用",invalid_payload:"数据校验失败",price_precision_overflow:"价格精度不符",history_source_configuration:"来源配置异常",shared_busy:"共享读取未完成",discarded:"结果未接纳",interrupted:"进程中断，结果未知",started:"读取中"};
+const readResults:Record<string,string> = {data:"返回数据",empty_success:"成功空响应",inherited:"继承父版本",timeout:"超时",rate_limited:"请求限流",unauthorized:"授权异常",unavailable:"来源不可用",invalid_payload:"数据校验失败",price_precision_overflow:"价格超出旧规则精度，需显式重试后按数据集精度四舍五入",history_source_configuration:"来源配置异常",shared_busy:"共享读取未完成",discarded:"结果未接纳",interrupted:"进程中断，结果未知",started:"读取中"};
 
 export function CoverageView({versions,selected,view,page,requestPage,refresh,select}: {
   versions:Version[];selected?:string;view:string;page:number;requestPage:number;refresh:number;select:(key:string,value:string)=>void;
@@ -116,6 +116,11 @@ function VersionDetails({version:v,refresh,compare}: {version:Version;refresh:nu
   const artifacts=useSnapshot<Period[]>(`/market-data/versions/${v.id}/artifacts`,refresh);
   return <>
     <dl className="dc-detail-facts"><div><dt>固定版本身份</dt><dd>{v.id}</dd></div><div><dt>发布时间</dt><dd>{time(v.published_at)}</dd></div><div><dt>固定范围</dt><dd>{time(v.start)} — {time(v.end)}</dd></div><div><dt>状态</dt><dd>{v.payload_available === false ? "价格已回收，清单保留" : names[v.status] || v.status}</dd></div><div><dt>观测 / 未知分钟</dt><dd>{v.manifest?.rows ?? "—"} / {v.manifest?.unknown_minutes ?? "—"}</dd></div></dl>
+    <p>{v.manifest?.price_rule_version === "dataset-precision-half-up-v1"
+      ? `价格精度：${v.manifest.price_precision} 位；超出设定精度的价格自动四舍五入，未超精度的价格保持原值。`
+      : v.manifest?.price_rule_version
+        ? "此版本使用其他价格处理规则，请核对版本记录。"
+        : "此版本沿用旧价格规则，保持已保存价格。"}</p>
     <h3>周期产物</h3><Feedback error={artifacts.error} loading={artifacts.loading} empty={!artifacts.data}/>
     {artifacts.data?.map(p=><p key={p.id}>{p.timeframe} · {names[p.status] || p.status} · 观测 {p.rows} / 完整 {p.complete_rows}</p>)}
     {v.status === "published" && <div className="dc-detail-actions">

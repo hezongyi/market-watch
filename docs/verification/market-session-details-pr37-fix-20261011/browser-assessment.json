@@ -1,0 +1,73 @@
+{
+  "result": "functional assertions passed; strict navigation-event assertion failed on expected cancellations",
+  "functional_cases": 41,
+  "page_errors": [],
+  "completed_periods": [
+    {
+      "case": "native period ready",
+      "interval": "1",
+      "range": {
+        "interval": "1",
+        "from": 1791570540,
+        "to": 1791580140
+      }
+    },
+    {
+      "case": "native period ready",
+      "interval": "60",
+      "range": {
+        "interval": "60",
+        "from": 1791036000,
+        "to": 1791612000
+      }
+    },
+    {
+      "case": "native period ready",
+      "interval": "240",
+      "range": {
+        "interval": "240",
+        "from": 1789416000,
+        "to": 1791720000
+      }
+    },
+    {
+      "case": "native period ready",
+      "interval": "1D",
+      "range": {
+        "interval": "1D",
+        "from": 1778544000,
+        "to": 1792368000
+      }
+    },
+    {
+      "case": "native period ready",
+      "interval": "1W",
+      "range": {
+        "interval": "1W",
+        "from": 1704067200,
+        "to": 1797206400
+      }
+    },
+    {
+      "case": "native period ready",
+      "interval": "1M",
+      "range": {
+        "interval": "1M",
+        "from": 1704067200,
+        "to": 1817078400
+      }
+    }
+  ],
+  "expected_navigation_cancellations": [
+    "已取消旧图表的历史加载",
+    "已取消旧图表的历史加载"
+  ],
+  "classification_evidence": [
+    "advanced-host/native-navigation.js cancelled() defines message with HISTORY_CANCELLED",
+    "advanced-host/bridge.js ignores HISTORY_CANCELLED navigation errors"
+  ],
+  "raw_report": "browser/browser.json",
+  "runner_final_status": "failed expected-cancellation classification assertion",
+  "harness_fix": "record HISTORY_CANCELLED separately; no new product change",
+  "corrected_harness_rerun": false
+}

@@ -1,0 +1,85 @@
+{
+  "project": "mw-pr37-fix-ubuntu-20261011",
+  "task": "mw-pr37-fix-20261011",
+  "apply": true,
+  "containers": [
+    "mw-pr37-fix-ubuntu-20261011-chart-origin-1",
+    "mw-pr37-fix-ubuntu-20261011-market-stream-worker-1",
+    "mw-pr37-fix-ubuntu-20261011-native-history-worker-1",
+    "mw-pr37-fix-ubuntu-20261011-api-1",
+    "mw-pr37-fix-ubuntu-20261011-tls-1",
+    "mw-pr37-fix-ubuntu-20261011-web-1",
+    "mw-pr37-fix-ubuntu-20261011-pg-1"
+  ],
+  "volumes": [
+    "mw-pr37-fix-ubuntu-20261011_pg-data"
+  ],
+  "networks": [
+    "d9b015e04084"
+  ],
+  "retained_images": []
+}
+{"task": "mw-pr37-fix-20261011", "completed_at": "2026-10-11T00:32:16.514820+00:00"}
+{
+  "apply": true,
+  "automatic": false,
+  "images": [
+    {
+      "id": "sha256:046ece57543010ab5e72359817965c809109c59f036a67ca287d2497f9a5fe30",
+      "task": "mw-pr37-fix-20261011",
+      "refs": [
+        "sha256:046ece57543010ab5e72359817965c809109c59f036a67ca287d2497f9a5fe30"
+      ]
+    },
+    {
+      "id": "sha256:0c460590ceb16e165a082cccbfa3ae31526ab6937ef22dec8584f891a32c8440",
+      "task": "mw-pr37-fix-20261011",
+      "refs": [
+        "market-watch-web:pr37-fix-20261011"
+      ]
+    },
+    {
+      "id": "sha256:1b7142bb209611cbae5784d6e9f278516f94d4f864d9eaa25ba4ce828a98937b",
+      "task": "mw-pr37-fix-20261011",
+      "refs": [
+        "market-watch-chart-origin:pr37-fix-20261011"
+      ]
+    },
+    {
+      "id": "sha256:2abdc92a9e5fa33330bcaebacb24d7e7e3f2ec44aecb670ada9c1e78e40c5315",
+      "task": "mw-pr37-fix-20261011",
+      "refs": [
+        "sha256:2abdc92a9e5fa33330bcaebacb24d7e7e3f2ec44aecb670ada9c1e78e40c5315"
+      ]
+    },
+    {
+      "id": "sha256:51166316bb867a2b64d2e691278eea7b371ea6ddb6f20145b00e01658c11de19",
+      "task": "mw-pr37-fix-20261011",
+      "refs": [
+        "market-watch-api:pr37-fix-20261011"
+      ]
+    },
+    {
+      "id": "sha256:5ba9e25863cbcfb1f08be91b7879afaf11b72f6a6f54367563788f0db70b1bdd",
+      "task": "mw-pr37-fix-20261011",
+      "refs": [
+        "sha256:5ba9e25863cbcfb1f08be91b7879afaf11b72f6a6f54367563788f0db70b1bdd"
+      ]
+    },
+    {
+      "id": "sha256:6b549379bbf96813051eaf0022f813e37605c67e6a593aa845c254b19d54d148",
+      "task": "mw-pr37-fix-20261011",
+      "refs": [
+        "sha256:6b549379bbf96813051eaf0022f813e37605c67e6a593aa845c254b19d54d148"
+      ]
+    },
+    {
+      "id": "sha256:8b1b7094949151fb18a1acb4b7fea8957fbbfdec148918f0643e3a49a934d30a",
+      "task": "mw-pr37-fix-20261011",
+      "refs": [
+        "sha256:8b1b7094949151fb18a1acb4b7fea8957fbbfdec148918f0643e3a49a934d30a"
+      ]
+    }
+  ]
+}
+{"archive": "/home/quant/.local/share/market-watch-docker/archives/mw-pr37-fix-ubuntu-20261011-20261011T002930-b2f994bb", "restore_verified": true}

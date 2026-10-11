@@ -1,0 +1,7 @@
+mw-session-details-fix-ubuntu-20261011-native-history-worker-1	market-watch-api:session-details-fix-20261011	Up 11 minutes	8000/tcp
+mw-session-details-fix-ubuntu-20261011-market-stream-worker-1	market-watch-api:session-details-fix-20261011	Up 11 minutes	8000/tcp
+mw-session-details-fix-ubuntu-20261011-api-1	market-watch-api:session-details-fix-20261011	Up 11 minutes (healthy)	8000/tcp
+mw-session-details-fix-ubuntu-20261011-chart-origin-1	market-watch-chart-origin:session-details-fix-20261011	Up 21 minutes	80/tcp
+mw-session-details-fix-ubuntu-20261011-web-1	market-watch-web:session-details-fix-20261011	Up 42 minutes	80/tcp
+mw-session-details-fix-ubuntu-20261011-tls-1	nginx:1.28-alpine	Up 52 minutes	80/tcp, 127.0.0.1:17443->443/tcp, 127.0.0.1:17444->444/tcp
+mw-session-details-fix-ubuntu-20261011-pg-1	postgres:14-bookworm	Up 52 minutes (healthy)	5432/tcp

@@ -2,6 +2,8 @@
 
 2026-10-11。基线为正式 tag `v1.18.0`，提交 `e75694c79e62ff8a464916278f35c9148cce6241`。实施工作树为 `/home/quant/repos/market-watch-native-alert-ui-v118-20261011`，分支 `feat/native-alert-ui-v118-20261011`。原 v1.14.1 实施工作树与其未提交内容保留。
 
+本目录验收对应实施提交 `1741c9c` 的代码与运行快照。PR 提交时另合并最新 main（v1.19.0），新增的提交前复验与当前源码摘要见 [PR 提交记录](../pr-submit/README.md)；本目录原哈希、版本、截图和 Docker 验收证据保持历史原样。
+
 ## 对齐内容
 
 - 在 v1.18.0 上迁入已实施的真实 widgetbar、原生告警窗口/控件及共享 React renderer。保持父页面 API、CSRF 和工作区草稿隔离。

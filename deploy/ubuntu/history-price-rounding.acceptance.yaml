@@ -1,0 +1,51 @@
+# Ubuntu-only isolated acceptance; build both images with mw-docker first.
+services:
+  postgres:
+    image: postgres:14-bookworm
+    restart: "no"
+    environment:
+      POSTGRES_DB: price_rounding
+      POSTGRES_USER: price_rounding
+      POSTGRES_PASSWORD: ${MW_ACCEPTANCE_DB_PASSWORD:?Set a development-only password}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U price_rounding -d price_rounding"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  migrate:
+    image: ${MW_API_IMAGE:?Build the task-owned API image}
+    restart: "no"
+    command: [alembic, upgrade, head]
+    environment: &backend-env
+      ALERTS_DATABASE_URL: postgresql+psycopg://price_rounding:${MW_ACCEPTANCE_DB_PASSWORD}@postgres/price_rounding
+      ALERTS_COOKIE_SECURE: "false"
+      ALERTS_DELIVERY_ENABLED: "false"
+      ALERTS_MCP_ENABLED: "false"
+      ALERTS_YAHOO_ENABLED: "false"
+      ALERTS_INITIAL_HISTORY_DAYS: "0"
+      ALERTS_DATABASE_POOL_SIZE: "1"
+      ALERTS_DATABASE_MAX_OVERFLOW: "0"
+    depends_on:
+      postgres: {condition: service_healthy}
+  api:
+    image: ${MW_API_IMAGE:?Build the task-owned API image}
+    restart: "no"
+    environment: *backend-env
+    ports: ["127.0.0.1:18011:8000"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8000/readyz', timeout=3)"]
+      interval: 3s
+      timeout: 4s
+      retries: 20
+  web:
+    image: ${MW_WEB_IMAGE:?Build the task-owned web image}
+    restart: "no"
+    ports: ["127.0.0.1:18013:80"]
+    depends_on:
+      api: {condition: service_healthy}
+volumes:
+  postgres-data:

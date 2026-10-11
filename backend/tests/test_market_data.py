@@ -633,7 +633,8 @@ def test_quote_quality_distinguishes_open_stale_from_weekend(database, monkeypat
                 row = client.post("/api/market-data/quotes", json={"symbols": ["EURUSD"]}).json()[0]
                 assert row["quality"] == quality
                 assert row["age_ms"] == offset
-                assert "2026-09-25 21:00 UTC" in row["v"]["description"]
+                assert "最后行情时间 2026-09-25 20:59:00 UTC" in row["v"]["description"]
+                assert not row["v"].get("session_conflict")
     finally:
         api_module.app.dependency_overrides.clear()
 

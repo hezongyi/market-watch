@@ -1,0 +1,636 @@
+{
+  "items": [
+    {
+      "source": "dukascopy",
+      "version": "dukascopy-spot-v1",
+      "scope": "XAU/USD and EUR/USD in the provider catalog",
+      "timezone": "America/New_York",
+      "regular_hours": "周日 17:00 至周五 17:00（纽约时间）；XAU/USD 每日 17:00-18:00 暂停",
+      "status": "verified",
+      "checked_at": "2026-10-10",
+      "review_due_at": "2026-11-10",
+      "valid_from": "2026-01-01",
+      "valid_until": "2027-03-31",
+      "evidence": [
+        "https://www.dukascopy.com/swiss/english/forex/forex-trading-accounts/link/",
+        "https://www.dukascopy.com/swiss/english/marketwatch/trading-breaks-calendar/",
+        "https://www.dukascopy.com/swiss/english/forex/forex-trading-accounts/overnight/"
+      ],
+      "mappings": [
+        "XAU/USD"
+      ],
+      "exceptions": [],
+      "enabled": true,
+      "exceptions_reviewed": false,
+      "coverage_note": "常规计划已记录；未登记的节假日和临时调整仍待核实。",
+      "row_id": "dukascopy-spot-v1:XAU/USD",
+      "market_session": "closed",
+      "session_reason": "周末",
+      "calendar_verified": true,
+      "calendar_version": "dukascopy-spot-v1"
+    },
+    {
+      "source": "dukascopy",
+      "version": "dukascopy-spot-v1",
+      "scope": "XAU/USD and EUR/USD in the provider catalog",
+      "timezone": "America/New_York",
+      "regular_hours": "周日 17:00 至周五 17:00（纽约时间）；无已登记每日暂停",
+      "status": "verified",
+      "checked_at": "2026-10-10",
+      "review_due_at": "2026-11-10",
+      "valid_from": "2026-01-01",
+      "valid_until": "2027-03-31",
+      "evidence": [
+        "https://www.dukascopy.com/swiss/english/forex/forex-trading-accounts/link/",
+        "https://www.dukascopy.com/swiss/english/marketwatch/trading-breaks-calendar/",
+        "https://www.dukascopy.com/swiss/english/forex/forex-trading-accounts/overnight/"
+      ],
+      "mappings": [
+        "EUR/USD"
+      ],
+      "exceptions": [],
+      "enabled": true,
+      "exceptions_reviewed": false,
+      "coverage_note": "常规计划已记录；未登记的节假日和临时调整仍待核实。",
+      "row_id": "dukascopy-spot-v1:EUR/USD",
+      "market_session": "closed",
+      "session_reason": "周末",
+      "calendar_verified": true,
+      "calendar_version": "dukascopy-spot-v1"
+    },
+    {
+      "source": "oanda",
+      "version": "oanda-account-scope-pending-v1",
+      "scope": "实际账户实体、通道和产品映射待核实",
+      "timezone": "America/New_York",
+      "regular_hours": "未发布通用规则；按账户产品核实",
+      "status": "unverified",
+      "checked_at": "2026-10-10",
+      "review_due_at": "2026-11-10",
+      "valid_from": null,
+      "valid_until": null,
+      "evidence": [
+        "https://developer.oanda.com/rest-live-v20/instrument-ep/"
+      ],
+      "mappings": [
+        "EUR_USD",
+        "XAU_USD"
+      ],
+      "exceptions": [
+        {
+          "date": "2026-04-03",
+          "reason": "Good Friday",
+          "hours": "US energies and metals closed",
+          "source": "https://www.oanda.com/sg-en/trading/holiday-trading-hours/"
+        },
+        {
+          "date": "2026-05-25",
+          "reason": "Memorial Day",
+          "hours": "US energies and metals close 14:29; gold reopens 18:05 ET",
+          "source": "https://www.oanda.com/sg-en/trading/holiday-trading-hours/"
+        },
+        {
+          "date": "2026-07-03",
+          "reason": "Independence Day observed",
+          "hours": "US energies and metals close 12:59 ET",
+          "source": "https://www.oanda.com/sg-en/trading/holiday-trading-hours/"
+        },
+        {
+          "date": "2026-09-07",
+          "reason": "Labor Day",
+          "hours": "US energies and metals close 14:29 ET; reopen 18:01 ET",
+          "source": "https://www.oanda.com/sg-en/trading/holiday-trading-hours/"
+        }
+      ],
+      "enabled": false,
+      "exceptions_reviewed": false,
+      "coverage_note": "常规计划已记录；未登记的节假日和临时调整仍待核实。"
+    },
+    {
+      "source": "binance",
+      "version": "binance-spot-hours-pending-v1",
+      "scope": "Binance Spot BTCUSDT；常规交易时段及交易对状态待官方证据核实",
+      "timezone": "Etc/UTC",
+      "regular_hours": "全天候候选尚未认证；临时维护和交易对状态单独核实",
+      "status": "unverified",
+      "checked_at": null,
+      "review_due_at": "2026-11-10",
+      "valid_from": null,
+      "valid_until": null,
+      "evidence": [
+        "https://developers.binance.com/docs/binance-spot-api-docs/rest-api/general-endpoints"
+      ],
+      "mappings": [
+        "BTCUSDT"
+      ],
+      "exceptions": [],
+      "enabled": true,
+      "exceptions_reviewed": false,
+      "coverage_note": "常规计划已记录；未登记的节假日和临时调整仍待核实。"
+    },
+    {
+      "source": "yahoo",
+      "version": "yahoo-exchange-mapping-pending-v1",
+      "scope": "必须按 Yahoo 返回的交易所和资产类别逐项核实",
+      "timezone": "exchange",
+      "regular_hours": "未核实；不能把外汇、加密和证券共用一个时段",
+      "status": "unverified",
+      "checked_at": "2026-10-10",
+      "review_due_at": "2026-11-10",
+      "valid_from": null,
+      "valid_until": null,
+      "evidence": [
+        "https://finance.yahoo.com/"
+      ],
+      "mappings": [],
+      "exceptions": [],
+      "enabled": true,
+      "exceptions_reviewed": false,
+      "coverage_note": "常规计划已记录；未登记的节假日和临时调整仍待核实。"
+    },
+    {
+      "source": "yahoo",
+      "version": "yahoo-exchange-mapping-pending-v1",
+      "scope": "当前来源品种 AAPL",
+      "timezone": "exchange",
+      "regular_hours": "未核实；不能把外汇、加密和证券共用一个时段",
+      "status": "unverified",
+      "checked_at": null,
+      "review_due_at": null,
+      "valid_from": null,
+      "valid_until": null,
+      "evidence": [
+        "https://finance.yahoo.com/"
+      ],
+      "mappings": [
+        "AAPL"
+      ],
+      "exceptions": [],
+      "enabled": true,
+      "market_session": "unknown",
+      "session_reason": null,
+      "calendar_verified": false,
+      "calendar_version": null,
+      "runtime_status": "unverified",
+      "exceptions_reviewed": false,
+      "coverage_note": "按实际来源身份匹配；无适用证据的部分保持未核实。",
+      "row_id": "yahoo:YAHOO:1eb44d625271a4eb75016f276d137836:yahoo-exchange-mapping-pending-v1"
+    },
+    {
+      "source": "yahoo",
+      "version": "yahoo-exchange-mapping-pending-v1",
+      "scope": "当前来源品种 AMZN",
+      "timezone": "exchange",
+      "regular_hours": "未核实；不能把外汇、加密和证券共用一个时段",
+      "status": "unverified",
+      "checked_at": null,
+      "review_due_at": null,
+      "valid_from": null,
+      "valid_until": null,
+      "evidence": [
+        "https://finance.yahoo.com/"
+      ],
+      "mappings": [
+        "AMZN"
+      ],
+      "exceptions": [],
+      "enabled": true,
+      "market_session": "unknown",
+      "session_reason": null,
+      "calendar_verified": false,
+      "calendar_version": null,
+      "runtime_status": "unverified",
+      "exceptions_reviewed": false,
+      "coverage_note": "按实际来源身份匹配；无适用证据的部分保持未核实。",
+      "row_id": "yahoo:YAHOO:31ac18dc22b8969027ad1d66155054ca:yahoo-exchange-mapping-pending-v1"
+    },
+    {
+      "source": "yahoo",
+      "version": "yahoo-exchange-mapping-pending-v1",
+      "scope": "当前来源品种 CL=F",
+      "timezone": "exchange",
+      "regular_hours": "未核实；不能把外汇、加密和证券共用一个时段",
+      "status": "unverified",
+      "checked_at": null,
+      "review_due_at": null,
+      "valid_from": null,
+      "valid_until": null,
+      "evidence": [
+        "https://finance.yahoo.com/"
+      ],
+      "mappings": [
+        "CL=F"
+      ],
+      "exceptions": [],
+      "enabled": true,
+      "market_session": "unknown",
+      "session_reason": null,
+      "calendar_verified": false,
+      "calendar_version": null,
+      "runtime_status": "unverified",
+      "exceptions_reviewed": false,
+      "coverage_note": "按实际来源身份匹配；无适用证据的部分保持未核实。",
+      "row_id": "yahoo:YAHOO:bdee2875bb189e62de2ab68d352e5504:yahoo-exchange-mapping-pending-v1"
+    },
+    {
+      "source": "yahoo",
+      "version": "yahoo-exchange-mapping-pending-v1",
+      "scope": "当前来源品种 EURUSD=X",
+      "timezone": "exchange",
+      "regular_hours": "未核实；不能把外汇、加密和证券共用一个时段",
+      "status": "unverified",
+      "checked_at": null,
+      "review_due_at": null,
+      "valid_from": null,
+      "valid_until": null,
+      "evidence": [
+        "https://finance.yahoo.com/"
+      ],
+      "mappings": [
+        "EURUSD=X"
+      ],
+      "exceptions": [],
+      "enabled": true,
+      "market_session": "unknown",
+      "session_reason": null,
+      "calendar_verified": false,
+      "calendar_version": null,
+      "runtime_status": "unverified",
+      "exceptions_reviewed": false,
+      "coverage_note": "按实际来源身份匹配；无适用证据的部分保持未核实。",
+      "row_id": "yahoo:YAHOO:edb0c8f3d3a261a3a3497905f4873c34:yahoo-exchange-mapping-pending-v1"
+    },
+    {
+      "source": "yahoo",
+      "version": "yahoo-exchange-mapping-pending-v1",
+      "scope": "当前来源品种 GBPUSD=X",
+      "timezone": "exchange",
+      "regular_hours": "未核实；不能把外汇、加密和证券共用一个时段",
+      "status": "unverified",
+      "checked_at": null,
+      "review_due_at": null,
+      "valid_from": null,
+      "valid_until": null,
+      "evidence": [
+        "https://finance.yahoo.com/"
+      ],
+      "mappings": [
+        "GBPUSD=X"
+      ],
+      "exceptions": [],
+      "enabled": true,
+      "market_session": "unknown",
+      "session_reason": null,
+      "calendar_verified": false,
+      "calendar_version": null,
+      "runtime_status": "unverified",
+      "exceptions_reviewed": false,
+      "coverage_note": "按实际来源身份匹配；无适用证据的部分保持未核实。",
+      "row_id": "yahoo:YAHOO:4af81190de0c28d06046d62433b6ff65:yahoo-exchange-mapping-pending-v1"
+    },
+    {
+      "source": "yahoo",
+      "version": "yahoo-exchange-mapping-pending-v1",
+      "scope": "当前来源品种 GC=F",
+      "timezone": "exchange",
+      "regular_hours": "未核实；不能把外汇、加密和证券共用一个时段",
+      "status": "unverified",
+      "checked_at": null,
+      "review_due_at": null,
+      "valid_from": null,
+      "valid_until": null,
+      "evidence": [
+        "https://finance.yahoo.com/"
+      ],
+      "mappings": [
+        "GC=F"
+      ],
+      "exceptions": [],
+      "enabled": true,
+      "market_session": "unknown",
+      "session_reason": null,
+      "calendar_verified": false,
+      "calendar_version": null,
+      "runtime_status": "unverified",
+      "exceptions_reviewed": false,
+      "coverage_note": "按实际来源身份匹配；无适用证据的部分保持未核实。",
+      "row_id": "yahoo:YAHOO:652cc40d03a64e41ad50e19a49a0ef77:yahoo-exchange-mapping-pending-v1"
+    },
+    {
+      "source": "yahoo",
+      "version": "yahoo-exchange-mapping-pending-v1",
+      "scope": "当前来源品种 GOOGL",
+      "timezone": "exchange",
+      "regular_hours": "未核实；不能把外汇、加密和证券共用一个时段",
+      "status": "unverified",
+      "checked_at": null,
+      "review_due_at": null,
+      "valid_from": null,
+      "valid_until": null,
+      "evidence": [
+        "https://finance.yahoo.com/"
+      ],
+      "mappings": [
+        "GOOGL"
+      ],
+      "exceptions": [],
+      "enabled": true,
+      "market_session": "unknown",
+      "session_reason": null,
+      "calendar_verified": false,
+      "calendar_version": null,
+      "runtime_status": "unverified",
+      "exceptions_reviewed": false,
+      "coverage_note": "按实际来源身份匹配；无适用证据的部分保持未核实。",
+      "row_id": "yahoo:YAHOO:a25fc665a45215b94107ae2888d71a15:yahoo-exchange-mapping-pending-v1"
+    },
+    {
+      "source": "yahoo",
+      "version": "yahoo-exchange-mapping-pending-v1",
+      "scope": "当前来源品种 META",
+      "timezone": "exchange",
+      "regular_hours": "未核实；不能把外汇、加密和证券共用一个时段",
+      "status": "unverified",
+      "checked_at": null,
+      "review_due_at": null,
+      "valid_from": null,
+      "valid_until": null,
+      "evidence": [
+        "https://finance.yahoo.com/"
+      ],
+      "mappings": [
+        "META"
+      ],
+      "exceptions": [],
+      "enabled": true,
+      "market_session": "unknown",
+      "session_reason": null,
+      "calendar_verified": false,
+      "calendar_version": null,
+      "runtime_status": "unverified",
+      "exceptions_reviewed": false,
+      "coverage_note": "按实际来源身份匹配；无适用证据的部分保持未核实。",
+      "row_id": "yahoo:YAHOO:2d1edf729cc53756834657ce399b1568:yahoo-exchange-mapping-pending-v1"
+    },
+    {
+      "source": "yahoo",
+      "version": "yahoo-exchange-mapping-pending-v1",
+      "scope": "当前来源品种 MSFT",
+      "timezone": "exchange",
+      "regular_hours": "未核实；不能把外汇、加密和证券共用一个时段",
+      "status": "unverified",
+      "checked_at": null,
+      "review_due_at": null,
+      "valid_from": null,
+      "valid_until": null,
+      "evidence": [
+        "https://finance.yahoo.com/"
+      ],
+      "mappings": [
+        "MSFT"
+      ],
+      "exceptions": [],
+      "enabled": true,
+      "market_session": "unknown",
+      "session_reason": null,
+      "calendar_verified": false,
+      "calendar_version": null,
+      "runtime_status": "unverified",
+      "exceptions_reviewed": false,
+      "coverage_note": "按实际来源身份匹配；无适用证据的部分保持未核实。",
+      "row_id": "yahoo:YAHOO:8638f0279b38c5e1e182bf0abb950cf0:yahoo-exchange-mapping-pending-v1"
+    },
+    {
+      "source": "yahoo",
+      "version": "yahoo-exchange-mapping-pending-v1",
+      "scope": "当前来源品种 NVDA",
+      "timezone": "exchange",
+      "regular_hours": "未核实；不能把外汇、加密和证券共用一个时段",
+      "status": "unverified",
+      "checked_at": null,
+      "review_due_at": null,
+      "valid_from": null,
+      "valid_until": null,
+      "evidence": [
+        "https://finance.yahoo.com/"
+      ],
+      "mappings": [
+        "NVDA"
+      ],
+      "exceptions": [],
+      "enabled": true,
+      "market_session": "unknown",
+      "session_reason": null,
+      "calendar_verified": false,
+      "calendar_version": null,
+      "runtime_status": "unverified",
+      "exceptions_reviewed": false,
+      "coverage_note": "按实际来源身份匹配；无适用证据的部分保持未核实。",
+      "row_id": "yahoo:YAHOO:426219f2bc19829619cd8e71b51d7b93:yahoo-exchange-mapping-pending-v1"
+    },
+    {
+      "source": "yahoo",
+      "version": "yahoo-exchange-mapping-pending-v1",
+      "scope": "当前来源品种 QQQ",
+      "timezone": "exchange",
+      "regular_hours": "未核实；不能把外汇、加密和证券共用一个时段",
+      "status": "unverified",
+      "checked_at": null,
+      "review_due_at": null,
+      "valid_from": null,
+      "valid_until": null,
+      "evidence": [
+        "https://finance.yahoo.com/"
+      ],
+      "mappings": [
+        "QQQ"
+      ],
+      "exceptions": [],
+      "enabled": true,
+      "market_session": "unknown",
+      "session_reason": null,
+      "calendar_verified": false,
+      "calendar_version": null,
+      "runtime_status": "unverified",
+      "exceptions_reviewed": false,
+      "coverage_note": "按实际来源身份匹配；无适用证据的部分保持未核实。",
+      "row_id": "yahoo:YAHOO:e9c5d7403d908b95343d66b100aef3bf:yahoo-exchange-mapping-pending-v1"
+    },
+    {
+      "source": "yahoo",
+      "version": "yahoo-exchange-mapping-pending-v1",
+      "scope": "当前来源品种 SI=F",
+      "timezone": "exchange",
+      "regular_hours": "未核实；不能把外汇、加密和证券共用一个时段",
+      "status": "unverified",
+      "checked_at": null,
+      "review_due_at": null,
+      "valid_from": null,
+      "valid_until": null,
+      "evidence": [
+        "https://finance.yahoo.com/"
+      ],
+      "mappings": [
+        "SI=F"
+      ],
+      "exceptions": [],
+      "enabled": true,
+      "market_session": "unknown",
+      "session_reason": null,
+      "calendar_verified": false,
+      "calendar_version": null,
+      "runtime_status": "unverified",
+      "exceptions_reviewed": false,
+      "coverage_note": "按实际来源身份匹配；无适用证据的部分保持未核实。",
+      "row_id": "yahoo:YAHOO:f7b6eda7a4a42ae26cf3d440aea709a3:yahoo-exchange-mapping-pending-v1"
+    },
+    {
+      "source": "yahoo",
+      "version": "yahoo-exchange-mapping-pending-v1",
+      "scope": "当前来源品种 SPY",
+      "timezone": "exchange",
+      "regular_hours": "未核实；不能把外汇、加密和证券共用一个时段",
+      "status": "unverified",
+      "checked_at": null,
+      "review_due_at": null,
+      "valid_from": null,
+      "valid_until": null,
+      "evidence": [
+        "https://finance.yahoo.com/"
+      ],
+      "mappings": [
+        "SPY"
+      ],
+      "exceptions": [],
+      "enabled": true,
+      "market_session": "unknown",
+      "session_reason": null,
+      "calendar_verified": false,
+      "calendar_version": null,
+      "runtime_status": "unverified",
+      "exceptions_reviewed": false,
+      "coverage_note": "按实际来源身份匹配；无适用证据的部分保持未核实。",
+      "row_id": "yahoo:YAHOO:6493341e6b5636b2080fa9a1961f4fd3:yahoo-exchange-mapping-pending-v1"
+    },
+    {
+      "source": "yahoo",
+      "version": "yahoo-exchange-mapping-pending-v1",
+      "scope": "当前来源品种 TSLA",
+      "timezone": "exchange",
+      "regular_hours": "未核实；不能把外汇、加密和证券共用一个时段",
+      "status": "unverified",
+      "checked_at": null,
+      "review_due_at": null,
+      "valid_from": null,
+      "valid_until": null,
+      "evidence": [
+        "https://finance.yahoo.com/"
+      ],
+      "mappings": [
+        "TSLA"
+      ],
+      "exceptions": [],
+      "enabled": true,
+      "market_session": "unknown",
+      "session_reason": null,
+      "calendar_verified": false,
+      "calendar_version": null,
+      "runtime_status": "unverified",
+      "exceptions_reviewed": false,
+      "coverage_note": "按实际来源身份匹配；无适用证据的部分保持未核实。",
+      "row_id": "yahoo:YAHOO:2ff6985a9799a3a91cd0e3be08a6eb69:yahoo-exchange-mapping-pending-v1"
+    },
+    {
+      "source": "yahoo",
+      "version": "yahoo-exchange-mapping-pending-v1",
+      "scope": "当前来源品种 ^DJI",
+      "timezone": "exchange",
+      "regular_hours": "未核实；不能把外汇、加密和证券共用一个时段",
+      "status": "unverified",
+      "checked_at": null,
+      "review_due_at": null,
+      "valid_from": null,
+      "valid_until": null,
+      "evidence": [
+        "https://finance.yahoo.com/"
+      ],
+      "mappings": [
+        "^DJI"
+      ],
+      "exceptions": [],
+      "enabled": true,
+      "market_session": "unknown",
+      "session_reason": null,
+      "calendar_verified": false,
+      "calendar_version": null,
+      "runtime_status": "unverified",
+      "exceptions_reviewed": false,
+      "coverage_note": "按实际来源身份匹配；无适用证据的部分保持未核实。",
+      "row_id": "yahoo:YAHOO:7c74a995e0ae1c1bb018e0c03fae84f9:yahoo-exchange-mapping-pending-v1"
+    },
+    {
+      "source": "yahoo",
+      "version": "yahoo-exchange-mapping-pending-v1",
+      "scope": "当前来源品种 ^GSPC",
+      "timezone": "exchange",
+      "regular_hours": "未核实；不能把外汇、加密和证券共用一个时段",
+      "status": "unverified",
+      "checked_at": null,
+      "review_due_at": null,
+      "valid_from": null,
+      "valid_until": null,
+      "evidence": [
+        "https://finance.yahoo.com/"
+      ],
+      "mappings": [
+        "^GSPC"
+      ],
+      "exceptions": [],
+      "enabled": true,
+      "market_session": "unknown",
+      "session_reason": null,
+      "calendar_verified": false,
+      "calendar_version": null,
+      "runtime_status": "unverified",
+      "exceptions_reviewed": false,
+      "coverage_note": "按实际来源身份匹配；无适用证据的部分保持未核实。",
+      "row_id": "yahoo:YAHOO:df302d10ee5b87601ddf84ca52ef9bde:yahoo-exchange-mapping-pending-v1"
+    },
+    {
+      "source": "yahoo",
+      "version": "yahoo-exchange-mapping-pending-v1",
+      "scope": "当前来源品种 ^IXIC",
+      "timezone": "exchange",
+      "regular_hours": "未核实；不能把外汇、加密和证券共用一个时段",
+      "status": "unverified",
+      "checked_at": null,
+      "review_due_at": null,
+      "valid_from": null,
+      "valid_until": null,
+      "evidence": [
+        "https://finance.yahoo.com/"
+      ],
+      "mappings": [
+        "^IXIC"
+      ],
+      "exceptions": [],
+      "enabled": true,
+      "market_session": "unknown",
+      "session_reason": null,
+      "calendar_verified": false,
+      "calendar_version": null,
+      "runtime_status": "unverified",
+      "exceptions_reviewed": false,
+      "coverage_note": "按实际来源身份匹配；无适用证据的部分保持未核实。",
+      "row_id": "yahoo:YAHOO:f166b2829a6863c847283ecc98a0e91a:yahoo-exchange-mapping-pending-v1"
+    }
+  ],
+  "sources": [
+    "binance",
+    "dukascopy",
+    "oanda",
+    "yahoo"
+  ],
+  "checked_at": "2026-10-10",
+  "review_due": 20
+}

@@ -1,0 +1,155 @@
+{
+  "project": "mw-session-details-fix-ubuntu-20261011",
+  "task": "mw-session-details-fix-20261011",
+  "apply": true,
+  "containers": [
+    "mw-session-details-fix-ubuntu-20261011-native-history-worker-1",
+    "mw-session-details-fix-ubuntu-20261011-market-stream-worker-1",
+    "mw-session-details-fix-ubuntu-20261011-api-1",
+    "mw-session-details-fix-ubuntu-20261011-chart-origin-1",
+    "mw-session-details-fix-ubuntu-20261011-web-1",
+    "mw-session-details-fix-ubuntu-20261011-tls-1",
+    "mw-session-details-fix-ubuntu-20261011-pg-1"
+  ],
+  "volumes": [
+    "mw-session-details-fix-ubuntu-20261011_pg-data"
+  ],
+  "networks": [
+    "fdbb89e58f52"
+  ],
+  "retained_images": []
+}
+{"task": "mw-session-details-fix-20261011", "completed_at": "2026-10-10T22:13:06.488714+00:00"}
+{
+  "apply": true,
+  "automatic": false,
+  "images": [
+    {
+      "id": "sha256:0bb653cdb7f4391d519c40c3825d963ea2fcd974b25e4b5dd5c0a8d98fc381ed",
+      "task": "mw-session-details-fix-20261011",
+      "refs": [
+        "sha256:0bb653cdb7f4391d519c40c3825d963ea2fcd974b25e4b5dd5c0a8d98fc381ed"
+      ]
+    },
+    {
+      "id": "sha256:0e09668b130f2ea1a6828bbe78e0ff93a881492d2e4c7309c29abee617dd4478",
+      "task": "mw-session-details-fix-20261011",
+      "refs": [
+        "sha256:0e09668b130f2ea1a6828bbe78e0ff93a881492d2e4c7309c29abee617dd4478"
+      ]
+    },
+    {
+      "id": "sha256:12c09607c3e95601ea3c9e401083d2685d9dd295bfd0ea6010de012457aea978",
+      "task": "mw-session-details-fix-20261011",
+      "refs": [
+        "sha256:12c09607c3e95601ea3c9e401083d2685d9dd295bfd0ea6010de012457aea978"
+      ]
+    },
+    {
+      "id": "sha256:225b45bed38b1efe65deecaecd7d0576ac89e135ecdbae94d3efa4e8b4a46ab0",
+      "task": "mw-session-details-fix-20261011",
+      "refs": [
+        "market-watch-web:session-details-fix-20261011"
+      ]
+    },
+    {
+      "id": "sha256:29a8956524f131ecb80e5b88e7771ab082b1c37cde79863cc56818b641c35606",
+      "task": "mw-session-details-fix-20261011",
+      "refs": [
+        "sha256:29a8956524f131ecb80e5b88e7771ab082b1c37cde79863cc56818b641c35606"
+      ]
+    },
+    {
+      "id": "sha256:2d512435d865b2a01d514a4f1498e685f3fdeee7ae8e729295962a0677c2527a",
+      "task": "mw-session-details-fix-20261011",
+      "refs": [
+        "sha256:2d512435d865b2a01d514a4f1498e685f3fdeee7ae8e729295962a0677c2527a"
+      ]
+    },
+    {
+      "id": "sha256:4bb1bf1c4463faa68e5494e224b8c31ddf4774191185f2b915621662099908a1",
+      "task": "mw-session-details-fix-20261011",
+      "refs": [
+        "sha256:4bb1bf1c4463faa68e5494e224b8c31ddf4774191185f2b915621662099908a1"
+      ]
+    },
+    {
+      "id": "sha256:78efbf226709e909a34314ab2c02f5abd9e34d35d7a4d2ef05d40a6ff6ab123b",
+      "task": "mw-session-details-fix-20261011",
+      "refs": [
+        "sha256:78efbf226709e909a34314ab2c02f5abd9e34d35d7a4d2ef05d40a6ff6ab123b"
+      ]
+    },
+    {
+      "id": "sha256:ada0c999e9538b5523aa7d8f86aa07cc5dc1f0692f255e4d140560cf37d86e8a",
+      "task": "mw-session-details-fix-20261011",
+      "refs": [
+        "sha256:ada0c999e9538b5523aa7d8f86aa07cc5dc1f0692f255e4d140560cf37d86e8a"
+      ]
+    },
+    {
+      "id": "sha256:b4c03839e5c8b746cdd1de334354c11c0805ca0e2dc8bd132340de5695789611",
+      "task": "mw-session-details-fix-20261011",
+      "refs": [
+        "sha256:b4c03839e5c8b746cdd1de334354c11c0805ca0e2dc8bd132340de5695789611"
+      ]
+    },
+    {
+      "id": "sha256:c1d0d54aeab6c75b6a4a3126cfb4bd79d5d052e5ebd909b6bc63be4be395eb14",
+      "task": "mw-session-details-fix-20261011",
+      "refs": [
+        "sha256:c1d0d54aeab6c75b6a4a3126cfb4bd79d5d052e5ebd909b6bc63be4be395eb14"
+      ]
+    },
+    {
+      "id": "sha256:cb40ae65f2a63a87d97572f8a1986f04f55b4fbca16e70ed00beb0f954363891",
+      "task": "mw-session-details-fix-20261011",
+      "refs": [
+        "sha256:cb40ae65f2a63a87d97572f8a1986f04f55b4fbca16e70ed00beb0f954363891"
+      ]
+    },
+    {
+      "id": "sha256:cdabe694fe1da6d5058f4e4ed8d039f8ac39318fb97544144a686253646ed17c",
+      "task": "mw-session-details-fix-20261011",
+      "refs": [
+        "sha256:cdabe694fe1da6d5058f4e4ed8d039f8ac39318fb97544144a686253646ed17c"
+      ]
+    },
+    {
+      "id": "sha256:d5690c741853e8910dc7289951fb77c92d8fce1ac9e403acdd9f24bc18794cda",
+      "task": "mw-session-details-fix-20261011",
+      "refs": [
+        "market-watch-chart-origin:session-details-fix-20261011"
+      ]
+    },
+    {
+      "id": "sha256:e84473439d8921a6d6b9f458919c5149fbf3f1e8b91c87c905ecd95a08954f2a",
+      "task": "mw-session-details-fix-20261011",
+      "refs": [
+        "sha256:e84473439d8921a6d6b9f458919c5149fbf3f1e8b91c87c905ecd95a08954f2a"
+      ]
+    },
+    {
+      "id": "sha256:e98ec3c60abd1918495b9382876e0a49ee99f3fdf26cd9a382c09c58f44ed80d",
+      "task": "mw-session-details-fix-20261011",
+      "refs": [
+        "sha256:e98ec3c60abd1918495b9382876e0a49ee99f3fdf26cd9a382c09c58f44ed80d"
+      ]
+    },
+    {
+      "id": "sha256:ee8dc683ac167ae505a0f65084af1d3356502eed3e2173c3c06196016745dc09",
+      "task": "mw-session-details-fix-20261011",
+      "refs": [
+        "sha256:ee8dc683ac167ae505a0f65084af1d3356502eed3e2173c3c06196016745dc09"
+      ]
+    },
+    {
+      "id": "sha256:febd15ed4247a45852f87179ef3c9c0d586fc8ccaa4cf2610d00e305085d1842",
+      "task": "mw-session-details-fix-20261011",
+      "refs": [
+        "market-watch-api:session-details-fix-20261011"
+      ]
+    }
+  ]
+}
+{"archive": "/home/quant/.local/share/market-watch-docker/archives/mw-session-details-fix-ubuntu-20261011-20261010T221054-ba354bbf", "restore_verified": true}

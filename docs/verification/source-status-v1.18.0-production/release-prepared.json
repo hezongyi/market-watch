@@ -1,0 +1,33 @@
+{
+  "version": "1.18.0",
+  "tag": "v1.18.0",
+  "source_commit": "e75694c79e62ff8a464916278f35c9148cce6241",
+  "implementation_prs": [
+    33,
+    34
+  ],
+  "build_task": "mw-source-status-v1180-release-20261010",
+  "build_project": "mw-v1180-release-build",
+  "purpose": "release",
+  "schema": "ar45_market_stream",
+  "no_schema_change": true,
+  "backend_source_modules": 133,
+  "dependencies_equal_v1170": true,
+  "source_regressions_passed": 91,
+  "release_regressions_passed": 32,
+  "actual_ubuntu_yahoo_probe": {
+    "passed": true,
+    "symbol": "AAPL",
+    "metadata_source": "yahoo",
+    "timeframe": "D1",
+    "bars": 10,
+    "quote_price": "336.64",
+    "quote_time": 1791576000000,
+    "actual_upstream": true,
+    "proxy_configured": true
+  },
+  "reviews": {
+    "Standards": 0,
+    "Spec": 0
+  }
+}

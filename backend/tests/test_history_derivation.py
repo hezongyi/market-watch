@@ -36,6 +36,8 @@ def test_derived_version_reuses_original_chunks_even_if_staging_is_newer(databas
         version = db.get(HistoryVersion, derived)
         assert version.status == "published"
         assert list(snapshot_rows(db, derived)) == list(snapshot_rows(db, parent))
+        assert version.manifest["price_precision"] == 6
+        assert version.manifest["price_rule_version"]
         assert version.manifest["provenance"]["copied_minutes"] == 2
         assert version.manifest["provenance"]["derived_from_version"] == parent
         assert db.get(HistoryVersion, parent).manifest == original

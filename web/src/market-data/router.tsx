@@ -4,6 +4,7 @@ import type { ReturnContexts } from "./returnContext";
 
 export type CenterNavigation = {
   workspace?: string;
+  timezone?: string;
   returns?: ReturnContexts;
   location: string;
   navigate: (to: string, options?: { replace?: boolean; saved?: boolean }) => void;

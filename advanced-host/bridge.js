@@ -44,6 +44,7 @@ let seq = 0,
   workspaceEpoch = 0,
   nativeReadonly = false;
 let barRangeMapping, syncCoordinator;
+let compactQuote;
 let rangeGuard, edgeGuard, demandReporter, progressivePages, progressivePoll, beforeInitialHistory, initialSymbol;
 let prewarming = false;
 let autoSave, editRevision = 0, manualSavePending = false;
@@ -73,6 +74,154 @@ const quoteSubscriptions = new Map();
 const marketPollingFallback = new URLSearchParams(location.search).get('marketPolling') === '1';
 const marketHistoryState = new Map();
 let marketGeneration = 0;
+
+function quoteTimeText(stamp, meta) {
+  if (!Number.isFinite(stamp)) return "";
+  let timezone = "UTC";
+  try {
+    timezone = widget?.activeChart?.().getTimezoneApi?.().getTimezone?.().id || "UTC";
+  } catch (_) {}
+  if (timezone === "exchange") timezone = meta?.timezone || "UTC";
+  try {
+    const date = new Date(stamp);
+    const parts = Object.fromEntries(new Intl.DateTimeFormat("en-CA", {
+      timeZone: timezone, year:"numeric", month:"2-digit", day:"2-digit",
+      hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false,
+    }).formatToParts(date).filter(part => part.type !== "literal").map(part => [part.type, part.value]));
+    const value = `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:${parts.minute}:${parts.second}`;
+    const offset = new Intl.DateTimeFormat("en", {timeZone: timezone, timeZoneName:"longOffset"})
+      .formatToParts(date).find(part => part.type === "timeZoneName")?.value || "GMT";
+    const shortOffset = offset === "GMT" ? "UTC" : offset.replace(/^GMT/, "UTC")
+      .replace(/UTC([+-])0?(\d{1,2}):00$/, "UTC$1$2");
+    const zone = timezone === "UTC" || timezone === "Etc/UTC" ? "UTC" :
+      timezone === "Asia/Shanghai" ? shortOffset : `${timezone} (${shortOffset})`;
+    return `${value} ${zone}`;
+  } catch (_) { return new Date(stamp).toISOString().replace("T", " ").replace(".000Z", " UTC"); }
+}
+function presentQuote(row) {
+  const meta = presentationFor(row.n);
+  const result = chartQuotePresentation(row, meta);
+  const value = result.v && typeof result.v === "object" ? {...result.v} : result.v;
+  if (value && typeof value === "object") {
+    const base = value.description_base ?? String(value.description || "")
+      .replace(/ · (?:最后更新于|最后行情时间|历史数据时间) .*?(?= · |$)/g, "")
+      .replace(/ · 来源 M1 分钟数据/g, "");
+    const parts = [base];
+    if (value.description_base != null && value.time_type !== "fixed_history") {
+      parts.push(({closed:"休市",scheduled_open:"交易时段内",unknown:"时段未核实"})[value.market_session] || "时段未核实");
+      if (value.session_reason) parts.push(value.session_reason);
+      if (value.session_conflict_reason) parts.push(value.session_conflict_reason);
+    }
+    if (value.fetch_status && value.fetch_status !== "ok")
+      parts.push(value.lp != null ? "更新失败，保留上次数据" : "更新失败，暂无成功行情");
+    const epoch = value.quote_time ?? value.data_start;
+    const stamp = typeof epoch === "number" && Number.isFinite(epoch) ? epoch : null;
+    if (value.description_base != null && value.market_session === "scheduled_open" &&
+        (stamp == null || value.read_at - stamp > 180000)) parts.push("等待新行情");
+    if (stamp != null && stamp >= 0) {
+      const prefix = value.time_type === "fixed_history" ? "历史数据时间" : value.quote_time != null ? "最后更新于" : "最后行情时间";
+      parts.push(`${prefix} ${quoteTimeText(stamp, meta)}`);
+      if (value.time_type === "source_m1" || value.observation_type === "source_m1") {
+        const end = Number.isFinite(value.data_end) ? `（区间至 ${quoteTimeText(value.data_end,meta)}，不含终点）` : "";
+        parts.push("来源 M1 分钟数据"+end);
+      }
+    } else parts.push("暂无行情更新时间");
+    value.description = parts.join(" · ");
+  }
+  // Native details ignores the description on error rows. A resolved session
+  // remains useful without a successful price; fetch_status carries the error.
+  return {...result, s:result.s === "error" && value?.market_session ? "ok" : result.s, v: value};
+}
+function refreshQuotePresentation() {
+  if (typeof dataCenter !== "undefined") dataCenter?.refreshTimezone?.();
+  for (const sub of quoteSubscriptions.values()) {
+    const rows = sub.symbols.map(ticker => quoteSnapshotRows.get(ticker)).filter(Boolean);
+    if (rows.length) sub.cb(rows.map(presentQuote));
+  }
+  compactQuote?.refresh();
+}
+function compactQuotePresentation(chartWidget) {
+  const probe = chartWidget.createButton({align:"left",useTradingViewStyle:false});
+  const doc = probe.ownerDocument;
+  chartWidget.removeButton(probe);
+  const panel = document.createElement("aside");
+  panel.hidden = true;
+  panel.setAttribute("aria-label", "商品状态和行情时间");
+  panel.setAttribute("aria-live", "polite");
+  panel.tabIndex = 0;
+  panel.style.cssText = "flex:none;padding:8px 12px;font:12px/1.6 sans-serif;overflow-wrap:anywhere;border-top:1px solid #787b8640";
+  document.body.style.cssText = "display:flex;flex-direction:column;height:100%;margin:0";
+  const chart = document.getElementById("chart");
+  chart.style.cssText = "flex:1;min-height:0;height:auto";
+  chart.after(panel);
+  let ticker, disposed = false;
+  const bindings = new Map();
+  const render = () => {
+    const row = quoteSnapshotRows.get(ticker);
+    const value = row && presentQuote(row).v;
+    const text = value?.description || "时段未核实 · 暂无行情更新时间";
+    if (panel.textContent !== text) panel.textContent = text;
+    const dark = chartWidget.getTheme().toLowerCase() === "dark";
+    panel.style.background = dark ? "#131722" : "#fff";
+    panel.style.color = dark ? "#d1d4dc" : "#131722";
+  };
+  const refresh = () => {
+    if (disposed || !ready || loading) return;
+    // The pinned native layout removes its sidebar on small viewports. Reading
+    // visibility avoids a duplicate information group when native details fit.
+    const sidebar = doc.querySelector(".layout__area--right");
+    const hidden = (sidebar?.getBoundingClientRect().width || 0) < 150;
+    panel.hidden = !hidden;
+    const selected = hidden ? chartWidget.activeChart().symbol() : null;
+    if (ticker !== selected || ticker && !quoteSubscriptions.has("@compact-details")) {
+      ticker = selected;
+      feed.unsubscribeQuotes("@compact-details");
+      if (ticker) feed.subscribeQuotes([ticker], [], render, "@compact-details");
+    }
+    if (hidden) render();
+    const charts = Array.from({length:chartWidget.chartsCount()},(_,i)=>chartWidget.chart(i));
+    for (const [api, changed] of bindings) {
+      if (!charts.includes(api)) {
+        api.onSymbolChanged().unsubscribe(null,changed);bindings.delete(api);
+      }
+    }
+    for (let i=0;i<chartWidget.chartsCount();i++) {
+      const api=chartWidget.chart(i);
+      if (!bindings.has(api)) {const changed=()=>refresh();api.onSymbolChanged().subscribe(null,changed);bindings.set(api,changed);}
+    }
+  };
+  const resized = () => refresh();
+    const observer = new ResizeObserver(resized);
+    observer.observe(document.documentElement);
+    const sidebar = doc.querySelector(".layout__area--right");
+    if (sidebar) observer.observe(sidebar);
+  chartWidget.subscribe("chart_theme_changed",refresh);
+  chartWidget.subscribe("layout_changed",refresh);
+  return {refresh,reset() {ticker=null;panel.hidden=true;},dispose() {
+    disposed=true;observer.disconnect();feed.unsubscribeQuotes("@compact-details");
+    chartWidget.unsubscribe("chart_theme_changed",refresh);chartWidget.unsubscribe("layout_changed",refresh);
+    for(const [api,changed] of bindings) api.onSymbolChanged().unsubscribe(null,changed);
+    panel.remove();
+  }};
+}
+function bindTimezoneEvents() {
+  if (!widget) return;
+  for (const [api, changed] of timezoneBindings) api.onTimezoneChanged().unsubscribe(null, changed);
+  timezoneBindings.clear();
+  for (let index = 0; index < widget.chartsCount(); index++) {
+    const api = widget.chart(index).getTimezoneApi?.();
+    if (!api?.onTimezoneChanged) continue;
+    const changed = () => refreshQuotePresentation();
+    api.onTimezoneChanged().subscribe(null, changed);
+    timezoneBindings.set(api, changed);
+  }
+}
+const timezoneBindings = new Map();
+function bindActiveChartEvent() {
+  if (!widget?.subscribe) return;
+  widget.unsubscribe?.("activeChartChanged", refreshQuotePresentation);
+  widget.subscribe("activeChartChanged", refreshQuotePresentation);
+}
 
 function marketQuery(ticker, res) {
   const identity = decode(ticker);
@@ -150,6 +299,50 @@ function synchronizeMarketVisibility() {
   }
 }
 const symbolPresentations = new Map();
+const quoteSnapshotRows = new Map();
+const quoteResetTokens = new Map();
+function presentationFor(ticker) {
+  const exact = symbolPresentations.get(ticker);
+  if (exact) return exact;
+  try { return symbolPresentations.get(decode(ticker).symbol); } catch (_) { return undefined; }
+}
+function rememberQuoteRows(rows) {
+  for (const row of rows || []) {
+    if (!row?.n) continue;
+    const previous = quoteSnapshotRows.get(row.n);
+    // The subscription generation handles identity changes; read time fences
+    // delayed initial snapshots from overwriting a newer stream observation.
+    if (previous?.v?.read_at != null && row.v?.read_at != null && row.v.read_at < previous.v.read_at) continue;
+    const failed = row.s === "error" || (row.v?.fetch_status && row.v.fetch_status !== "ok");
+    const sameBinding = ["revision_id", "input_revision", "source_identity"].every(key =>
+      row.v?.[key] == null || JSON.stringify(row.v[key]) === JSON.stringify(previous?.v?.[key]));
+    if (failed && row.v?.lp == null && previous?.v?.lp != null && sameBinding) {
+      const value = {...previous.v, fetch_status: row.v?.fetch_status || "fetch_failed"};
+      for (const key of ["market_session", "session_reason", "session_conflict_reason", "calendar_verified", "calendar_version"])
+        if (Object.hasOwn(row.v || {}, key)) value[key] = row.v[key];
+      quoteSnapshotRows.set(row.n, {...previous, v: value});
+      continue;
+    }
+    quoteSnapshotRows.set(row.n, row);
+  }
+  while (quoteSnapshotRows.size > 250)
+    quoteSnapshotRows.delete(quoteSnapshotRows.keys().next().value);
+}
+function quoteFailureRows(symbols, initialRows) {
+  const failed = [];
+  for (const ticker of symbols) {
+    const previous = quoteSnapshotRows.get(ticker);
+    if (initialRows && previous !== initialRows.get(ticker)) continue;
+    const placeholder = previous ? null : seriesPresentationRows([ticker])[0];
+    const value = previous?.v || placeholder?.v || {description_base: ticker, market_session: "unknown"};
+    // Preserve the bound observation and its read time. Failure is a transport
+    // state, not a newer price; a successful same-time snapshot can recover it.
+    const row = {s: previous?.s || "ok", n: ticker, v: {...value, fetch_status: "fetch_failed"}};
+    quoteSnapshotRows.set(ticker, row);
+    failed.push(row);
+  }
+  return failed.map(presentQuote);
+}
 const alertSourceMetadata = new Map();
 const alertCalculationOrigins = new Map();
 const lastHistory = new Map();
@@ -467,13 +660,14 @@ function historyQuery(args) {
 function seriesPresentationRows(symbols) {
   return symbols.flatMap(ticker => {
     const identity = decode(ticker);
-    const meta = symbolPresentations.get(identity.symbol);
+    const meta = presentationFor(ticker);
     const shown = meta?.display_symbol || meta?.symbol || MWSeries.display(identity.symbol);
-    return meta ? [{s:"ok",n:ticker,v:{short_name:shown,
-      description:meta.source === 'yahoo' ? meta.name + " · " + shown + " · Yahoo 市场报价" : shown + (
+    const base = meta?.source === 'yahoo' ? meta.name + " · " + shown + " · Yahoo 市场报价" : shown + (
         identity.series_kind === 'provider' ? " · 平台原生行情" :
-        identity.series_kind === 'history' ? " · 固定历史" : " · 组合行情"),
-      exchange:meta.exchange || meta.source?.toUpperCase()}}] : [];
+        identity.series_kind === 'history' ? " · 固定历史" : " · 组合行情");
+    return meta ? [{s:"ok",n:ticker,v:{short_name:shown,description:base,description_base:base,
+      market_session:"unknown",time_type:identity.series_kind === "history" ? "fixed_history" : null,
+      exchange:meta.exchange || meta.source?.toUpperCase()}}].map(presentQuote) : [];
   });
 }
 // Vendor start counts returned rows; backend cursors count qualified candidates.
@@ -509,26 +703,44 @@ const feed = {
   // Authenticated/network access stays in the trusted parent origin.
   getServerTime: (cb) => request({op: "serverTime"}, "market")
     .then(cb).catch(error => send({type: "error", error: "服务器时间获取失败：" + String(error)})),
-  getQuotes: (symbols, cb, err) => {
+  getQuotes: (symbols, cb, err, isCurrent = () => true) => {
     if (!symbols.length) {
       queueMicrotask(() => cb([]));
       return;
     }
     const epoch = workspaceEpoch;
+    const initialRows = new Map(symbols.map(ticker => [ticker, quoteSnapshotRows.get(ticker)]));
+    const resetTokens = new Map(symbols.map(ticker => [ticker, quoteResetTokens.get(ticker)]));
+    const currentSymbols = () => symbols.filter(ticker => quoteResetTokens.get(ticker) === resetTokens.get(ticker));
     // Details/watchlist quotes must not consume the bounded bridge/upstream
     // slots ahead of the first visible candle page. Failure also opens the gate.
     Promise.resolve(initialHistoryGate?.promise)
       .then(() => request({ op: "quotes", args: { symbols } }, "market",
-        () => epoch === workspaceEpoch))
-      .then((rows) => cb(rows.map(row => chartQuotePresentation(row,
-        symbolPresentations.get(decode(row.n).symbol)))))
-      .catch((e) => err(String(e)));
+        () => epoch === workspaceEpoch && isCurrent()))
+      .then((rows) => {
+        if (epoch !== workspaceEpoch || !isCurrent()) return;
+        // A stream/reset received while this request was outstanding owns the
+        // current selection, including its composite revision and identity.
+        const active = currentSymbols();
+        if (!active.length) return;
+        rememberQuoteRows(rows.filter(row => active.includes(row.n) && quoteSnapshotRows.get(row.n) === initialRows.get(row.n)));
+        cb(active.map(ticker => quoteSnapshotRows.get(ticker)).filter(Boolean).map(presentQuote));
+      })
+      .catch((e) => {
+        if (epoch !== workspaceEpoch || !isCurrent()) return;
+        const active = currentSymbols();
+        if (!active.length) return;
+        const rows = quoteFailureRows(active, initialRows);
+        if (rows.length) cb(rows);
+        err(String(e));
+      });
   },
   subscribeQuotes: (symbols, fastSymbols, cb, id) => {
     feed.unsubscribeQuotes(id);
     const all=[...new Set([...symbols, ...fastSymbols])];
-    const quoteSub={symbols:all,cb,listeners:[]};
+    const quoteSub={symbols:all,cb,listeners:[],lastRows:[]};
     quoteSubscriptions.set(id, quoteSub);
+    rememberQuoteRows([]);
     if(!marketPollingFallback) for(const ticker of all) {
       const listener=crypto.randomUUID(),generation=++marketGeneration;
       quoteSub.listeners.push({listener,generation,ticker,sequence:0});
@@ -543,9 +755,16 @@ const feed = {
       // Give native details its resolved human name while the real market
       // snapshot loads. No price, change or quote time is invented here.
       const named=seriesPresentationRows(presented);
-      if(named.length) setTimeout(()=>{if(quoteSubscriptions.has(id)) cb(named)},0);
-      feed.getQuotes(presented,rows=>{if(quoteSubscriptions.has(id)) cb(rows)},
-        error=>send({type:"feed-poll-state",key:"@quotes",error:String(error)}));
+      if(named.length) setTimeout(()=>{if(quoteSubscriptions.get(id) === quoteSub) cb(named)},0);
+      feed.getQuotes(presented,rows=>{
+        if(quoteSubscriptions.get(id) !== quoteSub) return;
+        // Keep the first snapshot beside streaming/polling rows so a timezone
+        // or active-chart change can reformat the same stored epoch without
+        // issuing another provider request.
+        cb(rows);
+      },
+        error=>send({type:"feed-poll-state",key:"@quotes",error:String(error)}),
+        () => quoteSubscriptions.get(id) === quoteSub);
     }
   },
   unsubscribeQuotes: (id) => {
@@ -595,10 +814,12 @@ const feed = {
       );
       alertSourceMetadata.set(MWSeries.encode(symbol,series_kind),meta);
       while(alertSourceMetadata.size>250) alertSourceMetadata.delete(alertSourceMetadata.keys().next().value);
-      if(meta.native_series_id || ['yahoo','dukascopy'].includes(meta.source) || ['history','composite'].includes(series_kind)) {
-        symbolPresentations.set(symbol,meta);
-        while(symbolPresentations.size>250) symbolPresentations.delete(symbolPresentations.keys().next().value);
-      }
+      // Quote descriptions are reformatted when the active chart timezone
+      // changes. Keep every resolved source's timezone metadata available,
+      // including managed OANDA/Binance instruments.
+      symbolPresentations.set(ticker,meta);
+      if (!symbolPresentations.has(symbol)) symbolPresentations.set(symbol,meta);
+      while(symbolPresentations.size>250) symbolPresentations.delete(symbolPresentations.keys().next().value);
       cb({
         name: meta.display_symbol || meta.symbol || MWSeries.display(symbol),
         ticker,
@@ -1145,9 +1366,17 @@ async function tick() {
   if(!marketPollingFallback) return;
   if (polling) return;
   polling = true;
+  const epoch = workspaceEpoch;
+  const quoteBindings = [...quoteSubscriptions].map(([id, sub]) => ({id, sub,
+    initialRows: new Map(sub.symbols.map(ticker => [ticker, quoteSnapshotRows.get(ticker)]))}));
+  const current = ({id, sub}) => epoch === workspaceEpoch && quoteSubscriptions.get(id) === sub;
+  const initialQuotes = new Map(quoteBindings.flatMap(({initialRows}) => [...initialRows]));
+  const resetTokens = new Map([...initialQuotes.keys()].map(ticker => [ticker, quoteResetTokens.get(ticker)]));
+  const currentSymbols = () => [...new Set(quoteBindings.filter(current).flatMap(({sub}) => sub.symbols))]
+    .filter(ticker => quoteResetTokens.get(ticker) === resetTokens.get(ticker));
   try {
     const quoteSymbols = [
-      ...new Set([...quoteSubscriptions.values()].flatMap((s) => s.symbols)),
+      ...new Set(quoteBindings.flatMap(({sub}) => sub.symbols)),
     ];
     if (quoteSymbols.length) {
       try {
@@ -1165,15 +1394,23 @@ async function tick() {
               "market",
             )),
           );
-        for (const sub of quoteSubscriptions.values())
-          sub.cb(
-            rows
-              .filter((r) => sub.symbols.includes(r.n))
-              .map(row => chartQuotePresentation(row,
-                symbolPresentations.get(decode(row.n).symbol))),
-          );
+        const active = new Set(currentSymbols());
+        rememberQuoteRows(rows.filter(r => active.has(r.n) &&
+          quoteSnapshotRows.get(r.n) === initialQuotes.get(r.n)));
+        for (const binding of quoteBindings) {
+          if (!current(binding)) continue;
+          const {sub} = binding;
+          const symbols = sub.symbols.filter(ticker => active.has(ticker));
+          if (symbols.length) sub.cb(symbols.map(ticker => quoteSnapshotRows.get(ticker)).filter(Boolean).map(presentQuote));
+        }
         send({ type: "feed-poll-state", key: "@quotes", error: "" });
       } catch (e) {
+        const rows = quoteFailureRows(currentSymbols(), initialQuotes);
+        for (const binding of quoteBindings) {
+          if (!current(binding)) continue;
+          const selected = rows.filter(row => binding.sub.symbols.includes(row.n));
+          if (selected.length) binding.sub.cb(selected);
+        }
         send({ type: "feed-poll-state", key: "@quotes", error: "报价更新失败：" + String(e) });
       }
     } else {
@@ -1361,8 +1598,12 @@ function boot(
   symbolMetadata = null,
 ) {
   initialSymbol = symbolMetadata;
-  if(symbolMetadata?.metadata?.source === "yahoo")
-    symbolPresentations.set(decode(symbolMetadata.ticker).symbol,symbolMetadata.metadata);
+  if(symbolMetadata?.metadata) {
+    const ticker = symbolMetadata.ticker;
+    const symbol = decode(ticker).symbol;
+    symbolPresentations.set(ticker,symbolMetadata.metadata);
+    if (!symbolPresentations.has(symbol)) symbolPresentations.set(symbol,symbolMetadata.metadata);
+  }
   // save_load_adapter content is a layout envelope; saved_data expects its chart state.
   const storedViewports = doc.state?._mwViewports;
   let chartState = doc.state;
@@ -1744,6 +1985,9 @@ function boot(
     ],
     disabled_features: [
       "widget_logo",
+      // The native legend derives "open" from unverified symbol sessions.
+      // Host-owned quote status remains visible in the details description.
+      "display_market_status",
       "use_localstorage_for_settings",
       "open_account_manager",
       "create_volume_indicator_by_default",
@@ -1764,11 +2008,14 @@ function boot(
   widget
     .headerReady()
     .then(async () => {
+      compactQuote?.dispose();compactQuote=compactQuotePresentation(widget);
       if (!readonly) indicatorPicker = chartIndicatorPicker(widget, catalog, (e) =>
         send({type: "error", error: String(e)}), () => dataCenter?.nativeUi);
       // Public left-aligned buttons retain their creation order in the header.
       if (!readonly) dataCenter = chartDataCenter({widget, appOrigin: parentOrigin,
         workspace: () => currentNativeWorkspace, epoch: () => workspaceEpoch, send, searchSymbols: searchNativeSymbols,
+        timezone: () => {const chart=widget.activeChart(),zone=chart.getTimezoneApi().getTimezone().id;
+          return zone === "exchange" ? presentationFor(chart.symbol())?.timezone || "UTC" : zone;},
         suspendIndicators: () => indicatorPicker?.close(),
         managementRequest: (args, signal) => request(args, "data-center-api", () => !signal.aborted),
         resolve: args => request({op:"resolve",args},"market")});
@@ -1943,11 +2190,14 @@ function boot(
       rangeGuard?.dispose();
       rangeGuard = undefined;
       workspaceEpoch++;
+      compactQuote?.reset();
       send({type:'native-load-reset',epoch:workspaceEpoch});
       syncCoordinator.resetWorkspace(pendingSync);
       workspaceLoadPause = syncCoordinator.acquirePause("workspace-load",["date","time","barWidth"]);
       for(const [id] of subscriptions) feed.unsubscribeBars(id);
       for(const [id] of quoteSubscriptions) feed.unsubscribeQuotes(id);
+      quoteSnapshotRows.clear();
+      quoteResetTokens.clear();
       marketHistoryState.clear();
       providerHistoryState.clear();
       providerHistoryWork.clear();
@@ -1988,12 +2238,18 @@ function boot(
       rangeGuard = rangeSyncLoadingGuard(widget);
       bindEdgeSync();
       bindViewports();
+      bindTimezoneEvents();
+      bindActiveChartEvent();
+      compactQuote?.refresh();
       alertBridge.refresh();
       if (!alertUI) await alertUIAttach();
     });
     rangeGuard = rangeSyncLoadingGuard(widget);
     bindEdgeSync();
     bindViewports();
+    bindTimezoneEvents();
+    bindActiveChartEvent();
+    compactQuote?.refresh();
     widget.subscribe("layout_changed", () => {
       synchronizeMarketVisibility();
       syncCoordinator.refreshCharts();
@@ -2002,6 +2258,7 @@ function boot(
       rangeGuard?.refresh();
       edgeGuard?.refresh();
       bindViewports();
+      bindTimezoneEvents();
       alertBridge.refresh();
     });
     widget.drawOnAllChartsEnabled().setValue(true);
@@ -2078,9 +2335,18 @@ addEventListener("message", async (e) => {
       if(event.result_epoch) entry.result_epoch=event.result_epoch;
       if(event.sequence<=entry.sequence) return;
       entry.sequence=event.sequence;
-      if(event.type==='quotes') quote.cb(event.quotes.map(({s,v})=>chartQuotePresentation(
-        {s,n:entry.ticker,v},symbolPresentations.get(decode(entry.ticker).symbol))));
+      if(event.type==='quotes') {
+        const rows = event.quotes.map(({s,v})=>({s,n:entry.ticker,v}));
+        rememberQuoteRows(rows);
+        quote.lastRows = rows;
+        quote.cb(rows.map(row => quoteSnapshotRows.get(row.n)).filter(Boolean).map(presentQuote));
+      }
+      if(event.type==='status' && (event.status==='error' || event.error)) {
+        quote.cb(quoteFailureRows([entry.ticker]));
+      }
       if(event.type==='reset') {
+        quoteSnapshotRows.delete(entry.ticker);
+        quoteResetTokens.set(entry.ticker, {});
         entry.generation=++marketGeneration;entry.sequence=0;
         send({type:'market-subscribe',args:{client:clientId,listener:entry.listener,generation:entry.generation,
           kind:'quotes',query:marketQuery(entry.ticker,'1'),sequence:0}});
@@ -2193,4 +2459,12 @@ addEventListener("message", async (e) => {
 });
 send({ type: "loaded" });
 
-addEventListener("pagehide", () => {alertUI?.destroy();alertBridge?.destroy();globalThis.MWChartMaximize?.dispose();barRangeMapping?.dispose();syncCoordinator?.dispose();}, {once:true});
+addEventListener("pagehide", () => {
+  alertUI?.destroy();
+  alertBridge?.destroy();
+  compactQuote?.dispose();
+  widget?.unsubscribe?.("activeChartChanged", refreshQuotePresentation);
+  for (const [api, changed] of timezoneBindings) api.onTimezoneChanged().unsubscribe(null, changed);
+  timezoneBindings.clear();
+  globalThis.MWChartMaximize?.dispose();barRangeMapping?.dispose();syncCoordinator?.dispose();
+}, {once:true});

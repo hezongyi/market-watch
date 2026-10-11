@@ -7,6 +7,7 @@ import { NativeConfigure } from "./NativeConfigure";
 import { PlatformMarket } from "./PlatformMarket";
 import { ManagedMarket } from "./ManagedMarket";
 import { LiveProviderStatus } from "./LiveProviderStatus";
+import { CalendarView } from "./CalendarView";
 
 export function Feedback({
   error,
@@ -68,6 +69,7 @@ function CenterPage() {
   if (params.get("tab") === "composite") return <CompositeList />;
   if (params.get("tab") === "tasks") return <Tasks />;
   if (params.get("tab") === "sources") return <LiveProviderStatus />;
+  if (params.get("tab") === "calendar") return <CalendarView />;
   return <ManagedMarket />;
 }
 

@@ -207,6 +207,7 @@ def coverage_report(db, version_id, *, page=1, page_size=25):
 
     from .history_quality import classify
     from .source_history_store import raw_chunk
+    from .market_datasets import version_price_rows
     from .storage import HistoryChunk, HistoryReclamation
 
     version = db.get(HistoryVersion, version_id)
@@ -222,7 +223,7 @@ def coverage_report(db, version_id, *, page=1, page_size=25):
     total = db.scalar(select(func.count()).select_from(query.subquery()))
     items = []
     for chunk in db.scalars(query.order_by(HistoryChunk.start).offset((page - 1) * page_size).limit(page_size)):
-        rows = json.loads(raw_chunk(db, chunk))
+        rows = version_price_rows(json.loads(raw_chunk(db, chunk)), version.manifest)
         items.append({"start": chunk.start, "end": chunk.end, "observed_at": chunk.observed_at,
             "result": chunk.result, **classify(version, rows, chunk.unknown)})
     return {"version_id": version.id, "items": items, "total": total, "page": page, "page_size": page_size}

@@ -1,0 +1,10 @@
+.....................................F.................................. [ 62%]
+............................................                             [100%]
+=================================== FAILURES ===================================
+___________ test_quote_quality_distinguishes_open_stale_from_weekend ___________
+backend/tests/test_market_data.py:636: in test_quote_quality_distinguishes_open_stale_from_weekend
+    assert "2026-09-25 21:00 UTC" in row["v"]["description"]
+E   AssertionError: assert '2026-09-25 21:00 UTC' in 'EURUSD · bid · M1 · 最近更新 · 时段与行情不一致，待核实 · 最后行情时间 2026-09-25 20:59 UTC'
+=========================== short test summary info ============================
+FAILED backend/tests/test_market_data.py::test_quote_quality_distinguishes_open_stale_from_weekend
+1 failed, 115 passed in 11.52s

@@ -164,6 +164,22 @@ def router(authenticated):
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
 
+    @routes.get("/center/calendars")
+    def center_calendars(source: str | None = None, query: str = ""):
+        from datetime import UTC, datetime
+
+        from .market_calendar import CALENDAR_RULES, calendar_rows
+
+        allowed = {item["source"] for item in CALENDAR_RULES}
+        if source and source not in allowed:
+            raise HTTPException(422, "未知行情来源")
+        now = datetime.now(UTC)
+        with transaction() as db:
+            rows = calendar_rows(source=source, query=query, as_of=now, db=db)
+        due = sum(row["status"] != "verified" for row in rows)
+        checked = max((item["checked_at"] for item in CALENDAR_RULES if item["checked_at"]), default=None)
+        return {"items": rows, "sources": sorted(allowed), "checked_at": checked, "review_due": due}
+
     @routes.get("/center/datasets/{dataset_id}")
     def center_detail(dataset_id: str):
         from .data_center import dataset_detail

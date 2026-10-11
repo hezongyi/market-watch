@@ -1,0 +1,28 @@
+{
+  "identity": {
+    "source": "dukascopy",
+    "channel": "python",
+    "environment": "historical",
+    "provider_symbol": "XAU/USD",
+    "account_scope": "public",
+    "quote_basis": "bid",
+    "calendar_version": "fixture-v1"
+  },
+  "actual_session": {
+    "market_session": "unknown",
+    "session_reason": null,
+    "calendar_verified": false,
+    "calendar_version": "dukascopy-spot-v1"
+  },
+  "calendar_rows": [
+    {
+      "row_id": "dukascopy-spot-v1:XAU/USD",
+      "mappings": [
+        "XAU/USD"
+      ],
+      "status": "verified",
+      "scope": "XAU/USD and EUR/USD in the provider catalog",
+      "market_session": "closed"
+    }
+  ]
+}

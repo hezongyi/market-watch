@@ -19,14 +19,17 @@ from .domain import (
     session_bounds,
 )
 from .market import stored_coverage
+from .market_calendar import session_status
 from .market_names import chinese_name, display_code, matches_code, pair_query
 from .providers import fetch_oanda_catalog
+from .quote_presentation import describe, fixed_snapshot
 from .storage import (
     Bar,
     ChartHistoryPlan,
     ImportJob,
     Instrument,
     MarketCatalog,
+    MarketDataset,
     MarketDemand,
     WeeklyHistoryRequest,
     instant,
@@ -800,8 +803,9 @@ def _all_series_page(query, *, page_size, source, calendar, symbol_type, cursor)
     """
     import base64
     import binascii
-    import json
     import hashlib
+    import json
+
     from .series_access import search_page
 
     signature = hashlib.sha256(json.dumps([query, source, calendar, symbol_type]).encode()).hexdigest()[:16]
@@ -1006,6 +1010,28 @@ def instrument_catalog(query: str = "", *, limit=250):
     return _rank_catalog(result + dukascopy, query)[:limit]
 
 
+def _session_observation(source, symbol, session, event_at, metadata, *, event_end=None):
+    """Flag a source observation that falls inside a reviewed closure.
+
+    A conflict is diagnostic only: the price remains visible and the current
+    session state is not replaced by a missing-data assumption. Evaluate the
+    observation time independently; boundary minutes remain legal observations.
+    """
+    if event_at is None:
+        return {}
+    observed = session_status(source, symbol, event_at, metadata=metadata)
+    probes = [event_at - 1]
+    if event_end is not None:
+        probes.extend((event_end - 1, event_end))
+    if observed.get("market_session") == "closed" and all(
+        session_status(source, symbol, at, metadata=metadata).get("market_session") == "closed"
+        for at in probes
+    ):
+        return {"session_conflict": True,
+                "session_conflict_reason": "时段与行情不一致，待核实"}
+    return {}
+
+
 def quote_snapshot(body: QuoteQuery):
     result = []
     # Fetch platform quotes before opening the managed read transaction.
@@ -1028,6 +1054,8 @@ def quote_snapshot(body: QuoteQuery):
                     values = {"short_name": shown, "description": meta["name"] + (
                         " · 固定历史" if kind == "history" else " · 组合行情"), "exchange": meta["source"].upper()}
                     facts = None
+                    if kind == "history":
+                        values.update(fixed_snapshot(db, ident, meta))
                     if kind == "composite":
                         from .composite_quotes import snapshot
                         from .series_access import composite_definition
@@ -1040,13 +1068,20 @@ def quote_snapshot(body: QuoteQuery):
                                 values["lp"] = float(facts["price"])
                                 if facts["price_type"] == "sampled_bid":
                                     values["bid"] = values["lp"]
-                            values.update(quote_time=facts["observed_at"], price_type=facts["price_type"],
-                                quote_ready=facts["quote_ready"], confirmed_tail_ready=facts["confirmed_tail_ready"],
-                                quality=facts["quality"])
+                            precise = facts["price_type"] == "sampled_bid"
+                            provenance = facts.get("provenance") or {}
+                            values.update(quote_time=facts["observed_at"] if precise else None,
+                                data_start=None if precise else provenance.get("start"),
+                                data_end=None if precise else provenance.get("end"),
+                                time_type="composite_snapshot", observation_type="provider_quote" if precise else "source_m1",
+                                price_type=facts["price_type"], quote_ready=facts["quote_ready"],
+                                confirmed_tail_ready=facts["confirmed_tail_ready"], quality=facts["quality"],
+                                **{key: facts.get(key) for key in ("market_session", "session_reason", "calendar_verified",
+                                    "calendar_version", "read_at", "revision_id", "input_revision", "source_identity",
+                                    "session_conflict", "session_conflict_reason", "fetch_status")})
                             values["description"] += " · " + ("抽样Bid" if facts["price_type"] == "sampled_bid" else
                                 "保存的确认M1收盘" if facts["price"] is not None else "等待报价")
-                            if facts["observed_at"] is not None:
-                                values["description"] += " · " + instant(facts["observed_at"]).strftime("%Y-%m-%d %H:%M UTC")
+
                     # Watchlist metadata is pure, never a first-use command.
                     result.append({"s": "ok", "n": ticker, "v": values,
                                    **({"snapshot": facts} if facts else {})})
@@ -1055,6 +1090,7 @@ def quote_snapshot(body: QuoteQuery):
             continue
         from .provider_chart import metadata, quote_page, quote_previous_close
 
+        meta = None
         try:
             from .config import settings
             deadline = time.monotonic() + settings.provider_request_seconds
@@ -1065,30 +1101,45 @@ def quote_snapshot(body: QuoteQuery):
                 snapshot = yahoo_quote(meta, deadline=deadline)
                 stamp = snapshot["quote_time"]
                 delay = snapshot["delay_seconds"]
+                read_at = now_ms()
+                session = session_status(meta["source"], meta["symbol"], now_ms(), metadata=meta)
                 description = meta["name"] + " · Yahoo 市场报价"
-                if stamp is not None:
-                    description += " · " + instant(stamp).strftime("%Y-%m-%d %H:%M UTC")
+
                 description += " · 延迟 " + str(delay//60) + " 分钟" if delay is not None and delay>0 else " · 延迟未知" if delay is None else " · 实时"
-                if snapshot["status"] != "ok":
-                    description += " · 抓取失败，保留上次报价"
+                conflict = _session_observation(meta["source"], meta["symbol"], session, stamp, meta)
                 values = {"short_name":shown, "description":description,
                           "exchange":meta["exchange"], "lp":float(snapshot["price"]),
                           "quote_time":stamp, "fetched_at":snapshot["fetched_at"],
-                          "delay_seconds":delay, "fetch_status":snapshot["status"]}
+                          "read_at":read_at, "time_type": "provider_quote" if stamp is not None else None,
+                          "delay_seconds":delay, "fetch_status":snapshot["status"], **session, **conflict}
                 previous = snapshot["previous_close"]
                 if previous is not None and Decimal(previous) != 0:
                     delta = Decimal(snapshot["price"])-Decimal(previous)
                     values.update(ch=float(delta), chp=float(delta/Decimal(previous)*100),
                                   prev_close_price=float(previous))
                 result.append({"s":"ok", "n":ticker, "v":values,
-                               **{k:snapshot[k] for k in ("quote_time","fetched_at","delay_seconds","status")}})
+                               **{k:snapshot[k] for k in ("quote_time","fetched_at","delay_seconds","status")},
+                               **session, **conflict, "read_at": read_at,
+                               "time_type": "provider_quote" if stamp is not None else None})
                 continue
             page = quote_page(meta)
             latest = page["bars"][-1] if page["bars"] else None
+            observed_now = now_ms()
+            session = session_status(meta["source"], meta["symbol"], observed_now, metadata=meta)
+            conflict = _session_observation(
+                meta["source"], meta["symbol"], session,
+                latest.get("start") if latest else None, meta,
+                event_end=latest.get("end") if latest else None,
+            )
+            fetch_status = page.get("fetch_status", "ok")
+            read_at = page.get("read_at", page.get("as_of"))
             values = {"short_name": shown, "description": shown + " · 平台行情" + (" · " + meta["price_description"] if meta.get("price_description") else ""),
-                      "exchange": meta["source"].upper()}
+                      "exchange": meta["source"].upper(), **session, **conflict,
+                      "fetched_at": page.get("as_of"), "read_at": read_at, "fetch_status": fetch_status,
+                      "time_type": "source_m1" if latest else None, "resolution": "M1"}
             if latest:
                 values["lp"] = float(latest["close"])
+                values.update(quote_time=None, data_start=latest.get("start"), data_end=latest.get("end"))
                 if meta["basis"] == "bid":
                     values["bid"] = values["lp"]
                 elif meta["basis"] == "ask":
@@ -1102,10 +1153,21 @@ def quote_snapshot(body: QuoteQuery):
                                       prev_close_price=float(previous))
                 except Exception:
                     pass
-            result.append({"s": "ok", "n": ticker, "v": values})
+            result.append({"s": "ok", "n": ticker, "v": values, **session,
+                           **conflict, "fetched_at": page.get("as_of"), "read_at": read_at,
+                           "fetch_status": fetch_status, "data_start": latest.get("start") if latest else None,
+                           "data_end": latest.get("end") if latest else None, "time_type": "source_m1" if latest else None,
+                           "resolution": "M1"})
         except Exception:
+            observed_now = now_ms()
+            session = session_status(meta["source"], meta["symbol"], observed_now, metadata=meta) if meta else {
+                "market_session": "unknown", "session_reason": None, "calendar_verified": False, "calendar_version": None}
             result.append({"s": "error", "n": ticker,
-                           "v": {"description": "平台报价暂不可用，请重试"}})
+                           "v": {"description": "平台报价暂不可用，请重试", **session,
+                                 "quote_time": None, "data_start": None, "read_at": observed_now,
+                                 "fetch_status": "fetch_failed",
+                                 **({"short_name": meta.get("display_symbol") or display_code(meta["symbol"], meta["source"]),
+                                     "exchange": meta["source"].upper()} if meta else {})}})
     with transaction() as db:
         for ident in managed:
             if len(ident) > 80:
@@ -1130,12 +1192,17 @@ def quote_snapshot(body: QuoteQuery):
                 if inst
                 else None
             )
+            dataset = db.scalar(select(MarketDataset).where(MarketDataset.instrument_id == ident)) if inst else None
+            session_meta = {"calendar_profile": inst.calendar_profile, "calendar_verified": bool(inst.calendar_profile),
+                            "source_identity": dataset.identity if dataset else None} if inst else {}
             if not bar:
                 if inst:
-                    result.append({"s": "ok", "n": ident, "quality": "pending", "v": {
+                    session = session_status(inst.source, inst.symbol, now_ms(), metadata=session_meta)
+                    result.append({"s": "ok", "n": ident, "quality": "pending", **session, "v": {
                         "short_name": display_code(inst.symbol, inst.source),
                         "description": display_code(inst.symbol, inst.source) + " · 报价准备中",
                         "exchange": inst.source.upper(),
+                        **session, "time_type": None, "quote_time": None, "data_start": None,
                     }})
                 else:
                     result.append({"s": "error", "n": ident,
@@ -1151,21 +1218,14 @@ def quote_snapshot(body: QuoteQuery):
                 values["bid"] = float(bar.close)
             observed_now = now_ms()
             age = max(0, observed_now - bar.end)
-            is_open = scheduled_open(
-                instant(observed_now),
-                calendar_for(inst),
-                gold=is_gold(inst.id),
-                closures=closures_from(inst.calendar_profile),
-            )
-            quality = "fresh" if age <= 180000 else "stale" if is_open else "closed"
-            label = {
-                "fresh": "最近更新",
-                "stale": "报价待更新",
-                "closed": "按日历休市，最后报价",
-            }[quality]
-            values["description"] += (
-                " · " + label + " · " + instant(bar.end).strftime("%Y-%m-%d %H:%M UTC")
-            )
+            session = session_status(inst.source, inst.symbol, observed_now, metadata=session_meta)
+            quality = "fresh" if age <= 180000 else "closed" if session["market_session"] == "closed" else "stale"
+            conflict = _session_observation(inst.source, inst.symbol, session, bar.start, session_meta,
+                                            event_end=bar.end)
+            fetched_at = bar.received_at or None
+            values.update(session, quote_time=None, data_start=bar.start, data_end=bar.end,
+                          fetched_at=fetched_at, read_at=observed_now, time_type="source_m1", resolution="M1",
+                          **conflict)
             session_start = ms(session_bounds(instant(bar.start), calendar_for(inst))[0])
             previous = db.scalar(
                 select(Bar)
@@ -1208,6 +1268,15 @@ def quote_snapshot(body: QuoteQuery):
                     "resolution": "M1",
                     "quality": quality,
                     "age_ms": age,
+                    **session,
+                    **conflict,
+                    "fetched_at": fetched_at,
+                    "read_at": observed_now,
+                    "data_start": bar.start,
+                    "data_end": bar.end,
+                    "time_type": "source_m1",
                 }
             )
+    for row in result:
+        row["v"] = describe(row["v"])
     return result

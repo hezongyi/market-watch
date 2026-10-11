@@ -1,0 +1,135 @@
+{
+  "passed": true,
+  "services": [
+    {
+      "service": "api",
+      "yahoo_enabled": true,
+      "enabled_sources": [
+        "oanda",
+        "binance",
+        "yahoo",
+        "dukascopy"
+      ],
+      "oanda_stream_enabled": true,
+      "oanda_credentials_configured": true,
+      "yahoo_proxy_configured": true
+    },
+    {
+      "service": "pricing-worker",
+      "yahoo_enabled": true,
+      "enabled_sources": [
+        "oanda",
+        "binance",
+        "yahoo",
+        "dukascopy"
+      ],
+      "oanda_stream_enabled": true,
+      "oanda_credentials_configured": true,
+      "yahoo_proxy_configured": true
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "yahoo_enabled": true,
+      "enabled_sources": [
+        "oanda",
+        "binance",
+        "yahoo",
+        "dukascopy"
+      ],
+      "oanda_stream_enabled": false,
+      "oanda_credentials_configured": true,
+      "yahoo_proxy_configured": true
+    },
+    {
+      "service": "chart-history-worker",
+      "yahoo_enabled": true,
+      "enabled_sources": [
+        "oanda",
+        "binance",
+        "yahoo",
+        "dukascopy"
+      ],
+      "oanda_stream_enabled": false,
+      "oanda_credentials_configured": true,
+      "yahoo_proxy_configured": true
+    },
+    {
+      "service": "history-worker",
+      "yahoo_enabled": true,
+      "enabled_sources": [
+        "oanda",
+        "binance",
+        "yahoo",
+        "dukascopy"
+      ],
+      "oanda_stream_enabled": false,
+      "oanda_credentials_configured": true,
+      "yahoo_proxy_configured": true
+    },
+    {
+      "service": "composite-aggregate-worker",
+      "yahoo_enabled": true,
+      "enabled_sources": [
+        "oanda",
+        "binance",
+        "yahoo",
+        "dukascopy"
+      ],
+      "oanda_stream_enabled": false,
+      "oanda_credentials_configured": true,
+      "yahoo_proxy_configured": true
+    },
+    {
+      "service": "native-history-worker",
+      "yahoo_enabled": true,
+      "enabled_sources": [
+        "oanda",
+        "binance",
+        "yahoo",
+        "dukascopy"
+      ],
+      "oanda_stream_enabled": false,
+      "oanda_credentials_configured": true,
+      "yahoo_proxy_configured": true
+    },
+    {
+      "service": "realtime-worker",
+      "yahoo_enabled": true,
+      "enabled_sources": [
+        "oanda",
+        "binance",
+        "yahoo",
+        "dukascopy"
+      ],
+      "oanda_stream_enabled": false,
+      "oanda_credentials_configured": true,
+      "yahoo_proxy_configured": true
+    },
+    {
+      "service": "notify-worker",
+      "yahoo_enabled": true,
+      "enabled_sources": [
+        "oanda",
+        "binance",
+        "yahoo",
+        "dukascopy"
+      ],
+      "oanda_stream_enabled": false,
+      "oanda_credentials_configured": true,
+      "yahoo_proxy_configured": true
+    },
+    {
+      "service": "market-stream-worker",
+      "yahoo_enabled": true,
+      "enabled_sources": [
+        "oanda",
+        "binance",
+        "yahoo",
+        "dukascopy"
+      ],
+      "oanda_stream_enabled": false,
+      "oanda_credentials_configured": true,
+      "yahoo_proxy_configured": true
+    }
+  ]
+}
