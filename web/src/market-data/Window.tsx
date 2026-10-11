@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { Database, Layers, ListChecks, Radio, Activity } from "lucide-react";
+import { Database, Layers, ListChecks, Radio, Activity, CalendarDays } from "lucide-react";
 import Center from "./Center";
 import { CenterContext, type CenterNavigation } from "./router";
 import { centerLocation, centerPositionKey, centerTab } from "./location";
@@ -7,10 +7,10 @@ import { ReturnContexts } from "./returnContext";
 import "./window.css";
 import { NativeSlot, NativeSidebar, NativeUiContext } from "./NativeControls";
 
-const navIcon = (key:string) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${({managed:'<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',platform:'<circle cx="12" cy="12" r="2"/><path d="M16 8a6 6 0 0 1 0 8M8 8a6 6 0 0 0 0 8M19 5a10 10 0 0 1 0 14M5 5a10 10 0 0 0 0 14"/>',composite:'<path d="m12 3 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 16l9 5 9-5"/>',tasks:'<path d="m3 6 2 2 4-4M12 6h9M3 13h6M12 13h9M3 20h6M12 20h9"/>',sources:'<path d="M3 12h4l3-8 4 16 3-8h4"/>'} as Record<string,string>)[key]}</svg>`;
+const navIcon = (key:string) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${({managed:'<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',platform:'<circle cx="12" cy="12" r="2"/><path d="M16 8a6 6 0 0 1 0 8M8 8a6 6 0 0 0 0 8M19 5a10 10 0 0 1 0 14M5 5a10 10 0 0 0 0 14"/>',composite:'<path d="m12 3 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 16l9 5 9-5"/>',tasks:'<path d="m3 6 2 2 4-4M12 6h9M3 13h6M12 13h9M3 20h6M12 20h9"/>',sources:'<path d="M3 12h4l3-8 4 16 3-8h4"/>',calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>'} as Record<string,string>)[key]}</svg>`;
 const channel = "mw-data-center-v1";
-const tabs = [["managed", "自建行情", Database], ["platform", "平台行情", Radio], ["composite", "组合行情", Layers], ["tasks", "任务与记录", ListChecks], ["sources", "来源状态", Activity]] as const;
-type Context = { workspace: string; target: string; theme: string; symbolSync: boolean; intervalSync: boolean; location?: string };
+const tabs = [["managed", "自建行情", Database], ["platform", "平台行情", Radio], ["composite", "组合行情", Layers], ["tasks", "任务与记录", ListChecks], ["sources", "来源状态", Activity], ["calendar", "交易日历", CalendarDays]] as const;
+type Context = { workspace: string; target: string; theme: string; timezone?: string; symbolSync: boolean; intervalSync: boolean; location?: string };
 type Position = { top: number; tableTop: number; tableLeft: number; focus: string | null };
 export type HostedCenter = {
   context: Context;
@@ -109,6 +109,7 @@ export default function DataCenterWindow({ hosted }: { hosted?: HostedCenter } =
   useEffect(() => {
     if (!hosted && (parent === window || !/^[a-f0-9-]{36}$/.test(session))) { setError("请从图表顶部的数据中心打开窗口。"); return; }
     const receive = (m: any) => {
+      if (m.type === "timezone" && typeof m.timezone === "string") setContext(value => value ? {...value, timezone:m.timezone} : value);
       if (m.type === "context" && typeof m.context?.target === "string" && typeof m.context?.workspace === "string") {
         setContext(m.context);
         if (m.context.location) { dirty.current.clear(); setRoute(centerLocation(m.context.location)); }
@@ -252,7 +253,7 @@ export default function DataCenterWindow({ hosted }: { hosted?: HostedCenter } =
     addEventListener("beforeunload", unload); addEventListener("keydown", keyboard, true);
     return () => { removeEventListener("beforeunload", unload); removeEventListener("keydown", keyboard, true); };
   }, [close, guard, hosted]);
-  return <CenterContext value={{ workspace: context?.workspace, returns: returns.current, location: route, navigate, apply, setDirty, clearDirty, busy }}>
+  return <CenterContext value={{ workspace: context?.workspace, timezone:context?.timezone, returns: returns.current, location: route, navigate, apply, setDirty, clearDirty, busy }}>
     <main className={`dc-window${hosted ? " dc-window-native" : ""}`} data-theme={context?.theme || "dark"}>
       {!hosted && <header className="dc-window-header"><h2><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3" /><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3" /></svg>数据中心</h2><button ref={closeButton} aria-label="关闭数据中心" onClick={close}><svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true"><path stroke="currentColor" strokeWidth="1.2" d="m1.5 1.5 15 15m0-15-15 15" /></svg></button></header>}
       <div className="dc-window-body" inert={guard !== null}>

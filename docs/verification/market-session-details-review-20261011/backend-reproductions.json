@@ -1,0 +1,34 @@
+{
+  "normal_friday_quote_on_saturday": {
+    "session_conflict": true,
+    "session_conflict_reason": "时段与行情不一致，待核实"
+  },
+  "quote_inside_saturday_closure": {},
+  "valid_weekend_after_suggested_review": {
+    "market_session": "unknown",
+    "session_reason": null,
+    "calendar_verified": false,
+    "calendar_version": "dukascopy-spot-v1"
+  },
+  "foreign_account_and_environment_profile": {
+    "market_session": "closed",
+    "next_session_at": 1791777600000,
+    "calendar_verified": true,
+    "session_reason": "周末",
+    "calendar_version": "foreign-account-fixture"
+  },
+  "search_XAUUSD": 0,
+  "search_XAU_slash_USD": 1,
+  "old_account_cache_after_account_switch": {
+    "bars": [
+      {
+        "start": 120000,
+        "end": 180000,
+        "close": "1.25"
+      }
+    ],
+    "as_of": 190000,
+    "fetch_status": "fetch_failed",
+    "read_at": 1791664912094
+  }
+}

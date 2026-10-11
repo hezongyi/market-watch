@@ -1,0 +1,21 @@
+{
+  "project": "mw-pr37-fix-ubuntu-20261011",
+  "task": "mw-pr37-fix-20261011",
+  "apply": false,
+  "containers": [
+    "mw-pr37-fix-ubuntu-20261011-chart-origin-1",
+    "mw-pr37-fix-ubuntu-20261011-market-stream-worker-1",
+    "mw-pr37-fix-ubuntu-20261011-native-history-worker-1",
+    "mw-pr37-fix-ubuntu-20261011-api-1",
+    "mw-pr37-fix-ubuntu-20261011-tls-1",
+    "mw-pr37-fix-ubuntu-20261011-web-1",
+    "mw-pr37-fix-ubuntu-20261011-pg-1"
+  ],
+  "volumes": [
+    "mw-pr37-fix-ubuntu-20261011_pg-data"
+  ],
+  "networks": [
+    "d9b015e04084"
+  ],
+  "retained_images": []
+}

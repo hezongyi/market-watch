@@ -672,6 +672,41 @@ const MWNativeNavigation = (() => {
               args[2] !== this._lastGotoTimeRange
             )
               return;
+            if (method === "gotoTimeRange" && args[2]) {
+              const marks = this.timeScale().tickMarks();
+              const indices = marks._marksByIndex;
+              // A completed callback can precede the replacement time scale.
+              // The pinned engine removes duplicate-time labels before it
+              // replaces their old index bounds. Do not read that mixed scale.
+              if (indices?.size && (!indices.has(marks.minIndex) || !indices.has(marks.maxIndex) ||
+                  indices.size !== marks.maxIndex - marks.minIndex + 1)) {
+                const deferred = args[2];
+                const retry = state.rangeRetry?.deferred === deferred ? state.rangeRetry :
+                  (state.rangeRetry = {deferred, started: performance.now(), scheduled: false});
+                if (performance.now() - retry.started >= 30000) {
+                  state.rangeRetry = null;
+                  const error = Error("图表时间刻度尚未完成更新，请重试范围定位");
+                  clearNativeWait(this, error);
+                  state.phase = "idle";
+                  globalThis.dispatchEvent(new CustomEvent("mw-navigation-error", {detail:error}));
+                  return;
+                }
+                if (!retry.scheduled) {
+                  retry.scheduled = true;
+                  requestAnimationFrame(() => {
+                    if (state.rangeRetry !== retry) return;
+                    retry.scheduled = false;
+                    if (models.get(this) !== state || this._lastGotoTimeRange !== deferred) {
+                      state.rangeRetry = null;
+                      return;
+                    }
+                    this.gotoTimeRange(...args);
+                  });
+                }
+                return;
+              }
+              state.rangeRetry = null;
+            }
             if (
               (method === "gotoTime" && args[0] === undefined) ||
               (method === "gotoTimeRange" && args[2])

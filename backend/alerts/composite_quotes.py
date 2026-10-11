@@ -77,19 +77,45 @@ def snapshot(db, composite, *, now=None, revision_id=None, input_revision=None):
         raise ValueError("组合修订不属于所选系列")
     prep = db.get(CompositePreparation, revision.id)
     live = live_snapshot(db, revision, now=stamp)
+    from .market_calendar import session_status as presentation_session
+
+    mapping = db.get(RealtimeMapping, revision.mapping_id)
+    target = db.get(MarketDataset, mapping.target_dataset_id)
+    profile = db.get(Instrument, target.instrument_id).calendar_profile
+    session = presentation_session(target.identity["source"], target.identity["provider_symbol"], stamp,
+        metadata={"source_identity": target.identity, "calendar_profile": profile,
+                  "calendar_verified": bool(profile)})
+    if not live["current_account"]:
+        session = {"market_session": "unknown", "session_reason": "接续来源账户已变化",
+                   "calendar_verified": False, "calendar_version": None}
     result = {"composite_id": composite.id, "revision_id": revision.id,
         "input_revision": prep.input_revision if input_revision is None else input_revision, "history_version_id": revision.history_version_id,
         "seam": revision.seam, "queried_at": stamp,
         "quote_ready": live["quote_ready"], "confirmed_tail_ready": live["confirmed_tail_ready"],
         "connection": live["connection"], "price": None, "observed_at": None,
-        "quality": "pending", "price_type": None, "provenance": None}
+        "quality": "pending", "price_type": None, "provenance": None,
+        **session, "read_at": stamp, "source_identity": target.identity,
+        "fetch_status": live["connection_error"] or "ok"}
+    def presented():
+        # Compare only observations from the selected continuation source;
+        # historical-side bars carry their own immutable source identity.
+        provenance = result.get("provenance") or {}
+        sampled = result["price_type"] == "sampled_bid"
+        if sampled or any(part.get("segment") == "target" for part in provenance.get("segments", ())):
+            from .market_data import _session_observation
+
+            result.update(_session_observation(target.identity["source"], target.identity["provider_symbol"],
+                session, result["observed_at"] if sampled else provenance.get("start"),
+                {"source_identity": target.identity, "calendar_profile": profile,
+                 "calendar_verified": bool(profile)}, event_end=None if sampled else provenance.get("end")))
+        return result
     if input_revision is None and live["quote_ready"] and live["quote"]["source_time"] >= revision.seam:
         result.update(price=str(live["quote"]["bid"]), observed_at=live["quote"]["source_time"],
             quality="sampled", price_type="sampled_bid", provenance={
                 "target_dataset_id": db.get(RealtimeMapping, revision.mapping_id).target_dataset_id,
                 "connection_epoch": live["connection_epoch"], "live_revision": live["live_revision"],
                 "received_at": live["received_at"], "quote": live["quote"]})
-        return result
+        return presented()
     # Uses the same pinned M1 input as the chart; never raw target history that
     # has not been accepted by this composite revision. Historical side is <T.
     page = chart_page(db, composite.id, "M1", before=stamp//60000*60000, count=1, provisional=False, now=stamp,
@@ -103,4 +129,4 @@ def snapshot(db, composite, *, now=None, revision_id=None, input_revision=None):
                 "source_confirmed": bar["source_confirmed"], "start": bar["start"], "end": bar["end"]})
     if not live["current_account"]:
         result["quality"] = "account_changed"
-    return result
+    return presented()

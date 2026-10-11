@@ -1,0 +1,43 @@
+{
+  "standards": {
+    "blocking_findings": 0,
+    "result": "passed",
+    "checked": [
+      "actual channel scopes",
+      "basis and native parameter scopes",
+      "same binding failure retention",
+      "reset tokens and workspace epochs"
+    ]
+  },
+  "spec": {
+    "blocking_findings": 0,
+    "result": "passed",
+    "checked": [
+      "fixed history failure warning",
+      "failed quote row retention",
+      "successful recovery",
+      "first empty-cache reset fences HTTP and polling success/rejection"
+    ]
+  },
+  "independent_vm": {
+    "executes_actual_reset_event": true,
+    "late_result_scenarios": 4,
+    "callbacks": 0,
+    "errors": 0,
+    "old_cache_writes": 0
+  },
+  "limits": "Browser acceptance is reported separately; these are code and VM review conclusions.",
+  "native_range": {
+    "blocking_findings": 0,
+    "result": "passed",
+    "persistent_incoherence_test": {
+      "frames": 1797,
+      "elapsed_ms": 30009.9,
+      "native_deferred_rejected": 1,
+      "notices": 1,
+      "queue": 0,
+      "phase": "idle"
+    },
+    "actual_clearNativeWait": true
+  }
+}

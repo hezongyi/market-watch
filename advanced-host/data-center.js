@@ -1,5 +1,5 @@
 /* Native dialog host. Authenticated operations remain in the trusted app. */
-function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, suspendIndicators, managementRequest, searchSymbols }) {
+function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, suspendIndicators, managementRequest, searchSymbols, timezone = () => widget.activeChart().getTimezoneApi().getTimezone().id }) {
   const probe = widget.createButton({ align: "left", useTradingViewStyle: false });
   const doc = probe.ownerDocument;
   widget.removeButton(probe);
@@ -89,7 +89,7 @@ function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, s
     target.chart.symbol() === target.symbol && target.chart.resolution() === target.resolution && widget.layout() === target.layout;
   function context() {
     if (!childReady || !target) return;
-    childPost({ type: "context", context: { workspace: target.workspace, target: target.id, theme: widget.getTheme().toLowerCase(),
+    childPost({ type: "context", context: { workspace: target.workspace, target: target.id, theme: widget.getTheme().toLowerCase(), timezone:timezone(),
       symbolSync: widget.symbolSync().value(), intervalSync: widget.intervalSync().value(), location: pendingLocation || remembered } });
     pendingLocation = undefined;
   }
@@ -111,7 +111,7 @@ function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, s
       send({ type: "data-center-state", open: true, session });
       const R=ui.react, mount=doc.createElement("div");
       const hosted = {
-        ui, context: {workspace:target.workspace,target:target.id,theme:widget.getTheme().toLowerCase(),
+        ui, context: {workspace:target.workspace,target:target.id,theme:widget.getTheme().toLowerCase(), timezone:timezone(),
           symbolSync:widget.symbolSync().value(),intervalSync:widget.intervalSync().value(),location:location||remembered},
         post: message=>{if(dialog.open && generation===openGeneration) handleMessage(message);}, subscribe(receive) {listeners.add(receive);return()=>listeners.delete(receive);},
         request(path, body, signal) {
@@ -278,5 +278,5 @@ function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, s
   const invalidate = () => { if (dialog.open && target) target.invalid = true; clearOperation(); };
   const events = ["layout_changed", "chart_load_requested", "activeChartChanged"];
   for (const name of events) widget.subscribe(name, invalidate);
-  return { open, nativeUi, dispose() { disposed = true; close(); clearOperation(); observer.disconnect();removeEventListener("message",fallbackMessage);doc.removeEventListener("keydown",modalKeys,true); style.remove(); noticeStyle.remove(); widget.removeButton(buttonId); widget.unsubscribe("chart_theme_changed",theme); for (const name of events) widget.unsubscribe(name,invalidate); } };
+  return { open, nativeUi, refreshTimezone() { if(dialog.open) childPost({type:"timezone",timezone:timezone()}); }, dispose() { disposed = true; close(); clearOperation(); observer.disconnect();removeEventListener("message",fallbackMessage);doc.removeEventListener("keydown",modalKeys,true); style.remove(); noticeStyle.remove(); widget.removeButton(buttonId); widget.unsubscribe("chart_theme_changed",theme); for (const name of events) widget.unsubscribe(name,invalidate); } };
 }
