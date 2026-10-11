@@ -1,0 +1,74 @@
+{
+  "passed": true,
+  "scope": "Ubuntu Chromium; real licensed library; mocked parent API",
+  "retry_create_bodies_identical": true,
+  "geometry_query_count": 3,
+  "queries": [
+    {
+      "instrument": "EURUSD",
+      "source": "fixture",
+      "series_kind": "managed",
+      "timeframe": "H1",
+      "published": true,
+      "kind": "trend_line",
+      "scale": "log",
+      "extend_left": true,
+      "extend_right": true,
+      "points": [
+        {
+          "time": 1800000000000,
+          "price": "1.12"
+        },
+        {
+          "time": 1800014400000,
+          "price": "1.13"
+        }
+      ]
+    },
+    {
+      "instrument": "EURUSD",
+      "source": "fixture",
+      "series_kind": "provider",
+      "timeframe": "H1",
+      "published": false,
+      "kind": "trend_line",
+      "scale": "log",
+      "extend_left": true,
+      "extend_right": true,
+      "points": [
+        {
+          "time": 1800000000000,
+          "price": "1.12"
+        },
+        {
+          "time": 1800014400000,
+          "price": "1.13"
+        }
+      ]
+    },
+    {
+      "instrument": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "source": "composite",
+      "series_kind": "composite",
+      "timeframe": "H1",
+      "published": false,
+      "composite_revision_id": "f7599a34-dfd6-4b9b-af10-0883f029b45e",
+      "kind": "trend_line",
+      "scale": "log",
+      "extend_left": true,
+      "extend_right": true,
+      "points": [
+        {
+          "time": 1800000000000,
+          "price": "1.12"
+        },
+        {
+          "time": 1800014400000,
+          "price": "1.13"
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "fixtureErrors": []
+}

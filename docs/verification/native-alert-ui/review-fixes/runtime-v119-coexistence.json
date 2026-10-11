@@ -1,0 +1,70 @@
+{
+  "scope": "Ubuntu Docker; actual v1.19.0 app, licensed chart and Binance SSE",
+  "passed": true,
+  "cases": [
+    "Real Binance bars/quotes arrive through authenticated SSE with one alert business root",
+    "Data center retains versioned sections and actual source-status reads; close preserves chart identity and alert root",
+    "Native indicator controller and search coexist with the native alert adapter",
+    "Alert draft survives data center/indicator use; both themes retain one renderer"
+  ],
+  "errors": [],
+  "credentials_sent_to_chart": [],
+  "workspace": "2d829d2d-4341-4ce8-9abe-01d1f49bc6d7",
+  "market_events": [
+    {
+      "type": "reset",
+      "sequence": 1,
+      "generation": 2
+    },
+    {
+      "type": "reset",
+      "sequence": 2,
+      "generation": 2
+    },
+    {
+      "type": "bars",
+      "sequence": 3,
+      "generation": 2
+    },
+    {
+      "type": "bars",
+      "sequence": 4,
+      "generation": 2
+    },
+    {
+      "type": "bars",
+      "sequence": 5,
+      "generation": 2
+    },
+    {
+      "type": "quotes",
+      "sequence": 2,
+      "generation": 3
+    },
+    {
+      "type": "bars",
+      "sequence": 5,
+      "generation": 7
+    },
+    {
+      "type": "quotes",
+      "sequence": 1,
+      "generation": 9
+    },
+    {
+      "type": "quotes",
+      "sequence": 2,
+      "generation": 9
+    },
+    {
+      "type": "quotes",
+      "sequence": 3,
+      "generation": 9
+    },
+    {
+      "type": "quotes",
+      "sequence": 3,
+      "generation": 10
+    }
+  ]
+}

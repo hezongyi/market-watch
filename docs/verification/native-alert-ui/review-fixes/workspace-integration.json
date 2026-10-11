@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "cases": [
+    "Full shipped host opens native dialog through validated parent context; draft resides in parent localStorage",
+    "Native Save As binds a fresh UI session and correctly scoped API; old workspace draft remains available",
+    "Native layout load restores A draft, rejects late B response, retains one renderer and keeps iframe alive",
+    "Version conflict preserves edited input and exposes native-window feedback"
+  ],
+  "errors": [],
+  "unexpected": []
+}

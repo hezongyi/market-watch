@@ -1,5 +1,7 @@
 # 原生告警 UI：PR 提交复验
 
+本页为首次提交 PR 时的历史证据。PR 审查后的修复与最终 v1.19.0 Docker 验收见 [修复与合并复核](../review-fixes/README.md)。
+
 2026-10-11。实现提交 `1741c9c` 基于 v1.18.0。PR 目标 main 已推进至 v1.19.0，提交 `6a928ce035739faa7c8b501f6a42165d30253cd7`；提交 PR 前在本分支合并该 main，以保留现行商品状态、日历、历史价格精度及范围恢复行为。
 
 唯一文本冲突位于 `advanced-host/bridge.js` 的 pagehide 清理函数。解决后同时销毁告警 UI/bridge、紧凑报价面板、报价与时区订阅，以及原有图表适配器。后台、数据库迁移、版本文件、生产 Compose、data-center 与 native-navigation 直接采用 main，没有为告警改写这些功能。

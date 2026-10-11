@@ -1,0 +1,71 @@
+{
+  "passed": true,
+  "cases": [
+    "Message and notification subpages apply only to draft; cancel/reentry restores values; finite trigger semantics",
+    "Native shell renders shipped form; failed save retains draft; parent owns every API write and CSRF",
+    "Pause/resume and edit use existing version/control revision API",
+    "Native drag reallocates chart width; native page rebuild retains search state and one mounted renderer; object tree round trip",
+    "Date-grouped log retains late evidence, rule version, delivery status and independent acknowledgement",
+    "Escape returns from subpage, modal focus stays inside native shell, final Escape closes; light theme applies",
+    "Native sidebar tab toggles with real mouse and keyboard; native menus handle Home/End/Escape",
+    "Real native controls preserve range, two indicator operands and drawing snapshot creation",
+    "Drawing timeframe change remaps endpoints before save; mapping failure retains the draft and prevents writes",
+    "Copy is draft only; current-symbol filter follows active pane while edit draft stays fixed; edit footer archives through existing lifecycle",
+    "Native fullscreen retains one renderer and permits dialog creation; exiting restores the native alert page",
+    "Failed chunk loading leaves native configuration intact; destruction cancels a pending native dialog without a stray window",
+    "Narrow viewport retains bounded dialog; destruction removes business root"
+  ],
+  "errors": [],
+  "fixtureErrors": [],
+  "remappedConfig": {
+    "name": "EURUSD 告警",
+    "instrument": "EURUSD",
+    "series_kind": "managed",
+    "source": "fixture",
+    "timeframe": "H4",
+    "mode": "close",
+    "condition": {
+      "relation": "cross_up",
+      "left": {
+        "kind": "price"
+      },
+      "right": {
+        "kind": "line",
+        "line": {
+          "kind": "trend_line",
+          "scale": "linear",
+          "extend_left": false,
+          "extend_right": true,
+          "mapping_version": "bar-index-v1",
+          "points": [
+            {
+              "time": 1800000000000,
+              "price": "1.12",
+              "index": 0
+            },
+            {
+              "time": 1800014400000,
+              "price": "1.13",
+              "index": 1
+            }
+          ]
+        }
+      }
+    },
+    "max_triggers": 1,
+    "expires_at": null,
+    "message": "",
+    "notify_web": true,
+    "notify_ntfy": false,
+    "late_delivery": "log_only",
+    "association": null,
+    "calculation_version": "chart-python-v1",
+    "calculation_origin": null,
+    "published": true
+  },
+  "cleanup": {
+    "failed": true,
+    "restored": true,
+    "stray": 0
+  }
+}
