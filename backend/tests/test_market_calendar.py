@@ -246,3 +246,53 @@ def test_builtin_rule_never_certifies_a_different_observation_identity():
             metadata={"source_identity": {"source": source, "provider_symbol": symbol,
                 "channel": channel, "environment": "historical", "account_scope": "public"}})
         assert state["market_session"] == "unknown" and not state["calendar_verified"]
+
+
+def test_calendar_keeps_mapped_symbols_with_distinct_actual_channels(database):
+    from alerts.storage import Instrument, MarketDataset, ProviderDataset
+
+    moment = datetime.fromisoformat("2026-10-10T12:00:00+00:00")
+    identity = {"source": "dukascopy", "channel": "python", "environment": "historical",
+                "provider_symbol": "XAU/USD", "account_scope": "public"}
+    with database.begin() as db:
+        db.add(Instrument(id="python-gold", label="Python gold", source="dukascopy",
+            symbol="XAU/USD", basis="bid", calendar="ny17", precision=3))
+        db.add(MarketDataset(id="python-gold-data", instrument_id="python-gold",
+            logical_symbol="XAUUSD", identity=identity, volume_kind="unavailable"))
+        for frame in ("M1", "H1"):
+            db.add(ProviderDataset(id="json3-gold-" + frame, source="dukascopy",
+                symbol="XAU/USD", timeframe=frame,
+                metadata_json={"source": "dukascopy", "symbol": "XAU/USD"}))
+    with database() as db:
+        rows = calendar_rows(db=db, source="dukascopy", query="XAUUSD", as_of=moment)
+    actual = next(row for row in rows if "python-gold" in row.get("row_id", ""))
+    expected = session_status("dukascopy", "XAU/USD", int(moment.timestamp() * 1000),
+                              metadata={"source_identity": identity})
+    assert actual["market_session"] == expected["market_session"] == "unknown"
+    assert actual["status"] == "unverified"
+    native = [row for row in rows if "provider:" in row.get("row_id", "")]
+    assert len(native) == 1 and native[0]["market_session"] == "closed"
+
+
+def test_calendar_keeps_native_price_parameters_but_deduplicates_periods(database):
+    from alerts.native_series import DEFAULTS
+    from alerts.storage import ProviderDataset
+
+    with database.begin() as db:
+        for ident, basis, price, smooth, frame in (
+            ("bid-m1", "bid", "B", False, "M1"), ("bid-h1", "bid", "B", False, "H1"),
+            ("ask-m1", "ask", "A", False, "M1"), ("smooth-m1", "bid", "B", True, "M1"),
+        ):
+            identity = {"source": "oanda", "channel": "v20", "environment": "practice",
+                "provider_symbol": "EUR_USD", "account_scope": "sha256:" + "a" * 64,
+                "basis": basis, "parameters": {**DEFAULTS, "price": price, "smooth": smooth, "granularity": frame}}
+            db.add(ProviderDataset(id=ident, source="oanda", symbol="EUR_USD", timeframe=frame,
+                metadata_json={"source": "oanda", "symbol": "EUR_USD", "basis": basis, "native_identity": identity}))
+    with database() as db:
+        rows = calendar_rows(db=db, source="oanda", query="EURUSD",
+            as_of=datetime.fromisoformat("2026-10-10T12:00:00+00:00"))
+    native = [row for row in rows if "provider:" in row.get("row_id", "")]
+    assert len(native) == 3
+    assert {row["price_basis"] for row in native} == {"bid", "ask"}
+    assert len([row for row in native if row["native_parameters"]["smooth"]]) == 1
+    assert all(row["market_session"] == "unknown" for row in native)

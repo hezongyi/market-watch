@@ -7,7 +7,7 @@ const context = {
   Intl, Date, Number, compactQuote: null,
   widget: {activeChart: () => ({getTimezoneApi: () => ({getTimezone: () => ({id: timezone})})})},
   chartQuotePresentation: row => row,
-  symbolPresentations: new Map(), quoteSnapshotRows: new Map(), quoteSubscriptions: new Map(),
+  symbolPresentations: new Map(), quoteSnapshotRows: new Map(), quoteResetTokens: new Map(), quoteSubscriptions: new Map(),
   decode: ticker => ({symbol: ticker}),
 };
 vm.createContext(context);
@@ -76,5 +76,31 @@ vm.runInContext(source.slice(source.indexOf("const feed = {"),source.indexOf("  
   context.stillCurrent=false;resolveRequest([row]);
   await new Promise(resolve=>setImmediate(resolve));
   assert.equal(context.called,false);
+  let rejectRequest;
+  context.request=()=>new Promise((resolve,reject)=>{rejectRequest=reject;});
+  context.called=false;context.failed=false;
+  vm.runInContext("feed.getQuotes(['A'], rows => { called=true; delivered=rows; }, () => { failed=true; });",context);
+  await new Promise(resolve=>setImmediate(resolve));rejectRequest(Error('HTTP failed'));
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(context.called,true);assert.equal(context.failed,true);
+  assert.equal(context.delivered[0].v.lp,99);
+  assert.match(context.delivered[0].v.description,/更新失败，保留上次数据/);
+  context.called=false;context.failed=false;context.stillCurrent=true;
+  vm.runInContext("feed.getQuotes(['A'], () => { called=true; }, () => { failed=true; }, () => stillCurrent);",context);
+  await new Promise(resolve=>setImmediate(resolve));context.stillCurrent=false;rejectRequest(Error('cancelled HTTP failed'));
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(context.called,false);assert.equal(context.failed,false);
+  for(const rejected of [false,true]) {
+    context.quoteSnapshotRows.delete('A');context.called=false;context.failed=false;
+    context.request=()=>new Promise((resolve,reject)=>{resolveRequest=resolve;rejectRequest=reject;});
+    vm.runInContext("feed.getQuotes(['A'], () => { called=true; }, () => { failed=true; });",context);
+    await new Promise(resolve=>setImmediate(resolve));
+    // Reset must fence the first HTTP request even when both caches are empty.
+    context.quoteResetTokens.set('A',{});
+    if(rejected)rejectRequest(Error('old generation'));else resolveRequest([row]);
+    await new Promise(resolve=>setImmediate(resolve));
+    assert.equal(context.called,false);assert.equal(context.failed,false);
+    assert.equal(context.quoteSnapshotRows.has('A'),false);
+  }
   console.log("Market session presentation regressions passed (including late HTTP/stream binding and cancelled subscription)");
 })().catch(error=>{console.error(error);process.exitCode=1;});

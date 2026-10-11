@@ -300,6 +300,8 @@ def calendar_rows(*, source: str | None = None, query: str = "", as_of: datetime
 
 def _runtime_rules(db, moment):
     """Read configured identities and profiles without refreshing catalogs or providers."""
+    import json
+
     from sqlalchemy import select
 
     from .config import settings
@@ -322,33 +324,59 @@ def _runtime_rules(db, moment):
                     row["regular_hours"] = "周日 17:00 至周五 17:00（纽约时间）；无已登记每日暂停"
             rules.append(row)
     instruments = []
-    seen = set()
+    def price_scope(source, meta):
+        explicit = meta.get("source_identity") or meta.get("native_identity") or meta.get("native_period_identity") or {}
+        basis = explicit.get("basis") or explicit.get("quote_basis") or meta.get("basis")
+        parameters = explicit.get("parameters") or meta.get("native_parameters") or {}
+        if source == "oanda" and not parameters:
+            from .native_series import DEFAULTS
+
+            parameters = {**DEFAULTS, "price": {"ask": "A", "mid": "M"}.get(basis, "B")}
+        # Periods share a calendar scope; price and alignment choices do not.
+        parameters = {key: value for key, value in parameters.items() if key != "granularity"}
+        return basis or {"dukascopy": "bid", "oanda": "bid"}.get(source, "last"), parameters
+
+    def scope_key(source, symbol, meta):
+        identity = observation_identity(source, symbol, meta)
+        basis, parameters = price_scope(source, meta)
+        explicit = meta.get("source_identity") or meta.get("native_identity") or meta.get("native_period_identity") or {}
+        return (source, canonical_symbol(source, symbol), identity.get("channel"),
+                identity.get("environment"), identity.get("account_scope"),
+                basis, json.dumps(parameters, sort_keys=True),
+                meta.get("calendar_version") or explicit.get("calendar_version"),
+                json.dumps(effective_profile(identity, meta.get("calendar_profile")), sort_keys=True))
+
+    seen_scopes = set()
     for inst in db.scalars(select(Instrument).where(Instrument.enabled.is_(True))):
         dataset = db.scalar(select(MarketDataset).where(MarketDataset.instrument_id == inst.id))
-        instruments.append((inst.source, inst.symbol, inst.id, {"symbol": inst.symbol,
+        instruments.append((inst.source, inst.symbol, inst.id, {"symbol": inst.symbol, "basis": inst.basis,
             "calendar_profile": inst.calendar_profile, "calendar_verified": bool(inst.calendar_profile),
             "source_identity": dataset.identity if dataset else None}))
-        seen.add((inst.source, inst.symbol))
+        seen_scopes.add(scope_key(inst.source, inst.symbol, instruments[-1][3]))
     for entry in db.scalars(select(MarketCatalog).where(MarketCatalog.available.is_(True))):
-        if (entry.source, entry.symbol) not in seen:
-            instruments.append((entry.source, entry.symbol, entry.id, {"symbol": entry.symbol}))
-            seen.add((entry.source, entry.symbol))
+        meta = {"symbol": entry.symbol}
+        if entry.source == "oanda" and (entry.metadata_json or {}).get("history_account_scope"):
+            meta["source_identity"] = {"source": "oanda", "channel": "v20", "environment": "practice",
+                "provider_symbol": entry.symbol, "account_scope": entry.metadata_json["history_account_scope"]}
+        key = scope_key(entry.source, entry.symbol, meta)
+        if key not in seen_scopes:
+            instruments.append((entry.source, entry.symbol, entry.id, meta))
+            seen_scopes.add(key)
     cached_scopes = set()
     for cached in db.scalars(select(ProviderDataset)):
         meta = cached.metadata_json
         if not isinstance(meta, dict):
             continue
-        identity = observation_identity(cached.source, cached.symbol, meta)
-        key = (cached.source, cached.symbol, tuple(identity.values()), meta.get("calendar_version"))
-        if key in cached_scopes or (cached.source, cached.symbol) in seen and not meta.get("calendar_profile"):
+        key = scope_key(cached.source, cached.symbol, meta)
+        if key in cached_scopes or key in seen_scopes:
             continue
         cached_scopes.add(key)
         instruments.append((cached.source, cached.symbol, "provider:" + cached.id, {**meta, "symbol": cached.symbol}))
     for symbol in set(settings.oanda_resident_symbols.split(",")) | set(settings.oanda_live_session_profiles) | set(settings.oanda_calendar_profiles):
-        if symbol and ("oanda", symbol) not in seen:
-            instruments.append(("oanda", symbol, "configured:" + symbol, {"symbol": symbol,
-                "calendar_profile": settings.oanda_calendar_profiles.get(symbol),
-                "calendar_verified": settings.oanda_calendar_verified}))
+        meta = {"symbol": symbol, "calendar_profile": settings.oanda_calendar_profiles.get(symbol),
+                "calendar_verified": settings.oanda_calendar_verified}
+        if symbol and scope_key("oanda", symbol, meta) not in seen_scopes:
+            instruments.append(("oanda", symbol, "configured:" + symbol, meta))
     for source, symbol, scope_id, meta in sorted(instruments):
         base = _RULE_BY_SOURCE.get(source)
         if base is None:
@@ -357,14 +385,21 @@ def _runtime_rules(db, moment):
         profile = effective_profile(identity, meta.get("calendar_profile"))
         session = session_status(source, symbol, stamp, metadata=meta)
         normalized = canonical_symbol(source, symbol)
-        if not profile and normalized in {canonical_symbol(source, item) for item in base["mappings"]}:
-            continue
+        basis, parameters = price_scope(source, meta)
         row = {**base, "version": session.get("calendar_version") or base["version"],
                "mappings": (symbol,), "enabled": enabled[source], **session,
                "runtime_status": "verified" if session.get("calendar_verified") else "unverified",
                "checked_at": None, "review_due_at": None, "valid_from": None, "valid_until": None,
-               "scope": "当前来源品种 " + symbol, "exceptions": (), "exceptions_reviewed": False,
+               "scope": "当前来源品种 " + symbol + " · " + str(identity.get("channel") or "通道未确认")
+                        + " / " + str(identity.get("environment") or "环境未确认") + " · " + basis,
+               "price_basis": basis, "native_parameters": parameters,
+               "exceptions": (), "exceptions_reviewed": False,
                "coverage_note": "按实际来源身份匹配；无适用证据的部分保持未核实。"}
+        if not profile and session.get("calendar_version") == base["version"] and session.get("calendar_verified"):
+            row.update(runtime_status=effective_rule_status(base, as_of=moment),
+                       **{key: base[key] for key in ("checked_at", "review_due_at", "valid_from", "valid_until")})
+            if source == "dukascopy" and normalized == "EUR/USD":
+                row["regular_hours"] = "周日 17:00 至周五 17:00（纽约时间）；无已登记每日暂停"
         source_session = profile.get("source_session") if isinstance(profile, dict) else None
         if isinstance(source_session, dict):
             row.update(timezone=source_session.get("timezone", base["timezone"]),

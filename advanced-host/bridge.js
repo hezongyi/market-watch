@@ -110,9 +110,9 @@ function presentQuote(row) {
       parts.push(({closed:"休市",scheduled_open:"交易时段内",unknown:"时段未核实"})[value.market_session] || "时段未核实");
       if (value.session_reason) parts.push(value.session_reason);
       if (value.session_conflict_reason) parts.push(value.session_conflict_reason);
-      if (value.fetch_status && value.fetch_status !== "ok")
-        parts.push(value.lp != null ? "更新失败，保留上次数据" : "更新失败，暂无成功行情");
     }
+    if (value.fetch_status && value.fetch_status !== "ok")
+      parts.push(value.lp != null ? "更新失败，保留上次数据" : "更新失败，暂无成功行情");
     const epoch = value.quote_time ?? value.data_start;
     const stamp = typeof epoch === "number" && Number.isFinite(epoch) ? epoch : null;
     if (value.description_base != null && value.market_session === "scheduled_open" &&
@@ -299,6 +299,7 @@ function synchronizeMarketVisibility() {
 }
 const symbolPresentations = new Map();
 const quoteSnapshotRows = new Map();
+const quoteResetTokens = new Map();
 function presentationFor(ticker) {
   const exact = symbolPresentations.get(ticker);
   if (exact) return exact;
@@ -311,10 +312,35 @@ function rememberQuoteRows(rows) {
     // The subscription generation handles identity changes; read time fences
     // delayed initial snapshots from overwriting a newer stream observation.
     if (previous?.v?.read_at != null && row.v?.read_at != null && row.v.read_at < previous.v.read_at) continue;
+    const failed = row.s === "error" || (row.v?.fetch_status && row.v.fetch_status !== "ok");
+    const sameBinding = ["revision_id", "input_revision", "source_identity"].every(key =>
+      row.v?.[key] == null || JSON.stringify(row.v[key]) === JSON.stringify(previous?.v?.[key]));
+    if (failed && row.v?.lp == null && previous?.v?.lp != null && sameBinding) {
+      const value = {...previous.v, fetch_status: row.v?.fetch_status || "fetch_failed"};
+      for (const key of ["market_session", "session_reason", "session_conflict_reason", "calendar_verified", "calendar_version"])
+        if (Object.hasOwn(row.v || {}, key)) value[key] = row.v[key];
+      quoteSnapshotRows.set(row.n, {...previous, v: value});
+      continue;
+    }
     quoteSnapshotRows.set(row.n, row);
   }
   while (quoteSnapshotRows.size > 250)
     quoteSnapshotRows.delete(quoteSnapshotRows.keys().next().value);
+}
+function quoteFailureRows(symbols, initialRows) {
+  const failed = [];
+  for (const ticker of symbols) {
+    const previous = quoteSnapshotRows.get(ticker);
+    if (initialRows && previous !== initialRows.get(ticker)) continue;
+    const placeholder = previous ? null : seriesPresentationRows([ticker])[0];
+    const value = previous?.v || placeholder?.v || {description_base: ticker, market_session: "unknown"};
+    // Preserve the bound observation and its read time. Failure is a transport
+    // state, not a newer price; a successful same-time snapshot can recover it.
+    const row = {s: previous?.s || "ok", n: ticker, v: {...value, fetch_status: "fetch_failed"}};
+    quoteSnapshotRows.set(ticker, row);
+    failed.push(row);
+  }
+  return failed.map(presentQuote);
 }
 const alertSourceMetadata = new Map();
 const alertCalculationOrigins = new Map();
@@ -683,6 +709,8 @@ const feed = {
     }
     const epoch = workspaceEpoch;
     const initialRows = new Map(symbols.map(ticker => [ticker, quoteSnapshotRows.get(ticker)]));
+    const resetTokens = new Map(symbols.map(ticker => [ticker, quoteResetTokens.get(ticker)]));
+    const currentSymbols = () => symbols.filter(ticker => quoteResetTokens.get(ticker) === resetTokens.get(ticker));
     // Details/watchlist quotes must not consume the bounded bridge/upstream
     // slots ahead of the first visible candle page. Failure also opens the gate.
     Promise.resolve(initialHistoryGate?.promise)
@@ -692,10 +720,19 @@ const feed = {
         if (epoch !== workspaceEpoch || !isCurrent()) return;
         // A stream/reset received while this request was outstanding owns the
         // current selection, including its composite revision and identity.
-        rememberQuoteRows(rows.filter(row => quoteSnapshotRows.get(row.n) === initialRows.get(row.n)));
-        cb(symbols.map(ticker => quoteSnapshotRows.get(ticker)).filter(Boolean).map(presentQuote));
+        const active = currentSymbols();
+        if (!active.length) return;
+        rememberQuoteRows(rows.filter(row => active.includes(row.n) && quoteSnapshotRows.get(row.n) === initialRows.get(row.n)));
+        cb(active.map(ticker => quoteSnapshotRows.get(ticker)).filter(Boolean).map(presentQuote));
       })
-      .catch((e) => err(String(e)));
+      .catch((e) => {
+        if (epoch !== workspaceEpoch || !isCurrent()) return;
+        const active = currentSymbols();
+        if (!active.length) return;
+        const rows = quoteFailureRows(active, initialRows);
+        if (rows.length) cb(rows);
+        err(String(e));
+      });
   },
   subscribeQuotes: (symbols, fastSymbols, cb, id) => {
     feed.unsubscribeQuotes(id);
@@ -1328,9 +1365,17 @@ async function tick() {
   if(!marketPollingFallback) return;
   if (polling) return;
   polling = true;
+  const epoch = workspaceEpoch;
+  const quoteBindings = [...quoteSubscriptions].map(([id, sub]) => ({id, sub,
+    initialRows: new Map(sub.symbols.map(ticker => [ticker, quoteSnapshotRows.get(ticker)]))}));
+  const current = ({id, sub}) => epoch === workspaceEpoch && quoteSubscriptions.get(id) === sub;
+  const initialQuotes = new Map(quoteBindings.flatMap(({initialRows}) => [...initialRows]));
+  const resetTokens = new Map([...initialQuotes.keys()].map(ticker => [ticker, quoteResetTokens.get(ticker)]));
+  const currentSymbols = () => [...new Set(quoteBindings.filter(current).flatMap(({sub}) => sub.symbols))]
+    .filter(ticker => quoteResetTokens.get(ticker) === resetTokens.get(ticker));
   try {
     const quoteSymbols = [
-      ...new Set([...quoteSubscriptions.values()].flatMap((s) => s.symbols)),
+      ...new Set(quoteBindings.flatMap(({sub}) => sub.symbols)),
     ];
     if (quoteSymbols.length) {
       try {
@@ -1348,14 +1393,23 @@ async function tick() {
               "market",
             )),
           );
-        for (const sub of quoteSubscriptions.values()) {
-          const selected = rows.filter((r) => sub.symbols.includes(r.n));
-          rememberQuoteRows(selected);
-          sub.lastRows = selected;
-          sub.cb(selected.map(presentQuote));
+        const active = new Set(currentSymbols());
+        rememberQuoteRows(rows.filter(r => active.has(r.n) &&
+          quoteSnapshotRows.get(r.n) === initialQuotes.get(r.n)));
+        for (const binding of quoteBindings) {
+          if (!current(binding)) continue;
+          const {sub} = binding;
+          const symbols = sub.symbols.filter(ticker => active.has(ticker));
+          if (symbols.length) sub.cb(symbols.map(ticker => quoteSnapshotRows.get(ticker)).filter(Boolean).map(presentQuote));
         }
         send({ type: "feed-poll-state", key: "@quotes", error: "" });
       } catch (e) {
+        const rows = quoteFailureRows(currentSymbols(), initialQuotes);
+        for (const binding of quoteBindings) {
+          if (!current(binding)) continue;
+          const selected = rows.filter(row => binding.sub.symbols.includes(row.n));
+          if (selected.length) binding.sub.cb(selected);
+        }
         send({ type: "feed-poll-state", key: "@quotes", error: "报价更新失败：" + String(e) });
       }
     } else {
@@ -2109,6 +2163,7 @@ function boot(
       for(const [id] of subscriptions) feed.unsubscribeBars(id);
       for(const [id] of quoteSubscriptions) feed.unsubscribeQuotes(id);
       quoteSnapshotRows.clear();
+      quoteResetTokens.clear();
       marketHistoryState.clear();
       providerHistoryState.clear();
       providerHistoryWork.clear();
@@ -2239,8 +2294,12 @@ addEventListener("message", async (e) => {
         quote.lastRows = rows;
         quote.cb(rows.map(row => quoteSnapshotRows.get(row.n)).filter(Boolean).map(presentQuote));
       }
+      if(event.type==='status' && (event.status==='error' || event.error)) {
+        quote.cb(quoteFailureRows([entry.ticker]));
+      }
       if(event.type==='reset') {
         quoteSnapshotRows.delete(entry.ticker);
+        quoteResetTokens.set(entry.ticker, {});
         entry.generation=++marketGeneration;entry.sequence=0;
         send({type:'market-subscribe',args:{client:clientId,listener:entry.listener,generation:entry.generation,
           kind:'quotes',query:marketQuery(entry.ticker,'1'),sequence:0}});

@@ -29,6 +29,12 @@ const record=report.cases.push.bind(report.cases);report.cases.push=item=>{conso
     const ticker = entry.ticker || "MWP:"+entry.id;
     const calendars = await (await context.request.get(APP+"/api/market-data/center/calendars")).json();
     fs.writeFileSync(OUT+"/calendar-inventory.json",JSON.stringify(calendars,null,2));
+    if(process.env.SESSION_ASSERT_PYTHON_SCOPE === "1") {
+      const actual=calendars.items.find(row=>row.scope.includes("python / historical"));
+      assert.ok(actual && actual.market_session === "unknown" && actual.status === "unverified");
+      assert.ok(calendars.items.some(row=>row.source === "dukascopy" && row.status === "verified"));
+      report.cases.push({case:"actual Python calendar scope preserved",status:actual.status});
+    }
     const workspace = await post("advanced-charts/workspaces",{name:"Session details synthetic acceptance"});
     await post("advanced-charts/workspaces/"+workspace.id+"/save",{name:workspace.name,revision:workspace.revision,
       document:{engine:"tv31",schemaVersion:1,symbol:ticker,series_kind:"provider",interval:"1"}});
@@ -85,6 +91,40 @@ const record=report.cases.push.bind(report.cases);report.cases.push=item=>{conso
     // proves native rendering of rare states; backend cases are tested separately.
     await frame.evaluate(()=>{globalThis.sessionAcceptanceCallbacks=[...quoteSubscriptions].map(([id,sub])=>({id,symbols:sub.symbols,cb:sub.cb}));
       for(const id of [...quoteSubscriptions.keys()]) feed.unsubscribeQuotes(id);});
+    async function streamEvent(type,values={}) {
+      return frame.evaluate(({ticker,type,values})=>{
+        let sub=quoteSubscriptions.get("acceptance-events");
+        if(!sub) {
+          const targets=sessionAcceptanceCallbacks.filter(sub=>sub.symbols.includes(ticker));
+          sub={symbols:[ticker],listeners:[{listener:"acceptance-events",ticker,generation:++marketGeneration,sequence:0}],
+            cb:rows=>{for(const target of targets) target.cb(rows);}};
+          quoteSubscriptions.set("acceptance-events",sub);
+        }
+        const entry=sub.listeners[0];
+        dispatchEvent(new MessageEvent("message",{source:parent,origin:parentOrigin,data:{channel:"mw-chart-v1",type:"market-event",
+          event:{type,listener:entry.listener,generation:entry.generation,sequence:entry.sequence+1,...values}}}));
+        return quoteSnapshotRows.get(ticker);
+      },{ticker,type,values});
+    }
+    await streamEvent("quotes",{quotes:[{...quote,v:{...quote.v,read_at:Date.now()}}]});
+    const failed=await streamEvent("status",{status:"error",error:"acceptance fixture"});
+    assert.equal(failed.v.lp,quote.v.lp);assert.equal(failed.v.data_start,quote.v.data_start);
+    await ui.getByText("更新失败，保留上次数据",{exact:false}).first().waitFor({timeout:15000});
+    report.cases.push({case:"stream failure reaches native details",price:failed.v.lp,time:failed.v.data_start});
+    await streamEvent("quotes",{quotes:[{...quote,v:{...quote.v,read_at:Date.now()}}]});
+    await ui.getByText(/休市.*周末.*最后行情时间/).first().waitFor({timeout:15000});
+    assert.equal(await ui.getByText("更新失败，保留上次数据",{exact:false}).count(),0);
+    await streamEvent("status",{status:"error",generation:0});
+    assert.equal(await ui.getByText("更新失败，保留上次数据",{exact:false}).count(),0);
+    report.cases.push({case:"native stream recovery and old generation rejection",passed:true});
+    await streamEvent("quotes",{quotes:[{s:"error",v:{fetch_status:"fetch_failed",read_at:Date.now(),data_start:null}}]});
+    await ui.getByText("更新失败，保留上次数据",{exact:false}).first().waitFor({timeout:15000});
+    report.cases.push({case:"failed quote row retains native observation",passed:true});
+    await streamEvent("quotes",{quotes:[{...quote,v:{...quote.v,time_type:"fixed_history",read_at:Date.now()}}]});
+    await streamEvent("status",{status:"error"});
+    await ui.getByText(/更新失败，保留上次数据.*历史数据时间/).first().waitFor({timeout:15000});
+    report.cases.push({case:"fixed history native failure warning",passed:true});
+    await frame.evaluate(()=>quoteSubscriptions.delete("acceptance-events"));
     async function inject(overrides) {
       await frame.evaluate(({ticker,value})=>{const row={s:"ok",n:ticker,v:value};rememberQuoteRows([row]);
         for(const sub of sessionAcceptanceCallbacks) if(sub.symbols.includes(ticker)) sub.cb([presentQuote(row)]);
