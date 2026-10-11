@@ -7,11 +7,11 @@
 先按现有许可安装脚本将供应商包安装到advanced-host/charting_library，再执行：
 
 ```sh
-mw-docker build --repo . --component chart --tag market-watch-chart-origin:VERSION \
+mw-docker build --repo . --component chart --context . --file advanced-host/Dockerfile --tag market-watch-chart-origin:VERSION \
   --task mw-chart-acceptance --project mw-chart-acceptance --purpose acceptance
 ```
 
-构建上下文仅为advanced-host，白名单排除开发服务、缓存和其他文件。镜像显式包含range-sync等适配脚本，不包含后台代码、环境文件、账户凭据或数据库。供应商包不会通过Git分发，需要在实际构建机准备。
+图表构建使用仓库根上下文，以复用 web 中的告警 React 源码；`advanced-host/Dockerfile.dockerignore` 仅允许静态图表脚本、许可库和告警前端构建所需源码，排除后台、开发服务、缓存和其他文件。镜像显式包含range-sync等适配脚本，不包含后台代码、环境文件、账户凭据或数据库。供应商包不会通过Git分发，需要在实际构建机准备。
 
 主站镜像也需传入隔离来源的外部地址，例如：
 

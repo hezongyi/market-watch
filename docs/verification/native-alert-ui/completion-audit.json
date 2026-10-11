@@ -1,0 +1,60 @@
+{
+  "status": "implementation and Ubuntu acceptance complete; instance retained for user inspection",
+  "production_deployed": false,
+  "requirements": [
+    {
+      "requirement": "Isolated implementation worktree/branch",
+      "evidence": "feat/native-alert-ui-impl-20261008 / baseline 6fd9273"
+    },
+    {
+      "requirement": "Full native alert entrance/list/log/create/edit/message/notification scope",
+      "evidence": [
+        "ui-integration.json",
+        "runtime-native-ui.json",
+        "screenshots/runtime-native-edit.png",
+        "screenshots/runtime-native-log.png"
+      ]
+    },
+    {
+      "requirement": "Real vendor reuse and all 17 reference scenes with stated differences",
+      "evidence": [
+        "README.md",
+        "comparison.json",
+        "comparison.html"
+      ]
+    },
+    {
+      "requirement": "Workspace, draft, late response, cleanup, keyboard, theme, multi-chart and fullscreen invariants",
+      "evidence": [
+        "ui-integration.json",
+        "workspace-integration.json",
+        "runtime-native-ui.json"
+      ]
+    },
+    {
+      "requirement": "Existing business and actual authenticated API/worker/closed-browser behavior",
+      "evidence": [
+        "native-business.json",
+        "runtime-browser.json",
+        "runtime-api-worker.json",
+        "no-browser-real-source.json",
+        "fault-acceptance.json"
+      ]
+    },
+    {
+      "requirement": "Ubuntu Docker ownership, runtime access, start/stop and private resources",
+      "evidence": [
+        "runtime-environment.json",
+        "README.md",
+        "source-hashes.json"
+      ]
+    },
+    {
+      "requirement": "Actual backup/restore and restart durability",
+      "evidence": [
+        "postgres-backup-restore.json",
+        "restart-acceptance.json"
+      ]
+    }
+  ]
+}

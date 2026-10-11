@@ -1,0 +1,10 @@
+{
+  "scope": "actual React components / synthetic routed API, no deployed instance",
+  "cases": [
+    "message subpage applies only to draft; creation defaults to one trigger",
+    "failed save and cancellation preserve draft and idempotent request; warming displayed accurately",
+    "pause/resume lifecycle; copy remains draft; event acknowledgement independent",
+    "dark/light render; modal keyboard focus and Escape cancellation"
+  ],
+  "errors": []
+}

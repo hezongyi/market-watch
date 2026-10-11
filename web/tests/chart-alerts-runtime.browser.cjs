@@ -15,6 +15,10 @@ const ENVIRONMENTS = {
     "https://localhost:19443",
     "https://127.0.0.1:19444",
   ],
+  "/tmp/mw-native-alert-ui-runtime": [
+    "https://localhost:19643",
+    "https://127.0.0.1:19644",
+  ],
   "/tmp/mw-chart-alerts-integration": [
     "https://localhost:19543",
     "https://127.0.0.1:19544",
@@ -139,15 +143,37 @@ assert.deepEqual(
     }
     report.cases.push("actual HTTPS login and platform native chart load");
     await frame.evaluate(() => alertBridge.create());
-    const dialog = page.getByRole("dialog");
+    const nativeUI = frame.childFrames()[0];
+    const dialog = nativeUI.locator('[data-name="mw-native-alert-dialog"]');
+    const setName = async (name) => {
+      await dialog.getByRole("button", { name: "消息", exact: true }).click();
+      await dialog.getByLabel("警报名称", { exact: true }).fill(name);
+      await dialog
+        .getByRole("button", { name: "应用到草稿", exact: true })
+        .click();
+    };
+    const select = async (label, option) => {
+      const advanced = dialog.locator(".alert-advanced-options");
+      if (/^判定/.test(label))
+        await advanced.evaluate((node) => {
+          node.open = true;
+        });
+      await dialog.getByRole("button", { name: label, exact: true }).click();
+      await nativeUI.getByRole("option", { name: option, exact: true }).click();
+    };
     await dialog.waitFor();
-    assert.equal(await dialog.getByLabel("触发次数").inputValue(), "1");
+    assert.match(
+      await dialog
+        .getByRole("button", { name: "触发次数", exact: true })
+        .textContent(),
+      /仅一次/,
+    );
     const priceName = "真实实例价格告警 " + Date.now();
-    await dialog.getByLabel("名称", { exact: true }).fill(priceName);
+    await setName(priceName);
     await dialog.getByLabel("比较值", { exact: true }).fill("1000000");
-    await dialog.getByLabel(/^判定/).selectOption("intrabar");
-    await dialog.getByLabel("触发次数").selectOption("2");
-    await dialog.getByRole("button", { name: /消息与通知/ }).click();
+    await select("判定", "盘中观察");
+    await select("触发次数", "最多 2 次");
+    await dialog.getByRole("button", { name: "消息", exact: true }).click();
     await dialog.getByLabel("消息正文").fill("价格观察 {symbol}");
     await dialog.getByRole("button", { name: "应用到草稿" }).click();
     const created = page.waitForResponse(
@@ -201,7 +227,7 @@ assert.deepEqual(
       "price worker ready",
     );
     assert.equal((await api("/chart-alerts/" + priceRow.id)).count, 0);
-    const article = page
+    const article = nativeUI
       .locator(".chart-alert-card")
       .filter({ hasText: priceName });
     await article.getByRole("button", { name: "暂停", exact: true }).click();
@@ -212,7 +238,10 @@ assert.deepEqual(
       "resumed",
     );
     const before = (await api("/chart-alerts")).length;
-    await article.getByRole("button", { name: "复制为草稿" }).click();
+    await article.getByRole("button", { name: /行操作/ }).click();
+    await nativeUI
+      .getByRole("menuitem", { name: "复制为草稿", exact: true })
+      .click();
     assert.equal((await api("/chart-alerts")).length, before);
     await dialog.getByRole("button", { name: "取消（保留草稿）" }).click();
     report.cases.push(
@@ -229,7 +258,7 @@ assert.deepEqual(
       return id;
     });
     await dialog.waitFor();
-    await dialog.getByLabel("名称", { exact: true }).fill("真实实例画线告警");
+    await setName("真实实例画线告警");
     const drawingResponse = page.waitForResponse(
       (r) =>
         r.url().endsWith("/api/chart-alerts") &&
@@ -307,9 +336,7 @@ assert.deepEqual(
       { price, bars: actualBars },
     );
     await dialog.waitFor();
-    await dialog
-      .getByLabel("名称", { exact: true })
-      .fill("真实鼠标拖动 " + Date.now());
+    await setName("真实鼠标拖动 " + Date.now());
     const dragCreated = page.waitForResponse(
       (r) =>
         r.url().endsWith("/api/chart-alerts") &&
@@ -407,10 +434,8 @@ print(sum(ys)/len(ys))
         { kind, scale, bars: actualBars, price },
       );
       await dialog.waitFor();
-      await dialog
-        .getByLabel("名称", { exact: true })
-        .fill("真实斜线 " + kind + " " + Date.now());
-      await dialog.getByLabel(/^判定/).selectOption("intrabar");
+      await setName("真实斜线 " + kind + " " + Date.now());
+      await select("判定", "盘中观察");
       const response = page.waitForResponse(
         (r) =>
           r.url().endsWith("/api/chart-alerts") &&
@@ -471,10 +496,8 @@ print(sum(ys)/len(ys))
         await alertBridge.create({ chart: c, object: { type: "study", id } });
       }, name);
       await dialog.waitFor();
-      await dialog
-        .getByLabel("名称", { exact: true })
-        .fill("真实指标 " + name + " " + Date.now());
-      await dialog.getByLabel(/^判定/).selectOption("intrabar");
+      await setName("真实指标 " + name + " " + Date.now());
+      await select("判定", "盘中观察");
       await dialog.getByLabel("比较值", { exact: true }).fill("1000000");
       const response = page.waitForResponse(
         (r) =>

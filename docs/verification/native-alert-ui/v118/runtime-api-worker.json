@@ -1,0 +1,27 @@
+{
+  "scope": "running Ubuntu Compose API/worker/PostgreSQL; synthetic fixture observations",
+  "cases": [
+    "running autonomous worker initializes baseline without firing",
+    "1/2/3 triggers stop at limit; sustained/equal/released same-candle observations obey counts",
+    "isolated notification sink accepts events after retry; acknowledging one leaves other events independent",
+    "price interval skips unobserved jump across range; counts only actual entries",
+    "real persisted history revision blocks indicator evaluation; explicit rebaseline preserves run/count without duplicate events"
+  ],
+  "external_notifications_sent": false,
+  "notification_delivery_attempts": [
+    1,
+    1,
+    2
+  ],
+  "notification_alert": "73ba7d66-3424-40e5-bad5-9b37289e3da2",
+  "finite_alerts": [
+    "eaef1597-6b79-433b-b0f8-fe53a16193ec",
+    "bac734e7-e771-465e-b7a5-fc9880c02c79",
+    "44c25c0d-2250-42e5-b7da-01ef23ae8812",
+    "73ba7d66-3424-40e5-bad5-9b37289e3da2"
+  ],
+  "additional_alerts": [
+    "cfd54041-552d-4918-8366-58a1462bf04f",
+    "c3d3119c-75ce-4a16-808f-902798928b45"
+  ]
+}

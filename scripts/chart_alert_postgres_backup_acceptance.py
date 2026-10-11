@@ -1,6 +1,6 @@
 """Verify real pg_dump/pg_restore using only this task's dedicated Compose DB.
 
-The source must be chart_alerts_acceptance; restoration always uses a fresh
+The source must be a whitelisted task-owned database; restoration uses a fresh
 random DB on that same task-owned pg container. No workers attach to the restore.
 """
 
@@ -13,6 +13,7 @@ import subprocess
 import uuid
 
 from alerts.storage import (
+    AdvancedWorkspace,
     AgentCredential,
     AgentOperation,
     ChartAlert,
@@ -81,7 +82,7 @@ def main():
     path = ROOT / (restored_name + ".dump")
     restored = None
     created = False
-    tables = (ChartAlert, ChartAlertVersion, SignalRow, Notification, Outbox)
+    tables = (ChartAlert, ChartAlertVersion, SignalRow, Notification, Outbox, AdvancedWorkspace)
     if PROJECT == "mw-chart-alerts-integration":
         tables += (AgentCredential, AgentOperation, ChartAlertAction)
 
@@ -97,10 +98,22 @@ def main():
                 for model in tables
             }
 
+    def table_counts(db):
+        with db.connect() as connection:
+            names = connection.scalars(text(
+                "SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename"
+            )).all()
+            quote = connection.dialect.identifier_preparer.quote
+            return {name: connection.scalar(text("SELECT count(*) FROM public." + quote(name)))
+                    for name in names}
+
     try:
         # Caller stops only task writer services before snapshotting; read-only
         # API access and sessions cannot change these five alert tables.
         expected = contents(engine)
+        expected_counts = table_counts(engine)
+        with engine.connect() as connection:
+            expected_head = connection.scalar(text("SELECT version_num FROM alembic_version"))
         if not expected["signals"] or not expected["chart_alerts"]:
             raise ValueError("Backup must include populated chart alerts and events")
         payload = pg(
@@ -134,12 +147,9 @@ def main():
         assert contents(restored) == expected, (
             "Restored rules, versions, evidence, checkpoints, or outbox differ"
         )
+        assert table_counts(restored) == expected_counts, "Public table row counts differ after restore"
         with restored.connect() as connection:
-            assert connection.scalar(text("SELECT version_num FROM alembic_version")) == (
-                "s20_chart_alerts"
-                if PROJECT == "mw-chart-alerts-acceptance"
-                else "u22_chart_alert_actions"
-            )
+            assert connection.scalar(text("SELECT version_num FROM alembic_version")) == expected_head
         result = {
             "verified": True,
             "postgres_version": pg("postgres", "--version").stdout.decode().strip(),
@@ -147,9 +157,9 @@ def main():
             "bytes": len(payload),
             "alert_table_counts": {name: len(rows) for name, rows in expected.items()},
             "full_alert_payloads_equal": True,
-            "migration_head": "s20_chart_alerts"
-            if PROJECT == "mw-chart-alerts-acceptance"
-            else "u22_chart_alert_actions",
+            "workspace_payloads_equal": True,
+            "public_table_counts": expected_counts,
+            "migration_head": expected_head,
             "temporary_restore_database_removed": True,
         }
     finally:

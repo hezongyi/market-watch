@@ -7,7 +7,9 @@ services:
       args:
         VITE_ADVANCED_CHART_ORIGIN: ${VITE_ADVANCED_CHART_ORIGIN:?Set the public isolated HTTPS chart origin}
   chart-origin:
-    build: ./advanced-host
+    build:
+      context: .
+      dockerfile: advanced-host/Dockerfile
     ports:
       - "${CHART_ORIGIN_BIND:-127.0.0.1}:${CHART_ORIGIN_PORT:-15187}:80"
     restart: unless-stopped

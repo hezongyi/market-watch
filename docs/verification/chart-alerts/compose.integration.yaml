@@ -73,7 +73,9 @@ services:
     image: market-watch-web:chart-alerts-integration
     depends_on: [api]
   chart-origin:
-    build: ../../../advanced-host
+    build:
+      context: ../../..
+      dockerfile: advanced-host/Dockerfile
     image: market-watch-chart-origin:chart-alerts-integration
   tls:
     image: nginx:1.28-alpine

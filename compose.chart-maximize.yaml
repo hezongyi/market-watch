@@ -50,7 +50,9 @@ services:
     depends_on:
       api: {condition: service_healthy}
   chart-origin:
-    build: ./advanced-host
+    build:
+      context: .
+      dockerfile: advanced-host/Dockerfile
     image: market-watch-chart-origin:chart-maximize-v1121-20261007
   tls:
     image: nginx:1.28-alpine

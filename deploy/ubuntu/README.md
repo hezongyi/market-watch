@@ -18,7 +18,7 @@ builder默认选中可以防止普通构建继续使用legacy builder，但不�
 ```bash
 mw-docker build --repo . --component api --tag market-watch-api:issue-42 \
   --task mw-issue42 --project mw-issue42 --purpose acceptance
-mw-docker build --repo . --component chart --tag market-watch-chart-origin:issue-42 \
+mw-docker build --repo . --component chart --context . --file advanced-host/Dockerfile --tag market-watch-chart-origin:issue-42 \
   --task mw-issue42 --project mw-issue42 --purpose acceptance
 mw-docker build --repo . --component web --tag market-watch-web:issue-42 \
   --task mw-issue42 --project mw-issue42 --purpose acceptance \

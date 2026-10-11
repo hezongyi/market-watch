@@ -1,0 +1,189 @@
+{
+  "scope": "Ubuntu Chromium, actual widget and shipped UI, cross-origin parent API fixture; no deployed instance",
+  "passed": true,
+  "cases": [
+    "Message and notification subpages apply only to draft; cancel/reentry restores values; finite trigger semantics",
+    "Native shell renders shipped form; failed save retains draft; parent owns every API write and CSRF",
+    "Pause/resume and edit use existing version/control revision API",
+    "Native drag reallocates chart width; native page rebuild retains search state and one mounted renderer; object tree round trip",
+    "Date-grouped log retains late evidence, rule version, delivery status and independent acknowledgement",
+    "Escape returns from subpage, modal focus stays inside native shell, final Escape closes; light theme applies",
+    "Native sidebar tab toggles with real mouse and keyboard; native menus handle Home/End/Escape",
+    "Real native controls preserve range, two indicator operands and drawing snapshot creation",
+    "Copy is draft only; current-symbol filter follows active pane while edit draft stays fixed; edit footer archives through existing lifecycle",
+    "Native fullscreen retains one renderer and permits dialog creation; exiting restores the native alert page",
+    "Failed chunk loading leaves native configuration intact; destruction cancels a pending native dialog without a stray window",
+    "Narrow viewport retains bounded dialog; destruction removes business root"
+  ],
+  "errors": [],
+  "geometry": {
+    "shell": {
+      "x": 1132,
+      "y": 212,
+      "width": 480,
+      "height": 465.9375,
+      "top": 212,
+      "right": 1612,
+      "bottom": 677.9375,
+      "left": 1132
+    },
+    "body": {
+      "x": 1132,
+      "y": 269,
+      "width": 480,
+      "height": 408.9375,
+      "top": 269,
+      "right": 1612,
+      "bottom": 677.9375,
+      "left": 1132
+    },
+    "controls": [
+      {
+        "x": 1284,
+        "y": 285,
+        "width": 308,
+        "height": 34,
+        "top": 285,
+        "right": 1592,
+        "bottom": 319,
+        "left": 1284
+      },
+      {
+        "x": 1284,
+        "y": 327,
+        "width": 308,
+        "height": 34,
+        "top": 327,
+        "right": 1592,
+        "bottom": 361,
+        "left": 1284
+      },
+      {
+        "x": 1284,
+        "y": 369,
+        "width": 308,
+        "height": 34,
+        "top": 369,
+        "right": 1592,
+        "bottom": 403,
+        "left": 1284
+      }
+    ],
+    "select": [
+      {
+        "tag": "SPAN",
+        "className": "container-WDZ0PRNh container-small-WDZ0PRNh intent-default-WDZ0PRNh border-thin-WDZ0PRNh size-small-WDZ0PRNh stretch-WDZ0PRNh adjust-position-WDZ0PRNh first-row-WDZ0PRNh first-col-WDZ0PRNh button-tFul0OhX",
+        "align": "left",
+        "justify": "flex-start"
+      },
+      {
+        "tag": "SPAN",
+        "className": "inner-slot-W53jtLjw inner-middle-slot-W53jtLjw",
+        "align": "left",
+        "justify": "flex-start"
+      },
+      {
+        "tag": "SPAN",
+        "className": "button-children-tFul0OhX",
+        "align": "left",
+        "justify": "normal"
+      },
+      {
+        "tag": "SPAN",
+        "className": "",
+        "align": "left",
+        "justify": "normal"
+      },
+      {
+        "tag": "SPAN",
+        "className": "inner-slot-W53jtLjw interactive-W53jtLjw",
+        "align": "left",
+        "justify": "center"
+      },
+      {
+        "tag": "SPAN",
+        "className": "button-PYEOTd6i disabled-PYEOTd6i",
+        "align": "left",
+        "justify": "center"
+      },
+      {
+        "tag": "SPAN",
+        "className": "icon-PYEOTd6i",
+        "align": "left",
+        "justify": "center"
+      },
+      {
+        "tag": "svg",
+        "className": {},
+        "align": "left",
+        "justify": "normal"
+      },
+      {
+        "tag": "path",
+        "className": {},
+        "align": "left",
+        "justify": "normal"
+      },
+      {
+        "tag": "SPAN",
+        "className": "highlight-WDZ0PRNh",
+        "align": "left",
+        "justify": "normal"
+      }
+    ]
+  },
+  "reuse": [
+    {
+      "kind": "select",
+      "nativeClass": "container-WDZ0PRNh container-small-WDZ0PRNh intent-default-WDZ0PRNh border-thin-WDZ0PRNh size-small-WDZ0PRNh stretch-WDZ0PRNh adjust-position-WDZ0PRNh first-row-WDZ0PRNh first-col-WDZ0PRNh button-tFul0OhX"
+    },
+    {
+      "kind": "select",
+      "nativeClass": "container-WDZ0PRNh container-small-WDZ0PRNh intent-default-WDZ0PRNh border-thin-WDZ0PRNh size-small-WDZ0PRNh stretch-WDZ0PRNh adjust-position-WDZ0PRNh first-row-WDZ0PRNh first-col-WDZ0PRNh button-tFul0OhX"
+    },
+    {
+      "kind": "input",
+      "nativeClass": "container-WDZ0PRNh container-small-WDZ0PRNh intent-primary-WDZ0PRNh border-thin-WDZ0PRNh size-small-WDZ0PRNh with-highlight-WDZ0PRNh focused-WDZ0PRNh stretch-WDZ0PRNh adjust-position-WDZ0PRNh first-row-WDZ0PRNh first-col-WDZ0PRNh"
+    },
+    {
+      "kind": "select",
+      "nativeClass": "container-WDZ0PRNh container-small-WDZ0PRNh intent-default-WDZ0PRNh border-thin-WDZ0PRNh size-small-WDZ0PRNh stretch-WDZ0PRNh adjust-position-WDZ0PRNh first-row-WDZ0PRNh first-col-WDZ0PRNh button-tFul0OhX"
+    },
+    {
+      "kind": "menu"
+    },
+    {
+      "kind": "select",
+      "nativeClass": "container-WDZ0PRNh container-small-WDZ0PRNh intent-default-WDZ0PRNh border-thin-WDZ0PRNh size-small-WDZ0PRNh stretch-WDZ0PRNh adjust-position-WDZ0PRNh first-row-WDZ0PRNh first-col-WDZ0PRNh button-tFul0OhX"
+    },
+    {
+      "kind": "select",
+      "nativeClass": "container-WDZ0PRNh container-small-WDZ0PRNh intent-default-WDZ0PRNh border-thin-WDZ0PRNh size-small-WDZ0PRNh stretch-WDZ0PRNh adjust-position-WDZ0PRNh first-row-WDZ0PRNh first-col-WDZ0PRNh button-tFul0OhX"
+    },
+    {
+      "kind": "select",
+      "nativeClass": "container-WDZ0PRNh container-small-WDZ0PRNh intent-default-WDZ0PRNh border-thin-WDZ0PRNh size-small-WDZ0PRNh stretch-WDZ0PRNh adjust-position-WDZ0PRNh first-row-WDZ0PRNh first-col-WDZ0PRNh button-tFul0OhX"
+    },
+    {
+      "kind": "select",
+      "nativeClass": "container-WDZ0PRNh container-small-WDZ0PRNh intent-default-WDZ0PRNh border-thin-WDZ0PRNh size-small-WDZ0PRNh stretch-WDZ0PRNh adjust-position-WDZ0PRNh first-row-WDZ0PRNh first-col-WDZ0PRNh button-tFul0OhX"
+    },
+    {
+      "kind": "input",
+      "nativeClass": "container-WDZ0PRNh container-small-WDZ0PRNh intent-default-WDZ0PRNh border-thin-WDZ0PRNh size-small-WDZ0PRNh stretch-WDZ0PRNh adjust-position-WDZ0PRNh first-row-WDZ0PRNh first-col-WDZ0PRNh"
+    },
+    {
+      "kind": "button",
+      "nativeClass": "button-D4RPB3ZC xsmall-D4RPB3ZC gray-D4RPB3ZC secondary-D4RPB3ZC apply-overflow-tooltip apply-overflow-tooltip--check-children-recursively apply-overflow-tooltip--allow-text apply-common-tooltip"
+    },
+    {
+      "kind": "button",
+      "nativeClass": "button-D4RPB3ZC xsmall-D4RPB3ZC gray-D4RPB3ZC primary-D4RPB3ZC apply-overflow-tooltip apply-overflow-tooltip--check-children-recursively apply-overflow-tooltip--allow-text apply-common-tooltip"
+    }
+  ],
+  "cleanup": {
+    "failed": true,
+    "restored": true,
+    "stray": 0
+  }
+}

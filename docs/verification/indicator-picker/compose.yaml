@@ -48,7 +48,9 @@ services:
     depends_on:
       migrate: {condition: service_completed_successfully}
   chart-origin:
-    build: ../../../advanced-host
+    build:
+      context: ../../..
+      dockerfile: advanced-host/Dockerfile
     image: market-watch-chart-origin:indicator-acceptance
   tls:
     image: nginx:1.28-alpine
