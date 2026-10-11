@@ -19,7 +19,13 @@ from .config import settings
 from .domain import Calendar, session_bounds
 from .provider_capabilities import SOURCES, versions
 from .provider_capabilities import frames as source_frames
-from .provider_transport import activity, discard_client, pooled_client, warm_connections
+from .provider_transport import (
+    activity,
+    discard_client,
+    pooled_client,
+    retryable_network_error,
+    warm_connections,
+)
 from .provider_transport import close_clients as close_clients
 from .storage import Instrument, MarketCatalog, MarketDataset, instant, ms, now_ms, transaction
 from .volume import encoded
@@ -153,14 +159,15 @@ def label(start, frame, calendar):
 
 
 def _request(client, url, *, params, headers=None, deadline):
-    for attempt in range(3):
+    source = "oanda" if "oanda.com" in url else "binance"
+    max_attempts = 3 if source == "oanda" else 2
+    for attempt in range(max_attempts):
         remaining = deadline - time.monotonic()
         if remaining <= 0:
             raise TimeoutError("平台请求超过时间预算")
         try:
             from .market_resources import request_slot
 
-            source = "oanda" if "oanda.com" in url else "binance"
             slot_started = time.monotonic()
             with request_slot(source, deadline=deadline):
                 record_timing("upstream_slot", slot_started)
@@ -194,7 +201,8 @@ def _request(client, url, *, params, headers=None, deadline):
                     raise
                 finally:
                     record_timing("upstream_http", http_started)
-            if response.status_code not in (429, 502, 503, 504) or attempt == 2:
+            if (response.status_code not in (429, 502, 503, 504) or attempt == max_attempts-1
+                    or source == "binance" and response.status_code == 429):
                 response.raise_for_status()
                 decode_started = time.monotonic()
                 payload = response.json()
@@ -202,9 +210,11 @@ def _request(client, url, *, params, headers=None, deadline):
                 return payload
         except (httpx.ConnectError, httpx.TimeoutException) as error:
             record_timing("failure_" + type(error).__name__, http_started)
+            if not retryable_network_error(error):
+                raise
             if isinstance(error, (httpx.ConnectError, httpx.ConnectTimeout, httpx.PoolTimeout)):
                 discard_client(client)
-            if attempt == 2:
+            if attempt == max_attempts-1:
                 raise
         # A bounded retry leaves failure distinguishable from a history boundary.
         remaining = deadline - time.monotonic()

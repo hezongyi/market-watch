@@ -25,13 +25,12 @@ def main():
     with ExitStack() as stack:
         clients = {
             "oanda": stack.enter_context(httpx.Client(timeout=15, proxy=settings.oanda_proxy or None, trust_env=False)),
-            "binance": stack.enter_context(httpx.Client(timeout=15, proxy=settings.effective_binance_proxy or None, trust_env=False)),
         }
         def fetch_page(source, symbol, start, end):
             provider = {"oanda": fetch_oanda, "binance": fetch_binance}.get(source)
             if provider is None:
                 return fetch_source(source, symbol, start, end)
-            return provider(symbol, start, end, client=clients[source])
+            return provider(symbol, start, end, client=clients.get(source))
         run(fetch_page)
 
 

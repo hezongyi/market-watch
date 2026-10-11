@@ -1,0 +1,52 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_verified_closure_retires_old_instrument_fault_without_fabricating_confirmation _
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c62...46d6c2293435f9bf1cf970059e0f7dfb90b2e', provider_symbol='XAU_USD', basis='bid', calendar_version='ny17-candidate-v1')})
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f2ad6a8b910>
+
+    def test_verified_closure_retires_old_instrument_fault_without_fabricating_confirmation(running, monkeypatch):
+        factory, ownership, _, identities = running
+        stamp = int(datetime.fromisoformat('2026-10-10T04:00:00+00:00').timestamp()*1000)
+        monkeypatch.setattr(settings, 'oanda_live_session_profiles', {symbol: profile(identity) for symbol, identity in identities.items()})
+        before = {}
+        with factory.begin() as db:
+            owner = db.get(PricingOwner, ownership[0])
+            owner.expires = stamp + 120000
+            owner.error = 'unavailable'
+            for identity in identities.values():
+                state = db.get(LiveState, identity.key)
+                inst = db.get(Instrument, db.get(MarketDataset, identity.key).instrument_id)
+                inst.quality, inst.error = 'error', 'unavailable'
+                state.error = 'm1_late'
+                before[identity.key] = (state.confirmed_end, inst.last_received, inst.calendar_profile)
+        live.park_closed(ownership, identities, 60, now=stamp)
+        with factory.begin() as db:
+            for identity in identities.values():
+                state = db.get(LiveState, identity.key)
+                inst = db.get(Instrument, db.get(MarketDataset, identity.key).instrument_id)
+                assert state.connection == 'closed' and not state.ready and state.error is None
+>               assert inst.quality == 'waiting' and inst.error is None
+E               AssertionError: assert ('error' == 'waiting'
+E
+E                 - waiting
+E                 + error)
+
+backend/tests/test_oanda_recovery.py:334: AssertionError
+____________ test_unknown_session_cannot_clear_live_fault_as_closed ____________
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c62...46d6c2293435f9bf1cf970059e0f7dfb90b2e', provider_symbol='XAU_USD', basis='bid', calendar_version='ny17-candidate-v1')})
+
+    def test_unknown_session_cannot_clear_live_fault_as_closed(running):
+        factory, ownership, _, identities = running
+        stamp = int(datetime.fromisoformat('2026-10-10T04:00:00+00:00').timestamp()*1000)
+        with factory.begin() as db:
+            db.get(PricingOwner, ownership[0]).expires = stamp + 120000
+>       with pytest.raises(ValueError, match='verified'):
+E       Failed: DID NOT RAISE ValueError
+
+backend/tests/test_oanda_recovery.py:343: Failed
+=========================== short test summary info ============================
+FAILED backend/tests/test_oanda_recovery.py::test_verified_closure_retires_old_instrument_fault_without_fabricating_confirmation
+FAILED backend/tests/test_oanda_recovery.py::test_unknown_session_cannot_clear_live_fault_as_closed
+2 failed, 22 deselected in 0.53s

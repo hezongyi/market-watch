@@ -308,3 +308,37 @@ def test_operational_evidence_changes_status_without_reinterpreting_history(runn
             assert db.get(Instrument, db.get(MarketDataset, identity.key).instrument_id).calendar_profile == {}
         assert session_status(identity.model_dump(), {}, stamp)['market_session'] == 'closed'
         assert session_status(identity.model_dump() | {'channel': 'other'}, {}, stamp)['market_session'] == 'unknown'
+
+
+def test_verified_closure_retires_old_instrument_fault_without_fabricating_confirmation(running, monkeypatch):
+    factory, ownership, _, identities = running
+    stamp = int(datetime.fromisoformat('2026-10-10T04:00:00+00:00').timestamp()*1000)
+    monkeypatch.setattr(settings, 'oanda_live_session_profiles', {symbol: profile(identity) for symbol, identity in identities.items()})
+    before = {}
+    with factory.begin() as db:
+        owner = db.get(PricingOwner, ownership[0])
+        owner.expires = stamp + 120000
+        owner.error = 'unavailable'
+        for identity in identities.values():
+            state = db.get(LiveState, identity.key)
+            inst = db.get(Instrument, db.get(MarketDataset, identity.key).instrument_id)
+            inst.quality, inst.error = 'error', 'unavailable'
+            state.error = 'm1_late'
+            before[identity.key] = (state.confirmed_end, inst.last_received, inst.calendar_profile)
+    live.park_closed(ownership, identities, 60, now=stamp)
+    with factory.begin() as db:
+        for identity in identities.values():
+            state = db.get(LiveState, identity.key)
+            inst = db.get(Instrument, db.get(MarketDataset, identity.key).instrument_id)
+            assert state.connection == 'closed' and not state.ready and state.error is None
+            assert inst.quality == 'waiting' and inst.error is None
+            assert (state.confirmed_end, inst.last_received, inst.calendar_profile) == before[identity.key]
+
+
+def test_unknown_session_cannot_clear_live_fault_as_closed(running):
+    factory, ownership, _, identities = running
+    stamp = int(datetime.fromisoformat('2026-10-10T04:00:00+00:00').timestamp()*1000)
+    with factory.begin() as db:
+        db.get(PricingOwner, ownership[0]).expires = stamp + 120000
+    with pytest.raises(ValueError, match='verified'):
+        live.park_closed(ownership, identities, 60, now=stamp)

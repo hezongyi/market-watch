@@ -1,5 +1,7 @@
 """Provider HTTP pools and bounded idle transport maintenance, without market policy."""
 
+import logging
+import ssl
 import threading
 import time
 import weakref
@@ -21,6 +23,71 @@ _THREADS = []
 IDLE_SECONDS = 20
 
 
+def retryable_network_error(error):
+    if not isinstance(error, (httpx.ConnectError, httpx.TimeoutException,
+                              httpx.ReadError, httpx.RemoteProtocolError)):
+        return False
+    seen = set()
+    current = error
+    while current and id(current) not in seen:
+        seen.add(id(current))
+        if isinstance(current, ssl.SSLCertVerificationError) or "CERTIFICATE_VERIFY_FAILED" in str(current):
+            return False
+        current = current.__cause__ or current.__context__
+    return True
+
+
+def error_detail(error):
+    """Network failures carry a classification, never an upstream URL or credential."""
+    if isinstance(error, httpx.HTTPStatusError):
+        return f"{type(error).__name__}: HTTP {error.response.status_code}"
+    if isinstance(error, httpx.TransportError):
+        if not retryable_network_error(error) and isinstance(error, httpx.ConnectError):
+            category = "certificate_verification"
+        elif "UNEXPECTED_EOF_WHILE_READING" in str(error):
+            category = "tls_eof"
+        else:
+            category = "network_failure"
+        return f"{type(error).__name__}: {category}"
+    return str(error)[:600] or type(error).__name__
+
+
+def binance_get(client, url, *, params, deadline):
+    """At most two read-only attempts; every attempt reacquires the shared lane."""
+    from .market_resources import request_slot
+
+    for attempt in range(2):
+        phase = "slot"
+        route = "proxy" if settings.effective_binance_proxy else "direct"
+        def trace(name, info):
+            nonlocal phase
+            if name.endswith(".started"):
+                phase = name.rsplit(".", 1)[0]
+        started = time.monotonic()
+        current = client
+        try:
+            with request_slot("binance", deadline=deadline):
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise TimeoutError("Binance 请求超过时间预算")
+                with activity(client) as current:
+                    response = current.get(url, params=params,
+                        timeout=httpx.Timeout(min(7, remaining), connect=min(5, remaining)),
+                        extensions={"trace": trace})
+            response.raise_for_status()
+            return response
+        except httpx.TransportError as error:
+            if retryable_network_error(error):
+                discard_client(current)
+            logging.getLogger(__name__).warning(
+                "binance_transport_failed type=%s phase=%s route=%s attempt=%s elapsed_ms=%s",
+                type(error).__name__, phase, route, attempt+1, round((time.monotonic()-started)*1000))
+            if attempt or not retryable_network_error(error) or deadline-time.monotonic() <= .25:
+                raise
+            time.sleep(.25)
+    raise RuntimeError("Binance 请求重试耗尽")
+
+
 def pooled_client(source):
     if source == 'yahoo':
         raise ValueError('Yahoo SDK 会话只能在 Adapter 操作生命周期内取得')
@@ -39,7 +106,7 @@ def client_for_key(key):
 def state_for_key(key):
     # Callers hold _LOCK so assignment and activity reservation are atomic.
     if key not in _CLIENTS:
-        capacity = 2 if key[2] == 'chart' else 1
+        capacity = 2 if key[2] in ('chart', 'pricing') else 1
         _CLIENTS[key] = {
             'client': httpx.Client(timeout=7, proxy=key[1] or None, trust_env=False,
                                  limits=httpx.Limits(max_connections=capacity,
@@ -79,6 +146,16 @@ def discard_client(client):
             # Retain an empty replacement so idle maintenance can reestablish
             # transport after a startup/heartbeat failure without a chart read.
             state_for_key(key)
+    close_retired()
+
+
+def retire_client(client):
+    """Retire an owned pool without creating an unused replacement on shutdown."""
+    with _LOCK:
+        key = _KEYS.get(client)
+        state = _CLIENTS.pop(key, None)
+        if state:
+            _RETIRED.append(state)
     close_retired()
 
 
