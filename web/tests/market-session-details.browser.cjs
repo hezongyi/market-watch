@@ -53,6 +53,8 @@ const record=report.cases.push.bind(report.cases);report.cases.push=item=>{conso
     await page.locator('iframe[title="专业图表工作区"]').waitFor({timeout:60000});
     const frame = await (async()=>{for(let i=0;i<120;i++) {const f=page.frames().find(f=>f.url().startsWith("https://127.0.0.1:17444/"));if(f)return f;await page.waitForTimeout(500);}throw Error("missing chart origin");})();
     await frame.waitForFunction(()=>typeof ready!=="undefined" && ready && !loading && widget.activeChart().dataReady(),null,{timeout:120000});
+    await frame.evaluate(()=>{globalThis.sessionNavigationErrors=[];
+      addEventListener("mw-navigation-error",event=>sessionNavigationErrors.push(event.detail?.message || String(event.detail)));});
     const ui = frame.childFrames()[0]; assert.ok(ui,"native frame");
     await frame.evaluate(async()=> {const bar=await widget.widgetbar();bar.changeWidgetBarVisibility(true);bar.showPage("watchlist_details_news");});
     const quote = (await post("market-data/quotes",{symbols:[ticker]}))[0];
@@ -113,6 +115,7 @@ const record=report.cases.push.bind(report.cases);report.cases.push=item=>{conso
     report.cases.push({case:"stream failure reaches native details",price:failed.v.lp,time:failed.v.data_start});
     await streamEvent("quotes",{quotes:[{...quote,v:{...quote.v,read_at:Date.now()}}]});
     await ui.getByText(/休市.*周末.*最后行情时间/).first().waitFor({timeout:15000});
+    await ui.getByText("更新失败，保留上次数据",{exact:false}).first().waitFor({state:"hidden",timeout:15000});
     assert.equal(await ui.getByText("更新失败，保留上次数据",{exact:false}).count(),0);
     await streamEvent("status",{status:"error",generation:0});
     assert.equal(await ui.getByText("更新失败，保留上次数据",{exact:false}).count(),0);
@@ -209,6 +212,9 @@ const record=report.cases.push.bind(report.cases);report.cases.push=item=>{conso
     report.cases.push({case:"native details actual 200% zoom",visible:true});await zoom(1);
     for(const interval of ["1","60","240","1D","1W","1M"]) {
       report.phase="period "+interval;
+      await frame.waitForFunction(()=>!loading && !historyReloading && !pending.size && !requests.length &&
+        !rangeGuard.busy() && !edgeGuard.busy(),null,{timeout:90000});
+      await frame.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
       await frame.evaluate(async interval=>{
         const chart=widget.activeChart();
         if(chart.resolution()===interval)return;
@@ -219,7 +225,15 @@ const record=report.cases.push.bind(report.cases);report.cases.push=item=>{conso
         await new Promise(resolve=>setTimeout(resolve,0));
       },interval);
       await frame.waitForFunction(()=>widget.activeChart().dataReady(),null,{timeout:90000});
-      report.cases.push({case:"native period ready",interval});
+      await frame.waitForFunction(()=>!historyReloading && !pending.size && !requests.length &&
+        !rangeGuard.busy() && !edgeGuard.busy(),null,{timeout:90000});
+      await frame.waitForFunction(()=>{
+        const model=widget.activeChart()._chartWidget.model().model();
+        return model._lastGotoTimeRange == null && model.timeScale().visibleBarsStrictRange() != null;
+      },null,{timeout:90000});
+      const range=await frame.evaluate(()=>({interval:widget.activeChart().resolution(),...widget.activeChart().getVisibleRange()}));
+      assert.equal(range.interval,interval);assert.ok(range.from<range.to);
+      report.cases.push({case:"native period ready",interval,range});
     }
     // A separate native workspace view keeps the period range restoration
     // independent from the fast-selection quote identity assertion.
@@ -252,6 +266,8 @@ const record=report.cases.push.bind(report.cases);report.cases.push=item=>{conso
     report.cases.push({case:"rapid native symbol selection quote identity",selected:fxTicker,passed:true});
     await rapidPage.close();
     await page.waitForTimeout(1000);
+    report.navigationErrors=await frame.evaluate(()=>sessionNavigationErrors);
+    assert.deepEqual(report.navigationErrors,[]);
     assert.deepEqual(report.errors,[]);
     fs.writeFileSync(OUT+"/browser.json",JSON.stringify(report,null,2));
     console.log(JSON.stringify(report,null,2));
