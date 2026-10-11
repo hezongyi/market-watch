@@ -9,6 +9,9 @@ const library = process.env.MW_PROBE_LIBRARY;
 if (!library)
   throw Error("MW_PROBE_LIBRARY must point to the private pinned library");
 const origin = "https://native-dependencies.invalid";
+const delayedChunks = new Set(
+  (process.env.MW_DELAY_CHUNKS || "32171,36145").split(","),
+);
 const fixture = `
 const feed = {
   onReady: cb => setTimeout(() => cb({supported_resolutions:['60']}), 0),
@@ -54,7 +57,7 @@ widget.onChartReady(async () => {
       const url = new URL(route.request().url());
       // A successful but slow shared chunk reproduces the real startup race.
       // Alert initialization must await it rather than use a partly ready module.
-      if (/\/32171\.[^/]+\.js$/.test(url.pathname))
+      if (delayedChunks.has(path.basename(url.pathname).split(".")[0]))
         await new Promise((resolve) => setTimeout(resolve, 500));
       if (url.pathname === "/")
         return route.fulfill({

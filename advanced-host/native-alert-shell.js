@@ -41,9 +41,10 @@ async function nativeAlertShell(widget, { mount, unmount, report }) {
     ]);
   if (!vendor?.e) throw Error("v31.1.0 原生控件运行时契约不匹配");
   await Promise.all([
-    // Select (221339) imports DOM IDs (210754) from this shared chunk.
-    // Await it before requiring controls; other lazy UI may not have loaded it.
+    // Select imports DOM IDs (210754) and keyboard navigation (409286)
+    // from shared chunks. Other lazy UI may not have finished loading them.
     vendor.e(32171),
+    vendor.e(36145),
     vendor.e(21981),
     vendor.e(42706),
     vendor.e(34540),
