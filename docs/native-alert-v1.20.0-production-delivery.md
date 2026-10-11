@@ -34,7 +34,7 @@ cd /mnt/user/appdata/market-watch
 - 行情与通知心跳保持新鲜，发布进度继续更新；复查窗口未新增 error 类 audit。观察结果见 [worker 记录](verification/native-alert-v1.20.0-production/worker-stability.json)。
 - 两个外部 HTTPS 入口均 HTTP 200；Ubuntu Chromium 验证生产登录页、390px 无横向溢出、图表 CSP `connect-src 'none'` 及图表域不暴露 API，0 页面异常。
 
-**用户提供现有密码后，生产登录成功，但既有五图布局的原生告警初始化失败。** 两次新浏览器会话均在首次 `activeChartChanged` 取消订阅抛错；图表、行情和数据中心已就绪，`alertUI` 尚未初始化。此前 Ubuntu 新建工作区验收未覆盖该恢复路径。真实许可库最小回归已复现，补丁 v1.20.1 正在处理；不将本次生产 UI 宣称验收通过。只读检查阻止偏好迁移与业务保存，已退出登录；12 个服务、HTTPS 和用户状态指纹复查通过。也未重新验证全部历史版本业务、下一次定时备份、真实手机响铃或长期稳定性。具体结果见 [运行身份](verification/native-alert-v1.20.0-production/runtime.json)、[Yahoo 读取](verification/native-alert-v1.20.0-production/yahoo-production.json)、[公开页面](verification/native-alert-v1.20.0-production/production-public-browser.json)、[登录态结果](verification/native-alert-v1.20.0-production/authenticated-browser-status.json)。
+**用户提供现有密码后，生产登录成功，但既有五图布局的原生告警初始化失败。** 两次新浏览器会话均在首次 `activeChartChanged` 取消订阅抛错；图表、行情和数据中心已就绪，`alertUI` 尚未初始化。此前 Ubuntu 新建工作区验收未覆盖该恢复路径。真实许可库最小回归已复现，补丁 [v1.20.1](saved-layout-alert-v1.20.1-production-delivery.md) 已部署且登录态验收通过；不将本次生产 UI 宣称验收通过。只读检查阻止偏好迁移与业务保存，已退出登录；12 个服务、HTTPS 和用户状态指纹复查通过。也未重新验证全部历史版本业务、下一次定时备份、真实手机响铃或长期稳定性。具体结果见 [运行身份](verification/native-alert-v1.20.0-production/runtime.json)、[Yahoo 读取](verification/native-alert-v1.20.0-production/yahoo-production.json)、[公开页面](verification/native-alert-v1.20.0-production/production-public-browser.json)、[登录态结果](verification/native-alert-v1.20.0-production/authenticated-browser-status.json)。
 
 ## 回滚与清理
 

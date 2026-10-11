@@ -1,0 +1,20 @@
+{
+  "acceptance": {
+    "task": "mw-alert-init-v1201-20261011",
+    "project": "mw-alert-init-v1201-20261011",
+    "restore_verified": true,
+    "retired": true,
+    "initial_retire_refused_low_space": true,
+    "verified_local_release_archives_removed_before_retry": true
+  },
+  "production_backup_restore": {
+    "task": "mw-v1201-restore-20261011",
+    "project": "mw-v1201-restore-20261011",
+    "restore_verified": true,
+    "retired": true
+  },
+  "formal_backup_copies_verified_and_retained": true,
+  "production_temp_archives_removed": true,
+  "production_login_temporary_files_deleted": true,
+  "other_projects_untouched": true
+}

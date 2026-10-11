@@ -8,4 +8,4 @@ Ubuntu 独立 Docker project/task `mw-alert-init-v1201-20261011` 使用专用 Bu
 
 首次临时测试套用生产只读拦截，阻止空数据库初始化，不能视为产品失败；随后补启历史 worker 并在本项目初始化只含可用 BTCUSDT 的自选表。原始生产工作区私密读取未提交，也未复用生产数据库。最终结果与镜像见本目录 JSON；不是完整后端或历史全业务重跑。
 
-运行入口 `LD_LIBRARY_PATH=/tmp/pwlibs/root/usr/lib/x86_64-linux-gnu node web/tests/chart-active-event.browser.cjs`；完整临时 Docker runner、私密配置及启动记录在 `/tmp/mw-alert-init-v1201-20261011/`。生产正式验收另记录。
+运行入口 `LD_LIBRARY_PATH=/tmp/pwlibs/root/usr/lib/x86_64-linux-gnu node web/tests/chart-active-event.browser.cjs`；完整临时 Docker runner、私密配置及启动记录在 `/tmp/mw-alert-init-v1201-20261011/`。生产正式验收见 [v1.20.1 交付](../../saved-layout-alert-v1.20.1-production-delivery.md) 与本目录 production/。
