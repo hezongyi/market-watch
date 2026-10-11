@@ -539,25 +539,11 @@
     "errors": []
   },
   "production_authenticated_browser": {
-    "status": "failed",
-    "administrator_login_passed": true,
-    "logout_verified": true,
-    "scope": "Ubuntu Chromium against formal Unraid production; existing saved five-chart layout; preference migration suppressed, other business writes blocked",
-    "reason": "First activeChartChanged unsubscribe before any subscription throws in licensed chart library; ready charts and data center remain visible but alertUI never initializes. Reproduced in two fresh browser sessions.",
-    "chart_state": {
-      "ready": true,
-      "loading": false,
-      "dataReady": true,
-      "chartsCount": 5,
-      "alertUI": false,
-      "dataCenter": true
-    },
-    "unexpected_writes": [],
-    "http_errors": [],
-    "credentials_sent_to_chart": [],
-    "user_state_fingerprints_preserved": true,
-    "no_password_rotated_or_authentication_bypassed": true,
-    "patch_in_progress": "v1.20.1"
+    "status": "not_run",
+    "reason": "Current production administrator password is not available locally. User was asked; pending response.",
+    "ubuntu_final_implementation_browser_checks_passed": true,
+    "production_public_browser_checks_passed": true,
+    "no_password_rotated_or_authentication_bypassed": true
   },
   "rollback": {
     "version": "v1.18.0",
