@@ -329,24 +329,22 @@ export function ChartAlertDialog({
     setPage(value);
   }
   useEffect(() => {
-    if (native) {
-      native.recenter();
-      const restore = returning.current && page === "condition";
-      returning.current = false;
-      const timer = setTimeout(() => {
-        if (restore)
-          formRef.current
-            ?.querySelector<HTMLButtonElement>(
-              `[aria-label="${pageTrigger.current?.getAttribute("aria-label")}"]`,
-            )
-            ?.focus();
-        else
-          formRef.current
-            ?.querySelector<HTMLElement>("input,select,textarea,button")
-            ?.focus();
-      }, 0);
-      return () => clearTimeout(timer);
-    }
+    native?.recenter();
+    const restore = returning.current && page === "condition";
+    returning.current = false;
+    const timer = setTimeout(() => {
+      if (restore)
+        formRef.current
+          ?.querySelector<HTMLButtonElement>(
+            `[aria-label="${pageTrigger.current?.getAttribute("aria-label")}"]`,
+          )
+          ?.focus();
+      else
+        formRef.current
+          ?.querySelector<HTMLElement>("input,select,textarea,button")
+          ?.focus();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [page, native]);
   const compareTarget = (
     <label

@@ -1,16 +1,17 @@
-// Deployed Ubuntu acceptance: native alerts coexist with v1.18 chart features.
+// Deployed Ubuntu acceptance: native alerts coexist with current chart features.
 const { chromium, expect } = require("@playwright/test");
 const fs = require("node:fs"), path = require("node:path"), assert = require("node:assert/strict");
 const APP = process.env.APP_ORIGIN || "https://localhost:19643";
 const CHART = process.env.CHART_ORIGIN || "https://127.0.0.1:19644";
 const PRIVATE = process.env.MW_ALERT_PRIVATE_DIR || "/tmp/mw-native-alert-ui-runtime";
 const OUTPUT = process.env.MW_ALIGNMENT_OUTPUT || "/tmp/mw-native-alert-ui-v118-alignment";
+const VERSION = process.env.MW_ALIGNMENT_VERSION || "1.18.0";
 
 (async () => {
   fs.mkdirSync(OUTPUT, { recursive: true });
   const browser = await chromium.launch({ args: ["--no-sandbox"] });
   const page = await browser.newPage({ ignoreHTTPSErrors: true, viewport: { width: 1600, height: 1000 } });
-  const report = { scope: "Ubuntu Docker; actual v1.18.0 app, licensed chart and Binance SSE", passed: false, cases: [], errors: [], credentials_sent_to_chart: [] };
+  const report = { scope: `Ubuntu Docker; actual v${VERSION} app, licensed chart and Binance SSE`, passed: false, cases: [], errors: [], credentials_sent_to_chart: [] };
   page.on("pageerror", error => report.errors.push(String(error)));
   page.on("request", request => {
     if (request.url().startsWith(CHART + "/") && (request.headers().cookie || request.headers().authorization))
@@ -43,7 +44,7 @@ const OUTPUT = process.env.MW_ALIGNMENT_OUTPUT || "/tmp/mw-native-alert-ui-v118-
       if (!response.ok) throw Error(route + " HTTP " + response.status);
       return response.json();
     }, { route, body });
-    const workspace = await api("/advanced-charts/workspaces", { name: "v1.18.0 原生告警兼容验收" });
+    const workspace = await api("/advanced-charts/workspaces", { name: `v${VERSION} 原生告警兼容验收` });
     await api("/advanced-charts/workspaces/" + workspace.id + "/save", {
       name: workspace.name, revision: workspace.revision,
       document: { engine: "tv31", schemaVersion: 1, symbol: "MWP:BTCUSDT", interval: "1" },
@@ -57,7 +58,7 @@ const OUTPUT = process.env.MW_ALIGNMENT_OUTPUT || "/tmp/mw-native-alert-ui-v118-
     const roots = () => host.locator('[data-name="mw-alert-state"]');
     await expect(roots()).toHaveCount(1);
     await expect.poll(() => page.evaluate(() => window.__marketEvents.filter(event => ["bars", "quotes"].includes(event.type)).length), { timeout: 45000 }).toBeGreaterThan(0);
-    report.cases.push("Real Binance bars/quotes arrive through authenticated v1.18 SSE with one alert business root");
+    report.cases.push("Real Binance bars/quotes arrive through authenticated SSE with one alert business root");
 
     await host.evaluate(() => alertUI.open());
     await host.evaluate(() => alertBridge.create());
@@ -74,7 +75,12 @@ const OUTPUT = process.env.MW_ALIGNMENT_OUTPUT || "/tmp/mw-native-alert-ui-v118-
     await native.getByRole("button", { name: "数据中心", exact: true }).click();
     const center = native.locator(".dc-window");
     await expect(center).toBeVisible();
-    await expect(center.locator(".dc-window-nav").getByRole("button")).toHaveCount(5);
+    const sections = ["自建行情", "平台行情", "组合行情", "任务与记录", "来源状态"];
+    if (VERSION !== "1.18.0") sections.push("交易日历");
+    const navigation = center.locator(".dc-window-nav");
+    await expect(navigation.getByRole("button")).toHaveCount(sections.length);
+    for (const section of sections)
+      await expect(navigation.getByRole("button", { name: section, exact: true })).toBeVisible();
     const statusRead = page.waitForResponse(response => response.url().endsWith("/api/market-data/live/status") && response.request().method() === "GET");
     await center.getByRole("button", { name: "来源状态", exact: true }).click();
     assert.equal((await statusRead).status(), 200);
@@ -85,7 +91,7 @@ const OUTPUT = process.env.MW_ALIGNMENT_OUTPUT || "/tmp/mw-native-alert-ui-v118-
     await native.getByRole("button", { name: "关闭数据中心", exact: true }).click();
     await expect(center).toHaveCount(0);
     assert.deepEqual(await host.evaluate(() => ({ symbol: widget.activeChart().symbol(), resolution: widget.activeChart().resolution() })), identity);
-    report.cases.push("Data center retains five sections and actual source-status reads; close preserves chart identity and alert root");
+    report.cases.push("Data center retains versioned sections and actual source-status reads; close preserves chart identity and alert root");
 
     await native.getByRole("button", { name: "指标", exact: true }).click();
     const indicators = native.locator('[data-name="indicators-dialog"]');
@@ -113,7 +119,7 @@ const OUTPUT = process.env.MW_ALIGNMENT_OUTPUT || "/tmp/mw-native-alert-ui-v118-
     await expect(native.locator(".chart-alert-panel")).toHaveAttribute("data-theme", "dark");
     await page.screenshot({ path: path.join(OUTPUT, "v118-alerts-dark.png") });
     await expect(roots()).toHaveCount(1);
-    report.cases.push("Alert draft survives data center/indicator use; both v1.18 themes retain one renderer");
+    report.cases.push("Alert draft survives data center/indicator use; both themes retain one renderer");
     report.market_events = await page.evaluate(() => window.__marketEvents);
     assert.deepEqual(report.errors, []);
     assert.deepEqual(report.credentials_sent_to_chart, []);

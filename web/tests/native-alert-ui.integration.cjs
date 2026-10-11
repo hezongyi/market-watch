@@ -685,8 +685,26 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
         .textContent(),
       "H4",
     );
+    rejectCreate = true;
+    await dialog.getByRole("button", { name: "创建告警", exact: true }).click();
+    await dialog.getByText(/保存失败，请重试/).waitFor();
+    const geometryCalls = writes.filter(
+      (write) => write.path === "/api/chart-alerts/geometry",
+    ).length;
+    const uncertainWrite = writes
+      .filter((write) => write.path === "/api/chart-alerts")
+      .at(-1).body;
     await dialog.getByRole("button", { name: "创建告警", exact: true }).click();
     await dialog.waitFor({ state: "detached" });
+    assert.equal(
+      writes.filter((write) => write.path === "/api/chart-alerts/geometry")
+        .length,
+      geometryCalls,
+    );
+    assert.deepEqual(
+      writes.filter((write) => write.path === "/api/chart-alerts").at(-1).body,
+      uncertainWrite,
+    );
     assert.equal(rows.at(-1).config.timeframe, "H4");
     assert.deepEqual(
       rows
