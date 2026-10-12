@@ -1,0 +1,60 @@
+{
+  "at": 1791773451780,
+  "database_read_only": true,
+  "session_states": {
+    "XAU_USD": {
+      "market_session": "scheduled_open",
+      "next_session_at": null,
+      "calendar_verified": true
+    },
+    "EUR_USD": {
+      "market_session": "scheduled_open",
+      "next_session_at": null,
+      "calendar_verified": true
+    }
+  },
+  "live": [
+    {
+      "logical_symbol": "XAUUSD",
+      "quality": "healthy",
+      "connection": "connected",
+      "connection_epoch": 413,
+      "heartbeat_at": 1791773450786,
+      "last_confirmed_m1": 1791773400000,
+      "recovery_ready": true,
+      "error": null,
+      "market_session": "scheduled_open",
+      "calendar_verified": true,
+      "authentication_hold": false,
+      "connection_error": null,
+      "quote_age_ms": 862,
+      "quote_ready": true,
+      "candle_ready": true
+    },
+    {
+      "logical_symbol": "EURUSD",
+      "quality": "healthy",
+      "connection": "connected",
+      "connection_epoch": 413,
+      "heartbeat_at": 1791773450786,
+      "last_confirmed_m1": 1791773400000,
+      "recovery_ready": true,
+      "error": null,
+      "market_session": "scheduled_open",
+      "calendar_verified": true,
+      "authentication_hold": false,
+      "connection_error": null,
+      "quote_age_ms": 1155,
+      "quote_ready": true,
+      "candle_ready": true
+    }
+  ],
+  "latest_btc_m1": 1791773400000,
+  "unknown_composite_errors": 1823,
+  "routing_repairs": 1,
+  "desired_targets_preserved": true,
+  "binance_mode": "direct",
+  "effective_binance_proxy_set": false,
+  "yahoo_enabled": true,
+  "existing_composite_quality": "waiting"
+}

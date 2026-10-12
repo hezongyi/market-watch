@@ -1,0 +1,30 @@
+{
+  "scope": "Sanitized release evidence; raw private snapshots, env, credentials, dumps and licensed files excluded",
+  "version": "1.21.2",
+  "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+  "sha256": {
+    "alert-config-preservation.json": "9aef2ba88d7a9c15b97075db82cbb500e821c2d2d4188c4fb25ef88229bb6af4",
+    "backup-summary.json": "c250a98fbe017f9ed9b8932c982168a0953f1d9ed175f28f52ed2babc5e1647f",
+    "config-comparison.json": "6a7696416bdb5e8efad60a84e17ce34c998d6d246a5c115673ff2bdc404fcaaa",
+    "configuration-restore.json": "844b01bdc69085717f80f5e517e98816c7859e38f895d1a09343765a7fc9a8e8",
+    "database-restore.json": "5cccc09654bca059b36de2acb9a5e7451d8a4c39411c5761efb81eeb49d94c1c",
+    "final-health.json": "f71f4fda3da5dfe26f99d5b2effb985f7f4c2bf1fc8fbde0b0bf92b1cdbfe4fe",
+    "images.production.json": "d9cd35268146e9675b25cb24f8c34ead82819845455d19d3394e663111ab5bf5",
+    "production-assets.json": "01edeb82708d2a963a605e5961ec572d18c328378c7871255c4ef1d6e075b9ee",
+    "production-browser.json": "0f0ac312adc7008641521b8d83f6f8ab2c1799cb821c10cad88776661d2bd029",
+    "production-resource-closure.json": "749eed22bafb4b422742b7ed4f64ff595a4ca07ed1d998366b4a562a6385b262",
+    "provider-after.json": "dfee2338d0d51ad203821d7cf76661cdd68c00bf49ec404c3006d03a1dcb2c44",
+    "release-source-verified.json": "999d55ea8094cbe1a44789f75e1c2763ba2a39982ac01098142af8d7d205e69a",
+    "resource-final-check.json": "9ccb2c2b7e0aef0cf3186bb429d68a93d4b15bbca307ceb20adb459eb62b0307",
+    "runtime.json": "0973f975a5c79804b354be8a6bb3c8d9f00d0f3dc7c38fed7b71cce3be040180",
+    "worker-stability.json": "0054c75ac80dab12ffca671ca77ade75e6dc4f151a0bac8f031471ee028c37bb",
+    "yahoo-read.json": "1f81dc703aa168b9479630a3117c0589fdf3b32b91f55e5f5c5286a999d7713e"
+  },
+  "privacy_transformations": [
+    "Removed raw runtime database/account fingerprints and raw post_state",
+    "Removed production workspace IDs and revision values from browser report",
+    "Removed full restored per-table counts; all 86 tables were compared in the actual restore",
+    "Removed composite instrument IDs and immutable fingerprints from provider report",
+    "Kept unrelated-resource comparison counts without unrelated project/container identifiers"
+  ]
+}

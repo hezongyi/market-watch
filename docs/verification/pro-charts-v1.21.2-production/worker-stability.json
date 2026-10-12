@@ -1,0 +1,42 @@
+{
+  "passed": true,
+  "window_start_ms": 1791773532460,
+  "window_end_ms": 1791773792230,
+  "seconds_observed": 259.77,
+  "heartbeats": {
+    "market_heartbeat": {
+      "advanced": true,
+      "age_ms": 1655
+    },
+    "notify_heartbeat": {
+      "advanced": true,
+      "age_ms": 17670
+    }
+  },
+  "data_progress": {
+    "candles": {
+      "before": 9044897,
+      "after": 9044925,
+      "delta": 28
+    },
+    "provider_bars": {
+      "before": 999964,
+      "after": 999964,
+      "delta": 0
+    },
+    "chart_published_bars": {
+      "before": 72456,
+      "after": 72462,
+      "delta": 6
+    }
+  },
+  "market_stream_worker": {
+    "heartbeat_audit_defined": false,
+    "actual_authenticated_SSE_market_events": 16,
+    "browser_subscription_read_passed": true
+  },
+  "service_count": 12,
+  "restarts": 0,
+  "api_healthy": true,
+  "initial_probe_correction": "The first probe asked for a market_stream_heartbeat audit that this worker does not implement; verified actual authenticated SSE and zero container restarts instead."
+}

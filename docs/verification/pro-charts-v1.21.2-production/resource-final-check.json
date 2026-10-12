@@ -1,0 +1,38 @@
+{
+  "at": "2026-10-12T03:06:39.852225+00:00",
+  "retired_restore_projects_have_no_container_volume_network_remnants": true,
+  "restore_project_remnants": {
+    "mw-v1210-restore-20261012": {
+      "containers": [],
+      "volumes": [],
+      "networks": []
+    },
+    "mw-v1212-restore-20261012": {
+      "containers": [],
+      "volumes": [],
+      "networks": []
+    }
+  },
+  "restore_acceptance_image_removed": true,
+  "retirement_archives_present": [
+    {
+      "archive": "/home/quant/.local/share/market-watch-docker/archives/mw-v1210-restore-20261012-20261012T023538-c18693f3",
+      "present": true
+    },
+    {
+      "archive": "/home/quant/.local/share/market-watch-docker/archives/mw-v1212-restore-20261012-20261012T025516-403feef3",
+      "present": true
+    }
+  ],
+  "cleanup_scope": "Only explicitly named own restore projects, own temporary acceptance image, and verified own production preview .env copies; formal/rollback resources retained",
+  "global_prune_used": false,
+  "unrelated_container_identity_observation": {
+    "baseline_count": 7,
+    "retained_previous_id_count": 5,
+    "missing_previous_id_count": 2,
+    "new_id_count": 2,
+    "all_other_previous_container_ids_preserved": false,
+    "limit": "Two old IDs are no longer inspectable; current other-project api and migrate were created after this baseline. No old-container ownership/destruction attribution is asserted.",
+    "scope": "Other project resources were only read; retirement records name this release restore project exclusively."
+  }
+}
