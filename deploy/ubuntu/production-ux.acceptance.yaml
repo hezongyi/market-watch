@@ -55,6 +55,13 @@ services:
     volumes: [../../scripts/production_ux_fixture.py:/fixture/production_ux_fixture.py:ro]
     depends_on:
       api: {condition: service_healthy}
+  market-stream-worker:
+    image: ${MW_API_IMAGE:?Build task-owned API image}
+    restart: "no"
+    environment: *backend
+    command: [python, -m, alerts.market_stream_worker]
+    depends_on:
+      api: {condition: service_healthy}
   native-history-worker:
     image: ${MW_API_IMAGE:?Build task-owned API image}
     restart: "no"

@@ -657,6 +657,11 @@ def data(body):
     from .chart_indicators import calculate
 
     with transaction() as db:
+        # Published inputs and their prefix credential must describe one snapshot.
+        # Otherwise a concurrent correction could acknowledge newer evidence
+        # while the calculation still uses the earlier fetched candle payloads.
+        if db.get_bind().dialect.name == "postgresql":
+            db.connection(execution_options={"isolation_level": "REPEATABLE READ"})
         inst = db.get(Instrument, body.instrument)
         if inst is None:
             from fastapi import HTTPException

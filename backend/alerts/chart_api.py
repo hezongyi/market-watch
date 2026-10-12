@@ -807,6 +807,8 @@ def data_sync(body: DataQuery):
         if body.published:
             return published_data(body)
         with transaction() as db:
+            if (body.indicators or body.dependency_before) and db.get_bind().dialect.name == "postgresql":
+                db.connection(execution_options={"isolation_level": "REPEATABLE READ"})
             inst = db.get(Instrument, body.instrument)
             if not inst:
                 raise HTTPException(404, "品种不存在")
