@@ -52,7 +52,7 @@ export function CalendarView() {
     {!snapshot.loading && !rows.length && <p role="status">没有符合条件的交易日历规则。</p>}
     <div className="dc-calendar-table">{rows.map(row => <details className="dc-calendar-row" key={row.row_id || row.version}>
         <summary><strong>{row.mappings.length ? row.mappings.join("、") : "当前品种待映射"}</strong><span>{targetNames[row.target_kind || ""] || "通用规则"} · {names[row.source] || row.source} · {row.enabled === false ? "未启用 · " : ""}{statusNames[row.status] || row.status}</span><small>{row.version} · 核实于 {row.checked_at ? moment(row.checked_at,row.timezone) : "未记录"}</small>
-          <span className="dc-calendar-identity">{row.identity ? [row.identity.environment || "环境未记录", row.identity.channel || "通道未记录", row.identity.account_scope, row.identity.price_basis].filter(Boolean).join(" · ") : "适用身份未记录"} · {row.scope}</span>
+          <span className="dc-calendar-identity">{row.identity ? [row.identity.environment || "环境未记录", row.identity.channel || "通道未记录", row.identity.account_scope && row.identity.account_scope !== "public" ? `账户范围 …${row.identity.account_scope.slice(-8)}` : row.identity.account_scope, row.identity.price_basis].filter(Boolean).join(" · ") : "适用身份未记录"} · {row.scope}</span>
         </summary>
         {row.target_id && <p>适用对象：{targetNames[row.target_kind || ""]} · {row.target_id}。{targetUses[row.target_kind || ""]}；每个适用对象独立审核，审核不会自动转移到同名品种。</p>}
         {!!Object.keys(row.native_parameters || {}).length && <p>来源口径参数：{Object.entries(row.native_parameters || {}).map(([key,value])=>`${key}=${String(value)}`).join(" · ")}</p>}

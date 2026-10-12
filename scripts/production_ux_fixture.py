@@ -51,6 +51,10 @@ elif sys.argv[1] == "seed":
                 volume_unit="quotes",
             )
             inst.enabled = True
+        if not db.get(MarketCatalog, "UX:OANDA:EUR_USD"):
+            db.add(MarketCatalog(id="UX:OANDA:EUR_USD", source="oanda", symbol="EUR_USD",
+                label="Synthetic OANDA catalog scope", asset_type="CURRENCY", calendar="ny17", precision=5,
+                metadata_json={"history_account_scope":"sha256:" + "a" * 64}))
         if not db.get(MarketCatalog, "UX:BTCUSDT"):
             db.add(
                 MarketCatalog(
@@ -79,14 +83,15 @@ elif sys.argv[1] == "seed":
     print("Isolated UX fixture seeded; no upstream demand or notification enabled")
 elif sys.argv[1] == "chart-seed":
     from alerts import provider_cache as cache
-    from alerts.provider_dukascopy import metadata, stable_id
+    from alerts.provider_chart import metadata
+    from alerts.provider_dukascopy import stable_id
     from alerts.storage import ProviderDataset, now_ms, transaction
 
     # Explicitly synthetic cache for native UI/axis behavior, never evidence of
     # supplier availability or prices. Only this task's database is reachable.
     stamp = now_ms()
-    for symbol, price in (("EUR/USD", 1.12), ("AAPL.US/USD", 320)):
-        meta = metadata(stable_id(symbol))
+    for symbol, price in (("EUR/USD", 1.12), ("AAPL.US/USD", 320), ("BTCUSDT", 84000)):
+        meta = metadata("BTCUSDT" if symbol == "BTCUSDT" else stable_id(symbol))
         for frame, width in (("H4", 14400000), ("D1", 86400000), ("M5", 300000)):
             end = stamp // width * width + width
             bars = []
@@ -120,6 +125,86 @@ elif sys.argv[1] == "chart-seed":
             with transaction() as db:
                 db.get(ProviderDataset, key).latest_at = stamp + 3600000
     print("Synthetic native UI cache seeded; not supplier price/coverage verification")
+elif sys.argv[1] == "fixed-seed":
+    import json
+    from decimal import Decimal
+
+    from alerts import history_versions as history
+    from alerts.history_artifacts import artifact_tick, request_artifacts
+    from alerts.market_contracts import CandleBatch, DatasetIdentity, MinuteRow, RequestResult
+    from alerts.storage import AdvancedWorkspace, HistoryVersion, MarketDataset, transaction
+    from sqlalchemy import select
+
+    # Generate synthetic minutes through the real importer/publisher. Do not
+    # invent a published manifest or bypass fixed-version/period invariants.
+    with transaction() as db:
+        dataset = db.scalar(select(MarketDataset).where(MarketDataset.logical_symbol == "EURUSD"))
+        identity = DatasetIdentity.model_validate(dataset.identity)
+        instrument = dataset.instrument_id
+        start, end = 1791158400000, 1791417600000  # Oct 5--8, 2026 UTC
+        version = history.create_version(db, dataset.id, start, end)
+
+    class SyntheticAdapter:
+        def page(self, identity, start, end):
+            rows = []
+            for index, at in enumerate(range(start, end, 60000)):
+                price = Decimal("1.12000") + Decimal(index % 100) / Decimal("100000")
+                rows.append(MinuteRow(timestamp=at, open=str(price), high=str(price + Decimal("0.00020")),
+                    low=str(price - Decimal("0.00020")), close=str(price + Decimal("0.00010")),
+                    volume="10", complete=True))
+            return CandleBatch(identity=identity, window_start=start, window_end=end, observed_at=end + 60000,
+                result=RequestResult(status="data"), rows=tuple(rows), checkpoint=end,
+                volume_kind="price_count", volume_unit="quotes")
+
+    for _ in range(100):
+        history.import_page(SyntheticAdapter(), version_id=version)
+        with transaction() as db:
+            row = db.get(HistoryVersion, version)
+            if row.status == "published":
+                break
+            if row.error:
+                raise RuntimeError("Synthetic import failed: " + row.error)
+    with transaction() as db:
+        row = db.get(HistoryVersion, version)
+        if row.status != "published":
+            raise RuntimeError("Synthetic version failed to publish: " + str(row.error))
+        request_artifacts(db, row, ["M1", "H4", "D1"])
+        native = db.get(AdvancedWorkspace, "ux-synthetic-native")
+        native.document = {"engine": "tv31", "schemaVersion": 1, "symbol": "MWP:BTCUSDT", "series_kind": "provider"}
+    while artifact_tick(version):
+        pass
+    print(json.dumps({"version_id": version, "instrument_id": instrument, "start": start, "end": end,
+        "scope": "synthetic isolated imported/published minutes, not upstream verification"}))
+elif sys.argv[1] == "composite-seed":
+    import json
+
+    from alerts.composite_definitions import first_use, save_mapping
+    from alerts.history_catalog import account_scope
+    from alerts.storage import MarketCatalog, MarketDataset, transaction
+    from sqlalchemy import select
+
+    # Only this short-lived fixture process has a synthetic marker; no provider
+    # reads are made and no usable token is written to the application config.
+    settings.oanda_token = "synthetic-no-provider-access"
+    try:
+        with transaction() as db:
+            dataset = db.scalar(select(MarketDataset).where(MarketDataset.logical_symbol == "EURUSD"))
+            catalog_id = "HC:" + "f" * 36
+            if not db.get(MarketCatalog, catalog_id):
+                db.add(MarketCatalog(id=catalog_id, source="oanda", symbol="EUR_USD", label="Synthetic composite target",
+                    asset_type="CURRENCY", precision=5, calendar="ny17",
+                    metadata_json={"history_account_scope":account_scope()}))
+                db.flush()
+            mapping = save_mapping(db, dataset.id, catalog_id, {
+                "underlying":"EUR", "quote_currency":"USD", "historical_product":"spot_fx", "live_product":"spot_fx",
+                "relationship":"same_product", "historical_evidence":"https://example.invalid/synthetic-history",
+                "live_evidence":"https://example.invalid/synthetic-live", "reviewed":True,
+                "rationale":"Synthetic UI fixture only; this does not verify actual supplier equivalence"})
+            composite = first_use(db, dataset.id, mapping.id)
+            print(json.dumps({"composite_id":composite.id,"revision_id":composite.active_revision_id,
+                "scope":"Synthetic isolated mapping/first-use; no upstream pricing or product-equivalence claim"}))
+    finally:
+        settings.oanda_token = ""
 elif sys.argv[1] == "replay-seed":
     from alerts.storage import ImportJob, transaction
 

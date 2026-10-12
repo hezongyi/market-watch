@@ -1,0 +1,59 @@
+{
+  "scope": "Actual Docker stop/start of every current and legacy role, real 300-second stale threshold, sequential independent recovery",
+  "snapshots": [
+    {
+      "at": "2026-10-12T06:58:22.824Z",
+      "states": {
+        "history_versions": "running",
+        "chart_history": "running",
+        "native_history": "running",
+        "legacy_import": "running"
+      }
+    },
+    {
+      "at": "2026-10-12T07:03:22.186Z",
+      "states": {
+        "history_versions": "stale",
+        "chart_history": "stale",
+        "native_history": "stale",
+        "legacy_import": "stale"
+      }
+    },
+    {
+      "at": "2026-10-12T07:03:30.811Z",
+      "states": {
+        "history_versions": "running",
+        "chart_history": "stale",
+        "native_history": "stale",
+        "legacy_import": "stale"
+      }
+    },
+    {
+      "at": "2026-10-12T07:03:39.428Z",
+      "states": {
+        "history_versions": "running",
+        "chart_history": "running",
+        "native_history": "stale",
+        "legacy_import": "stale"
+      }
+    },
+    {
+      "at": "2026-10-12T07:03:52.887Z",
+      "states": {
+        "history_versions": "running",
+        "chart_history": "running",
+        "native_history": "running",
+        "legacy_import": "stale"
+      }
+    },
+    {
+      "at": "2026-10-12T07:04:01.465Z",
+      "states": {
+        "history_versions": "running",
+        "chart_history": "running",
+        "native_history": "running",
+        "legacy_import": "running"
+      }
+    }
+  ]
+}

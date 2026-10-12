@@ -1,0 +1,33 @@
+{
+  "checks": [
+    "375: actual ordinary/registered identities, long ID boundaries, selected M5 context, explicit composite selection required, click/Enter/Space × Esc/cancel/close focus on both available triggers",
+    "390: actual ordinary/registered identities, long ID boundaries, selected M5 context, explicit composite selection required, click/Enter/Space × Esc/cancel/close focus on both available triggers",
+    "844: actual ordinary/registered identities, long ID boundaries, selected M5 context, explicit composite selection required, click/Enter/Space × Esc/cancel/close focus on both available triggers",
+    "1440: actual ordinary/registered identities, long ID boundaries, selected M5 context, explicit composite selection required, click/Enter/Space × Esc/cancel/close focus on both available triggers",
+    "Actual persisted composite mapping: readable source/Bid/NY17, explicit series choice, no same-symbol automatic binding"
+  ],
+  "instruments": [
+    {
+      "id": "BTCUSDT",
+      "source": "binance"
+    },
+    {
+      "id": "EURUSD",
+      "source": "dukascopy"
+    },
+    {
+      "id": "MD:0ee69e0e7bb77cc01d63ddd66:EURUSD",
+      "logical_symbol": "EURUSD",
+      "source": "oanda"
+    },
+    {
+      "id": "MD:3cb2b09ae92a3157a3f935c9e:XAUUSD",
+      "logical_symbol": "XAUUSD",
+      "source": "oanda"
+    },
+    {
+      "id": "XAUUSD",
+      "source": "dukascopy"
+    }
+  ]
+}

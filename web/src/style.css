@@ -936,6 +936,11 @@ input::placeholder {
 .replay-setup {
   padding: 23px;
 }
+.replay-setup > details > summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.replay-setup > details[open] > summary { margin-bottom: 16px; }
 .replay-setup form {
   display: flex;
   align-items: end;

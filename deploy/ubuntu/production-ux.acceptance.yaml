@@ -1,4 +1,4 @@
-# Ubuntu-only task mw-production-ux-20261012. Build every app image via mw-docker.
+# Ubuntu-only isolated UX acceptance project. Build every app image via mw-docker.
 services:
   pg:
     image: postgres:14-bookworm
@@ -23,6 +23,7 @@ services:
       ALERTS_DELIVERY_ENABLED: "false"
       ALERTS_YAHOO_ENABLED: "false"
       ALERTS_OANDA_STREAM_ENABLED: "false"
+      ALERTS_OANDA_ACCOUNT_ID: "synthetic-ux-acceptance"
       ALERTS_INITIAL_HISTORY_DAYS: "0"
       ALERTS_DATABASE_POOL_SIZE: "2"
       ALERTS_DATABASE_MAX_OVERFLOW: "0"
@@ -93,13 +94,13 @@ services:
   web:
     image: ${MW_WEB_IMAGE:?Build task-owned web image}
     restart: "no"
-    ports: [127.0.0.1:19971:80]
+    ports: ["127.0.0.1:${MW_UX_WEB_PORT:-19971}:80"]
     depends_on:
       api: {condition: service_healthy}
   chart-origin:
     image: ${MW_CHART_IMAGE:?Build task-owned licensed chart image}
     restart: "no"
-    ports: [127.0.0.1:19972:80]
+    ports: ["127.0.0.1:${MW_UX_CHART_PORT:-19972}:80"]
     depends_on:
       web: {condition: service_started}
 volumes:

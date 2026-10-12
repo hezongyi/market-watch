@@ -3,14 +3,12 @@ const { chromium, expect } = require("@playwright/test");
 const fs = require("node:fs"),
   path = require("node:path"),
   assert = require("node:assert/strict");
-const base = "http://127.0.0.1:19971",
-  chartOrigin = "http://127.0.0.1:19972";
-const out = path.resolve(__dirname, "../../artifacts/production-ux-real");
-fs.mkdirSync(out, { recursive: true });
-const password = fs.readFileSync(
-  "/tmp/mw-production-ux-20261012-private/password",
-  "utf8",
-);
+const {
+  base,
+  origin: chartOrigin,
+  out,
+  password,
+} = require("./production-ux-env.cjs");
 const checks = [],
   measurements = [],
   runSuffix = Date.now();
@@ -171,7 +169,11 @@ async function bounds(page, locator) {
     await expect(page.getByLabel("管理员密码")).toHaveCount(0);
     const health = await (await page.request.get(base + "/api/health")).json();
     assert(health.history_services.every((s) => s.status === "running"));
-    assert.equal(health.legacy_import.status, "disabled");
+    const legacyEnabled = process.env.MW_UX_LEGACY_ENABLED === "true";
+    assert.equal(
+      health.legacy_import.status,
+      legacyEnabled ? "running" : "disabled",
+    );
     await page.getByRole("link", { name: "提醒与设置" }).click();
     await expect(page.getByLabel("历史服务运行状态")).toContainText(
       "自建历史发布",
@@ -180,11 +182,18 @@ async function bounds(page, locator) {
       "平台图表加载",
     );
     await expect(
-      page.getByText("未启用；不代表现行历史服务状态", { exact: true }),
+      page.getByText(
+        legacyEnabled
+          ? "业务心跳新鲜；不代表现行历史服务状态"
+          : "未启用；不代表现行历史服务状态",
+        { exact: true },
+      ),
     ).toBeVisible();
     await page.screenshot({ path: path.join(out, "health-running.png") });
     checks.push(
-      "Actual current workers report independent fresh business heartbeat; legacy disabled shown separately",
+      "Actual current workers report independent fresh business heartbeat; legacy " +
+        (legacyEnabled ? "running" : "disabled") +
+        " shown separately",
     );
     fs.writeFileSync(
       path.join(out, "results.json"),

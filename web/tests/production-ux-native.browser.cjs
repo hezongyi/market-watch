@@ -3,10 +3,13 @@ const { chromium, expect } = require("@playwright/test");
 const fs = require("fs"),
   assert = require("assert/strict"),
   crypto = require("crypto");
-const root = require("node:path").resolve(__dirname, "../.."),
-  base = "http://127.0.0.1:19971",
-  origin = "http://127.0.0.1:19972",
-  out = root + "/artifacts/production-ux-real";
+const {
+  root,
+  base,
+  origin,
+  out,
+  password,
+} = require("./production-ux-env.cjs");
 const id = (s) =>
   "DUKA:" + crypto.createHash("sha256").update(s).digest("hex").slice(0, 32);
 (async () => {
@@ -18,18 +21,34 @@ const id = (s) =>
   const p = await b.newPage({ viewport: { width: 1440, height: 1000 } }),
     errors = [],
     checks = [];
+  p.on("pageerror", (e) => errors.push(e.message));
   try {
     await p.goto(base + "/advanced-charts");
-    await p
-      .getByLabel("管理员密码")
-      .fill(
-        fs.readFileSync(
-          "/tmp/mw-production-ux-20261012-private/password",
-          "utf8",
-        ),
-      );
+    await p.getByLabel("管理员密码").fill(password);
     await p.getByRole("button", { name: "登录工作台" }).click();
     await expect(p.getByLabel("管理员密码")).toHaveCount(0);
+    const previous = await (
+      await p.request.get(base + "/api/chart-alerts")
+    ).json();
+    const session = await (await p.request.get(base + "/api/session")).json();
+    for (const row of previous.filter(
+      (r) => r.config.association?.workspace_id === "ux-synthetic-native",
+    )) {
+      const retired = await p.request.post(
+        base + "/api/chart-alerts/" + row.id + "/lifecycle",
+        {
+          headers: { "X-CSRF-Token": session.csrf },
+          data: {
+            version: row.version,
+            control_revision: row.control_revision,
+            request_id: crypto.randomUUID(),
+            action: "archive",
+          },
+        },
+      );
+      assert(retired.ok(), await retired.text());
+    }
+    await p.reload();
     await expect
       .poll(() => p.frames().some((f) => f.url().startsWith(origin + "/?")), {
         timeout: 30000,
@@ -42,7 +61,6 @@ const id = (s) =>
       { timeout: 45000 },
     );
     const n = p.frames().find((f) => f.url().startsWith("blob:"));
-    p.on("pageerror", (e) => errors.push(e.message));
     const studyIds = await h.evaluate(async () => {
       const c = widget.activeChart();
       for (const s of c.getAllStudies()) c.removeEntity(s.id);
@@ -90,6 +108,95 @@ const id = (s) =>
     checks.push(
       "Actual licensed native Added window reads built-in localized metadata and Python metadata, preserving changed values",
     );
+    // The actual Python study has loaded the cached provider prices and uses
+    // the real chart/alert calculation origin; do not inject a fabricated one.
+    await expect
+      .poll(
+        () =>
+          h.evaluate(
+            () =>
+              alertCalculationOrigins.get(
+                widget.activeChart().symbol() +
+                  "|" +
+                  widget.activeChart().resolution(),
+              ) ?? null,
+          ),
+        { timeout: 45000 },
+      )
+      .not.toBeNull();
+    await h.evaluate(
+      async (id) => alertBridge.create({ object: { type: "study", id } }),
+      studyIds.python,
+    );
+    const objectAlert = n.locator(".chart-alert-dialog");
+    await expect(objectAlert).toBeVisible();
+    for (const [label, value] of [
+      ["快线周期", "19"],
+      ["慢线周期", "35"],
+      ["信号周期", "11"],
+    ])
+      await expect(objectAlert.getByLabel(label, { exact: true })).toHaveValue(
+        value,
+      );
+    await objectAlert.getByLabel("比较值", { exact: true }).fill("0");
+    await objectAlert
+      .getByRole("button", { name: "关系", exact: true })
+      .click();
+    await n.getByRole("option", { name: "高于", exact: true }).click();
+    await p.setViewportSize({ width: 1366, height: 768 });
+    await expect(
+      objectAlert.getByRole("button", { name: "创建告警", exact: true }),
+    ).toBeInViewport();
+    await p.screenshot({ path: out + "/python-object-alert-1366.png" });
+    await p.setViewportSize({ width: 1440, height: 1000 });
+    await p.screenshot({ path: out + "/python-object-alert-snapshot.png" });
+    const saveResponse = p.waitForResponse(
+      (r) =>
+        r.url() === base + "/api/chart-alerts" &&
+        r.request().method() === "POST",
+    );
+    await objectAlert
+      .getByRole("button", { name: "创建告警", exact: true })
+      .click();
+    const save = await saveResponse;
+    assert.equal(save.status(), 201, await save.text());
+    const saved = await save.json();
+    assert.deepEqual(saved.config.condition.left.indicator.params, {
+      fast: 19,
+      slow: 35,
+      signal: 11,
+    });
+    assert.equal(saved.config.association.object_kind, "indicator");
+    assert.equal(
+      saved.config.association.native_object_id,
+      String(studyIds.python),
+    );
+    assert(Number.isSafeInteger(saved.config.calculation_origin));
+    await expect(objectAlert).toHaveCount(0);
+    await h.evaluate(
+      (id) =>
+        widget
+          .activeChart()
+          .getStudyById(id)
+          .setInputValues([
+            { id: "fast", value: 23 },
+            { id: "slow", value: 39 },
+            { id: "signal", value: 13 },
+          ]),
+      studyIds.python,
+    );
+    const reread = await (
+      await p.request.get(base + "/api/chart-alerts/" + saved.id)
+    ).json();
+    assert.deepEqual(reread.config.condition.left.indicator.params, {
+      fast: 19,
+      slow: 35,
+      signal: 11,
+    });
+    await p.screenshot({ path: out + "/python-alert-saved-independent.png" });
+    checks.push(
+      "Actual native Python object entry: real calculation origin, values19/35/11, UI POST201, association persists, changing chart to23/39/13 leaves saved snapshot unchanged",
+    );
     await h.evaluate(async () => {
       await alertBridge.create();
     });
@@ -112,10 +219,24 @@ const id = (s) =>
     await expect(alert).toContainText("同名内置指标不自动同步");
     await alert.getByLabel("快线周期", { exact: true }).fill("21");
     await p.screenshot({ path: out + "/manual-alert-parameter-snapshot.png" });
-    await p.keyboard.press("Escape");
+    await alert.getByLabel("比较值", { exact: true }).fill("0");
+    const manualSaveResponse = p.waitForResponse(
+      (r) =>
+        r.url() === base + "/api/chart-alerts" &&
+        r.request().method() === "POST",
+    );
+    await alert.getByRole("button", { name: "创建告警", exact: true }).click();
+    const manualSave = await manualSaveResponse;
+    assert.equal(manualSave.status(), 201, await manualSave.text());
+    const manualSaved = await manualSave.json();
+    assert.deepEqual(manualSaved.config.condition.left.indicator.params, {
+      fast: 21,
+      slow: 26,
+      signal: 9,
+    });
     await expect(alert).toHaveCount(0);
     checks.push(
-      "Actual native manual MACD alert uses independent default parameters, readable metadata labels and explicit chart-matching explanation",
+      "Actual native manual MACD alert uses independent default parameters, readable metadata labels and explicit chart-matching explanation; UI POST201 preserves21/26/9",
     );
     await h.evaluate(() =>
       dataCenter.open("/market-data?tab=platform&source=dukascopy&query=AAPL"),
@@ -142,6 +263,84 @@ const id = (s) =>
     await n.getByRole("button", { name: "关闭数据中心", exact: true }).click();
     checks.push(
       "Actual native calendar shows registered vs catalog independent review scopes",
+    );
+    for (const [symbol, token] of [
+      ["0700", "0700.HK/HKD"],
+      ["7203", "7203.JP/JPY"],
+    ]) {
+      await h.evaluate(
+        (query) =>
+          dataCenter.open(
+            "/market-data?tab=platform&source=dukascopy&query=" + query,
+          ),
+        symbol,
+      );
+      await expect(dc).toBeVisible();
+      await dc.getByRole("tab", { name: "股票", exact: true }).click();
+      await expect(dc).toContainText(token);
+      await expect(dc).toContainText("具体合约类型待核实");
+      await p.screenshot({ path: out + "/dukascopy-stock-" + symbol + ".png" });
+      await n
+        .getByRole("button", { name: "关闭数据中心", exact: true })
+        .click();
+    }
+    checks.push(
+      "Actual native Dukascopy stock/source/keyword filters include representative Hong Kong0700 and Japan7203",
+    );
+    await h.evaluate(() =>
+      dataCenter.open("/market-data?tab=calendar&source=oanda&query=EURUSD"),
+    );
+    await expect(dc).toBeVisible();
+    const oandaRows = dc.locator(".dc-calendar-row");
+    await expect
+      .poll(() => oandaRows.filter({ hasText: "已登记品种" }).count())
+      .toBeGreaterThanOrEqual(1);
+    await expect
+      .poll(() => oandaRows.filter({ hasText: "来源目录" }).count())
+      .toBeGreaterThanOrEqual(1);
+    await dc
+      .locator(".dc-content")
+      .evaluate((e) => {
+        e.scrollTop = 0;
+      })
+      .catch(() => {});
+    await p.screenshot({
+      path: out + "/calendar-oanda-independent-overview.png",
+    });
+    for (const row of await oandaRows.all())
+      await row.locator("summary").click();
+    await expect(dc).toContainText("用于现有行情与策略绑定");
+    await expect(dc).toContainText("用于来源检索及登记前核对");
+    await expect(dc).toContainText("审核不会自动转移到同名品种");
+    const registered = oandaRows.filter({ hasText: "已登记品种" }).first();
+    await registered.locator("summary").scrollIntoViewIfNeeded();
+    await p.screenshot({
+      path: out + "/calendar-oanda-independent-targets.png",
+    });
+    const catalog = oandaRows.filter({ hasText: "来源目录" }).first();
+    await catalog.locator("summary").scrollIntoViewIfNeeded();
+    await p.screenshot({ path: out + "/calendar-oanda-catalog-target.png" });
+    const calendar = await (
+      await p.request.get(
+        base + "/api/market-data/center/calendars?source=oanda&query=EURUSD",
+      )
+    ).json();
+    assert.equal(
+      new Set(calendar.items.map((row) => row.row_id)).size,
+      calendar.items.length,
+    );
+    assert(calendar.items.every((row) => row.status !== "verified"));
+    assert.equal(
+      calendar.review_due,
+      calendar.items.filter((row) =>
+        ["unverified", "review_due", "expired", "not_yet_valid"].includes(
+          row.status,
+        ),
+      ).length,
+    );
+    await n.getByRole("button", { name: "关闭数据中心", exact: true }).click();
+    checks.push(
+      "Actual native OANDA registered/catalog same-symbol scopes expanded: separate IDs/uses, independent review counts, unverified preserved",
     );
     await h.evaluate(() => {
       const s = widget.activeChart().getPanes()[0].getMainSourcePriceScale();
@@ -192,6 +391,56 @@ const id = (s) =>
     await p.screenshot({ path: out + "/manual-scale-restored.png" });
     checks.push(
       "S-02: existing native Reset chart view restores autoscale after synthetic FX to stock switch",
+    );
+    await p.reload();
+    await expect
+      .poll(() => p.frames().some((f) => f.url().startsWith(origin + "/?")), {
+        timeout: 30000,
+      })
+      .toBe(true);
+    const reloadHost = p
+      .frames()
+      .find((f) => f.url().startsWith(origin + "/?"));
+    await reloadHost.waitForFunction(
+      () => ready && widget.activeChart().dataReady(),
+      null,
+      { timeout: 45000 },
+    );
+    await reloadHost.waitForFunction(() => !!alertUI);
+    await reloadHost.evaluate(() => alertUI.open());
+    const persisted = await (
+      await p.request.get(base + "/api/chart-alerts/" + saved.id)
+    ).json();
+    assert.deepEqual(persisted.config.condition.left.indicator.params, {
+      fast: 19,
+      slow: 35,
+      signal: 11,
+    });
+    assert.equal(
+      persisted.config.calculation_origin,
+      saved.config.calculation_origin,
+    );
+    const manualPersisted = await (
+      await p.request.get(base + "/api/chart-alerts/" + manualSaved.id)
+    ).json();
+    assert.deepEqual(manualPersisted.config.condition.left.indicator.params, {
+      fast: 21,
+      slow: 26,
+      signal: 9,
+    });
+    await expect
+      .poll(
+        () =>
+          p
+            .frames()
+            .find((f) => f.url().startsWith("blob:"))
+            ?.locator(".chart-alert-card")
+            .count() || 0,
+      )
+      .toBeGreaterThanOrEqual(2);
+    await p.screenshot({ path: out + "/alerts-reloaded.png" });
+    checks.push(
+      "Actual saved Python and manual alert parameter snapshots persist across page reload",
     );
     assert.deepEqual(errors, []);
     fs.writeFileSync(

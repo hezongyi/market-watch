@@ -400,11 +400,16 @@ function Dashboard({
   }
   function closeWatch() {
     setOpen(false);
-    const trigger = watchTrigger.current;
-    requestAnimationFrame(() => {
+  }
+  useEffect(() => {
+    if (open || !watchTrigger.current) return;
+    // Restore only after React removes the modal and runs its close cleanup.
+    const frame = requestAnimationFrame(() => {
+      const trigger = watchTrigger.current;
       if (trigger?.isConnected) trigger.focus({preventScroll:true});
     });
-  }
+    return () => cancelAnimationFrame(frame);
+  }, [open]);
   const [range,setRange]=useState<any>(null);
   const inst = instruments.find((i) => i.id === selected);
   useEffect(() => {
@@ -1005,8 +1010,9 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
   },[selectedHistory?.dataset_id]);
   const generation=useRef(0);
   const [savedRuns,setSavedRuns]=useState<any[]>([]);
+  const [setupOpen,setSetupOpen]=useState(true);
   useEffect(()=>{api('/replays').then(setSavedRuns).catch(()=>{})},[]);
-  async function resumeReplay(id:string){const g=++generation.current;setPlaying(false);setError('');try{const r=await api(`/replays/${id}`);if(g===generation.current)setRun(r)}catch(e){if(g===generation.current)setError(String(e))}}
+  async function resumeReplay(id:string){const g=++generation.current;setPlaying(false);setError('');try{const r=await api(`/replays/${id}`);if(g===generation.current){setRun(r);setSetupOpen(false)}}catch(e){if(g===generation.current)setError(String(e))}}
 
   const [jobs,setJobs]=useState<any[]>([]);
   const [jobSummary,setJobSummary]=useState<any>(null);
@@ -1022,6 +1028,8 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
     [open, setOpen] = useState(false),
     [seek, setSeek] = useState("");
   const locked = useRef(false);
+  const playbackButton = useRef<HTMLButtonElement>(null);
+  useEffect(()=>{if(run?.id)playbackButton.current?.focus()},[run?.id]);
   const fixedDataset=inputMode==='history'?historyDatasets.find(d=>d.id===selectedHistory?.dataset_id):undefined;
   function selectHistory(row:QualifiedSeries|null){
     setSelectedHistory(row);setDatasetVersion('');setStart('');setEnd('');setError('');
@@ -1058,7 +1066,7 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
           start: new Date(start).getTime(),
           end: new Date(end).getTime(),
         });
-      if(g===generation.current)setRun(result);
+      if(g===generation.current){setRun(result);setSetupOpen(false)}
     } catch (e) {
       setError(String(e));
     } finally {
@@ -1115,6 +1123,8 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
       </div>
       {savedRuns.length>0&&<section className="panel"><div className="panel-heading"><h2>继续已有演练</h2></div><div className="replay-controls"><label>已保存的演练<select defaultValue="" onChange={e=>{if(e.target.value)resumeReplay(e.target.value)}}><option value="">选择演练</option>{savedRuns.map(r=><option key={r.id} value={r.id}>{replayLabel(r.instrument_id)} · {r.timeframe} · {date(r.cursor)} · {r.id.slice(0,6)}</option>)}</select></label></div></section>}
       <section className="panel replay-setup">
+        <details open={setupOpen} onToggle={e=>setSetupOpen(e.currentTarget.open)}>
+          <summary>{run ? "新建演练 · 选择另一段固定历史" : "新建演练"}</summary>
         <form onSubmit={create}>
           <label>行情范围<select value={inputMode} onChange={e=>{
             const mode=e.target.value as 'history'|'legacy';setInputMode(mode);setDatasetVersion('');setStart('');setEnd('');setError('');
@@ -1172,6 +1182,7 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
           {datasetVersion&&missingPeriods.length>0&&!periodsLoading&&<button type="button" className="secondary" disabled={preparingPeriods} onClick={prepareReplayPeriods}>{preparingPeriods?'正在提交…':'准备回测周期'}</button>}
           <span>请从图表顶部的数据中心查看历史覆盖与维护。</span>
         </div>}
+        </details>
       </section>
       {error && (
         <p className="error" role="alert">
@@ -1196,16 +1207,10 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
               </button>
             </div>
             {!frames.includes(run.timeframe)&&<p>该周期支持价格回放；现有模拟预警支持 M1、M5、M15、H1、H4、D1。</p>}
-            <Chart
-              bars={run.bars}
-              markers={run.signals}
-              precision={
-                instruments.find((i) => i.id === run.instrument_id)?.precision ?? historyDatasets.find(d=>d.instrument_id===run.instrument_id)?.precision
-              }
-            />
             <div className="replay-controls">
               <button
                 className="secondary"
+                ref={playbackButton}
                 disabled={run.finished}
                 onClick={() => setPlaying(!playing)}
               >
@@ -1229,6 +1234,13 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
               </button>
               <span>{run.finished ? "演练已到结尾" : "按收盘事件推进"}</span>
             </div>
+            <Chart
+              bars={run.bars}
+              markers={run.signals}
+              precision={
+                instruments.find((i) => i.id === run.instrument_id)?.precision ?? historyDatasets.find(d=>d.instrument_id===run.instrument_id)?.precision
+              }
+            />
             <div className="seek">
               <label>
                 定位到时间（创建新分支，清空模拟监控）
