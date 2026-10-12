@@ -224,7 +224,7 @@ function startIndicatorCoordinator(catalog) {
           before:Number.isFinite(base.lastStart) ? base.lastStart+1 : undefined,
           query:{...(base.revision && id.series_kind==='composite'?{composite_revision_id:base.revision}:{}),
             ...(id.series_kind==='provider' && base.calculationStart?{calculation_origin:base.calculationStart}:{}),
-            ...(id.series_kind==='managed' && base.firstStart>0 ? {dependency_before:base.firstStart}:{}),
+            ...(['managed','history','composite'].includes(id.series_kind) && base.firstStart>0 ? {dependency_before:base.firstStart}:{}),
             provisional:true}};
       },
       chartTime:(bar,res,ticker)=>stamp(bar,res,decode(ticker).symbol),
