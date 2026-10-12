@@ -254,3 +254,33 @@ def test_legacy_review_keeps_profile_identity_across_closures_and_new_revisions(
         actual = row(db, "EURUSD", as_of=datetime(2026, 10, 12, tzinfo=UTC))
         assert actual["version"] == "legacy-reviewed-v2"
         assert actual["audit"] is None and actual["checked_at"] is None and actual["review_due_at"] is None
+
+
+@pytest.mark.parametrize("revision", [7, False, None, "", [], {}, "x" * 101])
+def test_invalid_saved_revision_remains_readable_and_cannot_reuse_an_old_review(database, revision):
+    with database.begin() as db:
+        calendar_admin.apply_profile(db, "EURUSD", {"revision": "dukascopy-spot-v1", "closures": []}, apply=True)
+        review(db, "EURUSD", "dukascopy-spot-v1")
+        db.get(Instrument, "EURUSD").calendar_profile = {"revision": revision, "closures": []}
+    with database() as db:
+        actual = row(db, "EURUSD", as_of=datetime(2026, 10, 12, tzinfo=UTC))
+        assert isinstance(actual["row_id"], str) and isinstance(actual["version"], str)
+        assert actual["status"] == "unverified" and actual["market_session"] == "unknown"
+        assert actual["calendar_verified"] is False
+        assert actual["audit"] is None and actual["checked_at"] is None
+
+
+@pytest.mark.parametrize("saved", [[], False, 0, "", {"revision": "invalid-closure-v1", "closures": [{"start": "invalid"}]}])
+def test_calendar_api_keeps_malformed_saved_profiles_visible_as_unverified(database, monkeypatch, saved):
+    with database.begin() as db:
+        db.get(Instrument, "EURUSD").calendar_profile = saved
+    monkeypatch.setitem(api.app.dependency_overrides, api.authenticated, lambda: "test")
+    with TestClient(api.app) as client:
+        response = client.get("/api/market-data/center/calendars?source=dukascopy&query=EURUSD")
+        assert response.status_code == 200
+        payload = response.json()
+        actual = next(r for r in payload["items"] if r.get("row_id", "").startswith("dukascopy:EURUSD:"))
+        assert actual["status"] == "unverified" and actual["market_session"] == "unknown"
+        assert actual["calendar_verified"] is False and actual["audit"] is None
+        assert "规则格式无效" in actual["coverage_note"]
+        assert payload["review_due"] >= 1

@@ -304,6 +304,7 @@ def _runtime_rules(db, moment):
 
     from sqlalchemy import or_, select
 
+    from .calendar_profile import closures_from
     from .config import settings
     from .live_session import effective_profile
     from .storage import Audit, Instrument, MarketCatalog, MarketDataset, ProviderDataset
@@ -394,12 +395,22 @@ def _runtime_rules(db, moment):
             continue
         identity = observation_identity(source, symbol, meta)
         profile = effective_profile(identity, meta.get("calendar_profile"))
-        session = session_status(source, symbol, stamp, metadata=meta)
+        version = profile.get("revision") if isinstance(profile, dict) else None
+        if not isinstance(version, str) or not 0 < len(version) <= 100:
+            version = None
+        invalid_profile = False
+        try:
+            if profile is not None and not isinstance(profile, dict):
+                raise ValueError("Calendar profile must be an object")
+            closures = closures_from(profile)
+        except (TypeError, ValueError, KeyError):
+            closures = ()
+            invalid_profile = True
+        session = _unknown(version) if invalid_profile else session_status(source, symbol, stamp, metadata=meta)
         normalized = canonical_symbol(source, symbol)
         basis, parameters = price_scope(source, meta)
         # The configured profile owns the review identity; session evidence may
         # still use a built-in rule outside the profile's explicit closures.
-        version = profile.get("revision") if isinstance(profile, dict) else None
         row = {**base, "version": version or session.get("calendar_version") or base["version"],
                "mappings": (symbol,), "enabled": enabled[source], **session,
                "runtime_status": "verified" if session.get("calendar_verified") else "unverified",
@@ -419,25 +430,21 @@ def _runtime_rules(db, moment):
                        **{key: base[key] for key in ("checked_at", "review_due_at", "valid_from", "valid_until")})
             if source == "dukascopy" and normalized == "EUR/USD":
                 row["regular_hours"] = "周日 17:00 至周五 17:00（纽约时间）；无已登记每日暂停"
-        source_session = profile.get("source_session") if isinstance(profile, dict) else None
+        source_session = profile.get("source_session") if isinstance(profile, dict) and not invalid_profile else None
         if isinstance(source_session, dict):
             row.update(timezone=source_session.get("timezone", base["timezone"]),
                        scope=source_session.get("applicability", row["scope"]),
                        valid_from=source_session.get("reviewed_start"), valid_until=source_session.get("reviewed_end"),
                        evidence=[source_session["evidence_url"]] if source_session.get("evidence_url") else [],
                        regular_hours="有限审核范围内的来源会话；开闭边界分钟保留未核实。")
-        if isinstance(profile, dict):
-            from .calendar_profile import closures_from
-
-            try:
-                row["exceptions"] = tuple({"start": c.start.isoformat(), "end": c.end.isoformat(),
-                    "reason": c.reason, "source": c.source} for c in closures_from(profile))
-            except (TypeError, ValueError, KeyError):
-                row["coverage_note"] = "规则格式无效；保留未核实，需重新维护。"
+        row["exceptions"] = tuple({"start": c.start.isoformat(), "end": c.end.isoformat(),
+            "reason": c.reason, "source": c.source} for c in closures)
+        if invalid_profile:
+            row["coverage_note"] = "规则格式无效；保留未核实，需重新维护。"
         # Separate rows preserve immutable dataset scopes; different instances
         # may have the same symbol with different rules. No account ID is exposed.
         row["row_id"] = source + ":" + scope_id + ":" + row["version"]
-        audit = audits.get((scope_id, row["version"]))
+        audit = audits.get((scope_id, version)) if version and not invalid_profile else None
         row["audit"] = ({"reviewed_at": datetime.fromtimestamp(audit.at / 1000, UTC).isoformat(),
             "reviewer": audit.details.get("reviewer"), "method": audit.details.get("method"),
             "evidence_version": audit.details.get("evidence_version"),
