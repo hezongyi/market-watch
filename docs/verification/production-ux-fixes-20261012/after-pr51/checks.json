@@ -1,0 +1,67 @@
+{
+  "main_base": "33ef507affef2cb34c10018333b7d827dd50085b",
+  "merge_commit": "0b0eef0837ec98b316640c97300413b9fdd4be83",
+  "tree": "Merge plus canonical alert calculation-origin bridge fix; browser scripts and evidence in same delivery commit",
+  "backend_regressions": {
+    "passed": 299,
+    "command": "PYTHONPATH=backend .venv/bin/python -m pytest -q backend/tests/test_swing_sr.py backend/tests/test_chart_indicator_contract.py backend/tests/test_indicator_state.py backend/tests/test_fixed_indicators.py backend/tests/test_chart_workspace.py backend/tests/test_provider_chart.py backend/tests/test_provider_cache.py backend/tests/test_managed_dataset.py backend/tests/test_chart_alert_values.py backend/tests/test_chart_alert_calculation_contract.py backend/tests/test_chart_alert_api.py backend/tests/test_chart_export.py backend/tests/test_provider_service.py backend/tests/test_market_stream_worker.py backend/tests/test_health.py"
+  },
+  "ubuntu_database_regressions": {
+    "passed": 24,
+    "command": "docker compose --env-file PRIVATE/acceptance.env -p NEW_TASK -f deploy/ubuntu/production-ux.acceptance.yaml run --rm --no-deps verify backend/tests/test_swing_sr_postgres.py backend/tests/test_health.py backend/tests/test_instrument_presentation.py backend/tests/test_history_worker_recovery_postgres.py -q -p no:cacheprovider --tb=short"
+  },
+  "javascript": {
+    "commands": [
+      "node web/tests/swing-sr-adapter.cjs",
+      "node web/tests/native-indicator-identity.cjs",
+      "node web/tests/native-indicator-labels.cjs",
+      "node --test web/tests/chart-alerts-bridge.test.cjs"
+    ],
+    "passed": true,
+    "bridge_tests": 7
+  },
+  "frontend_build": "npm --prefix web run build: tsc + Vite + data-center bundle passed; existing >500kB advisory",
+  "native_local_file_capability": {
+    "passed": true,
+    "checks": [
+      "circles",
+      "bridges",
+      "statistics",
+      "hide",
+      "native-template",
+      "parameters",
+      "rollback",
+      "visibility",
+      "multiple-instances",
+      "two-charts",
+      "narrow-light",
+      "legacy-8-templates"
+    ],
+    "errors": [],
+    "scope": "Licensed native local-file with frozen feed; separate from Docker application acceptance",
+    "command": "PYTHONPATH=backend .venv/bin/python web/tests/fixtures/swing-sr-feed.py; node web/tests/swing-sr-native.browser.cjs"
+  },
+  "docker_browser": {
+    "native_checks": 9,
+    "integration_checks": 3,
+    "mobile_viewports": [
+      375,
+      390,
+      844
+    ],
+    "page_errors": [],
+    "commands": [
+      "node web/tests/production-ux-native.browser.cjs",
+      "node web/tests/production-ux-real.browser.cjs",
+      "node web/tests/production-ux-after51.browser.cjs"
+    ]
+  },
+  "template_scope": "Actual Docker combined MACD19/35/11 + Swing3/7, display defaults true/below_name, no style edits",
+  "limitations": [
+    "Synthetic task price cache, no upstream validation",
+    "No alert worker end-to-end decision or notification",
+    "No physical phone/Safari/production recheck",
+    "Four-worker stop/recovery and full replay evidence remain round2, not rerun here",
+    "No GitHub Actions CI claim"
+  ]
+}

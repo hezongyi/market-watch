@@ -74,3 +74,38 @@ mw-docker retire --task "$MW_UX_PROJECT" --project "$MW_UX_PROJECT" --apply
 第一轮已按mw-docker预览/apply退役，87张业务表9198行在真实临时恢复库核对数量及排序内容SHA256一致，资源归零；证明保留在 [第一轮cleanup.json](verification/production-ux-fixes-20261012/cleanup.json)。名称含production的精确验收例外保留归属、共享资源、PG digest与实际恢复核对，不允许生产用途。
 
 第二轮已预览9个容器、1个PG卷与独立网络并apply退役；87张业务表47494行在真实临时恢复库逐表核对数量及排序内容SHA256一致，来源稳定性再次核对。本任务容器、卷、网络剩余均为0，两个URL已停止；证明见 [round2/cleanup.json](verification/production-ux-fixes-20261012/round2/cleanup.json)。临时明文password、env、health override已删除，私有归档0700保留。私有归档不提交。仓库未配置GitHub Actions，不能宣称CI全绿；本次本地回归与实际网页验收结果已保存。交付 [PR #50](https://github.com/hezongyi/market-watch/pull/50)，不合并或部署生产。
+
+## PR #51 合入后的集成复验
+
+main `33ef507affef2cb34c10018333b7d827dd50085b`（已合并 #51）合入本分支，merge commit `0b0eef0837ec98b316640c97300413b9fdd4be83`。唯一冲突位于 Python 指标参数名称：优先读取 #50 的 metadata label，Swing 没有 label 时保留 #51 的 `High strength`／`Low strength`。Swing 算法和技术参数键保持原契约，适配器回归同时断言 MACD 中文标签与 Swing fallback。
+
+实际网页登录发现原生库会把 Dukascopy ticker 中的摘要转为大写，而历史计算 origin map 使用规范小写。告警入口原来直接用原生 ticker 查找，因而误报“请等待 Python 指标历史计算完成”。现按 map 写入方式 `MWSeries.decode` 后 `encode` 再查询，保留 series kind 和 managed fallback；真实大写 ticker 的指标对象入口已通过。Dukascopy 的告警日历仍未核实，UI 正确禁止提交；实际 POST201／保存／刷新使用日历已支持的 Binance BTCUSDT，不放宽来源限制。
+
+本轮运行 Ubuntu `quant-server` 本机独立 Docker task/project `mw-ux-acceptance-after51-20261012`，网页 `http://127.0.0.1:19991/`、图表来源 `http://127.0.0.1:19992/`，数据库 `production_ux_acceptance` 和独立 PG volume。三镜像 `market-watch-api:ux-after51`、`market-watch-web:ux-after51`、`market-watch-chart-origin:ux-after51` 均经 `mw-docker build`／`market-watch-ubuntu` 构建；chart 在 origin 修复后重建。没有启用 legacy profile，三现行角色实际 running，兼容补数显示 disabled；本轮没有重复四角色 stop/recovery，完整证明仍引用第二轮。#51 自己的实例与其他任务未操作。
+
+- 299 项相关 Python 回归、24 项真实 PostgreSQL 回归通过，覆盖 Swing／指标契约／状态、工作区、provider/cache、managed、告警值与计算契约等；JS 指标适配、身份／标签及 7 项告警 bridge 测试通过。前端 tsc／Vite／数据中心 bundle 构建通过，保留既有大 chunk 提示。
+- 在实际登录的原生图上同时添加 MACD 19/35/11 与 Swing 3/7，Added 摘要、中文 MACD 名称、Swing strength 名称正确。实际 UI 保存模板，移除指标后应用模板，保存工作区并整页刷新，两个指标参数、Swing 显示与 MACD 数值曲线恢复；刷新后持久化模板仍可应用。
+- 本轮组合模板只验证 Swing 默认显示选项 `show_average_spacing=true`、`statistics_position=below_name`，未改变样式。关闭统计、左下角、多实例、双图、旧八指标模板等另有 12 能力组 local-file 原生 probe 通过；不能将该 probe 当成真实 Docker／供源验收。
+- 实际 BTCUSDT Python 指标对象入口带入 origin 与 19/35/11，UI POST201；图表随后改为 23/39/13，已存告警仍独立。手选 MACD 21/26/9 POST201，整页刷新后两条列表与参数快照持久化。股票／日历筛选及既有 reset 恢复 autoscale 一并复验；本轮 reset 来源是合成 BTC→股票，第二轮 FX→股票证据保持原样。
+- 375×812、390×844、844×390 Chromium 触摸视口实际取消／保存 POST201／刷新／绑定／焦点复验通过。14 张本轮留存截图已逐张打开复核，尺寸与 SHA256 见 [after-pr51/visual-review.json](verification/production-ux-fixes-20261012/after-pr51/visual-review.json)。截图中工作区可能与已存告警品种不同，告警持久化以 API／DOM 断言证明；不宣称重新附着到该工作区。
+
+复现沿用上节独立构建／Compose 方法，但必须使用新 task/project、新镜像标签和空闲端口；这轮只需 seed 与 chart-seed，不启用 legacy／health override。浏览器按 native → real → after51 顺序串行运行：
+
+```bash
+# Set to a NEW task after preparing its private env/password and synthetic seed.
+export MW_UX_PROJECT=mw-ux-acceptance-after51-new
+export MW_UX_BASE=http://127.0.0.1:19991
+export MW_UX_CHART_ORIGIN=http://127.0.0.1:19992
+export PLAYWRIGHT_CHROMIUM_EXECUTABLE=/home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome
+export LD_LIBRARY_PATH=/tmp/mw-indicator-browser-libs/root/usr/lib/x86_64-linux-gnu
+node web/tests/production-ux-native.browser.cjs
+node web/tests/production-ux-real.browser.cjs
+node web/tests/production-ux-after51.browser.cjs
+# After acceptance, leave PG running for actual restore verification.
+mw-docker retire --task "$MW_UX_PROJECT" --project "$MW_UX_PROJECT"
+mw-docker retire --task "$MW_UX_PROJECT" --project "$MW_UX_PROJECT" --apply
+```
+
+规范／Spec 两轴对合并解决与 origin 修复均无交付阻塞；模板与数据来源范围按实际验证记录。最新证据、精确测试命令及退役恢复核对见 [after-pr51/README.md](verification/production-ux-fixes-20261012/after-pr51/README.md)。原第一／第二轮证据不覆盖。价格仍来自本任务显式合成缓存；未新增真实供源价格、告警 worker 判定、通知投递、实机／Safari或生产验收结论。PR #50 继续保持可审，不合并或部署生产。
+
+本轮已预览8个容器、1个PG卷和独立网络后 apply 退役。87张业务表42118行在真实临时恢复库逐表核对行数与排序内容 SHA256 一致，并再次检查来源内容稳定；本任务容器／卷／网络均为0，19991／19992已停止。临时明文 env／password 已删除，0700私有归档保留且不提交；证明见 [after-pr51/cleanup.json](verification/production-ux-fixes-20261012/after-pr51/cleanup.json)。

@@ -60,6 +60,13 @@ const id = (s) =>
       null,
       { timeout: 45000 },
     );
+    // Binance's public alert calendar is supported; Dukascopy remains unverified.
+    await h.evaluate(
+      () =>
+        new Promise((resolve) =>
+          widget.activeChart().setSymbol("MWP:BTCUSDT", resolve),
+        ),
+    );
     const n = p.frames().find((f) => f.url().startsWith("blob:"));
     const studyIds = await h.evaluate(async () => {
       const c = widget.activeChart();
@@ -116,7 +123,10 @@ const id = (s) =>
           h.evaluate(
             () =>
               alertCalculationOrigins.get(
-                widget.activeChart().symbol() +
+                MWSeries.encode(
+                  MWSeries.decode(widget.activeChart().symbol()).symbol,
+                  MWSeries.decode(widget.activeChart().symbol()).series_kind,
+                ) +
                   "|" +
                   widget.activeChart().resolution(),
               ) ?? null,
@@ -390,7 +400,7 @@ const id = (s) =>
     assert(after.from > 100);
     await p.screenshot({ path: out + "/manual-scale-restored.png" });
     checks.push(
-      "S-02: existing native Reset chart view restores autoscale after synthetic FX to stock switch",
+      "S-02: existing native Reset chart view restores autoscale after synthetic BTC to stock switch with manual price range",
     );
     await p.reload();
     await expect
