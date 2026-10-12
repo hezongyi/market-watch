@@ -1,0 +1,33 @@
+{
+  "task": "mw-production-ux-20261012",
+  "project": "mw-production-ux-20261012",
+  "preview_containers": 9,
+  "preview_volumes": [
+    "mw-production-ux-20261012_pg-data"
+  ],
+  "retired": true,
+  "remaining_project_containers": 0,
+  "remaining_project_volumes": 0,
+  "remaining_project_networks": 0,
+  "restore_verification": [
+    {
+      "database": "postgres",
+      "actual_restore_verified": true,
+      "tables_verified": 0,
+      "rows_verified": 0,
+      "content_sha256_checked": true,
+      "dump_sha256": "84c36d42a44ede9dde5e078784dcbafb8cfcc07a07b5e383dc3f0a1178fd2300"
+    },
+    {
+      "database": "production_ux_acceptance",
+      "actual_restore_verified": true,
+      "tables_verified": 87,
+      "rows_verified": 9198,
+      "content_sha256_checked": true,
+      "dump_sha256": "241139757ad0ecafb513295161f2ff2d85c9a6cc70689464923d6607dee91784"
+    }
+  ],
+  "archive_private": "/home/quant/.local/share/market-watch-docker/archives/mw-production-ux-20261012-20261012T055439-4606bc03",
+  "other_resources": "No production or other-task deletion; shared official PG image retained",
+  "addresses": "127.0.0.1:19971 and :19972 no longer serve this retired task"
+}

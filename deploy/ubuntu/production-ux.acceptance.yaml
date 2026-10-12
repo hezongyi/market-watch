@@ -1,0 +1,106 @@
+# Ubuntu-only task mw-production-ux-20261012. Build every app image via mw-docker.
+services:
+  pg:
+    image: postgres:14-bookworm
+    restart: "no"
+    environment:
+      POSTGRES_DB: production_ux_acceptance
+      POSTGRES_USER: ux_acceptance
+      POSTGRES_PASSWORD: ${MW_UX_DB_PASSWORD:?Set acceptance-only password}
+    volumes: [pg-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U ux_acceptance -d production_ux_acceptance]
+      interval: 3s
+      retries: 20
+  migrate:
+    image: ${MW_API_IMAGE:?Build task-owned API image}
+    restart: "no"
+    command: [alembic, upgrade, head]
+    environment: &backend
+      ALERTS_DATABASE_URL: postgresql+psycopg://ux_acceptance:${MW_UX_DB_PASSWORD}@pg/production_ux_acceptance
+      ALERTS_ADMIN_PASSWORD_HASH: ${MW_UX_LOGIN_HASH:?Set acceptance-only hash}
+      ALERTS_COOKIE_SECURE: "false"
+      ALERTS_DELIVERY_ENABLED: "false"
+      ALERTS_YAHOO_ENABLED: "false"
+      ALERTS_OANDA_STREAM_ENABLED: "false"
+      ALERTS_INITIAL_HISTORY_DAYS: "0"
+      ALERTS_DATABASE_POOL_SIZE: "2"
+      ALERTS_DATABASE_MAX_OVERFLOW: "0"
+      ALERTS_HISTORY_HEALTH_WORKERS: '["history_versions","chart_history","native_history"]'
+    depends_on:
+      pg: {condition: service_healthy}
+  api:
+    image: ${MW_API_IMAGE:?Build task-owned API image}
+    restart: "no"
+    environment: *backend
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8000/readyz', timeout=3)"]
+      interval: 3s
+      retries: 20
+  history-worker:
+    image: ${MW_API_IMAGE:?Build task-owned API image}
+    restart: "no"
+    environment: *backend
+    command: [python, -m, alerts.history_versions, --without-composite-aggregates]
+    depends_on:
+      api: {condition: service_healthy}
+  chart-history-worker:
+    image: ${MW_API_IMAGE:?Build task-owned API image}
+    restart: "no"
+    environment: *backend
+    command: [python, /fixture/production_ux_fixture.py, chart-worker]
+    volumes: [../../scripts/production_ux_fixture.py:/fixture/production_ux_fixture.py:ro]
+    depends_on:
+      api: {condition: service_healthy}
+  native-history-worker:
+    image: ${MW_API_IMAGE:?Build task-owned API image}
+    restart: "no"
+    environment: *backend
+    command: [python, -m, alerts.native_history_loads]
+    depends_on:
+      api: {condition: service_healthy}
+  legacy-import-worker:
+    image: ${MW_API_IMAGE:?Build task-owned API image}
+    restart: "no"
+    profiles: [legacy]
+    environment: *backend
+    command: [python, -m, alerts.market, --imports-only]
+    depends_on:
+      api: {condition: service_healthy}
+  seed:
+    image: ${MW_API_IMAGE:?Build task-owned API image}
+    restart: "no"
+    profiles: [verification]
+    environment: *backend
+    command: [python, /fixture/production_ux_fixture.py, seed]
+    volumes: [../../scripts/production_ux_fixture.py:/fixture/production_ux_fixture.py:ro]
+    depends_on:
+      api: {condition: service_healthy}
+  verify:
+    image: ${MW_API_IMAGE:?Build task-owned API image}
+    restart: "no"
+    profiles: [verification]
+    environment:
+      <<: *backend
+      TEST_POSTGRES_URL: postgresql+psycopg://ux_acceptance:${MW_UX_DB_PASSWORD}@pg/production_ux_acceptance
+    entrypoint: [python, -m, pytest]
+    working_dir: /repo
+    volumes: [../..:/repo:ro]
+    depends_on:
+      pg: {condition: service_healthy}
+  web:
+    image: ${MW_WEB_IMAGE:?Build task-owned web image}
+    restart: "no"
+    ports: [127.0.0.1:19971:80]
+    depends_on:
+      api: {condition: service_healthy}
+  chart-origin:
+    image: ${MW_CHART_IMAGE:?Build task-owned licensed chart image}
+    restart: "no"
+    ports: [127.0.0.1:19972:80]
+    depends_on:
+      web: {condition: service_started}
+volumes:
+  pg-data:

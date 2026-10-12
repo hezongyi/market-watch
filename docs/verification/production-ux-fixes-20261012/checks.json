@@ -1,0 +1,18 @@
+{
+  "backend_regressions": {
+    "passed": 178,
+    "command": "PYTHONPATH=backend .venv/bin/python -m pytest backend/tests/test_health.py backend/tests/test_instrument_presentation.py backend/tests/test_live_api.py backend/tests/test_provider_dukascopy.py backend/tests/test_history_catalog.py backend/tests/test_platform_catalog.py backend/tests/test_aggregation_policy.py backend/tests/test_source_calendar.py backend/tests/test_calendar_profile.py backend/tests/test_calendar_review.py backend/tests/test_market_calendar.py backend/tests/test_chart_indicator_contract.py backend/tests/test_chart_alert_api.py -q --tb=short"
+  },
+  "ubuntu_database_regressions": {
+    "passed": 18,
+    "command": "docker compose ... run --rm --no-deps verify backend/tests/test_health.py backend/tests/test_instrument_presentation.py backend/tests/test_history_worker_recovery_postgres.py -q -p no:cacheprovider --tb=short"
+  },
+  "docker_lifecycle": {
+    "passed": 56,
+    "subtests": 15
+  },
+  "frontend_build": "tsc + vite + data-center bundle passed; existing >500kB chunk advisory",
+  "native_labels": "Actual Added function: built-in localized metadata, Python catalogue metadata and changed values passed",
+  "source_contract_limit": "Dukascopy official shares page unreachable (connection timeout); SDK confirms stock groups, contract type remains unverified",
+  "python_object_alert_limit": "Native Python object-entry alert creation remained gated on calculation origin in synthetic cache. No success claim for that entry; manual alert labels/defaults and bridge parameter semantics reviewed."
+}
