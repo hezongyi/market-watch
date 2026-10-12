@@ -23,7 +23,7 @@
 
 原生窗口使用本机已许可库，库文件不提交；图表价格来自本任务显式合成缓存，用于UI／轴行为，不能证明供源价格或覆盖。Dukascopy官方股票网页连接超时，SDK分组只证明股票类别，因此未将全部股票宣称为已核实CFD或股票所有权。实际价格身份和来源参数未修改。
 
-原生Python指标对象入口在合成环境仍等待calculation origin，未完成该入口的告警创建；实际bridge对象入口fixture验证19/35/11快照、calculation origin和图表后续改值不影响既有快照；摘要实际值及手动告警默认／修改值已验证。没有宣称此入口完整通过，也没有宣称告警worker判定、真实通知投递、手机响铃、实机／Safari、长期稳定性通过。没有新增生产部署；正式页面的修复后只读复验需在后续明确授权发布后执行。
+原生Python指标对象入口在合成环境仍等待calculation origin，未完成该入口的告警创建；实际bridge对象入口fixture验证19/35/11快照、calculation origin和图表后续改值不影响既有快照；摘要实际值及手动告警默认／修改值已验证。没有宣称此入口完整通过，也没有宣称告警worker判定、真实通知投递、手机响铃、实机／Safari、长期稳定性通过。追加既有原生告警大范围probe在价格告警菜单定位处超时，未走到后续指标案例，未计入通过；本次采用上述已执行的独立参数／窗口断言。没有新增生产部署；正式页面的修复后只读复验需在后续明确授权发布后执行。
 
 ## 实际环境与复现
 
@@ -55,3 +55,5 @@ sg docker -c 'docker compose --env-file /tmp/mw-production-ux-20261012-private/a
 清理工具原来仅因项目名含production拒绝验收项目。新增显式 `--confirm-acceptance-project EXACT_NAME`，必须同时匹配task/project且已登记acceptance用途，实际镜像label、资源归属、共享资源拒绝、官方PG digest、备份实际恢复及内容SHA核对全部保留。生命周期测试和独立安全审查通过；仅更新本机工具入口，没有改任务登记或资源标签。预览只列本项目9个容器、1个PG卷和独立网络，再执行apply。
 
 清理已完成：87张业务表、9198行在临时恢复库逐表核对数量与排序内容SHA256一致；本项目容器、卷及网络剩余均为0，原验收URL已停止。清理最终状态及经裁剪的恢复证明见 [cleanup.json](verification/production-ux-fixes-20261012/cleanup.json)。私有归档包含角色、env、inspect与数据库备份，不提交。原生产实例和其他任务资源未操作。
+
+修复草稿PR：[PR #50](https://github.com/hezongyi/market-watch/pull/50)。最终提交后234项选择回归与15项subtests、120项首页检查通过；仓库未配置GitHub Actions状态检查。任务已退役，临时明文密码与env已删除；重建需新生成独立凭据并使用新的任务名。

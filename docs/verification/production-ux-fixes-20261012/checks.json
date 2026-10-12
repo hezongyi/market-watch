@@ -14,5 +14,14 @@
   "frontend_build": "tsc + vite + data-center bundle passed; existing >500kB chunk advisory",
   "native_labels": "Actual Added function: built-in localized metadata, Python catalogue metadata and changed values passed",
   "source_contract_limit": "Dukascopy official shares page unreachable (connection timeout); SDK confirms stock groups, contract type remains unverified",
-  "python_object_alert_limit": "Native Python object-entry alert creation remained gated on calculation origin in synthetic cache. No success claim for that entry; manual alert labels/defaults and bridge parameter semantics reviewed."
+  "python_object_alert_limit": "Native Python object-entry alert creation remained gated on calculation origin in synthetic cache. No success claim for that entry; manual alert labels/defaults and bridge parameter semantics reviewed.",
+  "final_committed_regressions": {
+    "passed": 234,
+    "subtests": 15,
+    "scope": "178 selected backend tests + 56 Docker lifecycle tests; final committed tree"
+  },
+  "additional_existing_native_probe": {
+    "status": "incomplete",
+    "reason": "Existing chart-alerts-native.probe.cjs timed out locating context-menu price-alert action before indicator cases; not counted as passing evidence."
+  }
 }
