@@ -438,7 +438,11 @@ def router(authenticated):
             from .series_access import search
             sources += [{"id": row["ticker"], "symbol": row["symbol"], "source": row["source"],
                 "environment": row["description"], "series_kind": row["series_kind"]} for row in search(db)]
-        return {"frames": FRAMES, "indicators": public_catalog(), "managed_sources": sources}
+        # The legacy workspace only supports numeric inputs and generic series.
+        # Native profiles require the advanced host's controls and plot mapping.
+        indicators = {name: meta for name, meta in public_catalog().items()
+                      if not meta.get("render_profile")}
+        return {"frames": FRAMES, "indicators": indicators, "managed_sources": sources}
 
     @r.post("/export")
     def export(body: ExportQuery):

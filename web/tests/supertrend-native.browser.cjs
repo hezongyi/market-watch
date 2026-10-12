@@ -56,6 +56,36 @@ const poll = async (fn, ms=60000) => {
     const login=page.waitForResponse(r=>r.url().endsWith('/api/login'));
     await page.getByRole('button',{name:'登录工作台'}).click();
     assert.equal((await login).status(),200);
+    const legacyCatalog=await(await page.request.get(base+'/api/charts/catalog')).json();
+    assert.deepEqual(Object.keys(legacyCatalog.indicators).sort(),
+      ['SMA','EMA','LWMA','BBANDS','RSI','MACD','ATR','STOCH'].sort());
+    const legacy=await page.evaluate(async()=>{
+      const session=await(await fetch('/api/session')).json();
+      const response=await fetch('/api/charts/workspaces',{method:'POST',
+        headers:{'Content-Type':'application/json','X-CSRF-Token':session.csrf},
+        body:JSON.stringify({name:'Supertrend legacy catalog regression'})});
+      if(!response.ok) throw Error('Legacy workspace creation failed '+response.status);
+      return response.json();
+    });
+    await page.goto(base+'/chart-workspaces/'+legacy.id);
+    await page.getByRole('button',{name:'指标',exact:true}).click();
+    const picker=page.getByLabel('新增指标类型');
+    assert.deepEqual(await picker.locator('option').evaluateAll(items=>items.map(i=>i.value).sort()),
+      Object.keys(legacyCatalog.indicators).sort());
+    await picker.selectOption('SMA');
+    await page.getByRole('button',{name:'添加指标',exact:true}).click();
+    const period=page.getByRole('dialog').locator('fieldset').first().locator('input[type=number]');
+    await period.fill('11');await period.press('Tab');
+    assert.equal(await period.inputValue(),'11');
+    await page.screenshot({path:path.join(output,'legacy-catalog.png')});
+    await page.getByRole('button',{name:'关闭设置'}).click();
+    await page.getByRole('button',{name:'保存',exact:true}).click();
+    await poll(async()=>{
+      const saved=await(await page.request.get(base+'/api/charts/workspaces/'+legacy.id)).json();
+      return saved.document.panels[0].indicators[0]?.params.period===11;
+    });
+    checks.push('legacy workspace lists only eight supported studies; SMA period edit saves to server');
+    await page.goto(base+'/advanced-charts');
     await page.evaluate(async ticker=>{
       const session=await(await fetch('/api/session')).json();
       const response=await fetch('/api/advanced-charts/workspaces',{method:'POST',
@@ -106,6 +136,15 @@ const poll = async (fn, ms=60000) => {
       await page.mouse.move(1550,20);
     };
     await rendered(host,ids);
+    const swingName='守望 Python SWING_SR_V1';
+    const swingId=await host.evaluate(name=>widget.activeChart().createStudy(name,false,false,
+      {high_strength:3,low_strength:7}),swingName);
+    assert.ok(swingId);
+    await rendered(host,[...ids,swingId],[]);
+    await host.evaluate(id=>widget.activeChart().getStudyById(id).setInputValues([
+      {id:'show_average_spacing',value:false},{id:'statistics_position',value:'bottom_left'}]),swingId);
+    await page.screenshot({path:path.join(output,'swing-coexistence.png')});
+    checks.push('Supertrend and Swing coexist with finite native values and independent settings');
     checks.push('each native study exposes finite plotted trend values on five distinct candles');
     const style=await host.evaluate(id=>widget.activeChart().getStudyById(id).getStyleValues(),ids[0]);
     assert.equal(style.styles.up.plottype,7);
@@ -136,6 +175,12 @@ const poll = async (fn, ms=60000) => {
       .map(s=>widget.activeChart().getStudyById(s.id).getInputValues()),studyName);
     assert.ok(values.some(inputs=>inputs.find(i=>i.id==='showsignals')?.value===false));
     assert.ok(values.some(inputs=>inputs.find(i=>i.id==='source')?.value==='ohlc4'));
+    const templatedSwing=await host.evaluate(name=>{
+      const study=widget.activeChart().getAllStudies().find(s=>s.name===name);
+      return study && widget.activeChart().getStudyById(study.id).getInputValues();
+    },swingName);
+    assert.equal(templatedSwing.find(i=>i.id==='high_strength').value,3);
+    assert.equal(templatedSwing.find(i=>i.id==='show_average_spacing').value,false);
     checks.push('native Boolean controls; display inputs; study template preserves two independent instances');
     const templatedIds=await host.evaluate(name=>widget.activeChart().getAllStudies().filter(s=>s.name===name).map(s=>s.id),studyName);
     await rendered(host,templatedIds);
@@ -158,6 +203,19 @@ const poll = async (fn, ms=60000) => {
     assert.equal(alternateStyle.styles.down.linewidth,3);
     checks.push('server reload preserves both calculation/display inputs and custom color/line width');
     await rendered(host,[original.id,alternate.id]);
+    const restoredSwing=await host.evaluate(name=>{
+      const study=widget.activeChart().getAllStudies().find(s=>s.name===name);
+      return study && {id:study.id,inputs:widget.activeChart().getStudyById(study.id).getInputValues()};
+    },swingName);
+    assert.ok(restoredSwing);
+    assert.equal(restoredSwing.inputs.find(i=>i.id==='high_strength').value,3);
+    assert.equal(restoredSwing.inputs.find(i=>i.id==='low_strength').value,7);
+    assert.equal(restoredSwing.inputs.find(i=>i.id==='show_average_spacing').value,false);
+    assert.equal(restoredSwing.inputs.find(i=>i.id==='statistics_position').value,'bottom_left');
+    await rendered(host,[original.id,alternate.id,restoredSwing.id],[]);
+    await page.screenshot({path:path.join(output,'swing-restored.png')});
+    checks.push('study template and server reload preserve Swing alongside both Supertrend instances');
+    await host.evaluate(id=>widget.activeChart().removeEntity(id),restoredSwing.id);
     await host.evaluate(id=>widget.activeChart().removeEntity(id),alternate.id);
     await host.evaluate(async id=>{await widget.activeChart().getStudyById(id).setInputValues([
       {id:'showsignals',value:true},{id:'highlighting',value:true}]);},original.id);

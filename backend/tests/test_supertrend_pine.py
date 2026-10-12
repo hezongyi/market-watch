@@ -213,7 +213,7 @@ def test_catalog_public_profile_and_enum_contract():
     json.dumps(meta, allow_nan=False)
 
 
-def test_both_authenticated_catalogs_serialize_without_private_callables(database):
+def test_authenticated_catalogs_keep_native_profiles_out_of_legacy_workspace(database):
     from alerts import api
     from fastapi.testclient import TestClient
 
@@ -223,7 +223,15 @@ def test_both_authenticated_catalogs_serialize_without_private_callables(databas
             legacy = client.get("/api/charts/catalog")
             advanced = client.get("/api/advanced-charts/catalog")
             assert legacy.status_code == advanced.status_code == 200
-            assert legacy.json()["indicators"][NAME] == advanced.json()[NAME]
+            legacy_indicators = legacy.json()["indicators"]
+            assert NAME not in legacy_indicators
+            assert "SWING_SR_V1" not in legacy_indicators
+            assert set(legacy_indicators) == {
+                "SMA", "EMA", "LWMA", "BBANDS", "RSI", "MACD", "ATR", "STOCH",
+            }
+            assert all("render_profile" not in meta for meta in legacy_indicators.values())
+            assert advanced.json()[NAME]["render_profile"] == "supertrend_pine_v1"
+            assert advanced.json()["SWING_SR_V1"]["render_profile"] == "swing_sr_v1"
             assert "history_requirement" not in advanced.json()[NAME]
     finally:
         api.app.dependency_overrides.clear()
