@@ -100,13 +100,13 @@ def test_bounded_progress_fences_stale_owners_and_recovers_from_checkpoint(datab
         db.flush()
 
 
-def add_tail(database, revision_id, rows):
+def add_tail(database, revision_id, rows, *, observed_at=210000000):
     with database.begin() as db:
         revision = db.get(CompositeRevision, revision_id)
         target = db.get(MarketDataset, db.get(RealtimeMapping, revision.mapping_id).target_dataset_id)
         apply_minutes(db, record(db, batch(identity=DatasetIdentity.model_validate(target.identity),
             window_start=min(row.timestamp for row in rows), window_end=max(row.timestamp for row in rows) + 60000,
-            checkpoint=max(row.timestamp for row in rows) + 60000, observed_at=210000000,
+            checkpoint=max(row.timestamp for row in rows) + 60000, observed_at=observed_at,
             volume_kind="price_count", volume_unit="quotes", rows=tuple(rows))))
 
 

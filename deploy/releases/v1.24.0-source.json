@@ -1,0 +1,25 @@
+{
+  "version": "1.24.0",
+  "release_tag": "v1.24.0",
+  "previous_source_tag": "v1.23.0",
+  "pull_request": "https://github.com/hezongyi/market-watch/pull/54",
+  "tested_application_commit": "5faba2c0369f0ca569fdb76f7aa90fb3d15543f3",
+  "source_commit_resolution": "Resolve annotated v1.24.0^{commit}; targets PR #54 main merge including synchronized version metadata.",
+  "verification_record": "docs/verification/atr-offset-20261012/review-fixes/README.md",
+  "verification": {
+    "python_passed": 328,
+    "python_skipped": 1,
+    "latest_atr_passed": 67,
+    "postgres_passed": 151,
+    "postgres_additional_passed": 5,
+    "test_sets_overlap": true,
+    "runtime_browser_passed": true,
+    "screenshots_manually_reviewed": 11,
+    "standards_remaining_blockers": 0,
+    "spec_remaining_blockers": 0
+  },
+  "new_migrations": ["as46_provider_price_confirmation"],
+  "application_dependencies_changed": false,
+  "acceptance_instance": "Retained for user review; lifecycle task mw-atr-offset-20261012 not retired.",
+  "production_deployment": "Not performed; this authorization covers source merge and annotated tag publication."
+}

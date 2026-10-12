@@ -97,6 +97,26 @@ class Operand(Contract):
         return self.indicator.unit if self.indicator else "constant" if self.kind == "constant" else "price"
 
 
+class AtrOffset(Contract):
+    kind: Literal["atr"] = "atr"
+    version: Literal["1"] = "1"
+    timeframe: str
+    period: int = Field(default=14, strict=True, ge=2, le=500)
+    multiplier: Decimal = Field(default=Decimal("0.2"), gt=0, le=100, allow_inf_nan=False)
+    reference: Literal["closed_at_evaluation_bar_open"] = "closed_at_evaluation_bar_open"
+
+    @model_validator(mode="after")
+    def frame(self):
+        from .chart_data import FRAMES
+
+        if self.timeframe not in FRAMES:
+            raise ValueError("未知 ATR K线周期")
+        return self
+
+    def spec(self):
+        return {"name": "ATR", "version": "1", "params": {"period": self.period}}
+
+
 class Condition(Contract):
     relation: Literal["cross", "cross_up", "cross_down", "above", "below",
                       "enter", "exit", "break_upper", "break_lower"]
@@ -104,6 +124,7 @@ class Condition(Contract):
     right: Operand | None = None
     lower: Decimal | None = Field(default=None, gt=0, allow_inf_nan=False)
     upper: Decimal | None = Field(default=None, gt=0, allow_inf_nan=False)
+    offset: AtrOffset | None = None
 
     @model_validator(mode="after")
     def compatible(self):
@@ -119,6 +140,11 @@ class Condition(Contract):
             raise ValueError("比较条件需要一个比较目标")
         elif self.right.unit != "constant" and self.left.unit != self.right.unit:
             raise ValueError("条件两侧的单位不兼容")
+        if self.offset and (self.relation not in ("cross_up", "cross_down", "above", "below")
+                            or self.left.unit != "price" or not self.right
+                            or self.right.kind not in ("constant", "line", "indicator")
+                            or self.right.unit not in ("price", "constant")):
+            raise ValueError("ATR 阈值仅支持价格单位的上穿、下穿、高于或低于比较")
         return self
 
 

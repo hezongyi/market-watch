@@ -1,0 +1,32 @@
+{
+  "scope": "Actual HTTPS login and existing Ubuntu Docker rules/events; no API mocks",
+  "screenshots": [
+    "01-rule-chart.png",
+    "02-edit-dark.png",
+    "03-message.png",
+    "04-notification.png",
+    "05-edit-light.png",
+    "06-create-offset-off.png",
+    "07-create-offset-defaults.png",
+    "08-drawing-wait.png",
+    "09-event.png",
+    "10-event-evidence.png",
+    "11-event-evidence-detail.png"
+  ],
+  "errors": [],
+  "alert_writes": [],
+  "price_rule": {
+    "version": 2,
+    "health": "ready",
+    "count": 1
+  },
+  "manual_review": {
+    "all_screenshots_opened": true,
+    "verdict": "ATR feature UI accepted; existing long native-dialog title truncation remains a minor visual limitation",
+    "limitations": [
+      "Controlled OHLC data; no live supplier validation",
+      "Drawing close rule is warming due to late confirmation; not all rules are ready",
+      "Desktop actual instance screenshots; 375px light form coverage is a separate React fixture"
+    ]
+  }
+}

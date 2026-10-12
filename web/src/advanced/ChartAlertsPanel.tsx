@@ -6,6 +6,7 @@ import {
   deliveryNames,
   freshDraft,
   healthNames,
+  offsetSnapshot,
   statuses,
   type AlertConfig,
   type AlertContext,
@@ -607,6 +608,9 @@ export function ChartAlertsPanel({
                       {healthNames[row.health]}
                       {row.health_reason ? "：" + row.health_reason : ""}
                     </p>
+                    {row.config.condition.offset && offsetSnapshot(row.runtime.offset) && (
+                      <p>{offsetSnapshot(row.runtime.offset)}</p>
+                    )}
                     <p>
                       版本 {row.version} · 生效 {date(row.effective_at)}
                     </p>
@@ -675,6 +679,9 @@ export function ChartAlertsPanel({
                           实际值 {event.evidence.left} · 比较值{" "}
                           {event.threshold} · 市场价格 {event.price}
                         </p>
+                        {offsetSnapshot(event.evidence.observation.offset) && (
+                          <p>{offsetSnapshot(event.evidence.observation.offset)}</p>
+                        )}
                         <p>
                           规则版本 {event.evidence.rule_version} · 第{" "}
                           {event.evidence.ordinal} 次

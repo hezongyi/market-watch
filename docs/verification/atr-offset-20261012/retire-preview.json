@@ -1,0 +1,24 @@
+{
+  "project": "mw-atr-offset-20261012",
+  "task": "mw-atr-offset-20261012",
+  "apply": false,
+  "containers": [
+    "mw-atr-offset-20261012-notify-worker-1",
+    "mw-atr-offset-20261012-alert-worker-1",
+    "mw-atr-offset-20261012-web-1",
+    "mw-atr-offset-20261012-api-1",
+    "mw-atr-offset-20261012-notification-sink-1",
+    "mw-atr-offset-20261012-chart-origin-1",
+    "mw-atr-offset-20261012-migrate-1",
+    "mw-atr-offset-20261012-tls-1",
+    "mw-atr-offset-20261012-pg-1"
+  ],
+  "volumes": [
+    "mw-atr-offset-20261012_atr-postgres"
+  ],
+  "networks": [
+    "fbb62f9c5de4",
+    "1b54a51a6bf3"
+  ],
+  "retained_images": []
+}

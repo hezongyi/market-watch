@@ -24,6 +24,14 @@ export type Condition = {
   right?: Operand | null;
   lower?: string | null;
   upper?: string | null;
+  offset?: {
+    kind: "atr";
+    version: "1";
+    timeframe: string;
+    period: number;
+    multiplier: string;
+    reference: "closed_at_evaluation_bar_open";
+  } | null;
 };
 export type Association = {
   workspace_id: string;
@@ -90,6 +98,12 @@ export type AlertRow = {
   condition_summary: string;
   runtime: Record<string, unknown>;
 };
+export function offsetSnapshot(value: unknown): string | null {
+  if (!value || typeof value !== "object") return null;
+  const v = value as Record<string, unknown>;
+  return [v.base_target, v.atr, v.signed_offset, v.threshold].every(x => typeof x === "string")
+    ? `原目标 ${v.base_target} · ATR ${v.atr} · 偏移 ${v.signed_offset} · 实际边界 ${v.threshold}` : null;
+}
 export type AlertEvent = {
   display_label?: string;
   id: string;
@@ -121,6 +135,7 @@ export type Capabilities = {
     available: boolean;
     reason: string | null;
     observation_basis: string;
+    atr_frames?: string[];
   }[];
   modes: string[];
   indicators: string[];

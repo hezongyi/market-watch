@@ -11,7 +11,7 @@ from alerts.storage import HistoryVersion, Instrument
 from sqlalchemy import create_engine, inspect, text
 
 ROOT = Path(__file__).resolve().parents[2]
-HEAD = "ar45_market_stream"
+HEAD = "as46_provider_price_confirmation"
 
 
 def configuration():

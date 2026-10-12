@@ -1,5 +1,9 @@
 # Git与版本维护
 
+## v1.24.0 ATR 告警偏移源码发布
+
+PR #54 新增兼容的可选 ATR 告警偏移，采用次版本 1.24.0。同步 Python/web 及锁文件根版本、README 和 CHANGELOG；按用户授权合并，以最终 main 合并提交创建并推送不可移动附注标签 `v1.24.0`，保留已有标签。受测产品提交 `5faba2c0369f0ca569fdb76f7aa90fb3d15543f3`，后续发布整理只修改版本及交付记录，不改受测运行代码、依赖或迁移。新增迁移 `as46_provider_price_confirmation` 已在 Ubuntu 验收实例验证，生产执行迁移前需备份；旧 checkpoint 安全重建。测试及最新 11 张截图见 [最终复审](verification/atr-offset-20261012/review-fixes/README.md)，源码清单见 `deploy/releases/v1.24.0-source.json`。实例继续保留供复核，Docker 生命周期 task 未退役；本次授权范围为源码合并和 tag 发布。
+
 ## v1.22.1 生产验收 UX 修复源码发布
 
 PR #50 修复既有 UX 与告警入口问题，采用兼容补丁版本1.22.1。同步 Python/web/锁文件根版本及 CHANGELOG；按用户授权合并，并以最终 main 合并提交创建、推送不可移动的附注标签 `v1.22.1`，保留 `v1.22.0`。最终受测交付提交为 `f115f4cebbdd0f1cbcf29c87ac972e0935112858`，包含 main `33ef507`（#51）的集成；发布整理仅修改版本元数据、README和源码发布记录，不改变运行实现、依赖或迁移。299项相关Python、24项真实PostgreSQL、JS与实际登录网页组合模板／工作区／告警／三手机视口复验通过，Standards／Spec无阻塞。原完整验收、14张追加截图、合成价格与未验证边界见 [修复记录](production-ux-fixes-20261012.md)，源码清单见 `deploy/releases/v1.22.1-source.json`。独立验收任务已备份、实际恢复验证及退役。本次授权为源码合并和tag发布，不包含生产部署。
