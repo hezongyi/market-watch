@@ -1,0 +1,104 @@
+{
+  "host": "quant-server",
+  "project": "mw-supertrend-20261012",
+  "services": [
+    {
+      "service": "api",
+      "image": "market-watch-api:supertrend-pine-v1-20261012",
+      "state": "running",
+      "health": "healthy",
+      "ports": [
+        {
+          "URL": "127.0.0.1",
+          "TargetPort": 8000,
+          "PublishedPort": 20189,
+          "Protocol": "tcp"
+        }
+      ]
+    },
+    {
+      "service": "chart-origin",
+      "image": "market-watch-chart:supertrend-pine-v1-20261012",
+      "state": "running",
+      "health": "",
+      "ports": [
+        {
+          "URL": "127.0.0.1",
+          "TargetPort": 80,
+          "PublishedPort": 20188,
+          "Protocol": "tcp"
+        }
+      ]
+    },
+    {
+      "service": "history-state-worker",
+      "image": "market-watch-api:supertrend-pine-v1-20261012",
+      "state": "running",
+      "health": "",
+      "ports": [
+        {
+          "URL": "",
+          "TargetPort": 8000,
+          "PublishedPort": 0,
+          "Protocol": "tcp"
+        }
+      ]
+    },
+    {
+      "service": "market-stream-worker",
+      "image": "market-watch-api:supertrend-pine-v1-20261012",
+      "state": "running",
+      "health": "",
+      "ports": [
+        {
+          "URL": "",
+          "TargetPort": 8000,
+          "PublishedPort": 0,
+          "Protocol": "tcp"
+        }
+      ]
+    },
+    {
+      "service": "native-history-worker",
+      "image": "market-watch-api:supertrend-pine-v1-20261012",
+      "state": "running",
+      "health": "",
+      "ports": [
+        {
+          "URL": "",
+          "TargetPort": 8000,
+          "PublishedPort": 0,
+          "Protocol": "tcp"
+        }
+      ]
+    },
+    {
+      "service": "postgres",
+      "image": "postgres:14-bookworm",
+      "state": "running",
+      "health": "healthy",
+      "ports": [
+        {
+          "URL": "127.0.0.1",
+          "TargetPort": 5432,
+          "PublishedPort": 20190,
+          "Protocol": "tcp"
+        }
+      ]
+    },
+    {
+      "service": "web",
+      "image": "market-watch-web:supertrend-pine-v1-20261012",
+      "state": "running",
+      "health": "",
+      "ports": [
+        {
+          "URL": "127.0.0.1",
+          "TargetPort": 80,
+          "PublishedPort": 20187,
+          "Protocol": "tcp"
+        }
+      ]
+    }
+  ]
+}

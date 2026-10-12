@@ -9,9 +9,14 @@ import copy
 import math
 
 from .chart_indicators import CATALOG, validate
+from .supertrend_pine import ALGORITHM as SUPERTREND_ALGORITHM
+from .supertrend_pine import NAME as SUPERTREND_NAME
+from .supertrend_pine import step as supertrend_step
 
 ALGORITHM = "fixed-indicator-state-v3"
-SUPPORTED = frozenset(("SMA", "EMA", "LWMA", "BBANDS", "RSI", "MACD", "ATR", "STOCH"))
+SUPPORTED = frozenset(("SMA", "EMA", "LWMA", "BBANDS", "RSI", "MACD", "ATR", "STOCH",
+                       SUPERTREND_NAME))
+ALGORITHMS = (ALGORITHM, SUPERTREND_ALGORITHM)
 
 
 class IndicatorState:
@@ -20,15 +25,22 @@ class IndicatorState:
         if self.name not in SUPPORTED:
             raise ValueError("该指标尚未声明完整初始化与检查点算法")
         self.spec = {"name": self.name, "version": "1", "params": self.params}
+        self.algorithm = SUPERTREND_ALGORITHM if self.name == SUPERTREND_NAME else ALGORITHM
         self.state = {}
         if checkpoint is not None:
-            if (checkpoint.get("algorithm") != ALGORITHM or checkpoint.get("spec") != self.spec):
+            if (checkpoint.get("algorithm") != self.algorithm or checkpoint.get("spec") != self.spec):
                 raise ValueError("指标检查点算法或参数不匹配")
             self.state = copy.deepcopy(checkpoint["state"])
 
     def checkpoint(self):
-        return {"algorithm": ALGORITHM, "spec": copy.deepcopy(self.spec),
+        return {"algorithm": self.algorithm, "spec": copy.deepcopy(self.spec),
                 "state": copy.deepcopy(self.state)}
+
+    def initialized(self, values):
+        # Event/alternating plots intentionally contain null after warmup.
+        if self.name == SUPERTREND_NAME:
+            return self.state.get("atr") is not None
+        return all(value is not None for value in values.values())
 
     def step(self, row, *, provisional=False):
         if provisional:
@@ -43,6 +55,13 @@ class IndicatorState:
         high, low, close = (float(row[key]) for key in ("high", "low", "close"))
         if not all(math.isfinite(value) for value in (high, low, close)):
             raise ValueError("指标输入价格必须是有限数值")
+        if self.name == SUPERTREND_NAME:
+            try:
+                open_ = float(row["open"])
+            except (KeyError, TypeError, ValueError) as exc:
+                raise ValueError(f"{self.name}: missing or invalid open input") from exc
+            if not math.isfinite(open_):
+                raise ValueError(f"{self.name}: open 必须是有限数值")
         s, p = self.state, self.params
         continued = bool(s)
         if not s:
@@ -59,7 +78,9 @@ class IndicatorState:
                 dependencies.pop(0)
             s["origin"] = dependencies[0][0]
             s["seam"] = any(item[1] for item in dependencies)
-        if self.name in ("SMA", "LWMA", "BBANDS", "EMA"):
+        if self.name == SUPERTREND_NAME:
+            result = supertrend_step(s, open_, high, low, close, p)
+        elif self.name in ("SMA", "LWMA", "BBANDS", "EMA"):
             period = p["period"]
             window = s.setdefault("window", [])
             if self.name == "EMA" and n > period:
@@ -165,5 +186,6 @@ def presentation(spec, rows):
     return {"name": name, "version": "1", "params": params, "pane": CATALOG[name]["pane"],
         "levels": CATALOG[name].get("levels", []), "series": [
             {**item, "values": [{"time": row["start"], "value": row["values"][item["key"]],
+                **({"break_before": True} if row.get("break_before") else {}),
                 **({"provisional": True} if row.get("provisional") else {})} for row in rows]}
             for item in CATALOG[name]["series"]]}

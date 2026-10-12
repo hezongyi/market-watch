@@ -419,18 +419,20 @@ function barsOf(result, res, ticker) {
     }));
   const values = new Map(
     (result.indicators[0]?.series.find((s) => s.key === key)?.values || []).map(
-      (v) => [v.time, v.value],
+      (v) => [v.time, v],
     ),
   );
   return result.bars.map((b) => {
-    const v = values.get(b.start);
+    const point = values.get(b.start), v = point?.value;
     return {
       time: b.chart_time ?? stamp(b, res, symbol),
       open: v ?? 0,
       high: v ?? 0,
       low: v ?? 0,
       close: v ?? 0,
-      volume: Number(v !== null && v !== undefined),
+      // 2 retains a valid numeric value and marks a true data gap for profiles
+      // that must break even with period=1 (which has no warmup null).
+      volume: v !== null && v !== undefined ? (point.break_before ? 2 : 1) : 0,
     };
   });
 }
@@ -796,7 +798,8 @@ const feed = {
         weekly_multipliers: ["1"],
         monthly_multipliers: ["1"],
         supported_resolutions: meta.frames ? resolutions.filter(r=>meta.frames.includes(frames[r])) : resolutions,
-        visible_plots_set: meta.volume_kind && meta.volume_kind !== "unavailable" ? "ohlcv" : "ohlc",
+        // Synthetic study feeds always carry the null/gap marker in volume.
+        visible_plots_set: decode(ticker).spec || meta.volume_kind && meta.volume_kind !== "unavailable" ? "ohlcv" : "ohlc",
         volume_precision: meta.volume_kind === "tick" ? 0 : 8,
         format: "price",
         data_status: meta.delay_seconds > 0 ? "delayed_streaming" : "streaming",

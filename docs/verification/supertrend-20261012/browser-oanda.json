@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "environment": "Ubuntu Docker mw-supertrend-20261012",
+  "base": "http://localhost:20187",
+  "chartOrigin": "http://localhost:20188",
+  "ticker": "MWP:EURUSD",
+  "checks": [
+    "Python catalog; two native instances; real backend output received",
+    "each native study exposes finite plotted trend values on five distinct candles",
+    "native Boolean controls; display inputs; study template preserves two independent instances",
+    "actual workspace server save/reload restores stable study identities",
+    "server reload preserves both calculation/display inputs and custom color/line width"
+  ],
+  "errors": [],
+  "resets": [],
+  "visual_review": "Screenshots require inspection for labels, dot anchoring, fills, gaps and reference plot.",
+  "backend_requests": {
+    "count": 28,
+    "http_status_counts": {
+      "200": 28
+    },
+    "calculation_parameters": [
+      {
+        "atr_method": "sma",
+        "multiplier": 2,
+        "period": 7,
+        "source": "ohlc4"
+      },
+      {
+        "atr_method": "wilder",
+        "multiplier": 3,
+        "period": 10,
+        "source": "hl2"
+      }
+    ],
+    "raw_local_evidence": "artifacts/supertrend/browser.json"
+  }
+}

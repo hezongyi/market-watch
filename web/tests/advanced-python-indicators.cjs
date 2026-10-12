@@ -10,6 +10,7 @@ const context = vm.createContext({
   Intl,
   Error,
   location: { search: "?parent=http://localhost" },
+  document: {createElement: () => ({}), head: {append() {}}},
   parent: { postMessage() {} },
   crypto: { randomUUID: () => "test" },
   addEventListener() {},
@@ -120,3 +121,10 @@ assert.equal(extended['mw-window'],'mw-test');
 const payload=JSON.parse(Buffer.from(extended.symbol.slice(5),'base64').toString());
 assert.equal(payload.symbol,'MWP:EURUSD');
 console.log('Python feed retains historical window identity without changing backend symbol');
+
+context.result.indicators[0].series[1].values[1].break_before = true;
+assert.equal(vm.runInContext('barsOf(result,"1",ticker)[0].volume',context), 0,
+  'a missing point stays null even with a gap marker');
+context.result.indicators[0].series[1].values[2].break_before = true;
+assert.equal(vm.runInContext('barsOf(result,"1",ticker)[1].volume',context), 2,
+  'a true gap retains the real zero value and carries a visual break marker');

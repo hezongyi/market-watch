@@ -1,0 +1,24 @@
+{
+  "provenance": "Hand-calculated from the user supplied Pine expressions; not a Pine engine export.",
+  "reference_sha256": "3ddd7b5dc61b285ff7c3932255bd0d66ce427a9e17edcca87322b05a384a6ce8",
+  "params": {"period": 2, "source": "hl2", "multiplier": 1},
+  "ohlc": [[10,11,9,10],[10,12,10,11],[11,13,11,12],[12,12,8,8],[8,9,7,8],[13,15,13,14]],
+  "wilder": {
+    "atr": [null,2,2,3,2.5,4.75],
+    "up": [null,9,10,null,null,9.25],
+    "down": [null,null,null,13,10.5,null],
+    "buy_price": [null,null,null,null,null,9.25],
+    "sell_price": [null,null,null,13,null,null],
+    "fill_reference": [10,10.75,11.75,10,8,13.75],
+    "direction": [1,1,1,-1,-1,1]
+  },
+  "sma": {
+    "atr": [null,null,2,3,3,4.5],
+    "up": [null,null,10,null,null,9.5],
+    "down": [null,null,null,13,11,null],
+    "buy_price": [null,null,null,null,null,9.5],
+    "sell_price": [null,null,null,13,null,null],
+    "fill_reference": [10,10.75,11.75,10,8,13.75],
+    "direction": [1,1,1,-1,-1,1]
+  }
+}

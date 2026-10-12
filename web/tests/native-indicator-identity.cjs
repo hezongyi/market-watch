@@ -2,7 +2,7 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const source=fs.readFileSync('advanced-host/native-indicator-dialog.js','utf8');
 const resolver=source.slice(source.indexOf('  function entryFor(row)'),source.indexOf('  function annotate(row)'));
-const ids=['SMA','EMA','LWMA','BBANDS','RSI','MACD','ATR','STOCH'];
+const ids=['SMA','EMA','LWMA','BBANDS','RSI','MACD','ATR','STOCH','SUPERTREND_PINE_V1'];
 const entries=[{name:'MACD',id:'MACD',label:'MACD',source:'内置',aliases:[]},
   ...ids.map(id=>({name:'守望 Python '+id,id,label:id,source:'Python',aliases:[id]}))];
 const context=vm.createContext({state:{entries,names:new Map(ids.map(id=>['MWPython'+id+'@market-watch','守望 Python '+id]))}});
@@ -18,4 +18,6 @@ context.row={id:'unrecognized-custom',title:'Python MACD',studyData:{id:'unrecog
 assert.equal(vm.runInContext('entryFor(row)?.source',context),'Python','Restricted fallback stays in Python namespace');
 context.row={id:'unrecognized-custom',title:'Python MISSING',studyData:{id:'unrecognized-custom'}};
 assert.equal(vm.runInContext('entryFor(row)',context),null);
-console.log('Eight Python identities, colliding native MACD, stale title and unknown identity passed');
+context.row={id:'unknown',title:'Python SUPERTREND_PINE_V1'};
+assert.equal(vm.runInContext('entryFor(row)?.id',context),'SUPERTREND_PINE_V1');
+console.log('Nine Python identities, colliding native MACD, versioned Supertrend, stale title and unknown identity passed');

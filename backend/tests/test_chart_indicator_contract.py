@@ -83,6 +83,12 @@ def test_catalog_filters_nested_plugin_details_and_preserves_metadata(plugin):
         {"history_requirement": 5},
         {"description": lambda: "private"},
         {"calculation": {}},
+        {"input_fields": ["open", "open"]},
+        {"input_fields": ["volume"]},
+        {"input_fields": [[]]},
+        {"render_profile": "arbitrary-code"},
+        {"display_inputs": {"showsignals": 1}},
+        {"display_inputs": {"unknown": True}},
     ],
 )
 def test_bad_declarations_fail_at_registration(plugin, change):
@@ -163,7 +169,8 @@ def test_builtin_order_parameters_and_warmup_remain_stable():
         "MACD": ["macd", "signal", "histogram"],
         "STOCH": ["k", "d"],
     }
-    for name, meta in indicators.public_catalog().items():
+    for name in ("SMA", "EMA", "LWMA", "BBANDS", "RSI", "MACD", "ATR", "STOCH"):
+        meta = indicators.public_catalog()[name]
         assert [s["key"] for s in meta["series"]] == expected.get(name, ["value"])
         assert indicators.validate({"name": name})[1] == meta["params"]
     assert [
@@ -204,7 +211,7 @@ def test_authenticated_catalog_serializes_declarations_without_calculation(
             response = client.get("/api/advanced-charts/catalog")
             assert response.status_code == 200
             assert list(response.json()["MACD"]["params"]) == ["fast", "slow", "signal"]
-            assert len(response.json()) == 9
+            assert set(response.json()) == set(indicators.CATALOG)
             assert response.json()[plugin[0]]["series"] == [{"key": "value", "type": "line"}]
             assert not calls
     finally:

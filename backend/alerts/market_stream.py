@@ -498,6 +498,15 @@ def delivery(db, task, sub, payload, cursors):
     if cursor and page.get("bars") and "latest_time" not in page and cursor < page["bars"][0].get("chart_time", page["bars"][0]["start"]):
         return {"type": "reset", "reason": "history_gap"}
     page["bars"] = [bar for bar in page.get("bars", []) if bar.get("chart_time", bar["start"]) >= cursor]
+    # Recursive calculations retain their complete prefix. A native plot needs
+    # only values for this consumer's delivered bars, keyed by input start (not
+    # the daily trading-date label). Rebuild the lists without mutating the
+    # shared retained snapshot or another subscriber's delivery.
+    times = {bar["start"] for bar in page["bars"]}
+    if "indicators" in page:
+        page["indicators"] = [{**indicator, "series": [
+            {**series, "values": [value for value in series["values"] if value["time"] in times]}
+            for series in indicator["series"]]} for indicator in page["indicators"]]
     if page["bars"]:
         state["cursor"] = page["bars"][-1].get("chart_time", page["bars"][-1]["start"])
         state["loaded_before"] = page["bars"][-1]["start"]
