@@ -35,15 +35,22 @@ def main():
 
 
 def run(fetch_page):
+    from .worker_health import Pulse
+
+    pulse = Pulse("chart_history")
     refreshed = 0
+    catalog_error = None
     while True:
         try:
+            pulse.start()
             if time.monotonic() - refreshed > 86400:
                 try:
                     refresh_catalog()
                     refreshed = time.monotonic()
+                    catalog_error = None
                 except Exception as exc:
                     logging.warning("catalog refresh failed: %s",type(exc).__name__)
+                    catalog_error = "catalog:" + type(exc).__name__
                     refreshed = time.monotonic()-86400+300
             # Reevaluate after every completed page; do not idle for the
             # maintenance timer while a foreground window is still incomplete.
@@ -57,8 +64,10 @@ def run(fetch_page):
                 if not worked:
                     from .volume_jobs import once
                     worked = once(fetch_page)
+            pulse.finish(worked=worked, errors=[catalog_error] if catalog_error else [])
             time.sleep(0.2 if worked else 1)
         except Exception as exc:
+            pulse.finish(errors=[type(exc).__name__])
             logging.warning("chart history cycle failed: %s", type(exc).__name__)
             time.sleep(5)
 

@@ -16,6 +16,7 @@ from .storage import (
     CompositeWatchBinding,
     DeviceReceipt,
     Instrument,
+    MarketDataset,
     Notification,
     Outbox,
     Quote,
@@ -101,6 +102,7 @@ def instruments():
 
     live = {row["instrument_id"]: row for row in snapshots()}
     with transaction() as db:
+        datasets = {row.instrument_id: row for row in db.scalars(select(MarketDataset))}
         result = []
         for inst in db.scalars(
             select(Instrument).where(Instrument.enabled.is_(True)).order_by(Instrument.id)
@@ -118,6 +120,7 @@ def instruments():
                         for k in [
                             "id",
                             "label",
+                            "symbol",
                             "source",
                             "basis",
                             "calendar",
@@ -150,6 +153,12 @@ def instruments():
                     "age_seconds": (now_ms() - latest.end) // 1000 if latest else None,
                 }
             )
+            dataset = datasets.get(inst.id)
+            if dataset:
+                result[-1].update(
+                    logical_symbol=dataset.logical_symbol,
+                    dataset_identity=dataset.identity,
+                )
             quote = db.get(Quote, inst.id)
             if quote and (not latest or quote.at > latest.end):
                 result[-1].update(

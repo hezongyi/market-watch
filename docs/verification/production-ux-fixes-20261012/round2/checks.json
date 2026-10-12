@@ -1,0 +1,33 @@
+{
+  "backend_regressions": {
+    "passed": 178,
+    "command": "PYTHONPATH=backend .venv/bin/python -m pytest backend/tests/test_health.py backend/tests/test_instrument_presentation.py backend/tests/test_live_api.py backend/tests/test_provider_dukascopy.py backend/tests/test_history_catalog.py backend/tests/test_platform_catalog.py backend/tests/test_aggregation_policy.py backend/tests/test_source_calendar.py backend/tests/test_calendar_profile.py backend/tests/test_calendar_review.py backend/tests/test_market_calendar.py backend/tests/test_chart_indicator_contract.py backend/tests/test_chart_alert_api.py -q --tb=short"
+  },
+  "ubuntu_database_regressions": {
+    "passed": 18,
+    "command": "docker compose ... run --rm --no-deps verify backend/tests/test_health.py backend/tests/test_instrument_presentation.py backend/tests/test_history_worker_recovery_postgres.py -q -p no:cacheprovider --tb=short"
+  },
+  "docker_lifecycle": {
+    "passed": 56,
+    "subtests": 15
+  },
+  "frontend_build": "tsc + vite + data-center bundle passed; existing >500kB chunk advisory",
+  "native_labels": "Actual Added function: built-in localized metadata, Python catalogue metadata and changed values passed",
+  "source_contract_limit": "Dukascopy official shares page unreachable (connection timeout); SDK confirms stock groups, contract type remains unverified",
+  "final_tree_backend_lifecycle": {
+    "passed": 234,
+    "subtests": 15,
+    "scope": "178 backend + 56 lifecycle; no backend/lifecycle changes since this run"
+  },
+  "python_object_alert": "实际native Python study对象入口、真实calculation origin、UI POST201、后续改值独立性及reload持久化均通过",
+  "focus_regression": {
+    "cause": "RAF曾在dialog[open]仍存在时执行，背景inert导致focus无效",
+    "fix": "open=false commit后的effect调度恢复",
+    "validation": "真实三视口取消/POST201保存/reload通过，修复后连续四轮；两个发起按钮4视口×3打开×3关闭矩阵通过；120fixture通过"
+  },
+  "limitations": [
+    "synthetic prices; no upstream verification",
+    "no alert worker decision or real notification",
+    "no physical phone/Safari/production recheck"
+  ]
+}

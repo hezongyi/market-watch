@@ -22,6 +22,13 @@ assert.deepEqual(Array.from(Object.values(swing.metainfo.defaults.styles),s=>s.p
 assert.deepEqual(Array.from(Object.values(swing.metainfo.defaults.styles),s=>s.color),['#f23645','#f23645','#00bcd4','#00bcd4']);
 assert.ok(Object.values(swing.metainfo.defaults.styles).every(s=>s.joinPoints===false));
 const cfg=swing.metainfo.inputs;
+assert.equal(cfg.find(i=>i.id==='high_strength').name,'High strength');
+assert.equal(cfg.find(i=>i.id==='low_strength').name,'Low strength');
+const macd=studies.find(item=>item.name==='守望 Python MACD');
+assert.deepEqual(Array.from(macd.metainfo.inputs,item=>[item.id,item.name]),
+  [['fast','快线周期'],['slow','慢线周期'],['signal','信号周期']]);
+assert.deepEqual(Array.from(Object.values(macd.metainfo.styles),item=>item.title),
+  ['MACD 线','信号线','柱状差值']);
 assert.equal(cfg.find(i=>i.id==='show_average_spacing').type,'bool');
 assert.equal(cfg.find(i=>i.id==='statistics_position').type,'text');
 assert.equal(cfg.find(i=>i.id==='statistics_position').display,0);

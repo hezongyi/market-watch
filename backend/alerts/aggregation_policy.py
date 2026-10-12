@@ -9,9 +9,9 @@ from .market_contracts import DatasetIdentity
 from .market_datasets import register_dataset
 from .storage import Bar, HistoryVersion, Instrument, MarketDataset
 
-AssetClass = Literal["forex", "metal", "crypto", "index", "other", "unspecified"]
+AssetClass = Literal["forex", "metal", "crypto", "index", "equity", "etf", "future", "other", "unspecified"]
 AggregationCalendar = Literal["ny17", "utc0"]
-ASSET_CLASSES = ("forex", "metal", "crypto", "index", "other", "unspecified")
+ASSET_CLASSES = ("forex", "metal", "crypto", "index", "equity", "etf", "future", "other", "unspecified")
 DEFAULTS = {"forex": "ny17", "metal": "ny17", "crypto": "utc0"}
 
 

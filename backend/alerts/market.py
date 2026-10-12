@@ -874,12 +874,17 @@ def main():
         parser.error("--imports-only cannot be combined with instrument or date arguments")
     bootstrap()
     if args.imports_only:
+        from .worker_health import Pulse
+
+        pulse = Pulse("legacy_import")
         with transaction() as db:
             queue_initial_history(db)
         while True:
+            pulse.start()
             import_once()
             with transaction() as db:
                 db.add(Audit(kind="import_heartbeat", details={}))
+            pulse.finish()
             if args.once:
                 return
             time.sleep(max(2, settings.import_poll_seconds))

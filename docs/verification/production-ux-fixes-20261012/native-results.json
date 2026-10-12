@@ -1,0 +1,28 @@
+{
+  "checks": [
+    "Actual licensed native Added window reads built-in localized metadata and Python metadata, preserving changed values",
+    "Actual native manual MACD alert uses independent default parameters, readable metadata labels and explicit chart-matching explanation",
+    "Actual native platform search combines AAPL keyword, stock category and Dukascopy source",
+    "Actual native calendar shows registered vs catalog independent review scopes",
+    "S-02: existing native Reset chart view restores autoscale after synthetic FX to stock switch"
+  ],
+  "errors": [],
+  "scope": "Actual licensed native UI and own Docker API/DB with explicitly synthetic price cache; not upstream price verification",
+  "studyIds": {
+    "native": "6bXzh9",
+    "python": "1Ci3Qo"
+  },
+  "manualScale": {
+    "before": {
+      "auto": false,
+      "range": {
+        "from": 315.44634262374524,
+        "to": 324.42583172031846
+      }
+    },
+    "after": {
+      "from": 315.44634262374524,
+      "to": 324.42583172031846
+    }
+  }
+}

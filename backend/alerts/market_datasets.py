@@ -91,7 +91,7 @@ def process_rows(rows, precision):
 
 def register_dataset(db, identity, *, logical_symbol, label, calendar, precision,
                      volume_kind, volume_unit, calendar_profile=None, asset_class="unspecified"):
-    if asset_class not in ("forex", "metal", "crypto", "index", "other", "unspecified"):
+    if asset_class not in ("forex", "metal", "crypto", "index", "equity", "etf", "future", "other", "unspecified"):
         raise ValueError("Unsupported asset class")
     identity = DatasetIdentity.model_validate(identity)
     profile = normalized_profile(calendar_profile) if calendar_profile else {}

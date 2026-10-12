@@ -50,7 +50,7 @@ function pythonStudies(PineJS, catalog) {
         styles: Object.fromEntries(
           series.map((s, i) => [
             "plot" + i,
-            { title: s.key, histogramBase: 0 },
+            { title: s.label || s.key, histogramBase: 0 },
           ]),
         ),
         inputs: [...keys.map((key) => {
@@ -61,7 +61,7 @@ function pythonStudies(PineJS, catalog) {
               : { type: "integer", min: 2, max: 500 });
           return {
             id: key,
-            name: swing ? (key === "high_strength" ? "High strength" : "Low strength") : key,
+            name: rule.label || (swing ? (key === "high_strength" ? "High strength" : "Low strength") : key),
             type: rule.type,
             defval: meta.params[key],
             min: rule.min,

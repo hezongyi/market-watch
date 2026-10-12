@@ -1714,7 +1714,7 @@ function boot(
   alertBridge = chartAlertBridge({getWidget:()=>widget,getWorkspace:()=>currentNativeWorkspace,
     getEpoch:()=>workspaceEpoch,isLoading:()=>loading||!ready,readonly,
     metadata:ticker=>alertSourceMetadata.get(MWSeries.encode(MWSeries.decode(ticker).symbol,MWSeries.decode(ticker).series_kind)),frames,
-    calculationOrigin:(ticker,res)=>alertCalculationOrigins.get(ticker+'|'+res) ??
+    calculationOrigin:(ticker,res)=>alertCalculationOrigins.get(MWSeries.encode(MWSeries.decode(ticker).symbol,MWSeries.decode(ticker).series_kind)+'|'+res) ??
       (MWSeries.decode(ticker).series_kind === "managed" ? managedSessions.get(MWSeries.decode(ticker).symbol+'|'+res)?.start : null),
     compositeRevision:(ticker,res)=>alertCompositeRevisions.get(MWSeries.encode(MWSeries.decode(ticker).symbol,'composite')+'|'+res) ?? null,
     rpc:query=>request(query,"chart-alert-rpc"),send: message => {

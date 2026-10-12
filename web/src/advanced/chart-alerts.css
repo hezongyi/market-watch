@@ -499,6 +499,12 @@ html:not(.theme-dark) .alert-menu {
   gap: 8px;
   font-size: 11px;
 }
+.alert-indicator-fields > p,
+.alert-indicator-fields > details {
+  grid-column: 1 / -1;
+  margin: 0;
+  line-height: 1.5;
+}
 .alert-indicator-fields legend {
   padding: 4px 0;
   font-size: 11px;

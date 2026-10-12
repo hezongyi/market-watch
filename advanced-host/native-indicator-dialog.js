@@ -205,10 +205,16 @@ function chartNativeIndicators(widget, doc, req, ui) {
                 (entry) => entry.name === study.name,
               ),
               api = chart.getStudyById(study.id);
+            let definitions = [];
+            try { definitions = widget.getStudyInputs(study.name); } catch {}
             const summary = api
               .getInputValues()
               .filter((input) => typeof input.value === "number")
-              .map((input) => `${input.id}=${input.value}`)
+              .map((input) => {
+                const metadata = definitions.find(item=>item.id === input.id);
+                const label = entry?.meta?.parameter_schema?.[input.id]?.label || metadata?.localizedName || metadata?.name || input.id;
+                return `${label} ${input.value}`;
+              })
               .join(" · ");
             return R.createElement(
               "div",

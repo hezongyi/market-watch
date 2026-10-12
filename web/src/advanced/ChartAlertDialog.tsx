@@ -30,9 +30,11 @@ import {
 function IndicatorFields({
   value,
   onChange,
+  metadata,
 }: {
   value: IndicatorSpec;
   onChange: (v: IndicatorSpec) => void;
+  metadata?: Capabilities["indicator_metadata"];
 }) {
   return (
     <fieldset className="alert-indicator-fields">
@@ -59,11 +61,11 @@ function IndicatorFields({
       </label>
       {Object.entries(value.params).map(([key, n]) => (
         <label key={key}>
-          {key}
+          {metadata?.[value.name]?.parameter_schema[key]?.label || key}
           <AlertInput
             type="number"
-            min={2}
-            max={500}
+            min={metadata?.[value.name]?.parameter_schema[key]?.min ?? 2}
+            max={metadata?.[value.name]?.parameter_schema[key]?.max ?? 500}
             step={1}
             required
             value={n}
@@ -87,10 +89,13 @@ function IndicatorFields({
             ? ["macd", "signal", "histogram"]
             : ["value"]
           ).map((key) => (
-            <option key={key}>{key}</option>
+            <option key={key} value={key}>{metadata?.[value.name]?.series.find(item=>item.key===key)?.label || key}</option>
           ))}
         </AlertSelect>
       </label>
+      <p>手动选择指标时使用告警默认参数，需要自行核对图表。通过已映射的 Python 指标创建时，初始值读取该指标当时的实际参数；同名内置指标不自动同步。</p>
+      <p>以上可编辑值是告警判定的参数快照；保存后独立于图表参数，修改图表不会同步已保存告警。</p>
+      <details><summary>参数技术键与实际值</summary><p>{Object.entries(value.params).map(([key,n])=>`${key}=${n}`).join(" · ")} · output={value.output}</p></details>
     </fieldset>
   );
 }
@@ -529,6 +534,7 @@ export function ChartAlertDialog({
                 {draft.condition.left.indicator && (
                   <IndicatorFields
                     value={draft.condition.left.indicator}
+                    metadata={capabilities?.indicator_metadata}
                     onChange={(indicator) =>
                       operand("left", { kind: "indicator", indicator })
                     }
@@ -632,6 +638,7 @@ export function ChartAlertDialog({
                     {draft.condition.right?.indicator && (
                       <IndicatorFields
                         value={draft.condition.right.indicator}
+                        metadata={capabilities?.indicator_metadata}
                         onChange={(indicator) =>
                           operand("right", { kind: "indicator", indicator })
                         }

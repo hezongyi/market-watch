@@ -1,0 +1,157 @@
+{
+  "checks": [
+    "Actual native MACD localized parameters and Swing High/Low strength coexist; Added summaries preserve19/35/11 and3/7",
+    "Uppercase native Dukascopy ticker resolves canonical calculation origin; actual study-entry alert opens with19/35/11; unverified calendar correctly prevents submission",
+    "Actual template UI save and apply restore both study numerical/display inputs; native workspace save and full reload retain values and Swing rendering; persisted template remains usable after reload"
+  ],
+  "errors": [],
+  "definitions": {
+    "macd": [
+      {
+        "id": "fast",
+        "name": "快线周期",
+        "type": "integer",
+        "defval": 12,
+        "min": 2,
+        "max": 500,
+        "display": 15,
+        "localizedName": "快线周期"
+      },
+      {
+        "id": "slow",
+        "name": "慢线周期",
+        "type": "integer",
+        "defval": 26,
+        "min": 2,
+        "max": 500,
+        "display": 15,
+        "localizedName": "慢线周期"
+      },
+      {
+        "id": "signal",
+        "name": "信号周期",
+        "type": "integer",
+        "defval": 9,
+        "min": 2,
+        "max": 500,
+        "display": 15,
+        "localizedName": "信号周期"
+      }
+    ],
+    "swing": [
+      {
+        "id": "high_strength",
+        "name": "High strength",
+        "type": "integer",
+        "defval": 5,
+        "min": 1,
+        "max": 500,
+        "display": 15,
+        "localizedName": "High strength"
+      },
+      {
+        "id": "low_strength",
+        "name": "Low strength",
+        "type": "integer",
+        "defval": 5,
+        "min": 1,
+        "max": 500,
+        "display": 15,
+        "localizedName": "Low strength"
+      },
+      {
+        "id": "hh_source",
+        "name": "HH source",
+        "type": "text",
+        "defval": "high",
+        "options": [
+          "high"
+        ],
+        "display": 15,
+        "localizedName": "HH source"
+      },
+      {
+        "id": "ll_source",
+        "name": "LL source",
+        "type": "text",
+        "defval": "low",
+        "options": [
+          "low"
+        ],
+        "display": 15,
+        "localizedName": "LL source"
+      },
+      {
+        "id": "show_average_spacing",
+        "name": "显示平均间隔",
+        "type": "bool",
+        "defval": true,
+        "isHidden": false,
+        "display": 0,
+        "localizedName": "显示平均间隔"
+      },
+      {
+        "id": "statistics_position",
+        "name": "统计位置",
+        "type": "text",
+        "defval": "below_name",
+        "options": [
+          "below_name",
+          "bottom_left"
+        ],
+        "isHidden": false,
+        "display": 0,
+        "localizedName": "统计位置"
+      }
+    ]
+  },
+  "studies": [
+    {
+      "name": "守望 Python SWING_SR_V1",
+      "values": [
+        {
+          "id": "high_strength",
+          "value": 3
+        },
+        {
+          "id": "low_strength",
+          "value": 7
+        },
+        {
+          "id": "hh_source",
+          "value": "high"
+        },
+        {
+          "id": "ll_source",
+          "value": "low"
+        },
+        {
+          "id": "show_average_spacing",
+          "value": true
+        },
+        {
+          "id": "statistics_position",
+          "value": "below_name"
+        }
+      ]
+    },
+    {
+      "name": "守望 Python MACD",
+      "values": [
+        {
+          "id": "fast",
+          "value": 19
+        },
+        {
+          "id": "slow",
+          "value": 35
+        },
+        {
+          "id": "signal",
+          "value": 11
+        }
+      ]
+    }
+  ],
+  "scope": "Real merged app/API/PG/native template/workspace; synthetic task price cache. No upstream, worker alert decision or notification claim."
+}

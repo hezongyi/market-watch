@@ -124,6 +124,7 @@ export type Capabilities = {
   }[];
   modes: string[];
   indicators: string[];
+  indicator_metadata?: Record<string, {label:string;parameter_schema:Record<string,{label?:string;min:number;max:number;type:string}>;series:{key:string;label?:string;type:string}[]}>;
   line_mapping: string;
 };
 export const statuses: Record<string, string> = {

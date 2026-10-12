@@ -57,6 +57,8 @@ mw-docker retire --task mw-issue42 --project mw-issue42 --apply
 
 共享卷、外部卷、非PG卷、bind数据库和外部数据库需要单独审查，不自动删除。验证失败保留卷；删除容器前失败会尝试重启原先运行的容器。归档位于`~/.local/share/market-watch-docker/archives/`，权限0700；包含角色凭据及env，严禁提交仓库。
 
+项目名含 `production` 时默认拒绝退役，防止误选正式项目。若确认只是命名含该词的隔离验收任务，预览及 apply 都需追加 `--confirm-acceptance-project EXACT_NAME`，其值必须与 task、project 完全一致；登记用途仍须为 acceptance，镜像归属、共享资源和数据库恢复校验全部照常执行。此参数不允许正式／回滚镜像或跨任务生产依赖。
+
 纯构建任务没有容器时：
 
 ```bash
