@@ -442,6 +442,11 @@ def _runtime_rules(db, moment):
         if audit:
             row["checked_at"] = row["audit"]["reviewed_at"]
             row["review_due_at"] = row["audit"]["review_due_at"]
+            # Applicability was checked by session_status; review deadlines
+            # only affect maintenance state and cannot certify unknown minutes.
+            if row["runtime_status"] == "verified":
+                row["runtime_status"] = effective_rule_status({
+                    "status": "verified", "review_due_at": row["review_due_at"]}, as_of=moment)
         rules.append(row)
         for generic in rules[:-1]:
             if generic["source"] == source and not generic.get("row_id"):

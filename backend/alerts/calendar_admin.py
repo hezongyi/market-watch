@@ -167,10 +167,10 @@ def main():
         parser.error("--record-review requires --apply and all four review fields")
     with transaction() as db:
         data = json.loads(args.file.read_text()) if args.file else None
-        report = (apply_profile(db, args.instrument, data, apply=args.apply) if data else
+        report = (apply_profile(db, args.instrument, data, apply=args.apply) if args.file else
                   {"review_recorded": True, "revision": args.record_review})
         if all(review):
-            record_review(db, args.instrument, revision=data["revision"] if data else args.record_review,
+            record_review(db, args.instrument, revision=data["revision"] if args.file else args.record_review,
                 reviewer=args.reviewer, method=args.review_method,
                 evidence_version=args.evidence_version, review_due_at=args.review_due)
     # Report success only after the audit transaction committed.
