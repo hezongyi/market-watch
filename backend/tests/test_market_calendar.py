@@ -296,3 +296,28 @@ def test_calendar_keeps_native_price_parameters_but_deduplicates_periods(databas
     assert {row["price_basis"] for row in native} == {"bid", "ask"}
     assert len([row for row in native if row["native_parameters"]["smooth"]]) == 1
     assert all(row["market_session"] == "unknown" for row in native)
+
+
+def test_calendar_preserves_catalog_and_instrument_with_same_identifier(database):
+    from alerts import history_api
+    from alerts.storage import Instrument, MarketCatalog
+    from fastapi import FastAPI
+    from fastapi.testclient import TestClient
+
+    with database.begin() as db:
+        db.add(Instrument(id="yahoo:AAPL", label="Adjusted AAPL", source="yahoo", symbol="AAPL",
+            basis="adjusted", calendar="utc0", precision=2))
+        db.add(MarketCatalog(id="yahoo:AAPL", source="yahoo", symbol="AAPL", label="AAPL",
+            asset_type="stock", calendar="utc0", precision=2))
+
+    app = FastAPI()
+    app.include_router(history_api.router(lambda: "test"))
+    with TestClient(app) as client:
+        response = client.get("/api/market-data/center/calendars", params={"source": "yahoo", "query": "AAPL"})
+    assert response.status_code == 200
+    rows = response.json()["items"]
+    assert len(rows) == 2
+    assert len({row["row_id"] for row in rows}) == 2
+    assert any("catalog:yahoo:AAPL" in row["row_id"] for row in rows)
+    assert {row["price_basis"] for row in rows} == {"adjusted", "last"}
+    assert all(row["audit"] is None and row["status"] == "unverified" for row in rows)

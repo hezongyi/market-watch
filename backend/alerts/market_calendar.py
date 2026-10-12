@@ -364,7 +364,7 @@ def _runtime_rules(db, moment):
                 "provider_symbol": entry.symbol, "account_scope": entry.metadata_json["history_account_scope"]}
         key = scope_key(entry.source, entry.symbol, meta)
         if key not in seen_scopes:
-            instruments.append((entry.source, entry.symbol, entry.id, meta))
+            instruments.append((entry.source, entry.symbol, "catalog:" + entry.id, meta))
             seen_scopes.add(key)
     cached_scopes = set()
     for cached in db.scalars(select(ProviderDataset)):
@@ -389,7 +389,8 @@ def _runtime_rules(db, moment):
                 .order_by(Audit.at.desc(), Audit.id.desc())):
             details = audit.details
             audits.setdefault((details.get("instrument"), details.get("revision")), audit)
-    for source, symbol, scope_id, meta in sorted(instruments):
+    # Catalog and instrument IDs can coincide while describing distinct price scopes.
+    for source, symbol, scope_id, meta in sorted(instruments, key=lambda item: item[:3]):
         base = _RULE_BY_SOURCE.get(source)
         if base is None:
             continue
