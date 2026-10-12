@@ -1,0 +1,214 @@
+{
+  "passed": true,
+  "at": 1791810520367,
+  "environment": "unraid formal production",
+  "services": [
+    {
+      "service": "api",
+      "image_id": "sha256:f9c1be033ac0bfdd058cea7415237c627293a451ad71addf48fe114e7d5468f3",
+      "running": true,
+      "restart_count": 0,
+      "health": "healthy",
+      "source_commit": "463b863482a908c3d7317f5e191e4f291f1a6d4a",
+      "purpose": "release"
+    },
+    {
+      "service": "pricing-worker",
+      "image_id": "sha256:f9c1be033ac0bfdd058cea7415237c627293a451ad71addf48fe114e7d5468f3",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "463b863482a908c3d7317f5e191e4f291f1a6d4a",
+      "purpose": "release"
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "image_id": "sha256:f9c1be033ac0bfdd058cea7415237c627293a451ad71addf48fe114e7d5468f3",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "463b863482a908c3d7317f5e191e4f291f1a6d4a",
+      "purpose": "release"
+    },
+    {
+      "service": "chart-history-worker",
+      "image_id": "sha256:f9c1be033ac0bfdd058cea7415237c627293a451ad71addf48fe114e7d5468f3",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "463b863482a908c3d7317f5e191e4f291f1a6d4a",
+      "purpose": "release"
+    },
+    {
+      "service": "history-worker",
+      "image_id": "sha256:f9c1be033ac0bfdd058cea7415237c627293a451ad71addf48fe114e7d5468f3",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "463b863482a908c3d7317f5e191e4f291f1a6d4a",
+      "purpose": "release"
+    },
+    {
+      "service": "composite-aggregate-worker",
+      "image_id": "sha256:f9c1be033ac0bfdd058cea7415237c627293a451ad71addf48fe114e7d5468f3",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "463b863482a908c3d7317f5e191e4f291f1a6d4a",
+      "purpose": "release"
+    },
+    {
+      "service": "native-history-worker",
+      "image_id": "sha256:f9c1be033ac0bfdd058cea7415237c627293a451ad71addf48fe114e7d5468f3",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "463b863482a908c3d7317f5e191e4f291f1a6d4a",
+      "purpose": "release"
+    },
+    {
+      "service": "realtime-worker",
+      "image_id": "sha256:f9c1be033ac0bfdd058cea7415237c627293a451ad71addf48fe114e7d5468f3",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "463b863482a908c3d7317f5e191e4f291f1a6d4a",
+      "purpose": "release"
+    },
+    {
+      "service": "notify-worker",
+      "image_id": "sha256:f9c1be033ac0bfdd058cea7415237c627293a451ad71addf48fe114e7d5468f3",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "463b863482a908c3d7317f5e191e4f291f1a6d4a",
+      "purpose": "release"
+    },
+    {
+      "service": "market-stream-worker",
+      "image_id": "sha256:f9c1be033ac0bfdd058cea7415237c627293a451ad71addf48fe114e7d5468f3",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "463b863482a908c3d7317f5e191e4f291f1a6d4a",
+      "purpose": "release"
+    },
+    {
+      "service": "web",
+      "image_id": "sha256:9f9045124047171fac1db208692d6f17c062997cc9f5b8835be166ba4f257c46",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "463b863482a908c3d7317f5e191e4f291f1a6d4a",
+      "purpose": "release"
+    },
+    {
+      "service": "chart-origin",
+      "image_id": "sha256:35d95c4a64834bf24552be8632b48aef371444ea33827df494d01799b4789d39",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "463b863482a908c3d7317f5e191e4f291f1a6d4a",
+      "purpose": "release"
+    }
+  ],
+  "actual_settings": [
+    {
+      "service": "api",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": true,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "pricing-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": true,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "chart-history-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "history-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "composite-aggregate-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "native-history-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "realtime-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "notify-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "market-stream-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    }
+  ],
+  "readyz": {
+    "status": "ready",
+    "time": 1791810516093
+  },
+  "http_status": {
+    "https://trade.kookvv.com:8443/": "200",
+    "https://charts.kookvv.com:8443/": "200"
+  },
+  "api_version": "1.23.0",
+  "schema": "ar45_market_stream",
+  "workspace_and_saved_alert_configuration_and_account_notification_preserved": true,
+  "alert_mutable_execution_fields_excluded": [
+    "health_reason",
+    "runtime"
+  ],
+  "password_change_events_added": 0,
+  "notification_test_events_added": 0
+}

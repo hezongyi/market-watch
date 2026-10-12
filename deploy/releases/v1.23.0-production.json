@@ -1,0 +1,188 @@
+{
+  "version": "1.23.0",
+  "tag": "v1.23.0",
+  "commit": "463b863482a908c3d7317f5e191e4f291f1a6d4a",
+  "pr": 52,
+  "host": "unraid-aio",
+  "address": "192.168.7.33",
+  "production_root": "/mnt/user/appdata/market-watch",
+  "active_release": "releases/v1.23.0-463b863",
+  "images": {
+    "market-watch-api:v1.23.0": {
+      "production_id": "sha256:f9c1be033ac0bfdd058cea7415237c627293a451ad71addf48fe114e7d5468f3",
+      "ubuntu_id": "sha256:e58f9a951e00ed9b816632b91a760e77bb476c9b6c000058544af58a54d2730b",
+      "rootfs_matches_ubuntu": true,
+      "effective_config_matches_ubuntu": true,
+      "legacy_empty_config_fields": [
+        "AttachStderr",
+        "AttachStdin",
+        "AttachStdout",
+        "Domainname",
+        "Hostname",
+        "Image",
+        "OpenStdin",
+        "StdinOnce",
+        "Tty"
+      ],
+      "diff_ids": [
+        "sha256:34467cc93912af891dfee8a3902adf9b4f355a9bca4eaa46f658d1181a21de0d",
+        "sha256:b3445de4503d21b3ebc42db2f284bc6c8ad96184ea91ce55fb57f5e87910e1f2",
+        "sha256:546c86e4df2dc808fcf1953c346bfeef32f4c953933634d57c1d38730b750e9c",
+        "sha256:6b6ff8eb9da6c277f4b33452c77d59f8b5ff04e0bcca1a3054570b9db343da79",
+        "sha256:4c26d5ab76a91c6629679e9f7bb38dbc0ddbe3f33c6357ce2391eddb18f864aa",
+        "sha256:6e4f6f90f0e22588121cd0f97da665fa1260c1620a4aac4292bda398de71bc52",
+        "sha256:274fb8c406db8a49f5b926671af130179d8375d941fee0a3733a2cc5a1d16936",
+        "sha256:ac6fd77446797ebed45b19842dcbae35adf87e22e2b87acd3df65a936c1f1d77",
+        "sha256:d37db1c29e9b6ec29bb4dee49592ee50af1f42e0655eaf55a303cfb9948f18b1",
+        "sha256:d9458798d3604892477424753a132f4ec0f160af732be595be6f03bf38df7c0b",
+        "sha256:c342556fc8aa1838061ac502033df6d757c0202f423c9356c9be2efc9cad8c5b",
+        "sha256:0bec9cea2d7e50b46a3580c8454f67e7a49cefdabcda9d4318f085debd69293e",
+        "sha256:d2f215c6d9f572d6a43ba21a31cd880ad3f78193bd4cfeef30696d84a5c88ee8",
+        "sha256:d9fe72295b2083b3ffd8ae0d91046367b33f0b1794abbcb2a86d94b05350947d",
+        "sha256:7e824c9fecb76ed23ba4dc2dea0db9cc1d463764736d159bb21181f67c5004f8",
+        "sha256:0fe2ea6daf5a500eefb799c0ff1baa05510e17e8c37608bf51eb3e030d9622e5"
+      ],
+      "labels": {
+        "io.market-watch.built-at": "2026-10-12T12:19:51.907249+00:00",
+        "io.market-watch.commit": "463b863482a908c3d7317f5e191e4f291f1a6d4a",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-v1230-release-build",
+        "io.market-watch.purpose": "release",
+        "io.market-watch.task": "mw-v1230-release-20261012"
+      }
+    },
+    "market-watch-web:v1.23.0": {
+      "production_id": "sha256:9f9045124047171fac1db208692d6f17c062997cc9f5b8835be166ba4f257c46",
+      "ubuntu_id": "sha256:9502e1f536eebfe0e7e9f13472fad73006452bdec32417d7c97ce6b77f54c971",
+      "rootfs_matches_ubuntu": true,
+      "effective_config_matches_ubuntu": true,
+      "legacy_empty_config_fields": [
+        "AttachStderr",
+        "AttachStdin",
+        "AttachStdout",
+        "Domainname",
+        "Hostname",
+        "Image",
+        "OpenStdin",
+        "StdinOnce",
+        "Tty",
+        "User"
+      ],
+      "diff_ids": [
+        "sha256:989e799e634906e94dc9a5ee2ee26fc92ad260522990f26e707861a5f52bf64e",
+        "sha256:a2738b08d7114c9d5581dd5482d3b5cc297fcf73b8d330c3ba38d24c43939119",
+        "sha256:47a53288c3ef0ee51df84ef47d217f18c1762412532fded9af1fd88ecee14294",
+        "sha256:9e707aa6db4786355904a1b794c80f378b690f8f0384af56117708a23a91f1da",
+        "sha256:a3446cc6c821fa11b704a45811ab554675f0327307af71b3f4ff5a70c7a4eec8",
+        "sha256:42608b42cb5e68548abf1c71aa851acfd65816d0ceaff6ee85849c7c478463f0",
+        "sha256:53c769b49ca0a2f0f6cf5e4a807af8933cec6cde9302d56d91a78bc38ea407a8",
+        "sha256:f76f397f2ce6b266573b70eb60ef1335e9984a1941eedd2a3505af4870c3afa0",
+        "sha256:c8501c3cf9d700f2b7b2ec746b312efc7ee68041304ba582bafe7cd50b11d32a",
+        "sha256:8e444b84b905bfd811880d8d707092219ba602b0a61d54782c2aa1ec12a816a5"
+      ],
+      "labels": {
+        "io.market-watch.built-at": "2026-10-12T12:21:33.707421+00:00",
+        "io.market-watch.commit": "463b863482a908c3d7317f5e191e4f291f1a6d4a",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-v1230-release-build",
+        "io.market-watch.purpose": "release",
+        "io.market-watch.task": "mw-v1230-release-20261012",
+        "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+      }
+    },
+    "market-watch-chart-origin:v1.23.0": {
+      "production_id": "sha256:35d95c4a64834bf24552be8632b48aef371444ea33827df494d01799b4789d39",
+      "ubuntu_id": "sha256:6ed27617083af1e23499b16828b396be93883cc099eed68af3e0c6da384fe0b9",
+      "rootfs_matches_ubuntu": true,
+      "effective_config_matches_ubuntu": true,
+      "legacy_empty_config_fields": [
+        "AttachStderr",
+        "AttachStdin",
+        "AttachStdout",
+        "Domainname",
+        "Hostname",
+        "Image",
+        "OpenStdin",
+        "StdinOnce",
+        "Tty",
+        "User"
+      ],
+      "diff_ids": [
+        "sha256:989e799e634906e94dc9a5ee2ee26fc92ad260522990f26e707861a5f52bf64e",
+        "sha256:a2738b08d7114c9d5581dd5482d3b5cc297fcf73b8d330c3ba38d24c43939119",
+        "sha256:47a53288c3ef0ee51df84ef47d217f18c1762412532fded9af1fd88ecee14294",
+        "sha256:9e707aa6db4786355904a1b794c80f378b690f8f0384af56117708a23a91f1da",
+        "sha256:a3446cc6c821fa11b704a45811ab554675f0327307af71b3f4ff5a70c7a4eec8",
+        "sha256:42608b42cb5e68548abf1c71aa851acfd65816d0ceaff6ee85849c7c478463f0",
+        "sha256:53c769b49ca0a2f0f6cf5e4a807af8933cec6cde9302d56d91a78bc38ea407a8",
+        "sha256:f76f397f2ce6b266573b70eb60ef1335e9984a1941eedd2a3505af4870c3afa0",
+        "sha256:12f49446f2e7ca671362f89617b53c593f7c7ea8d8ba523dc2e8b4f7953faa50",
+        "sha256:1143bd60ce68dfc8fe9818ea28159c4a52b8a48a0b23aaeec3031f2366d97d9e",
+        "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"
+      ],
+      "labels": {
+        "io.market-watch.built-at": "2026-10-12T12:22:08.805322+00:00",
+        "io.market-watch.commit": "463b863482a908c3d7317f5e191e4f291f1a6d4a",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-v1230-release-build",
+        "io.market-watch.purpose": "release",
+        "io.market-watch.task": "mw-v1230-release-20261012",
+        "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+      }
+    },
+    "market-watch-backup:v1.23.0": {
+      "production_id": "sha256:b9e6d56330d4a4ebe7058a07a00b0a003b2063415f6fd7c8e07b999d2fa281aa",
+      "ubuntu_id": "sha256:75b4b48b48a098715adb4710dd36c04369c8709986895481bfadac40319a220c",
+      "rootfs_matches_ubuntu": true,
+      "effective_config_matches_ubuntu": true,
+      "legacy_empty_config_fields": [
+        "AttachStderr",
+        "AttachStdin",
+        "AttachStdout",
+        "Domainname",
+        "Hostname",
+        "Image",
+        "OpenStdin",
+        "StdinOnce",
+        "Tty"
+      ],
+      "diff_ids": [
+        "sha256:34467cc93912af891dfee8a3902adf9b4f355a9bca4eaa46f658d1181a21de0d",
+        "sha256:b3445de4503d21b3ebc42db2f284bc6c8ad96184ea91ce55fb57f5e87910e1f2",
+        "sha256:546c86e4df2dc808fcf1953c346bfeef32f4c953933634d57c1d38730b750e9c",
+        "sha256:6b6ff8eb9da6c277f4b33452c77d59f8b5ff04e0bcca1a3054570b9db343da79",
+        "sha256:4c26d5ab76a91c6629679e9f7bb38dbc0ddbe3f33c6357ce2391eddb18f864aa",
+        "sha256:6e4f6f90f0e22588121cd0f97da665fa1260c1620a4aac4292bda398de71bc52",
+        "sha256:274fb8c406db8a49f5b926671af130179d8375d941fee0a3733a2cc5a1d16936",
+        "sha256:ac6fd77446797ebed45b19842dcbae35adf87e22e2b87acd3df65a936c1f1d77",
+        "sha256:d37db1c29e9b6ec29bb4dee49592ee50af1f42e0655eaf55a303cfb9948f18b1",
+        "sha256:d9458798d3604892477424753a132f4ec0f160af732be595be6f03bf38df7c0b",
+        "sha256:c342556fc8aa1838061ac502033df6d757c0202f423c9356c9be2efc9cad8c5b",
+        "sha256:0bec9cea2d7e50b46a3580c8454f67e7a49cefdabcda9d4318f085debd69293e",
+        "sha256:d2f215c6d9f572d6a43ba21a31cd880ad3f78193bd4cfeef30696d84a5c88ee8",
+        "sha256:d9fe72295b2083b3ffd8ae0d91046367b33f0b1794abbcb2a86d94b05350947d",
+        "sha256:7e824c9fecb76ed23ba4dc2dea0db9cc1d463764736d159bb21181f67c5004f8",
+        "sha256:0fe2ea6daf5a500eefb799c0ff1baa05510e17e8c37608bf51eb3e030d9622e5",
+        "sha256:38acc11262e9c7b82bff69e27777d2bef838f0d7d189b4ad19c9bfa6a2763a2b",
+        "sha256:f7015cacd436fecfbf99d2174c654f6456d7dfd2dbcb436d5b56dd119330d969",
+        "sha256:4a24f9cc27a3630f8e613931e23d5a22a700470f37538bb220dd663731ef3027"
+      ],
+      "labels": {
+        "io.market-watch.built-at": "2026-10-12T12:22:32.359096+00:00",
+        "io.market-watch.commit": "463b863482a908c3d7317f5e191e4f291f1a6d4a",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-v1230-release-build",
+        "io.market-watch.purpose": "release",
+        "io.market-watch.task": "mw-v1230-release-20261012"
+      }
+    }
+  }
+}

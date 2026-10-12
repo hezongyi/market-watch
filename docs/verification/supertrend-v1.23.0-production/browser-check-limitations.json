@@ -1,0 +1,12 @@
+{
+  "scope": "Ubuntu Chromium against real production with market requests unchanged; workspace/preference writes intercepted in browser only",
+  "observed_harness_issues": [
+    "initial readiness predicate used unguarded ready variable",
+    "legacy read allowlist omitted native history-load requests",
+    "native settings remembers last selected tab; input tab selected explicitly",
+    "raw widget.load from single-chart verification back to five-chart snapshot triggered vendor Value is null in refreshCharts; server reload used to restore saved workspace"
+  ],
+  "raw_widget_layout_reconstruction_not_accepted_as_passed": true,
+  "no_production_workspaces_saved": true,
+  "no_real_notification_test_or_password_change": true
+}
