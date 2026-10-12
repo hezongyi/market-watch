@@ -1,0 +1,64 @@
+{
+  "environment": "Ubuntu task-owned Docker mw-pending-fixes-20261013; actual native host, data-center and HTTP",
+  "passed": true,
+  "checks": [
+    "native drawing template UI save/apply with real persisted preferences preserves non-contiguous mask",
+    "native drawing range controls in Docker",
+    "non-contiguous mask survives persisted drawing property template",
+    "repeat acceptance correctly reaches the three-read quota; no new source read",
+    "real composite list detail/focus",
+    "real Docker detail at widths 1600/1250/980/720 in light/dark",
+    "source-recheck form through real HTTP and audited provider configuration failure",
+    "failed source response preserves unknown",
+    "non-modal right-bottom notice in deployed host"
+  ],
+  "geometry": {
+    "main": 440,
+    "row": 560,
+    "overflow": false,
+    "mode": "side"
+  },
+  "responsive": [
+    {
+      "theme": "Light",
+      "width": 1600,
+      "mode": "side"
+    },
+    {
+      "theme": "Light",
+      "width": 1250,
+      "mode": "side"
+    },
+    {
+      "theme": "Light",
+      "width": 980,
+      "mode": "full"
+    },
+    {
+      "theme": "Light",
+      "width": 720,
+      "mode": "full"
+    },
+    {
+      "theme": "Dark",
+      "width": 1600,
+      "mode": "side"
+    },
+    {
+      "theme": "Dark",
+      "width": 1250,
+      "mode": "side"
+    },
+    {
+      "theme": "Dark",
+      "width": 980,
+      "mode": "full"
+    },
+    {
+      "theme": "Dark",
+      "width": 720,
+      "mode": "full"
+    }
+  ],
+  "errors": []
+}

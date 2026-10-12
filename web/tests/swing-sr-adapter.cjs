@@ -22,6 +22,20 @@ assert.deepEqual(Array.from(Object.values(swing.metainfo.defaults.styles),s=>s.p
 assert.deepEqual(Array.from(Object.values(swing.metainfo.defaults.styles),s=>s.color),['#f23645','#f23645','#00bcd4','#00bcd4']);
 assert.ok(Object.values(swing.metainfo.defaults.styles).every(s=>s.joinPoints===false));
 const cfg=swing.metainfo.inputs;
+for (const saved of [undefined, 'below_name', 'bottom_left']) {
+  const repaired=[];
+  const input={high_strength:3,low_strength:7,hh_source:'high',ll_source:'low',show_average_spacing:false,
+    ...(saved ? {statistics_position:saved} : {})};
+  const api={getInputValues:()=>Object.entries(input).map(([id,value])=>({id,value})),
+    setInputValues:rows=>repaired.push(...rows)};
+  context.savedStudy=api;
+  const display=vm.runInContext('swingDisplayInputs(savedStudy)',context);
+  assert.equal(display.position,'bottom_left');
+  assert.equal(display.show,false,'migration must preserve a hidden statistic');
+  assert.equal(display.params.high_strength,3);
+  assert.equal(display.params.low_strength,7);
+  assert.deepEqual(JSON.parse(JSON.stringify(repaired)),saved==='bottom_left'?[]:[{id:'statistics_position',value:'bottom_left'}]);
+}
 assert.equal(cfg.find(i=>i.id==='high_strength').name,'High strength');
 assert.equal(cfg.find(i=>i.id==='low_strength').name,'Low strength');
 const macd=studies.find(item=>item.name==='守望 Python MACD');

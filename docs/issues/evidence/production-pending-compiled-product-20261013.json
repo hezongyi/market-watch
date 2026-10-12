@@ -1,0 +1,27 @@
+{
+  "environment": "Ubuntu Chromium; routed compiled host, Python fixtures, no Docker/backend deployment",
+  "passed": true,
+  "checks": [
+    "actual bridge boot and datafeed",
+    "batched multi-output Python reads",
+    "hide/show demand release and recovery",
+    "SuperTrend display inputs",
+    "study template restore",
+    "parameter generation",
+    "D1/M5 switch",
+    "left pagination",
+    "ordinary tail append without blank/reset",
+    "input correction withdraws before recompute",
+    "tail retraction through market reset",
+    "five panes",
+    "saved workspace reload"
+  ],
+  "requestCount": 36,
+  "indicatorReadCount": 19,
+  "stateCounts": {
+    "preparing": 109,
+    "ready": 70,
+    "error": 0,
+    "removed": 56
+  }
+}

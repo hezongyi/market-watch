@@ -29,12 +29,92 @@ const MWDrawingVisibilityAdapter = (() => {
         const legacyMask = children => resolutions.reduce((mask, resolution, index) => mask |
           (require(722618).isActualInterval(require(738318).Interval.parse(resolution),
             {childs:()=>({...children,mwMask:undefined})}) ? 1 << index : 0), 0);
+        const rangeDefinitions = (children,model) => {
+          const definitions=require(937298),Text=require(411227).TranslatedString;
+          const Collected=require(956879).LineToolCollectedProperty;
+          const UndoWrapper=require(614807).CollectiblePropertyUndoWrapper;
+          const WatchedValue=require(963325).WatchedValue;
+          const objects=children.mwMask.map((_,i)=>Object.fromEntries(
+            Object.entries(children).map(([key,values])=>[key,values[i]])));
+          const maskAt=i=>valid(objects[i].mwMask.value()) ? objects[i].mwMask.value() : legacyMask(objects[i]);
+          const categories=[
+            {key:'minutes',title:'分钟',indices:[0,1,2,3],values:[1,5,15,30],max:59},
+            {key:'hours',title:'小时',indices:[4,5],values:[1,4],max:24},
+            {key:'days',title:'天',indices:[6],values:[1],max:366},
+            {key:'weeks',title:'周',indices:[7],values:[1],max:52},
+            {key:'months',title:'月',indices:[8],values:[1],max:12},
+          ];
+          const apply=(applier,property,value)=>{
+            if(property.value()===value)return;
+            if(applier)applier.applyValue(property,value);else property.setValue(value);
+          };
+          const bounds=(i,category)=>{
+            const object=objects[i],mask=maskAt(i);
+            const values=category.values.filter((_,j)=>mask & (1 << category.indices[j]));
+            const from=object[category.key+'From'].value(),to=object[category.key+'To'].value();
+            const raw=object[category.key].value() ? category.values.filter(n=>n>=from && n<=to) : [];
+            if(values.length===raw.length && values.every((n,j)=>n===raw[j]))
+              return {checked:object[category.key].value(),from,to};
+            return {checked:values.length>0,
+              from:values.length ? Math.min(...values) : object[category.key+'From'].value(),
+              to:values.length ? Math.max(...values) : object[category.key+'To'].value()};
+          };
+          return categories.flatMap(category=>{
+            const property=field=>{
+              class RangeCollection extends Collected {
+                constructor(){super(objects.flatMap(object=>[object.mwMask,object[category.key],
+                  object[category.key+'From'],object[category.key+'To']]));}
+                value(){
+                  const values=objects.map((_,i)=>bounds(i,category)[field]);
+                  return values.every(value=>value===values[0]) ? values[0] : 'mixed';
+                }
+                setValue(value,unused,applier){
+                  if(value==='mixed')return;
+                  objects.forEach((object,i)=>{
+                    if(bounds(i,category)[field]===value)return;
+                    const mask=maskAt(i),state={...bounds(i,category),[field]:value};
+                    // Raw bounds and the effective mask share the native undo
+                    // transaction. Opening or undoing never expands a mask.
+                    apply(applier,object[category.key],state.checked);
+                    apply(applier,object[category.key+'From'],state.from);
+                    apply(applier,object[category.key+'To'],state.to);
+                    const bits=category.indices.reduce((mask,index)=>mask | (1 << index),0);
+                    const selected=category.values.reduce((mask,n,j)=>mask |
+                      (state.checked && n>=state.from && n<=state.to ? 1 << category.indices[j] : 0),0);
+                    apply(applier,object.mwMask,(mask & ~bits) | selected);
+                  });
+                }
+              }
+              return new UndoWrapper(new RangeCollection(),new Text('change drawing range',`修改绘图${category.title}范围`),model);
+            };
+            class SelectionStatus extends Collected {
+              constructor(){super(objects.flatMap(object=>[object.mwMask,object[category.key],
+                object[category.key+'From'],object[category.key+'To']]));}
+              value(){
+                const states=objects.map((_,i)=>{
+                  const mask=maskAt(i),state=bounds(i,category);
+                  const selected=category.values.filter((_,j)=>mask & (1 << category.indices[j]));
+                  if(!selected.length)return state.checked ? '该范围没有可用的已选周期' : '未选择周期';
+                  const continuous=category.values.filter(n=>n>=selected[0] && n<=selected.at(-1));
+                  return (selected.length!==continuous.length ? '自定义周期：' : '已选周期：')+
+                    category.indices.filter(index=>mask & (1 << index)).map(index=>labels[index]).join('、');
+                });
+                return states.every(state=>state===states[0]) ? states[0] : '混合周期';
+              }
+              setValue(){} // Native read-only text; effective values belong to mwMask.
+            }
+            return [definitions.createRangePropertyDefinition({checked:property('checked'),from:property('from'),to:property('to')},
+              {id:'MWDrawingRange'+category.key,title:category.title,min:new WatchedValue(1),max:new WatchedValue(category.max)}),
+              definitions.createTextPropertyDefinition({text:new SelectionStatus()},
+                {id:'MWDrawingSelection'+category.key,title:'',isEditable:false})];
+          });
+        };
         module.exports = {...native, getIntervalsVisibilitiesPropertiesDefinitions(model, children, title) {
           // The shared definitions module also serves studies; preserve them.
           if (!children.mwMask) return native.getIntervalsVisibilitiesPropertiesDefinitions(model, children, title);
           const definitions = require(937298);
           const Text = require(411227).TranslatedString;
-          return {definitions: labels.map((label, index) => {
+          return {definitions: [...rangeDefinitions(Object.fromEntries(Object.entries(children).map(([key,value])=>[key,[value]])),model), ...labels.map((label, index) => {
             const bit = 1 << index;
             const read = mask => !!((valid(mask) ? mask : legacyMask(children)) & bit);
             const write = checked => {
@@ -44,14 +124,14 @@ const MWDrawingVisibilityAdapter = (() => {
             const checked = definitions.convertToDefinitionProperty(model, children.mwMask,
               new Text(`change drawing visibility on ${label}`, `修改绘图在 ${label} 的可见性`), [read,write]);
             return definitions.createCheckablePropertyDefinition({checked}, {id:`MWDrawingVisibility${label}`,title:label});
-          })};
+          })]};
         }, getSelectionIntervalsVisibilitiesPropertiesDefinition(children, model) {
           if (!children.mwMask?.length)
             return native.getSelectionIntervalsVisibilitiesPropertiesDefinition(children, model);
           const definitions = require(937298), Text = require(411227).TranslatedString;
           const Collected = require(956879).LineToolCollectedProperty;
           const UndoWrapper = require(614807).CollectiblePropertyUndoWrapper;
-          return {definitions: labels.map((label, index) => {
+          return {definitions: [...rangeDefinitions(children,model), ...labels.map((label, index) => {
             const bit = 1 << index, properties = children.mwMask;
             const maskAt = i => {
               const value = properties[i].value();
@@ -78,7 +158,7 @@ const MWDrawingVisibilityAdapter = (() => {
             const checked = new UndoWrapper(new PeriodCollection(properties),
               new Text(`change drawing visibility on ${label}`, `修改绘图在 ${label} 的可见性`), model);
             return definitions.createCheckablePropertyDefinition({checked}, {id:`MWDrawingVisibility${label}`,title:label});
-          })};
+          })]};
         }};
       }
       adapted.mwDrawingVisibility = true;

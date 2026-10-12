@@ -208,7 +208,7 @@ METADATA = {
             "id": "statistics_position",
             "name": "统计位置",
             "type": "text",
-            "default": "below_name",
+            "default": "bottom_left",
             "options": ["below_name", "bottom_left"],
         },
     ],

@@ -17,6 +17,8 @@ COPY advanced-host/swing-sr-display.js advanced-host/study-templates.js ./
 COPY advanced-host/native-ui.js advanced-host/native-indicator-dialog.js ./
 COPY advanced-host/patch-native-toolset.mjs ./
 COPY advanced-host/native-alert-shell.js ./
+COPY advanced-host/chart-notices.js ./
+COPY advanced-host/native-indicator-results.js advanced-host/indicator-coordinator.js ./
 COPY --from=alert-ui /alert-ui/ ./
 ARG NATIVE_RESERVE_ENABLED=true
 ENV NATIVE_RESERVE_ENABLED=${NATIVE_RESERVE_ENABLED}

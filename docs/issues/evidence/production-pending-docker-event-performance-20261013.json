@@ -1,0 +1,814 @@
+{
+  "environment": "Ubuntu task-owned Docker mw-pending-fixes-20261013, loopback HTTP, actual PostgreSQL/Python, same synthetic M5 source; indicatorSet reported per sample",
+  "limitations": [
+    "fresh browser context per sample; backend cache remains warm/resident",
+    "first valid data/next animation frames are not paint timestamps; optional firstIndicatorPixelMs polls actual canvas pixels in large plot canvases after temporary magenta line overrides; scans add CPU/heap overhead, so pixel-run timings and heap are not directly comparable to uninstrumented runs",
+    "CDP task/script/layout metrics include the renderer and parent UI",
+    "heap samples cover the browser frame, not backend memory",
+    "optional acceptance wrapper SQL spans include driver/roundtrip; calculation CPU is thread CPU, backend span excludes final body transfer; sums can overlap concurrent reads",
+    "optional pagination timings wait for actual main-history extension and all indicator first times to align; page/sample sizes reported; source size and maximum page count are configurable, only completed extensions contribute",
+    "repetitions reported per sample; no claimed performance ratio or full stage-D completion",
+    "All 9 final samples use resident API/PG processes; counts 1,4,8 repeated three times, 5 pages each. No restart was performed before these cells; compare with historical matrix cautiously. HTTP request starts, failures and unsettled counts are separate from requestfinished metrics."
+  ],
+  "measurements": [
+    {
+      "lane": "new-python",
+      "count": 1,
+      "indicatorSet": [
+        "LWMA period5 repeated 1"
+      ],
+      "paginationSamples": [
+        {
+          "ms": 1340,
+          "barsBefore": 1186,
+          "barsAfter": 2356
+        },
+        {
+          "ms": 1035,
+          "barsBefore": 2356,
+          "barsAfter": 3760
+        },
+        {
+          "ms": 1377,
+          "barsBefore": 3760,
+          "barsAfter": 5164
+        },
+        {
+          "ms": 1080,
+          "barsBefore": 5164,
+          "barsAfter": 5966
+        },
+        {
+          "ms": 937,
+          "barsBefore": 5966,
+          "barsAfter": 7170
+        }
+      ],
+      "paginationP50Ms": 1080,
+      "paginationP95Ms": 1377,
+      "firstIndicatorPixelMs": 1297,
+      "firstValidDataMs": 1219,
+      "allValidDataMs": 1219,
+      "nextAnimationFramesMs": 1412,
+      "cachedNavigationP50Ms": 38,
+      "cachedNavigationP95Ms": 98,
+      "emptyDataFrames": 0,
+      "cachedEmptyDataFrames": 0,
+      "paginationEmptyDataFrames": 0,
+      "chartResets": 0,
+      "peakJsHeapBytes": null,
+      "peakCdpJsHeapBytes": 74181692,
+      "cdpHeapSamples": 81,
+      "TaskDurationSeconds": 4.603422,
+      "ScriptDurationSeconds": 2.119267,
+      "LayoutDurationSeconds": 0.048203,
+      "RecalcStyleDurationSeconds": 0.078578,
+      "httpReads": 16,
+      "indicatorHttpReads": 6,
+      "httpResponseBytes": 5033043,
+      "httpRequestsStarted": 16,
+      "indicatorHttpRequestsStarted": 6,
+      "httpRequestsFailed": 0,
+      "indicatorHttpRequestsFailed": 0,
+      "httpRequestsUnsettled": 0,
+      "indicatorHttpRequestsUnsettled": 0,
+      "httpKinds": {
+        "reserve": 6,
+        "data": 6,
+        "history-loads": 4
+      },
+      "httpDurationMedianMs": 272.036,
+      "httpBodyMedianMs": 8.523000000000025,
+      "repetition": 0,
+      "cacheCondition": "resident API/PG, fresh browser",
+      "profiledHttpReads": 16,
+      "backendMs": 6630.288,
+      "sqlDriverMs": 699.736,
+      "calculationMs": 363.189,
+      "calculationCpuMs": 164.919,
+      "sqlQueries": 263,
+      "pythonCalculations": 6,
+      "apiPeakRssKiB": 326244,
+      "expectedHistoryCancellations": 0
+    },
+    {
+      "lane": "new-python",
+      "count": 4,
+      "indicatorSet": [
+        "LWMA period5 repeated 4"
+      ],
+      "paginationSamples": [
+        {
+          "ms": 1130,
+          "barsBefore": 1404,
+          "barsAfter": 2574
+        },
+        {
+          "ms": 1045,
+          "barsBefore": 2574,
+          "barsAfter": 3978
+        },
+        {
+          "ms": 744,
+          "barsBefore": 3978,
+          "barsAfter": 4780
+        },
+        {
+          "ms": 594,
+          "barsBefore": 4780,
+          "barsAfter": 5984
+        },
+        {
+          "ms": 521,
+          "barsBefore": 5984,
+          "barsAfter": 7388
+        }
+      ],
+      "paginationP50Ms": 744,
+      "paginationP95Ms": 1130,
+      "firstIndicatorPixelMs": 1495,
+      "firstValidDataMs": 1551,
+      "allValidDataMs": 1551,
+      "nextAnimationFramesMs": 1595,
+      "cachedNavigationP50Ms": 38,
+      "cachedNavigationP95Ms": 67,
+      "emptyDataFrames": 0,
+      "cachedEmptyDataFrames": 0,
+      "paginationEmptyDataFrames": 0,
+      "chartResets": 0,
+      "peakJsHeapBytes": null,
+      "peakCdpJsHeapBytes": 99653876,
+      "cdpHeapSamples": 65,
+      "TaskDurationSeconds": 3.798884,
+      "ScriptDurationSeconds": 1.577142,
+      "LayoutDurationSeconds": 0.054084,
+      "RecalcStyleDurationSeconds": 0.103538,
+      "httpReads": 16,
+      "indicatorHttpReads": 6,
+      "httpResponseBytes": 5035657,
+      "httpRequestsStarted": 16,
+      "indicatorHttpRequestsStarted": 6,
+      "httpRequestsFailed": 0,
+      "indicatorHttpRequestsFailed": 0,
+      "httpRequestsUnsettled": 0,
+      "indicatorHttpRequestsUnsettled": 0,
+      "httpKinds": {
+        "reserve": 6,
+        "data": 6,
+        "history-loads": 4
+      },
+      "httpDurationMedianMs": 166.962,
+      "httpBodyMedianMs": 3.1520000000000437,
+      "repetition": 0,
+      "cacheCondition": "resident API/PG, fresh browser",
+      "profiledHttpReads": 16,
+      "backendMs": 5048.724000000001,
+      "sqlDriverMs": 795.119,
+      "calculationMs": 272.54900000000004,
+      "calculationCpuMs": 153.767,
+      "sqlQueries": 267,
+      "pythonCalculations": 6,
+      "apiPeakRssKiB": 326244,
+      "expectedHistoryCancellations": 0
+    },
+    {
+      "lane": "new-python",
+      "count": 8,
+      "indicatorSet": [
+        "LWMA period5 repeated 8"
+      ],
+      "paginationSamples": [
+        {
+          "ms": 738,
+          "barsBefore": 1404,
+          "barsAfter": 2574
+        },
+        {
+          "ms": 753,
+          "barsBefore": 2574,
+          "barsAfter": 3978
+        },
+        {
+          "ms": 974,
+          "barsBefore": 3978,
+          "barsAfter": 5382
+        },
+        {
+          "ms": 1028,
+          "barsBefore": 5382,
+          "barsAfter": 6184
+        },
+        {
+          "ms": 777,
+          "barsBefore": 6184,
+          "barsAfter": 7388
+        }
+      ],
+      "paginationP50Ms": 777,
+      "paginationP95Ms": 1028,
+      "firstIndicatorPixelMs": 1055,
+      "firstValidDataMs": 977,
+      "allValidDataMs": 977,
+      "nextAnimationFramesMs": 1141,
+      "cachedNavigationP50Ms": 36,
+      "cachedNavigationP95Ms": 63,
+      "emptyDataFrames": 0,
+      "cachedEmptyDataFrames": 0,
+      "paginationEmptyDataFrames": 0,
+      "chartResets": 0,
+      "peakJsHeapBytes": null,
+      "peakCdpJsHeapBytes": 165710876,
+      "cdpHeapSamples": 62,
+      "TaskDurationSeconds": 4.07008,
+      "ScriptDurationSeconds": 1.567143,
+      "LayoutDurationSeconds": 0.113644,
+      "RecalcStyleDurationSeconds": 0.11669,
+      "httpReads": 16,
+      "indicatorHttpReads": 6,
+      "httpResponseBytes": 5035705,
+      "httpRequestsStarted": 17,
+      "indicatorHttpRequestsStarted": 7,
+      "httpRequestsFailed": 1,
+      "indicatorHttpRequestsFailed": 1,
+      "httpRequestsUnsettled": 0,
+      "indicatorHttpRequestsUnsettled": 0,
+      "httpKinds": {
+        "reserve": 6,
+        "data": 6,
+        "history-loads": 4
+      },
+      "httpDurationMedianMs": 229.478,
+      "httpBodyMedianMs": 5.747000000000014,
+      "repetition": 0,
+      "cacheCondition": "resident API/PG, fresh browser",
+      "profiledHttpReads": 16,
+      "backendMs": 4180.563999999999,
+      "sqlDriverMs": 633.462,
+      "calculationMs": 225.30499999999998,
+      "calculationCpuMs": 144.713,
+      "sqlQueries": 268,
+      "pythonCalculations": 6,
+      "apiPeakRssKiB": 326244,
+      "expectedHistoryCancellations": 0
+    },
+    {
+      "lane": "new-python",
+      "count": 1,
+      "indicatorSet": [
+        "LWMA period5 repeated 1"
+      ],
+      "paginationSamples": [
+        {
+          "ms": 680,
+          "barsBefore": 1186,
+          "barsAfter": 2356
+        },
+        {
+          "ms": 782,
+          "barsBefore": 2356,
+          "barsAfter": 3760
+        },
+        {
+          "ms": 673,
+          "barsBefore": 3760,
+          "barsAfter": 5164
+        },
+        {
+          "ms": 892,
+          "barsBefore": 5164,
+          "barsAfter": 6568
+        },
+        {
+          "ms": 650,
+          "barsBefore": 6568,
+          "barsAfter": 7972
+        }
+      ],
+      "paginationP50Ms": 680,
+      "paginationP95Ms": 892,
+      "firstIndicatorPixelMs": 984,
+      "firstValidDataMs": 984,
+      "allValidDataMs": 984,
+      "nextAnimationFramesMs": 1020,
+      "cachedNavigationP50Ms": 33,
+      "cachedNavigationP95Ms": 45,
+      "emptyDataFrames": 0,
+      "cachedEmptyDataFrames": 0,
+      "paginationEmptyDataFrames": 0,
+      "chartResets": 0,
+      "peakJsHeapBytes": null,
+      "peakCdpJsHeapBytes": 89932408,
+      "cdpHeapSamples": 54,
+      "TaskDurationSeconds": 2.6932869999999998,
+      "ScriptDurationSeconds": 1.336543,
+      "LayoutDurationSeconds": 0.023838,
+      "RecalcStyleDurationSeconds": 0.045349,
+      "httpReads": 17,
+      "indicatorHttpReads": 6,
+      "httpResponseBytes": 5228224,
+      "httpRequestsStarted": 18,
+      "indicatorHttpRequestsStarted": 7,
+      "httpRequestsFailed": 1,
+      "indicatorHttpRequestsFailed": 1,
+      "httpRequestsUnsettled": 0,
+      "indicatorHttpRequestsUnsettled": 0,
+      "httpKinds": {
+        "reserve": 6,
+        "data": 6,
+        "history-loads": 5
+      },
+      "httpDurationMedianMs": 136.297,
+      "httpBodyMedianMs": 2.716000000000001,
+      "repetition": 1,
+      "cacheCondition": "resident API/PG, fresh browser",
+      "profiledHttpReads": 17,
+      "backendMs": 3777.876,
+      "sqlDriverMs": 583.157,
+      "calculationMs": 188.393,
+      "calculationCpuMs": 149.92700000000002,
+      "sqlQueries": 296,
+      "pythonCalculations": 6,
+      "apiPeakRssKiB": 326244,
+      "expectedHistoryCancellations": 0
+    },
+    {
+      "lane": "new-python",
+      "count": 4,
+      "indicatorSet": [
+        "LWMA period5 repeated 4"
+      ],
+      "paginationSamples": [
+        {
+          "ms": 636,
+          "barsBefore": 1325,
+          "barsAfter": 2495
+        },
+        {
+          "ms": 785,
+          "barsBefore": 2495,
+          "barsAfter": 3899
+        },
+        {
+          "ms": 773,
+          "barsBefore": 3899,
+          "barsAfter": 5303
+        },
+        {
+          "ms": 954,
+          "barsBefore": 5303,
+          "barsAfter": 6707
+        },
+        {
+          "ms": 1784,
+          "barsBefore": 6707,
+          "barsAfter": 8111
+        }
+      ],
+      "paginationP50Ms": 785,
+      "paginationP95Ms": 1784,
+      "firstIndicatorPixelMs": 1492,
+      "firstValidDataMs": 1487,
+      "allValidDataMs": 1487,
+      "nextAnimationFramesMs": 1628,
+      "cachedNavigationP50Ms": 33,
+      "cachedNavigationP95Ms": 79,
+      "emptyDataFrames": 0,
+      "cachedEmptyDataFrames": 0,
+      "paginationEmptyDataFrames": 0,
+      "chartResets": 0,
+      "peakJsHeapBytes": null,
+      "peakCdpJsHeapBytes": 109038584,
+      "cdpHeapSamples": 73,
+      "TaskDurationSeconds": 4.697049,
+      "ScriptDurationSeconds": 1.68204,
+      "LayoutDurationSeconds": 0.073174,
+      "RecalcStyleDurationSeconds": 0.101224,
+      "httpReads": 19,
+      "indicatorHttpReads": 7,
+      "httpResponseBytes": 5897929,
+      "httpRequestsStarted": 19,
+      "indicatorHttpRequestsStarted": 7,
+      "httpRequestsFailed": 0,
+      "indicatorHttpRequestsFailed": 0,
+      "httpRequestsUnsettled": 0,
+      "indicatorHttpRequestsUnsettled": 0,
+      "httpKinds": {
+        "reserve": 7,
+        "data": 7,
+        "history-loads": 5
+      },
+      "httpDurationMedianMs": 198.365,
+      "httpBodyMedianMs": 5.428999999999974,
+      "repetition": 1,
+      "cacheCondition": "resident API/PG, fresh browser",
+      "profiledHttpReads": 19,
+      "backendMs": 6129.736000000001,
+      "sqlDriverMs": 1033.295,
+      "calculationMs": 397.60200000000003,
+      "calculationCpuMs": 189.631,
+      "sqlQueries": 322,
+      "pythonCalculations": 7,
+      "apiPeakRssKiB": 326244,
+      "expectedHistoryCancellations": 0
+    },
+    {
+      "lane": "new-python",
+      "count": 8,
+      "indicatorSet": [
+        "LWMA period5 repeated 8"
+      ],
+      "paginationSamples": [
+        {
+          "ms": 1398,
+          "barsBefore": 845,
+          "barsAfter": 2417
+        },
+        {
+          "ms": 1533,
+          "barsBefore": 2417,
+          "barsAfter": 3821
+        },
+        {
+          "ms": 1427,
+          "barsBefore": 3821,
+          "barsAfter": 5225
+        },
+        {
+          "ms": 1291,
+          "barsBefore": 5225,
+          "barsAfter": 6027
+        },
+        {
+          "ms": 2606,
+          "barsBefore": 6027,
+          "barsAfter": 7231
+        }
+      ],
+      "paginationP50Ms": 1427,
+      "paginationP95Ms": 2606,
+      "firstIndicatorPixelMs": 1946,
+      "firstValidDataMs": 1684,
+      "allValidDataMs": 1684,
+      "nextAnimationFramesMs": 2048,
+      "cachedNavigationP50Ms": 48,
+      "cachedNavigationP95Ms": 103,
+      "emptyDataFrames": 0,
+      "cachedEmptyDataFrames": 0,
+      "paginationEmptyDataFrames": 0,
+      "chartResets": 0,
+      "peakJsHeapBytes": null,
+      "peakCdpJsHeapBytes": 172538204,
+      "cdpHeapSamples": 112,
+      "TaskDurationSeconds": 7.396904,
+      "ScriptDurationSeconds": 2.778863,
+      "LayoutDurationSeconds": 0.197562,
+      "RecalcStyleDurationSeconds": 0.240618,
+      "httpReads": 17,
+      "indicatorHttpReads": 6,
+      "httpResponseBytes": 5141610,
+      "httpRequestsStarted": 17,
+      "indicatorHttpRequestsStarted": 7,
+      "httpRequestsFailed": 1,
+      "indicatorHttpRequestsFailed": 1,
+      "httpRequestsUnsettled": 0,
+      "indicatorHttpRequestsUnsettled": 0,
+      "httpKinds": {
+        "history-loads": 4,
+        "data": 6,
+        "reserve": 7
+      },
+      "httpDurationMedianMs": 312.558,
+      "httpBodyMedianMs": 4.617999999999995,
+      "repetition": 1,
+      "cacheCondition": "resident API/PG, fresh browser",
+      "profiledHttpReads": 17,
+      "backendMs": 8221.309000000001,
+      "sqlDriverMs": 1128.3460000000002,
+      "calculationMs": 434.733,
+      "calculationCpuMs": 176.104,
+      "sqlQueries": 277,
+      "pythonCalculations": 6,
+      "apiPeakRssKiB": 326244,
+      "expectedHistoryCancellations": 0
+    },
+    {
+      "lane": "new-python",
+      "count": 1,
+      "indicatorSet": [
+        "LWMA period5 repeated 1"
+      ],
+      "paginationSamples": [
+        {
+          "ms": 802,
+          "barsBefore": 1404,
+          "barsAfter": 2574
+        },
+        {
+          "ms": 1406,
+          "barsBefore": 2574,
+          "barsAfter": 3978
+        },
+        {
+          "ms": 1058,
+          "barsBefore": 3978,
+          "barsAfter": 5382
+        },
+        {
+          "ms": 1013,
+          "barsBefore": 5382,
+          "barsAfter": 6786
+        },
+        {
+          "ms": 919,
+          "barsBefore": 6786,
+          "barsAfter": 8190
+        }
+      ],
+      "paginationP50Ms": 1013,
+      "paginationP95Ms": 1406,
+      "firstIndicatorPixelMs": 1864,
+      "firstValidDataMs": 1791,
+      "allValidDataMs": 1791,
+      "nextAnimationFramesMs": 1941,
+      "cachedNavigationP50Ms": 33,
+      "cachedNavigationP95Ms": 64,
+      "emptyDataFrames": 0,
+      "cachedEmptyDataFrames": 0,
+      "paginationEmptyDataFrames": 0,
+      "chartResets": 0,
+      "peakJsHeapBytes": null,
+      "peakCdpJsHeapBytes": 83503240,
+      "cdpHeapSamples": 79,
+      "TaskDurationSeconds": 4.28325,
+      "ScriptDurationSeconds": 2.104095,
+      "LayoutDurationSeconds": 0.041519,
+      "RecalcStyleDurationSeconds": 0.078539,
+      "httpReads": 17,
+      "indicatorHttpReads": 6,
+      "httpResponseBytes": 5230918,
+      "httpRequestsStarted": 17,
+      "indicatorHttpRequestsStarted": 6,
+      "httpRequestsFailed": 0,
+      "indicatorHttpRequestsFailed": 0,
+      "httpRequestsUnsettled": 0,
+      "indicatorHttpRequestsUnsettled": 0,
+      "httpKinds": {
+        "reserve": 6,
+        "data": 6,
+        "history-loads": 5
+      },
+      "httpDurationMedianMs": 239.854,
+      "httpBodyMedianMs": 5.2620000000000005,
+      "repetition": 2,
+      "cacheCondition": "resident API/PG, fresh browser",
+      "profiledHttpReads": 17,
+      "backendMs": 6916.653000000002,
+      "sqlDriverMs": 812.7860000000001,
+      "calculationMs": 393.749,
+      "calculationCpuMs": 166.248,
+      "sqlQueries": 295,
+      "pythonCalculations": 6,
+      "apiPeakRssKiB": 326244,
+      "expectedHistoryCancellations": 0
+    },
+    {
+      "lane": "new-python",
+      "count": 4,
+      "indicatorSet": [
+        "LWMA period5 repeated 4"
+      ],
+      "paginationSamples": [
+        {
+          "ms": 784,
+          "barsBefore": 1186,
+          "barsAfter": 2356
+        },
+        {
+          "ms": 1058,
+          "barsBefore": 2356,
+          "barsAfter": 3760
+        },
+        {
+          "ms": 886,
+          "barsBefore": 3760,
+          "barsAfter": 5164
+        },
+        {
+          "ms": 689,
+          "barsBefore": 5164,
+          "barsAfter": 6568
+        },
+        {
+          "ms": 778,
+          "barsBefore": 6568,
+          "barsAfter": 7972
+        }
+      ],
+      "paginationP50Ms": 784,
+      "paginationP95Ms": 1058,
+      "firstIndicatorPixelMs": 1364,
+      "firstValidDataMs": 1251,
+      "allValidDataMs": 1251,
+      "nextAnimationFramesMs": 1410,
+      "cachedNavigationP50Ms": 35,
+      "cachedNavigationP95Ms": 75,
+      "emptyDataFrames": 0,
+      "cachedEmptyDataFrames": 0,
+      "paginationEmptyDataFrames": 0,
+      "chartResets": 0,
+      "peakJsHeapBytes": null,
+      "peakCdpJsHeapBytes": 130888464,
+      "cdpHeapSamples": 64,
+      "TaskDurationSeconds": 4.110448,
+      "ScriptDurationSeconds": 1.8160859999999999,
+      "LayoutDurationSeconds": 0.066182,
+      "RecalcStyleDurationSeconds": 0.102083,
+      "httpReads": 17,
+      "indicatorHttpReads": 6,
+      "httpResponseBytes": 5228225,
+      "httpRequestsStarted": 17,
+      "indicatorHttpRequestsStarted": 6,
+      "httpRequestsFailed": 0,
+      "indicatorHttpRequestsFailed": 0,
+      "httpRequestsUnsettled": 0,
+      "indicatorHttpRequestsUnsettled": 0,
+      "httpKinds": {
+        "reserve": 6,
+        "data": 6,
+        "history-loads": 5
+      },
+      "httpDurationMedianMs": 134.15,
+      "httpBodyMedianMs": 4.179000000000002,
+      "repetition": 2,
+      "cacheCondition": "resident API/PG, fresh browser",
+      "profiledHttpReads": 17,
+      "backendMs": 4556.165,
+      "sqlDriverMs": 588.07,
+      "calculationMs": 440.90599999999995,
+      "calculationCpuMs": 277.247,
+      "sqlQueries": 291,
+      "pythonCalculations": 6,
+      "apiPeakRssKiB": 326244,
+      "expectedHistoryCancellations": 0
+    },
+    {
+      "lane": "new-python",
+      "count": 8,
+      "indicatorSet": [
+        "LWMA period5 repeated 8"
+      ],
+      "paginationSamples": [
+        {
+          "ms": 688,
+          "barsBefore": 957,
+          "barsAfter": 1927
+        },
+        {
+          "ms": 1202,
+          "barsBefore": 1927,
+          "barsAfter": 3331
+        },
+        {
+          "ms": 1298,
+          "barsBefore": 3331,
+          "barsAfter": 4735
+        },
+        {
+          "ms": 953,
+          "barsBefore": 4735,
+          "barsAfter": 6139
+        },
+        {
+          "ms": 850,
+          "barsBefore": 6139,
+          "barsAfter": 7543
+        }
+      ],
+      "paginationP50Ms": 953,
+      "paginationP95Ms": 1298,
+      "firstIndicatorPixelMs": 1491,
+      "firstValidDataMs": 1310,
+      "allValidDataMs": 1310,
+      "nextAnimationFramesMs": 1599,
+      "cachedNavigationP50Ms": 50,
+      "cachedNavigationP95Ms": 100,
+      "emptyDataFrames": 0,
+      "cachedEmptyDataFrames": 0,
+      "paginationEmptyDataFrames": 0,
+      "chartResets": 0,
+      "peakJsHeapBytes": null,
+      "peakCdpJsHeapBytes": 184040604,
+      "cdpHeapSamples": 76,
+      "TaskDurationSeconds": 4.599144,
+      "ScriptDurationSeconds": 1.8090279999999999,
+      "LayoutDurationSeconds": 0.116052,
+      "RecalcStyleDurationSeconds": 0.143074,
+      "httpReads": 17,
+      "indicatorHttpReads": 6,
+      "httpResponseBytes": 5236427,
+      "httpRequestsStarted": 18,
+      "indicatorHttpRequestsStarted": 7,
+      "httpRequestsFailed": 1,
+      "indicatorHttpRequestsFailed": 1,
+      "httpRequestsUnsettled": 0,
+      "indicatorHttpRequestsUnsettled": 0,
+      "httpKinds": {
+        "data": 6,
+        "reserve": 7,
+        "history-loads": 4
+      },
+      "httpDurationMedianMs": 273.572,
+      "httpBodyMedianMs": 5.261000000000003,
+      "repetition": 2,
+      "cacheCondition": "resident API/PG, fresh browser",
+      "profiledHttpReads": 17,
+      "backendMs": 4930.034,
+      "sqlDriverMs": 777.487,
+      "calculationMs": 213.59,
+      "calculationCpuMs": 161.752,
+      "sqlQueries": 279,
+      "pythonCalculations": 6,
+      "apiPeakRssKiB": 326244,
+      "expectedHistoryCancellations": 0
+    }
+  ],
+  "implementation": "final event-driven accepted-main range, native readiness gate, same-input dispatched-read reuse",
+  "syntheticSourceHash": "67cdfc376be3d537ce6c744b22e6000a6d345c6e919cdac9e987b4fc4d8b2051",
+  "summary": [
+    {
+      "count": 1,
+      "samples": 3,
+      "paginationSamples": 15,
+      "paginationP50Ms": 937,
+      "paginationP95Ms": 1406,
+      "peakCdpJsHeapBytes": 89932408,
+      "indicatorHttpRequestsStarted": [
+        6,
+        7,
+        6
+      ],
+      "indicatorHttpRequestsFailed": [
+        0,
+        1,
+        0
+      ],
+      "indicatorHttpRequestsUnsettled": [
+        0,
+        0,
+        0
+      ],
+      "emptyDataFrames": 0,
+      "chartResets": 0
+    },
+    {
+      "count": 4,
+      "samples": 3,
+      "paginationSamples": 15,
+      "paginationP50Ms": 784,
+      "paginationP95Ms": 1784,
+      "peakCdpJsHeapBytes": 130888464,
+      "indicatorHttpRequestsStarted": [
+        6,
+        7,
+        6
+      ],
+      "indicatorHttpRequestsFailed": [
+        0,
+        0,
+        0
+      ],
+      "indicatorHttpRequestsUnsettled": [
+        0,
+        0,
+        0
+      ],
+      "emptyDataFrames": 0,
+      "chartResets": 0
+    },
+    {
+      "count": 8,
+      "samples": 3,
+      "paginationSamples": 15,
+      "paginationP50Ms": 1028,
+      "paginationP95Ms": 2606,
+      "peakCdpJsHeapBytes": 184040604,
+      "indicatorHttpRequestsStarted": [
+        7,
+        7,
+        7
+      ],
+      "indicatorHttpRequestsFailed": [
+        1,
+        1,
+        1
+      ],
+      "indicatorHttpRequestsUnsettled": [
+        0,
+        0,
+        0
+      ],
+      "emptyDataFrames": 0,
+      "chartResets": 0
+    }
+  ]
+}

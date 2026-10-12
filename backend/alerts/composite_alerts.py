@@ -239,7 +239,16 @@ def evaluate(db, alert, version, config, now):
     if bar["start"] < revision.seam:
         return wait(alert, runtime, "warming", "只有固定历史可读，尚无接续来源确认输入")
     if config.mode == "close" and not (bar["time_closed"] and bar["source_confirmed"] and bar["coverage_complete"]):
-        return wait(alert, runtime, "stale", "判定柱的时间结束、来源确认或覆盖依赖不完整")
+        from datetime import datetime, timezone
+
+        label = lambda stamp: datetime.fromtimestamp(stamp / 1000, timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+        runtime["coverage_dependency"] = {key: bar.get(key) for key in (
+            "start", "end", "time_closed", "source_confirmed", "coverage_complete", "observed_minutes", "unknown_minutes")}
+        reason = (f"判定柱 {label(bar['start'])} 至 {label(bar['end'])}："
+                  f"观测 {bar.get('observed_minutes', 0)} 分钟，未知 {bar.get('unknown_minutes', 0)} 分钟；"
+                  "时间结束、来源确认或覆盖依赖未满足；缺失观测不作为闭市证据")
+        return wait(alert, runtime, "stale", reason)
+    runtime.pop("coverage_dependency", None)
     if config.mode == "close" and live.confirmed_end < bar["end"]:
         return wait(alert, runtime, "stale", "实时来源确认水位尚未覆盖判定柱")
     quote = live.quote if live else {}

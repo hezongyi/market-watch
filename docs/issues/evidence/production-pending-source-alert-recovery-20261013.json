@@ -1,0 +1,38 @@
+{
+  "environment": "Ubuntu quant-server; backend tests plus real PostgreSQL in task-owned Docker mw-pending-fixes-20261013 unique isolated schema",
+  "passed": true,
+  "test": "test_recheck_restores_same_fixed_alert_baseline_before_later_cross",
+  "scenario": "M5 fixed composite alert, one missing M1 with otherwise time-closed/source-confirmed input; controlled provider response registered through the actual recheck/confirmed-minutes/composite-input/aggregate/evaluation path",
+  "checks": [
+    "initial alert ready with complete M5",
+    "disconnect marks stale",
+    "reconnected input is source-confirmed/time-closed but one unknown minute remains stale",
+    "accepted provider minute through bounded idempotent recheck increases input revision exactly once",
+    "new input coverage complete, old input revision retains unknown minute",
+    "same alert version and composite revision retained",
+    "first restored comparison produces recovery_baseline with no SignalRow",
+    "later complete M5 below then above threshold creates one SignalRow",
+    "same-sample reevaluation creates no duplicate signal"
+  ],
+  "validation": [
+    {
+      "command": "PYTHONPATH=backend .venv/bin/python -m pytest -q backend/tests/test_composite_recheck.py backend/tests/test_composite_alerts.py",
+      "passed": 29,
+      "scope": "full pair after M5 coverage assertions"
+    },
+    {
+      "command": "isolated Compose verify -q -p no:cacheprovider backend/tests/test_composite_recheck_postgres.py",
+      "passed": 8,
+      "scope": "source-recheck rollback, concurrency, plus new fixed-alert recovery"
+    },
+    {
+      "command": "isolated Compose verify -q -p no:cacheprovider backend/tests/test_composite_recheck_postgres.py -k fixed_alert_recovery",
+      "passed": 1,
+      "deselected": 7,
+      "scope": "final added old-input immutability assertion"
+    }
+  ],
+  "limitations": [
+    "Controlled source observations and live connection state; does not prove production missing minutes can be filled or that production alert recovered. No production writes. M5 acceptance fixture tests same complete-minute coverage and fixed-revision recovery mechanism; it is not the production D1 evidence."
+  ]
+}

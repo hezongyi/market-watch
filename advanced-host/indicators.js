@@ -101,7 +101,7 @@ function pythonStudies(PineJS, catalog) {
                 trackPrice: false,
                 transparency: 0,
                 visible: true,
-                color: swing ? (i < 2 ? "#f23645" : "#00bcd4") : colors[i % colors.length],
+                color: swing ? (i < 2 ? "#f23645" : "#00bcd4") : name === "LWMA" ? "#FFFFFF" : colors[i % colors.length],
               },
             ]),
           ),

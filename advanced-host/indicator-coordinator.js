@@ -1,0 +1,266 @@
+/* Main-chart ranges drive Python demand. One read includes all plots; shared
+ * results stay time-keyed until the native adapter maps them to current indexes. */
+function chartIndicatorCoordinator(widget,catalog,{read,identity,report=()=>{},status=()=>{},presentation=()=>{}}) {
+  const results=globalThis.MWNativeIndicatorResults;
+  read=chartIndicatorReadBatch(read);
+  const consumers=new Map(),shared=new Map(),charts=new WeakMap(),rangeEvents=new Map();
+  let chartSequence=0;
+  let disposed=false,timer,syncQueued=false;
+  function scheduleSync(){
+    if(disposed || syncQueued)return;
+    syncQueued=true;
+    // Native data completion follows time-axis acceptance. Observe that scope
+    // promptly, while coalescing simultaneous panes into one batch of demands.
+    queueMicrotask(()=>{syncQueued=false;void sync();});
+  }
+  const canonical=params=>JSON.stringify(Object.fromEntries(Object.entries(params).sort(([a],[b])=>a.localeCompare(b))));
+  function prune(){
+    let total=0,values=0;
+    for(const record of shared.values()){total+=record.rows.length;values+=record.values || 0;}
+    for(const [key,record] of shared){
+      if(total<=400000 && values<=1000000 && shared.size<=24)break;
+      if(!record.settled)continue;
+      shared.delete(key);total-=record.rows.length;values-=record.values || 0;
+    }
+  }
+  function detach(consumer){status(consumer,'removed');if(consumer.handle)results.detach(consumer.handle);consumers.delete(consumer.key);}
+  function rowsFor(result,page,meta,params,inputs,resolution,ticker){
+    const source=new Map(result.series.map(series=>[series.key,new Map(series.values.map(point=>[point.time,point]))]));
+    const supertrend=meta.render_profile==='supertrend_pine_v1';
+    const swing=meta.render_profile==='swing_sr_v1';
+    const series=supertrend ? meta.series.filter(series=>series.key!=='direction') : meta.series;
+    const offsets=swing ? {plot1:-params.high_strength,plot3:-params.low_strength} : {};
+    const rows=page.bars.map(bar=>{
+      const values=series.map(series=>{
+        const point=source.get(series.key)?.get(bar.start);
+        return point?.break_before && supertrend && ['up','down','fill_reference'].includes(series.key) ? null : point?.value ?? null;
+      });
+      if(supertrend){
+        const [up,down,buy,sell,reference]=values;
+        values.splice(0,values.length,up,down,reference,inputs.highlighting ? up : null,inputs.highlighting ? down : null,
+          buy,sell,inputs.showsignals ? buy : null,inputs.showsignals ? sell : null);
+      }
+      // The backend owns exchange trading-date labels. Never infer indexes or
+      // regenerate D/W/M chart dates here.
+      const time=bar.chart_time ?? identity.chartTime(bar,resolution,ticker);
+      return {time,sourceTime:bar.start,values,valid:values.map(Number.isFinite)};
+    });
+    return {rows,offsets};
+  }
+  function scopeIdentity(chart,scope,params,version,binding){
+    return {main:chart.symbol(),fixedRevision:binding.revision || 'provider:'+chart.symbol(),
+      paramsFingerprint:canonical(params),algorithmVersion:scope.name+':'+(version || '1'),
+      calculationStart:binding.calculationStart ?? 0,period:scope.resolution};
+  }
+  async function prepare(consumer,scope){
+    const {chart,meta,params,inputs}=consumer;
+    const binding=identity.binding(chart.symbol(),scope.resolution);
+    if(!binding)return;
+    const nextIdentity=scopeIdentity(chart,scope,params,meta.version,binding);
+    // A genuine input revision change withdraws dependent values before recompute.
+    // A reset may remove/recreate the coordinator consumer while the adapter
+    // retains its rows. A new consumer must also withdraw a corrected binding.
+    const corrected=(binding.correctionVersion || 0)!==(consumer.correctionVersion || 0);
+    if(!consumer.handle || consumer.generation!==scope.generation ||
+      JSON.stringify(consumer.handle.identity)!==JSON.stringify(nextIdentity)){
+      consumer.handle=results.attach(chart,consumer.id,nextIdentity);consumer.sequence=0;
+      consumer.generation=scope.generation;
+    }
+    if(corrected){
+      const withdrawn=await results.invalidate(consumer.handle,[-Number.MAX_VALUE,Number.MAX_VALUE],String(binding.inputRevision ?? binding.tailVersion ?? 0));
+      // A native reset can replace the binding while its withdrawal is queued.
+      // Do not acknowledge that correction until the current generation really
+      // withdrew it; the next sync must retry against the replacement handle.
+      if(!withdrawn)return;
+      consumer.correctionVersion=binding.correctionVersion;consumer.sequence++;
+    }
+    // During native reset the engine may already expose a new range while the
+    // main study has not accepted it. Reading then wastes a request that the
+    // next generation will cancel. Corrections above still withdraw immediately.
+    if(!chart.dataReady())return;
+    scope=results.scope(chart,consumer.id);if(!scope)return;
+    consumer.generation=scope.generation;
+    const signature=JSON.stringify([scope.generation,nextIdentity,binding.inputRevision,scope.first,scope.last,scope.count,binding.tailVersion,binding.correctionVersion,
+      inputs.showsignals,inputs.highlighting]);
+    if(consumer.failedSignature===signature && consumer.retryAt>Date.now())return;
+    if(consumer.accepted===signature || consumer.pending===signature)return;
+    consumer.inputRevision=binding.inputRevision;consumer.correctionVersion=binding.correctionVersion;
+    consumer.pending=signature;
+    // The adapter knows whether native restart retained these results. A
+    // consumer's previous scope alone cannot prove that its cache still exists.
+    const previous=scope.coverage;
+    const same=previous && previous.identity===JSON.stringify(nextIdentity) &&
+      previous.correctionVersion===binding.correctionVersion && previous.inputRevision===binding.inputRevision;
+    const prepend=same && previous.first>scope.first && previous.last===scope.last &&
+      previous.tailVersion===binding.tailVersion;
+    const tail=previous && previous.generation===scope.generation && previous.first===scope.first &&
+      previous.last<=scope.last && previous.count<=scope.count && same;
+    const requestFirst=tail ? previous.last : scope.first;
+    // Provider pages use chart labels; fixed-history readers use source starts.
+    // Preserve the backend's actual boundary for NY17 D/W/M instead of guessing.
+    const requestBefore=prepend ? previous.sourceFirst ?? previous.first : binding.before ?? scope.last+1;
+    const unchangedBinding=()=>{
+      const latest=identity.binding(chart.symbol(),scope.resolution);
+      return latest && ['revision','inputRevision','tailVersion','correctionVersion','before'].every(key=>latest[key]===binding[key]) &&
+        (!binding.calculationStart || latest.calculationStart===binding.calculationStart);
+    };
+    const current=()=>!disposed && consumers.get(consumer.key)===consumer &&
+      results.scope(chart,consumer.id)?.generation===scope.generation && consumer.pending===signature && unchangedBinding();
+    const key=JSON.stringify([nextIdentity,binding.inputRevision,scope.first,scope.last,scope.count,binding.tailVersion,binding.correctionVersion,
+      inputs.showsignals,inputs.highlighting,requestFirst,requestBefore]);consumer.cacheKey=key;
+    let cached=shared.get(key);
+    if(!cached){
+      const promise=(async()=>{
+        const pages=[],rows=[];let before=requestBefore,covered=false;const deadline=Date.now()+30000;
+        for(let partition=0;partition<100;partition++){
+          const sharedCurrent=()=>!disposed && [...consumers.values()].some(other=>other.cacheKey===key &&
+            results.scope(other.chart,other.id)?.generation===other.generation);
+          if(!sharedCurrent())return null;
+          if(Date.now()>deadline)throw Error('指标范围读取超时');
+          const page=await read(chart.symbol(),scope.resolution,{before,limit:2000,
+            indicators:[{name:scope.name,params}],...binding.query},sharedCurrent,
+            JSON.stringify([binding.revision,binding.calculationStart,binding.inputRevision,binding.tailVersion,binding.correctionVersion]));
+          const progress=page.indicator_progress?.find(item=>item.name===scope.name);
+          if(progress && progress.status!=='complete')return {pending:true};
+          const result=page.indicators?.find(item=>item.name===scope.name && canonical(item.params)===canonical(params));
+          if(!result)throw Error('Python 指标结果未返回');
+          if(page.input_revision!==undefined && binding.inputRevision!==undefined && page.input_revision!==binding.inputRevision)return null;
+          rows.push(...rowsFor(result,page,meta,params,inputs,scope.resolution,chart.symbol()).rows);
+          // Keep only result identity/revision/presentation in the shared cache.
+          // Raw bars and plot payloads would duplicate the normalized rows.
+          const {bars,indicators,...metadata}=page;
+          pages.push({page:{...metadata,presentation:result.presentation,
+            ...(result.presentation ? {bars:bars.map(bar=>({start:bar.start,chart_time:bar.chart_time}))} : {})}});
+          if(!page.bars.length || (page.bars[0].chart_time ?? identity.chartTime(page.bars[0],scope.resolution,chart.symbol()))<=requestFirst || page.has_more===false){covered=true;break;}
+          if(!((page.next_before ?? page.bars[0]?.start)<before))throw Error('指标范围分页未推进');
+          before=page.next_before ?? page.bars[0]?.start;
+        }
+        if(!covered)throw Error('指标范围超出读取容量');
+        const unique=[...new Map(rows.filter(row=>row.time>=requestFirst).map(row=>[row.time,row])).values()].sort((a,b)=>a.time-b.time);
+        if(unique.length>200000)throw Error('指标范围超出缓存容量');
+        return {rows:unique,pages};
+      })();
+      cached={promise,rows:[]};shared.set(key,cached);
+      promise.then(value=>{cached.settled=true;if(value && !value.pending){cached.rows=value.rows;cached.values=value.rows.reduce((n,row)=>n+row.values.length,0);}else shared.delete(key);},()=>{cached.settled=true;shared.delete(key);});
+    }
+    status(consumer,'preparing');
+    try {
+      const batch=await cached.promise;
+      if(!current() || !batch)return;
+      if(batch.pending){consumer.failedSignature=signature;consumer.retryAt=Date.now()+1500;return;}
+      const page=batch.pages[0]?.page;
+      const revisionOf=item=>{
+        const value=String(item?.input_revision ?? item?.cache_revision ?? item?.revision ?? item?.history_revision ?? binding.inputRevision ?? binding.tailVersion ?? 0);
+        return /^\d+$/.test(value)?value:'0';
+      };
+      const revision=revisionOf(page);
+      if(batch.pages.some(({page:item})=>revisionOf(item)!==revision)){shared.delete(key);return;}
+      identity.remember?.(chart.symbol(),scope.resolution,page);
+      const origin=page?.calculation_origin ?? page?.origin ?? binding.calculationStart;
+      if(Number.isFinite(origin) && nextIdentity.calculationStart!==origin){
+        nextIdentity.calculationStart=origin;consumer.handle=results.attach(chart,consumer.id,nextIdentity);consumer.sequence=0;consumer.generation=consumer.handle.generation;
+      }
+      const offsets=meta.render_profile==='swing_sr_v1'?{plot1:-params.high_strength,plot3:-params.low_strength}:{};
+      const coverage={first:scope.first,last:scope.last,count:scope.count,identity:JSON.stringify(nextIdentity),
+        sourceFirst:tail ? previous.sourceFirst : batch.rows.find(row=>row.time>=scope.first)?.sourceTime,
+        correctionVersion:binding.correctionVersion,inputRevision:binding.inputRevision,tailVersion:binding.tailVersion};
+      const accepted=await results.applyBatch(consumer.handle,{identity:consumer.handle.identity,
+        generation:consumer.handle.generation,sequence:++consumer.sequence,inputRevision:revision,
+        kind:prepend?'prepend':tail?'append':'snapshot',rows:batch.rows,offsets,coverage});
+      if(accepted){consumer.acceptedScope={...coverage,generation:consumer.handle.generation};
+        consumer.accepted=JSON.stringify([consumer.handle.generation,nextIdentity,binding.inputRevision,scope.first,scope.last,scope.count,binding.tailVersion,binding.correctionVersion,inputs.showsignals,inputs.highlighting]);
+        consumer.failures=0;consumer.retryAt=0;status(consumer,'ready');
+        for(const {page} of batch.pages)presentation(chart.symbol(),scope.resolution,{...page,indicators:[{name:scope.name,params,presentation:page.presentation}]});}
+    }catch(error){if(current()){
+      consumer.failedSignature=signature;
+      consumer.failures=(consumer.failures || 0)+1;
+      consumer.retryAt=consumer.failures>=3?Infinity:Date.now()+1000*2**consumer.failures;
+      status(consumer,'error',error);report(error,consumer);
+    }}
+    finally{if(consumer.pending===signature)consumer.pending=null;prune();}
+  }
+  async function sync(){
+    if(disposed)return;
+    {
+      const live=new Set(),liveCharts=new Set(),work=[];
+      for(let index=0;index<widget.chartsCount();index++){
+        const chart=widget.chart(index);
+        const owner=chart._chartWidget || chart;liveCharts.add(owner);
+        if(!rangeEvents.has(owner)){
+          const event=chart.onDataLoaded();event.subscribe(null,scheduleSync);
+          rangeEvents.set(owner,()=>event.unsubscribe(null,scheduleSync));
+        }
+        for(const study of chart.getAllStudies()){
+          const scope=results.scope(chart,study.id);if(!scope)continue;
+          const meta=catalog[scope.name];if(!meta)continue;
+          const api=chart.getStudyById(study.id);if(api.isVisible && !api.isVisible())continue;
+          const inputs=Object.fromEntries(api.getInputValues().map(item=>[item.id,item.value]));
+          const params=meta.render_profile==='supertrend_pine_v1' ? {period:inputs.period,source:inputs.source,
+            multiplier:inputs.multiplier,atr_method:inputs.changeATR ? 'wilder' : 'sma'} :
+            Object.fromEntries(Object.keys(meta.params).map(key=>[key,inputs[key]]));
+          if(!charts.has(owner))charts.set(owner,++chartSequence);
+          const key=charts.get(owner)+'|'+study.id;live.add(key);
+          let consumer=consumers.get(key);
+          if(!consumer){consumer={key,id:study.id,chart,index,meta,params,inputs,sequence:0};consumers.set(key,consumer);}
+          else Object.assign(consumer,{chart,index,meta,params,inputs});
+          work.push(prepare(consumer,scope).catch(error=>report(error,consumer)));
+        }
+      }
+      for(const [owner,unsubscribe] of rangeEvents)if(!liveCharts.has(owner)){
+        unsubscribe();rangeEvents.delete(owner);
+      }
+      for(const consumer of consumers.values())if(!live.has(consumer.key))detach(consumer);
+      await Promise.allSettled(work);
+    }
+  }
+  timer=setInterval(()=>void sync(),500);
+  return {sync,retry(index){for(const c of consumers.values())if(c.index===index){c.retryAt=0;c.failures=0;c.accepted=null;}return sync();},dispose(){disposed=true;clearInterval(timer);for(const unsubscribe of rangeEvents.values())unsubscribe();rangeEvents.clear();for(const consumer of consumers.values())detach(consumer);shared.clear();},
+    diagnostics:()=>({consumers:consumers.size,shared:shared.size,rows:[...shared.values()].reduce((n,r)=>n+r.rows.length,0)})};
+}
+
+// Coalesce independent studies over the same input page. Cancellation belongs
+// to each consumer; one deletion must not abort the remaining shared read.
+function chartIndicatorReadBatch(read) {
+  const queued=new Map(),inFlight=new Map();
+  return (ticker,resolution,args,current,inputVersion=null)=>new Promise((resolve,reject)=>{
+    const {indicators,...query}=args,key=JSON.stringify([ticker,resolution,query,inputVersion]);
+    let group=queued.get(key);
+    // Native pagination can restart a study before its accepted source page
+    // returns. A replacement needing the same dispatched specs joins that
+    // request, so removing the old generation does not abort valid new demand.
+    if(!group)group=[...(inFlight.get(key) || [])].find(candidate=>
+      indicators.every(spec=>candidate.specKeys.has(JSON.stringify(spec))));
+    if(!group){
+      group={ticker,resolution,query,consumers:[]};queued.set(key,group);
+      queueMicrotask(async()=>{
+        queued.delete(key);
+        const alive=()=>group.consumers.some(consumer=>consumer.current());
+        const specs=[...new Map(group.consumers.filter(c=>c.current()).flatMap(c=>c.indicators)
+          .map(spec=>[JSON.stringify(spec),spec])).values()];
+        group.specKeys=new Set(specs.map(spec=>JSON.stringify(spec)));
+        let running=inFlight.get(key);
+        if(!running){running=new Set();inFlight.set(key,running);}
+        running.add(group);
+        try {
+          if(!alive())throw Object.assign(Error('指标读取已取消'),{code:'HISTORY_CANCELLED'});
+          let page;
+          for(let offset=0;offset<specs.length;offset+=12){
+            if(!alive())throw Object.assign(Error('指标读取已取消'),{code:'HISTORY_CANCELLED'});
+            const next=await read(ticker,resolution,{...query,indicators:specs.slice(offset,offset+12)},alive);
+            if(!page)page=next;
+            else {
+              const revision=item=>JSON.stringify([item.input_revision,item.cache_revision,item.revision,item.calculation_origin,item.origin]);
+              if(revision(page)!==revision(next))throw Error('批量指标输入在读取期间改变，请重试');
+              page={...page,indicators:[...(page.indicators || []),...(next.indicators || [])],
+                indicator_progress:[...(page.indicator_progress || []),...(next.indicator_progress || [])]};
+            }
+          }
+          for(const consumer of group.consumers)consumer.current()?consumer.resolve(page):
+            consumer.reject(Object.assign(Error('指标读取已取消'),{code:'HISTORY_CANCELLED'}));
+        }catch(error){for(const consumer of group.consumers)consumer.reject(error);}
+        finally{running.delete(group);if(!running.size)inFlight.delete(key);}
+      });
+    }
+    group.consumers.push({indicators,current,resolve,reject});
+  });
+}

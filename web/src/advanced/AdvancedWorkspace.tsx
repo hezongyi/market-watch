@@ -1,3 +1,4 @@
+import { validIndicatorRead } from "./indicatorRequests";
 import {
   loadNativeHistory,
   type HistoryCapabilities,
@@ -68,6 +69,7 @@ export default function AdvancedWorkspace() {
   const [nativeLoads, setNativeLoads] = useState<Record<string, NativeLoad>>(
     {},
   );
+  const [indicatorStates,setIndicatorStates]=useState<Record<string,{index:number;name:string;state:string;error:string;epoch:number}>>({});
   const [chartFailures,setChartFailures]=useState<{index:number;symbol:string;resolution:string;label:string;error:string;epoch:number}[]>([]);
   const [capacityDialog, setCapacityDialog] = useState<{
     capabilities: HistoryCapabilities;
@@ -509,12 +511,20 @@ export default function AdvancedWorkspace() {
         return;
       }
       if (m.type === "native-load-reset" && Number.isSafeInteger(m.epoch)) {
-        setChartFailures([]);
+        setChartFailures([]);setIndicatorStates({});
         nativeLoadEpoch.current = m.epoch;
         setNativeLoads({});
         setCapacityNotices({});
         setCapacityDialog(null);
         return;
+      }
+      if(m.type==='chart-indicator-state' && m.epoch===nativeLoadEpoch.current &&
+        Number.isSafeInteger(m.index) && m.index>=0 && m.index<8 && typeof m.id==='string' &&
+        typeof m.name==='string' && typeof m.error==='string' && ['preparing','ready','error','removed'].includes(m.state)) {
+        setIndicatorStates(old=>{const next={...old},key=m.index+'|'+m.id;
+          if(m.state==='ready' || m.state==='removed')delete next[key];
+          else next[key]={index:m.index,name:m.name,state:m.state,error:m.error,epoch:m.epoch};
+          return next;});return;
       }
       if (m.type === 'chart-history-failures' && m.epoch===nativeLoadEpoch.current && Array.isArray(m.failures)) {
         setChartFailures(m.failures.filter((item:any)=>Number.isSafeInteger(item.index) &&
@@ -1117,10 +1127,7 @@ export default function AdvancedWorkspace() {
         const q = m.query;
         if (
           !q ||
-          (q.indicators !== undefined &&
-            (!Array.isArray(q.indicators) ||
-              q.indicators.length > 1 ||
-              JSON.stringify(q.indicators).length > 2000)) ||
+          !validIndicatorRead(q.indicators) ||
           typeof q.instrument !== "string" ||
           q.instrument.length > 80 ||
           (q.series_kind !== undefined &&
@@ -1400,6 +1407,7 @@ export default function AdvancedWorkspace() {
   return (
     <main className="advanced-workspace" data-theme={chartTheme}>
       {mobile && <p className="advanced-readonly-note" role="note">手机只读看盘。编辑图表、绘图和告警请使用桌面浏览器；桌面工作区布局仍保留。</p>}
+      {Object.keys(indicatorStates).length>0 && <aside className="advanced-history-failures" aria-label="图格指标状态">{Object.entries(indicatorStates).map(([key,item])=><p key={key} role="status">图格 {item.index+1} · {item.name}：{item.state==='preparing'?'正在准备指标':item.error}{item.state==='error' && <button onClick={()=>post({type:'retry-chart-indicators',index:item.index,epoch:item.epoch})}>重试指标</button>}</p>)}</aside>}
       {chartFailures.length>0 && <aside className="advanced-history-failures" aria-label="图格历史加载失败">{chartFailures.map(item=><p key={item.index} role="status">图格 {item.index+1} · {item.label} · {item.resolution}：{item.error}<button onClick={()=>post({type:'retry-chart-history',...item})}>重试此图格</button></p>)}</aside>}
       {(Object.keys(nativeLoads).length > 0 ||
         Object.keys(capacityNotices).length > 0) && (

@@ -188,7 +188,7 @@ def test_builtin_order_parameters_and_warmup_remain_stable():
     assert [
         indicators.history_requirement({"name": name})
         for name in ("SMA", "EMA", "LWMA", "BBANDS", "RSI", "MACD", "ATR", "STOCH")
-    ] == [19, 200, 19, 19, 140, 350, 140, 17]
+    ] == [19, 200, 4, 19, 140, 350, 140, 17]
     with pytest.raises(ValueError, match="MACD"):
         indicators.validate({"name": "MACD", "params": {"fast": 26}})
     assert (

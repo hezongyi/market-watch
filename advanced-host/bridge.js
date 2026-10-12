@@ -11,19 +11,20 @@ document.head.append(framePolicy);
 const send = (value) =>
   parent.postMessage({ channel: "mw-chart-v1", ...value }, parentOrigin);
 const pending = new Map();
-// Use public native dialogs. The widget has no public non-modal toast API.
-// Keep acknowledged conditions deduplicated until the parent clears them.
+// Only draft recovery requires a native confirmation.
 const acknowledgedNotices = new Set();
+let ordinaryNotices;
 let activeNotices = [], noticeDialogOpen = false, chartMenu, indicatorPicker, alertBridge, alertUI, alertUISession, alertUIDraft, alertUIWorkspace, alertUIAttach, dataCenter;
 let invalidateAlertUI = () => {};
 // Lazy loading keeps ordinary datafeed consumers independent of the renderer.
 let swingSnapshots;
 function swingStore() {return swingSnapshots ||= swingSnapshotStore();}
-let swingDisplay;
+let swingDisplay, indicatorCoordinator;
+const indicatorBindings=new Map();
 let studyTemplates;
 function showNextNotice() {
   if (!ready || noticeDialogOpen) return;
-  const notice = activeNotices.find(entry => !acknowledgedNotices.has(entry.key));
+  const notice = activeNotices.find(entry => entry.recover && !acknowledgedNotices.has(entry.key));
   if (!notice) return;
   acknowledgedNotices.add(notice.key);
   noticeDialogOpen = true;
@@ -35,7 +36,6 @@ function showNextNotice() {
       done();
     },
   });
-  else widget.showNoticeDialog({title: "图表提示", body: notice.text, callback: done});
 }
 let seq = 0,
   widget,
@@ -178,7 +178,51 @@ function registerMarketBar(sub) {
     observed_at:state.observed_at || 0,
     binding:state.binding || null,initial_input_revision:state.input_revision ?? null,initial_indicator_pending:!!sub.initialIndicatorPending,historical:!!sub.historical}});
 }
+function rememberIndicatorBinding(ticker,res,page,{correction=false}={}) {
+  if(decode(ticker).spec)return;
+  const key=ticker+'|'+res,old=indicatorBindings.get(key) || {};
+  const provider=decode(ticker).series_kind==='provider';
+  indicatorBindings.set(key,{...old,
+    revision:page.revision_id ?? old.revision,
+    inputRevision:page.input_revision ?? page.initial_input_revision ?? old.inputRevision,
+    // A main provider page's start follows the viewport. Only a Python result
+    // may establish the calculation origin; later price pagination preserves it.
+    calculationStart:provider && !page.indicators?.length ? old.calculationStart :
+      page.calculation_origin ?? page.origin ?? old.calculationStart,
+    tailVersion:page.cache_revision ?? page.revision ?? old.tailVersion ?? 0,
+    lastStart:page.bars?.length ? Math.max(old.lastStart ?? -Infinity,...page.bars.map(bar=>bar.start)) : old.lastStart,
+    correctionVersion:correction ? (old.correctionVersion || 0)+1 : old.correctionVersion || 0,
+  });
+  void indicatorCoordinator?.sync();
+}
+function startIndicatorCoordinator(catalog) {
+  indicatorCoordinator=chartIndicatorCoordinator(widget,catalog,{
+    read:(symbol,res,args,current)=>query(symbol,res,args,Date.now()+30000,current),
+    identity:{
+      binding:(ticker,res)=>{
+        const id=decode(ticker),key=ticker+'|'+res,base=indicatorBindings.get(key);
+        if(!base)return null;
+        const session=managedSessions.get(id.symbol+'|'+res);
+        return {...base,revision:base.revision || (id.series_kind==='history'?id.symbol:
+          id.series_kind==='managed'?'published:'+String(session?.revision):'provider:'+id.symbol),
+          calculationStart:base.calculationStart ?? session?.start ?? 0,
+          before:Number.isFinite(base.lastStart) ? base.lastStart+1 : undefined,
+          query:{...(base.revision && id.series_kind==='composite'?{composite_revision_id:base.revision}:{}),
+            ...(id.series_kind==='provider' && base.calculationStart?{calculation_origin:base.calculationStart}:{}),
+            provisional:true}};
+      },
+      chartTime:(bar,res,ticker)=>stamp(bar,res,decode(ticker).symbol),
+      remember:(ticker,res,page)=>{const old=indicatorBindings.get(ticker+'|'+res);if(old)
+        Object.assign(old,{calculationStart:page.calculation_origin ?? page.origin ?? old.calculationStart});},
+    },
+    status:(consumer,state,error)=>send({type:'chart-indicator-state',epoch:workspaceEpoch,index:consumer.index,
+      id:consumer.id,name:consumer.meta.label || consumer.id,state,error:error?.message || ''}),
+    report:error=>{if(error.code!=='HISTORY_CANCELLED')send({type:'error',error:'指标读取失败：'+String(error)});},
+    presentation:(ticker,res,page)=>{swingStore().publish(ticker,res,page,swingStore().ticket());swingDisplay?.refresh();},
+  });
+}
 function acceptMarketHistory(ticker,res,page,window = '', acceptedRows) {
+  rememberIndicatorBinding(ticker,res,page);
   if(marketPollingFallback) return;
   const key=ticker+'|'+res+'|'+(window || ''), old=marketHistoryState.get(key) || {};
   const acceptedTimes=acceptedRows && new Set(acceptedRows.map(bar=>bar.time));
@@ -1877,6 +1921,7 @@ function boot(
   initialHistoryGate.promise = new Promise(resolve => {initialHistoryGate.resolve = resolve;});
   loading = true;
   ready = false;
+  indicatorCoordinator?.dispose();indicatorCoordinator=undefined;indicatorBindings.clear();
   progressivePages?.dispose();
   progressivePages = undefined;
   managedSessions.clear();
@@ -1895,6 +1940,7 @@ function boot(
   globalThis.MWChartMaximize?.dispose();
   globalThis.MWChartMaximize = undefined;
   unbindActiveChartEvent();
+  MWNativeIndicatorResults.configure(catalog,{enable:globalThis.MW_NATIVE_RESERVE_ENABLED!==false});
   widget = new TradingView.widget({
     context_menu:{items_processor:(items,factory,params)=>alertBridge.menu(items,factory,params)},
     save_load_adapter: { ...prefs.templates, ...layouts },
@@ -2010,6 +2056,7 @@ function boot(
     .catch((e) => send({ type: "error", error: String(e) }));
   widget.onChartReady(async () => {
     await restoreTheme();
+    startIndicatorCoordinator(catalog);
     globalThis.MWChartMaximize = chartBlankDoubleClick(widget, { readonly });
     ensureSync();
     syncCoordinator.refreshCharts();
@@ -2102,10 +2149,12 @@ function boot(
     pendingSync = undefined;
     ready = true;
     loading = false;
+    ordinaryNotices?.theme(widget.getTheme());
     send({ type: "theme-changed", theme: widget.getTheme() });
     alertUI?.theme(widget.getTheme());
     widget.subscribe("chart_theme_changed", (name, standard, onlyActive) => {
       alertUI?.theme(widget.getTheme());
+      ordinaryNotices?.theme(widget.getTheme());
       send({ type: "theme-changed", theme: widget.getTheme() });
       if (!standard && !readonly) {
         prefs.templates.getChartTemplateContent(name)
@@ -2183,6 +2232,7 @@ function boot(
       rangeGuard?.dispose();
       rangeGuard = undefined;
       workspaceEpoch++;
+      indicatorCoordinator?.dispose();indicatorCoordinator=undefined;indicatorBindings.clear();
       quoteDetails?.refresh();
       send({type:'native-load-reset',epoch:workspaceEpoch});
       syncCoordinator.resetWorkspace(pendingSync);
@@ -2224,6 +2274,7 @@ function boot(
       workspaceLoadPause?.release();
       workspaceLoadPause = undefined;
       loading = false;
+      if(!indicatorCoordinator)startIndicatorCoordinator(catalog);
       barRangeMapping.configure(pendingBarRange || {version:1,enabled:false,style:"background"}, true);
       synchronizeMarketVisibility();
       barRangeMapping.refreshCharts();
@@ -2316,6 +2367,11 @@ addEventListener("message", async (e) => {
         text: entry.text.replace(/^(?:Error:\s*)+/, ""), recover: entry.recover === true && !nativeReadonly}));
     const live = new Set(activeNotices.map(entry => entry.key));
     for (const key of acknowledgedNotices) if (!live.has(key)) acknowledgedNotices.delete(key);
+    if (activeNotices.some(entry => !entry.recover) || ordinaryNotices) {
+      ordinaryNotices ||= chartNotices(document);
+      ordinaryNotices.theme(widget?.getTheme?.() || "Dark");
+      ordinaryNotices.update(activeNotices.map(entry => ({...entry,id:entry.key})));
+    }
     chartMenu?.setDraftBlocked(m.draftBlocked === true);
     showNextNotice();
     return;
@@ -2362,6 +2418,7 @@ addEventListener("message", async (e) => {
     if(event.sequence<=sub.marketSequence) return;
     sub.marketSequence=event.sequence;
     if(event.type==='reset') {
+      rememberIndicatorBinding(sub.symbol,sub.res,event,{correction:true});
       // Fence the old generation while asynchronous native recovery runs.
       // Its replacement is registered only after the new history is accepted.
       sub.marketGeneration=++marketGeneration;
@@ -2391,6 +2448,7 @@ addEventListener("message", async (e) => {
         if(event.history_tail_revision != null) state.history_tail_revision=event.history_tail_revision;
         if(event.initial_input_revision != null) state.input_revision=event.initial_input_revision;
       }
+      rememberIndicatorBinding(sub.symbol,sub.res,event);
       if(event.pending?.length) send({type:'status',text:event.pending.join('；')});
       if(event.status?.error) send({type:'feed-poll-state',key:sub.symbol+'|'+sub.res,error:event.status.error});
       else send({type:'feed-poll-state',key:sub.symbol+'|'+sub.res,error:''});
@@ -2408,6 +2466,7 @@ addEventListener("message", async (e) => {
       providerHistoryState.set(key,{revision:event.revision||0,observed_at:event.as_of||0,
         cursor:Math.max(old?.cursor||0,event.cursor||0)});
     if(event.type==='reset') {
+      rememberIndicatorBinding(sub.symbol,sub.res,{...event,cache_revision:event.revision},{correction:true});
       await reviewProviderReset(sub,event).catch(error=>{
         if(error.code!=='HISTORY_CANCELLED') send({type:'error',error:'历史检查未完成：'+String(error)});
       });
@@ -2425,6 +2484,7 @@ addEventListener("message", async (e) => {
         swingDisplay?.refresh();
       }
       for(const bar of rows) if(bar.time>=sub.last) {sub.cb({...bar});observeRangeBars(sub.symbol,sub.res,event.bars,[bar],sub.window);sub.last=bar.time;}
+      rememberIndicatorBinding(sub.symbol,sub.res,{...event,cache_revision:event.revision});
     } else if(event.type==='error') {
       send({type:'error',error:event.error||'平台行情暂不可用，后台重试中'});
     }
@@ -2446,6 +2506,8 @@ addEventListener("message", async (e) => {
     send({type:"history-capacity-open",usage:MWNativeNavigation.diagnostics().resident});
   } else if (m.type === "cancel-history") {
     MWNativeNavigation.cancelAll();
+  } else if(m.type==='retry-chart-indicators' && m.epoch===workspaceEpoch && Number.isSafeInteger(m.index)) {
+    void indicatorCoordinator?.retry(m.index);
   } else if (m.type === 'retry-chart-history' && ready && !loading && m.epoch===workspaceEpoch &&
       Number.isSafeInteger(m.index) && m.index>=0 && m.index<widget.chartsCount()) {
     const chart=widget.chart(m.index);
@@ -2469,6 +2531,8 @@ addEventListener("message", async (e) => {
 send({ type: "loaded" });
 
 addEventListener("pagehide", () => {
+  indicatorCoordinator?.dispose();
+  ordinaryNotices?.dispose();
   alertUI?.destroy();
   alertBridge?.destroy();
   quoteDetails?.dispose();

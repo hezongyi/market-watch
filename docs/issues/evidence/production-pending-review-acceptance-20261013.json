@@ -1,0 +1,270 @@
+{
+  "date": "2026-10-13",
+  "scope": "User-authorized patch review and Ubuntu instance acceptance; defer unreproduced Load failed",
+  "baseline": "1b3e4a2",
+  "branch": "fix/production-pending-20261013",
+  "review": {
+    "standards": {
+      "documentedViolations": 0,
+      "optionalSmells": 1,
+      "optionalSuggestion": "Possible duplicated private-runtime lookup in native-indicator-results.js attach/scope"
+    },
+    "spec": {
+      "initialP2": 1,
+      "fixedP2": 1,
+      "remainingConfirmedFindings": 0,
+      "fix": "Reject ranges without unknown minutes before reserving quota or supplier reads; use accepted input revision and target-source calendar; retain filled-gap request-ID idempotency"
+    }
+  },
+  "backendTests": {
+    "passed": 54,
+    "actualPostgresTests": 12,
+    "files": [
+      "backend/tests/test_composite_recheck.py",
+      "backend/tests/test_composite_alerts.py",
+      "backend/tests/test_composite_series.py",
+      "backend/tests/test_composite_recheck_postgres.py"
+    ],
+    "environment": "Full dependency task-owned Docker verify container; per-test isolated PostgreSQL schemas",
+    "warnings": "Read-only pytest cache only"
+  },
+  "build": {
+    "tool": "mw-docker build",
+    "task": "mw-pending-fixes-20261013",
+    "project": "mw-pending-fixes-20261013",
+    "purpose": "acceptance",
+    "apiImageId": "sha256:5977a6df9dfb0b220eb8a438b2a5ae682f55761ccf7d9c16177c53f91cb1ccd1",
+    "apiFileSha256": "2b78ad1305c2d8848d399245ec7c7d65a6db1ab1ca0f4933923752bf0bb6c1f3",
+    "runningFileMatchesSource": true
+  },
+  "postDeploymentBrowserResults": [
+    {
+      "environment": "Ubuntu task-owned Docker mw-pending-fixes-20261013; actual native host, data-center and HTTP",
+      "passed": true,
+      "checks": [
+        "native drawing template UI save/apply with real persisted preferences preserves non-contiguous mask",
+        "native drawing range controls in Docker",
+        "non-contiguous mask survives persisted drawing property template",
+        "repeat acceptance correctly reaches the three-read quota; no new source read",
+        "real composite list detail/focus",
+        "real Docker detail at widths 1600/1250/980/720 in light/dark",
+        "source-recheck form through real HTTP and audited provider configuration failure",
+        "failed source response preserves unknown",
+        "non-modal right-bottom notice in deployed host"
+      ],
+      "geometry": {
+        "main": 440,
+        "row": 560,
+        "overflow": false,
+        "mode": "side"
+      },
+      "responsive": [
+        {
+          "theme": "Light",
+          "width": 1600,
+          "mode": "side"
+        },
+        {
+          "theme": "Light",
+          "width": 1250,
+          "mode": "side"
+        },
+        {
+          "theme": "Light",
+          "width": 980,
+          "mode": "full"
+        },
+        {
+          "theme": "Light",
+          "width": 720,
+          "mode": "full"
+        },
+        {
+          "theme": "Dark",
+          "width": 1600,
+          "mode": "side"
+        },
+        {
+          "theme": "Dark",
+          "width": 1250,
+          "mode": "side"
+        },
+        {
+          "theme": "Dark",
+          "width": 980,
+          "mode": "full"
+        },
+        {
+          "theme": "Dark",
+          "width": 720,
+          "mode": "full"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "environment": "Ubuntu task-owned Docker mw-pending-fixes-20261013; actual HTTP/API/PostgreSQL/Python and licensed chart",
+      "passed": true,
+      "checks": [
+        "real PostgreSQL/Python multi-output reads and native result values",
+        "LWMA period5/white",
+        "Swing card reserves no top height",
+        "hide/show releases demand",
+        "parameter change retains Python agreement",
+        "cached navigation retains curves",
+        "five Swing panes: light/dark, collapse, maximize",
+        "saved migration and hidden choice preserve strengths",
+        "real saved workspace reload"
+      ],
+      "requests": 7,
+      "batchedReads": 2,
+      "errors": []
+    }
+  ],
+  "browserTransportObservations": [
+    {
+      "test": "production-pending-docker",
+      "exitCode": 0,
+      "requestFailures": [
+        {
+          "route": "chart",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "route": "chart",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "route": "chart",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "route": "chart",
+          "error": "net::ERR_ABORTED"
+        }
+      ],
+      "pageErrorCount": 0,
+      "loadFailedObserved": false,
+      "phase": "before-gap-guard-deployment"
+    },
+    {
+      "test": "production-pending-ui",
+      "exitCode": 0,
+      "requestFailures": [
+        {
+          "route": "chart",
+          "error": "net::ERR_ABORTED"
+        }
+      ],
+      "pageErrorCount": 0,
+      "loadFailedObserved": false,
+      "phase": "before-gap-guard-deployment"
+    },
+    {
+      "test": "production-pending-diagnostics",
+      "exitCode": 0,
+      "requestFailures": [],
+      "pageErrorCount": 0,
+      "loadFailedObserved": false,
+      "phase": "before-gap-guard-deployment"
+    },
+    {
+      "test": "normal-docker-pagination",
+      "exitCode": 0,
+      "requestFailures": [
+        {
+          "route": "chart",
+          "error": "net::ERR_ABORTED"
+        }
+      ],
+      "pageErrorCount": 0,
+      "loadFailedObserved": false,
+      "phase": "before-gap-guard-deployment"
+    },
+    {
+      "test": "post-fix-ui",
+      "exitCode": 1,
+      "requestFailures": [
+        {
+          "route": "chart",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "route": "chart",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "route": "chart",
+          "error": "net::ERR_ABORTED"
+        }
+      ],
+      "pageErrorCount": 0,
+      "loadFailedObserved": false,
+      "phase": "after-gap-guard-deployment"
+    },
+    {
+      "test": "post-fix-ui-retry",
+      "exitCode": 0,
+      "requestFailures": [
+        {
+          "route": "chart",
+          "error": "net::ERR_ABORTED"
+        }
+      ],
+      "pageErrorCount": 0,
+      "loadFailedObserved": false,
+      "phase": "after-gap-guard-deployment"
+    },
+    {
+      "test": "post-fix-product",
+      "exitCode": 0,
+      "requestFailures": [
+        {
+          "route": "chart",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "route": "chart",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "route": "chart",
+          "error": "net::ERR_ABORTED"
+        }
+      ],
+      "pageErrorCount": 0,
+      "loadFailedObserved": false,
+      "phase": "after-gap-guard-deployment"
+    }
+  ],
+  "loadFailed": {
+    "observed": false,
+    "disposition": "Deferred per explicit user instruction; root cause not claimed fixed",
+    "observation": "Passive pageerror/requestfailed events; no response interception; only net::ERR_ABORTED observed"
+  },
+  "uiFirstAttempt": {
+    "passed": false,
+    "reason": "Waiting for data-center close after consecutive Escape actions timed out",
+    "pageerrors": 0,
+    "unchangedScriptRetryPassed": true,
+    "rootCauseConfirmed": false
+  },
+  "normalConfigurationPagination": {
+    "phase": "before-gap-guard-deployment",
+    "instances": 4,
+    "pages": 5,
+    "blankFrames": 0,
+    "wholeChartResets": 0,
+    "comparisonClaim": false
+  },
+  "limitations": [
+    "Existing supplier minutes remain unknown/stale without new observations or applicable closure evidence",
+    "Historical intermediate Value is null remains unexplained",
+    "UI first attempt close-wait timeout remains recorded",
+    "Existing final matrix does not establish strict OS-cold performance or universally faster/lower-memory results"
+  ],
+  "productionChanged": false,
+  "committed": false,
+  "pullRequestCreated": false,
+  "instanceRetainedForReview": true
+}

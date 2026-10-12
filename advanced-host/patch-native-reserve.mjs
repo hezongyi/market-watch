@@ -178,9 +178,14 @@ replacements.push(
   ['calcIsActualInterval(){const e=this._isActualInterval,t=this._properties,i=this._model.mainSeries();',
    'calcIsActualInterval(){globalThis.parent?.MWDrawingVisibility?.ensure(this._properties.childs().intervalsVisibilities);const e=this._isActualInterval,t=this._properties,i=this._model.mainSeries();'],
 );
+const drawingVisibilityHooks = replacements.map(pair=>[...pair]);
+replacements.push([
+  '_createStudy(e,t,i,s,r,o,a,l){this._studiesCache[s][r].completed=!1;',
+  '_createStudy(e,t,i,s,r,o,a,l){if(globalThis.parent?.MWNativeIndicatorResults?.start(this,e,t,i,s,r,o,a,l))return;this._studiesCache[s][r].completed=!1;',
+]);
 const digest = text => createHash('sha256').update(text).digest('hex');
 if (digest(source) !== expected) {
-  const installed = [replacements, quoteScaleHooks, maximizedHooks, productionV112Hooks, legacySyncHooks, previousSyncHooks, legacyPreviousSyncHooks, rangeHooks, legacyRangeHooks, previous, continuousHooks, continuousV9, continuousV8, continuousV7, continuousV6, continuousV5, continuousV4, continuousV3, continuousV2, continuousV1, legacy].find(candidate=>
+  const installed = [replacements, drawingVisibilityHooks, quoteScaleHooks, maximizedHooks, productionV112Hooks, legacySyncHooks, previousSyncHooks, legacyPreviousSyncHooks, rangeHooks, legacyRangeHooks, previous, continuousHooks, continuousV9, continuousV8, continuousV7, continuousV6, continuousV5, continuousV4, continuousV3, continuousV2, continuousV1, legacy].find(candidate=>
     candidate.every(([,after])=>source.split(after).length===2));
   if (!installed) throw Error('Incomplete native hooks: restore the verified original bundle before installing');
   let original = source;
