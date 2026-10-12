@@ -50,6 +50,8 @@ from .storage import (
 
 @asynccontextmanager
 async def lifespan(app):
+    from .swing_sr import register_indicator
+    register_indicator()
     bootstrap()
     from .provider_chart import warm_clients
     await asyncio.to_thread(warm_clients)

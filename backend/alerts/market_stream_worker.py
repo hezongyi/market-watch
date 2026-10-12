@@ -168,24 +168,27 @@ class Calculator:
         elif query.series_kind == "provider":
             from .chart_calculation_history import calculation_rows
             from .chart_indicators import calculate
-            from .provider_cache import snapshot
-            from .storage import ProviderBar
-            page = snapshot(identity["dataset_id"], now_ms() + 1, 2000)
+            from .provider_cache import snapshot_transaction
             from .provider_service import interest_id
-            from .storage import ProviderInterest
-            with transaction() as db:
+            from .storage import ProviderBar, ProviderInterest
+            with snapshot_transaction(identity["dataset_id"], now_ms() + 1, 2000) as (db, page):
                 interest = db.get(ProviderInterest, interest_id("stream_" + work["id"][:32], "shared"))
                 page["status"] = {"state": "error" if interest and interest.error else "ready",
                                   "error": "平台行情暂不可用，后台重试中" if interest and interest.error else None}
-            if query.indicators and page["bars"]:
-                with transaction() as db:
+                if query.indicators and page["bars"]:
                     dataset = db.get(ProviderDataset, identity["dataset_id"])
                     inputs = list(db.scalars(select(ProviderBar).where(
-                        ProviderBar.dataset_id == dataset.id).order_by(ProviderBar.chart_time)))
+                        ProviderBar.dataset_id == dataset.id,
+                        ProviderBar.chart_time <= page["bars"][-1].get("chart_time", page["bars"][-1]["start"]),
+                    ).order_by(ProviderBar.chart_time)))
                     page["indicators"] = [calculate(calculation_rows(
                         [r.payload for r in inputs if spec.get("calculation_origin") is None or
                          r.start >= spec["calculation_origin"]], dataset.metadata_json, query.instrument),
                         spec, provisional=query.provisional) for spec in query.indicators]
+                    for result in page["indicators"]:
+                        if "presentation" in result:
+                            result["presentation"] = result["presentation"] | {
+                                "history_revision": str(dataset.revision), "history_complete": True}
         else:
             page = data_sync(query)
         self.signals[work["id"]] = signal_value

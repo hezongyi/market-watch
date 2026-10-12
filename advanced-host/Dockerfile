@@ -4,6 +4,7 @@ COPY index.html build-assets.mjs patch-native-reserve.mjs native-reserve.js nati
 COPY charting_library/ ./charting_library/
 COPY chart-maximize.js data-center.js price-format.js ./
 COPY chart-theme.js ./
+COPY swing-sr-display.js study-templates.js ./
 COPY native-ui.js native-indicator-dialog.js ./
 COPY patch-native-toolset.mjs ./
 ARG NATIVE_RESERVE_ENABLED=true

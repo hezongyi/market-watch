@@ -678,10 +678,12 @@ def data(body):
             if body.indicators
             else body.limit + 1
         )
+        swing = any(spec.get("name") == "SWING_SR_V1" for spec in body.indicators)
         rows = read_rows(
-            db, inst, body.timeframe, before, max(1, count), dataset_start=body.dataset_start
+            db, inst, body.timeframe, now_ms() + 1 if swing else before, max(1, count),
+            dataset_start=body.dataset_start
         )
-        visible = rows[-body.limit :]
+        visible = [row for row in rows if row["start"] < before][-body.limit :]
         left = max(pub.start, body.dataset_start or pub.start) if pub else None
         revision = pub.revision if pub else 0
         from .volume import metadata
@@ -694,6 +696,9 @@ def data(body):
     indicators = []
     for spec in body.indicators:
         result = calculate(rows, spec, provisional=body.provisional)
+        if "presentation" in result:
+            result["presentation"] = result["presentation"] | {
+                "history_revision": str(revision), "history_complete": True}
         start = visible[0]["start"] if visible else before
         indicators.append(
             {

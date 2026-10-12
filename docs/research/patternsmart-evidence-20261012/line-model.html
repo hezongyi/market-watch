@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Swing 支撑阻力：平均间隔与绘图模型</title>
+<style>
+body{margin:0;background:#11151b;color:#e3e9f0;font:16px system-ui,sans-serif;line-height:1.65}main{max-width:1100px;margin:auto;padding:28px 22px}h1{font-size:26px}h2{font-size:20px;margin-top:30px}p{max-width:1000px}.panel{background:#19202a;padding:20px;border:1px solid #374150;border-radius:12px}.cards{display:flex;gap:16px;flex-wrap:wrap}.cards>div{flex:1;min-width:240px;background:#19202a;padding:18px;border-radius:10px}.big{font-size:32px;font-weight:700}small,.muted{color:#b2c0d0}label{display:inline-block;margin:8px 18px 8px 0}input[type=range]{width:min(500px,65vw);vertical-align:middle}svg{width:100%;height:auto;display:block}table{border-collapse:collapse;width:100%;font-size:14px}th,td{border-bottom:1px solid #374150;padding:9px;text-align:left}a{color:#83bcff}.status{min-height:54px}.controls{margin-top:12px}code{color:#ffc58a}button{font:inherit;border:1px solid #526175;background:#253449;color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer}details{margin-top:20px}summary{cursor:pointer}
+</style>
+<main>
+<h1>Swing 支撑阻力：平均间隔与绘图模型</h1>
+<p>使用已有生产 OANDA bid H4 缓存 4,000 根，加原截图时刻保存的两根当前柱，离线计算 5/5 局部极值。截图供源是 FXCM。下面演示能解释截图的模型，尚未取得 Patternsmart 原源码。</p>
+<div class="cards"><div><small>高点之间平均柱间隔</small><div class="big">15.1673 → 15</div><span>264 个点，263 个间隔<br>总间隔 3,989 ÷ 263</span></div><div><small>低点之间平均柱间隔</small><div class="big">16.0403 → 16</div><span>249 个点，248 个间隔<br>总间隔 3,978 ÷ 248</span></div></div>
+<p>统计的是同类拐点的下标差 <code>q − p</code>，不是点线长度。该样本中四舍五入和截断均给出 15／16，因此不能仅凭两个整数断定取整方式。长滚动窗口等其他算法也可能给出相同整数。</p>
+<h2>移动当前柱，观察线何时出现</h2>
+<div class="panel">
+<p>示例：第 5 根发生高点 A=110，第 25 根发生高点 B=105。右侧窗口为 5；分别在第 10、30 根才有足够数据识别。这里演示柱完成后的状态更新，实际截图最后高点仍可能是盘中候选。</p>
+<div><label for="time">当前柱 T：<strong id="timeValue">30</strong></label><input id="time" type="range" min="5" max="45" value="30" aria-label="当前柱"><button id="before">确认前 T=29</button> <button id="after">确认后 T=30</button></div>
+<div class="controls"><label><input id="unshifted" type="checkbox" checked> 未偏移圆点</label><label><input id="shifted" type="checkbox" checked> 左移 5 柱圆点</label><label><input id="bridge" type="checkbox" checked> 最新实线桥</label></div>
+<svg id="chart" viewBox="0 0 1080 365" role="img" aria-label="高点确认与水平线回画的交互示意"></svg>
+<p class="status" id="status"></p>
+</div>
+<p>红色实心点是未偏移状态，橙色空心点是左移状态，蓝色线是当前价位的实线桥。取消“最新实线桥”后，在 T=30 时，新高点 B 只有第 25、30 根两个点，中间 26–29 没有连接；这说明两个圆点序列不足以解释截图中的最新红色实线。</p>
+<h2>历史段的准确范围</h2>
+<table><thead><tr><th>部分</th><th>旧价位 A</th><th>新价位 B 在 T=30</th></tr></thead><tbody><tr><td>未偏移圆点</td><td>10…29</td><td>30</td></tr><tr><td>左移 5 柱圆点</td><td>5…24</td><td>25</td></tr><tr><td>两组并集</td><td>5…29</td><td>25、30</td></tr><tr><td>最新实线桥</td><td>替换后不保留旧实线桥</td><td>25…30</td></tr></tbody></table>
+<p>旧、新价位在横轴 25…29 同时可见，共五个位置。把 <code>p=5、q=25</code> 换成任意相邻同类拐点，旧段终点是 <code>q+4</code>。截图中的五条历史红段都符合这个终点模型。</p>
+<details><summary>累计平均和其他统计的比较</summary><table><thead><tr><th>严格 5/5 统计范围</th><th>高点均值</th><th>低点均值</th><th>四舍五入</th></tr></thead><tbody><tr><td>完整缓存＋截图时刻尾部</td><td>15.1673</td><td>16.0403</td><td>15／16</td></tr><tr><td>完整缓存，只用已完成柱</td><td>15.1603</td><td>16.0403</td><td>15／16</td></tr><tr><td>最近 10 个间隔</td><td>15.4</td><td>13.2</td><td>15／13</td></tr><tr><td>最近 20 个间隔</td><td>13.9</td><td>14.35</td><td>14／14</td></tr><tr><td>最近 50 个间隔</td><td>12.2</td><td>14.04</td><td>12／14</td></tr><tr><td>最近 200 个间隔</td><td>14.95</td><td>15.8</td><td>15／16</td></tr><tr><td>最近 3,000 根柱中的间隔</td><td>14.95</td><td>15.6126</td><td>15／16</td></tr></tbody></table></details>
+<p>价位被突破后，模型继续保留状态，直到出现新的同类拐点。这解释的是画图痕迹；它没有把旧线自动定义为仍然有效的交易支撑／阻力。</p>
+<p><a href="comparison.html">查看实际截图与 OANDA 重建图</a> · <a href="long_statistics.json">完整统计结果</a> · <a href="../patternsmart-average-spacing-and-lines-20261012.md">研究说明</a></p>
+</main>
+<script>
+const time=document.getElementById('time'),chart=document.getElementById('chart');
+const x=i=>55+i*21,y=v=>v===110?125:225;
+function render(){
+ const T=Number(time.value),U=document.getElementById('unshifted').checked,S=document.getElementById('shifted').checked,B=document.getElementById('bridge').checked;
+ document.getElementById('timeValue').textContent=T;
+ const points=[{p:5,d:10,v:110},{p:25,d:30,v:105}],latest=points.filter(p=>p.d<=T).at(-1);
+ let svg='<rect width="1080" height="365" fill="#131922"/>';
+ svg+='<rect x="'+(x(25)-10)+'" y="65" width="105" height="210" fill="#594a30" opacity=".5"/>';
+ svg+='<text x="'+x(25)+'" y="52" fill="#e9c58c" font-size="13">新旧价位重叠的五个位置</text>';
+ for(const v of [110,105])svg+='<path d="M40 '+y(v)+' H1020" stroke="#374150"/><text x="8" y="'+(y(v)+5)+'" fill="#bac8d8" font-size="13">'+v+'</text>';
+ for(let i=0;i<=45;i++){
+  svg+='<path d="M'+x(i)+' 285 V'+(i%5===0?298:291)+'" stroke="#8291a3"/>';
+  if(i%5===0)svg+='<text x="'+(x(i)-6)+'" y="315" fill="#b9c7d7" font-size="13">'+i+'</text>';
+ }
+ for(let k=0;k<=T;k++){
+  const active=points.filter(p=>p.d<=k).at(-1);if(!active)continue;
+  if(U)svg+='<circle cx="'+x(k)+'" cy="'+y(active.v)+'" r="3" fill="#f23645"/>';
+  if(S)svg+='<circle cx="'+x(k-5)+'" cy="'+y(active.v)+'" r="5" stroke="#ffb55f" stroke-width="1.5" fill="none"/>';
+ }
+ if(B&&latest)svg+='<path d="M'+x(latest.p)+' '+y(latest.v)+' H'+x(T)+'" stroke="#45cced" stroke-width="2"/>';
+ svg+='<path d="M'+x(T)+' 70 V285" stroke="#d4e0ee" stroke-dasharray="4 4"/><text x="'+(x(T)-12)+'" y="340" fill="#fff">T='+T+'</text>';
+ for(const p of points)svg+='<text x="'+(x(p.p)-35)+'" y="'+(y(p.v)-20)+'" fill="#aebfd3" font-size="12">发生柱 '+p.p+'</text>';
+ chart.innerHTML=svg;
+ document.getElementById('status').textContent=T<10?'第一个高点还未确认，不能在发生柱就使用它。':T<30?'当前仍保持 A=110。B 虽发生在第25根，但右侧尚不足5根，当前没有 B 的确认事件。':'B 在第30根首次可识别，最新价位改为105；向左回画到25。旧价位仍留在25…29的未偏移历史点上。';
+}
+for(const id of ['time','unshifted','shifted','bridge'])document.getElementById(id).addEventListener('input',render);
+document.getElementById('before').onclick=()=>{time.value=29;render()};document.getElementById('after').onclick=()=>{time.value=30;render()};render();
+</script>
+</html>
