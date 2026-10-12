@@ -101,4 +101,20 @@ node tests/supertrend-native.browser.cjs
 - [合并后原生合成探针](merge-browser-profile.json)：同一末柱信号翻转与撤回、周期 1 真缺口通过；这是读取当前 adapter 源码的原生库探针，不等于 OANDA 全栈验收。
 - [实际登录再次复验](browser-login-recheck.json)：30 次指标响应全部 HTTP 200，无页面异常或 reset；设置、开关、暗色及浅色截图再次逐张人工检查。
 
-运行中的 Docker 验收镜像和上述实际登录截图对应实现提交 `f4aeaaa`。合入最新 main 后未重建整套验收镜像；合并后的代码证据为这里列出的自动化与合成探针。PR 将推送远程分支，仍未部署生产。
+上述首次集成复验的 Docker 镜像和登录截图对应实现提交 `f4aeaaa`；当时合入 main 后尚未重建镜像。PR #52 后续修复与完整重建复验见下一节，仍未部署生产。
+
+## PR #52 阻塞修复与最终复验
+
+复审发现旧 `/chart-workspaces` 接口把原生 profile 暴露给只支持数字参数和通用折线的渲染器，导致 Supertrend 枚举无法编辑、全部六输出误绘。修复在旧目录接口排除原生 `render_profile`，保留八个通用指标；专业图表目录、算法及保存接口仍提供 Supertrend 和 Swing。
+
+认证接口回归已先复现失败，再修复通过；同时断言旧目录八项、高级目录两个 profile。完整后端回归再次运行：[235 passed](review-fix/python-tests.txt)。
+
+实际应用代码提交为 `a8e4ae8`。通过 `mw-docker build` 重建 API、web 和 chart 三个镜像，任务/项目为 `mw-supertrend-20261012`、用途 `acceptance`、工作树干净，详见 [镜像身份](review-fix/images.json) 与 [运行服务](review-fix/runtime.json)。仍使用 Ubuntu 主机 `quant-server` 及上面的同一隔离 project、数据库和端口。后续提交只修正浏览器验收脚本的工作区读取接口及添加证据，不改变镜像中的应用代码。
+
+重新实际登录并运行增强的浏览器验收：
+
+- [OANDA 实际行情](review-fix/browser-oanda.json)：27 次指标响应全部 HTTP 200，无页面异常、无 reset。验证旧页面八项选择器、SMA 周期 11 编辑与服务器保存；两个 Supertrend 与 Swing 同时有有效原生值；模板与服务器保存/重载恢复三个实例的独立计算参数、展示参数和 Supertrend 样式。
+- [固定历史完整应用回归](review-fix/browser-fixed-regression.json)：任务 PostgreSQL 的 seed117 合成 OHLC，经真实 API/原生库运行，13 次指标响应全部 HTTP 200，无页面异常或 reset。验证旧八个 Python 指标与内置 SuperTrend 均有有效原生值；同时重复共存、保存恢复及目录验收。这是固定合成历史，不作为 OANDA 数值证据。
+- 以下七张新截图已逐张打开人工检查：[旧工作区参数](review-fix/legacy-catalog.png)、[Supertrend/Swing 共存](review-fix/swing-coexistence.png)、[服务器恢复后共存](review-fix/swing-restored.png)、[原生设置](review-fix/settings.png)、[标签/填色关闭](review-fix/switches-off.png)、[暗色](review-fix/native-dark.png)、[浅色](review-fix/native-light.png)。旧页面截图使用空的自建行情，证明目录/参数保存；专业图表截图使用实际 OANDA，趋势线、信号、圆点及填色正常，Swing 圆点不影响 Supertrend 独立设置。
+
+Standards 和 Spec 两轴复审均无剩余阻塞，原 P2 已解决；详见 [复审结论](review-fix/review.md)。前述同 OHLC Pine 引擎对照、填色产品映射和非穷举组合的证据边界仍然适用。

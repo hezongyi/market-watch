@@ -1,0 +1,37 @@
+{
+  "passed": true,
+  "environment": "Ubuntu Docker mw-supertrend-20261012",
+  "base": "http://localhost:20187",
+  "chartOrigin": "http://localhost:20188",
+  "ticker": "MWP:EURUSD",
+  "checks": [
+    "legacy workspace lists only eight supported studies; SMA period edit saves to server",
+    "Python catalog; two native instances; real backend output received",
+    "Supertrend and Swing coexist with finite native values and independent settings",
+    "each native study exposes finite plotted trend values on five distinct candles",
+    "native Boolean controls; display inputs; study template preserves two independent instances",
+    "actual workspace server save/reload restores stable study identities",
+    "server reload preserves both calculation/display inputs and custom color/line width",
+    "study template and server reload preserve Swing alongside both Supertrend instances"
+  ],
+  "errors": [],
+  "resets": [],
+  "application_commit": "a8e4ae8145eff50ec3b2daeb6ef77b87fa7e79a5",
+  "responses": 27,
+  "response_statuses": [
+    200
+  ],
+  "visual_review": {
+    "inspected": true,
+    "screenshots": [
+      "legacy-catalog.png",
+      "swing-coexistence.png",
+      "swing-restored.png",
+      "settings.png",
+      "switches-off.png",
+      "native-dark.png",
+      "native-light.png"
+    ],
+    "notes": "Legacy catalog and SMA period edit, two Supertrend instances and Swing circles, restored parameters/styles, Boolean settings, hidden labels/fills, dark/light trend plots manually inspected."
+  }
+}

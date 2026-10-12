@@ -81,8 +81,8 @@ const poll = async (fn, ms=60000) => {
     await page.getByRole('button',{name:'关闭设置'}).click();
     await page.getByRole('button',{name:'保存',exact:true}).click();
     await poll(async()=>{
-      const saved=await(await page.request.get(base+'/api/charts/workspaces/'+legacy.id)).json();
-      return saved.document.panels[0].indicators[0]?.params.period===11;
+      const saved=await(await page.request.get(base+'/api/charts/workspaces')).json();
+      return saved.find(row=>row.id===legacy.id)?.document.panels[0].indicators[0]?.params.period===11;
     });
     checks.push('legacy workspace lists only eight supported studies; SMA period edit saves to server');
     await page.goto(base+'/advanced-charts');
