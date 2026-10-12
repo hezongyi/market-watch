@@ -38,6 +38,7 @@ class CapabilityQuery(Contract):
 
 
 def capabilities(body):
+    from .chart_indicators import public_catalog
     from .chart_data import FRAMES
     from .provider_capabilities import frames, poll_seconds
     if body.timeframe not in FRAMES:
@@ -52,6 +53,7 @@ def capabilities(body):
                     "calendar": meta["calendar"], "available": body.timeframe in meta["frames"], "reason": None,
                     "observation_basis": "固定历史与确认M1接续；临时触价为显式抽样模式，断线后不追认未观测事件"}],
                 "modes": ["close", "intrabar"], "indicators": ["SMA", "EMA", "RSI", "MACD"],
+                "indicator_metadata": {name: meta for name, meta in public_catalog().items() if name in ("SMA", "EMA", "RSI", "MACD")},
                 "line_mapping": "固定组合修订；斜线需要准确周期柱序号", "seam_policies": ["reject", "accept_raw"]}
         instrument = db.get(Instrument, body.instrument)
         managed = ({"source": instrument.source, "series_kind": "managed", "basis": instrument.basis,
@@ -73,6 +75,7 @@ def capabilities(body):
         row["observation_basis"] = f"抽样 K 线当前收盘值，约每 {seconds} 秒观察；不重建未观测路径"
     return {"instrument": body.instrument, "timeframe": body.timeframe, "sources": sources,
             "modes": ["close", "intrabar"], "indicators": ["SMA", "EMA", "RSI", "MACD"],
+            "indicator_metadata": {name: meta for name, meta in public_catalog().items() if name in ("SMA", "EMA", "RSI", "MACD")},
             "relations": ["cross", "cross_up", "cross_down", "above", "below", "enter", "exit", "break_upper", "break_lower"],
             "line_mapping": "必须核对原生 K 线序号和价格轴；未匹配端点时等待数据"}
 

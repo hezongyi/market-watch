@@ -111,10 +111,14 @@ _DETAILS = {
         "以 k 根高低区间计算位置比例，依次用 smooth 和 d 简单均线得到 K、D。",
     ),
 }
+_PARAMETER_LABELS = {"period":"计算周期", "fast":"快线周期", "slow":"慢线周期",
+    "signal":"信号周期", "deviation":"标准差倍数", "k":"K 线周期", "smooth":"K 线平滑周期", "d":"D 线周期"}
+_OUTPUT_LABELS = {"value":"指标值", "macd":"MACD 线", "signal":"信号线", "histogram":"柱状差值",
+    "upper":"上轨", "middle":"中轨", "lower":"下轨", "k":"K 线", "d":"D 线"}
 for _name, _meta in CATALOG.items():
     _meta["description"], _meta["calculation"] = _DETAILS[_name]
     _meta["series"] = [
-        {"key": key, "type": "histogram" if key == "histogram" else "line"}
+        {"key": key, "label": _OUTPUT_LABELS[key], "type": "histogram" if key == "histogram" else "line"}
         for key in _OUTPUTS.get(_name, ("value",))
     ]
     _meta["aliases"] = [_name, *_ALIASES[_name]]
@@ -124,6 +128,8 @@ for _name, _meta in CATALOG.items():
         else {"type": "integer", "min": 2, "max": 500, "default": value}
         for key, value in _meta["params"].items()
     }
+    for _key, _schema in _meta["parameter_schema"].items():
+        _schema["label"] = _PARAMETER_LABELS[_key]
 
 
 def _validate_metadata(name, meta):
@@ -159,6 +165,8 @@ def _validate_metadata(name, meta):
             or item.get("type") not in ("line", "histogram")
         ):
             raise ValueError(f"{name}: invalid output declaration")
+        if "label" in item and (not isinstance(item["label"], str) or not item["label"]):
+            raise ValueError(f"{name}: invalid output label")
         keys.append(item["key"])
     if len(set(keys)) != len(keys):
         raise ValueError(f"{name}: duplicate output keys")
@@ -177,6 +185,8 @@ def _validate_metadata(name, meta):
             or rule["default"] != params[key]
         ):
             raise ValueError(f"{name}: invalid parameter declaration {key}")
+        if "label" in rule and (not isinstance(rule["label"], str) or not rule["label"]):
+            raise ValueError(f"{name}: invalid parameter label")
         _validate_parameter(name, key, params[key], rule)
     if "history_requirement" in meta and not callable(meta["history_requirement"]):
         raise ValueError(f"{name}: history_requirement must be callable")
@@ -216,9 +226,9 @@ def public_catalog():
     return {
         name: {
             **deepcopy({key: meta[key] for key in fields if key in meta}),
-            "series": [{key: item[key] for key in ("key", "type")} for item in meta["series"]],
+            "series": [{key: item[key] for key in ("key", "type", "label") if key in item} for item in meta["series"]],
             "parameter_schema": {
-                parameter: {key: rule[key] for key in ("type", "min", "max", "default")}
+                parameter: {key: rule[key] for key in ("type", "min", "max", "default", "label") if key in rule}
                 for parameter, rule in meta["parameter_schema"].items()
             },
             "version": "1",
