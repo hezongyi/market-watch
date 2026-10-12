@@ -40,7 +40,9 @@ services:
     image: market-watch-web:native-mcp-acceptance
     depends_on: [api]
   chart-origin:
-    build: ../../../advanced-host
+    build:
+      context: ../../..
+      dockerfile: advanced-host/Dockerfile
     image: market-watch-chart:native-mcp-acceptance
   tls:
     image: nginx:1.28-alpine

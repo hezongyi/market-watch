@@ -81,6 +81,9 @@ function chartAlertBridge({
       series_kind: identity.series_kind,
       timeframe: frames[chart.resolution()],
       source: meta.source,
+      display_label: [meta.display_symbol || meta.symbol || meta.logical_symbol || meta.name || identity.symbol,
+        ({provider:'平台行情',managed:'自建行情',composite:'组合行情',history:'固定历史'})[identity.series_kind],
+        meta.price_description || meta.basis, frames[chart.resolution()]].filter(Boolean).join(' · '),
       calculation_origin:
         calculationOrigin(chart.symbol(), chart.resolution()) ?? null,
       published: identity.series_kind === "managed",
@@ -197,7 +200,11 @@ function chartAlertBridge({
         : snapshot(chart);
       if (!stillCurrent(chart, context))
         throw Error("发起操作的图表已改变，请重新打开菜单");
-      if (Number.isFinite(price) && price > 0) context.price = String(price);
+      if (Number.isFinite(price) && price > 0) {
+        const presented = context.price_presentation || chartAlertPricePresentation(chart, price);
+        context.price = presented.value;
+        context.price_presentation = presented;
+      }
       if (object?.type === "shape") {
         context.association.object_id = crypto.randomUUID();
         context.association.object_kind = "drawing";
@@ -244,6 +251,10 @@ function chartAlertBridge({
         ? menuPoint.price
         : undefined;
     menuPoint = null;
+    if (Number.isFinite(price)) {
+      try {context.price_presentation = chartAlertPricePresentation(chart, price);}
+      catch (error) {fail(error);return items;}
+    }
     const item = actionsFactory.createAction({
       actionId: "mw-chart-alert-create",
       label:
@@ -252,7 +263,7 @@ function chartAlertBridge({
           : object?.type === "study"
             ? "在此指标上创建告警…"
             : Number.isFinite(price)
-              ? `在 ${price} 创建价格告警…`
+              ? `在 ${context.price_presentation.text} 创建价格告警…`
               : "创建主价格系列告警…",
       onExecute: () => create({ chart, object, price, context }),
     });
@@ -740,6 +751,11 @@ function chartAlertBridge({
     drawingEvent,
     drawingAction,
     geometry,
+    currentInstrument: () => {
+      if (disposed || isLoading()) return null;
+      const identity = MWSeries.decode(getWidget().activeChart().symbol());
+      return {instrument: identity.symbol, series_kind: identity.series_kind};
+    },
     diagnostics: () => ({
       charts: chartList().map((chart) => chartIdentity(chart)),
       rows: rows.map((row) => ({ id: row.id, version: row.version })),

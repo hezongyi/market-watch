@@ -103,6 +103,12 @@ export type Task = {
   desired_state?: string;
   controllable: boolean;
   dataset: Dataset;
+  derivation?: {
+    stage: string; published_periods: number; total_periods: number;
+    processed_rows: number | null; total_rows: number | null;
+    estimated_remaining_seconds: number | null;
+    periods: {timeframe:string;status:string;processed_rows:number|null;total_rows:number|null;cursor:number}[];
+  };
 };
 export type Page<T> = {
   items: T[];

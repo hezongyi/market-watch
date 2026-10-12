@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const {spawnSync}=require('node:child_process');
 const repo=path.resolve(__dirname,'../..');
-const generated=spawnSync(path.join(repo,'.venv/bin/python'),
+const generated=spawnSync(process.env.MARKET_WATCH_TEST_PYTHON || path.join(repo,'.venv/bin/python'),
   [path.join(__dirname,'fixtures/fixed-indicator-feed.py')],{cwd:repo,encoding:'utf8',
     env:{...process.env,PYTHONPATH:path.join(repo,'backend')+':'+path.join(repo,'backend/tests'),
       ALERTS_DATABASE_URL:'sqlite://',ALERTS_DELIVERY_ENABLED:'false'}});
@@ -9,10 +9,11 @@ assert.equal(generated.status,0,generated.stderr);
 const responses=JSON.parse(generated.stdout),events=[],sent=[],handlers={};
 const parent={postMessage:message=>sent.push(message)};
 const ctx=vm.createContext({URL,URLSearchParams,Map,Set,Promise,Date,Intl,Error,
+  document:{createElement:()=>({}),head:{append(){}}},
   location:{search:'?parent=http://localhost'},parent,
   crypto:{randomUUID:()=> 'test'},addEventListener:(name,callback)=>handlers[name]=callback,setTimeout,clearTimeout,
   atob:s=>Buffer.from(s,'base64').toString('utf8'),btoa:s=>Buffer.from(s).toString('base64'),responses,events});
-for(const name of ['series.js','bridge.js'])vm.runInContext(fs.readFileSync(path.join(repo,'advanced-host',name),'utf8'),ctx);
+for(const name of ['series.js','price-format.js','bridge.js'])vm.runInContext(fs.readFileSync(path.join(repo,'advanced-host',name),'utf8'),ctx);
 (async()=>{
   await vm.runInContext(`(async()=>{
     ready=true;

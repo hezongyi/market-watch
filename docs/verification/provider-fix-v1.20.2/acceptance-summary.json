@@ -1,0 +1,77 @@
+{
+  "tested_application_commit": "df7affb29a27c2851feacfe47225c9d3f4655529",
+  "packaged_image_commit": "ac7cf0d",
+  "current_source_commit": "e20b812c19972592e653b56dbb9f62cf5b4be336",
+  "application_modules_unchanged_since_tested_commit": true,
+  "source_suite": {
+    "passed": 1466,
+    "skipped": 389,
+    "postgres_skips_not_counted_as_pass": true
+  },
+  "source_network_followup": {
+    "passed": 89
+  },
+  "postgres_business": {
+    "passed": 56,
+    "files": [
+      "test_live_pricing_postgres.py",
+      "test_oanda_recovery_postgres.py",
+      "test_market_usage_postgres.py",
+      "test_composite_series_postgres.py",
+      "test_composite_chart_postgres.py",
+      "test_composite_definitions_postgres.py",
+      "test_composite_alerts_postgres.py",
+      "test_composite_quotes_postgres.py"
+    ]
+  },
+  "final_image_core": {
+    "passed": 35,
+    "postgres_routing_and_reopening": 11,
+    "network": 10,
+    "routing_sqlite": 10,
+    "finite_session": 4,
+    "final_test_fixture_mounted_readonly": true
+  },
+  "limitations": [
+    "Synthetic TLS seam with real HTTPcore CONNECT/socket/pool; not an external outage.",
+    "OANDA production is closed now; future real open-session readiness is not certified.",
+    "Provider direct-route small sample is not long-term stability."
+  ],
+  "production_deployed": false,
+  "browser": {
+    "passed": true,
+    "environment": "Ubuntu independent Docker mw-provider-fix-20261011",
+    "app": "https://192.168.7.232:19819",
+    "chart": "https://192-168-7-232.sslip.io:19820",
+    "checks": [
+      "Acceptance administrator login and independent workspace created",
+      "Licensed chart ready using actual Binance M1 in independent PostgreSQL",
+      "Data center and source status read actual isolated API"
+    ],
+    "expected_unconfigured_sources": [
+      {
+        "path": "/api/market-data/resolve",
+        "status": 422,
+        "args": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        }
+      },
+      {
+        "path": "/api/market-data/resolve",
+        "status": 422,
+        "args": {
+          "instrument": "XAUUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        }
+      }
+    ],
+    "errors": [],
+    "http_errors": [],
+    "credential_leaks": [],
+    "symbol": "MWP:BTCUSDT",
+    "logout_verified": true
+  }
+}

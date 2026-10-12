@@ -13,6 +13,7 @@ COPY backend ./backend
 COPY migrations ./migrations
 COPY alembic.ini ./
 COPY scripts/volume_backfill.py ./scripts/volume_backfill.py
+COPY scripts/oanda_live_sessions.py ./scripts/oanda_live_sessions.py
 RUN pip install --no-cache-dir --no-deps .
 COPY --from=adapter /adapter ./adapters/dukascopy
 RUN useradd --uid 10001 --create-home app

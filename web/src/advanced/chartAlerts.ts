@@ -61,6 +61,8 @@ export type AlertContext = {
   series_kind: "managed" | "provider" | "composite";
   timeframe: string;
   price?: string;
+  display_label?: string;
+  price_presentation?: {text: string; value: string};
   source?: string;
   association: Association;
   line?: LineGeometry;
@@ -70,6 +72,7 @@ export type AlertContext = {
   composite_revision_id?: string | null;
 };
 export type AlertRow = {
+  display_label?: string;
   id: string;
   name: string;
   version: number;
@@ -88,6 +91,7 @@ export type AlertRow = {
   runtime: Record<string, unknown>;
 };
 export type AlertEvent = {
+  display_label?: string;
   id: string;
   alert_id: string;
   occurred_at: number;
@@ -199,7 +203,7 @@ export function validAlertContext(
 }
 export function freshDraft(context: AlertContext): AlertConfig {
   return {
-    name: context.instrument + " 告警",
+    name: (context.display_label || context.instrument) + " 告警",
     instrument: context.instrument,
     series_kind: context.series_kind,
     source: context.source || "",

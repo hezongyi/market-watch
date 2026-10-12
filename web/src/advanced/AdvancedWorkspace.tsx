@@ -10,8 +10,8 @@ import { HistoryPlansDialog, type DatasetViews } from "./HistoryPlansDialog";
 import { MaintenanceDialog } from "./MaintenanceDialog";
 import { ExportDialog, type ExportSelection } from "./ExportDialog";
 import { providerSubscriptions } from "./providerSubscriptions";
-import { ChartAlertsPanel } from "./ChartAlertsPanel";
-import { validAlertContext, type AlertContext } from "./chartAlerts";
+import { validAlertContext } from "./chartAlerts";
+import { chartAlertUiRequest } from "./chartAlertUiApi";
 import { HistoryCapacityDialog } from "./HistoryCapacityDialog";
 import {
   HistoryLoadingNotice,
@@ -59,9 +59,7 @@ export default function AdvancedWorkspace() {
   const [pollErrors, setPollErrors] = useState<Record<string, string>>({});
   const [chartTheme, setChartTheme] = useState("dark");
   const [nativeReady, setNativeReady] = useState(false);
-  const [alertsOpen, setAlertsOpen] = useState(false);
-  const [alertContext, setAlertContext] = useState<AlertContext | null>(null);
-  const [alertAssociations, setAlertAssociations] = useState<Record<string, string>>({});
+  const alertUiSession = useRef("");
   const historyCapabilities = useRef<HistoryCapabilities | null>(null);
   const nativeLoadEpoch = useRef(0);
   const [capacityNotices, setCapacityNotices] = useState<
@@ -70,6 +68,7 @@ export default function AdvancedWorkspace() {
   const [nativeLoads, setNativeLoads] = useState<Record<string, NativeLoad>>(
     {},
   );
+  const [chartFailures,setChartFailures]=useState<{index:number;symbol:string;resolution:string;label:string;error:string;epoch:number}[]>([]);
   const [capacityDialog, setCapacityDialog] = useState<{
     capabilities: HistoryCapabilities;
     usage: number;
@@ -127,6 +126,7 @@ export default function AdvancedWorkspace() {
     setSyncNotices({});
     unsaved.current = false;
     current.current = row;
+    alertUiSession.current = "";
     blocked.current =
       !mobile && !!localStorage.getItem("mw-tv-draft:" + row.id);
     setActive(row);
@@ -262,7 +262,7 @@ export default function AdvancedWorkspace() {
         source.postMessage({ channel, ...value }, origin);
       if (m.type === "data-center-state" && typeof m.session === "string" && /^[a-f0-9-]{36}$/.test(m.session)) {
         centerSession.current = m.open === true ? m.session : null;
-        if (m.open) { setAlertsOpen(false); setCapacityDialog(null); setExportSelection(null); }
+        if (m.open) { setCapacityDialog(null); setExportSelection(null); }
         return;
       }
       if (m.type === "data-center-replay" && m.session === centerSession.current && /^\/replay(?:\?dataset_version=[a-f0-9-]{36})?$/.test(m.path)) {
@@ -287,39 +287,150 @@ export default function AdvancedWorkspace() {
         }
         return;
       }
-      if (m.type === "chart-alert-context") {
-        if (mobile || !validAlertContext(m.context, current.current?.id)) return;
-        setAlertContext(m.context); setAlertsOpen(true);
+      const readAlertDraft = (workspace: string | undefined) => {
+        try {
+          const value = JSON.parse(
+            localStorage.getItem("mw-chart-alert-draft:" + workspace) || "null",
+          );
+          return value?.config?.instrument &&
+            typeof value.requestId === "string"
+            ? value
+            : null;
+        } catch {
+          return null;
+        }
+      };
+      if (m.type === "chart-alert-ui-draft") {
+        if (
+          m.session !== alertUiSession.current ||
+          !m.session ||
+          m.workspace_id !== current.current?.id ||
+          m.draft === undefined ||
+          JSON.stringify(m.draft).length > 20_000
+        )
+          return;
+        if (
+          m.draft &&
+          (!m.draft.config?.instrument || typeof m.draft.requestId !== "string")
+        )
+          return;
+        try {
+          const key = "mw-chart-alert-draft:" + m.workspace_id;
+          if (m.draft) localStorage.setItem(key, JSON.stringify(m.draft));
+          else localStorage.removeItem(key);
+        } catch {
+          setError("本地告警草稿保存失败，请保留表单后重试");
+        }
         return;
       }
-      if (m.type === "chart-alert-open") {setAlertsOpen(true); return;}
-      if (m.type === "chart-alert-association") {
-        if (m.workspace_id === current.current?.id && typeof m.alert_id === "string" && /^[a-f0-9-]{36}$/.test(m.alert_id) && typeof m.text === "string" && m.text.length <= 1000)
-          setAlertAssociations(previous => ({...previous, [m.alert_id]: m.text}));
+      if (m.type === "chart-alert-context") {
+        if (mobile || !validAlertContext(m.context, current.current?.id))
+          return;
+        reply({ type: "chart-alert-ui-context", context: m.context });
+        return;
+      }
+      if (m.type === "chart-alert-ui-rpc") {
+        const workspace = current.current?.id,
+          session = alertUiSession.current;
+        if (!workspace || !session || !Number.isSafeInteger(m.id) || m.id <= 0)
+          return;
+        try {
+          const result = await chartAlertUiRequest(
+            m.query,
+            { workspace_id: workspace, session },
+            () =>
+              current.current?.id === workspace &&
+              alertUiSession.current === session &&
+              frame.current?.contentWindow === source,
+            (path, body) => {
+              if (
+                mobile &&
+                body !== undefined &&
+                path !== "/chart-alerts/capabilities" &&
+                !path.endsWith("/ack")
+              )
+                throw Error("当前图表只读");
+              return api(path, body);
+            },
+          );
+          reply({ type: "result", id: m.id, result });
+        } catch (e) {
+          reply({
+            type: "result",
+            id: m.id,
+            error: String(e),
+            errorDetails: { ...apiErrorDetails(e), status: (e as any)?.status },
+          });
+        }
         return;
       }
       if (m.type === "chart-alert-rpc") {
         const q = m.query;
         const requestWorkspace = current.current?.id;
-        if (mobile || !Number.isSafeInteger(m.id) || m.id <= 0 || !q ||
-            JSON.stringify(q).length > 20_000 || !["geometry", "edit", "read", "lifecycle"].includes(q.op)) return;
+        if (
+          mobile ||
+          !Number.isSafeInteger(m.id) ||
+          m.id <= 0 ||
+          !q ||
+          JSON.stringify(q).length > 20_000 ||
+          !["geometry", "edit", "read", "lifecycle"].includes(q.op)
+        )
+          return;
         try {
           let result;
-          if (q.op === "geometry") result = await api("/chart-alerts/geometry", q.args);
-          else if (typeof q.alert_id === "string" && /^[a-f0-9-]{36}$/.test(q.alert_id)) {
-            if (q.op === "read") result = await api(`/chart-alerts/${q.alert_id}`);
+          if (q.op === "geometry")
+            result = await api("/chart-alerts/geometry", q.args);
+          else if (
+            typeof q.alert_id === "string" &&
+            /^[a-f0-9-]{36}$/.test(q.alert_id)
+          ) {
+            if (q.op === "read")
+              result = await api(`/chart-alerts/${q.alert_id}`);
             else {
               // A drawing message may only affect the persisted object from this
               // workspace; it cannot replace an arbitrary alert configuration.
-              const row = await api(`/chart-alerts/${q.alert_id}`), a = row.config.association;
-              if (!a || requestWorkspace !== current.current?.id || q.workspace_id !== requestWorkspace || a.workspace_id !== requestWorkspace || a.object_id !== q.object_id || a.chart_id !== q.chart_id) throw Error("告警图表关联已改变");
-              if (q.op === "lifecycle" && q.action === "drawing_deleted") result = await api(`/chart-alerts/${q.alert_id}/lifecycle`, {version: q.version, control_revision: q.control_revision, request_id: q.request_id, action: "drawing_deleted"});
-              else if (q.op === "edit" && q.line && a.object_kind === "drawing") result = await api(`/chart-alerts/${q.alert_id}/edit`, {version: q.version, config: {...row.config, condition: {...row.config.condition, right: {kind: "line", line: q.line}}, association: {...a, generation: q.generation}}});
+              const row = await api(`/chart-alerts/${q.alert_id}`),
+                a = row.config.association;
+              if (
+                !a ||
+                requestWorkspace !== current.current?.id ||
+                q.workspace_id !== requestWorkspace ||
+                a.workspace_id !== requestWorkspace ||
+                a.object_id !== q.object_id ||
+                a.chart_id !== q.chart_id
+              )
+                throw Error("告警图表关联已改变");
+              if (q.op === "lifecycle" && q.action === "drawing_deleted")
+                result = await api(`/chart-alerts/${q.alert_id}/lifecycle`, {
+                  version: q.version,
+                  control_revision: q.control_revision,
+                  request_id: q.request_id,
+                  action: "drawing_deleted",
+                });
+              else if (q.op === "edit" && q.line && a.object_kind === "drawing")
+                result = await api(`/chart-alerts/${q.alert_id}/edit`, {
+                  version: q.version,
+                  config: {
+                    ...row.config,
+                    condition: {
+                      ...row.config.condition,
+                      right: { kind: "line", line: q.line },
+                    },
+                    association: { ...a, generation: q.generation },
+                  },
+                });
               else throw Error("不允许的画线告警操作");
             }
           } else throw Error("无效告警请求");
-          reply({type: "result", id: m.id, result});
-        } catch (e) {reply({type: "result", id: m.id, error: String(e), errorDetails: apiErrorDetails(e)});}
+          reply({ type: "result", id: m.id, result });
+        } catch (e) {
+          reply({
+            type: "result",
+            id: m.id,
+            error: String(e),
+            errorDetails: apiErrorDetails(e),
+          });
+        }
         return;
       }
       if (
@@ -398,10 +509,17 @@ export default function AdvancedWorkspace() {
         return;
       }
       if (m.type === "native-load-reset" && Number.isSafeInteger(m.epoch)) {
+        setChartFailures([]);
         nativeLoadEpoch.current = m.epoch;
         setNativeLoads({});
         setCapacityNotices({});
         setCapacityDialog(null);
+        return;
+      }
+      if (m.type === 'chart-history-failures' && m.epoch===nativeLoadEpoch.current && Array.isArray(m.failures)) {
+        setChartFailures(m.failures.filter((item:any)=>Number.isSafeInteger(item.index) &&
+          item.index>=0 && item.index<8 && typeof item.symbol==='string' && typeof item.resolution==='string' &&
+          typeof item.label==='string' && typeof item.error==='string').map((item:any)=>({...item,epoch:m.epoch})));
         return;
       }
       if (
@@ -446,14 +564,24 @@ export default function AdvancedWorkspace() {
               ...(Number.isFinite(m.limit) ? { limit: m.limit } : {}),
               ...(Number.isFinite(m.resident) ? { resident: m.resident } : {}),
               scope: m.scope,
-              started:Number.isFinite(m.started) ? m.started : previous[m.key]?.started,
-              finished:Number.isFinite(m.finished) ? m.finished : undefined,
-              totalBars:Number.isSafeInteger(m.totalBars) ? m.totalBars : undefined,
-              loadedBars:Number.isSafeInteger(m.loadedBars) ? m.loadedBars : undefined,
-              pages:Number.isSafeInteger(m.pages) ? m.pages : undefined,
-              estimatedPages:Number.isSafeInteger(m.estimatedPages) ? m.estimatedPages : undefined,
-              batch:Number.isSafeInteger(m.batch) ? m.batch : undefined,
-              completedBatch:Number.isSafeInteger(m.completedBatch) ? m.completedBatch : undefined,
+              started: Number.isFinite(m.started)
+                ? m.started
+                : previous[m.key]?.started,
+              finished: Number.isFinite(m.finished) ? m.finished : undefined,
+              totalBars: Number.isSafeInteger(m.totalBars)
+                ? m.totalBars
+                : undefined,
+              loadedBars: Number.isSafeInteger(m.loadedBars)
+                ? m.loadedBars
+                : undefined,
+              pages: Number.isSafeInteger(m.pages) ? m.pages : undefined,
+              estimatedPages: Number.isSafeInteger(m.estimatedPages)
+                ? m.estimatedPages
+                : undefined,
+              batch: Number.isSafeInteger(m.batch) ? m.batch : undefined,
+              completedBatch: Number.isSafeInteger(m.completedBatch)
+                ? m.completedBatch
+                : undefined,
             };
           }
           return next;
@@ -472,7 +600,10 @@ export default function AdvancedWorkspace() {
             const load = previous[m.id];
             if (!load) return previous;
             const duration = Date.now() - load.started;
-            if (duration < HISTORY_NOTICE_DELAY_MS || duration >= HISTORY_NOTICE_DELAY_MS + 500) {
+            if (
+              duration < HISTORY_NOTICE_DELAY_MS ||
+              duration >= HISTORY_NOTICE_DELAY_MS + 500
+            ) {
               const next = { ...previous };
               delete next[m.id];
               return next;
@@ -512,9 +643,12 @@ export default function AdvancedWorkspace() {
               to: m.to,
               started: Date.now(),
               phase: "queued",
-              ...(Number.isSafeInteger(m.boundaryId) ? {boundaryId:m.boundaryId,batch:m.batch} : {}),
+              ...(Number.isSafeInteger(m.boundaryId)
+                ? { boundaryId: m.boundaryId, batch: m.batch }
+                : {}),
               ...(Number.isSafeInteger(m.estimatedPages) && m.estimatedPages > 0
-                ? { estimatedPages:m.estimatedPages } : {}),
+                ? { estimatedPages: m.estimatedPages }
+                : {}),
             };
           } else if (m.type === "native-load-applying" && next[m.id]) {
             next[m.id] = {
@@ -553,6 +687,7 @@ export default function AdvancedWorkspace() {
         return;
       }
       if (m.type === "loaded") {
+        alertUiSession.current = crypto.randomUUID();
         await provider.clear();
         await legacyProvider.clear();
         try {
@@ -565,6 +700,8 @@ export default function AdvancedWorkspace() {
           historyCapabilities.current = capabilities;
           reply({
             type: "init",
+            alert_ui_session: alertUiSession.current,
+            alert_ui_draft: readAlertDraft(current.current?.id),
             history_capabilities: capabilities,
             document: current.current?.document || {},
             workspace: current.current,
@@ -728,6 +865,7 @@ export default function AdvancedWorkspace() {
               localStorage.getItem("mw-tv-draft:" + draftId) === draft
             )
               localStorage.removeItem("mw-tv-draft:" + draftId);
+            const previousWorkspace = current.current?.id;
             current.current = {
               id: result.id,
               name: result.name,
@@ -737,6 +875,15 @@ export default function AdvancedWorkspace() {
             // Native loads happen inside the existing widget. Reflect their
             // identity without recreating the iframe or discarding chart state.
             setActive(current.current);
+            if (previousWorkspace !== result.id || q.op === "load") {
+              alertUiSession.current = crypto.randomUUID();
+              reply({
+                type: "chart-alert-ui-scope",
+                workspace_id: result.id,
+                session: alertUiSession.current,
+                draft: readAlertDraft(result.id),
+              });
+            }
             setRows((p) =>
               p.some((x) => x.id === result.id)
                 ? p.map((x) => (x.id === result.id ? current.current! : x))
@@ -927,13 +1074,23 @@ export default function AdvancedWorkspace() {
                     page_size:String(Number.isSafeInteger(q.args?.page_size) ? Math.max(1,Math.min(100,q.args.page_size)) : 25),
                     offset:String(Number.isSafeInteger(q.args?.offset) ? q.args.offset : 0)})
                   : q.op === "search"
-                  ? "?query=" + encodeURIComponent(String(q.args?.query || "")) +
-                    "&kind=" + encodeURIComponent(["provider", "history", "composite", "all"].includes(q.args?.kind) ? q.args.kind : "all") +
-                    (q.args?.source ? "&source=" + encodeURIComponent(String(q.args.source)) : "")
-                  : q.op === "retry"
-                    ? "/" + encodeURIComponent(q.args.id)
-                    : ""),
-              ["search","searchPage"].includes(q.op) ? undefined : q.args,
+                    ? "?query=" +
+                      encodeURIComponent(String(q.args?.query || "")) +
+                      "&kind=" +
+                      encodeURIComponent(
+                        ["provider", "history", "composite", "all"].includes(
+                          q.args?.kind,
+                        )
+                          ? q.args.kind
+                          : "all",
+                      ) +
+                      (q.args?.source
+                        ? "&source=" + encodeURIComponent(String(q.args.source))
+                        : "")
+                    : q.op === "retry"
+                      ? "/" + encodeURIComponent(q.args.id)
+                      : ""),
+              ["search", "searchPage"].includes(q.op) ? undefined : q.args,
               controller.signal,
             );
           reply({
@@ -967,7 +1124,9 @@ export default function AdvancedWorkspace() {
           typeof q.instrument !== "string" ||
           q.instrument.length > 80 ||
           (q.series_kind !== undefined &&
-            !["provider", "managed", "history", "composite"].includes(q.series_kind)) ||
+            !["provider", "managed", "history", "composite"].includes(
+              q.series_kind,
+            )) ||
           !frames.has(q.timeframe) ||
           !Number.isInteger(q.limit) ||
           q.limit < 1 ||
@@ -1070,8 +1229,13 @@ export default function AdvancedWorkspace() {
                 instrument: q.instrument,
                 series_kind: q.series_kind || "managed",
                 published: q.series_kind !== "provider",
-                ...(q.series_kind === "composite" ? {client:q.client,
-                  composite_revision_id:q.composite_revision_id,input_revision:q.input_revision} : {}),
+                ...(q.series_kind === "composite"
+                  ? {
+                      client: q.client,
+                      composite_revision_id: q.composite_revision_id,
+                      input_revision: q.input_revision,
+                    }
+                  : {}),
                 ...(typeof q.dataset_start === "number"
                   ? { dataset_start: q.dataset_start }
                   : {}),
@@ -1084,8 +1248,11 @@ export default function AdvancedWorkspace() {
                       firstDataRequest: q.firstDataRequest === true,
                       client: q.client,
                       ...(q.native_history !== undefined
-                        ? { native_history: q.native_history,
-                            history_page_bars:q.history_page_bars === 1000 ? 1000 : 4000 }
+                        ? {
+                            native_history: q.native_history,
+                            history_page_bars:
+                              q.history_page_bars === 1000 ? 1000 : 4000,
+                          }
                         : {}),
                       ...(q.native_reserve !== undefined
                         ? { native_reserve: q.native_reserve }
@@ -1232,6 +1399,8 @@ export default function AdvancedWorkspace() {
   }
   return (
     <main className="advanced-workspace" data-theme={chartTheme}>
+      {mobile && <p className="advanced-readonly-note" role="note">手机只读看盘。编辑图表、绘图和告警请使用桌面浏览器；桌面工作区布局仍保留。</p>}
+      {chartFailures.length>0 && <aside className="advanced-history-failures" aria-label="图格历史加载失败">{chartFailures.map(item=><p key={item.index} role="status">图格 {item.index+1} · {item.label} · {item.resolution}：{item.error}<button onClick={()=>post({type:'retry-chart-history',...item})}>重试此图格</button></p>)}</aside>}
       {(Object.keys(nativeLoads).length > 0 ||
         Object.keys(capacityNotices).length > 0) && (
         <HistoryLoadingNotice
@@ -1324,12 +1493,6 @@ export default function AdvancedWorkspace() {
           </button>
         </section>
       )}
-      {active && <ChartAlertsPanel key={active.id} workspaceId={active.id} context={alertContext?.association.workspace_id === active.id ? alertContext : null}
-        open={alertsOpen} theme={chartTheme} readonly={mobile} associationNotices={alertAssociations} onClose={() => setAlertsOpen(false)}
-        onRequest={() => post({type: "chart-alert-create"})}
-        onLocate={(row, event) => post({type: "chart-alert-locate", row, event})}
-        onDrawingAction={(row, action) => post({type: "chart-alert-drawing-action", alert_id:row.id,action})}
-        onRows={rows => post({type: "chart-alert-rows", rows})} />}
     </main>
   );
 }

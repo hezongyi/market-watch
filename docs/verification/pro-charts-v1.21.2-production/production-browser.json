@@ -1,0 +1,108 @@
+{
+  "scope": "Unraid formal production; Ubuntu browser; existing workspace, read-only UI and market subscriptions; preference migration and native preference saves suppressed",
+  "passed": true,
+  "cases": [
+    "HTTPS administrator login and Secure/HttpOnly session",
+    "Existing production chart ready, one alert business root, actual bars/quotes through authenticated SSE",
+    "Deployed native alert sidebar/dialog, message cancel and notification Escape restore entry focus; no alert saved",
+    "Production data center retains six sections, source status and exact calendar revision review state read",
+    "Native indicator window coexists with alerts",
+    "Existing drawing native property window exposes all nine visibility periods; cancelled without editing",
+    "390px production home has no horizontal overflow",
+    "Touch-emulated phone displays read-only chart notice and keeps existing desktop workspace"
+  ],
+  "errors": [],
+  "http_errors": [],
+  "credential_leaks": [],
+  "unexpected_writes": [],
+  "blocked_preference_saves": [
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "kind": "setting",
+      "name": "widgetbar.layout-settings"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "kind": "setting",
+      "name": "widgetbar.layout-settings"
+    }
+  ],
+  "started_at": "2026-10-12T02:53:22.111Z",
+  "chart_count": 5,
+  "v1210_adapters": {
+    "drawingVisibility": true,
+    "visibilityInstalled": true,
+    "blankDoubleClick": true
+  },
+  "calendar_rows": 299,
+  "calendar_review_due": 293,
+  "calendar_row_ids_unique": true,
+  "market_events": [
+    {
+      "type": "bars",
+      "sequence": 1
+    },
+    {
+      "type": "bars",
+      "sequence": 1
+    },
+    {
+      "type": "bars",
+      "sequence": 1
+    },
+    {
+      "type": "bars",
+      "sequence": 1
+    },
+    {
+      "type": "bars",
+      "sequence": 1
+    },
+    {
+      "type": "quotes",
+      "sequence": 1
+    },
+    {
+      "type": "quotes",
+      "sequence": 1
+    },
+    {
+      "type": "quotes",
+      "sequence": 1
+    },
+    {
+      "type": "quotes",
+      "sequence": 1
+    },
+    {
+      "type": "quotes",
+      "sequence": 1
+    },
+    {
+      "type": "quotes",
+      "sequence": 1
+    },
+    {
+      "type": "bars",
+      "sequence": 2
+    },
+    {
+      "type": "bars",
+      "sequence": 2
+    },
+    {
+      "type": "bars",
+      "sequence": 2
+    },
+    {
+      "type": "bars",
+      "sequence": 2
+    },
+    {
+      "type": "quotes",
+      "sequence": 2
+    }
+  ],
+  "logout_verified": true,
+  "existing_workspace_count": 2
+}

@@ -14,7 +14,8 @@ const pending = new Map();
 // Use public native dialogs. The widget has no public non-modal toast API.
 // Keep acknowledged conditions deduplicated until the parent clears them.
 const acknowledgedNotices = new Set();
-let activeNotices = [], noticeDialogOpen = false, chartMenu, indicatorPicker, alertBridge, dataCenter;
+let activeNotices = [], noticeDialogOpen = false, chartMenu, indicatorPicker, alertBridge, alertUI, alertUISession, alertUIDraft, alertUIWorkspace, alertUIAttach, dataCenter;
+let invalidateAlertUI = () => {};
 // Lazy loading keeps ordinary datafeed consumers independent of the renderer.
 let swingSnapshots;
 function swingStore() {return swingSnapshots ||= swingSnapshotStore();}
@@ -48,6 +49,7 @@ let seq = 0,
   workspaceEpoch = 0,
   nativeReadonly = false;
 let barRangeMapping, syncCoordinator;
+let quoteDetails;
 let rangeGuard, edgeGuard, demandReporter, progressivePages, progressivePoll, beforeInitialHistory, initialSymbol;
 let prewarming = false;
 let autoSave, editRevision = 0, manualSavePending = false;
@@ -77,6 +79,79 @@ const quoteSubscriptions = new Map();
 const marketPollingFallback = new URLSearchParams(location.search).get('marketPolling') === '1';
 const marketHistoryState = new Map();
 let marketGeneration = 0;
+
+function quoteTimeText(stamp, meta) {
+  if (!Number.isFinite(stamp)) return "";
+  let timezone = "UTC";
+  try {
+    timezone = widget?.activeChart?.().getTimezoneApi?.().getTimezone?.().id || "UTC";
+  } catch (_) {}
+  if (timezone === "exchange") timezone = meta?.timezone || "UTC";
+  try {
+    const date = new Date(stamp);
+    const parts = Object.fromEntries(new Intl.DateTimeFormat("en-CA", {
+      timeZone: timezone, year:"numeric", month:"2-digit", day:"2-digit",
+      hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false,
+    }).formatToParts(date).filter(part => part.type !== "literal").map(part => [part.type, part.value]));
+    const value = `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:${parts.minute}:${parts.second}`;
+    const offset = new Intl.DateTimeFormat("en", {timeZone: timezone, timeZoneName:"longOffset"})
+      .formatToParts(date).find(part => part.type === "timeZoneName")?.value || "GMT";
+    const shortOffset = offset === "GMT" ? "UTC" : offset.replace(/^GMT/, "UTC")
+      .replace(/UTC([+-])0?(\d{1,2}):00$/, "UTC$1$2");
+    const zone = timezone === "UTC" || timezone === "Etc/UTC" ? "UTC" :
+      timezone === "Asia/Shanghai" ? shortOffset : `${timezone} (${shortOffset})`;
+    return `${value} ${zone}`;
+  } catch (_) { return new Date(stamp).toISOString().replace("T", " ").replace(".000Z", " UTC"); }
+}
+function presentQuote(row) {
+  setTimeout(()=>quoteDetails?.refresh(),0);
+  const meta = presentationFor(row.n);
+  const result = chartQuotePresentation(row, meta);
+  const value = result.v && typeof result.v === "object" ? {...result.v} : result.v;
+  if (value && typeof value === "object") {
+    const base = value.description_base ?? String(value.description || "")
+      .replace(/ · (?:最后更新于|最后行情时间|历史数据时间) .*?(?= · |$)/g, "")
+      .replace(/ · 来源 M1 分钟数据/g, "");
+    value.description = base;
+  }
+  // Native details ignores the description on error rows. A resolved session
+  // remains useful without a successful price; fetch_status carries the error.
+  return {...result, s:result.s === "error" && value?.market_session ? "ok" : result.s, v: value};
+}
+function refreshQuotePresentation() {
+  if (typeof dataCenter !== "undefined") dataCenter?.refreshTimezone?.();
+  for (const sub of quoteSubscriptions.values()) {
+    const rows = sub.symbols.map(ticker => quoteSnapshotRows.get(ticker)).filter(Boolean);
+    if (rows.length) sub.cb(rows.map(presentQuote));
+  }
+  quoteDetails?.refresh();
+}
+function bindTimezoneEvents() {
+  if (!widget) return;
+  for (const [api, changed] of timezoneBindings) api.onTimezoneChanged().unsubscribe(null, changed);
+  timezoneBindings.clear();
+  for (let index = 0; index < widget.chartsCount(); index++) {
+    const api = widget.chart(index).getTimezoneApi?.();
+    if (!api?.onTimezoneChanged) continue;
+    const changed = () => refreshQuotePresentation();
+    api.onTimezoneChanged().subscribe(null, changed);
+    timezoneBindings.set(api, changed);
+  }
+}
+const timezoneBindings = new Map();
+let activeChartEventWidget;
+function unbindActiveChartEvent() {
+  if (!activeChartEventWidget) return;
+  activeChartEventWidget.unsubscribe("activeChartChanged", refreshQuotePresentation);
+  activeChartEventWidget = undefined;
+}
+function bindActiveChartEvent() {
+  if (!widget?.subscribe) return;
+  if (activeChartEventWidget === widget) return;
+  unbindActiveChartEvent();
+  widget.subscribe("activeChartChanged", refreshQuotePresentation);
+  activeChartEventWidget = widget;
+}
 
 function marketQuery(ticker, res) {
   const identity = decode(ticker);
@@ -154,6 +229,50 @@ function synchronizeMarketVisibility() {
   }
 }
 const symbolPresentations = new Map();
+const quoteSnapshotRows = new Map();
+const quoteResetTokens = new Map();
+function presentationFor(ticker) {
+  const exact = symbolPresentations.get(ticker);
+  if (exact) return exact;
+  try { return symbolPresentations.get(decode(ticker).symbol); } catch (_) { return undefined; }
+}
+function rememberQuoteRows(rows) {
+  for (const row of rows || []) {
+    if (!row?.n) continue;
+    const previous = quoteSnapshotRows.get(row.n);
+    // The subscription generation handles identity changes; read time fences
+    // delayed initial snapshots from overwriting a newer stream observation.
+    if (previous?.v?.read_at != null && row.v?.read_at != null && row.v.read_at < previous.v.read_at) continue;
+    const failed = row.s === "error" || (row.v?.fetch_status && row.v.fetch_status !== "ok");
+    const sameBinding = ["revision_id", "input_revision", "source_identity"].every(key =>
+      row.v?.[key] == null || JSON.stringify(row.v[key]) === JSON.stringify(previous?.v?.[key]));
+    if (failed && row.v?.lp == null && previous?.v?.lp != null && sameBinding) {
+      const value = {...previous.v, fetch_status: row.v?.fetch_status || "fetch_failed"};
+      for (const key of ["market_session", "session_reason", "session_conflict_reason", "calendar_verified", "calendar_version"])
+        if (Object.hasOwn(row.v || {}, key)) value[key] = row.v[key];
+      quoteSnapshotRows.set(row.n, {...previous, v: value});
+      continue;
+    }
+    quoteSnapshotRows.set(row.n, row);
+  }
+  while (quoteSnapshotRows.size > 250)
+    quoteSnapshotRows.delete(quoteSnapshotRows.keys().next().value);
+}
+function quoteFailureRows(symbols, initialRows) {
+  const failed = [];
+  for (const ticker of symbols) {
+    const previous = quoteSnapshotRows.get(ticker);
+    if (initialRows && previous !== initialRows.get(ticker)) continue;
+    const placeholder = previous ? null : seriesPresentationRows([ticker])[0];
+    const value = previous?.v || placeholder?.v || {description_base: ticker, market_session: "unknown"};
+    // Preserve the bound observation and its read time. Failure is a transport
+    // state, not a newer price; a successful same-time snapshot can recover it.
+    const row = {s: previous?.s || "ok", n: ticker, v: {...value, fetch_status: "fetch_failed"}};
+    quoteSnapshotRows.set(ticker, row);
+    failed.push(row);
+  }
+  return failed.map(presentQuote);
+}
 const alertSourceMetadata = new Map();
 const alertCalculationOrigins = new Map();
 const lastHistory = new Map();
@@ -378,13 +497,28 @@ function nativeReserveWarmup(symbol, resolution) {
   }
   return prefix;
 }
-globalThis.MWNativeReserve?.configure(async ({symbol, resolution, before, screen_bars, batch_screens, warmup_bars, window}) => {
+globalThis.MWNativeReserve?.configure(async ({symbol, resolution, before, screen_bars, batch_screens, warmup_bars, window, current=()=>true}) => {
   const rangeTicket = barRangeMapping?.capture(symbol,resolution,window);
+  if(['history','composite'].includes(decode(symbol).series_kind)) {
+    const identity=decode(symbol);
+    const stateKey=MWSeries.encode(identity.symbol,identity.series_kind)+'|'+resolution+'|'+(window || '');
+    const acceptedState=marketHistoryState.get(stateKey);
+    const binding=acceptedState?.binding;
+    const inputRevision=acceptedState?.input_revision;
+    const page=await query(symbol,resolution,{before,limit:Math.min(2000,screen_bars*batch_screens),
+      ...(binding ? {composite_revision_id:binding,input_revision:inputRevision} : {})},Date.now()+30000,current);
+    const latest=marketHistoryState.get(stateKey);
+    if(!current() || binding && (latest?.binding!==binding || latest?.input_revision!==inputRevision))
+      throw Object.assign(Error('已取消旧图表的历史加载'),{code:'HISTORY_CANCELLED'});
+    const rows=barsOf(page,resolution,symbol);
+    return {...page,bars:rows,history_boundary:page.has_more===false && !page.pending?.length,
+      accepted:()=>observeRangeBars(symbol,resolution,page.bars,rows,window,rangeTicket)};
+  }
   const page = await query(symbol, resolution, {
     before, limit: screen_bars * batch_screens, countBack: screen_bars * batch_screens,
     client: clientId, native_history: nativeHistoryContext(symbol, resolution),
     native_reserve: {screen_bars, batch_screens, warmup_bars},
-  });
+  },Infinity,current);
   // An old API silently ignores optional fields. Never feed its unbounded
   // mandatory result into the reserve lane or mistake an empty miss for EOD.
   if (!['ready', 'partial', 'miss'].includes(page.reserve_status))
@@ -403,6 +537,17 @@ globalThis.addEventListener('mw-navigation-error', event => {
 });
 globalThis.addEventListener('mw-capacity-state', event =>
   send({type:'capacity-notice',epoch:workspaceEpoch,...event.detail}));
+function reportHistoryFailures() {
+  if(!ready || loading) return;
+  const failures=[];
+  for(let index=0;index<widget.chartsCount();index++) {
+    const chart=widget.chart(index),error=MWNativeNavigation.failure(chart);
+    if(error) failures.push({index,symbol:chart.symbol(),resolution:chart.resolution(),
+      label:alertSourceMetadata.get(chart.symbol())?.display_symbol || chart.symbol(),error:String(error)});
+  }
+  send({type:'chart-history-failures',epoch:workspaceEpoch,failures});
+}
+globalThis.addEventListener('mw-history-state',()=>setTimeout(reportHistoryFailures,0));
 
 function query(ticker, res, args, expires = Infinity, current = () => true) {
   const { symbol, spec, series_kind } = decode(ticker);
@@ -426,9 +571,11 @@ function query(ticker, res, args, expires = Infinity, current = () => true) {
   const swingTicket = spec?.name==='SWING_SR_V1' ? swingStore().ticket() : null;
   // Native owns the lifetime of its period caches. A temporary period switch
   // does not cancel a getBars callback that it can reuse when switching back.
-  const promise = request(q, "data", () => epoch === workspaceEpoch && current() && Date.now() < expires &&
-    (series_kind === 'provider' || hasHistoryViewer({instrument:MWSeries.encode(symbol,series_kind),timeframe:frames[res]})))
+  const currentRead = () => epoch === workspaceEpoch && current() && Date.now() < expires &&
+    (series_kind !== 'managed' || hasHistoryViewer({instrument:MWSeries.encode(symbol,series_kind),timeframe:frames[res]}));
+  const promise = request(q, "data", currentRead)
     .then(page=>{
+      if (!currentRead()) throw Object.assign(Error('已取消旧图表的历史加载'), {code:'HISTORY_CANCELLED'});
       if(epoch===workspaceEpoch && series_kind==='composite' && page.revision_id)
         alertCompositeRevisions.set(MWSeries.encode(symbol,series_kind)+'|'+res,page.revision_id);
       if (epoch===workspaceEpoch && spec && Number.isSafeInteger(page.calculation_origin ?? page.origin))
@@ -476,13 +623,14 @@ function historyQuery(args) {
 function seriesPresentationRows(symbols) {
   return symbols.flatMap(ticker => {
     const identity = decode(ticker);
-    const meta = symbolPresentations.get(identity.symbol);
+    const meta = presentationFor(ticker);
     const shown = meta?.display_symbol || meta?.symbol || MWSeries.display(identity.symbol);
-    return meta ? [{s:"ok",n:ticker,v:{short_name:shown,
-      description:meta.source === 'yahoo' ? meta.name + " · " + shown + " · Yahoo 市场报价" : shown + (
+    const base = meta?.source === 'yahoo' ? meta.name + " · " + shown + " · Yahoo 市场报价" : shown + (
         identity.series_kind === 'provider' ? " · 平台原生行情" :
-        identity.series_kind === 'history' ? " · 固定历史" : " · 组合行情"),
-      exchange:meta.exchange || meta.source?.toUpperCase()}}] : [];
+        identity.series_kind === 'history' ? " · 固定历史" : " · 组合行情");
+    return meta ? [{s:"ok",n:ticker,v:{short_name:shown,description:base,description_base:base,
+      market_session:"unknown",time_type:identity.series_kind === "history" ? "fixed_history" : null,
+      exchange:meta.exchange || meta.source?.toUpperCase()}}].map(presentQuote) : [];
   });
 }
 // Vendor start counts returned rows; backend cursors count qualified candidates.
@@ -518,26 +666,44 @@ const feed = {
   // Authenticated/network access stays in the trusted parent origin.
   getServerTime: (cb) => request({op: "serverTime"}, "market")
     .then(cb).catch(error => send({type: "error", error: "服务器时间获取失败：" + String(error)})),
-  getQuotes: (symbols, cb, err) => {
+  getQuotes: (symbols, cb, err, isCurrent = () => true) => {
     if (!symbols.length) {
       queueMicrotask(() => cb([]));
       return;
     }
     const epoch = workspaceEpoch;
+    const initialRows = new Map(symbols.map(ticker => [ticker, quoteSnapshotRows.get(ticker)]));
+    const resetTokens = new Map(symbols.map(ticker => [ticker, quoteResetTokens.get(ticker)]));
+    const currentSymbols = () => symbols.filter(ticker => quoteResetTokens.get(ticker) === resetTokens.get(ticker));
     // Details/watchlist quotes must not consume the bounded bridge/upstream
     // slots ahead of the first visible candle page. Failure also opens the gate.
     Promise.resolve(initialHistoryGate?.promise)
       .then(() => request({ op: "quotes", args: { symbols } }, "market",
-        () => epoch === workspaceEpoch))
-      .then((rows) => cb(rows.map(row => chartQuotePresentation(row,
-        symbolPresentations.get(decode(row.n).symbol)))))
-      .catch((e) => err(String(e)));
+        () => epoch === workspaceEpoch && isCurrent()))
+      .then((rows) => {
+        if (epoch !== workspaceEpoch || !isCurrent()) return;
+        // A stream/reset received while this request was outstanding owns the
+        // current selection, including its composite revision and identity.
+        const active = currentSymbols();
+        if (!active.length) return;
+        rememberQuoteRows(rows.filter(row => active.includes(row.n) && quoteSnapshotRows.get(row.n) === initialRows.get(row.n)));
+        cb(active.map(ticker => quoteSnapshotRows.get(ticker)).filter(Boolean).map(presentQuote));
+      })
+      .catch((e) => {
+        if (epoch !== workspaceEpoch || !isCurrent()) return;
+        const active = currentSymbols();
+        if (!active.length) return;
+        const rows = quoteFailureRows(active, initialRows);
+        if (rows.length) cb(rows);
+        err(String(e));
+      });
   },
   subscribeQuotes: (symbols, fastSymbols, cb, id) => {
     feed.unsubscribeQuotes(id);
     const all=[...new Set([...symbols, ...fastSymbols])];
-    const quoteSub={symbols:all,cb,listeners:[]};
+    const quoteSub={symbols:all,cb,listeners:[],lastRows:[]};
     quoteSubscriptions.set(id, quoteSub);
+    rememberQuoteRows([]);
     if(!marketPollingFallback) for(const ticker of all) {
       const listener=crypto.randomUUID(),generation=++marketGeneration;
       quoteSub.listeners.push({listener,generation,ticker,sequence:0});
@@ -552,9 +718,16 @@ const feed = {
       // Give native details its resolved human name while the real market
       // snapshot loads. No price, change or quote time is invented here.
       const named=seriesPresentationRows(presented);
-      if(named.length) setTimeout(()=>{if(quoteSubscriptions.has(id)) cb(named)},0);
-      feed.getQuotes(presented,rows=>{if(quoteSubscriptions.has(id)) cb(rows)},
-        error=>send({type:"feed-poll-state",key:"@quotes",error:String(error)}));
+      if(named.length) setTimeout(()=>{if(quoteSubscriptions.get(id) === quoteSub) cb(named)},0);
+      feed.getQuotes(presented,rows=>{
+        if(quoteSubscriptions.get(id) !== quoteSub) return;
+        // Keep the first snapshot beside streaming/polling rows so a timezone
+        // or active-chart change can reformat the same stored epoch without
+        // issuing another provider request.
+        cb(rows);
+      },
+        error=>send({type:"feed-poll-state",key:"@quotes",error:String(error)}),
+        () => quoteSubscriptions.get(id) === quoteSub);
     }
   },
   unsubscribeQuotes: (id) => {
@@ -604,10 +777,12 @@ const feed = {
       );
       alertSourceMetadata.set(MWSeries.encode(symbol,series_kind),meta);
       while(alertSourceMetadata.size>250) alertSourceMetadata.delete(alertSourceMetadata.keys().next().value);
-      if(meta.native_series_id || ['yahoo','dukascopy'].includes(meta.source) || ['history','composite'].includes(series_kind)) {
-        symbolPresentations.set(symbol,meta);
-        while(symbolPresentations.size>250) symbolPresentations.delete(symbolPresentations.keys().next().value);
-      }
+      // Quote descriptions are reformatted when the active chart timezone
+      // changes. Keep every resolved source's timezone metadata available,
+      // including managed OANDA/Binance instruments.
+      symbolPresentations.set(ticker,meta);
+      if (!symbolPresentations.has(symbol)) symbolPresentations.set(symbol,meta);
+      while(symbolPresentations.size>250) symbolPresentations.delete(symbolPresentations.keys().next().value);
       cb({
         name: meta.display_symbol || meta.symbol || MWSeries.display(symbol),
         ticker,
@@ -775,12 +950,20 @@ const feed = {
       }
       const identity = decode(s.ticker), symbol=identity.symbol;
       if (['history','composite'].includes(identity.series_kind)) {
+        const epoch = workspaceEpoch;
+        const current = () => epoch === workspaceEpoch && (!s.mw_current || s.mw_current());
         const requested = Math.max(1, Math.ceil(p.countBack));
-        if (!Number.isSafeInteger(requested) || requested > 20000) throw Error('固定行情单次最多请求20000根');
+        if (!Number.isSafeInteger(requested)) throw Error('无效历史根数');
+        const capabilities=globalThis.MW_HISTORY_CAPABILITIES;
+        const deadline=Date.now()+(capabilities?.task_seconds || 600)*1000;
+        const pageBudget=capabilities?.task_pages || 300;
+        const reserveStarted=globalThis.performance?.now() || 0;
         let before=p.to*1000 + (['1D','1W','1M'].includes(res) ? 2*86400000 : 0);
         let rows=[], rawRows=[], boundary=false, fixed={};
-        for (let partition=0; rows.length<requested && partition<32; partition++) {
-          const page=await query(s.ticker,res,{before,limit:Math.min(2000,requested-rows.length),...fixed});
+        for (let partition=0; rows.length<requested; partition++) {
+          if(partition>=pageBudget) throw Object.assign(Error('固定历史分页预算已耗尽，请缩小范围后重试'),{code:'HISTORY_PAGE_BUDGET'});
+          const page=await query(s.ticker,res,{before,limit:Math.min(2000,requested-rows.length),...fixed},deadline,current);
+          if (!current()) throw Object.assign(Error('已取消旧图表的历史加载'), {code:'HISTORY_CANCELLED'});
           marketHistoryPage ||= page;
           if (identity.spec) fixedIndicatorPending.set(historyKey,
             page.indicator_progress?.some(item=>item.status!=='complete') || false);
@@ -789,7 +972,7 @@ const feed = {
           rawRows.push(...page.bars);
           rows=barsOf(page,res,s.ticker).filter(bar=>bar.time<p.to*1000).concat(rows);
           if (page.revision_id) fixed={composite_revision_id:page.revision_id,input_revision:page.input_revision};
-          boundary=!page.has_more;
+          boundary=page.has_more===false && !page.pending?.length;
           if (page.pending?.length) {
             send({type:'status',text:page.pending.join('；')});
             // Indicator initialization is asynchronous; retain pagination and
@@ -810,6 +993,7 @@ const feed = {
           lastHistory.set(historyKey,Math.max(lastHistory.get(historyKey)||0,rows.at(-1).time));
         }
         if (accepted) {observeRangeBars(s.ticker,res,rawRows,rows,s.mw_window,rangeTicket); acceptMarketHistory(s.ticker,res,{...marketHistoryPage,bars:[...rawRows].sort((a,b)=>a.start-b.start)},s.mw_window,rows);}
+        if(accepted && globalThis.MWNativeReserve) requestAnimationFrame(()=>MWNativeReserve.delivered(s,res,performance.now()-reserveStarted));
         if(!rows.length) finishTerminal();
         return;
       }
@@ -862,7 +1046,7 @@ const feed = {
       if (accepted) {observeRangeBars(s.ticker,res,rawRows,rows,'',rangeTicket); acceptMarketHistory(s.ticker,res,{...marketHistoryPage,bars:[...rawRows].sort((a,b)=>a.start-b.start)},s.mw_window,rows);}
       if(!rows.length) finishTerminal();
     } catch (e) {
-      err(isProvider ? e : String(e));
+      err(e);
       finishTerminal();
       if (e.code !== "HISTORY_CANCELLED" && e.code !== "NATIVE_HISTORY_CAPACITY_EXCEEDED")
         send({ type: "error", error: String(e) });
@@ -1154,9 +1338,17 @@ async function tick() {
   if(!marketPollingFallback) return;
   if (polling) return;
   polling = true;
+  const epoch = workspaceEpoch;
+  const quoteBindings = [...quoteSubscriptions].map(([id, sub]) => ({id, sub,
+    initialRows: new Map(sub.symbols.map(ticker => [ticker, quoteSnapshotRows.get(ticker)]))}));
+  const current = ({id, sub}) => epoch === workspaceEpoch && quoteSubscriptions.get(id) === sub;
+  const initialQuotes = new Map(quoteBindings.flatMap(({initialRows}) => [...initialRows]));
+  const resetTokens = new Map([...initialQuotes.keys()].map(ticker => [ticker, quoteResetTokens.get(ticker)]));
+  const currentSymbols = () => [...new Set(quoteBindings.filter(current).flatMap(({sub}) => sub.symbols))]
+    .filter(ticker => quoteResetTokens.get(ticker) === resetTokens.get(ticker));
   try {
     const quoteSymbols = [
-      ...new Set([...quoteSubscriptions.values()].flatMap((s) => s.symbols)),
+      ...new Set(quoteBindings.flatMap(({sub}) => sub.symbols)),
     ];
     if (quoteSymbols.length) {
       try {
@@ -1174,15 +1366,23 @@ async function tick() {
               "market",
             )),
           );
-        for (const sub of quoteSubscriptions.values())
-          sub.cb(
-            rows
-              .filter((r) => sub.symbols.includes(r.n))
-              .map(row => chartQuotePresentation(row,
-                symbolPresentations.get(decode(row.n).symbol))),
-          );
+        const active = new Set(currentSymbols());
+        rememberQuoteRows(rows.filter(r => active.has(r.n) &&
+          quoteSnapshotRows.get(r.n) === initialQuotes.get(r.n)));
+        for (const binding of quoteBindings) {
+          if (!current(binding)) continue;
+          const {sub} = binding;
+          const symbols = sub.symbols.filter(ticker => active.has(ticker));
+          if (symbols.length) sub.cb(symbols.map(ticker => quoteSnapshotRows.get(ticker)).filter(Boolean).map(presentQuote));
+        }
         send({ type: "feed-poll-state", key: "@quotes", error: "" });
       } catch (e) {
+        const rows = quoteFailureRows(currentSymbols(), initialQuotes);
+        for (const binding of quoteBindings) {
+          if (!current(binding)) continue;
+          const selected = rows.filter(row => binding.sub.symbols.includes(row.n));
+          if (selected.length) binding.sub.cb(selected);
+        }
         send({ type: "feed-poll-state", key: "@quotes", error: "报价更新失败：" + String(e) });
       }
     } else {
@@ -1370,8 +1570,12 @@ function boot(
   symbolMetadata = null,
 ) {
   initialSymbol = symbolMetadata;
-  if(symbolMetadata?.metadata?.source === "yahoo")
-    symbolPresentations.set(decode(symbolMetadata.ticker).symbol,symbolMetadata.metadata);
+  if(symbolMetadata?.metadata) {
+    const ticker = symbolMetadata.ticker;
+    const symbol = decode(ticker).symbol;
+    symbolPresentations.set(ticker,symbolMetadata.metadata);
+    if (!symbolPresentations.has(symbol)) symbolPresentations.set(symbol,symbolMetadata.metadata);
+  }
   // save_load_adapter content is a layout envelope; saved_data expects its chart state.
   const storedViewports = doc.state?._mwViewports;
   let chartState = doc.state;
@@ -1480,6 +1684,32 @@ function boot(
   nativeMode = true;
   nativeReadonly = readonly;
   let currentNativeWorkspace = workspace;
+  let attachingAlerts = 0, alertAttachQueue = Promise.resolve(), alertUIStopped = false;
+  invalidateAlertUI = () => {
+    attachingAlerts++;
+    alertUI?.destroy(); alertUI = undefined;
+  };
+  // Serialize private widgetbar mutations. A cancelled attach must finish and
+  // restore its shell before a newer session can install another one.
+  alertUIAttach = () => {
+    if (alertUIStopped || loading || !ready || String(currentNativeWorkspace?.id) !== alertUIWorkspace) return Promise.resolve();
+    const attempt = ++attachingAlerts, session = alertUISession, workspaceId = alertUIWorkspace;
+    alertAttachQueue = alertAttachQueue.then(async () => {
+    if (attempt !== attachingAlerts || alertUIStopped) return;
+    alertUI?.destroy(); alertUI = undefined;
+    try {
+      const instance = await MWNativeAlerts.attach({widget, scope: {workspace_id: workspaceId, session}, readonly,
+        initialDraft: alertUIDraft,
+        persistDraft: draft => send({type:'chart-alert-ui-draft', workspace_id: workspaceId, session, draft}),
+        bridge: alertBridge, request: query => request(query, 'chart-alert-ui-rpc', () => attempt === attachingAlerts && session === alertUISession),
+        report: error => send({type:'error', error:String(error)})});
+      if (attempt !== attachingAlerts || session !== alertUISession || alertUIStopped) {instance.destroy();return;}
+      alertUI = instance; instance.theme(widget.getTheme());
+    } catch (error) {if (attempt === attachingAlerts && !alertUIStopped) send({type:'error', error:'原生告警接入失败：' + String(error)});}
+    });
+    return alertAttachQueue;
+  };
+  addEventListener('pagehide', () => {alertUIStopped = true; invalidateAlertUI();}, {once:true});
   alertBridge?.destroy();
   alertBridge = chartAlertBridge({getWidget:()=>widget,getWorkspace:()=>currentNativeWorkspace,
     getEpoch:()=>workspaceEpoch,isLoading:()=>loading||!ready,readonly,
@@ -1487,7 +1717,10 @@ function boot(
     calculationOrigin:(ticker,res)=>alertCalculationOrigins.get(ticker+'|'+res) ??
       (MWSeries.decode(ticker).series_kind === "managed" ? managedSessions.get(MWSeries.decode(ticker).symbol+'|'+res)?.start : null),
     compositeRevision:(ticker,res)=>alertCompositeRevisions.get(MWSeries.encode(MWSeries.decode(ticker).symbol,'composite')+'|'+res) ?? null,
-    rpc:query=>request(query,"chart-alert-rpc"),send,
+    rpc:query=>request(query,"chart-alert-rpc"),send: message => {
+      if (message.type === 'chart-alert-association') alertUI?.association(message.alert_id, message.text);
+      else send(message);
+    },
     fail:error=>send({type:"error",error:String(error)})});
   alertBridge.reset(chartState || {});
   const layouts = nativeWorkspaces(
@@ -1501,6 +1734,7 @@ function boot(
     (row) => {
       currentNativeWorkspace = row;
       savedDoc = { ...row.document, nativeName: row.name };
+      if (!alertUI) void alertUIAttach();
     },
   );
   // Preserve native/user bar spacing across interval changes. History load
@@ -1657,6 +1891,7 @@ function boot(
   globalThis.MWBarRangeMapping = barRangeMapping;
   globalThis.MWChartMaximize?.dispose();
   globalThis.MWChartMaximize = undefined;
+  unbindActiveChartEvent();
   widget = new TradingView.widget({
     context_menu:{items_processor:(items,factory,params)=>alertBridge.menu(items,factory,params)},
     save_load_adapter: { ...prefs.templates, ...layouts },
@@ -1725,6 +1960,9 @@ function boot(
     ],
     disabled_features: [
       "widget_logo",
+      // The native legend derives "open" from unverified symbol sessions.
+      // Host-owned quote status remains visible in the native details section.
+      "display_market_status",
       "use_localstorage_for_settings",
       "open_account_manager",
       "create_volume_indicator_by_default",
@@ -1745,11 +1983,23 @@ function boot(
   widget
     .headerReady()
     .then(async () => {
+      quoteDetails?.dispose();
+      quoteDetails=chartNativeQuoteDetails(widget,()=>{
+        const ticker=widget.activeChart().symbol();
+        const identity=decode(ticker);
+        // Native uppercases immutable UUID/hash tickers; snapshots retain the
+        // canonical backend identity. Both spellings refer to the same series.
+        const row=quoteSnapshotRows.get(ticker) ||
+          quoteSnapshotRows.get(MWSeries.encode(identity.symbol,identity.series_kind));
+        return {value:row?.v, time:stamp=>quoteTimeText(stamp,presentationFor(ticker))};
+      });
       if (!readonly) indicatorPicker = chartIndicatorPicker(widget, catalog, (e) =>
         send({type: "error", error: String(e)}), () => dataCenter?.nativeUi);
       // Public left-aligned buttons retain their creation order in the header.
       if (!readonly) dataCenter = chartDataCenter({widget, appOrigin: parentOrigin,
         workspace: () => currentNativeWorkspace, epoch: () => workspaceEpoch, send, searchSymbols: searchNativeSymbols,
+        timezone: () => {const chart=widget.activeChart(),zone=chart.getTimezoneApi().getTimezone().id;
+          return zone === "exchange" ? presentationFor(chart.symbol())?.timezone || "UTC" : zone;},
         suspendIndicators: () => indicatorPicker?.close(),
         managementRequest: (args, signal) => request(args, "data-center-api", () => !signal.aborted),
         resolve: args => request({op:"resolve",args},"market")});
@@ -1791,6 +2041,7 @@ function boot(
         }
       }
     }
+    MWDrawingVisibility.install(widget._innerWindow());
     widget.headerReady().then(async()=>{
         studyTemplates=chartStudyTemplates(widget,prefs.templates,readonly,
           error=>send({type:'error',error:String(error)}));
@@ -1803,7 +2054,6 @@ function boot(
           send({ type: "error", error: String(e) }),
           grid, [
             {label: "守望主页", run: () => send({type: "workspace-action", action: "home"})},
-            {label: "告警与日志", run: () => send({type:"chart-alert-open"})},
             {label: "历史数据容量", run: () => send({type:"history-capacity-open",usage:MWNativeNavigation.diagnostics().resident})},
             ...(!readonly ? [{label: "保存样式", title: "保存图表样式模板", run: async () => {
               try {
@@ -1850,7 +2100,9 @@ function boot(
     ready = true;
     loading = false;
     send({ type: "theme-changed", theme: widget.getTheme() });
+    alertUI?.theme(widget.getTheme());
     widget.subscribe("chart_theme_changed", (name, standard, onlyActive) => {
+      alertUI?.theme(widget.getTheme());
       send({ type: "theme-changed", theme: widget.getTheme() });
       if (!standard && !readonly) {
         prefs.templates.getChartTemplateContent(name)
@@ -1920,6 +2172,7 @@ function boot(
       );
     };
     widget.subscribe("chart_load_requested", () => {
+      invalidateAlertUI();
       barRangeMapping.suspend();
       send({type: "viewport-notice", key: "*", text: ""});
       edgeGuard?.dispose();
@@ -1927,11 +2180,14 @@ function boot(
       rangeGuard?.dispose();
       rangeGuard = undefined;
       workspaceEpoch++;
+      quoteDetails?.refresh();
       send({type:'native-load-reset',epoch:workspaceEpoch});
       syncCoordinator.resetWorkspace(pendingSync);
       workspaceLoadPause = syncCoordinator.acquirePause("workspace-load",["date","time","barWidth"]);
       for(const [id] of subscriptions) feed.unsubscribeBars(id);
       for(const [id] of quoteSubscriptions) feed.unsubscribeQuotes(id);
+      quoteSnapshotRows.clear();
+      quoteResetTokens.clear();
       marketHistoryState.clear();
       providerHistoryState.clear();
       providerHistoryWork.clear();
@@ -1972,11 +2228,20 @@ function boot(
       rangeGuard = rangeSyncLoadingGuard(widget);
       bindEdgeSync();
       bindViewports();
+      bindTimezoneEvents();
+      bindActiveChartEvent();
+      quoteDetails?.refresh();
       alertBridge.refresh();
+      for(let index=0;index<widget.chartsCount();index++) MWNativeNavigation.recoverInitial(widget.chart(index));
+      reportHistoryFailures();
+      if (!alertUI) await alertUIAttach();
     });
     rangeGuard = rangeSyncLoadingGuard(widget);
     bindEdgeSync();
     bindViewports();
+    bindTimezoneEvents();
+    bindActiveChartEvent();
+    quoteDetails?.refresh();
     widget.subscribe("layout_changed", () => {
       synchronizeMarketVisibility();
       syncCoordinator.refreshCharts();
@@ -1985,6 +2250,7 @@ function boot(
       rangeGuard?.refresh();
       edgeGuard?.refresh();
       bindViewports();
+      bindTimezoneEvents();
       alertBridge.refresh();
     });
     widget.drawOnAllChartsEnabled().setValue(true);
@@ -1996,6 +2262,7 @@ function boot(
     const undoChanged = command => {if(command?.affectsState()) markWorkspaceDirty();};
     undoStack.onChange().subscribe(null,undoChanged);
     addEventListener('pagehide',()=>undoStack.onChange().unsubscribe(null,undoChanged),{once:true});
+    await alertUIAttach();
     send({ type: "ready" });
     clearInterval(progressivePoll);
     demandReporter?.dispose();
@@ -2023,6 +2290,17 @@ addEventListener("message", async (e) => {
     return;
   const m = e.data;
   if (m.type === "data-center-open" && ready && !loading && typeof m.location === "string" && m.location.length <= 4000) { dataCenter?.open(m.location); return; }
+  if (m.type === 'chart-alert-ui-scope') {
+    if (typeof m.session !== 'string' || typeof m.workspace_id !== 'string') return;
+    alertUISession = m.session; alertUIDraft = m.draft; alertUIWorkspace = m.workspace_id;
+    invalidateAlertUI();
+    // The workspace result may still be in flight. Attach is gated by its ID;
+    // Save As retries from onSaved, layout loads retry from chart_loaded.
+    void alertUIAttach?.();
+    return;
+  }
+  if (m.type === 'chart-alert-ui-context') {alertUI?.context(m.context); return;}
+  if (m.type === 'chart-alert-ui-open') {alertUI?.open(); return;}
   if (m.type === "chart-alert-create" && ready && !loading) {void alertBridge?.create(); return;}
   if (m.type === "chart-alert-drawing-action" && typeof m.alert_id === "string" && ["retry","restore"].includes(m.action) && ready && !loading) {void alertBridge?.drawingAction(m.alert_id,m.action); return;}
   if (m.type === "chart-alert-rows" && Array.isArray(m.rows)) {alertBridge?.setRows(m.rows); return;}
@@ -2049,9 +2327,18 @@ addEventListener("message", async (e) => {
       if(event.result_epoch) entry.result_epoch=event.result_epoch;
       if(event.sequence<=entry.sequence) return;
       entry.sequence=event.sequence;
-      if(event.type==='quotes') quote.cb(event.quotes.map(({s,v})=>chartQuotePresentation(
-        {s,n:entry.ticker,v},symbolPresentations.get(decode(entry.ticker).symbol))));
+      if(event.type==='quotes') {
+        const rows = event.quotes.map(({s,v})=>({s,n:entry.ticker,v}));
+        rememberQuoteRows(rows);
+        quote.lastRows = rows;
+        quote.cb(rows.map(row => quoteSnapshotRows.get(row.n)).filter(Boolean).map(presentQuote));
+      }
+      if(event.type==='status' && (event.status==='error' || event.error)) {
+        quote.cb(quoteFailureRows([entry.ticker]));
+      }
       if(event.type==='reset') {
+        quoteSnapshotRows.delete(entry.ticker);
+        quoteResetTokens.set(entry.ticker, {});
         entry.generation=++marketGeneration;entry.sequence=0;
         send({type:'market-subscribe',args:{client:clientId,listener:entry.listener,generation:entry.generation,
           kind:'quotes',query:marketQuery(entry.ticker,'1'),sequence:0}});
@@ -2156,7 +2443,14 @@ addEventListener("message", async (e) => {
     send({type:"history-capacity-open",usage:MWNativeNavigation.diagnostics().resident});
   } else if (m.type === "cancel-history") {
     MWNativeNavigation.cancelAll();
+  } else if (m.type === 'retry-chart-history' && ready && !loading && m.epoch===workspaceEpoch &&
+      Number.isSafeInteger(m.index) && m.index>=0 && m.index<widget.chartsCount()) {
+    const chart=widget.chart(m.index);
+    if(chart.symbol()===m.symbol && chart.resolution()===m.resolution) MWNativeNavigation.recoverInitial(chart,true);
   } else if (m.type === "init" && !widget) {
+    alertUISession = m.alert_ui_session;
+    alertUIDraft = m.alert_ui_draft;
+    alertUIWorkspace = String(m.workspace?.id);
     MWNativeNavigation.setCapabilities(m.history_capabilities);
     globalThis.MW_HISTORY_CAPABILITIES=m.history_capabilities;
     boot(m.document, m.readonly, m.catalog, m.preferences, m.workspace, m.initial_symbol);
@@ -2171,4 +2465,12 @@ addEventListener("message", async (e) => {
 });
 send({ type: "loaded" });
 
-addEventListener("pagehide", () => {globalThis.MWChartMaximize?.dispose();barRangeMapping?.dispose();syncCoordinator?.dispose();}, {once:true});
+addEventListener("pagehide", () => {
+  alertUI?.destroy();
+  alertBridge?.destroy();
+  quoteDetails?.dispose();
+  unbindActiveChartEvent();
+  for (const [api, changed] of timezoneBindings) api.onTimezoneChanged().unsubscribe(null, changed);
+  timezoneBindings.clear();
+  globalThis.MWChartMaximize?.dispose();barRangeMapping?.dispose();syncCoordinator?.dispose();
+}, {once:true});

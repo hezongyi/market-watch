@@ -1,0 +1,53 @@
+{
+  "passed": true,
+  "checks": {
+    "runtime-browser.json": {
+      "passed": true,
+      "cases": 8
+    },
+    "runtime-api-worker.json": {
+      "passed": true,
+      "cases": 5
+    },
+    "fault-acceptance.json": {
+      "passed": true,
+      "cases": 3
+    },
+    "runtime-native-ui.json": {
+      "passed": true,
+      "cases": 4
+    },
+    "backend_alerts_and_stream": {
+      "passed": true,
+      "tests": 51
+    },
+    "backend_stream_extended": {
+      "passed": true,
+      "tests": 39
+    },
+    "bridge_rpc_stream_toolbar": {
+      "passed": true,
+      "tests": 12
+    },
+    "provider_transport": {
+      "passed": true
+    },
+    "web_build": {
+      "passed": true,
+      "version": "1.18.0"
+    },
+    "compose_config": {
+      "passed": true
+    },
+    "git_diff_check": {
+      "passed": true
+    },
+    "unchanged_v118_backend_migrations_production_versions": {
+      "passed": true
+    },
+    "readiness": {
+      "status": "ready",
+      "time": 1791666603336
+    }
+  }
+}

@@ -16,10 +16,11 @@ from .history_request_evidence import snapshot as read_snapshot
 from .history_request_evidence import start as start_read
 from .history_sources import HistoryConfigurationError, HistorySources, history_identity, page_end
 from .market_contracts import DatasetIdentity, failed_request
-from .market_datasets import PricePrecisionError, register_dataset
+from .market_datasets import PRICE_RULE_VERSION, PricePrecisionError, version_price_rows, register_dataset
 from .market_resources import cooldown, lane
 from .source_history_store import AcquisitionBusy, raw_chunk, shared_page, store_blob
 from .source_registry import collection_identity
+from .transaction_retry import is_conflict, retry_conflicts
 from .storage import (
     HistoryChunk,
     HistoryReadAttempt,
@@ -48,7 +49,11 @@ def create_version(db, dataset_id, start, end):
     history_identity(dataset.identity)
     if not 0 <= start < end <= (now_ms() - 5000) // 60000 * 60000 or start % 60000 or end % 60000:
         raise ValueError("Historical version requires fixed past UTC minute boundaries")
-    version = HistoryVersion(dataset_id=dataset_id, start=start, end=end, cursor=start)
+    dataset_row = db.get(MarketDataset, dataset_id)
+    instrument = db.get(Instrument, dataset_row.instrument_id)
+    version = HistoryVersion(dataset_id=dataset_id, start=start, end=end, cursor=start,
+                             manifest={"price_precision": instrument.precision,
+                                       "price_rule_version": PRICE_RULE_VERSION})
     db.add(version)
     db.flush()
     return version.id
@@ -121,6 +126,11 @@ def publish(db, version):
         raise ValueError("Historical query partition is incomplete")
     dataset = db.get(MarketDataset, version.dataset_id)
     instrument = db.get(Instrument, dataset.instrument_id)
+    existing = version.manifest or {}
+    price_manifest = {}
+    if existing.get("price_rule_version") and "price_precision" in existing:
+        price_manifest = {"price_precision": existing["price_precision"],
+                          "price_rule_version": existing["price_rule_version"]}
     version.manifest = {
         "dataset_version": version.id, "identity": dataset.identity,
         "start": version.start, "end": version.end,
@@ -130,6 +140,9 @@ def publish(db, version):
         "coverage": "observed_only; unobserved intervals remain unknown",
         "checksum": checksum.hexdigest(), "chunks": manifest_chunks,
         "request_evidence": read_snapshot(db, version.id),
+        **price_manifest,
+        **({"price_rule_activation": version.manifest["price_rule_activation"]}
+           if version.manifest.get("price_rule_activation") else {}),
         **({"provenance": version.manifest["provenance"]} if version.manifest.get("provenance") else {}),
         **({"maintenance": version.manifest["maintenance"]} if version.manifest.get("maintenance") else {}),
     }
@@ -173,7 +186,7 @@ def import_page(adapter, *, version_id=None):
         from .history_derivation import derive_page
 
         return derive_page(deriving)
-    ownership = claim(version_id)
+    ownership = retry_conflicts(lambda: claim(version_id))
     if ownership is None:
         return False
     ident, token, start, end, raw_identity = ownership
@@ -222,41 +235,44 @@ def import_page(adapter, *, version_id=None):
             raise ValueError("Historical page is not confirmed within its checkpoint")
         content = json.dumps([row.model_dump() for row in batch.rows],
                              sort_keys=True, separators=(",", ":")).encode()
-        with transaction() as db:
-            version = lock_version(db, ident)
-            if (version.lease_token != token or version.cursor != start
-                    or version.lease_until <= now_ms()):
-                finish_read(db.get(HistoryReadAttempt, read_id), "discarded", batch=batch,
-                            read_kind=evidence.get("read_kind"))
-                return True
-            if controlled_stop(db, version):
-                finish_read(db.get(HistoryReadAttempt, read_id), "discarded", batch=batch,
-                            read_kind=evidence.get("read_kind"))
-                return True
-            dataset = db.get(MarketDataset, version.dataset_id)
-            from .market import ingest
+        def commit_page():
+            with transaction() as db:
+                version = lock_version(db, ident)
+                if (version.lease_token != token or version.cursor != start
+                        or version.lease_until <= now_ms()):
+                    finish_read(db.get(HistoryReadAttempt, read_id), "discarded", batch=batch,
+                                read_kind=evidence.get("read_kind"))
+                    return True
+                if controlled_stop(db, version):
+                    finish_read(db.get(HistoryReadAttempt, read_id), "discarded", batch=batch,
+                                read_kind=evidence.get("read_kind"))
+                    return True
+                dataset = db.get(MarketDataset, version.dataset_id)
+                from .market import ingest
 
-            ingest(db, db.get(Instrument, dataset.instrument_id), batch.ingestion_payload(),
-                   defer_aggregation=True)
-            content_id, checksum = store_blob(db, collection_identity(raw_identity).key, content)
-            db.add(HistoryChunk(version_id=ident, start=start, end=checkpoint,
-                observed_at=batch.observed_at, count=len(batch.rows),
-                checksum=checksum, content=b"", content_id=content_id,
-                result=batch.result.status, unknown=_unknown(batch.rows, start, checkpoint)))
-            version.cursor = checkpoint
-            version.lease_token = None
-            version.lease_until = 0
-            version.attempts = 0
-            version.error = None
-            version.next_at = now_ms()
-            finish_read(db.get(HistoryReadAttempt, read_id), batch.result.status, batch=batch,
-                        read_kind=evidence.get("read_kind"), accepted=True)
-            db.flush()
-            if version.cursor == version.end:
-                publish(db, version)
-            else:
-                version.status = "pending"
-        return True
+                ingest(db, db.get(Instrument, dataset.instrument_id), batch.ingestion_payload(),
+                       defer_aggregation=True, price_manifest=version.manifest or {})
+                content_id, checksum = store_blob(db, collection_identity(raw_identity).key, content)
+                db.add(HistoryChunk(version_id=ident, start=start, end=checkpoint,
+                    observed_at=batch.observed_at, count=len(batch.rows),
+                    checksum=checksum, content=b"", content_id=content_id,
+                    result=batch.result.status, unknown=_unknown(batch.rows, start, checkpoint)))
+                version.cursor = checkpoint
+                version.lease_token = None
+                version.lease_until = 0
+                version.attempts = 0
+                version.error = None
+                version.next_at = now_ms()
+                finish_read(db.get(HistoryReadAttempt, read_id), batch.result.status, batch=batch,
+                            read_kind=evidence.get("read_kind"), accepted=True)
+                db.flush()
+                if version.cursor == version.end:
+                    publish(db, version)
+                else:
+                    version.status = "pending"
+            return True
+
+        return retry_conflicts(commit_page)
     except AcquisitionBusy:
         with transaction() as db:
             version = lock_version(db, ident)
@@ -280,9 +296,10 @@ def import_page(adapter, *, version_id=None):
             result = batch.result if batch and not batch.result.successful else failed_request(error, observed_at=now_ms())
             metadata_failure = isinstance(error, PricePrecisionError)
             configuration_failure = isinstance(error, HistoryConfigurationError)
-            version.error = "price_precision_overflow" if metadata_failure else (
-                "history_source_configuration" if configuration_failure else
-                result.status if result else "invalid_payload")
+            version.error = ("price_precision_overflow" if metadata_failure else
+                             "history_source_configuration" if configuration_failure else
+                             "database_conflict" if is_conflict(error) else
+                             result.status if result else "invalid_payload")
             finish_read(db.get(HistoryReadAttempt, read_id), version.error, batch=batch,
                         read_kind=evidence.get("read_kind"))
             version.next_at = (result.retry_at if result and result.retry_at else
@@ -292,7 +309,7 @@ def import_page(adapter, *, version_id=None):
             version.lease_token = None
             version.lease_until = 0
         # Exceptions are captured as structured safe types, not supplier bodies.
-        if not isinstance(error, (ValueError, RuntimeError, TimeoutError)):
+        if not isinstance(error, (ValueError, RuntimeError, TimeoutError)) and not is_conflict(error):
             raise
         return True
 
@@ -309,6 +326,7 @@ def version_report(db, ident):
     # Times come from persisted events. Legacy mutation timestamps remain
     # unknown; poll time and lease deadlines are not task update timestamps.
     from .storage import HistoryArtifact, HistoryReadAttempt
+    from .history_artifacts import derivation_progress
 
     started_at = db.scalar(select(func.min(HistoryReadAttempt.started_at)).where(
         HistoryReadAttempt.version_id == version.id))
@@ -329,7 +347,8 @@ def version_report(db, ident):
             "task_status": task_status(db, version),
             "completed_at": run.completed_at if run else None,
             "parent_version_id": run.parent_version_id if run else None,
-            "refresh_start": run.refresh_start if run else None, "refresh_end": run.refresh_end if run else None}
+            "refresh_start": run.refresh_start if run else None, "refresh_end": run.refresh_end if run else None,
+            "derivation": derivation_progress(db, version)}
 
 
 def snapshot_rows(db, ident, *, start=None, end=None):
@@ -349,9 +368,45 @@ def snapshot_rows(db, ident, *, start=None, end=None):
         HistoryChunk.start < right, HistoryChunk.end > left).order_by(HistoryChunk.start)
     for chunk in db.scalars(query.execution_options(yield_per=1)):
         raw = raw_chunk(db, chunk)
-        for row in json.loads(raw):
+        rows = version_price_rows(json.loads(raw), version.manifest)
+        for row in rows:
             if left <= row["timestamp"] < right:
                 yield row
+
+
+def worker_tick(adapter, *, version_id=None, without_composite_aggregates=False):
+    """Isolate each role's failed round so unrelated runnable work still runs."""
+    from .history_artifacts import artifact_tick
+
+    worked = False
+
+    def phase(name, operation):
+        nonlocal worked
+        try:
+            worked = bool(operation()) or worked
+        except Exception as error:
+            # Only safe structural facts. Supplier payloads and SQL parameters
+            # can contain private account configuration and are never printed.
+            print(json.dumps({"component": "history_worker", "phase": name,
+                "error_type": type(error).__name__,
+                "sqlstate": getattr(getattr(error, "orig", None), "sqlstate", None)}), flush=True)
+
+    phase("artifacts", lambda: artifact_tick(version_id))
+    if not version_id:
+        from .composite_aggregates import aggregate_tick
+        from .composite_preparation import preparation_tick
+        from .composite_revisions import preparation_tick as revision_tick
+        from .fixed_indicators import indicator_tick
+        from .history_maintenance import schedule_tick
+
+        phase("schedule", schedule_tick)
+        phase("preparation", lambda: preparation_tick(adapter))
+        if not without_composite_aggregates:
+            phase("composite_aggregates", aggregate_tick)
+        phase("indicators", indicator_tick)
+        phase("revisions", revision_tick)
+    phase("import", lambda: import_page(adapter, version_id=version_id))
+    return worked
 
 
 def main():
@@ -402,28 +457,13 @@ def main():
     adapter = HistorySources()
     try:
         while True:
-            from .history_artifacts import artifact_tick
-
-            artifacts_worked = artifact_tick(version_id)
-            if not version_id:
-                from .composite_aggregates import aggregate_tick
-                from .composite_preparation import preparation_tick
-                from .composite_revisions import preparation_tick as revision_tick
-                from .fixed_indicators import indicator_tick
-                from .history_maintenance import schedule_tick
-
-                schedule_tick()
-                preparation_tick(adapter)
-                aggregated = False if args.without_composite_aggregates else aggregate_tick()
-                indicated = indicator_tick()
-                revision_tick()
-            else:
-                aggregated = False
-                indicated = False
-            worked = import_page(adapter, version_id=version_id)
+            worked = worker_tick(adapter, version_id=version_id,
+                without_composite_aggregates=args.without_composite_aggregates)
             if args.once:
                 return
-            time.sleep(1 if worked or artifacts_worked or aggregated or indicated else 5)
+            # Every round services all roles with bounded page transactions.
+            # Yield briefly under load; there is no one-second per-page floor.
+            time.sleep(0.01 if worked else 5)
     finally:
         adapter.close()
 

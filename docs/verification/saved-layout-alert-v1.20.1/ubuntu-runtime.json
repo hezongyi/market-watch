@@ -1,0 +1,56 @@
+{
+  "passed": true,
+  "environment": "Ubuntu quant-server",
+  "task": "mw-alert-init-v1201-20261011",
+  "project": "mw-alert-init-v1201-20261011",
+  "app_origin": "https://localhost:19653",
+  "chart_origin": "https://127.0.0.1:19654",
+  "services": [
+    {
+      "service": "api",
+      "image_id": "sha256:1d093f29f8133fe0a6c2a8a0f4939e291867eecaf91265b282d06aa9ec56ab06",
+      "running": true,
+      "labels": {
+        "io.market-watch.built-at": "2026-10-11T02:19:07.776713+00:00",
+        "io.market-watch.commit": "c23537d633f3d5fd59cd558f1971133d68b987a4",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "2026-10-18T02:19:07.776713+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-alert-init-v1201-20261011",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-alert-init-v1201-20261011"
+      }
+    },
+    {
+      "service": "web",
+      "image_id": "sha256:e33c04c0579a89fe9df6e47e714921dd9b6b3f10610240991303c34244b4d891",
+      "running": true,
+      "labels": {
+        "io.market-watch.built-at": "2026-10-11T02:21:24.446937+00:00",
+        "io.market-watch.commit": "e6d33932b63053447b3ebcb3db51811327d54566",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "2026-10-18T02:21:24.446937+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-alert-init-v1201-20261011",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-alert-init-v1201-20261011"
+      }
+    },
+    {
+      "service": "chart-origin",
+      "image_id": "sha256:1d2125abd994aca35e34e7a12985ea346a01f6078792d097067f75aefae08e56",
+      "running": true,
+      "labels": {
+        "io.market-watch.built-at": "2026-10-11T02:18:01.912645+00:00",
+        "io.market-watch.commit": "c23537d633f3d5fd59cd558f1971133d68b987a4",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "2026-10-18T02:18:01.912645+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-alert-init-v1201-20261011",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-alert-init-v1201-20261011"
+      }
+    }
+  ],
+  "build_source_difference_only_old_release_manifest_document": true
+}

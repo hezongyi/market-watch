@@ -61,6 +61,28 @@ def fetch_source(source, symbol, start=None, end=None, mode="live"):
     raise ValueError(f"Unknown source: {source}")
 
 
+def ordinary_instruments():
+    """Legacy collection owns neither registered datasets nor derived composites."""
+    from .storage import MarketComposite, MarketDataset
+
+    return select(Instrument).where(
+        Instrument.source.in_(("dukascopy", "oanda", "binance")),
+        Instrument.id.not_in(select(MarketDataset.instrument_id)),
+        Instrument.id.not_in(select(MarketComposite.instrument_id)),
+    )
+
+
+def clear_misrouted_composite_errors(db):
+    for inst in db.scalars(select(Instrument).where(
+            Instrument.source == "composite", Instrument.error == "Unknown source: composite"
+    ).with_for_update(skip_locked=True)):
+        inst.error = None
+        inst.quality = "waiting"
+        db.add(Audit(kind="market_routing_repaired", details={
+            "instrument": inst.id, "owner": "composite", "quality": "waiting",
+        }))
+
+
 def upsert(db, instrument_id, timeframe, c):
     write_bars(db, instrument_id, timeframe, [c])
     return db.scalar(select(Bar).where(Bar.instrument_id == instrument_id,
@@ -115,14 +137,18 @@ class Ingestion:
     price_changed: bool
 
 
-def ingest(db, instrument, payload, received_at=None, *, defer_aggregation=False, report_changes=False):
+def ingest(db, instrument, payload, received_at=None, *, defer_aggregation=False, report_changes=False, price_manifest=None):
     # Serialize bounded writes for one instrument across live and history workers.
     from .storage import MarketDataset
 
     if instrument.id.startswith("MD:"):
         db.scalar(select(MarketDataset.id).where(MarketDataset.instrument_id == instrument.id).with_for_update())
     db.scalar(select(Instrument).where(Instrument.id == instrument.id).with_for_update())
-    batch = validate_ingestion(db, instrument, payload)
+    batch = validate_ingestion(db, instrument, payload, price_manifest=price_manifest)
+    if batch is not None:
+        # Keep the source payload immutable, but pass the validated business
+        # rows to every Bar and aggregation writer.
+        payload = {**payload, "rows": [row.model_dump() for row in batch.rows]}
     if batch and payload.get("coverage"):
         raise ValueError("Explicit M1 batches certify observed minutes only")
     if payload.get("source") and payload["source"] != instrument.source:
@@ -460,7 +486,7 @@ def queue_initial_history(db, *, end=None):
     left = max(0, right - days * 86400_000)
     count = 0
     for instrument in db.scalars(
-        select(Instrument).where(Instrument.enabled.is_(True)).with_for_update()
+        ordinary_instruments().where(Instrument.enabled.is_(True)).with_for_update()
     ):
         key = f"initial_history:{instrument.id}:{instrument.source}:{instrument.basis}"
         if db.get(Preference, key):
@@ -513,9 +539,7 @@ def queue_initial_history(db, *, end=None):
 def once(symbol=None, start=None, end=None, *, include_viewers=False, fetcher=None):
     fetch = fetcher or fetch_source
     with transaction() as db:
-        from .storage import MarketDataset
-
-        explicit = set(db.scalars(select(MarketDataset.instrument_id)))
+        clear_misrouted_composite_errors(db)
         viewers = set()
         if include_viewers:
             from .storage import ChartHistoryPlan, ChartViewportDemand, MarketDemand
@@ -527,8 +551,8 @@ def once(symbol=None, start=None, end=None, *, include_viewers=False, fetcher=No
                 ChartViewportDemand.expires > now_ms())))
         instruments = [
             (i.id, i.symbol, i.source)
-            for i in db.scalars(select(Instrument).order_by(Instrument.enabled.desc(), Instrument.id))
-            if i.id not in explicit and (i.id == symbol if symbol else i.enabled or i.id in viewers)
+            for i in db.scalars(ordinary_instruments().order_by(Instrument.enabled.desc(), Instrument.id))
+            if (i.id == symbol if symbol else i.enabled or i.id in viewers)
         ]
     for instrument_id, provider_symbol, source in instruments:
         with transaction() as db:
@@ -599,10 +623,12 @@ def once(symbol=None, start=None, end=None, *, include_viewers=False, fetcher=No
                     inst.quality = "receiving" if latest and now_ms() - latest < 180000 else "stale"
                     inst.error = None
         except (RuntimeError, ValueError, TimeoutError, subprocess.TimeoutExpired, OSError, httpx.HTTPError) as e:
+            from .provider_transport import error_detail
+            detail = error_detail(e)
             with transaction() as db:
                 inst = db.get(Instrument, instrument_id)
                 inst.quality = "error"
-                inst.error = str(e)[:600]
+                inst.error = detail
                 if "429" in str(e):
                     delay = db.get(Preference, f"market_backoff:{source}")
                     if delay:
@@ -616,7 +642,8 @@ def once(symbol=None, start=None, end=None, *, include_viewers=False, fetcher=No
                 db.add(
                     Audit(
                         kind="market_error",
-                        details={"instrument": instrument_id, "error": str(e)[:600]},
+                        details={"instrument": instrument_id, "error": detail,
+                                 "error_type": type(e).__name__},
                     )
                 )
     with transaction() as db:
@@ -655,7 +682,8 @@ def import_once(*, chart_only=False, fetcher=None, defer_aggregation=False,
             .where(
                 ImportJob.instrument_id.not_in(saturated_symbols) if defer_aggregation else True,
                 ImportJob.instrument_id.in_(
-                    select(Instrument.id).where(Instrument.source.not_in(cooling_sources))
+                    ordinary_instruments().with_only_columns(Instrument.id).where(
+                        Instrument.source.not_in(cooling_sources))
                 ),
                 ImportJob.next_at <= now_ms(),
                 ImportJob.priority == 0 if realtime_only else True,

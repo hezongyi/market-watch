@@ -1,0 +1,253 @@
+PASS native details ready
+PASS native quote timezone Asia/Shanghai
+PASS native quote timezone America/New_York
+PASS native quote timezone exchange
+PASS native quote timezone Etc/UTC
+PASS active chart/timezone switch
+PASS native controlled quote state unknown
+PASS native controlled quote state no time
+PASS native controlled quote state read failure
+PASS native controlled quote state reopened waiting
+PASS native controlled quote state closure conflict
+PASS native controlled quote state precise event
+PASS native controlled quote state fixed history
+PASS rapid quote subscription replacement
+PASS details responsive 375
+PASS details responsive 768
+PASS details responsive 1440
+PASS details responsive 375
+PASS details responsive 768
+PASS details responsive 1440
+PASS calendar native responsive 375
+PASS calendar native responsive 768
+PASS calendar native responsive 1440
+PASS calendar native responsive 375
+PASS calendar native responsive 768
+PASS calendar native responsive 1440
+PASS calendar keyboard disclosure
+PASS actual Chrome browser zoom
+PASS native details actual 200% zoom
+PASS native period ready
+PASS native period ready
+PASS native period ready
+PASS native period ready
+PASS native period ready
+PASS native period ready
+PASS rapid native symbol selection quote identity
+{
+  "scope": "Ubuntu Docker, synthetic provider history, actual pinned native UI",
+  "cases": [
+    {
+      "case": "native details ready",
+      "quoteTime": 1791579540000,
+      "description": "XAUUSD · 平台行情 · Bid · 来源原生UTC周期 · 休市 · 周末 · 最后行情时间 2026-10-09 20:59:00 UTC · 来源 M1 分钟数据（区间至 2026-10-09 21:00:00 UTC，不含终点）"
+    },
+    {
+      "case": "native quote timezone",
+      "zone": "Asia/Shanghai",
+      "expected": "2026-10-10 04:59:00 UTC+8",
+      "visible": true
+    },
+    {
+      "case": "native quote timezone",
+      "zone": "America/New_York",
+      "expected": "2026-10-09 16:59:00 America/New_York (UTC-4)",
+      "visible": true
+    },
+    {
+      "case": "native quote timezone",
+      "zone": "exchange",
+      "expected": "2026-10-09 20:59:00 UTC",
+      "visible": true
+    },
+    {
+      "case": "native quote timezone",
+      "zone": "Etc/UTC",
+      "expected": "2026-10-09 20:59:00 UTC",
+      "visible": true
+    },
+    {
+      "case": "active chart/timezone switch",
+      "passed": true
+    },
+    {
+      "case": "native controlled quote state",
+      "name": "unknown",
+      "phrase": "时段未核实"
+    },
+    {
+      "case": "native controlled quote state",
+      "name": "no time",
+      "phrase": "暂无行情更新时间"
+    },
+    {
+      "case": "native controlled quote state",
+      "name": "read failure",
+      "phrase": "更新失败，保留上次数据"
+    },
+    {
+      "case": "native controlled quote state",
+      "name": "reopened waiting",
+      "phrase": "等待新行情"
+    },
+    {
+      "case": "native controlled quote state",
+      "name": "closure conflict",
+      "phrase": "时段与行情不一致，待核实"
+    },
+    {
+      "case": "native controlled quote state",
+      "name": "precise event",
+      "phrase": "最后更新于 2026-10-09 20:59:58 UTC"
+    },
+    {
+      "case": "native controlled quote state",
+      "name": "fixed history",
+      "phrase": "历史数据时间"
+    },
+    {
+      "case": "rapid quote subscription replacement",
+      "selected": "MWP:DUKA:c2893271b856e9d2550cadc243bdf793",
+      "results": [
+        {
+          "generation": "new",
+          "symbols": [
+            "MWP:DUKA:c2893271b856e9d2550cadc243bdf793"
+          ]
+        },
+        {
+          "generation": "new",
+          "symbols": [
+            "MWP:DUKA:c2893271b856e9d2550cadc243bdf793"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "details responsive",
+      "theme": "Dark",
+      "width": 375,
+      "visible": true,
+      "mode": "compact compatibility"
+    },
+    {
+      "case": "details responsive",
+      "theme": "Dark",
+      "width": 768,
+      "visible": true,
+      "mode": "native details"
+    },
+    {
+      "case": "details responsive",
+      "theme": "Dark",
+      "width": 1440,
+      "visible": true,
+      "mode": "native details"
+    },
+    {
+      "case": "details responsive",
+      "theme": "Light",
+      "width": 375,
+      "visible": true,
+      "mode": "compact compatibility"
+    },
+    {
+      "case": "details responsive",
+      "theme": "Light",
+      "width": 768,
+      "visible": true,
+      "mode": "native details"
+    },
+    {
+      "case": "details responsive",
+      "theme": "Light",
+      "width": 1440,
+      "visible": true,
+      "mode": "native details"
+    },
+    {
+      "case": "calendar native responsive",
+      "theme": "Dark",
+      "width": 375,
+      "overflow": 0
+    },
+    {
+      "case": "calendar native responsive",
+      "theme": "Dark",
+      "width": 768,
+      "overflow": 0
+    },
+    {
+      "case": "calendar native responsive",
+      "theme": "Dark",
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "case": "calendar native responsive",
+      "theme": "Light",
+      "width": 375,
+      "overflow": 0
+    },
+    {
+      "case": "calendar native responsive",
+      "theme": "Light",
+      "width": 768,
+      "overflow": 0
+    },
+    {
+      "case": "calendar native responsive",
+      "theme": "Light",
+      "width": 1440,
+      "overflow": 0
+    },
+    {
+      "case": "calendar keyboard disclosure",
+      "passed": true
+    },
+    {
+      "case": "actual Chrome browser zoom",
+      "factor": 2,
+      "viewport": {
+        "width": 720,
+        "height": 500,
+        "dpr": 2
+      }
+    },
+    {
+      "case": "native details actual 200% zoom",
+      "visible": true
+    },
+    {
+      "case": "native period ready",
+      "interval": "1"
+    },
+    {
+      "case": "native period ready",
+      "interval": "60"
+    },
+    {
+      "case": "native period ready",
+      "interval": "240"
+    },
+    {
+      "case": "native period ready",
+      "interval": "1D"
+    },
+    {
+      "case": "native period ready",
+      "interval": "1W"
+    },
+    {
+      "case": "native period ready",
+      "interval": "1M"
+    },
+    {
+      "case": "rapid native symbol selection quote identity",
+      "selected": "MWP:DUKA:9105c84af42600ccfa4f03132cc2472b",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "phase": "rapid symbol switching"
+}

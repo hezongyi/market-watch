@@ -319,6 +319,7 @@ function Shell({ logout }: { logout: () => void }) {
           </div>
         </header>
         <main id="main-content" tabIndex={-1}>
+          {matchMedia("(pointer:coarse)").matches && <p className="muted" role="note">专业图表在手机上只读看盘；编辑功能请使用桌面浏览器。</p>}
           {error && (
             <div className="error" role="alert">
               连接出现问题：{error}

@@ -1,0 +1,17 @@
+.....F                                                                   [100%]
+=================================== FAILURES ===================================
+E   AssertionError: pricing transaction aborted: (psycopg.errors.DeadlockDetected) deadlock detected
+      DETAIL:  Process 2275 waits for ShareLock on transaction 1243; blocked by process 2274.
+      Process 2274 waits for ShareLock on transaction 1245; blocked by process 2275.
+      HINT:  See server log for query details.
+      CONTEXT:  while locking tuple (0,2) in relation "instruments"
+      [SQL: SELECT instruments.id, instruments.label, instruments.source, instruments.symbol, instruments.basis, instruments.calendar, instruments.calendar_profile, instruments.precision, instruments.quality, instruments.last_received, instruments.error, instruments.enabled
+      FROM instruments
+      WHERE instruments.id = %(id_1)s::VARCHAR FOR UPDATE]
+      [parameters: {'id_1': 'MD:f294f9cb6b8462a5f722dd1cc:EURUSD'}]
+      (Background on this error at: https://sqlalche.me/e/21/e3q8)
+    assert OperationalError('(psycopg.errors.DeadlockDetected) deadlock detected\nDETAIL:  Process 2275 waits for ShareLock on tr...rocess 2275.\nHINT:  See server log for query details.\nCONTEXT:  while locking tuple (0,2) in relation "instruments"') is None
+/home/quant/repos/market-watch-pro-charts-impl-20261011/backend/tests/test_pricing_publication_deadlock_postgres.py:106: AssertionError: pricing transaction aborted: (psycopg.errors.DeadlockDetected) deadlock detected
+=========================== short test summary info ============================
+FAILED backend/tests/test_pricing_publication_deadlock_postgres.py::test_publisher_plan_progress_does_not_deadlock_confirmed_pricing[False-cancelled]
+1 failed, 5 passed, 22 deselected in 11.30s

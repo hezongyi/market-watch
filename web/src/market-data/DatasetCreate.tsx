@@ -564,6 +564,7 @@ export function DatasetCreate() {
                       </small>
                     </label>
                   )}
+                  <p>超出设定精度的价格自动四舍五入；未超精度的价格保持原值。</p>
                 </fieldset>
                 <fieldset disabled={busy || uncertain}>
                   <legend>历史范围与日线划分</legend>

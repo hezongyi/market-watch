@@ -1,0 +1,78 @@
+{
+  "scope": "Unraid formal production; Ubuntu browser; existing workspace, read-only UI and market subscriptions; preference migration and native preference saves suppressed",
+  "passed": true,
+  "cases": [
+    "HTTPS administrator login and Secure/HttpOnly session",
+    "Existing production chart ready, one alert business root, actual bars/quotes through authenticated SSE",
+    "Deployed native alert sidebar/dialog, message cancel and notification Escape restore entry focus; no alert saved",
+    "Production data center retains six sections and source-status actual read",
+    "Native indicator window coexists with alerts",
+    "390px production home has no horizontal overflow"
+  ],
+  "errors": [],
+  "http_errors": [],
+  "credential_leaks": [],
+  "unexpected_writes": [],
+  "blocked_preference_saves": [
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "kind": "setting",
+      "name": "widgetbar.layout-settings"
+    }
+  ],
+  "started_at": "2026-10-11T02:44:39.603Z",
+  "existing_workspaces": [
+    {
+      "id": "dcb312bb-b8ca-4b9c-b981-51cce1dbde6e",
+      "revision": 251
+    }
+  ],
+  "chart_count": 5,
+  "market_events": [
+    {
+      "type": "bars",
+      "sequence": 1
+    },
+    {
+      "type": "bars",
+      "sequence": 1
+    },
+    {
+      "type": "bars",
+      "sequence": 1
+    },
+    {
+      "type": "bars",
+      "sequence": 1
+    },
+    {
+      "type": "bars",
+      "sequence": 1
+    },
+    {
+      "type": "bars",
+      "sequence": 1
+    },
+    {
+      "type": "quotes",
+      "sequence": 2
+    },
+    {
+      "type": "quotes",
+      "sequence": 2
+    },
+    {
+      "type": "bars",
+      "sequence": 1
+    },
+    {
+      "type": "quotes",
+      "sequence": 3
+    },
+    {
+      "type": "quotes",
+      "sequence": 3
+    }
+  ],
+  "logout_verified": true
+}

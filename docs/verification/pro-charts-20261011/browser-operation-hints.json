@@ -1,0 +1,435 @@
+{
+  "environment": "Ubuntu mw-pro-charts-20261011",
+  "cases": [
+    {
+      "name": "keyboard sidebar toggle/selection/focus at browser-equivalent viewport and DPR zoom",
+      "theme": "Dark",
+      "zoom": 1,
+      "geometry": {
+        "button": [
+          44,
+          44
+        ],
+        "svg": [
+          44,
+          44
+        ],
+        "center": [
+          22,
+          22
+        ],
+        "focus": true,
+        "focusVisible": true,
+        "outline": "rgb(219, 219, 219) none 3px",
+        "shadow": "none"
+      },
+      "decoration": {
+        "outline": "rgb(41, 98, 255) solid 2px",
+        "content": "\"\""
+      }
+    },
+    {
+      "name": "keyboard sidebar toggle/selection/focus at browser-equivalent viewport and DPR zoom",
+      "theme": "Dark",
+      "zoom": 1.25,
+      "geometry": {
+        "button": [
+          44,
+          44
+        ],
+        "svg": [
+          44,
+          44
+        ],
+        "center": [
+          22,
+          22
+        ],
+        "focus": true,
+        "focusVisible": true,
+        "outline": "rgb(219, 219, 219) none 3px",
+        "shadow": "none"
+      },
+      "decoration": {
+        "outline": "rgb(41, 98, 255) solid 2px",
+        "content": "\"\""
+      }
+    },
+    {
+      "name": "keyboard sidebar toggle/selection/focus at browser-equivalent viewport and DPR zoom",
+      "theme": "Dark",
+      "zoom": 1.5,
+      "geometry": {
+        "button": [
+          44,
+          44
+        ],
+        "svg": [
+          44,
+          44
+        ],
+        "center": [
+          22,
+          22
+        ],
+        "focus": true,
+        "focusVisible": true,
+        "outline": "rgb(219, 219, 219) none 3px",
+        "shadow": "none"
+      },
+      "decoration": {
+        "outline": "rgb(41, 98, 255) solid 2px",
+        "content": "\"\""
+      }
+    },
+    {
+      "name": "section hint changes without height jump; keyboard last row clear of footer",
+      "theme": "Dark",
+      "hintBefore": {
+        "x": 16,
+        "y": 548,
+        "width": 736,
+        "height": 40
+      },
+      "hintAfter": {
+        "x": 16,
+        "y": 548,
+        "width": 736,
+        "height": 40
+      },
+      "rowBox": {
+        "x": 164,
+        "y": 437,
+        "width": 576,
+        "height": 51
+      },
+      "focus": {
+        "visible": true,
+        "outline": "rgb(144, 178, 255) solid 2px"
+      }
+    },
+    {
+      "name": "375px all section hints retain native height",
+      "theme": "Dark",
+      "narrow": [
+        {
+          "section": "交易日历",
+          "text": "展开品种查看交易日历。 Esc 关闭窗口。",
+          "box": {
+            "x": 0,
+            "y": 528,
+            "width": 375,
+            "height": 40
+          }
+        },
+        {
+          "section": "任务与记录",
+          "text": "刷新列表，展开任务记录。 Esc 关闭窗口。",
+          "box": {
+            "x": 0,
+            "y": 528,
+            "width": 375,
+            "height": 40
+          }
+        },
+        {
+          "section": "自建行情",
+          "text": "选择行情查看版本与周期。 Esc 关闭窗口。",
+          "box": {
+            "x": 0,
+            "y": 528,
+            "width": 375,
+            "height": 40
+          }
+        },
+        {
+          "section": "来源状态",
+          "text": "展开来源查看状态与记录。 Esc 关闭窗口。",
+          "box": {
+            "x": 0,
+            "y": 528,
+            "width": 375,
+            "height": 40
+          }
+        },
+        {
+          "section": "组合行情",
+          "text": "选择组合查看接续与修订。 Esc 关闭窗口。",
+          "box": {
+            "x": 0,
+            "y": 528,
+            "width": 375,
+            "height": 40
+          }
+        },
+        {
+          "section": "平台行情",
+          "text": "搜索或筛选品种，查看详情。 Esc 关闭窗口。",
+          "box": {
+            "x": 0,
+            "y": 528,
+            "width": 375,
+            "height": 40
+          }
+        }
+      ]
+    },
+    {
+      "name": "marked catalogue 503, real API keyboard retry, last native row focus clear of hint",
+      "theme": "Dark",
+      "detailBox": {
+        "x": 694,
+        "y": 442.5,
+        "width": 38,
+        "height": 32
+      },
+      "platformHint": {
+        "x": 0,
+        "y": 548,
+        "width": 736,
+        "height": 40
+      },
+      "detailFocus": {
+        "focused": true,
+        "visible": true,
+        "outline": "rgb(144, 178, 255) solid 2px"
+      }
+    },
+    {
+      "name": "last Python indicator and keyboard focus clear of native operation hint",
+      "theme": "Dark",
+      "indicatorBox": {
+        "x": 696,
+        "y": 444,
+        "width": 44,
+        "height": 36
+      },
+      "indicatorFooter": {
+        "x": 16,
+        "y": 548,
+        "width": 736,
+        "height": 40
+      },
+      "indicatorFocus": {
+        "visible": true,
+        "outline": "rgb(144, 178, 255) solid 2px"
+      }
+    },
+    {
+      "name": "keyboard sidebar toggle/selection/focus at browser-equivalent viewport and DPR zoom",
+      "theme": "Light",
+      "zoom": 1,
+      "geometry": {
+        "button": [
+          44,
+          44
+        ],
+        "svg": [
+          44,
+          44
+        ],
+        "center": [
+          22,
+          22
+        ],
+        "focus": true,
+        "focusVisible": true,
+        "outline": "rgb(15, 15, 15) none 3px",
+        "shadow": "none"
+      },
+      "decoration": {
+        "outline": "rgb(41, 98, 255) solid 2px",
+        "content": "\"\""
+      }
+    },
+    {
+      "name": "keyboard sidebar toggle/selection/focus at browser-equivalent viewport and DPR zoom",
+      "theme": "Light",
+      "zoom": 1.25,
+      "geometry": {
+        "button": [
+          44,
+          44
+        ],
+        "svg": [
+          44,
+          44
+        ],
+        "center": [
+          22,
+          22
+        ],
+        "focus": true,
+        "focusVisible": true,
+        "outline": "rgb(15, 15, 15) none 3px",
+        "shadow": "none"
+      },
+      "decoration": {
+        "outline": "rgb(41, 98, 255) solid 2px",
+        "content": "\"\""
+      }
+    },
+    {
+      "name": "keyboard sidebar toggle/selection/focus at browser-equivalent viewport and DPR zoom",
+      "theme": "Light",
+      "zoom": 1.5,
+      "geometry": {
+        "button": [
+          44,
+          44
+        ],
+        "svg": [
+          44,
+          44
+        ],
+        "center": [
+          22,
+          22
+        ],
+        "focus": true,
+        "focusVisible": true,
+        "outline": "rgb(15, 15, 15) none 3px",
+        "shadow": "none"
+      },
+      "decoration": {
+        "outline": "rgb(41, 98, 255) solid 2px",
+        "content": "\"\""
+      }
+    },
+    {
+      "name": "section hint changes without height jump; keyboard last row clear of footer",
+      "theme": "Light",
+      "hintBefore": {
+        "x": 16,
+        "y": 461,
+        "width": 736,
+        "height": 40
+      },
+      "hintAfter": {
+        "x": 16,
+        "y": 461,
+        "width": 736,
+        "height": 40
+      },
+      "rowBox": {
+        "x": 164,
+        "y": 350,
+        "width": 576,
+        "height": 51
+      },
+      "focus": {
+        "visible": true,
+        "outline": "rgb(41, 98, 255) solid 2px"
+      }
+    },
+    {
+      "name": "375px all section hints retain native height",
+      "theme": "Light",
+      "narrow": [
+        {
+          "section": "交易日历",
+          "text": "展开品种查看交易日历。 Esc 关闭窗口。",
+          "box": {
+            "x": 0,
+            "y": 528,
+            "width": 375,
+            "height": 40
+          }
+        },
+        {
+          "section": "任务与记录",
+          "text": "刷新列表，展开任务记录。 Esc 关闭窗口。",
+          "box": {
+            "x": 0,
+            "y": 528,
+            "width": 375,
+            "height": 40
+          }
+        },
+        {
+          "section": "自建行情",
+          "text": "选择行情查看版本与周期。 Esc 关闭窗口。",
+          "box": {
+            "x": 0,
+            "y": 528,
+            "width": 375,
+            "height": 40
+          }
+        },
+        {
+          "section": "来源状态",
+          "text": "展开来源查看状态与记录。 Esc 关闭窗口。",
+          "box": {
+            "x": 0,
+            "y": 528,
+            "width": 375,
+            "height": 40
+          }
+        },
+        {
+          "section": "组合行情",
+          "text": "选择组合查看接续与修订。 Esc 关闭窗口。",
+          "box": {
+            "x": 0,
+            "y": 528,
+            "width": 375,
+            "height": 40
+          }
+        },
+        {
+          "section": "平台行情",
+          "text": "搜索或筛选品种，查看详情。 Esc 关闭窗口。",
+          "box": {
+            "x": 0,
+            "y": 528,
+            "width": 375,
+            "height": 40
+          }
+        }
+      ]
+    },
+    {
+      "name": "marked catalogue 503, real API keyboard retry, last native row focus clear of hint",
+      "theme": "Light",
+      "detailBox": {
+        "x": 694,
+        "y": 442.5,
+        "width": 38,
+        "height": 32
+      },
+      "platformHint": {
+        "x": 0,
+        "y": 548,
+        "width": 736,
+        "height": 40
+      },
+      "detailFocus": {
+        "focused": true,
+        "visible": true,
+        "outline": "rgb(41, 98, 255) solid 2px"
+      }
+    },
+    {
+      "name": "last Python indicator and keyboard focus clear of native operation hint",
+      "theme": "Light",
+      "indicatorBox": {
+        "x": 696,
+        "y": 444,
+        "width": 44,
+        "height": 36
+      },
+      "indicatorFooter": {
+        "x": 16,
+        "y": 548,
+        "width": 736,
+        "height": 40
+      },
+      "indicatorFocus": {
+        "visible": true,
+        "outline": "rgb(41, 98, 255) solid 2px"
+      }
+    }
+  ],
+  "passed": true,
+  "errors": []
+}

@@ -1,0 +1,41 @@
+{
+  "environment": "Ubuntu mw-pro-charts-20261011",
+  "cases": [
+    {
+      "name": "real fixed comparison consumer survives hidden layout roundtrip",
+      "comparison": {
+        "studies": [
+          {
+            "id": "e3nJNl",
+            "name": "Compare"
+          }
+        ],
+        "tracked": true,
+        "inputs": [
+          {
+            "id": "source",
+            "value": "close"
+          },
+          {
+            "id": "symbol",
+            "value": "MWH:95d5f45a-54dd-4e1e-8367-3edd37d5618c"
+          }
+        ]
+      }
+    },
+    {
+      "name": "injected one-load 503 and actual UI per-pane retry preserves peer",
+      "failure": "Error: ApiError: isolated acceptance single request failure",
+      "peer": {
+        "symbol": "MWP:EURUSD",
+        "resolution": "60",
+        "range": {
+          "from": 1791550800,
+          "to": 1791788400
+        }
+      }
+    }
+  ],
+  "passed": true,
+  "errors": []
+}

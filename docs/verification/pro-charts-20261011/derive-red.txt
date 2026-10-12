@@ -1,0 +1,20 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+________ test_two_versions_and_periods_advance_before_any_one_finishes _________
+backend/tests/test_history_derive_scheduling.py:20: in test_two_versions_and_periods_advance_before_any_one_finishes
+    assert cursors == [5000 * 60000] * 4, "each runnable version/period receives one page"
+E   AssertionError: each runnable version/period receives one page
+E   assert [0, 0, 960000000, 0] == [300000000, 3...00, 300000000]
+E
+E     At index 0 diff: 0 != 300000000
+E     Use -v to get more diff
+________ test_price_decoding_reused_across_committed_pages_and_periods _________
+backend/tests/test_history_derive_scheduling.py:36: in test_price_decoding_reused_across_committed_pages_and_periods
+    assert len(calls) == 1, "one immutable source chunk is normalized once across all six pages"
+E   AssertionError: one immutable source chunk is normalized once across all six pages
+E   assert 6 == 1
+E    +  where 6 = len([10001, 10001, 10001, 10001, 10001, 10001])
+=========================== short test summary info ============================
+FAILED backend/tests/test_history_derive_scheduling.py::test_two_versions_and_periods_advance_before_any_one_finishes
+FAILED backend/tests/test_history_derive_scheduling.py::test_price_decoding_reused_across_committed_pages_and_periods
+2 failed in 17.07s

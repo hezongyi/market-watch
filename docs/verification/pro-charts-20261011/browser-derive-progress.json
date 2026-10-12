@@ -1,0 +1,106 @@
+{
+  "environment": "Ubuntu mw-pro-charts-20261011",
+  "seeded": {
+    "version": "8271d6cb-bd10-4fd2-be8b-629749aa12f8",
+    "dataset": "554b92e06964da09b0cb3aac264653082a545ef2205907e10bdd9e5c50f78e6f",
+    "progress": {
+      "stage": "derive",
+      "published_periods": 0,
+      "total_periods": 2,
+      "processed_rows": 5000,
+      "total_rows": 24002,
+      "estimated_remaining_seconds": 2.9377092000000005,
+      "periods": [
+        {
+          "timeframe": "H1",
+          "status": "pending",
+          "processed_rows": 5000,
+          "total_rows": 12001,
+          "cursor": 1791338340000,
+          "work_seconds": 0.6908208322711289,
+          "updated_at": 1791758443403
+        },
+        {
+          "timeframe": "M1",
+          "status": "pending",
+          "processed_rows": 0,
+          "total_rows": 12001,
+          "cursor": 1791038340000,
+          "work_seconds": 0,
+          "updated_at": null
+        }
+      ]
+    }
+  },
+  "cases": [
+    {
+      "name": "actual committed counts and recent ETA rendered in task details",
+      "progress": {
+        "stage": "derive",
+        "published_periods": 0,
+        "total_periods": 2,
+        "processed_rows": 10000,
+        "total_rows": 24002,
+        "estimated_remaining_seconds": 32.873895600000004,
+        "periods": [
+          {
+            "timeframe": "H1",
+            "status": "pending",
+            "processed_rows": 5000,
+            "total_rows": 12001,
+            "cursor": 1791338340000,
+            "work_seconds": 0.6908208322711289,
+            "updated_at": 1791758443403
+          },
+          {
+            "timeframe": "M1",
+            "status": "pending",
+            "processed_rows": 5000,
+            "total_rows": 12001,
+            "cursor": 1791338340000,
+            "work_seconds": 1.5610379530116916,
+            "updated_at": 1791758461209
+          }
+        ]
+      }
+    },
+    {
+      "name": "actual page pause/resume clears ETA until newly committed service",
+      "pausedEta": null,
+      "resumedEta": null
+    },
+    {
+      "name": "actual completion shows every period and no obsolete ETA",
+      "progress": {
+        "stage": "derive",
+        "published_periods": 2,
+        "total_periods": 2,
+        "processed_rows": 24002,
+        "total_rows": 24002,
+        "estimated_remaining_seconds": 0,
+        "periods": [
+          {
+            "timeframe": "H1",
+            "status": "published",
+            "processed_rows": 12001,
+            "total_rows": 12001,
+            "cursor": 1791758400000,
+            "work_seconds": 3.2086267485283315,
+            "updated_at": 1791758492512
+          },
+          {
+            "timeframe": "M1",
+            "status": "published",
+            "processed_rows": 12001,
+            "total_rows": 12001,
+            "cursor": 1791758400000,
+            "work_seconds": 2.442239302676171,
+            "updated_at": 1791758492741
+          }
+        ]
+      }
+    }
+  ],
+  "passed": true,
+  "errors": []
+}

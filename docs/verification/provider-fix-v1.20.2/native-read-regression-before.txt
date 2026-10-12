@@ -1,0 +1,142 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_ test_binance_native_chart_rotates_pool_for_retryable_read_failure[ReadError] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fe12df8b150>
+error_type = <class 'httpx.ReadError'>
+
+    @pytest.mark.parametrize('error_type', [httpx.ReadError, httpx.RemoteProtocolError, httpx.ReadTimeout])
+    def test_binance_native_chart_rotates_pool_for_retryable_read_failure(monkeypatch, error_type):
+        import time
+        from alerts.provider_chart import _request
+
+        requests, discarded = [], []
+        def receive(request):
+            requests.append(request)
+            if len(requests) == 1:
+                raise error_type('controlled', request=request)
+            return httpx.Response(200, json=[])
+        monkeypatch.setattr('alerts.provider_chart.discard_client', discarded.append)
+        with httpx.Client(transport=httpx.MockTransport(receive)) as client:
+>           assert _request(client, 'https://data-api.binance.vision/api/v3/klines', params={},
+                            deadline=time.monotonic()+3) == []
+
+backend/tests/test_provider_network_recovery.py:149:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend/alerts/provider_chart.py:192: in _request
+    response = client.get(
+../../miniforge3/envs/planck/lib/python3.11/site-packages/httpx/_client.py:1053: in get
+    return self.request(
+../../miniforge3/envs/planck/lib/python3.11/site-packages/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniforge3/envs/planck/lib/python3.11/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+../../miniforge3/envs/planck/lib/python3.11/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+../../miniforge3/envs/planck/lib/python3.11/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniforge3/envs/planck/lib/python3.11/site-packages/httpx/_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniforge3/envs/planck/lib/python3.11/site-packages/httpx/_transports/mock.py:24: in handle_request
+    response = self.handler(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = <Request('GET', 'https://data-api.binance.vision/api/v3/klines')>
+
+    def receive(request):
+        requests.append(request)
+        if len(requests) == 1:
+>           raise error_type('controlled', request=request)
+E           httpx.ReadError: controlled
+
+backend/tests/test_provider_network_recovery.py:145: ReadError
+_ test_binance_native_chart_rotates_pool_for_retryable_read_failure[RemoteProtocolError] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fe12da5fc50>
+error_type = <class 'httpx.RemoteProtocolError'>
+
+    @pytest.mark.parametrize('error_type', [httpx.ReadError, httpx.RemoteProtocolError, httpx.ReadTimeout])
+    def test_binance_native_chart_rotates_pool_for_retryable_read_failure(monkeypatch, error_type):
+        import time
+        from alerts.provider_chart import _request
+
+        requests, discarded = [], []
+        def receive(request):
+            requests.append(request)
+            if len(requests) == 1:
+                raise error_type('controlled', request=request)
+            return httpx.Response(200, json=[])
+        monkeypatch.setattr('alerts.provider_chart.discard_client', discarded.append)
+        with httpx.Client(transport=httpx.MockTransport(receive)) as client:
+>           assert _request(client, 'https://data-api.binance.vision/api/v3/klines', params={},
+                            deadline=time.monotonic()+3) == []
+
+backend/tests/test_provider_network_recovery.py:149:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend/alerts/provider_chart.py:192: in _request
+    response = client.get(
+../../miniforge3/envs/planck/lib/python3.11/site-packages/httpx/_client.py:1053: in get
+    return self.request(
+../../miniforge3/envs/planck/lib/python3.11/site-packages/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniforge3/envs/planck/lib/python3.11/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+../../miniforge3/envs/planck/lib/python3.11/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+../../miniforge3/envs/planck/lib/python3.11/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniforge3/envs/planck/lib/python3.11/site-packages/httpx/_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniforge3/envs/planck/lib/python3.11/site-packages/httpx/_transports/mock.py:24: in handle_request
+    response = self.handler(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = <Request('GET', 'https://data-api.binance.vision/api/v3/klines')>
+
+    def receive(request):
+        requests.append(request)
+        if len(requests) == 1:
+>           raise error_type('controlled', request=request)
+E           httpx.RemoteProtocolError: controlled
+
+backend/tests/test_provider_network_recovery.py:145: RemoteProtocolError
+_ test_binance_native_chart_rotates_pool_for_retryable_read_failure[ReadTimeout] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fe12dba6850>
+error_type = <class 'httpx.ReadTimeout'>
+
+    @pytest.mark.parametrize('error_type', [httpx.ReadError, httpx.RemoteProtocolError, httpx.ReadTimeout])
+    def test_binance_native_chart_rotates_pool_for_retryable_read_failure(monkeypatch, error_type):
+        import time
+        from alerts.provider_chart import _request
+
+        requests, discarded = [], []
+        def receive(request):
+            requests.append(request)
+            if len(requests) == 1:
+                raise error_type('controlled', request=request)
+            return httpx.Response(200, json=[])
+        monkeypatch.setattr('alerts.provider_chart.discard_client', discarded.append)
+        with httpx.Client(transport=httpx.MockTransport(receive)) as client:
+            assert _request(client, 'https://data-api.binance.vision/api/v3/klines', params={},
+                            deadline=time.monotonic()+3) == []
+>           assert discarded == [client]
+E           assert [] == [<httpx.Clien...7fe12dba6b10>]
+E
+E             Right contains one more item: <httpx.Client object at 0x7fe12dba6b10>
+E             Use -v to get more diff
+
+backend/tests/test_provider_network_recovery.py:151: AssertionError
+=========================== short test summary info ============================
+FAILED backend/tests/test_provider_network_recovery.py::test_binance_native_chart_rotates_pool_for_retryable_read_failure[ReadError]
+FAILED backend/tests/test_provider_network_recovery.py::test_binance_native_chart_rotates_pool_for_retryable_read_failure[RemoteProtocolError]
+FAILED backend/tests/test_provider_network_recovery.py::test_binance_native_chart_rotates_pool_for_retryable_read_failure[ReadTimeout]
+3 failed, 7 deselected in 0.77s

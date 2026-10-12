@@ -73,7 +73,7 @@ def metadata(ident):
         raise HTTPException(404, "未知Dukascopy来源品种，请重新搜索")
     return {**row, "name": row["label"], "basis": "bid", "series_kind": "provider",
         "calendar": CALENDAR, "timezone": "Etc/UTC", "session": "24x7",
-        "session_verified": False, "volume_kind": "quantity", "volume_unit": "source_quantity",
+        "session_verified": False, "calendar_version": "dukascopy-spot-v1", "volume_kind": "quantity", "volume_unit": "source_quantity",
         "price_description": "Bid · 来源原生UTC周期", "native_page_capacity": 4000,
         "request_parameters": {"offer_side": "B", "splits": "true", "stocks": "true"},
         "completion_basis": "elapsed_native_interval; confirmation_not_supplied"}

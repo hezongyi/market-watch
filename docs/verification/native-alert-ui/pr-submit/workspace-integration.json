@@ -1,0 +1,2153 @@
+{
+  "scope": "Ubuntu Chromium; full AdvancedWorkspace and shipped bridge with actual licensed widget; routed synthetic API; no deployed instance",
+  "cases": [
+    "Full shipped host opens native dialog through validated parent context; draft resides in parent localStorage",
+    "Native Save As binds a fresh UI session and correctly scoped API; old workspace draft remains available",
+    "Native layout load restores A draft, rejects late B response, retains one renderer and keeps iframe alive",
+    "Version conflict preserves edited input and exposes native-window feedback"
+  ],
+  "passed": true,
+  "errors": [],
+  "unexpected": [],
+  "messages": [
+    {
+      "type": "loaded"
+    },
+    {
+      "type": "preferences"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "preferences"
+    },
+    {
+      "type": "preferences"
+    },
+    {
+      "type": "native-load-start"
+    },
+    {
+      "type": "data"
+    },
+    {
+      "type": "preferences"
+    },
+    {
+      "type": "native-load-applying"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "data"
+    },
+    {
+      "type": "native-load-end"
+    },
+    {
+      "type": "preferences"
+    },
+    {
+      "type": "workspace"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "preferences"
+    },
+    {
+      "type": "native-saved"
+    },
+    {
+      "type": "theme-changed"
+    },
+    {
+      "type": "market-unsubscribe"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "preferences"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "preferences"
+    },
+    {
+      "type": "market-unsubscribe"
+    },
+    {
+      "type": "ready"
+    },
+    {
+      "type": "data"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "preferences"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "preferences"
+    },
+    {
+      "type": "chart-alert-ui-rpc"
+    },
+    {
+      "type": "chart-alert-ui-rpc"
+    },
+    {
+      "type": "chart-alert-ui-draft",
+      "workspace_id": "workspace-a"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "market-unsubscribe"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "preferences"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "preferences"
+    },
+    {
+      "type": "market-unsubscribe"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "market-unsubscribe"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "market-unsubscribe"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "chart-alert-context"
+    },
+    {
+      "type": "chart-alert-ui-rpc"
+    },
+    {
+      "type": "chart-alert-ui-draft",
+      "workspace_id": "workspace-a"
+    },
+    {
+      "type": "chart-alert-ui-draft",
+      "workspace_id": "workspace-a"
+    },
+    {
+      "type": "chart-alert-ui-draft",
+      "workspace_id": "workspace-a"
+    },
+    {
+      "type": "chart-alert-ui-draft",
+      "workspace_id": "workspace-a"
+    },
+    {
+      "type": "workspace"
+    },
+    {
+      "type": "preferences"
+    },
+    {
+      "type": "native-saved"
+    },
+    {
+      "type": "preferences"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "market-unsubscribe"
+    },
+    {
+      "type": "chart-alert-ui-rpc"
+    },
+    {
+      "type": "chart-alert-ui-rpc"
+    },
+    {
+      "type": "chart-alert-ui-draft",
+      "workspace_id": "workspace-1"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "market-unsubscribe"
+    },
+    {
+      "type": "market-unsubscribe"
+    },
+    {
+      "type": "market-unsubscribe"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "market-unsubscribe"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "chart-alert-context"
+    },
+    {
+      "type": "chart-alert-ui-rpc"
+    },
+    {
+      "type": "chart-alert-ui-draft",
+      "workspace_id": "workspace-1"
+    },
+    {
+      "type": "market-unsubscribe"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "chart-alert-ui-draft",
+      "workspace_id": "workspace-1"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "chart-alert-ui-draft",
+      "workspace_id": "workspace-1"
+    },
+    {
+      "type": "chart-alert-ui-rpc"
+    },
+    {
+      "type": "chart-alert-ui-rpc"
+    },
+    {
+      "type": "chart-alert-ui-rpc"
+    },
+    {
+      "type": "chart-alert-ui-draft",
+      "workspace_id": "workspace-1"
+    },
+    {
+      "type": "chart-alert-ui-rpc"
+    },
+    {
+      "type": "chart-alert-ui-rpc"
+    },
+    {
+      "type": "workspace"
+    },
+    {
+      "type": "preferences"
+    },
+    {
+      "type": "capacity-notice"
+    },
+    {
+      "type": "market-unsubscribe"
+    },
+    {
+      "type": "viewport-notice"
+    },
+    {
+      "type": "native-load-reset"
+    },
+    {
+      "type": "market-unsubscribe"
+    },
+    {
+      "type": "viewport-notice"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "cancel-request"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "native-load-start"
+    },
+    {
+      "type": "data"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "native-load-applying"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "market-unsubscribe"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "data"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "market-unsubscribe"
+    },
+    {
+      "type": "market-unsubscribe"
+    },
+    {
+      "type": "market-unsubscribe"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "native-load-end"
+    },
+    {
+      "type": "market-unsubscribe"
+    },
+    {
+      "type": "preferences"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "market-unsubscribe"
+    },
+    {
+      "type": "chart-alert-ui-rpc"
+    },
+    {
+      "type": "chart-alert-ui-rpc"
+    },
+    {
+      "type": "chart-alert-ui-draft",
+      "workspace_id": "workspace-a"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "data"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "market-unsubscribe"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "market-unsubscribe"
+    },
+    {
+      "type": "market"
+    },
+    {
+      "type": "market-subscribe"
+    },
+    {
+      "type": "chart-alert-ui-rpc"
+    },
+    {
+      "type": "chart-alert-ui-draft",
+      "workspace_id": "workspace-a"
+    },
+    {
+      "type": "chart-alert-ui-rpc"
+    },
+    {
+      "type": "chart-alert-ui-rpc"
+    },
+    {
+      "type": "chart-alert-ui-rpc"
+    },
+    {
+      "type": "chart-alert-ui-draft",
+      "workspace_id": "workspace-a"
+    },
+    {
+      "type": "chart-alert-ui-rpc"
+    },
+    {
+      "type": "chart-alert-ui-draft",
+      "workspace_id": "workspace-a"
+    },
+    {
+      "type": "chart-alert-ui-draft",
+      "workspace_id": "workspace-a"
+    },
+    {
+      "type": "chart-alert-ui-draft",
+      "workspace_id": "workspace-a"
+    },
+    {
+      "type": "chart-alert-ui-rpc"
+    }
+  ],
+  "requests": [
+    {
+      "path": "/api/advanced-charts/workspaces"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/migrate",
+      "body": {}
+    },
+    {
+      "path": "/api/advanced-charts/catalog"
+    },
+    {
+      "path": "/api/advanced-charts/preferences"
+    },
+    {
+      "path": "/api/charts/history-capabilities"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "body": {
+        "kind": "setting",
+        "name": "toggle_delete_locked_linetools",
+        "tool": "",
+        "content": {
+          "value": "false"
+        },
+        "revision": 0
+      }
+    },
+    {
+      "path": "/readyz"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "body": {
+        "instrument": "EURUSD",
+        "series_kind": "provider",
+        "timeframe": "M1"
+      }
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "body": {
+        "kind": "setting",
+        "name": "savedwatch.TOGzFEaDQjuj",
+        "tool": "",
+        "content": {
+          "value": "{\"symbols\":[\"MWP:EURUSD\",\"MWP:XAUUSD\",\"MWP:BTCUSDT\"],\"title\":\"自选表\"}"
+        },
+        "revision": 0
+      }
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "body": {
+        "kind": "setting",
+        "name": "widgetbar.widget.watchlistterminal",
+        "tool": "",
+        "content": {
+          "value": "TOGzFEaDQjuj"
+        },
+        "revision": 0
+      }
+    },
+    {
+      "path": "/api/charts/history-loads",
+      "body": {
+        "request_id": "f1154ede-8883-4d7c-9bf2-122fff4d2f65",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "published": false,
+          "timeframe": "H1",
+          "limit": 198,
+          "countBack": 198,
+          "from": 1790966811000,
+          "firstDataRequest": true,
+          "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+          "native_history": {
+            "chart_count": 1,
+            "focused": true,
+            "historical_navigation": false,
+            "screen_bars": 198,
+            "batch_screens": 1
+          },
+          "history_page_bars": 4000,
+          "indicators": [],
+          "before": 1791679611000,
+          "track_history": false
+        }
+      }
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "body": {
+        "kind": "setting",
+        "name": "BarsMarksContainer.visibile",
+        "tool": "",
+        "content": {
+          "value": "true"
+        },
+        "revision": 0
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "b8c596ef-08dc-4623-8cb3-f4880101bc7e",
+        "generation": 1,
+        "kind": "bars",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "H1"
+        },
+        "history_accepted": false,
+        "history_plot_width": 1187,
+        "history_bar_spacing": 6,
+        "cursor": 0,
+        "sequence": 0,
+        "loaded_after": null,
+        "loaded_before": 0,
+        "history_revision": null,
+        "history_tail_revision": null,
+        "observed_at": 0,
+        "binding": null,
+        "initial_input_revision": null,
+        "initial_indicator_pending": false,
+        "historical": false
+      }
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "body": {
+        "symbols": [
+          "MWP:EURUSD"
+        ]
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "b8c596ef-08dc-4623-8cb3-f4880101bc7e",
+        "generation": 2,
+        "kind": "bars",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "H1"
+        },
+        "history_accepted": true,
+        "history_plot_width": 1187,
+        "history_bar_spacing": 6,
+        "cursor": 1791673200000,
+        "sequence": 0,
+        "loaded_after": 1790964000000,
+        "loaded_before": 1791673200000,
+        "history_revision": null,
+        "history_tail_revision": null,
+        "observed_at": 1791679551684,
+        "binding": null,
+        "initial_input_revision": null,
+        "initial_indicator_pending": false,
+        "historical": false
+      }
+    },
+    {
+      "path": "/api/charts/stream/events"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "b8c596ef-08dc-4623-8cb3-f4880101bc7e",
+        "generation": 2,
+        "kind": "bars",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "H1"
+        },
+        "history_accepted": true,
+        "history_plot_width": 1187,
+        "history_bar_spacing": 6,
+        "cursor": 1791673200000,
+        "sequence": 0,
+        "loaded_after": 1790964000000,
+        "loaded_before": 1791673200000,
+        "history_revision": null,
+        "history_tail_revision": null,
+        "observed_at": 1791679551684,
+        "binding": null,
+        "initial_input_revision": null,
+        "initial_indicator_pending": false,
+        "historical": false
+      }
+    },
+    {
+      "path": "/api/charts/reserve",
+      "body": {
+        "instrument": "EURUSD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H1",
+        "limit": 198,
+        "countBack": 198,
+        "firstDataRequest": false,
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "native_history": {
+          "chart_count": 1,
+          "focused": true,
+          "historical_navigation": false,
+          "screen_bars": 198,
+          "batch_screens": 1
+        },
+        "history_page_bars": 4000,
+        "native_reserve": {
+          "screen_bars": 198,
+          "batch_screens": 1,
+          "warmup_bars": 0
+        },
+        "indicators": [],
+        "before": 1790964000000,
+        "track_history": false
+      }
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "body": {
+        "kind": "setting",
+        "name": "current_theme.name",
+        "tool": "",
+        "content": {
+          "value": "dark"
+        },
+        "revision": 0
+      }
+    },
+    {
+      "path": "/api/advanced-charts/native-charts/save",
+      "body": {
+        "id": "workspace-a",
+        "name": "工作区 A",
+        "symbol": "MWP:EURUSD",
+        "resolution": "60",
+        "content": "{\"layout\":\"s\",\"charts\":[{\"panes\":[{\"sources\":[{\"type\":\"MainSeries\",\"id\":\"_seriesId\",\"zorder\":0,\"haStyle\":{\"studyId\":\"BarSetHeikenAshi@tv-basicstudies-60\"},\"renkoStyle\":{\"studyId\":\"BarSetRenko@tv-prostudies-73\"},\"pbStyle\":{\"studyId\":\"BarSetPriceBreak@tv-prostudies-34\"},\"kagiStyle\":{\"studyId\":\"BarSetKagi@tv-prostudies-73\"},\"pnfStyle\":{\"studyId\":\"BarSetPnF@tv-prostudies-73\"},\"rangeStyle\":{\"studyId\":\"BarSetRange@tv-basicstudies-72\"},\"formattingDeps\":{\"format\":\"price\",\"pricescale\":100000,\"minmov\":1},\"state\":{\"style\":1,\"esdShowDividends\":true,\"esdShowSplits\":true,\"esdShowEarnings\":true,\"esdShowBreaks\":false,\"showContinuousContractSwitches\":true,\"showContinuousContractSwitchesBreaks\":false,\"showFuturesContractExpiration\":true,\"showLastNews\":true,\"showCountdown\":false,\"visible\":true,\"showPriceLine\":true,\"priceLineWidth\":1,\"showPrevClosePriceLine\":false,\"prevClosePriceLineWidth\":1,\"minTick\":\"default\",\"dividendsAdjustment\":{},\"backAdjustment\":false,\"settlementAsClose\":true,\"sessionId\":\"regular\",\"bidAsk\":{\"visible\":false,\"lineStyle\":1,\"lineWidth\":1,\"bidLineColor\":\"#2962FF\",\"askLineColor\":\"#F7525F\"},\"prePostMarket\":{\"visible\":true,\"lineStyle\":1,\"lineWidth\":1,\"preMarketColor\":\"#FB8C00\",\"postMarketColor\":\"#2962FF\"},\"highLowAvgPrice\":{\"highLowPriceLinesVisible\":false,\"highLowPriceLabelsVisible\":false,\"averageClosePriceLineVisible\":false,\"averageClosePriceLabelVisible\":false,\"highLowPriceLinesWidth\":1,\"averagePriceLineWidth\":1,\"highLowPriceLinesColor\":\"\",\"averagePriceLineColor\":\"\"},\"statusViewStyle\":{\"fontSize\":16,\"showExchange\":true,\"showInterval\":true,\"symbolTextSource\":\"description\"},\"lineStyle\":{\"linestyle\":0,\"linewidth\":2,\"priceSource\":\"close\",\"colorType\":\"gradient\",\"color\":\"#2962FF\",\"gradientStartColor\":\"#D500F9\",\"gradientEndColor\":\"#00BCE5\"},\"lineWithMarkersStyle\":{\"linestyle\":0,\"linewidth\":2,\"priceSource\":\"close\",\"colorType\":\"gradient\",\"color\":\"#2962FF\",\"gradientStartColor\":\"#D500F9\",\"gradientEndColor\":\"#00BCE5\"},\"steplineStyle\":{\"linestyle\":0,\"linewidth\":2,\"priceSource\":\"close\",\"colorType\":\"gradient\",\"color\":\"#2962FF\",\"gradientStartColor\":\"#D500F9\",\"gradientEndColor\":\"#00BCE5\"},\"baselineStyle\":{\"topLineWidth\":2,\"bottomLineWidth\":2,\"topLineStyle\":0,\"bottomLineStyle\":0,\"priceSource\":\"close\",\"transparency\":50,\"baseLevelPercentage\":50,\"baselineColor\":\"#8C8C8C\",\"topFillColor1\":\"rgba(8, 153, 129, 0.28)\",\"topFillColor2\":\"rgba(8, 153, 129, 0.05)\",\"bottomFillColor1\":\"rgba(242, 54, 69, 0.05)\",\"bottomFillColor2\":\"rgba(242, 54, 69, 0.28)\",\"topLineColor\":\"#089981\",\"bottomLineColor\":\"#F23645\"},\"areaStyle\":{\"linestyle\":0,\"linewidth\":2,\"priceSource\":\"close\",\"transparency\":100,\"color1\":\"rgba(41, 98, 255, 0.28)\",\"color2\":\"#2962FF\",\"linecolor\":\"#2962FF\"},\"hlcAreaStyle\":{\"highLineVisible\":true,\"highLineStyle\":0,\"highLineWidth\":2,\"lowLineVisible\":true,\"lowLineStyle\":0,\"lowLineWidth\":2,\"closeLineStyle\":0,\"closeLineWidth\":2,\"highLineColor\":\"#00bcd4\",\"lowLineColor\":\"#e91e63\",\"closeLineColor\":\"#2962FF\",\"highCloseFillColor\":\"rgba(0, 188, 212, 0.25)\",\"closeLowFillColor\":\"rgba(233, 30, 99, 0.25)\"},\"barStyle\":{\"barColorsOnPrevClose\":false,\"dontDrawOpen\":false,\"thinBars\":true,\"downColor\":\"#F23645\",\"upColor\":\"#089981\"},\"hlcBarsStyle\":{\"thinBars\":true,\"color\":\"#2962FF\"},\"candleStyle\":{\"drawWick\":true,\"drawBorder\":true,\"barColorsOnPrevClose\":false,\"drawBody\":true,\"borderColor\":\"#378658\",\"upColor\":\"#089981\",\"wickColor\":\"#737375\",\"wickUpColor\":\"#089981\",\"wickDownColor\":\"#F23645\",\"downColor\":\"#F23645\",\"borderUpColor\":\"#089981\",\"borderDownColor\":\"#F23645\"},\"volCandlesStyle\":{\"drawWick\":true,\"drawBorder\":true,\"barColorsOnPrevClose\":false,\"drawBody\":true,\"borderColor\":\"#378658\",\"upColor\":\"#089981\",\"wickColor\":\"#737375\",\"wickUpColor\":\"#089981\",\"wickDownColor\":\"#F23645\",\"downColor\":\"#F23645\",\"borderUpColor\":\"#089981\",\"borderDownColor\":\"#F23645\"},\"hollowCandleStyle\":{\"drawWick\":true,\"drawBorder\":true,\"drawBody\":true,\"upColor\":\"#089981\",\"downColor\":\"#F23645\",\"borderColor\":\"#378658\",\"borderUpColor\":\"#089981\",\"borderDownColor\":\"#F23645\",\"wickColor\":\"#737375\",\"wickUpColor\":\"#089981\",\"wickDownColor\":\"#F23645\"},\"haStyle\":{\"drawWick\":true,\"drawBorder\":true,\"showRealLastPrice\":false,\"barColorsOnPrevClose\":false,\"inputs\":{},\"inputInfo\":{},\"drawBody\":true,\"borderColor\":\"#378658\",\"upColor\":\"#089981\",\"wickColor\":\"#737375\",\"wickUpColor\":\"#089981\",\"wickDownColor\":\"#F23645\",\"downColor\":\"#F23645\",\"borderUpColor\":\"#089981\",\"borderDownColor\":\"#F23645\"},\"hiloStyle\":{\"showBorders\":true,\"showLabels\":true,\"drawBody\":true,\"color\":\"#2962FF\",\"borderColor\":\"#2962FF\",\"labelColor\":\"#2962FF\"},\"columnStyle\":{\"barColorsOnPrevClose\":true,\"priceSource\":\"close\",\"baselinePosition\":\"bottom\",\"upColor\":\"rgba(8, 153, 129, 0.5)\",\"downColor\":\"rgba(242, 54, 69, 0.5)\"},\"renkoStyle\":{\"inputs\":{\"source\":\"close\",\"sources\":\"Close\",\"boxSize\":3,\"style\":\"ATR\",\"atrLength\":14,\"percentageLTP\":1,\"wicks\":true},\"inputInfo\":{\"source\":{\"name\":\"Source\"},\"sources\":{\"name\":\"Source\"},\"boxSize\":{\"name\":\"Box size\"},\"style\":{\"name\":\"Style\"},\"atrLength\":{\"name\":\"ATR length\"},\"percentageLTP\":{\"name\":\"Percentage\"},\"wicks\":{\"name\":\"Wicks\"}},\"upColor\":\"#089981\",\"downColor\":\"#F23645\",\"borderUpColor\":\"#089981\",\"borderDownColor\":\"#F23645\",\"upColorProjection\":\"#336854\",\"downColorProjection\":\"#7f323f\",\"borderUpColorProjection\":\"#336854\",\"borderDownColorProjection\":\"#7f323f\",\"wickUpColor\":\"#089981\",\"wickDownColor\":\"#F23645\"},\"pbStyle\":{\"inputs\":{\"lb\":3},\"inputInfo\":{\"lb\":{\"name\":\"Number of line\"}},\"upColor\":\"#089981\",\"downColor\":\"#F23645\",\"borderUpColor\":\"#089981\",\"borderDownColor\":\"#F23645\",\"upColorProjection\":\"#336854\",\"downColorProjection\":\"#7f323f\",\"borderUpColorProjection\":\"#336854\",\"borderDownColorProjection\":\"#7f323f\"},\"kagiStyle\":{\"inputs\":{\"style\":\"ATR\",\"atrLength\":14,\"percentageLTP\":1,\"reversalAmount\":1},\"inputInfo\":{\"style\":{\"name\":\"Style\"},\"atrLength\":{\"name\":\"ATR length\"},\"percentageLTP\":{\"name\":\"Percentage\"},\"reversalAmount\":{\"name\":\"Reversal amount\"}},\"downColor\":\"#F23645\",\"upColor\":\"#089981\",\"upColorProjection\":\"#336854\",\"downColorProjection\":\"#7f323f\"},\"pnfStyle\":{\"inputs\":{\"sources\":\"Close\",\"reversalAmount\":3,\"boxSize\":1,\"style\":\"ATR\",\"atrLength\":14,\"percentageLTP\":1,\"oneStepBackBuilding\":false},\"inputInfo\":{\"sources\":{\"name\":\"Source\"},\"boxSize\":{\"name\":\"Box size\"},\"reversalAmount\":{\"name\":\"Reversal amount\"},\"style\":{\"name\":\"Style\"},\"atrLength\":{\"name\":\"ATR length\"},\"percentageLTP\":{\"name\":\"Percentage\"},\"oneStepBackBuilding\":{\"name\":\"One step back building\"}},\"downColor\":\"#F23645\",\"upColor\":\"#089981\",\"upColorProjection\":\"#336854\",\"downColorProjection\":\"#7f323f\"},\"rangeStyle\":{\"barStyle\":0,\"thinBars\":true,\"inputs\":{\"range\":10,\"phantomBars\":false},\"inputInfo\":{\"range\":{\"name\":\"Range\"},\"phantomBars\":{\"name\":\"Phantom bars\"}},\"upColor\":\"#089981\",\"downColor\":\"#F23645\",\"upColorProjection\":\"#336854\",\"downColorProjection\":\"#7f323f\",\"candlesUpColor\":\"#089981\",\"candlesDownColor\":\"#F23645\",\"candlesBorderUpColor\":\"#089981\",\"candlesBorderDownColor\":\"#F23645\",\"candlesWickUpColor\":\"#089981\",\"candlesWickDownColor\":\"#F23645\"},\"tpoStyle\":{},\"svpStyle\":{},\"volFootprintStyle\":{},\"baseLineColor\":\"#636363\",\"prevClosePriceLineColor\":\"#555555\",\"priceLineColor\":\"\",\"timeframe\":\"\",\"shortName\":\"EURUSD\",\"currencyId\":null,\"unitId\":null,\"metricId\":null,\"symbol\":\"MWP:EURUSD\",\"interval\":\"60\",\"priceAxisProperties\":{\"autoScale\":true,\"autoScaleDisabled\":false,\"lockScale\":false,\"percentage\":false,\"percentageDisabled\":false,\"log\":false,\"logDisabled\":false,\"alignLabels\":true,\"isInverted\":false,\"indexedTo100\":false}}}],\"mainSourceId\":\"_seriesId\",\"stretchFactor\":2000,\"leftAxisesState\":[],\"rightAxisesState\":[{\"state\":{\"id\":\"7fNM7iMuzm7N\",\"m_priceRange\":null,\"m_isAutoScale\":true,\"m_isPercentage\":false,\"m_isIndexedTo100\":false,\"m_isLog\":false,\"m_isLockScale\":false,\"m_isInverted\":false,\"m_topMargin\":0.1,\"m_bottomMargin\":0.08,\"alignLabels\":true,\"logFormula\":{\"logicalOffset\":5,\"coordOffset\":0.00001},\"hasCalculatedPriceRange\":true},\"sources\":[\"_seriesId\"]}],\"overlayPriceScales\":{},\"priceScaleRatio\":null,\"isCollapsed\":false,\"isMaximized\":false,\"mode\":0}],\"timeScale\":{\"m_barSpacing\":6,\"m_rightOffset\":10,\"rightOffsetPercentage\":5,\"usePercentageRightOffset\":false},\"chartProperties\":{\"paneProperties\":{\"backgroundType\":\"solid\",\"gridLinesMode\":\"both\",\"vertGridProperties\":{\"color\":\"rgba(242, 242, 242, 0.18)\"},\"horzGridProperties\":{\"color\":\"rgba(242, 242, 242, 0.18)\"},\"crossHairProperties\":{\"style\":2,\"transparency\":0,\"width\":1,\"color\":\"#9C9C9C\"},\"topMargin\":10,\"bottomMargin\":8,\"axisProperties\":{\"autoScale\":true,\"autoScaleDisabled\":false,\"lockScale\":false,\"percentage\":false,\"percentageDisabled\":false,\"indexedTo100\":false,\"log\":false,\"logDisabled\":false,\"alignLabels\":true,\"isInverted\":false},\"legendProperties\":{\"showStudyArguments\":true,\"showStudyTitles\":true,\"showStudyValues\":true,\"showSeriesTitle\":true,\"showSeriesOHLC\":true,\"showLegend\":true,\"showLastDayChange\":false,\"showBarChange\":true,\"showVolume\":false,\"showBackground\":true,\"showPriceSource\":true,\"backgroundTransparency\":50,\"showLogo\":true,\"showTradingButtons\":true,\"showTradingButtonsMobile\":true,\"showSeriesLegendCloseOnMobile\":true,\"barChangeUpColor\":\"#089981\",\"barChangeDownColor\":\"#F23645\",\"useBarChangeCustomColors\":false},\"separatorColor\":\"#2E2E2E\",\"background\":\"#0F0F0F\",\"backgroundGradientStartColor\":\"#1F1F1F\",\"backgroundGradientEndColor\":\"#0F0F0F\"},\"scalesProperties\":{\"fontSize\":12,\"scaleSeriesOnly\":false,\"showSeriesLastValue\":true,\"seriesLastValueMode\":1,\"showSeriesPrevCloseValue\":false,\"showStudyLastValue\":true,\"showSymbolLabels\":false,\"showStudyPlotLabels\":false,\"showBidAskLabels\":false,\"showPrePostMarketPriceLabel\":true,\"showFundamentalNameLabel\":false,\"showFundamentalLastValue\":true,\"barSpacing\":6,\"axisHighlightColor\":\"rgba(41, 98, 255, 0.25)\",\"axisLineToolLabelBackgroundColorCommon\":\"#2962FF\",\"axisLineToolLabelBackgroundColorActive\":\"#143EB2\",\"showPriceScaleCrosshairLabel\":true,\"showTimeScaleCrosshairLabel\":true,\"crosshairLabelBgColorLight\":\"#0F0F0F\",\"crosshairLabelBgColorDark\":\"#3D3D3D\",\"saveLeftEdge\":false,\"textColor\":\"#B8B8B8\",\"lineColor\":\"rgba(242, 242, 242, 0)\",\"backgroundColor\":\"#ffffff\"},\"chartEventsSourceProperties\":{\"visible\":true,\"futureOnly\":true,\"breaks\":{\"color\":\"#555555\",\"visible\":false,\"style\":2,\"width\":1}},\"tradingProperties\":{\"showPositions\":true,\"positionPL\":{\"visibility\":true,\"display\":0},\"bracketsPL\":{\"visibility\":true,\"display\":0},\"positionAndBracketsPL\":true,\"showProjectMarketOrder\":false,\"showOrders\":true,\"showExecutions\":true,\"showExecutionsLabels\":false,\"showReverse\":true,\"horizontalAlignment\":2,\"extendLeft\":true,\"lineLength\":5,\"lineWidth\":1,\"lineStyle\":0},\"priceScaleSelectionStrategyName\":\"auto\",\"inactivityGaps\":false},\"sessions\":{\"properties\":{\"sessionHighlight\":{\"backgrounds\":{\"preMarket\":{\"color\":\"#FF9800\",\"transparency\":92},\"postMarket\":{\"color\":\"#2962FF\",\"transparency\":92},\"electronic\":{\"color\":\"#2962FF\",\"transparency\":92},\"outOfSession\":{\"color\":\"#2962FF\",\"transparency\":92,\"visible\":true,\"available\":false}},\"vertlines\":{\"sessBreaks\":{\"color\":\"#4985e7\",\"style\":2,\"visible\":false,\"width\":1,\"available\":true}}}}},\"version\":3,\"timezone\":\"Etc/UTC\",\"shouldBeSavedEvenIfHidden\":false,\"linkingGroup\":null,\"lineToolsGroups\":{\"groups\":[]},\"chartId\":\"1\"}],\"symbolLock\":0,\"intervalLock\":0,\"trackTimeLock\":1,\"dateRangeLock\":1,\"crosshairLock\":1,\"layoutsSizes\":{\"s\":[{\"percent\":1}]},\"studyMetaInfoMap\":{},\"_mwBarRangeMapping\":{\"version\":2,\"enabled\":false,\"style\":\"background\",\"colorMode\":\"theme\",\"color\":\"#5A91FF\",\"transparencyMode\":\"theme\",\"transparency\":82,\"priceLabels\":true},\"_mwSync\":{\"date\":true,\"barWidth\":false,\"time\":true},\"_mwViewports\":[{\"symbol\":\"MWP:EURUSD\",\"resolution\":\"60\",\"range\":{\"from\":1791032400,\"to\":1791709200},\"spacing\":6,\"offset\":10,\"width\":1132}],\"_mwAlertCharts\":[\"254d09f3-94a5-44fe-84be-e815927fc64b\"],\"_mwGridStyle\":\"dotted\",\"_mwTheme\":\"Dark\",\"_mwDrawingProjection\":{\"version\":1,\"charts\":[{\"chart_id\":\"0\",\"symbol\":\"MWP:EURUSD\",\"resolution\":\"60\",\"drawings\":[],\"status\":\"supported\"}]}}",
+        "revision": 1
+      }
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "body": {
+        "symbols": [
+          "MWP:EURUSD"
+        ]
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "3f1e1c6d-a1ab-453c-b275-2737dca7dc90",
+        "generation": 3,
+        "kind": "quotes",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "body": {
+        "kind": "setting",
+        "name": "chartproperties",
+        "tool": "",
+        "content": {
+          "value": "{\"timezone\":\"Etc/UTC\",\"priceScaleSelectionStrategyName\":\"auto\",\"inactivityGaps\":false,\"paneProperties\":{\"backgroundType\":\"solid\",\"gridLinesMode\":\"both\",\"vertGridProperties\":{\"style\":0,\"color\":\"rgba(242, 242, 242, 0.06)\"},\"horzGridProperties\":{\"style\":0,\"color\":\"rgba(242, 242, 242, 0.06)\"},\"crossHairProperties\":{\"style\":2,\"transparency\":0,\"width\":1,\"color\":\"#9C9C9C\"},\"topMargin\":10,\"bottomMargin\":8,\"axisProperties\":{\"autoScale\":true,\"autoScaleDisabled\":false,\"lockScale\":false,\"percentage\":false,\"percentageDisabled\":false,\"indexedTo100\":false,\"log\":false,\"logDisabled\":false,\"alignLabels\":true,\"isInverted\":false},\"legendProperties\":{\"showStudyArguments\":true,\"showStudyTitles\":true,\"showStudyValues\":true,\"showSeriesTitle\":true,\"showSeriesOHLC\":true,\"showLegend\":true,\"showLastDayChange\":false,\"showBarChange\":true,\"showVolume\":false,\"showBackground\":true,\"showPriceSource\":true,\"backgroundTransparency\":50,\"showLogo\":true,\"showTradingButtons\":true,\"showTradingButtonsMobile\":true,\"showSeriesLegendCloseOnMobile\":true,\"barChangeUpColor\":\"#089981\",\"barChangeDownColor\":\"#F23645\",\"useBarChangeCustomColors\":false},\"separatorColor\":\"#2E2E2E\",\"background\":\"#0F0F0F\",\"backgroundGradientStartColor\":\"#1F1F1F\",\"backgroundGradientEndColor\":\"#0F0F0F\"},\"scalesProperties\":{\"fontSize\":12,\"scaleSeriesOnly\":false,\"showSeriesLastValue\":true,\"seriesLastValueMode\":1,\"showSeriesPrevCloseValue\":false,\"showStudyLastValue\":true,\"showSymbolLabels\":false,\"showStudyPlotLabels\":false,\"showBidAskLabels\":false,\"showPrePostMarketPriceLabel\":true,\"showFundamentalNameLabel\":false,\"showFundamentalLastValue\":true,\"barSpacing\":6,\"saveLeftEdge\":false,\"textColor\":\"#B8B8B8\",\"lineColor\":\"rgba(242, 242, 242, 0)\",\"backgroundColor\":\"#ffffff\"},\"chartEventsSourceProperties\":{\"visible\":true,\"futureOnly\":true,\"breaks\":{\"color\":\"#555555\",\"visible\":false,\"style\":2,\"width\":1}},\"tradingProperties\":{\"showPositions\":true,\"positionPL\":{\"visibility\":true,\"display\":0},\"bracketsPL\":{\"visibility\":true,\"display\":0},\"positionAndBracketsPL\":true,\"showProjectMarketOrder\":false,\"showOrders\":true,\"showExecutions\":true,\"showExecutionsLabels\":false,\"showReverse\":true,\"horizontalAlignment\":2,\"extendLeft\":true,\"lineLength\":5,\"lineWidth\":1,\"lineStyle\":0},\"volumePaneSize\":\"large\"}"
+        },
+        "revision": 0
+      }
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "3f1e1c6d-a1ab-453c-b275-2737dca7dc90",
+        "generation": 3
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "deae6e6b-1579-4a71-b899-8502ba253f45",
+        "generation": 4,
+        "kind": "quotes",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "body": {
+        "instrument": "XAUUSD",
+        "series_kind": "provider",
+        "timeframe": "M1"
+      }
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "body": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "timeframe": "M1"
+      }
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "body": {
+        "kind": "setting",
+        "name": "chartproperties.mainSeriesProperties",
+        "tool": "",
+        "content": {
+          "value": "{\"style\":1,\"esdShowDividends\":true,\"esdShowSplits\":true,\"esdShowEarnings\":true,\"esdShowBreaks\":false,\"showContinuousContractSwitches\":true,\"showContinuousContractSwitchesBreaks\":false,\"showFuturesContractExpiration\":true,\"showLastNews\":true,\"showCountdown\":false,\"showPriceLine\":true,\"priceLineWidth\":1,\"showPrevClosePriceLine\":false,\"prevClosePriceLineWidth\":1,\"minTick\":\"default\",\"dividendsAdjustment\":{},\"backAdjustment\":false,\"settlementAsClose\":true,\"sessionId\":\"regular\",\"bidAsk\":{\"visible\":false,\"lineStyle\":1,\"lineWidth\":1,\"bidLineColor\":\"#2962FF\",\"askLineColor\":\"#F7525F\"},\"prePostMarket\":{\"visible\":true,\"lineStyle\":1,\"lineWidth\":1,\"preMarketColor\":\"#FB8C00\",\"postMarketColor\":\"#2962FF\"},\"highLowAvgPrice\":{\"highLowPriceLinesVisible\":false,\"highLowPriceLabelsVisible\":false,\"averageClosePriceLineVisible\":false,\"averageClosePriceLabelVisible\":false,\"highLowPriceLinesWidth\":1,\"averagePriceLineWidth\":1,\"highLowPriceLinesColor\":\"\",\"averagePriceLineColor\":\"\"},\"statusViewStyle\":{\"fontSize\":16,\"showExchange\":true,\"showInterval\":true,\"symbolTextSource\":\"description\"},\"lineStyle\":{\"linestyle\":0,\"linewidth\":2,\"priceSource\":\"close\",\"colorType\":\"gradient\",\"color\":\"#2962FF\",\"gradientStartColor\":\"#D500F9\",\"gradientEndColor\":\"#00BCE5\"},\"lineWithMarkersStyle\":{\"linestyle\":0,\"linewidth\":2,\"priceSource\":\"close\",\"colorType\":\"gradient\",\"color\":\"#2962FF\",\"gradientStartColor\":\"#D500F9\",\"gradientEndColor\":\"#00BCE5\"},\"steplineStyle\":{\"linestyle\":0,\"linewidth\":2,\"priceSource\":\"close\",\"colorType\":\"gradient\",\"color\":\"#2962FF\",\"gradientStartColor\":\"#D500F9\",\"gradientEndColor\":\"#00BCE5\"},\"baselineStyle\":{\"topLineWidth\":2,\"bottomLineWidth\":2,\"topLineStyle\":0,\"bottomLineStyle\":0,\"priceSource\":\"close\",\"transparency\":50,\"baseLevelPercentage\":50,\"baselineColor\":\"#8C8C8C\",\"topFillColor1\":\"rgba(8, 153, 129, 0.28)\",\"topFillColor2\":\"rgba(8, 153, 129, 0.05)\",\"bottomFillColor1\":\"rgba(242, 54, 69, 0.05)\",\"bottomFillColor2\":\"rgba(242, 54, 69, 0.28)\",\"topLineColor\":\"#089981\",\"bottomLineColor\":\"#F23645\"},\"areaStyle\":{\"linestyle\":0,\"linewidth\":2,\"priceSource\":\"close\",\"transparency\":100,\"color1\":\"rgba(41, 98, 255, 0.28)\",\"color2\":\"#2962FF\",\"linecolor\":\"#2962FF\"},\"hlcAreaStyle\":{\"highLineVisible\":true,\"highLineStyle\":0,\"highLineWidth\":2,\"lowLineVisible\":true,\"lowLineStyle\":0,\"lowLineWidth\":2,\"closeLineStyle\":0,\"closeLineWidth\":2,\"highLineColor\":\"#00bcd4\",\"lowLineColor\":\"#e91e63\",\"closeLineColor\":\"#2962FF\",\"highCloseFillColor\":\"rgba(0, 188, 212, 0.25)\",\"closeLowFillColor\":\"rgba(233, 30, 99, 0.25)\"},\"barStyle\":{\"barColorsOnPrevClose\":false,\"dontDrawOpen\":false,\"thinBars\":true,\"downColor\":\"#F23645\",\"upColor\":\"#089981\"},\"hlcBarsStyle\":{\"thinBars\":true,\"color\":\"#2962FF\"},\"candleStyle\":{\"drawWick\":true,\"drawBorder\":true,\"barColorsOnPrevClose\":false,\"drawBody\":true,\"borderColor\":\"#378658\",\"upColor\":\"#089981\",\"wickColor\":\"#737375\",\"wickUpColor\":\"#089981\",\"wickDownColor\":\"#F23645\",\"downColor\":\"#F23645\",\"borderUpColor\":\"#089981\",\"borderDownColor\":\"#F23645\"},\"volCandlesStyle\":{\"drawWick\":true,\"drawBorder\":true,\"barColorsOnPrevClose\":false,\"drawBody\":true,\"borderColor\":\"#378658\",\"upColor\":\"#089981\",\"wickColor\":\"#737375\",\"wickUpColor\":\"#089981\",\"wickDownColor\":\"#F23645\",\"downColor\":\"#F23645\",\"borderUpColor\":\"#089981\",\"borderDownColor\":\"#F23645\"},\"hollowCandleStyle\":{\"drawWick\":true,\"drawBorder\":true,\"drawBody\":true,\"upColor\":\"#089981\",\"downColor\":\"#F23645\",\"borderColor\":\"#378658\",\"borderUpColor\":\"#089981\",\"borderDownColor\":\"#F23645\",\"wickColor\":\"#737375\",\"wickUpColor\":\"#089981\",\"wickDownColor\":\"#F23645\"},\"haStyle\":{\"drawWick\":true,\"drawBorder\":true,\"showRealLastPrice\":false,\"barColorsOnPrevClose\":false,\"inputs\":{},\"inputInfo\":{},\"drawBody\":true,\"borderColor\":\"#378658\",\"upColor\":\"#089981\",\"wickColor\":\"#737375\",\"wickUpColor\":\"#089981\",\"wickDownColor\":\"#F23645\",\"downColor\":\"#F23645\",\"borderUpColor\":\"#089981\",\"borderDownColor\":\"#F23645\"},\"hiloStyle\":{\"showBorders\":true,\"showLabels\":true,\"drawBody\":true,\"color\":\"#2962FF\",\"borderColor\":\"#2962FF\",\"labelColor\":\"#2962FF\"},\"columnStyle\":{\"barColorsOnPrevClose\":true,\"priceSource\":\"close\",\"baselinePosition\":\"bottom\",\"upColor\":\"rgba(8, 153, 129, 0.5)\",\"downColor\":\"rgba(242, 54, 69, 0.5)\"},\"renkoStyle\":{\"inputs\":{\"source\":\"close\",\"sources\":\"Close\",\"boxSize\":3,\"style\":\"ATR\",\"atrLength\":14,\"percentageLTP\":1,\"wicks\":true},\"inputInfo\":{\"source\":{\"name\":\"Source\"},\"sources\":{\"name\":\"Source\"},\"boxSize\":{\"name\":\"Box size\"},\"style\":{\"name\":\"Style\"},\"atrLength\":{\"name\":\"ATR length\"},\"percentageLTP\":{\"name\":\"Percentage\"},\"wicks\":{\"name\":\"Wicks\"}},\"upColor\":\"#089981\",\"downColor\":\"#F23645\",\"borderUpColor\":\"#089981\",\"borderDownColor\":\"#F23645\",\"upColorProjection\":\"#336854\",\"downColorProjection\":\"#7f323f\",\"borderUpColorProjection\":\"#336854\",\"borderDownColorProjection\":\"#7f323f\",\"wickUpColor\":\"#089981\",\"wickDownColor\":\"#F23645\"},\"pbStyle\":{\"inputs\":{\"lb\":3},\"inputInfo\":{\"lb\":{\"name\":\"Number of line\"}},\"upColor\":\"#089981\",\"downColor\":\"#F23645\",\"borderUpColor\":\"#089981\",\"borderDownColor\":\"#F23645\",\"upColorProjection\":\"#336854\",\"downColorProjection\":\"#7f323f\",\"borderUpColorProjection\":\"#336854\",\"borderDownColorProjection\":\"#7f323f\"},\"kagiStyle\":{\"inputs\":{\"style\":\"ATR\",\"atrLength\":14,\"percentageLTP\":1,\"reversalAmount\":1},\"inputInfo\":{\"style\":{\"name\":\"Style\"},\"atrLength\":{\"name\":\"ATR length\"},\"percentageLTP\":{\"name\":\"Percentage\"},\"reversalAmount\":{\"name\":\"Reversal amount\"}},\"downColor\":\"#F23645\",\"upColor\":\"#089981\",\"upColorProjection\":\"#336854\",\"downColorProjection\":\"#7f323f\"},\"pnfStyle\":{\"inputs\":{\"sources\":\"Close\",\"reversalAmount\":3,\"boxSize\":1,\"style\":\"ATR\",\"atrLength\":14,\"percentageLTP\":1,\"oneStepBackBuilding\":false},\"inputInfo\":{\"sources\":{\"name\":\"Source\"},\"boxSize\":{\"name\":\"Box size\"},\"reversalAmount\":{\"name\":\"Reversal amount\"},\"style\":{\"name\":\"Style\"},\"atrLength\":{\"name\":\"ATR length\"},\"percentageLTP\":{\"name\":\"Percentage\"},\"oneStepBackBuilding\":{\"name\":\"One step back building\"}},\"downColor\":\"#F23645\",\"upColor\":\"#089981\",\"upColorProjection\":\"#336854\",\"downColorProjection\":\"#7f323f\"},\"rangeStyle\":{\"barStyle\":0,\"thinBars\":true,\"inputs\":{\"range\":10,\"phantomBars\":false},\"inputInfo\":{\"range\":{\"name\":\"Range\"},\"phantomBars\":{\"name\":\"Phantom bars\"}},\"upColor\":\"#089981\",\"downColor\":\"#F23645\",\"upColorProjection\":\"#336854\",\"downColorProjection\":\"#7f323f\",\"candlesUpColor\":\"#089981\",\"candlesDownColor\":\"#F23645\",\"candlesBorderUpColor\":\"#089981\",\"candlesBorderDownColor\":\"#F23645\",\"candlesWickUpColor\":\"#089981\",\"candlesWickDownColor\":\"#F23645\"},\"tpoStyle\":{},\"svpStyle\":{},\"volFootprintStyle\":{},\"baseLineColor\":\"#636363\",\"prevClosePriceLineColor\":\"#555555\",\"priceLineColor\":\"\",\"timeframe\":\"\",\"shortName\":\"\",\"unitId\":null,\"metricId\":null,\"symbol\":\"MWP:EURUSD\",\"interval\":\"60\",\"priceAxisProperties\":{\"autoScale\":true,\"autoScaleDisabled\":false,\"lockScale\":false,\"percentage\":false,\"percentageDisabled\":false,\"log\":false,\"logDisabled\":false,\"alignLabels\":true,\"isInverted\":false,\"indexedTo100\":false}}"
+        },
+        "revision": 0
+      }
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "body": {
+        "symbols": [
+          "MWP:EURUSD",
+          "MWP:XAUUSD",
+          "MWP:BTCUSDT"
+        ]
+      }
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "body": {
+        "kind": "setting",
+        "name": "sessions",
+        "tool": "",
+        "content": {
+          "value": "{\"sessionHighlight\":{\"backgrounds\":{\"preMarket\":{\"color\":\"#FF9800\",\"transparency\":92},\"postMarket\":{\"color\":\"#2962FF\",\"transparency\":92},\"electronic\":{\"color\":\"#2962FF\",\"transparency\":92},\"outOfSession\":{\"color\":\"#2962FF\",\"transparency\":92,\"visible\":true,\"available\":true}},\"vertlines\":{\"sessBreaks\":{\"color\":\"#4985e7\",\"style\":2,\"visible\":false,\"width\":1,\"available\":true}}}}"
+        },
+        "revision": 0
+      }
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "deae6e6b-1579-4a71-b899-8502ba253f45",
+        "generation": 4
+      }
+    },
+    {
+      "path": "/api/charts/reserve",
+      "body": {
+        "instrument": "EURUSD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H1",
+        "limit": 378,
+        "countBack": 378,
+        "firstDataRequest": false,
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "native_history": {
+          "chart_count": 1,
+          "focused": true,
+          "historical_navigation": false,
+          "screen_bars": 189,
+          "batch_screens": 2
+        },
+        "history_page_bars": 4000,
+        "native_reserve": {
+          "screen_bars": 189,
+          "batch_screens": 2,
+          "warmup_bars": 0
+        },
+        "indicators": [],
+        "before": 1790251200000,
+        "track_history": false
+      }
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "body": {
+        "symbols": [
+          "MWP:EURUSD"
+        ]
+      }
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "body": {
+        "kind": "setting",
+        "name": "chart.bottom-widgetbar",
+        "tool": "",
+        "content": {
+          "value": "{\"activeWidget\":\"paper_trading\",\"height\":320,\"mode\":\"minimized\"}"
+        },
+        "revision": 0
+      }
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "body": {
+        "symbols": [
+          "MWP:EURUSD"
+        ]
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "3d785d25-2aaf-4645-9bff-07fa8bc867a4",
+        "generation": 5,
+        "kind": "quotes",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "body": {
+        "kind": "setting",
+        "name": "widgetbar.layout-settings",
+        "tool": "",
+        "content": {
+          "value": "{\"widgets\":{\"watchlist\":[{\"id\":\"watchlist.terminal\"}],\"detail\":[{\"id\":\"detail.P9x5epVk8tPW\"}],\"datawindow\":[{\"id\":\"datawindow.4lkkhRDIAssb\"}],\"object_tree\":[{\"id\":\"object_tree.W8PezVlXF6DW\"}]},\"settings\":{\"width\":300,\"version\":2}}"
+        },
+        "revision": 0
+      }
+    },
+    {
+      "path": "/api/chart-alerts"
+    },
+    {
+      "path": "/api/chart-alerts/events"
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "body": {
+        "symbols": [
+          "MWP:EURUSD",
+          "MWP:XAUUSD",
+          "MWP:BTCUSDT"
+        ]
+      }
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "3d785d25-2aaf-4645-9bff-07fa8bc867a4",
+        "generation": 5
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "b7347502-d8cd-4e5e-8d89-c5fac86022a9",
+        "generation": 6,
+        "kind": "quotes",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "body": {
+        "kind": "setting",
+        "name": "widgetbar.layout-settings",
+        "tool": "",
+        "content": {
+          "value": "{\"widgets\":{\"watchlist\":[{\"id\":\"watchlist.terminal\"}],\"detail\":[{\"id\":\"detail.P9x5epVk8tPW\"}],\"alerts\":[{\"id\":\"alerts.VvNxkcVwULCq\"}],\"datawindow\":[{\"id\":\"datawindow.4lkkhRDIAssb\"}],\"object_tree\":[{\"id\":\"object_tree.W8PezVlXF6DW\"}]},\"settings\":{\"width\":300,\"version\":2}}"
+        },
+        "revision": 1
+      }
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "body": {
+        "symbols": [
+          "MWP:EURUSD"
+        ]
+      }
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "body": {
+        "kind": "setting",
+        "name": "mw.watchlists.v1",
+        "tool": "",
+        "content": {
+          "value": {
+            "lists": [
+              {
+                "id": "TOGzFEaDQjuj",
+                "symbols": [
+                  "MWP:EURUSD",
+                  "MWP:XAUUSD",
+                  "MWP:BTCUSDT"
+                ],
+                "title": "自选表"
+              }
+            ],
+            "active": "TOGzFEaDQjuj"
+          }
+        },
+        "revision": 0
+      }
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "b7347502-d8cd-4e5e-8d89-c5fac86022a9",
+        "generation": 6
+      }
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "body": {
+        "symbols": [
+          "MWP:EURUSD"
+        ]
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "d89dc85a-fd87-42f0-bb47-76b3af86c6fe",
+        "generation": 7,
+        "kind": "quotes",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "body": {
+        "symbols": [
+          "MWP:EURUSD"
+        ]
+      }
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "d89dc85a-fd87-42f0-bb47-76b3af86c6fe",
+        "generation": 7
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "30c2e4b8-ee63-4d42-b2d4-12bbf7c720f3",
+        "generation": 8,
+        "kind": "quotes",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "30c2e4b8-ee63-4d42-b2d4-12bbf7c720f3",
+        "generation": 8
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "296ca20b-c14b-4d86-9e2f-6633547ac323",
+        "generation": 9,
+        "kind": "quotes",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/chart-alerts/capabilities",
+      "body": {
+        "instrument": "EURUSD",
+        "series_kind": "provider",
+        "timeframe": "H1"
+      }
+    },
+    {
+      "path": "/api/charts/stream/events"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "b8c596ef-08dc-4623-8cb3-f4880101bc7e",
+        "generation": 2,
+        "kind": "bars",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "H1"
+        },
+        "history_accepted": true,
+        "history_plot_width": 1187,
+        "history_bar_spacing": 6,
+        "cursor": 1791673200000,
+        "sequence": 0,
+        "loaded_after": 1790964000000,
+        "loaded_before": 1791673200000,
+        "history_revision": null,
+        "history_tail_revision": null,
+        "observed_at": 1791679551684,
+        "binding": null,
+        "initial_input_revision": null,
+        "initial_indicator_pending": false,
+        "historical": false
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "296ca20b-c14b-4d86-9e2f-6633547ac323",
+        "generation": 9,
+        "kind": "quotes",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/advanced-charts/native-charts/save",
+      "body": {
+        "id": null,
+        "name": "工作区 B",
+        "symbol": "MWP:EURUSD",
+        "resolution": "60",
+        "content": "{\"name\":\"工作区 B\",\"layout\":\"s\",\"charts\":[{\"panes\":[{\"sources\":[{\"type\":\"MainSeries\",\"id\":\"_seriesId\",\"zorder\":0,\"haStyle\":{\"studyId\":\"BarSetHeikenAshi@tv-basicstudies-60\"},\"renkoStyle\":{\"studyId\":\"BarSetRenko@tv-prostudies-73\"},\"pbStyle\":{\"studyId\":\"BarSetPriceBreak@tv-prostudies-34\"},\"kagiStyle\":{\"studyId\":\"BarSetKagi@tv-prostudies-73\"},\"pnfStyle\":{\"studyId\":\"BarSetPnF@tv-prostudies-73\"},\"rangeStyle\":{\"studyId\":\"BarSetRange@tv-basicstudies-72\"},\"formattingDeps\":{\"format\":\"price\",\"pricescale\":100000,\"minmov\":1},\"state\":{\"style\":1,\"esdShowDividends\":true,\"esdShowSplits\":true,\"esdShowEarnings\":true,\"esdShowBreaks\":false,\"showContinuousContractSwitches\":true,\"showContinuousContractSwitchesBreaks\":false,\"showFuturesContractExpiration\":true,\"showLastNews\":true,\"showCountdown\":false,\"visible\":true,\"showPriceLine\":true,\"priceLineWidth\":1,\"showPrevClosePriceLine\":false,\"prevClosePriceLineWidth\":1,\"minTick\":\"default\",\"dividendsAdjustment\":{},\"backAdjustment\":false,\"settlementAsClose\":true,\"sessionId\":\"regular\",\"bidAsk\":{\"visible\":false,\"lineStyle\":1,\"lineWidth\":1,\"bidLineColor\":\"#2962FF\",\"askLineColor\":\"#F7525F\"},\"prePostMarket\":{\"visible\":true,\"lineStyle\":1,\"lineWidth\":1,\"preMarketColor\":\"#FB8C00\",\"postMarketColor\":\"#2962FF\"},\"highLowAvgPrice\":{\"highLowPriceLinesVisible\":false,\"highLowPriceLabelsVisible\":false,\"averageClosePriceLineVisible\":false,\"averageClosePriceLabelVisible\":false,\"highLowPriceLinesWidth\":1,\"averagePriceLineWidth\":1,\"highLowPriceLinesColor\":\"\",\"averagePriceLineColor\":\"\"},\"statusViewStyle\":{\"fontSize\":16,\"showExchange\":true,\"showInterval\":true,\"symbolTextSource\":\"description\"},\"lineStyle\":{\"linestyle\":0,\"linewidth\":2,\"priceSource\":\"close\",\"colorType\":\"gradient\",\"color\":\"#2962FF\",\"gradientStartColor\":\"#D500F9\",\"gradientEndColor\":\"#00BCE5\"},\"lineWithMarkersStyle\":{\"linestyle\":0,\"linewidth\":2,\"priceSource\":\"close\",\"colorType\":\"gradient\",\"color\":\"#2962FF\",\"gradientStartColor\":\"#D500F9\",\"gradientEndColor\":\"#00BCE5\"},\"steplineStyle\":{\"linestyle\":0,\"linewidth\":2,\"priceSource\":\"close\",\"colorType\":\"gradient\",\"color\":\"#2962FF\",\"gradientStartColor\":\"#D500F9\",\"gradientEndColor\":\"#00BCE5\"},\"baselineStyle\":{\"topLineWidth\":2,\"bottomLineWidth\":2,\"topLineStyle\":0,\"bottomLineStyle\":0,\"priceSource\":\"close\",\"transparency\":50,\"baseLevelPercentage\":50,\"baselineColor\":\"#8C8C8C\",\"topFillColor1\":\"rgba(8, 153, 129, 0.28)\",\"topFillColor2\":\"rgba(8, 153, 129, 0.05)\",\"bottomFillColor1\":\"rgba(242, 54, 69, 0.05)\",\"bottomFillColor2\":\"rgba(242, 54, 69, 0.28)\",\"topLineColor\":\"#089981\",\"bottomLineColor\":\"#F23645\"},\"areaStyle\":{\"linestyle\":0,\"linewidth\":2,\"priceSource\":\"close\",\"transparency\":100,\"color1\":\"rgba(41, 98, 255, 0.28)\",\"color2\":\"#2962FF\",\"linecolor\":\"#2962FF\"},\"hlcAreaStyle\":{\"highLineVisible\":true,\"highLineStyle\":0,\"highLineWidth\":2,\"lowLineVisible\":true,\"lowLineStyle\":0,\"lowLineWidth\":2,\"closeLineStyle\":0,\"closeLineWidth\":2,\"highLineColor\":\"#00bcd4\",\"lowLineColor\":\"#e91e63\",\"closeLineColor\":\"#2962FF\",\"highCloseFillColor\":\"rgba(0, 188, 212, 0.25)\",\"closeLowFillColor\":\"rgba(233, 30, 99, 0.25)\"},\"barStyle\":{\"barColorsOnPrevClose\":false,\"dontDrawOpen\":false,\"thinBars\":true,\"downColor\":\"#F23645\",\"upColor\":\"#089981\"},\"hlcBarsStyle\":{\"thinBars\":true,\"color\":\"#2962FF\"},\"candleStyle\":{\"drawWick\":true,\"drawBorder\":true,\"barColorsOnPrevClose\":false,\"drawBody\":true,\"borderColor\":\"#378658\",\"upColor\":\"#089981\",\"wickColor\":\"#737375\",\"wickUpColor\":\"#089981\",\"wickDownColor\":\"#F23645\",\"downColor\":\"#F23645\",\"borderUpColor\":\"#089981\",\"borderDownColor\":\"#F23645\"},\"volCandlesStyle\":{\"drawWick\":true,\"drawBorder\":true,\"barColorsOnPrevClose\":false,\"drawBody\":true,\"borderColor\":\"#378658\",\"upColor\":\"#089981\",\"wickColor\":\"#737375\",\"wickUpColor\":\"#089981\",\"wickDownColor\":\"#F23645\",\"downColor\":\"#F23645\",\"borderUpColor\":\"#089981\",\"borderDownColor\":\"#F23645\"},\"hollowCandleStyle\":{\"drawWick\":true,\"drawBorder\":true,\"drawBody\":true,\"upColor\":\"#089981\",\"downColor\":\"#F23645\",\"borderColor\":\"#378658\",\"borderUpColor\":\"#089981\",\"borderDownColor\":\"#F23645\",\"wickColor\":\"#737375\",\"wickUpColor\":\"#089981\",\"wickDownColor\":\"#F23645\"},\"haStyle\":{\"drawWick\":true,\"drawBorder\":true,\"showRealLastPrice\":false,\"barColorsOnPrevClose\":false,\"inputs\":{},\"inputInfo\":{},\"drawBody\":true,\"borderColor\":\"#378658\",\"upColor\":\"#089981\",\"wickColor\":\"#737375\",\"wickUpColor\":\"#089981\",\"wickDownColor\":\"#F23645\",\"downColor\":\"#F23645\",\"borderUpColor\":\"#089981\",\"borderDownColor\":\"#F23645\"},\"hiloStyle\":{\"showBorders\":true,\"showLabels\":true,\"drawBody\":true,\"color\":\"#2962FF\",\"borderColor\":\"#2962FF\",\"labelColor\":\"#2962FF\"},\"columnStyle\":{\"barColorsOnPrevClose\":true,\"priceSource\":\"close\",\"baselinePosition\":\"bottom\",\"upColor\":\"rgba(8, 153, 129, 0.5)\",\"downColor\":\"rgba(242, 54, 69, 0.5)\"},\"renkoStyle\":{\"inputs\":{\"source\":\"close\",\"sources\":\"Close\",\"boxSize\":3,\"style\":\"ATR\",\"atrLength\":14,\"percentageLTP\":1,\"wicks\":true},\"inputInfo\":{\"source\":{\"name\":\"Source\"},\"sources\":{\"name\":\"Source\"},\"boxSize\":{\"name\":\"Box size\"},\"style\":{\"name\":\"Style\"},\"atrLength\":{\"name\":\"ATR length\"},\"percentageLTP\":{\"name\":\"Percentage\"},\"wicks\":{\"name\":\"Wicks\"}},\"upColor\":\"#089981\",\"downColor\":\"#F23645\",\"borderUpColor\":\"#089981\",\"borderDownColor\":\"#F23645\",\"upColorProjection\":\"#336854\",\"downColorProjection\":\"#7f323f\",\"borderUpColorProjection\":\"#336854\",\"borderDownColorProjection\":\"#7f323f\",\"wickUpColor\":\"#089981\",\"wickDownColor\":\"#F23645\"},\"pbStyle\":{\"inputs\":{\"lb\":3},\"inputInfo\":{\"lb\":{\"name\":\"Number of line\"}},\"upColor\":\"#089981\",\"downColor\":\"#F23645\",\"borderUpColor\":\"#089981\",\"borderDownColor\":\"#F23645\",\"upColorProjection\":\"#336854\",\"downColorProjection\":\"#7f323f\",\"borderUpColorProjection\":\"#336854\",\"borderDownColorProjection\":\"#7f323f\"},\"kagiStyle\":{\"inputs\":{\"style\":\"ATR\",\"atrLength\":14,\"percentageLTP\":1,\"reversalAmount\":1},\"inputInfo\":{\"style\":{\"name\":\"Style\"},\"atrLength\":{\"name\":\"ATR length\"},\"percentageLTP\":{\"name\":\"Percentage\"},\"reversalAmount\":{\"name\":\"Reversal amount\"}},\"downColor\":\"#F23645\",\"upColor\":\"#089981\",\"upColorProjection\":\"#336854\",\"downColorProjection\":\"#7f323f\"},\"pnfStyle\":{\"inputs\":{\"sources\":\"Close\",\"reversalAmount\":3,\"boxSize\":1,\"style\":\"ATR\",\"atrLength\":14,\"percentageLTP\":1,\"oneStepBackBuilding\":false},\"inputInfo\":{\"sources\":{\"name\":\"Source\"},\"boxSize\":{\"name\":\"Box size\"},\"reversalAmount\":{\"name\":\"Reversal amount\"},\"style\":{\"name\":\"Style\"},\"atrLength\":{\"name\":\"ATR length\"},\"percentageLTP\":{\"name\":\"Percentage\"},\"oneStepBackBuilding\":{\"name\":\"One step back building\"}},\"downColor\":\"#F23645\",\"upColor\":\"#089981\",\"upColorProjection\":\"#336854\",\"downColorProjection\":\"#7f323f\"},\"rangeStyle\":{\"barStyle\":0,\"thinBars\":true,\"inputs\":{\"range\":10,\"phantomBars\":false},\"inputInfo\":{\"range\":{\"name\":\"Range\"},\"phantomBars\":{\"name\":\"Phantom bars\"}},\"upColor\":\"#089981\",\"downColor\":\"#F23645\",\"upColorProjection\":\"#336854\",\"downColorProjection\":\"#7f323f\",\"candlesUpColor\":\"#089981\",\"candlesDownColor\":\"#F23645\",\"candlesBorderUpColor\":\"#089981\",\"candlesBorderDownColor\":\"#F23645\",\"candlesWickUpColor\":\"#089981\",\"candlesWickDownColor\":\"#F23645\"},\"tpoStyle\":{},\"svpStyle\":{},\"volFootprintStyle\":{},\"baseLineColor\":\"#636363\",\"prevClosePriceLineColor\":\"#555555\",\"priceLineColor\":\"\",\"timeframe\":\"\",\"shortName\":\"EURUSD\",\"currencyId\":null,\"unitId\":null,\"metricId\":null,\"symbol\":\"MWP:EURUSD\",\"interval\":\"60\",\"priceAxisProperties\":{\"autoScale\":true,\"autoScaleDisabled\":false,\"lockScale\":false,\"percentage\":false,\"percentageDisabled\":false,\"log\":false,\"logDisabled\":false,\"alignLabels\":true,\"isInverted\":false,\"indexedTo100\":false}}}],\"mainSourceId\":\"_seriesId\",\"stretchFactor\":2000,\"leftAxisesState\":[],\"rightAxisesState\":[{\"state\":{\"id\":\"7fNM7iMuzm7N\",\"m_priceRange\":null,\"m_isAutoScale\":true,\"m_isPercentage\":false,\"m_isIndexedTo100\":false,\"m_isLog\":false,\"m_isLockScale\":false,\"m_isInverted\":false,\"m_topMargin\":0.1,\"m_bottomMargin\":0.08,\"alignLabels\":true,\"logFormula\":{\"logicalOffset\":5,\"coordOffset\":0.00001},\"hasCalculatedPriceRange\":true},\"sources\":[\"_seriesId\"]}],\"overlayPriceScales\":{},\"priceScaleRatio\":null,\"isCollapsed\":false,\"isMaximized\":false,\"mode\":0}],\"timeScale\":{\"m_barSpacing\":6,\"m_rightOffset\":10,\"rightOffsetPercentage\":5,\"usePercentageRightOffset\":false},\"chartProperties\":{\"paneProperties\":{\"backgroundType\":\"solid\",\"gridLinesMode\":\"both\",\"vertGridProperties\":{\"color\":\"rgba(242, 242, 242, 0.18)\"},\"horzGridProperties\":{\"color\":\"rgba(242, 242, 242, 0.18)\"},\"crossHairProperties\":{\"style\":2,\"transparency\":0,\"width\":1,\"color\":\"#9C9C9C\"},\"topMargin\":10,\"bottomMargin\":8,\"axisProperties\":{\"autoScale\":true,\"autoScaleDisabled\":false,\"lockScale\":false,\"percentage\":false,\"percentageDisabled\":false,\"indexedTo100\":false,\"log\":false,\"logDisabled\":false,\"alignLabels\":true,\"isInverted\":false},\"legendProperties\":{\"showStudyArguments\":true,\"showStudyTitles\":true,\"showStudyValues\":true,\"showSeriesTitle\":true,\"showSeriesOHLC\":true,\"showLegend\":true,\"showLastDayChange\":false,\"showBarChange\":true,\"showVolume\":false,\"showBackground\":true,\"showPriceSource\":true,\"backgroundTransparency\":50,\"showLogo\":true,\"showTradingButtons\":true,\"showTradingButtonsMobile\":true,\"showSeriesLegendCloseOnMobile\":true,\"barChangeUpColor\":\"#089981\",\"barChangeDownColor\":\"#F23645\",\"useBarChangeCustomColors\":false},\"separatorColor\":\"#2E2E2E\",\"background\":\"#0F0F0F\",\"backgroundGradientStartColor\":\"#1F1F1F\",\"backgroundGradientEndColor\":\"#0F0F0F\"},\"scalesProperties\":{\"fontSize\":12,\"scaleSeriesOnly\":false,\"showSeriesLastValue\":true,\"seriesLastValueMode\":1,\"showSeriesPrevCloseValue\":false,\"showStudyLastValue\":true,\"showSymbolLabels\":false,\"showStudyPlotLabels\":false,\"showBidAskLabels\":false,\"showPrePostMarketPriceLabel\":true,\"showFundamentalNameLabel\":false,\"showFundamentalLastValue\":true,\"barSpacing\":6,\"axisHighlightColor\":\"rgba(41, 98, 255, 0.25)\",\"axisLineToolLabelBackgroundColorCommon\":\"#2962FF\",\"axisLineToolLabelBackgroundColorActive\":\"#143EB2\",\"showPriceScaleCrosshairLabel\":true,\"showTimeScaleCrosshairLabel\":true,\"crosshairLabelBgColorLight\":\"#0F0F0F\",\"crosshairLabelBgColorDark\":\"#3D3D3D\",\"saveLeftEdge\":false,\"textColor\":\"#B8B8B8\",\"lineColor\":\"rgba(242, 242, 242, 0)\",\"backgroundColor\":\"#ffffff\"},\"chartEventsSourceProperties\":{\"visible\":true,\"futureOnly\":true,\"breaks\":{\"color\":\"#555555\",\"visible\":false,\"style\":2,\"width\":1}},\"tradingProperties\":{\"showPositions\":true,\"positionPL\":{\"visibility\":true,\"display\":0},\"bracketsPL\":{\"visibility\":true,\"display\":0},\"positionAndBracketsPL\":true,\"showProjectMarketOrder\":false,\"showOrders\":true,\"showExecutions\":true,\"showExecutionsLabels\":false,\"showReverse\":true,\"horizontalAlignment\":2,\"extendLeft\":true,\"lineLength\":5,\"lineWidth\":1,\"lineStyle\":0},\"priceScaleSelectionStrategyName\":\"auto\",\"inactivityGaps\":false},\"sessions\":{\"properties\":{\"sessionHighlight\":{\"backgrounds\":{\"preMarket\":{\"color\":\"#FF9800\",\"transparency\":92},\"postMarket\":{\"color\":\"#2962FF\",\"transparency\":92},\"electronic\":{\"color\":\"#2962FF\",\"transparency\":92},\"outOfSession\":{\"color\":\"#2962FF\",\"transparency\":92,\"visible\":true,\"available\":false}},\"vertlines\":{\"sessBreaks\":{\"color\":\"#4985e7\",\"style\":2,\"visible\":false,\"width\":1,\"available\":true}}}}},\"version\":3,\"timezone\":\"Etc/UTC\",\"shouldBeSavedEvenIfHidden\":false,\"linkingGroup\":null,\"lineToolsGroups\":{\"groups\":[]},\"chartId\":\"1\"}],\"symbolLock\":0,\"intervalLock\":0,\"trackTimeLock\":1,\"dateRangeLock\":1,\"crosshairLock\":1,\"layoutsSizes\":{\"s\":[{\"percent\":1}]},\"studyMetaInfoMap\":{},\"_mwBarRangeMapping\":{\"version\":2,\"enabled\":false,\"style\":\"background\",\"colorMode\":\"theme\",\"color\":\"#5A91FF\",\"transparencyMode\":\"theme\",\"transparency\":82,\"priceLabels\":true},\"_mwSync\":{\"date\":true,\"barWidth\":false,\"time\":true},\"_mwViewports\":[{\"symbol\":\"MWP:EURUSD\",\"resolution\":\"60\",\"range\":{\"from\":1791032400,\"to\":1791709200},\"spacing\":6,\"offset\":10,\"width\":1132}],\"_mwAlertCharts\":[\"254d09f3-94a5-44fe-84be-e815927fc64b\"],\"_mwGridStyle\":\"dotted\",\"_mwTheme\":\"Dark\",\"_mwDrawingProjection\":{\"version\":1,\"charts\":[{\"chart_id\":\"0\",\"symbol\":\"MWP:EURUSD\",\"resolution\":\"60\",\"drawings\":[],\"status\":\"supported\"}]}}",
+        "revision": 0
+      }
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "body": {
+        "kind": "setting",
+        "name": "widgetbar.layout-settings",
+        "tool": "",
+        "content": {
+          "value": "{\"widgets\":{\"watchlist\":[{\"id\":\"watchlist.terminal\"}],\"detail\":[{\"id\":\"detail.P9x5epVk8tPW\"}],\"datawindow\":[{\"id\":\"datawindow.4lkkhRDIAssb\"}],\"object_tree\":[{\"id\":\"object_tree.W8PezVlXF6DW\"}]},\"settings\":{\"width\":300,\"version\":2}}"
+        },
+        "revision": 2
+      }
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "body": {
+        "kind": "setting",
+        "name": "widgetbar.layout-settings",
+        "tool": "",
+        "content": {
+          "value": "{\"widgets\":{\"watchlist\":[{\"id\":\"watchlist.terminal\"}],\"detail\":[{\"id\":\"detail.P9x5epVk8tPW\"}],\"alerts\":[{\"id\":\"alerts.ZbyAPTmAqxB2\"}],\"datawindow\":[{\"id\":\"datawindow.4lkkhRDIAssb\"}],\"object_tree\":[{\"id\":\"object_tree.W8PezVlXF6DW\"}]},\"settings\":{\"width\":300,\"version\":2}}"
+        },
+        "revision": 3
+      }
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "body": {
+        "symbols": [
+          "MWP:EURUSD",
+          "MWP:XAUUSD",
+          "MWP:BTCUSDT"
+        ]
+      }
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "296ca20b-c14b-4d86-9e2f-6633547ac323",
+        "generation": 9
+      }
+    },
+    {
+      "path": "/api/chart-alerts"
+    },
+    {
+      "path": "/api/chart-alerts/events"
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "body": {
+        "symbols": [
+          "MWP:EURUSD"
+        ]
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "e65aa227-425a-4490-bb3f-38a0695f21bb",
+        "generation": 10,
+        "kind": "quotes",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "f4c3584b-2c20-4db3-9d63-cfc9fb8084bb",
+        "generation": 11,
+        "kind": "quotes",
+        "query": {
+          "instrument": "XAUUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "2402b0d6-5c51-4330-aa77-dd4e3a70e9aa",
+        "generation": 12,
+        "kind": "quotes",
+        "query": {
+          "instrument": "BTCUSDT",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "e65aa227-425a-4490-bb3f-38a0695f21bb",
+        "generation": 10
+      }
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "f4c3584b-2c20-4db3-9d63-cfc9fb8084bb",
+        "generation": 11
+      }
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "2402b0d6-5c51-4330-aa77-dd4e3a70e9aa",
+        "generation": 12
+      }
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "body": {
+        "symbols": [
+          "MWP:EURUSD"
+        ]
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "60908a7c-9f64-40a9-a5d8-a402b5ddf1bd",
+        "generation": 13,
+        "kind": "quotes",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "60908a7c-9f64-40a9-a5d8-a402b5ddf1bd",
+        "generation": 13
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "d0618fa7-d4b9-43e4-8794-6fa63ad09383",
+        "generation": 14,
+        "kind": "quotes",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/chart-alerts/capabilities",
+      "body": {
+        "instrument": "EURUSD",
+        "series_kind": "provider",
+        "timeframe": "H1"
+      }
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "d0618fa7-d4b9-43e4-8794-6fa63ad09383",
+        "generation": 14
+      }
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "body": {
+        "symbols": [
+          "MWP:EURUSD"
+        ]
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "ad348cd3-b54c-4114-9f0a-618a99d354aa",
+        "generation": 15,
+        "kind": "quotes",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/chart-alerts",
+      "body": {
+        "request_id": "477c0c14-3c54-4411-b0a1-8596a3305bd2",
+        "config": {
+          "name": "EURUSD 告警",
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "source": "fixture",
+          "timeframe": "H1",
+          "mode": "close",
+          "condition": {
+            "relation": "cross_up",
+            "left": {
+              "kind": "price"
+            },
+            "right": {
+              "kind": "constant",
+              "value": "1.13"
+            }
+          },
+          "max_triggers": 1,
+          "expires_at": null,
+          "message": "",
+          "notify_web": true,
+          "notify_ntfy": false,
+          "late_delivery": "log_only",
+          "association": {
+            "workspace_id": "workspace-1",
+            "chart_id": "254d09f3-94a5-44fe-84be-e815927fc64b",
+            "chart_index": 0,
+            "generation": "0:0",
+            "object_id": null,
+            "object_kind": null,
+            "native_object_id": null
+          },
+          "calculation_version": "chart-python-v1",
+          "calculation_origin": null,
+          "published": false
+        }
+      }
+    },
+    {
+      "path": "/api/chart-alerts"
+    },
+    {
+      "path": "/api/chart-alerts/events"
+    },
+    {
+      "path": "/api/charts/stream/events"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "b8c596ef-08dc-4623-8cb3-f4880101bc7e",
+        "generation": 2,
+        "kind": "bars",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "H1"
+        },
+        "history_accepted": true,
+        "history_plot_width": 1187,
+        "history_bar_spacing": 6,
+        "cursor": 1791673200000,
+        "sequence": 0,
+        "loaded_after": 1790964000000,
+        "loaded_before": 1791673200000,
+        "history_revision": null,
+        "history_tail_revision": null,
+        "observed_at": 1791679551684,
+        "binding": null,
+        "initial_input_revision": null,
+        "initial_indicator_pending": false,
+        "historical": false
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "ad348cd3-b54c-4114-9f0a-618a99d354aa",
+        "generation": 15,
+        "kind": "quotes",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/chart-alerts"
+    },
+    {
+      "path": "/api/chart-alerts/events"
+    },
+    {
+      "path": "/api/advanced-charts/native-charts/workspace-a"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "body": {
+        "kind": "setting",
+        "name": "widgetbar.layout-settings",
+        "tool": "",
+        "content": {
+          "value": "{\"widgets\":{\"watchlist\":[{\"id\":\"watchlist.terminal\"}],\"detail\":[{\"id\":\"detail.P9x5epVk8tPW\"}],\"datawindow\":[{\"id\":\"datawindow.4lkkhRDIAssb\"}],\"object_tree\":[{\"id\":\"object_tree.W8PezVlXF6DW\"}]},\"settings\":{\"width\":300,\"version\":2}}"
+        },
+        "revision": 4
+      }
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "b8c596ef-08dc-4623-8cb3-f4880101bc7e",
+        "generation": 2
+      }
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "ad348cd3-b54c-4114-9f0a-618a99d354aa",
+        "generation": 15
+      }
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "body": {
+        "instrument": "EURUSD",
+        "series_kind": "provider",
+        "timeframe": "M1"
+      }
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "body": {
+        "instrument": "XAUUSD",
+        "series_kind": "provider",
+        "timeframe": "M1"
+      }
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "body": {
+        "instrument": "BTCUSDT",
+        "series_kind": "provider",
+        "timeframe": "M1"
+      }
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "body": {
+        "symbols": [
+          "MWP:EURUSD"
+        ]
+      }
+    },
+    {
+      "path": "/api/charts/history-loads",
+      "body": {
+        "request_id": "a0895071-4603-4cb0-91a5-3c7719c63f94",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "published": false,
+          "timeframe": "H1",
+          "limit": 189,
+          "countBack": 189,
+          "from": 1791002818000,
+          "firstDataRequest": true,
+          "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+          "native_history": {
+            "chart_count": 1,
+            "focused": true,
+            "historical_navigation": false,
+            "screen_bars": 188,
+            "batch_screens": 1
+          },
+          "history_page_bars": 4000,
+          "indicators": [],
+          "before": 1791679618000,
+          "track_history": false
+        }
+      }
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "body": {
+        "symbols": [
+          "MWP:EURUSD"
+        ]
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "7f32498c-05f7-4e36-bee3-4b4ea75f2a20",
+        "generation": 16,
+        "kind": "quotes",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/charts/stream/events"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "7f32498c-05f7-4e36-bee3-4b4ea75f2a20",
+        "generation": 16,
+        "kind": "quotes",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "18b43219-7c5d-484d-adfe-2d66cc3f5504",
+        "generation": 17,
+        "kind": "bars",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "H1"
+        },
+        "history_accepted": false,
+        "history_plot_width": 1124,
+        "history_bar_spacing": 6,
+        "cursor": 0,
+        "sequence": 0,
+        "loaded_after": null,
+        "loaded_before": 0,
+        "history_revision": null,
+        "history_tail_revision": null,
+        "observed_at": 0,
+        "binding": null,
+        "initial_input_revision": null,
+        "initial_indicator_pending": false,
+        "historical": false
+      }
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "body": {
+        "symbols": [
+          "MWP:EURUSD",
+          "MWP:XAUUSD",
+          "MWP:BTCUSDT"
+        ]
+      }
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "7f32498c-05f7-4e36-bee3-4b4ea75f2a20",
+        "generation": 16
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "0b5d30f2-9ad5-4350-acb0-be7d18f81177",
+        "generation": 19,
+        "kind": "quotes",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "18b43219-7c5d-484d-adfe-2d66cc3f5504",
+        "generation": 18,
+        "kind": "bars",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "H1"
+        },
+        "history_accepted": true,
+        "history_plot_width": 1124,
+        "history_bar_spacing": 6,
+        "cursor": 1791673200000,
+        "sequence": 0,
+        "loaded_after": 1790996400000,
+        "loaded_before": 1791673200000,
+        "history_revision": null,
+        "history_tail_revision": null,
+        "observed_at": 1791679558935,
+        "binding": null,
+        "initial_input_revision": null,
+        "initial_indicator_pending": false,
+        "historical": false
+      }
+    },
+    {
+      "path": "/api/charts/reserve",
+      "body": {
+        "instrument": "EURUSD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H1",
+        "limit": 376,
+        "countBack": 376,
+        "firstDataRequest": false,
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "native_history": {
+          "chart_count": 1,
+          "focused": true,
+          "historical_navigation": false,
+          "screen_bars": 188,
+          "batch_screens": 2
+        },
+        "history_page_bars": 4000,
+        "native_reserve": {
+          "screen_bars": 188,
+          "batch_screens": 2,
+          "warmup_bars": 0
+        },
+        "indicators": [],
+        "before": 1790996400000,
+        "track_history": false
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "6faab5ae-5399-47d1-a4fa-b2816d66695b",
+        "generation": 20,
+        "kind": "quotes",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "89d9ea07-1d06-4711-b323-17d273e4e817",
+        "generation": 21,
+        "kind": "quotes",
+        "query": {
+          "instrument": "XAUUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "2f4e763a-e1ec-4251-b93e-29cc23a4d153",
+        "generation": 22,
+        "kind": "quotes",
+        "query": {
+          "instrument": "BTCUSDT",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "body": {
+        "symbols": [
+          "MWP:EURUSD",
+          "MWP:XAUUSD",
+          "MWP:BTCUSDT"
+        ]
+      }
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "6faab5ae-5399-47d1-a4fa-b2816d66695b",
+        "generation": 20
+      }
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "89d9ea07-1d06-4711-b323-17d273e4e817",
+        "generation": 21
+      }
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "2f4e763a-e1ec-4251-b93e-29cc23a4d153",
+        "generation": 22
+      }
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "0b5d30f2-9ad5-4350-acb0-be7d18f81177",
+        "generation": 19
+      }
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "body": {
+        "kind": "setting",
+        "name": "widgetbar.layout-settings",
+        "tool": "",
+        "content": {
+          "value": "{\"widgets\":{\"watchlist\":[{\"id\":\"watchlist.terminal\"}],\"detail\":[{\"id\":\"detail.P9x5epVk8tPW\"}],\"alerts\":[{\"id\":\"alerts.yP7luw084HKK\"}],\"datawindow\":[{\"id\":\"datawindow.4lkkhRDIAssb\"}],\"object_tree\":[{\"id\":\"object_tree.W8PezVlXF6DW\"}]},\"settings\":{\"width\":300,\"version\":2}}"
+        },
+        "revision": 5
+      }
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "body": {
+        "symbols": [
+          "MWP:EURUSD"
+        ]
+      }
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "body": {
+        "symbols": [
+          "MWP:EURUSD",
+          "MWP:XAUUSD",
+          "MWP:BTCUSDT"
+        ]
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "764e883a-2445-4ae2-8a87-b1e0852dc04e",
+        "generation": 23,
+        "kind": "quotes",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "764e883a-2445-4ae2-8a87-b1e0852dc04e",
+        "generation": 23
+      }
+    },
+    {
+      "path": "/api/chart-alerts"
+    },
+    {
+      "path": "/api/chart-alerts/events"
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "body": {
+        "symbols": [
+          "MWP:EURUSD"
+        ]
+      }
+    },
+    {
+      "path": "/api/charts/reserve",
+      "body": {
+        "instrument": "EURUSD",
+        "series_kind": "provider",
+        "published": false,
+        "timeframe": "H1",
+        "limit": 378,
+        "countBack": 378,
+        "firstDataRequest": false,
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "native_history": {
+          "chart_count": 1,
+          "focused": true,
+          "historical_navigation": false,
+          "screen_bars": 189,
+          "batch_screens": 2
+        },
+        "history_page_bars": 4000,
+        "native_reserve": {
+          "screen_bars": 189,
+          "batch_screens": 2,
+          "warmup_bars": 0
+        },
+        "indicators": [],
+        "before": 1789642800000,
+        "track_history": false
+      }
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "body": {
+        "symbols": [
+          "MWP:EURUSD"
+        ]
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "f5ed2ab1-9b85-49a9-b7e8-17464903bae2",
+        "generation": 24,
+        "kind": "quotes",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "f5ed2ab1-9b85-49a9-b7e8-17464903bae2",
+        "generation": 24
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "ab9c2c75-89b9-4cd9-b9b3-9512749523f7",
+        "generation": 25,
+        "kind": "quotes",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "ab9c2c75-89b9-4cd9-b9b3-9512749523f7",
+        "generation": 25
+      }
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "body": {
+        "symbols": [
+          "MWP:EURUSD"
+        ]
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "62af4338-09c9-4ca8-8b94-a90085416b4a",
+        "generation": 26,
+        "kind": "quotes",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/chart-alerts/capabilities",
+      "body": {
+        "instrument": "EURUSD",
+        "series_kind": "provider",
+        "timeframe": "H1"
+      }
+    },
+    {
+      "path": "/api/chart-alerts",
+      "body": {
+        "request_id": "bd203511-f2ec-4869-8477-1b7aaddfa825",
+        "config": {
+          "name": "工作区 A 的草稿",
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "source": "fixture",
+          "timeframe": "H1",
+          "mode": "close",
+          "condition": {
+            "relation": "cross_up",
+            "left": {
+              "kind": "price"
+            },
+            "right": {
+              "kind": "constant",
+              "value": "1.125"
+            }
+          },
+          "max_triggers": 1,
+          "expires_at": null,
+          "message": "",
+          "notify_web": true,
+          "notify_ntfy": false,
+          "late_delivery": "log_only",
+          "association": {
+            "workspace_id": "workspace-a",
+            "chart_id": "254d09f3-94a5-44fe-84be-e815927fc64b",
+            "chart_index": 0,
+            "generation": "0:0",
+            "object_id": null,
+            "object_kind": null,
+            "native_object_id": null
+          },
+          "calculation_version": "chart-python-v1",
+          "calculation_origin": null,
+          "published": false
+        }
+      }
+    },
+    {
+      "path": "/api/chart-alerts"
+    },
+    {
+      "path": "/api/chart-alerts/events"
+    },
+    {
+      "path": "/api/chart-alerts/capabilities",
+      "body": {
+        "instrument": "EURUSD",
+        "series_kind": "provider",
+        "timeframe": "H1"
+      }
+    },
+    {
+      "path": "/api/charts/stream/events"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "18b43219-7c5d-484d-adfe-2d66cc3f5504",
+        "generation": 18,
+        "kind": "bars",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "H1"
+        },
+        "history_accepted": true,
+        "history_plot_width": 1124,
+        "history_bar_spacing": 6,
+        "cursor": 1791673200000,
+        "sequence": 0,
+        "loaded_after": 1790996400000,
+        "loaded_before": 1791673200000,
+        "history_revision": null,
+        "history_tail_revision": null,
+        "observed_at": 1791679558935,
+        "binding": null,
+        "initial_input_revision": null,
+        "initial_indicator_pending": false,
+        "historical": false
+      }
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "body": {
+        "client": "85484567-93bc-4c54-ad15-b161089fbdcc",
+        "listener": "62af4338-09c9-4ca8-8b94-a90085416b4a",
+        "generation": 26,
+        "kind": "quotes",
+        "query": {
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "timeframe": "M1"
+        },
+        "sequence": 0
+      }
+    },
+    {
+      "path": "/api/chart-alerts/15435639-c0e7-4f2c-9562-9025da15dd6e/edit",
+      "body": {
+        "version": 1,
+        "config": {
+          "name": "工作区 A 的草稿",
+          "instrument": "EURUSD",
+          "series_kind": "provider",
+          "source": "fixture",
+          "timeframe": "H1",
+          "mode": "close",
+          "condition": {
+            "relation": "cross_up",
+            "left": {
+              "kind": "price"
+            },
+            "right": {
+              "kind": "constant",
+              "value": "1.14"
+            }
+          },
+          "max_triggers": 1,
+          "expires_at": null,
+          "message": "",
+          "notify_web": true,
+          "notify_ntfy": false,
+          "late_delivery": "log_only",
+          "association": {
+            "workspace_id": "workspace-a",
+            "chart_id": "254d09f3-94a5-44fe-84be-e815927fc64b",
+            "chart_index": 0,
+            "generation": "0:0",
+            "object_id": null,
+            "object_kind": null,
+            "native_object_id": null
+          },
+          "calculation_version": "chart-python-v1",
+          "calculation_origin": null,
+          "published": false
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "scope": "deployed autonomous worker; synthetic data, gaps, stale timestamps and generated rule epoch",
+  "cases": [
+    "gap fences persisted checkpoint; actual backfill yields exactly two ordered late events",
+    "container restart consumes queued bars once, preserves prior two events and completes at three",
+    "stale intrabar observation is rejected; fresh source restores ready baseline without firing"
+  ],
+  "verified": true,
+  "close_alert": "9c5be274-f37b-47b4-ac36-386339dd2a1a",
+  "intrabar_alert": "405ac8a2-8fc3-4817-98e4-4d5e7a0f6321"
+}

@@ -1,0 +1,262 @@
+{
+  "environment": "Ubuntu quant-server / mw-pro-charts-20261011",
+  "url": "http://localhost:19997/advanced-charts",
+  "supply": "Task synthetic provider I/O; real API, PostgreSQL and licensed chart engine",
+  "screenshots": [
+    {
+      "file": "dark-01-five-charts.png",
+      "requirement": "F1/U6",
+      "notes": "Five real native panes: H1/M5/W1/D1/H4, current fixed composite revision.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-02-symbol-details.png",
+      "requirement": "U3/U4",
+      "notes": "Real quote observation time; no snapshot replay.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-03-alert-sidebar.png",
+      "requirement": "F3/U2/U8",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-04-alert-log.png",
+      "requirement": "F3/U8",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-05-price-menu.png",
+      "requirement": "F3/U8",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-06-price-alert-dialog.png",
+      "requirement": "F3/U8",
+      "notes": "Current initiating chart identity and formatter; draft only.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-07-python-indicators.png",
+      "requirement": "F6/U5",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-08-python-indicator-detail.png",
+      "requirement": "F6/U5",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-09-drawing-nine-periods.png",
+      "requirement": "U7",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-10-center-calendar.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "交易日历 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-11-calendar-expanded.png",
+      "requirement": "F5/U1",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-10-center-tasks.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "任务与记录 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-10-center-managed.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "自建行情 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-10-center-sources.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "来源状态 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-10-center-composite.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "组合行情 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-10-center-platform.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "平台行情 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-12-baseline-dropdown.png",
+      "requirement": "DC1",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-13-mapping-dropdown.png",
+      "requirement": "DC1",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-14-target-dropdown.png",
+      "requirement": "DC1",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-15-task-progress.png",
+      "requirement": "F4",
+      "notes": "Real committed progress from a new task-only synthetic AUDUSD import.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-16-calendar-768.png",
+      "requirement": "F5/U1/U5",
+      "notes": "Narrow desktop pointer viewport, not phone emulation.",
+      "viewport": {
+        "width": 768,
+        "height": 800
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-17-platform-768.png",
+      "requirement": "U5/DC1",
+      "notes": "",
+      "viewport": {
+        "width": 768,
+        "height": 800
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-18-indicators-768.png",
+      "requirement": "F6/U5",
+      "notes": "",
+      "viewport": {
+        "width": 768,
+        "height": 800
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-16-calendar-375.png",
+      "requirement": "F5/U1/U5",
+      "notes": "Narrow desktop pointer viewport, not phone emulation.",
+      "viewport": {
+        "width": 375,
+        "height": 800
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-17-platform-375.png",
+      "requirement": "U5/DC1",
+      "notes": "",
+      "viewport": {
+        "width": 375,
+        "height": 800
+      },
+      "review": "pending"
+    }
+  ],
+  "errors": [],
+  "visualReview": "pending",
+  "progressFixture": "4b5999ab-7e55-4737-8603-94921e25ce5b",
+  "failure": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: '我的 Python', exact: true })\u001b[22m\n\n    at /home/quant/repos/market-watch-pro-charts-impl-20261011/web/tests/pro-charts-visual-capture.browser.cjs:82:128",
+  "progressFixtureFinished": true
+}

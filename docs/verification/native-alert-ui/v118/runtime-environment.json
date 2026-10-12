@@ -1,0 +1,232 @@
+{
+  "host": "quant-server",
+  "app_origin": "https://localhost:19643",
+  "chart_origin": "https://127.0.0.1:19644",
+  "compose_project": "mw-native-alert-ui-runtime",
+  "base_commit": "e75694c79e62ff8a464916278f35c9148cce6241",
+  "base_tag": "v1.18.0",
+  "containers": [
+    {
+      "name": "mw-native-alert-ui-runtime-notification-worker-1",
+      "service": "notification-worker",
+      "image": "market-watch-api:native-alert-ui-runtime",
+      "image_id": "sha256:7336dbb3527796fb92ccb749a6388cf63d652afb2c9bfbdd9777b5dac6a57e52",
+      "state": "running",
+      "health": null,
+      "exit_code": 0,
+      "ports": {
+        "8000/tcp": null
+      }
+    },
+    {
+      "name": "mw-native-alert-ui-runtime-aggregation-worker-1",
+      "service": "aggregation-worker",
+      "image": "market-watch-api:native-alert-ui-runtime",
+      "image_id": "sha256:7336dbb3527796fb92ccb749a6388cf63d652afb2c9bfbdd9777b5dac6a57e52",
+      "state": "running",
+      "health": null,
+      "exit_code": 0,
+      "ports": {
+        "8000/tcp": null
+      }
+    },
+    {
+      "name": "mw-native-alert-ui-runtime-managed-history-worker-1",
+      "service": "managed-history-worker",
+      "image": "market-watch-api:native-alert-ui-runtime",
+      "image_id": "sha256:7336dbb3527796fb92ccb749a6388cf63d652afb2c9bfbdd9777b5dac6a57e52",
+      "state": "running",
+      "health": null,
+      "exit_code": 0,
+      "ports": {
+        "8000/tcp": null
+      }
+    },
+    {
+      "name": "mw-native-alert-ui-runtime-web-1",
+      "service": "web",
+      "image": "market-watch-web:native-alert-ui-runtime",
+      "image_id": "sha256:c22c6b33b5310aea27e7f7c8b194cda465715d929aab3ac08c327db0a81f46d5",
+      "state": "running",
+      "health": null,
+      "exit_code": 0,
+      "ports": {
+        "80/tcp": null
+      }
+    },
+    {
+      "name": "mw-native-alert-ui-runtime-notification-sink-1",
+      "service": "notification-sink",
+      "image": "market-watch-api:native-alert-ui-runtime",
+      "image_id": "sha256:7336dbb3527796fb92ccb749a6388cf63d652afb2c9bfbdd9777b5dac6a57e52",
+      "state": "running",
+      "health": null,
+      "exit_code": 0,
+      "ports": {
+        "8000/tcp": null
+      }
+    },
+    {
+      "name": "mw-native-alert-ui-runtime-history-worker-1",
+      "service": "history-worker",
+      "image": "market-watch-api:native-alert-ui-runtime",
+      "image_id": "sha256:7336dbb3527796fb92ccb749a6388cf63d652afb2c9bfbdd9777b5dac6a57e52",
+      "state": "running",
+      "health": null,
+      "exit_code": 0,
+      "ports": {
+        "8000/tcp": null
+      }
+    },
+    {
+      "name": "mw-native-alert-ui-runtime-market-worker-1",
+      "service": "market-worker",
+      "image": "market-watch-api:native-alert-ui-runtime",
+      "image_id": "sha256:7336dbb3527796fb92ccb749a6388cf63d652afb2c9bfbdd9777b5dac6a57e52",
+      "state": "running",
+      "health": null,
+      "exit_code": 0,
+      "ports": {
+        "8000/tcp": null
+      }
+    },
+    {
+      "name": "mw-native-alert-ui-runtime-api-1",
+      "service": "api",
+      "image": "market-watch-api:native-alert-ui-runtime",
+      "image_id": "sha256:7336dbb3527796fb92ccb749a6388cf63d652afb2c9bfbdd9777b5dac6a57e52",
+      "state": "running",
+      "health": "healthy",
+      "exit_code": 0,
+      "ports": {
+        "8000/tcp": null
+      }
+    },
+    {
+      "name": "mw-native-alert-ui-runtime-market-stream-worker-1",
+      "service": "market-stream-worker",
+      "image": "market-watch-api:native-alert-ui-runtime",
+      "image_id": "sha256:7336dbb3527796fb92ccb749a6388cf63d652afb2c9bfbdd9777b5dac6a57e52",
+      "state": "running",
+      "health": null,
+      "exit_code": 0,
+      "ports": {
+        "8000/tcp": null
+      }
+    },
+    {
+      "name": "mw-native-alert-ui-runtime-chart-origin-1",
+      "service": "chart-origin",
+      "image": "market-watch-chart-origin:native-alert-ui-runtime",
+      "image_id": "sha256:a4d044c877e2190770e9f7df504fb062354594fb327d1253d451e7dcd8de4e8e",
+      "state": "running",
+      "health": null,
+      "exit_code": 0,
+      "ports": {
+        "80/tcp": null
+      }
+    },
+    {
+      "name": "mw-native-alert-ui-runtime-migrate-1",
+      "service": "migrate",
+      "image": "market-watch-api:native-alert-ui-runtime",
+      "image_id": "sha256:7336dbb3527796fb92ccb749a6388cf63d652afb2c9bfbdd9777b5dac6a57e52",
+      "state": "exited",
+      "health": null,
+      "exit_code": 0,
+      "ports": {}
+    },
+    {
+      "name": "mw-native-alert-ui-runtime-tls-1",
+      "service": "tls",
+      "image": "nginx:1.28-alpine",
+      "image_id": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "state": "running",
+      "health": null,
+      "exit_code": 0,
+      "ports": {
+        "443/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "19643"
+          }
+        ],
+        "444/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "19644"
+          }
+        ],
+        "80/tcp": null
+      }
+    },
+    {
+      "name": "mw-native-alert-ui-runtime-pg-1",
+      "service": "pg",
+      "image": "postgres:14-bookworm",
+      "image_id": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "state": "running",
+      "health": "healthy",
+      "exit_code": 0,
+      "ports": {
+        "5432/tcp": null
+      }
+    }
+  ],
+  "images": [
+    {
+      "reference": "market-watch-api:native-alert-ui-runtime",
+      "id": "sha256:7336dbb3527796fb92ccb749a6388cf63d652afb2c9bfbdd9777b5dac6a57e52",
+      "labels": {
+        "com.docker.compose.project": "mw-native-alert-ui-runtime",
+        "com.docker.compose.service": "migrate",
+        "com.docker.compose.version": "2.40.3",
+        "io.market-watch.built-at": "2026-10-10T20:57:03.700314+00:00",
+        "io.market-watch.commit": "e75694c79e62ff8a464916278f35c9148cce6241",
+        "io.market-watch.dirty": "true",
+        "io.market-watch.expires-at": "2026-10-17T20:57:03.700314+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-native-alert-ui-runtime",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-native-alert-ui-runtime"
+      }
+    },
+    {
+      "reference": "market-watch-web:native-alert-ui-runtime",
+      "id": "sha256:c22c6b33b5310aea27e7f7c8b194cda465715d929aab3ac08c327db0a81f46d5",
+      "labels": {
+        "com.docker.compose.project": "mw-native-alert-ui-runtime",
+        "com.docker.compose.service": "web",
+        "com.docker.compose.version": "2.40.3",
+        "io.market-watch.built-at": "2026-10-10T20:57:03.700314+00:00",
+        "io.market-watch.commit": "e75694c79e62ff8a464916278f35c9148cce6241",
+        "io.market-watch.dirty": "true",
+        "io.market-watch.expires-at": "2026-10-17T20:57:03.700314+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-native-alert-ui-runtime",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-native-alert-ui-runtime",
+        "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+      }
+    },
+    {
+      "reference": "market-watch-chart-origin:native-alert-ui-runtime",
+      "id": "sha256:a4d044c877e2190770e9f7df504fb062354594fb327d1253d451e7dcd8de4e8e",
+      "labels": {
+        "com.docker.compose.project": "mw-native-alert-ui-runtime",
+        "com.docker.compose.service": "chart-origin",
+        "com.docker.compose.version": "2.40.3",
+        "io.market-watch.built-at": "2026-10-10T20:57:03.700314+00:00",
+        "io.market-watch.commit": "e75694c79e62ff8a464916278f35c9148cce6241",
+        "io.market-watch.dirty": "true",
+        "io.market-watch.expires-at": "2026-10-17T20:57:03.700314+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-native-alert-ui-runtime",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-native-alert-ui-runtime",
+        "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+      }
+    }
+  ],
+  "backend_installed_version": "1.18.0"
+}

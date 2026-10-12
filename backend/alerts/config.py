@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     adapter_path: str = "adapters/dukascopy/probe.mjs"
     market_proxy: str = ""
     binance_proxy: str = ""
+    binance_connection_mode: Literal["configured", "direct"] = "configured"
     yahoo_enabled: bool = False
     yahoo_proxy: str = Field(default="", repr=False)
     yahoo_poll_seconds: int = Field(default=60, ge=15, le=900)
@@ -88,6 +89,8 @@ class Settings(BaseSettings):
 
     @property
     def effective_binance_proxy(self) -> str:
+        if self.binance_connection_mode == "direct":
+            return ""
         return self.binance_proxy or self.market_proxy
 
 

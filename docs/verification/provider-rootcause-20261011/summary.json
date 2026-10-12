@@ -1,0 +1,35 @@
+{
+  "source_commit": "0cebcf5fd89d52c67b8b66f7b5b967c5b2f9b67e",
+  "production_release": "v1.20.1",
+  "production_changes": false,
+  "composite": {
+    "original_with_demand": "failed: Unknown source: composite",
+    "without_demand": "passed",
+    "in_memory_candidate_filter": "passed",
+    "candidate_implementation_status": "diagnostic only"
+  },
+  "binance": {
+    "verify": true,
+    "trust_env": false,
+    "configured_15s_fresh": {
+      "attempts": 24,
+      "success": 21,
+      "ssl_eof": 3
+    },
+    "direct_15s_fresh": {
+      "attempts": 12,
+      "success": 12
+    },
+    "failure_phase": "proxy.start_tls",
+    "network_hop_responsibility": "unresolved",
+    "long_term_stability": "not verified"
+  },
+  "oanda": {
+    "mapped_target_in_desired": true,
+    "heartbeat_fresh_at_snapshot": true,
+    "m1_ready": false,
+    "session": "unknown",
+    "calendar_verified": false
+  },
+  "scope": "Ubuntu in-memory reproduction; existing production read-only SQL and public GETs; no debug instance or notifications"
+}

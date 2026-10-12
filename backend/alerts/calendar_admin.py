@@ -22,6 +22,24 @@ from .storage import (
 )
 
 
+def record_review(db, instrument_id, *, revision, reviewer, method, evidence_version, review_due_at):
+    """Record an explicit review action separately from immutable applicability."""
+    from datetime import date
+
+    instrument = db.scalar(select(Instrument).where(Instrument.id == instrument_id).with_for_update())
+    if not instrument or (instrument.calendar_profile or {}).get("revision") != revision:
+        raise ValueError("Calendar review must name the current exact profile revision")
+    if not all(isinstance(value, str) and 0 < len(value.strip()) <= 200
+               for value in (reviewer, method, evidence_version)):
+        raise ValueError("Review requires reviewer, method and evidence version")
+    date.fromisoformat(review_due_at)
+    event = Audit(kind="calendar_review", at=now_ms(), details={"instrument": instrument_id,
+        "revision": revision, "reviewer": reviewer, "method": method,
+        "evidence_version": evidence_version, "review_due_at": review_due_at})
+    db.add(event)
+    return event
+
+
 def apply_profile(db, instrument_id, data, *, apply=False):
     profile = normalized_profile(data)
     instrument = db.scalar(
@@ -131,20 +149,32 @@ def apply_profile(db, instrument_id, data, *, apply=False):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--instrument", required=True)
-    parser.add_argument("--file", type=Path, required=True)
+    action = parser.add_mutually_exclusive_group(required=True)
+    action.add_argument("--file", type=Path, help="Validate or apply a new legacy calendar profile")
+    action.add_argument("--record-review", metavar="REVISION", help="Record review of the exact current profile without changing it")
+    parser.add_argument("--reviewer")
+    parser.add_argument("--review-method")
+    parser.add_argument("--evidence-version")
+    parser.add_argument("--review-due")
     parser.add_argument(
         "--apply", action="store_true", help="Without this flag, only validate and report"
     )
     args = parser.parse_args()
+    review = (args.reviewer, args.review_method, args.evidence_version, args.review_due)
+    if any(review) and (not all(review) or not args.apply):
+        parser.error("Review recording requires --apply and all four review fields")
+    if args.record_review and not all(review):
+        parser.error("--record-review requires --apply and all four review fields")
     with transaction() as db:
-        print(
-            json.dumps(
-                apply_profile(
-                    db, args.instrument, json.loads(args.file.read_text()), apply=args.apply
-                ),
-                ensure_ascii=False,
-            )
-        )
+        data = json.loads(args.file.read_text()) if args.file else None
+        report = (apply_profile(db, args.instrument, data, apply=args.apply) if args.file else
+                  {"review_recorded": True, "revision": args.record_review})
+        if all(review):
+            record_review(db, args.instrument, revision=data["revision"] if args.file else args.record_review,
+                reviewer=args.reviewer, method=args.review_method,
+                evidence_version=args.evidence_version, review_due_at=args.review_due)
+    # Report success only after the audit transaction committed.
+    print(json.dumps(report, ensure_ascii=False))
 
 
 if __name__ == "__main__":

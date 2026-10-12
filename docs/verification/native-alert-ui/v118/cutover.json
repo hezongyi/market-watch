@@ -1,0 +1,61 @@
+{
+  "project": "mw-native-alert-ui-runtime",
+  "base": "e75694c79e62ff8a464916278f35c9148cce6241",
+  "version": "1.18.0",
+  "migration_verified": true,
+  "before": {
+    "chart_alerts": {
+      "count": 22,
+      "payload_md5": "396d18dbbe426caf628c9fd54051a970"
+    },
+    "chart_alert_versions": {
+      "count": 28,
+      "payload_md5": "59a3780c9a854c6562e1e9535c2c5acd"
+    },
+    "signals": {
+      "count": 14,
+      "payload_md5": "50b39b6e3c9add5626d35434c7b32bd8"
+    },
+    "notifications": {
+      "count": 14,
+      "payload_md5": "06cc4e3331dcd449eef80117d22cc526"
+    },
+    "outbox": {
+      "count": 3,
+      "payload_md5": "dd9e3de3097797b7b0981e58235439e3"
+    },
+    "advanced_chart_workspaces": {
+      "count": 1,
+      "payload_md5": "288b3245597051b50a9b81b0e43f018a"
+    }
+  },
+  "backup_restored": true,
+  "after": {
+    "chart_alerts": {
+      "count": 22,
+      "payload_md5": "396d18dbbe426caf628c9fd54051a970"
+    },
+    "chart_alert_versions": {
+      "count": 28,
+      "payload_md5": "59a3780c9a854c6562e1e9535c2c5acd"
+    },
+    "signals": {
+      "count": 14,
+      "payload_md5": "50b39b6e3c9add5626d35434c7b32bd8"
+    },
+    "notifications": {
+      "count": 14,
+      "payload_md5": "06cc4e3331dcd449eef80117d22cc526"
+    },
+    "outbox": {
+      "count": 3,
+      "payload_md5": "dd9e3de3097797b7b0981e58235439e3"
+    },
+    "advanced_chart_workspaces": {
+      "count": 1,
+      "payload_md5": "288b3245597051b50a9b81b0e43f018a"
+    }
+  },
+  "migration_head": "ar45_market_stream",
+  "cutover_seconds": 72.57
+}

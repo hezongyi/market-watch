@@ -107,13 +107,21 @@ const MWNativeNavigation = (() => {
   function clearNativeWait(m, error) {
     const scrolling = m._scrollingState;
     m._scrollingState = null;
-    scrolling?.deferred.reject(error);
+    rejectNativeDeferred(scrolling?.deferred, error);
     const range = m._lastGotoTimeRange;
     m._lastGotoTimeRange = null;
-    range?.deferred.reject(error);
+    rejectNativeDeferred(range?.deferred, error);
     if (m._lastAppliedGotoTimeRange) m._lastAppliedGotoTimeRange.actual = false;
     m._lastAppliedGotoTimeRange = null;
     m.timeScale()._requestingMoreData = false;
+  }
+  function rejectNativeDeferred(deferred, error) {
+    // The pinned engine creates a range deferred before tick marks exist but
+    // returns undefined from that call, so no caller can observe its promise.
+    // Mark that internal promise handled before rejecting. A public promise
+    // already adopted from it still receives the structured rejection.
+    deferred?.promise?.catch(() => {});
+    deferred?.reject(error);
   }
   function begin(m, state) {
     state.boundaryAt = undefined;
@@ -414,7 +422,11 @@ const MWNativeNavigation = (() => {
       replay(m, state);
     },
     bindThread(thread, resolution) {
-      if (!thread._symbolInfo.ticker?.startsWith("MWP:")) return;
+      const ticker = thread._symbolInfo.ticker;
+      const kind = typeof MWSeries === "undefined" ?
+        (ticker?.startsWith("MWP:") ? "provider" : null) : MWSeries.decode(ticker).series_kind;
+      if (!["provider", "history", "composite"].includes(kind)) return;
+      thread.mw_seriesKind = kind;
       thread.mw_key = this.threadKey(thread._symbolInfo, resolution);
       threads.set(thread.mw_key, thread);
       thread.mw_sourceGeneration = 0;
@@ -443,6 +455,7 @@ const MWNativeNavigation = (() => {
         const valid = () =>
           !settled &&
           !thread._destroyed &&
+          threads.get(thread.mw_key) === thread &&
           thread._cache === cache &&
           thread.mw_sourceGeneration === sourceGeneration;
         const complete = (callback, ...args) => {
@@ -455,6 +468,7 @@ const MWNativeNavigation = (() => {
         };
         const fail = (error) => {
           if (!valid()) return;
+          thread.mw_lastFailure = {error, firstDataRequest:request.firstDataRequest === true};
           thread.mw_boundaryContinuation = error?.code === "NATIVE_HISTORY_CAPACITY_EXCEEDED" ? continuation : undefined;
           if (boundary?.promoting && boundaries.get(thread) === boundary) {
             if (error?.code === "NATIVE_HISTORY_CAPACITY_EXCEEDED" || error?.code === "HISTORY_CANCELLED")
@@ -464,6 +478,7 @@ const MWNativeNavigation = (() => {
           if(error?.code === "NATIVE_HISTORY_CAPACITY_EXCEEDED") thread.mw_capacityRequest = request;
           thread.mw_failedCursor = thread.mw_requestCursor;
           complete(failure, error);
+          globalThis.dispatchEvent(new CustomEvent("mw-history-state", {detail:{key:thread.mw_key}}));
         };
         thread.mw_read = { cancel: () => fail(cancelled()), valid };
         try {
@@ -489,6 +504,9 @@ const MWNativeNavigation = (() => {
                 0,
               );
               admit(thread, extra, undefined, true);
+              thread.mw_lastFailure = null;
+              thread.mw_initialRecoveryAttempted = false;
+              globalThis.dispatchEvent(new CustomEvent("mw-history-state", {detail:{key:thread.mw_key}}));
               return complete(success, bars, meta);
             } catch (error) {
               fail(error);
@@ -650,9 +668,6 @@ const MWNativeNavigation = (() => {
           state.cursor = null;
           state.phase = "idle";
           clearNativeWait(m, cancelled());
-          for (const thread of threads.values())
-            if (thread.mw_read && !peers(thread).length)
-              thread.mw_read.cancel();
         };
         m.mainSeries().onIntervalChanged().subscribe(state, changed);
         m.mainSeries().symbolResolved().subscribe(state, changed);
@@ -672,6 +687,41 @@ const MWNativeNavigation = (() => {
               args[2] !== this._lastGotoTimeRange
             )
               return;
+            if (method === "gotoTimeRange" && args[2]) {
+              const marks = this.timeScale().tickMarks();
+              const indices = marks._marksByIndex;
+              // A completed callback can precede the replacement time scale.
+              // The pinned engine removes duplicate-time labels before it
+              // replaces their old index bounds. Do not read that mixed scale.
+              if (indices?.size && (!indices.has(marks.minIndex) || !indices.has(marks.maxIndex) ||
+                  indices.size !== marks.maxIndex - marks.minIndex + 1)) {
+                const deferred = args[2];
+                const retry = state.rangeRetry?.deferred === deferred ? state.rangeRetry :
+                  (state.rangeRetry = {deferred, started: performance.now(), scheduled: false});
+                if (performance.now() - retry.started >= 30000) {
+                  state.rangeRetry = null;
+                  const error = Error("图表时间刻度尚未完成更新，请重试范围定位");
+                  clearNativeWait(this, error);
+                  state.phase = "idle";
+                  globalThis.dispatchEvent(new CustomEvent("mw-navigation-error", {detail:error}));
+                  return;
+                }
+                if (!retry.scheduled) {
+                  retry.scheduled = true;
+                  requestAnimationFrame(() => {
+                    if (state.rangeRetry !== retry) return;
+                    retry.scheduled = false;
+                    if (models.get(this) !== state || this._lastGotoTimeRange !== deferred) {
+                      state.rangeRetry = null;
+                      return;
+                    }
+                    this.gotoTimeRange(...args);
+                  });
+                }
+                return;
+              }
+              state.rangeRetry = null;
+            }
             if (
               (method === "gotoTime" && args[0] === undefined) ||
               (method === "gotoTimeRange" && args[2])
@@ -721,11 +771,12 @@ const MWNativeNavigation = (() => {
       m.mainSeries().symbolResolved().unsubscribeAll(state);
       m.mainSeries().dataEvents().completed().unsubscribeAll(state);
       m.mainSeries().dataEvents().dataUpdated().unsubscribeAll(state);
-      for (const thread of threads.values())
-        if (thread.mw_read && !peers(thread).length) thread.mw_read.cancel();
+      // Comparisons and studies can own any supported source without a
+      // main-series peer. Native cache purge/destroy owns their cancellation.
     },
     historyFailure(thread, error) {
       if (
+        !["provider", "history", "composite"].includes(thread.mw_seriesKind) &&
         !thread._symbolInfo.ticker?.startsWith("MWP:") &&
         !thread._symbolInfo.mw_window
       )
@@ -754,7 +805,7 @@ const MWNativeNavigation = (() => {
         ts._requestingMoreData = false;
         const scroll = m._scrollingState;
         m._scrollingState = null;
-        scroll?.deferred.reject(error);
+        rejectNativeDeferred(scroll?.deferred, error);
         clearNativeWait(m, error);
         state.phase = "idle";
         const points = ts.points().range().value(),
@@ -799,6 +850,22 @@ const MWNativeNavigation = (() => {
         },0);
       } else if (!capacityFailure || !boundaries.has(thread))
         globalThis.dispatchEvent(new CustomEvent("mw-navigation-error", {detail:error}));
+      return true;
+    },
+    failure(chart) {
+      const thread=threads.get(modelKey(chart._chartWidget.model().model()));
+      return thread?.mw_lastFailure?.error;
+    },
+    recoverInitial(chart, manual=false) {
+      const thread=threads.get(modelKey(chart._chartWidget.model().model()));
+      if (!thread?.mw_lastFailure || thread.mw_read || thread._destroyed) return false;
+      if (!manual && (!thread.mw_lastFailure.firstDataRequest || thread._cache.bars.length ||
+          thread.mw_lastFailure.error?.code !== 'HISTORY_CANCELLED' || thread.mw_initialRecoveryAttempted)) return false;
+      thread.mw_initialRecoveryAttempted = true;
+      // Reset only this current native chart's data after a failed first load;
+      // drawings and the workspace are retained. One automatic attempt per
+      // failure; explicit retry remains available if it also fails.
+      chart.resetData();
       return true;
     },
     cancelAll() {

@@ -1,0 +1,62 @@
+services:
+  api:
+    image: market-watch-api:pro-charts-20261011
+    env_file:
+      - path: /tmp/mw-pro-charts-20261011/app.env
+        format: raw
+    volumes:
+      - ./fixture-runtime.py:/acceptance/fixture-runtime.py:ro
+    command: [python, /acceptance/fixture-runtime.py, api]
+    depends_on:
+      pg: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8000/readyz',timeout=3)"]
+      interval: 5s
+      timeout: 4s
+      retries: 20
+  native-worker:
+    image: market-watch-api:pro-charts-20261011
+    env_file:
+      - path: /tmp/mw-pro-charts-20261011/app.env
+        format: raw
+    volumes:
+      - ./fixture-runtime.py:/acceptance/fixture-runtime.py:ro
+    command: [python, /acceptance/fixture-runtime.py, native]
+    depends_on:
+      api: {condition: service_healthy}
+  web:
+    image: market-watch-web:pro-charts-20261011
+    ports: [127.0.0.1:19997:80]
+    depends_on:
+      api: {condition: service_healthy}
+  market-worker:
+    image: market-watch-api:pro-charts-20261011
+    env_file:
+      - path: /tmp/mw-pro-charts-20261011/app.env
+        format: raw
+    volumes:
+      - ./fixture-runtime.py:/acceptance/fixture-runtime.py:ro
+    command: [python, /acceptance/fixture-runtime.py, market]
+    depends_on:
+      api: {condition: service_healthy}
+  chart-origin:
+    image: market-watch-chart-origin:pro-charts-20261011
+    ports: [127.0.0.1:19998:80]
+  ui-probe:
+    image: nginx:1.28-alpine
+    ports: [127.0.0.1:19996:80]
+    volumes:
+      - /tmp/mw-pro-charts-20261011/ui-probe:/usr/share/nginx/html:ro
+      - /home/quant/repos/market-watch/advanced-host/charting_library:/usr/share/nginx/html/charting_library:ro
+  pg:
+    image: postgres:14-bookworm
+    env_file: [/tmp/mw-pro-charts-20261011/pg.env]
+    ports: [127.0.0.1:19995:5432]
+    volumes: [pg-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U acceptance -d pro_charts]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+volumes:
+  pg-data:

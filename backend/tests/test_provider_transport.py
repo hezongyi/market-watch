@@ -118,7 +118,7 @@ def test_repeated_real_connect_tunnel_failures_do_not_exhaust_the_running_pool(m
             timings = {}
             token = provider_chart.TIMINGS.set(timings)
             try:
-                with pytest.raises(TimeoutError):
+                with pytest.raises((TimeoutError, httpx.ConnectTimeout)):
                     provider_chart._request(transport.pooled_client('binance'),
                                             'https://data-api.binance.vision/api/v3/klines',
                                             params={}, deadline=time.monotonic() + 0.05)

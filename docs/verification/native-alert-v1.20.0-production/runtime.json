@@ -1,0 +1,244 @@
+{
+  "passed": true,
+  "at": 1791684129762,
+  "environment": "unraid formal production",
+  "services": [
+    {
+      "service": "api",
+      "image_id": "sha256:72c4fa273bb90d37f1e2903a4ffbaccba156927ea2dea196afe91d60ad7e52a4",
+      "running": true,
+      "restart_count": 0,
+      "health": "healthy",
+      "source_commit": "73356b7983e21c9da313e75075672378bae760ef",
+      "purpose": "release"
+    },
+    {
+      "service": "pricing-worker",
+      "image_id": "sha256:72c4fa273bb90d37f1e2903a4ffbaccba156927ea2dea196afe91d60ad7e52a4",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "73356b7983e21c9da313e75075672378bae760ef",
+      "purpose": "release"
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "image_id": "sha256:72c4fa273bb90d37f1e2903a4ffbaccba156927ea2dea196afe91d60ad7e52a4",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "73356b7983e21c9da313e75075672378bae760ef",
+      "purpose": "release"
+    },
+    {
+      "service": "chart-history-worker",
+      "image_id": "sha256:72c4fa273bb90d37f1e2903a4ffbaccba156927ea2dea196afe91d60ad7e52a4",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "73356b7983e21c9da313e75075672378bae760ef",
+      "purpose": "release"
+    },
+    {
+      "service": "history-worker",
+      "image_id": "sha256:72c4fa273bb90d37f1e2903a4ffbaccba156927ea2dea196afe91d60ad7e52a4",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "73356b7983e21c9da313e75075672378bae760ef",
+      "purpose": "release"
+    },
+    {
+      "service": "composite-aggregate-worker",
+      "image_id": "sha256:72c4fa273bb90d37f1e2903a4ffbaccba156927ea2dea196afe91d60ad7e52a4",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "73356b7983e21c9da313e75075672378bae760ef",
+      "purpose": "release"
+    },
+    {
+      "service": "native-history-worker",
+      "image_id": "sha256:72c4fa273bb90d37f1e2903a4ffbaccba156927ea2dea196afe91d60ad7e52a4",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "73356b7983e21c9da313e75075672378bae760ef",
+      "purpose": "release"
+    },
+    {
+      "service": "realtime-worker",
+      "image_id": "sha256:72c4fa273bb90d37f1e2903a4ffbaccba156927ea2dea196afe91d60ad7e52a4",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "73356b7983e21c9da313e75075672378bae760ef",
+      "purpose": "release"
+    },
+    {
+      "service": "notify-worker",
+      "image_id": "sha256:72c4fa273bb90d37f1e2903a4ffbaccba156927ea2dea196afe91d60ad7e52a4",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "73356b7983e21c9da313e75075672378bae760ef",
+      "purpose": "release"
+    },
+    {
+      "service": "market-stream-worker",
+      "image_id": "sha256:72c4fa273bb90d37f1e2903a4ffbaccba156927ea2dea196afe91d60ad7e52a4",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "73356b7983e21c9da313e75075672378bae760ef",
+      "purpose": "release"
+    },
+    {
+      "service": "web",
+      "image_id": "sha256:61a6343720ea90175376fe2fae21d7b93b6516ad2166f4e137fa2ade5c2ab5b5",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "73356b7983e21c9da313e75075672378bae760ef",
+      "purpose": "release"
+    },
+    {
+      "service": "chart-origin",
+      "image_id": "sha256:77d14237ddca09bbe010e1f5844e20151b2a439521ce9b15ae6869523d619ab2",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "73356b7983e21c9da313e75075672378bae760ef",
+      "purpose": "release"
+    }
+  ],
+  "actual_settings": [
+    {
+      "service": "api",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": true,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "pricing-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": true,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "chart-history-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "history-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "composite-aggregate-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "native-history-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "realtime-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "notify-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "market-stream-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    }
+  ],
+  "readyz": {
+    "status": "ready",
+    "time": 1791684125178
+  },
+  "http_status": {
+    "https://trade.kookvv.com:8443/": "200",
+    "https://charts.kookvv.com:8443/": "200"
+  },
+  "api_version": "1.20.0",
+  "schema": "ar45_market_stream",
+  "workspace_alert_account_notification_fingerprints_preserved": true,
+  "password_change_events_added": 0,
+  "notification_test_events_added": 0,
+  "post_state": {
+    "at": 1791684124388,
+    "schema": "ar45_market_stream",
+    "fingerprints": {
+      "advanced_chart_workspaces": "2f1350e25e1d9a5f9760e160a442ba88287901c5e00cdc631a50f72c6205271a",
+      "advanced_chart_preferences": "72638418b6bdd29c46d26e048169bfc685c86660d432d63ac75dc1b086c83a65",
+      "chart_workspaces": "3ce55615000c89e4f983eb202e5e1b1c6bded01ea4e6e15ffa6e99e5fd904e52",
+      "watches": "3e812064ffac0a72173046404646083352c6aba5fef24b2487293149d3a768ec",
+      "chart_alerts": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "chart_alert_versions": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "chart_alert_actions": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "preferences": {
+      "auth.admin": "6222c393fa55752cefda8eee7783670a354c896b66fa76d4a9570d477da88302",
+      "notifications": "f9d4d431ac3196873f33874a2fb3bc1772805265dc38ec51cabb910a2e2b34c8"
+    },
+    "notification_tests": 6,
+    "password_changes": 2,
+    "heartbeats": {
+      "market_heartbeat": 1791684112524,
+      "notify_heartbeat": 1791684077718,
+      "market_stream_heartbeat": null
+    },
+    "counts": {
+      "candles": 7489352,
+      "provider_bars": 999863,
+      "chart_published_bars": 70496,
+      "chart_alerts": 0,
+      "advanced_chart_workspaces": 1
+    },
+    "version": "1.20.0",
+    "yahoo_enabled": true,
+    "proxy_configured": true
+  }
+}

@@ -29,7 +29,7 @@ def generate(scope, start, end, symbols):
             'provider_symbol': symbol, 'account_scope': scope, 'timezone': 'America/New_York',
             'reviewed_start': start.isoformat(), 'reviewed_end': end.isoformat(),
             'evidence_url': HOURS,
-            'applicability': 'OANDA SG account/product hours reviewed for status and scheduling only; excludes boundary minutes; not minute coverage or holiday completeness',
+            'applicability': 'User-confirmed OANDA SG account; reviewed SG regular hours as a finite Practice scheduling plan only. Excludes boundary minutes; not quote availability, minute coverage or holiday completeness. Review the official holiday table for this interval.',
             'weekly_closures': closures}}
         result[symbol] = Profile.model_validate(value).model_dump(mode='json')
     return result

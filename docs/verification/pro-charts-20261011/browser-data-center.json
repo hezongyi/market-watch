@@ -1,0 +1,128 @@
+{
+  "environment": "Ubuntu mw-pro-charts-20261011",
+  "supplier": "synthetic fixture",
+  "checks": [
+    "DC1 baseline/mapping pointer selection with real options",
+    "DC1 clearing baseline disables mapping; keyboard selection Escape/Tab",
+    "DC1 unsaved guard Escape retains actual form",
+    "DC1 real target pointer/keyboard/first invalid focus and mapping commit; nonrequired product selects",
+    "DC1 real revision prepare/activate committed against synthetic supply"
+  ],
+  "mapping": {
+    "id": "4e7acb9a9e70bdd20328a86d35744a27145f9503723fed226da5bd7bd6b3a756",
+    "dataset_id": "1139a661eecac6e400618e4514d405a5b0850eed83d6c966a43584294ae9e36a",
+    "created_at": 1791725007706,
+    "target_dataset_id": "0b158e3efda8b84c303a38295fb3d72a10d631bd80804a590208873727236563",
+    "target_identity": {
+      "source": "oanda",
+      "channel": "v20",
+      "environment": "practice",
+      "account_scope": "sha256:0ec7a178300cdbb9da93ce7b451762a1b57ae4191ed5102d81844752811faf67",
+      "provider_symbol": "EUR_USD",
+      "basis": "bid",
+      "calendar_version": "ny17-candidate-v1"
+    },
+    "match": {
+      "underlying": "EUR",
+      "quote_currency": "USD",
+      "historical_product": "spot_fx",
+      "live_product": "spot_fx",
+      "relationship": "same_product",
+      "historical_evidence": "https://example.test/synthetic-history",
+      "live_evidence": "https://example.test/synthetic-live",
+      "rationale": "Synthetic isolated acceptance fixture; no external account",
+      "reviewed": true,
+      "basis": "bid",
+      "historical_identity": {
+        "source": "dukascopy",
+        "channel": "python",
+        "environment": "historical",
+        "account_scope": "public",
+        "provider_symbol": "EUR/USD",
+        "basis": "bid",
+        "calendar_version": "pro-charts-fixture-v2"
+      },
+      "target_identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:0ec7a178300cdbb9da93ce7b451762a1b57ae4191ed5102d81844752811faf67",
+        "provider_symbol": "EUR_USD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      },
+      "target_catalog": {
+        "symbol": "EUR_USD",
+        "type": "CURRENCY",
+        "precision": 5,
+        "updated_at": 1791725007599
+      },
+      "collection_identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:0ec7a178300cdbb9da93ce7b451762a1b57ae4191ed5102d81844752811faf67",
+        "provider_symbol": "EUR_USD",
+        "basis": "bid",
+        "parameters": {
+          "granularity": "M1",
+          "price": "B",
+          "smooth": false
+        }
+      }
+    },
+    "target_display_symbol": "EURUSD",
+    "current_account": true
+  },
+  "revision": {
+    "id": "e16ec716-e7f9-4eb3-9152-525b819a61ce",
+    "request_id": "86e4462a-a298-4d55-bf80-7e78a2b2f400",
+    "parent_revision_id": "53ab41d6-7752-4f31-8ed0-4c3f5c220f42",
+    "history_version_id": "95d5f45a-54dd-4e1e-8367-3edd37d5618c",
+    "dataset_id": "1139a661eecac6e400618e4514d405a5b0850eed83d6c966a43584294ae9e36a",
+    "history_checksum": "45e727222cc21dedd264be9f9330dd7a1482ac8c109c415a3f69629b8baed223",
+    "mapping_id": "4e7acb9a9e70bdd20328a86d35744a27145f9503723fed226da5bd7bd6b3a756",
+    "seam": 1791665940000,
+    "rules": {
+      "aggregation": "configured-phase-m1-v1",
+      "seam": "explicit-minute-boundary-v1",
+      "selection": "history-before-T-target-from-T-v1",
+      "tail_revisions": "source-confirmed-replace-audit-v1",
+      "aggregation_calendar": "ny17",
+      "historical_calendar_version": "pro-charts-fixture-v2"
+    },
+    "created_at": 1791751155098,
+    "reason": "Ubuntu isolated acceptance revision",
+    "change": {
+      "request": {
+        "request_id": "86e4462a-a298-4d55-bf80-7e78a2b2f400",
+        "expected_revision_id": "53ab41d6-7752-4f31-8ed0-4c3f5c220f42",
+        "history_version_id": "95d5f45a-54dd-4e1e-8367-3edd37d5618c",
+        "mapping_id": "4e7acb9a9e70bdd20328a86d35744a27145f9503723fed226da5bd7bd6b3a756",
+        "seam": 1791665940000,
+        "reason": "Ubuntu isolated acceptance revision",
+        "allow_non_day_boundary": true
+      },
+      "cutoff": 1791751140000,
+      "history_checksum": "45e727222cc21dedd264be9f9330dd7a1482ac8c109c415a3f69629b8baed223",
+      "warmups": [],
+      "affected_rules": [],
+      "indicator_algorithm": "fixed-indicator-state-v3",
+      "policy": "no_implicit_rule_migration"
+    },
+    "preparation": {
+      "ready": false,
+      "status": "confirming_m1",
+      "input_revision": null,
+      "cutoff": 1791751140000,
+      "periods_ready": false,
+      "indicators": [],
+      "query_error": null,
+      "coverage": "per-bar; readiness does not certify all historical coverage"
+    },
+    "activated_at": null,
+    "activation": null
+  },
+  "passed": true,
+  "errors": []
+}

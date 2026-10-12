@@ -1,0 +1,754 @@
+{
+  "version": "1.20.2",
+  "release_tag": "v1.20.2",
+  "source_commit": "d8d5f0b15469c8627bc2232320496bbf0a4ba673",
+  "implementation_pr": 40,
+  "tested_application_commit": "253d0550813a5b262e23fd714b4fab4f2df6f812",
+  "release_product_match": {
+    "passed": true,
+    "release_source_commit": "d8d5f0b15469c8627bc2232320496bbf0a4ba673",
+    "tested_application_commit": "253d0550813a5b262e23fd714b4fab4f2df6f812",
+    "installed_product_files_identical": true,
+    "installed_python_dependencies_identical": true,
+    "product_python_files": 136,
+    "dependency_count": 76
+  },
+  "schema": "ar45_market_stream",
+  "schema_migration": false,
+  "build_environment": "Ubuntu quant-server; market-watch-ubuntu BuildKit",
+  "build_task": "mw-provider-fix-v1202-release-20261011",
+  "build_project": "mw-v1202-release-build",
+  "build_purpose": "release",
+  "images": {
+    "market-watch-api:v1.20.2-d8d5f0b": {
+      "production_id": "sha256:85206313dc6342d97d344cd07f504eed8edcc192f6e69a311aa51d32713ce41d",
+      "ubuntu_id": "sha256:a599c1a20df0b2d4e9880e10c2af55887ccb810d85b084c0efd38c7b51d4ccdc",
+      "rootfs_matches_ubuntu": true,
+      "effective_config_matches_ubuntu": true,
+      "legacy_empty_config_fields": [
+        "AttachStderr",
+        "AttachStdin",
+        "AttachStdout",
+        "Domainname",
+        "Hostname",
+        "Image",
+        "OpenStdin",
+        "StdinOnce",
+        "Tty"
+      ],
+      "diff_ids": [
+        "sha256:34467cc93912af891dfee8a3902adf9b4f355a9bca4eaa46f658d1181a21de0d",
+        "sha256:b3445de4503d21b3ebc42db2f284bc6c8ad96184ea91ce55fb57f5e87910e1f2",
+        "sha256:546c86e4df2dc808fcf1953c346bfeef32f4c953933634d57c1d38730b750e9c",
+        "sha256:6b6ff8eb9da6c277f4b33452c77d59f8b5ff04e0bcca1a3054570b9db343da79",
+        "sha256:b228db38876c7528443881d4a87eff776f58777a34b719537b90aedaee1d96a7",
+        "sha256:35ec5c2c5712e1a0ab1257296a9f6643eba520df2e40d5a8dacb976aa8c1bbd2",
+        "sha256:b17dea5f7592466f75f80ef82de9a2cb30986f00bd44ee225c08e3d4023c71a8",
+        "sha256:586316f58c9d868e8c3542962740d208097ca593181478faa402f8a465901c1d",
+        "sha256:920f5fc6e99284756f424a34f0de4139ebb17981ab949b50b55124619b8278a2",
+        "sha256:a76a506173f1d1f28c647b424e9c26a8e0c176b0fad128449b3134c5d7e01cdc",
+        "sha256:dfccfe2599e95f4065162b2f083a6c547c7d653cd8ac6a8af27cb5a1ea797e59",
+        "sha256:2c09e34f78fb4260888af03595fa4d01b8e9af617abbdb85963f3d35c2d8e836",
+        "sha256:6625b8efd662fb5f78b36ec21e5e99dce4fe9cca0fb663194ad32c5eee6475a7",
+        "sha256:9eb156b8abcad5ab7a5278e6ebaea4d4c4f335a45d962778917f0c9ddba75899",
+        "sha256:7f5a885456fcf416c79045e6fd1a256626a2b4720bc51ced6e907213385df4b6",
+        "sha256:4d5529f935e7d36679ec97c4745116d85a9ea720c758ce489a649e2b40b36b29"
+      ],
+      "labels": {
+        "io.market-watch.built-at": "2026-10-11T05:07:27.494765+00:00",
+        "io.market-watch.commit": "d8d5f0b15469c8627bc2232320496bbf0a4ba673",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-v1202-release-build",
+        "io.market-watch.purpose": "release",
+        "io.market-watch.task": "mw-provider-fix-v1202-release-20261011"
+      }
+    },
+    "market-watch-web:v1.20.2-d8d5f0b": {
+      "production_id": "sha256:39afc198df3f201b56b4bd04cb5adc021b1030da89e52f8671c5e1fb1781ed3e",
+      "ubuntu_id": "sha256:b45540086ce7e5b238f17a0c1f3ec318c5de6f056accc431232e2190fa9b0846",
+      "rootfs_matches_ubuntu": true,
+      "effective_config_matches_ubuntu": true,
+      "legacy_empty_config_fields": [
+        "AttachStderr",
+        "AttachStdin",
+        "AttachStdout",
+        "Domainname",
+        "Hostname",
+        "Image",
+        "OpenStdin",
+        "StdinOnce",
+        "Tty",
+        "User"
+      ],
+      "diff_ids": [
+        "sha256:989e799e634906e94dc9a5ee2ee26fc92ad260522990f26e707861a5f52bf64e",
+        "sha256:a2738b08d7114c9d5581dd5482d3b5cc297fcf73b8d330c3ba38d24c43939119",
+        "sha256:47a53288c3ef0ee51df84ef47d217f18c1762412532fded9af1fd88ecee14294",
+        "sha256:9e707aa6db4786355904a1b794c80f378b690f8f0384af56117708a23a91f1da",
+        "sha256:a3446cc6c821fa11b704a45811ab554675f0327307af71b3f4ff5a70c7a4eec8",
+        "sha256:42608b42cb5e68548abf1c71aa851acfd65816d0ceaff6ee85849c7c478463f0",
+        "sha256:53c769b49ca0a2f0f6cf5e4a807af8933cec6cde9302d56d91a78bc38ea407a8",
+        "sha256:f76f397f2ce6b266573b70eb60ef1335e9984a1941eedd2a3505af4870c3afa0",
+        "sha256:f060a08be61a19c1d8f9f92a51f476255831e676efa1af7f0f32437531d8cea7",
+        "sha256:2a295c02dcae9b94be5daa2ec9c39bf36061aac8ea1f26d04d517c6e930f692b"
+      ],
+      "labels": {
+        "io.market-watch.built-at": "2026-10-11T05:11:31.480738+00:00",
+        "io.market-watch.commit": "d8d5f0b15469c8627bc2232320496bbf0a4ba673",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-v1202-release-build",
+        "io.market-watch.purpose": "release",
+        "io.market-watch.task": "mw-provider-fix-v1202-release-20261011",
+        "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+      }
+    },
+    "market-watch-chart-origin:v1.20.2-d8d5f0b": {
+      "production_id": "sha256:5bbf1a44d22da9a852087f7687f83e618e8ba14f3502f51b0407159e5cf78321",
+      "ubuntu_id": "sha256:f22c538efa85d9d0ea90cbb9bdd71e0afb09b7fa44026627d1b9708cf97f2b98",
+      "rootfs_matches_ubuntu": true,
+      "effective_config_matches_ubuntu": true,
+      "legacy_empty_config_fields": [
+        "AttachStderr",
+        "AttachStdin",
+        "AttachStdout",
+        "Domainname",
+        "Hostname",
+        "Image",
+        "OpenStdin",
+        "StdinOnce",
+        "Tty",
+        "User"
+      ],
+      "diff_ids": [
+        "sha256:989e799e634906e94dc9a5ee2ee26fc92ad260522990f26e707861a5f52bf64e",
+        "sha256:a2738b08d7114c9d5581dd5482d3b5cc297fcf73b8d330c3ba38d24c43939119",
+        "sha256:47a53288c3ef0ee51df84ef47d217f18c1762412532fded9af1fd88ecee14294",
+        "sha256:9e707aa6db4786355904a1b794c80f378b690f8f0384af56117708a23a91f1da",
+        "sha256:a3446cc6c821fa11b704a45811ab554675f0327307af71b3f4ff5a70c7a4eec8",
+        "sha256:42608b42cb5e68548abf1c71aa851acfd65816d0ceaff6ee85849c7c478463f0",
+        "sha256:53c769b49ca0a2f0f6cf5e4a807af8933cec6cde9302d56d91a78bc38ea407a8",
+        "sha256:f76f397f2ce6b266573b70eb60ef1335e9984a1941eedd2a3505af4870c3afa0",
+        "sha256:ff8e24edc1a74eb8477f6ed012e51897c14d38bd4bf9087af954fac9b117b3a8",
+        "sha256:3ba8eed2f60d28a3532fc0a0f1f50d3c87c280b0bc246f1a0ee3ac2613d2f586",
+        "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"
+      ],
+      "labels": {
+        "io.market-watch.built-at": "2026-10-11T05:12:49.087485+00:00",
+        "io.market-watch.commit": "d8d5f0b15469c8627bc2232320496bbf0a4ba673",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-v1202-release-build",
+        "io.market-watch.purpose": "release",
+        "io.market-watch.task": "mw-provider-fix-v1202-release-20261011",
+        "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+      }
+    },
+    "market-watch-backup:v1.20.2-d8d5f0b": {
+      "production_id": "sha256:8bfe1a8659b59e97edd5633602dd8a9b8a1eefe22b6185bd5f05419c98f8a989",
+      "ubuntu_id": "sha256:26e396c9cebc64149b4d6240bfbe9a635e991049aa4acfb74df84a4428ee6858",
+      "rootfs_matches_ubuntu": true,
+      "effective_config_matches_ubuntu": true,
+      "legacy_empty_config_fields": [
+        "AttachStderr",
+        "AttachStdin",
+        "AttachStdout",
+        "Domainname",
+        "Hostname",
+        "Image",
+        "OpenStdin",
+        "StdinOnce",
+        "Tty"
+      ],
+      "diff_ids": [
+        "sha256:34467cc93912af891dfee8a3902adf9b4f355a9bca4eaa46f658d1181a21de0d",
+        "sha256:b3445de4503d21b3ebc42db2f284bc6c8ad96184ea91ce55fb57f5e87910e1f2",
+        "sha256:546c86e4df2dc808fcf1953c346bfeef32f4c953933634d57c1d38730b750e9c",
+        "sha256:6b6ff8eb9da6c277f4b33452c77d59f8b5ff04e0bcca1a3054570b9db343da79",
+        "sha256:b228db38876c7528443881d4a87eff776f58777a34b719537b90aedaee1d96a7",
+        "sha256:35ec5c2c5712e1a0ab1257296a9f6643eba520df2e40d5a8dacb976aa8c1bbd2",
+        "sha256:b17dea5f7592466f75f80ef82de9a2cb30986f00bd44ee225c08e3d4023c71a8",
+        "sha256:586316f58c9d868e8c3542962740d208097ca593181478faa402f8a465901c1d",
+        "sha256:920f5fc6e99284756f424a34f0de4139ebb17981ab949b50b55124619b8278a2",
+        "sha256:a76a506173f1d1f28c647b424e9c26a8e0c176b0fad128449b3134c5d7e01cdc",
+        "sha256:dfccfe2599e95f4065162b2f083a6c547c7d653cd8ac6a8af27cb5a1ea797e59",
+        "sha256:2c09e34f78fb4260888af03595fa4d01b8e9af617abbdb85963f3d35c2d8e836",
+        "sha256:6625b8efd662fb5f78b36ec21e5e99dce4fe9cca0fb663194ad32c5eee6475a7",
+        "sha256:9eb156b8abcad5ab7a5278e6ebaea4d4c4f335a45d962778917f0c9ddba75899",
+        "sha256:7f5a885456fcf416c79045e6fd1a256626a2b4720bc51ced6e907213385df4b6",
+        "sha256:4d5529f935e7d36679ec97c4745116d85a9ea720c758ce489a649e2b40b36b29",
+        "sha256:7faeb60e0a7b9b4f9620a762c677a6cde5c4309fe0cd7d579f65dc0a5841de7c",
+        "sha256:62d790e3240a41e7776eb6126da939a0505ea208953fb202daff17ba1a98d6f4",
+        "sha256:6ab99424e89f94e669d35d0db5b5fae7568a0a60ed9a50ca3fadc9ec4e64802e"
+      ],
+      "labels": {
+        "io.market-watch.built-at": "2026-10-11T05:13:41.063948+00:00",
+        "io.market-watch.commit": "d8d5f0b15469c8627bc2232320496bbf0a4ba673",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-v1202-release-build",
+        "io.market-watch.purpose": "release",
+        "io.market-watch.task": "mw-provider-fix-v1202-release-20261011"
+      }
+    }
+  },
+  "production_deployed": true,
+  "production_root": "/mnt/user/appdata/market-watch",
+  "production_project": "market-watch",
+  "production_environment": "Unraid 192.168.7.33",
+  "public_url": "https://trade.kookvv.com:8443/",
+  "chart_origin": "https://charts.kookvv.com:8443/",
+  "active_release": "releases/v1.20.2-d8d5f0b",
+  "runtime": {
+    "passed": true,
+    "at": 1791696905544,
+    "services": [
+      {
+        "service": "api",
+        "image_id": "sha256:85206313dc6342d97d344cd07f504eed8edcc192f6e69a311aa51d32713ce41d",
+        "running": true,
+        "restart_count": 0,
+        "health": "healthy",
+        "source_commit": "d8d5f0b15469c8627bc2232320496bbf0a4ba673",
+        "purpose": "release"
+      },
+      {
+        "service": "pricing-worker",
+        "image_id": "sha256:85206313dc6342d97d344cd07f504eed8edcc192f6e69a311aa51d32713ce41d",
+        "running": true,
+        "restart_count": 0,
+        "health": null,
+        "source_commit": "d8d5f0b15469c8627bc2232320496bbf0a4ba673",
+        "purpose": "release"
+      },
+      {
+        "service": "chart-aggregation-worker",
+        "image_id": "sha256:85206313dc6342d97d344cd07f504eed8edcc192f6e69a311aa51d32713ce41d",
+        "running": true,
+        "restart_count": 0,
+        "health": null,
+        "source_commit": "d8d5f0b15469c8627bc2232320496bbf0a4ba673",
+        "purpose": "release"
+      },
+      {
+        "service": "chart-history-worker",
+        "image_id": "sha256:85206313dc6342d97d344cd07f504eed8edcc192f6e69a311aa51d32713ce41d",
+        "running": true,
+        "restart_count": 0,
+        "health": null,
+        "source_commit": "d8d5f0b15469c8627bc2232320496bbf0a4ba673",
+        "purpose": "release"
+      },
+      {
+        "service": "history-worker",
+        "image_id": "sha256:85206313dc6342d97d344cd07f504eed8edcc192f6e69a311aa51d32713ce41d",
+        "running": true,
+        "restart_count": 0,
+        "health": null,
+        "source_commit": "d8d5f0b15469c8627bc2232320496bbf0a4ba673",
+        "purpose": "release"
+      },
+      {
+        "service": "composite-aggregate-worker",
+        "image_id": "sha256:85206313dc6342d97d344cd07f504eed8edcc192f6e69a311aa51d32713ce41d",
+        "running": true,
+        "restart_count": 0,
+        "health": null,
+        "source_commit": "d8d5f0b15469c8627bc2232320496bbf0a4ba673",
+        "purpose": "release"
+      },
+      {
+        "service": "native-history-worker",
+        "image_id": "sha256:85206313dc6342d97d344cd07f504eed8edcc192f6e69a311aa51d32713ce41d",
+        "running": true,
+        "restart_count": 0,
+        "health": null,
+        "source_commit": "d8d5f0b15469c8627bc2232320496bbf0a4ba673",
+        "purpose": "release"
+      },
+      {
+        "service": "realtime-worker",
+        "image_id": "sha256:85206313dc6342d97d344cd07f504eed8edcc192f6e69a311aa51d32713ce41d",
+        "running": true,
+        "restart_count": 0,
+        "health": null,
+        "source_commit": "d8d5f0b15469c8627bc2232320496bbf0a4ba673",
+        "purpose": "release"
+      },
+      {
+        "service": "notify-worker",
+        "image_id": "sha256:85206313dc6342d97d344cd07f504eed8edcc192f6e69a311aa51d32713ce41d",
+        "running": true,
+        "restart_count": 0,
+        "health": null,
+        "source_commit": "d8d5f0b15469c8627bc2232320496bbf0a4ba673",
+        "purpose": "release"
+      },
+      {
+        "service": "market-stream-worker",
+        "image_id": "sha256:85206313dc6342d97d344cd07f504eed8edcc192f6e69a311aa51d32713ce41d",
+        "running": true,
+        "restart_count": 0,
+        "health": null,
+        "source_commit": "d8d5f0b15469c8627bc2232320496bbf0a4ba673",
+        "purpose": "release"
+      },
+      {
+        "service": "web",
+        "image_id": "sha256:39afc198df3f201b56b4bd04cb5adc021b1030da89e52f8671c5e1fb1781ed3e",
+        "running": true,
+        "restart_count": 0,
+        "health": null,
+        "source_commit": "d8d5f0b15469c8627bc2232320496bbf0a4ba673",
+        "purpose": "release"
+      },
+      {
+        "service": "chart-origin",
+        "image_id": "sha256:5bbf1a44d22da9a852087f7687f83e618e8ba14f3502f51b0407159e5cf78321",
+        "running": true,
+        "restart_count": 0,
+        "health": null,
+        "source_commit": "d8d5f0b15469c8627bc2232320496bbf0a4ba673",
+        "purpose": "release"
+      }
+    ],
+    "actual_settings": [
+      {
+        "service": "api",
+        "yahoo_enabled": true,
+        "oanda_stream_enabled": true,
+        "proxy_configured": true,
+        "database_pool_size": 2,
+        "database_max_overflow": 0
+      },
+      {
+        "service": "pricing-worker",
+        "yahoo_enabled": true,
+        "oanda_stream_enabled": true,
+        "proxy_configured": true,
+        "database_pool_size": 2,
+        "database_max_overflow": 0
+      },
+      {
+        "service": "chart-aggregation-worker",
+        "yahoo_enabled": true,
+        "oanda_stream_enabled": false,
+        "proxy_configured": true,
+        "database_pool_size": 2,
+        "database_max_overflow": 0
+      },
+      {
+        "service": "chart-history-worker",
+        "yahoo_enabled": true,
+        "oanda_stream_enabled": false,
+        "proxy_configured": true,
+        "database_pool_size": 2,
+        "database_max_overflow": 0
+      },
+      {
+        "service": "history-worker",
+        "yahoo_enabled": true,
+        "oanda_stream_enabled": false,
+        "proxy_configured": true,
+        "database_pool_size": 2,
+        "database_max_overflow": 0
+      },
+      {
+        "service": "composite-aggregate-worker",
+        "yahoo_enabled": true,
+        "oanda_stream_enabled": false,
+        "proxy_configured": true,
+        "database_pool_size": 2,
+        "database_max_overflow": 0
+      },
+      {
+        "service": "native-history-worker",
+        "yahoo_enabled": true,
+        "oanda_stream_enabled": false,
+        "proxy_configured": true,
+        "database_pool_size": 2,
+        "database_max_overflow": 0
+      },
+      {
+        "service": "realtime-worker",
+        "yahoo_enabled": true,
+        "oanda_stream_enabled": false,
+        "proxy_configured": true,
+        "database_pool_size": 2,
+        "database_max_overflow": 0
+      },
+      {
+        "service": "notify-worker",
+        "yahoo_enabled": true,
+        "oanda_stream_enabled": false,
+        "proxy_configured": true,
+        "database_pool_size": 2,
+        "database_max_overflow": 0
+      },
+      {
+        "service": "market-stream-worker",
+        "yahoo_enabled": true,
+        "oanda_stream_enabled": false,
+        "proxy_configured": true,
+        "database_pool_size": 2,
+        "database_max_overflow": 0
+      }
+    ],
+    "readyz": {
+      "status": "ready",
+      "time": 1791696900105
+    },
+    "http_status": {
+      "https://trade.kookvv.com:8443/": "200",
+      "https://charts.kookvv.com:8443/": "200"
+    },
+    "api_version": "1.20.2",
+    "workspace_alert_account_notification_fingerprints_preserved": true,
+    "password_change_events_added": 0,
+    "notification_test_events_added": 0
+  },
+  "compose_backend_yahoo_enabled_services": 11,
+  "runtime_yahoo_enabled_services": 10,
+  "provider_verification": {
+    "passed": true,
+    "production_database_read_only": true,
+    "observation_ms": 165366,
+    "btc_m1_advanced_ms": 120000,
+    "btc_latest_m1_age_ms": 72452,
+    "unknown_composite_errors_added": 0,
+    "historical_error_audit_retained": true,
+    "routing_repair_added": 1,
+    "composite_and_target_identities_unchanged": true,
+    "desired_targets_preserved": true,
+    "binance_mode": "direct",
+    "yahoo_enabled": true,
+    "oanda_closed_verified": true,
+    "oanda_quote_and_candle_readiness_remain_false": true,
+    "oanda_open_market_prices_not_verified": true,
+    "finite_profile_expires": "2026-10-18T00:00:00Z"
+  },
+  "worker_observation": {
+    "passed": true,
+    "services_running": 12,
+    "restart_count": 0,
+    "heartbeat_ages_ms": {
+      "market_heartbeat": 132,
+      "notify_heartbeat": 48699
+    },
+    "production_workers_unchanged": true,
+    "short_observation_only": true
+  },
+  "yahoo_upstream_read": {
+    "passed": true,
+    "symbol": "AAPL",
+    "metadata_source": "yahoo",
+    "timeframe": "D1",
+    "bars": 27,
+    "quote_price": "336.64",
+    "quote_time": 1791576000000,
+    "actual_upstream": true,
+    "proxy_configured": true
+  },
+  "backup_database_restore": {
+    "verified": true,
+    "environment": "Ubuntu isolated Docker mw-v1202-restore-20261011",
+    "sha256": "aa8e52b025ce73ed9e5ab952972775750a2e5104939c3e6451c22024644be0fc",
+    "bytes": 490672986,
+    "schema": "ar45_market_stream",
+    "restored_database_bytes": 3436866907,
+    "tables": 86,
+    "counts": {
+      "ack_grants": 2,
+      "advanced_chart_preferences": 31,
+      "advanced_chart_workspaces": 1,
+      "agent_credentials": 0,
+      "agent_operations": 0,
+      "audit_events": 618533,
+      "candles": 7489607,
+      "chart_aggregation_jobs": 0,
+      "chart_aggregation_state": 40,
+      "chart_alert_actions": 0,
+      "chart_alert_versions": 0,
+      "chart_alerts": 0,
+      "chart_history_plans": 8,
+      "chart_indicator_templates": 0,
+      "chart_publication_jobs": 13,
+      "chart_publication_state": 72,
+      "chart_publications": 60,
+      "chart_published_bars": 70756,
+      "chart_viewport_demands": 0,
+      "chart_workspaces": 1,
+      "delivery_attempts": 2,
+      "device_receipts": 0,
+      "devices": 0,
+      "import_jobs": 822,
+      "instruments": 135,
+      "market_composite_activations": 0,
+      "market_composite_aggregate_bars": 7124,
+      "market_composite_aggregate_tasks": 9,
+      "market_composite_input_events": 434,
+      "market_composite_judgments": 0,
+      "market_composite_minute_inputs": 2865,
+      "market_composite_minutes": 2865,
+      "market_composite_preparations": 1,
+      "market_composite_read_attempts": 1,
+      "market_composite_revision_changes": 0,
+      "market_composite_revisions": 1,
+      "market_composite_watch_bindings": 0,
+      "market_composite_watch_judgments": 0,
+      "market_composites": 1,
+      "market_coverage_checkpoints": 9,
+      "market_coverage_projection": 15265,
+      "market_coverage_quarantine": 0,
+      "market_data_coverage": 82670,
+      "market_data_demand": 23,
+      "market_dataset_maintenance": 3,
+      "market_dataset_reclamations": 0,
+      "market_dataset_sources": 130,
+      "market_datasets": 130,
+      "market_fixed_indicator_blocks": 0,
+      "market_fixed_indicator_runs": 0,
+      "market_history_artifact_blocks": 8463,
+      "market_history_artifacts": 45,
+      "market_history_chunks": 1786,
+      "market_history_read_attempts": 1928,
+      "market_history_reclamations": 0,
+      "market_history_runs": 7,
+      "market_history_versions": 7,
+      "market_instrument_catalog": 285,
+      "market_live_minutes": 12378,
+      "market_live_states": 127,
+      "market_pricing_owners": 1,
+      "market_realtime_mappings": 1,
+      "market_source_blobs": 1137,
+      "market_source_fetches": 1184,
+      "market_source_minute_revisions": 8353,
+      "market_source_minutes": 8353,
+      "market_source_series": 130,
+      "market_stream_clients": 1,
+      "market_stream_results": 96,
+      "market_stream_subscriptions": 17,
+      "market_stream_tasks": 16,
+      "native_history_loads": 0,
+      "notifications": 2,
+      "outbox": 2,
+      "preferences": 18,
+      "provider_bars": 999905,
+      "provider_datasets": 44,
+      "provider_interests": 5,
+      "quotes": 2,
+      "replays": 7,
+      "sessions": 3,
+      "signals": 2,
+      "volume_backfill_jobs": 1,
+      "volume_backfill_segments": 32,
+      "watches": 7,
+      "weekly_history_requests": 0
+    },
+    "fingerprints": {
+      "advanced_chart_workspaces": true,
+      "advanced_chart_preferences": true,
+      "chart_workspaces": true,
+      "watches": true,
+      "chart_alerts": true,
+      "chart_alert_versions": true,
+      "chart_alert_actions": true,
+      "market_composites": true,
+      "market_composite_revisions": true,
+      "market_realtime_mappings": true
+    },
+    "account_and_notification_settings_match": true,
+    "temporary_restore_database_removed": true
+  },
+  "backup_config_restore": {
+    "passed": true,
+    "actual_ubuntu_extraction": true,
+    "selected_configuration_files": 3,
+    "env_hash_matches_production": true,
+    "env_permissions_private": true,
+    "compose_matches_rollback": true,
+    "active_release": "releases/v1.20.1-89c5597",
+    "sha256": "d53328d0a029fab792299163fd9d5b822ce9baca877934ef0b3500b51bad923e",
+    "compose_config_valid": true,
+    "extracted_directory_removed": true
+  },
+  "backup": {
+    "root": "/mnt/user/backup/market-watch",
+    "dump": "alerts-20261011T052028734823Z.dump",
+    "config": "config-20261011T052137Z-xNCGKd.tar.gz"
+  },
+  "switch": {
+    "writers_stopped": "2026-10-11T05:20:26Z",
+    "switched": "2026-10-11T05:28:13Z",
+    "writer_pause_seconds": 467,
+    "previous_release": "v1.20.1-89c5597",
+    "new_release": "v1.20.2-d8d5f0b",
+    "actual_ubuntu_restore_before_switch": true,
+    "rollback_needed": false
+  },
+  "production_authenticated_browser": {
+    "scope": "Unraid formal production; Ubuntu browser; existing workspace, read-only UI and market subscriptions; preference migration and native preference saves suppressed",
+    "passed": true,
+    "cases": [
+      "HTTPS administrator login and Secure/HttpOnly session",
+      "Existing production chart ready, one alert business root, actual bars/quotes through authenticated SSE",
+      "Deployed native alert sidebar/dialog, message cancel and notification Escape restore entry focus; no alert saved",
+      "Production data center retains six sections and source-status actual read",
+      "Native indicator window coexists with alerts",
+      "390px production home has no horizontal overflow"
+    ],
+    "errors": [],
+    "http_errors": [],
+    "credential_leaks": [],
+    "unexpected_writes": [],
+    "started_at": "2026-10-11T05:34:08.253Z",
+    "chart_count": 5,
+    "market_events": [
+      {
+        "type": "bars",
+        "sequence": 1
+      },
+      {
+        "type": "bars",
+        "sequence": 1
+      },
+      {
+        "type": "bars",
+        "sequence": 1
+      },
+      {
+        "type": "bars",
+        "sequence": 1
+      },
+      {
+        "type": "quotes",
+        "sequence": 26
+      },
+      {
+        "type": "bars",
+        "sequence": 1
+      },
+      {
+        "type": "quotes",
+        "sequence": 26
+      },
+      {
+        "type": "bars",
+        "sequence": 1
+      },
+      {
+        "type": "quotes",
+        "sequence": 26
+      },
+      {
+        "type": "bars",
+        "sequence": 1
+      }
+    ],
+    "logout_verified": true
+  },
+  "browser_previous_pass": {
+    "passed": true,
+    "started_at": "2026-10-11T05:31:36.277Z",
+    "page_errors": 0,
+    "http_errors": 0
+  },
+  "first_browser_attempt": {
+    "passed": false,
+    "started_at": "2026-10-11T05:28:41.829Z",
+    "http_errors": [
+      {
+        "path": "/api/charts/data",
+        "status": 500
+      }
+    ],
+    "logout_verified": true,
+    "root_cause": "Existing SELECT-then-INSERT race in market_data.renew_demand; same lease key concurrently inserts market_data_demand_pkey",
+    "fixed_in_this_release": false,
+    "affected_files_unchanged_from_v1201": true,
+    "followup_solution": "Atomic identity-preserving upsert plus real PostgreSQL concurrent same-key regression"
+  },
+  "rollback": {
+    "release": "v1.20.1-89c5597",
+    "script": "deploy/provider-fix-v1.20.2-switch-20261011/rollback.sh",
+    "schema_downgrade": false,
+    "previous_images_and_configuration_retained": true
+  },
+  "known_limits": [
+    "Production OANDA reopen quotes/M1 not observed during Sunday closure; readiness remains false",
+    "Account-bound operational profile expires 2026-10-18T00:00:00Z; official session evidence needs renewal before expiry",
+    "Synchronous DNS and multi-address connect cannot guarantee absolute wall-clock interruption",
+    "HTTPcore private backend integration must be reverified on dependency upgrades",
+    "Production runtime observation is short, not a long-duration stability claim",
+    "Existing concurrent first-demand insertion can return HTTP 500 and remains a separate followup"
+  ],
+  "resource_closure": {
+    "at": "2026-10-11T06:00:13.201762+00:00",
+    "status": "complete",
+    "environment": "Ubuntu quant-server; local Docker",
+    "free_before_gib_approx": 7.7,
+    "free_after_bytes": 13413232640,
+    "free_after_gib": 12.49,
+    "retired_projects": [
+      {
+        "task": "mw-v1202-restore-20261011",
+        "project": "mw-v1202-restore-20261011",
+        "completed_at": "2026-10-11T05:54:55.660098+00:00",
+        "archive": "/home/quant/.local/share/market-watch-docker/archives/mw-v1202-restore-20261011-20261011T055431-f7661e7a",
+        "removed_containers": 1,
+        "removed_volumes": [
+          "mw-v1202-restore-20261011_pg"
+        ],
+        "actual_restore_verified": true,
+        "backed_up_databases": [
+          {
+            "database": "postgres",
+            "sha256": "b54869062e1f29cece9daabea3e97c28e6576fc24fa762da788810e26e646187",
+            "tables": 0
+          },
+          {
+            "database": "restore_admin",
+            "sha256": "b834c930bac53a11ab820e2646b99d2880174e6d6148a93c5b059b854ebc5d93",
+            "tables": 0
+          }
+        ]
+      },
+      {
+        "task": "mw-provider-fix-20261011",
+        "project": "mw-provider-fix-20261011",
+        "completed_at": "2026-10-11T05:57:39.157284+00:00",
+        "archive": "/home/quant/.local/share/market-watch-docker/archives/mw-provider-fix-20261011-20261011T055552-e1ba029d",
+        "removed_containers": 11,
+        "removed_volumes": [
+          "mw-provider-fix-20261011_postgres-data"
+        ],
+        "actual_restore_verified": true,
+        "backed_up_databases": [
+          {
+            "database": "postgres",
+            "sha256": "7bbf1b034f89173a45b67d2de6ff659a51c50d6bde380070f0c4af9b263863a1",
+            "tables": 0
+          },
+          {
+            "database": "provider_fix",
+            "sha256": "f77d065cfecf756658d7d3efa2480178313a711f52ba7cae771cf12efc6081cb",
+            "tables": 87
+          }
+        ]
+      }
+    ],
+    "other_containers_preserved": 77,
+    "other_container_identity_and_state_matches": true,
+    "official_and_rollback_images_retained": true,
+    "official_remote_backups_retained": true,
+    "global_prune_used": false,
+    "partition_or_disk_changed": false,
+    "private_archives_not_committed": true,
+    "previous_low_disk_failures_retained": true
+  }
+}

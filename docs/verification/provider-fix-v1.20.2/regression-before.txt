@@ -1,0 +1,408 @@
+FFF.FFFFF.....FFF...                                                     [100%]
+=================================== FAILURES ===================================
+____________ test_composite_never_reaches_ordinary_supplier[chart] _____________
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f2a7c252b50>
+demand = 'chart'
+
+    @pytest.mark.parametrize("demand", ["chart", "plan", "viewport", "expired", "forced", "enabled"])
+    def test_composite_never_reaches_ordinary_supplier(database, monkeypatch, demand):
+        now = 1791690000000
+        monkeypatch.setattr(market, "now_ms", lambda: now)
+        ident = "MC:routing-test:EURUSD"
+        with database.begin() as db:
+            for inst in db.scalars(select(Instrument)):
+                inst.enabled = False
+            db.add(Instrument(id=ident, label="Composite", source="composite", symbol="EURUSD",
+                basis="bid", calendar="ny17", precision=5, enabled=demand == "enabled"))
+            if demand == "chart":
+                db.add(MarketDemand(id="chart", instrument_id=ident, expires=now + 60000))
+            elif demand == "plan":
+                db.add(ChartHistoryPlan(instrument_id=ident, target_start=0, target_end=60000,
+                    realtime_enabled=True))
+            elif demand in ("viewport", "expired"):
+                db.add(ChartViewportDemand(id="viewport", instrument_id=ident, timeframe="M1",
+                    start=0, end=60000, warm_start=0, focused=True,
+                    expires=now + (60000 if demand == "viewport" else -1)))
+        calls = []
+        def fetch(*args, **kwargs):
+            calls.append(args)
+            raise AssertionError("composite reached an ordinary supplier")
+>       market.once(symbol=ident if demand == "forced" else None, include_viewers=True, fetcher=fetch)
+
+backend/tests/test_market_collection_routing.py:34:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend/alerts/market.py:543: in once
+    payload = fetch(source, provider_symbol, start, end)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = ('composite', 'EURUSD', None, None), kwargs = {}
+
+    def fetch(*args, **kwargs):
+        calls.append(args)
+>       raise AssertionError("composite reached an ordinary supplier")
+E       AssertionError: composite reached an ordinary supplier
+
+backend/tests/test_market_collection_routing.py:33: AssertionError
+_____________ test_composite_never_reaches_ordinary_supplier[plan] _____________
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f2a7c252450>
+demand = 'plan'
+
+    @pytest.mark.parametrize("demand", ["chart", "plan", "viewport", "expired", "forced", "enabled"])
+    def test_composite_never_reaches_ordinary_supplier(database, monkeypatch, demand):
+        now = 1791690000000
+        monkeypatch.setattr(market, "now_ms", lambda: now)
+        ident = "MC:routing-test:EURUSD"
+        with database.begin() as db:
+            for inst in db.scalars(select(Instrument)):
+                inst.enabled = False
+            db.add(Instrument(id=ident, label="Composite", source="composite", symbol="EURUSD",
+                basis="bid", calendar="ny17", precision=5, enabled=demand == "enabled"))
+            if demand == "chart":
+                db.add(MarketDemand(id="chart", instrument_id=ident, expires=now + 60000))
+            elif demand == "plan":
+                db.add(ChartHistoryPlan(instrument_id=ident, target_start=0, target_end=60000,
+                    realtime_enabled=True))
+            elif demand in ("viewport", "expired"):
+                db.add(ChartViewportDemand(id="viewport", instrument_id=ident, timeframe="M1",
+                    start=0, end=60000, warm_start=0, focused=True,
+                    expires=now + (60000 if demand == "viewport" else -1)))
+        calls = []
+        def fetch(*args, **kwargs):
+            calls.append(args)
+            raise AssertionError("composite reached an ordinary supplier")
+>       market.once(symbol=ident if demand == "forced" else None, include_viewers=True, fetcher=fetch)
+
+backend/tests/test_market_collection_routing.py:34:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend/alerts/market.py:543: in once
+    payload = fetch(source, provider_symbol, start, end)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = ('composite', 'EURUSD', None, None), kwargs = {}
+
+    def fetch(*args, **kwargs):
+        calls.append(args)
+>       raise AssertionError("composite reached an ordinary supplier")
+E       AssertionError: composite reached an ordinary supplier
+
+backend/tests/test_market_collection_routing.py:33: AssertionError
+___________ test_composite_never_reaches_ordinary_supplier[viewport] ___________
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f2a7c07abd0>
+demand = 'viewport'
+
+    @pytest.mark.parametrize("demand", ["chart", "plan", "viewport", "expired", "forced", "enabled"])
+    def test_composite_never_reaches_ordinary_supplier(database, monkeypatch, demand):
+        now = 1791690000000
+        monkeypatch.setattr(market, "now_ms", lambda: now)
+        ident = "MC:routing-test:EURUSD"
+        with database.begin() as db:
+            for inst in db.scalars(select(Instrument)):
+                inst.enabled = False
+            db.add(Instrument(id=ident, label="Composite", source="composite", symbol="EURUSD",
+                basis="bid", calendar="ny17", precision=5, enabled=demand == "enabled"))
+            if demand == "chart":
+                db.add(MarketDemand(id="chart", instrument_id=ident, expires=now + 60000))
+            elif demand == "plan":
+                db.add(ChartHistoryPlan(instrument_id=ident, target_start=0, target_end=60000,
+                    realtime_enabled=True))
+            elif demand in ("viewport", "expired"):
+                db.add(ChartViewportDemand(id="viewport", instrument_id=ident, timeframe="M1",
+                    start=0, end=60000, warm_start=0, focused=True,
+                    expires=now + (60000 if demand == "viewport" else -1)))
+        calls = []
+        def fetch(*args, **kwargs):
+            calls.append(args)
+            raise AssertionError("composite reached an ordinary supplier")
+>       market.once(symbol=ident if demand == "forced" else None, include_viewers=True, fetcher=fetch)
+
+backend/tests/test_market_collection_routing.py:34:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend/alerts/market.py:543: in once
+    payload = fetch(source, provider_symbol, start, end)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = ('composite', 'EURUSD', None, None), kwargs = {}
+
+    def fetch(*args, **kwargs):
+        calls.append(args)
+>       raise AssertionError("composite reached an ordinary supplier")
+E       AssertionError: composite reached an ordinary supplier
+
+backend/tests/test_market_collection_routing.py:33: AssertionError
+____________ test_composite_never_reaches_ordinary_supplier[forced] ____________
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f2a7c251b10>
+demand = 'forced'
+
+    @pytest.mark.parametrize("demand", ["chart", "plan", "viewport", "expired", "forced", "enabled"])
+    def test_composite_never_reaches_ordinary_supplier(database, monkeypatch, demand):
+        now = 1791690000000
+        monkeypatch.setattr(market, "now_ms", lambda: now)
+        ident = "MC:routing-test:EURUSD"
+        with database.begin() as db:
+            for inst in db.scalars(select(Instrument)):
+                inst.enabled = False
+            db.add(Instrument(id=ident, label="Composite", source="composite", symbol="EURUSD",
+                basis="bid", calendar="ny17", precision=5, enabled=demand == "enabled"))
+            if demand == "chart":
+                db.add(MarketDemand(id="chart", instrument_id=ident, expires=now + 60000))
+            elif demand == "plan":
+                db.add(ChartHistoryPlan(instrument_id=ident, target_start=0, target_end=60000,
+                    realtime_enabled=True))
+            elif demand in ("viewport", "expired"):
+                db.add(ChartViewportDemand(id="viewport", instrument_id=ident, timeframe="M1",
+                    start=0, end=60000, warm_start=0, focused=True,
+                    expires=now + (60000 if demand == "viewport" else -1)))
+        calls = []
+        def fetch(*args, **kwargs):
+            calls.append(args)
+            raise AssertionError("composite reached an ordinary supplier")
+>       market.once(symbol=ident if demand == "forced" else None, include_viewers=True, fetcher=fetch)
+
+backend/tests/test_market_collection_routing.py:34:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend/alerts/market.py:543: in once
+    payload = fetch(source, provider_symbol, start, end)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = ('composite', 'EURUSD', None, None), kwargs = {}
+
+    def fetch(*args, **kwargs):
+        calls.append(args)
+>       raise AssertionError("composite reached an ordinary supplier")
+E       AssertionError: composite reached an ordinary supplier
+
+backend/tests/test_market_collection_routing.py:33: AssertionError
+___________ test_composite_never_reaches_ordinary_supplier[enabled] ____________
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f2a7c4e8e10>
+demand = 'enabled'
+
+    @pytest.mark.parametrize("demand", ["chart", "plan", "viewport", "expired", "forced", "enabled"])
+    def test_composite_never_reaches_ordinary_supplier(database, monkeypatch, demand):
+        now = 1791690000000
+        monkeypatch.setattr(market, "now_ms", lambda: now)
+        ident = "MC:routing-test:EURUSD"
+        with database.begin() as db:
+            for inst in db.scalars(select(Instrument)):
+                inst.enabled = False
+            db.add(Instrument(id=ident, label="Composite", source="composite", symbol="EURUSD",
+                basis="bid", calendar="ny17", precision=5, enabled=demand == "enabled"))
+            if demand == "chart":
+                db.add(MarketDemand(id="chart", instrument_id=ident, expires=now + 60000))
+            elif demand == "plan":
+                db.add(ChartHistoryPlan(instrument_id=ident, target_start=0, target_end=60000,
+                    realtime_enabled=True))
+            elif demand in ("viewport", "expired"):
+                db.add(ChartViewportDemand(id="viewport", instrument_id=ident, timeframe="M1",
+                    start=0, end=60000, warm_start=0, focused=True,
+                    expires=now + (60000 if demand == "viewport" else -1)))
+        calls = []
+        def fetch(*args, **kwargs):
+            calls.append(args)
+            raise AssertionError("composite reached an ordinary supplier")
+>       market.once(symbol=ident if demand == "forced" else None, include_viewers=True, fetcher=fetch)
+
+backend/tests/test_market_collection_routing.py:34:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend/alerts/market.py:543: in once
+    payload = fetch(source, provider_symbol, start, end)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = ('composite', 'EURUSD', None, None), kwargs = {}
+
+    def fetch(*args, **kwargs):
+        calls.append(args)
+>       raise AssertionError("composite reached an ordinary supplier")
+E       AssertionError: composite reached an ordinary supplier
+
+backend/tests/test_market_collection_routing.py:33: AssertionError
+_ test_composite_demand_still_routes_to_exact_target_and_old_error_is_cleared_once _
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f2a7c4f8fd0>
+
+    def test_composite_demand_still_routes_to_exact_target_and_old_error_is_cleared_once(database, monkeypatch):
+        from alerts import live_pricing
+        from alerts.config import settings
+        from alerts.storage import MarketComposite, MarketDataset
+        from test_market_usage import ready
+
+        composite_id, ticker = ready(database, monkeypatch)
+        with database.begin() as db:
+            inst = db.get(Instrument, ticker)
+            inst.quality, inst.error = "error", "Unknown source: composite"
+            db.add(MarketDemand(id="live-chart", instrument_id=ticker, expires=market.now_ms()+60000))
+            baseline = db.get(MarketComposite, composite_id).active_revision_id
+            datasets = [(d.id, d.identity) for d in db.scalars(select(MarketDataset))]
+        before = live_pricing.desired_datasets(settings.oanda_account_id)
+        calls = []
+>       market.once(symbol=ticker, include_viewers=True, fetcher=lambda *a: calls.append(a))
+
+backend/tests/test_market_collection_routing.py:56:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend/alerts/market.py:547: in once
+    queue_recovery(db, inst, payload)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+db = <sqlalchemy.orm.session.Session object at 0x7f2a77aee910>
+instrument = <alerts.storage.Instrument object at 0x7f2a7797a810>
+payload = None, received_at = None
+
+    def queue_recovery(db, instrument, payload, received_at=None):
+        """Repair inter-window and internal gaps, excluding certified sparse OANDA spans."""
+        cutoff = ((received_at if received_at is not None else now_ms()) - 5000) // 60000 * 60000
+        incoming = sorted(
+>           {int(r["timestamp"]) for r in payload["rows"] if int(r["timestamp"]) + 60000 <= cutoff}
+                                          ^^^^^^^^^^^^^^^
+        )
+E       TypeError: 'NoneType' object is not subscriptable
+
+backend/alerts/market.py:412: TypeError
+__________ test_composite_history_jobs_are_not_created_or_dispatched ___________
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f2a77fc16d0>
+
+    def test_composite_history_jobs_are_not_created_or_dispatched(database, monkeypatch):
+        monkeypatch.setattr(market.settings, "initial_history_days", 1)
+        ident = "MC:history-test:EURUSD"
+        with database.begin() as db:
+            for inst in db.scalars(select(Instrument)):
+                inst.enabled = False
+            db.add(Instrument(id=ident, label="Composite", source="composite", symbol="EURUSD",
+                basis="bid", calendar="ny17", precision=5, enabled=True))
+            db.flush()
+>           assert market.queue_initial_history(db, end=172800000) == 0
+E           assert 2 == 0
+E            +  where 2 = <function queue_initial_history at 0x7f2a7c7fd3a0>(<sqlalchemy.orm.session.Session object at 0x7f2a7c316f10>, end=172800000)
+E            +    where <function queue_initial_history at 0x7f2a7c7fd3a0> = market.queue_initial_history
+
+backend/tests/test_market_collection_routing.py:79: AssertionError
+_________________ test_unrelated_composite_error_is_preserved __________________
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+
+    def test_unrelated_composite_error_is_preserved(database):
+        ident = "MC:other-error:EURUSD"
+        with database.begin() as db:
+            db.add(Instrument(id=ident, label="Composite", source="composite", symbol="EURUSD",
+                basis="bid", calendar="ny17", precision=5, enabled=False,
+                quality="error", error="preparation failed"))
+        market.once(symbol=ident, include_viewers=True)
+        with database.begin() as db:
+>           assert db.get(Instrument, ident).error == "preparation failed"
+E           AssertionError: assert 'Unknown source: composite' == 'preparation failed'
+E
+E             - preparation failed
+E             + Unknown source: composite
+
+backend/tests/test_market_collection_routing.py:92: AssertionError
+_______ test_explicit_binance_direct_mode_does_not_change_other_sources ________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f2a77822b10>
+
+    def test_explicit_binance_direct_mode_does_not_change_other_sources(monkeypatch):
+        from alerts.config import Settings
+        monkeypatch.setenv("ALERTS_MARKET_PROXY", "http://common-proxy:7890")
+        monkeypatch.setenv("ALERTS_BINANCE_PROXY", "http://dedicated-proxy:7890")
+        monkeypatch.setenv("ALERTS_BINANCE_CONNECTION_MODE", "direct")
+        settings = Settings(_env_file=None)
+>       assert settings.effective_binance_proxy == ""
+E       AssertionError: assert 'http://dedicated-proxy:7890' == ''
+E
+E         + http://dedicated-proxy:7890
+
+backend/tests/test_providers.py:79: AssertionError
+__________ test_binance_transient_eof_retries_once_and_preserves_data __________
+
+caplog = <_pytest.logging.LogCaptureFixture object at 0x7f2a7435c850>
+
+    def test_binance_transient_eof_retries_once_and_preserves_data(caplog):
+        calls = []
+        def response(request):
+            calls.append(request)
+            if len(calls) == 1:
+                raise httpx.ConnectError("[SSL: UNEXPECTED_EOF_WHILE_READING] test", request=request)
+            return httpx.Response(200, json=[[60000,"10.12345678","12","9","11","4"]])
+        with httpx.Client(transport=httpx.MockTransport(response)) as client:
+>           result = fetch_binance(start="1970-01-01T00:01:00Z", end="1970-01-01T00:02:00Z", client=client)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend/tests/test_providers.py:92:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend/alerts/providers.py:47: in fetch_binance
+    response = client.get(
+../../miniforge3/envs/planck/lib/python3.11/site-packages/httpx/_client.py:1053: in get
+    return self.request(
+../../miniforge3/envs/planck/lib/python3.11/site-packages/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniforge3/envs/planck/lib/python3.11/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+../../miniforge3/envs/planck/lib/python3.11/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+../../miniforge3/envs/planck/lib/python3.11/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniforge3/envs/planck/lib/python3.11/site-packages/httpx/_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniforge3/envs/planck/lib/python3.11/site-packages/httpx/_transports/mock.py:24: in handle_request
+    response = self.handler(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+request = <Request('GET', 'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1m&startTime=60000&endTime=119999&limit=1000')>
+
+    def response(request):
+        calls.append(request)
+        if len(calls) == 1:
+>           raise httpx.ConnectError("[SSL: UNEXPECTED_EOF_WHILE_READING] test", request=request)
+E           httpx.ConnectError: [SSL: UNEXPECTED_EOF_WHILE_READING] test
+
+backend/tests/test_providers.py:89: ConnectError
+_ test_binance_persistent_failure_is_bounded_and_certificate_failure_is_not_retried _
+
+    def test_binance_persistent_failure_is_bounded_and_certificate_failure_is_not_retried():
+        import ssl
+        for certificate, expected in [(False, 2), (True, 1)]:
+            calls = []
+            def failed(request):
+                calls.append(request)
+                cause = ssl.SSLCertVerificationError("test invalid certificate") if certificate else ssl.SSLEOFError("test eof")
+                raise httpx.ConnectError("[URL REDACTED]", request=request) from cause
+            with httpx.Client(transport=httpx.MockTransport(failed)) as client:
+                with pytest.raises(httpx.ConnectError):
+                    fetch_binance(client=client)
+>           assert len(calls) == expected
+E           AssertionError: assert 1 == 2
+E            +  where 1 = len([<Request('GET', 'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1m&startTime=1791684584764&endTime=1791691784763&limit=1000')>])
+
+backend/tests/test_providers.py:109: AssertionError
+=========================== short test summary info ============================
+FAILED backend/tests/test_market_collection_routing.py::test_composite_never_reaches_ordinary_supplier[chart]
+FAILED backend/tests/test_market_collection_routing.py::test_composite_never_reaches_ordinary_supplier[plan]
+FAILED backend/tests/test_market_collection_routing.py::test_composite_never_reaches_ordinary_supplier[viewport]
+FAILED backend/tests/test_market_collection_routing.py::test_composite_never_reaches_ordinary_supplier[forced]
+FAILED backend/tests/test_market_collection_routing.py::test_composite_never_reaches_ordinary_supplier[enabled]
+FAILED backend/tests/test_market_collection_routing.py::test_composite_demand_still_routes_to_exact_target_and_old_error_is_cleared_once
+FAILED backend/tests/test_market_collection_routing.py::test_composite_history_jobs_are_not_created_or_dispatched
+FAILED backend/tests/test_market_collection_routing.py::test_unrelated_composite_error_is_preserved
+FAILED backend/tests/test_providers.py::test_explicit_binance_direct_mode_does_not_change_other_sources
+FAILED backend/tests/test_providers.py::test_binance_transient_eof_retries_once_and_preserves_data
+FAILED backend/tests/test_providers.py::test_binance_persistent_failure_is_bounded_and_certificate_failure_is_not_retried
+11 failed, 9 passed in 2.99s

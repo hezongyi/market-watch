@@ -1,0 +1,45 @@
+{
+  "pr": "https://github.com/hezongyi/market-watch/pull/36",
+  "date_local": "2026-10-11",
+  "host": "quant-server",
+  "environment": "Ubuntu local Docker",
+  "task": "mw-price-rounding-review-20261011",
+  "project": "mw-price-rounding-review-20261011",
+  "builder": "market-watch-ubuntu",
+  "api_image_id": "sha256:4a57ce029e2aa3798ec4cad14274351c732c665d3901bd85b3a42e118fbd046b",
+  "web_image_id": "sha256:503adbc370e967a6c17a473491755f9fdb831a2e7e34e06f6b16011f6b03b3e4",
+  "images_built_from_dirty_worktree": true,
+  "host_regression": {"passed": 206, "seconds": 59.48},
+  "container_postgres_regression": {
+    "passed": 34,
+    "seconds": 79.80,
+    "modules": ["test_history_price_rules_postgres", "test_history_maintenance_postgres", "test_history_artifacts_postgres", "test_source_history_store_postgres"],
+    "warnings": ["Non-root pytest could not write cache; assertions passed"],
+    "isolated_schema_per_test": true,
+    "new_price_rules_test_copied_after_build": true
+  },
+  "health": {"api": "ready", "web_proxy": "ready", "native_bundle_http_status": 200},
+  "web_build": "TypeScript and Vite passed",
+  "browser": {
+    "engine": "Chromium via Playwright",
+    "loaded_assets": "Compiled bundle served by Ubuntu web container",
+    "api_data": "Controlled fixture; no supplier or complete chart E2E",
+    "widths": [1280, 390],
+    "checks_passed": ["Creation rounding explanation", "Frozen precision 5 version explanation", "Legacy version explanation", "No page horizontal overflow"],
+    "page_errors": []
+  },
+  "limitations": ["Full backend suite not completed", "Production task continuation and publication not performed", "No new independent price string length, significant digit count or absolute exponent bounds"],
+  "retirement": {
+    "restore_verified": true,
+    "verified_databases": ["postgres", "price_rounding"],
+    "price_rounding_tables_verified": 87,
+    "verification": "Actual restore, table row counts and content fingerprints matched; source stability rechecked",
+    "containers_removed": 4,
+    "volumes_removed": ["mw-price-rounding-review-20261011_postgres-data"],
+    "networks_removed": 1,
+    "task_image_refs_removed": ["market-watch-api:mw-price-rounding-review-20261011", "market-watch-web:mw-price-rounding-review-20261011"],
+    "private_archive": "~/.local/share/market-watch-docker/archives/mw-price-rounding-review-20261011-20261010T205849-c2824dda",
+    "completed_at_utc": "2026-10-10T21:00:48.724571+00:00"
+  },
+  "production_operations": false
+}

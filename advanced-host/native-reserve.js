@@ -5,13 +5,16 @@ const MWNativeReserve = (() => {
   const retries = new WeakMap(), caches = new WeakMap();
   const purgeObservers = new WeakSet();
   const key = (symbol, resolution) => `${symbol}|${resolution}`;
+  const sameSeries = (left, right) => typeof MWSeries === 'undefined' ? left === right : MWSeries.same(left,right);
   let transport, calculationPrefix = () => 0;
   const enabled = globalThis.MW_NATIVE_RESERVE_ENABLED !== false &&
     new URLSearchParams(location.search).get('native_reserve') !== 'off';
   const now = () => performance.now();
   const threadKey = t => globalThis.MWNativeNavigation?.threadKey(t._symbolInfo, t._resolution) || key(t._symbolInfo?.ticker || t._symbolInfo?.name, t._resolution);
   const identity = m => globalThis.MWNativeNavigation?.modelKey(m) || key(m.mainSeries().symbol(), m.interval());
-  const provider = symbol => typeof symbol === 'string' && symbol.startsWith('MWP:');
+  const provider = symbol => typeof symbol === 'string' &&
+    (typeof MWSeries === 'undefined' ? symbol.startsWith('MWP:') :
+      ['provider','history','composite'].includes(MWSeries.decode(symbol).series_kind));
   function retryState(thread) {
     // Native reset/purge reuses the thread but replaces its cache object.
     // Keep retries and terminal state scoped to that cache generation.
@@ -103,7 +106,7 @@ const MWNativeReserve = (() => {
       thread._cache === cache && thread._cache.bars[0]?.time === before && !thread._requesting;
     const flight = (async () => {
       try {
-        const result = await transport({symbol, resolution, window:thread._symbolInfo.mw_window, before:requestBefore,
+        const result = await transport({symbol, resolution, current, window:thread._symbolInfo.mw_window, before:requestBefore,
           screen_bars: g.screen, batch_screens: mode.batch, warmup_bars: warmup});
         if (!current()) return;
         if (now() - started >= 800)
@@ -175,7 +178,7 @@ const MWNativeReserve = (() => {
       if (!enabled || !provider(info.ticker || info.name)) return 0;
       let extra = 0;
       for (const [m, state] of models) {
-        if (m.mainSeries().symbol() !== (info.ticker || info.name) || m.interval() !== resolution ||
+        if (!sameSeries(m.mainSeries().symbol(), info.ticker || info.name) || m.interval() !== resolution ||
             (globalThis.MWNativeNavigation && identity(m) !== MWNativeNavigation.threadKey(info, resolution))) continue;
         const g = geometry(m);
         if (g) extra = Math.max(extra, Math.ceil(g.screen * (state.batch || 1)));
@@ -189,7 +192,7 @@ const MWNativeReserve = (() => {
         (thread._endOfData ? 0 : calculationPrefix(info.ticker || info.name, res))));
     },
     delivered(info, resolution, duration) {
-      for (const [m, state] of models) if (m.mainSeries().symbol() === (info.ticker || info.name) && m.interval() === resolution &&
+      for (const [m, state] of models) if (sameSeries(m.mainSeries().symbol(), info.ticker || info.name) && m.interval() === resolution &&
         (!globalThis.MWNativeNavigation || identity(m) === MWNativeNavigation.threadKey(info, resolution))) {
         if (duration >= 800) state.enhancedUntil = now() + 10000;
         schedule(m);
@@ -201,6 +204,7 @@ const MWNativeReserve = (() => {
       to:t._cache.bars.length ? t._dealignTime(t._cache.bars.at(-1).time) : undefined,
     })),
     enabled: () => enabled,
+    eligible: info => provider(info?.ticker || info?.name),
     diagnostics: () => ({models: [...models].map(([m, state]) => ({symbol: m.mainSeries().symbol(),
       resolution: m.interval(), state: {...state, ...retries.get(threads.get(identity(m)))}, geometry: (() => {const g = geometry(m);
         return g && {screen:g.screen, reserve:g.reserve,

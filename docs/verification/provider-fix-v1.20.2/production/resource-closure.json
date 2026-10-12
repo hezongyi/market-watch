@@ -1,0 +1,64 @@
+{
+  "at": "2026-10-11T06:00:13.201762+00:00",
+  "status": "complete",
+  "environment": "Ubuntu quant-server; local Docker",
+  "free_before_gib_approx": 7.7,
+  "free_after_bytes": 13413232640,
+  "free_after_gib": 12.49,
+  "retired_projects": [
+    {
+      "task": "mw-v1202-restore-20261011",
+      "project": "mw-v1202-restore-20261011",
+      "completed_at": "2026-10-11T05:54:55.660098+00:00",
+      "archive": "/home/quant/.local/share/market-watch-docker/archives/mw-v1202-restore-20261011-20261011T055431-f7661e7a",
+      "removed_containers": 1,
+      "removed_volumes": [
+        "mw-v1202-restore-20261011_pg"
+      ],
+      "actual_restore_verified": true,
+      "backed_up_databases": [
+        {
+          "database": "postgres",
+          "sha256": "b54869062e1f29cece9daabea3e97c28e6576fc24fa762da788810e26e646187",
+          "tables": 0
+        },
+        {
+          "database": "restore_admin",
+          "sha256": "b834c930bac53a11ab820e2646b99d2880174e6d6148a93c5b059b854ebc5d93",
+          "tables": 0
+        }
+      ]
+    },
+    {
+      "task": "mw-provider-fix-20261011",
+      "project": "mw-provider-fix-20261011",
+      "completed_at": "2026-10-11T05:57:39.157284+00:00",
+      "archive": "/home/quant/.local/share/market-watch-docker/archives/mw-provider-fix-20261011-20261011T055552-e1ba029d",
+      "removed_containers": 11,
+      "removed_volumes": [
+        "mw-provider-fix-20261011_postgres-data"
+      ],
+      "actual_restore_verified": true,
+      "backed_up_databases": [
+        {
+          "database": "postgres",
+          "sha256": "7bbf1b034f89173a45b67d2de6ff659a51c50d6bde380070f0c4af9b263863a1",
+          "tables": 0
+        },
+        {
+          "database": "provider_fix",
+          "sha256": "f77d065cfecf756658d7d3efa2480178313a711f52ba7cae771cf12efc6081cb",
+          "tables": 87
+        }
+      ]
+    }
+  ],
+  "other_containers_preserved": 77,
+  "other_container_identity_and_state_matches": true,
+  "official_and_rollback_images_retained": true,
+  "official_remote_backups_retained": true,
+  "global_prune_used": false,
+  "partition_or_disk_changed": false,
+  "private_archives_not_committed": true,
+  "previous_low_disk_failures_retained": true
+}

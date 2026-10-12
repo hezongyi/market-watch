@@ -1,0 +1,18 @@
+{
+  "ubuntu_restore_task": {
+    "task": "mw-v1200-restore-20261011",
+    "project": "mw-v1200-restore-20261011",
+    "purpose": "acceptance",
+    "created_at": "2026-10-11T01:48:41.344257+00:00",
+    "completed_at": "2026-10-11T01:59:34.702057+00:00",
+    "retained_images": []
+  },
+  "restore_project_removed": true,
+  "private_config_extraction_removed": true,
+  "production_cron": "0 3 * * * /mnt/user/appdata/market-watch/deploy/unraid-backup.sh >> /mnt/user/backup/market-watch/latest-run.log 2>&1",
+  "production_temp_archives_pending_removal": false,
+  "production_temp_archives_removed": true,
+  "completed_migration_container_removed": true,
+  "old_production_images_and_rollback_retained": true,
+  "no_unraid_test_instance_created": true
+}

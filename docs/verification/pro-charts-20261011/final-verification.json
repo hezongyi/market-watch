@@ -1,0 +1,1529 @@
+{
+  "checked_at_utc": "2026-10-12T00:38:51.463910+00:00",
+  "scope": "Final integrity audit of existing Ubuntu acceptance evidence; browser syntax checks only, no functional reruns or supplier throughput claim",
+  "host": "quant-server",
+  "project": "mw-pro-charts-20261011",
+  "services": [
+    {
+      "container_id": "51b4b19c55470148bcbb685719b37a6446e05049f450d154930f38371e017887",
+      "name": "mw-pro-charts-20261011-api-1",
+      "image_id": "sha256:d795a4ecac6c3c52d196d0ad35d5fb0fce077bb74b0f6dc76aa9aa1677e8bb5c",
+      "state": "running",
+      "project": "mw-pro-charts-20261011",
+      "service": "api",
+      "health": "healthy"
+    },
+    {
+      "container_id": "ead7055681c004993832b34b474153cb51531653fb36839838b36daa57f39e21",
+      "name": "mw-pro-charts-20261011-chart-origin-1",
+      "image_id": "sha256:4ac66357d8794c32d160f756d7623d231575b3920e35e614446e9ebc944bf43a",
+      "state": "running",
+      "project": "mw-pro-charts-20261011",
+      "service": "chart-origin",
+      "health": null
+    },
+    {
+      "container_id": "80e655cea00ceee1ec673b2c8c210ef6671761ebb1640437cc15d74c42d4d198",
+      "name": "mw-pro-charts-20261011-market-worker-1",
+      "image_id": "sha256:d795a4ecac6c3c52d196d0ad35d5fb0fce077bb74b0f6dc76aa9aa1677e8bb5c",
+      "state": "running",
+      "project": "mw-pro-charts-20261011",
+      "service": "market-worker",
+      "health": null
+    },
+    {
+      "container_id": "e2668350b17e2de75c429a1aa31a591923178f45f2fe651d6a2d921324e761c4",
+      "name": "mw-pro-charts-20261011-native-worker-1",
+      "image_id": "sha256:d795a4ecac6c3c52d196d0ad35d5fb0fce077bb74b0f6dc76aa9aa1677e8bb5c",
+      "state": "running",
+      "project": "mw-pro-charts-20261011",
+      "service": "native-worker",
+      "health": null
+    },
+    {
+      "container_id": "cf88f7498a21a84eb53439d63e5986fff2e93fdc8998509ec964d3bcf6ac8e6e",
+      "name": "mw-pro-charts-20261011-pg-1",
+      "image_id": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "state": "running",
+      "project": "mw-pro-charts-20261011",
+      "service": "pg",
+      "health": "healthy"
+    },
+    {
+      "container_id": "676f8291128fd710cbc11a376d072d1e24f39237373d9e5580e239db9753b6ba",
+      "name": "mw-pro-charts-20261011-ui-probe-1",
+      "image_id": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "state": "running",
+      "project": "mw-pro-charts-20261011",
+      "service": "ui-probe",
+      "health": null
+    },
+    {
+      "container_id": "a56e6e9bc7111babf8e25b26d8f341716dd51bbd524041b701f44aecc3f3d9c7",
+      "name": "mw-pro-charts-20261011-web-1",
+      "image_id": "sha256:9882ca3f995170f3fd0c914bb4501dce1d2ad470e79a66b04f6ebbdca0bf9443",
+      "state": "running",
+      "project": "mw-pro-charts-20261011",
+      "service": "web",
+      "health": null
+    }
+  ],
+  "runtime_manifest_matches": true,
+  "http": [
+    {
+      "url": "http://localhost:19997/advanced-charts",
+      "status": 200
+    },
+    {
+      "url": "http://localhost:19998/",
+      "status": 200
+    }
+  ],
+  "source_manifest": {
+    "count": 42,
+    "hashes_match": true,
+    "api_history_artifacts_hash_matches": true,
+    "api_history_artifacts_sha256": "9ed16d19c0202a3d2530512f7dd24c44755bfef38c8ceddd064f05be1975f90a"
+  },
+  "browser": {
+    "report_count": 20,
+    "case_count": 119,
+    "reports": [
+      {
+        "file": "browser-alert-subtitle.json",
+        "sha256": "ba68b635d4ec7fd0fee7820a247293e30ebc2e9a16c4fc51cfd417d65689dd8d",
+        "passed": true,
+        "case_count": 4,
+        "errors": [],
+        "failed_cases": []
+      },
+      {
+        "file": "browser-alerts.json",
+        "sha256": "57180e54d34a714ffc442cdb29d05bdca7c5cf5ded6f12e9483bb01ae1fcce0e",
+        "passed": true,
+        "case_count": 9,
+        "errors": [],
+        "failed_cases": []
+      },
+      {
+        "file": "browser-consumers.json",
+        "sha256": "9118c4fbe8eeacc8856d68cfc0de62d6b71831b133de94549e905e076072bb9d",
+        "passed": true,
+        "case_count": 2,
+        "errors": [],
+        "failed_cases": []
+      },
+      {
+        "file": "browser-data-center.json",
+        "sha256": "a9a439a09fad8f8e7b6b7bcd2c95a70f01e06fb1e84a7f35b2ee0d6cf2fa693d",
+        "passed": true,
+        "case_count": 5,
+        "errors": [],
+        "failed_cases": []
+      },
+      {
+        "file": "browser-derive-progress.json",
+        "sha256": "153952a2e712cfd57e86edd905cf0a1c970e740503f09b1196d19b88b0cb44ec",
+        "passed": true,
+        "case_count": 3,
+        "errors": [],
+        "failed_cases": []
+      },
+      {
+        "file": "browser-drawing-association.json",
+        "sha256": "4c92c5bb555707fd949fd8cd78479f5c317ab270dc0faa4fec858667517ce4d9",
+        "passed": true,
+        "case_count": 6,
+        "errors": [],
+        "failed_cases": []
+      },
+      {
+        "file": "browser-drawings.json",
+        "sha256": "89e25029df03c0e2fabd3134654c3e2273ed6f1dd207d34f88a18d99e7d0ddbc",
+        "passed": true,
+        "case_count": 10,
+        "errors": [],
+        "failed_cases": []
+      },
+      {
+        "file": "browser-full-stack.json",
+        "sha256": "8cf79522243b417c511f90c5252d9bba7f75481c71522cdb85294a230003ad75",
+        "passed": true,
+        "case_count": 1,
+        "errors": [],
+        "failed_cases": []
+      },
+      {
+        "file": "browser-indicators.json",
+        "sha256": "856c07ad6c6365e8a897e0258771e86373104b7f596ee88673e15ac22c2b2703",
+        "passed": true,
+        "case_count": 2,
+        "errors": [],
+        "failed_cases": []
+      },
+      {
+        "file": "browser-lifecycle.json",
+        "sha256": "cc0c0fce40f68285c15e98ffa2197bc0a876b5b1407ae7cdbc42489a7af5496e",
+        "passed": true,
+        "case_count": 3,
+        "errors": [],
+        "failed_cases": []
+      },
+      {
+        "file": "browser-mobile.json",
+        "sha256": "b55a264e227aa1449599d859368d0f2f529ced89d2db8d8835f45324553c11c2",
+        "passed": true,
+        "case_count": 2,
+        "errors": [],
+        "failed_cases": []
+      },
+      {
+        "file": "browser-native-zoom.json",
+        "sha256": "d5c9327349c97462dc4d29e1fe7b76dcb0dac9e74de6214af19201aa952c9bda",
+        "passed": true,
+        "case_count": 6,
+        "errors": [],
+        "failed_cases": []
+      },
+      {
+        "file": "browser-notifications.json",
+        "sha256": "9f41952b8e1b03f01a34aab69218a1ce25f5acae7d940448522c86f266bac1d6",
+        "passed": true,
+        "case_count": 3,
+        "errors": [],
+        "failed_cases": []
+      },
+      {
+        "file": "browser-operation-hints.json",
+        "sha256": "3f59befd1775f768d530547d3c705fab4e58657882411deb226147aab2405af1",
+        "passed": true,
+        "case_count": 14,
+        "errors": [],
+        "failed_cases": []
+      },
+      {
+        "file": "browser-presentation.json",
+        "sha256": "1e6dde92629f3367cafa9d57978102f7e1d71f2c004eae5e486314748928c765",
+        "passed": true,
+        "case_count": 13,
+        "errors": [],
+        "failed_cases": []
+      },
+      {
+        "file": "browser-reserve-fencing.json",
+        "sha256": "97e80a3596149d3639ec9e30a7af6f5083df9ad1baac080905b11ad8544cd30a",
+        "passed": true,
+        "case_count": 4,
+        "errors": [],
+        "failed_cases": []
+      },
+      {
+        "file": "browser-reserve-indicator.json",
+        "sha256": "77d0932075eb12e3690a1cf403ead310ac7aecde037cd6c8238ae74a34240898",
+        "passed": true,
+        "case_count": 2,
+        "errors": [],
+        "failed_cases": []
+      },
+      {
+        "file": "browser-reserve-performance.json",
+        "sha256": "1d4517d8afd56a90e7706d25e72b65aa5ce0479da487b7f7b2fb3242df0f8ed0",
+        "passed": true,
+        "case_count": 12,
+        "errors": [],
+        "failed_cases": []
+      },
+      {
+        "file": "browser-reserve.json",
+        "sha256": "d615fcb6edc9af211a8a59a665c797b4c49bd9a3d9d5b68c7bab1463e2a7267d",
+        "passed": true,
+        "case_count": 13,
+        "errors": [],
+        "failed_cases": []
+      },
+      {
+        "file": "browser-revision-consumers.json",
+        "sha256": "91e57cf4c315efc8280a104944de02901346b667554f66b1eb4dbc55aaaf3c98",
+        "passed": true,
+        "case_count": 5,
+        "errors": [],
+        "failed_cases": []
+      }
+    ],
+    "full_stack_latest_process_exit_code": 0,
+    "full_stack_http_error_responses": [],
+    "full_stack_request_cancellations": [
+      {
+        "failed": true,
+        "path": "/api/charts/stream/events",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "failed": true,
+        "path": "/api/market-data/quotes",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "failed": true,
+        "path": "/api/charts/stream/events",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "failed": true,
+        "path": "/api/charts/stream/events",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "failed": true,
+        "path": "/api/charts/stream/events",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "failed": true,
+        "path": "/api/market-data/quotes",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  "benchmark": {
+    "passed": true,
+    "isolated_schema_removed": true,
+    "observations": 2147763,
+    "buckets_compared": 2841385,
+    "seconds": 457.87250836892053,
+    "derivation_peak_rss_mib": 411.828125
+  },
+  "additional_contracts": {
+    "native_page_zoom": {
+      "passed": true,
+      "cases": 6,
+      "mechanism": "Chromium chrome.tabs.setZoom automatic per-origin page zoom; no Emulation overrides"
+    },
+    "reserve_frame_performance": {
+      "passed": true,
+      "cases": 12,
+      "pan_frame_p95_ms_range": [
+        16.700000000000728,
+        16.80000000000291
+      ],
+      "native_pan_call_p95_ms_range": [
+        0.40000009536743164,
+        1.5
+      ],
+      "controlled_900ms_background_reads": 8
+    },
+    "bounded_batch_prototype": {
+      "passed": true,
+      "cases": 36,
+      "input_minutes": 60000,
+      "calendars": [
+        "ny17",
+        "utc0"
+      ],
+      "all_fields_equal": true
+    }
+  },
+  "checks": {
+    "git_diff_check_passed": true,
+    "python_ast_files": 29,
+    "latest_browser_scripts_node_syntax": [
+      {
+        "file": "web/tests/pro-charts-derive-progress.browser.cjs",
+        "passed": true
+      },
+      {
+        "file": "web/tests/pro-charts-operation-hints.browser.cjs",
+        "passed": true
+      },
+      {
+        "file": "web/tests/pro-charts-revision-consumers.browser.cjs",
+        "passed": true
+      },
+      {
+        "file": "web/tests/pro-charts-isolated.browser.cjs",
+        "passed": true
+      },
+      {
+        "file": "web/tests/pro-charts-browser-zoom.browser.cjs",
+        "passed": true
+      },
+      {
+        "file": "web/tests/pro-charts-reserve-performance.browser.cjs",
+        "passed": true
+      },
+      {
+        "file": "web/tests/pro-charts-visual-capture.browser.cjs",
+        "passed": true
+      },
+      {
+        "file": "web/tests/pro-charts-alert-subtitle.browser.cjs",
+        "passed": true
+      },
+      {
+        "file": "web/tests/pro-charts-presentation.browser.cjs",
+        "passed": true
+      }
+    ],
+    "credential_pattern_hits_locations_only": [],
+    "unexpected_nontext_files": [],
+    "reviewed_png_evidence": [
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/before-contrast-light-03-alert-sidebar.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "b677c9911267e3e3ded0436e0f9eedded3d967c89347b1d43ab1b58ea139d63a"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/before-dark-03-alert-sidebar.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "5bddeff7d58dcd0e2dd8860d5002290a2989b716e5473fc7908b1e7cb8b1ba93"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/before-dark-04-alert-log.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "cba06308a0d17f6fc83dcac96af505da8fce452708b698e0348c076e06b37c47"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/before-light-03-alert-sidebar.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "733902f562a7e97cf48080287054dc07cd6968c3412408cb76c352e255ceb933"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/before-light-04-alert-log.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "98780efa64160108a43a4cc82262e590279d6df31cfabc94574ceaef777080f6"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/capture-attempt-3.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "68597c3358152e3e0d6a851b77eeb08e48f02cdd6bda34c48cb8c0e6a4552904"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-01-five-charts.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "b6cb6a75e62ebf6875b1e109f7aced648f2597e7f1157dbea7a0b144511ba036"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-02-symbol-details.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "e9e097376681d68dcbabf07015cce19bbdf77424a40c933ae821646b4e32b670"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-03-alert-expanded.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "cd3a44e126f7f2fbe02817d3c2520ad0388dd7e77969249c210be752057dbf96"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-03-alert-sidebar.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "6cf7dc2f7f9762ea5281aee7e81148b93f5b42d3d806e4f4eee73c4ae36f6fdd"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-04-alert-log-expanded.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "175c751c853d77633a1b9a570bbc9901de09f62eb07c5bce5efba6564aafb89d"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-04-alert-log.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "27848d2616cbc93f1bf02d86746019a5ea8bd0e3c12660a383b5994f7e8287a9"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-05-price-menu.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "95bafb44df88bd3b96d0527d3b3b6eb7c760d60a20ca18735734c7c5cd9f7cb2"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-06-price-alert-dialog.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "7687099bf31ff3bf970cac43230d81f714ce844c980222d3ace1f42706e89810"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-07-python-indicators.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "4103ca38dc0db2403a040cc958f8191c97fb8e2658a8159869a532a2a92b1666"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-08-python-indicator-detail.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "e4a71407f2892f9bb74b06c09c0236605fd84d3322e6d1ac5377d85ae685b77f"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-09-drawing-nine-periods.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "fd074960ce51444031a318d9436b4940b7d1015c634dc59ea4029fed537bc0d1"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-10-center-calendar.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "f6efa2e50bb8ca82a52fb5db0f2bc0f29413a2c1c7e16865da966b243cbe44e7"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-10-center-composite.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "3733199cdf3af87040a491ad655346041423ace5ddffe7241d8e7f274e63966c"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-10-center-managed.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "bb8d13ccec11dc5cb8e51e22826400e3da08eb6b1d2157c848004f51919727a7"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-10-center-platform.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "4b20ed30f3b5c042d4fa7a61bae1589d9560e1585962fdb208eccc3b3c90d9cf"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-10-center-sources.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "88853d1d322d6f18f524bc46356ba12ee696d218c9b770a0b3b3abaac65e132f"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-10-center-tasks.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "e92067d067a849781754128ed07d62e827760d120b527b277683e2828fc54910"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-11-calendar-bottom.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "218c54c61cb59949dc33616391fc7624e58232657179e068276e98a2b7cd8966"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-11-calendar-expanded.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "7005d33cd81a5706a502fabb7b9c2a98fbd7d84f50e3df7a2d2aa880c1b38a00"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-12-baseline-dropdown.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "10a12d8845b5049a684771bd98a6fbae2e27fdad6686c716a0dd33fdd136eefe"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-13-mapping-dropdown.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "8a5f3c9ebae76d83206e8cef1dbdd395dce1e76310fb41e50c76acdd2cf1ef71"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-14-target-dropdown.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "77384604a6975388b7438324913044683b1a2cd0f3603b71b3e8b2b614b20376"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-15-task-bottom.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "dff538ae324f2517a700d6a4871a5ec5f4147449c556356a53b1ce3cf8046cee"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-15-task-progress.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "427e8cc0192e626b928256f24daa74e9227c90d9eb022dc0aa10cf0aefc45f32"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-16-calendar-375.png",
+        "dimensions": [
+          375,
+          800
+        ],
+        "metadata_keys": [],
+        "sha256": "11420b90441a565d89ea7b5280976f451fe34793bbf7860e3f7be27477dcb3b0"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-16-calendar-768.png",
+        "dimensions": [
+          768,
+          800
+        ],
+        "metadata_keys": [],
+        "sha256": "e4d9da41dde64648084f893fb8cfc76ca9e016acf2bbf79f1e02a5bbbfe2fb24"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-16-calendar-bottom-375.png",
+        "dimensions": [
+          375,
+          800
+        ],
+        "metadata_keys": [],
+        "sha256": "1168fd26245ba7c3f9f0d9eed58b33c717a84c5ca8126ec6b007aa3875833a4d"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-16-calendar-bottom-768.png",
+        "dimensions": [
+          768,
+          800
+        ],
+        "metadata_keys": [],
+        "sha256": "3f35714714537651122480418e4cf4a47135e5c1237439a20c275493523498e9"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-17-platform-375.png",
+        "dimensions": [
+          375,
+          800
+        ],
+        "metadata_keys": [],
+        "sha256": "b62713e48a73cb713f939fa2ec2797ad5092471bc50ceb53a6c17e4c2f23b3c3"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-17-platform-768.png",
+        "dimensions": [
+          768,
+          800
+        ],
+        "metadata_keys": [],
+        "sha256": "570e2755df8ceaa8012179aac8b28248e612389305efeab1128250568404c8a5"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-18-indicators-375.png",
+        "dimensions": [
+          375,
+          800
+        ],
+        "metadata_keys": [],
+        "sha256": "a19444a2bb9275dcf108a57dbcbb0d24c454b7082e4a44160275c7b08aa3fcdf"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-18-indicators-768.png",
+        "dimensions": [
+          768,
+          800
+        ],
+        "metadata_keys": [],
+        "sha256": "20fc5f9b2d92c6740fbe9a5e1e20aaa0c74af1847b2f039dc30ab136bddd99ce"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-19-indicator-detail-375.png",
+        "dimensions": [
+          375,
+          800
+        ],
+        "metadata_keys": [],
+        "sha256": "29ed4fe664bee6bad7aa72b54500951bb8b233a8f9c0fd089e41754a5183127e"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/dark-19-indicator-detail-768.png",
+        "dimensions": [
+          768,
+          800
+        ],
+        "metadata_keys": [],
+        "sha256": "11448065fbd50ad4b1f9b3b997dc2998fa42d2543ee7ad74afa69067598ea713"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-01-five-charts.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "bb51436faada33a8b8cb0249343f94ef0827048d646201add219a5288778416e"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-02-symbol-details.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "20cdfb497c001a461780a033473d81bb7af4c137d9f48ce382c68735a64ec4c9"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-03-alert-expanded.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "5b29e35dc116cfc5260d02f35c552b5a737135b6da82d7975a0a4b98e92371a3"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-03-alert-sidebar.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "5937d4c76b696cde649178aadf313a446c64fa463156697b930fbb6ea2ece8b5"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-04-alert-log-expanded.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "19e1f5128358068ed93a56968e7de60804166d8e9d7c9b4be4085981e0976e0e"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-04-alert-log.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "a8c7601b9c31f3ed1abaa73303eac4a9eb24f733b1226abfbdb1bfd149d0ca98"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-05-price-menu.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "c717118fd5bda08fe2338bd6a4c2fdf991e21702640e36a39b95b4e8dc4af36c"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-06-price-alert-dialog.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "b3ff4ad91e4298bc86f160312dc7701f77de93eaeee848543ea31b65930d83ba"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-07-python-indicators.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "f1f77713893d3116d201170a0c46f58b86f080b3889474b0251a5724335f74bb"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-08-python-indicator-detail.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "5885e87e4bb9146b26075de78a0b47ea6bdee2b9515955c993c615d746c60c01"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-09-drawing-nine-periods.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "0779e86e24c1fa8bc3cdbae26b1e1df9edacdb5ada3955b8ca4c0ea2f8247980"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-10-center-calendar.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "acfe53a7356415138fc811dc830bb683dd47db3213bbe31d813fdb2da9df70b4"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-10-center-composite.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "9c1aa2a629013df8a384b58d4227e7d6b89d8c3bcb305c88b314c101dd56b23a"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-10-center-managed.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "a621f70f387fbb3e6ae922ddbf41d49267c0ac2d0be6c0dfa6658b1045360b8d"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-10-center-platform.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "5058a853d458a67638a1045b09832da7ae0782bca65e267fc81d3e3ac9dd1d2f"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-10-center-sources.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "2a19ff0d0ba316567d7194ae49d9a8de67292f16e908173dfdfd9b33bbcca46d"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-10-center-tasks.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "db447811546e66828a12beef5de1067a0644a7b386318b909ecc95fad3232b86"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-11-calendar-bottom.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "831434d17b932a8535ab293cd2273ccc5bebec19aad51476dc705157792d3948"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-11-calendar-expanded.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "a3e567d49e71ebc2f96e9f6b1ab308d95c01f572698491d26baa61f04bdee971"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-12-baseline-dropdown.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "58744cadd051045522277ec6c5ff16a29917b9116b80c04809c018cd1908605a"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-13-mapping-dropdown.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "8ef661bc799fe3d2df0de5cd856872e2b19ca6a2e288e58ba4c0345f48ec57be"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-14-target-dropdown.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "d5babc34047d4c8743f4dd83f6dcc9b35ebc2e94a2e937c58ffb5c8f44d29b22"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-15-task-bottom.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "4c2b0205a1be639e1b834d6d558d36952641d95b64287ffa56400d9ba1618a21"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-15-task-progress.png",
+        "dimensions": [
+          1600,
+          1000
+        ],
+        "metadata_keys": [],
+        "sha256": "85d43da023510780d1bc1fa3f4baff4a3364b96294773e3fa4aa91edb15922d5"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-16-calendar-375.png",
+        "dimensions": [
+          375,
+          800
+        ],
+        "metadata_keys": [],
+        "sha256": "531a56126af668779ebd07bfa59fc14bfabab95201491cf229c3fb0a1a37d858"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-16-calendar-768.png",
+        "dimensions": [
+          768,
+          800
+        ],
+        "metadata_keys": [],
+        "sha256": "6977eae2784e2b5f9a068fbbfa70c33aab1ab5ef6cefff3c3b0650281e42d848"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-16-calendar-bottom-375.png",
+        "dimensions": [
+          375,
+          800
+        ],
+        "metadata_keys": [],
+        "sha256": "36dc2f657e0c2d27e456224c79afa971b433bb4e2419d6ffb6b70a4f4df9b8dd"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-16-calendar-bottom-768.png",
+        "dimensions": [
+          768,
+          800
+        ],
+        "metadata_keys": [],
+        "sha256": "b589e5350146ef03dc372b487f200703b47face004aa27563a76c334d5474433"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-17-platform-375.png",
+        "dimensions": [
+          375,
+          800
+        ],
+        "metadata_keys": [],
+        "sha256": "4269d3b39499f1df7b3caf010f2a9fa6ccf1cd521233db30f7ab515efff8a98f"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-17-platform-768.png",
+        "dimensions": [
+          768,
+          800
+        ],
+        "metadata_keys": [],
+        "sha256": "c67610c634c0f4f43300380eed12d72dcce76a785535faf2c39b35bea624bf86"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-18-indicators-375.png",
+        "dimensions": [
+          375,
+          800
+        ],
+        "metadata_keys": [],
+        "sha256": "3e402b8c7675f1b9814a00d107fd85e799922f47face901415f0046b59bb1294"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-18-indicators-768.png",
+        "dimensions": [
+          768,
+          800
+        ],
+        "metadata_keys": [],
+        "sha256": "69d85725d4e7f70ab93b5f57b0a9ed91a999ef4ce70f98975573a9990bdfc48b"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-19-indicator-detail-375.png",
+        "dimensions": [
+          375,
+          800
+        ],
+        "metadata_keys": [],
+        "sha256": "ab1d336b10840bf1ac396e604d3f2214c24fa8cbbb4492b280d57dad9ae497cb"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/light-19-indicator-detail-768.png",
+        "dimensions": [
+          768,
+          800
+        ],
+        "metadata_keys": [],
+        "sha256": "2282f16d982943a3b4d2b310e58dc007f55bb5cdb6bbeb0e30df38c72cab1033"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/mobile-readonly-375.png",
+        "dimensions": [
+          375,
+          812
+        ],
+        "metadata_keys": [],
+        "sha256": "43e0cad0cb2635be89067c2b90f52ac435c86150632e0f78df323d36194be4e6"
+      },
+      {
+        "file": "docs/verification/pro-charts-20261011/visual-acceptance/mobile-readonly-915.png",
+        "dimensions": [
+          915,
+          412
+        ],
+        "metadata_keys": [],
+        "sha256": "4fcb5063e4c7610349b813feed4ae5ce700bd5fcdc215ac94b0d8d0856d71e73"
+      }
+    ],
+    "license_resource_files": []
+  },
+  "visual_acceptance": {
+    "passed": true,
+    "screenshots": 70,
+    "review": "visual-acceptance/review.md",
+    "gallery": "visual-acceptance/index.html",
+    "capture_sha256": "a98fb0031f87db6cd0559b1a6719a145ce7fc294b75167283f548da6cb5b8cbc",
+    "review_sha256": "414866e5583837359cb74bd2a84a9974454f3d0530fe3304caa8b35b9afbf0b8",
+    "gallery_sha256": "fcdfdb9c11d95136265b509201888a65a2ef63f49c591decd6fd2e996f982dd3",
+    "findings": [
+      {
+        "id": "VA1",
+        "status": "fixed",
+        "problem": "Long source label clipped status by 19\u201360px and event time by 22px.",
+        "fix": "Shrink identity text with ellipsis; keep status/time visible; expiry may occupy an additional line.",
+        "before": "before-dark-03-alert-sidebar.png",
+        "after": "dark-03-alert-sidebar.png",
+        "red": "../alert-subtitle-red.json",
+        "green": "../browser-alert-subtitle.json"
+      },
+      {
+        "id": "VA2",
+        "status": "fixed",
+        "problem": "Light-theme status text contrast was 2.34\u20132.44:1.",
+        "fix": "Use dark green/ochre in light theme; measured minimum 5.003:1.",
+        "before": "before-contrast-light-03-alert-sidebar.png",
+        "after": "light-03-alert-sidebar.png",
+        "red": "../alert-subtitle-contrast-red.json",
+        "green": "../browser-alert-subtitle.json"
+      }
+    ],
+    "scope": "Task synthetic provider I/O; real API, PostgreSQL and licensed chart engine",
+    "physical_device_status": "user_owned_not_yet_verified"
+  },
+  "evidence_files": [
+    {
+      "file": "acceptance-decision.md",
+      "bytes": 1471,
+      "sha256": "ac6cc86bdf996e028d65b6c2c886a96011f3b0b850373ca6ee9e7bf7156e099d"
+    },
+    {
+      "file": "alert-api-green.txt",
+      "bytes": 98,
+      "sha256": "9ec88763ca7b1e87a2ba76c9669081800c3bf52d9f3da256103d558b923e173f"
+    },
+    {
+      "file": "alert-calendar-regression.txt",
+      "bytes": 100,
+      "sha256": "bef8da5dc3795dd38780d3fd51342459592c217d2cf16de37add7b50a899e294"
+    },
+    {
+      "file": "alert-final-regression.txt",
+      "bytes": 180,
+      "sha256": "c8a6c3838226ebcf82f521ca68270414927fcfc9bc0cda2fb6038721e8936e6b"
+    },
+    {
+      "file": "alert-price-green.txt",
+      "bytes": 34,
+      "sha256": "189b074780b0bed89bc388ad81760b380f9d07b96277c4b7f40bb8cab9e1b29f"
+    },
+    {
+      "file": "alert-price-red.txt",
+      "bytes": 915,
+      "sha256": "a0a74cead79b1e04ce58af289cc1b9304dd24d4c348b61b39ee08364561e492a"
+    },
+    {
+      "file": "alert-subtitle-contrast-red.json",
+      "bytes": 7524,
+      "sha256": "d0934462f3d180c08b2176a07a20e625f4081ea209ddbf437159256527d50fd1"
+    },
+    {
+      "file": "alert-subtitle-red.json",
+      "bytes": 5526,
+      "sha256": "296386bc1aec0d9c2fc44866c74a739daf430b65addfc149c6f7b1f404492461"
+    },
+    {
+      "file": "bridge-final-regression.txt",
+      "bytes": 2680,
+      "sha256": "065657c4c896b858aed36e97015088812846a86289954c98ed368e34bf48f4d2"
+    },
+    {
+      "file": "browser-alert-subtitle.json",
+      "bytes": 7446,
+      "sha256": "ba68b635d4ec7fd0fee7820a247293e30ebc2e9a16c4fc51cfd417d65689dd8d"
+    },
+    {
+      "file": "browser-alerts.json",
+      "bytes": 9200,
+      "sha256": "57180e54d34a714ffc442cdb29d05bdca7c5cf5ded6f12e9483bb01ae1fcce0e"
+    },
+    {
+      "file": "browser-consumers.json",
+      "bytes": 940,
+      "sha256": "9118c4fbe8eeacc8856d68cfc0de62d6b71831b133de94549e905e076072bb9d"
+    },
+    {
+      "file": "browser-data-center.json",
+      "bytes": 4906,
+      "sha256": "a9a439a09fad8f8e7b6b7bcd2c95a70f01e06fb1e84a7f35b2ee0d6cf2fa693d"
+    },
+    {
+      "file": "browser-derive-progress.json",
+      "bytes": 2985,
+      "sha256": "153952a2e712cfd57e86edd905cf0a1c970e740503f09b1196d19b88b0cb44ec"
+    },
+    {
+      "file": "browser-drawing-association.json",
+      "bytes": 1381,
+      "sha256": "4c92c5bb555707fd949fd8cd78479f5c317ab270dc0faa4fec858667517ce4d9"
+    },
+    {
+      "file": "browser-drawings.json",
+      "bytes": 2018,
+      "sha256": "89e25029df03c0e2fabd3134654c3e2273ed6f1dd207d34f88a18d99e7d0ddbc"
+    },
+    {
+      "file": "browser-full-stack.json",
+      "bytes": 6332,
+      "sha256": "8cf79522243b417c511f90c5252d9bba7f75481c71522cdb85294a230003ad75"
+    },
+    {
+      "file": "browser-indicators.json",
+      "bytes": 1314,
+      "sha256": "856c07ad6c6365e8a897e0258771e86373104b7f596ee88673e15ac22c2b2703"
+    },
+    {
+      "file": "browser-lifecycle.json",
+      "bytes": 119136,
+      "sha256": "cc0c0fce40f68285c15e98ffa2197bc0a876b5b1407ae7cdbc42489a7af5496e"
+    },
+    {
+      "file": "browser-mobile.json",
+      "bytes": 458,
+      "sha256": "b55a264e227aa1449599d859368d0f2f529ced89d2db8d8835f45324553c11c2"
+    },
+    {
+      "file": "browser-native-zoom.json",
+      "bytes": 4987,
+      "sha256": "d5c9327349c97462dc4d29e1fe7b76dcb0dac9e74de6214af19201aa952c9bda"
+    },
+    {
+      "file": "browser-notifications.json",
+      "bytes": 10979,
+      "sha256": "9f41952b8e1b03f01a34aab69218a1ce25f5acae7d940448522c86f266bac1d6"
+    },
+    {
+      "file": "browser-operation-hints.json",
+      "bytes": 9995,
+      "sha256": "3f59befd1775f768d530547d3c705fab4e58657882411deb226147aab2405af1"
+    },
+    {
+      "file": "browser-presentation.json",
+      "bytes": 7727,
+      "sha256": "1e6dde92629f3367cafa9d57978102f7e1d71f2c004eae5e486314748928c765"
+    },
+    {
+      "file": "browser-reserve-fencing.json",
+      "bytes": 1533,
+      "sha256": "97e80a3596149d3639ec9e30a7af6f5083df9ad1baac080905b11ad8544cd30a"
+    },
+    {
+      "file": "browser-reserve-indicator.json",
+      "bytes": 11738,
+      "sha256": "77d0932075eb12e3690a1cf403ead310ac7aecde037cd6c8238ae74a34240898"
+    },
+    {
+      "file": "browser-reserve-performance.json",
+      "bytes": 699001,
+      "sha256": "1d4517d8afd56a90e7706d25e72b65aa5ce0479da487b7f7b2fb3242df0f8ed0"
+    },
+    {
+      "file": "browser-reserve.json",
+      "bytes": 231972,
+      "sha256": "d615fcb6edc9af211a8a59a665c797b4c49bd9a3d9d5b68c7bab1463e2a7267d"
+    },
+    {
+      "file": "browser-revision-consumers.json",
+      "bytes": 13670,
+      "sha256": "91e57cf4c315efc8280a104944de02901346b667554f66b1eb4dbc55aaaf3c98"
+    },
+    {
+      "file": "calendar-green.txt",
+      "bytes": 99,
+      "sha256": "7f22c9d1bfdf3c01d5bbf4f8425b0c058e560db29769b3c44bfaef85b786b4e3"
+    },
+    {
+      "file": "completion-audit.md",
+      "bytes": 12825,
+      "sha256": "1de56fd3633d8c58b9913af15ecd685c151e5e8edab468d4b2628e6531696971"
+    },
+    {
+      "file": "compose.yaml",
+      "bytes": 2061,
+      "sha256": "ed03e3756d9daf8e7d974ae0a222ec1011b310420082aa9a431a7ce8c867a7df"
+    },
+    {
+      "file": "debug-progress-tasks.json",
+      "bytes": 2372,
+      "sha256": "5880b1d16ffa74277ba018e2c55347240c0423d87f0bfab882b3f52c198cd31d"
+    },
+    {
+      "file": "demand-green.txt",
+      "bytes": 100,
+      "sha256": "daa74cbda94d5737879c9de28f30973d1491fc46724ce36ec67248216639dbc0"
+    },
+    {
+      "file": "demand-red.txt",
+      "bytes": 3639,
+      "sha256": "a80280540267803373035a3407197b1f162c5f9ae3575c7944189929023e6a94"
+    },
+    {
+      "file": "derive-batch-decision.json",
+      "bytes": 1143,
+      "sha256": "6c1b4cda6f12fa79ef640fbdd5409232243d2719705dc6f67a05d700e27afc27"
+    },
+    {
+      "file": "derive-batch-equivalence.json",
+      "bytes": 18555,
+      "sha256": "5fc6a1e0d237ad8aac317d92e453061205e1939feb2964242c2cf502700b9d9c"
+    },
+    {
+      "file": "derive-batch-equivalence.py",
+      "bytes": 5479,
+      "sha256": "f1b2d266090598ff134a76d23125d626b089f3b657497a6b48cc31da3421a932"
+    },
+    {
+      "file": "derive-contract-10001.json",
+      "bytes": 8363,
+      "sha256": "b94b8663fe97943abc1a6c941d6d439503087908a2010a238a7765f29a6f4edf"
+    },
+    {
+      "file": "derive-contract-2147763.json",
+      "bytes": 8444,
+      "sha256": "40bb6714ed8208ed14f9a8666aeacbfb677a97eb171927c18c0b5f91e964b3ae"
+    },
+    {
+      "file": "derive-contract-benchmark.py",
+      "bytes": 11181,
+      "sha256": "0a3f3427de215bba70dfb7927b8d4202cc344c13c8d74c159118ed751c1a44da"
+    },
+    {
+      "file": "derive-end-to-end.json",
+      "bytes": 4225,
+      "sha256": "4cb29df7927eb6a815566da807d99c654e66402fcfccb9f4340070666588f497"
+    },
+    {
+      "file": "derive-end-to-end.py",
+      "bytes": 5893,
+      "sha256": "98c8101e8b769e7ec8b46241dd9e8e87dd819fe158f012b42a2bdeb2a06b8d49"
+    },
+    {
+      "file": "derive-eta-final.txt",
+      "bytes": 112,
+      "sha256": "0d94bbd31c4aa9be0b14d59acecc4922cd250d2e64d2ee5984f0dae3aaabba24"
+    },
+    {
+      "file": "derive-eta-green.txt",
+      "bytes": 110,
+      "sha256": "749ac8db28ecc0d0653d0488b649b5912c6ddf0241dd49c7255183d9e58211c1"
+    },
+    {
+      "file": "derive-eta-recovery-pg.txt",
+      "bytes": 99,
+      "sha256": "e53065b1871cd30be36dd203706dfcace442c6643ea305abc70d3f2d3609b441"
+    },
+    {
+      "file": "derive-eta-red.txt",
+      "bytes": 348,
+      "sha256": "e4fc24f8ab3620bd68f98ecfc2b0dd9b8d67d4e14fc39be2a9cfdb0c205373db"
+    },
+    {
+      "file": "derive-green.txt",
+      "bytes": 100,
+      "sha256": "2a7a275f0be8ff41717bc5b2ef36a9b23a612718d902184f1e6e19264f8e7bd0"
+    },
+    {
+      "file": "derive-progress-counters-green.txt",
+      "bytes": 99,
+      "sha256": "504119f8bdd352f500340dfde065e9efc74fadea053a6cab5e6e479a4851f7f9"
+    },
+    {
+      "file": "derive-progress-green.txt",
+      "bytes": 100,
+      "sha256": "6e966449d3ef188c803f54767301a0b0dc81df4931c0bd94e81ef5d5e243a61f"
+    },
+    {
+      "file": "derive-progress-runtime.py",
+      "bytes": 2856,
+      "sha256": "732c99604fda1782df0f34c26a74864befc26950977b70f3e0851ff9f085ec25"
+    },
+    {
+      "file": "derive-recovery-green.txt",
+      "bytes": 99,
+      "sha256": "1bb29079856433878b54b034e23118c489f137fa04b6052cf63329b6637f6084"
+    },
+    {
+      "file": "derive-red.txt",
+      "bytes": 1455,
+      "sha256": "d23cef0867b5a7c1c059a94291c35db7a7a1d5bd04f96b1c65c36ab8722cb410"
+    },
+    {
+      "file": "drawing-visibility-final.txt",
+      "bytes": 533,
+      "sha256": "b31c3ab45d4c2c68b6db03dc721d9119e3c116984b938a8623a11f373364f683"
+    },
+    {
+      "file": "drawing-visibility-green.txt",
+      "bytes": 533,
+      "sha256": "997d7eced5f580f4887b90f31013a9d1684bac677b17daa6cb494915ee55e8ec"
+    },
+    {
+      "file": "fixed-lifetime-green.txt",
+      "bytes": 115,
+      "sha256": "a87d5341e1c7ff113ea6f176087e48825814a576bc2b7f2960636f1ec31aee0e"
+    },
+    {
+      "file": "fixed-lifetime-red.txt",
+      "bytes": 316,
+      "sha256": "95a62b0773e82a622a0170c29dd7472b7d30d5eb18da027eec69439ecc6a387c"
+    },
+    {
+      "file": "fixture-runtime.py",
+      "bytes": 6402,
+      "sha256": "18fa07e5538bb14f93d46fc90ef35fc75c18efd1b403b32901677cd4117105a3"
+    },
+    {
+      "file": "history-recovery-green.txt",
+      "bytes": 100,
+      "sha256": "140a40bcde0044a3e6fced6ab3c36e2ced76d708efbd12ef4d211ac137eb4a92"
+    },
+    {
+      "file": "history-recovery-red.txt",
+      "bytes": 8796,
+      "sha256": "5b7bb965d091d721a647d1ab7b068241d44421cd556d2145487512f67b259930"
+    },
+    {
+      "file": "implementation-status.md",
+      "bytes": 14350,
+      "sha256": "fd2422ea72910350fb1f00245e34fe4530c4d9652ea948994f0829c6edd342f4"
+    },
+    {
+      "file": "import-publication-green.txt",
+      "bytes": 99,
+      "sha256": "3e203b0388053edd9d8bd3bb7c75b1608c77da162e8bc09761a80429bc52bfd4"
+    },
+    {
+      "file": "indicator-green.txt",
+      "bytes": 88,
+      "sha256": "b0ae2b518ae286e661f4936680f8e34baf2bf22db29dcf4688a86dab0eb58e53"
+    },
+    {
+      "file": "indicator-red.txt",
+      "bytes": 888,
+      "sha256": "86a422e7df9d0cd37686e06e120ba820bc80cd836b4d7195a4a6e719a01511a4"
+    },
+    {
+      "file": "mobile-device-availability.json",
+      "bytes": 1051,
+      "sha256": "21c0ccb388746b2f1d3491d22dda7f03fbdd9047b25077b3bef64aa0ea679c40"
+    },
+    {
+      "file": "mobile-physical-acceptance.md",
+      "bytes": 3470,
+      "sha256": "fed09e99c2d76dac231b773d9819c3985426dcfb49e79fd27db62bfa159a9876"
+    },
+    {
+      "file": "notification-identity-green.txt",
+      "bytes": 100,
+      "sha256": "87ffa6a066666f5aedc264f55de237837ca23cfe8d458e4187e9bfff104a0511"
+    },
+    {
+      "file": "notification-identity-red.txt",
+      "bytes": 7347,
+      "sha256": "a2d396e3971e22d299db5dc897becd9c65d5b7d2666efdf0f5c610d498cbacc9"
+    },
+    {
+      "file": "notification-precision-pg-green.txt",
+      "bytes": 98,
+      "sha256": "1b52c2f31186657df7398bb6daa1f1d155d39f5e18120249f10c3c87b18663cc"
+    },
+    {
+      "file": "notification-precision-pg-red.txt",
+      "bytes": 2885,
+      "sha256": "cc871f61ce62553764637b2de86bd4e0afc6ab58d9ab09363588d0ea9579ae0f"
+    },
+    {
+      "file": "notification-runtime.json",
+      "bytes": 1312,
+      "sha256": "54b280531785bc9424e577f68e602c79905ad634772203d26119065cf3c74a18"
+    },
+    {
+      "file": "notification-runtime.py",
+      "bytes": 3283,
+      "sha256": "23cd1cc3fbe0238e105d9f6aaa0910f9cff1d7d1bfbd7fc71c4ca70cb6d6dedd"
+    },
+    {
+      "file": "notification-title-final.txt",
+      "bytes": 110,
+      "sha256": "15a1d40ffde5288f9f7ca2bb4e1cfafd24d30fd6b6b6a172422c2e1e4609cb19"
+    },
+    {
+      "file": "operation-hints-red.txt",
+      "bytes": 376,
+      "sha256": "d048e989211fab1d85ad996dd27850e264f08bc4af09d6e86542479de7ca492f"
+    },
+    {
+      "file": "presentation-visual-rerun-rate-limit.json",
+      "bytes": 2119,
+      "sha256": "ce4a1f2fc38a78005fb88daf9b7f292bb0ada60082b75472d11cf37e6d92571e"
+    },
+    {
+      "file": "price-native-green.txt",
+      "bytes": 274,
+      "sha256": "ccd86f617149be7c7747dd897db057e5cda91da2cefc01d7e04d17f544c57f64"
+    },
+    {
+      "file": "publication-green.txt",
+      "bytes": 100,
+      "sha256": "f3426633c71d9c1062d3343415206c70a6050dea721c4f714ccf9b33f453b5d3"
+    },
+    {
+      "file": "publication-red.txt",
+      "bytes": 1801,
+      "sha256": "67f108ae3cb5b178cb9c3e7af82912676db6d51a3218d801fb951bd788f09e06"
+    },
+    {
+      "file": "reserve-lifetime-green.txt",
+      "bytes": 99,
+      "sha256": "8ace3812861176c5e29cb8afe04b9e76fe5fc2320b3ee34f44e8847b2d1d96cb"
+    },
+    {
+      "file": "runtime.json",
+      "bytes": 4529,
+      "sha256": "f08a1013e9300862db3475f3e6bd39aab42ae8470760070144be71bfc7d799a3"
+    },
+    {
+      "file": "select-green.txt",
+      "bytes": 205,
+      "sha256": "60ef5e63064f9935a8ced842d24bd0f6eda0e4ef74cb6bc4e4e62527523c49ef"
+    },
+    {
+      "file": "select-red.txt",
+      "bytes": 1671,
+      "sha256": "511d06497711c59e2a4acc489d40a53491cb1f25047eafa28e447530f42da4d0"
+    },
+    {
+      "file": "source-manifest.json",
+      "bytes": 6268,
+      "sha256": "7822390365db9b0efe86101c20c8460cf05f561eb6b31f95688834760af08103"
+    },
+    {
+      "file": "stability-regression.txt",
+      "bytes": 110,
+      "sha256": "725932b6f9c34ac0530f4cbf897a6fb4c104425a12b3a42f09f9729c8db491b8"
+    }
+  ],
+  "remaining": [],
+  "user_followup": [
+    {
+      "requirement": "Android/iOS physical-device portrait/landscape, soft keyboard, touch and back navigation",
+      "owner": "user",
+      "status": "not_yet_verified",
+      "blocks_development_completion": false,
+      "decision": "acceptance-decision.md"
+    }
+  ],
+  "completion_audit": "Development requirements met under the explicit user acceptance decision; physical-device validation remains user-owned followup",
+  "goal_status": "complete",
+  "docker_lifecycle_task_status": "active",
+  "committed": false,
+  "pushed": false,
+  "production_deployed": false,
+  "local_verification_passed": true
+}

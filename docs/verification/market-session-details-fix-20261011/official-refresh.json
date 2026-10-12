@@ -1,0 +1,43 @@
+{
+  "method": "Direct HTTPS without account credentials. Unsuccessful requests do not overwrite recorded evidence or checked_at.",
+  "results": [
+    {
+      "source": "dukascopy",
+      "url": "https://www.dukascopy.com/swiss/english/forex/forex-trading-accounts/link/",
+      "attempted_at": "2026-10-10T21:32:58.228319+00:00",
+      "error_type": "ConnectError"
+    },
+    {
+      "source": "dukascopy",
+      "url": "https://www.dukascopy.com/swiss/english/marketwatch/trading-breaks-calendar/",
+      "attempted_at": "2026-10-10T21:32:58.230694+00:00",
+      "error_type": "ConnectError"
+    },
+    {
+      "source": "oanda",
+      "url": "https://www.oanda.com/sg-en/trading/hours-of-operation/",
+      "attempted_at": "2026-10-10T21:32:58.230996+00:00",
+      "error_type": "ConnectError"
+    },
+    {
+      "source": "oanda",
+      "url": "https://www.oanda.com/sg-en/trading/holiday-trading-hours/",
+      "attempted_at": "2026-10-10T21:32:58.231230+00:00",
+      "error_type": "ConnectError"
+    },
+    {
+      "source": "binance",
+      "url": "https://developers.binance.com/docs/binance-spot-api-docs/rest-api/general-endpoints",
+      "attempted_at": "2026-10-10T21:32:58.232192+00:00",
+      "error_type": "ConnectError"
+    },
+    {
+      "source": "yahoo",
+      "url": "https://finance.yahoo.com/",
+      "attempted_at": "2026-10-10T21:32:58.233068+00:00",
+      "status": 429,
+      "sha256": "0d24c98db98d3b4a87b9626a026e7d72c99754ab6bd88211a17bc372350b7d89",
+      "bytes": 23
+    }
+  ]
+}

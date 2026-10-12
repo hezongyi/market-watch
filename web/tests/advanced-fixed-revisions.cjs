@@ -1,17 +1,18 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const {spawnSync}=require('node:child_process');
 const repo=path.resolve(__dirname,'../..');
-const generated=spawnSync(path.join(repo,'.venv/bin/python'),
+const generated=spawnSync(process.env.MARKET_WATCH_TEST_PYTHON || path.join(repo,'.venv/bin/python'),
   [path.join(__dirname,'fixtures/fixed-series-revision-feed.py')],{
     cwd:repo,encoding:'utf8',env:{...process.env,PYTHONPATH:path.join(repo,'backend')+':'+path.join(repo,'backend/tests'),
       ALERTS_DATABASE_URL:'sqlite://',ALERTS_DELIVERY_ENABLED:'false'}});
 assert.equal(generated.status,0,generated.stderr);
 const responses=JSON.parse(generated.stdout),events=[],queries=[];
 const ctx=vm.createContext({URL,URLSearchParams,Map,Set,Promise,Date,Intl,Error,
+  document:{createElement:()=>({}),head:{append(){}}},
   location:{search:'?parent=http://localhost&marketPolling=1'},parent:{postMessage(){}},
   crypto:{randomUUID:()=> 'test'},addEventListener(){},setTimeout,clearTimeout,
   responses,events,queries});
-for(const name of ['series.js','bridge.js'])
+for(const name of ['series.js','price-format.js','bridge.js'])
   vm.runInContext(fs.readFileSync(path.join(repo,'advanced-host',name),'utf8'),ctx);
 (async()=>{
   await vm.runInContext(`(async()=>{

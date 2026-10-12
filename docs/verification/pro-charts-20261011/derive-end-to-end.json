@@ -1,0 +1,174 @@
+{
+  "scope": "Ubuntu isolated PostgreSQL, synthetic observed M1, actual nine-period derivation; no supplier import speed claim",
+  "rows": 2147763,
+  "frames": [
+    "M1",
+    "M5",
+    "M15",
+    "M30",
+    "H1",
+    "H4",
+    "D1",
+    "W1",
+    "MN"
+  ],
+  "phases": {
+    "fixture_publish_seconds": 29.88082401175052,
+    "nine_period_end_to_end_seconds": 451.12055115401745,
+    "input_read_validate_decode_calendar_seconds": 39.08821868011728,
+    "bucket_coverage_finalize_seconds": 77.81005468219519
+  },
+  "ticks": 3960,
+  "decode_calls": 49,
+  "longest_tick_seconds": 1.9833941017277539,
+  "cache_bytes": 56509549,
+  "peak_rss_kib": 407340,
+  "periods": [
+    {
+      "timeframe": "D1",
+      "status": "published",
+      "rows": 1796,
+      "complete_rows": 0
+    },
+    {
+      "timeframe": "H1",
+      "status": "published",
+      "rows": 35905,
+      "complete_rows": 24107
+    },
+    {
+      "timeframe": "H4",
+      "status": "published",
+      "rows": 9276,
+      "complete_rows": 0
+    },
+    {
+      "timeframe": "M1",
+      "status": "published",
+      "rows": 2147763,
+      "complete_rows": 2137583
+    },
+    {
+      "timeframe": "M15",
+      "status": "published",
+      "rows": 143617,
+      "complete_rows": 131134
+    },
+    {
+      "timeframe": "M30",
+      "status": "published",
+      "rows": 71809,
+      "complete_rows": 59628
+    },
+    {
+      "timeframe": "M5",
+      "status": "published",
+      "rows": 430850,
+      "complete_rows": 417688
+    },
+    {
+      "timeframe": "MN",
+      "status": "published",
+      "rows": 69,
+      "complete_rows": 0
+    },
+    {
+      "timeframe": "W1",
+      "status": "published",
+      "rows": 300,
+      "complete_rows": 0
+    }
+  ],
+  "progress": {
+    "stage": "derive",
+    "published_periods": 9,
+    "total_periods": 9,
+    "processed_rows": 19329867,
+    "total_rows": 19329867,
+    "estimated_remaining_seconds": 0,
+    "periods": [
+      {
+        "timeframe": "D1",
+        "status": "published",
+        "processed_rows": 2147763,
+        "total_rows": 2147763,
+        "cursor": 1727222880000,
+        "work_seconds": 56.10198283335194,
+        "updated_at": 1791749825776
+      },
+      {
+        "timeframe": "H1",
+        "status": "published",
+        "processed_rows": 2147763,
+        "total_rows": 2147763,
+        "cursor": 1727222880000,
+        "work_seconds": 20.92434232123196,
+        "updated_at": 1791749825883
+      },
+      {
+        "timeframe": "H4",
+        "status": "published",
+        "processed_rows": 2147763,
+        "total_rows": 2147763,
+        "cursor": 1727222880000,
+        "work_seconds": 18.949197496287525,
+        "updated_at": 1791749825934
+      },
+      {
+        "timeframe": "M1",
+        "status": "published",
+        "processed_rows": 2147763,
+        "total_rows": 2147763,
+        "cursor": 1727222880000,
+        "work_seconds": 111.29363224515691,
+        "updated_at": 1791749827213
+      },
+      {
+        "timeframe": "M15",
+        "status": "published",
+        "processed_rows": 2147763,
+        "total_rows": 2147763,
+        "cursor": 1727222880000,
+        "work_seconds": 28.7742339563556,
+        "updated_at": 1791749827332
+      },
+      {
+        "timeframe": "M30",
+        "status": "published",
+        "processed_rows": 2147763,
+        "total_rows": 2147763,
+        "cursor": 1727222880000,
+        "work_seconds": 22.88187004486099,
+        "updated_at": 1791749827432
+      },
+      {
+        "timeframe": "M5",
+        "status": "published",
+        "processed_rows": 2147763,
+        "total_rows": 2147763,
+        "cursor": 1727222880000,
+        "work_seconds": 47.22062784526497,
+        "updated_at": 1791749827702
+      },
+      {
+        "timeframe": "MN",
+        "status": "published",
+        "processed_rows": 2147763,
+        "total_rows": 2147763,
+        "cursor": 1727222880000,
+        "work_seconds": 20.27311986265704,
+        "updated_at": 1791749827875
+      },
+      {
+        "timeframe": "W1",
+        "status": "published",
+        "processed_rows": 2147763,
+        "total_rows": 2147763,
+        "cursor": 1727222880000,
+        "work_seconds": 20.639533979352564,
+        "updated_at": 1791749827937
+      }
+    ]
+  },
+  "passed": true
+}

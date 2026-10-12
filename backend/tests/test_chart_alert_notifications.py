@@ -1,12 +1,80 @@
 from decimal import Decimal as D
+from types import SimpleNamespace
+import os
 
 import httpx
+import pytest
 from alerts import notify
 from alerts.chart_alert_domain import Observation
-from alerts.chart_alert_message import signal_message
+from alerts.chart_alert_message import signal_message, signal_title
 from alerts.chart_alert_service import AlertConfig, consume, create
-from alerts.storage import ChartAlert, Notification, Outbox, SignalRow
+from alerts.storage import ChartAlert, ChartAlertVersion, Notification, Outbox, SignalRow
 from sqlalchemy import select
+from test_provider_postgres import provider_pg
+
+
+@pytest.mark.parametrize("kind,source,instrument,symbol,shown", [
+    ("provider", "yahoo", "YAHOO:JPY_X", "JPY=X", "USDJPY"),
+    ("provider", "yahoo", "YAHOO:AAPL", "AAPL", "AAPL"),
+    ("managed", "oanda", "managed-eurusd", "EUR_USD", "EURUSD"),
+    ("composite", "composite", "a" * 64, "EURUSD", "EURUSD"),
+])
+def test_notification_uses_saved_readable_symbol_and_preserves_decimal_threshold(
+        kind, source, instrument, symbol, shown):
+    threshold = "1.128313520286396123"
+    signal = SimpleNamespace(
+        id="notification-identity", instrument_id=instrument, occurred_at=1000, reason="原有自定义名称",
+        price=D("1.13"), threshold=D(threshold),
+        evidence={"chart_alert": True, "market_identity": {
+            "series_kind": kind, "source": source, "symbol": symbol},
+            "config": {"timeframe": "M1", "message": "{symbol} {threshold}",
+                       "condition": {"relation": "above", "left": {"kind": "price"},
+                                     "right": {"kind": "constant", "value": threshold}}},
+            "detected_at": 1001, "left": "1.13", "unit": "price", "late": False})
+    message = signal_message(signal)
+    assert message.startswith(f"{shown} {threshold}\n{shown} · {source} · M1\n")
+    assert f"比较值 {threshold}" in message
+    assert signal_title(signal) == f"{shown} · 原有自定义名称"
+    assert signal.threshold == D(threshold)
+
+
+@pytest.mark.skipif(not os.getenv("TEST_POSTGRES_URL"), reason="Requires isolated Ubuntu PostgreSQL")
+def test_committed_pg_event_message_preserves_manual_precision(provider_pg, monkeypatch):
+    from alerts.storage import Instrument, Preference
+
+    factory, _ = provider_pg
+    threshold = "1.123456789012345678"
+    config = AlertConfig.model_validate({
+        "name": "manual decimal", "instrument": "notification-managed", "source": "oanda", "timeframe": "M1",
+        "condition": {"relation": "cross_up", "left": {"kind": "price"},
+                      "right": {"kind": "constant", "value": threshold}}})
+    with factory.begin() as db:
+        db.add(Instrument(id=config.instrument, symbol="EUR_USD", label="acceptance", source="oanda",
+                          basis="bid", calendar="ny17", precision=5, enabled=True))
+        db.add(Preference(key="auth.admin", value={}))
+    with factory.begin() as db:
+        alert = create(db, "notification-exact", config, at=0)
+        ident = alert.id
+        consume(db, ident, Observation("baseline", 0, 0, D(1), D(threshold), D(1)), baseline=True)
+        event = consume(db, ident, Observation("cross", 1, 1000, D(2), D(threshold), D(2)), detected_at=1001)
+        event_id = event.id
+    with factory() as db:
+        event = db.get(SignalRow, event_id)
+        assert f"比较值 {threshold}" in signal_message(event)
+        assert event.evidence["threshold"] == threshold
+        assert event.evidence["price"] == "2"
+        version = db.scalar(select(ChartAlertVersion).where(ChartAlertVersion.alert_id == ident))
+        assert version.config["condition"]["right"]["value"] == threshold
+    from alerts import api as api_module
+    from fastapi.testclient import TestClient
+    from test_chart_alert_api import login
+
+    with TestClient(api_module.app) as client:
+        login(client, monkeypatch)
+        saved = client.get("/api/chart-alerts/events", params={"alert_id": ident}).json()[0]
+        assert saved["threshold"] == threshold
+        assert saved["price"] == "2"
+        assert f"比较值 {threshold}" in saved["message"]
 
 
 def test_indicator_message_preserves_units_and_delivery_retry_does_not_increment_count(database, monkeypatch):

@@ -1,0 +1,484 @@
+{
+  "version": "1.20.4",
+  "release_tag": "v1.20.4",
+  "source_commit": "d4298b6ed8fbc9a7c1fb68e31ac857ed7da0b84a",
+  "implementation_pr": 43,
+  "build_environment": "Ubuntu quant-server; market-watch-ubuntu BuildKit",
+  "build_task": "mw-native-dependency-v1204-release-20261011",
+  "build_project": "mw-v1204-release-build",
+  "build_purpose": "release",
+  "schema_migration": false,
+  "schema": "ar45_market_stream",
+  "tested_application_commit": "2e6dad9",
+  "verification": {
+    "standards_findings": 0,
+    "spec_findings": 0,
+    "cold_dependency_regression_chromium124": true,
+    "cold_dependency_regression_chromium153": true,
+    "multichunk_delayed_regression": true,
+    "runtime_synchronous_dependency_closure_modules": [130, 131],
+    "runtime_synchronous_dependency_closure_missing": 0,
+    "browser_only_candidate_repetitions_passed": 10,
+    "ubuntu_built_host_response_fixture_repetitions_passed": 8,
+    "existing_native_alert_integration_cases": 13,
+    "existing_native_alert_integration_passed": true
+  },
+  "previous_release_failure": {
+    "release": "v1.20.3",
+    "implementation_pr": 42,
+    "production_repetition_failed": 4,
+    "rolled_back_to": "v1.20.2",
+    "tag_preserved": true
+  },
+  "known_limits": [
+    "Exact user error suffix was not provided; no direct capture of their own exception stack",
+    "Safari itself was not executed; local WebKit failed EGL startup",
+    "Existing concurrent first-demand insertion can return HTTP 500; reproduced before deployment and remains a separate followup"
+  ],
+  "images": {
+    "market-watch-api:v1.20.4-d4298b6": {
+      "production_id": "sha256:2f5c2fbc417e77f6fb8374308e46bdad982736ffd1a60e1bda65c7240a0729f5",
+      "ubuntu_id": "sha256:781cc76c7e25b881c2d969cb3270d99f7f444f79e9ad906ae31687ddf3a678f8",
+      "rootfs_matches_ubuntu": true,
+      "effective_config_matches_ubuntu": true,
+      "legacy_empty_config_fields": [
+        "AttachStderr",
+        "AttachStdin",
+        "AttachStdout",
+        "Domainname",
+        "Hostname",
+        "Image",
+        "OpenStdin",
+        "StdinOnce",
+        "Tty"
+      ],
+      "diff_ids": [
+        "sha256:34467cc93912af891dfee8a3902adf9b4f355a9bca4eaa46f658d1181a21de0d",
+        "sha256:b3445de4503d21b3ebc42db2f284bc6c8ad96184ea91ce55fb57f5e87910e1f2",
+        "sha256:546c86e4df2dc808fcf1953c346bfeef32f4c953933634d57c1d38730b750e9c",
+        "sha256:6b6ff8eb9da6c277f4b33452c77d59f8b5ff04e0bcca1a3054570b9db343da79",
+        "sha256:ac2ac6e826f23bcf29d4d0d9253c4ebba3817e73e0295e09639b9b0987f1634a",
+        "sha256:500e6ed13d52ee7349f653fb02b7a8fcdacc6b4ce34fcafc147fdb285de10711",
+        "sha256:4bf24a20e6dfddfe23added7827a3c94535c2d088cf56820d4f710b9dbc2de20",
+        "sha256:3196f0b13c0fa27c25a759fd62206279f00ea3efb06bf5233ce2c8a90142629e",
+        "sha256:e01ce3b45cee49bfe21b8a26647987c4f44171aaa63e473d7e37664c5d0fe331",
+        "sha256:e648fd0b9c1caeaa23e91b67ab869a7261c7ec114e8debe1c65aee88b0ea7dec",
+        "sha256:0fc31ac59543569b84a10457445062bc6c2e0e9c48cef2cb6a2c8c62f69cf3c3",
+        "sha256:62dcb54f9e4c98b123322f3d13d555d5d18d06619820f570a53524f9d5bb2c8c",
+        "sha256:a9e4808642d8bc76a14b6405d0f383fdc4aece0fd159b9349256e1449298e68d",
+        "sha256:bf4bf694b35718781440d1abcd73682ee29c2c81aaff1261348f4ec004fdc789",
+        "sha256:8535296f751094920f8bdcb4110d8d8bf88d9e2f51ae7e2ce4e1cb5f0804e745",
+        "sha256:aa568d6a45c57a4919b519d45ddd305acd076a8f497165480d874e7ae08e745f"
+      ],
+      "labels": {
+        "io.market-watch.built-at": "2026-10-11T07:24:12.640459+00:00",
+        "io.market-watch.commit": "d4298b6ed8fbc9a7c1fb68e31ac857ed7da0b84a",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-v1204-release-build",
+        "io.market-watch.purpose": "release",
+        "io.market-watch.task": "mw-native-dependency-v1204-release-20261011"
+      }
+    },
+    "market-watch-web:v1.20.4-d4298b6": {
+      "production_id": "sha256:c8cccbc35cf49c229517a9cef4bbf8e3c78cb7f19aeea0b6693176062eb635d2",
+      "ubuntu_id": "sha256:562ba75a089e1e25a5b49fd2befd6a718de158ff70ce0c2d0f172488a7641506",
+      "rootfs_matches_ubuntu": true,
+      "effective_config_matches_ubuntu": true,
+      "legacy_empty_config_fields": [
+        "AttachStderr",
+        "AttachStdin",
+        "AttachStdout",
+        "Domainname",
+        "Hostname",
+        "Image",
+        "OpenStdin",
+        "StdinOnce",
+        "Tty",
+        "User"
+      ],
+      "diff_ids": [
+        "sha256:989e799e634906e94dc9a5ee2ee26fc92ad260522990f26e707861a5f52bf64e",
+        "sha256:a2738b08d7114c9d5581dd5482d3b5cc297fcf73b8d330c3ba38d24c43939119",
+        "sha256:47a53288c3ef0ee51df84ef47d217f18c1762412532fded9af1fd88ecee14294",
+        "sha256:9e707aa6db4786355904a1b794c80f378b690f8f0384af56117708a23a91f1da",
+        "sha256:a3446cc6c821fa11b704a45811ab554675f0327307af71b3f4ff5a70c7a4eec8",
+        "sha256:42608b42cb5e68548abf1c71aa851acfd65816d0ceaff6ee85849c7c478463f0",
+        "sha256:53c769b49ca0a2f0f6cf5e4a807af8933cec6cde9302d56d91a78bc38ea407a8",
+        "sha256:f76f397f2ce6b266573b70eb60ef1335e9984a1941eedd2a3505af4870c3afa0",
+        "sha256:b388056e0e388583cec23ceadb8289676cd29ef0e17cdf23b6f0cd0a13565b10",
+        "sha256:4f35277fdb62e87413d3279d8d91dbbf137302434d81f62e8c5131c66ff6aff1"
+      ],
+      "labels": {
+        "io.market-watch.built-at": "2026-10-11T07:30:27.297716+00:00",
+        "io.market-watch.commit": "d4298b6ed8fbc9a7c1fb68e31ac857ed7da0b84a",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-v1204-release-build",
+        "io.market-watch.purpose": "release",
+        "io.market-watch.task": "mw-native-dependency-v1204-release-20261011",
+        "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+      }
+    },
+    "market-watch-chart-origin:v1.20.4-d4298b6": {
+      "production_id": "sha256:132fe3312a27730e72c0749fbcb290d620c06c12d6b4053c041d1a7c897bcca0",
+      "ubuntu_id": "sha256:fc7efa0997c4f0090a6ae702b841b82b07e38a267c4fbad828df66f02a65ada7",
+      "rootfs_matches_ubuntu": true,
+      "effective_config_matches_ubuntu": true,
+      "legacy_empty_config_fields": [
+        "AttachStderr",
+        "AttachStdin",
+        "AttachStdout",
+        "Domainname",
+        "Hostname",
+        "Image",
+        "OpenStdin",
+        "StdinOnce",
+        "Tty",
+        "User"
+      ],
+      "diff_ids": [
+        "sha256:989e799e634906e94dc9a5ee2ee26fc92ad260522990f26e707861a5f52bf64e",
+        "sha256:a2738b08d7114c9d5581dd5482d3b5cc297fcf73b8d330c3ba38d24c43939119",
+        "sha256:47a53288c3ef0ee51df84ef47d217f18c1762412532fded9af1fd88ecee14294",
+        "sha256:9e707aa6db4786355904a1b794c80f378b690f8f0384af56117708a23a91f1da",
+        "sha256:a3446cc6c821fa11b704a45811ab554675f0327307af71b3f4ff5a70c7a4eec8",
+        "sha256:42608b42cb5e68548abf1c71aa851acfd65816d0ceaff6ee85849c7c478463f0",
+        "sha256:53c769b49ca0a2f0f6cf5e4a807af8933cec6cde9302d56d91a78bc38ea407a8",
+        "sha256:f76f397f2ce6b266573b70eb60ef1335e9984a1941eedd2a3505af4870c3afa0",
+        "sha256:83130557d51c693564833d601f08d0a3adcfb1e8998c111cf34cdcb8f51a87b2",
+        "sha256:4abaa5360b13660221e3463933baa76e0fc9749d3b23547aa0b8660bf6b92705",
+        "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"
+      ],
+      "labels": {
+        "io.market-watch.built-at": "2026-10-11T07:29:29.662978+00:00",
+        "io.market-watch.commit": "d4298b6ed8fbc9a7c1fb68e31ac857ed7da0b84a",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-v1204-release-build",
+        "io.market-watch.purpose": "release",
+        "io.market-watch.task": "mw-native-dependency-v1204-release-20261011",
+        "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+      }
+    }
+  },
+  "backup": {
+    "production_database_backup": true,
+    "dump": "/mnt/user/backup/market-watch/alerts-20261011T072448256967Z.dump",
+    "bytes": 489572623,
+    "sha256": "33f44239546f8086f06b4dab8b8d49467cb13569707725bcb0ec48debb06dc1d",
+    "hash_verified": true,
+    "config": "/mnt/user/backup/market-watch/config-20261011T072609Z-od0utb.tar.gz",
+    "config_hash_verified": true,
+    "actual_restore_this_release": false,
+    "reason": "No schema migration or production database modification by release switch; latest actual Ubuntu restore was verified for v1.20.2"
+  },
+  "switch": {
+    "switched": "2026-10-11T07:34:28Z",
+    "previous_release": "releases/v1.20.2-d8d5f0b",
+    "new_release": "releases/v1.20.4-d4298b6",
+    "rollback_script": "deploy/native-dependency-v1.20.4-switch-20261011/rollback.sh",
+    "env_unchanged": true,
+    "schema_migration": false
+  },
+  "config_comparison": {
+    "effective_configuration_identical_except_images": true,
+    "backend_yahoo_enabled": true,
+    "service_count": 14,
+    "backup_image_preserved": true
+  },
+  "assets": {
+    "passed": true,
+    "host": "/host.623db7406d0dae88.js",
+    "host_sha256": "623db7406d0dae8802c00a3acbfe95169b685947b7cde1a72f2b793da335fafd",
+    "acceptance_host_exact_bytes_match": true,
+    "both_shared_dependencies_explicitly_awaited": true,
+    "library_prefix": "/charting_library_ea1375a3ae620aa7/"
+  },
+  "production_runtime": {
+    "passed": true,
+    "at": 1791704413782,
+    "environment": "unraid formal production",
+    "services": [
+      {
+        "service": "api",
+        "image_id": "sha256:2f5c2fbc417e77f6fb8374308e46bdad982736ffd1a60e1bda65c7240a0729f5",
+        "running": true,
+        "restart_count": 0,
+        "health": "healthy",
+        "source_commit": "d4298b6ed8fbc9a7c1fb68e31ac857ed7da0b84a",
+        "purpose": "release"
+      },
+      {
+        "service": "pricing-worker",
+        "image_id": "sha256:2f5c2fbc417e77f6fb8374308e46bdad982736ffd1a60e1bda65c7240a0729f5",
+        "running": true,
+        "restart_count": 0,
+        "health": null,
+        "source_commit": "d4298b6ed8fbc9a7c1fb68e31ac857ed7da0b84a",
+        "purpose": "release"
+      },
+      {
+        "service": "chart-aggregation-worker",
+        "image_id": "sha256:2f5c2fbc417e77f6fb8374308e46bdad982736ffd1a60e1bda65c7240a0729f5",
+        "running": true,
+        "restart_count": 0,
+        "health": null,
+        "source_commit": "d4298b6ed8fbc9a7c1fb68e31ac857ed7da0b84a",
+        "purpose": "release"
+      },
+      {
+        "service": "chart-history-worker",
+        "image_id": "sha256:2f5c2fbc417e77f6fb8374308e46bdad982736ffd1a60e1bda65c7240a0729f5",
+        "running": true,
+        "restart_count": 0,
+        "health": null,
+        "source_commit": "d4298b6ed8fbc9a7c1fb68e31ac857ed7da0b84a",
+        "purpose": "release"
+      },
+      {
+        "service": "history-worker",
+        "image_id": "sha256:2f5c2fbc417e77f6fb8374308e46bdad982736ffd1a60e1bda65c7240a0729f5",
+        "running": true,
+        "restart_count": 0,
+        "health": null,
+        "source_commit": "d4298b6ed8fbc9a7c1fb68e31ac857ed7da0b84a",
+        "purpose": "release"
+      },
+      {
+        "service": "composite-aggregate-worker",
+        "image_id": "sha256:2f5c2fbc417e77f6fb8374308e46bdad982736ffd1a60e1bda65c7240a0729f5",
+        "running": true,
+        "restart_count": 0,
+        "health": null,
+        "source_commit": "d4298b6ed8fbc9a7c1fb68e31ac857ed7da0b84a",
+        "purpose": "release"
+      },
+      {
+        "service": "native-history-worker",
+        "image_id": "sha256:2f5c2fbc417e77f6fb8374308e46bdad982736ffd1a60e1bda65c7240a0729f5",
+        "running": true,
+        "restart_count": 0,
+        "health": null,
+        "source_commit": "d4298b6ed8fbc9a7c1fb68e31ac857ed7da0b84a",
+        "purpose": "release"
+      },
+      {
+        "service": "realtime-worker",
+        "image_id": "sha256:2f5c2fbc417e77f6fb8374308e46bdad982736ffd1a60e1bda65c7240a0729f5",
+        "running": true,
+        "restart_count": 0,
+        "health": null,
+        "source_commit": "d4298b6ed8fbc9a7c1fb68e31ac857ed7da0b84a",
+        "purpose": "release"
+      },
+      {
+        "service": "notify-worker",
+        "image_id": "sha256:2f5c2fbc417e77f6fb8374308e46bdad982736ffd1a60e1bda65c7240a0729f5",
+        "running": true,
+        "restart_count": 0,
+        "health": null,
+        "source_commit": "d4298b6ed8fbc9a7c1fb68e31ac857ed7da0b84a",
+        "purpose": "release"
+      },
+      {
+        "service": "market-stream-worker",
+        "image_id": "sha256:2f5c2fbc417e77f6fb8374308e46bdad982736ffd1a60e1bda65c7240a0729f5",
+        "running": true,
+        "restart_count": 0,
+        "health": null,
+        "source_commit": "d4298b6ed8fbc9a7c1fb68e31ac857ed7da0b84a",
+        "purpose": "release"
+      },
+      {
+        "service": "web",
+        "image_id": "sha256:c8cccbc35cf49c229517a9cef4bbf8e3c78cb7f19aeea0b6693176062eb635d2",
+        "running": true,
+        "restart_count": 0,
+        "health": null,
+        "source_commit": "d4298b6ed8fbc9a7c1fb68e31ac857ed7da0b84a",
+        "purpose": "release"
+      },
+      {
+        "service": "chart-origin",
+        "image_id": "sha256:132fe3312a27730e72c0749fbcb290d620c06c12d6b4053c041d1a7c897bcca0",
+        "running": true,
+        "restart_count": 0,
+        "health": null,
+        "source_commit": "d4298b6ed8fbc9a7c1fb68e31ac857ed7da0b84a",
+        "purpose": "release"
+      }
+    ],
+    "actual_settings": [
+      {
+        "service": "api",
+        "yahoo_enabled": true,
+        "oanda_stream_enabled": true,
+        "proxy_configured": true,
+        "database_pool_size": 2,
+        "database_max_overflow": 0
+      },
+      {
+        "service": "pricing-worker",
+        "yahoo_enabled": true,
+        "oanda_stream_enabled": true,
+        "proxy_configured": true,
+        "database_pool_size": 2,
+        "database_max_overflow": 0
+      },
+      {
+        "service": "chart-aggregation-worker",
+        "yahoo_enabled": true,
+        "oanda_stream_enabled": false,
+        "proxy_configured": true,
+        "database_pool_size": 2,
+        "database_max_overflow": 0
+      },
+      {
+        "service": "chart-history-worker",
+        "yahoo_enabled": true,
+        "oanda_stream_enabled": false,
+        "proxy_configured": true,
+        "database_pool_size": 2,
+        "database_max_overflow": 0
+      },
+      {
+        "service": "history-worker",
+        "yahoo_enabled": true,
+        "oanda_stream_enabled": false,
+        "proxy_configured": true,
+        "database_pool_size": 2,
+        "database_max_overflow": 0
+      },
+      {
+        "service": "composite-aggregate-worker",
+        "yahoo_enabled": true,
+        "oanda_stream_enabled": false,
+        "proxy_configured": true,
+        "database_pool_size": 2,
+        "database_max_overflow": 0
+      },
+      {
+        "service": "native-history-worker",
+        "yahoo_enabled": true,
+        "oanda_stream_enabled": false,
+        "proxy_configured": true,
+        "database_pool_size": 2,
+        "database_max_overflow": 0
+      },
+      {
+        "service": "realtime-worker",
+        "yahoo_enabled": true,
+        "oanda_stream_enabled": false,
+        "proxy_configured": true,
+        "database_pool_size": 2,
+        "database_max_overflow": 0
+      },
+      {
+        "service": "notify-worker",
+        "yahoo_enabled": true,
+        "oanda_stream_enabled": false,
+        "proxy_configured": true,
+        "database_pool_size": 2,
+        "database_max_overflow": 0
+      },
+      {
+        "service": "market-stream-worker",
+        "yahoo_enabled": true,
+        "oanda_stream_enabled": false,
+        "proxy_configured": true,
+        "database_pool_size": 2,
+        "database_max_overflow": 0
+      }
+    ],
+    "http_status": {
+      "https://trade.kookvv.com:8443/": "200",
+      "https://charts.kookvv.com:8443/": "200"
+    },
+    "api_version": "1.20.4",
+    "schema": "ar45_market_stream",
+    "workspace_alert_account_notification_fingerprints_preserved": true,
+    "password_change_events_added": 0,
+    "notification_test_events_added": 0
+  },
+  "production_browser": {
+    "passed": true,
+    "cases": [
+      "HTTPS administrator login and Secure/HttpOnly session",
+      "Existing production chart ready, one alert business root, actual bars/quotes through authenticated SSE",
+      "Deployed native alert sidebar/dialog, message cancel and notification Escape restore entry focus; no alert saved",
+      "Production data center retains six sections and source-status actual read",
+      "Native indicator window coexists with alerts",
+      "390px production home has no horizontal overflow"
+    ],
+    "errors": [],
+    "http_errors": [],
+    "credential_leaks": [],
+    "unexpected_writes": [],
+    "chart_count": 5,
+    "logout_verified": true,
+    "started_at": "2026-10-11T07:38:42.448Z"
+  },
+  "production_chromium124": {
+    "passed": true,
+    "repetitions": 10,
+    "native_failures": 0,
+    "page_errors": 0,
+    "http_errors": [],
+    "native_alert_and_data_center_ready_each_attempt": true,
+    "logout_verified": true,
+    "completed_at": "2026-10-11T07:36:53.391Z"
+  },
+  "production_chromium153": {
+    "passed": true,
+    "repetitions": 5,
+    "native_failures": 0,
+    "page_errors": 0,
+    "http_errors": [],
+    "native_alert_and_data_center_ready_each_attempt": true,
+    "logout_verified": true,
+    "completed_at": "2026-10-11T07:37:47.366Z"
+  },
+  "first_production_attempt": {
+    "passed": false,
+    "http_errors": [
+      {
+        "path": "/api/charts/data",
+        "status": 500
+      }
+    ],
+    "native_failures": [],
+    "completed_at": "2026-10-11T07:35:16.563Z",
+    "root_cause": "Existing SELECT-then-INSERT race in market_data.renew_demand, duplicate market_data_demand_pkey",
+    "fixed_in_this_release": false,
+    "later_clean_repetitions_do_not_resolve_this_issue": true
+  },
+  "yahoo_read": {
+    "passed": true,
+    "symbol": "AAPL",
+    "metadata_source": "yahoo",
+    "timeframe": "D1",
+    "bars": 27,
+    "quote_price": "336.64",
+    "quote_time": 1791576000000,
+    "actual_upstream": true,
+    "proxy_configured": true
+  },
+  "resource_closure": {
+    "at": 1791704542907,
+    "retired_task": "mw-native-dependency-closure-20261011",
+    "retired_project": "mw-native-dependency-closure-20261011",
+    "removed_containers": 1,
+    "database_volumes": 0,
+    "database_restore_this_retirement": "not applicable; no database or data volume",
+    "archive": "/home/quant/.local/share/market-watch-docker/archives/mw-native-dependency-closure-20261011-20261011T074115-e38b1eb5",
+    "release_build_task_finished": true,
+    "production_and_rollback_images_retained": true,
+    "global_prune_used": false,
+    "free_bytes": 11027574784
+  },
+  "production_observation": "Short browser and runtime verification; not a long-duration stability claim"
+}

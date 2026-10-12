@@ -11,6 +11,13 @@ import httpx
 
 from .market_contracts import CandleBatch, MinuteRow, QuoteEvent, RequestResult, failed_request
 from .market_resources import cooldown, request_slot
+from .provider_transport import (
+    activity,
+    client_for_key,
+    discard_client,
+    retire_client,
+    retryable_network_error,
+)
 
 log = logging.getLogger(__name__)
 
@@ -132,8 +139,7 @@ class OandaPractice:
             raise ValueError("OANDA practice backend credentials are required")
         self.token, self.account_id = token, account_id
         self.proxy = proxy or None
-        self.rest = rest_client or httpx.Client(proxy=proxy or None, trust_env=False,
-                                                timeout=httpx.Timeout(15, connect=5))
+        self.rest = rest_client or client_for_key(('oanda', proxy or '', 'pricing'))
         self.stream_client = stream_client
         self.owns_rest = rest_client is None
         self.owns_stream = stream_client is None
@@ -141,7 +147,7 @@ class OandaPractice:
 
     def close(self):
         if self.owns_rest:
-            self.rest.close()
+            retire_client(self.rest)
         if self.owns_stream and self.stream_client is not None:
             self.stream_client.close()
 
@@ -149,12 +155,25 @@ class OandaPractice:
     def headers(self):
         return {"Authorization": "Bearer " + self.token, "Accept-Datetime-Format": "UNIX"}
 
+    def rest_get(self, url, **kwargs):
+        # Each operation redirects old handles after failure; concurrent readers
+        # finish their own generation before its pool is closed.
+        with activity(self.rest) as client:
+            try:
+                if self.owns_rest:
+                    kwargs['timeout'] = httpx.Timeout(15, connect=5)
+                return client.get(url, **kwargs)
+            except httpx.TransportError as error:
+                if self.owns_rest and retryable_network_error(error):
+                    discard_client(client)
+                raise
+
     def catalog(self):
         trace, response = TransportTrace(), None
         try:
             with request_slot("oanda"):
                 trace.phase, trace.route = "request", "upstream"
-                response = self.rest.get(
+                response = self.rest_get(
                     "https://api-fxpractice.oanda.com/v3/accounts/" + self.account_id + "/instruments",
                     headers=self.headers, extensions={"trace": trace})
             response.raise_for_status()
@@ -168,7 +187,7 @@ class OandaPractice:
 
     def _account_json(self, endpoint, *, params=None):
         with request_slot('oanda'):
-            response = self.rest.get(
+            response = self.rest_get(
                 'https://api-fxpractice.oanda.com/v3/accounts/' + self.account_id + '/' + endpoint,
                 headers=self.headers, params=params)
         response.raise_for_status()
@@ -223,7 +242,7 @@ class OandaPractice:
         try:
             with request_slot("oanda"):
                 trace.phase, trace.route = "request", "upstream"
-                response = self.rest.get(
+                response = self.rest_get(
                     f"https://api-fxpractice.oanda.com/v3/accounts/{self.account_id}"
                     f"/instruments/{identity.provider_symbol}/candles",
                     headers=self.headers, params={"granularity": "M1", "price": "B",

@@ -1,0 +1,19 @@
+{
+  "effective_configuration_identical_except_images": true,
+  "backend_yahoo_enabled": true,
+  "backend_service_definitions": [
+    "api",
+    "chart-aggregation-worker",
+    "chart-history-worker",
+    "composite-aggregate-worker",
+    "history-worker",
+    "market-stream-worker",
+    "migrate",
+    "native-history-worker",
+    "notify-worker",
+    "pricing-worker",
+    "realtime-worker"
+  ],
+  "service_count": 14,
+  "production_env_preserved": true
+}

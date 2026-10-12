@@ -1,0 +1,80 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_______ test_absolute_deadline_stops_real_socket_drip_response[ordinary] _______
+
+entry = 'ordinary'
+
+    @pytest.mark.parametrize('entry', ['ordinary', 'native'])
+    def test_absolute_deadline_stops_real_socket_drip_response(entry):
+        import time
+
+        from alerts.provider_deadline import deadline_transport
+        from alerts.provider_chart import _request
+
+        class Drip(BaseHTTPRequestHandler):
+            def log_message(self, *_):
+                pass
+            def do_GET(self):
+                self.send_response(200)
+                self.send_header('Content-Length', '5')
+                self.end_headers()
+                try:
+                    for byte in b' [ ] ':
+                        self.wfile.write(bytes([byte]))
+                        self.wfile.flush()
+                        time.sleep(.12)
+                except (BrokenPipeError, ConnectionResetError):
+                    pass
+        server = ThreadingHTTPServer(('127.0.0.1', 0), Drip)
+        server.daemon_threads = True
+        thread = threading.Thread(target=server.serve_forever, kwargs={'poll_interval': .01})
+        thread.start()
+        try:
+            backend = deadline_transport(proxy=None, limits=httpx.Limits(max_connections=1))
+            with httpx.Client(transport=backend, trust_env=False) as client:
+                start = time.monotonic()
+>               with pytest.raises(httpx.ReadTimeout):
+E               Failed: DID NOT RAISE ReadTimeout
+
+backend/tests/test_provider_network_recovery.py:186: Failed
+________ test_absolute_deadline_stops_real_socket_drip_response[native] ________
+
+entry = 'native'
+
+    @pytest.mark.parametrize('entry', ['ordinary', 'native'])
+    def test_absolute_deadline_stops_real_socket_drip_response(entry):
+        import time
+
+        from alerts.provider_deadline import deadline_transport
+        from alerts.provider_chart import _request
+
+        class Drip(BaseHTTPRequestHandler):
+            def log_message(self, *_):
+                pass
+            def do_GET(self):
+                self.send_response(200)
+                self.send_header('Content-Length', '5')
+                self.end_headers()
+                try:
+                    for byte in b' [ ] ':
+                        self.wfile.write(bytes([byte]))
+                        self.wfile.flush()
+                        time.sleep(.12)
+                except (BrokenPipeError, ConnectionResetError):
+                    pass
+        server = ThreadingHTTPServer(('127.0.0.1', 0), Drip)
+        server.daemon_threads = True
+        thread = threading.Thread(target=server.serve_forever, kwargs={'poll_interval': .01})
+        thread.start()
+        try:
+            backend = deadline_transport(proxy=None, limits=httpx.Limits(max_connections=1))
+            with httpx.Client(transport=backend, trust_env=False) as client:
+                start = time.monotonic()
+>               with pytest.raises(httpx.ReadTimeout):
+E               Failed: DID NOT RAISE ReadTimeout
+
+backend/tests/test_provider_network_recovery.py:186: Failed
+=========================== short test summary info ============================
+FAILED backend/tests/test_provider_network_recovery.py::test_absolute_deadline_stops_real_socket_drip_response[ordinary]
+FAILED backend/tests/test_provider_network_recovery.py::test_absolute_deadline_stops_real_socket_drip_response[native]
+2 failed, 10 deselected in 1.25s

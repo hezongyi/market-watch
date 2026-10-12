@@ -1,0 +1,35 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_committed_pg_event_message_preserves_manual_precision __________
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://[REDACTED]@127.0.0.1:19995/pro_charts), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://[REDACTED]@127.0.0.1:19995/pro_charts))
+
+    @pytest.mark.skipif(not os.getenv("TEST_POSTGRES_URL"), reason="Requires isolated Ubuntu PostgreSQL")
+    def test_committed_pg_event_message_preserves_manual_precision(provider_pg):
+        from alerts.storage import Instrument
+
+        factory, _ = provider_pg
+        threshold = "1.123456789012345678"
+        config = AlertConfig.model_validate({
+            "name": "manual decimal", "instrument": "notification-managed", "source": "oanda", "timeframe": "M1",
+            "condition": {"relation": "cross_up", "left": {"kind": "price"},
+                          "right": {"kind": "constant", "value": threshold}}})
+        with factory.begin() as db:
+            db.add(Instrument(id=config.instrument, symbol="EUR_USD", label="acceptance", source="oanda",
+                              basis="bid", calendar="ny17", precision=5, enabled=True))
+        with factory.begin() as db:
+            alert = create(db, "notification-exact", config, at=0)
+            ident = alert.id
+            consume(db, ident, Observation("baseline", 0, 0, D(1), D(threshold), D(1)), baseline=True)
+            event = consume(db, ident, Observation("cross", 1, 1000, D(2), D(threshold), D(2)), detected_at=1001)
+            event_id = event.id
+        with factory() as db:
+            event = db.get(SignalRow, event_id)
+>           assert f"比较值 {threshold}" in signal_message(event)
+E           AssertionError: assert '比较值 1.123456789012345678' in 'EURUSD · oanda · M1\n价格 上穿 1.123456789012345678\n价格 2 / 比较值 1.1234567890\n市场价格 2.0000000000\n发生时间 1970-01-01T00:00:01+00:00 / 检测延迟 0.001s\n信号 70d9968f-abe1-415f-9ff5-abee2d7b4b7a\n请使用“确认”停止此事件的后续提醒。'
+E            +  where 'EURUSD · oanda · M1\n价格 上穿 1.123456789012345678\n价格 2 / 比较值 1.1234567890\n市场价格 2.0000000000\n发生时间 1970-01-01T00:00:01+00:00 / 检测延迟 0.001s\n信号 70d9968f-abe1-415f-9ff5-abee2d7b4b7a\n请使用“确认”停止此事件的后续提醒。' = signal_message(<alerts.storage.SignalRow object at 0x7f80051ebad0>)
+
+backend/tests/test_chart_alert_notifications.py:61: AssertionError
+=========================== short test summary info ============================
+FAILED backend/tests/test_chart_alert_notifications.py::test_committed_pg_event_message_preserves_manual_precision
+1 failed, 5 deselected in 1.91s

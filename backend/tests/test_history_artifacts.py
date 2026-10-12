@@ -178,3 +178,43 @@ def test_chart_reads_only_newest_required_blocks_and_keeps_old_period_identity(d
         request_artifacts(db, db.get(HistoryVersion, ident), ["H4"])
         with pytest.raises(ValueError, match="尚未发布"):
             chart_page(db, ident, "H4")
+
+
+@pytest.mark.parametrize("parent_rule", ["legacy", "different_precision"])
+def test_artifact_reuse_requires_compatible_version_price_rules(database, monkeypatch, parent_rule):
+    from alerts import history_artifacts
+    from alerts.history_maintenance import configure, create_run
+    from test_market_contracts import identity
+    from test_history_maintenance import Adapter as MaintenanceAdapter
+
+    with database.begin() as db:
+        register(db)
+        configure(db, identity().key, target_start=0, timeframes=["M1"], overlap_minutes=1)
+        parent = create_run(db, identity().key, end=180000, request_id="parent").id
+        version = db.get(HistoryVersion, parent)
+        version.manifest = ({"maintenance": version.manifest["maintenance"]} if parent_rule == "legacy"
+                            else {**version.manifest, "price_precision": 6})
+    close = "1.11111" if parent_rule == "legacy" else "1.111111"
+    import_page(Adapter([batch(rows=(minute(0, close=close), minute(60000, close=close)),
+                              checkpoint=120000, window_end=180000)]), version_id=parent)
+    import_page(Adapter([batch(window_start=120000, window_end=180000, checkpoint=180000,
+                              observed_at=185000, rows=(minute(120000, close=close),))]), version_id=parent)
+    finish(parent)
+    with database.begin() as db:
+        child = create_run(db, identity().key, end=240000, request_id="child").id
+    adapter = MaintenanceAdapter()
+    while import_page(adapter, version_id=child):
+        pass
+    calls = []
+    original = history_artifacts._add
+    def track(state, row, instrument, **kwargs):
+        calls.append(row["timestamp"])
+        return original(state, row, instrument, **kwargs)
+    monkeypatch.setattr(history_artifacts, "_add", track)
+    finish(child)
+    assert 0 in calls and 60000 in calls
+    with database.begin() as db:
+        from alerts.history_versions import snapshot_rows
+
+        artifact = read_artifact(db, child, "M1")[0]
+        assert artifact["close"] == list(snapshot_rows(db, child))[0]["close"] == "1.11111"

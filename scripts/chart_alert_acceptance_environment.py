@@ -7,6 +7,7 @@ PROJECT = os.environ.get("MW_ALERT_ACCEPTANCE_PROJECT", "mw-chart-alerts-accepta
 ENVIRONMENTS = {
     "mw-chart-alerts-acceptance": ("chart_alerts_acceptance", 19443),
     "mw-chart-alerts-integration": ("chart_alerts_integration", 19543),
+    "mw-native-alert-ui-runtime": ("native_alert_ui", 19643),
     "mw-range-main-20261006": ("range_main", 16843),
 }
 if PROJECT not in ENVIRONMENTS:
@@ -24,3 +25,6 @@ if PROJECT == "mw-range-main-20261006":
     ROOT = Path("/home/quant/repos/.acceptance/range-main-20261006")
     APP = "https://192.168.7.232:16843"
     COMPOSE = ROOT / "compose.yaml"
+
+if PROJECT == "mw-native-alert-ui-runtime":
+    COMPOSE = Path(__file__).resolve().parents[1] / "compose.native-alert-ui.yaml"

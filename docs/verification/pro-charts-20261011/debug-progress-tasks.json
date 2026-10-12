@@ -1,0 +1,76 @@
+{
+  "scope": "Two exact task-only synthetic AUDUSD debugging runs; records/data retained; Docker task/project stays active",
+  "before": [
+    {
+      "version": "919b5ff4-f97c-46a7-ab39-ebedfefc2a5a",
+      "dataset": "c9f815edd6fc55d545f2057f3f3ca9767e559a8e9f995de48adad40c7b58b5aa",
+      "calendar_version": "progress-acceptance-v1",
+      "version_status": "retrying",
+      "task_status": "retrying",
+      "desired_state": "running",
+      "completed_at": null,
+      "error": "invalid_payload"
+    },
+    {
+      "version": "a48ca41f-1201-4c47-8a50-f3814cc12fab",
+      "dataset": "c67912b53830ebafc209926dc5d63e0da775b3f14bd6ec2e95a87378c3545cf8",
+      "calendar_version": "progress-acceptance-v2",
+      "version_status": "published",
+      "task_status": "deriving",
+      "desired_state": "running",
+      "completed_at": null,
+      "error": null
+    }
+  ],
+  "after": [
+    {
+      "version": "919b5ff4-f97c-46a7-ab39-ebedfefc2a5a",
+      "dataset": "c9f815edd6fc55d545f2057f3f3ca9767e559a8e9f995de48adad40c7b58b5aa",
+      "calendar_version": "progress-acceptance-v1",
+      "version_status": "cancelled",
+      "task_status": "cancelled",
+      "desired_state": "cancelled",
+      "completed_at": null,
+      "error": "invalid_payload"
+    },
+    {
+      "version": "a48ca41f-1201-4c47-8a50-f3814cc12fab",
+      "dataset": "c67912b53830ebafc209926dc5d63e0da775b3f14bd6ec2e95a87378c3545cf8",
+      "calendar_version": "progress-acceptance-v2",
+      "version_status": "published",
+      "task_status": "published",
+      "desired_state": "running",
+      "completed_at": 1791758928729,
+      "error": null
+    }
+  ],
+  "completed_progress": {
+    "stage": "derive",
+    "published_periods": 2,
+    "total_periods": 2,
+    "processed_rows": 24002,
+    "total_rows": 24002,
+    "estimated_remaining_seconds": 0,
+    "periods": [
+      {
+        "timeframe": "H1",
+        "status": "published",
+        "processed_rows": 12001,
+        "total_rows": 12001,
+        "cursor": 1791757740000,
+        "work_seconds": 1.592332030646503,
+        "updated_at": 1791758928626
+      },
+      {
+        "timeframe": "M1",
+        "status": "published",
+        "processed_rows": 12001,
+        "total_rows": 12001,
+        "cursor": 1791757740000,
+        "work_seconds": 1.5706197046674788,
+        "updated_at": 1791758928721
+      }
+    ]
+  },
+  "passed": true
+}

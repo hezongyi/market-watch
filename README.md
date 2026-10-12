@@ -1,6 +1,6 @@
 # 守望 · Market Watch
 
-个人外汇、黄金和比特币监控网站。当前源码版本 **v1.14.1**，包含发布空闲开销、聚合公平性及回退覆盖核验修复，保留平台、自建与组合三层行情、数据中心和现有图表功能。源码发布与验收边界见 [v1.14.1 交付记录](docs/publication-v1.14.1-source-delivery.md)，既有操作见[双系列使用说明](docs/chart-dual-dataset-user-guide.md)。原预警系统验收见[交付矩阵](docs/acceptance-matrix.md)。
+个人外汇、黄金和比特币监控网站。当前源码版本 **v1.21.2**，包含专业图表生命周期、后台发布恢复、原生界面和日历审核修复，以及九周期独立绘图可见性。源码发布与验收边界见 [PR #46 复审及发布记录](docs/verification/pro-charts-20261011/pr46-review.md)，既有操作见[双系列使用说明](docs/chart-dual-dataset-user-guide.md)。原预警系统验收见[交付矩阵](docs/acceptance-matrix.md)。
 
 v1.14.1 保留固定自建历史、实时接续组合及可审计修订；部署前需迁移至 `aq44_aggregation_service_order`，按发布身份执行覆盖 `--until-complete --verify`。应用回退及重新升级步骤见 [发布说明](docs/verification/issue-13/release-pr.md)；本次为源码发布。
 
@@ -17,6 +17,8 @@ v1.10.0 新增原生 HTTP MCP，默认关闭，使用独立 agent 凭据并提�
 v1.7.0 增加原生视窗历史储备，并修复缓存重置及 Yahoo PG-only 储备边界。功能要求见 [实施计划](docs/native-viewport-history-buffer-plan.md)，发布与部署记录见 [v1.7.0 交付](docs/chart-v1.7.0-delivery.md)。
 
 版本变化见 [更新日志](CHANGELOG.md)，发布规则见 [版本维护](docs/versioning.md)。后续功能选项见[图表能力清单](docs/advanced-charts-v31-future-integration-capability-research.md)，MT4 接入路线见[Windows 桥接研究](docs/mt4-live-trading-bridge-research.md)。
+
+Android APK 的个人使用、低维护选型与手机界面分析见 [讨论与研究归档](docs/research/android-apk-discussion-record-20261011.md)，包含当前建议及早期通知研究的范围说明。
 
 历史 v1.7.0 发布：PR #6 已合入 main，附注标签 `v1.7.0` 指向 `e40eaac` 并已推送。Unraid 生产已从 v1.5.0 升级；四类镜像由该标签源码构建，实际镜像、备份恢复与验收见 [v1.7.0-production.json](deploy/releases/v1.7.0-production.json)。
 

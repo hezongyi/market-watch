@@ -1,0 +1,228 @@
+{
+  "at": 1791690547654,
+  "database_read_only": true,
+  "instruments": [
+    {
+      "id": "BTCUSDT",
+      "source": "binance",
+      "symbol": "BTCUSDT",
+      "enabled": true,
+      "quality": "receiving",
+      "last_received": 1791690537257,
+      "error": null,
+      "explicit_dataset": false,
+      "realtime_plan": true,
+      "active_demand": 0,
+      "active_viewport": 0
+    },
+    {
+      "id": "MC:b3f55bdfc39e3f5c5508371e3:EURUSD",
+      "source": "composite",
+      "symbol": "EURUSD",
+      "enabled": false,
+      "quality": "error",
+      "last_received": null,
+      "error": "Unknown source: composite",
+      "explicit_dataset": false,
+      "realtime_plan": false,
+      "active_demand": 2,
+      "active_viewport": 0
+    }
+  ],
+  "errors_24h": [
+    {
+      "instrument": "BTCUSDT",
+      "error": "",
+      "count": 1487,
+      "first": 1791656334869,
+      "last": 1791683440866
+    },
+    {
+      "instrument": "MC:b3f55bdfc39e3f5c5508371e3:EURUSD",
+      "error": "Unknown source: composite",
+      "count": 1288,
+      "first": 1791629085186,
+      "last": 1791690540481
+    },
+    {
+      "instrument": "BTCUSDT",
+      "error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1016)",
+      "count": 266,
+      "first": 1791605617023,
+      "last": 1791690356828
+    }
+  ],
+  "recent_events": [
+    {
+      "at": 1791690540481,
+      "kind": "market_error",
+      "instrument": "MC:b3f55bdfc39e3f5c5508371e3:EURUSD",
+      "error": "Unknown source: composite",
+      "minutes": null
+    },
+    {
+      "at": 1791690537248,
+      "kind": "market_ingested",
+      "instrument": "BTCUSDT",
+      "error": null,
+      "minutes": "119"
+    },
+    {
+      "at": 1791690518727,
+      "kind": "market_error",
+      "instrument": "MC:b3f55bdfc39e3f5c5508371e3:EURUSD",
+      "error": "Unknown source: composite",
+      "minutes": null
+    },
+    {
+      "at": 1791690517810,
+      "kind": "market_ingested",
+      "instrument": "BTCUSDT",
+      "error": null,
+      "minutes": "119"
+    },
+    {
+      "at": 1791690514873,
+      "kind": "market_error",
+      "instrument": "MC:b3f55bdfc39e3f5c5508371e3:EURUSD",
+      "error": "Unknown source: composite",
+      "minutes": null
+    },
+    {
+      "at": 1791690509771,
+      "kind": "market_ingested",
+      "instrument": "BTCUSDT",
+      "error": null,
+      "minutes": "119"
+    },
+    {
+      "at": 1791690490250,
+      "kind": "market_error",
+      "instrument": "MC:b3f55bdfc39e3f5c5508371e3:EURUSD",
+      "error": "Unknown source: composite",
+      "minutes": null
+    },
+    {
+      "at": 1791690488148,
+      "kind": "market_ingested",
+      "instrument": "BTCUSDT",
+      "error": null,
+      "minutes": "119"
+    },
+    {
+      "at": 1791690476798,
+      "kind": "market_error",
+      "instrument": "MC:b3f55bdfc39e3f5c5508371e3:EURUSD",
+      "error": "Unknown source: composite",
+      "minutes": null
+    },
+    {
+      "at": 1791690473277,
+      "kind": "market_ingested",
+      "instrument": "BTCUSDT",
+      "error": null,
+      "minutes": "119"
+    },
+    {
+      "at": 1791690459623,
+      "kind": "market_error",
+      "instrument": "MC:b3f55bdfc39e3f5c5508371e3:EURUSD",
+      "error": "Unknown source: composite",
+      "minutes": null
+    },
+    {
+      "at": 1791690458089,
+      "kind": "market_ingested",
+      "instrument": "BTCUSDT",
+      "error": null,
+      "minutes": "119"
+    },
+    {
+      "at": 1791690442685,
+      "kind": "market_ingested",
+      "instrument": "BTCUSDT",
+      "error": null,
+      "minutes": "119"
+    },
+    {
+      "at": 1791690427787,
+      "kind": "market_ingested",
+      "instrument": "BTCUSDT",
+      "error": null,
+      "minutes": "119"
+    },
+    {
+      "at": 1791690413548,
+      "kind": "market_ingested",
+      "instrument": "BTCUSDT",
+      "error": null,
+      "minutes": "119"
+    },
+    {
+      "at": 1791690398602,
+      "kind": "market_ingested",
+      "instrument": "BTCUSDT",
+      "error": null,
+      "minutes": "119"
+    },
+    {
+      "at": 1791690383013,
+      "kind": "market_ingested",
+      "instrument": "BTCUSDT",
+      "error": null,
+      "minutes": "119"
+    },
+    {
+      "at": 1791690370392,
+      "kind": "market_recovered",
+      "instrument": "BTCUSDT",
+      "error": null,
+      "minutes": null
+    },
+    {
+      "at": 1791690370387,
+      "kind": "market_ingested",
+      "instrument": "BTCUSDT",
+      "error": null,
+      "minutes": "119"
+    },
+    {
+      "at": 1791690356828,
+      "kind": "market_error",
+      "instrument": "BTCUSDT",
+      "error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1016)",
+      "minutes": null
+    }
+  ],
+  "composites": [
+    {
+      "id": "b3f55bdfc39e3f5c5508371e3692ac31576dc92fd3c22048275e134f7ae33ac3",
+      "instrument_id": "MC:b3f55bdfc39e3f5c5508371e3:EURUSD",
+      "dataset_id": "e3aaae7f238e6a55ca937c1d01b1225c1ccf2b6c6225f18744d11fd73b5436d3",
+      "active_revision_id": "a3c66706-f9fa-498b-8b65-cb7dfd494d70",
+      "mapping_id": "e322f5541033401a75eb46d46a169c9981ae0c53da5ceee4f2a6f5b8a5abb8e9",
+      "seam": 1791406800000,
+      "target_dataset_id": "7fd3d31e7c7c0e43be3df53eb494e5e2c8fc4d0e408f6b213049e6c09e0cf764",
+      "target_source": "oanda",
+      "target_symbol": "EUR_USD",
+      "target_enabled": true,
+      "target_quality": "error",
+      "target_received": 1791589965214,
+      "target_error": "unavailable"
+    }
+  ],
+  "bars": [
+    {
+      "instrument_id": "BTCUSDT",
+      "timeframe": "M1",
+      "latest_end": 1791690480000
+    }
+  ],
+  "imports": [
+    {
+      "instrument_id": "BTCUSDT",
+      "status": "complete",
+      "count": 244
+    }
+  ]
+}

@@ -73,7 +73,7 @@ Swing 支撑阻力指标已接入 Python 计算、历史分页、共享实时更
 
 Compose project／task 为 `mw-swing-sr-20261012`，独立 PG14、数据库、volume、网络及端口。postgres、api 为 healthy；market-stream、web、chart-origin、tls 正常运行；migrate 成功退出。只有 TLS 加入 task 专属 edge 网络发布 loopback 端口，应用和数据库继续使用 internal 网络。没有采集或通知 worker。
 
-构建均通过授权的 `sg docker` 调用 `mw-docker build`，task、project、purpose=acceptance 明确。chart 必须显式 `--context advanced-host`，并将展示及模板脚本纳入 `.dockerignore` 白名单。
+构建均通过授权的 `sg docker` 调用 `mw-docker build`，task、project、purpose=acceptance 明确。原基线 chart 使用 `--context advanced-host`；同步最新 main 后沿用包含 React 告警组件的仓库根构建 context，展示及模板脚本由 `advanced-host/Dockerfile.dockerignore` 白名单纳入。
 
 以下为最终运行镜像的 manifest digest（Docker inspect 的 Image ID；与镜像 config digest 不混用）：
 
@@ -89,7 +89,7 @@ API 与 chart 中本任务源文件 SHA256 已与工作区逐一核对；build-a
 cd /home/quant/repos/market-watch-swing-sr-20261012
 
 sg docker -c 'mw-docker build --repo . --component api --tag market-watch-api:swing-sr-20261012 --task mw-swing-sr-20261012 --project mw-swing-sr-20261012 --purpose acceptance'
-sg docker -c 'mw-docker build --repo . --component chart --context advanced-host --tag market-watch-chart-origin:swing-sr-20261012 --task mw-swing-sr-20261012 --project mw-swing-sr-20261012 --purpose acceptance'
+sg docker -c 'mw-docker build --repo . --component chart --tag market-watch-chart-origin:swing-sr-20261012 --task mw-swing-sr-20261012 --project mw-swing-sr-20261012 --purpose acceptance'
 sg docker -c 'mw-docker build --repo . --component web --tag market-watch-web:swing-sr-20261012 --task mw-swing-sr-20261012 --project mw-swing-sr-20261012 --purpose acceptance --build-arg VITE_ADVANCED_CHART_ORIGIN=https://127.0.0.1:16444'
 
 # 启动已有实例，保留现有私有配置和冻结数据库：

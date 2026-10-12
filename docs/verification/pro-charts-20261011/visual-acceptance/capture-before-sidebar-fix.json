@@ -1,0 +1,664 @@
+{
+  "environment": "Ubuntu quant-server / mw-pro-charts-20261011",
+  "url": "http://localhost:19997/advanced-charts",
+  "supply": "Task synthetic provider I/O; real API, PostgreSQL and licensed chart engine",
+  "screenshots": [
+    {
+      "file": "dark-01-five-charts.png",
+      "requirement": "F1/U6",
+      "notes": "Five real native panes: H1/M5/W1/D1/H4, current fixed composite revision.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-02-symbol-details.png",
+      "requirement": "U3/U4",
+      "notes": "Real quote observation time; no snapshot replay.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-03-alert-sidebar.png",
+      "requirement": "F3/U2/U8",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-04-alert-log.png",
+      "requirement": "F3/U8",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-05-price-menu.png",
+      "requirement": "F3/U8",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-06-price-alert-dialog.png",
+      "requirement": "F3/U8",
+      "notes": "Current initiating chart identity and formatter; draft only.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-07-python-indicators.png",
+      "requirement": "F6/U5",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-08-python-indicator-detail.png",
+      "requirement": "F6/U5",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-09-drawing-nine-periods.png",
+      "requirement": "U7",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-10-center-calendar.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "交易日历 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-11-calendar-expanded.png",
+      "requirement": "F5/U1",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-11-calendar-bottom.png",
+      "requirement": "U5",
+      "notes": "Actual content scroll to rule evidence and bottom rows.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-10-center-tasks.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "任务与记录 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-10-center-managed.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "自建行情 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-10-center-sources.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "来源状态 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-10-center-composite.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "组合行情 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-10-center-platform.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "平台行情 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-12-baseline-dropdown.png",
+      "requirement": "DC1",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-13-mapping-dropdown.png",
+      "requirement": "DC1",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-14-target-dropdown.png",
+      "requirement": "DC1",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-15-task-progress.png",
+      "requirement": "F4",
+      "notes": "Real committed progress from a new task-only synthetic AUDUSD import.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-16-calendar-768.png",
+      "requirement": "F5/U1/U5",
+      "notes": "Narrow desktop pointer viewport, not phone emulation.",
+      "viewport": {
+        "width": 768,
+        "height": 800
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-16-calendar-bottom-768.png",
+      "requirement": "U5",
+      "notes": "Actual scroll to the bottom; narrow desktop pointer viewport.",
+      "viewport": {
+        "width": 768,
+        "height": 800
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-17-platform-768.png",
+      "requirement": "U5/DC1",
+      "notes": "",
+      "viewport": {
+        "width": 768,
+        "height": 800
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-18-indicators-768.png",
+      "requirement": "F6/U5",
+      "notes": "",
+      "viewport": {
+        "width": 768,
+        "height": 800
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-19-indicator-detail-768.png",
+      "requirement": "F6/U5",
+      "notes": "Responsive indicator detail; full panel at narrow width.",
+      "viewport": {
+        "width": 768,
+        "height": 800
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-16-calendar-375.png",
+      "requirement": "F5/U1/U5",
+      "notes": "Narrow desktop pointer viewport, not phone emulation.",
+      "viewport": {
+        "width": 375,
+        "height": 800
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-16-calendar-bottom-375.png",
+      "requirement": "U5",
+      "notes": "Actual scroll to the bottom; narrow desktop pointer viewport.",
+      "viewport": {
+        "width": 375,
+        "height": 800
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-17-platform-375.png",
+      "requirement": "U5/DC1",
+      "notes": "",
+      "viewport": {
+        "width": 375,
+        "height": 800
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-18-indicators-375.png",
+      "requirement": "F6/U5",
+      "notes": "",
+      "viewport": {
+        "width": 375,
+        "height": 800
+      },
+      "review": "pending"
+    },
+    {
+      "file": "dark-19-indicator-detail-375.png",
+      "requirement": "F6/U5",
+      "notes": "Responsive indicator detail; full panel at narrow width.",
+      "viewport": {
+        "width": 375,
+        "height": 800
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-01-five-charts.png",
+      "requirement": "F1/U6",
+      "notes": "Five real native panes: H1/M5/W1/D1/H4, current fixed composite revision.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-02-symbol-details.png",
+      "requirement": "U3/U4",
+      "notes": "Real quote observation time; no snapshot replay.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-03-alert-sidebar.png",
+      "requirement": "F3/U2/U8",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-04-alert-log.png",
+      "requirement": "F3/U8",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-05-price-menu.png",
+      "requirement": "F3/U8",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-06-price-alert-dialog.png",
+      "requirement": "F3/U8",
+      "notes": "Current initiating chart identity and formatter; draft only.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-07-python-indicators.png",
+      "requirement": "F6/U5",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-08-python-indicator-detail.png",
+      "requirement": "F6/U5",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-09-drawing-nine-periods.png",
+      "requirement": "U7",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-10-center-calendar.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "交易日历 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-11-calendar-expanded.png",
+      "requirement": "F5/U1",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-11-calendar-bottom.png",
+      "requirement": "U5",
+      "notes": "Actual content scroll to rule evidence and bottom rows.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-10-center-tasks.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "任务与记录 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-10-center-managed.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "自建行情 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-10-center-sources.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "来源状态 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-10-center-composite.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "组合行情 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-10-center-platform.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "平台行情 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-12-baseline-dropdown.png",
+      "requirement": "DC1",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-13-mapping-dropdown.png",
+      "requirement": "DC1",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-14-target-dropdown.png",
+      "requirement": "DC1",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-15-task-progress.png",
+      "requirement": "F4",
+      "notes": "Real committed progress from a new task-only synthetic AUDUSD import.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-16-calendar-768.png",
+      "requirement": "F5/U1/U5",
+      "notes": "Narrow desktop pointer viewport, not phone emulation.",
+      "viewport": {
+        "width": 768,
+        "height": 800
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-16-calendar-bottom-768.png",
+      "requirement": "U5",
+      "notes": "Actual scroll to the bottom; narrow desktop pointer viewport.",
+      "viewport": {
+        "width": 768,
+        "height": 800
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-17-platform-768.png",
+      "requirement": "U5/DC1",
+      "notes": "",
+      "viewport": {
+        "width": 768,
+        "height": 800
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-18-indicators-768.png",
+      "requirement": "F6/U5",
+      "notes": "",
+      "viewport": {
+        "width": 768,
+        "height": 800
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-19-indicator-detail-768.png",
+      "requirement": "F6/U5",
+      "notes": "Responsive indicator detail; full panel at narrow width.",
+      "viewport": {
+        "width": 768,
+        "height": 800
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-16-calendar-375.png",
+      "requirement": "F5/U1/U5",
+      "notes": "Narrow desktop pointer viewport, not phone emulation.",
+      "viewport": {
+        "width": 375,
+        "height": 800
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-16-calendar-bottom-375.png",
+      "requirement": "U5",
+      "notes": "Actual scroll to the bottom; narrow desktop pointer viewport.",
+      "viewport": {
+        "width": 375,
+        "height": 800
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-17-platform-375.png",
+      "requirement": "U5/DC1",
+      "notes": "",
+      "viewport": {
+        "width": 375,
+        "height": 800
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-18-indicators-375.png",
+      "requirement": "F6/U5",
+      "notes": "",
+      "viewport": {
+        "width": 375,
+        "height": 800
+      },
+      "review": "pending"
+    },
+    {
+      "file": "light-19-indicator-detail-375.png",
+      "requirement": "F6/U5",
+      "notes": "Responsive indicator detail; full panel at narrow width.",
+      "viewport": {
+        "width": 375,
+        "height": 800
+      },
+      "review": "pending"
+    },
+    {
+      "file": "mobile-readonly-375.png",
+      "requirement": "F7",
+      "notes": "Chromium touch simulation; physical-device validation belongs to user.",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "review": "pending"
+    },
+    {
+      "file": "mobile-readonly-915.png",
+      "requirement": "F7",
+      "notes": "Chromium touch simulation; physical-device validation belongs to user.",
+      "viewport": {
+        "width": 915,
+        "height": 412
+      },
+      "review": "pending"
+    }
+  ],
+  "errors": [],
+  "visualReview": "requires_fix",
+  "progressFixture": "76d390d3-a76a-47fb-ae8a-45c9cb3ab3af",
+  "progressFixtureFinished": true,
+  "capturePassed": true,
+  "visualFindings": [
+    {
+      "id": "VA1",
+      "finding": "Long source identity clips status and log timestamp in 300px native sidebar",
+      "files": [
+        "dark-03-alert-sidebar.png",
+        "dark-04-alert-log.png",
+        "light-03-alert-sidebar.png",
+        "light-04-alert-log.png"
+      ]
+    }
+  ]
+}

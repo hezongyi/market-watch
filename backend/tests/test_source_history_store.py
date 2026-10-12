@@ -5,7 +5,7 @@ from alerts import history_versions as history
 from alerts.source_history_store import raw_chunk, shared_page
 from alerts.storage import HistoryChunk, HistoryVersion, SourceBlob, SourceFetch
 from sqlalchemy import func, select
-from test_market_contracts import batch, identity
+from test_market_contracts import batch, identity, minute
 from test_market_datasets import register
 
 
@@ -38,6 +38,47 @@ def test_two_prepared_calendars_acquire_once_and_reference_one_original_blob(dat
         assert db.scalar(select(func.count()).select_from(SourceBlob)) == 1
         assert list(history.snapshot_rows(db, versions[0])) == list(history.snapshot_rows(db, versions[1]))
         assert db.get(HistoryVersion, versions[0]).manifest["identity"] != db.get(HistoryVersion, versions[1]).manifest["identity"]
+
+
+def test_shared_raw_page_is_processed_per_version_precision_without_mutation(database):
+    second_identity = identity(calendar_version="utc0-v1")
+    rows = (minute(open="1.093887", high="1.093887", low="1.093887", close="1.093887",
+                   volume="6.30"),)
+    with database.begin() as db:
+        register(db, precision=5)
+        register(db, second_identity, precision=6)
+        versions = [history.create_version(db, raw.key, 0, 120000)
+                    for raw in (identity(), second_identity)]
+
+    class Adapter:
+        calls = 0
+
+        def page(self, raw, start, end):
+            self.calls += 1
+            return batch(identity=raw, checkpoint=end, rows=rows)
+
+    adapter = Adapter()
+    for ident in versions:
+        assert history.import_page(adapter, version_id=ident)
+    assert adapter.calls == 1
+
+    with database.begin() as db:
+        chunks = [db.scalar(select(HistoryChunk).where(HistoryChunk.version_id == ident))
+                  for ident in versions]
+        blob = db.scalar(select(SourceBlob))
+        raw = raw_chunk(db, chunks[0])
+        assert chunks[0].checksum == chunks[1].checksum == blob.checksum
+        assert raw_chunk(db, chunks[1]) == raw
+        assert b'"close":"1.093887"' in raw
+
+        rounded = list(history.snapshot_rows(db, versions[0]))[0]
+        precise = list(history.snapshot_rows(db, versions[1]))[0]
+        assert rounded["close"] == "1.09389"
+        assert precise["close"] == "1.093887"
+        for key in ("timestamp", "volume", "complete"):
+            assert rounded[key] == precise[key]
+        assert raw_chunk(db, chunks[0]) == raw
+        assert blob.checksum == chunks[0].checksum
 
 
 def test_blob_cannot_be_mutated_or_deleted_and_reads_verify_content(database):

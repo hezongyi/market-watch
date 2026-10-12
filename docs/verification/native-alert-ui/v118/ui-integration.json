@@ -1,0 +1,620 @@
+{
+  "scope": "Ubuntu Chromium, actual widget and shipped UI, cross-origin parent API fixture; no deployed instance",
+  "cases": [
+    "Message and notification subpages apply only to draft; cancel/reentry restores values; finite trigger semantics",
+    "Native shell renders shipped form; failed save retains draft; parent owns every API write and CSRF",
+    "Pause/resume and edit use existing version/control revision API",
+    "Native drag reallocates chart width; native page rebuild retains search state and one mounted renderer; object tree round trip",
+    "Date-grouped log retains late evidence, rule version, delivery status and independent acknowledgement",
+    "Escape returns from subpage, modal focus stays inside native shell, final Escape closes; light theme applies",
+    "Native sidebar tab toggles with real mouse and keyboard; native menus handle Home/End/Escape",
+    "Real native controls preserve range, two indicator operands and drawing snapshot creation",
+    "Copy is draft only; current-symbol filter follows active pane while edit draft stays fixed; edit footer archives through existing lifecycle",
+    "Native fullscreen retains one renderer and permits dialog creation; exiting restores the native alert page",
+    "Failed chunk loading leaves native configuration intact; destruction cancels a pending native dialog without a stray window",
+    "Narrow viewport retains bounded dialog; destruction removes business root"
+  ],
+  "errors": [],
+  "reuse": [
+    {
+      "kind": "select",
+      "nativeClass": "container-WDZ0PRNh container-small-WDZ0PRNh intent-default-WDZ0PRNh border-thin-WDZ0PRNh size-small-WDZ0PRNh stretch-WDZ0PRNh adjust-position-WDZ0PRNh first-row-WDZ0PRNh first-col-WDZ0PRNh button-tFul0OhX"
+    },
+    {
+      "kind": "select",
+      "nativeClass": "container-WDZ0PRNh container-small-WDZ0PRNh intent-default-WDZ0PRNh border-thin-WDZ0PRNh size-small-WDZ0PRNh stretch-WDZ0PRNh adjust-position-WDZ0PRNh first-row-WDZ0PRNh first-col-WDZ0PRNh button-tFul0OhX"
+    },
+    {
+      "kind": "input",
+      "nativeClass": "container-WDZ0PRNh container-small-WDZ0PRNh intent-primary-WDZ0PRNh border-thin-WDZ0PRNh size-small-WDZ0PRNh with-highlight-WDZ0PRNh focused-WDZ0PRNh stretch-WDZ0PRNh adjust-position-WDZ0PRNh first-row-WDZ0PRNh first-col-WDZ0PRNh"
+    },
+    {
+      "kind": "select",
+      "nativeClass": "container-WDZ0PRNh container-small-WDZ0PRNh intent-default-WDZ0PRNh border-thin-WDZ0PRNh size-small-WDZ0PRNh stretch-WDZ0PRNh adjust-position-WDZ0PRNh first-row-WDZ0PRNh first-col-WDZ0PRNh button-tFul0OhX"
+    },
+    {
+      "kind": "menu"
+    },
+    {
+      "kind": "select",
+      "nativeClass": "container-WDZ0PRNh container-small-WDZ0PRNh intent-default-WDZ0PRNh border-thin-WDZ0PRNh size-small-WDZ0PRNh stretch-WDZ0PRNh adjust-position-WDZ0PRNh first-row-WDZ0PRNh first-col-WDZ0PRNh button-tFul0OhX"
+    },
+    {
+      "kind": "select",
+      "nativeClass": "container-WDZ0PRNh container-small-WDZ0PRNh intent-default-WDZ0PRNh border-thin-WDZ0PRNh size-small-WDZ0PRNh stretch-WDZ0PRNh adjust-position-WDZ0PRNh first-row-WDZ0PRNh first-col-WDZ0PRNh button-tFul0OhX"
+    },
+    {
+      "kind": "select",
+      "nativeClass": "container-WDZ0PRNh container-small-WDZ0PRNh intent-default-WDZ0PRNh border-thin-WDZ0PRNh size-small-WDZ0PRNh stretch-WDZ0PRNh adjust-position-WDZ0PRNh first-row-WDZ0PRNh first-col-WDZ0PRNh button-tFul0OhX"
+    },
+    {
+      "kind": "select",
+      "nativeClass": "container-WDZ0PRNh container-small-WDZ0PRNh intent-default-WDZ0PRNh border-thin-WDZ0PRNh size-small-WDZ0PRNh stretch-WDZ0PRNh adjust-position-WDZ0PRNh first-row-WDZ0PRNh first-col-WDZ0PRNh button-tFul0OhX"
+    },
+    {
+      "kind": "input",
+      "nativeClass": "container-WDZ0PRNh container-small-WDZ0PRNh intent-default-WDZ0PRNh border-thin-WDZ0PRNh size-small-WDZ0PRNh stretch-WDZ0PRNh adjust-position-WDZ0PRNh first-row-WDZ0PRNh first-col-WDZ0PRNh"
+    },
+    {
+      "kind": "button",
+      "nativeClass": "button-D4RPB3ZC xsmall-D4RPB3ZC gray-D4RPB3ZC secondary-D4RPB3ZC apply-overflow-tooltip apply-overflow-tooltip--check-children-recursively apply-overflow-tooltip--allow-text apply-common-tooltip"
+    },
+    {
+      "kind": "button",
+      "nativeClass": "button-D4RPB3ZC xsmall-D4RPB3ZC gray-D4RPB3ZC primary-D4RPB3ZC apply-overflow-tooltip apply-overflow-tooltip--check-children-recursively apply-overflow-tooltip--allow-text apply-common-tooltip"
+    }
+  ],
+  "geometry": {
+    "shell": {
+      "x": 1132,
+      "y": 212,
+      "width": 480,
+      "height": 465.9375,
+      "top": 212,
+      "right": 1612,
+      "bottom": 677.9375,
+      "left": 1132
+    },
+    "body": {
+      "x": 1132,
+      "y": 269,
+      "width": 480,
+      "height": 408.9375,
+      "top": 269,
+      "right": 1612,
+      "bottom": 677.9375,
+      "left": 1132
+    },
+    "controls": [
+      {
+        "x": 1284,
+        "y": 285,
+        "width": 308,
+        "height": 34,
+        "top": 285,
+        "right": 1592,
+        "bottom": 319,
+        "left": 1284
+      },
+      {
+        "x": 1284,
+        "y": 327,
+        "width": 308,
+        "height": 34,
+        "top": 327,
+        "right": 1592,
+        "bottom": 361,
+        "left": 1284
+      },
+      {
+        "x": 1284,
+        "y": 369,
+        "width": 308,
+        "height": 34,
+        "top": 369,
+        "right": 1592,
+        "bottom": 403,
+        "left": 1284
+      }
+    ],
+    "select": [
+      {
+        "tag": "SPAN",
+        "className": "container-WDZ0PRNh container-small-WDZ0PRNh intent-default-WDZ0PRNh border-thin-WDZ0PRNh size-small-WDZ0PRNh stretch-WDZ0PRNh adjust-position-WDZ0PRNh first-row-WDZ0PRNh first-col-WDZ0PRNh button-tFul0OhX",
+        "align": "left",
+        "justify": "flex-start"
+      },
+      {
+        "tag": "SPAN",
+        "className": "inner-slot-W53jtLjw inner-middle-slot-W53jtLjw",
+        "align": "left",
+        "justify": "flex-start"
+      },
+      {
+        "tag": "SPAN",
+        "className": "button-children-tFul0OhX",
+        "align": "left",
+        "justify": "normal"
+      },
+      {
+        "tag": "SPAN",
+        "className": "",
+        "align": "left",
+        "justify": "normal"
+      },
+      {
+        "tag": "SPAN",
+        "className": "inner-slot-W53jtLjw interactive-W53jtLjw",
+        "align": "left",
+        "justify": "center"
+      },
+      {
+        "tag": "SPAN",
+        "className": "button-PYEOTd6i disabled-PYEOTd6i",
+        "align": "left",
+        "justify": "center"
+      },
+      {
+        "tag": "SPAN",
+        "className": "icon-PYEOTd6i",
+        "align": "left",
+        "justify": "center"
+      },
+      {
+        "tag": "svg",
+        "className": {},
+        "align": "left",
+        "justify": "normal"
+      },
+      {
+        "tag": "path",
+        "className": {},
+        "align": "left",
+        "justify": "normal"
+      },
+      {
+        "tag": "SPAN",
+        "className": "highlight-WDZ0PRNh",
+        "align": "left",
+        "justify": "normal"
+      }
+    ]
+  },
+  "nativeTabs": [
+    {
+      "page": "base",
+      "label": "观察清单和详情"
+    },
+    {
+      "page": "alerts",
+      "label": "警报"
+    },
+    {
+      "page": "data-window",
+      "label": "数据窗口"
+    },
+    {
+      "page": "object_tree",
+      "label": "显示对象树"
+    }
+  ],
+  "cleanup": {
+    "failed": true,
+    "restored": true,
+    "stray": 0
+  },
+  "passed": true,
+  "writes": [
+    {
+      "path": "/api/chart-alerts/capabilities",
+      "body": {
+        "instrument": "EURUSD",
+        "series_kind": "managed",
+        "timeframe": "H1"
+      }
+    },
+    {
+      "path": "/api/chart-alerts",
+      "body": {
+        "request_id": "56f33de1-06f8-4333-90c7-34389f7f0546",
+        "config": {
+          "name": "欧元突破",
+          "instrument": "EURUSD",
+          "series_kind": "managed",
+          "source": "fixture",
+          "timeframe": "H1",
+          "mode": "close",
+          "condition": {
+            "relation": "cross_up",
+            "left": {
+              "kind": "price"
+            },
+            "right": {
+              "kind": "constant",
+              "value": "1.121"
+            }
+          },
+          "max_triggers": 2,
+          "expires_at": null,
+          "message": "观察 {symbol}",
+          "notify_web": true,
+          "notify_ntfy": true,
+          "late_delivery": "log_only",
+          "association": {
+            "workspace_id": "fixture",
+            "chart_id": "2257bcde-9e2d-4973-8f6f-7d7d5effce7e",
+            "chart_index": 0,
+            "generation": "1:0",
+            "object_id": null,
+            "object_kind": null,
+            "native_object_id": null
+          },
+          "calculation_version": "chart-python-v1",
+          "calculation_origin": null,
+          "published": true
+        }
+      }
+    },
+    {
+      "path": "/api/chart-alerts",
+      "body": {
+        "request_id": "56f33de1-06f8-4333-90c7-34389f7f0546",
+        "config": {
+          "name": "欧元突破",
+          "instrument": "EURUSD",
+          "series_kind": "managed",
+          "source": "fixture",
+          "timeframe": "H1",
+          "mode": "close",
+          "condition": {
+            "relation": "cross_up",
+            "left": {
+              "kind": "price"
+            },
+            "right": {
+              "kind": "constant",
+              "value": "1.121"
+            }
+          },
+          "max_triggers": 2,
+          "expires_at": null,
+          "message": "观察 {symbol}",
+          "notify_web": true,
+          "notify_ntfy": true,
+          "late_delivery": "log_only",
+          "association": {
+            "workspace_id": "fixture",
+            "chart_id": "2257bcde-9e2d-4973-8f6f-7d7d5effce7e",
+            "chart_index": 0,
+            "generation": "1:0",
+            "object_id": null,
+            "object_kind": null,
+            "native_object_id": null
+          },
+          "calculation_version": "chart-python-v1",
+          "calculation_origin": null,
+          "published": true
+        }
+      }
+    },
+    {
+      "path": "/api/chart-alerts/a4e0fd23-b2fa-47dc-ad0d-863dbddd8a7c/lifecycle",
+      "body": {
+        "version": 1,
+        "control_revision": 1,
+        "request_id": "917ecf0c-6ff2-43ac-9798-847c6b33a21f",
+        "action": "pause"
+      }
+    },
+    {
+      "path": "/api/chart-alerts/a4e0fd23-b2fa-47dc-ad0d-863dbddd8a7c/lifecycle",
+      "body": {
+        "version": 1,
+        "control_revision": 2,
+        "request_id": "39c49d20-0e6b-42b9-afb6-156b3537421f",
+        "action": "resume"
+      }
+    },
+    {
+      "path": "/api/chart-alerts/capabilities",
+      "body": {
+        "instrument": "EURUSD",
+        "series_kind": "managed",
+        "timeframe": "H1"
+      }
+    },
+    {
+      "path": "/api/chart-alerts/a4e0fd23-b2fa-47dc-ad0d-863dbddd8a7c/edit",
+      "body": {
+        "version": 1,
+        "config": {
+          "name": "已编辑",
+          "instrument": "EURUSD",
+          "series_kind": "managed",
+          "source": "fixture",
+          "timeframe": "H1",
+          "mode": "close",
+          "condition": {
+            "relation": "cross_up",
+            "left": {
+              "kind": "price"
+            },
+            "right": {
+              "kind": "constant",
+              "value": "1.121"
+            }
+          },
+          "max_triggers": 2,
+          "expires_at": null,
+          "message": "观察 {symbol}",
+          "notify_web": true,
+          "notify_ntfy": true,
+          "late_delivery": "log_only",
+          "association": {
+            "workspace_id": "fixture",
+            "chart_id": "2257bcde-9e2d-4973-8f6f-7d7d5effce7e",
+            "chart_index": 0,
+            "generation": "1:0",
+            "object_id": null,
+            "object_kind": null,
+            "native_object_id": null
+          },
+          "calculation_version": "chart-python-v1",
+          "calculation_origin": null,
+          "published": true
+        }
+      }
+    },
+    {
+      "path": "/api/notifications/7d06bec8-12ae-46cc-972e-fc87728c35e1/ack",
+      "body": {}
+    },
+    {
+      "path": "/api/chart-alerts/capabilities",
+      "body": {
+        "instrument": "EURUSD",
+        "series_kind": "managed",
+        "timeframe": "H1"
+      }
+    },
+    {
+      "path": "/api/chart-alerts/capabilities",
+      "body": {
+        "instrument": "EURUSD",
+        "series_kind": "managed",
+        "timeframe": "H1"
+      }
+    },
+    {
+      "path": "/api/chart-alerts/capabilities",
+      "body": {
+        "instrument": "EURUSD",
+        "series_kind": "managed",
+        "timeframe": "H1"
+      }
+    },
+    {
+      "path": "/api/chart-alerts/capabilities",
+      "body": {
+        "instrument": "EURUSD",
+        "series_kind": "managed",
+        "timeframe": "H1"
+      }
+    },
+    {
+      "path": "/api/chart-alerts",
+      "body": {
+        "request_id": "576b1804-70b5-4df5-a080-90adc0632f02",
+        "config": {
+          "name": "EURUSD 告警",
+          "instrument": "EURUSD",
+          "series_kind": "managed",
+          "source": "fixture",
+          "timeframe": "H1",
+          "mode": "close",
+          "condition": {
+            "relation": "enter",
+            "left": {
+              "kind": "price"
+            },
+            "lower": "1.115",
+            "upper": "1.125"
+          },
+          "max_triggers": 1,
+          "expires_at": null,
+          "message": "",
+          "notify_web": true,
+          "notify_ntfy": false,
+          "late_delivery": "log_only",
+          "association": {
+            "workspace_id": "fixture",
+            "chart_id": "2257bcde-9e2d-4973-8f6f-7d7d5effce7e",
+            "chart_index": 0,
+            "generation": "1:0",
+            "object_id": null,
+            "object_kind": null,
+            "native_object_id": null
+          },
+          "calculation_version": "chart-python-v1",
+          "calculation_origin": null,
+          "published": true
+        }
+      }
+    },
+    {
+      "path": "/api/chart-alerts/capabilities",
+      "body": {
+        "instrument": "EURUSD",
+        "series_kind": "managed",
+        "timeframe": "H1"
+      }
+    },
+    {
+      "path": "/api/chart-alerts",
+      "body": {
+        "request_id": "2c4be180-2522-4008-9f0f-6508345726e3",
+        "config": {
+          "name": "EURUSD 告警",
+          "instrument": "EURUSD",
+          "series_kind": "managed",
+          "source": "fixture",
+          "timeframe": "H1",
+          "mode": "close",
+          "condition": {
+            "relation": "cross_up",
+            "left": {
+              "kind": "indicator",
+              "indicator": {
+                "name": "SMA",
+                "version": "1",
+                "params": {
+                  "period": 20
+                },
+                "output": "value"
+              }
+            },
+            "right": {
+              "kind": "indicator",
+              "indicator": {
+                "name": "EMA",
+                "version": "1",
+                "params": {
+                  "period": 20
+                },
+                "output": "value"
+              }
+            }
+          },
+          "max_triggers": 1,
+          "expires_at": null,
+          "message": "",
+          "notify_web": true,
+          "notify_ntfy": false,
+          "late_delivery": "log_only",
+          "association": {
+            "workspace_id": "fixture",
+            "chart_id": "2257bcde-9e2d-4973-8f6f-7d7d5effce7e",
+            "chart_index": 0,
+            "generation": "1:0",
+            "object_id": null,
+            "object_kind": null,
+            "native_object_id": null
+          },
+          "calculation_version": "chart-python-v1",
+          "calculation_origin": null,
+          "published": true
+        }
+      }
+    },
+    {
+      "path": "/api/chart-alerts/capabilities",
+      "body": {
+        "instrument": "EURUSD",
+        "series_kind": "managed",
+        "timeframe": "H1"
+      }
+    },
+    {
+      "path": "/api/chart-alerts",
+      "body": {
+        "request_id": "50b34c52-8090-49dc-b565-372de9d09a4e",
+        "config": {
+          "name": "EURUSD 告警",
+          "instrument": "EURUSD",
+          "series_kind": "managed",
+          "source": "fixture",
+          "timeframe": "H1",
+          "mode": "close",
+          "condition": {
+            "relation": "cross_up",
+            "left": {
+              "kind": "price"
+            },
+            "right": {
+              "kind": "line",
+              "line": {
+                "instrument": "EURUSD",
+                "source": "fixture",
+                "series_kind": "managed",
+                "timeframe": "H1",
+                "published": true,
+                "kind": "horizontal_line",
+                "scale": "linear",
+                "extend_left": false,
+                "extend_right": false,
+                "points": [
+                  {
+                    "time": 1791691200000,
+                    "price": "1.125",
+                    "index": 0
+                  }
+                ],
+                "mapping_version": "bar-index-v1"
+              }
+            }
+          },
+          "max_triggers": 1,
+          "expires_at": null,
+          "message": "",
+          "notify_web": true,
+          "notify_ntfy": false,
+          "late_delivery": "log_only",
+          "association": {
+            "workspace_id": "fixture",
+            "chart_id": "2257bcde-9e2d-4973-8f6f-7d7d5effce7e",
+            "chart_index": 0,
+            "generation": "1:0",
+            "object_id": "78bc9d6c-24f1-4217-acf3-289054565c22",
+            "object_kind": "drawing",
+            "native_object_id": "uyxl7W"
+          },
+          "calculation_version": "chart-python-v1",
+          "calculation_origin": null,
+          "published": true
+        }
+      }
+    },
+    {
+      "path": "/api/chart-alerts/capabilities",
+      "body": {
+        "instrument": "EURUSD",
+        "series_kind": "managed",
+        "timeframe": "H1"
+      }
+    },
+    {
+      "path": "/api/chart-alerts/capabilities",
+      "body": {
+        "instrument": "EURUSD",
+        "series_kind": "managed",
+        "timeframe": "H1"
+      }
+    },
+    {
+      "path": "/api/chart-alerts/capabilities",
+      "body": {
+        "instrument": "EURUSD",
+        "series_kind": "managed",
+        "timeframe": "H1"
+      }
+    },
+    {
+      "path": "/api/chart-alerts/a4e0fd23-b2fa-47dc-ad0d-863dbddd8a7c/lifecycle",
+      "body": {
+        "version": 2,
+        "control_revision": 3,
+        "request_id": "f93f8985-e14c-49e3-b106-85ecf210663c",
+        "action": "archive"
+      }
+    },
+    {
+      "path": "/api/chart-alerts/capabilities",
+      "body": {
+        "instrument": "EURUSD",
+        "series_kind": "managed",
+        "timeframe": "H1"
+      }
+    }
+  ],
+  "fixtureErrors": []
+}

@@ -31,6 +31,10 @@
   padding: 32px;
 }
 .advanced-workspace[data-theme="light"] { background: #fff; color: #131722; }
+.advanced-readonly-note { margin:0;padding:8px 12px;line-height:1.5;flex:none; }
+.advanced-history-failures {position:fixed;z-index:20;inset:64px 16px auto auto;max-width:min(440px,calc(100% - 32px));background:#202020;padding:8px 12px;border:1px solid #787b86;border-radius:4px;}
+.advanced-workspace[data-theme="light"] .advanced-history-failures {background:#fff;}
+.advanced-history-failures p {margin:4px 0;line-height:1.5;overflow-wrap:anywhere;}
 .advanced-loading-notice {
   position: fixed;
   z-index: 10;

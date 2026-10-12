@@ -5,6 +5,29 @@ const vm = require('node:vm');
 const context = vm.createContext({ Intl, Number, Math });
 vm.runInContext(fs.readFileSync(path.resolve(__dirname, '../../advanced-host/price-format.js'), 'utf8'), context);
 const factory = context.chartPriceFormatter;
+// The initiating chart's formatter controls defaults; storage gets a separate
+// canonical decimal, never its grouped display text or interpolated JS number.
+assert.equal(typeof context.chartAlertPricePresentation, 'function');
+const alertPrice = (price, format) => context.chartAlertPricePresentation({priceFormatter: () => ({format})}, price);
+for (const [price, text, decimal] of [
+  [1.128313520286396, '1.12831', '1.12831'],
+  [151.23456789, '151.235', '151.235'],
+  [2651.12789, '2,651.13', '2651.13'],
+  [62000.123456789, '62,000.12', '62000.12'],
+  [252.29456789, '252.29', '252.29'],
+  [0.000000014, '0.00000001', '0.00000001'],
+  [10.023, '10.05', '10.05'],
+]) {
+  const value=alertPrice(price, () => text);
+  assert.equal(value.text, text);
+  assert.equal(value.value, decimal);
+}
+assert.throws(() => alertPrice(1, () => 'bad format'), /报价格式/);
+for(const [text,scale,factor,value] of [["133'21",32,0,'133.65625'],["119'16'2",128,4,'119.5078125'],["119'16'7",128,4,'119.5234375'],["10'2",4,0,'10.25'],["10'5",8,0,'10.625']]){
+ const actual=context.chartAlertPricePresentation({symbolExt:()=>({fractional:true,pricescale:scale,minmove2:factor}),priceFormatter:()=>({format:()=>text})},Number(value));
+ assert.equal(actual.value,value);
+}
+assert.equal(alertPrice(10.014,()=> '\u202a10.02\u202c').value,'10.02','variable tick/native directional marks');
 const formatter = precision => factory({ mw_range_source: 'yahoo', mw_display_precision: precision }, 'default');
 assert.equal(formatter(2).format(530.82456789), '530.82');
 assert.equal(formatter(2).format(-37.63), '-37.63');

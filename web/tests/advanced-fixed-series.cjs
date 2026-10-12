@@ -1,10 +1,11 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const events=[];
 const ctx=vm.createContext({URL,URLSearchParams,Map,Set,Promise,Date,Intl,Error,
+ document:{createElement:()=>({}),head:{append(){}}},
  location:{search:'?parent=http://localhost'},parent:{postMessage:m=>events.push(m)},
  crypto:{randomUUID:()=> 'test'},atob:s=>Buffer.from(s,'base64').toString('utf8'),
  addEventListener(){},setTimeout,clearTimeout,queueMicrotask});
-for(const file of ['series.js','bridge.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+file,'utf8'),ctx);
+for(const file of ['series.js','price-format.js','bridge.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+file,'utf8'),ctx);
 (async()=>{
  await vm.runInContext(`(async()=>{
   globalThis.calls=[];

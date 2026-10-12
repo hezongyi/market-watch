@@ -1,0 +1,6 @@
+{"instrument": "MC:b3f55bdfc39e3f5c5508371e3:EURUSD", "enabled": false, "quality": "error", "error": "Unknown source: composite", "market_errors": [{"instrument": "MC:b3f55bdfc39e3f5c5508371e3:EURUSD", "error": "Unknown source: composite"}]}
+Traceback (most recent call last):
+  File "/tmp/mw-provider-rootcause-20261011/composite_repro.py", line 42, in <module>
+    assert inst.error != "Unknown source: composite", "composite reached ordinary provider fetch"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: composite reached ordinary provider fetch

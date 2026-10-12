@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "alert_count": 1,
+  "saved_alert_definition_and_lifecycle_fields_preserved": true,
+  "mutable_execution_fields_changed": [
+    [
+      "health_reason",
+      "runtime"
+    ]
+  ],
+  "comparison_source": "Actual final PG14 backup, isolated table restore compared with read-only production rows",
+  "temporary_comparison_database_removed": true
+}
