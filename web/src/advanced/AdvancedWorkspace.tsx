@@ -1246,6 +1246,12 @@ export default function AdvancedWorkspace() {
                 ...(typeof q.dataset_start === "number"
                   ? { dataset_start: q.dataset_start }
                   : {}),
+                ...(typeof q.calculation_origin === "number"
+                  ? { calculation_origin: q.calculation_origin }
+                  : {}),
+                ...(typeof q.dependency_before === "number"
+                  ? { dependency_before: q.dependency_before }
+                  : {}),
                 timeframe: q.timeframe,
                 limit: q.limit,
                 ...(q.series_kind === "provider"

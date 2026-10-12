@@ -37,7 +37,6 @@ function mutate(action,at){
      return {count:study.data().size(),last:study.data().last()?.value[1]};}),resets:correctionResets};
   });
   await expect.poll(async()=>(await snapshot()).studies.every(s=>s.count>100),{timeout:60000}).toBe(true);
-  console.log('initial binding '+JSON.stringify(await snapshot()));
   await expect.poll(async()=>!!(await snapshot()).binding.dependencyRevision,{timeout:15000}).toBe(true);
   const initial=await snapshot();assert.equal(initial.studies[0].last,10);
   mutate('tail');
