@@ -1,0 +1,38 @@
+{
+  "baseline_at_utc": "2026-10-12T03:29:28.628000+00:00",
+  "final_at_utc": "2026-10-12T04:22:00.438000+00:00",
+  "stable_table_count": 9,
+  "stable_tables_equal": {
+    "advanced_chart_workspaces": true,
+    "advanced_chart_preferences": true,
+    "chart_workspaces": true,
+    "watches": true,
+    "chart_alert_versions": true,
+    "chart_alert_actions": true,
+    "market_composites": true,
+    "market_composite_revisions": true,
+    "market_realtime_mappings": true
+  },
+  "original_workspaces_byte_fingerprints_equal": true,
+  "workspace_count_before": 2,
+  "workspace_count_after": 2,
+  "alert_definition_and_lifecycle_equal": true,
+  "alert_comparison_baseline": "Verified pre-deployment backup from the same formal release; stable definition/version/action tables also match this acceptance start snapshot.",
+  "alert_observed_changed_columns": [
+    "health_reason",
+    "runtime"
+  ],
+  "admin_and_notification_settings_equal": true,
+  "notification_test_requests_delta": 0,
+  "password_changes_delta": 0,
+  "cleanup": {
+    "scratchDeleted": true,
+    "originalWorkspaceCount": 2,
+    "originalContentSame": true,
+    "loggedOut": true
+  },
+  "browser_closed": true,
+  "login_secret_and_bridge_token_removed": true,
+  "version_after": "1.21.2",
+  "yahoo_enabled_after": true
+}

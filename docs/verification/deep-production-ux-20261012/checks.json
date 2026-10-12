@@ -1,0 +1,98 @@
+{
+  "environment": "Ubuntu Chromium against existing unraid formal production v1.21.2; no acceptance server or Docker instance created",
+  "desktop_viewports": [
+    {
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "width": 1366,
+      "height": 768
+    },
+    {
+      "width": 1024,
+      "height": 768
+    }
+  ],
+  "phone_profiles": [
+    {
+      "configured_width": 390,
+      "height": 844,
+      "ua": "Android Chromium emulation",
+      "touch": true
+    },
+    {
+      "configured_width": 375,
+      "height": 812,
+      "ua": "Android Chromium emulation",
+      "touch": true
+    }
+  ],
+  "passed_paths": [
+    "production login/logout",
+    "dashboard BTC M5 and actual 50-row data table",
+    "signal detail expansion without acknowledgment",
+    "legacy workspace load and indicator/settings panel inspection",
+    "professional native search selects Yahoo AAPL D1",
+    "MACD add and native settings cancellation",
+    "independent native layout copy and persisted reload",
+    "alert price and MACD drafts without saving",
+    "alert message/notification apply and cancel draft with focus restoration",
+    "alert search empty state and empty event log",
+    "all six data center sections",
+    "managed source search and detail",
+    "platform AAPL search and metadata",
+    "composite detail and management overview",
+    "12 historical maintenance task records and task detail",
+    "OANDA source quote and completed bar status reading",
+    "calendar search and expand",
+    "new managed history configuration preview and duplicate warning",
+    "dirty form keep/discard protection",
+    "data center keyboard containment and return focus",
+    "native light/dark data center and chart settings cancellation",
+    "existing drawing properties cancellation",
+    "fixed replay version selection with H4 and D1 artifacts ready",
+    "existing replay load and 752-bar export",
+    "Android readonly chart load and touch pan"
+  ],
+  "not_executed": [
+    "real alert creation/lifecycle or delivery",
+    "real ntfy test or phone ringing",
+    "notification or account/password changes",
+    "real history task creation, repairs or publishing",
+    "new replay create/step/seek",
+    "drawing placement and undo end-to-end",
+    "Safari/iOS/Android physical devices",
+    "actual OS browser zoom and long-term stability"
+  ],
+  "guard_notes": [
+    "Initial history-loads POST blocking was caused by the acceptance guard. Enabled normal history-loads and cancellation, then repeated AAPL D1 successfully; this was excluded from product defects.",
+    "Dataset creation read-only check POST was initially blocked, later allowed and repeated successfully; its Failed to fetch was excluded.",
+    "Original workspace writes and preferences migration/persistence were suppressed; save/delivery paths not actually exercised are not considered end-to-end passes.",
+    "Script locator/timeouts and early snapshots taken before loading completed were excluded from product findings."
+  ],
+  "investigation_notes": [
+    {
+      "title": "One touch emulation encountered a missing dynamic hammerjs asset",
+      "scope": "Desktop user agent with mobile emulation on first touch chart load",
+      "requested_asset_status": 404,
+      "requested_asset_suffix": "hammerjs.faf756299593572313c8.js",
+      "installed_asset_status": 200,
+      "installed_asset_suffix": "hammerjs.4e17378884ca530926b7.js",
+      "actual_android_profile_repeat": "readonly chart and touch pan completed without new errors",
+      "fresh_hybrid_profile_repeat": "no new HTTP or page errors",
+      "classification": "needs further investigation; excluded from the seven confirmed product usability defects; no claim of all phones failing"
+    },
+    {
+      "title": "Manual price axis retention on switching asset",
+      "scope": "Observed once using an existing manual EURUSD scale; auto restored AAPL chart",
+      "repeat": "Second uninterrupted switch did not complete for classification; record as recoverable usability advice, not a general symbol-switch defect"
+    }
+  ],
+  "cleanup": {
+    "scratchDeleted": true,
+    "originalWorkspaceCount": 2,
+    "originalContentSame": true,
+    "loggedOut": true
+  }
+}

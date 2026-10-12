@@ -1,0 +1,57 @@
+{
+  "date": "2026-10-12",
+  "production_url": "https://trade.kookvv.com:8443/",
+  "version": "v1.21.2",
+  "product_commit": "65f49669f2e798d6285885d5e91087e734805277",
+  "started_at_utc": "2026-10-12T03:28:58.061Z",
+  "completed_at_utc": "2026-10-12T04:22:41.154Z",
+  "conclusion": "Desktop core reading and analysis paths work with recorded usability issues; phone home watch creation fails viewport acceptance; protected writes are outside end-to-end scope.",
+  "confirmed_issue_count": 7,
+  "priority_counts": {
+    "P1": 1,
+    "P2": 5,
+    "P3": 1
+  },
+  "efficiency_suggestion_count": 3,
+  "issues": [
+    {
+      "id": "UX-01",
+      "priority": "P2",
+      "title": "Homepage exposes long internal quote identifiers and wrong gold/forex icons"
+    },
+    {
+      "id": "UX-02",
+      "priority": "P2",
+      "title": "Settings maps legacy import heartbeat to current history service failure"
+    },
+    {
+      "id": "UX-03",
+      "priority": "P3",
+      "title": "Indicator parameters expose internal keys and raw technical labels"
+    },
+    {
+      "id": "UX-04",
+      "priority": "P2",
+      "title": "Dukascopy Apple instruments disappear under stock classification"
+    },
+    {
+      "id": "UX-05",
+      "priority": "P2",
+      "title": "Calendar identities appear as duplicate indistinguishable rules"
+    },
+    {
+      "id": "UX-06",
+      "priority": "P1",
+      "title": "Overflowing home identifiers push phone watch dialog and footer outside visible viewport"
+    },
+    {
+      "id": "UX-07",
+      "priority": "P2",
+      "title": "Home watch dismissal loses keyboard focus"
+    }
+  ],
+  "product_code_modified": false,
+  "new_server_instances_created": 0,
+  "scratch_workspaces_remaining": 0,
+  "credentials_in_evidence": false
+}
