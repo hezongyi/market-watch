@@ -18,7 +18,7 @@ from sqlalchemy import delete, func, select, update
 from .calendar_profile import closures_from
 from .chart_data import FRAMES, chart_rows, future_grid
 from .chart_history_plan import bucket_has_trading
-from .chart_indicators import CATALOG, calculate, validate
+from .chart_indicators import calculate, public_catalog, validate
 from .chart_series import SeriesKind, decode, is_gold
 from .domain import calendar_for
 from .managed_dataset import data as published_data
@@ -438,9 +438,11 @@ def router(authenticated):
             from .series_access import search
             sources += [{"id": row["ticker"], "symbol": row["symbol"], "source": row["source"],
                 "environment": row["description"], "series_kind": row["series_kind"]} for row in search(db)]
-        from .chart_indicators import public_catalog
-
-        return {"frames": FRAMES, "indicators": public_catalog(), "managed_sources": sources}
+        # The legacy workspace only supports numeric inputs and generic series.
+        # Native profiles require the advanced host's controls and plot mapping.
+        indicators = {name: meta for name, meta in public_catalog().items()
+                      if not meta.get("render_profile")}
+        return {"frames": FRAMES, "indicators": indicators, "managed_sources": sources}
 
     @r.post("/export")
     def export(body: ExportQuery):

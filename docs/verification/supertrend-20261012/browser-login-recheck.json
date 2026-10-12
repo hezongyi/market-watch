@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "environment": "Ubuntu Docker mw-supertrend-20261012",
+  "base": "http://localhost:20187",
+  "chartOrigin": "http://localhost:20188",
+  "ticker": "MWP:EURUSD",
+  "checks": [
+    "Python catalog; two native instances; real backend output received",
+    "each native study exposes finite plotted trend values on five distinct candles",
+    "native Boolean controls; display inputs; study template preserves two independent instances",
+    "actual workspace server save/reload restores stable study identities",
+    "server reload preserves both calculation/display inputs and custom color/line width"
+  ],
+  "errors": [],
+  "resets": [],
+  "code_commit": "f4aeaaa",
+  "responses": 30,
+  "response_statuses": [
+    200
+  ],
+  "visual_review": "Manually opened and inspected settings, display switches off, dark and light screenshots; lines, dots, labels and fills rendered correctly."
+}

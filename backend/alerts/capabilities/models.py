@@ -79,7 +79,7 @@ class QuoteQuery(Input):
 class IndicatorSpec(Input):
     name: str = Field(min_length=1, max_length=80)
     version: str = "1"
-    params: dict[str, int | float] = Field(default_factory=dict)
+    params: dict[str, int | float | str] = Field(default_factory=dict)
 
 
 class BarsQuery(QuoteQuery):
@@ -199,7 +199,7 @@ class IndicatorSeries(Record):
 class IndicatorResult(Record):
     name: str
     version: str
-    params: dict[str, int | float]
+    params: dict[str, int | float | str]
     series: list[IndicatorSeries]
 
 

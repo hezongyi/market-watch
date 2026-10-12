@@ -19,6 +19,7 @@ from alerts.storage import (
     MarketDataset,
     RealtimeMapping,
 )
+from alerts.supertrend_pine import NAME as SUPERTREND_NAME
 from sqlalchemy import select
 from test_composite_aggregates import drain as aggregates
 from test_composite_chart import populated
@@ -109,10 +110,13 @@ def add_tail(database, revision_id, rows):
             volume_kind="price_count", volume_unit="quotes", rows=tuple(rows))))
 
 
-def test_composite_append_reuses_prefix_correction_repairs_suffix_and_old_input_remains(database, monkeypatch):
+@pytest.mark.parametrize("spec", [
+    {"name": "EMA", "params": {"period": 2}},
+    {"name": SUPERTREND_NAME, "params": {"period": 2, "multiplier": 0.1}},
+])
+def test_composite_append_reuses_prefix_correction_repairs_suffix_and_old_input_remains(database, monkeypatch, spec):
     monkeypatch.setattr(jobs, "PAGE_SIZE", 4)
     composite, revision, seam = populated(database, monkeypatch)
-    spec = {"name": "EMA", "params": {"period": 2}}
     aggregates(revision, "M1")
     def request(value):
         with database.begin() as db:
@@ -145,9 +149,10 @@ def test_composite_append_reuses_prefix_correction_repairs_suffix_and_old_input_
         for row in corrected["bars"]:
             row["gap_before"] = jobs.gap_before(previous, row["start"], phase, profiles)
             previous = row["end"]
-        expected = calculate(corrected["bars"], spec)["series"][0]["values"]
-        assert [row["start"] for row in actual] == [row["time"] for row in expected]
-        assert [row["values"]["value"] for row in actual] == pytest.approx([row["value"] for row in expected])
+        for series in calculate(corrected["bars"], spec)["series"]:
+            expected = series["values"]
+            assert [row["start"] for row in actual] == [row["time"] for row in expected]
+            assert [row["values"][series["key"]] for row in actual] == pytest.approx([row["value"] for row in expected])
 
 
 def test_missing_aggregate_waterline_waits_without_publishing_or_advancing(database, monkeypatch):

@@ -114,6 +114,20 @@ def test_initialize_discovery_and_call(mcp):
     assert rpc(client, token, "tools/list", path="/mcp/").status_code == 200
 
 
+def test_supertrend_enum_inputs_and_sparse_outputs_match_shared_chart_api(mcp):
+    client, token, database = mcp
+    seed_bars(database)
+    query = {"instrument": "EURUSD", "timeframe": "H1", "limit": 20,
+             "indicators": [{"name": "SUPERTREND_PINE_V1", "params": {
+                 "period": 3, "source": "ohlc4", "atr_method": "sma", "multiplier": 0.5}}]}
+    result = call(client, token, "indicators_calculate", query)
+    assert not result.get("isError"), result
+    browser = client.post("/api/charts/data", json=query | {"provisional": False}).json()
+    assert result["structuredContent"]["page"]["indicators"] == browser["indicators"]
+    query["indicators"][0]["params"]["source"] = "arbitrary-code"
+    assert call(client, token, "indicators_calculate", query)["isError"]
+
+
 def test_authentication_scopes_expiry_revoke(mcp):
     client, token, database = mcp
     assert rpc(client, None, "tools/list").status_code == 401

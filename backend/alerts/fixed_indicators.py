@@ -16,7 +16,8 @@ from .chart_history_plan import bucket_has_trading
 from .composite_series import period
 from .domain import calendar_from
 from .history_artifacts import read_artifact
-from .indicator_state import ALGORITHM, IndicatorState, presentation
+from .indicator_state import ALGORITHM as ALGORITHM
+from .indicator_state import ALGORITHMS, IndicatorState, presentation
 from .source_history_store import _insert
 from .storage import (
     CompositeMinuteInput,
@@ -80,7 +81,7 @@ def request(db, page, spec, *, stamp=None):
         # Keep the clock boundary only while the last observed bucket is open.
         target = min(period(stamp, page["timeframe"], phase)[0],
                      period(max(revision.seam, latest if latest is not None else revision.seam), page["timeframe"], phase)[1])
-    group = digest([version.id, revision_id, page["timeframe"], engine.spec, ALGORITHM])
+    group = digest([version.id, revision_id, page["timeframe"], engine.spec, engine.algorithm])
     ident = digest([group, value, target])
     existing = db.get(FixedIndicatorRun, ident)
     if existing:
@@ -111,7 +112,7 @@ def request(db, page, spec, *, stamp=None):
             break
     db.execute(_insert(db)(FixedIndicatorRun).values(id=ident, group_key=group,
         history_version_id=version.id, revision_id=revision_id, timeframe=page["timeframe"],
-        spec=engine.spec, algorithm=ALGORITHM, input_revision=value, target_end=target,
+        spec=engine.spec, algorithm=engine.algorithm, input_revision=value, target_end=target,
         parent_id=parent, prefix_end=prefix, cursor=prefix, state=state, status="pending",
         lease_until=0, next_at=0, attempts=0, updated_at=stamp)
         .on_conflict_do_nothing(index_elements=["id"]))
@@ -165,7 +166,7 @@ def input_rows(db, run):
 def claim(run_id=None):
     with transaction() as db:
         stamp = now_ms()
-        query = select(FixedIndicatorRun).where(FixedIndicatorRun.status == "pending", FixedIndicatorRun.algorithm == ALGORITHM,
+        query = select(FixedIndicatorRun).where(FixedIndicatorRun.status == "pending", FixedIndicatorRun.algorithm.in_(ALGORITHMS),
             FixedIndicatorRun.lease_until <= stamp, FixedIndicatorRun.next_at <= stamp)
         if run_id:
             query = query.where(FixedIndicatorRun.id == run_id)
@@ -202,8 +203,9 @@ def build(ownership):
                 row["seam_at_start"] = True
             values = engine.step(row)
             output.append({"start": row["start"], "end": row["end"], "values": values,
+                **({"break_before": True} if row["gap_before"] else {}),
                 "dependency_origin": engine.state.get("origin"), "seam_dependency": engine.state.get("seam", False),
-                "initialized": all(value is not None for value in values.values())})
+                "initialized": engine.initialized(values)})
         cursor = rows[-1]["end"] if rows else run.target_end
         done = len(rows) < PAGE_SIZE or cursor >= run.target_end
         return {"rows": output, "state": engine.checkpoint(), "cursor": run.target_end if done else cursor, "done": done}
@@ -317,8 +319,9 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None):
                 trial.step({**row, "complete": True})
                 if start <= bar["start"] < end:
                     rows.append({"start": bar["start"], "values": values, "provisional": True,
+                        **({"break_before": True} if row["gap_before"] else {}),
                         "dependency_origin": trial.state.get("origin"), "seam_dependency": trial.state.get("seam", False),
-                        "initialized": all(value is not None for value in values.values())})
+                        "initialized": trial.initialized(values)})
                 break
         result = presentation(spec, rows, display)
         results.append({**result, "id": status["id"], "calculation": status,

@@ -43,7 +43,7 @@ assert.deepEqual(Array.from(study.main(ctx),v=>v.value),[1.1242,1.1242,1.11711,1
 assert.ok(tickerSpecs.every(s=>JSON.stringify(s.spec)==='{"name":"SWING_SR_V1","params":{"high_strength":3,"low_strength":7}}'));
 study.init(ctx,index=>[1,2,'high','low',false,'below_name'][index]);
 assert.deepEqual(Array.from(study.main(ctx),v=>v.offset),[0,-1,0,-2]);
-for(const old of studies.filter(s=>s!==swing)) {
+for(const old of studies.filter(s=>!catalog[s.name.slice('守望 Python '.length)].render_profile)) {
   assert.ok(Object.values(old.metainfo.defaults.styles).every(s=>s.plottype!==6));
   assert.equal(old.metainfo.inputs.length,Object.keys(catalog[old.name.slice('守望 Python '.length)].params).length);
 }

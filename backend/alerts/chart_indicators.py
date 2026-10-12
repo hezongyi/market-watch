@@ -27,8 +27,8 @@ CATALOG = {
 }
 
 
-# New standard indicators register metadata and a pure vectorized calculator here.
-# Calculator receives high, low, close arrays and validated parameters, returns keyed arrays.
+# Calculators receive readonly arrays in declared input_fields order, followed
+# by validated parameters. Existing declarations default to high, low, close.
 CALCULATORS = {
     "SMA": lambda h, low, c, p: {"value": talib.SMA(c, timeperiod=p["period"])},
     "EMA": lambda h, low, c, p: {"value": talib.EMA(c, timeperiod=p["period"])},
@@ -153,6 +153,11 @@ def _validate_metadata(name, meta):
         raise ValueError(f"{name}: levels must be finite numbers")
     if meta.get("pane") not in ("main", "sub"):
         raise ValueError(f"{name}: pane must be main or sub")
+    fields = meta.get("input_fields", ["high", "low", "close"])
+    if (not isinstance(fields, list) or not fields
+            or any(not isinstance(field, str) or field not in ("open", "high", "low", "close")
+                   for field in fields) or len(set(fields)) != len(fields)):
+        raise ValueError(f"{name}: invalid input_fields")
     params, series = meta.get("params"), meta.get("series")
     if not isinstance(params, dict) or not isinstance(series, list) or not series:
         raise ValueError(f"{name}: params and explicit series declarations required")
@@ -174,6 +179,14 @@ def _validate_metadata(name, meta):
     if not isinstance(schema, dict) or set(schema) != set(params):
         raise ValueError(f"{name}: parameter schema must match params")
     for key, rule in schema.items():
+        if isinstance(rule, dict) and rule.get("type") == "enum":
+            options = rule.get("options")
+            if (not isinstance(options, list) or not options
+                    or any(not isinstance(value, str) or not value for value in options)
+                    or len(set(options)) != len(options) or rule.get("default") != params[key]):
+                raise ValueError(f"{name}: invalid parameter declaration {key}")
+            _validate_parameter(name, key, params[key], rule)
+            continue
         if (
             not isinstance(rule, dict)
             or rule.get("type") not in ("integer", "float")
@@ -192,11 +205,17 @@ def _validate_metadata(name, meta):
         raise ValueError(f"{name}: history_requirement must be callable")
     if meta.get("result_format") not in (None, "series_presentation_v1"):
         raise ValueError(f"{name}: unknown result format")
-    if meta.get("render_profile") not in (None, "swing_sr_v1"):
-        raise ValueError(f"{name}: unknown render profile")
-    if bool(meta.get("render_profile")) != bool(meta.get("result_format")):
-        raise ValueError(f"{name}: render profile requires the extended result contract")
+    profile = meta.get("render_profile")
+    if profile not in (None, "swing_sr_v1", "supertrend_pine_v1"):
+        raise ValueError(f"{name}: invalid render_profile")
+    if (profile == "swing_sr_v1") != bool(meta.get("result_format")):
+        raise ValueError(f"{name}: Swing render profile requires the extended result contract")
     display = meta.get("display_inputs", [])
+    if profile == "supertrend_pine_v1":
+        if (not isinstance(display, dict) or set(display) - {"showsignals", "highlighting"}
+                or any(type(value) is not bool for value in display.values())):
+            raise ValueError(f"{name}: invalid display_inputs")
+        return
     if not isinstance(display, list):
         raise ValueError(f"{name}: invalid display inputs")
     seen = set(params)
@@ -218,6 +237,10 @@ def _validate_metadata(name, meta):
 
 
 def _validate_parameter(name, key, value, rule):
+    if rule["type"] == "enum":
+        if not isinstance(value, str) or value not in rule["options"]:
+            raise ValueError(f"{name}: {key} 应为 {' / '.join(rule['options'])}")
+        return
     integer = rule["type"] == "integer"
     if (
         type(value) not in ((int,) if integer else (int, float))
@@ -248,13 +271,14 @@ for _name, _meta in CATALOG.items():
 def public_catalog():
     """Only serializable display/contract fields; never invoke calculators."""
     fields = ("label", "aliases", "pane", "params", "levels", "description", "calculation",
-              "render_profile")
+              "render_profile", "display_inputs")
     return {
         name: {
             **deepcopy({key: meta[key] for key in fields if key in meta}),
             "series": [{key: item[key] for key in ("key", "type", "label") if key in item} for item in meta["series"]],
             "parameter_schema": {
-                parameter: {key: rule[key] for key in ("type", "min", "max", "default", "label") if key in rule}
+                parameter: {key: deepcopy(rule[key]) for key in
+                            ("type", "min", "max", "default", "options", "label") if key in rule}
                 for parameter, rule in meta["parameter_schema"].items()
             },
             "version": "1",
@@ -262,7 +286,7 @@ def public_catalog():
             **({"display_inputs": [{key: deepcopy(item[key]) for key in
                                     ("id", "name", "type", "default", "options") if key in item}
                                    for item in meta["display_inputs"]]}
-               if "display_inputs" in meta else {}),
+               if isinstance(meta.get("display_inputs"), list) else {}),
         }
         for name, meta in CATALOG.items()
     }
@@ -291,7 +315,8 @@ def validate(spec):
 def validate_display(name, supplied):
     """Display settings never enter numerical specs or cache identities."""
     declarations = CATALOG[name].get("display_inputs", [])
-    rules = {item["id"]: item for item in declarations}
+    rules = ({key: {"type": "bool", "default": value} for key, value in declarations.items()}
+             if isinstance(declarations, dict) else {item["id"]: item for item in declarations})
     if not isinstance(supplied, dict) or set(supplied) - set(rules):
         raise ValueError(f"{name}: unknown display inputs")
     result = {key: item["default"] for key, item in rules.items()} | supplied
@@ -326,9 +351,9 @@ def history_requirement(spec):
     raise ValueError(f"{name}: 该指标尚未声明前置历史要求")
 
 
-def _run(name, h, low, c, params):
+def _run(name, arrays, params):
     # Protect the caller's data and prevent accidental in-place algorithm mutation.
-    inputs = [array.copy() for array in (h, low, c)]
+    inputs = [array.copy() for array in arrays.values()]
     for array in inputs:
         array.flags.writeable = False
     try:
@@ -353,7 +378,7 @@ def _run(name, h, low, c, params):
                     or type(event["price"]) not in (int, float) or not math.isfinite(event["price"])
                     or any(type(event[key]) is not int for key in
                            ("pivot_time", "detected_bar_time", "pivot_index", "confirmed_at"))
-                    or not 0 <= event["pivot_time"] < event["detected_bar_time"] < len(c)
+                    or not 0 <= event["pivot_time"] < event["detected_bar_time"] < len(inputs[0])
                     or event["pivot_index"] != event["pivot_time"]
                     or event["confirmed_at"] != event["detected_bar_time"] + 1
                     or event["provisional"] is not False):
@@ -367,9 +392,10 @@ def _run(name, h, low, c, params):
             array = np.asarray(output)
         except (ValueError, TypeError) as exc:
             raise ValueError(f"{name}: invalid numeric output {key}: {exc}") from exc
-        if array.ndim != 1 or len(array) != len(c) or array.dtype.kind not in "iuf":
+        length = len(inputs[0])
+        if array.ndim != 1 or len(array) != length or array.dtype.kind not in "iuf":
             raise ValueError(
-                f"{name}: {key} must be a one-dimensional numeric array of length {len(c)}"
+                f"{name}: {key} must be a one-dimensional numeric array of length {length}"
             )
     return values, presentation
 
@@ -381,10 +407,16 @@ def calculate(rows, spec, *, provisional=False):
     if provisional_time is not None:
         rows = [*rows[:-1], {**rows[-1], "complete": True}]
     name, p = validate(spec)
-    arrays = {
-        key: np.array([float(r[key]) if r["complete"] else np.nan for r in rows])
-        for key in ("high", "low", "close")
-    }
+    try:
+        arrays = {
+            key: np.array([float(r[key]) if r["complete"] else np.nan for r in rows])
+            for key in CATALOG[name].get("input_fields", ["high", "low", "close"])
+        }
+    except (KeyError, TypeError, ValueError) as exc:
+        raise ValueError(f"{name}: missing or invalid OHLC input: {exc}") from exc
+    for array in arrays.values():
+        if any(row["complete"] and not math.isfinite(value) for row, value in zip(rows, array)):
+            raise ValueError(f"{name}: 指标输入价格必须是有限数值")
     # Restart after an incomplete bar: do not bridge an unknown interval with invented prices.
     outputs = {item["key"]: np.full(len(rows), np.nan) for item in CATALOG[name]["series"]}
     extended = CATALOG[name].get("result_format") == "series_presentation_v1"
@@ -393,7 +425,7 @@ def calculate(rows, spec, *, provisional=False):
 
         stats, current = empty_statistics(), {"high": None, "low": None}
     # A missing interval breaks recursive state, even when its next bar is complete.
-    mask = np.isfinite(arrays["close"])
+    mask = np.array([row["complete"] for row in rows], dtype=bool)
     edges = list(np.flatnonzero(np.diff(np.r_[False, mask, False])))
     spans = []
     for start, end in zip(edges[::2], edges[1::2]):
@@ -401,8 +433,8 @@ def calculate(rows, spec, *, provisional=False):
         spans.extend(zip(cuts, cuts[1:]))
     for start, end in spans:
         start, end = int(start), int(end)
-        h, low, c = (arrays[k][start:end] for k in ("high", "low", "close"))
-        values, display = _run(name, h, low, c, p)
+        span = {key: values[start:end] for key, values in arrays.items()}
+        values, display = _run(name, span, p)
         for key, output in values.items():
             outputs[key][start:end] = output
         if extended:
@@ -438,6 +470,7 @@ def calculate(rows, spec, *, provisional=False):
                 ),
                 "values": [
                     {"time": row["start"], "value": float(v) if math.isfinite(v) else None,
+                     **({"break_before": True} if row.get("gap_before") else {}),
                      **({"provisional": True} if row["start"] == provisional_time else {})}
                     for row, v in zip(rows, values)
                 ],
@@ -466,3 +499,11 @@ def calculate(rows, spec, *, provisional=False):
 from .swing_sr import register_indicator  # noqa: E402
 
 register_indicator()
+
+
+# Import-time registration also covers workers/exports that never start the API.
+from .supertrend_pine import METADATA as _SUPERTREND_METADATA  # noqa: E402
+from .supertrend_pine import NAME as _SUPERTREND_NAME  # noqa: E402
+from .supertrend_pine import calculate as _supertrend_calculate  # noqa: E402
+
+register(_SUPERTREND_NAME, _SUPERTREND_METADATA, _supertrend_calculate)

@@ -1,0 +1,20 @@
+{
+  "version": "1.23.0",
+  "release_tag": "v1.23.0",
+  "previous_source_tag": "v1.22.1",
+  "pull_request": "https://github.com/hezongyi/market-watch/pull/52",
+  "tested_application_commit": "a8e4ae8145eff50ec3b2daeb6ef77b87fa7e79a5",
+  "source_commit_resolution": "Resolve annotated v1.23.0^{commit}; targets PR #52 main merge including synchronized version metadata.",
+  "verification_record": "docs/verification/supertrend-20261012/README.md",
+  "verification": {
+    "python_passed": 235,
+    "postgres_passed": 63,
+    "oanda_browser_passed": true,
+    "fixed_history_browser_passed": true,
+    "standards_remaining_blockers": 0,
+    "spec_remaining_blockers": 0
+  },
+  "new_migrations": [],
+  "application_dependencies_changed": false,
+  "production_deployment": "Authorized by user; resulting production evidence recorded separately."
+}

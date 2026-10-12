@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "environment": "Ubuntu Docker mw-supertrend-20261012",
+  "base": "http://localhost:20187",
+  "chartOrigin": "http://localhost:20188",
+  "ticker": "MWH:4d8ae755-db39-4b83-9006-1d498ebd0467",
+  "checks": [
+    "legacy workspace lists only eight supported studies; SMA period edit saves to server",
+    "Python catalog; two native instances; real backend output received",
+    "Supertrend and Swing coexist with finite native values and independent settings",
+    "each native study exposes finite plotted trend values on five distinct candles",
+    "native Boolean controls; display inputs; study template preserves two independent instances",
+    "actual workspace server save/reload restores stable study identities",
+    "server reload preserves both calculation/display inputs and custom color/line width",
+    "study template and server reload preserve Swing alongside both Supertrend instances",
+    "all eight existing Python indicators and built-in SuperTrend expose native finite values"
+  ],
+  "errors": [],
+  "resets": [],
+  "application_commit": "a8e4ae8145eff50ec3b2daeb6ef77b87fa7e79a5",
+  "responses": 13,
+  "response_statuses": [
+    200
+  ],
+  "data_kind": "Task PostgreSQL fixed synthetic OHLC seed117; real API/native browser pipeline, not OANDA."
+}

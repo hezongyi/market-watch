@@ -81,6 +81,44 @@ def test_composite_history_snapshot_budget_allows_windowed_native_delivery(datab
     assert len(rows[0]["bars"]) == 1 and rows[0]["bars"][0]["start"] == tail
 
 
+def test_recursive_study_feeds_deliver_only_values_for_accepted_tail_bars(database):
+    owner = session(database)
+    count, span, date_offset = 4500, 86400000, 10800000
+    tail = count * span
+    # Native Supertrend subscribes to five plots of the same six-output study.
+    # Daily chart dates differ from the input start keys used by indicator values.
+    for index in range(5):
+        register(owner, listener=f"plot{index}", state={
+            "cursor": tail + date_offset, "history_accepted": True})
+    register(owner, client="earlier", state={
+        "cursor": tail - span + date_offset, "history_accepted": True})
+    keys = ("up", "down", "buy_price", "sell_price", "fill_reference", "direction")
+    values = [{"time": index * span, "value": 1.1234567890123456}
+              for index in range(1, count + 1)]
+    payload = {"type": "bars", "bars": [{
+        "start": index * span, "chart_time": index * span + date_offset, "close": "1.1"}
+        for index in range(count - 1999, count + 1)],
+        "indicators": [{"name": "SUPERTREND_PINE_V1", "series": [
+            {"key": key, "values": values if key != "buy_price" else [
+                {**value, "value": None} for value in values]} for key in keys]}]}
+    stream.commit(stream.claim(), payload)
+    rows = stream.events(owner, "page", {})
+    assert len(rows) == 5
+    assert all(row["type"] == "bars" for row in rows), "Full-prefix values cause delivery_budget reloads"
+    for row in rows:
+        assert len(row["bars"]) == 1 and row["bars"][0]["start"] == tail
+        assert all(len(series["values"]) == 1 and series["values"][0]["time"] == tail
+                   for series in row["indicators"][0]["series"])
+        assert row["indicators"][0]["series"][2]["values"][0]["value"] is None
+    earlier = stream.events(owner, "earlier", {})[0]
+    assert [value["time"] for value in earlier["indicators"][0]["series"][0]["values"]] == [
+        tail - span, tail]
+    # Consumer filtering must not destroy the retained calculation snapshot.
+    with database.begin() as db:
+        retained = db.scalar(select(MarketStreamTask)).payload
+        assert len(retained["indicators"][0]["series"][0]["values"]) == count
+
+
 def test_old_cancel_duplicate_register_and_late_register_do_not_remove_new_generation(database):
     owner = session(database)
     register(owner, generation=2)

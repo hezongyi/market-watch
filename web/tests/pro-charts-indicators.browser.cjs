@@ -4,7 +4,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs');
  try{
   await p.ui.getByRole('button',{name:'指标',exact:true}).click();
   await p.ui.getByRole('button',{name:'我的 Python',exact:true}).click();
-  const rows=p.ui.locator('.mw-native-study-row');await p.expect(rows).toHaveCount(8);
+  const rows=p.ui.locator('.mw-native-study-row');await p.expect(rows).toHaveCount(9);
   r.python=await rows.evaluateAll(ns=>ns.map(n=>({id:n.dataset.nativeStudyId,label:n.textContent})));assert.ok(r.python.every(s=>s.label.includes('Python')));
   const macd=p.ui.locator('.mw-native-study-row[data-native-study-id="MWPythonMACD@market-watch"]');
   await macd.hover();await macd.getByLabel('添加到收藏',{exact:true}).click();
@@ -18,7 +18,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs');
   await p.ui.getByRole('button',{name:'全部指标',exact:true}).click();
   const dialog=p.ui.locator('[data-name="indicators-dialog"]');await dialog.getByRole('searchbox').fill('MACD');
   await p.expect(macd).toBeVisible();assert.ok(await rows.count()>=2);
-  r.checks.push('all eight Python identities; native exclusion; MACD collision search; favorite; real add/current category');
+  r.checks.push('all nine Python identities; native exclusion; MACD collision search; favorite; real add/current category');
   r.footer=await dialog.locator('[class*="footer-"]').allTextContents();assert.ok(r.footer.some(s=>s.includes('星标')));
   await p.ui.getByRole('button',{name:'关闭指标窗口',exact:true}).click();
   await p.host.evaluate(()=>new Promise((ok,bad)=>widget.saveChartToServer(ok,bad)));

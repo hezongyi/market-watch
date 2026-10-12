@@ -1,0 +1,44 @@
+[
+  {
+    "service": "api",
+    "image": "market-watch-api:supertrend-pr52-reviewfix",
+    "state": "running",
+    "health": "healthy"
+  },
+  {
+    "service": "chart-origin",
+    "image": "market-watch-chart:supertrend-pr52-reviewfix",
+    "state": "running",
+    "health": ""
+  },
+  {
+    "service": "history-state-worker",
+    "image": "market-watch-api:supertrend-pr52-reviewfix",
+    "state": "running",
+    "health": ""
+  },
+  {
+    "service": "market-stream-worker",
+    "image": "market-watch-api:supertrend-pr52-reviewfix",
+    "state": "running",
+    "health": ""
+  },
+  {
+    "service": "native-history-worker",
+    "image": "market-watch-api:supertrend-pr52-reviewfix",
+    "state": "running",
+    "health": ""
+  },
+  {
+    "service": "postgres",
+    "image": "postgres:14-bookworm",
+    "state": "running",
+    "health": "healthy"
+  },
+  {
+    "service": "web",
+    "image": "market-watch-web:supertrend-pr52-reviewfix",
+    "state": "running",
+    "health": ""
+  }
+]

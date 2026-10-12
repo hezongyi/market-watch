@@ -22,7 +22,6 @@ pytestmark = pytest.mark.skipif(not os.getenv("TEST_POSTGRES_URL"), reason="Requ
 @pytest.mark.parametrize("contract", [
     contracts.test_historical_page_reads_full_origin_and_persisted_outputs_without_m1,
     contracts.test_bounded_progress_fences_stale_owners_and_recovers_from_checkpoint,
-    contracts.test_composite_append_reuses_prefix_correction_repairs_suffix_and_old_input_remains,
     contracts.test_missing_aggregate_waterline_waits_without_publishing_or_advancing,
     contracts.test_failed_build_preserves_cursor_and_retries,
     contracts.test_recursive_history_review_includes_dependencies_before_visible_price_range,
@@ -34,6 +33,15 @@ pytestmark = pytest.mark.skipif(not os.getenv("TEST_POSTGRES_URL"), reason="Requ
 ])
 def test_indicator_contract(provider_pg, monkeypatch, contract):
     contract(provider_pg[0], monkeypatch)
+
+
+@pytest.mark.parametrize("spec", [
+    {"name": "EMA", "params": {"period": 2}},
+    {"name": "SUPERTREND_PINE_V1", "params": {"period": 2, "multiplier": 0.1}},
+])
+def test_append_and_repair(provider_pg, monkeypatch, spec):
+    contracts.test_composite_append_reuses_prefix_correction_repairs_suffix_and_old_input_remains(
+        provider_pg[0], monkeypatch, spec)
 
 
 def test_concurrent_first_requests_and_workers_share_one_run_and_owner(provider_pg, monkeypatch):
