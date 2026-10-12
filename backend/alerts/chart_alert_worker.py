@@ -97,6 +97,11 @@ def offset_rows(db, version, config, now, runtime):
     binding = version.market_identity["atr_dependency"]
     key = binding.get("dataset_id")
     checkpoint = runtime.get("atr_calculation", {"origin": binding["origin"]})
+    if checkpoint.get("state") and "confirmation_watermark" not in checkpoint:
+        # A pre-fix checkpoint cannot prove when its seed inputs were available.
+        # Rebuild once from the same origin and safely recover the baseline.
+        checkpoint = {"origin": binding["origin"]}
+        runtime["offset_recovering"] = True
     if checkpoint.get("prefix_stamp") is not None:
         stamp = atr_prefix_stamp(db, config, binding, checkpoint["end"])
         if checkpoint["prefix_stamp"] != stamp:
@@ -153,7 +158,8 @@ def stored_rows(db, version, config, now, *, fixed_origin=None, read_from=None, 
         records = list(db.scalars(query.order_by(ProviderBar.start)))
         rows = [{**record.payload, "chart_time": record.chart_time,
                  "revision": record.revision, "observed_at": record.observed_at,
-                 "confirmed_at": record.changed_at or record.observed_at}
+                 "confirmed_at": record.price_confirmed_at if record.price_confirmed_at is not None
+                    else record.changed_at or record.observed_at}
                 for record in records]
         return rows, dataset.metadata_json
     instrument = db.get(Instrument, config.instrument)
@@ -368,6 +374,10 @@ def evaluate(db, alert_id, *, now=None, values_cache=None):
                 needed = [item for item in atr_rows if item["end"] <= end]
                 values, calculated = ordinary_values(needed, config.condition.offset, checkpoint,
                                                        fingerprint, cache=_ATR_CACHE)
+                if calculated["confirmation_watermark"] > sequence:
+                    runtime["offset_recovering"] = True
+                    health(alert, "warming", "ATR 递归输入确认晚于观察时点，等待安全恢复基准")
+                    continue
                 binding = version.market_identity["atr_dependency"]
                 calculated = {**calculated, "prefix_stamp": atr_prefix_stamp(db, config, binding, end),
                     "price_digest": atr_price_digest(db, config, binding, end, checkpoint)}
@@ -376,6 +386,7 @@ def evaluate(db, alert_id, *, now=None, values_cache=None):
                         "confirmed_end": end, "input_fingerprint": fingerprint(needed)})
                 resolved["available_at"] = sequence
                 resolved["confirmed_at"] = confirmed_at
+                resolved["confirmation_watermark"] = calculated["confirmation_watermark"]
                 resolved["reference_fingerprint"] = reference_fingerprint
                 if already_confirmed:
                     resolved["confirmed_at"] = prior_offset["confirmed_at"]

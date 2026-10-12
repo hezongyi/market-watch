@@ -170,7 +170,7 @@ def operands(db, page, config, now):
     return values, dependencies, progress
 
 
-def atr_offset(db, identity, config, bar, value, now, profiles):
+def atr_offset(db, identity, config, bar, value, now, profiles, runtime):
     """The ATR reader owns the same immutable revision/input as the main page."""
     from .chart_alert_offsets import OffsetComputing, OffsetPending, reference_bar, resolve
     from .composite_chart import chart_page
@@ -199,13 +199,24 @@ def atr_offset(db, identity, config, bar, value, now, profiles):
         raise OffsetPending("ATR 来源确认或覆盖依赖不完整")
     if dependency.get("seam_dependency") and config.seam_policy == "reject":
         raise OffsetPending("ATR 依赖包含原价接缝；需明确接受接缝影响")
+    from .composite_inputs import confirmation_watermark
+
+    origin = dependency["dependency_origin"]
+    key = [identity["composite_revision_id"], value, origin, end]
+    cached = runtime.get("atr_confirmation", {})
+    watermark = cached.get("watermark") if cached.get("key") == key else None
+    if watermark is None:
+        watermark = confirmation_watermark(db, identity["composite_revision_id"], origin, end, value,
+                                           previous=cached if cached.get("key") else None)
+        runtime["atr_confirmation"] = {"key": key, "watermark": watermark}
     resolved = resolve(spec, config.condition.relation, bar, reference,
         point["value"] if point else None, dependency={**identity["atr_dependency"],
             "composite_revision_id": identity["composite_revision_id"], "input_revision": value,
             "history_version_id": identity["history_version_id"],
             "calculation": result["calculation"], "dependency": dependency})
     resolved["available_at"] = now
-    resolved["confirmation_watermark"] = db.get(CompositePreparation, identity["composite_revision_id"]).confirmed_end
+    resolved["confirmation_watermark"] = watermark
+    resolved["confirmed_end"] = db.get(CompositePreparation, identity["composite_revision_id"]).confirmed_end
     return resolved
 
 
@@ -317,7 +328,10 @@ def evaluate(db, alert, version, config, now):
     if config.condition.offset:
         from .chart_alert_offsets import OffsetComputing, OffsetPending, apply
         try:
-            resolved = atr_offset(db, identity, config, bar, value, now, profiles)
+            resolved = atr_offset(db, identity, config, bar, value, now, profiles, runtime)
+            observation_at = bar["end"] if config.mode == "close" else quote["source_time"]
+            if resolved["confirmation_watermark"] > observation_at:
+                raise OffsetPending("ATR 递归输入确认晚于观察时点，等待安全恢复基准")
             values[1] = apply(values[1], resolved)
             dependencies.append({"kind": "atr_offset", **resolved})
         except OffsetPending as exc:

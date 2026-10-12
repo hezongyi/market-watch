@@ -95,3 +95,67 @@ def test_postgres_provider_first_confirmation(provider_pg):
 
 def test_postgres_ny17_weekend_confirmation(provider_pg):
     contracts.test_managed_ny17_dst_weekend_uses_confirmed_friday_atr(provider_pg[0])
+
+
+@pytest.mark.parametrize("published", [False, True])
+def test_postgres_late_atr_seed_recovery(provider_pg, published):
+    contracts.test_late_atr_seed_cannot_generate_past_event_and_recovers(provider_pg[0], published)
+
+
+@pytest.mark.parametrize("published", [False, True])
+def test_postgres_managed_price_confirmation(provider_pg, monkeypatch, published):
+    contracts.test_managed_unchanged_reference_reread_keeps_first_confirmation(provider_pg[0], monkeypatch, published)
+
+
+@pytest.mark.parametrize("change", ["observation", "volume", "representation", "price"])
+def test_postgres_provider_price_confirmation(provider_pg, monkeypatch, change):
+    contracts.test_provider_reference_metadata_refresh_keeps_crossing(provider_pg[0], monkeypatch, change)
+
+
+@pytest.mark.parametrize("paged", [False, True])
+def test_postgres_atr_confirmation_checkpoint(provider_pg, monkeypatch, paged):
+    contracts.test_atr_checkpoint_retains_seed_confirmation_watermark(provider_pg[0], monkeypatch, paged)
+
+
+def test_postgres_legacy_atr_confirmation_checkpoint(provider_pg):
+    contracts.test_legacy_atr_checkpoint_rebuilds_watermark_without_replaying_events(provider_pg[0])
+
+
+def test_postgres_price_confirmation_migration_preserves_legacy(provider_pg):
+    import importlib.util
+    from pathlib import Path
+
+    from alembic.migration import MigrationContext
+    from alembic.operations import Operations
+    from alerts.storage import ProviderBar
+    from sqlalchemy import text
+
+    factory, engine = provider_pg
+    from alerts.provider_cache import ensure
+    key = ensure({"id": "BTCUSDT", "source": "binance", "symbol": "BTCUSDT",
+        "basis": "last", "calendar": "utc0", "precision": 2}, "M1")
+    with factory.begin() as db:
+        db.add(ProviderBar(dataset_id=key, start=0, chart_time=0, complete=True,
+            payload={"close": "100"}, observed_at=70000, changed_at=65000, revision=2))
+    path = Path(__file__).resolve().parents[2] / "migrations/versions/as46_provider_price_confirmation.py"
+    spec = importlib.util.spec_from_file_location("confirmation_migration", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    with engine.begin() as connection:
+        module.op = Operations(MigrationContext.configure(connection))
+        module.downgrade()
+        before = connection.execute(text("SELECT payload, observed_at, changed_at, revision FROM provider_bars")).one()
+        module.upgrade()
+        module.upgrade()
+        after = connection.execute(text("SELECT payload, observed_at, changed_at, revision, price_confirmed_at FROM provider_bars")).one()
+        assert tuple(after[:4]) == tuple(before) and after[4] is None
+
+
+@pytest.mark.parametrize("confirmation_delay", [0, 2])
+@pytest.mark.parametrize("late_seed", [False, True])
+def test_postgres_composite_confirmation_at_quote(provider_pg, monkeypatch, confirmation_delay, late_seed):
+    contracts.test_composite_atr_input_must_be_known_at_quote_then_recovers(provider_pg[0], monkeypatch, confirmation_delay, late_seed)
+
+
+def test_postgres_composite_confirmation_delta(provider_pg, monkeypatch):
+    contracts.test_composite_confirmation_delta_matches_full_fixed_revision(provider_pg[0], monkeypatch)

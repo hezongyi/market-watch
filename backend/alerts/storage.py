@@ -1248,6 +1248,7 @@ class ProviderBar(Base):
     payload: Mapped[dict] = mapped_column(JSON)
     observed_at: Mapped[int] = mapped_column(BigInteger)
     changed_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    price_confirmed_at: Mapped[int | None] = mapped_column(BigInteger)
     revision: Mapped[int] = mapped_column(default=1)
 
 

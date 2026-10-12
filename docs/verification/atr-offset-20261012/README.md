@@ -4,6 +4,8 @@
 
 ## 结果与范围
 
+PR #54 复审发现的三项 P1 已修复；**最新结果以[修复与最终复审](review-fixes/README.md)为准**：扩展 Python 328 passed / 1 skipped、最新 ATR 67 passed、真实 PostgreSQL 151 passed及追加 5 项补验，完整浏览器与最新 11 张截图通过。以下保留初始实现的原始验收记录。
+
 - [Python 回归](python-tests.txt)：277 passed / 1 skipped（无 TEST_POSTGRES_URL 的既有通知 PostgreSQL 测试）。包括新增 ATR 合同、原告警/provider/composite 回归，以及新基线 Supertrend/fixed-indicator 回归。其后新增 NY17 worker 用例独立通过；最终 Docker 也覆盖它。
 - [Node bridge/RPC](node-tests.txt)：10 passed。
 - [PostgreSQL](postgres-tests.txt)：99 passed；独立 PG14 数据库内唯一 schema，包含新 ATR、事务/并发和迁移测试，无 PostgreSQL 跳过。

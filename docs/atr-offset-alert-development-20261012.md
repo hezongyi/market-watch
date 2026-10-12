@@ -17,6 +17,8 @@
 
 ## 验证证据
 
+PR #54 修复与两轴复审已完成，最新证据见[修复与最终复审](verification/atr-offset-20261012/review-fixes/README.md)。确认时间现在与读取/成交量元数据独立，普通与 composite 路径检查完整 ATR 递归前缀的真实可用时间；旧 checkpoint 安全重建。新增 as46 可空迁移已在实例执行。最新扩展回归 328 passed / 1 skipped、ATR 67 passed、真实 PostgreSQL 151 passed及追加 5 项补验；完整浏览器和 11 张截图逐图审阅通过，三项 P1 关闭，无新增阻塞。下文保留初次验收的数字和时间来源。
+
 证据目录：[verification/atr-offset-20261012](verification/atr-offset-20261012/README.md)。本机扩展回归 277 passed / 1 skipped（跳过项需要 PostgreSQL），另追加 NY17 完整 worker 夹具 1 passed；包括新基线 Supertrend 与 fixed-indicator 回归。Node bridge/RPC 10 passed；Ruff 和 diff check 通过。新基线三个 Docker 镜像构建通过，Web 构建含既有 bundle 大小提示。
 
 ATR 合同覆盖刷新不误报和首笔不漏、上下方向严格相等、水平/趋势/对数/SMA目标、原目标运动语义、跨周期与共享收盘边界、固定起点/增量/Wilder 对照、缺口/确认延迟/修订、volume-only、旧幂等、事务回滚及并发消费。

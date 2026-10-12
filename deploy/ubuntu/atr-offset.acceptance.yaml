@@ -63,7 +63,9 @@ services:
       - ../../alembic.ini:/verification/alembic.ini:ro
     command: [python, -m, pytest, -q, -p, "no:cacheprovider", /verification/backend/tests/test_chart_alert_offsets.py,
       /verification/backend/tests/test_chart_alert_postgres.py, /verification/backend/tests/test_chart_alert_offsets_postgres.py,
-      /verification/backend/tests/test_composite_alerts_postgres.py]
+      /verification/backend/tests/test_composite_alerts_postgres.py,
+      /verification/backend/tests/test_provider_postgres.py,
+      /verification/backend/tests/test_publication_migration_postgres.py]
     depends_on:
       migrate: {condition: service_completed_successfully}
   web:

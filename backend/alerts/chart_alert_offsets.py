@@ -95,7 +95,11 @@ def ordinary_values(rows, spec, checkpoint, fingerprint, *, cache=None):
         raise OffsetPending("ATR 独立固定历史起点缺失")
     end = checkpoint.get("end", -1)
     engine = IndicatorState(spec.spec(), checkpoint.get("state"))
-    key = (origin, spec.period, fingerprint(rows), json.dumps(checkpoint.get("state"), sort_keys=True))
+    watermark = checkpoint.get("confirmation_watermark", 0)
+    for row in rows:
+        if row["end"] > end:
+            watermark = max(watermark, row.get("confirmed_at", row.get("observed_at", row["end"])))
+    key = (origin, spec.period, fingerprint(rows), json.dumps(checkpoint.get("state"), sort_keys=True), watermark)
     cached = cache.get(key) if cache is not None else None
     if cached:
         return cached
@@ -104,7 +108,7 @@ def ordinary_values(rows, spec, checkpoint, fingerprint, *, cache=None):
         if row["end"] > end:
             values[str(row["start"])] = engine.step(row)["value"]
     result = (values, {"origin": origin, "end": rows[-1]["end"], "last_start": rows[-1]["start"],
-        "state": engine.checkpoint(), "fingerprint": fingerprint(rows),
+        "state": engine.checkpoint(), "fingerprint": fingerprint(rows), "confirmation_watermark": watermark,
         # The next turn only needs the last old reference plus newly added rows.
         "values": {str(rows[-1]["start"]): values.get(str(rows[-1]["start"]))}})
     if cache is not None:

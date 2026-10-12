@@ -19,7 +19,7 @@ def populated(database, monkeypatch):
         ident = DatasetIdentity.model_validate(target.identity)
         seam = revision.seam
         source = batch(identity=ident, window_start=seam, window_end=seam + 600000,
-            checkpoint=seam + 600000, observed_at=200000000, volume_kind="price_count", volume_unit="quotes",
+            checkpoint=seam + 600000, observed_at=seam + 600000, volume_kind="price_count", volume_unit="quotes",
             rows=tuple(minute(at, volume="3") for at in range(seam, seam + 600000, 60000)))
         apply_minutes(db, record(db, source))
         composite = revision.composite_id

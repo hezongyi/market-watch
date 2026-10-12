@@ -80,7 +80,8 @@ def seed(db, rows):
         start = index * 60000
         db.add(Bar(instrument_id="BTCUSDT", timeframe="M1", start=start, end=start + 60000,
             open=D(close), close=D(close), high=D(close) + D(width) / 2,
-            low=D(close) - D(width) / 2, complete=True, observed_at=start + 60000))
+            low=D(close) - D(width) / 2, complete=True, observed_at=start + 60000,
+            received_at=start + 60000))
     db.flush()
 
 
@@ -216,7 +217,8 @@ def test_missing_latest_atr_waits_then_recovers_without_gap_signal(database):
         assert db.get(ChartAlert, ident).runtime["offset_recovering"]
     with database.begin() as db:
         db.add(Bar(instrument_id="BTCUSDT", timeframe="M1", start=540000, end=600000,
-            open=D(100), high=D(102), low=D(98), close=D(100), complete=True, observed_at=600000))
+            open=D(100), high=D(102), low=D(98), close=D(100), complete=True,
+            observed_at=600000, received_at=600000))
         assert evaluate(db, ident, now=900002) == []
         row = db.get(ChartAlert, ident)
         assert row.count == 0 and D(row.state["left"]) == 104
@@ -252,7 +254,7 @@ def test_h4_d1_shared_close_uses_old_day_then_rebases_on_first_new_price(databas
         for index, width in enumerate((4, 4, 4, 20)):
             db.add(Bar(instrument_id="BTCUSDT", timeframe="D1", start=index * day,
                 end=(index + 1) * day, open=D(100), high=D(100 + width / 2), low=D(100 - width / 2),
-                close=D(100), complete=True, observed_at=(index + 1) * day))
+                close=D(100), complete=True, observed_at=(index + 1) * day, received_at=(index + 1) * day))
         for start, price in ((4 * day - 2 * h4, 100), (4 * day - h4, 103), (4 * day, 107)):
             db.add(Bar(instrument_id="BTCUSDT", timeframe="H4", start=start, end=start + h4,
                 open=D(price), high=D(price), low=D(price), close=D(price), complete=True,
@@ -392,7 +394,8 @@ def test_composite_cross_frame_atr_watermark_seam_and_price_correction(database,
     from test_market_contracts import minute
 
     composite, revision, seam = populated(database, monkeypatch)
-    add_tail(database, revision, [minute(seam + i * 60000, volume="3") for i in range(10, 30)])
+    add_tail(database, revision, [minute(seam + i * 60000, volume="3") for i in range(10, 30)],
+             observed_at=seam + 1800000)
     drain(revision, "M1")
     drain(revision, "M5")
     stamp = seam + 1800010
@@ -429,7 +432,7 @@ def test_composite_cross_frame_atr_watermark_seam_and_price_correction(database,
         alert = db.get(ChartAlert, ident)
         assert alert.runtime["offset"]["reference_end"] == seam + 1800000
         snapshot = db.scalar(select(SignalRow)).evidence
-    add_tail(database, revision, [minute(seam + 60000, volume="3", high="1.14")])
+    add_tail(database, revision, [minute(seam + 60000, volume="3", high="1.14")], observed_at=seam + 1980010)
     drain(revision, "M1")
     drain(revision, "M5")
     assert settle(database, ident, seam + 1980020) == []
@@ -492,7 +495,8 @@ def test_intrabar_h4_d1_reference_stays_fixed_and_delayed_confirmation_recovers(
         for i in range(4):
             db.add(Bar(instrument_id="BTCUSDT", timeframe="D1", start=i * day, end=(i + 1) * day,
                 open=D(100), high=D(102), low=D(98), close=D(100), complete=i < 3,
-                observed_at=3 * day + 1000 if i == 2 else (i + 1) * day))
+                observed_at=3 * day + 1000 if i == 2 else (i + 1) * day,
+                received_at=3 * day + 1000 if i == 2 else (i + 1) * day))
         db.add(Bar(instrument_id="BTCUSDT", timeframe="H4", start=3 * day, end=3 * day + h4,
             open=D(100), high=D(104), low=D(100), close=D(104), complete=False,
             observed_at=3 * day + 500))
@@ -614,7 +618,7 @@ def test_managed_ny17_dst_weekend_uses_confirmed_friday_atr(database):
             left, right = reference_bar(cursor, "D1", {"calendar": "ny17"}, "EURUSD")
             db.add(Bar(instrument_id="EURUSD", timeframe="D1", start=left, end=right,
                 open=D("1.10"), high=D("1.102"), low=D("1.098"), close=D("1.10"),
-                complete=True, observed_at=right))
+                complete=True, observed_at=right, received_at=right))
             cursor = left
         end = period(opened, "H4", "ny17")[1]
         db.add(Bar(instrument_id="EURUSD", timeframe="H4", start=opened, end=end,
@@ -633,3 +637,256 @@ def test_managed_ny17_dst_weekend_uses_confirmed_friday_atr(database):
         offset = db.scalar(select(SignalRow)).evidence["observation"]["offset"]
         assert offset["reference_end"] == friday_end
         assert D(offset["threshold"]) == pytest.approx(D("1.1008"))
+
+
+@pytest.mark.parametrize("published", [False, True])
+def test_late_atr_seed_cannot_generate_past_event_and_recovers(database, published):
+    from alerts.storage import ChartPublication, ChartPublishedBar
+    with database.begin() as db:
+        seed(db, [(100, 4), (100, 4), (100, 4), (101, 2), (104, 2)])
+        late = db.scalar(select(Bar).where(Bar.timeframe == "M1", Bar.start == 60000,
+                                          Bar.instrument_id == "BTCUSDT"))
+        late.received_at = late.observed_at = 300001
+        if published:
+            db.add(ChartPublication(instrument_id="BTCUSDT", timeframe="M1", start=0,
+                end=300000, complete_count=5, initialized=True))
+            for bar in db.scalars(select(Bar).where(Bar.instrument_id == "BTCUSDT", Bar.timeframe == "M1")):
+                payload = dict(start=bar.start, end=bar.end, open=str(bar.open), high=str(bar.high),
+                    low=str(bar.low), close=str(bar.close), complete=True,
+                    observed_at=bar.observed_at, confirmed_at=bar.received_at)
+                db.add(ChartPublishedBar(instrument_id="BTCUSDT", timeframe="M1", start=bar.start,
+                    end=bar.end, complete=True, payload=payload))
+        ident = create(db, "late-atr-seed", config(published=published), at=180000).id
+        assert evaluate(db, ident, now=300002) == []
+        assert db.get(ChartAlert, ident).runtime["offset_recovering"]
+        assert db.scalar(select(func.count()).select_from(SignalRow)) == 0
+    with database.begin() as db:
+        for start, price in ((300000, 100), (360000, 104)):
+            db.add(Bar(instrument_id="BTCUSDT", timeframe="M1", start=start, end=start + 60000,
+                open=D(price), close=D(price), high=D(price) + 2, low=D(price) - 2,
+                complete=True, observed_at=start + 60000, received_at=start + 60000))
+            if published:
+                payload = dict(start=start, end=start + 60000, open=str(price), high=str(price + 2),
+                    low=str(price - 2), close=str(price), complete=True,
+                    observed_at=start + 60000, confirmed_at=start + 60000)
+                db.add(ChartPublishedBar(instrument_id="BTCUSDT", timeframe="M1", start=start,
+                    end=start + 60000, complete=True, payload=payload))
+        if published:
+            db.get(ChartPublication, ("BTCUSDT", "M1")).end = 420000
+        # First fresh sample after late input establishes the recovery baseline.
+        assert evaluate(db, ident, now=360001) == []
+        assert D(db.get(ChartAlert, ident).state["left"]) == 100
+    with database.begin() as db:
+        assert len(evaluate(db, ident, now=420001)) == 1
+        assert db.get(ChartAlert, ident).count == 1
+
+
+@pytest.mark.parametrize("published", [False, True])
+def test_managed_unchanged_reference_reread_keeps_first_confirmation(database, monkeypatch, published):
+    from alerts.bar_batch import write_bars
+    from alerts.managed_dataset import publish_corrections
+    from alerts.storage import ChartPublication, ChartPublishedBar, Instrument
+    with database.begin() as db:
+        seed(db, [(100, 4), (100, 4), (100, 4), (101, 2), (104, 2)])
+        if published:
+            db.add(ChartPublication(instrument_id="BTCUSDT", timeframe="M1", start=0,
+                end=300000, complete_count=5, initialized=True))
+            for bar in db.scalars(select(Bar).where(Bar.instrument_id == "BTCUSDT", Bar.timeframe == "M1")):
+                payload = dict(start=bar.start, end=bar.end, open=str(bar.open), high=str(bar.high),
+                    low=str(bar.low), close=str(bar.close), complete=True,
+                    observed_at=bar.observed_at, confirmed_at=bar.received_at)
+                db.add(ChartPublishedBar(instrument_id="BTCUSDT", timeframe="M1", start=bar.start,
+                    end=bar.end, complete=True, payload=payload))
+        ident = create(db, "managed-reference-reread", config(published=published), at=180000).id
+        assert evaluate(db, ident, now=240001) == []
+        ref = db.scalar(select(Bar).where(Bar.timeframe == "M1", Bar.start == 180000,
+                                         Bar.instrument_id == "BTCUSDT"))
+        monkeypatch.setattr("alerts.bar_batch.now_ms", lambda: 300001)
+        write_bars(db, "BTCUSDT", "M1", [ref.candle()], observed_at=300001, observation_only=True)
+        assert ref.received_at == 240000 and ref.observed_at == 300001
+        if published:
+            publish_corrections(db, db.get(Instrument, "BTCUSDT"), db.get(ChartPublication, ("BTCUSDT", "M1")),
+                                "M1", 0, 300000, [], 300002)
+            assert db.get(ChartPublishedBar, ("BTCUSDT", "M1", 180000)).payload["confirmed_at"] == 240000
+        assert len(evaluate(db, ident, now=300002)) == 1
+        assert db.get(ChartAlert, ident).health == "ready"
+
+
+@pytest.mark.parametrize("change", ["observation", "volume", "representation", "price"])
+def test_provider_reference_metadata_refresh_keeps_crossing(database, monkeypatch, change):
+    from alerts import provider_cache
+    from alerts.storage import ProviderBar, ProviderDataset
+    key = provider_cache.ensure({"id": "BTCUSDT", "source": "binance", "symbol": "BTCUSDT",
+        "basis": "last", "calendar": "utc0", "precision": 2}, "M1")
+    with database.begin() as db:
+        for i, (price, width) in enumerate([(100, 4), (100, 4), (100, 4), (101, 2), (104, 2)]):
+            start, end = i * 60000, (i + 1) * 60000
+            payload = dict(start=start, end=end, chart_time=start, open=str(price), close=str(price),
+                high=str(price + width / 2), low=str(price - width / 2), complete=True, volume="1")
+            db.add(ProviderBar(dataset_id=key, start=start, chart_time=start, complete=True,
+                payload=payload, observed_at=end, changed_at=end))
+        ident = create(db, "provider-reference-refresh", config(series_kind="provider"), dataset_id=key, at=180000).id
+        tail = db.get(ProviderBar, (key, 240000))
+        final_payload = dict(tail.payload)
+        db.delete(tail)
+        db.flush()
+        assert evaluate(db, ident, now=240001) == []
+        assert db.get(ChartAlert, ident).runtime["offset"]["reference_start"] == 120000
+        db.add(ProviderBar(dataset_id=key, start=240000, chart_time=240000, complete=True,
+            payload=final_payload, observed_at=300000, changed_at=300000))
+        payload = dict(db.get(ProviderBar, (key, 180000)).payload)
+        if change == "volume":
+            payload["volume"] = "7"
+        elif change == "representation":
+            payload["high"] = "102.000"
+        elif change == "price":
+            payload["high"] = "103"
+        dataset = db.get(ProviderDataset, key)
+        dataset.lease_token, dataset.lease_until = "refresh", 900000
+        generation = dataset.generation
+    monkeypatch.setattr(provider_cache, "now_ms", lambda: 300001)
+    provider_cache.commit_page(key, ("refresh", generation), {"bars": [payload], "history_boundary": False},
+                              before=240000, observed_at=300001)
+    with database.begin() as db:
+        reference = db.get(ProviderBar, (key, 180000))
+        assert reference.price_confirmed_at == (300001 if change == "price" else 240000)
+        if change in ("price", "representation"):
+            assert evaluate(db, ident, now=300002) == []
+            # Main-series revision policy is unchanged by the ATR fix.
+            assert db.get(ChartAlert, ident).health == "blocked"
+            return
+        assert len(evaluate(db, ident, now=300002)) == 1
+        event = db.scalar(select(SignalRow))
+        assert event.evidence["observation"]["offset"]["confirmed_at"] == 240000
+
+
+@pytest.mark.parametrize("paged", [False, True])
+def test_atr_checkpoint_retains_seed_confirmation_watermark(database, monkeypatch, paged):
+    from alerts import chart_alert_worker as worker
+    if paged:
+        monkeypatch.setattr(worker, "ATR_PAGE_ROWS", 4)
+    with database.begin() as db:
+        seed(db, [(100, 4)] * 15)
+        late = db.scalar(select(Bar).where(Bar.timeframe == "M1", Bar.start == 60000,
+                                          Bar.instrument_id == "BTCUSDT"))
+        late.received_at = late.observed_at = 900001
+        ident = create(db, "checkpoint-confirmation", config(), at=780000).id
+    for attempt in range(6):
+        with database.begin() as db:
+            assert evaluate(db, ident, now=900002 + attempt) == []
+    with database.begin() as db:
+        alert = db.get(ChartAlert, ident)
+        assert alert.runtime["offset_recovering"] and alert.count == 0
+        # Even after paging and new evaluator calls, old observations are unsafe.
+        db.add(Bar(instrument_id="BTCUSDT", timeframe="M1", start=900000, end=960000,
+            open=D(100), high=D(102), low=D(98), close=D(100), complete=True,
+            observed_at=960000, received_at=960000))
+        assert evaluate(db, ident, now=960001) == []
+        alert = db.get(ChartAlert, ident)
+        assert alert.state["sequence"] == 960000 and alert.health == "ready"
+        assert alert.runtime["atr_calculation"]["confirmation_watermark"] == 900001
+        assert alert.runtime["offset"]["confirmation_watermark"] == 900001
+
+
+def test_legacy_atr_checkpoint_rebuilds_watermark_without_replaying_events(database):
+    with database.begin() as db:
+        seed(db, [(100, 4), (100, 4), (100, 4), (101, 2), (104, 2)])
+        ident = create(db, "legacy-watermark", config(), at=180000).id
+        assert len(evaluate(db, ident, now=300001)) == 1
+        alert = db.get(ChartAlert, ident)
+        runtime = dict(alert.runtime)
+        calculated = dict(runtime["atr_calculation"])
+        calculated.pop("confirmation_watermark")
+        runtime["atr_calculation"] = calculated
+        alert.runtime = runtime
+    with database.begin() as db:
+        assert evaluate(db, ident, now=300002) == []
+        db.add(Bar(instrument_id="BTCUSDT", timeframe="M1", start=300000, end=360000,
+            open=D(100), high=D(102), low=D(98), close=D(100), complete=True,
+            observed_at=360000, received_at=360000))
+        assert evaluate(db, ident, now=360001) == []
+        alert = db.get(ChartAlert, ident)
+        assert alert.count == 1 and alert.runtime["atr_calculation"]["confirmation_watermark"] == 300000
+        assert db.scalar(select(func.count()).select_from(SignalRow)) == 1
+
+
+@pytest.mark.parametrize("confirmation_delay", [0, 2])
+@pytest.mark.parametrize("late_seed", [False, True])
+def test_composite_atr_input_must_be_known_at_quote_then_recovers(database, monkeypatch, confirmation_delay, late_seed):
+    from alerts.composite_inputs import apply_minutes
+    from alerts.confirmed_minutes import record
+    from alerts.market_contracts import DatasetIdentity
+    from alerts.storage import (
+        CompositePreparation,
+        CompositeRevision,
+        MarketDataset,
+        RealtimeMapping,
+    )
+    from test_composite_aggregates import drain as aggregate
+    from test_composite_alerts import armed, forming, settle
+    from test_market_contracts import batch, minute
+
+    ident, _, revision, seam, _ = armed(database, monkeypatch, mode="intrabar", seam_policy="accept_raw",
+        condition={"relation": "cross_up", "right": {"kind": "constant", "value": "1.11"},
+                   "offset": {"timeframe": "M1", "period": 2, "multiplier": "0.2"}})
+    forming(database, revision, seam + 600000, seam + 659995, price="1.11")
+    assert settle(database, ident, seam + 659995) == []
+    with database.begin() as db:
+        rev = db.get(CompositeRevision, revision)
+        target = db.get(MarketDataset, db.get(RealtimeMapping, rev.mapping_id).target_dataset_id)
+        input_start = seam + 480000 if late_seed else seam + 600000
+        input_rows = (minute(input_start, volume="3", high="1.121"), minute(seam + 600000, volume="3")) if late_seed else (minute(input_start, volume="3"),)
+        source = batch(identity=DatasetIdentity.model_validate(target.identity),
+            window_start=input_start, window_end=seam + 660000, checkpoint=seam + 660000,
+            observed_at=seam + 660000 + confirmation_delay, volume_kind="price_count", volume_unit="quotes",
+            rows=input_rows)
+        apply_minutes(db, record(db, source))
+    aggregate(revision, "M1")
+    forming(database, revision, seam + 660000, seam + 660001, price="1.119")
+    events = settle(database, ident, seam + 660003)
+    if not confirmation_delay:
+        if late_seed:
+            assert events == []  # A changed historical seed safely rebaselines.
+        else:
+            assert len(events) == 1
+        return
+    assert events == []
+    with database.begin() as db:
+        assert db.get(ChartAlert, ident).runtime["recovering"]
+    # After availability, first valid quote establishes a safe baseline.
+    forming(database, revision, seam + 660000, seam + 660004, price="1.119")
+    assert settle(database, ident, seam + 660004) == []
+    with database.begin() as db:
+        runtime = db.get(ChartAlert, ident).runtime
+        cached = runtime["atr_confirmation"]
+        actual = db.get(CompositePreparation, revision).input_revision
+        # A corrected historical source was included in the exact revision proof.
+        assert cached["key"][1] == actual and cached["watermark"] == seam + 660002
+    forming(database, revision, seam + 660000, seam + 660005, price="1.11")
+    assert settle(database, ident, seam + 660005) == []
+    forming(database, revision, seam + 660000, seam + 660006, price="1.119")
+    assert len(settle(database, ident, seam + 660006)) == 1
+
+
+def test_composite_confirmation_delta_matches_full_fixed_revision(database, monkeypatch):
+    from alerts.composite_inputs import confirmation_watermark
+    from test_composite_chart import populated
+    from test_fixed_indicators import add_tail
+    from test_market_contracts import minute
+
+    _, revision, seam = populated(database, monkeypatch)
+    with database.begin() as db:
+        initial = confirmation_watermark(db, revision, seam, seam + 540000, 1)
+        cache = {"key": [revision, 1, seam, seam + 540000], "watermark": initial}
+    add_tail(database, revision, [minute(seam + 600000, volume="3")], observed_at=seam + 660000)
+    with database.begin() as db:
+        assert confirmation_watermark(db, revision, seam, seam + 540000, 2, previous=cache) == initial
+        growth = confirmation_watermark(db, revision, seam, seam + 660000, 2, previous=cache)
+        assert growth == confirmation_watermark(db, revision, seam, seam + 660000, 2) == seam + 660000
+    cache = {"key": [revision, 2, seam, seam + 660000], "watermark": growth}
+    add_tail(database, revision, [minute(seam + 60000, volume="3", high="1.14")], observed_at=seam + 670000)
+    with database.begin() as db:
+        for start, end, value in ((seam, seam + 660000, 3), (seam, seam + 540000, 3),
+                                  (seam + 600000, seam + 660000, 3), (seam, seam + 660000, 1)):
+            assert confirmation_watermark(db, revision, start, end, value, previous=cache) == confirmation_watermark(
+                db, revision, start, end, value)

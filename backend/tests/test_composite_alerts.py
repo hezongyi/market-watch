@@ -74,7 +74,7 @@ def armed(database, monkeypatch, **changes):
 
 
 def append(database, revision, at, close, now):
-    add_tail(database, revision, [minute(at, volume="3", close=close)])
+    add_tail(database, revision, [minute(at, volume="3", close=close)], observed_at=at + 60000)
     aggregate(revision, "M1")
     live(database, revision, now, at + 60000)
 
