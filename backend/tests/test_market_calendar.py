@@ -321,3 +321,18 @@ def test_calendar_preserves_catalog_and_instrument_with_same_identifier(database
     assert any("catalog:yahoo:AAPL" in row["row_id"] for row in rows)
     assert {row["price_basis"] for row in rows} == {"adjusted", "last"}
     assert all(row["audit"] is None and row["status"] == "unverified" for row in rows)
+
+
+def test_duplicate_rules_expose_independent_review_targets(database):
+    from alerts.storage import MarketCatalog
+
+    with database.begin() as db:
+        db.add(MarketCatalog(id="BTC-fixture", source="binance", symbol="BTCUSDT",
+            label="Bitcoin", asset_type="CRYPTO", calendar="utc0", precision=2))
+    with database() as db:
+        rows = calendar_rows(db=db, source="binance", query="BTCUSDT")
+        assert {row["target_kind"] for row in rows} == {"registered", "catalog"}
+        assert {row["target_id"] for row in rows} == {"BTCUSDT", "catalog:BTC-fixture"}
+        assert len({row["review_target"] for row in rows}) == 2
+        assert all(row["status"] == "unverified" for row in rows)
+        assert not db.new and not db.dirty

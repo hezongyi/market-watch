@@ -23,7 +23,32 @@ def asset_class(kind, symbol):
         return "crypto"
     if kind == "INDEX" or kind.startswith("INSTRUMENT_IDX_"):
         return "index"
+    if kind in ("EQUITY", "STOCK"):
+        return "equity"
+    if kind in ("ETF", "FUND") or kind.startswith("INSTRUMENT_ETF_CFD_"):
+        return "etf"
+    if kind in ("FUTURE", "FUTURES"):
+        return "future"
+    # SDK stock entries use geographic groups, unlike FX/IDX/CMD families.
+    # Match those groups and the exchange suffix together, never arbitrary
+    # symbols (e.g. Yahoo XAAPL=F) or ETFs sharing the same exchange.
+    stock_groups = ("US", "UK", "JAPAN", "HONG_KONG", "AUSTRIA", "BELGIUM",
+        "DENMARK", "FINLAND", "FRANCE", "GERMANY", "IRELAND", "ITALY", "MEXICO",
+        "NETHERLANDS", "NORWAY", "PORTUGAL", "SPAIN", "SWEDEN", "SWITZERLAND")
+    if kind.startswith(tuple("INSTRUMENT_" + group + "_" for group in stock_groups)) and re.fullmatch(
+            r"[A-Z0-9_-]+\.[A-Z]{2}/[A-Z]{3}", symbol):
+        return "equity"
     return "other"
+
+
+def product_metadata(kind, asset):
+    if asset == "etf" and kind.startswith("INSTRUMENT_ETF_CFD_"):
+        return {"product_type": "etf_cfd", "product_label": "ETF CFD"}
+    if asset == "equity":
+        # SDK grouping proves the underlying stock category, not ownership of
+        # shares or a reviewed broker contract. Keep that distinction explicit.
+        return {"product_type": "stock_source", "product_label": "股票类来源行情（具体合约类型待核实）"}
+    return {}
 
 
 def catalog(db, *, source, query="", page=1, page_size=25, symbol_type=""):
@@ -49,6 +74,7 @@ def catalog(db, *, source, query="", page=1, page_size=25, symbol_type=""):
                 "asset_class": asset_class(name, symbol), "precision": None,
                 "precision_status": "manual_required", "availability": "sdk_symbol; coverage_not_verified",
                 "metadata_origin": "dukascopy-python instruments", "updated_at": None})
+            items[-1].update(product_metadata(name, items[-1]["asset_class"]))
     else:
         scope = account_scope()
         rows = [row for row in db.scalars(select(MarketCatalog).where(MarketCatalog.source == source,

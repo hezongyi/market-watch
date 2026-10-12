@@ -228,3 +228,18 @@ def test_malformed_upstream_http_reports_unavailable_not_empty(database, monkeyp
         assert response.json()["detail"]["status"] == "invalid_data"
     finally:
         api.app.dependency_overrides.clear()
+def test_stock_and_fund_catalogue_preserves_source_product_identity():
+    from alerts.provider_dukascopy import catalog, stable_id
+    from alerts.search_types import symbol_type
+
+    for symbol in ("AAPL.US/USD", "0700.HK/HKD", "7203.JP/JPY"):
+        row = next(row for row in catalog(symbol) if row["symbol"] == symbol)
+        assert row["id"] == stable_id(symbol)
+        assert row["asset_class"] == "equity"
+        assert symbol_type(row["asset_type"]) == "stock"
+        assert row["product_type"] == "stock_source"
+        assert "股票类" in row["description"]
+        assert "具体合约类型待核实" in row["description"]
+    fund = next(row for row in catalog("2822.HK") if row["symbol"] == "2822.HK/HKD")
+    assert fund["asset_class"] == "etf"
+    assert fund["product_type"] == "etf_cfd"

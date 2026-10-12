@@ -29,6 +29,9 @@ const assetNames: Record<string, string> = {
   metal: "金属",
   crypto: "加密",
   index: "指数",
+  equity: "股票类",
+  etf: "ETF / 基金",
+  future: "期货",
   other: "其他",
 };
 const defaults: Record<string, string> = {

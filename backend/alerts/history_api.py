@@ -324,7 +324,7 @@ def router(authenticated):
     @routes.get("/aggregation-options")
     def options():
         return {"defaults": DEFAULTS, "calendars": ["ny17", "utc0"],
-                "unresolved_asset_classes": ["index", "other", "unspecified"]}
+                "unresolved_asset_classes": ["index", "equity", "etf", "future", "other", "unspecified"]}
 
     @routes.get("/date-boundary")
     def date_boundary(date: str, calendar: AggregationCalendar):

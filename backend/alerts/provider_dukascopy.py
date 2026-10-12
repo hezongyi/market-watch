@@ -34,7 +34,7 @@ def stable_id(symbol):
 def _catalog():
     from dukascopy_python import instruments
 
-    from .history_catalog import asset_class
+    from .history_catalog import asset_class, product_metadata
 
     rows = {}
     for name, symbol in vars(instruments).items():
@@ -45,11 +45,16 @@ def _catalog():
         rows[symbol] = {"id": stable_id(symbol), "symbol": symbol, "label": symbol,
             "display_symbol": display_code(symbol, "dukascopy", kind),
             "logical_symbol": logical, "source": "dukascopy", "asset_type": {
-                "forex": "CURRENCY", "metal": "METAL", "crypto": "CRYPTO", "index": "INDEX"}.get(kind, "OTHER"),
+                "forex": "CURRENCY", "metal": "METAL", "crypto": "CRYPTO", "index": "INDEX",
+                "equity": "EQUITY", "etf": "ETF", "future": "FUTURE"}.get(kind, "OTHER"),
             "asset_class": kind, "available": True, "supported": True, "series_kinds": ["provider"],
             "precision": 8, "precision_status": "display_only; source_prices_not_rounded",
             "frames": list(FRAMES), "description": "平台 · Dukascopy · Bid · 原生周期",
             "metadata_origin": "dukascopy-python 4.0.1 instruments; coverage_not_verified"}
+        rows[symbol].update(product_metadata(name, kind))
+        if rows[symbol].get("product_label"):
+            rows[symbol]["description"] += " · " + rows[symbol]["product_label"]
+            rows[symbol]["label"] = symbol + " · " + rows[symbol]["product_label"]
     return sorted(rows.values(), key=lambda row: row["symbol"])
 
 
