@@ -374,17 +374,22 @@ def snapshot_rows(db, ident, *, start=None, end=None):
                 yield row
 
 
-def worker_tick(adapter, *, version_id=None, without_composite_aggregates=False):
+def worker_tick(adapter, *, version_id=None, without_composite_aggregates=False, pulse=None):
     """Isolate each role's failed round so unrelated runnable work still runs."""
     from .history_artifacts import artifact_tick
+    from .worker_health import Pulse
 
     worked = False
+    errors = []
+    pulse = pulse or Pulse("history_versions")
+    pulse.start()
 
     def phase(name, operation):
         nonlocal worked
         try:
             worked = bool(operation()) or worked
         except Exception as error:
+            errors.append(name + ":" + type(error).__name__)
             # Only safe structural facts. Supplier payloads and SQL parameters
             # can contain private account configuration and are never printed.
             print(json.dumps({"component": "history_worker", "phase": name,
@@ -406,6 +411,7 @@ def worker_tick(adapter, *, version_id=None, without_composite_aggregates=False)
         phase("indicators", indicator_tick)
         phase("revisions", revision_tick)
     phase("import", lambda: import_page(adapter, version_id=version_id))
+    pulse.finish(errors=errors, worked=worked)
     return worked
 
 
@@ -413,7 +419,7 @@ def main():
     parser = argparse.ArgumentParser(description="Source-isolated managed historical versions")
     parser.add_argument("--create", help="Canonical logical symbol, e.g. EURUSD or BTCUSD")
     parser.add_argument("--provider-symbol", help="Exact Dukascopy symbol, e.g. EUR/USD")
-    parser.add_argument("--asset-class", choices=("forex", "metal", "crypto", "index", "other"))
+    parser.add_argument("--asset-class", choices=("forex", "metal", "crypto", "index", "equity", "etf", "future", "other"))
     parser.add_argument("--aggregation-calendar", choices=("ny17", "utc0"))
     parser.add_argument("--start")
     parser.add_argument("--end")
@@ -455,10 +461,13 @@ def main():
             print(json.dumps(version_report(db, version_id)))
         return
     adapter = HistorySources()
+    from .worker_health import Pulse
+
+    pulse = Pulse("history_versions")
     try:
         while True:
             worked = worker_tick(adapter, version_id=version_id,
-                without_composite_aggregates=args.without_composite_aggregates)
+                without_composite_aggregates=args.without_composite_aggregates, pulse=pulse)
             if args.once:
                 return
             # Every round services all roles with bounded page transactions.

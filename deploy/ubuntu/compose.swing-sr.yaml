@@ -1,0 +1,97 @@
+# Ubuntu acceptance only: dedicated database/volume/network/ports, frozen OANDA.
+name: mw-swing-sr-20261012
+x-api: &api
+  image: market-watch-api:swing-sr-20261012
+  env_file:
+    - path: ${MW_SWING_PRIVATE_DIR:?Run prepare-swing-sr.py}/api.env
+      format: raw
+  environment:
+    ALERTS_DATABASE_APPLICATION_NAME: mw-swing-sr-20261012
+    ALERTS_DELIVERY_ENABLED: "false"
+    ALERTS_YAHOO_ENABLED: "false"
+    ALERTS_OANDA_STREAM_ENABLED: "false"
+  networks: [swing]
+  restart: "no"
+services:
+  postgres:
+    image: postgres:14-bookworm
+    env_file:
+      - path: ${MW_SWING_PRIVATE_DIR}/postgres.env
+        format: raw
+    volumes: [swing-postgres:/var/lib/postgresql/data]
+    networks: [swing]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U swing -d swing]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  migrate:
+    <<: *api
+    command: [alembic, upgrade, head]
+    depends_on:
+      postgres: {condition: service_healthy}
+  api:
+    <<: *api
+    volumes:
+      - ../../scripts/seed_swing_sr_acceptance.py:/acceptance/seed.py:ro
+      - ../../scripts/swing_sr_acceptance_tick.py:/acceptance/tick.py:ro
+      - ../../docs/research/patternsmart-evidence-20261012:/acceptance/evidence:ro
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8000/readyz', timeout=3)"]
+      interval: 5s
+      timeout: 4s
+      retries: 20
+  market-stream:
+    <<: *api
+    command: [python, -m, alerts.market_stream_worker]
+    depends_on:
+      api: {condition: service_healthy}
+  verification:
+    <<: *api
+    profiles: [verification]
+    environment:
+      PYTHONPATH: /app/backend:/verification/backend/tests
+      ALERTS_DATABASE_APPLICATION_NAME: mw-swing-sr-20261012
+      ALERTS_DELIVERY_ENABLED: "false"
+      ALERTS_YAHOO_ENABLED: "false"
+      ALERTS_OANDA_STREAM_ENABLED: "false"
+    volumes:
+      - ../../backend/tests:/verification/backend/tests:ro
+      - ../../docs/research/patternsmart-evidence-20261012:/verification/docs/research/patternsmart-evidence-20261012:ro
+    command:
+      - python
+      - -c
+      - >-
+        import os; from alerts.config import settings;
+        os.environ['TEST_POSTGRES_URL'] = settings.database_url;
+        import pytest; raise SystemExit(pytest.main(['-q', '-p', 'no:cacheprovider',
+        '/verification/backend/tests/test_swing_sr_postgres.py']))
+    depends_on:
+      postgres: {condition: service_healthy}
+  web:
+    image: market-watch-web:swing-sr-20261012
+    networks: [swing]
+    depends_on:
+      api: {condition: service_healthy}
+  chart-origin:
+    image: market-watch-chart-origin:swing-sr-20261012
+    networks: [swing]
+  tls:
+    image: nginx:1.28-alpine
+    ports: ["127.0.0.1:16443:443", "127.0.0.1:16444:444"]
+    volumes:
+      - ${MW_SWING_PRIVATE_DIR}/tls.conf:/etc/nginx/conf.d/default.conf:ro
+      - ${MW_SWING_PRIVATE_DIR}/cert.pem:/certs/cert.pem:ro
+      - ${MW_SWING_PRIVATE_DIR}/key.pem:/certs/key.pem:ro
+    networks: [swing, edge]
+    depends_on: [web, chart-origin]
+volumes:
+  swing-postgres:
+networks:
+  swing:
+    internal: true
+  # Docker does not publish ports on an internal-only network. Only TLS joins
+  # this task-owned ingress bridge; data/application services remain internal.
+  edge:

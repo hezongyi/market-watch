@@ -1,0 +1,103 @@
+{
+  "scope": "Ubuntu Chromium实际网页登录，14张逐张打开复核；触摸/viewport模拟，无实机结论。截图配合API/DOM断言。",
+  "images": [
+    {
+      "file": "integrated-added-indicators.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "75bacb83fcf3d9da6511c15ed4cc41d5559cb06d2922797b8b4d8cefeb6e401e",
+      "visual_review": "逐张打开复核：同图两指标摘要显示MACD中文参数19/35/11及Swing High/Low strength 3/7；本图不证明曲线加载"
+    },
+    {
+      "file": "integrated-template-save.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "8e3892300e65fc79846f6cd4b132adcab69955f08d384b59ccc3c25d4dc1c12c",
+      "visual_review": "逐张打开复核：实际模板保存窗口，名称与取消/保存可读；不单独证明计算完成"
+    },
+    {
+      "file": "integrated-template-applied.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "cb96b5c490cb4953a3138cfdb81bd84e69c872000e93a0bf39a289bb1889d955",
+      "visual_review": "逐张打开复核：应用模板后Swing圆点/水平线/默认名称下统计及MACD数值曲线恢复"
+    },
+    {
+      "file": "integrated-workspace-reloaded.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "da54fb291640201c329f862c99a590f3c3c59eafce624d211d635ca392fc92fb",
+      "visual_review": "逐张打开复核：整页刷新后同图Swing3/7和MACD19/35/11数值曲线恢复"
+    },
+    {
+      "file": "integrated-dukascopy-alert-origin.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "63be238bb58e4f0397560612b275a37381bc3c420dfa37285ee9709df0055501",
+      "visual_review": "逐张打开复核：实际Dukascopy指标对象入口可见19/35/11；未核实日历提示及禁提交保留"
+    },
+    {
+      "file": "native-indicator-actual-values.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "7ad40f36776a4fa51bcd93e7a1bdaa83d388b35617002f17ee0a9e385639e91f",
+      "visual_review": "逐张打开复核：内置17/31/7与Python19/35/11摘要及标签可区分；本图不证明Python曲线完成"
+    },
+    {
+      "file": "python-object-alert-1366.png",
+      "width": 1366,
+      "height": 768,
+      "sha256": "a0e133c9ca28137244416bd11dea80686b2289a52b61822cc99b3d14be7e1e9f",
+      "visual_review": "逐张打开复核：1366x768对象入口参数/说明/提交区可读可达；更多选项在内部滚动范围"
+    },
+    {
+      "file": "python-object-alert-snapshot.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "655899ac7769dbf239a1868e3a835603f967c8fa7cca63d1a5557bfc3c37f290",
+      "visual_review": "逐张打开复核：Python对象入口真实19/35/11、MACD线和独立快照说明"
+    },
+    {
+      "file": "python-alert-saved-independent.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "9c2bed27963d030ffe3b8285c55b605789b0e9a414171ab955b41c346c731d55",
+      "visual_review": "逐张打开复核：保存后图表23/39/13，列表提示与告警快照不同；独立快照以API断言证明"
+    },
+    {
+      "file": "manual-alert-parameter-snapshot.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "6e46c977f1b756b4bfdd5f915ecafae84ff1e27bf939d6f730568c1392200d3b",
+      "visual_review": "逐张打开复核：手选MACD21/26/9与图表不同，参数快照说明保留"
+    },
+    {
+      "file": "alerts-reloaded.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "f57c3923ae7be1bbac6ac9cc8962a44ad4e1e99252aa3cbd49b59b35d51f1afb",
+      "visual_review": "逐张打开复核：刷新后两条BTC告警列表保留；本图不同品种工作区且曲线尚在加载，不证明重新附着或曲线恢复"
+    },
+    {
+      "file": "watch-375.png",
+      "width": 375,
+      "height": 812,
+      "sha256": "09b60d4abff9a56475f0d117f5d9ff09e4c05f290a11a406fbf0293375cba2a6",
+      "visual_review": "逐张打开复核：375触摸窗口无横向溢出，长身份边界清楚，取消和提交可达"
+    },
+    {
+      "file": "watch-390.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "a4a3b622ede3fd2719c2994d68406525c7f71d2c28730041ce75782eba1dc67f",
+      "visual_review": "逐张打开复核：390触摸窗口身份/参数可读，关闭/取消/提交可达"
+    },
+    {
+      "file": "watch-844.png",
+      "width": 844,
+      "height": 390,
+      "sha256": "bec4a4e66f06eff9cf5186e88ccf6a285519cc93b93b03b6dfc18ee0bfc9f507",
+      "visual_review": "逐张打开复核：844横屏内部已滚动到操作区，固定标题/关闭和底部操作可达"
+    }
+  ]
+}

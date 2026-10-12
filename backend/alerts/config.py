@@ -60,6 +60,9 @@ class Settings(BaseSettings):
     market_poll_seconds: int = 15
     coverage_projection_enabled: bool = True
     import_poll_seconds: int = 30
+    history_health_workers: list[Literal["history_versions", "chart_history", "native_history", "legacy_import"]] = [
+        "history_versions", "chart_history", "native_history",
+    ]
     initial_history_days: int = Field(default=180, ge=0, le=366)
     postgres_bin_dir: str = ""
     provider_request_seconds: float = Field(default=8, ge=1, le=30)

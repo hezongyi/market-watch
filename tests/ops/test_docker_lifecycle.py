@@ -21,6 +21,43 @@ m = module("mw_docker")
 guard = module("docker_guard")
 
 
+class AcceptanceNameTests(unittest.TestCase):
+    def test_confirmation_only_removes_name_heuristic_and_keeps_resource_checks(self):
+        project = "mw-production-ux-test"
+        args = SimpleNamespace(task=project, project=project, retain_image=[], apply=False,
+                               confirm_acceptance_project=project)
+        docker = mock.Mock()
+        with mock.patch.object(m, "read", return_value={"project": project, "purpose": "acceptance"}), \
+             mock.patch.object(m, "project_inventory", return_value=([], [], [])), \
+             mock.patch.object(m, "validate_retirement", side_effect=ValueError("ownership check")) as check:
+            with self.assertRaisesRegex(ValueError, "ownership check"):
+                m.retire(docker, args)
+            check.assert_called_once()
+
+    def test_missing_wrong_or_non_acceptance_confirmation_is_rejected(self):
+        project = "mw-production-ux-test"
+        for name, purpose in [(None, "acceptance"), ("mw-other", "acceptance"),
+                              (project, "release"), (project, "rollback")]:
+            args = SimpleNamespace(task=project, project=project, retain_image=[], apply=False,
+                                   confirm_acceptance_project=name)
+            with self.subTest(name=name, purpose=purpose), \
+                 mock.patch.object(m, "read", return_value={"project": project, "purpose": purpose}), \
+                 mock.patch.object(m, "project_inventory") as inventory:
+                with self.assertRaises(ValueError):
+                    m.retire(mock.Mock(), args)
+                inventory.assert_not_called()
+
+    def test_confirmation_cannot_cross_task_boundary(self):
+        project = "mw-production-ux-test"
+        args = SimpleNamespace(task="mw-other-task", project=project, retain_image=[], apply=False,
+                               confirm_acceptance_project=project)
+        with mock.patch.object(m, "read", return_value={"project": project, "purpose": "acceptance"}), \
+             mock.patch.object(m, "project_inventory") as inventory:
+            with self.assertRaisesRegex(ValueError, "exactly match task and project"):
+                m.retire(mock.Mock(), args)
+            inventory.assert_not_called()
+
+
 class BuildDefaultsTests(unittest.TestCase):
     def test_default_component_sources_and_dockerfile(self):
         for component, directory, dockerfile in (

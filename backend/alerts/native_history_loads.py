@@ -230,13 +230,19 @@ def once():
 
 def main():
     from .provider_chart import warm_clients
+    from .worker_health import Pulse
+
+    pulse = Pulse("native_history")
     logging.basicConfig(level=logging.INFO)
     logging.getLogger("httpx").setLevel(logging.WARNING)
     warm_clients()
     while True:
         try:
+            pulse.start()
             worked = once()
+            pulse.finish(worked=worked)
         except Exception as exc:
+            pulse.finish(errors=[type(exc).__name__])
             log.warning("History worker turn failed type=%s", type(exc).__name__)
             worked = False
         time.sleep(0.05 if worked else 1)

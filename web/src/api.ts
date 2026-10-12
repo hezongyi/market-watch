@@ -54,6 +54,17 @@ export type Bar = {
 export type Instrument = {
   id: string;
   label: string;
+  symbol?: string;
+  logical_symbol?: string;
+  dataset_identity?: {
+    source: string;
+    channel: string;
+    environment: string;
+    account_scope: string;
+    provider_symbol: string;
+    basis: string;
+    calendar_version: string;
+  };
   source: string;
   basis: string;
   calendar: string;

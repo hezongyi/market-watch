@@ -102,7 +102,7 @@ def test_retry_rechecks_controls_after_rollback(provider_pg, change):
             assert version.lease_token == "successor"
 
 
-def test_one_failed_worker_phase_does_not_exit_or_starve_other_phases(monkeypatch):
+def test_one_failed_worker_phase_does_not_exit_or_starve_other_phases(database, monkeypatch):
     from alerts import history_artifacts, history_maintenance, composite_preparation
     from alerts import composite_aggregates, composite_revisions, fixed_indicators
     from sqlalchemy.exc import OperationalError
@@ -120,3 +120,8 @@ def test_one_failed_worker_phase_does_not_exit_or_starve_other_phases(monkeypatc
     assert history.worker_tick(object())
     assert calls == ["artifact-failed", "schedule_tick", "preparation_tick", "aggregate_tick",
         "indicator_tick", "preparation_tick", "import"]
+    from alerts.worker_health import services
+    with database() as db:
+        row = next(row for row in services(db) if row["id"] == "history_versions")
+    assert row["status"] == "degraded"
+    assert row["errors"] == ["artifacts:OperationalError"]

@@ -1,0 +1,33 @@
+{
+  "task": "mw-ux-acceptance-20261012-r2",
+  "project": "mw-ux-acceptance-20261012-r2",
+  "preview_containers": 9,
+  "preview_volumes": [
+    "mw-ux-acceptance-20261012-r2_pg-data"
+  ],
+  "retired": true,
+  "remaining_project_containers": 0,
+  "remaining_project_volumes": 0,
+  "remaining_project_networks": 0,
+  "restore_verification": [
+    {
+      "database": "postgres",
+      "actual_restore_verified": true,
+      "tables_verified": 0,
+      "rows_verified": 0,
+      "content_sha256_checked": true,
+      "dump_sha256": "57dd27d006677ed76c4d15e0f61ecaa8033c7f82c361d02e553c49a83722669f"
+    },
+    {
+      "database": "production_ux_acceptance",
+      "actual_restore_verified": true,
+      "tables_verified": 87,
+      "rows_verified": 47494,
+      "content_sha256_checked": true,
+      "dump_sha256": "a4307550f128d5edcd8f82182c477d5261d82eb22294d414e73c9da2b125906f"
+    }
+  ],
+  "archive_private": "/home/quant/.local/share/market-watch-docker/archives/mw-ux-acceptance-20261012-r2-20261012T072514-558320b5",
+  "other_resources": "Only exact task/project resources retired; no production or other-task deletion; shared official PG image retained",
+  "addresses": "127.0.0.1:19981 and :19982 retired"
+}

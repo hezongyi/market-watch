@@ -72,6 +72,17 @@ def test_catalog_filters_nested_plugin_details_and_preserves_metadata(plugin):
     assert indicators.validate({"name": name})[1] == {"period": 3}
 
 
+def test_builtin_display_metadata_preserves_parameter_and_output_contracts():
+    meta = indicators.public_catalog()["MACD"]
+    assert meta["params"] == {"fast": 12, "slow": 26, "signal": 9}
+    assert {key: value["label"] for key, value in meta["parameter_schema"].items()} == {
+        "fast": "快线周期", "slow": "慢线周期", "signal": "信号周期",
+    }
+    assert [(output["key"], output["label"]) for output in meta["series"]] == [
+        ("macd", "MACD 线"), ("signal", "信号线"), ("histogram", "柱状差值"),
+    ]
+
+
 @pytest.mark.parametrize(
     "change",
     [
@@ -168,6 +179,7 @@ def test_builtin_order_parameters_and_warmup_remain_stable():
         "BBANDS": ["upper", "middle", "lower"],
         "MACD": ["macd", "signal", "histogram"],
         "STOCH": ["k", "d"],
+        "SWING_SR_V1": ["high", "high_left", "low", "low_left"],
     }
     for name in ("SMA", "EMA", "LWMA", "BBANDS", "RSI", "MACD", "ATR", "STOCH"):
         meta = indicators.public_catalog()[name]

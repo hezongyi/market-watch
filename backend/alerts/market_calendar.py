@@ -445,6 +445,13 @@ def _runtime_rules(db, moment):
         # Separate rows preserve immutable dataset scopes; different instances
         # may have the same symbol with different rules. No account ID is exposed.
         row["row_id"] = source + ":" + scope_id + ":" + row["version"]
+        row["target_id"] = scope_id
+        row["target_kind"] = ("catalog" if scope_id.startswith("catalog:") else
+            "provider" if scope_id.startswith("provider:") else
+            "configured" if scope_id.startswith("configured:") else "registered")
+        # Reviews are scoped to this immutable target and revision. A matching
+        # display rule never transfers an audit to a different binding.
+        row["review_target"] = row["row_id"]
         audit = audits.get((scope_id, version)) if version and not invalid_profile else None
         row["audit"] = ({"reviewed_at": datetime.fromtimestamp(audit.at / 1000, UTC).isoformat(),
             "reviewer": audit.details.get("reviewer"), "method": audit.details.get("method"),

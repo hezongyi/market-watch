@@ -909,6 +909,9 @@ def data_sync(body: DataQuery):
                 result = cached_result[1]
             else:
                 result = calculate(all_rows, spec, provisional=body.provisional)
+                if "presentation" in result:
+                    result["presentation"] = result["presentation"] | {
+                        "history_revision": revision, "history_complete": True}
                 weight = sum(len(series["values"]) for series in result["series"])
                 with _CACHE_LOCK:
                     _RESULT_CACHE[result_key] = (time.monotonic(), result, weight)

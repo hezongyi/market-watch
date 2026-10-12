@@ -1,0 +1,41 @@
+{
+  "scope": "Actual Docker stop/start and elapsed 300-second stale threshold",
+  "snapshots": [
+    {
+      "at": "2026-10-12T05:38:11.614Z",
+      "states": {
+        "history_versions": "running",
+        "chart_history": "running",
+        "native_history": "running",
+        "legacy_import": "running"
+      }
+    },
+    {
+      "at": "2026-10-12T05:43:13.868Z",
+      "states": {
+        "history_versions": "stale",
+        "chart_history": "running",
+        "native_history": "running",
+        "legacy_import": "stale"
+      }
+    },
+    {
+      "at": "2026-10-12T05:43:22.583Z",
+      "states": {
+        "history_versions": "running",
+        "chart_history": "running",
+        "native_history": "running",
+        "legacy_import": "stale"
+      }
+    },
+    {
+      "at": "2026-10-12T05:43:30.781Z",
+      "states": {
+        "history_versions": "running",
+        "chart_history": "running",
+        "native_history": "running",
+        "legacy_import": "running"
+      }
+    }
+  ]
+}

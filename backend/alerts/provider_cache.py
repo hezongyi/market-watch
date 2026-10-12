@@ -754,18 +754,32 @@ def data(body):
     if body.indicators and prefix:
         # One source prefix for all pages and live updates. A viewport's
         # warmup window cannot define a recursive EMA/RSI/MACD seed.
-        with transaction() as db:
+        swing = any(spec.get("name") == "SWING_SR_V1" for spec in body.indicators)
+        with budget_transaction(isolation_level="REPEATABLE READ") as db:
+            dataset = db.get(ProviderDataset, page["dataset_id"]) if swing else None
             prefix = [row.payload for row in db.scalars(select(ProviderBar).where(
                 ProviderBar.dataset_id == page["dataset_id"],
-                ProviderBar.start <= prefix[-1]["start"],
+                ProviderBar.start <= (2**63 - 1 if swing else prefix[-1]["start"]),
                 ProviderBar.start >= (body.calculation_origin or 0),
             ).order_by(ProviderBar.start))]
+            if dataset is not None:
+                # Values, display and visible candles use the same revision,
+                # even when provider publication races the original page read.
+                by_start = {row["start"]: row for row in prefix}
+                if any(row["start"] not in by_start for row in visible):
+                    raise ValueError("行情历史已修订，请重新加载")
+                visible = [by_start[row["start"]] for row in visible]
+                page["cache_revision"], page["as_of"] = dataset.revision, dataset.updated_at
         if prefix and body.calculation_origin is not None and prefix[0]["start"] != body.calculation_origin:
             raise ValueError("指标固定历史起点缺失，请刷新并核对数据集")
         prefix = calculation_rows(prefix, meta, body.instrument)
     indicators = []
     for spec in body.indicators:
         result = calculate(prefix, spec, provisional=body.provisional)
+        if "presentation" in result:
+            result["presentation"] = result["presentation"] | {
+                "history_revision": str(page.get("cache_revision", page.get("revision", 0))),
+                "history_complete": not page.get("pending")}
         indicators.append(
             {
                 **result,

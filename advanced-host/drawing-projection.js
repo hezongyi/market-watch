@@ -9,7 +9,9 @@ function captureDrawingProjection(widget) {
       for (const shape of chart.getAllShapes()) {
         const item = { id: String(shape.id), name: shape.name, points: [] };
         try {
-          item.points = chart.getShapeById(shape.id).getPoints().map(point => ({
+          const drawing = chart.getShapeById(shape.id);
+          if (drawing.isSavingEnabled() === false) continue;
+          item.points = drawing.getPoints().map(point => ({
             time: typeof point.time === "number" && Number.isFinite(point.time) ? point.time : null,
             price: point.price,
           }));

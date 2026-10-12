@@ -15,7 +15,7 @@ from .supertrend_pine import step as supertrend_step
 
 ALGORITHM = "fixed-indicator-state-v3"
 SUPPORTED = frozenset(("SMA", "EMA", "LWMA", "BBANDS", "RSI", "MACD", "ATR", "STOCH",
-                       SUPERTREND_NAME))
+                       "SWING_SR_V1", SUPERTREND_NAME))
 ALGORITHMS = (ALGORITHM, SUPERTREND_ALGORITHM)
 
 
@@ -43,6 +43,15 @@ class IndicatorState:
         return all(value is not None for value in values.values())
 
     def step(self, row, *, provisional=False):
+        if self.name == "SWING_SR_V1":
+            from .swing_sr import SwingState
+
+            engine = SwingState(self.params, self.state or None)
+            values, _ = engine.step(row, provisional=provisional)
+            self.last_presentation = engine.presentation()
+            if not provisional:
+                self.state = engine.state
+            return values
         if provisional:
             trial = IndicatorState(self.spec, self.checkpoint())
             return trial.step({**row, "complete": True})
@@ -181,9 +190,10 @@ class IndicatorState:
         return {key: value if value is None or math.isfinite(value) else None for key, value in result.items()}
 
 
-def presentation(spec, rows):
+def presentation(spec, rows, display=None):
     name, params = validate(spec)
     return {"name": name, "version": "1", "params": params, "pane": CATALOG[name]["pane"],
+        **({"presentation": display} if display is not None else {}),
         "levels": CATALOG[name].get("levels", []), "series": [
             {**item, "values": [{"time": row["start"], "value": row["values"][item["key"]],
                 **({"break_before": True} if row.get("break_before") else {}),

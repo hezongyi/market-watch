@@ -89,4 +89,16 @@ node tests/supertrend-native.browser.cjs
 - [Sell 出现](intrabar-sell.png)、[撤回](intrabar-retracted.png)、[再次出现](intrabar-sell-again.png)：最右末柱的 Sell 标签随当前方向撤回、恢复。
 - [周期 1 真缺口](gap-period-one.png)：线与填色均留出断口，没有零价线或跨缺口填色。
 
-独立实例保留运行供本机审阅；未做生产部署、推送远程分支或发通知。退役时按 deploy/ubuntu/README.md 的精确项目流程进行数据库归档与真实恢复校验；未执行全局清理。
+实现验收结束时独立实例保留运行供本机审阅，未做生产部署、推送远程分支或发通知；后续 PR 交付状态见下节。退役时按 deploy/ubuntu/README.md 的精确项目流程进行数据库归档与真实恢复校验；未执行全局清理。
+
+## PR 集成复验
+
+提交 PR 前合入 `main` 的 `cbd0477`，保留 Swing 的扩展 presentation、展示参数及原生偏移行为。合并后的目录同时注册两个指标，旧固定状态版本继续供 Swing 和原有八个指标使用。
+
+- [合并后 Python 回归](merge-python-tests.txt)：235 passed，覆盖 Supertrend、Swing、目录、固定历史、检查点、MCP、实时推送及供源 worker。
+- [合并后真实 PostgreSQL 回归](merge-postgres-tests.txt)：63 passed，覆盖固定指标、Swing 及实时推送，每个用例使用任务数据库中的隔离 schema。
+- JS 七组契约通过：Supertrend、Swing adapter、Python adapter、固定指标、搜索、原生身份及中文标签。
+- [合并后原生合成探针](merge-browser-profile.json)：同一末柱信号翻转与撤回、周期 1 真缺口通过；这是读取当前 adapter 源码的原生库探针，不等于 OANDA 全栈验收。
+- [实际登录再次复验](browser-login-recheck.json)：30 次指标响应全部 HTTP 200，无页面异常或 reset；设置、开关、暗色及浅色截图再次逐张人工检查。
+
+运行中的 Docker 验收镜像和上述实际登录截图对应实现提交 `f4aeaaa`。合入最新 main 后未重建整套验收镜像；合并后的代码证据为这里列出的自动化与合成探针。PR 将推送远程分支，仍未部署生产。

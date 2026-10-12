@@ -111,10 +111,14 @@ _DETAILS = {
         "以 k 根高低区间计算位置比例，依次用 smooth 和 d 简单均线得到 K、D。",
     ),
 }
+_PARAMETER_LABELS = {"period":"计算周期", "fast":"快线周期", "slow":"慢线周期",
+    "signal":"信号周期", "deviation":"标准差倍数", "k":"K 线周期", "smooth":"K 线平滑周期", "d":"D 线周期"}
+_OUTPUT_LABELS = {"value":"指标值", "macd":"MACD 线", "signal":"信号线", "histogram":"柱状差值",
+    "upper":"上轨", "middle":"中轨", "lower":"下轨", "k":"K 线", "d":"D 线"}
 for _name, _meta in CATALOG.items():
     _meta["description"], _meta["calculation"] = _DETAILS[_name]
     _meta["series"] = [
-        {"key": key, "type": "histogram" if key == "histogram" else "line"}
+        {"key": key, "label": _OUTPUT_LABELS[key], "type": "histogram" if key == "histogram" else "line"}
         for key in _OUTPUTS.get(_name, ("value",))
     ]
     _meta["aliases"] = [_name, *_ALIASES[_name]]
@@ -124,6 +128,8 @@ for _name, _meta in CATALOG.items():
         else {"type": "integer", "min": 2, "max": 500, "default": value}
         for key, value in _meta["params"].items()
     }
+    for _key, _schema in _meta["parameter_schema"].items():
+        _schema["label"] = _PARAMETER_LABELS[_key]
 
 
 def _validate_metadata(name, meta):
@@ -152,12 +158,6 @@ def _validate_metadata(name, meta):
             or any(not isinstance(field, str) or field not in ("open", "high", "low", "close")
                    for field in fields) or len(set(fields)) != len(fields)):
         raise ValueError(f"{name}: invalid input_fields")
-    if meta.get("render_profile") not in (None, "supertrend_pine_v1"):
-        raise ValueError(f"{name}: invalid render_profile")
-    display = meta.get("display_inputs", {})
-    if (not isinstance(display, dict) or set(display) - {"showsignals", "highlighting"}
-            or any(type(value) is not bool for value in display.values())):
-        raise ValueError(f"{name}: invalid display_inputs")
     params, series = meta.get("params"), meta.get("series")
     if not isinstance(params, dict) or not isinstance(series, list) or not series:
         raise ValueError(f"{name}: params and explicit series declarations required")
@@ -170,6 +170,8 @@ def _validate_metadata(name, meta):
             or item.get("type") not in ("line", "histogram")
         ):
             raise ValueError(f"{name}: invalid output declaration")
+        if "label" in item and (not isinstance(item["label"], str) or not item["label"]):
+            raise ValueError(f"{name}: invalid output label")
         keys.append(item["key"])
     if len(set(keys)) != len(keys):
         raise ValueError(f"{name}: duplicate output keys")
@@ -196,9 +198,42 @@ def _validate_metadata(name, meta):
             or rule["default"] != params[key]
         ):
             raise ValueError(f"{name}: invalid parameter declaration {key}")
+        if "label" in rule and (not isinstance(rule["label"], str) or not rule["label"]):
+            raise ValueError(f"{name}: invalid parameter label")
         _validate_parameter(name, key, params[key], rule)
     if "history_requirement" in meta and not callable(meta["history_requirement"]):
         raise ValueError(f"{name}: history_requirement must be callable")
+    if meta.get("result_format") not in (None, "series_presentation_v1"):
+        raise ValueError(f"{name}: unknown result format")
+    profile = meta.get("render_profile")
+    if profile not in (None, "swing_sr_v1", "supertrend_pine_v1"):
+        raise ValueError(f"{name}: invalid render_profile")
+    if (profile == "swing_sr_v1") != bool(meta.get("result_format")):
+        raise ValueError(f"{name}: Swing render profile requires the extended result contract")
+    display = meta.get("display_inputs", [])
+    if profile == "supertrend_pine_v1":
+        if (not isinstance(display, dict) or set(display) - {"showsignals", "highlighting"}
+                or any(type(value) is not bool for value in display.values())):
+            raise ValueError(f"{name}: invalid display_inputs")
+        return
+    if not isinstance(display, list):
+        raise ValueError(f"{name}: invalid display inputs")
+    seen = set(params)
+    for item in display:
+        if (not isinstance(item, dict) or not isinstance(item.get("id"), str)
+                or item["id"] in seen or not isinstance(item.get("name"), str)
+                or item.get("type") not in ("bool", "text")):
+            raise ValueError(f"{name}: invalid display input")
+        seen.add(item["id"])
+        if item["type"] == "bool":
+            valid = type(item.get("default")) is bool
+        else:
+            options = item.get("options")
+            valid = (isinstance(options, list) and bool(options)
+                     and all(isinstance(option, str) for option in options)
+                     and item.get("default") in options)
+        if not valid:
+            raise ValueError(f"{name}: invalid display default/options")
 
 
 def _validate_parameter(name, key, value, rule):
@@ -240,14 +275,18 @@ def public_catalog():
     return {
         name: {
             **deepcopy({key: meta[key] for key in fields if key in meta}),
-            "series": [{key: item[key] for key in ("key", "type")} for item in meta["series"]],
+            "series": [{key: item[key] for key in ("key", "type", "label") if key in item} for item in meta["series"]],
             "parameter_schema": {
                 parameter: {key: deepcopy(rule[key]) for key in
-                            ("type", "min", "max", "default", "options") if key in rule}
+                            ("type", "min", "max", "default", "options", "label") if key in rule}
                 for parameter, rule in meta["parameter_schema"].items()
             },
             "version": "1",
             "source": "Python",
+            **({"display_inputs": [{key: deepcopy(item[key]) for key in
+                                    ("id", "name", "type", "default", "options") if key in item}
+                                   for item in meta["display_inputs"]]}
+               if isinstance(meta.get("display_inputs"), list) else {}),
         }
         for name, meta in CATALOG.items()
     }
@@ -268,7 +307,25 @@ def validate(spec):
         _validate_parameter(name, key, value, CATALOG[name]["parameter_schema"][key])
     if name == "MACD" and params["fast"] >= params["slow"]:
         raise ValueError("MACD快线周期必须小于慢线")
+    if "display_inputs" in spec:
+        validate_display(name, spec["display_inputs"])
     return name, params
+
+
+def validate_display(name, supplied):
+    """Display settings never enter numerical specs or cache identities."""
+    declarations = CATALOG[name].get("display_inputs", [])
+    rules = ({key: {"type": "bool", "default": value} for key, value in declarations.items()}
+             if isinstance(declarations, dict) else {item["id"]: item for item in declarations})
+    if not isinstance(supplied, dict) or set(supplied) - set(rules):
+        raise ValueError(f"{name}: unknown display inputs")
+    result = {key: item["default"] for key, item in rules.items()} | supplied
+    for key, value in result.items():
+        rule = rules[key]
+        if (rule["type"] == "bool" and type(value) is not bool
+                or rule["type"] == "text" and value not in rule["options"]):
+            raise ValueError(f"{name}: invalid display input {key}")
+    return result
 
 
 def history_requirement(spec):
@@ -304,6 +361,30 @@ def _run(name, arrays, params):
     except Exception as exc:
         raise ValueError(f"{name}: calculator failed: {exc}") from exc
     expected = [item["key"] for item in CATALOG[name]["series"]]
+    presentation = None
+    if CATALOG[name].get("result_format") == "series_presentation_v1":
+        if not isinstance(values, dict) or set(values) != {"series", "presentation"}:
+            raise ValueError(f"{name}: invalid extended result")
+        presentation, values = values["presentation"], values["series"]
+        # V1 accepts local event records only, never arbitrary calculator objects.
+        fields = {"side", "price", "pivot_time", "detected_bar_time", "confirmed_at",
+                  "provisional", "pivot_index"}
+        if (not isinstance(presentation, dict) or set(presentation) != {"events"}
+                or not isinstance(presentation["events"], list)):
+            raise ValueError(f"{name}: invalid presentation")
+        for event in presentation["events"]:
+            if (not isinstance(event, dict) or set(event) != fields
+                    or event["side"] not in ("high", "low")
+                    or type(event["price"]) not in (int, float) or not math.isfinite(event["price"])
+                    or any(type(event[key]) is not int for key in
+                           ("pivot_time", "detected_bar_time", "pivot_index", "confirmed_at"))
+                    or not 0 <= event["pivot_time"] < event["detected_bar_time"] < len(inputs[0])
+                    or event["pivot_index"] != event["pivot_time"]
+                    or event["confirmed_at"] != event["detected_bar_time"] + 1
+                    or event["provisional"] is not False):
+                raise ValueError(f"{name}: invalid presentation event")
+            if event["detected_bar_time"] - event["pivot_time"] != params[event["side"] + "_strength"]:
+                raise ValueError(f"{name}: invalid event detection window")
     if not isinstance(values, dict) or list(values) != expected:
         raise ValueError(f"{name}: output keys/order must be {expected}")
     for key, output in values.items():
@@ -316,7 +397,7 @@ def _run(name, arrays, params):
             raise ValueError(
                 f"{name}: {key} must be a one-dimensional numeric array of length {length}"
             )
-    return values
+    return values, presentation
 
 
 def calculate(rows, spec, *, provisional=False):
@@ -338,6 +419,11 @@ def calculate(rows, spec, *, provisional=False):
             raise ValueError(f"{name}: 指标输入价格必须是有限数值")
     # Restart after an incomplete bar: do not bridge an unknown interval with invented prices.
     outputs = {item["key"]: np.full(len(rows), np.nan) for item in CATALOG[name]["series"]}
+    extended = CATALOG[name].get("result_format") == "series_presentation_v1"
+    if extended:
+        from .swing_sr import empty_statistics, statistics
+
+        stats, current = empty_statistics(), {"high": None, "low": None}
     # A missing interval breaks recursive state, even when its next bar is complete.
     mask = np.array([row["complete"] for row in rows], dtype=bool)
     edges = list(np.flatnonzero(np.diff(np.r_[False, mask, False])))
@@ -346,10 +432,31 @@ def calculate(rows, spec, *, provisional=False):
         cuts = [start] + [i for i in range(start + 1, end) if rows[i].get("gap_before")] + [end]
         spans.extend(zip(cuts, cuts[1:]))
     for start, end in spans:
+        start, end = int(start), int(end)
         span = {key: values[start:end] for key, values in arrays.items()}
-        for key, values in _run(name, span, p).items():
-            outputs[key][start:end] = values
-    return {
+        values, display = _run(name, span, p)
+        for key, output in values.items():
+            outputs[key][start:end] = output
+        if extended:
+            previous = {"high": None, "low": None}
+            current = {"high": None, "low": None}
+            for event in display["events"]:
+                side, pivot, detected = event["side"], start + event["pivot_time"], start + event["detected_bar_time"]
+                item = stats[side]
+                preview = rows[detected]["start"] == provisional_time
+                if previous[side] is not None:
+                    item["interval_sum"] += pivot - previous[side]
+                    item["interval_count"] += 1
+                item["event_count"] += 1
+                item["preview_count" if preview else "confirmed_count"] += 1
+                previous[side] = pivot
+                current[side] = {"price": event["price"], "pivot_time": rows[pivot]["start"],
+                                 "detected_bar_time": rows[detected]["start"],
+                                 "confirmed_at": None if preview else rows[detected].get("end"),
+                                 "provisional": preview}
+                if "chart_time" in rows[pivot]:
+                    current[side]["pivot_chart_time"] = rows[pivot]["chart_time"]
+    result = {
         "name": name,
         "version": "1",
         "params": p,
@@ -371,6 +478,27 @@ def calculate(rows, spec, *, provisional=False):
             for key, values in outputs.items()
         ],
     }
+    if extended:
+        if not rows:
+            current = {"high": None, "low": None}
+        # Disabling the final live preview retains the last confirmed display.
+        # An incomplete historical candle still resets the next complete span.
+        as_of = next((row["start"] for row, valid in zip(reversed(rows), reversed(mask))
+                      if valid), None)
+        result["presentation"] = {"render_profile": CATALOG[name]["render_profile"],
+                                  "as_of_bar_time": as_of,
+                                  "statistics_origin": rows[0]["start"] if rows else None,
+                                  "current": current, "statistics": statistics(stats)}
+        chart_row = next((row for row in reversed(rows) if row["start"] == as_of), None)
+        if chart_row and "chart_time" in chart_row:
+            result["presentation"]["as_of_chart_time"] = chart_row["chart_time"]
+    return result
+
+
+# Explicit registration on module load also covers independent market workers.
+from .swing_sr import register_indicator  # noqa: E402
+
+register_indicator()
 
 
 # Import-time registration also covers workers/exports that never start the API.

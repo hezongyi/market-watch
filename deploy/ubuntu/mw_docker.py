@@ -619,7 +619,11 @@ def retire(docker, args):
     record = read(task_path(task))
     if not record or record["project"] != project or record["purpose"] != "acceptance":
         raise ValueError("Only registered acceptance tasks with matching project can retire")
-    if not project.startswith(("mw-", "market-watch-")) or "production" in project:
+    confirmed_name = getattr(args, "confirm_acceptance_project", None)
+    if confirmed_name is not None and (confirmed_name != project or task != project):
+        raise ValueError("Acceptance name confirmation must exactly match task and project")
+    if not project.startswith(("mw-", "market-watch-")) or (
+            "production" in project and confirmed_name != project):
         raise ValueError("Expected an isolated Market Watch acceptance project")
     cs, vs, ns = project_inventory(docker, project)
     if retained_images - {c['Image'] for c in cs}:
@@ -960,6 +964,8 @@ def parser():
     s.add_argument("--task", required=True)
     s.add_argument("--apply", action="store_true")
     s.add_argument("--archive-root", default=str(STATE / "archives"))
+    s.add_argument("--confirm-acceptance-project",
+                   help="Exact registered task/project name for an acceptance project whose name contains production; all resource/restore checks remain required")
     s.add_argument("--retain-image", action="append", default=[],
                    help="Explicit full-ID dependency: remove only own containers, preserve image")
     s = sub.add_parser("monitor")

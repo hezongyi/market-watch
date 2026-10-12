@@ -79,3 +79,16 @@ def test_search_asset_names_cover_provider_and_dataset_vocabularies():
                             (["METAL", "metal", "commodity"], "commodity")):
         assert all(symbol_type(name) == expected for name in names)
     assert symbol_type("unknown") == "other"
+
+
+def test_dukascopy_stocks_are_found_with_category_query_and_source(database):
+    from alerts.history_catalog import catalog as history_catalog
+
+    with database() as db:
+        for query, symbol in (("AAPL", "AAPL.US/USD"), ("0700.HK", "0700.HK/HKD"), ("7203.JP", "7203.JP/JPY")):
+            rows = catalog(db, source="dukascopy", query=query, asset="equity")["items"]
+            assert symbol in {row["provider_symbol"] for row in rows}
+            assert not catalog(db, source="dukascopy", query=query, asset="future")["items"]
+            historical = history_catalog(db, source="dukascopy", query=query, symbol_type="stock")["items"]
+            assert symbol in {row["provider_symbol"] for row in historical}
+        assert not db.new and not db.dirty

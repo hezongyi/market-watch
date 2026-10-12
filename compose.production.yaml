@@ -24,6 +24,7 @@ services:
       ALERTS_DATABASE_POOL_SIZE: "2"
       ALERTS_DATABASE_MAX_OVERFLOW: "0"
       ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-api
+      ALERTS_HISTORY_HEALTH_WORKERS: '["history_versions","chart_history","native_history"]'
     depends_on:
       migrate: {condition: service_completed_successfully}
     healthcheck:
