@@ -92,6 +92,8 @@ export function providerSubscriptions(
             for (const name of ['loaded_before', 'history_revision', 'history_tail_revision', 'initial_input_revision'])
               if (value[name] != null) current[name] = value[name];
           }
+          for(const name of ['dependency_observed_at','dependency_revision','initial_input_revision'])
+            if(value[name]!=null)current[name]=value[name];
           if (value.type === 'quotes') {
             const binding = value.quotes?.find((quote: any) => quote.snapshot)?.snapshot?.revision_id;
             if (binding != null) current.binding = binding;

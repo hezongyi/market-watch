@@ -109,6 +109,7 @@ class DataQuery(BaseModel):
     published: bool = False
     dataset_start: int | None = Field(default=None, ge=0)
     calculation_origin: int | None = Field(default=None, ge=0)
+    dependency_before: int | None = Field(default=None, gt=0)
     provisional: bool = True
     composite_revision_id: str | None = Field(default=None, max_length=36)
     input_revision: int | None = Field(default=None, ge=0)

@@ -1,11 +1,25 @@
 /* Main-chart ranges drive Python demand. One read includes all plots; shared
  * results stay time-keyed until the native adapter maps them to current indexes. */
-function chartIndicatorCoordinator(widget,catalog,{read,identity,report=()=>{},status=()=>{},presentation=()=>{}}) {
+function chartIndicatorCoordinator(widget,catalog,{read,identity,report=()=>{},status=()=>{},presentation=()=>{},demand=()=>{}}) {
   const results=globalThis.MWNativeIndicatorResults;
   read=chartIndicatorReadBatch(read);
   const consumers=new Map(),shared=new Map(),charts=new WeakMap(),rangeEvents=new Map();
   let chartSequence=0;
-  let disposed=false,timer,syncQueued=false;
+  let disposed=false,timer,syncQueued=false,demandSignature;
+  function publishDemand(){
+    const origins=new Map();
+    for(const consumer of consumers.values()){
+      const ticker=consumer.chart.symbol(),resolution=consumer.chart.resolution();
+      const binding=identity.binding(ticker,resolution),origin=binding?.calculationStart;
+      if(!Number.isFinite(origin))continue;
+      const key=ticker+'|'+resolution,old=origins.get(key);
+      origins.set(key,{ticker,resolution,origin:Math.min(old?.origin ?? Infinity,origin),
+        ...(binding.dependencyRevision ? {dependencyBefore:binding.dependencyBefore,dependencyRevision:binding.dependencyRevision} : {})});
+    }
+    const rows=[...origins.values()].sort((a,b)=>(a.ticker+'|'+a.resolution).localeCompare(b.ticker+'|'+b.resolution));
+    const signature=JSON.stringify(rows);
+    if(signature!==demandSignature){demandSignature=signature;demand(rows);}
+  }
   function scheduleSync(){
     if(disposed || syncQueued)return;
     syncQueued=true;
@@ -120,10 +134,13 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,report=()=>{},s
           const page=await read(chart.symbol(),scope.resolution,{before,limit:2000,
             indicators:[{name:scope.name,params}],...binding.query},sharedCurrent,
             JSON.stringify([binding.revision,binding.calculationStart,binding.inputRevision,binding.tailVersion,binding.correctionVersion]));
-          const progress=page.indicator_progress?.find(item=>item.name===scope.name);
-          if(progress && progress.status!=='complete')return {pending:true};
           const result=page.indicators?.find(item=>item.name===scope.name && canonical(item.params)===canonical(params));
           if(!result)throw Error('Python 指标结果未返回');
+          // Fixed-result progress is keyed by run_id/id, not name. Different
+          // parameters of one algorithm can have independent pending runs.
+          const progress=result.calculation ||
+            (page.indicators.length===1 ? page.indicator_progress?.find(item=>item.id===(result.id || scope.name)) : undefined);
+          if(progress && progress.status!=='complete')return {pending:true};
           if(page.input_revision!==undefined && binding.inputRevision!==undefined && page.input_revision!==binding.inputRevision)return null;
           rows.push(...rowsFor(result,page,meta,params,inputs,scope.resolution,chart.symbol()).rows);
           // Keep only result identity/revision/presentation in the shared cache.
@@ -149,12 +166,11 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,report=()=>{},s
       if(!current() || !batch)return;
       if(batch.pending){consumer.failedSignature=signature;consumer.retryAt=Date.now()+1500;return;}
       const page=batch.pages[0]?.page;
-      const revisionOf=item=>{
-        const value=String(item?.input_revision ?? item?.cache_revision ?? item?.revision ?? item?.history_revision ?? binding.inputRevision ?? binding.tailVersion ?? 0);
-        return /^\d+$/.test(value)?value:'0';
-      };
-      const revision=revisionOf(page);
-      if(batch.pages.some(({page:item})=>revisionOf(item)!==revision)){shared.delete(key);return;}
+      const revisionOf=item=>String(item?.input_revision ?? item?.cache_revision ?? item?.revision ?? item?.history_revision ?? '');
+      if(batch.pages.some(({page:item})=>revisionOf(item)!==revisionOf(page))){shared.delete(key);return;}
+      // Managed history fingerprints/publication counters are not the accepted
+      // tail version. Keep apply and invalidate in the same numeric domain.
+      const revision=String(page?.input_revision ?? page?.cache_revision ?? page?.revision ?? binding.inputRevision ?? binding.tailVersion ?? 0);
       identity.remember?.(chart.symbol(),scope.resolution,page);
       const origin=page?.calculation_origin ?? page?.origin ?? binding.calculationStart;
       if(Number.isFinite(origin) && nextIdentity.calculationStart!==origin){
@@ -210,11 +226,13 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,report=()=>{},s
         unsubscribe();rangeEvents.delete(owner);
       }
       for(const consumer of consumers.values())if(!live.has(consumer.key))detach(consumer);
+      publishDemand();
       await Promise.allSettled(work);
+      if(!disposed)publishDemand();
     }
   }
   timer=setInterval(()=>void sync(),500);
-  return {sync,retry(index){for(const c of consumers.values())if(c.index===index){c.retryAt=0;c.failures=0;c.accepted=null;}return sync();},dispose(){disposed=true;clearInterval(timer);for(const unsubscribe of rangeEvents.values())unsubscribe();rangeEvents.clear();for(const consumer of consumers.values())detach(consumer);shared.clear();},
+  return {sync,retry(index){for(const c of consumers.values())if(c.index===index){c.retryAt=0;c.failures=0;c.accepted=null;}return sync();},dispose(){disposed=true;clearInterval(timer);for(const unsubscribe of rangeEvents.values())unsubscribe();rangeEvents.clear();for(const consumer of consumers.values())detach(consumer);shared.clear();publishDemand();},
     diagnostics:()=>({consumers:consumers.size,shared:shared.size,rows:[...shared.values()].reduce((n,r)=>n+r.rows.length,0)})};
 }
 

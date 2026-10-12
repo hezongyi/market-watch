@@ -693,6 +693,9 @@ def data(body):
         basis, calendar, precision = inst.basis, inst.calendar, inst.precision
         future = future_grid(inst, body.timeframe, visible[-1]["end"]) if visible else []
         history_check = published_history_check(db, inst, pub, visible, body)
+        dependency = published_history_check(db, inst, pub, visible,
+            body.model_copy(update={"track_history": True, "revision_before": body.dependency_before,
+                "revision_after": None})) if body.dependency_before else None
         calculation_meta = {"calendar": inst.calendar, "calendar_profile": inst.calendar_profile}
     rows = calculation_rows(rows, calculation_meta, body.instrument)
     indicators = []
@@ -724,6 +727,8 @@ def data(body):
         bounded_history=True,
         history_revision=str(revision),
         history_check=history_check,
+        dependency_before=body.dependency_before,
+        dependency_revision=dependency["revision"] if dependency else None,
         future=future,
         basis=basis,
         calendar=calendar,

@@ -36,6 +36,8 @@ pytestmark = pytest.mark.skipif(not os.getenv("TEST_POSTGRES_URL"),
     contracts.test_slow_consumer_does_not_block_fast_delivery_and_replay_is_bounded,
     contracts.test_composite_history_snapshot_budget_allows_windowed_native_delivery,
     contracts.test_recursive_study_feeds_deliver_only_values_for_accepted_tail_bars,
+    contracts.test_external_indicator_prefix_is_consumer_state_not_shared_calculation,
+    contracts.test_published_external_prefix_uses_accepted_snapshot_and_preserves_tail,
 ])
 def test_durable_contract(provider_pg, contract):
     # These managed contracts use the same baseline instrument catalogue as
@@ -70,6 +72,7 @@ def test_concurrent_clients_and_workers_share_one_task_and_one_claim(provider_pg
     worker_contracts.test_indicator_initialization_is_shared_and_completion_requests_history_recovery,
     worker_contracts.test_correction_to_previously_streamed_bar_requires_native_history_reset,
     worker_contracts.test_historical_window_credentials_do_not_expand_to_realtime_tail,
+    worker_contracts.test_external_composite_prefix_correction_preserves_shared_main_task,
 ])
 def test_worker_contract_postgres(provider_pg, monkeypatch, contract):
     contract(provider_pg[0], monkeypatch)
