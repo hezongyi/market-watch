@@ -5,6 +5,7 @@ step issues at most one provider page; it never recursively activates interests.
 """
 
 import hashlib
+import json
 import logging
 import threading
 import time
@@ -239,8 +240,9 @@ def renew(client):
 def events(client, cursors):
     """Snapshot only: SSE never fetches upstream or holds DB during its wait."""
     result = []
+    swing_results = {}
     now = now_ms()
-    with transaction() as db:
+    with cache.budget_transaction(isolation_level="REPEATABLE READ") as db:
         rows = list(
             db.scalars(
                 select(ProviderInterest).where(
@@ -335,8 +337,17 @@ def events(client, cursors):
                             kind="reset"
                             indicators=[]
                             break
-                        calculated = calculate(calculation_rows(inputs, dataset.metadata_json,
-                                                                dataset.metadata_json["id"]), spec, provisional=True)
+                        cache_key = (dataset.id, dataset.revision, origin,
+                                     json.dumps(spec.get("params", {}), sort_keys=True))
+                        calculated = swing_results.get(cache_key) if spec["name"] == "SWING_SR_V1" else None
+                        if calculated is None:
+                            calculated = calculate(calculation_rows(inputs, dataset.metadata_json,
+                                                                    dataset.metadata_json["id"]), spec, provisional=True)
+                            if "presentation" in calculated:
+                                calculated["presentation"] = calculated["presentation"] | {
+                                    "history_revision": str(dataset.revision), "history_complete": True}
+                            if spec["name"] == "SWING_SR_V1":
+                                swing_results[cache_key] = calculated
                         indicators.append(
                             {
                                 **calculated,

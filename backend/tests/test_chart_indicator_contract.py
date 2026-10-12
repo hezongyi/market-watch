@@ -162,6 +162,7 @@ def test_builtin_order_parameters_and_warmup_remain_stable():
         "BBANDS": ["upper", "middle", "lower"],
         "MACD": ["macd", "signal", "histogram"],
         "STOCH": ["k", "d"],
+        "SWING_SR_V1": ["high", "high_left", "low", "low_left"],
     }
     for name, meta in indicators.public_catalog().items():
         assert [s["key"] for s in meta["series"]] == expected.get(name, ["value"])
@@ -204,7 +205,7 @@ def test_authenticated_catalog_serializes_declarations_without_calculation(
             response = client.get("/api/advanced-charts/catalog")
             assert response.status_code == 200
             assert list(response.json()["MACD"]["params"]) == ["fast", "slow", "signal"]
-            assert len(response.json()) == 9
+            assert len(response.json()) == 10
             assert response.json()[plugin[0]]["series"] == [{"key": "value", "type": "line"}]
             assert not calls
     finally:

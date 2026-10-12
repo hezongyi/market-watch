@@ -1,6 +1,6 @@
 # 守望 · Market Watch
 
-个人外汇、黄金和比特币监控网站。当前源码版本 **v1.21.2**，包含专业图表生命周期、后台发布恢复、原生界面和日历审核修复，以及九周期独立绘图可见性。源码发布与验收边界见 [PR #46 复审及发布记录](docs/verification/pro-charts-20261011/pr46-review.md)，既有操作见[双系列使用说明](docs/chart-dual-dataset-user-guide.md)。原预警系统验收见[交付矩阵](docs/acceptance-matrix.md)。
+个人外汇、黄金和比特币监控网站。当前源码版本 **v1.22.0**，新增 Swing 支撑阻力、盘中候选回滚、平均间隔统计及原生指标模板恢复，保留专业图表生命周期、原生界面和日历审核修复。源码发布与验收边界见 [Swing 验收记录](docs/swing-sr-implementation-acceptance-20261012.md) 和 [源码清单](deploy/releases/v1.22.0-source.json)，既有操作见[双系列使用说明](docs/chart-dual-dataset-user-guide.md)。原预警系统验收见[交付矩阵](docs/acceptance-matrix.md)。
 
 v1.14.1 保留固定自建历史、实时接续组合及可审计修订；部署前需迁移至 `aq44_aggregation_service_order`，按发布身份执行覆盖 `--until-complete --verify`。应用回退及重新升级步骤见 [发布说明](docs/verification/issue-13/release-pr.md)；本次为源码发布。
 

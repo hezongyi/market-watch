@@ -1,0 +1,71 @@
+{
+  "version": "1.22.0",
+  "release_tag": "v1.22.0",
+  "previous_source_tag": "v1.21.2",
+  "pull_request": "https://github.com/hezongyi/market-watch/pull/51",
+  "tested_product_commit": "450b48034e151f4e688832bd706b2293c2b5c3fc",
+  "review_base_commit": "7f80f72ce0c79e289bf10b6bf36a99ab00d257cd",
+  "source_commit_resolution": "Resolve annotated v1.22.0^{commit}; tag targets the final PR #51 main merge commit.",
+  "release_scope": "Source merge and annotated tag publication.",
+  "verification_record": "docs/swing-sr-implementation-acceptance-20261012.md",
+  "browser_evidence": "docs/verification/swing-sr-v1-20261012/browser-acceptance.json",
+  "tested_product_sha256": {
+    "advanced-host/.dockerignore": "e88f7a187ca304c7045ede0414adc6dce5c94339183a1b1a2f564a8dfb2626c2",
+    "advanced-host/Dockerfile": "56b04599fd3931058c3f2464fd2fb618126eabe07cbef4a9efc6f51bf1b7b3a5",
+    "advanced-host/bridge.js": "f5f8064cdf3d0ea92e466a2d2378e464902d64bdb5bd4d8cca6e1ee72a6b0f47",
+    "advanced-host/build-assets.mjs": "e6b7eb1061787a0b5db9f569ab15d2a5906c9c613d0a7cf39aa81c4369601371",
+    "advanced-host/drawing-projection.js": "299332d0a56c0a960f012ba3267553dc49be7bd2ca7eceda8ff3a6a127789af4",
+    "advanced-host/index.html": "1533bcbb1ae96aa3bbd5b399ac61d40046bc09d229368257e8c7dc8443042270",
+    "advanced-host/indicators.js": "e37f16bf6a8eddfe926b1bee2f72a6183d2460a0bae0191298c34c4f467c8b93",
+    "advanced-host/native-indicator-dialog.js": "90d98e7e3179e70b986ccc06326370a7dc9e20e3a00ff28ed9a34d250ac9f427",
+    "advanced-host/study-templates.js": "6272033b48562b29ddc37bb50420d3b69134efe8ad4ab9509207dcaa21c780c4",
+    "advanced-host/swing-sr-display.js": "e3ef046a6653597221e91533620062a84d733524329e3e1b35540b7b7872c2f5",
+    "backend/alerts/api.py": "065ce37b1bad68d96fdbc7bc0e97ca60caab59c227363254b7464c0ab085a219",
+    "backend/alerts/chart_api.py": "f561179b4db08307400653e8b86b2fabec365d531a25821cc044aa1e75d974e4",
+    "backend/alerts/chart_indicators.py": "93c2f1ca36dff32a25ba6ed6cec90c21f8765a60f898d721bc9abb9b036e60f6",
+    "backend/alerts/fixed_indicators.py": "a33c5a2a6f959e48402ae012f90e805a70147235ed9967021ea5837c7b8a7696",
+    "backend/alerts/indicator_state.py": "9dba789740edc3c0f77a96df03f82cc022dd770ef44e78644e28d6e52d843a51",
+    "backend/alerts/managed_dataset.py": "0d2986ba83ddc3f1b63c15447a015f0d322b7bca0495a56277a908144102e57e",
+    "backend/alerts/market_stream_worker.py": "97d76066694273aa19278d0b38b9f1d7f2f82e3bb98297411a7892c317566f17",
+    "backend/alerts/provider_cache.py": "adf47e8933e9f35d6dac9a4bc8ee89c353d4e1284dd5730be92fe705374aa85b",
+    "backend/alerts/provider_service.py": "73f9638bf51b4872e4268b110fc84e1cfa7023f036343c0b8ed870c9d4d00e8a",
+    "backend/alerts/swing_sr.py": "34f2e9b65523f7c4b967a24bce4a2da2b06cad5c1788714c4c16297cae601ca0"
+  },
+  "new_migrations": [],
+  "application_dependencies_changed": false,
+  "verification": {
+    "related_python_passed": 318,
+    "isolated_postgres_passed": 6,
+    "node_regression": [
+      "web/tests/swing-sr-adapter.cjs",
+      "web/tests/advanced-market-stream.cjs"
+    ],
+    "authenticated_browser_assertion_groups": 12,
+    "browser_errors": [],
+    "published_history_boundary": {
+      "count_back": 5000,
+      "returned_bars": 4002,
+      "no_data": true
+    },
+    "stale_revision_event": {
+      "display_unchanged": true,
+      "native_callbacks": 0
+    },
+    "standards_remaining_blockers": 0,
+    "spec_remaining_blockers": 0,
+    "github_ci_configured": false
+  },
+  "acceptance_environment": {
+    "host": "Ubuntu quant-server",
+    "project": "mw-swing-sr-20261012",
+    "app": "https://localhost:16443/advanced-charts",
+    "product_image_commit": "450b48034e151f4e688832bd706b2293c2b5c3fc"
+  },
+  "scope_limits": [
+    "Frozen OANDA fixture; 2024 holiday closures include explicit acceptance assumptions.",
+    "Unknown original Pine boundary semantics are not claimed identical.",
+    "Numeric published/provider revisions are ordered with BigInt; hash revisions retain existing generation/ticket fencing."
+  ],
+  "production_operated": false,
+  "release_images": null
+}

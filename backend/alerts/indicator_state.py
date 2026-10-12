@@ -11,7 +11,7 @@ import math
 from .chart_indicators import CATALOG, validate
 
 ALGORITHM = "fixed-indicator-state-v3"
-SUPPORTED = frozenset(("SMA", "EMA", "LWMA", "BBANDS", "RSI", "MACD", "ATR", "STOCH"))
+SUPPORTED = frozenset(("SMA", "EMA", "LWMA", "BBANDS", "RSI", "MACD", "ATR", "STOCH", "SWING_SR_V1"))
 
 
 class IndicatorState:
@@ -31,6 +31,15 @@ class IndicatorState:
                 "state": copy.deepcopy(self.state)}
 
     def step(self, row, *, provisional=False):
+        if self.name == "SWING_SR_V1":
+            from .swing_sr import SwingState
+
+            engine = SwingState(self.params, self.state or None)
+            values, _ = engine.step(row, provisional=provisional)
+            self.last_presentation = engine.presentation()
+            if not provisional:
+                self.state = engine.state
+            return values
         if provisional:
             trial = IndicatorState(self.spec, self.checkpoint())
             return trial.step({**row, "complete": True})
@@ -160,9 +169,10 @@ class IndicatorState:
         return {key: value if value is None or math.isfinite(value) else None for key, value in result.items()}
 
 
-def presentation(spec, rows):
+def presentation(spec, rows, display=None):
     name, params = validate(spec)
     return {"name": name, "version": "1", "params": params, "pane": CATALOG[name]["pane"],
+        **({"presentation": display} if display is not None else {}),
         "levels": CATALOG[name].get("levels", []), "series": [
             {**item, "values": [{"time": row["start"], "value": row["values"][item["key"]],
                 **({"provisional": True} if row.get("provisional") else {})} for row in rows]}

@@ -189,6 +189,10 @@ def build(ownership):
         output = []
         for source in rows:
             row = dict(source)
+            if run.spec["name"] == "SWING_SR_V1":
+                from .series_access import fixed_label
+
+                row["chart_time"] = fixed_label(row, run.timeframe, phase)
             row["gap_before"] = gap_before(engine.state.get("last_end"), row["start"], phase, profiles)
             previous_end = engine.state.get("last_end")
             if (seam is not None and not row["gap_before"] and previous_end is not None
@@ -272,10 +276,28 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None):
             "cursor": run.cursor, "target_end": run.target_end, "input_revision": run.input_revision,
             "algorithm": run.algorithm, "error": run.error, "next_at": run.next_at,
             "parent_run_id": run.parent_id, "reused_prefix_end": run.prefix_end}
-        if run.status == "complete" and provisional and end > run.target_end:
+        display = None
+        if run.spec["name"] == "SWING_SR_V1":
+            from .swing_sr import SwingState
+
+            display = SwingState(run.spec["params"], run.state["state"] or None).presentation()
+            display["history_complete"] = run.status == "complete"
+            display["history_revision"] = run.id
+        tail = page["bars"]
+        if (display is not None and run.status == "complete" and provisional
+                and end <= run.target_end and run.revision_id):
+            # Ordinary left pagination retains the live display cutoff. This is
+            # a bounded read of the current bucket, never another history scan.
+            from .composite_chart import chart_page
+
+            latest = chart_page(db, page["composite_id"], run.timeframe, count=1,
+                                revision_id=run.revision_id, provisional=True, now=stamp)
+            if latest["input_revision"] == run.input_revision:
+                tail = latest["bars"]
+        if run.status == "complete" and provisional and (end > run.target_end or tail is not page["bars"]):
             _, _, phase, profiles = _context(db, run)
             engine = IndicatorState(run.spec, run.state)
-            for bar in page["bars"]:
+            for bar in tail:
                 if bar["start"] < run.target_end:
                     continue
                 if bar["start"] >= period(stamp or now_ms(), run.timeframe, phase)[1]:
@@ -283,14 +305,22 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None):
                 if rows and bar["start"] <= rows[-1]["start"]:
                     raise ValueError("Indicator tail overlaps fixed output")
                 row = {**bar, "gap_before": gap_before(engine.state.get("last_end"), bar["start"], phase, profiles)}
+                if display is not None:
+                    from .series_access import fixed_label
+
+                    row["chart_time"] = fixed_label(row, run.timeframe, phase)
                 values = engine.step(row, provisional=True)
+                if display is not None:
+                    display = engine.last_presentation | {
+                        "history_complete": True, "history_revision": run.id}
                 trial = IndicatorState(run.spec, run.state)
                 trial.step({**row, "complete": True})
-                rows.append({"start": bar["start"], "values": values, "provisional": True,
-                    "dependency_origin": trial.state.get("origin"), "seam_dependency": trial.state.get("seam", False),
-                    "initialized": all(value is not None for value in values.values())})
+                if start <= bar["start"] < end:
+                    rows.append({"start": bar["start"], "values": values, "provisional": True,
+                        "dependency_origin": trial.state.get("origin"), "seam_dependency": trial.state.get("seam", False),
+                        "initialized": all(value is not None for value in values.values())})
                 break
-        result = presentation(spec, rows)
+        result = presentation(spec, rows, display)
         results.append({**result, "id": status["id"], "calculation": status,
                         "dependencies": [{key: row.get(key) for key in
                             ("start", "dependency_origin", "seam_dependency", "initialized", "provisional")} for row in rows]})

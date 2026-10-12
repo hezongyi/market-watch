@@ -16,6 +16,11 @@ const pending = new Map();
 const acknowledgedNotices = new Set();
 let activeNotices = [], noticeDialogOpen = false, chartMenu, indicatorPicker, alertBridge, alertUI, alertUISession, alertUIDraft, alertUIWorkspace, alertUIAttach, dataCenter;
 let invalidateAlertUI = () => {};
+// Lazy loading keeps ordinary datafeed consumers independent of the renderer.
+let swingSnapshots;
+function swingStore() {return swingSnapshots ||= swingSnapshotStore();}
+let swingDisplay;
+let studyTemplates;
 function showNextNotice() {
   if (!ready || noticeDialogOpen) return;
   const notice = activeNotices.find(entry => !acknowledgedNotices.has(entry.key));
@@ -561,8 +566,9 @@ function query(ticker, res, args, expires = Infinity, current = () => true) {
   };
   const key = JSON.stringify(q);
   const old = cache.get(key);
-  if (series_kind === 'managed' && old && Date.now() - old.time < 1000) return old.promise;
+  if ((series_kind === 'managed' || spec) && old && Date.now() - old.time < 1000) return old.promise;
   const epoch = workspaceEpoch;
+  const swingTicket = spec?.name==='SWING_SR_V1' ? swingStore().ticket() : null;
   // Native owns the lifetime of its period caches. A temporary period switch
   // does not cancel a getBars callback that it can reuse when switching back.
   const currentRead = () => epoch === workspaceEpoch && current() && Date.now() < expires &&
@@ -574,6 +580,10 @@ function query(ticker, res, args, expires = Infinity, current = () => true) {
         alertCompositeRevisions.set(MWSeries.encode(symbol,series_kind)+'|'+res,page.revision_id);
       if (epoch===workspaceEpoch && spec && Number.isSafeInteger(page.calculation_origin ?? page.origin))
         alertCalculationOrigins.set(MWSeries.encode(symbol,series_kind)+'|'+res,page.calculation_origin ?? page.origin);
+      if(epoch===workspaceEpoch && spec?.name==='SWING_SR_V1') {
+        swingStore().publish(MWSeries.encode(symbol,series_kind),res,page,swingTicket);
+        swingDisplay?.refresh();
+      }
       return page;
     })
     .catch(error=>{
@@ -581,7 +591,7 @@ function query(ticker, res, args, expires = Infinity, current = () => true) {
         throw Object.assign(Error('历史复核时间预算已耗尽'), {code:'HISTORY_TIMEOUT'});
       throw error;
     });
-  if (series_kind === 'managed') cache.set(key, { time: Date.now(), promise });
+  if (series_kind === 'managed' || spec) cache.set(key, { time: Date.now(), promise });
   if (cache.size > 64) cache.delete(cache.keys().next().value);
   return promise;
 }
@@ -1869,6 +1879,8 @@ function boot(
   managedSessions.clear();
   maintenanceAsked.clear();
   dataCenter?.dispose();
+  swingDisplay?.dispose();
+  studyTemplates?.dispose();
   indicatorPicker?.dispose();
   barRangeMapping?.dispose();
   barRangeMapping = chartBarRangeMapping({widget:()=>widget,initial:pendingBarRange,readonly,changed:()=>{
@@ -2031,6 +2043,12 @@ function boot(
     }
     MWDrawingVisibility.install(widget._innerWindow());
     widget.headerReady().then(async()=>{
+        studyTemplates=chartStudyTemplates(widget,prefs.templates,readonly,
+          error=>send({type:'error',error:String(error)}));
+        swingDisplay = chartSwingDisplay(widget,swingStore(),{root:document.getElementById('chart'),
+          identity:symbol=>{const id=decode(symbol);return MWSeries.encode(id.symbol,id.series_kind);},
+          chartTime:(time,chart)=>stamp({start:time,end:time+86400000},chart.resolution(),decode(chart.symbol()).symbol),
+          report:error=>send({type:'error',error:'Swing 显示失败：'+String(error)})});
         alertBridge.attach();
         chartMenu = chartThemeMenu(widget, (e) =>
           send({ type: "error", error: String(e) }),
@@ -2354,6 +2372,11 @@ addEventListener("message", async (e) => {
       sub.last=0;
       await recoverMarketBar(sub);
     } else if(event.type==='bars' && !sub.historical && !sub.needsHistoryReload) {
+      const identity=decode(sub.symbol);
+      if(identity.spec?.name==='SWING_SR_V1') {
+        if(!swingStore().publish(MWSeries.encode(identity.symbol,identity.series_kind),sub.res,event,swingStore().ticket())) return;
+        swingDisplay?.refresh();
+      }
       const rows=barsOf(event,sub.res,sub.symbol);
       for(const bar of rows) if(bar.time>=sub.last) {
         sub.cb({...bar}); observeRangeBars(sub.symbol,sub.res,event.bars,[bar],sub.window);sub.last=bar.time;
@@ -2393,6 +2416,11 @@ addEventListener("message", async (e) => {
       if (sub.historical) return;
       const rows=barsOf({bars:event.bars,indicators:event.indicators||[]},sub.res,sub.symbol);
       if (historyOlder({cache_revision:event.revision,as_of:event.as_of},old)) return;
+      const identity=decode(sub.symbol);
+      if(identity.spec?.name==='SWING_SR_V1') {
+        swingStore().publish(MWSeries.encode(identity.symbol,identity.series_kind),sub.res,event,swingStore().ticket());
+        swingDisplay?.refresh();
+      }
       for(const bar of rows) if(bar.time>=sub.last) {sub.cb({...bar});observeRangeBars(sub.symbol,sub.res,event.bars,[bar],sub.window);sub.last=bar.time;}
     } else if(event.type==='error') {
       send({type:'error',error:event.error||'平台行情暂不可用，后台重试中'});

@@ -1,0 +1,126 @@
+{
+  "passed": true,
+  "app": "https://localhost:16443",
+  "chart": "https://127.0.0.1:16444",
+  "presentation": {
+    "render_profile": "swing_sr_v1",
+    "as_of_bar_time": 1791766800000,
+    "statistics_origin": 1710478800000,
+    "current": {
+      "high": {
+        "price": 1.1242,
+        "pivot_time": 1791522000000,
+        "detected_bar_time": 1791766800000,
+        "confirmed_at": null,
+        "provisional": true,
+        "pivot_chart_time": 1791522000000
+      },
+      "low": {
+        "price": 1.11711,
+        "pivot_time": 1791450000000,
+        "detected_bar_time": 1791522000000,
+        "confirmed_at": 1791536400000,
+        "provisional": false,
+        "pivot_chart_time": 1791450000000
+      }
+    },
+    "statistics": {
+      "high": {
+        "event_count": 264,
+        "confirmed_count": 263,
+        "preview_count": 1,
+        "interval_sum": 3989,
+        "interval_count": 263,
+        "mean": 15.167300380228136,
+        "display_integer": 15
+      },
+      "low": {
+        "event_count": 249,
+        "confirmed_count": 249,
+        "preview_count": 0,
+        "interval_sum": 3978,
+        "interval_count": 248,
+        "mean": 16.04032258064516,
+        "display_integer": 16
+      }
+    },
+    "history_revision": "116",
+    "history_complete": true
+  },
+  "validations": [
+    "published Swing origin ends pagination while preserving full statistics",
+    "native Python catalog lists nine identities and adds Swing through real UI",
+    "actual native Swing datafeed traverses 4002 bars and terminates an oversized countBack",
+    "real browser message handler rejects older revision for both display and native plots",
+    "four circles and finite horizontal bridges",
+    "actual shared SSE withdrawal, restore and confirmation",
+    "workspace and preferences template restore strengths, display settings and styles",
+    "two charts save/reload",
+    "two same-strength charts share four native subscriptions and one server task; both receive withdrawal and restoration",
+    "hide/show, timeframe switch and symbol switch clear and restore owned display",
+    "375px light card bounds and no horizontal overflow",
+    "old eight indicators preferences template and workspace restore"
+  ],
+  "screenshotGeometry": {
+    "range": {
+      "from": 1789621200,
+      "to": 1791939600
+    },
+    "spacing": 13,
+    "pane": {
+      "left": 56,
+      "top": 42,
+      "width": 1482,
+      "height": 755
+    }
+  },
+  "timing": [
+    275.40000009536743,
+    288.69999980926514,
+    163.59999990463257,
+    180.19999980926514,
+    324.40000009536743
+  ],
+  "errors": [],
+  "scope": "Ubuntu task-local frozen OANDA fixture; origin/main 7f80f72; PR #51 blocker fixes",
+  "shared_tasks": [
+    {
+      "params": {
+        "high_strength": 3,
+        "low_strength": 7
+      },
+      "listeners": 4
+    },
+    {
+      "params": {
+        "high_strength": 5,
+        "low_strength": 5
+      },
+      "listeners": 0
+    }
+  ],
+  "template_dialog_checks": [
+    "save",
+    "overwrite cancel",
+    "overwrite confirm",
+    "coarse-pointer readonly",
+    "delete cancel",
+    "delete confirm",
+    "dispose and reload"
+  ],
+  "historyBoundary": {
+    "count": 4002,
+    "first": 1710478800000,
+    "last": 1791766800000,
+    "meta": {
+      "noData": true
+    }
+  },
+  "staleSnapshot": {
+    "acceptedRevision": "116",
+    "staleRevision": "115",
+    "currentRevision": "116",
+    "unchanged": true,
+    "callbacks": 0
+  }
+}

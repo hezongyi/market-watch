@@ -10,6 +10,32 @@ from test_fixed_series_revisions import correction
 from test_market_stream import session
 
 
+def test_provider_swing_worker_uses_bar_revision_and_ignores_future_rows(database, monkeypatch):
+    from alerts import market_stream_worker as worker
+    from alerts import provider_cache as cache
+    from alerts import provider_chart as upstream
+    from test_provider_cache import META, page, seed
+
+    key = seed(META, "M5", 10000, page(1000, 10000))
+    # A cache may already contain rows beyond the worker's observation clock.
+    seed(META, "M5", 15000, page(10000, 15000))
+    monkeypatch.setattr(upstream, "metadata", lambda *_a, **_k: META)
+    monkeypatch.setattr(worker, "now_ms", lambda: 10000)
+    owner = session(database)
+    query = DataQuery(instrument=META["id"], series_kind="provider", timeframe="M5",
+                      indicators=[{"name": "SWING_SR_V1"}])
+    identity, serialized = resolve(Subscription(client="page", listener="swing", generation=1,
+                                               kind="bars", query=query))
+    stream.register(owner, "page", "swing", 1, identity, serialized, {})
+    payload, _ = Calculator().build(stream.claim())
+    presentation = payload["indicators"][0]["presentation"]
+    assert presentation["as_of_bar_time"] == payload["bars"][-1]["start"] == 10000
+    assert presentation["history_revision"] == str(payload["cache_revision"])
+    assert presentation["history_complete"] is True
+    assert payload["cache_revision"] == cache.snapshot(key, 15000, 1)["cache_revision"]
+    assert all(v["time"] <= 10000 for s in payload["indicators"][0]["series"] for v in s["values"])
+
+
 def test_shared_worker_detects_history_only_correction_and_consumers_have_distinct_windows(database, monkeypatch):
     composite, revision, seam = populated(database, monkeypatch)
     owner = session(database)
