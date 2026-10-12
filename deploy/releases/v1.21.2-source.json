@@ -1,13 +1,13 @@
 {
-  "version": "1.21.1",
-  "release_tag": "v1.21.1",
+  "version": "1.21.2",
+  "release_tag": "v1.21.2",
   "previous_source_tag": "v1.21.0",
   "pull_request": "https://github.com/hezongyi/market-watch/pull/46",
   "tested_product_commit": "39615ab0da8ade52d4e2f87ca0ab617460a988d1",
   "review_base_commit": "56048c82b7d5e0ec774a7c768b931fafeb54d3e1",
-  "source_commit_resolution": "Resolve annotated v1.21.1^{commit}; tag targets the final calendar-scope collision patch PR main merge.",
+  "source_commit_resolution": "Resolve annotated v1.21.2^{commit}; tag targets the final calendar-scope collision patch PR main merge.",
   "release_scope": "Source publication; production build and deployment are separate.",
-  "verification_record": "docs/calendar-scope-collision-v1.21.1.md",
+  "verification_record": "docs/calendar-scope-collision-v1.21.2.md",
   "tested_product_sha256": {
     "advanced-host/Dockerfile": "1904b0f8ac31945ea9bc2910ff117fd89e01de1f583eb12865a2d1853a824915",
     "advanced-host/bridge.js": "394a4da8521dae946207e5ea1e871b23f0eb20e898d6e8301745af8db8c17c97",
@@ -61,7 +61,7 @@
     "latest_related_backend_failed": 0,
     "latest_related_backend_errors": 0,
     "latest_related_backend_skipped": 0,
-    "latest_related_backend_report": "docs/verification/calendar-scope-collision-v1.21.1/regression.xml",
+    "latest_related_backend_report": "docs/verification/calendar-scope-collision-v1.21.2/regression.xml",
     "latest_related_backend_report_sha256": "d4bd400097287924698c5caf2ee2d3f9ae374c68fe4226978c1af88176032fe7",
     "standards_remaining_findings": 0,
     "spec_remaining_findings": 0,
@@ -75,8 +75,14 @@
   },
   "ubuntu_review": {
     "environment": "Ubuntu quant-server isolated SQLite and FastAPI HTTP fixture",
-    "production_backup_patch_preflight": "Ubuntu isolated PG14; 86 tables restored, 430 calendar rows readable; v1.21.0 image with only market_calendar source substituted for patch preflight; final v1.21.1 image verification remains deployment gate"
+    "production_backup_patch_preflight": "Ubuntu isolated PG14; 86 tables restored, 430 calendar rows readable; v1.21.0 image with only market_calendar source substituted for patch preflight; final v1.21.2 image verification remains deployment gate"
   },
   "production_operated": false,
-  "release_images": null
+  "release_images": null,
+  "withdrawn_tag": {
+    "tag": "v1.21.1",
+    "target": "56048c82b7d5e0ec774a7c768b931fafeb54d3e1",
+    "reason": "Release script failed to stop after pre-merge assertion; tag does not contain the patch and must not be deployed",
+    "retained_immutable": true
+  }
 }
