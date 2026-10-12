@@ -390,6 +390,8 @@ main#main-content {
   margin-bottom: 24px;
 }
 .market-card {
+  min-width: 0;
+  overflow-wrap: anywhere;
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: 11px;
@@ -421,6 +423,7 @@ main#main-content {
   gap: 11px;
 }
 .instrument-icon {
+  flex-shrink: 0;
   display: grid;
   place-items: center;
   width: 36px;
@@ -441,6 +444,7 @@ main#main-content {
   color: #ba7c3a;
 }
 .card-top > div {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -454,6 +458,7 @@ main#main-content {
   color: var(--muted);
 }
 .card-top > svg {
+  flex-shrink: 0;
   margin-left: auto;
   color: #8b968c;
 }
@@ -465,6 +470,7 @@ main#main-content {
   line-height: 1.2;
 }
 .card-bottom {
+  flex-wrap: wrap;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -748,6 +754,49 @@ dialog::backdrop {
   background: #16251db0;
   backdrop-filter: blur(3px);
 }
+.watch-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  max-width: calc(100dvw - 28px);
+  max-height: calc(100dvh - 28px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 0;
+  overflow-wrap: anywhere;
+}
+.watch-dialog form {
+  padding: 0 24px;
+  min-width: 0;
+}
+.watch-dialog .dialog-heading {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--card);
+  padding: 16px 0;
+}
+.watch-dialog .dialog-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  background: var(--card);
+  margin: 0;
+  padding: 12px 0;
+  flex-wrap: wrap;
+}
+.watch-dialog input,
+.watch-dialog select { min-width: 0; max-width: 100%; }
+.watch-dialog .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.instrument-tag { flex-wrap: wrap; gap: 8px; overflow-wrap: anywhere; }
+.instrument-tag small { display: block; }
+.instrument-details { font-size: 12px; overflow-wrap: anywhere; }
+.instrument-details summary { cursor: pointer; }
+.instrument-details button { margin: 8px 8px 8px 0; }
+.watch-context { font-size: 12px; line-height: 1.6; margin-bottom: 16px; }
+.replay-completed-jobs > summary { padding: 16px; cursor: pointer; }
+.replay-completed-jobs > p { padding: 0 16px 16px; font-size: 12px; }
+.chart-panel .panel-heading > div:first-child { min-width: 0; overflow-wrap: anywhere; }
 .dialog-heading {
   display: flex;
   align-items: center;
@@ -1188,6 +1237,7 @@ dd {
     margin-top: 21px;
   }
   .market-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
   .market-card {
@@ -1201,6 +1251,12 @@ dd {
   .card-top div > span {
     display: none;
   }
+  .card-top div > .market-identity {
+    display: block;
+    font-size: 10px;
+    line-height: 1.5;
+  }
+  .watch-dialog form { padding: 0 14px; }
   .instrument-icon {
     width: 23px;
     height: 23px;

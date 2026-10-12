@@ -42,6 +42,9 @@ import AdvancedWorkspacePage from "./advanced/AdvancedWorkspace";
 import DataCenterWindow from "./market-data/Window";
 import { centerLocation } from "./market-data/location";
 import SeriesPicker, { type QualifiedSeries } from "./market-data/SeriesPicker";
+import { instrumentName, instrumentIdentity, instrumentIcon } from "./instrumentPresentation";
+import InstrumentDetails from "./InstrumentDetails";
+import ReplayJobs from "./ReplayJobs";
 
 const names: Record<string, string> = {
   pullback: "回落 / 反弹结束",
@@ -348,7 +351,7 @@ function Shell({ logout }: { logout: () => void }) {
             />
             <Route
               path="/settings"
-              element={<SettingsPage health={health} previewSound={async () => {
+              element={<SettingsPage health={health} instruments={instruments} previewSound={async () => {
                 audio.current ??= new AudioContext();
                 await audio.current.resume();
                 if (audio.current.state !== "running") throw new Error("浏览器未允许播放声音，请检查站点声音权限。");
@@ -390,6 +393,18 @@ function Dashboard({
     [open, setOpen] = useState(false),
     [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const watchTrigger = useRef<HTMLButtonElement | null>(null);
+  function openWatch(event: React.MouseEvent<HTMLButtonElement>) {
+    watchTrigger.current = event.currentTarget;
+    setOpen(true);
+  }
+  function closeWatch() {
+    setOpen(false);
+    const trigger = watchTrigger.current;
+    requestAnimationFrame(() => {
+      if (trigger?.isConnected) trigger.focus({preventScroll:true});
+    });
+  }
   const [range,setRange]=useState<any>(null);
   const inst = instruments.find((i) => i.id === selected);
   useEffect(() => {
@@ -432,7 +447,7 @@ function Dashboard({
           <h1>让机会，主动找到你。</h1>
           <p>关注市场结构，设置条件，然后把时间留给生活。</p>
         </div>
-        <button className="primary" onClick={() => setOpen(true)}>
+        <button className="primary" onClick={openWatch}>
           <Plus size={18} />
           新建预警
         </button>
@@ -446,12 +461,13 @@ function Dashboard({
             aria-pressed={selected === i.id}
           >
             <div className="card-top">
-              <span className={`instrument-icon ${i.id.toLowerCase()}`}>
-                {i.id === "EURUSD" ? "€" : i.id === "XAUUSD" ? "Au" : "₿"}
+              <span aria-hidden="true" className={`instrument-icon ${instrumentIcon(i).className}`}>
+                {instrumentIcon(i).text}
               </span>
               <div>
-                <strong>{i.id}</strong>
+                <strong>{instrumentName(i)}</strong>
                 <span>{i.label}</span>
+                <span className="market-identity">{instrumentIdentity(i)}</span>
               </div>
               <ChevronRight size={16} />
             </div>
@@ -481,13 +497,14 @@ function Dashboard({
         <div className="panel-heading">
           <div>
             <h2>
-              {selected}
+              {inst ? instrumentName(inst) : selected}
               <span className="muted">{inst?.label}</span>
             </h2>
             <p>
-              {inst?.source} · {inst?.basis} · 图表时间 UTC
+              {inst ? instrumentIdentity(inst) : "正在读取行情身份"} · 图表时间 UTC
               {inst?.calendar_profile?.revision && <> · 日历 {inst.calendar_profile.revision}</>}
             </p>
+            {inst && <InstrumentDetails key={inst.id} instrument={inst} />}
             {!!inst?.calendar_profile?.closures?.length && <details><summary>已确认休市区间</summary>{inst.calendar_profile.closures.map(c => <p key={c.start}>{date(Date.parse(c.start))} — {date(Date.parse(c.end))}（本地时间） · {c.reason} · <a href={c.source} target="_blank" rel="noreferrer">来源</a></p>)}</details>}
           </div>
           <div className="segmented">
@@ -554,7 +571,7 @@ function Dashboard({
                 <div className="watch-name">
                   <strong>{w.name}</strong>
                   <span>
-                    {w.market_identity ? `${w.market_identity.symbol} · 组合 · ${w.market_identity.calendar === "ny17" ? "NY17" : "UTC 00:00"}` : w.instrument_id} · {w.rule.timeframe} ·{" "}
+                    {w.market_identity ? `${w.market_identity.symbol} · 组合 · ${w.market_identity.calendar === "ny17" ? "NY17" : "UTC 00:00"}` : (()=>{const source = instruments.find(i=>i.id===w.instrument_id);return source ? `${instrumentName(source)} · ${instrumentIdentity(source)}` : w.instrument_id;})()} · {w.rule.timeframe} ·{" "}
                     {names[w.rule.kind]}
                   </span>
                   {w.market_identity && <small>固定修订 {w.market_identity.composite_revision_id.slice(0, 8)} · {w.market_identity.seam_policy === "accept_raw" ? "接受原价接缝依赖" : "完整同源依赖"} · {w.health === "ready" ? "可判断" : "等待依赖或恢复"}</small>}
@@ -578,7 +595,7 @@ function Dashboard({
             <Target size={28} />
             <h3>你的下一次机会，从一条预警开始</h3>
             <p>发现回落或突破机会后，开启监控，让守望替你盯盘。</p>
-            <button className="secondary" onClick={() => setOpen(true)}>
+            <button className="secondary" onClick={openWatch}>
               <Plus size={16} />
               创建第一条预警
             </button>
@@ -588,12 +605,14 @@ function Dashboard({
       {open && (
         <WatchDialog
           instrument={selected}
+          instrumentInfo={inst}
+          initialTimeframe={timeframe}
           liveInput
-          onClose={() => setOpen(false)}
+          onClose={closeWatch}
           onSave={async (data) => {
             await api("/watches", data);
             await refresh();
-            setOpen(false);
+            closeWatch();
           }}
         />
       )}
@@ -607,12 +626,16 @@ function WatchDialog({
   onSave,
   timeframe,
   liveInput = false,
+  instrumentInfo,
+  initialTimeframe,
 }: {
   instrument: string;
   onClose: () => void;
   onSave: (data: any) => Promise<void>;
   timeframe?: string;
   liveInput?: boolean;
+  instrumentInfo?: Instrument;
+  initialTimeframe?: string;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [inputKind, setInputKind] = useState(liveInput ? "composite" : "legacy");
@@ -621,7 +644,7 @@ function WatchDialog({
   const selectedInput = inputKind === "composite" ? series?.id ?? "" : instrument;
   const [kind, setKind] = useState("pullback"),
     [direction, setDirection] = useState("both"),
-    [frame, setFrame] = useState(timeframe || "H4"),
+    [frame, setFrame] = useState(timeframe || initialTimeframe || "H4"),
     [count, setCount] = useState(2),
     [fast, setFast] = useState(10),
     [slow, setSlow] = useState(20),
@@ -631,7 +654,9 @@ function WatchDialog({
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
   useEffect(() => {
-    dialog.current?.showModal();
+    const node = dialog.current;
+    node?.showModal();
+    return () => { node?.close(); };
   }, []);
   async function save(e: React.FormEvent) {
     e.preventDefault();
@@ -641,7 +666,7 @@ function WatchDialog({
       await onSave({
         instrument_id: selectedInput,
         ...(liveInput ? {series_kind: inputKind, ...(inputKind === "composite" ? {seam_policy: seamPolicy} : {})} : {}),
-        name: name || `${series && inputKind === "composite" ? series.symbol : instrument} · ${names[kind]}`,
+        name: name || `${series && inputKind === "composite" ? series.symbol : instrumentInfo ? instrumentName(instrumentInfo) : instrument} · ${names[kind]}`,
         kind,
         timeframe: frame,
         direction,
@@ -657,12 +682,12 @@ function WatchDialog({
     }
   }
   return (
-    <dialog ref={dialog} onCancel={onClose}>
+    <dialog className="watch-dialog" ref={dialog} aria-labelledby="watch-dialog-title" onCancel={event=>{event.preventDefault();onClose();}}>
       <form onSubmit={save}>
         <div className="dialog-heading">
           <div>
             <span className="eyebrow">NEW WATCH</span>
-            <h2>设置一条预警</h2>
+            <h2 id="watch-dialog-title">设置一条预警</h2>
           </div>
           <button
             type="button"
@@ -673,6 +698,7 @@ function WatchDialog({
             ×
           </button>
         </div>
+        {liveInput && instrumentInfo && <p className="watch-context">当前看盘：{instrumentName(instrumentInfo)} · {instrumentIdentity(instrumentInfo)} · {initialTimeframe}。预警默认使用独立组合行情，请明确选择；同名品种不会自动视为相同价格身份。需要当前行情时，选择“兼容旧行情与旧绑定”。</p>}
         {liveInput && <label>行情输入<select value={inputKind} onChange={e => setInputKind(e.target.value)}>
           <option value="composite">组合行情（历史基线 + OANDA 接续）</option>
           <option value="legacy">兼容旧行情与旧绑定</option>
@@ -686,14 +712,16 @@ function WatchDialog({
           <p>提交时固定历史基线、组合修订与切日规则。后台完成完整依赖检查后才开始判断；后续图表切换修订不改变这条策略。</p>
           <p>接缝两侧不判断穿越；断线、修订及恢复期间不补发过期信号。实时触价使用抽样 Bid，可能漏掉短暂触价。</p>
         </> : <div className="instrument-tag">
-          {instrument} <span>一次性监控 · 触发后关闭</span>
+          <div>{instrumentInfo ? instrumentName(instrumentInfo) : instrument}
+            {instrumentInfo && <small>{instrumentIdentity(instrumentInfo)}</small>}
+          </div><span>一次性监控 · 触发后关闭</span>
         </div>}
         <label>
           预警名称
           <input
             value={name}
             maxLength={100}
-            placeholder={`${series && inputKind === "composite" ? series.symbol : instrument} · ${names[kind]}`}
+            placeholder={`${series && inputKind === "composite" ? series.symbol : instrumentInfo ? instrumentName(instrumentInfo) : instrument} · ${names[kind]}`}
             onChange={(e) => setName(e.target.value)}
           />
         </label>
@@ -703,7 +731,7 @@ function WatchDialog({
             value={kind}
             onChange={(e) => {
               setKind(e.target.value);
-              if (!timeframe)
+              if (!timeframe && !initialTimeframe)
                 setFrame(e.target.value === "pullback" ? "H4" : "M5");
             }}
           >
@@ -1145,16 +1173,6 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
           <span>请从图表顶部的数据中心查看历史覆盖与维护。</span>
         </div>}
       </section>
-      {jobSummary?.weekly_requests?.length>0&&<section className="panel">
-        <div className="panel-heading"><h2>周线后台需求</h2><small>优先保障日线及以下周期，最多显示 30 项</small></div>
-        {jobSummary.weekly_requests.map((request:any)=><div className="watch-row" key={request.id}>
-          <strong>{request.instrument_id}</strong><small>截止 {date(request.before)}</small>
-          <span className="status">{{pending:'排队或补数中',complete:'已完成',needs_review:'待核查',failed:'未完成'}[request.status as string]||request.status}</span>
-          <span>尚需 {request.remaining} 根周线</span>
-          {request.status==='needs_review'&&<small className="warning">已查询区间没有可用周线，已停止自动向前补数；尚未确认历史起点，请检查品种与日期范围。</small>}
-        </div>)}
-      </section>}
-      {jobs.length>0&&<section className="panel"><div className="panel-heading"><h2>历史数据任务</h2><small>后台分日获取，可在重启后继续</small></div>{jobSummary&&<p>共 {jobSummary.total} 项：已完成 {jobSummary.counts.complete||0}，等待 {jobSummary.counts.pending||0}，获取中 {jobSummary.counts.running||0}，失败 {jobSummary.counts.failed||0}。下方最多显示 30 项，失败任务优先。</p>}{jobs.map(j=><div className="watch-row" key={j.id}><strong>{j.instrument_id}</strong><small>{j.priority===0?"断档修复":j.priority===50?"初始历史":j.priority===100?"图表历史":j.priority===200?"周线后台":"手动导入"} · {date(j.start)} — {date(j.end)}</small><span className="status">{{pending:'等待获取',running:'获取中',complete:'已完成',failed:'失败'}[j.status as string]||j.status}</span><span>{Math.round((j.cursor-j.start)/(j.end-j.start)*100)}%</span>{j.status==='failed'&&<button className="secondary" onClick={()=>retryImport(j.id)}>从断点重试</button>}{j.error&&<small className="warning">{j.error.includes('429')?'上游限流，等待重试':j.error}</small>}</div>)}</section>}
       {error && (
         <p className="error" role="alert">
           {error}
@@ -1262,6 +1280,7 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
           </div>
         </section>
       )}
+      <ReplayJobs jobs={jobs} summary={jobSummary} retry={retryImport} />
       {open && run && (
         <WatchDialog
           instrument={run.instrument_id}
@@ -1277,7 +1296,7 @@ function ReplayPage({ instruments }: { instruments: Instrument[] }) {
   );
 }
 
-function SettingsPage({ health, previewSound }: { health: any; previewSound: () => Promise<void> }) {
+function SettingsPage({ health, instruments, previewSound }: { health: any; instruments: Instrument[]; previewSound: () => Promise<void> }) {
   const [audioMessage, setAudioMessage] = useState(""), [audioBusy, setAudioBusy] = useState(false);
   const [config, setConfig] = useState<any>(null),
     [message, setMessage] = useState(""),
@@ -1415,7 +1434,22 @@ function SettingsPage({ health, previewSound }: { health: any; previewSound: () 
           {audioMessage && <p role="status">{audioMessage}</p>}
           <Activity size={24} />
           <h2>后台运行状态</h2>
-          {health.market_incidents?.map((item:any) => <p key={item.instrument}>{item.instrument}：24 小时内 {item.errors_24h} 次行情异常{item.current_error ? '，当前仍有错误' : ''}{item.last_error_at ? `；最近异常 ${date(item.last_error_at)}` : ''}{item.last_recovered_at ? `；最近恢复 ${date(item.last_recovered_at)}` : ''}</p>)}
+          {health.market_incidents?.map((item:any) => {
+            const instrument = instruments.find(row=>row.id===item.instrument);
+            return <div key={item.instrument}><p>{instrument ? `${instrumentName(instrument)} · ${instrumentIdentity(instrument)}` : item.instrument}：24 小时内 {item.errors_24h} 次行情异常{item.current_error ? '，当前仍有错误' : ''}{item.last_error_at ? `；最近异常 ${date(item.last_error_at)}` : ''}{item.last_recovered_at ? `；最近恢复 ${date(item.last_recovered_at)}` : ''}</p>{instrument && <InstrumentDetails instrument={instrument} />}</div>;
+          })}
+          <div className="history-service-status" aria-label="历史服务运行状态">
+            {health.history_services?.map((service:any)=><div key={service.id}>
+              <h3>{service.label}</h3>
+              <p>{({running:"业务循环有新鲜心跳",stale:"心跳过期，请检查对应服务",degraded:"业务循环报告异常",disabled:"未启用",unknown:"尚未收到业务心跳，健康情况未知"} as Record<string,string>)[service.status]}</p>
+              <p>最近心跳：{service.heartbeat_at ? date(service.heartbeat_at) : "尚未上报"} · 最近成功轮次：{service.last_success_at ? date(service.last_success_at) : "尚未记录"}</p>
+              <p>任务状态：{Object.entries(service.task_counts || {}).map(([state,count])=>`${({published:"已发布",complete:"已完成",ready:"就绪",pending:"等待",running:"处理中",waiting:"等待加载",filling:"加载中",failed:"失败",cancelled:"已取消",expired:"已过期"} as Record<string,string>)[state] || state} ${count}`).join(" · ") || "暂无任务"}{service.task_scope ? ` · ${service.task_scope}` : ""}</p>
+              {(service.status==="stale" || service.status==="degraded" || service.status==="unknown") && <p>{service.impact}。检查对应 worker 与任务记录；心跳新鲜仍不保证所选数据已就绪。</p>}
+              {service.errors?.length>0 && <p>最近轮次异常：{service.errors.join(" · ")}</p>}
+              {!!service.recent_tasks?.length && <details><summary>最近任务进展</summary>{service.recent_tasks.map((task:any)=><p key={task.id}>{task.id.slice(0,8)} · {task.state} · {task.pages !== undefined ? `完成分页 ${task.pages} · 连续未推进 ${task.stalls}` : `${task.end>task.start ? Math.min(100,Math.max(0,Math.round((task.cursor-task.start)/(task.end-task.start)*100))) : 0}%`}{task.updated_at ? ` · 最近变更 ${date(task.updated_at)}` : ""}</p>)}</details>}
+            </div>)}
+            <p>状态接口可读表示能查询状态；历史就绪仍以具体任务与数据覆盖为准。</p>
+          </div>
           <dl>
             <dt>数据库备份</dt><dd>{health.backup?.status === 'recent' ? '最近一次备份成功' : health.backup?.status === 'failed' ? '最近一次备份失败，请检查服务' : health.backup?.status === 'stale' ? '超过 36 小时未成功备份' : '尚无定时备份记录'}</dd>
             <dt>备份最近执行时间</dt><dd>{health.backup?.at ? date(health.backup.at) : '尚未执行'}</dd>
@@ -1426,8 +1460,8 @@ function SettingsPage({ health, previewSound }: { health: any; previewSound: () 
                 ? date(health.workers.market_heartbeat)
                 : "尚未上报"}
             </dd>
-            <dt>历史补数后台状态</dt><dd>{health.worker_status?.import_heartbeat === "running" ? "运行中" : health.worker_status?.import_heartbeat === "stale" ? "心跳过期，请检查服务" : "尚未收到心跳"}</dd>
-            <dt>补数 worker 最近心跳</dt><dd>{health.workers?.import_heartbeat ? date(health.workers.import_heartbeat) : "尚未上报"}</dd>
+            <dt>兼容旧补数链路</dt><dd>{health.legacy_import?.status === "disabled" ? "未启用" : health.legacy_import?.status === "running" ? "业务心跳新鲜" : health.legacy_import?.status === "stale" ? "兼容链路心跳过期" : "兼容链路健康情况未知"}；不代表现行历史服务状态</dd>
+            <dt>兼容补数最近心跳</dt><dd>{health.legacy_import?.heartbeat_at ? date(health.legacy_import.heartbeat_at) : health.workers?.import_heartbeat ? `旧版记录 ${date(health.workers.import_heartbeat)}` : "尚未上报"}</dd>
             <dt>通知后台状态</dt><dd>{health.worker_status?.notify_heartbeat === "running" ? "运行中" : health.worker_status?.notify_heartbeat === "stale" ? "心跳过期，请检查服务" : "尚未收到心跳"}</dd>
             <dt>凭证错误而暂停的投递</dt><dd>{health.blocked_notifications ?? 0}</dd>
             <dt>通知 worker 最近心跳</dt>

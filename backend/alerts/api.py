@@ -385,7 +385,10 @@ def readyz(response: Response):
 
 @app.get("/api/health", dependencies=[Depends(authenticated)])
 def health():
+    from .worker_health import services
+
     with transaction() as db:
+        history_services = services(db)
         pending = db.scalar(
             select(func.count()).select_from(Outbox).where(Outbox.status == "pending")
         )
@@ -446,6 +449,8 @@ def health():
             "last_notification_test": last_test_result,
             "workers": latest,
             "worker_status": worker_status,
+            "history_services": [row for row in history_services if row["role"] == "current"],
+            "legacy_import": next(row for row in history_services if row["role"] == "compatibility"),
             "blocked_notifications": blocked,
             "delivery_enabled": settings.delivery_enabled,
             "ntfy_configured": bool(settings.ntfy_topic),

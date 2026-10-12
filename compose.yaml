@@ -27,6 +27,7 @@ services:
     environment:
       ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
       ALERTS_COOKIE_SECURE: "true"
+      ALERTS_HISTORY_HEALTH_WORKERS: '["legacy_import"]'
     depends_on:
       migrate: {condition: service_completed_successfully}
     healthcheck:
