@@ -1,0 +1,9 @@
+NAME                                         IMAGE                                           COMMAND                  SERVICE             CREATED          STATUS                    PORTS
+mw-atr-offset-20261012-alert-worker-1        market-watch-api:atr-offset-20261012            "python /fixture/api…"   alert-worker        5 minutes ago    Up 5 minutes              8000/tcp
+mw-atr-offset-20261012-api-1                 market-watch-api:atr-offset-20261012            "python /fixture/api…"   api                 5 minutes ago    Up 5 minutes (healthy)    8000/tcp
+mw-atr-offset-20261012-chart-origin-1        market-watch-chart-origin:atr-offset-20261012   "/docker-entrypoint.…"   chart-origin        5 minutes ago    Up 5 minutes              80/tcp
+mw-atr-offset-20261012-notification-sink-1   market-watch-api:atr-offset-20261012            "python /fixture/sin…"   notification-sink   5 minutes ago    Up 5 minutes              8000/tcp
+mw-atr-offset-20261012-notify-worker-1       market-watch-api:atr-offset-20261012            "python -m alerts.no…"   notify-worker       5 minutes ago    Up 5 minutes              8000/tcp
+mw-atr-offset-20261012-pg-1                  postgres:14-bookworm                            "docker-entrypoint.s…"   pg                  49 minutes ago   Up 49 minutes (healthy)   5432/tcp
+mw-atr-offset-20261012-tls-1                 nginx:1.28-alpine                               "/docker-entrypoint.…"   tls                 47 minutes ago   Up Less than a second     80/tcp, 127.0.0.1:17443->443/tcp, 127.0.0.1:17444->444/tcp
+mw-atr-offset-20261012-web-1                 market-watch-web:atr-offset-20261012            "/docker-entrypoint.…"   web                 5 minutes ago    Up 5 minutes              80/tcp

@@ -94,8 +94,67 @@ class Conflict(ValueError):
 
 
 def config_hash(config):
-    return hashlib.sha256(json.dumps(config.model_dump(mode="json"), sort_keys=True,
+    payload = config.model_dump(mode="json")
+    # Preserve pre-offset protocol hashes, including historical request retries.
+    if config.condition.offset is None:
+        payload["condition"].pop("offset", None)
+    return hashlib.sha256(json.dumps(payload, sort_keys=True,
                                      separators=(",", ":")).encode()).hexdigest()
+
+
+def bind_offset(db, config, identity, dataset_id):
+    spec = config.condition.offset
+    if spec is None:
+        return identity
+    from .chart_alert_offsets import OffsetPending, reference_bar
+    from .indicator_state import ALGORITHM
+    from .provider_cache import identity as provider_identity
+    from .storage import Bar, ChartPublishedBar, ProviderBar
+
+    frame = spec.timeframe
+    supported = frames(config.source) if config.series_kind == "provider" else FRAMES
+    if frame not in supported:
+        raise ValueError("所选来源不支持该 ATR K线周期")
+    key, origin = None, None
+    if config.series_kind == "provider":
+        meta = db.get(ProviderDataset, dataset_id).metadata_json
+        key = provider_identity(meta, frame)
+        if not db.get(ProviderDataset, key):
+            stored_meta = dict(meta)
+            if meta["source"] == "oanda":
+                from .native_series import parameters, source_identity
+                stored_meta["native_period_identity"] = source_identity(meta, parameters(meta), timeframe=frame).model_dump()
+            db.add(ProviderDataset(id=key, source=config.source, symbol=meta["symbol"],
+                timeframe=frame, metadata_json=stored_meta, coverage=[], earliest=False))
+            db.flush()
+        origin = db.scalar(select(ProviderBar.start).where(ProviderBar.dataset_id == key)
+                           .order_by(ProviderBar.start).limit(1))
+    elif config.series_kind == "composite":
+        from .composite_series import period
+        origin = period(identity["history_start"], frame, identity["calendar"])[0]
+    else:
+        model = ChartPublishedBar if config.published else Bar
+        source_frame = frame if config.published else "M15" if frame == "M30" else "D1" if frame in ("W1", "MN") else frame
+        origin = db.scalar(select(model.start).where(model.instrument_id == config.instrument,
+            model.timeframe == source_frame).order_by(model.start).limit(1))
+        if origin is not None and source_frame != frame:
+            from .composite_series import period
+            origin = period(origin, frame, identity["calendar"])[0]
+        from .publication_schedule import request
+        request(db, config.instrument, frames=(frame,))
+    if origin is None:
+        # Pin a separate scheduled origin. Collection remains subject to source
+        # budgets / approved managed history, never the H4 viewport origin.
+        cursor = now_ms()
+        for _ in range(spec.period * 10 + 1):
+            try:
+                origin, _ = reference_bar(cursor, frame, identity, config.instrument)
+            except OffsetPending:
+                origin = 0
+                break
+            cursor = origin
+    return {**identity, "atr_dependency": {"timeframe": frame, "dataset_id": key,
+        "origin": origin, "algorithm": ALGORITHM}}
 
 
 def market_identity(db, config: AlertConfig, dataset_id=None):
@@ -152,7 +211,7 @@ def create(db, request_id: str, config: AlertConfig, *, dataset_id=None, at=None
     at = now_ms() if at is None else at
     if config.expires_at is not None and config.expires_at <= at:
         raise ValueError("到期时间必须晚于生效时间")
-    identity = market_identity(db, config, dataset_id)
+    identity = bind_offset(db, config, market_identity(db, config, dataset_id), dataset_id)
     alert = ChartAlert(request_id=request_id, request_hash=digest, name=config.name,
                        effective_at=at, max_triggers=config.max_triggers,
                        expires_at=config.expires_at)
@@ -181,7 +240,7 @@ def edit(db, alert_id, expected_version, config, *, dataset_id=None, at=None):
     at = now_ms() if at is None else at
     if config.expires_at is not None and config.expires_at <= at:
         raise ValueError("到期时间必须晚于生效时间")
-    identity = market_identity(db, config, dataset_id)
+    identity = bind_offset(db, config, market_identity(db, config, dataset_id), dataset_id)
     alert.version += 1
     alert.control_revision += 1
     alert.name, alert.max_triggers, alert.expires_at = config.name, config.max_triggers, config.expires_at
@@ -256,6 +315,16 @@ def consume(db, alert_id, observation: Observation, *, detected_at=None, baselin
     state = EvaluationState(**alert.state) if alert.state else EvaluationState(count=alert.count)
     if state.sequence is not None and observation.sequence <= state.sequence:
         return None
+    if config.condition.offset:
+        from .chart_alert_offsets import rebase
+        resolved = (observation.evidence or {}).get("offset")
+        if not resolved:
+            raise ValueError("ATR 告警观察缺少已确认偏移证据")
+        runtime = dict(alert.runtime)
+        state, translation = rebase(state, runtime.get("offset"), resolved)
+        resolved["baseline_translation"] = translation
+        runtime["offset"] = dict(resolved)
+        alert.runtime = runtime
     # Historical observations are accepted only as an explicit baseline, never as events.
     if observation.occurred_at <= alert.effective_at or baseline:
         alert.state = asdict(EvaluationState(observation.sequence, str(observation.left),
