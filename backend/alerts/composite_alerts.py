@@ -170,6 +170,56 @@ def operands(db, page, config, now):
     return values, dependencies, progress
 
 
+def atr_offset(db, identity, config, bar, value, now, profiles, runtime):
+    """The ATR reader owns the same immutable revision/input as the main page."""
+    from .chart_alert_offsets import OffsetComputing, OffsetPending, reference_bar, resolve
+    from .composite_chart import chart_page
+    from .storage import CompositePreparation
+
+    spec = config.condition.offset
+    task = db.get(CompositeAggregateTask, (identity["composite_revision_id"], spec.timeframe))
+    if not task or task.applied_input_revision < value:
+        raise OffsetPending("ATR 周期聚合水位尚未处理完整固定输入")
+    meta = {"calendar": identity["calendar"], "calendar_profile": profiles[-1][2], "series_kind": "composite"}
+    start, end = reference_bar(bar["start"], spec.timeframe, meta, config.instrument)
+    page = chart_page(db, identity["composite_id"], spec.timeframe,
+        revision_id=identity["composite_revision_id"], input_revision=value,
+        provisional=False, count=2, before=end, now=now)
+    reference = next((row for row in page["bars"] if row["start"] == start and row["end"] == end), None)
+    if page["pending"] or not reference:
+        raise OffsetPending("最近预期 ATR 柱缺失，等待固定输入完整发布")
+    page["bars"] = [reference]
+    results, progress = chart_results(db, page, [spec.spec()], provisional=False, stamp=now)
+    if not progress or any(item["status"] != "complete" for item in progress):
+        raise OffsetComputing("ATR 固定起点初始化或修订修复尚未完成")
+    result = results[0]
+    point = next((row for row in result["series"][0]["values"] if row["time"] == start), None)
+    dependency = next((row for row in result["dependencies"] if row["start"] == start), None)
+    if not dependency or not dependency.get("initialized"):
+        raise OffsetPending("ATR 来源确认或覆盖依赖不完整")
+    if dependency.get("seam_dependency") and config.seam_policy == "reject":
+        raise OffsetPending("ATR 依赖包含原价接缝；需明确接受接缝影响")
+    from .composite_inputs import confirmation_watermark
+
+    origin = dependency["dependency_origin"]
+    key = [identity["composite_revision_id"], value, origin, end]
+    cached = runtime.get("atr_confirmation", {})
+    watermark = cached.get("watermark") if cached.get("key") == key else None
+    if watermark is None:
+        watermark = confirmation_watermark(db, identity["composite_revision_id"], origin, end, value,
+                                           previous=cached if cached.get("key") else None)
+        runtime["atr_confirmation"] = {"key": key, "watermark": watermark}
+    resolved = resolve(spec, config.condition.relation, bar, reference,
+        point["value"] if point else None, dependency={**identity["atr_dependency"],
+            "composite_revision_id": identity["composite_revision_id"], "input_revision": value,
+            "history_version_id": identity["history_version_id"],
+            "calculation": result["calculation"], "dependency": dependency})
+    resolved["available_at"] = now
+    resolved["confirmation_watermark"] = watermark
+    resolved["confirmed_end"] = db.get(CompositePreparation, identity["composite_revision_id"]).confirmed_end
+    return resolved
+
+
 def evaluate(db, alert, version, config, now):
     from .chart_alert_service import consume
     from .composite_chart import chart_page
@@ -283,14 +333,27 @@ def evaluate(db, alert, version, config, now):
         return wait(alert, runtime, "warming", "完整有效依赖尚不足以初始化指标或画线观察")
     if config.seam_policy == "reject" and any(item.get("seam_dependency") for item in dependencies):
         return wait(alert, runtime, "blocked", "指标依赖包含原价接缝；需明确接受接缝影响或等待完整同源窗口")
+    resolved = None
+    if config.condition.offset:
+        from .chart_alert_offsets import OffsetComputing, OffsetPending, apply
+        try:
+            resolved = atr_offset(db, identity, config, bar, value, now, profiles, runtime)
+            observation_at = bar["end"] if config.mode == "close" else quote["source_time"]
+            if resolved["confirmation_watermark"] > observation_at:
+                raise OffsetPending("ATR 递归输入确认晚于观察时点，等待安全恢复基准")
+            values[1] = apply(values[1], resolved)
+            dependencies.append({"kind": "atr_offset", **resolved})
+        except OffsetPending as exc:
+            return wait(alert, runtime, "warming", str(exc), reset=not isinstance(exc, OffsetComputing))
     previous = page["bars"][-2] if len(page["bars"]) > 1 else None
     sequence = bar["end"] if config.mode == "close" else quote["source_time"]
     old_end = runtime.get("confirmed_end", 0)
     previous_input = runtime.get("processed_input_revision", value)
+    correction_end = max(old_end, runtime.get("offset", {}).get("reference_end", 0))
     earliest = db.scalar(select(func.min(CompositeMinuteInput.start)).where(
         CompositeMinuteInput.revision_id == revision.id,
         CompositeMinuteInput.input_revision > previous_input, CompositeMinuteInput.input_revision <= value,
-        CompositeMinuteInput.start < old_end)) if value > previous_input else None
+        CompositeMinuteInput.start < correction_end)) if value > previous_input else None
     correction = earliest is not None
     prior_sequence = alert.state.get("sequence")
     observation_gap = sequence - prior_sequence if config.mode == "intrabar" and prior_sequence is not None else None
@@ -326,9 +389,13 @@ def evaluate(db, alert, version, config, now):
         "observation_gap_ms": observation_gap,
         "source_epoch": live.epoch, "quote": dict(quote) if config.mode == "intrabar" else None,
         "observation_basis": "complete_close" if config.mode == "close" else "sampled_bid_quote"}
+    if resolved:
+        evidence["offset"] = resolved
     sample = Observation(f"bar:{bar['start']}" if config.mode == "close" else f"sample:{sequence}",
         sequence, sequence, values[0], values[1], Decimal(str(quote["bid"] if config.mode == "intrabar" else bar["close"])), evidence)
+    alert.runtime = runtime
     signal = consume(db, alert.id, sample, detected_at=now, baseline=baseline, expected_version=alert.version)
+    runtime = dict(alert.runtime)
     judgment_id = digest([version.id, alert.run, revision.id, value, sequence, live.epoch, outcome])
     if not db.get(CompositeJudgment, judgment_id):
         db.add(CompositeJudgment(id=judgment_id, alert_version_id=version.id, revision_id=revision.id,

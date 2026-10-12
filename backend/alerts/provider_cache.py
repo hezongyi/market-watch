@@ -11,6 +11,7 @@ import threading
 import time
 from contextlib import contextmanager
 from contextvars import ContextVar
+from decimal import Decimal
 
 from sqlalchemy import delete, exists, func, select, text, update
 from sqlalchemy.dialects.postgresql import insert as pg_insert
@@ -281,6 +282,14 @@ def release(key, lease):
         log.warning("Provider lease cleanup timed out; normal lease expiry retained")
 
 
+def price_input(payload):
+    """Only inputs that affect price calculations and their completeness."""
+    return (payload["start"], payload["end"],
+        *(Decimal(str(payload[k])) for k in ("open", "high", "low", "close")),
+        bool(payload["complete"]), payload.get("source_confirmed", True),
+        payload.get("coverage_complete", True), bool(payload.get("gap_before")))
+
+
 def commit_page(key, lease, page, before, observed_at, *, latest=False):
     """Commit bars and only the range proven by this successful count/to page."""
     rows = page["bars"]
@@ -345,6 +354,7 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
                 revision = old.revision + (old.payload != bar)
                 if old.payload != bar:
                     changed.append(bar["chart_time"])
+            price_changed = not old or price_input(old.payload) != price_input(bar)
             values.append(
                 dict(
                     dataset_id=key,
@@ -354,6 +364,8 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
                     payload=bar,
                     observed_at=observed_at,
                     changed_at=observed_at if not old or old.payload != bar else old.changed_at,
+                    price_confirmed_at=observed_at if price_changed else (
+                        old.price_confirmed_at if old.price_confirmed_at is not None else old.changed_at or old.observed_at),
                     revision=revision,
                 )
             )
@@ -371,6 +383,7 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
                             "payload",
                             "observed_at",
                             "changed_at",
+                            "price_confirmed_at",
                             "revision",
                         )
                     },

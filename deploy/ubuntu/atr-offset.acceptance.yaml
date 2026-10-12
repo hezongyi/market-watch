@@ -1,0 +1,108 @@
+# Ubuntu-only task: mw-atr-offset-20261012. No credentials or source network access.
+name: mw-atr-offset-20261012
+x-backend: &backend
+  image: market-watch-api:atr-offset-20261012
+  env_file:
+    - path: ${MW_ATR_PRIVATE_DIR:?Run prepare-atr-offset.py}/api.env
+      format: raw
+  networks: [atr]
+  restart: "no"
+services:
+  pg:
+    image: postgres:14-bookworm
+    env_file:
+      - path: ${MW_ATR_PRIVATE_DIR}/postgres.env
+        format: raw
+    volumes: [atr-postgres:/var/lib/postgresql/data]
+    networks: [atr]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U atr -d atr]
+      interval: 3s
+      retries: 30
+  migrate:
+    <<: *backend
+    command: [alembic, upgrade, head]
+    depends_on:
+      pg: {condition: service_healthy}
+  api:
+    <<: *backend
+    command: [python, /fixture/api.py, api]
+    environment:
+      ALERTS_MARKET_POLL_SECONDS: "3"
+      ALERTS_PROVIDER_FRESH_SECONDS: "3"
+    volumes:
+      - ../../scripts/atr_offset_acceptance_api.py:/fixture/api.py:ro
+      - ${MW_ATR_PRIVATE_DIR}/evidence:/fixture-state
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8000/readyz', timeout=3)"]
+      interval: 3s
+      retries: 30
+  alert-worker:
+    <<: *backend
+    command: [python, /fixture/api.py, worker]
+    environment:
+      ALERTS_MARKET_POLL_SECONDS: "3"
+      ALERTS_PROVIDER_FRESH_SECONDS: "3"
+    volumes:
+      - ../../scripts/atr_offset_acceptance_api.py:/fixture/api.py:ro
+      - ${MW_ATR_PRIVATE_DIR}/evidence:/fixture-state
+    depends_on:
+      api: {condition: service_healthy}
+  verification:
+    <<: *backend
+    profiles: [verification]
+    environment:
+      PYTHONPATH: /app/backend:/verification/backend/tests
+      TEST_POSTGRES_URL: ${MW_ATR_TEST_POSTGRES_URL:?Private Compose env}
+      CHART_ALERT_TEST_DATABASE_URL: ${MW_ATR_TEST_POSTGRES_URL}
+    volumes:
+      - ../../backend/tests:/verification/backend/tests:ro
+      - ../../migrations:/verification/migrations:ro
+      - ../../alembic.ini:/verification/alembic.ini:ro
+    command: [python, -m, pytest, -q, -p, "no:cacheprovider", /verification/backend/tests/test_chart_alert_offsets.py,
+      /verification/backend/tests/test_chart_alert_postgres.py, /verification/backend/tests/test_chart_alert_offsets_postgres.py,
+      /verification/backend/tests/test_composite_alerts_postgres.py,
+      /verification/backend/tests/test_provider_postgres.py,
+      /verification/backend/tests/test_publication_migration_postgres.py]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  web:
+    image: market-watch-web:atr-offset-20261012
+    networks: [atr]
+    depends_on:
+      api: {condition: service_healthy}
+  notification-sink:
+    <<: *backend
+    command: [python, /fixture/sink.py]
+    volumes:
+      - ../../scripts/atr_offset_notification_sink.py:/fixture/sink.py:ro
+      - ${MW_ATR_PRIVATE_DIR}/evidence:/evidence
+  notify-worker:
+    <<: *backend
+    profiles: [notification]
+    command: [python, -m, alerts.notify]
+    environment:
+      ALERTS_DELIVERY_ENABLED: "true"
+    depends_on:
+      api: {condition: service_healthy}
+      notification-sink: {condition: service_started}
+  chart-origin:
+    image: market-watch-chart-origin:atr-offset-20261012
+    networks: [atr]
+  tls:
+    image: nginx:1.28-alpine
+    ports: ["127.0.0.1:17443:443", "127.0.0.1:17444:444"]
+    volumes:
+      - ${MW_ATR_PRIVATE_DIR}/tls.conf:/etc/nginx/conf.d/default.conf:ro
+      - ${MW_ATR_PRIVATE_DIR}/cert.pem:/certs/cert.pem:ro
+      - ${MW_ATR_PRIVATE_DIR}/key.pem:/certs/key.pem:ro
+    networks: [atr, edge]
+    depends_on: [web, chart-origin]
+volumes:
+  atr-postgres:
+networks:
+  atr:
+    internal: true
+  edge:

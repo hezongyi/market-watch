@@ -38,8 +38,8 @@ class CapabilityQuery(Contract):
 
 
 def capabilities(body):
-    from .chart_indicators import public_catalog
     from .chart_data import FRAMES
+    from .chart_indicators import public_catalog
     from .provider_capabilities import frames, poll_seconds
     if body.timeframe not in FRAMES:
         raise ValueError("未知判定周期")
@@ -49,7 +49,7 @@ def capabilities(body):
 
             meta = fixed_metadata(db, body.instrument, "composite")
             return {"instrument": body.instrument, "timeframe": body.timeframe,
-                "sources": [{"source": "composite", "series_kind": "composite", "basis": meta["basis"],
+                "sources": [{"source": "composite", "series_kind": "composite", "basis": meta["basis"], "atr_frames": meta["frames"],
                     "calendar": meta["calendar"], "available": body.timeframe in meta["frames"], "reason": None,
                     "observation_basis": "固定历史与确认M1接续；临时触价为显式抽样模式，断线后不追认未观测事件"}],
                 "modes": ["close", "intrabar"], "indicators": ["SMA", "EMA", "RSI", "MACD"],
@@ -68,6 +68,7 @@ def capabilities(body):
         provider = None
     sources = [row for row in (managed, provider) if row]
     for row in sources:
+        row["atr_frames"] = list(frames(row["source"]) if row["series_kind"] == "provider" else FRAMES)
         reason = ("此来源尚未确认告警交易日历" if row["calendar"] not in ("ny17", "utc0")
                   else "来源或周期暂不可用" if not row["enabled"] else None)
         row["available"], row["reason"] = reason is None, reason
@@ -105,6 +106,8 @@ def dataset_for(config):
     meta = metadata(config.instrument)
     if meta["source"] != config.source:
         raise ValueError("图表来源已改变，请重新读取图表上下文")
+    if isinstance(config, AlertConfig) and config.condition.offset:
+        ensure(meta, config.condition.offset.timeframe)
     return ensure(meta, config.timeframe)
 
 

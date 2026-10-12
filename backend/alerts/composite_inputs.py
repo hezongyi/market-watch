@@ -4,10 +4,10 @@ Every writer acquires the source lock before preparation locks. Current composit
 heads allow indexed reads; immutable event deltas retain prior judgment inputs.
 """
 
-from sqlalchemy import and_, func, select
+from sqlalchemy import and_, func, or_, select
 
-from .source_registry import collection_identity
 from .market_datasets import process_price_row
+from .source_registry import collection_identity
 from .storage import (
     CompositeInputEvent,
     CompositeMinute,
@@ -98,3 +98,26 @@ def rows(db, revision_id, start, end, *, input_revision=None):
         data = process_price_row(row.data, instrument.precision)
         yield {**data, "minute_revision_id": row.id, "source_id": row.source_id,
                "observed_at": row.observed_at}
+
+
+def confirmation_watermark(db, revision_id, start, end, input_revision, *, previous=None):
+    """Latest immutable minute inputs in the exact recursive dependency prefix."""
+    query = select(CompositeMinuteInput.start, func.max(CompositeMinuteInput.input_revision).label("latest")).where(
+        CompositeMinuteInput.revision_id == revision_id, CompositeMinuteInput.start >= start,
+        CompositeMinuteInput.start < end, CompositeMinuteInput.input_revision <= input_revision
+    )
+    watermark = 0
+    if previous:
+        old_revision, old_value, old_start, old_end = previous["key"]
+        if old_revision == revision_id and old_start == start and old_end <= end and old_value <= input_revision:
+            # Read only added time buckets or immutable revisions since the
+            # previous proof. Unchanged minute prefixes need no payload scan.
+            query = query.where(or_(CompositeMinuteInput.start >= old_end,
+                                    CompositeMinuteInput.input_revision > old_value))
+            watermark = previous["watermark"]
+    latest = query.group_by(CompositeMinuteInput.start).subquery()
+    observed = db.scalar(select(func.max(SourceMinuteRevision.observed_at)).join(CompositeMinuteInput,
+        CompositeMinuteInput.source_revision_id == SourceMinuteRevision.id).join(latest, and_(
+            CompositeMinuteInput.start == latest.c.start, CompositeMinuteInput.input_revision == latest.c.latest)
+        ).where(CompositeMinuteInput.revision_id == revision_id)) or 0
+    return max(watermark, observed)

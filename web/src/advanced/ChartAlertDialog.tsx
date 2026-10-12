@@ -214,13 +214,19 @@ export function ChartAlertDialog({
     return () => {
       current = false;
     };
-  }, [draft.instrument, draft.timeframe]);
+  }, [draft.instrument, draft.timeframe, draft.series_kind]);
   const source = capabilities?.sources.find(
     (s) => s.source === draft.source && s.series_kind === draft.series_kind,
   );
   const interval = ["enter", "exit", "break_upper", "break_lower"].includes(
     draft.condition.relation,
   );
+  const offset = draft.condition.offset;
+  const priceUnit = (value?: Operand | null) => !value?.indicator || ["SMA", "EMA"].includes(value.indicator.name);
+  const offsetSupported = ["cross_up", "cross_down", "above", "below"].includes(draft.condition.relation)
+    && priceUnit(draft.condition.left) && priceUnit(draft.condition.right)
+    && ["constant", "line", "indicator"].includes(draft.condition.right?.kind || "");
+  const atrFrames = source?.atr_frames || [];
   function change(value: Partial<AlertConfig>) {
     setDraft((p) => ({ ...p, ...value }));
   }
@@ -229,6 +235,11 @@ export function ChartAlertDialog({
   }
   async function submit() {
     if (submitting.current) return;
+    if (offset && (!offsetSupported || !atrFrames.includes(offset.timeframe))) {
+      setError("ATR 阈值需要价格单位的有向比较，并选择此来源支持的 ATR K线周期");
+      errorBox.current?.focus();
+      return;
+    }
     if (!source?.available) {
       setError(
         source?.reason || "行情来源尚未可用，请等待能力查询或显式选择来源",
@@ -562,6 +573,7 @@ export function ChartAlertDialog({
                               upper: draft.condition.upper || "",
                             }
                           : {
+                              ...draft.condition,
                               relation,
                               left: draft.condition.left,
                               right: draft.condition.right || {
@@ -573,7 +585,7 @@ export function ChartAlertDialog({
                     }}
                   >
                     {Object.entries(relations).map(([value, label]) => (
-                      <option key={value} value={value}>
+                      <option key={value} value={value} disabled={!!offset && !["cross_up", "cross_down", "above", "below"].includes(value)}>
                         {label}
                       </option>
                     ))}
@@ -656,6 +668,40 @@ export function ChartAlertDialog({
                     )}
                   </>
                 )}
+              </fieldset>
+              <fieldset className="alert-indicator-fields" disabled={busy}>
+                <legend className="sr-only">突破阈值参数</legend>
+                <label>
+                  突破阈值
+                  <AlertSelect aria-label="突破阈值" value={offset ? "atr" : "none"}
+                    onChange={(event) => change({condition: {...draft.condition, offset: event.target.value === "atr"
+                      ? {kind: "atr", version: "1", timeframe: atrFrames.includes("D1") ? "D1" : atrFrames[0],
+                         period: 14, multiplier: "0.2", reference: "closed_at_evaluation_bar_open"} : null}})}>
+                    <option value="none">无</option>
+                    <option value="atr" disabled={!offsetSupported || !atrFrames.length}>ATR</option>
+                  </AlertSelect>
+                </label>
+                {!offsetSupported && <p>ATR 仅支持价格单位的上穿、下穿、高于或低于比较。</p>}
+                {offset && <>
+                  <label>ATR K线周期
+                    <AlertSelect aria-label="ATR K线周期" value={offset.timeframe}
+                      onChange={(event) => change({condition: {...draft.condition, offset: {...offset, timeframe: event.target.value}}})}>
+                      {!atrFrames.includes(offset.timeframe) && <option value={offset.timeframe} disabled>{offset.timeframe}（来源不支持）</option>}
+                      {atrFrames.map((frame) => <option key={frame}>{frame}</option>)}
+                    </AlertSelect>
+                  </label>
+                  <label>ATR 计算长度
+                    <AlertInput aria-label="ATR 计算长度" type="number" required min={2} max={500} step={1} value={offset.period}
+                      onChange={(event) => change({condition: {...draft.condition, offset: {...offset, period: Number(event.target.value)}}})} />
+                  </label>
+                  <label>ATR 乘数
+                    <AlertInput aria-label="ATR 乘数" type="number" required min="0.01" max="100" step="0.01" value={offset.multiplier}
+                      onChange={(event) => change({condition: {...draft.condition, offset: {...offset, multiplier: event.target.value}}})} />
+                  </label>
+                  <p>{draft.timeframe} {draft.mode === "close" ? "收盘确认" : "盘中观察"} · {relations[draft.condition.relation]}
+                    {draft.condition.relation === "cross_up" || draft.condition.relation === "above" ? " + " : " − "}
+                    {offset.multiplier} × {offset.timeframe} ATR({offset.period})。ATR 取判定柱开盘前最近已收盘值。</p>
+                </>}
               </fieldset>
               <div className="alert-summary-fields">
                 <label>

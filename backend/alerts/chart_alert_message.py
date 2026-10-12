@@ -37,7 +37,12 @@ def operand_label(operand):
 def condition_label(condition):
     label = operand_label(condition["left"]) + " " + RELATIONS[condition["relation"]]
     if condition.get("right"):
-        return label + " " + operand_label(condition["right"])
+        label += " " + operand_label(condition["right"])
+        offset = condition.get("offset")
+        if offset:
+            sign = "+" if condition["relation"] in ("cross_up", "above") else "−"
+            label += f" {sign} {offset['multiplier']} × {offset['timeframe']} ATR({offset['period']})（取判定柱开盘前已收盘值）"
+        return label
     return label + f" [{condition['lower']}, {condition['upper']}]"
 
 
@@ -64,8 +69,11 @@ def signal_message(signal):
     custom = config.get("message", "")
     unit_label = "价格" if evidence["unit"] == "price" else "指标值"
     message = custom.format_map(values) + "\n" if custom else ""
+    offset = evidence.get("observation", {}).get("offset")
+    detail = (f"\n原目标 {offset['base_target']} / ATR {offset['atr']} / 偏移 {offset['signed_offset']}"
+              if offset else "")
     return (message + f"{values['symbol']} · {values['source']} · {values['timeframe']}\n"
             f"{values['condition']}\n{unit_label} {values['value']} / 比较值 {values['threshold']}\n"
-            f"市场价格 {values['price']}\n发生时间 {values['event_time']} / 检测延迟 {values['delay']}"
+            f"市场价格 {values['price']}" + detail + f"\n发生时间 {values['event_time']} / 检测延迟 {values['delay']}"
             + ("（迟到事件）" if evidence["late"] else "")
             + f"\n信号 {signal.id}\n请使用“确认”停止此事件的后续提醒。")

@@ -98,7 +98,8 @@ def _chart_rows(db, instrument, frame, before, limit, now, *, observed=False, af
         ).all()[::-1]
         if budget:
             budget.consume(len(rows))
-        return [{**candle_dict(r.candle()), **({"observed_at": r.observed_at or r.received_at} if observed else {})} for r in rows]
+        return [{**candle_dict(r.candle()), **({"observed_at": r.observed_at or r.received_at,
+                                             "confirmed_at": r.received_at} if observed else {})} for r in rows]
     calendar = calendar_for(instrument)
     source = "M15" if frame == "M30" else "D1"
     # Paginate whole target buckets, so a request never cuts a source bucket in half.
@@ -195,7 +196,8 @@ def _chart_rows(db, instrument, frame, before, limit, now, *, observed=False, af
             volume_complete=complete and ms(right) <= now and all(r.volume_complete for r in members),
             volume_supplied=True,
         )
-        result.append({**candle_dict(c), **({"observed_at": max(r.observed_at or r.received_at for r in members)} if observed else {})})
+        result.append({**candle_dict(c), **({"observed_at": max(r.observed_at or r.received_at for r in members),
+            "confirmed_at": max(r.received_at for r in members)} if observed else {})})
     return result
 
 
