@@ -397,7 +397,10 @@ def _runtime_rules(db, moment):
         session = session_status(source, symbol, stamp, metadata=meta)
         normalized = canonical_symbol(source, symbol)
         basis, parameters = price_scope(source, meta)
-        row = {**base, "version": session.get("calendar_version") or base["version"],
+        # The configured profile owns the review identity; session evidence may
+        # still use a built-in rule outside the profile's explicit closures.
+        version = profile.get("revision") if isinstance(profile, dict) else None
+        row = {**base, "version": version or session.get("calendar_version") or base["version"],
                "mappings": (symbol,), "enabled": enabled[source], **session,
                "runtime_status": "verified" if session.get("calendar_verified") else "unverified",
                "checked_at": None, "review_due_at": None, "valid_from": None, "valid_until": None,

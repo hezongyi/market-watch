@@ -4,7 +4,7 @@ import sys
 from datetime import UTC, datetime, timedelta
 
 import pytest
-from alerts import api, calendar_admin
+from alerts import api, calendar_admin, market_calendar
 from alerts.calendar_profile import normalized_profile
 from alerts.market_calendar import calendar_rows
 from alerts.market_datasets import register_dataset
@@ -135,7 +135,8 @@ def test_review_cannot_certify_out_of_scope_or_boundary_minutes(database, moment
         assert after["valid_until"] == before["valid_until"]
 
 
-def test_calendar_api_counts_overdue_reviews_and_latest_renewal(database, monkeypatch):
+@pytest.mark.parametrize("legacy", [False, True])
+def test_calendar_api_counts_overdue_reviews_and_latest_renewal(database, monkeypatch, legacy):
     moment = datetime.now(UTC).replace(second=0, microsecond=0)
     ident = identity(calendar_version="api-review-fixture-v1")
     proposed = profile(ident)
@@ -143,8 +144,18 @@ def test_calendar_api_counts_overdue_reviews_and_latest_renewal(database, monkey
         reviewed_start=(moment - timedelta(days=366)).isoformat(),
         reviewed_end=(moment + timedelta(days=366)).isoformat(), weekly_closures=[])
     with database.begin() as db:
-        inst = register_dataset(db, ident, logical_symbol="EURUSD", label="fixture", calendar="ny17",
-            precision=5, volume_kind="quantity", volume_unit="source_quantity", calendar_profile=proposed)
+        if legacy:
+            calendar_admin.apply_profile(db, "EURUSD", {"revision": ident.calendar_version, "closures": []}, apply=True)
+            inst = db.get(Instrument, "EURUSD")
+            # Keep this synthetic API test within the built-in evidence window
+            # even when the test suite runs after the real registry expires.
+            monkeypatch.setitem(market_calendar._RULE_BY_SOURCE, "dukascopy", {
+                **market_calendar._RULE_BY_SOURCE["dukascopy"],
+                "valid_from": (moment - timedelta(days=366)).date().isoformat(),
+                "valid_until": (moment + timedelta(days=366)).date().isoformat()})
+        else:
+            inst = register_dataset(db, ident, logical_symbol="EURUSD", label="fixture", calendar="ny17",
+                precision=5, volume_kind="quantity", volume_unit="source_quantity", calendar_profile=proposed)
     monkeypatch.setitem(api.app.dependency_overrides, api.authenticated, lambda: "test")
 
     with TestClient(api.app) as client:
@@ -193,10 +204,53 @@ def test_cli_applies_profile_and_commits_review_for_the_same_revision(database, 
     path.write_text(json.dumps(proposed))
     monkeypatch.setattr(sys, "argv", ["calendar_admin", "--instrument", "EURUSD",
         "--file", str(path), "--apply", "--reviewer", "fixture", "--review-method", "comparison",
-        "--evidence-version", "fixture-v1", "--review-due", "2026-11-01"])
+        "--evidence-version", "fixture-v1", "--review-due", "2026-10-01"])
     calendar_admin.main()
     assert json.loads(capsys.readouterr().out)["applied"] is True
     with database() as db:
         assert db.get(Instrument, "EURUSD").calendar_profile == proposed
         event = db.scalar(select(Audit).where(Audit.kind == "calendar_review"))
         assert event.details["revision"] == proposed["revision"]
+        actual = row(db, "EURUSD", as_of=datetime(2026, 10, 12, tzinfo=UTC))
+        assert actual["version"] == actual["identity"]["calendar_version"] == proposed["revision"]
+        assert actual["audit"]["evidence_version"] == "fixture-v1"
+        assert actual["review_due_at"] == "2026-10-01"
+        assert actual["status"] == "review_due"
+
+
+def test_legacy_review_keeps_profile_identity_across_closures_and_new_revisions(database, monkeypatch):
+    proposed = {"revision": "legacy-reviewed-v1", "closures": [{
+        "start": "2026-10-12T12:00:00+00:00", "end": "2026-10-12T13:00:00+00:00",
+        "reason": "synthetic maintenance", "source": "https://example.test/calendar"}]}
+    monkeypatch.setattr(calendar_admin, "now_ms", lambda: 1788220800000)
+    with database.begin() as db:
+        calendar_admin.apply_profile(db, "EURUSD", proposed, apply=True)
+        calendar_admin.record_review(db, "EURUSD", revision=proposed["revision"], reviewer="fixture",
+            method="comparison", evidence_version="fixture-v1", review_due_at="2026-10-01")
+    with database() as db:
+        actual_rows = [row(db, "EURUSD", as_of=datetime(2026, 10, 12, hour, minute, tzinfo=UTC))
+                      for hour, minute in ((11, 30), (12, 30), (13, 30))]
+        assert {actual["row_id"] for actual in actual_rows} == {"dukascopy:EURUSD:legacy-reviewed-v1"}
+        assert [actual["calendar_version"] for actual in actual_rows] == [
+            "dukascopy-spot-v1", "legacy-reviewed-v1", "dukascopy-spot-v1"]
+        assert [actual["market_session"] for actual in actual_rows] == ["scheduled_open", "closed", "scheduled_open"]
+        assert all(actual["status"] == "review_due" and actual["audit"] for actual in actual_rows)
+        expired = row(db, "EURUSD", as_of=datetime(2027, 4, 1, tzinfo=UTC))
+        assert expired["version"] == "legacy-reviewed-v1" and expired["audit"]
+        assert expired["calendar_version"] == "dukascopy-spot-v1"
+        assert expired["status"] == "unverified" and expired["market_session"] == "unknown"
+        assert expired["calendar_verified"] is False
+    monkeypatch.setattr(calendar_admin, "now_ms", lambda: 1791763200000)
+    with database.begin() as db:
+        calendar_admin.record_review(db, "EURUSD", revision=proposed["revision"], reviewer="fixture",
+            method="comparison", evidence_version="fixture-v2", review_due_at="2026-11-01")
+    with database() as db:
+        assert row(db, "EURUSD", as_of=datetime(2026, 10, 12, tzinfo=UTC))["status"] == "verified"
+        assert row(db, "EURUSD", as_of=datetime(2026, 11, 2, tzinfo=UTC))["status"] == "review_due"
+        assert db.get(Instrument, "EURUSD").calendar_profile == normalized_profile(proposed)
+    with database.begin() as db:
+        calendar_admin.apply_profile(db, "EURUSD", {"revision": "legacy-reviewed-v2", "closures": []}, apply=True)
+    with database() as db:
+        actual = row(db, "EURUSD", as_of=datetime(2026, 10, 12, tzinfo=UTC))
+        assert actual["version"] == "legacy-reviewed-v2"
+        assert actual["audit"] is None and actual["checked_at"] is None and actual["review_due_at"] is None
