@@ -59,7 +59,7 @@ with transaction() as db:
     await page.frameLocator('iframe[title="专业图表工作区"]').locator('#chart').waitFor({ timeout: 30000 });
     const chart = page.frames().find(item => item.url().startsWith(CHART + '/'));
     assert.ok(chart, 'task-local chart origin must load');
-    await chart.waitForFunction(() => ready && !loading && widget.activeChart().dataReady(), null,
+    await chart.waitForFunction(() => typeof ready!=='undefined' && ready && !loading && widget.activeChart().dataReady(), null,
       { timeout: 60000 });
     return chart;
   }
@@ -73,8 +73,11 @@ with transaction() as db:
   async function save(chart) {
     await chart.waitForFunction(() => !loading && !nativeSaving && !rangeGuard?.busy() && !edgeGuard?.busy() &&
       Array.from({length:widget.chartsCount()},(_,index)=>widget.chart(index).dataReady()).every(Boolean));
-    await chart.evaluate(() => new Promise((resolve, reject) => widget.saveChartToServer(resolve,
-      error=>reject(Error(typeof error==='string'?error:JSON.stringify(error))))));
+    await chart.evaluate(() => new Promise((resolve, reject) => {
+      const deadline=setTimeout(()=>reject(Error('Native save callback timed out')),20000);
+      widget.saveChartToServer(()=>{clearTimeout(deadline);resolve();},error=>{clearTimeout(deadline);
+        reject(Error(typeof error==='string'?error:JSON.stringify(error)));});
+    }));
   }
   async function inputs(chart) {
     return chart.evaluate(() => widget.activeChart().getAllStudies().map(item => ({
@@ -105,7 +108,17 @@ with transaction() as db:
     }
     await page.goto(APP + '/advanced-charts');
     let chart = await frame();
-    await chart.evaluate(() => widget.activeChart().createStudy('守望 Python SWING_SR_V1', false, false));
+    const initialUI=chart.childFrames()[0];
+    await initialUI.getByRole('button',{name:'指标',exact:true}).click();
+    await initialUI.getByRole('button',{name:'我的 Python',exact:true}).click();
+    const pythonRows=initialUI.locator('.mw-native-study-row');
+    assert.equal(await pythonRows.count(),9,'eight existing Python indicators plus Swing');
+    const swingRow=initialUI.locator('.mw-native-study-row[data-native-study-id="MWPythonSWING_SR_V1@market-watch"]');
+    await swingRow.waitFor();
+    assert.ok((await swingRow.innerText()).includes('Python SWING_SR_V1'));
+    await swingRow.locator('[role="option"]').click();
+    await initialUI.getByRole('button',{name:'关闭指标窗口',exact:true}).click();
+    validations.push('native Python catalog lists nine identities and adds Swing through real UI');
     await chart.waitForFunction(() => document.querySelector('.mw-swing-row')?.textContent.includes('高点 15根'));
     await chart.waitForFunction(() => widget.activeChart().getAllShapes().length === 2);
     const firstShared=sharedTasks(await chart.evaluate(()=>clientId));
@@ -138,6 +151,7 @@ with transaction() as db:
       spacing:widget.activeChart().getTimeScale().barSpacing(),pane:swingPaneBounds(widget.activeChart(),document.getElementById('chart'))}));
     await page.screenshot({path:path.join(ROOT,'artifacts/swing-application-comparison.png')});
     await page.setViewportSize({width:1900,height:950});
+    console.log("Acceptance checkpoint", validations.length+1);
     validations.push('four circles and finite horizontal bridges');
     changedFixture = true;
     tick('withdraw');
@@ -152,6 +166,7 @@ with transaction() as db:
     tick('restore');
     await chart.waitForFunction(() => document.querySelector('.mw-swing-details')?.textContent.includes('高点 263（预览 1）'),
       null, { timeout: 30000 });
+    console.log("Acceptance checkpoint", validations.length+1);
     validations.push('actual shared SSE withdrawal, restore and confirmation');
     await chart.evaluate(() => {
       const c = widget.activeChart();
@@ -199,6 +214,7 @@ with transaction() as db:
     await secondUI.getByText(templateName, { exact: true }).click();
     await chart.waitForFunction(() => widget.activeChart().getAllStudies().length === 1);
     assert.deepEqual(await inputs(chart), expected, 'preferences API template must restore inputs in another workspace');
+    console.log("Acceptance checkpoint", validations.length+1);
     validations.push('workspace and preferences template restore strengths, display settings and styles');
     assert.equal(await chart.locator('.mw-swing-row').count(), 0);
     await chart.evaluate(() => {
@@ -224,6 +240,7 @@ with transaction() as db:
     chart = await frame();
     await chart.waitForFunction(() => widget.chartsCount() === 2 && document.querySelectorAll('.mw-swing-row').length === 2);
     assert.deepEqual(await inputs(chart), multi);
+    console.log("Acceptance checkpoint", validations.length+1);
     validations.push('two charts save/reload');
     await chart.evaluate(()=>widget.chart(1).getStudyById(widget.chart(1).getAllStudies()[0].id).setInputValues([
       {id:'high_strength',value:3},{id:'low_strength',value:7}]));
@@ -248,6 +265,7 @@ with transaction() as db:
     tick('restore');
     await chart.waitForFunction(()=>[0,1].every(index=>widget.chart(index).getAllShapes().some(shape=>
       widget.chart(index).getShapeById(shape.id).getPoints()[0].price===1.1242)),null,{timeout:30000});
+    console.log("Acceptance checkpoint", validations.length+1);
     validations.push('two same-strength charts share four native subscriptions and one server task; both receive withdrawal and restoration');
     await chart.evaluate(()=>widget.setLayout('s'));
     await chart.waitForFunction(()=>widget.chartsCount()===1);
@@ -269,6 +287,7 @@ with transaction() as db:
       await chart.childFrames()[0].getByRole('button',{name:'确认',exact:true}).click();
     }
     assert.equal(await chart.evaluate(()=>noticeDialogOpen),false);
+    console.log("Acceptance checkpoint", validations.length+1);
     validations.push('hide/show, timeframe switch and symbol switch clear and restore owned display');
     await chart.evaluate(()=>widget.activeChart().getStudyById(widget.activeChart().getAllStudies()[0].id).setInputValues([
       {id:'high_strength',value:5},{id:'low_strength',value:5}]));
@@ -284,6 +303,7 @@ with transaction() as db:
     await page.screenshot({path:path.join(ROOT,'artifacts/swing-application-narrow-light.png')});
     await page.setViewportSize({width:1900,height:950});
     await chart.evaluate(()=>widget.changeTheme('Dark'));
+    console.log("Acceptance checkpoint", validations.length+1);
     validations.push('375px light card bounds and no horizontal overflow');
     await chart.evaluate(async () => {
       widget.setLayout('s');
@@ -311,6 +331,7 @@ with transaction() as db:
     await page.reload();
     chart = await frame();
     assert.deepEqual(await inputs(chart), legacy, 'all eight previous Python indicators restore in the real workspace');
+    console.log("Acceptance checkpoint", validations.length+1);
     validations.push('old eight indicators preferences template and workspace restore');
     await chart.evaluate(()=>{const c=widget.activeChart();for(const study of c.getAllStudies()) c.removeEntity(study.id);});
     await chart.waitForFunction(()=>!document.querySelector('.mw-swing-row') && widget.activeChart().getAllShapes().length===0);
@@ -341,6 +362,10 @@ with transaction() as db:
     await page.screenshot({ path: path.join(ROOT, 'artifacts/swing-application-failure.png') }).catch(() => {});
     fs.writeFileSync(path.join(ROOT, 'artifacts/swing-application-failure.json'), JSON.stringify({
       error: String(error), stack: error.stack, errors, requests,
+      state:await page.frames().find(frame=>frame.url().startsWith(CHART+'/'))?.evaluate(()=>({
+        ready:typeof ready!=='undefined'&&ready,loading,nativeSaving,noticeDialogOpen,
+        studies:Array.from({length:widget.chartsCount()},(_,index)=>widget.chart(index).getAllStudies()),
+        error:document.getElementById('error')?.textContent})).catch(()=>null),
       frames: page.frames().map(item => item.url()),
     }, null, 2));
     throw error;

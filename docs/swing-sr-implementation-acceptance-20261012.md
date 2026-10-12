@@ -1,6 +1,6 @@
 # Swing V1 实施与验收记录
 
-2026-10-12；Ubuntu 本机 `quant-server`。实现目录 `/home/quant/repos/market-watch-swing-sr-20261012`，分支 `feat/swing-sr-v1-20261012`，基线 `8c65edfdee15f0281750e888711cf8ecd20de1a0`。
+2026-10-12；Ubuntu 本机 `quant-server`。实现目录 `/home/quant/repos/market-watch-swing-sr-20261012`，分支 `feat/swing-sr-v1-20261012`，原始基线 `8c65edfdee15f0281750e888711cf8ecd20de1a0`；提交 PR 前同步 `origin/main` 至 `7f80f72`（v1.21.2），保留主线原生告警 UI、历史取消检查和生命周期修复。
 
 ## 交付结果
 
@@ -8,7 +8,7 @@ Swing 支撑阻力指标已接入 Python 计算、历史分页、共享实时更
 
 验收实例保留运行，当前工作区留有默认 Swing（high=5、low=5、统计开启且位于名称下方），4002 根冻结 OANDA H4 数据已恢复，包括末根盘中候选。管理员登录凭据位于 `/tmp/mw-swing-sr-20261012-private/credentials.json`，不在本文中展示。
 
-本任务在独立功能分支提交并准备 PR 审阅。许可库、凭据、TLS 私钥和完整浏览器状态未加入 Git；浏览器截图和结果位于 ignored `artifacts/`。没有生产发布或真实通知。
+本任务在独立功能分支提交并准备 PR 审阅。许可库、凭据、TLS 私钥和完整浏览器状态未加入 Git；浏览器原始结果位于 ignored `artifacts/`，脱敏截图与验收结果另存于 `docs/verification/swing-sr-v1-20261012/` 供 PR 审阅。没有生产发布或真实通知。
 
 ## 实现
 
@@ -49,15 +49,15 @@ Swing 支撑阻力指标已接入 Python 计算、历史分页、共享实时更
 
 ## 已执行验证与性能
 
-- 相关 Python 回归：**283 passed，68.95s**。
-- 专属 PostgreSQL 独立测试 schema：**6 passed，9.38s**，覆盖 provider SSE 合并／revision、worker 观察截止点、provider 分页、fixed history／composite 候选及 published 分页。
-- 实际应用 Chromium：`swing-sr-application.browser.cjs` 通过，`errors=[]`；数值、SSE、真实模板 UI／API、工作区重载、两图共享、切周期／品种、375px浅色及旧八指标恢复均有断言。
+- 相关 Python 回归：**286 passed，76.35s（同步最新 main 后）**。
+- 专属 PostgreSQL 独立测试 schema：**6 passed，11.52s（同步最新 main 后）**，覆盖 provider SSE 合并／revision、worker 观察截止点、provider 分页、fixed history／composite 候选及 published 分页。
+- 同步 main 后重新构建三种镜像并登录应用复验。实际应用 Chromium：`swing-sr-application.browser.cjs` 通过，`errors=[]`；数值、SSE、真实模板 UI／API、工作区重载、两图共享、切周期／品种、375px浅色及旧八指标恢复均有断言。
 - 模板交互 Chromium：`study-templates.browser.cjs` 验证覆盖取消／确认、删除取消／确认、实际粗指针只读及 dispose／重载。结果记录于 `artifacts/study-templates-acceptance.json`。
-- JS adapter、快照顺序与请求合并、market-stream、indicator-picker、chart-style、preferences、native-workspaces 通过；旧 VM 的 python-indicators、history-dedup、provider-subscriptions、history-pagination 使用临时 document stub 通过。
+- 原生指标目录九项身份识别及实际 UI 添加 Swing、JS adapter、快照顺序与请求合并、market-stream、indicator-picker、chart-style、preferences、native-workspaces 通过；旧 VM 的 python-indicators、history-dedup、provider-subscriptions、history-pagination 使用临时 document stub 通过。
 - 前端 build、许可图表真实 Docker build、核心／部署及新增测试 Ruff、JS 语法检查与 `git diff --check` 通过。
 - 既有 `advanced-native-save-race.cjs` 因 VM mock 缺 `chartThemeName` 失败；未把它记为通过。真实原生及应用保存已单独验证桥排除，原生探针还验证普通用户画线保留。
 
-实际容器完整4002根统计、裁剪返回175根的5次浏览器请求耗时为252.9／172.9／267.3／173.6／161.9ms，中位173.6ms、最大267.3ms。包含浏览器、TLS、API、数据库和反序列化，是有限串行测量，不是生产吞吐量承诺。两个同参数图表只保留四个原生 listener 和一个服务端 task，两个图表均实际接收到候选撤回／恢复；原生参数重载和旧订阅注销为异步流程，验收等待稳定状态后再检查共享任务；服务端测试断言四 listener 只全量计算一次。离线4002根计算曾测得中位约57ms，不将其混称容器延迟。
+实际容器完整4002根统计、裁剪返回175根的5次浏览器请求耗时为166.1／225.8／171.1／308.9／320.0ms，中位225.8ms、最大320.0ms。包含浏览器、TLS、API、数据库和反序列化，是有限串行测量，不是生产吞吐量承诺。两个同参数图表只保留四个原生 listener 和一个服务端 task，两个图表均实际接收到候选撤回／恢复；原生参数重载和旧订阅注销为异步流程，验收等待稳定状态后再检查共享任务；服务端测试断言四 listener 只全量计算一次。离线4002根计算曾测得中位约57ms，不将其混称容器延迟。
 
 可随 PR 审阅的脱敏截图及结果见[浏览器证据](verification/swing-sr-v1-20261012/README.md)。
 
@@ -79,9 +79,9 @@ Compose project／task 为 `mw-swing-sr-20261012`，独立 PG14、数据库、vo
 
 | 服务 | 运行镜像摘要 |
 | --- | --- |
-| API／market-stream | `sha256:a494fbef7187889ee5984267cbc10184b00e265e7ed47b2a10d5a51a2049e601` |
-| web | `sha256:7db1f357e1d9747373afe9adf613445bd0b0314d61f9bef844303eadf439a49f` |
-| chart-origin | `sha256:cc820b6bb238c05eeeab53f83ef75d05b478a5372ef1649b371975694c705de8` |
+| API／market-stream | `sha256:8ddba9a3bcff21d653f7f51f1dfb181d6e1b54566f21beb76d3dffada981a0f9` |
+| web | `sha256:61ed6375fed39d81cb9e603a7d0da04baf49ffd90164f9963136d53d28206537` |
+| chart-origin | `sha256:1714b696ba2af71a2928e44a52f4f03152d4f67692a86780509896788915097e` |
 
 API 与 chart 中本任务源文件 SHA256 已与工作区逐一核对；build-assets 从同一 source 打包版本化 host 脚本。
 

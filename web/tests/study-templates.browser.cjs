@@ -15,7 +15,7 @@ const APP = 'https://localhost:16443', CHART = 'https://127.0.0.1:16444';
     await target.goto(APP+'/advanced-charts');
     await target.frameLocator('iframe[title="专业图表工作区"]').locator('#chart').waitFor();
     const chart=target.frames().find(frame=>frame.url().startsWith(CHART+'/'));
-    await chart.waitForFunction(()=>ready&&!loading&&widget.activeChart().dataReady(),null,{timeout:60000});
+    await chart.waitForFunction(()=>typeof ready!=='undefined'&&ready&&!loading&&widget.activeChart().dataReady(),null,{timeout:60000});
     await chart.childFrames()[0].getByRole('button',{name:'保存或应用指标模板',exact:true}).waitFor();
     return chart;
   }
@@ -28,6 +28,7 @@ const APP = 'https://localhost:16443', CHART = 'https://127.0.0.1:16444';
     await page.getByRole('button',{name:'登录工作台'}).click();
     await page.waitForFunction(()=>!document.querySelector('input[type=password]'));
     const chart=await chartFrame(page), ui=chart.childFrames()[0];
+    console.log('Template acceptance: chart ready');
     async function menuItem(title) {
       await ui.getByRole('button',{name:'保存或应用指标模板',exact:true}).click();
       await ui.getByText(title,{exact:true}).filter({visible:true}).click();
@@ -37,6 +38,7 @@ const APP = 'https://localhost:16443', CHART = 'https://127.0.0.1:16444';
       await ui.locator('input[maxlength="64"]').fill(name);
       await ui.locator('input[maxlength="64"]').press('Enter');
     }
+    console.log('Template acceptance: saving');
     await saveTemplate();
     await ui.locator('dialog.mw-study-template-save').waitFor({state:'hidden'});
     created=true;
@@ -47,6 +49,7 @@ const APP = 'https://localhost:16443', CHART = 'https://127.0.0.1:16444';
       c.getStudyById(id).setInputValues([{id:'high_strength',value:3},{id:'low_strength',value:7}]);
     });
     await chart.waitForFunction(()=>document.querySelector('.mw-swing-row')?.textContent.includes('Swing 3 7'));
+    console.log('Template acceptance: saving');
     await saveTemplate();
     await ui.getByText('覆盖指标模板',{exact:true}).waitFor();
     await ui.getByRole('button',{name:'否',exact:true}).click({timeout:5000});
