@@ -32,13 +32,13 @@ function chartNativeIndicators(widget, doc, req, ui) {
     const nativeId = row.studyData?.id || row.id;
     // Native normalizes the package suffix (market-watch-1 -> market-watch).
     // Resolve this exact namespace before any translated/search display label.
-    const pythonId = String(nativeId || "").match(/^MWPython([A-Z]+)@market-watch(?:-1)?$/)?.[1];
+    const pythonId = String(nativeId || "").match(/^MWPython([A-Z][A-Z0-9_]*)@market-watch(?:-1)?$/)?.[1];
     if (pythonId) return state.entries.find(entry=>entry.source === "Python" && entry.id === pythonId) || null;
     const name = state.names.get(nativeId);
     const exact = state.entries.find(entry=>entry.name === name) ||
       state.entries.find(entry=>entry.name === row.title);
     if (exact) return exact;
-    const titleId = String(row.title || "").match(/^(?:守望 Python |Python )([A-Z]+)$/)?.[1];
+    const titleId = String(row.title || "").match(/^(?:守望 Python |Python )([A-Z][A-Z0-9_]*)$/)?.[1];
     if (titleId) return state.entries.find(entry=>entry.source === "Python" && entry.id === titleId) || null;
     return state.entries.find(entry=>entry.label === name) ||
       state.entries.find(entry=>entry.label === row.title) || null;

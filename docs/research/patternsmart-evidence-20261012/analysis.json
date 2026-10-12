@@ -1,0 +1,778 @@
+{
+  "scope": "Ubuntu offline analysis of read-only existing production data; no app implementation",
+  "source": "OANDA bid / EUR_USD / H4 / ny17; screenshot FXCM",
+  "managed_count": 175,
+  "native_count": 173,
+  "native_managed_exact_ohlc_matches": 173,
+  "input_sha256": "06a079e9384e22adf50f850a1c44b0e46612699a906a7e132a1fa2acd049cd8d",
+  "first_start": "2026-09-01T09:00:00+08:00",
+  "last_start": "2026-10-12T09:00:00+08:00",
+  "last_complete": false,
+  "time_labels": "UTC+8 compatibility, screenshot timezone not explicitly shown",
+  "variants": {
+    "high": {
+      "1/1": {
+        "indices": [
+          75,
+          78,
+          82,
+          86,
+          91,
+          103,
+          105,
+          111,
+          114,
+          117,
+          125,
+          128,
+          132,
+          139,
+          141,
+          143,
+          146,
+          148,
+          152,
+          159,
+          162,
+          165,
+          169
+        ],
+        "extra": [
+          75,
+          78,
+          82,
+          91,
+          103,
+          105,
+          114,
+          117,
+          125,
+          132,
+          139,
+          143,
+          146,
+          148,
+          159,
+          162,
+          165
+        ],
+        "missing": []
+      },
+      "2/2": {
+        "indices": [
+          75,
+          78,
+          82,
+          86,
+          91,
+          103,
+          111,
+          128,
+          141,
+          152,
+          162,
+          165,
+          169
+        ],
+        "extra": [
+          75,
+          78,
+          82,
+          91,
+          103,
+          162,
+          165
+        ],
+        "missing": []
+      },
+      "3/3": {
+        "indices": [
+          75,
+          86,
+          91,
+          103,
+          111,
+          128,
+          141,
+          152,
+          169
+        ],
+        "extra": [
+          75,
+          91,
+          103
+        ],
+        "missing": []
+      },
+      "4/4": {
+        "indices": [
+          75,
+          86,
+          111,
+          128,
+          141,
+          152,
+          169
+        ],
+        "extra": [
+          75
+        ],
+        "missing": []
+      },
+      "5/5": {
+        "indices": [
+          86,
+          111,
+          128,
+          141,
+          152,
+          169
+        ],
+        "extra": [],
+        "missing": []
+      },
+      "6/6": {
+        "indices": [
+          86,
+          111,
+          128,
+          152
+        ],
+        "extra": [],
+        "missing": [
+          141,
+          169
+        ]
+      },
+      "7/7": {
+        "indices": [
+          86,
+          111,
+          128,
+          152
+        ],
+        "extra": [],
+        "missing": [
+          141,
+          169
+        ]
+      },
+      "10/10": {
+        "indices": [
+          86,
+          111,
+          152
+        ],
+        "extra": [],
+        "missing": [
+          128,
+          141,
+          169
+        ]
+      },
+      "left5_only": {
+        "indices": [
+          86,
+          109,
+          110,
+          111,
+          127,
+          128,
+          141,
+          150,
+          151,
+          152,
+          165,
+          168,
+          169
+        ]
+      },
+      "closed_5/5": {
+        "indices": [
+          86,
+          111,
+          128,
+          141,
+          152
+        ]
+      },
+      "equal_policy_5/5": {
+        "True/True": [
+          15,
+          25,
+          31,
+          38,
+          67,
+          86,
+          111,
+          128,
+          141,
+          152,
+          169
+        ],
+        "True/False": [
+          15,
+          25,
+          31,
+          38,
+          67,
+          86,
+          111,
+          128,
+          141,
+          152,
+          169
+        ],
+        "False/True": [
+          15,
+          25,
+          31,
+          38,
+          67,
+          86,
+          111,
+          128,
+          141,
+          152,
+          169
+        ],
+        "False/False": [
+          15,
+          25,
+          31,
+          38,
+          67,
+          86,
+          111,
+          128,
+          141,
+          152,
+          169
+        ]
+      }
+    },
+    "low": {
+      "1/1": {
+        "indices": [
+          76,
+          80,
+          85,
+          88,
+          91,
+          93,
+          100,
+          102,
+          105,
+          108,
+          111,
+          113,
+          117,
+          123,
+          126,
+          130,
+          136,
+          138,
+          140,
+          144,
+          147,
+          151,
+          158,
+          161,
+          164,
+          171,
+          173
+        ],
+        "extra": [
+          76,
+          85,
+          88,
+          91,
+          93,
+          100,
+          102,
+          108,
+          111,
+          113,
+          117,
+          126,
+          130,
+          138,
+          140,
+          147,
+          151,
+          161,
+          171,
+          173
+        ],
+        "missing": []
+      },
+      "2/2": {
+        "indices": [
+          80,
+          88,
+          93,
+          105,
+          117,
+          123,
+          136,
+          140,
+          144,
+          151,
+          158,
+          164
+        ],
+        "extra": [
+          88,
+          93,
+          117,
+          140,
+          151
+        ],
+        "missing": []
+      },
+      "3/3": {
+        "indices": [
+          80,
+          105,
+          117,
+          123,
+          136,
+          140,
+          144,
+          158,
+          164
+        ],
+        "extra": [
+          117,
+          140
+        ],
+        "missing": []
+      },
+      "4/4": {
+        "indices": [
+          80,
+          105,
+          123,
+          136,
+          144,
+          158,
+          164
+        ],
+        "extra": [],
+        "missing": []
+      },
+      "5/5": {
+        "indices": [
+          80,
+          105,
+          123,
+          136,
+          144,
+          158,
+          164
+        ],
+        "extra": [],
+        "missing": []
+      },
+      "6/6": {
+        "indices": [
+          80,
+          105,
+          123,
+          136,
+          144,
+          158
+        ],
+        "extra": [],
+        "missing": [
+          164
+        ]
+      },
+      "7/7": {
+        "indices": [
+          80,
+          105,
+          123,
+          136,
+          144,
+          158
+        ],
+        "extra": [],
+        "missing": [
+          164
+        ]
+      },
+      "10/10": {
+        "indices": [
+          105,
+          144,
+          158
+        ],
+        "extra": [],
+        "missing": [
+          80,
+          123,
+          136,
+          164
+        ]
+      },
+      "left5_only": {
+        "indices": [
+          80,
+          87,
+          88,
+          91,
+          93,
+          96,
+          97,
+          98,
+          99,
+          100,
+          102,
+          104,
+          105,
+          115,
+          116,
+          117,
+          121,
+          122,
+          123,
+          130,
+          132,
+          133,
+          134,
+          135,
+          136,
+          144,
+          157,
+          158,
+          164,
+          171,
+          173
+        ]
+      },
+      "closed_5/5": {
+        "indices": [
+          80,
+          105,
+          123,
+          136,
+          144,
+          158,
+          164
+        ]
+      },
+      "equal_policy_5/5": {
+        "True/True": [
+          7,
+          20,
+          32,
+          44,
+          57,
+          71,
+          80,
+          105,
+          123,
+          136,
+          144,
+          158,
+          164
+        ],
+        "True/False": [
+          7,
+          20,
+          32,
+          44,
+          57,
+          71,
+          80,
+          105,
+          123,
+          136,
+          144,
+          158,
+          164
+        ],
+        "False/True": [
+          7,
+          20,
+          32,
+          44,
+          57,
+          71,
+          80,
+          105,
+          123,
+          136,
+          144,
+          158,
+          164
+        ],
+        "False/False": [
+          7,
+          20,
+          32,
+          44,
+          57,
+          71,
+          80,
+          105,
+          123,
+          136,
+          144,
+          158,
+          164
+        ]
+      }
+    }
+  },
+  "matches": [
+    {
+      "side": "high",
+      "index": 86,
+      "time": "2026-09-21T17:00:00+08:00",
+      "oanda_price": "1.1495000000",
+      "screenshot_price": null,
+      "screenshot_y": 72,
+      "approx_screenshot_price_from_pixels": 1.149514,
+      "approx_price_error_pips": 0.143,
+      "screenshot_start_x": 154,
+      "predicted_start_x": 154,
+      "start_error_pixels": 0,
+      "screenshot_end_x": 531,
+      "predicted_end_x": 531,
+      "end_error_pixels": 0,
+      "right5_index": 91,
+      "right5_bar_complete": true,
+      "right5_bar_end": "2026-09-22T17:00:00+08:00"
+    },
+    {
+      "side": "high",
+      "index": 111,
+      "time": "2026-09-25T21:00:00+08:00",
+      "oanda_price": "1.1410400000",
+      "screenshot_price": null,
+      "screenshot_y": 218,
+      "approx_screenshot_price_from_pixels": 1.141041,
+      "approx_price_error_pips": 0.015,
+      "screenshot_start_x": 479,
+      "predicted_start_x": 479,
+      "start_error_pixels": 0,
+      "screenshot_end_x": 752,
+      "predicted_end_x": 752,
+      "end_error_pixels": 0,
+      "right5_index": 116,
+      "right5_bar_complete": true,
+      "right5_bar_end": "2026-09-28T21:00:00+08:00"
+    },
+    {
+      "side": "high",
+      "index": 128,
+      "time": "2026-09-30T17:00:00+08:00",
+      "oanda_price": "1.1379600000",
+      "screenshot_price": null,
+      "screenshot_y": 270,
+      "approx_screenshot_price_from_pixels": 1.138024,
+      "approx_price_error_pips": 0.638,
+      "screenshot_start_x": 700,
+      "predicted_start_x": 700,
+      "start_error_pixels": 0,
+      "screenshot_end_x": 922,
+      "predicted_end_x": 922,
+      "end_error_pixels": 0,
+      "right5_index": 133,
+      "right5_bar_complete": true,
+      "right5_bar_end": "2026-10-01T17:00:00+08:00"
+    },
+    {
+      "side": "high",
+      "index": 141,
+      "time": "2026-10-02T21:00:00+08:00",
+      "oanda_price": "1.1284700000",
+      "screenshot_price": null,
+      "screenshot_y": 434,
+      "approx_screenshot_price_from_pixels": 1.128506,
+      "approx_price_error_pips": 0.364,
+      "screenshot_start_x": 869,
+      "predicted_start_x": 869,
+      "start_error_pixels": 0,
+      "screenshot_end_x": 1065,
+      "predicted_end_x": 1065,
+      "end_error_pixels": 0,
+      "right5_index": 146,
+      "right5_bar_complete": true,
+      "right5_bar_end": "2026-10-05T21:00:00+08:00"
+    },
+    {
+      "side": "high",
+      "index": 152,
+      "time": "2026-10-06T17:00:00+08:00",
+      "oanda_price": "1.1276000000",
+      "screenshot_price": null,
+      "screenshot_y": 449,
+      "approx_screenshot_price_from_pixels": 1.127636,
+      "approx_price_error_pips": 0.359,
+      "screenshot_start_x": 1013,
+      "predicted_start_x": 1013,
+      "start_error_pixels": 0,
+      "screenshot_end_x": 1286,
+      "predicted_end_x": 1286,
+      "end_error_pixels": 0,
+      "right5_index": 157,
+      "right5_bar_complete": true,
+      "right5_bar_end": "2026-10-07T17:00:00+08:00"
+    },
+    {
+      "side": "high",
+      "index": 169,
+      "time": "2026-10-09T13:00:00+08:00",
+      "oanda_price": "1.1242000000",
+      "screenshot_price": 1.12427,
+      "screenshot_y": 507,
+      "approx_screenshot_price_from_pixels": 1.12427,
+      "approx_price_error_pips": 0.7,
+      "screenshot_start_x": 1234,
+      "predicted_start_x": 1234,
+      "start_error_pixels": 0,
+      "screenshot_end_x": 1299,
+      "predicted_end_x": 1299,
+      "end_error_pixels": 0,
+      "right5_index": 174,
+      "right5_bar_complete": false,
+      "right5_bar_end": "2026-10-12T13:00:00+08:00"
+    },
+    {
+      "side": "low",
+      "index": 80,
+      "time": "2026-09-18T17:00:00+08:00",
+      "oanda_price": "1.1454200000",
+      "screenshot_price": null,
+      "screenshot_y": 143,
+      "approx_screenshot_price_from_pixels": 1.145394,
+      "approx_price_error_pips": -0.261,
+      "screenshot_start_x": 76,
+      "predicted_start_x": 76,
+      "start_error_pixels": 0,
+      "screenshot_end_x": 453,
+      "predicted_end_x": 453,
+      "end_error_pixels": 0,
+      "right5_index": 85,
+      "right5_bar_complete": true,
+      "right5_bar_end": "2026-09-21T17:00:00+08:00"
+    },
+    {
+      "side": "low",
+      "index": 105,
+      "time": "2026-09-24T21:00:00+08:00",
+      "oanda_price": "1.1358500000",
+      "screenshot_price": null,
+      "screenshot_y": 307,
+      "approx_screenshot_price_from_pixels": 1.135877,
+      "approx_price_error_pips": 0.266,
+      "screenshot_start_x": 401,
+      "predicted_start_x": 401,
+      "start_error_pixels": 0,
+      "screenshot_end_x": 687,
+      "predicted_end_x": 687,
+      "end_error_pixels": 0,
+      "right5_index": 110,
+      "right5_bar_complete": true,
+      "right5_bar_end": "2026-09-25T21:00:00+08:00"
+    },
+    {
+      "side": "low",
+      "index": 123,
+      "time": "2026-09-29T21:00:00+08:00",
+      "oanda_price": "1.1311000000",
+      "screenshot_price": null,
+      "screenshot_y": 389,
+      "approx_screenshot_price_from_pixels": 1.131118,
+      "approx_price_error_pips": 0.179,
+      "screenshot_start_x": 635,
+      "predicted_start_x": 635,
+      "start_error_pixels": 0,
+      "screenshot_end_x": 856,
+      "predicted_end_x": 856,
+      "end_error_pixels": 0,
+      "right5_index": 128,
+      "right5_bar_complete": true,
+      "right5_bar_end": "2026-09-30T21:00:00+08:00"
+    },
+    {
+      "side": "low",
+      "index": 136,
+      "time": "2026-10-02T01:00:00+08:00",
+      "oanda_price": "1.1214400000",
+      "screenshot_price": null,
+      "screenshot_y": 555,
+      "approx_screenshot_price_from_pixels": 1.121484,
+      "approx_price_error_pips": 0.444,
+      "screenshot_start_x": 804,
+      "predicted_start_x": 804,
+      "start_error_pixels": 0,
+      "screenshot_end_x": 948,
+      "predicted_end_x": 961,
+      "end_error_pixels": -13,
+      "right5_index": 141,
+      "right5_bar_complete": true,
+      "right5_bar_end": "2026-10-03T01:00:00+08:00"
+    },
+    {
+      "side": "low",
+      "index": 144,
+      "time": "2026-10-05T09:00:00+08:00",
+      "oanda_price": "1.1160200000",
+      "screenshot_price": null,
+      "screenshot_y": 648,
+      "approx_screenshot_price_from_pixels": 1.116087,
+      "approx_price_error_pips": 0.674,
+      "screenshot_start_x": 909,
+      "predicted_start_x": 909,
+      "start_error_pixels": 0,
+      "screenshot_end_x": 1143,
+      "predicted_end_x": 1143,
+      "end_error_pixels": 0,
+      "right5_index": 149,
+      "right5_bar_complete": true,
+      "right5_bar_end": "2026-10-06T09:00:00+08:00"
+    },
+    {
+      "side": "low",
+      "index": 158,
+      "time": "2026-10-07T17:00:00+08:00",
+      "oanda_price": "1.1163800000",
+      "screenshot_price": null,
+      "screenshot_y": 643,
+      "approx_screenshot_price_from_pixels": 1.116378,
+      "approx_price_error_pips": -0.025,
+      "screenshot_start_x": 1091,
+      "predicted_start_x": 1091,
+      "start_error_pixels": 0,
+      "screenshot_end_x": 1221,
+      "predicted_end_x": 1221,
+      "end_error_pixels": 0,
+      "right5_index": 163,
+      "right5_bar_complete": true,
+      "right5_bar_end": "2026-10-08T17:00:00+08:00"
+    },
+    {
+      "side": "low",
+      "index": 164,
+      "time": "2026-10-08T17:00:00+08:00",
+      "oanda_price": "1.1171100000",
+      "screenshot_price": 1.11719,
+      "screenshot_y": 629,
+      "approx_screenshot_price_from_pixels": 1.11719,
+      "approx_price_error_pips": 0.8,
+      "screenshot_start_x": 1169,
+      "predicted_start_x": 1169,
+      "start_error_pixels": 0,
+      "screenshot_end_x": 1299,
+      "predicted_end_x": 1299,
+      "end_error_pixels": 0,
+      "right5_index": 169,
+      "right5_bar_complete": true,
+      "right5_bar_end": "2026-10-09T17:00:00+08:00"
+    }
+  ]
+}

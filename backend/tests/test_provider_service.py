@@ -71,6 +71,44 @@ def test_new_history_does_not_reset_but_old_revision_does(database, monkeypatch)
     assert service.events("c", cursors)[0]["type"] == "reset"
 
 
+def test_four_swing_listeners_share_calculation_and_revision(database, monkeypatch):
+    key = seed(META, "M5", 10000, page(1000, 10000))
+    state = cache.snapshot(key, 10000, 3)
+    spec = {"name": "SWING_SR_V1", "params": {"high_strength": 1, "low_strength": 1}}
+    for listener in ("high", "high_left", "low", "low_left"):
+        subscribed(monkeypatch, "swing", listener, 9000, state["cache_revision"],
+                   state["as_of"], [spec | {"id": listener}])
+    seed(META, "M5", 12000, page(9000, 12000, close="4"))
+    calls = []
+    calculate = service.calculate
+
+    def counted(rows, spec, **kwargs):
+        calls.append(spec)
+        return calculate(rows, spec, **kwargs)
+
+    monkeypatch.setattr(service, "calculate", counted)
+    cursors = {}
+    events = service.events("swing", cursors)
+    assert len(events) == 4
+    assert len(calls) == 1, "four plots must not repeat full-history Swing calculation"
+    presentations = [event["indicators"][0]["presentation"] for event in events]
+    assert all(p == presentations[0] for p in presentations)
+    assert presentations[0]["history_revision"] == str(events[0]["revision"])
+    assert presentations[0]["history_complete"] is True
+    assert presentations[0]["as_of_bar_time"] == 11000
+    assert presentations[0]["statistics_origin"] == 1000
+    assert service.events("swing", cursors) == []
+    # Independent strengths and fixed origins remain independent calculations.
+    subscribed(monkeypatch, "swing", "different-strength", 9000, indicators=[
+        {"name": "SWING_SR_V1", "params": {"high_strength": 2, "low_strength": 1}}])
+    subscribed(monkeypatch, "swing", "different-origin", 9000, indicators=[
+        spec | {"calculation_origin": 2000}])
+    changed = service.events("swing", cursors)
+    assert len(changed) == 2 and len(calls) == 3
+    origin = next(e for e in changed if e["listener"] == "different-origin")
+    assert origin["indicators"][0]["presentation"]["statistics_origin"] == 2000
+
+
 def test_uncovered_disconnect_gap_requires_reset(database, monkeypatch):
     seed(META, "M5", 10000, page(5000, 10000))
     subscribed(monkeypatch, "c", "l", 9000)

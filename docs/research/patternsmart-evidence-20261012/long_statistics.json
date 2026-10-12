@@ -1,0 +1,4617 @@
+{
+  "scope": "read-only existing production cache; calculations local Ubuntu",
+  "source": "OANDA EUR_USD bid H4; screenshot FXCM",
+  "production_snapshot": {
+    "kind": "metadata",
+    "scope": "existing native production H4 SELECT only",
+    "snapshot_at": "2026-10-12 11:51:30.580657+08:00",
+    "start": 1709251200000,
+    "end": 1791849600000,
+    "dataset": "ec65e6a48c306c7dc0596bff6a270792cfb3745a723426d221c3f8fe7889210c"
+  },
+  "native_count": 4000,
+  "tail_count": 2,
+  "total_count": 4002,
+  "tail_scope": "two managed candles frozen in original screenshot-time export, not refreshed",
+  "overlap_exact_ohlc": 173,
+  "first": "2024-03-15T13:00:00+08:00",
+  "last": "2026-10-12T09:00:00+08:00",
+  "sha256": {
+    "long_snapshot.jsonl": "72c0fda690465c060df6bad88953d2c4290b65dc067a440a24b33e159ab81720",
+    "snapshot.jsonl": "06a079e9384e22adf50f850a1c44b0e46612699a906a7e132a1fa2acd049cd8d"
+  },
+  "statistics": {
+    "high": {
+      "strict_preview": {
+        "point_count": 264,
+        "interval_count": 263,
+        "interval_sum": 3989,
+        "first_index": 7,
+        "last_index": 3996,
+        "first_time": "2024-03-18T17:00:00+08:00",
+        "last_time": "2026-10-09T13:00:00+08:00",
+        "mean": 15.167300380228136,
+        "round_half_up": 15,
+        "floor": 15,
+        "median": 13,
+        "mean_excluding_both_endpoints": 14.167300380228136,
+        "mean_including_both_endpoints": 16.167300380228138,
+        "bar_index_divided_by_point_count": 15.155303030303031
+      },
+      "strict_closed": {
+        "point_count": 263,
+        "interval_count": 262,
+        "interval_sum": 3972,
+        "first_index": 7,
+        "last_index": 3979,
+        "first_time": "2024-03-18T17:00:00+08:00",
+        "last_time": "2026-10-06T17:00:00+08:00",
+        "mean": 15.16030534351145,
+        "round_half_up": 15,
+        "floor": 15,
+        "median": 13.0,
+        "mean_excluding_both_endpoints": 14.16030534351145,
+        "mean_including_both_endpoints": 16.16030534351145,
+        "bar_index_divided_by_point_count": 15.212927756653992
+      },
+      "relaxed_preview": {
+        "point_count": 272,
+        "interval_count": 271,
+        "interval_sum": 3989,
+        "first_index": 7,
+        "last_index": 3996,
+        "first_time": "2024-03-18T17:00:00+08:00",
+        "last_time": "2026-10-09T13:00:00+08:00",
+        "mean": 14.719557195571955,
+        "round_half_up": 15,
+        "floor": 14,
+        "median": 13,
+        "mean_excluding_both_endpoints": 13.719557195571955,
+        "mean_including_both_endpoints": 15.719557195571955,
+        "bar_index_divided_by_point_count": 14.709558823529411
+      },
+      "strict_left_relaxed_right": {
+        "point_count": 269,
+        "interval_count": 268,
+        "interval_sum": 3989,
+        "first_index": 7,
+        "last_index": 3996,
+        "first_time": "2024-03-18T17:00:00+08:00",
+        "last_time": "2026-10-09T13:00:00+08:00",
+        "mean": 14.884328358208956,
+        "round_half_up": 15,
+        "floor": 14,
+        "median": 13.0,
+        "mean_excluding_both_endpoints": 13.884328358208956,
+        "mean_including_both_endpoints": 15.884328358208956,
+        "bar_index_divided_by_point_count": 14.87360594795539
+      },
+      "relaxed_left_strict_right": {
+        "point_count": 267,
+        "interval_count": 266,
+        "interval_sum": 3989,
+        "first_index": 7,
+        "last_index": 3996,
+        "first_time": "2024-03-18T17:00:00+08:00",
+        "last_time": "2026-10-09T13:00:00+08:00",
+        "mean": 14.996240601503759,
+        "round_half_up": 15,
+        "floor": 14,
+        "median": 13.0,
+        "mean_excluding_both_endpoints": 13.996240601503759,
+        "mean_including_both_endpoints": 15.996240601503759,
+        "bar_index_divided_by_point_count": 14.985018726591761
+      }
+    },
+    "low": {
+      "strict_preview": {
+        "point_count": 249,
+        "interval_count": 248,
+        "interval_sum": 3978,
+        "first_index": 13,
+        "last_index": 3991,
+        "first_time": "2024-03-19T17:00:00+08:00",
+        "last_time": "2026-10-08T17:00:00+08:00",
+        "mean": 16.04032258064516,
+        "round_half_up": 16,
+        "floor": 16,
+        "median": 14.0,
+        "mean_excluding_both_endpoints": 15.040322580645162,
+        "mean_including_both_endpoints": 17.04032258064516,
+        "bar_index_divided_by_point_count": 16.068273092369477
+      },
+      "strict_closed": {
+        "point_count": 249,
+        "interval_count": 248,
+        "interval_sum": 3978,
+        "first_index": 13,
+        "last_index": 3991,
+        "first_time": "2024-03-19T17:00:00+08:00",
+        "last_time": "2026-10-08T17:00:00+08:00",
+        "mean": 16.04032258064516,
+        "round_half_up": 16,
+        "floor": 16,
+        "median": 14.0,
+        "mean_excluding_both_endpoints": 15.040322580645162,
+        "mean_including_both_endpoints": 17.04032258064516,
+        "bar_index_divided_by_point_count": 16.068273092369477
+      },
+      "relaxed_preview": {
+        "point_count": 253,
+        "interval_count": 252,
+        "interval_sum": 3978,
+        "first_index": 13,
+        "last_index": 3991,
+        "first_time": "2024-03-19T17:00:00+08:00",
+        "last_time": "2026-10-08T17:00:00+08:00",
+        "mean": 15.785714285714286,
+        "round_half_up": 16,
+        "floor": 15,
+        "median": 14.0,
+        "mean_excluding_both_endpoints": 14.785714285714286,
+        "mean_including_both_endpoints": 16.785714285714285,
+        "bar_index_divided_by_point_count": 15.814229249011857
+      },
+      "strict_left_relaxed_right": {
+        "point_count": 251,
+        "interval_count": 250,
+        "interval_sum": 3978,
+        "first_index": 13,
+        "last_index": 3991,
+        "first_time": "2024-03-19T17:00:00+08:00",
+        "last_time": "2026-10-08T17:00:00+08:00",
+        "mean": 15.912,
+        "round_half_up": 16,
+        "floor": 15,
+        "median": 14.0,
+        "mean_excluding_both_endpoints": 14.912,
+        "mean_including_both_endpoints": 16.912,
+        "bar_index_divided_by_point_count": 15.9402390438247
+      },
+      "relaxed_left_strict_right": {
+        "point_count": 251,
+        "interval_count": 250,
+        "interval_sum": 3978,
+        "first_index": 13,
+        "last_index": 3991,
+        "first_time": "2024-03-19T17:00:00+08:00",
+        "last_time": "2026-10-08T17:00:00+08:00",
+        "mean": 15.912,
+        "round_half_up": 16,
+        "floor": 15,
+        "median": 14.0,
+        "mean_excluding_both_endpoints": 14.912,
+        "mean_including_both_endpoints": 16.912,
+        "bar_index_divided_by_point_count": 15.9402390438247
+      }
+    }
+  },
+  "counterexamples": {
+    "high": {
+      "last_10_intervals": {
+        "point_count": 11,
+        "interval_count": 10,
+        "interval_sum": 154,
+        "first_index": 3842,
+        "last_index": 3996,
+        "first_time": "2026-09-03T21:00:00+08:00",
+        "last_time": "2026-10-09T13:00:00+08:00",
+        "mean": 15.4,
+        "round_half_up": 15,
+        "floor": 15,
+        "median": 15.0,
+        "mean_excluding_both_endpoints": 14.4,
+        "mean_including_both_endpoints": 16.4,
+        "bar_index_divided_by_point_count": 363.72727272727275
+      },
+      "last_20_intervals": {
+        "point_count": 21,
+        "interval_count": 20,
+        "interval_sum": 278,
+        "first_index": 3718,
+        "last_index": 3996,
+        "first_time": "2026-08-06T05:00:00+08:00",
+        "last_time": "2026-10-09T13:00:00+08:00",
+        "mean": 13.9,
+        "round_half_up": 14,
+        "floor": 13,
+        "median": 13.5,
+        "mean_excluding_both_endpoints": 12.9,
+        "mean_including_both_endpoints": 14.9,
+        "bar_index_divided_by_point_count": 190.52380952380952
+      },
+      "last_50_intervals": {
+        "point_count": 51,
+        "interval_count": 50,
+        "interval_sum": 610,
+        "first_index": 3386,
+        "last_index": 3996,
+        "first_time": "2026-05-20T21:00:00+08:00",
+        "last_time": "2026-10-09T13:00:00+08:00",
+        "mean": 12.2,
+        "round_half_up": 12,
+        "floor": 12,
+        "median": 11.0,
+        "mean_excluding_both_endpoints": 11.2,
+        "mean_including_both_endpoints": 13.2,
+        "bar_index_divided_by_point_count": 78.45098039215686
+      },
+      "last_100_intervals": {
+        "point_count": 101,
+        "interval_count": 100,
+        "interval_sum": 1402,
+        "first_index": 2594,
+        "last_index": 3996,
+        "first_time": "2025-11-13T22:00:00+08:00",
+        "last_time": "2026-10-09T13:00:00+08:00",
+        "mean": 14.02,
+        "round_half_up": 14,
+        "floor": 14,
+        "median": 12.0,
+        "mean_excluding_both_endpoints": 13.02,
+        "mean_including_both_endpoints": 15.02,
+        "bar_index_divided_by_point_count": 39.613861386138616
+      },
+      "last_200_intervals": {
+        "point_count": 201,
+        "interval_count": 200,
+        "interval_sum": 2990,
+        "first_index": 1006,
+        "last_index": 3996,
+        "first_time": "2024-11-06T06:00:00+08:00",
+        "last_time": "2026-10-09T13:00:00+08:00",
+        "mean": 14.95,
+        "round_half_up": 15,
+        "floor": 14,
+        "median": 13.0,
+        "mean_excluding_both_endpoints": 13.95,
+        "mean_including_both_endpoints": 15.95,
+        "bar_index_divided_by_point_count": 19.90547263681592
+      },
+      "last_500_bars": {
+        "point_count": 38,
+        "interval_count": 37,
+        "interval_sum": 477,
+        "first_index": 3519,
+        "last_index": 3996,
+        "first_time": "2026-06-20T01:00:00+08:00",
+        "last_time": "2026-10-09T13:00:00+08:00",
+        "mean": 12.891891891891891,
+        "round_half_up": 13,
+        "floor": 12,
+        "median": 11,
+        "mean_excluding_both_endpoints": 11.891891891891891,
+        "mean_including_both_endpoints": 13.891891891891891,
+        "bar_index_divided_by_point_count": 105.28947368421052
+      },
+      "last_1000_bars": {
+        "point_count": 75,
+        "interval_count": 74,
+        "interval_sum": 986,
+        "first_index": 3010,
+        "last_index": 3996,
+        "first_time": "2026-02-23T06:00:00+08:00",
+        "last_time": "2026-10-09T13:00:00+08:00",
+        "mean": 13.324324324324325,
+        "round_half_up": 13,
+        "floor": 13,
+        "median": 11.5,
+        "mean_excluding_both_endpoints": 12.324324324324325,
+        "mean_including_both_endpoints": 14.324324324324325,
+        "bar_index_divided_by_point_count": 53.346666666666664
+      },
+      "last_2000_bars": {
+        "point_count": 139,
+        "interval_count": 138,
+        "interval_sum": 1985,
+        "first_index": 2011,
+        "last_index": 3996,
+        "first_time": "2025-07-01T17:00:00+08:00",
+        "last_time": "2026-10-09T13:00:00+08:00",
+        "mean": 14.384057971014492,
+        "round_half_up": 14,
+        "floor": 14,
+        "median": 12.0,
+        "mean_excluding_both_endpoints": 13.384057971014492,
+        "mean_including_both_endpoints": 15.384057971014492,
+        "bar_index_divided_by_point_count": 28.784172661870503
+      },
+      "last_3000_bars": {
+        "point_count": 201,
+        "interval_count": 200,
+        "interval_sum": 2990,
+        "first_index": 1006,
+        "last_index": 3996,
+        "first_time": "2024-11-06T06:00:00+08:00",
+        "last_time": "2026-10-09T13:00:00+08:00",
+        "mean": 14.95,
+        "round_half_up": 15,
+        "floor": 14,
+        "median": 13.0,
+        "mean_excluding_both_endpoints": 13.95,
+        "mean_including_both_endpoints": 15.95,
+        "bar_index_divided_by_point_count": 19.90547263681592
+      },
+      "ema_10_intervals": {
+        "value": 15.297591765323709
+      },
+      "ema_14_intervals": {
+        "value": 14.859644623514097
+      },
+      "ema_20_intervals": {
+        "value": 14.310073785657357
+      },
+      "ema_50_intervals": {
+        "value": 13.438583328966175
+      }
+    },
+    "low": {
+      "last_10_intervals": {
+        "point_count": 11,
+        "interval_count": 10,
+        "interval_sum": 132,
+        "first_index": 3859,
+        "last_index": 3991,
+        "first_time": "2026-09-08T17:00:00+08:00",
+        "last_time": "2026-10-08T17:00:00+08:00",
+        "mean": 13.2,
+        "round_half_up": 13,
+        "floor": 13,
+        "median": 13.0,
+        "mean_excluding_both_endpoints": 12.2,
+        "mean_including_both_endpoints": 14.2,
+        "bar_index_divided_by_point_count": 363.72727272727275
+      },
+      "last_20_intervals": {
+        "point_count": 21,
+        "interval_count": 20,
+        "interval_sum": 287,
+        "first_index": 3704,
+        "last_index": 3991,
+        "first_time": "2026-08-03T21:00:00+08:00",
+        "last_time": "2026-10-08T17:00:00+08:00",
+        "mean": 14.35,
+        "round_half_up": 14,
+        "floor": 14,
+        "median": 13.0,
+        "mean_excluding_both_endpoints": 13.35,
+        "mean_including_both_endpoints": 15.35,
+        "bar_index_divided_by_point_count": 190.52380952380952
+      },
+      "last_50_intervals": {
+        "point_count": 51,
+        "interval_count": 50,
+        "interval_sum": 702,
+        "first_index": 3289,
+        "last_index": 3991,
+        "first_time": "2026-04-28T17:00:00+08:00",
+        "last_time": "2026-10-08T17:00:00+08:00",
+        "mean": 14.04,
+        "round_half_up": 14,
+        "floor": 14,
+        "median": 14.0,
+        "mean_excluding_both_endpoints": 13.04,
+        "mean_including_both_endpoints": 15.04,
+        "bar_index_divided_by_point_count": 78.45098039215686
+      },
+      "last_100_intervals": {
+        "point_count": 101,
+        "interval_count": 100,
+        "interval_sum": 1577,
+        "first_index": 2414,
+        "last_index": 3991,
+        "first_time": "2025-10-02T21:00:00+08:00",
+        "last_time": "2026-10-08T17:00:00+08:00",
+        "mean": 15.77,
+        "round_half_up": 16,
+        "floor": 15,
+        "median": 14.5,
+        "mean_excluding_both_endpoints": 14.77,
+        "mean_including_both_endpoints": 16.77,
+        "bar_index_divided_by_point_count": 39.613861386138616
+      },
+      "last_200_intervals": {
+        "point_count": 201,
+        "interval_count": 200,
+        "interval_sum": 3160,
+        "first_index": 831,
+        "last_index": 3991,
+        "first_time": "2024-09-26T01:00:00+08:00",
+        "last_time": "2026-10-08T17:00:00+08:00",
+        "mean": 15.8,
+        "round_half_up": 16,
+        "floor": 15,
+        "median": 14.0,
+        "mean_excluding_both_endpoints": 14.8,
+        "mean_including_both_endpoints": 16.8,
+        "bar_index_divided_by_point_count": 19.90547263681592
+      },
+      "last_500_bars": {
+        "point_count": 35,
+        "interval_count": 34,
+        "interval_sum": 475,
+        "first_index": 3516,
+        "last_index": 3991,
+        "first_time": "2026-06-19T13:00:00+08:00",
+        "last_time": "2026-10-08T17:00:00+08:00",
+        "mean": 13.970588235294118,
+        "round_half_up": 14,
+        "floor": 13,
+        "median": 13.0,
+        "mean_excluding_both_endpoints": 12.970588235294118,
+        "mean_including_both_endpoints": 14.970588235294118,
+        "bar_index_divided_by_point_count": 114.31428571428572
+      },
+      "last_1000_bars": {
+        "point_count": 66,
+        "interval_count": 65,
+        "interval_sum": 989,
+        "first_index": 3002,
+        "last_index": 3991,
+        "first_time": "2026-02-19T22:00:00+08:00",
+        "last_time": "2026-10-08T17:00:00+08:00",
+        "mean": 15.215384615384615,
+        "round_half_up": 15,
+        "floor": 15,
+        "median": 15,
+        "mean_excluding_both_endpoints": 14.215384615384615,
+        "mean_including_both_endpoints": 16.215384615384615,
+        "bar_index_divided_by_point_count": 60.621212121212125
+      },
+      "last_2000_bars": {
+        "point_count": 128,
+        "interval_count": 127,
+        "interval_sum": 1974,
+        "first_index": 2017,
+        "last_index": 3991,
+        "first_time": "2025-07-02T17:00:00+08:00",
+        "last_time": "2026-10-08T17:00:00+08:00",
+        "mean": 15.543307086614174,
+        "round_half_up": 16,
+        "floor": 15,
+        "median": 14,
+        "mean_excluding_both_endpoints": 14.543307086614174,
+        "mean_including_both_endpoints": 16.543307086614174,
+        "bar_index_divided_by_point_count": 31.2578125
+      },
+      "last_3000_bars": {
+        "point_count": 192,
+        "interval_count": 191,
+        "interval_sum": 2982,
+        "first_index": 1009,
+        "last_index": 3991,
+        "first_time": "2024-11-06T18:00:00+08:00",
+        "last_time": "2026-10-08T17:00:00+08:00",
+        "mean": 15.612565445026178,
+        "round_half_up": 16,
+        "floor": 15,
+        "median": 14,
+        "mean_excluding_both_endpoints": 14.612565445026178,
+        "mean_including_both_endpoints": 16.612565445026178,
+        "bar_index_divided_by_point_count": 20.838541666666668
+      },
+      "ema_10_intervals": {
+        "value": 12.407363723091233
+      },
+      "ema_14_intervals": {
+        "value": 12.899916119274971
+      },
+      "ema_20_intervals": {
+        "value": 13.301417607676113
+      },
+      "ema_50_intervals": {
+        "value": 14.257164795589139
+      }
+    }
+  },
+  "points": {
+    "high": [
+      {
+        "index": 7,
+        "start": 1710752400000,
+        "time": "2024-03-18T17:00:00+08:00",
+        "price": "1.09055",
+        "right5_end": "2024-03-19T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 24,
+        "start": 1710997200000,
+        "time": "2024-03-21T13:00:00+08:00",
+        "price": "1.09419",
+        "right5_end": "2024-03-22T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 43,
+        "start": 1711443600000,
+        "time": "2024-03-26T17:00:00+08:00",
+        "price": "1.08637",
+        "right5_end": "2024-03-27T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 86,
+        "start": 1712235600000,
+        "time": "2024-04-04T21:00:00+08:00",
+        "price": "1.08759",
+        "right5_end": "2024-04-05T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 104,
+        "start": 1712667600000,
+        "time": "2024-04-09T21:00:00+08:00",
+        "price": "1.08844",
+        "right5_end": "2024-04-10T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 116,
+        "start": 1712840400000,
+        "time": "2024-04-11T21:00:00+08:00",
+        "price": "1.07559",
+        "right5_end": "2024-04-12T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 127,
+        "start": 1713171600000,
+        "time": "2024-04-15T17:00:00+08:00",
+        "price": "1.06646",
+        "right5_end": "2024-04-16T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 144,
+        "start": 1713416400000,
+        "time": "2024-04-18T13:00:00+08:00",
+        "price": "1.06894",
+        "right5_end": "2024-04-19T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 152,
+        "start": 1713531600000,
+        "time": "2024-04-19T21:00:00+08:00",
+        "price": "1.06769",
+        "right5_end": "2024-04-22T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 167,
+        "start": 1713920400000,
+        "time": "2024-04-24T09:00:00+08:00",
+        "price": "1.07136",
+        "right5_end": "2024-04-25T09:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 180,
+        "start": 1714107600000,
+        "time": "2024-04-26T13:00:00+08:00",
+        "price": "1.07523",
+        "right5_end": "2024-04-29T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 193,
+        "start": 1714467600000,
+        "time": "2024-04-30T17:00:00+08:00",
+        "price": "1.07348",
+        "right5_end": "2024-05-01T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 201,
+        "start": 1714582800000,
+        "time": "2024-05-02T01:00:00+08:00",
+        "price": "1.07321",
+        "right5_end": "2024-05-03T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 211,
+        "start": 1714726800000,
+        "time": "2024-05-03T17:00:00+08:00",
+        "price": "1.08118",
+        "right5_end": "2024-05-06T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 224,
+        "start": 1715086800000,
+        "time": "2024-05-07T21:00:00+08:00",
+        "price": "1.07867",
+        "right5_end": "2024-05-08T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 262,
+        "start": 1715806800000,
+        "time": "2024-05-16T05:00:00+08:00",
+        "price": "1.08944",
+        "right5_end": "2024-05-17T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 276,
+        "start": 1716181200000,
+        "time": "2024-05-20T13:00:00+08:00",
+        "price": "1.08839",
+        "right5_end": "2024-05-21T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 283,
+        "start": 1716282000000,
+        "time": "2024-05-21T17:00:00+08:00",
+        "price": "1.08741",
+        "right5_end": "2024-05-22T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 296,
+        "start": 1716469200000,
+        "time": "2024-05-23T21:00:00+08:00",
+        "price": "1.08603",
+        "right5_end": "2024-05-24T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 313,
+        "start": 1716886800000,
+        "time": "2024-05-28T17:00:00+08:00",
+        "price": "1.08884",
+        "right5_end": "2024-05-29T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 331,
+        "start": 1717146000000,
+        "time": "2024-05-31T17:00:00+08:00",
+        "price": "1.08818",
+        "right5_end": "2024-06-03T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 340,
+        "start": 1717448400000,
+        "time": "2024-06-04T05:00:00+08:00",
+        "price": "1.09153",
+        "right5_end": "2024-06-05T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 355,
+        "start": 1717664400000,
+        "time": "2024-06-06T17:00:00+08:00",
+        "price": "1.09014",
+        "right5_end": "2024-06-07T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 361,
+        "start": 1717750800000,
+        "time": "2024-06-07T17:00:00+08:00",
+        "price": "1.09016",
+        "right5_end": "2024-06-10T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 372,
+        "start": 1718082000000,
+        "time": "2024-06-11T13:00:00+08:00",
+        "price": "1.07729",
+        "right5_end": "2024-06-12T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 380,
+        "start": 1718197200000,
+        "time": "2024-06-12T21:00:00+08:00",
+        "price": "1.08517",
+        "right5_end": "2024-06-13T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 404,
+        "start": 1718715600000,
+        "time": "2024-06-18T21:00:00+08:00",
+        "price": "1.07607",
+        "right5_end": "2024-06-19T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 428,
+        "start": 1719234000000,
+        "time": "2024-06-24T21:00:00+08:00",
+        "price": "1.07458",
+        "right5_end": "2024-06-25T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 446,
+        "start": 1719493200000,
+        "time": "2024-06-27T21:00:00+08:00",
+        "price": "1.07257",
+        "right5_end": "2024-06-28T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 456,
+        "start": 1719810000000,
+        "time": "2024-07-01T13:00:00+08:00",
+        "price": "1.07758",
+        "right5_end": "2024-07-02T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 470,
+        "start": 1720011600000,
+        "time": "2024-07-03T21:00:00+08:00",
+        "price": "1.08161",
+        "right5_end": "2024-07-04T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 488,
+        "start": 1720443600000,
+        "time": "2024-07-08T21:00:00+08:00",
+        "price": "1.08443",
+        "right5_end": "2024-07-09T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 505,
+        "start": 1720688400000,
+        "time": "2024-07-11T17:00:00+08:00",
+        "price": "1.08993",
+        "right5_end": "2024-07-12T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 518,
+        "start": 1721048400000,
+        "time": "2024-07-15T21:00:00+08:00",
+        "price": "1.09217",
+        "right5_end": "2024-07-16T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 530,
+        "start": 1721221200000,
+        "time": "2024-07-17T21:00:00+08:00",
+        "price": "1.09474",
+        "right5_end": "2024-07-18T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 544,
+        "start": 1721595600000,
+        "time": "2024-07-22T05:00:00+08:00",
+        "price": "1.09023",
+        "right5_end": "2024-07-23T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 551,
+        "start": 1721696400000,
+        "time": "2024-07-23T09:00:00+08:00",
+        "price": "1.08960",
+        "right5_end": "2024-07-24T09:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 560,
+        "start": 1721826000000,
+        "time": "2024-07-24T21:00:00+08:00",
+        "price": "1.08658",
+        "right5_end": "2024-07-25T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 567,
+        "start": 1721926800000,
+        "time": "2024-07-26T01:00:00+08:00",
+        "price": "1.08693",
+        "right5_end": "2024-07-27T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 575,
+        "start": 1722214800000,
+        "time": "2024-07-29T09:00:00+08:00",
+        "price": "1.08693",
+        "right5_end": "2024-07-30T09:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 583,
+        "start": 1722330000000,
+        "time": "2024-07-30T17:00:00+08:00",
+        "price": "1.08351",
+        "right5_end": "2024-07-31T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 590,
+        "start": 1722430800000,
+        "time": "2024-07-31T21:00:00+08:00",
+        "price": "1.08488",
+        "right5_end": "2024-08-01T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 607,
+        "start": 1722848400000,
+        "time": "2024-08-05T17:00:00+08:00",
+        "price": "1.10082",
+        "right5_end": "2024-08-06T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 624,
+        "start": 1723093200000,
+        "time": "2024-08-08T13:00:00+08:00",
+        "price": "1.09444",
+        "right5_end": "2024-08-09T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 632,
+        "start": 1723208400000,
+        "time": "2024-08-09T21:00:00+08:00",
+        "price": "1.09306",
+        "right5_end": "2024-08-12T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 650,
+        "start": 1723640400000,
+        "time": "2024-08-14T21:00:00+08:00",
+        "price": "1.10467",
+        "right5_end": "2024-08-15T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 681,
+        "start": 1724259600000,
+        "time": "2024-08-22T01:00:00+08:00",
+        "price": "1.11733",
+        "right5_end": "2024-08-23T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 694,
+        "start": 1724619600000,
+        "time": "2024-08-26T05:00:00+08:00",
+        "price": "1.12009",
+        "right5_end": "2024-08-27T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 705,
+        "start": 1724778000000,
+        "time": "2024-08-28T01:00:00+08:00",
+        "price": "1.11899",
+        "right5_end": "2024-08-29T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 751,
+        "start": 1725613200000,
+        "time": "2024-09-06T17:00:00+08:00",
+        "price": "1.11547",
+        "right5_end": "2024-09-09T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 769,
+        "start": 1726045200000,
+        "time": "2024-09-11T17:00:00+08:00",
+        "price": "1.10542",
+        "right5_end": "2024-09-12T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 792,
+        "start": 1726549200000,
+        "time": "2024-09-17T13:00:00+08:00",
+        "price": "1.11455",
+        "right5_end": "2024-09-18T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 801,
+        "start": 1726678800000,
+        "time": "2024-09-19T01:00:00+08:00",
+        "price": "1.11884",
+        "right5_end": "2024-09-20T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 810,
+        "start": 1726808400000,
+        "time": "2024-09-20T13:00:00+08:00",
+        "price": "1.11812",
+        "right5_end": "2024-09-23T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 830,
+        "start": 1727269200000,
+        "time": "2024-09-25T21:00:00+08:00",
+        "price": "1.12133",
+        "right5_end": "2024-09-26T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 846,
+        "start": 1727672400000,
+        "time": "2024-09-30T13:00:00+08:00",
+        "price": "1.12081",
+        "right5_end": "2024-10-01T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 882,
+        "start": 1728363600000,
+        "time": "2024-10-08T13:00:00+08:00",
+        "price": "1.09965",
+        "right5_end": "2024-10-09T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 914,
+        "start": 1728997200000,
+        "time": "2024-10-15T21:00:00+08:00",
+        "price": "1.09160",
+        "right5_end": "2024-10-16T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 934,
+        "start": 1729458000000,
+        "time": "2024-10-21T05:00:00+08:00",
+        "price": "1.08709",
+        "right5_end": "2024-10-22T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 961,
+        "start": 1729846800000,
+        "time": "2024-10-25T17:00:00+08:00",
+        "price": "1.08386",
+        "right5_end": "2024-10-28T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 968,
+        "start": 1730120400000,
+        "time": "2024-10-28T21:00:00+08:00",
+        "price": "1.08269",
+        "right5_end": "2024-10-29T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 991,
+        "start": 1730451600000,
+        "time": "2024-11-01T17:00:00+08:00",
+        "price": "1.09051",
+        "right5_end": "2024-11-04T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 997,
+        "start": 1730714400000,
+        "time": "2024-11-04T18:00:00+08:00",
+        "price": "1.09141",
+        "right5_end": "2024-11-05T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1006,
+        "start": 1730844000000,
+        "time": "2024-11-06T06:00:00+08:00",
+        "price": "1.09365",
+        "right5_end": "2024-11-07T06:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1016,
+        "start": 1730988000000,
+        "time": "2024-11-07T22:00:00+08:00",
+        "price": "1.08241",
+        "right5_end": "2024-11-08T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1039,
+        "start": 1731492000000,
+        "time": "2024-11-13T18:00:00+08:00",
+        "price": "1.06533",
+        "right5_end": "2024-11-14T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1051,
+        "start": 1731664800000,
+        "time": "2024-11-15T18:00:00+08:00",
+        "price": "1.05922",
+        "right5_end": "2024-11-18T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1059,
+        "start": 1731952800000,
+        "time": "2024-11-19T02:00:00+08:00",
+        "price": "1.06065",
+        "right5_end": "2024-11-20T02:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1066,
+        "start": 1732053600000,
+        "time": "2024-11-20T06:00:00+08:00",
+        "price": "1.06091",
+        "right5_end": "2024-11-21T06:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1093,
+        "start": 1732615200000,
+        "time": "2024-11-26T18:00:00+08:00",
+        "price": "1.05441",
+        "right5_end": "2024-11-27T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1100,
+        "start": 1732716000000,
+        "time": "2024-11-27T22:00:00+08:00",
+        "price": "1.05870",
+        "right5_end": "2024-11-28T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1110,
+        "start": 1732860000000,
+        "time": "2024-11-29T14:00:00+08:00",
+        "price": "1.05966",
+        "right5_end": "2024-12-02T14:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1141,
+        "start": 1733479200000,
+        "time": "2024-12-06T18:00:00+08:00",
+        "price": "1.06293",
+        "right5_end": "2024-12-09T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1148,
+        "start": 1733752800000,
+        "time": "2024-12-09T22:00:00+08:00",
+        "price": "1.05937",
+        "right5_end": "2024-12-10T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1180,
+        "start": 1734386400000,
+        "time": "2024-12-17T06:00:00+08:00",
+        "price": "1.05337",
+        "right5_end": "2024-12-18T06:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1203,
+        "start": 1734717600000,
+        "time": "2024-12-21T02:00:00+08:00",
+        "price": "1.04467",
+        "right5_end": "2024-12-24T02:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1225,
+        "start": 1735293600000,
+        "time": "2024-12-27T18:00:00+08:00",
+        "price": "1.04434",
+        "right5_end": "2024-12-30T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1231,
+        "start": 1735552800000,
+        "time": "2024-12-30T18:00:00+08:00",
+        "price": "1.04577",
+        "right5_end": "2024-12-31T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1255,
+        "start": 1736157600000,
+        "time": "2025-01-06T18:00:00+08:00",
+        "price": "1.04362",
+        "right5_end": "2025-01-07T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1261,
+        "start": 1736244000000,
+        "time": "2025-01-07T18:00:00+08:00",
+        "price": "1.04338",
+        "right5_end": "2025-01-08T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1297,
+        "start": 1736935200000,
+        "time": "2025-01-15T18:00:00+08:00",
+        "price": "1.03538",
+        "right5_end": "2025-01-16T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1304,
+        "start": 1737036000000,
+        "time": "2025-01-16T22:00:00+08:00",
+        "price": "1.03144",
+        "right5_end": "2025-01-17T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1327,
+        "start": 1737540000000,
+        "time": "2025-01-22T18:00:00+08:00",
+        "price": "1.04566",
+        "right5_end": "2025-01-23T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1345,
+        "start": 1737972000000,
+        "time": "2025-01-27T18:00:00+08:00",
+        "price": "1.05325",
+        "right5_end": "2025-01-28T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1356,
+        "start": 1738130400000,
+        "time": "2025-01-29T14:00:00+08:00",
+        "price": "1.04431",
+        "right5_end": "2025-01-30T14:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1364,
+        "start": 1738245600000,
+        "time": "2025-01-30T22:00:00+08:00",
+        "price": "1.04670",
+        "right5_end": "2025-01-31T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1370,
+        "start": 1738332000000,
+        "time": "2025-01-31T22:00:00+08:00",
+        "price": "1.04332",
+        "right5_end": "2025-02-03T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1388,
+        "start": 1738764000000,
+        "time": "2025-02-05T22:00:00+08:00",
+        "price": "1.04423",
+        "right5_end": "2025-02-06T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1399,
+        "start": 1738922400000,
+        "time": "2025-02-07T18:00:00+08:00",
+        "price": "1.04123",
+        "right5_end": "2025-02-10T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1430,
+        "start": 1739541600000,
+        "time": "2025-02-14T22:00:00+08:00",
+        "price": "1.05137",
+        "right5_end": "2025-02-17T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1456,
+        "start": 1740088800000,
+        "time": "2025-02-21T06:00:00+08:00",
+        "price": "1.05051",
+        "right5_end": "2025-02-22T06:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1463,
+        "start": 1740362400000,
+        "time": "2025-02-24T10:00:00+08:00",
+        "price": "1.05276",
+        "right5_end": "2025-02-25T10:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1478,
+        "start": 1740578400000,
+        "time": "2025-02-26T22:00:00+08:00",
+        "price": "1.05281",
+        "right5_end": "2025-02-27T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1519,
+        "start": 1741341600000,
+        "time": "2025-03-07T18:00:00+08:00",
+        "price": "1.08881",
+        "right5_end": "2025-03-10T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1533,
+        "start": 1741712400000,
+        "time": "2025-03-12T01:00:00+08:00",
+        "price": "1.09464",
+        "right5_end": "2025-03-13T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1549,
+        "start": 1741942800000,
+        "time": "2025-03-14T17:00:00+08:00",
+        "price": "1.09119",
+        "right5_end": "2025-03-17T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1560,
+        "start": 1742274000000,
+        "time": "2025-03-18T13:00:00+08:00",
+        "price": "1.09541",
+        "right5_end": "2025-03-19T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1579,
+        "start": 1742547600000,
+        "time": "2025-03-21T17:00:00+08:00",
+        "price": "1.08607",
+        "right5_end": "2025-03-24T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1604,
+        "start": 1743080400000,
+        "time": "2025-03-27T21:00:00+08:00",
+        "price": "1.08205",
+        "right5_end": "2025-03-28T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1614,
+        "start": 1743397200000,
+        "time": "2025-03-31T13:00:00+08:00",
+        "price": "1.08488",
+        "right5_end": "2025-04-01T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1633,
+        "start": 1743670800000,
+        "time": "2025-04-03T17:00:00+08:00",
+        "price": "1.11454",
+        "right5_end": "2025-04-04T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1657,
+        "start": 1744189200000,
+        "time": "2025-04-09T17:00:00+08:00",
+        "price": "1.10945",
+        "right5_end": "2025-04-10T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1668,
+        "start": 1744347600000,
+        "time": "2025-04-11T13:00:00+08:00",
+        "price": "1.14732",
+        "right5_end": "2025-04-14T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1689,
+        "start": 1744822800000,
+        "time": "2025-04-17T01:00:00+08:00",
+        "price": "1.14121",
+        "right5_end": "2025-04-18T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1705,
+        "start": 1745226000000,
+        "time": "2025-04-21T17:00:00+08:00",
+        "price": "1.15726",
+        "right5_end": "2025-04-22T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1725,
+        "start": 1745514000000,
+        "time": "2025-04-25T01:00:00+08:00",
+        "price": "1.13974",
+        "right5_end": "2025-04-26T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1737,
+        "start": 1745859600000,
+        "time": "2025-04-29T01:00:00+08:00",
+        "price": "1.14243",
+        "right5_end": "2025-04-30T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1760,
+        "start": 1746190800000,
+        "time": "2025-05-02T21:00:00+08:00",
+        "price": "1.13804",
+        "right5_end": "2025-05-05T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1766,
+        "start": 1746450000000,
+        "time": "2025-05-05T21:00:00+08:00",
+        "price": "1.13643",
+        "right5_end": "2025-05-06T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1773,
+        "start": 1746550800000,
+        "time": "2025-05-07T01:00:00+08:00",
+        "price": "1.13806",
+        "right5_end": "2025-05-08T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1790,
+        "start": 1746795600000,
+        "time": "2025-05-09T21:00:00+08:00",
+        "price": "1.12922",
+        "right5_end": "2025-05-12T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1807,
+        "start": 1747213200000,
+        "time": "2025-05-14T17:00:00+08:00",
+        "price": "1.12653",
+        "right5_end": "2025-05-15T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1825,
+        "start": 1747645200000,
+        "time": "2025-05-19T17:00:00+08:00",
+        "price": "1.12876",
+        "right5_end": "2025-05-20T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1839,
+        "start": 1747846800000,
+        "time": "2025-05-22T01:00:00+08:00",
+        "price": "1.13621",
+        "right5_end": "2025-05-23T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1853,
+        "start": 1748221200000,
+        "time": "2025-05-26T09:00:00+08:00",
+        "price": "1.14182",
+        "right5_end": "2025-05-27T09:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1877,
+        "start": 1748566800000,
+        "time": "2025-05-30T09:00:00+08:00",
+        "price": "1.13892",
+        "right5_end": "2025-06-02T09:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1888,
+        "start": 1748898000000,
+        "time": "2025-06-03T05:00:00+08:00",
+        "price": "1.14540",
+        "right5_end": "2025-06-04T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1904,
+        "start": 1749128400000,
+        "time": "2025-06-05T21:00:00+08:00",
+        "price": "1.14944",
+        "right5_end": "2025-06-06T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1915,
+        "start": 1749459600000,
+        "time": "2025-06-09T17:00:00+08:00",
+        "price": "1.14386",
+        "right5_end": "2025-06-10T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1933,
+        "start": 1749718800000,
+        "time": "2025-06-12T17:00:00+08:00",
+        "price": "1.16312",
+        "right5_end": "2025-06-13T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1946,
+        "start": 1750078800000,
+        "time": "2025-06-16T21:00:00+08:00",
+        "price": "1.16140",
+        "right5_end": "2025-06-17T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1958,
+        "start": 1750251600000,
+        "time": "2025-06-18T21:00:00+08:00",
+        "price": "1.15294",
+        "right5_end": "2025-06-19T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1982,
+        "start": 1750770000000,
+        "time": "2025-06-24T21:00:00+08:00",
+        "price": "1.16409",
+        "right5_end": "2025-06-25T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1992,
+        "start": 1750914000000,
+        "time": "2025-06-26T13:00:00+08:00",
+        "price": "1.17446",
+        "right5_end": "2025-06-27T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2000,
+        "start": 1751029200000,
+        "time": "2025-06-27T21:00:00+08:00",
+        "price": "1.17531",
+        "right5_end": "2025-06-30T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2011,
+        "start": 1751360400000,
+        "time": "2025-07-01T17:00:00+08:00",
+        "price": "1.18292",
+        "right5_end": "2025-07-02T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2032,
+        "start": 1751835600000,
+        "time": "2025-07-07T05:00:00+08:00",
+        "price": "1.17895",
+        "right5_end": "2025-07-08T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2040,
+        "start": 1751950800000,
+        "time": "2025-07-08T13:00:00+08:00",
+        "price": "1.17645",
+        "right5_end": "2025-07-09T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2050,
+        "start": 1752094800000,
+        "time": "2025-07-10T05:00:00+08:00",
+        "price": "1.17490",
+        "right5_end": "2025-07-11T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2060,
+        "start": 1752238800000,
+        "time": "2025-07-11T21:00:00+08:00",
+        "price": "1.17133",
+        "right5_end": "2025-07-14T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2078,
+        "start": 1752670800000,
+        "time": "2025-07-16T21:00:00+08:00",
+        "price": "1.17209",
+        "right5_end": "2025-07-17T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2096,
+        "start": 1753102800000,
+        "time": "2025-07-21T21:00:00+08:00",
+        "price": "1.17160",
+        "right5_end": "2025-07-22T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2102,
+        "start": 1753189200000,
+        "time": "2025-07-22T21:00:00+08:00",
+        "price": "1.17601",
+        "right5_end": "2025-07-23T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2114,
+        "start": 1753362000000,
+        "time": "2025-07-24T21:00:00+08:00",
+        "price": "1.17880",
+        "right5_end": "2025-07-25T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2122,
+        "start": 1753650000000,
+        "time": "2025-07-28T05:00:00+08:00",
+        "price": "1.17699",
+        "right5_end": "2025-07-29T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2172,
+        "start": 1754542800000,
+        "time": "2025-08-07T13:00:00+08:00",
+        "price": "1.16980",
+        "right5_end": "2025-08-08T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2183,
+        "start": 1754874000000,
+        "time": "2025-08-11T09:00:00+08:00",
+        "price": "1.16748",
+        "right5_end": "2025-08-12T09:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2197,
+        "start": 1755075600000,
+        "time": "2025-08-13T17:00:00+08:00",
+        "price": "1.17295",
+        "right5_end": "2025-08-14T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2212,
+        "start": 1755464400000,
+        "time": "2025-08-18T05:00:00+08:00",
+        "price": "1.17153",
+        "right5_end": "2025-08-19T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2221,
+        "start": 1755594000000,
+        "time": "2025-08-19T17:00:00+08:00",
+        "price": "1.16921",
+        "right5_end": "2025-08-20T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2241,
+        "start": 1755882000000,
+        "time": "2025-08-23T01:00:00+08:00",
+        "price": "1.17419",
+        "right5_end": "2025-08-26T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2252,
+        "start": 1756213200000,
+        "time": "2025-08-26T21:00:00+08:00",
+        "price": "1.16646",
+        "right5_end": "2025-08-27T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2274,
+        "start": 1756702800000,
+        "time": "2025-09-01T13:00:00+08:00",
+        "price": "1.17357",
+        "right5_end": "2025-09-02T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2288,
+        "start": 1756904400000,
+        "time": "2025-09-03T21:00:00+08:00",
+        "price": "1.16814",
+        "right5_end": "2025-09-04T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2300,
+        "start": 1757077200000,
+        "time": "2025-09-05T21:00:00+08:00",
+        "price": "1.17587",
+        "right5_end": "2025-09-08T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2310,
+        "start": 1757394000000,
+        "time": "2025-09-09T13:00:00+08:00",
+        "price": "1.17794",
+        "right5_end": "2025-09-10T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2318,
+        "start": 1757509200000,
+        "time": "2025-09-10T21:00:00+08:00",
+        "price": "1.17303",
+        "right5_end": "2025-09-11T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2328,
+        "start": 1757653200000,
+        "time": "2025-09-12T13:00:00+08:00",
+        "price": "1.17470",
+        "right5_end": "2025-09-15T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2343,
+        "start": 1758042000000,
+        "time": "2025-09-17T01:00:00+08:00",
+        "price": "1.18776",
+        "right5_end": "2025-09-18T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2349,
+        "start": 1758128400000,
+        "time": "2025-09-18T01:00:00+08:00",
+        "price": "1.19180",
+        "right5_end": "2025-09-19T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2369,
+        "start": 1758589200000,
+        "time": "2025-09-23T09:00:00+08:00",
+        "price": "1.18193",
+        "right5_end": "2025-09-24T09:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2383,
+        "start": 1758790800000,
+        "time": "2025-09-25T17:00:00+08:00",
+        "price": "1.17532",
+        "right5_end": "2025-09-26T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2400,
+        "start": 1759208400000,
+        "time": "2025-09-30T13:00:00+08:00",
+        "price": "1.17609",
+        "right5_end": "2025-10-01T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2406,
+        "start": 1759294800000,
+        "time": "2025-10-01T13:00:00+08:00",
+        "price": "1.17780",
+        "right5_end": "2025-10-02T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2420,
+        "start": 1759496400000,
+        "time": "2025-10-03T21:00:00+08:00",
+        "price": "1.17586",
+        "right5_end": "2025-10-06T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2442,
+        "start": 1759986000000,
+        "time": "2025-10-09T13:00:00+08:00",
+        "price": "1.16475",
+        "right5_end": "2025-10-10T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2450,
+        "start": 1760101200000,
+        "time": "2025-10-10T21:00:00+08:00",
+        "price": "1.16299",
+        "right5_end": "2025-10-13T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2478,
+        "start": 1760677200000,
+        "time": "2025-10-17T13:00:00+08:00",
+        "price": "1.17277",
+        "right5_end": "2025-10-20T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2498,
+        "start": 1761138000000,
+        "time": "2025-10-22T21:00:00+08:00",
+        "price": "1.16217",
+        "right5_end": "2025-10-23T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2509,
+        "start": 1761296400000,
+        "time": "2025-10-24T17:00:00+08:00",
+        "price": "1.16481",
+        "right5_end": "2025-10-27T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2523,
+        "start": 1761670800000,
+        "time": "2025-10-29T01:00:00+08:00",
+        "price": "1.16679",
+        "right5_end": "2025-10-30T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2570,
+        "start": 1762524000000,
+        "time": "2025-11-07T22:00:00+08:00",
+        "price": "1.15903",
+        "right5_end": "2025-11-10T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2581,
+        "start": 1762855200000,
+        "time": "2025-11-11T18:00:00+08:00",
+        "price": "1.16051",
+        "right5_end": "2025-11-12T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2594,
+        "start": 1763042400000,
+        "time": "2025-11-13T22:00:00+08:00",
+        "price": "1.16553",
+        "right5_end": "2025-11-14T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2612,
+        "start": 1763474400000,
+        "time": "2025-11-18T22:00:00+08:00",
+        "price": "1.16071",
+        "right5_end": "2025-11-19T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2628,
+        "start": 1763704800000,
+        "time": "2025-11-21T14:00:00+08:00",
+        "price": "1.15517",
+        "right5_end": "2025-11-24T14:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2635,
+        "start": 1763978400000,
+        "time": "2025-11-24T18:00:00+08:00",
+        "price": "1.15497",
+        "right5_end": "2025-11-25T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2651,
+        "start": 1764208800000,
+        "time": "2025-11-27T10:00:00+08:00",
+        "price": "1.16127",
+        "right5_end": "2025-11-28T10:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2665,
+        "start": 1764583200000,
+        "time": "2025-12-01T18:00:00+08:00",
+        "price": "1.16519",
+        "right5_end": "2025-12-02T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2682,
+        "start": 1764828000000,
+        "time": "2025-12-04T14:00:00+08:00",
+        "price": "1.16812",
+        "right5_end": "2025-12-05T14:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2694,
+        "start": 1765173600000,
+        "time": "2025-12-08T14:00:00+08:00",
+        "price": "1.16713",
+        "right5_end": "2025-12-09T14:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2714,
+        "start": 1765461600000,
+        "time": "2025-12-11T22:00:00+08:00",
+        "price": "1.17621",
+        "right5_end": "2025-12-12T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2732,
+        "start": 1765893600000,
+        "time": "2025-12-16T22:00:00+08:00",
+        "price": "1.18034",
+        "right5_end": "2025-12-17T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2743,
+        "start": 1766052000000,
+        "time": "2025-12-18T18:00:00+08:00",
+        "price": "1.17621",
+        "right5_end": "2025-12-19T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2765,
+        "start": 1766541600000,
+        "time": "2025-12-24T10:00:00+08:00",
+        "price": "1.18072",
+        "right5_end": "2025-12-26T10:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2773,
+        "start": 1766743200000,
+        "time": "2025-12-26T18:00:00+08:00",
+        "price": "1.17959",
+        "right5_end": "2025-12-29T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2795,
+        "start": 1767319200000,
+        "time": "2026-01-02T10:00:00+08:00",
+        "price": "1.17642",
+        "right5_end": "2026-01-05T10:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2808,
+        "start": 1767679200000,
+        "time": "2026-01-06T14:00:00+08:00",
+        "price": "1.17421",
+        "right5_end": "2026-01-07T14:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2833,
+        "start": 1768212000000,
+        "time": "2026-01-12T18:00:00+08:00",
+        "price": "1.16978",
+        "right5_end": "2026-01-13T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2846,
+        "start": 1768399200000,
+        "time": "2026-01-14T22:00:00+08:00",
+        "price": "1.16609",
+        "right5_end": "2026-01-15T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2869,
+        "start": 1768903200000,
+        "time": "2026-01-20T18:00:00+08:00",
+        "price": "1.17684",
+        "right5_end": "2026-01-21T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2875,
+        "start": 1768989600000,
+        "time": "2026-01-21T18:00:00+08:00",
+        "price": "1.17422",
+        "right5_end": "2026-01-22T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2901,
+        "start": 1769536800000,
+        "time": "2026-01-28T02:00:00+08:00",
+        "price": "1.20821",
+        "right5_end": "2026-01-29T02:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2910,
+        "start": 1769666400000,
+        "time": "2026-01-29T14:00:00+08:00",
+        "price": "1.19959",
+        "right5_end": "2026-01-30T14:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2934,
+        "start": 1770184800000,
+        "time": "2026-02-04T14:00:00+08:00",
+        "price": "1.18372",
+        "right5_end": "2026-02-05T14:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2942,
+        "start": 1770300000000,
+        "time": "2026-02-05T22:00:00+08:00",
+        "price": "1.18211",
+        "right5_end": "2026-02-06T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2954,
+        "start": 1770645600000,
+        "time": "2026-02-09T22:00:00+08:00",
+        "price": "1.19260",
+        "right5_end": "2026-02-10T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2960,
+        "start": 1770732000000,
+        "time": "2026-02-10T22:00:00+08:00",
+        "price": "1.19280",
+        "right5_end": "2026-02-11T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2992,
+        "start": 1771365600000,
+        "time": "2026-02-18T06:00:00+08:00",
+        "price": "1.18569",
+        "right5_end": "2026-02-19T06:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3010,
+        "start": 1771797600000,
+        "time": "2026-02-23T06:00:00+08:00",
+        "price": "1.18340",
+        "right5_end": "2026-02-24T06:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3038,
+        "start": 1772200800000,
+        "time": "2026-02-27T22:00:00+08:00",
+        "price": "1.18262",
+        "right5_end": "2026-03-02T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3055,
+        "start": 1772618400000,
+        "time": "2026-03-04T18:00:00+08:00",
+        "price": "1.16541",
+        "right5_end": "2026-03-05T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3069,
+        "start": 1772820000000,
+        "time": "2026-03-07T02:00:00+08:00",
+        "price": "1.16207",
+        "right5_end": "2026-03-10T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3081,
+        "start": 1773162000000,
+        "time": "2026-03-11T01:00:00+08:00",
+        "price": "1.16665",
+        "right5_end": "2026-03-12T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3115,
+        "start": 1773824400000,
+        "time": "2026-03-18T17:00:00+08:00",
+        "price": "1.15545",
+        "right5_end": "2026-03-19T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3123,
+        "start": 1773939600000,
+        "time": "2026-03-20T01:00:00+08:00",
+        "price": "1.16155",
+        "right5_end": "2026-03-21T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3134,
+        "start": 1774270800000,
+        "time": "2026-03-23T21:00:00+08:00",
+        "price": "1.16391",
+        "right5_end": "2026-03-24T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3142,
+        "start": 1774386000000,
+        "time": "2026-03-25T05:00:00+08:00",
+        "price": "1.16298",
+        "right5_end": "2026-03-26T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3176,
+        "start": 1775048400000,
+        "time": "2026-04-01T21:00:00+08:00",
+        "price": "1.16264",
+        "right5_end": "2026-04-02T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3206,
+        "start": 1775653200000,
+        "time": "2026-04-08T21:00:00+08:00",
+        "price": "1.17210",
+        "right5_end": "2026-04-09T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3218,
+        "start": 1775826000000,
+        "time": "2026-04-10T21:00:00+08:00",
+        "price": "1.17388",
+        "right5_end": "2026-04-13T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3230,
+        "start": 1776171600000,
+        "time": "2026-04-14T21:00:00+08:00",
+        "price": "1.18104",
+        "right5_end": "2026-04-15T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3239,
+        "start": 1776301200000,
+        "time": "2026-04-16T09:00:00+08:00",
+        "price": "1.18231",
+        "right5_end": "2026-04-17T09:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3248,
+        "start": 1776430800000,
+        "time": "2026-04-17T21:00:00+08:00",
+        "price": "1.18485",
+        "right5_end": "2026-04-20T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3256,
+        "start": 1776718800000,
+        "time": "2026-04-21T05:00:00+08:00",
+        "price": "1.17903",
+        "right5_end": "2026-04-22T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3283,
+        "start": 1777280400000,
+        "time": "2026-04-27T17:00:00+08:00",
+        "price": "1.17543",
+        "right5_end": "2026-04-28T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3292,
+        "start": 1777410000000,
+        "time": "2026-04-29T05:00:00+08:00",
+        "price": "1.17199",
+        "right5_end": "2026-04-30T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3308,
+        "start": 1777640400000,
+        "time": "2026-05-01T21:00:00+08:00",
+        "price": "1.17845",
+        "right5_end": "2026-05-04T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3325,
+        "start": 1778058000000,
+        "time": "2026-05-06T17:00:00+08:00",
+        "price": "1.17959",
+        "right5_end": "2026-05-07T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3331,
+        "start": 1778144400000,
+        "time": "2026-05-07T17:00:00+08:00",
+        "price": "1.17775",
+        "right5_end": "2026-05-08T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3339,
+        "start": 1778259600000,
+        "time": "2026-05-09T01:00:00+08:00",
+        "price": "1.17872",
+        "right5_end": "2026-05-12T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3360,
+        "start": 1778734800000,
+        "time": "2026-05-14T13:00:00+08:00",
+        "price": "1.17208",
+        "right5_end": "2026-05-15T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3376,
+        "start": 1779138000000,
+        "time": "2026-05-19T05:00:00+08:00",
+        "price": "1.16609",
+        "right5_end": "2026-05-20T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3386,
+        "start": 1779282000000,
+        "time": "2026-05-20T21:00:00+08:00",
+        "price": "1.16445",
+        "right5_end": "2026-05-21T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3403,
+        "start": 1779699600000,
+        "time": "2026-05-25T17:00:00+08:00",
+        "price": "1.16520",
+        "right5_end": "2026-05-26T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3415,
+        "start": 1779872400000,
+        "time": "2026-05-27T17:00:00+08:00",
+        "price": "1.16606",
+        "right5_end": "2026-05-28T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3422,
+        "start": 1779973200000,
+        "time": "2026-05-28T21:00:00+08:00",
+        "price": "1.16606",
+        "right5_end": "2026-05-29T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3428,
+        "start": 1780059600000,
+        "time": "2026-05-29T21:00:00+08:00",
+        "price": "1.16851",
+        "right5_end": "2026-06-01T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3439,
+        "start": 1780390800000,
+        "time": "2026-06-02T17:00:00+08:00",
+        "price": "1.16550",
+        "right5_end": "2026-06-03T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3451,
+        "start": 1780563600000,
+        "time": "2026-06-04T17:00:00+08:00",
+        "price": "1.16448",
+        "right5_end": "2026-06-05T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3457,
+        "start": 1780650000000,
+        "time": "2026-06-05T17:00:00+08:00",
+        "price": "1.16438",
+        "right5_end": "2026-06-08T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3470,
+        "start": 1781010000000,
+        "time": "2026-06-09T21:00:00+08:00",
+        "price": "1.15773",
+        "right5_end": "2026-06-10T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3476,
+        "start": 1781096400000,
+        "time": "2026-06-10T21:00:00+08:00",
+        "price": "1.15724",
+        "right5_end": "2026-06-11T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3483,
+        "start": 1781197200000,
+        "time": "2026-06-12T01:00:00+08:00",
+        "price": "1.15891",
+        "right5_end": "2026-06-13T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3492,
+        "start": 1781499600000,
+        "time": "2026-06-15T13:00:00+08:00",
+        "price": "1.16214",
+        "right5_end": "2026-06-16T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3500,
+        "start": 1781614800000,
+        "time": "2026-06-16T21:00:00+08:00",
+        "price": "1.16189",
+        "right5_end": "2026-06-17T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3519,
+        "start": 1781888400000,
+        "time": "2026-06-20T01:00:00+08:00",
+        "price": "1.14799",
+        "right5_end": "2026-06-23T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3547,
+        "start": 1782464400000,
+        "time": "2026-06-26T17:00:00+08:00",
+        "price": "1.14331",
+        "right5_end": "2026-06-29T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3554,
+        "start": 1782738000000,
+        "time": "2026-06-29T21:00:00+08:00",
+        "price": "1.14299",
+        "right5_end": "2026-06-30T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3560,
+        "start": 1782824400000,
+        "time": "2026-06-30T21:00:00+08:00",
+        "price": "1.14359",
+        "right5_end": "2026-07-01T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3571,
+        "start": 1782982800000,
+        "time": "2026-07-02T17:00:00+08:00",
+        "price": "1.14721",
+        "right5_end": "2026-07-03T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3586,
+        "start": 1783371600000,
+        "time": "2026-07-07T05:00:00+08:00",
+        "price": "1.14473",
+        "right5_end": "2026-07-08T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3605,
+        "start": 1783645200000,
+        "time": "2026-07-10T09:00:00+08:00",
+        "price": "1.14601",
+        "right5_end": "2026-07-13T09:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3612,
+        "start": 1783918800000,
+        "time": "2026-07-13T13:00:00+08:00",
+        "price": "1.14450",
+        "right5_end": "2026-07-14T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3619,
+        "start": 1784019600000,
+        "time": "2026-07-14T17:00:00+08:00",
+        "price": "1.14618",
+        "right5_end": "2026-07-15T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3627,
+        "start": 1784134800000,
+        "time": "2026-07-16T01:00:00+08:00",
+        "price": "1.14817",
+        "right5_end": "2026-07-17T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3642,
+        "start": 1784523600000,
+        "time": "2026-07-20T13:00:00+08:00",
+        "price": "1.14488",
+        "right5_end": "2026-07-21T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3649,
+        "start": 1784624400000,
+        "time": "2026-07-21T17:00:00+08:00",
+        "price": "1.14279",
+        "right5_end": "2026-07-22T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3659,
+        "start": 1784768400000,
+        "time": "2026-07-23T09:00:00+08:00",
+        "price": "1.14350",
+        "right5_end": "2026-07-24T09:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3672,
+        "start": 1785128400000,
+        "time": "2026-07-27T13:00:00+08:00",
+        "price": "1.14176",
+        "right5_end": "2026-07-28T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3680,
+        "start": 1785243600000,
+        "time": "2026-07-28T21:00:00+08:00",
+        "price": "1.14046",
+        "right5_end": "2026-07-29T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3692,
+        "start": 1785416400000,
+        "time": "2026-07-30T21:00:00+08:00",
+        "price": "1.15362",
+        "right5_end": "2026-07-31T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3700,
+        "start": 1785704400000,
+        "time": "2026-08-03T05:00:00+08:00",
+        "price": "1.15581",
+        "right5_end": "2026-08-04T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3718,
+        "start": 1785963600000,
+        "time": "2026-08-06T05:00:00+08:00",
+        "price": "1.15589",
+        "right5_end": "2026-08-07T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3727,
+        "start": 1786093200000,
+        "time": "2026-08-07T17:00:00+08:00",
+        "price": "1.15801",
+        "right5_end": "2026-08-10T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3745,
+        "start": 1786525200000,
+        "time": "2026-08-12T17:00:00+08:00",
+        "price": "1.15623",
+        "right5_end": "2026-08-13T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3762,
+        "start": 1786942800000,
+        "time": "2026-08-17T13:00:00+08:00",
+        "price": "1.16134",
+        "right5_end": "2026-08-18T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3781,
+        "start": 1787216400000,
+        "time": "2026-08-20T17:00:00+08:00",
+        "price": "1.17097",
+        "right5_end": "2026-08-21T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3787,
+        "start": 1787302800000,
+        "time": "2026-08-21T17:00:00+08:00",
+        "price": "1.17109",
+        "right5_end": "2026-08-24T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3801,
+        "start": 1787677200000,
+        "time": "2026-08-26T01:00:00+08:00",
+        "price": "1.16790",
+        "right5_end": "2026-08-27T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3812,
+        "start": 1787835600000,
+        "time": "2026-08-27T21:00:00+08:00",
+        "price": "1.16592",
+        "right5_end": "2026-08-28T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3818,
+        "start": 1787922000000,
+        "time": "2026-08-28T21:00:00+08:00",
+        "price": "1.16583",
+        "right5_end": "2026-08-31T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3826,
+        "start": 1788210000000,
+        "time": "2026-09-01T05:00:00+08:00",
+        "price": "1.16238",
+        "right5_end": "2026-09-02T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3842,
+        "start": 1788440400000,
+        "time": "2026-09-03T21:00:00+08:00",
+        "price": "1.16406",
+        "right5_end": "2026-09-04T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3852,
+        "start": 1788757200000,
+        "time": "2026-09-07T13:00:00+08:00",
+        "price": "1.16352",
+        "right5_end": "2026-09-08T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3858,
+        "start": 1788843600000,
+        "time": "2026-09-08T13:00:00+08:00",
+        "price": "1.16352",
+        "right5_end": "2026-09-09T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3865,
+        "start": 1788944400000,
+        "time": "2026-09-09T17:00:00+08:00",
+        "price": "1.16536",
+        "right5_end": "2026-09-10T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3894,
+        "start": 1789534800000,
+        "time": "2026-09-16T13:00:00+08:00",
+        "price": "1.15558",
+        "right5_end": "2026-09-17T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3913,
+        "start": 1789981200000,
+        "time": "2026-09-21T17:00:00+08:00",
+        "price": "1.14950",
+        "right5_end": "2026-09-22T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3938,
+        "start": 1790341200000,
+        "time": "2026-09-25T21:00:00+08:00",
+        "price": "1.14104",
+        "right5_end": "2026-09-28T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3955,
+        "start": 1790758800000,
+        "time": "2026-09-30T17:00:00+08:00",
+        "price": "1.13796",
+        "right5_end": "2026-10-01T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3968,
+        "start": 1790946000000,
+        "time": "2026-10-02T21:00:00+08:00",
+        "price": "1.12847",
+        "right5_end": "2026-10-05T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3979,
+        "start": 1791277200000,
+        "time": "2026-10-06T17:00:00+08:00",
+        "price": "1.12760",
+        "right5_end": "2026-10-07T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3996,
+        "start": 1791522000000,
+        "time": "2026-10-09T13:00:00+08:00",
+        "price": "1.12420",
+        "right5_end": "2026-10-12T13:00:00+08:00",
+        "right5_complete": false
+      }
+    ],
+    "low": [
+      {
+        "index": 13,
+        "start": 1710838800000,
+        "time": "2024-03-19T17:00:00+08:00",
+        "price": "1.08340",
+        "right5_end": "2024-03-20T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 19,
+        "start": 1710925200000,
+        "time": "2024-03-20T17:00:00+08:00",
+        "price": "1.08358",
+        "right5_end": "2024-03-21T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 33,
+        "start": 1711126800000,
+        "time": "2024-03-23T01:00:00+08:00",
+        "price": "1.08010",
+        "right5_end": "2024-03-26T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 60,
+        "start": 1711688400000,
+        "time": "2024-03-29T13:00:00+08:00",
+        "price": "1.07671",
+        "right5_end": "2024-04-01T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 72,
+        "start": 1712034000000,
+        "time": "2024-04-02T13:00:00+08:00",
+        "price": "1.07238",
+        "right5_end": "2024-04-03T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 92,
+        "start": 1712322000000,
+        "time": "2024-04-05T21:00:00+08:00",
+        "price": "1.07907",
+        "right5_end": "2024-04-08T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 122,
+        "start": 1712926800000,
+        "time": "2024-04-12T21:00:00+08:00",
+        "price": "1.06220",
+        "right5_end": "2024-04-15T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 135,
+        "start": 1713286800000,
+        "time": "2024-04-17T01:00:00+08:00",
+        "price": "1.06004",
+        "right5_end": "2024-04-18T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 149,
+        "start": 1713488400000,
+        "time": "2024-04-19T09:00:00+08:00",
+        "price": "1.06097",
+        "right5_end": "2024-04-22T09:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 158,
+        "start": 1713790800000,
+        "time": "2024-04-22T21:00:00+08:00",
+        "price": "1.06233",
+        "right5_end": "2024-04-23T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 176,
+        "start": 1714050000000,
+        "time": "2024-04-25T21:00:00+08:00",
+        "price": "1.06776",
+        "right5_end": "2024-04-26T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 182,
+        "start": 1714136400000,
+        "time": "2024-04-26T21:00:00+08:00",
+        "price": "1.06733",
+        "right5_end": "2024-04-29T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 198,
+        "start": 1714539600000,
+        "time": "2024-05-01T13:00:00+08:00",
+        "price": "1.06486",
+        "right5_end": "2024-05-02T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 228,
+        "start": 1715144400000,
+        "time": "2024-05-08T13:00:00+08:00",
+        "price": "1.07342",
+        "right5_end": "2024-05-09T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 235,
+        "start": 1715245200000,
+        "time": "2024-05-09T17:00:00+08:00",
+        "price": "1.07233",
+        "right5_end": "2024-05-10T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 242,
+        "start": 1715346000000,
+        "time": "2024-05-10T21:00:00+08:00",
+        "price": "1.07596",
+        "right5_end": "2024-05-13T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 253,
+        "start": 1715677200000,
+        "time": "2024-05-14T17:00:00+08:00",
+        "price": "1.07663",
+        "right5_end": "2024-05-15T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 271,
+        "start": 1715936400000,
+        "time": "2024-05-17T17:00:00+08:00",
+        "price": "1.08351",
+        "right5_end": "2024-05-20T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 297,
+        "start": 1716483600000,
+        "time": "2024-05-24T01:00:00+08:00",
+        "price": "1.08041",
+        "right5_end": "2024-05-25T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 307,
+        "start": 1716800400000,
+        "time": "2024-05-27T17:00:00+08:00",
+        "price": "1.08398",
+        "right5_end": "2024-05-28T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 324,
+        "start": 1717045200000,
+        "time": "2024-05-30T13:00:00+08:00",
+        "price": "1.07875",
+        "right5_end": "2024-05-31T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 337,
+        "start": 1717405200000,
+        "time": "2024-06-03T17:00:00+08:00",
+        "price": "1.08271",
+        "right5_end": "2024-06-04T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 350,
+        "start": 1717592400000,
+        "time": "2024-06-05T21:00:00+08:00",
+        "price": "1.08538",
+        "right5_end": "2024-06-06T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 367,
+        "start": 1718010000000,
+        "time": "2024-06-10T17:00:00+08:00",
+        "price": "1.07321",
+        "right5_end": "2024-06-11T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 374,
+        "start": 1718110800000,
+        "time": "2024-06-11T21:00:00+08:00",
+        "price": "1.07189",
+        "right5_end": "2024-06-12T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 392,
+        "start": 1718370000000,
+        "time": "2024-06-14T21:00:00+08:00",
+        "price": "1.06668",
+        "right5_end": "2024-06-17T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 403,
+        "start": 1718701200000,
+        "time": "2024-06-18T17:00:00+08:00",
+        "price": "1.07094",
+        "right5_end": "2024-06-19T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 420,
+        "start": 1718946000000,
+        "time": "2024-06-21T13:00:00+08:00",
+        "price": "1.06702",
+        "right5_end": "2024-06-24T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 440,
+        "start": 1719406800000,
+        "time": "2024-06-26T21:00:00+08:00",
+        "price": "1.06653",
+        "right5_end": "2024-06-27T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 463,
+        "start": 1719910800000,
+        "time": "2024-07-02T17:00:00+08:00",
+        "price": "1.07092",
+        "right5_end": "2024-07-03T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 494,
+        "start": 1720530000000,
+        "time": "2024-07-09T21:00:00+08:00",
+        "price": "1.08047",
+        "right5_end": "2024-07-10T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 524,
+        "start": 1721134800000,
+        "time": "2024-07-16T21:00:00+08:00",
+        "price": "1.08708",
+        "right5_end": "2024-07-17T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 558,
+        "start": 1721797200000,
+        "time": "2024-07-24T13:00:00+08:00",
+        "price": "1.08248",
+        "right5_end": "2024-07-25T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 564,
+        "start": 1721883600000,
+        "time": "2024-07-25T13:00:00+08:00",
+        "price": "1.08276",
+        "right5_end": "2024-07-26T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 584,
+        "start": 1722344400000,
+        "time": "2024-07-30T21:00:00+08:00",
+        "price": "1.07974",
+        "right5_end": "2024-07-31T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 595,
+        "start": 1722502800000,
+        "time": "2024-08-01T17:00:00+08:00",
+        "price": "1.07767",
+        "right5_end": "2024-08-02T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 613,
+        "start": 1722934800000,
+        "time": "2024-08-06T17:00:00+08:00",
+        "price": "1.09031",
+        "right5_end": "2024-08-07T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 626,
+        "start": 1723122000000,
+        "time": "2024-08-08T21:00:00+08:00",
+        "price": "1.08807",
+        "right5_end": "2024-08-09T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 643,
+        "start": 1723539600000,
+        "time": "2024-08-13T17:00:00+08:00",
+        "price": "1.09130",
+        "right5_end": "2024-08-14T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 656,
+        "start": 1723726800000,
+        "time": "2024-08-15T21:00:00+08:00",
+        "price": "1.09489",
+        "right5_end": "2024-08-16T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 680,
+        "start": 1724245200000,
+        "time": "2024-08-21T21:00:00+08:00",
+        "price": "1.10983",
+        "right5_end": "2024-08-22T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 686,
+        "start": 1724331600000,
+        "time": "2024-08-22T21:00:00+08:00",
+        "price": "1.10974",
+        "right5_end": "2024-08-23T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 716,
+        "start": 1724936400000,
+        "time": "2024-08-29T21:00:00+08:00",
+        "price": "1.10549",
+        "right5_end": "2024-08-30T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 724,
+        "start": 1725224400000,
+        "time": "2024-09-02T05:00:00+08:00",
+        "price": "1.10412",
+        "right5_end": "2024-09-03T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 735,
+        "start": 1725382800000,
+        "time": "2024-09-04T01:00:00+08:00",
+        "price": "1.10256",
+        "right5_end": "2024-09-05T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 770,
+        "start": 1726059600000,
+        "time": "2024-09-11T21:00:00+08:00",
+        "price": "1.10012",
+        "right5_end": "2024-09-12T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 803,
+        "start": 1726707600000,
+        "time": "2024-09-19T09:00:00+08:00",
+        "price": "1.10678",
+        "right5_end": "2024-09-20T09:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 816,
+        "start": 1727067600000,
+        "time": "2024-09-23T13:00:00+08:00",
+        "price": "1.10823",
+        "right5_end": "2024-09-24T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 831,
+        "start": 1727283600000,
+        "time": "2024-09-26T01:00:00+08:00",
+        "price": "1.11208",
+        "right5_end": "2024-09-27T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 840,
+        "start": 1727413200000,
+        "time": "2024-09-27T13:00:00+08:00",
+        "price": "1.11240",
+        "right5_end": "2024-09-30T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 872,
+        "start": 1728046800000,
+        "time": "2024-10-04T21:00:00+08:00",
+        "price": "1.09506",
+        "right5_end": "2024-10-07T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 897,
+        "start": 1728579600000,
+        "time": "2024-10-11T01:00:00+08:00",
+        "price": "1.08994",
+        "right5_end": "2024-10-12T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 926,
+        "start": 1729170000000,
+        "time": "2024-10-17T21:00:00+08:00",
+        "price": "1.08103",
+        "right5_end": "2024-10-18T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 949,
+        "start": 1729674000000,
+        "time": "2024-10-23T17:00:00+08:00",
+        "price": "1.07605",
+        "right5_end": "2024-10-24T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 974,
+        "start": 1730206800000,
+        "time": "2024-10-29T21:00:00+08:00",
+        "price": "1.07681",
+        "right5_end": "2024-10-30T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 993,
+        "start": 1730480400000,
+        "time": "2024-11-02T01:00:00+08:00",
+        "price": "1.08310",
+        "right5_end": "2024-11-05T02:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1000,
+        "start": 1730757600000,
+        "time": "2024-11-05T06:00:00+08:00",
+        "price": "1.08718",
+        "right5_end": "2024-11-06T06:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1009,
+        "start": 1730887200000,
+        "time": "2024-11-06T18:00:00+08:00",
+        "price": "1.06818",
+        "right5_end": "2024-11-07T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1045,
+        "start": 1731578400000,
+        "time": "2024-11-14T18:00:00+08:00",
+        "price": "1.04956",
+        "right5_end": "2024-11-15T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1053,
+        "start": 1731693600000,
+        "time": "2024-11-16T02:00:00+08:00",
+        "price": "1.05157",
+        "right5_end": "2024-11-19T02:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1062,
+        "start": 1731996000000,
+        "time": "2024-11-19T14:00:00+08:00",
+        "price": "1.05225",
+        "right5_end": "2024-11-20T14:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1070,
+        "start": 1732111200000,
+        "time": "2024-11-20T22:00:00+08:00",
+        "price": "1.05060",
+        "right5_end": "2024-11-21T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1080,
+        "start": 1732255200000,
+        "time": "2024-11-22T14:00:00+08:00",
+        "price": "1.03309",
+        "right5_end": "2024-11-25T14:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1090,
+        "start": 1732572000000,
+        "time": "2024-11-26T06:00:00+08:00",
+        "price": "1.04242",
+        "right5_end": "2024-11-27T06:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1118,
+        "start": 1733148000000,
+        "time": "2024-12-02T22:00:00+08:00",
+        "price": "1.04597",
+        "right5_end": "2024-12-03T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1130,
+        "start": 1733320800000,
+        "time": "2024-12-04T22:00:00+08:00",
+        "price": "1.04715",
+        "right5_end": "2024-12-05T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1145,
+        "start": 1733709600000,
+        "time": "2024-12-09T10:00:00+08:00",
+        "price": "1.05314",
+        "right5_end": "2024-12-10T10:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1170,
+        "start": 1734069600000,
+        "time": "2024-12-13T14:00:00+08:00",
+        "price": "1.04525",
+        "right5_end": "2024-12-16T14:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1178,
+        "start": 1734357600000,
+        "time": "2024-12-16T22:00:00+08:00",
+        "price": "1.04738",
+        "right5_end": "2024-12-17T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1191,
+        "start": 1734544800000,
+        "time": "2024-12-19T02:00:00+08:00",
+        "price": "1.03432",
+        "right5_end": "2024-12-20T02:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1200,
+        "start": 1734674400000,
+        "time": "2024-12-20T14:00:00+08:00",
+        "price": "1.03422",
+        "right5_end": "2024-12-23T14:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1208,
+        "start": 1734962400000,
+        "time": "2024-12-23T22:00:00+08:00",
+        "price": "1.03836",
+        "right5_end": "2024-12-24T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1214,
+        "start": 1735048800000,
+        "time": "2024-12-24T22:00:00+08:00",
+        "price": "1.03829",
+        "right5_end": "2024-12-26T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1232,
+        "start": 1735567200000,
+        "time": "2024-12-30T22:00:00+08:00",
+        "price": "1.03710",
+        "right5_end": "2024-12-31T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1244,
+        "start": 1735826400000,
+        "time": "2025-01-02T22:00:00+08:00",
+        "price": "1.02232",
+        "right5_end": "2025-01-03T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1267,
+        "start": 1736330400000,
+        "time": "2025-01-08T18:00:00+08:00",
+        "price": "1.02724",
+        "right5_end": "2025-01-09T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1284,
+        "start": 1736748000000,
+        "time": "2025-01-13T14:00:00+08:00",
+        "price": "1.01771",
+        "right5_end": "2025-01-14T14:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1298,
+        "start": 1736949600000,
+        "time": "2025-01-15T22:00:00+08:00",
+        "price": "1.02572",
+        "right5_end": "2025-01-16T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1310,
+        "start": 1737122400000,
+        "time": "2025-01-17T22:00:00+08:00",
+        "price": "1.02645",
+        "right5_end": "2025-01-20T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1334,
+        "start": 1737640800000,
+        "time": "2025-01-23T22:00:00+08:00",
+        "price": "1.03713",
+        "right5_end": "2025-01-24T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1357,
+        "start": 1738144800000,
+        "time": "2025-01-29T18:00:00+08:00",
+        "price": "1.03815",
+        "right5_end": "2025-01-30T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1372,
+        "start": 1738533600000,
+        "time": "2025-02-03T06:00:00+08:00",
+        "price": "1.02094",
+        "right5_end": "2025-02-04T06:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1393,
+        "start": 1738836000000,
+        "time": "2025-02-06T18:00:00+08:00",
+        "price": "1.03518",
+        "right5_end": "2025-02-07T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1402,
+        "start": 1739138400000,
+        "time": "2025-02-10T06:00:00+08:00",
+        "price": "1.02788",
+        "right5_end": "2025-02-11T06:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1409,
+        "start": 1739239200000,
+        "time": "2025-02-11T10:00:00+08:00",
+        "price": "1.02914",
+        "right5_end": "2025-02-12T10:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1417,
+        "start": 1739354400000,
+        "time": "2025-02-12T18:00:00+08:00",
+        "price": "1.03162",
+        "right5_end": "2025-02-13T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1425,
+        "start": 1739469600000,
+        "time": "2025-02-14T02:00:00+08:00",
+        "price": "1.03722",
+        "right5_end": "2025-02-15T02:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1448,
+        "start": 1739973600000,
+        "time": "2025-02-19T22:00:00+08:00",
+        "price": "1.04001",
+        "right5_end": "2025-02-20T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1460,
+        "start": 1740146400000,
+        "time": "2025-02-21T22:00:00+08:00",
+        "price": "1.04486",
+        "right5_end": "2025-02-24T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1491,
+        "start": 1740765600000,
+        "time": "2025-03-01T02:00:00+08:00",
+        "price": "1.03593",
+        "right5_end": "2025-03-04T02:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1515,
+        "start": 1741284000000,
+        "time": "2025-03-07T02:00:00+08:00",
+        "price": "1.07650",
+        "right5_end": "2025-03-08T02:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1524,
+        "start": 1741582800000,
+        "time": "2025-03-10T13:00:00+08:00",
+        "price": "1.08042",
+        "right5_end": "2025-03-11T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1544,
+        "start": 1741870800000,
+        "time": "2025-03-13T21:00:00+08:00",
+        "price": "1.08218",
+        "right5_end": "2025-03-14T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1574,
+        "start": 1742475600000,
+        "time": "2025-03-20T21:00:00+08:00",
+        "price": "1.08139",
+        "right5_end": "2025-03-21T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1580,
+        "start": 1742562000000,
+        "time": "2025-03-21T21:00:00+08:00",
+        "price": "1.07962",
+        "right5_end": "2025-03-24T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1590,
+        "start": 1742878800000,
+        "time": "2025-03-25T13:00:00+08:00",
+        "price": "1.07763",
+        "right5_end": "2025-03-26T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1600,
+        "start": 1743022800000,
+        "time": "2025-03-27T05:00:00+08:00",
+        "price": "1.07322",
+        "right5_end": "2025-03-28T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1609,
+        "start": 1743152400000,
+        "time": "2025-03-28T17:00:00+08:00",
+        "price": "1.07638",
+        "right5_end": "2025-03-31T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1621,
+        "start": 1743498000000,
+        "time": "2025-04-01T17:00:00+08:00",
+        "price": "1.07775",
+        "right5_end": "2025-04-02T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1642,
+        "start": 1743973200000,
+        "time": "2025-04-07T05:00:00+08:00",
+        "price": "1.08787",
+        "right5_end": "2025-04-08T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1652,
+        "start": 1744117200000,
+        "time": "2025-04-08T21:00:00+08:00",
+        "price": "1.08875",
+        "right5_end": "2025-04-09T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1659,
+        "start": 1744218000000,
+        "time": "2025-04-10T01:00:00+08:00",
+        "price": "1.09125",
+        "right5_end": "2025-04-11T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1682,
+        "start": 1744722000000,
+        "time": "2025-04-15T21:00:00+08:00",
+        "price": "1.12633",
+        "right5_end": "2025-04-16T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1693,
+        "start": 1744880400000,
+        "time": "2025-04-17T17:00:00+08:00",
+        "price": "1.13344",
+        "right5_end": "2025-04-18T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1714,
+        "start": 1745355600000,
+        "time": "2025-04-23T05:00:00+08:00",
+        "price": "1.13072",
+        "right5_end": "2025-04-24T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1727,
+        "start": 1745542800000,
+        "time": "2025-04-25T09:00:00+08:00",
+        "price": "1.13148",
+        "right5_end": "2025-04-28T09:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1734,
+        "start": 1745816400000,
+        "time": "2025-04-28T13:00:00+08:00",
+        "price": "1.13287",
+        "right5_end": "2025-04-29T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1754,
+        "start": 1746104400000,
+        "time": "2025-05-01T21:00:00+08:00",
+        "price": "1.12651",
+        "right5_end": "2025-05-02T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1769,
+        "start": 1746493200000,
+        "time": "2025-05-06T09:00:00+08:00",
+        "price": "1.12790",
+        "right5_end": "2025-05-07T09:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1797,
+        "start": 1747069200000,
+        "time": "2025-05-13T01:00:00+08:00",
+        "price": "1.10646",
+        "right5_end": "2025-05-14T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1809,
+        "start": 1747242000000,
+        "time": "2025-05-15T01:00:00+08:00",
+        "price": "1.11639",
+        "right5_end": "2025-05-16T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1820,
+        "start": 1747400400000,
+        "time": "2025-05-16T21:00:00+08:00",
+        "price": "1.11303",
+        "right5_end": "2025-05-19T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1845,
+        "start": 1747933200000,
+        "time": "2025-05-23T01:00:00+08:00",
+        "price": "1.12549",
+        "right5_end": "2025-05-24T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1870,
+        "start": 1748466000000,
+        "time": "2025-05-29T05:00:00+08:00",
+        "price": "1.12096",
+        "right5_end": "2025-05-30T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1880,
+        "start": 1748610000000,
+        "time": "2025-05-30T21:00:00+08:00",
+        "price": "1.13118",
+        "right5_end": "2025-06-02T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1896,
+        "start": 1749013200000,
+        "time": "2025-06-04T13:00:00+08:00",
+        "price": "1.13564",
+        "right5_end": "2025-06-05T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1910,
+        "start": 1749214800000,
+        "time": "2025-06-06T21:00:00+08:00",
+        "price": "1.13709",
+        "right5_end": "2025-06-09T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1920,
+        "start": 1749531600000,
+        "time": "2025-06-10T13:00:00+08:00",
+        "price": "1.13722",
+        "right5_end": "2025-06-11T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1939,
+        "start": 1749805200000,
+        "time": "2025-06-13T17:00:00+08:00",
+        "price": "1.14881",
+        "right5_end": "2025-06-16T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1962,
+        "start": 1750309200000,
+        "time": "2025-06-19T13:00:00+08:00",
+        "price": "1.14454",
+        "right5_end": "2025-06-20T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 1972,
+        "start": 1750626000000,
+        "time": "2025-06-23T05:00:00+08:00",
+        "price": "1.14517",
+        "right5_end": "2025-06-24T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2017,
+        "start": 1751446800000,
+        "time": "2025-07-02T17:00:00+08:00",
+        "price": "1.17461",
+        "right5_end": "2025-07-03T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2023,
+        "start": 1751533200000,
+        "time": "2025-07-03T17:00:00+08:00",
+        "price": "1.17163",
+        "right5_end": "2025-07-04T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2042,
+        "start": 1751979600000,
+        "time": "2025-07-08T21:00:00+08:00",
+        "price": "1.16817",
+        "right5_end": "2025-07-09T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2054,
+        "start": 1752152400000,
+        "time": "2025-07-10T21:00:00+08:00",
+        "price": "1.16616",
+        "right5_end": "2025-07-11T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2064,
+        "start": 1752469200000,
+        "time": "2025-07-14T13:00:00+08:00",
+        "price": "1.16534",
+        "right5_end": "2025-07-15T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2083,
+        "start": 1752742800000,
+        "time": "2025-07-17T17:00:00+08:00",
+        "price": "1.15559",
+        "right5_end": "2025-07-18T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2102,
+        "start": 1753189200000,
+        "time": "2025-07-22T21:00:00+08:00",
+        "price": "1.16780",
+        "right5_end": "2025-07-23T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2108,
+        "start": 1753275600000,
+        "time": "2025-07-23T21:00:00+08:00",
+        "price": "1.17103",
+        "right5_end": "2025-07-24T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2139,
+        "start": 1753894800000,
+        "time": "2025-07-31T01:00:00+08:00",
+        "price": "1.14001",
+        "right5_end": "2025-08-01T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2149,
+        "start": 1754038800000,
+        "time": "2025-08-01T17:00:00+08:00",
+        "price": "1.13908",
+        "right5_end": "2025-08-04T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2161,
+        "start": 1754384400000,
+        "time": "2025-08-05T17:00:00+08:00",
+        "price": "1.15271",
+        "right5_end": "2025-08-06T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2174,
+        "start": 1754571600000,
+        "time": "2025-08-07T21:00:00+08:00",
+        "price": "1.16102",
+        "right5_end": "2025-08-08T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2186,
+        "start": 1754917200000,
+        "time": "2025-08-11T21:00:00+08:00",
+        "price": "1.15893",
+        "right5_end": "2025-08-12T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2204,
+        "start": 1755176400000,
+        "time": "2025-08-14T21:00:00+08:00",
+        "price": "1.16302",
+        "right5_end": "2025-08-15T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2225,
+        "start": 1755651600000,
+        "time": "2025-08-20T09:00:00+08:00",
+        "price": "1.16213",
+        "right5_end": "2025-08-21T09:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2237,
+        "start": 1755824400000,
+        "time": "2025-08-22T09:00:00+08:00",
+        "price": "1.15821",
+        "right5_end": "2025-08-25T09:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2250,
+        "start": 1756184400000,
+        "time": "2025-08-26T13:00:00+08:00",
+        "price": "1.16014",
+        "right5_end": "2025-08-27T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2257,
+        "start": 1756285200000,
+        "time": "2025-08-27T17:00:00+08:00",
+        "price": "1.15732",
+        "right5_end": "2025-08-28T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2269,
+        "start": 1756458000000,
+        "time": "2025-08-29T17:00:00+08:00",
+        "price": "1.16499",
+        "right5_end": "2025-09-01T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2286,
+        "start": 1756875600000,
+        "time": "2025-09-03T13:00:00+08:00",
+        "price": "1.16074",
+        "right5_end": "2025-09-04T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2293,
+        "start": 1756976400000,
+        "time": "2025-09-04T17:00:00+08:00",
+        "price": "1.16292",
+        "right5_end": "2025-09-05T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2316,
+        "start": 1757480400000,
+        "time": "2025-09-10T13:00:00+08:00",
+        "price": "1.16815",
+        "right5_end": "2025-09-11T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2323,
+        "start": 1757581200000,
+        "time": "2025-09-11T17:00:00+08:00",
+        "price": "1.16587",
+        "right5_end": "2025-09-12T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2329,
+        "start": 1757667600000,
+        "time": "2025-09-12T17:00:00+08:00",
+        "price": "1.17003",
+        "right5_end": "2025-09-15T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2362,
+        "start": 1758488400000,
+        "time": "2025-09-22T05:00:00+08:00",
+        "price": "1.17254",
+        "right5_end": "2025-09-23T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2385,
+        "start": 1758819600000,
+        "time": "2025-09-26T01:00:00+08:00",
+        "price": "1.16449",
+        "right5_end": "2025-09-27T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2408,
+        "start": 1759323600000,
+        "time": "2025-10-01T21:00:00+08:00",
+        "price": "1.17147",
+        "right5_end": "2025-10-02T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2414,
+        "start": 1759410000000,
+        "time": "2025-10-02T21:00:00+08:00",
+        "price": "1.16824",
+        "right5_end": "2025-10-03T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2424,
+        "start": 1759726800000,
+        "time": "2025-10-06T13:00:00+08:00",
+        "price": "1.16510",
+        "right5_end": "2025-10-07T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2438,
+        "start": 1759928400000,
+        "time": "2025-10-08T21:00:00+08:00",
+        "price": "1.15977",
+        "right5_end": "2025-10-09T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2445,
+        "start": 1760029200000,
+        "time": "2025-10-10T01:00:00+08:00",
+        "price": "1.15413",
+        "right5_end": "2025-10-11T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2460,
+        "start": 1760418000000,
+        "time": "2025-10-14T13:00:00+08:00",
+        "price": "1.15417",
+        "right5_end": "2025-10-15T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2497,
+        "start": 1761123600000,
+        "time": "2025-10-22T17:00:00+08:00",
+        "price": "1.15762",
+        "right5_end": "2025-10-23T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2534,
+        "start": 1761829200000,
+        "time": "2025-10-30T21:00:00+08:00",
+        "price": "1.15462",
+        "right5_end": "2025-10-31T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2558,
+        "start": 1762351200000,
+        "time": "2025-11-05T22:00:00+08:00",
+        "price": "1.14678",
+        "right5_end": "2025-11-06T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2576,
+        "start": 1762783200000,
+        "time": "2025-11-10T22:00:00+08:00",
+        "price": "1.15404",
+        "right5_end": "2025-11-11T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2588,
+        "start": 1762956000000,
+        "time": "2025-11-12T22:00:00+08:00",
+        "price": "1.15622",
+        "right5_end": "2025-11-13T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2623,
+        "start": 1763632800000,
+        "time": "2025-11-20T18:00:00+08:00",
+        "price": "1.14986",
+        "right5_end": "2025-11-21T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2630,
+        "start": 1763733600000,
+        "time": "2025-11-21T22:00:00+08:00",
+        "price": "1.14904",
+        "right5_end": "2025-11-24T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2648,
+        "start": 1764165600000,
+        "time": "2025-11-26T22:00:00+08:00",
+        "price": "1.15463",
+        "right5_end": "2025-11-27T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2659,
+        "start": 1764324000000,
+        "time": "2025-11-28T18:00:00+08:00",
+        "price": "1.15546",
+        "right5_end": "2025-12-01T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2672,
+        "start": 1764684000000,
+        "time": "2025-12-02T22:00:00+08:00",
+        "price": "1.15903",
+        "right5_end": "2025-12-03T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2690,
+        "start": 1764943200000,
+        "time": "2025-12-05T22:00:00+08:00",
+        "price": "1.16272",
+        "right5_end": "2025-12-08T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2696,
+        "start": 1765202400000,
+        "time": "2025-12-08T22:00:00+08:00",
+        "price": "1.16156",
+        "right5_end": "2025-12-09T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2702,
+        "start": 1765288800000,
+        "time": "2025-12-09T22:00:00+08:00",
+        "price": "1.16143",
+        "right5_end": "2025-12-10T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2719,
+        "start": 1765533600000,
+        "time": "2025-12-12T18:00:00+08:00",
+        "price": "1.17188",
+        "right5_end": "2025-12-15T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2736,
+        "start": 1765951200000,
+        "time": "2025-12-17T14:00:00+08:00",
+        "price": "1.17023",
+        "right5_end": "2025-12-18T14:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2749,
+        "start": 1766138400000,
+        "time": "2025-12-19T18:00:00+08:00",
+        "price": "1.17016",
+        "right5_end": "2025-12-22T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2780,
+        "start": 1767016800000,
+        "time": "2025-12-29T22:00:00+08:00",
+        "price": "1.17486",
+        "right5_end": "2025-12-30T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2790,
+        "start": 1767160800000,
+        "time": "2025-12-31T14:00:00+08:00",
+        "price": "1.17192",
+        "right5_end": "2026-01-02T14:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2803,
+        "start": 1767607200000,
+        "time": "2026-01-05T18:00:00+08:00",
+        "price": "1.16583",
+        "right5_end": "2026-01-06T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2828,
+        "start": 1767967200000,
+        "time": "2026-01-09T22:00:00+08:00",
+        "price": "1.16173",
+        "right5_end": "2026-01-12T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2840,
+        "start": 1768312800000,
+        "time": "2026-01-13T22:00:00+08:00",
+        "price": "1.16334",
+        "right5_end": "2026-01-14T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2852,
+        "start": 1768485600000,
+        "time": "2026-01-15T22:00:00+08:00",
+        "price": "1.15923",
+        "right5_end": "2026-01-16T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2860,
+        "start": 1768773600000,
+        "time": "2026-01-19T06:00:00+08:00",
+        "price": "1.15764",
+        "right5_end": "2026-01-20T06:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2878,
+        "start": 1769032800000,
+        "time": "2026-01-22T06:00:00+08:00",
+        "price": "1.16689",
+        "right5_end": "2026-01-23T06:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2907,
+        "start": 1769623200000,
+        "time": "2026-01-29T02:00:00+08:00",
+        "price": "1.18948",
+        "right5_end": "2026-01-30T02:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2925,
+        "start": 1770055200000,
+        "time": "2026-02-03T02:00:00+08:00",
+        "price": "1.17752",
+        "right5_end": "2026-02-04T02:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2944,
+        "start": 1770328800000,
+        "time": "2026-02-06T06:00:00+08:00",
+        "price": "1.17648",
+        "right5_end": "2026-02-07T06:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2965,
+        "start": 1770804000000,
+        "time": "2026-02-11T18:00:00+08:00",
+        "price": "1.18322",
+        "right5_end": "2026-02-12T18:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2976,
+        "start": 1770962400000,
+        "time": "2026-02-13T14:00:00+08:00",
+        "price": "1.18464",
+        "right5_end": "2026-02-16T14:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 2990,
+        "start": 1771336800000,
+        "time": "2026-02-17T22:00:00+08:00",
+        "price": "1.18042",
+        "right5_end": "2026-02-18T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3002,
+        "start": 1771509600000,
+        "time": "2026-02-19T22:00:00+08:00",
+        "price": "1.17413",
+        "right5_end": "2026-02-20T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3020,
+        "start": 1771941600000,
+        "time": "2026-02-24T22:00:00+08:00",
+        "price": "1.17654",
+        "right5_end": "2026-02-25T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3050,
+        "start": 1772546400000,
+        "time": "2026-03-03T22:00:00+08:00",
+        "price": "1.15294",
+        "right5_end": "2026-03-04T22:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3071,
+        "start": 1773018000000,
+        "time": "2026-03-09T09:00:00+08:00",
+        "price": "1.15062",
+        "right5_end": "2026-03-10T09:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3099,
+        "start": 1773421200000,
+        "time": "2026-03-14T01:00:00+08:00",
+        "price": "1.14102",
+        "right5_end": "2026-03-17T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3120,
+        "start": 1773896400000,
+        "time": "2026-03-19T13:00:00+08:00",
+        "price": "1.14421",
+        "right5_end": "2026-03-20T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3133,
+        "start": 1774256400000,
+        "time": "2026-03-23T17:00:00+08:00",
+        "price": "1.14837",
+        "right5_end": "2026-03-24T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3164,
+        "start": 1774875600000,
+        "time": "2026-03-30T21:00:00+08:00",
+        "price": "1.14424",
+        "right5_end": "2026-03-31T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3181,
+        "start": 1775120400000,
+        "time": "2026-04-02T17:00:00+08:00",
+        "price": "1.15084",
+        "right5_end": "2026-04-03T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3190,
+        "start": 1775422800000,
+        "time": "2026-04-06T05:00:00+08:00",
+        "price": "1.15043",
+        "right5_end": "2026-04-07T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3220,
+        "start": 1776027600000,
+        "time": "2026-04-13T05:00:00+08:00",
+        "price": "1.16632",
+        "right5_end": "2026-04-14T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3235,
+        "start": 1776243600000,
+        "time": "2026-04-15T17:00:00+08:00",
+        "price": "1.17711",
+        "right5_end": "2026-04-16T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3242,
+        "start": 1776344400000,
+        "time": "2026-04-16T21:00:00+08:00",
+        "price": "1.17660",
+        "right5_end": "2026-04-17T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3250,
+        "start": 1776632400000,
+        "time": "2026-04-20T05:00:00+08:00",
+        "price": "1.17277",
+        "right5_end": "2026-04-21T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3273,
+        "start": 1776963600000,
+        "time": "2026-04-24T01:00:00+08:00",
+        "price": "1.16683",
+        "right5_end": "2026-04-25T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3289,
+        "start": 1777366800000,
+        "time": "2026-04-28T17:00:00+08:00",
+        "price": "1.16767",
+        "right5_end": "2026-04-29T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3299,
+        "start": 1777510800000,
+        "time": "2026-04-30T09:00:00+08:00",
+        "price": "1.16543",
+        "right5_end": "2026-05-01T09:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3318,
+        "start": 1777957200000,
+        "time": "2026-05-05T13:00:00+08:00",
+        "price": "1.16757",
+        "right5_end": "2026-05-06T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3333,
+        "start": 1778173200000,
+        "time": "2026-05-08T01:00:00+08:00",
+        "price": "1.17215",
+        "right5_end": "2026-05-09T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3355,
+        "start": 1778662800000,
+        "time": "2026-05-13T17:00:00+08:00",
+        "price": "1.16945",
+        "right5_end": "2026-05-14T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3370,
+        "start": 1779051600000,
+        "time": "2026-05-18T05:00:00+08:00",
+        "price": "1.16074",
+        "right5_end": "2026-05-19T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3386,
+        "start": 1779282000000,
+        "time": "2026-05-20T21:00:00+08:00",
+        "price": "1.15819",
+        "right5_end": "2026-05-21T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3392,
+        "start": 1779368400000,
+        "time": "2026-05-21T21:00:00+08:00",
+        "price": "1.15754",
+        "right5_end": "2026-05-22T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3398,
+        "start": 1779454800000,
+        "time": "2026-05-22T21:00:00+08:00",
+        "price": "1.15875",
+        "right5_end": "2026-05-25T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3410,
+        "start": 1779800400000,
+        "time": "2026-05-26T21:00:00+08:00",
+        "price": "1.16156",
+        "right5_end": "2026-05-27T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3419,
+        "start": 1779930000000,
+        "time": "2026-05-28T09:00:00+08:00",
+        "price": "1.15854",
+        "right5_end": "2026-05-29T09:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3434,
+        "start": 1780318800000,
+        "time": "2026-06-01T21:00:00+08:00",
+        "price": "1.16060",
+        "right5_end": "2026-06-02T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3448,
+        "start": 1780520400000,
+        "time": "2026-06-04T05:00:00+08:00",
+        "price": "1.15938",
+        "right5_end": "2026-06-05T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3463,
+        "start": 1780909200000,
+        "time": "2026-06-08T17:00:00+08:00",
+        "price": "1.14989",
+        "right5_end": "2026-06-09T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3483,
+        "start": 1781197200000,
+        "time": "2026-06-12T01:00:00+08:00",
+        "price": "1.15021",
+        "right5_end": "2026-06-13T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3498,
+        "start": 1781586000000,
+        "time": "2026-06-16T13:00:00+08:00",
+        "price": "1.15741",
+        "right5_end": "2026-06-17T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3516,
+        "start": 1781845200000,
+        "time": "2026-06-19T13:00:00+08:00",
+        "price": "1.14171",
+        "right5_end": "2026-06-22T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3536,
+        "start": 1782306000000,
+        "time": "2026-06-24T21:00:00+08:00",
+        "price": "1.13238",
+        "right5_end": "2026-06-25T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3558,
+        "start": 1782795600000,
+        "time": "2026-06-30T13:00:00+08:00",
+        "price": "1.13819",
+        "right5_end": "2026-07-01T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3566,
+        "start": 1782910800000,
+        "time": "2026-07-01T21:00:00+08:00",
+        "price": "1.13610",
+        "right5_end": "2026-07-02T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3584,
+        "start": 1783342800000,
+        "time": "2026-07-06T21:00:00+08:00",
+        "price": "1.14078",
+        "right5_end": "2026-07-07T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3596,
+        "start": 1783515600000,
+        "time": "2026-07-08T21:00:00+08:00",
+        "price": "1.13904",
+        "right5_end": "2026-07-09T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3615,
+        "start": 1783962000000,
+        "time": "2026-07-14T01:00:00+08:00",
+        "price": "1.13767",
+        "right5_end": "2026-07-15T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3625,
+        "start": 1784106000000,
+        "time": "2026-07-15T17:00:00+08:00",
+        "price": "1.14052",
+        "right5_end": "2026-07-16T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3644,
+        "start": 1784552400000,
+        "time": "2026-07-20T21:00:00+08:00",
+        "price": "1.14017",
+        "right5_end": "2026-07-21T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3652,
+        "start": 1784667600000,
+        "time": "2026-07-22T05:00:00+08:00",
+        "price": "1.13960",
+        "right5_end": "2026-07-23T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3662,
+        "start": 1784811600000,
+        "time": "2026-07-23T21:00:00+08:00",
+        "price": "1.13631",
+        "right5_end": "2026-07-24T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3668,
+        "start": 1784898000000,
+        "time": "2026-07-24T21:00:00+08:00",
+        "price": "1.13642",
+        "right5_end": "2026-07-27T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3679,
+        "start": 1785229200000,
+        "time": "2026-07-28T17:00:00+08:00",
+        "price": "1.13524",
+        "right5_end": "2026-07-29T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3698,
+        "start": 1785502800000,
+        "time": "2026-07-31T21:00:00+08:00",
+        "price": "1.14542",
+        "right5_end": "2026-08-03T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3704,
+        "start": 1785762000000,
+        "time": "2026-08-03T21:00:00+08:00",
+        "price": "1.14996",
+        "right5_end": "2026-08-04T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3722,
+        "start": 1786021200000,
+        "time": "2026-08-06T21:00:00+08:00",
+        "price": "1.15139",
+        "right5_end": "2026-08-07T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3738,
+        "start": 1786424400000,
+        "time": "2026-08-11T13:00:00+08:00",
+        "price": "1.15306",
+        "right5_end": "2026-08-12T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3750,
+        "start": 1786597200000,
+        "time": "2026-08-13T13:00:00+08:00",
+        "price": "1.15110",
+        "right5_end": "2026-08-14T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3768,
+        "start": 1787029200000,
+        "time": "2026-08-18T13:00:00+08:00",
+        "price": "1.15658",
+        "right5_end": "2026-08-19T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3798,
+        "start": 1787634000000,
+        "time": "2026-08-25T13:00:00+08:00",
+        "price": "1.16503",
+        "right5_end": "2026-08-26T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3811,
+        "start": 1787821200000,
+        "time": "2026-08-27T17:00:00+08:00",
+        "price": "1.16358",
+        "right5_end": "2026-08-28T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3820,
+        "start": 1788123600000,
+        "time": "2026-08-31T05:00:00+08:00",
+        "price": "1.15759",
+        "right5_end": "2026-09-01T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3834,
+        "start": 1788325200000,
+        "time": "2026-09-02T13:00:00+08:00",
+        "price": "1.15658",
+        "right5_end": "2026-09-03T13:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3847,
+        "start": 1788512400000,
+        "time": "2026-09-04T17:00:00+08:00",
+        "price": "1.15838",
+        "right5_end": "2026-09-07T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3859,
+        "start": 1788858000000,
+        "time": "2026-09-08T17:00:00+08:00",
+        "price": "1.16072",
+        "right5_end": "2026-09-09T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3871,
+        "start": 1789030800000,
+        "time": "2026-09-10T17:00:00+08:00",
+        "price": "1.15916",
+        "right5_end": "2026-09-11T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3884,
+        "start": 1789390800000,
+        "time": "2026-09-14T21:00:00+08:00",
+        "price": "1.15223",
+        "right5_end": "2026-09-15T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3898,
+        "start": 1789592400000,
+        "time": "2026-09-17T05:00:00+08:00",
+        "price": "1.14542",
+        "right5_end": "2026-09-18T05:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3907,
+        "start": 1789722000000,
+        "time": "2026-09-18T17:00:00+08:00",
+        "price": "1.14542",
+        "right5_end": "2026-09-21T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3932,
+        "start": 1790254800000,
+        "time": "2026-09-24T21:00:00+08:00",
+        "price": "1.13585",
+        "right5_end": "2026-09-25T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3950,
+        "start": 1790686800000,
+        "time": "2026-09-29T21:00:00+08:00",
+        "price": "1.13110",
+        "right5_end": "2026-09-30T21:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3963,
+        "start": 1790874000000,
+        "time": "2026-10-02T01:00:00+08:00",
+        "price": "1.12144",
+        "right5_end": "2026-10-03T01:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3971,
+        "start": 1791162000000,
+        "time": "2026-10-05T09:00:00+08:00",
+        "price": "1.11602",
+        "right5_end": "2026-10-06T09:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3985,
+        "start": 1791363600000,
+        "time": "2026-10-07T17:00:00+08:00",
+        "price": "1.11638",
+        "right5_end": "2026-10-08T17:00:00+08:00",
+        "right5_complete": true
+      },
+      {
+        "index": 3991,
+        "start": 1791450000000,
+        "time": "2026-10-08T17:00:00+08:00",
+        "price": "1.11711",
+        "right5_end": "2026-10-09T17:00:00+08:00",
+        "right5_complete": true
+      }
+    ]
+  }
+}

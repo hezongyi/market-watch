@@ -438,7 +438,9 @@ def router(authenticated):
             from .series_access import search
             sources += [{"id": row["ticker"], "symbol": row["symbol"], "source": row["source"],
                 "environment": row["description"], "series_kind": row["series_kind"]} for row in search(db)]
-        return {"frames": FRAMES, "indicators": CATALOG, "managed_sources": sources}
+        from .chart_indicators import public_catalog
+
+        return {"frames": FRAMES, "indicators": public_catalog(), "managed_sources": sources}
 
     @r.post("/export")
     def export(body: ExportQuery):
@@ -909,6 +911,9 @@ def data_sync(body: DataQuery):
                 result = cached_result[1]
             else:
                 result = calculate(all_rows, spec, provisional=body.provisional)
+                if "presentation" in result:
+                    result["presentation"] = result["presentation"] | {
+                        "history_revision": revision, "history_complete": True}
                 weight = sum(len(series["values"]) for series in result["series"])
                 with _CACHE_LOCK:
                     _RESULT_CACHE[result_key] = (time.monotonic(), result, weight)

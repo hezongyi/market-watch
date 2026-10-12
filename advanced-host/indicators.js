@@ -3,6 +3,8 @@ function pythonStudies(PineJS, catalog) {
   return Object.entries(catalog).map(([name, meta]) => {
     const keys = Object.keys(meta.params),
       series = meta.series;
+    const swing = meta.render_profile === "swing_sr_v1";
+    const displayInputs = meta.display_inputs || [];
     const colors = ["#42a5f5", "#ffb74d", "#ab47bc"];
     return {
       name: "守望 Python " + name,
@@ -10,7 +12,7 @@ function pythonStudies(PineJS, catalog) {
         _metainfoVersion: 53,
         id: "MWPython" + name + "@market-watch-1",
         description: "守望 Python " + name,
-        shortDescription: "PY " + name,
+        shortDescription: swing ? "Swing" : "PY " + name,
         is_hidden_study: false,
         is_price_study: meta.pane === "main",
         isCustomIndicator: true,
@@ -34,15 +36,16 @@ function pythonStudies(PineJS, catalog) {
               {
                 linestyle: 0,
                 linewidth: 2,
-                plottype: s.type === "histogram" ? 1 : 0,
+                plottype: swing ? 6 : s.type === "histogram" ? 1 : 0,
+                ...(swing ? {joinPoints:false} : {}),
                 trackPrice: false,
                 transparency: 0,
                 visible: true,
-                color: colors[i % colors.length],
+                color: swing ? (i < 2 ? "#f23645" : "#00bcd4") : colors[i % colors.length],
               },
             ]),
           ),
-          inputs: meta.params,
+          inputs: {...meta.params, ...Object.fromEntries(displayInputs.map(item=>[item.id,item.default]))},
         },
         styles: Object.fromEntries(
           series.map((s, i) => [
@@ -50,7 +53,7 @@ function pythonStudies(PineJS, catalog) {
             { title: s.label || s.key, histogramBase: 0 },
           ]),
         ),
-        inputs: keys.map((key) => {
+        inputs: [...keys.map((key) => {
           const rule =
             meta.parameter_schema?.[key] ||
             (key === "deviation"
@@ -58,13 +61,16 @@ function pythonStudies(PineJS, catalog) {
               : { type: "integer", min: 2, max: 500 });
           return {
             id: key,
-            name: rule.label || key,
+            name: rule.label || (swing ? (key === "high_strength" ? "High strength" : "Low strength") : key),
             type: rule.type,
             defval: meta.params[key],
             min: rule.min,
             max: rule.max,
           };
-        }),
+        }), ...displayInputs.map(item=>({id:item.id,name:item.name,type:item.type,defval:item.default,
+          ...(item.options ? {options:item.options} : {}),
+          ...(swing && ['show_average_spacing','statistics_position'].includes(item.id)
+            ? {isHidden:false,display:0} : {})}))],
       },
       constructor: function () {
         this.init = function (ctx, input) {
@@ -83,6 +89,8 @@ function pythonStudies(PineJS, catalog) {
             name,
             params: Object.fromEntries(keys.map((k, i) => [k, input(i)])),
           };
+          this.offsets = series.map(s=>s.key === 'high_left' ? -spec.params.high_strength :
+            s.key === 'low_left' ? -spec.params.low_strength : 0);
           for (const s of series) {
             const ticker="MWPY_" + btoa(JSON.stringify({ symbol, spec, key: s.key }));
             ctx.new_sym(window ? '='+JSON.stringify({symbol:ticker,'mw-window':window}) : ticker,
@@ -98,7 +106,8 @@ function pythonStudies(PineJS, catalog) {
             const value = ctx.new_var(
               PineJS.Std.volume(ctx) > 0 ? PineJS.Std.close(ctx) : NaN,
             );
-            return value.adopt(source, target, 1);
+            const result = value.adopt(source, target, 1);
+            return swing ? {value:result,offset:this.offsets[i]} : result;
           });
           ctx.select_sym(0);
           return values;
