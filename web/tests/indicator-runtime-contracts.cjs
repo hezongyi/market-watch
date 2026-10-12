@@ -33,6 +33,19 @@ function page(specs,pendingPeriod=null,value=10){
    series:[{key:'value',values:spec.params.period===pendingPeriod?[]:bars.map(b=>({time:b.start,value}))}]}))};
 }
 (async()=>{
+ const bridge=fs.readFileSync(root+'/advanced-host/bridge.js','utf8');
+ const querySource=bridge.slice(bridge.indexOf('function query('),bridge.indexOf('// Share only in-flight planning reads;'));
+ let requests=0;
+ const queryContext={decode:()=>({symbol:'TEST',series_kind:'managed'}),frames:{'1':'M1'},
+  managedSessions:new Map(),cache:new Map(),workspaceEpoch:1,Date:class extends Date {static now(){return 1000;}},
+  hasHistoryViewer:()=>true,MWSeries:{encode:s=>s},request:async()=>({value:++requests}),
+  alertCalculationOrigins:new Map(),alertCompositeRevisions:new Map()};
+ vm.runInNewContext(querySource,queryContext);
+ const args={before:3001,indicators:[{name:'EMA',params:{period:5}}]};
+ assert.equal((await queryContext.query('TEST','1',args)).value,1);
+ assert.equal((await queryContext.query('TEST','1',args)).value,2,
+  'new accepted tail/correction demand must not reuse completed managed response');
+
  let pending=5,reads=0;
  const progress=harness({studies:[{id:'a',period:5},{id:'b',period:7}],read:async(t,r,args)=>{reads++;return page(args.indicators,pending);}});
  await progress.coordinator.sync();
@@ -66,6 +79,20 @@ function page(specs,pendingPeriod=null,value=10){
  await managed.coordinator.sync();assert.equal(managedReads,2,
   'managed invalidation must use the same numeric domain as accepted results');
  managed.coordinator.dispose();
+
+ const fallback=harness({read:async(t,r,args)=>page(args.indicators)});
+ const ticker=fallback.chart.symbol(),key=ticker+'|5';
+ Object.assign(fallback.context.indicatorBindings.get(key),{firstStart:2000,dependencyRevision:'old'});
+ Object.assign(fallback.context,{indicatorDependencyOrigins:new Map([[key,1000]]),
+  query:async()=>({history_check:{revision:'new'}}),first:{symbol:ticker,res:'5'},identity:{series_kind:'composite'},result:{bars:[]}});
+ const pollSource=bridge.slice(bridge.indexOf('        const dependencyOrigin=indicatorDependencyOrigins.get(first.symbol'),
+  bridge.indexOf('        const bars = barsOf(result, first.res, first.symbol);',bridge.indexOf('        const dependencyOrigin=indicatorDependencyOrigins.get(first.symbol')));
+ vm.runInNewContext('async function prefixPoll(){'+pollSource+'}',fallback.context);
+ await fallback.context.prefixPoll();await fallback.context.prefixPoll();
+ assert.equal(fallback.context.indicatorBindings.get(key).dependencyRevision,'new');
+ assert.equal(fallback.context.indicatorBindings.get(key).correctionVersion,1,
+  'polling must retain proof before replacing binding so one repair withdraws only once');
+ fallback.coordinator.dispose();
 
  const demands=[],studies=[{id:'a',period:5},{id:'b',period:7}];
  const deps=harness({studies,demand:rows=>demands.push(JSON.parse(JSON.stringify(rows))),read:async(t,r,args)=>page(args.indicators)});

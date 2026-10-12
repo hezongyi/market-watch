@@ -640,7 +640,7 @@ function query(ticker, res, args, expires = Infinity, current = () => true) {
   };
   const key = JSON.stringify(q);
   const old = cache.get(key);
-  if ((series_kind === 'managed' || spec) && old && Date.now() - old.time < 1000) return old.promise;
+  if (!q.indicators?.length && (series_kind === 'managed' || spec) && old && Date.now() - old.time < 1000) return old.promise;
   const epoch = workspaceEpoch;
   const swingTicket = spec?.name==='SWING_SR_V1' ? swingStore().ticket() : null;
   // Native owns the lifetime of its period caches. A temporary period switch
@@ -665,7 +665,7 @@ function query(ticker, res, args, expires = Infinity, current = () => true) {
         throw Object.assign(Error('历史复核时间预算已耗尽'), {code:'HISTORY_TIMEOUT'});
       throw error;
     });
-  if (series_kind === 'managed' || spec) cache.set(key, { time: Date.now(), promise });
+  if (!q.indicators?.length && (series_kind === 'managed' || spec)) cache.set(key, { time: Date.now(), promise });
   if (cache.size > 64) cache.delete(cache.keys().next().value);
   return promise;
 }
@@ -1534,10 +1534,10 @@ async function tick() {
             revision_before:acceptedBinding.firstStart,revision_after:null,
             ...(identity.series_kind==='managed' ? {dataset_start:dependencyOrigin} : {revision_after:dependencyOrigin})});
           const revision=dependencyPage.history_check?.revision;
-          if(revision && acceptedBinding.dependencyRevision && revision!==acceptedBinding.dependencyRevision)
-            rememberIndicatorBinding(first.symbol,first.res,{}, {correction:true});
+          const corrected=revision && acceptedBinding.dependencyRevision && revision!==acceptedBinding.dependencyRevision;
           acceptedBinding.dependencyBefore=acceptedBinding.firstStart;
           acceptedBinding.dependencyRevision=revision;
+          if(corrected)rememberIndicatorBinding(first.symbol,first.res,{}, {correction:true});
         }
         rememberIndicatorBinding(first.symbol,first.res,result);
         const bars = barsOf(result, first.res, first.symbol);
