@@ -1,0 +1,143 @@
+{
+  "passed": true,
+  "at": "2026-10-12T03:06:42.956221+00:00",
+  "version": "1.21.2",
+  "host": "unraid 192.168.7.33",
+  "project": "market-watch",
+  "active_release": "releases/v1.21.2-65f4966",
+  "services": [
+    {
+      "service": "api",
+      "image_id": "sha256:5f42971f97c22d1b79655591150ea220dba30e6b8eee675ef3d534964fe0995d",
+      "running": true,
+      "restart_count": 0,
+      "health": "healthy",
+      "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+      "purpose": "release"
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "image_id": "sha256:5f42971f97c22d1b79655591150ea220dba30e6b8eee675ef3d534964fe0995d",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+      "purpose": "release"
+    },
+    {
+      "service": "chart-history-worker",
+      "image_id": "sha256:5f42971f97c22d1b79655591150ea220dba30e6b8eee675ef3d534964fe0995d",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+      "purpose": "release"
+    },
+    {
+      "service": "chart-origin",
+      "image_id": "sha256:ba6ced29ee370f3d3d812ee2967e83b006404659b3dba7c0b1fc4d36193dbd9a",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+      "purpose": "release"
+    },
+    {
+      "service": "composite-aggregate-worker",
+      "image_id": "sha256:5f42971f97c22d1b79655591150ea220dba30e6b8eee675ef3d534964fe0995d",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+      "purpose": "release"
+    },
+    {
+      "service": "history-worker",
+      "image_id": "sha256:5f42971f97c22d1b79655591150ea220dba30e6b8eee675ef3d534964fe0995d",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+      "purpose": "release"
+    },
+    {
+      "service": "market-stream-worker",
+      "image_id": "sha256:5f42971f97c22d1b79655591150ea220dba30e6b8eee675ef3d534964fe0995d",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+      "purpose": "release"
+    },
+    {
+      "service": "native-history-worker",
+      "image_id": "sha256:5f42971f97c22d1b79655591150ea220dba30e6b8eee675ef3d534964fe0995d",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+      "purpose": "release"
+    },
+    {
+      "service": "notify-worker",
+      "image_id": "sha256:5f42971f97c22d1b79655591150ea220dba30e6b8eee675ef3d534964fe0995d",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+      "purpose": "release"
+    },
+    {
+      "service": "pricing-worker",
+      "image_id": "sha256:5f42971f97c22d1b79655591150ea220dba30e6b8eee675ef3d534964fe0995d",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+      "purpose": "release"
+    },
+    {
+      "service": "realtime-worker",
+      "image_id": "sha256:5f42971f97c22d1b79655591150ea220dba30e6b8eee675ef3d534964fe0995d",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+      "purpose": "release"
+    },
+    {
+      "service": "web",
+      "image_id": "sha256:293acb007a294e99e5bd317ba67dab73eb32dd739efdc560f8fa108e61a17992",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+      "purpose": "release"
+    }
+  ],
+  "service_count": 12,
+  "heartbeats": {
+    "market_heartbeat": {
+      "age_ms": 9804,
+      "timestamp_ms": 1791774390952
+    },
+    "notify_heartbeat": {
+      "age_ms": 25584,
+      "timestamp_ms": 1791774375172
+    }
+  },
+  "compose_matches_pinned_candidate": true,
+  "production_env_unchanged": true,
+  "existing_unknown_composite_error_count_unchanged": true,
+  "rollback_files_verified": {
+    "rollback.sh": "a18d047651c42d87a2f44f47c87a5e53a385777a8c3667f1f84cac956a762c69",
+    "compose.rollback.yaml": "b70f70fa3d66a291c3b0b086b6b90a23c05bab504d6ce8b7084590c706f1daa8",
+    "active-release.rollback": "ff7feaecb809c03b86e6e2be043e92b31f52661316631eb3cc3edd13ead178ea"
+  },
+  "switch": {
+    "maintenance-started": "2026-10-12T02:44:39Z",
+    "switched": "2026-10-12T02:50:11Z",
+    "paused_writer_seconds": 332.0
+  },
+  "market_stream_worker": "Actual authenticated SSE checked in production-browser.json; no audit heartbeat implemented"
+}

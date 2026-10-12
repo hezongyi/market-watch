@@ -1,0 +1,236 @@
+{
+  "passed": true,
+  "at": 1791773850341,
+  "environment": "unraid formal production",
+  "services": [
+    {
+      "service": "api",
+      "image_id": "sha256:5f42971f97c22d1b79655591150ea220dba30e6b8eee675ef3d534964fe0995d",
+      "running": true,
+      "restart_count": 0,
+      "health": "healthy",
+      "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+      "purpose": "release"
+    },
+    {
+      "service": "pricing-worker",
+      "image_id": "sha256:5f42971f97c22d1b79655591150ea220dba30e6b8eee675ef3d534964fe0995d",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+      "purpose": "release"
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "image_id": "sha256:5f42971f97c22d1b79655591150ea220dba30e6b8eee675ef3d534964fe0995d",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+      "purpose": "release"
+    },
+    {
+      "service": "chart-history-worker",
+      "image_id": "sha256:5f42971f97c22d1b79655591150ea220dba30e6b8eee675ef3d534964fe0995d",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+      "purpose": "release"
+    },
+    {
+      "service": "history-worker",
+      "image_id": "sha256:5f42971f97c22d1b79655591150ea220dba30e6b8eee675ef3d534964fe0995d",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+      "purpose": "release"
+    },
+    {
+      "service": "composite-aggregate-worker",
+      "image_id": "sha256:5f42971f97c22d1b79655591150ea220dba30e6b8eee675ef3d534964fe0995d",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+      "purpose": "release"
+    },
+    {
+      "service": "native-history-worker",
+      "image_id": "sha256:5f42971f97c22d1b79655591150ea220dba30e6b8eee675ef3d534964fe0995d",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+      "purpose": "release"
+    },
+    {
+      "service": "realtime-worker",
+      "image_id": "sha256:5f42971f97c22d1b79655591150ea220dba30e6b8eee675ef3d534964fe0995d",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+      "purpose": "release"
+    },
+    {
+      "service": "notify-worker",
+      "image_id": "sha256:5f42971f97c22d1b79655591150ea220dba30e6b8eee675ef3d534964fe0995d",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+      "purpose": "release"
+    },
+    {
+      "service": "market-stream-worker",
+      "image_id": "sha256:5f42971f97c22d1b79655591150ea220dba30e6b8eee675ef3d534964fe0995d",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+      "purpose": "release"
+    },
+    {
+      "service": "web",
+      "image_id": "sha256:293acb007a294e99e5bd317ba67dab73eb32dd739efdc560f8fa108e61a17992",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+      "purpose": "release"
+    },
+    {
+      "service": "chart-origin",
+      "image_id": "sha256:ba6ced29ee370f3d3d812ee2967e83b006404659b3dba7c0b1fc4d36193dbd9a",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "65f49669f2e798d6285885d5e91087e734805277",
+      "purpose": "release"
+    }
+  ],
+  "actual_settings": [
+    {
+      "service": "api",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": true,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "pricing-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": true,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "chart-history-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "history-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "composite-aggregate-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "native-history-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "realtime-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "notify-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "market-stream-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    }
+  ],
+  "readyz": {
+    "status": "ready",
+    "time": 1791773845906
+  },
+  "http_status": {
+    "https://trade.kookvv.com:8443/": "200",
+    "https://charts.kookvv.com:8443/": "200"
+  },
+  "api_version": "1.21.2",
+  "schema": "ar45_market_stream",
+  "active_release": "releases/v1.21.2-65f4966",
+  "workspace_alert_account_notification_configuration_preserved": true,
+  "stable_table_raw_fingerprints_preserved": [
+    "advanced_chart_preferences",
+    "advanced_chart_workspaces",
+    "chart_alert_actions",
+    "chart_alert_versions",
+    "chart_workspaces",
+    "market_composite_revisions",
+    "market_composites",
+    "market_realtime_mappings",
+    "watches"
+  ],
+  "chart_alert_configuration_preserved_with_expected_worker_runtime_changes": {
+    "passed": true,
+    "alert_count": 1,
+    "saved_alert_definition_and_lifecycle_fields_preserved": true,
+    "mutable_execution_fields_changed": [
+      [
+        "health_reason",
+        "runtime"
+      ]
+    ],
+    "comparison_source": "Actual final PG14 backup, isolated table restore compared with read-only production rows",
+    "temporary_comparison_database_removed": true
+  },
+  "production_env_sha256_preserved": true,
+  "password_change_events_added": 0,
+  "notification_test_events_added": 0
+}
