@@ -1,0 +1,276 @@
+{
+  "scope": "Ubuntu isolated PostgreSQL; synthetic real-shape M1; nine actual period artifacts",
+  "rows": 2147763,
+  "baseline": "7b5c61416390d6db2c26ccdde07716b81affc36c",
+  "baseline_source_sha256": "b34f69ad4a252962e9f733ea1fe10c1df122ef38cf7c410055b9fde477ecdc59",
+  "frames": [
+    "M1",
+    "M5",
+    "M15",
+    "M30",
+    "H1",
+    "H4",
+    "D1",
+    "W1",
+    "MN"
+  ],
+  "phases": {
+    "sql_read_and_wait": 57.644615967758,
+    "source_content_access": 0.015434843022376299,
+    "encode_json": 24.884763748850673,
+    "decode_gzip": 0.3629010943695903,
+    "decode_json": 2.8887926093302667,
+    "decode_price_normalization": 20.998664911836386,
+    "checksum_calendar_cache_and_materialization": 14.23302455432713,
+    "bucket_keys": 14.521866361610591,
+    "decimal_aggregation": 65.76118891267106,
+    "coverage_finalize": 75.07084293244407,
+    "encode_gzip": 50.867298850789666,
+    "sql_write": 15.173923860769719,
+    "flush_commit_and_wait": 36.2961129299365
+  },
+  "ticks": 3960,
+  "decode_calls": 49,
+  "reference": [
+    {
+      "frame": "M1",
+      "buckets_compared": 2147763,
+      "observed_minutes": 2147763,
+      "all_fields_equal": true,
+      "current_sha256": "23be8eaf203b7596fa9b5c2cbd1a9e2463dfbc981ec36d5cdef21117de529317",
+      "baseline_sha256": "23be8eaf203b7596fa9b5c2cbd1a9e2463dfbc981ec36d5cdef21117de529317",
+      "seconds": 130.53114817198366
+    },
+    {
+      "frame": "M5",
+      "buckets_compared": 430850,
+      "observed_minutes": 2147763,
+      "all_fields_equal": true,
+      "current_sha256": "b4f45a8c3fcd1f4d02f7ff237e639c33fecf1226be2f362a835aab88e0f1e5f5",
+      "baseline_sha256": "b4f45a8c3fcd1f4d02f7ff237e639c33fecf1226be2f362a835aab88e0f1e5f5",
+      "seconds": 100.23910644510761
+    },
+    {
+      "frame": "M15",
+      "buckets_compared": 143617,
+      "observed_minutes": 2147763,
+      "all_fields_equal": true,
+      "current_sha256": "4a3c3b40969354d9b758ee485eba32e7892e279dbb9157ac6092baf9de267ad0",
+      "baseline_sha256": "4a3c3b40969354d9b758ee485eba32e7892e279dbb9157ac6092baf9de267ad0",
+      "seconds": 77.51119463518262
+    },
+    {
+      "frame": "M30",
+      "buckets_compared": 71809,
+      "observed_minutes": 2147763,
+      "all_fields_equal": true,
+      "current_sha256": "e99dd920cadd67779cb1916e94f63d30180b79544deb3ed6abfaeeb8701ee8b2",
+      "baseline_sha256": "e99dd920cadd67779cb1916e94f63d30180b79544deb3ed6abfaeeb8701ee8b2",
+      "seconds": 89.88989817164838
+    },
+    {
+      "frame": "H1",
+      "buckets_compared": 35905,
+      "observed_minutes": 2147763,
+      "all_fields_equal": true,
+      "current_sha256": "1707be3f59150f731029b4c9c0ab44ee9e246c7adf5ccdf8c017a368ba47d484",
+      "baseline_sha256": "1707be3f59150f731029b4c9c0ab44ee9e246c7adf5ccdf8c017a368ba47d484",
+      "seconds": 88.48889659019187
+    },
+    {
+      "frame": "H4",
+      "buckets_compared": 9276,
+      "observed_minutes": 2147763,
+      "all_fields_equal": true,
+      "current_sha256": "07aa060ec320ea903c74ac90673d393d9f97c28f8908b9713344db381c45863b",
+      "baseline_sha256": "07aa060ec320ea903c74ac90673d393d9f97c28f8908b9713344db381c45863b",
+      "seconds": 82.69291757885367
+    },
+    {
+      "frame": "D1",
+      "buckets_compared": 1796,
+      "observed_minutes": 2147763,
+      "all_fields_equal": true,
+      "current_sha256": "59647417c00f359b7dbe763a39cde3519753aed48a3930c6d58a8002609c1da5",
+      "baseline_sha256": "59647417c00f359b7dbe763a39cde3519753aed48a3930c6d58a8002609c1da5",
+      "seconds": 80.82776080397889
+    },
+    {
+      "frame": "W1",
+      "buckets_compared": 300,
+      "observed_minutes": 2147763,
+      "all_fields_equal": true,
+      "current_sha256": "e4ffcad8c4584f44aaaa8791037fe654242a2e7abea466f4d54a50c66710b36b",
+      "baseline_sha256": "e4ffcad8c4584f44aaaa8791037fe654242a2e7abea466f4d54a50c66710b36b",
+      "seconds": 96.94643871998414
+    },
+    {
+      "frame": "MN",
+      "buckets_compared": 69,
+      "observed_minutes": 2147763,
+      "all_fields_equal": true,
+      "current_sha256": "4284b4c06a2251f70f4a68aac17f483925c18aefa7119fde9b0dd725827b2966",
+      "baseline_sha256": "4284b4c06a2251f70f4a68aac17f483925c18aefa7119fde9b0dd725827b2966",
+      "seconds": 87.28618874400854
+    }
+  ],
+  "intentional_wait_seconds": 0,
+  "measurement_limit": "Exclusive instrumented wall times; SQL read time includes lock waits. No injected waits. Instrumentation overhead is included; no supplier throughput claim.",
+  "fixture_publish_seconds": 40.255845203995705,
+  "nine_period_end_to_end_seconds": 457.87250836892053,
+  "unassigned_python_and_measurement_seconds": 79.15307679120451,
+  "longest_tick_seconds": 1.9756678431294858,
+  "cache_high_water_bytes": 60270506,
+  "derivation_peak_rss_kib": 421712,
+  "periods": [
+    {
+      "timeframe": "D1",
+      "status": "published",
+      "rows": 1796,
+      "complete_rows": 0
+    },
+    {
+      "timeframe": "H1",
+      "status": "published",
+      "rows": 35905,
+      "complete_rows": 24107
+    },
+    {
+      "timeframe": "H4",
+      "status": "published",
+      "rows": 9276,
+      "complete_rows": 0
+    },
+    {
+      "timeframe": "M1",
+      "status": "published",
+      "rows": 2147763,
+      "complete_rows": 2137583
+    },
+    {
+      "timeframe": "M15",
+      "status": "published",
+      "rows": 143617,
+      "complete_rows": 131134
+    },
+    {
+      "timeframe": "M30",
+      "status": "published",
+      "rows": 71809,
+      "complete_rows": 59628
+    },
+    {
+      "timeframe": "M5",
+      "status": "published",
+      "rows": 430850,
+      "complete_rows": 417688
+    },
+    {
+      "timeframe": "MN",
+      "status": "published",
+      "rows": 69,
+      "complete_rows": 0
+    },
+    {
+      "timeframe": "W1",
+      "status": "published",
+      "rows": 300,
+      "complete_rows": 0
+    }
+  ],
+  "progress": {
+    "stage": "derive",
+    "published_periods": 9,
+    "total_periods": 9,
+    "processed_rows": 19329867,
+    "total_rows": 19329867,
+    "estimated_remaining_seconds": 0,
+    "periods": [
+      {
+        "timeframe": "D1",
+        "status": "published",
+        "processed_rows": 2147763,
+        "total_rows": 2147763,
+        "cursor": 1727222880000,
+        "work_seconds": 56.93134548421949,
+        "updated_at": 1791757500104
+      },
+      {
+        "timeframe": "H1",
+        "status": "published",
+        "processed_rows": 2147763,
+        "total_rows": 2147763,
+        "cursor": 1727222880000,
+        "work_seconds": 21.78975526848808,
+        "updated_at": 1791757500157
+      },
+      {
+        "timeframe": "H4",
+        "status": "published",
+        "processed_rows": 2147763,
+        "total_rows": 2147763,
+        "cursor": 1727222880000,
+        "work_seconds": 20.73374725272879,
+        "updated_at": 1791757500200
+      },
+      {
+        "timeframe": "M1",
+        "status": "published",
+        "processed_rows": 2147763,
+        "total_rows": 2147763,
+        "cursor": 1727222880000,
+        "work_seconds": 109.3633800004609,
+        "updated_at": 1791757500902
+      },
+      {
+        "timeframe": "M15",
+        "status": "published",
+        "processed_rows": 2147763,
+        "total_rows": 2147763,
+        "cursor": 1727222880000,
+        "work_seconds": 29.663735501933843,
+        "updated_at": 1791757500984
+      },
+      {
+        "timeframe": "M30",
+        "status": "published",
+        "processed_rows": 2147763,
+        "total_rows": 2147763,
+        "cursor": 1727222880000,
+        "work_seconds": 25.164096722379327,
+        "updated_at": 1791757501067
+      },
+      {
+        "timeframe": "M5",
+        "status": "published",
+        "processed_rows": 2147763,
+        "total_rows": 2147763,
+        "cursor": 1727222880000,
+        "work_seconds": 48.41496524773538,
+        "updated_at": 1791757501190
+      },
+      {
+        "timeframe": "MN",
+        "status": "published",
+        "processed_rows": 2147763,
+        "total_rows": 2147763,
+        "cursor": 1727222880000,
+        "work_seconds": 22.452334524597973,
+        "updated_at": 1791757501290
+      },
+      {
+        "timeframe": "W1",
+        "status": "published",
+        "processed_rows": 2147763,
+        "total_rows": 2147763,
+        "cursor": 1727222880000,
+        "work_seconds": 21.464615273289382,
+        "updated_at": 1791757501343
+      }
+    ]
+  },
+  "reference_comparison_seconds": 834.4375216192566,
+  "whole_process_peak_rss_kib": 475656,
+  "passed": true,
+  "isolated_schema_removed": true
+}

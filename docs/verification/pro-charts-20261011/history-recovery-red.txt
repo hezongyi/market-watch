@@ -1,0 +1,95 @@
+FFFFFFFFF                                                                [100%]
+=================================== FAILURES ===================================
+E   psycopg.errors.DeadlockDetected: acceptance conflict
+    CONTEXT:  PL/pgSQL function inline_code_block line 1 at RAISE
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (raised as a result of Query-invoked autoflush; consider using a session.no_autoflush block if this flush is occurring prematurely)
+    (psycopg.errors.DeadlockDetected) acceptance conflict
+    CONTEXT:  PL/pgSQL function inline_code_block line 1 at RAISE
+    [SQL: DO $$ BEGIN RAISE EXCEPTION 'acceptance conflict' USING ERRCODE='40P01'; END $$]
+    (Background on this error at: https://sqlalche.me/e/21/e3q8)
+/tmp/mw-native-alert-python311/lib/python3.11/site-packages/psycopg/cursor.py:117: sqlalchemy.exc.OperationalError: (raised as a result of Query-invoked autoflush; consider using a session.no_autoflush block if this flush is occurring prematurely)
+E   psycopg.errors.SerializationFailure: acceptance conflict
+    CONTEXT:  PL/pgSQL function inline_code_block line 1 at RAISE
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (raised as a result of Query-invoked autoflush; consider using a session.no_autoflush block if this flush is occurring prematurely)
+    (psycopg.errors.SerializationFailure) acceptance conflict
+    CONTEXT:  PL/pgSQL function inline_code_block line 1 at RAISE
+    [SQL: DO $$ BEGIN RAISE EXCEPTION 'acceptance conflict' USING ERRCODE='40001'; END $$]
+    (Background on this error at: https://sqlalche.me/e/21/e3q8)
+/tmp/mw-native-alert-python311/lib/python3.11/site-packages/psycopg/cursor.py:117: sqlalchemy.exc.OperationalError: (raised as a result of Query-invoked autoflush; consider using a session.no_autoflush block if this flush is occurring prematurely)
+E   psycopg.errors.DeadlockDetected: acceptance conflict
+    CONTEXT:  PL/pgSQL function inline_code_block line 1 at RAISE
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (raised as a result of Query-invoked autoflush; consider using a session.no_autoflush block if this flush is occurring prematurely)
+    (psycopg.errors.DeadlockDetected) acceptance conflict
+    CONTEXT:  PL/pgSQL function inline_code_block line 1 at RAISE
+    [SQL: DO $$ BEGIN RAISE EXCEPTION 'acceptance conflict' USING ERRCODE='40P01'; END $$]
+    (Background on this error at: https://sqlalche.me/e/21/e3q8)
+/tmp/mw-native-alert-python311/lib/python3.11/site-packages/psycopg/cursor.py:117: sqlalchemy.exc.OperationalError: (raised as a result of Query-invoked autoflush; consider using a session.no_autoflush block if this flush is occurring prematurely)
+E   psycopg.errors.SerializationFailure: acceptance conflict
+    CONTEXT:  PL/pgSQL function inline_code_block line 1 at RAISE
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (raised as a result of Query-invoked autoflush; consider using a session.no_autoflush block if this flush is occurring prematurely)
+    (psycopg.errors.SerializationFailure) acceptance conflict
+    CONTEXT:  PL/pgSQL function inline_code_block line 1 at RAISE
+    [SQL: DO $$ BEGIN RAISE EXCEPTION 'acceptance conflict' USING ERRCODE='40001'; END $$]
+    (Background on this error at: https://sqlalche.me/e/21/e3q8)
+/tmp/mw-native-alert-python311/lib/python3.11/site-packages/psycopg/cursor.py:117: sqlalchemy.exc.OperationalError: (raised as a result of Query-invoked autoflush; consider using a session.no_autoflush block if this flush is occurring prematurely)
+E   psycopg.errors.SerializationFailure: acceptance conflict
+    CONTEXT:  PL/pgSQL function inline_code_block line 1 at RAISE
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (raised as a result of Query-invoked autoflush; consider using a session.no_autoflush block if this flush is occurring prematurely)
+    (psycopg.errors.SerializationFailure) acceptance conflict
+    CONTEXT:  PL/pgSQL function inline_code_block line 1 at RAISE
+    [SQL: DO $$ BEGIN RAISE EXCEPTION 'acceptance conflict' USING ERRCODE='40001'; END $$]
+    (Background on this error at: https://sqlalche.me/e/21/e3q8)
+/tmp/mw-native-alert-python311/lib/python3.11/site-packages/psycopg/cursor.py:117: sqlalchemy.exc.OperationalError: (raised as a result of Query-invoked autoflush; consider using a session.no_autoflush block if this flush is occurring prematurely)
+E   psycopg.errors.SerializationFailure: acceptance conflict
+    CONTEXT:  PL/pgSQL function inline_code_block line 1 at RAISE
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (raised as a result of Query-invoked autoflush; consider using a session.no_autoflush block if this flush is occurring prematurely)
+    (psycopg.errors.SerializationFailure) acceptance conflict
+    CONTEXT:  PL/pgSQL function inline_code_block line 1 at RAISE
+    [SQL: DO $$ BEGIN RAISE EXCEPTION 'acceptance conflict' USING ERRCODE='40001'; END $$]
+    (Background on this error at: https://sqlalche.me/e/21/e3q8)
+/tmp/mw-native-alert-python311/lib/python3.11/site-packages/psycopg/cursor.py:117: sqlalchemy.exc.OperationalError: (raised as a result of Query-invoked autoflush; consider using a session.no_autoflush block if this flush is occurring prematurely)
+E   psycopg.errors.SerializationFailure: acceptance conflict
+    CONTEXT:  PL/pgSQL function inline_code_block line 1 at RAISE
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (raised as a result of Query-invoked autoflush; consider using a session.no_autoflush block if this flush is occurring prematurely)
+    (psycopg.errors.SerializationFailure) acceptance conflict
+    CONTEXT:  PL/pgSQL function inline_code_block line 1 at RAISE
+    [SQL: DO $$ BEGIN RAISE EXCEPTION 'acceptance conflict' USING ERRCODE='40001'; END $$]
+    (Background on this error at: https://sqlalche.me/e/21/e3q8)
+/tmp/mw-native-alert-python311/lib/python3.11/site-packages/psycopg/cursor.py:117: sqlalchemy.exc.OperationalError: (raised as a result of Query-invoked autoflush; consider using a session.no_autoflush block if this flush is occurring prematurely)
+E   psycopg.errors.SerializationFailure: acceptance conflict
+    CONTEXT:  PL/pgSQL function inline_code_block line 1 at RAISE
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.OperationalError: (raised as a result of Query-invoked autoflush; consider using a session.no_autoflush block if this flush is occurring prematurely)
+    (psycopg.errors.SerializationFailure) acceptance conflict
+    CONTEXT:  PL/pgSQL function inline_code_block line 1 at RAISE
+    [SQL: DO $$ BEGIN RAISE EXCEPTION 'acceptance conflict' USING ERRCODE='40001'; END $$]
+    (Background on this error at: https://sqlalche.me/e/21/e3q8)
+/tmp/mw-native-alert-python311/lib/python3.11/site-packages/psycopg/cursor.py:117: sqlalchemy.exc.OperationalError: (raised as a result of Query-invoked autoflush; consider using a session.no_autoflush block if this flush is occurring prematurely)
+E   AttributeError: module 'alerts.history_versions' has no attribute 'worker_tick'
+/home/quant/repos/market-watch-pro-charts-impl-20261011/backend/tests/test_history_worker_recovery_postgres.py:120: AttributeError: module 'alerts.history_versions' has no attribute 'worker_tick'
+=========================== short test summary info ============================
+FAILED backend/tests/test_history_worker_recovery_postgres.py::test_import_retries_entire_commit_without_refetching[1-40P01]
+FAILED backend/tests/test_history_worker_recovery_postgres.py::test_import_retries_entire_commit_without_refetching[1-40001]
+FAILED backend/tests/test_history_worker_recovery_postgres.py::test_import_retries_entire_commit_without_refetching[3-40P01]
+FAILED backend/tests/test_history_worker_recovery_postgres.py::test_import_retries_entire_commit_without_refetching[3-40001]
+FAILED backend/tests/test_history_worker_recovery_postgres.py::test_retry_rechecks_controls_after_rollback[cancel]
+FAILED backend/tests/test_history_worker_recovery_postgres.py::test_retry_rechecks_controls_after_rollback[pause]
+FAILED backend/tests/test_history_worker_recovery_postgres.py::test_retry_rechecks_controls_after_rollback[lease]
+FAILED backend/tests/test_history_worker_recovery_postgres.py::test_retry_rechecks_controls_after_rollback[cursor]
+FAILED backend/tests/test_history_worker_recovery_postgres.py::test_one_failed_worker_phase_does_not_exit_or_starve_other_phases
+9 failed in 17.74s

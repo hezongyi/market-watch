@@ -1,17 +1,18 @@
 // Runtime regression: shared transport failures and stale async completions.
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
-function fixture(count=8){
- let clock=0,next=0,symbol='MWP:A';const tasks=new Map(),models=[],listeners=[],deferred=[],requests=[];
+function fixture(count=8,initial='MWP:A'){
+ let clock=0,next=0,symbol=initial;const tasks=new Map(),models=[],listeners=[],deferred=[],requests=[];
  const ctx=vm.createContext({URLSearchParams,location:{search:''},performance:{now:()=>clock},
   setTimeout:(fn,delay)=>{const id=++next;tasks.set(id,{fn,at:clock+delay});return id;},
   clearTimeout:id=>tasks.delete(id),cancelAnimationFrame:id=>tasks.delete(id),
   requestAnimationFrame:fn=>{const id=++next;tasks.set(id,{fn,at:clock+16});return id;}});
+ vm.runInContext(fs.readFileSync(path.resolve(__dirname,'../../advanced-host/series.js'),'utf8'),ctx);
  vm.runInContext(fs.readFileSync(path.resolve(__dirname,'../../advanced-host/native-reserve.js'),'utf8'),ctx);
  const api=ctx.MWNativeReserve;
  function thread(ticker){const t={_symbolInfo:{ticker},_resolution:'5',_cache:{bars:[{time:100000}]},_dealignTime:t=>t,
   _processBars(){t.processed=(t.processed||0)+1;},_setEndOfData(){t._endOfData=true;}};
   api.bindThread(t,t._symbolInfo,'5');return t;}
- const a=thread('MWP:A'),b=thread('MWP:B');
+ const a=thread(initial),b=thread('MWP:B');
  function addModel(initialOffset=0){
   const event={subscribe:(_,fn)=>listeners.push(fn),unsubscribeAll(){}};
   let offset=initialOffset;const ts={visibleBarsStrictRange:()=>({firstBar:()=>0}),points:()=>({range:()=>({value:()=>({firstIndex:0})}),valueAt:()=>100}),width:()=>600,barSpacing:()=>6,rightOffset:()=>offset,visibleBarsStrictRangeChanged:()=>event,barSpacingChanged:()=>event};
@@ -28,6 +29,20 @@ function fixture(count=8){
  return{api,a,b,models,requests,deferred,advance,flush,addModel,switch:(next='MWP:B')=>{symbol=next;listeners.forEach(fn=>fn());}};
 }
 (async()=>{
+ for(const ticker of ['MWH:00000000-0000-0000-0000-000000000001','MWC:'+'a'.repeat(64)]){
+  const f=fixture(3,ticker);await f.advance(100);assert.equal(f.requests.length,1);
+  assert.equal(f.requests[0].symbol,ticker);
+  f.switch(ticker.toUpperCase());await f.advance(100);
+  assert.ok(f.api.extra({ticker},'5')>0,'uppercase native fixed ticker retains cache reserve capacity');
+  f.api.delivered({ticker},'5',1000);
+  assert.ok(f.api.diagnostics().models.every(m=>m.state.enhancedUntil>0),'fixed slow delivery applies to canonical-equivalent panes');
+  f.switch(ticker);await f.advance(100);
+  f.deferred[0].resolve({bars:[{time:90000}],history_boundary:false});await f.flush();
+  assert.equal(f.a.processed,1,'fixed peers share one native cache reserve');
+  await f.advance(100);f.a._cache={bars:[{time:80000}]};
+  f.deferred[1].resolve({bars:[{time:70000}],history_boundary:true});await f.flush();
+  assert.equal(f.a.processed,1,'obsolete fixed reserve cannot populate purged cache');
+ }
  {
   const ctx=vm.createContext({URLSearchParams,location:{search:'?native_reserve=off'},performance:{now:()=>0}});
   let notifications=0;

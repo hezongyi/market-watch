@@ -168,9 +168,19 @@ replacements.push([
   'pricescale:i.pricescale,minmov:i.minmov,minmove2:i.minmove2||0,fractional:i.fractional||!1',
   'pricescale:globalThis.parent?.chartQuoteScale?.(t,i)??i.pricescale,minmov:i.minmov,minmove2:i.minmove2||0,fractional:i.fractional||!1',
 ]);
+const quoteScaleHooks = replacements.map(pair => [...pair]);
+const endPair = replacements.find(pair => pair[0] === 's.endOfData=!0),e.onHistoryCallback(s)');
+endPair[1] = endPair[1].replace('this._symbolInfo.ticker?.startsWith("MWP:")', `${runtime}?.eligible(this._symbolInfo)`);
+// Drawing masks use each source model's interval and the native property tree.
+replacements.push(
+  ['function d(e,t){const i=t.childs();switch(e.kind())',
+   'function d(e,t){const mw=globalThis.parent?.MWDrawingVisibility?.actual(e,t);if(mw!==undefined)return mw;const i=t.childs();switch(e.kind())'],
+  ['calcIsActualInterval(){const e=this._isActualInterval,t=this._properties,i=this._model.mainSeries();',
+   'calcIsActualInterval(){globalThis.parent?.MWDrawingVisibility?.ensure(this._properties.childs().intervalsVisibilities);const e=this._isActualInterval,t=this._properties,i=this._model.mainSeries();'],
+);
 const digest = text => createHash('sha256').update(text).digest('hex');
 if (digest(source) !== expected) {
-  const installed = [replacements, maximizedHooks, productionV112Hooks, legacySyncHooks, previousSyncHooks, legacyPreviousSyncHooks, rangeHooks, legacyRangeHooks, previous, continuousHooks, continuousV9, continuousV8, continuousV7, continuousV6, continuousV5, continuousV4, continuousV3, continuousV2, continuousV1, legacy].find(candidate=>
+  const installed = [replacements, quoteScaleHooks, maximizedHooks, productionV112Hooks, legacySyncHooks, previousSyncHooks, legacyPreviousSyncHooks, rangeHooks, legacyRangeHooks, previous, continuousHooks, continuousV9, continuousV8, continuousV7, continuousV6, continuousV5, continuousV4, continuousV3, continuousV2, continuousV1, legacy].find(candidate=>
     candidate.every(([,after])=>source.split(after).length===2));
   if (!installed) throw Error('Incomplete native hooks: restore the verified original bundle before installing');
   let original = source;

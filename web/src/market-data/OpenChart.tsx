@@ -13,5 +13,5 @@ export function OpenChart({ ticker, frame = "M1", label = "在当前图表打开
     catch (e) { if (mounted.current) setError(String(e)); }
     finally { lock.release(); if (mounted.current) setOpening(false); }
   }
-  return <><button aria-disabled={busy} aria-busy={opening || undefined} onClick={() => void open()}>{opening ? "正在打开…" : label}</button>{error && <span className="error" role="alert">{error}</span>}</>;
+  return <><button aria-disabled={busy} aria-busy={opening || undefined} onClick={() => void open()}>{opening ? "正在打开…" : label}</button><small>打开将关闭品种和周期同步，保留其他图格。</small>{error && <span className="error" role="alert">{error}</span>}</>;
 }

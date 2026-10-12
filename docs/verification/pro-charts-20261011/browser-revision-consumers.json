@@ -1,0 +1,434 @@
+{
+  "environment": "Ubuntu mw-pro-charts-20261011",
+  "supplier": "synthetic I/O; actual API/PG revision and stream",
+  "cases": [
+    {
+      "name": "same composite/period consumers through real layout",
+      "layout": "2v",
+      "charts": [
+        {
+          "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+          "resolution": "60",
+          "range": {
+            "from": 1791151200,
+            "to": 1791792000
+          },
+          "first": 0,
+          "last": 622,
+          "studies": []
+        },
+        {
+          "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+          "resolution": "60",
+          "range": {
+            "from": 1791151200,
+            "to": 1791792000
+          },
+          "first": 0,
+          "last": 622,
+          "studies": []
+        }
+      ]
+    },
+    {
+      "name": "same composite/period consumers through real layout",
+      "layout": "3r",
+      "charts": [
+        {
+          "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+          "resolution": "60",
+          "range": {
+            "from": 1791486000,
+            "to": 1791792000
+          },
+          "first": 0,
+          "last": 622,
+          "studies": []
+        },
+        {
+          "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+          "resolution": "60",
+          "range": {
+            "from": 1791486000,
+            "to": 1791792000
+          },
+          "first": 0,
+          "last": 622,
+          "studies": []
+        },
+        {
+          "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+          "resolution": "60",
+          "range": {
+            "from": 1791486000,
+            "to": 1791792000
+          },
+          "first": 0,
+          "last": 622,
+          "studies": []
+        }
+      ]
+    },
+    {
+      "name": "same composite/period consumers through real layout",
+      "layout": "4",
+      "charts": [
+        {
+          "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+          "resolution": "60",
+          "range": {
+            "from": 1791486000,
+            "to": 1791792000
+          },
+          "first": 0,
+          "last": 622,
+          "studies": []
+        },
+        {
+          "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+          "resolution": "60",
+          "range": {
+            "from": 1791486000,
+            "to": 1791792000
+          },
+          "first": 0,
+          "last": 622,
+          "studies": []
+        },
+        {
+          "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+          "resolution": "60",
+          "range": {
+            "from": 1791486000,
+            "to": 1791792000
+          },
+          "first": 0,
+          "last": 622,
+          "studies": []
+        },
+        {
+          "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+          "resolution": "60",
+          "range": {
+            "from": 1791514800,
+            "to": 1791792000
+          },
+          "first": 0,
+          "last": 622,
+          "studies": [
+            {
+              "id": "GlLhNQ",
+              "name": "Compare"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "real symbol and interval synchronization on/off with shared consumers",
+      "charts": [
+        {
+          "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+          "resolution": "15",
+          "range": {
+            "from": 1791689400,
+            "to": 1791765900
+          },
+          "first": 0,
+          "last": 433,
+          "studies": []
+        },
+        {
+          "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+          "resolution": "15",
+          "range": {
+            "from": 1791689400,
+            "to": 1791765900
+          },
+          "first": 0,
+          "last": 433,
+          "studies": []
+        },
+        {
+          "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+          "resolution": "15",
+          "range": {
+            "from": 1791689400,
+            "to": 1791765900
+          },
+          "first": 0,
+          "last": 433,
+          "studies": []
+        },
+        {
+          "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+          "resolution": "15",
+          "range": {
+            "from": 1791696600,
+            "to": 1791765900
+          },
+          "first": 0,
+          "last": 433,
+          "studies": [
+            {
+              "id": "GlLhNQ",
+              "name": "Compare"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "committed actual activation resets shared main/compare consumers to new revision",
+      "state": {
+        "states": [
+          [
+            "MWC:85eb595180ed9491e1d5e3064aca750933a9ffd787b840d1357645fbbeca3b8a|60|",
+            {
+              "first": 1791435600000,
+              "accepted": true,
+              "empty": false,
+              "last": 1791756000000,
+              "observed_at": 1791757826114,
+              "input_revision": 1,
+              "binding": "901c49f7-55df-4703-ba66-b97a10db1eb4",
+              "history_revision": "807a08b99dfc07a01d98c1a3397391a739bfcc4611bd7c77ee4fcba568a217b8",
+              "history_tail_revision": null
+            }
+          ],
+          [
+            "MWC:85eb595180ed9491e1d5e3064aca750933a9ffd787b840d1357645fbbeca3b8a|15|",
+            {
+              "first": 1791680400000,
+              "accepted": true,
+              "empty": false,
+              "last": 1791756900000,
+              "observed_at": 1791757883118,
+              "input_revision": 1,
+              "binding": "a4fc8064-1fda-4252-926e-8cb80c9c0be5",
+              "history_revision": "fdd5b12fa1b78e01959b0ce5d0ba6ae73ae6fcaee9b4a85a7af160f527bad38a",
+              "history_tail_revision": null
+            }
+          ]
+        ],
+        "consumers": [
+          {
+            "res": "15",
+            "last": 1791756900000
+          }
+        ],
+        "loads": [
+          {
+            "ticker": "MWC:85eb595180ed9491e1d5e3064aca750933a9ffd787b840d1357645fbbeca3b8a",
+            "res": "15",
+            "rows": 86,
+            "accepted": true
+          }
+        ]
+      },
+      "charts": [
+        {
+          "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+          "resolution": "15",
+          "range": {
+            "from": 1791689400,
+            "to": 1791765900
+          },
+          "first": 0,
+          "last": 429,
+          "studies": []
+        },
+        {
+          "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+          "resolution": "15",
+          "range": {
+            "from": 1791689400,
+            "to": 1791765900
+          },
+          "first": 0,
+          "last": 429,
+          "studies": []
+        },
+        {
+          "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+          "resolution": "15",
+          "range": {
+            "from": 1791689400,
+            "to": 1791765900
+          },
+          "first": 0,
+          "last": 429,
+          "studies": []
+        },
+        {
+          "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+          "resolution": "15",
+          "range": {
+            "from": 1791696600,
+            "to": 1791765900
+          },
+          "first": 0,
+          "last": 429,
+          "studies": [
+            {
+              "id": "GlLhNQ",
+              "name": "Compare"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "originalRevision": "901c49f7-55df-4703-ba66-b97a10db1eb4",
+  "preparation": {
+    "status": 201,
+    "payload": {
+      "id": "a4fc8064-1fda-4252-926e-8cb80c9c0be5",
+      "request_id": "5ee25368-d48e-4d45-be85-60382ec56cb8",
+      "parent_revision_id": "901c49f7-55df-4703-ba66-b97a10db1eb4",
+      "history_version_id": "95d5f45a-54dd-4e1e-8367-3edd37d5618c",
+      "dataset_id": "1139a661eecac6e400618e4514d405a5b0850eed83d6c966a43584294ae9e36a",
+      "history_checksum": "45e727222cc21dedd264be9f9330dd7a1482ac8c109c415a3f69629b8baed223",
+      "mapping_id": "4e7acb9a9e70bdd20328a86d35744a27145f9503723fed226da5bd7bd6b3a756",
+      "seam": 1791665760000,
+      "rules": {
+        "aggregation": "configured-phase-m1-v1",
+        "seam": "explicit-minute-boundary-v1",
+        "selection": "history-before-T-target-from-T-v1",
+        "tail_revisions": "source-confirmed-replace-audit-v1",
+        "aggregation_calendar": "ny17",
+        "historical_calendar_version": "pro-charts-fixture-v2"
+      },
+      "created_at": 1791757847712,
+      "reason": "Ubuntu actual active revision shared-consumer acceptance",
+      "change": {
+        "request": {
+          "request_id": "5ee25368-d48e-4d45-be85-60382ec56cb8",
+          "expected_revision_id": "901c49f7-55df-4703-ba66-b97a10db1eb4",
+          "history_version_id": "95d5f45a-54dd-4e1e-8367-3edd37d5618c",
+          "mapping_id": "4e7acb9a9e70bdd20328a86d35744a27145f9503723fed226da5bd7bd6b3a756",
+          "seam": 1791665760000,
+          "reason": "Ubuntu actual active revision shared-consumer acceptance",
+          "allow_non_day_boundary": true
+        },
+        "cutoff": 1791757800000,
+        "history_checksum": "45e727222cc21dedd264be9f9330dd7a1482ac8c109c415a3f69629b8baed223",
+        "warmups": [],
+        "affected_rules": [
+          {
+            "id": "1b433882-0d82-4a2d-a5dc-67c6409ada25",
+            "name": "EURUSD · 组合行情 · bid · H1 告警",
+            "rule_version": 1,
+            "revision_id": "e16ec716-e7f9-4eb3-9152-525b819a61ce",
+            "migration": "keeps_fixed_revision"
+          },
+          {
+            "id": "079a9660-37ba-4c96-bf21-d3fbbbd672a3",
+            "name": "EURUSD · 组合行情 · bid · H1 告警",
+            "rule_version": 1,
+            "revision_id": "e16ec716-e7f9-4eb3-9152-525b819a61ce",
+            "migration": "keeps_fixed_revision"
+          },
+          {
+            "id": "df24be5c-1af2-44de-b9e8-136702cefd66",
+            "name": "EURUSD · 组合行情 · bid · H1 告警",
+            "rule_version": 1,
+            "revision_id": "e16ec716-e7f9-4eb3-9152-525b819a61ce",
+            "migration": "keeps_fixed_revision"
+          },
+          {
+            "id": "b36cab4c-cf3f-4875-bcfd-e354e60a5f08",
+            "name": "EURUSD · 组合行情 · bid · H1 告警",
+            "rule_version": 1,
+            "revision_id": "e16ec716-e7f9-4eb3-9152-525b819a61ce",
+            "migration": "keeps_fixed_revision"
+          },
+          {
+            "id": "5809c80d-e6da-406b-a5f5-2f49873016a4",
+            "name": "EURUSD · 组合行情 · bid · H1 告警",
+            "rule_version": 1,
+            "revision_id": "e16ec716-e7f9-4eb3-9152-525b819a61ce",
+            "migration": "keeps_fixed_revision"
+          },
+          {
+            "id": "6acc7735-c925-4fd7-8378-b687b31df614",
+            "name": "EURUSD · 组合行情 · bid · H1 告警",
+            "rule_version": 1,
+            "revision_id": "e16ec716-e7f9-4eb3-9152-525b819a61ce",
+            "migration": "keeps_fixed_revision"
+          },
+          {
+            "id": "1a05f85b-4ce3-4c26-a06c-5a41229e0013",
+            "name": "EURUSD · 组合行情 · bid · H1 告警",
+            "rule_version": 1,
+            "revision_id": "e16ec716-e7f9-4eb3-9152-525b819a61ce",
+            "migration": "keeps_fixed_revision"
+          }
+        ],
+        "indicator_algorithm": "fixed-indicator-state-v3",
+        "policy": "no_implicit_rule_migration"
+      },
+      "preparation": {
+        "ready": false,
+        "status": "confirming_m1",
+        "input_revision": null,
+        "cutoff": 1791757800000,
+        "periods_ready": false,
+        "indicators": [],
+        "query_error": null,
+        "coverage": "per-bar; readiness does not certify all historical coverage"
+      },
+      "activated_at": null,
+      "activation": null
+    }
+  },
+  "newRevision": "a4fc8064-1fda-4252-926e-8cb80c9c0be5",
+  "activation": {
+    "states": [
+      [
+        "MWC:85eb595180ed9491e1d5e3064aca750933a9ffd787b840d1357645fbbeca3b8a|60|",
+        {
+          "first": 1791435600000,
+          "accepted": true,
+          "empty": false,
+          "last": 1791756000000,
+          "observed_at": 1791757826114,
+          "input_revision": 1,
+          "binding": "901c49f7-55df-4703-ba66-b97a10db1eb4",
+          "history_revision": "807a08b99dfc07a01d98c1a3397391a739bfcc4611bd7c77ee4fcba568a217b8",
+          "history_tail_revision": null
+        }
+      ],
+      [
+        "MWC:85eb595180ed9491e1d5e3064aca750933a9ffd787b840d1357645fbbeca3b8a|15|",
+        {
+          "first": 1791680400000,
+          "accepted": true,
+          "empty": false,
+          "last": 1791756900000,
+          "observed_at": 1791757883118,
+          "input_revision": 1,
+          "binding": "a4fc8064-1fda-4252-926e-8cb80c9c0be5",
+          "history_revision": "fdd5b12fa1b78e01959b0ce5d0ba6ae73ae6fcaee9b4a85a7af160f527bad38a",
+          "history_tail_revision": null
+        }
+      ]
+    ],
+    "consumers": [
+      {
+        "res": "15",
+        "last": 1791756900000
+      }
+    ],
+    "loads": [
+      {
+        "ticker": "MWC:85eb595180ed9491e1d5e3064aca750933a9ffd787b840d1357645fbbeca3b8a",
+        "res": "15",
+        "rows": 86,
+        "accepted": true
+      }
+    ]
+  },
+  "passed": true,
+  "errors": []
+}

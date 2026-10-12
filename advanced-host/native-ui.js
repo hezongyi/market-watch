@@ -116,7 +116,7 @@ function chartNativeUi(widget, doc, searchSymbols) {
         const items=ctx.searchSources.filter(item=>!platform.latest.current.allowedSources || !item.value() || platform.latest.current.allowedSources.includes(item.value().toLowerCase())).map(item=>({value:item.value().toLowerCase(),content:item.value() ? item.name() : "全部来源"}));
         return R.createElement(SearchContext.Provider,{value:scoped},R.createElement("div",{
           ref:container,className:"mw-platform-inline",onKeyDown:keyboard,"aria-label":"平台行情搜索",
-        },props.render(),sourceHeader && createPortal(R.createElement("div",{className:"dc-select-control mw-platform-source"},
+        },platform.latest.current.mode !== "select" && R.createElement("small",{className:"mw-platform-status"},"打开将关闭品种和周期同步，保留其他图格。"),props.render(),sourceHeader && createPortal(R.createElement("div",{className:"dc-select-control mw-platform-source"},
           R.createElement("div",{className:"dc-native-slot","data-native-component":"select"},
             R.createElement(Select,{value:source,items,onChange:value=>{setSource(value);ctx.setSelectedIndex(-1);},
               "aria-label":"来源",size:"small",className:"dc-native-select"}))),sourceHeader)));
@@ -136,7 +136,7 @@ function chartNativeUi(widget, doc, searchSymbols) {
           finally {if(platform.alive.current)setOpening(false);}
         }
         const actions=R.createElement(R.Fragment,null,
-          props.item.available && R.createElement("button",{id:props.item.rowId+"-open",type:"button",className:"mw-platform-action",onClick:open,disabled:!actionable || platform.latest.current.busy,tabIndex:actionable?0:-1,"aria-pressed":selecting?selected:undefined,"aria-busy":opening||undefined},selecting?(selected?"已选择":"选择"):opening?"正在打开…":"打开图表"),
+          props.item.available && R.createElement("button",{id:props.item.rowId+"-open",type:"button",className:"mw-platform-action",onClick:open,disabled:!actionable || platform.latest.current.busy,tabIndex:actionable?0:-1,"aria-pressed":selecting?selected:undefined,"aria-busy":opening||undefined,title:selecting?undefined:"打开到当前图格，并关闭品种与周期同步"},selecting?(selected?"已选择":"选择"):opening?"正在打开…":"打开图表"),
           !selecting && R.createElement("button",{id:props.item.rowId+"-details",type:"button",className:"mw-platform-action",disabled:!actionable,tabIndex:actionable?0:-1,onClick:event=>{event.stopPropagation();platform.latest.current.onDetails(ticker);}},"详情"));
         return R.createElement(SearchRow,{...props,
           title:props.item.symbol,dangerousTitleHTML:undefined,description:props.item.description,dangerousDescriptionHTML:undefined,
@@ -297,6 +297,7 @@ function chartNativeUi(widget, doc, searchSymbols) {
         input: req(909536).InputControl,
         checkbox: req(343577).Checkbox,
         select: req(221339).Select,
+        operationHint: req(989231).SymbolSearchDialogFooter,
         platformSearch: PlatformSearch,
       };
       for (const [name, component] of Object.entries(components))
@@ -307,7 +308,13 @@ function chartNativeUi(widget, doc, searchSymbols) {
         node.dataset.nativeComponent = kind;
         if(kind === "platformSearch") req(371996).setValue((props.settingsScope||"mw.data-center.platform")+".category",props.asset || "");
         const element = value => kind === "sidebar" ? R.createElement(component, {className:value.className},
-          R.createElement("div", {ref:value.contentRef})) : R.createElement(component, value);
+          R.createElement("div", {ref:value.contentRef})) : kind === "select" ?
+          // This pinned ControlSkeleton supports a real button tag. It is
+          // labelable, and keeps the vendor disclosure/menu/keyboard controller.
+          R.createElement(component, {...value, tag:"button", type:"button", ref:element=>{
+            if(element) element.disabled=!!value.disabled;
+            value.reference?.(element);
+          }}) : R.createElement(component, value);
         let root = createRoot(element(props), node);
         return { update(next) { root?.render(element(next)); },
           dispose() { root?.unmount(); root = null; delete node.dataset.nativeComponent; } };
@@ -357,4 +364,59 @@ function chartNativeUi(widget, doc, searchSymbols) {
     return loading;
   }
   return { load };
+}
+
+// The pinned details view disables vendor session inference (symbol.session is
+// an aggregation hint). Present the backend's reviewed session and actual time
+// in that view alone, using its native section/status classes.
+function chartNativeQuoteDetails(widget, snapshot) {
+  const expected = "6b804c486857f27920cf761aa7eb6e29d9bb6362";
+  if (!String(TradingView.version()).includes(expected)) throw Error("品种详情版本尚未适配");
+  const probe=widget.createButton({align:"left",useTradingViewStyle:false});
+  const doc=probe.ownerDocument;
+  widget.removeButton(probe);
+  let req, disposed=false;
+  doc.defaultView.webpackChunktradingview.push([[`mw-quote-details-${crypto.randomUUID()}`],{},value=>{req=value;}]);
+  const nodes=new Set();
+  function refresh() {
+    if(disposed || !req?.m[808579] || !req.m[542830] || !req.m[802878]) return;
+    const sections=req(808579),nativeStatus=req(542830),exchange=req(802878);
+    const status={status:nativeStatus.statusWrapper,text:nativeStatus.lastTime,
+      textWithIcon:nativeStatus.status,dot:exchange.dot,open:nativeStatus.green,close:nativeStatus.neutral};
+    for(const node of nodes) if(!node.isConnected) nodes.delete(node);
+    const {value,time}=snapshot();
+    const containers=[...doc.querySelectorAll('.layout__area--right [data-test-id-widget-type="detail"] .widgetbar-widgetbody')]
+      .filter(node=>node.querySelector('[data-qa-id="details-element exchange"]'));
+    for(const container of containers) {
+      let slot=container.querySelector('[data-name="mw-quote-details-time"]');
+      if(!slot) {
+        slot=doc.createElement('div');slot.dataset.name='mw-quote-details-time';slot.className=sections.widgetWrapper;
+        const state=doc.createElement('div');state.className=status.status;
+        const dot=doc.createElement('span');dot.className=status.dot;dot.setAttribute('aria-hidden','true');
+        const label=doc.createElement('span');label.className=`${status.text} ${status.textWithIcon}`;
+        state.append(dot,label);
+        const updated=doc.createElement('div');updated.className=status.text;
+        updated.style.cssText='margin-top:4px;line-height:1.5;overflow-wrap:anywhere';
+        slot.append(state,updated);
+        const sectionsInView=[...container.querySelectorAll(`.${sections.widgetWrapper}`)];
+        (sectionsInView[1] || sectionsInView[0])?.after(slot);
+        nodes.add(slot);
+      }
+      const state=slot.firstElementChild,label=state.lastElementChild,updated=slot.lastElementChild;
+      const session=value?.market_session;
+      const text=({closed:'休市',scheduled_open:'交易时段内',unknown:'时段未核实'})[session] || '时段未核实';
+      const stateText=text+(value?.fetch_status && value.fetch_status!=='ok' ? ' · 更新失败' : '');
+      if(label.textContent!==stateText) label.textContent=stateText;
+      const nextClass=`${status.status} ${session==='scheduled_open' ? status.open : status.close}`;
+      if(state.className!==nextClass) state.className=nextClass;
+      const stamp=value?.quote_time ?? value?.data_start;
+      const prefix=value?.time_type==='fixed_history' ? '历史数据时间' : value?.quote_time!=null ? '最后更新时间' : '来源行情观察时间';
+      const updatedText=Number.isFinite(stamp) ? `${prefix}：${time(stamp)}` : '最后更新时间：暂无记录';
+      if(updated.textContent!==updatedText) updated.textContent=updatedText;
+    }
+  }
+  const observer=new MutationObserver(refresh);
+  observer.observe(doc.body,{childList:true,subtree:true});
+  refresh();
+  return {refresh,dispose(){disposed=true;observer.disconnect();for(const node of nodes)node.remove();nodes.clear();}};
 }

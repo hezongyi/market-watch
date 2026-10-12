@@ -1,0 +1,231 @@
+{
+  "environment": "Ubuntu mw-pro-charts-20261011",
+  "supply": "synthetic task-only; real API/PostgreSQL/licensed engine",
+  "cases": [
+    {
+      "name": "F1 full five-to-single BTCUSDT XAUUSD Yahoo-AAPL composite-EURUSD five",
+      "passed": true,
+      "sequence": [
+        {
+          "step": "five-initial",
+          "state": {
+            "layout": "2-3",
+            "charts": [
+              {
+                "index": 0,
+                "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+                "resolution": "60",
+                "ready": true,
+                "range": {
+                  "from": 1791486000,
+                  "to": 1791792000
+                }
+              },
+              {
+                "index": 1,
+                "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+                "resolution": "5",
+                "ready": true,
+                "range": {
+                  "from": 1791735000,
+                  "to": 1791760500
+                }
+              },
+              {
+                "index": 2,
+                "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+                "resolution": "1W",
+                "ready": true,
+                "range": {
+                  "from": 1787529600,
+                  "to": 1797199200
+                }
+              },
+              {
+                "index": 3,
+                "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+                "resolution": "1D",
+                "ready": true,
+                "range": {
+                  "from": 1787875200,
+                  "to": 1792702800
+                }
+              },
+              {
+                "index": 4,
+                "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+                "resolution": "240",
+                "ready": true,
+                "range": {
+                  "from": 1791118800,
+                  "to": 1791896400
+                }
+              }
+            ]
+          }
+        },
+        {
+          "step": "BTCUSDT",
+          "state": {
+            "layout": "s",
+            "charts": [
+              {
+                "index": 0,
+                "symbol": "MWP:BTCUSDT",
+                "resolution": "60",
+                "ready": true,
+                "range": {
+                  "from": 1791435600,
+                  "to": 1791792000
+                }
+              }
+            ]
+          }
+        },
+        {
+          "step": "XAUUSD",
+          "state": {
+            "layout": "s",
+            "charts": [
+              {
+                "index": 0,
+                "symbol": "MWP:DUKA:C2893271B856E9D2550CADC243BDF793",
+                "resolution": "60",
+                "ready": true,
+                "range": {
+                  "from": 1791435600,
+                  "to": 1791792000
+                }
+              }
+            ]
+          }
+        },
+        {
+          "step": "AAPL",
+          "state": {
+            "layout": "s",
+            "charts": [
+              {
+                "index": 0,
+                "symbol": "MWP:YAHOO:1EB44D625271A4EB75016F276D137836",
+                "resolution": "60",
+                "ready": true,
+                "range": {
+                  "from": 1791435600,
+                  "to": 1791905400
+                }
+              }
+            ]
+          }
+        },
+        {
+          "step": "EURUSD",
+          "state": {
+            "layout": "s",
+            "charts": [
+              {
+                "index": 0,
+                "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+                "resolution": "60",
+                "ready": true,
+                "range": {
+                  "from": 1791435600,
+                  "to": 1791792000
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "final": {
+        "layout": "2-3",
+        "charts": [
+          {
+            "index": 0,
+            "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+            "resolution": "60",
+            "ready": true,
+            "range": {
+              "from": 1791486000,
+              "to": 1791792000
+            }
+          },
+          {
+            "index": 1,
+            "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+            "resolution": "5",
+            "ready": true,
+            "range": {
+              "from": 1791735000,
+              "to": 1791760500
+            }
+          },
+          {
+            "index": 2,
+            "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+            "resolution": "1W",
+            "ready": true,
+            "range": {
+              "from": 1787529600,
+              "to": 1797199200
+            }
+          },
+          {
+            "index": 3,
+            "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+            "resolution": "1D",
+            "ready": true,
+            "range": {
+              "from": 1787875200,
+              "to": 1792702800
+            }
+          },
+          {
+            "index": 4,
+            "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+            "resolution": "240",
+            "ready": true,
+            "range": {
+              "from": 1791118800,
+              "to": 1791896400
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "http": [
+    {
+      "failed": true,
+      "path": "/api/charts/stream/events",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "failed": true,
+      "path": "/api/market-data/quotes",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "failed": true,
+      "path": "/api/charts/stream/events",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "failed": true,
+      "path": "/api/charts/stream/events",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "failed": true,
+      "path": "/api/charts/stream/events",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "failed": true,
+      "path": "/api/market-data/quotes",
+      "error": "net::ERR_ABORTED"
+    }
+  ],
+  "passed": true
+}

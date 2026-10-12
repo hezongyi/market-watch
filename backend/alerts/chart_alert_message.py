@@ -2,6 +2,7 @@
 
 from string import Formatter
 
+from .market_names import display_code
 from .storage import instant
 
 PLACEHOLDERS = {"symbol", "source", "timeframe", "condition", "value", "threshold",
@@ -40,17 +41,25 @@ def condition_label(condition):
     return label + f" [{condition['lower']}, {condition['upper']}]"
 
 
+def signal_title(signal):
+    if not signal.evidence.get("chart_alert"):
+        return f"{signal.instrument_id} · {signal.reason}"
+    identity = signal.evidence.get("market_identity", {})
+    symbol = display_code(identity.get("symbol") or signal.instrument_id, identity.get("source"))
+    return f"{symbol} · {signal.reason}"
+
+
 def signal_message(signal):
     evidence = signal.evidence
     if not evidence.get("chart_alert"):
         return f"价格 {signal.price} / 阈值 {signal.threshold}\n发生时间 {instant(signal.occurred_at).isoformat()}\n信号 {signal.id}\n请使用“确认”停止后续提醒。"
     config, identity = evidence["config"], evidence["market_identity"]
     delay = max(0, evidence["detected_at"] - signal.occurred_at) / 1000
-    values = {"symbol": identity.get("symbol", signal.instrument_id) if identity.get("series_kind") == "composite" else signal.instrument_id,
+    values = {"symbol": display_code(identity.get("symbol") or signal.instrument_id, identity.get("source")),
               "source": identity["source"],
               "timeframe": config["timeframe"], "condition": condition_label(config["condition"]),
-              "value": evidence["left"], "threshold": str(signal.threshold),
-              "price": str(signal.price), "event_time": instant(signal.occurred_at).isoformat(),
+              "value": evidence["left"], "threshold": evidence.get("threshold", str(signal.threshold)),
+              "price": evidence.get("price", str(signal.price)), "event_time": instant(signal.occurred_at).isoformat(),
               "delay": f"{delay:g}s"}
     custom = config.get("message", "")
     unit_label = "价格" if evidence["unit"] == "price" else "指标值"

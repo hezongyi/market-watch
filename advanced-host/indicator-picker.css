@@ -416,9 +416,6 @@
 .mw-native-indicator-content button:disabled { opacity:.5;cursor:default; }
 .mw-native-indicator-content :focus-visible { outline:2px solid var(--mw-accent);outline-offset:-2px; }
 .mw-native-indicator-search input,.mw-native-indicator-search input:focus,.mw-native-indicator-search input:focus-visible {outline:none!important;box-shadow:none!important;}
-.mw-native-indicator-content footer { border-top:1px solid var(--mw-border);display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 16px; }
-.mw-native-indicator-content footer [role="status"] { flex:1 1 180px;min-width:0;font-size:12px;color:var(--mw-muted);overflow-wrap:anywhere; }
-.mw-native-indicator-content footer button,.mw-native-added-actions button,.mw-native-indicator-detail button { border:1px solid var(--mw-border);border-radius:6px;padding:6px 10px;min-height:34px;background:var(--mw-surface); }
 .mw-native-indicator-category-select { display:none;padding:8px 12px;border-bottom:1px solid var(--mw-border); }
 .mw-native-indicator-detail { display:flex;flex-direction:column;flex:0 0 320px;min-width:0;border-left:1px solid var(--mw-border);background:var(--mw-surface); }
 .mw-native-detail-header { display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:14px;border-bottom:1px solid var(--mw-border); }
@@ -439,3 +436,5 @@
 @media(max-width:750px) { .mw-native-indicator-categories { display:none; }.mw-native-indicator-category-select { display:block; }.mw-native-added-row { flex-wrap:wrap; } }
 @media(max-width:600px) { .mw-native-indicators { width:100vw !important; }.mw-native-indicators-wrapper { height:100dvh; } }
 @media(max-width:450px) { .mw-native-study-meta {flex-basis:88px;padding-right:6px;}.mw-native-study-details {margin-right:6px;padding-inline:4px;}.mw-native-study-main>[data-role="list-item"] {padding-inline:10px;} }
+.mw-native-indicator-feedback {padding:8px 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;}
+.mw-native-indicator-feedback button {font:inherit;}

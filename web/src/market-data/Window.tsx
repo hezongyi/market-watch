@@ -5,11 +5,19 @@ import { CenterContext, type CenterNavigation } from "./router";
 import { centerLocation, centerPositionKey, centerTab } from "./location";
 import { ReturnContexts } from "./returnContext";
 import "./window.css";
-import { NativeSlot, NativeSidebar, NativeUiContext } from "./NativeControls";
+import { NativeSlot, NativeSidebar, NativeUiContext, NativeOperationHint } from "./NativeControls";
 
 const navIcon = (key:string) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${({managed:'<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',platform:'<circle cx="12" cy="12" r="2"/><path d="M16 8a6 6 0 0 1 0 8M8 8a6 6 0 0 0 0 8M19 5a10 10 0 0 1 0 14M5 5a10 10 0 0 0 0 14"/>',composite:'<path d="m12 3 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 16l9 5 9-5"/>',tasks:'<path d="m3 6 2 2 4-4M12 6h9M3 13h6M12 13h9M3 20h6M12 20h9"/>',sources:'<path d="M3 12h4l3-8 4 16 3-8h4"/>',calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>'} as Record<string,string>)[key]}</svg>`;
 const channel = "mw-data-center-v1";
 const tabs = [["managed", "自建行情", Database], ["platform", "平台行情", Radio], ["composite", "组合行情", Layers], ["tasks", "任务与记录", ListChecks], ["sources", "来源状态", Activity], ["calendar", "交易日历", CalendarDays]] as const;
+const operationHints: Record<string, string> = {
+  managed: "选择行情查看版本与周期。",
+  platform: "搜索或筛选品种，查看详情。",
+  composite: "选择组合查看接续与修订。",
+  tasks: "刷新列表，展开任务记录。",
+  sources: "展开来源查看状态与记录。",
+  calendar: "展开品种查看交易日历。",
+};
 type Context = { workspace: string; target: string; theme: string; timezone?: string; symbolSync: boolean; intervalSync: boolean; location?: string };
 type Position = { top: number; tableTop: number; tableLeft: number; focus: string | null };
 export type HostedCenter = {
@@ -266,7 +274,7 @@ export default function DataCenterWindow({ hosted }: { hosted?: HostedCenter } =
           {!context ? <p role="status">正在连接图表工作区…</p> : <Center />}
         </div>
       </div>
-      <footer className="dc-window-footer" role="status">{busy ? "正在打开所选行情…" : context?.symbolSync || context?.intervalSync ? "仅在打开时记录的图格应用行情；打开将关闭品种和周期同步，以保留其他图格。" : "浏览不会启动实时采集；关闭窗口后，已提交的维护继续运行。"}</footer>
+      <NativeOperationHint>{`${operationHints[centerTab(route)] || "点击分区浏览。"} Esc 关闭窗口。`}</NativeOperationHint>
       {guard && <div ref={guardBox} className="dc-unsaved" role="alertdialog" aria-modal="true" aria-labelledby="dc-unsaved-title"><h3 id="dc-unsaved-title">尚有未保存的修改</h3><p>离开将放弃这些输入；已经提交的后台任务会继续。</p><div className="dc-actions"><button onClick={() => { setGuard(null); guardFocus.current?.focus(); }}>继续编辑</button><button onClick={() => { const action = guard; dirty.current.clear(); setGuard(null); action(); }}>放弃修改</button></div></div>}
     </main>
   </CenterContext>;

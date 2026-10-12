@@ -302,11 +302,11 @@ def _runtime_rules(db, moment):
     """Read configured identities and profiles without refreshing catalogs or providers."""
     import json
 
-    from sqlalchemy import select
+    from sqlalchemy import or_, select
 
     from .config import settings
     from .live_session import effective_profile
-    from .storage import Instrument, MarketCatalog, MarketDataset, ProviderDataset
+    from .storage import Audit, Instrument, MarketCatalog, MarketDataset, ProviderDataset
 
     enabled = {"dukascopy": True, "binance": True, "yahoo": settings.yahoo_enabled,
                "oanda": bool(settings.oanda_account_id and settings.oanda_token)}
@@ -347,7 +347,10 @@ def _runtime_rules(db, moment):
                 json.dumps(effective_profile(identity, meta.get("calendar_profile")), sort_keys=True))
 
     seen_scopes = set()
-    for inst in db.scalars(select(Instrument).where(Instrument.enabled.is_(True))):
+    # Explicit historical datasets are intentionally disabled for live polling;
+    # their immutable calendar identities still belong in this registry.
+    for inst in db.scalars(select(Instrument).where(or_(Instrument.enabled.is_(True),
+            select(MarketDataset.id).where(MarketDataset.instrument_id == Instrument.id).exists()))):
         dataset = db.scalar(select(MarketDataset).where(MarketDataset.instrument_id == inst.id))
         instruments.append((inst.source, inst.symbol, inst.id, {"symbol": inst.symbol, "basis": inst.basis,
             "calendar_profile": inst.calendar_profile, "calendar_verified": bool(inst.calendar_profile),
@@ -377,6 +380,14 @@ def _runtime_rules(db, moment):
                 "calendar_verified": settings.oanda_calendar_verified}
         if symbol and scope_key("oanda", symbol, meta) not in seen_scopes:
             instruments.append(("oanda", symbol, "configured:" + symbol, meta))
+    audits = {}
+    candidate_ids = [scope_id for _, _, scope_id, _ in instruments]
+    if candidate_ids:
+        for audit in db.scalars(select(Audit).where(Audit.kind == "calendar_review",
+                Audit.details["instrument"].as_string().in_(candidate_ids))
+                .order_by(Audit.at.desc(), Audit.id.desc())):
+            details = audit.details
+            audits.setdefault((details.get("instrument"), details.get("revision")), audit)
     for source, symbol, scope_id, meta in sorted(instruments):
         base = _RULE_BY_SOURCE.get(source)
         if base is None:
@@ -395,6 +406,11 @@ def _runtime_rules(db, moment):
                "price_basis": basis, "native_parameters": parameters,
                "exceptions": (), "exceptions_reviewed": False,
                "coverage_note": "按实际来源身份匹配；无适用证据的部分保持未核实。"}
+        scope = identity.get("account_scope")
+        row["identity"] = {"channel": identity.get("channel"), "environment": identity.get("environment"),
+            "account_scope": "public" if scope == "public" else
+                "sha256:" + scope.split(":", 1)[1][:12] if isinstance(scope, str) and scope.startswith("sha256:") else "未记录",
+            "provider_symbol": symbol, "price_basis": basis, "calendar_version": row["version"]}
         if not profile and session.get("calendar_version") == base["version"] and session.get("calendar_verified"):
             row.update(runtime_status=effective_rule_status(base, as_of=moment),
                        **{key: base[key] for key in ("checked_at", "review_due_at", "valid_from", "valid_until")})
@@ -418,6 +434,14 @@ def _runtime_rules(db, moment):
         # Separate rows preserve immutable dataset scopes; different instances
         # may have the same symbol with different rules. No account ID is exposed.
         row["row_id"] = source + ":" + scope_id + ":" + row["version"]
+        audit = audits.get((scope_id, row["version"]))
+        row["audit"] = ({"reviewed_at": datetime.fromtimestamp(audit.at / 1000, UTC).isoformat(),
+            "reviewer": audit.details.get("reviewer"), "method": audit.details.get("method"),
+            "evidence_version": audit.details.get("evidence_version"),
+            "review_due_at": audit.details.get("review_due_at")} if audit else None)
+        if audit:
+            row["checked_at"] = row["audit"]["reviewed_at"]
+            row["review_due_at"] = row["audit"]["review_due_at"]
         rules.append(row)
         for generic in rules[:-1]:
             if generic["source"] == source and not generic.get("row_id"):

@@ -1,0 +1,236 @@
+{
+  "environment": "Ubuntu quant-server / mw-pro-charts-20261011",
+  "zoom": "Chromium chrome.tabs.setZoom automatic per-origin page zoom; no Emulation overrides",
+  "cases": [
+    {
+      "name": "native page zoom preserves alert entry size/center and keyboard toggle/focus",
+      "theme": "Dark",
+      "factor": 1,
+      "native": {
+        "factor": 1,
+        "settings": {
+          "defaultZoomFactor": 1,
+          "mode": "automatic",
+          "scope": "per-origin"
+        }
+      },
+      "outer": {
+        "dpr": 1,
+        "width": 1600,
+        "height": 1000
+      },
+      "geometry": {
+        "button": [
+          44,
+          44
+        ],
+        "svg": [
+          44,
+          44
+        ],
+        "center": [
+          22,
+          22
+        ],
+        "focused": true,
+        "focusVisible": true,
+        "outline": "rgb(41, 98, 255) solid 2px",
+        "decoration": "\"\"",
+        "dpr": 1
+      },
+      "passed": true
+    },
+    {
+      "name": "native page zoom preserves alert entry size/center and keyboard toggle/focus",
+      "theme": "Dark",
+      "factor": 1.25,
+      "native": {
+        "factor": 1.25,
+        "settings": {
+          "defaultZoomFactor": 1,
+          "mode": "automatic",
+          "scope": "per-origin"
+        }
+      },
+      "outer": {
+        "dpr": 1.25,
+        "width": 1280,
+        "height": 800
+      },
+      "geometry": {
+        "button": [
+          44,
+          44
+        ],
+        "svg": [
+          44,
+          44
+        ],
+        "center": [
+          22,
+          22
+        ],
+        "focused": true,
+        "focusVisible": true,
+        "outline": "rgb(41, 98, 255) solid 1.6px",
+        "decoration": "\"\"",
+        "dpr": 1.25
+      },
+      "passed": true
+    },
+    {
+      "name": "native page zoom preserves alert entry size/center and keyboard toggle/focus",
+      "theme": "Dark",
+      "factor": 1.5,
+      "native": {
+        "factor": 1.5,
+        "settings": {
+          "defaultZoomFactor": 1,
+          "mode": "automatic",
+          "scope": "per-origin"
+        }
+      },
+      "outer": {
+        "dpr": 1.5,
+        "width": 1067,
+        "height": 667
+      },
+      "geometry": {
+        "button": [
+          44,
+          44
+        ],
+        "svg": [
+          44,
+          44
+        ],
+        "center": [
+          22,
+          22
+        ],
+        "focused": true,
+        "focusVisible": true,
+        "outline": "rgb(41, 98, 255) solid 2px",
+        "decoration": "\"\"",
+        "dpr": 1.5
+      },
+      "passed": true
+    },
+    {
+      "name": "native page zoom preserves alert entry size/center and keyboard toggle/focus",
+      "theme": "Light",
+      "factor": 1,
+      "native": {
+        "factor": 1,
+        "settings": {
+          "defaultZoomFactor": 1,
+          "mode": "automatic",
+          "scope": "per-origin"
+        }
+      },
+      "outer": {
+        "dpr": 1,
+        "width": 1600,
+        "height": 1000
+      },
+      "geometry": {
+        "button": [
+          44,
+          44
+        ],
+        "svg": [
+          44,
+          44
+        ],
+        "center": [
+          22,
+          22
+        ],
+        "focused": true,
+        "focusVisible": true,
+        "outline": "rgb(41, 98, 255) solid 2px",
+        "decoration": "\"\"",
+        "dpr": 1
+      },
+      "passed": true
+    },
+    {
+      "name": "native page zoom preserves alert entry size/center and keyboard toggle/focus",
+      "theme": "Light",
+      "factor": 1.25,
+      "native": {
+        "factor": 1.25,
+        "settings": {
+          "defaultZoomFactor": 1,
+          "mode": "automatic",
+          "scope": "per-origin"
+        }
+      },
+      "outer": {
+        "dpr": 1.25,
+        "width": 1280,
+        "height": 800
+      },
+      "geometry": {
+        "button": [
+          44,
+          44
+        ],
+        "svg": [
+          44,
+          44
+        ],
+        "center": [
+          22,
+          22
+        ],
+        "focused": true,
+        "focusVisible": true,
+        "outline": "rgb(41, 98, 255) solid 1.6px",
+        "decoration": "\"\"",
+        "dpr": 1.25
+      },
+      "passed": true
+    },
+    {
+      "name": "native page zoom preserves alert entry size/center and keyboard toggle/focus",
+      "theme": "Light",
+      "factor": 1.5,
+      "native": {
+        "factor": 1.5,
+        "settings": {
+          "defaultZoomFactor": 1,
+          "mode": "automatic",
+          "scope": "per-origin"
+        }
+      },
+      "outer": {
+        "dpr": 1.5,
+        "width": 1067,
+        "height": 667
+      },
+      "geometry": {
+        "button": [
+          44,
+          44
+        ],
+        "svg": [
+          44,
+          44
+        ],
+        "center": [
+          22,
+          22
+        ],
+        "focused": true,
+        "focusVisible": true,
+        "outline": "rgb(41, 98, 255) solid 2px",
+        "decoration": "\"\"",
+        "dpr": 1.5
+      },
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

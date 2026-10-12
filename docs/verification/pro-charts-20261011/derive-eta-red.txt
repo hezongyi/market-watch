@@ -1,0 +1,5 @@
+Pre-fix: pytest backend/tests/test_history_derive_scheduling.py -q -k eta
+2 failed, 4 deselected in 4.13s
+Recent wall throughput: estimated 2.0 seconds; expected 100 seconds.
+After paused task resumes without a new committed batch: estimated 3.0004 seconds; expected None.
+The live derivation_progress call exercised the actual API reporting path.

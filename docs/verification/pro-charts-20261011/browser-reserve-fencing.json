@@ -1,0 +1,56 @@
+{
+  "environment": "Ubuntu mw-pro-charts-20261011",
+  "cases": [
+    {
+      "name": "actual fixed reserve transport with controlled snapshot transition",
+      "change": "unchanged",
+      "query": {
+        "revision": "e16ec716-e7f9-4eb3-9152-525b819a61ce",
+        "input": 1
+      },
+      "result": {
+        "rows": 17,
+        "revision": "e16ec716-e7f9-4eb3-9152-525b819a61ce",
+        "input": 1
+      }
+    },
+    {
+      "name": "actual fixed reserve transport with controlled snapshot transition",
+      "change": "input_revision",
+      "query": {
+        "revision": "e16ec716-e7f9-4eb3-9152-525b819a61ce",
+        "input": 1
+      },
+      "result": {
+        "code": "HISTORY_CANCELLED",
+        "error": "Error: 已取消旧图表的历史加载"
+      }
+    },
+    {
+      "name": "actual fixed reserve transport with controlled snapshot transition",
+      "change": "binding",
+      "query": {
+        "revision": "e16ec716-e7f9-4eb3-9152-525b819a61ce",
+        "input": 1
+      },
+      "result": {
+        "code": "HISTORY_CANCELLED",
+        "error": "Error: 已取消旧图表的历史加载"
+      }
+    },
+    {
+      "name": "actual fixed reserve transport with controlled snapshot transition",
+      "change": "cancelled_consumer",
+      "query": {
+        "revision": "e16ec716-e7f9-4eb3-9152-525b819a61ce",
+        "input": 1
+      },
+      "result": {
+        "code": "HISTORY_CANCELLED",
+        "error": "Error: 已取消旧图表的历史加载"
+      }
+    }
+  ],
+  "passed": true,
+  "errors": []
+}

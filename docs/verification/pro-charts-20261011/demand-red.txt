@@ -1,0 +1,33 @@
+FFF.F.                                                                   [100%]
+=================================== FAILURES ===================================
+E   psycopg.errors.UniqueViolation: duplicate key value violates unique constraint "market_data_demand_pkey"
+    DETAIL:  Key (id)=(326d1ded3fa74ad867488a8012ae040374a746db) already exists.
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.IntegrityError: (psycopg.errors.UniqueViolation) duplicate key value violates unique constraint "market_data_demand_pkey"
+    DETAIL:  Key (id)=(326d1ded3fa74ad867488a8012ae040374a746db) already exists.
+    [SQL: INSERT INTO market_data_demand (id, instrument_id, composite_revision_id, expires, updated_at) VALUES (%(id)s::VARCHAR, %(instrument_id)s::VARCHAR, %(composite_revision_id)s::VARCHAR, %(expires)s::BIGINT, %(updated_at)s::BIGINT)]
+    [parameters: {'id': '326d1ded3fa74ad867488a8012ae040374a746db', 'instrument_id': 'legacy-demand', 'composite_revision_id': None, 'expires': 1791721696528, 'updated_at': 1791721576528}]
+    (Background on this error at: https://sqlalche.me/e/21/gkpj)
+/tmp/mw-native-alert-python311/lib/python3.11/site-packages/psycopg/cursor.py:117: sqlalchemy.exc.IntegrityError: (psycopg.errors.UniqueViolation) duplicate key value violates unique constraint "market_data_demand_pkey"
+E   psycopg.errors.UniqueViolation: duplicate key value violates unique constraint "market_data_demand_pkey"
+    DETAIL:  Key (id)=(6d283107a505df696f44fae5315d8ae10148d138) already exists.
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.IntegrityError: (psycopg.errors.UniqueViolation) duplicate key value violates unique constraint "market_data_demand_pkey"
+    DETAIL:  Key (id)=(6d283107a505df696f44fae5315d8ae10148d138) already exists.
+    [SQL: INSERT INTO market_data_demand (id, instrument_id, composite_revision_id, expires, updated_at) VALUES (%(id)s::VARCHAR, %(instrument_id)s::VARCHAR, %(composite_revision_id)s::VARCHAR, %(expires)s::BIGINT, %(updated_at)s::BIGINT)]
+    [parameters: {'id': '6d283107a505df696f44fae5315d8ae10148d138', 'instrument_id': 'MC:76da6e93ef429b5b6853dc388:EURUSD', 'composite_revision_id': 'e8b952c9-adf2-4c6a-a3cf-b7dc48380f97', 'expires': 1791721698625, 'updated_at': 1791721578625}]
+    (Background on this error at: https://sqlalche.me/e/21/gkpj)
+/tmp/mw-native-alert-python311/lib/python3.11/site-packages/psycopg/cursor.py:117: sqlalchemy.exc.IntegrityError: (psycopg.errors.UniqueViolation) duplicate key value violates unique constraint "market_data_demand_pkey"
+E   assert 2000000100000 == 2000000200000
+     +  where 2000000100000 = <alerts.storage.MarketDemand object at 0x7f90544d5350>.updated_at
+/home/quant/repos/market-watch-pro-charts-impl-20261011/backend/tests/test_market_demand_postgres.py:127: assert 2000000100000 == 2000000200000
+E   Failed: DID NOT RAISE ValueError
+/home/quant/repos/market-watch-pro-charts-impl-20261011/backend/tests/test_market_demand_postgres.py:164: Failed: DID NOT RAISE ValueError
+=========================== short test summary info ============================
+FAILED backend/tests/test_market_demand_postgres.py::test_same_key_first_registration_commits_both_requests[renew]
+FAILED backend/tests/test_market_demand_postgres.py::test_same_key_first_registration_commits_both_requests[data_sync]
+FAILED backend/tests/test_market_demand_postgres.py::test_concurrent_late_older_renewal_cannot_shorten_lease
+FAILED backend/tests/test_market_demand_postgres.py::test_conflicting_identity_is_rejected_instead_of_silently_renewed
+4 failed, 2 passed in 10.69s

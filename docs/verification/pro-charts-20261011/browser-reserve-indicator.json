@@ -1,0 +1,343 @@
+{
+  "environment": "Ubuntu mw-pro-charts-20261011",
+  "cases": [
+    {
+      "name": "real Python SMA200 prewarm, native cached pan and reserve prefix",
+      "before": {
+        "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+        "resolution": "5",
+        "range": {
+          "from": 1791711600,
+          "to": 1791755100
+        },
+        "spacing": 8,
+        "warmup": 200,
+        "inputs": [
+          {
+            "id": "period",
+            "value": 200
+          }
+        ],
+        "plots": 560,
+        "reserve": {
+          "models": [
+            {
+              "symbol": "MWP:YAHOO:1EB44D625271A4EB75016F276D137836",
+              "resolution": "60",
+              "state": {
+                "identity": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836|60|",
+                "enhancedUntil": 0,
+                "raf": 0,
+                "previous": {
+                  "at": 4336.199999809265,
+                  "offset": 10
+                },
+                "lastAttemptOffset": 10,
+                "screen": 68,
+                "batch": 1,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 68,
+                "reserve": 206,
+                "firstTime": 1790805600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+              "resolution": "5",
+              "state": {
+                "identity": "MWC:85eb595180ed9491e1d5e3064aca750933a9ffd787b840d1357645fbbeca3b8a|5|",
+                "enhancedUntil": 25500.699999809265,
+                "raf": 0,
+                "previous": {
+                  "at": 17950.599999904633,
+                  "offset": 10
+                },
+                "lastAttemptOffset": 10,
+                "screen": 142,
+                "batch": 2,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 142,
+                "reserve": 428,
+                "firstTime": 1791583200,
+                "requesting": false
+              }
+            }
+          ],
+          "threads": [
+            {
+              "key": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836|60|",
+              "cache": 435,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWC:85eb595180ed9491e1d5e3064aca750933a9ffd787b840d1357645fbbeca3b8a|60|",
+              "cache": 702,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWC:85eb595180ed9491e1d5e3064aca750933a9ffd787b840d1357645fbbeca3b8a|5|",
+              "cache": 561,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWPY_eyJzeW1ib2wiOiJNV0M6ODVlYjU5NTE4MGVkOTQ5MWUxZDVlMzA2NGFjYTc1MDkzM2E5ZmZkNzg3Yjg0MGQxMzU3NjQ1ZmJiZWNhM2I4YSIsInNwZWMiOnsibmFtZSI6IlNNQSIsInBhcmFtcyI6eyJwZXJpb2QiOjIwfX0sImtleSI6InZhbHVlIn0=|5|",
+              "cache": 576,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWPY_eyJzeW1ib2wiOiJNV0M6ODVlYjU5NTE4MGVkOTQ5MWUxZDVlMzA2NGFjYTc1MDkzM2E5ZmZkNzg3Yjg0MGQxMzU3NjQ1ZmJiZWNhM2I4YSIsInNwZWMiOnsibmFtZSI6IlNNQSIsInBhcmFtcyI6eyJwZXJpb2QiOjIwMH19LCJrZXkiOiJ2YWx1ZSJ9|5|",
+              "cache": 576,
+              "requesting": false,
+              "endOfData": false
+            }
+          ],
+          "flights": 0
+        }
+      },
+      "after": {
+        "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+        "resolution": "5",
+        "range": {
+          "from": 1791708600,
+          "to": 1791750900
+        },
+        "spacing": 8,
+        "warmup": 200,
+        "inputs": [
+          {
+            "id": "period",
+            "value": 200
+          }
+        ],
+        "plots": 560,
+        "reserve": {
+          "models": [
+            {
+              "symbol": "MWP:YAHOO:1EB44D625271A4EB75016F276D137836",
+              "resolution": "60",
+              "state": {
+                "identity": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836|60|",
+                "enhancedUntil": 0,
+                "raf": 0,
+                "previous": {
+                  "at": 4336.199999809265,
+                  "offset": 10
+                },
+                "lastAttemptOffset": 10,
+                "screen": 68,
+                "batch": 1,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 68,
+                "reserve": 206,
+                "firstTime": 1790805600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+              "resolution": "5",
+              "state": {
+                "identity": "MWC:85eb595180ed9491e1d5e3064aca750933a9ffd787b840d1357645fbbeca3b8a|5|",
+                "enhancedUntil": 25500.699999809265,
+                "raf": 0,
+                "previous": {
+                  "at": 18952.599999904633,
+                  "offset": 0
+                },
+                "lastAttemptOffset": 0,
+                "screen": 142,
+                "batch": 2,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 142,
+                "reserve": 418,
+                "firstTime": 1791583200,
+                "requesting": false
+              }
+            }
+          ],
+          "threads": [
+            {
+              "key": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836|60|",
+              "cache": 435,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWC:85eb595180ed9491e1d5e3064aca750933a9ffd787b840d1357645fbbeca3b8a|60|",
+              "cache": 702,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWC:85eb595180ed9491e1d5e3064aca750933a9ffd787b840d1357645fbbeca3b8a|5|",
+              "cache": 561,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWPY_eyJzeW1ib2wiOiJNV0M6ODVlYjU5NTE4MGVkOTQ5MWUxZDVlMzA2NGFjYTc1MDkzM2E5ZmZkNzg3Yjg0MGQxMzU3NjQ1ZmJiZWNhM2I4YSIsInNwZWMiOnsibmFtZSI6IlNNQSIsInBhcmFtcyI6eyJwZXJpb2QiOjIwfX0sImtleSI6InZhbHVlIn0=|5|",
+              "cache": 576,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWPY_eyJzeW1ib2wiOiJNV0M6ODVlYjU5NTE4MGVkOTQ5MWUxZDVlMzA2NGFjYTc1MDkzM2E5ZmZkNzg3Yjg0MGQxMzU3NjQ1ZmJiZWNhM2I4YSIsInNwZWMiOnsibmFtZSI6IlNNQSIsInBhcmFtcyI6eyJwZXJpb2QiOjIwMH19LCJrZXkiOiJ2YWx1ZSJ9|5|",
+              "cache": 576,
+              "requesting": false,
+              "endOfData": false
+            }
+          ],
+          "flights": 1
+        }
+      }
+    },
+    {
+      "name": "controlled 900ms actual fixed HTTP delay activates enhanced reserve without changing column width",
+      "state": {
+        "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+        "resolution": "15",
+        "range": {
+          "from": 1791687600,
+          "to": 1791750600
+        },
+        "spacing": 8,
+        "warmup": 200,
+        "inputs": [
+          {
+            "id": "period",
+            "value": 200
+          }
+        ],
+        "plots": 71,
+        "reserve": {
+          "models": [
+            {
+              "symbol": "MWP:YAHOO:1EB44D625271A4EB75016F276D137836",
+              "resolution": "60",
+              "state": {
+                "identity": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836|60|",
+                "enhancedUntil": 0,
+                "raf": 0,
+                "previous": {
+                  "at": 4336.199999809265,
+                  "offset": 10
+                },
+                "lastAttemptOffset": 10,
+                "screen": 68,
+                "batch": 1,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 68,
+                "reserve": 206,
+                "firstTime": 1790805600,
+                "requesting": false
+              }
+            },
+            {
+              "symbol": "MWC:85EB595180ED9491E1D5E3064ACA750933A9FFD787B840D1357645FBBECA3B8A",
+              "resolution": "15",
+              "state": {
+                "identity": "MWC:85eb595180ed9491e1d5e3064aca750933a9ffd787b840d1357645fbbeca3b8a|15|",
+                "enhancedUntil": 30126.799999713898,
+                "raf": 0,
+                "previous": {
+                  "at": 20147.799999713898,
+                  "offset": 0
+                },
+                "lastAttemptOffset": 0,
+                "screen": 142,
+                "batch": 2,
+                "failures": 0,
+                "misses": 0,
+                "retryAt": 0,
+                "boundary": false
+              },
+              "geometry": {
+                "screen": 142,
+                "reserve": -71,
+                "firstTime": 1791687600,
+                "requesting": true
+              }
+            }
+          ],
+          "threads": [
+            {
+              "key": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836|60|",
+              "cache": 435,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWC:85eb595180ed9491e1d5e3064aca750933a9ffd787b840d1357645fbbeca3b8a|60|",
+              "cache": 702,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWC:85eb595180ed9491e1d5e3064aca750933a9ffd787b840d1357645fbbeca3b8a|5|",
+              "cache": 845,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWPY_eyJzeW1ib2wiOiJNV0M6ODVlYjU5NTE4MGVkOTQ5MWUxZDVlMzA2NGFjYTc1MDkzM2E5ZmZkNzg3Yjg0MGQxMzU3NjQ1ZmJiZWNhM2I4YSIsInNwZWMiOnsibmFtZSI6IlNNQSIsInBhcmFtcyI6eyJwZXJpb2QiOjIwfX0sImtleSI6InZhbHVlIn0=|5|",
+              "cache": 576,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWPY_eyJzeW1ib2wiOiJNV0M6ODVlYjU5NTE4MGVkOTQ5MWUxZDVlMzA2NGFjYTc1MDkzM2E5ZmZkNzg3Yjg0MGQxMzU3NjQ1ZmJiZWNhM2I4YSIsInNwZWMiOnsibmFtZSI6IlNNQSIsInBhcmFtcyI6eyJwZXJpb2QiOjIwMH19LCJrZXkiOiJ2YWx1ZSJ9|5|",
+              "cache": 576,
+              "requesting": false,
+              "endOfData": false
+            },
+            {
+              "key": "MWC:85eb595180ed9491e1d5e3064aca750933a9ffd787b840d1357645fbbeca3b8a|15|",
+              "cache": 72,
+              "requesting": true,
+              "endOfData": false
+            },
+            {
+              "key": "MWPY_eyJzeW1ib2wiOiJNV0M6ODVlYjU5NTE4MGVkOTQ5MWUxZDVlMzA2NGFjYTc1MDkzM2E5ZmZkNzg3Yjg0MGQxMzU3NjQ1ZmJiZWNhM2I4YSIsInNwZWMiOnsibmFtZSI6IlNNQSIsInBhcmFtcyI6eyJwZXJpb2QiOjIwMH19LCJrZXkiOiJ2YWx1ZSJ9|15|",
+              "cache": 72,
+              "requesting": true,
+              "endOfData": false
+            }
+          ],
+          "flights": 0
+        }
+      }
+    }
+  ],
+  "passed": true,
+  "errors": []
+}

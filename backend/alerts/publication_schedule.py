@@ -1,7 +1,7 @@
 """Durable input generations and fair bounded selection for legacy publications.
 
-Writers already own the Instrument lock. Workers acquire that same lock before
-the state row, keeping the existing ingestion/aggregation lock order. Wakeups
+Writers own Dataset then Instrument when a managed dataset exists. Workers take
+the same locks before the state row. Wakeups
 live in the same transaction as input writes; no process memory acknowledges work.
 """
 
@@ -13,6 +13,7 @@ from sqlalchemy import case, func, select, update
 from .chart_data import FRAMES
 from .publication_result import PublicationResult
 from .source_history_store import _insert
+from .transaction_retry import is_conflict, retry_conflicts
 from .storage import (
     PUBLICATION_SERVICE_SEQUENCE,
     ChartAggregationJob,
@@ -98,10 +99,6 @@ def discover(db, stamp):
         select(func.count()).select_from(ChartPublicationState).where(
             ChartPublicationState.instrument_id == targets.c.instrument_id,
             ChartPublicationState.timeframe.in_(FRAMES)).scalar_subquery() < len(FRAMES)).limit(20)))
-    for ident in missing:
-        if db.scalar(select(Instrument).where(Instrument.id == ident).with_for_update(skip_locked=True)) is None:
-            continue
-        request(db, ident, reason=INITIAL, stamp=stamp, approved=True)
     # Older applications/manual repair tools can persist bucket jobs without a
     # request generation. Recover only ready dirty buckets, never wake every
     # unchanged snapshot or an aggregate still waiting for its source.
@@ -118,10 +115,19 @@ def discover(db, stamp):
                 else_=ChartPublicationJob.timeframe),
             ChartAggregationJob.start < ChartPublicationJob.end,
             ChartAggregationJob.end > ChartPublicationJob.start).exists()).distinct().limit(20)))
-    for ident, frame in missed:
-        if db.scalar(select(Instrument).where(Instrument.id == ident).with_for_update(skip_locked=True)) is None:
-            continue
-        request(db, ident, frames=(frame,), reason=BARS, stamp=stamp, approved=True)
+    from .chart_history_plan import lock_plan_instrument
+
+    # Adoption must not leave a batch of Instrument locks in the publication
+    # transaction. Each bounded target owns its Dataset first and commits its
+    # wakeup independently, just like legacy plan adoption.
+    for ident in sorted(set(missing)):
+        with transaction() as writer:
+            if lock_plan_instrument(writer, ident, skip_locked=True) is not None:
+                request(writer, ident, reason=INITIAL, stamp=stamp, approved=True)
+    for ident, frame in sorted(set(missed)):
+        with transaction() as writer:
+            if lock_plan_instrument(writer, ident, skip_locked=True) is not None:
+                request(writer, ident, frames=(frame,), reason=BARS, stamp=stamp, approved=True)
 
 
 def tick(publisher, corrections):
@@ -130,28 +136,49 @@ def tick(publisher, corrections):
     with transaction() as db:
         stamp = managed_dataset.now_ms()
         discover(db, stamp)
-        selected = db.execute(select(ChartPublicationState, Instrument).join(
-            Instrument, Instrument.id == ChartPublicationState.instrument_id).where(
+        candidates = list(db.execute(select(ChartPublicationState.instrument_id,
+            ChartPublicationState.timeframe).where(
             ChartPublicationState.requested > ChartPublicationState.processed,
             ChartPublicationState.next_at <= stamp).order_by(
                 ChartPublicationState.last_service_seq, ChartPublicationState.requested_at,
-                ChartPublicationState.instrument_id, ChartPublicationState.timeframe).limit(1)
-            .with_for_update(of=Instrument, skip_locked=True)).first()
-        if selected is None:
-            earliest = db.scalar(select(func.min(ChartPublicationState.next_at)).where(
-                ChartPublicationState.requested > ChartPublicationState.processed))
-            return PublicationResult(next_due_at=max(stamp + 100, earliest) if earliest is not None else None,
-                                     blocked_reason='locked' if earliest is not None and earliest <= stamp else None)
-        state, inst = selected
-        ident, frame = state.instrument_id, state.timeframe
+                ChartPublicationState.instrument_id, ChartPublicationState.timeframe).limit(20)))
+    for ident, frame in candidates:
+        try:
+            result = retry_conflicts(lambda: _publish_target(publisher, corrections, ident, frame, stamp))
+        except Exception as error:
+            if not is_conflict(error):
+                raise
+            # Rollback released every row lock; record a bounded, durable retry
+            # against the current generation in a new correctly ordered round.
+            result = _publish_target(publisher, corrections, ident, frame, stamp, conflict=True)
+        if result is not None:
+            return result
+    with transaction() as db:
+        earliest = db.scalar(select(func.min(ChartPublicationState.next_at)).where(
+            ChartPublicationState.requested > ChartPublicationState.processed))
+        return PublicationResult(next_due_at=max(stamp + 100, earliest) if earliest is not None else None,
+                                 blocked_reason='locked' if earliest is not None and earliest <= stamp else None)
+
+
+def _publish_target(publisher, corrections, ident, frame, stamp, *, conflict=False):
+    from .chart_history_plan import lock_plan_instrument
+
+    with transaction() as db:
+        inst = lock_plan_instrument(db, ident, skip_locked=True)
+        if inst is None:
+            return None
+        from . import managed_dataset
+
         managed_dataset._PUBLISH_CURSOR = (ident, frame)
         state = db.scalar(select(ChartPublicationState).where(
             ChartPublicationState.instrument_id == ident, ChartPublicationState.timeframe == frame)
-            .with_for_update().execution_options(populate_existing=True))
-        if state.requested <= state.processed or state.next_at is None or state.next_at > stamp:
-            return PublicationResult()
+            .with_for_update(skip_locked=True).execution_options(populate_existing=True))
+        if state is None or state.requested <= state.processed or state.next_at is None or state.next_at > stamp:
+            return None
         generation = state.requested
         try:
+            if conflict:
+                raise RuntimeError("database_conflict")
             with db.begin_nested():
                 from .coverage_projection import backfill_page
                 coverage_work = backfill_page(db, inst, limit=64)
@@ -165,10 +192,12 @@ def tick(publisher, corrections):
                 result = result if result is not None else PublicationResult()
                 db.flush()
         except Exception as error:
+            if is_conflict(error):
+                raise
             state.attempts += 1
             state.next_at = stamp + min(300_000, 1000 * 2 ** min(state.attempts, 8))
             _service(db, state, stamp)
-            state.blocked_reason = type(error).__name__[:40]
+            state.blocked_reason = 'database_conflict' if conflict else type(error).__name__[:40]
             return _queue(db, stamp, selected_target=(ident, frame), attempted=True,
                           blocked_reason=state.blocked_reason)
         # The equality condition also protects callers that enqueue another

@@ -1,0 +1,80 @@
+TAP version 13
+# Fixed history, composite and Python cache lifetimes: hidden loads, purge, destroy, workspace and pagination passed
+# Subtest: web/tests/advanced-fixed-request-lifetime.cjs
+ok 1 - web/tests/advanced-fixed-request-lifetime.cjs
+  ---
+  duration_ms: 4293.129858
+  type: 'test'
+  ...
+# Shared error/miss backoff, bounded retries, viewport restart and stale completion isolation passed
+# Subtest: web/tests/advanced-native-reserve-lifetime.cjs
+ok 2 - web/tests/advanced-native-reserve-lifetime.cjs
+  ---
+  duration_ms: 217.234131
+  type: 'test'
+  ...
+# Subtest: drag previews do not write; mouse up serializes successive versions
+ok 3 - drag previews do not write; mouse up serializes successive versions
+  ---
+  duration_ms: 61.917208
+  type: 'test'
+  ...
+# Subtest: timeout queries committed version; failures preserve position until explicit restore
+ok 4 - timeout queries committed version; failures preserve position until explicit restore
+  ---
+  duration_ms: 34.673366
+  type: 'test'
+  ...
+# Subtest: explicit removal pauses; symbol, interval and layout changes never pause
+ok 5 - explicit removal pauses; symbol, interval and layout changes never pause
+  ---
+  duration_ms: 60.626729
+  type: 'test'
+  ...
+# Subtest: source changes fence drawing edits and menu contexts are captured at open
+ok 6 - source changes fence drawing edits and menu contexts are captured at open
+  ---
+  duration_ms: 19.416112
+  type: 'test'
+  ...
+# Subtest: style changes preserve the rule when serialized geometry order or price formatting differs
+ok 7 - style changes preserve the rule when serialized geometry order or price formatting differs
+  ---
+  duration_ms: 26.516731
+  type: 'test'
+  ...
+# Subtest: native history events submit restored geometry without resuming a paused alert
+ok 8 - native history events submit restored geometry without resuming a paused alert
+  ---
+  duration_ms: 44.863436
+  type: 'test'
+  ...
+# Subtest: price-axis presentation changes cannot silently replace the saved coordinate system
+ok 9 - price-axis presentation changes cannot silently replace the saved coordinate system
+  ---
+  duration_ms: 38.055688
+  type: 'test'
+  ...
+# 38 price formatting checks passed
+# Subtest: web/tests/chart-price-format.cjs
+ok 4 - web/tests/chart-price-format.cjs
+  ---
+  duration_ms: 152.79818
+  type: 'test'
+  ...
+# Eight Python identities, colliding native MACD, stale title and unknown identity passed
+# Subtest: web/tests/native-indicator-identity.cjs
+ok 5 - web/tests/native-indicator-identity.cjs
+  ---
+  duration_ms: 53.060562
+  type: 'test'
+  ...
+1..11
+# tests 11
+# suites 0
+# pass 11
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4309.146158

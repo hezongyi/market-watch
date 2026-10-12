@@ -35,7 +35,8 @@ def _insert(db):
     return postgres_insert if db.get_bind().dialect.name == "postgresql" else sqlite_insert
 
 
-def raw_chunk(db, chunk):
+def compressed_chunk(db, chunk):
+    """Validate the immutable source binding even when decoded input is cached."""
     if chunk.content_id:
         blob = db.get(SourceBlob, chunk.content_id)
         version = db.get(HistoryVersion, chunk.version_id)
@@ -46,6 +47,11 @@ def raw_chunk(db, chunk):
         compressed = blob.content
     else:
         compressed = chunk.content
+    return compressed
+
+
+def raw_chunk(db, chunk):
+    compressed = compressed_chunk(db, chunk)
     raw = gzip.decompress(compressed)
     if hashlib.sha256(raw).hexdigest() != chunk.checksum:
         raise ValueError("Historical chunk content checksum mismatch")

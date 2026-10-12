@@ -1,0 +1,52 @@
+const {chromium,expect}=require('@playwright/test');
+const fs=require('node:fs');
+const base='http://127.0.0.1:19996/';
+const baseline=process.env.BASELINE==='1';
+(async()=>{
+  const browser=await chromium.launch({executablePath:'/home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome',args:['--no-sandbox']});
+  const page=await browser.newPage({viewport:{width:1440,height:950}}),errors=[];
+  page.on('pageerror',e=>errors.push(e.message));
+  const checks=[];
+  try {
+    await page.goto(base+(baseline?'baseline.html':''));
+    const ui=page.frames().find(f=>f!==page.mainFrame());
+    const dialog=ui.locator('[data-dialog-name="必填控件回归"]');
+    await expect(dialog.getByRole('button',{name:'新历史基线',exact:true})).toBeVisible({timeout:30000});
+    const choose=async(label,option)=>{
+      await dialog.getByRole('button',{name:label,exact:true}).click();
+      await ui.getByRole('option',{name:option,exact:true}).click({timeout:3000});
+    };
+    await expect(dialog.getByRole('button',{name:'实时映射版本',exact:true})).toBeDisabled();
+    await choose('新历史基线','固定版本二');checks.push('mouse-history');
+    await choose('实时映射版本','已审核映射一');checks.push('mouse-mapping');
+    await choose('目标准确品种','EUR_USD');checks.push('mouse-target');
+    await dialog.locator('label').filter({has:ui.getByRole('button',{name:'目标准确品种',exact:true})}).click({position:{x:10,y:8}});
+    await expect(ui.getByRole('option',{name:'USD_JPY',exact:true})).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(dialog.getByRole('button',{name:'目标准确品种',exact:true})).toBeFocused();
+    await page.keyboard.press('Enter');await expect(ui.getByRole('option',{name:'USD_JPY',exact:true})).toBeVisible();
+    await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');
+    await expect(dialog.locator('output')).toContainText('USD_JPY');checks.push('label-and-keyboard');
+    await choose('新历史基线','选择已发布固定M1版本');
+    await dialog.getByRole('button',{name:'验证提交',exact:true}).click();
+    const version=dialog.getByRole('button',{name:'新历史基线',exact:true});
+    await expect(version).toBeFocused();await expect(version).toHaveAttribute('aria-invalid','true');
+    await expect(dialog.getByText('请选择新历史基线',{exact:true})).toBeVisible();
+    await expect(dialog.locator('output')).toContainText('"submitted":0');checks.push('required-invalid-visible-focus');
+    await choose('新历史基线','固定版本一');await expect(version).not.toHaveAttribute('aria-invalid','true');
+    await version.click();await expect(ui.getByRole('option',{name:'固定版本二',exact:true})).toBeVisible();
+    await page.keyboard.press('Escape');await expect(ui.getByRole('option',{name:'固定版本二',exact:true})).toHaveCount(0);
+    await expect(dialog).toBeVisible();await page.keyboard.press('Tab');
+    await expect(dialog.getByRole('button',{name:'实时映射版本',exact:true})).toBeFocused();checks.push('escape-tab');
+    await dialog.getByRole('button',{name:'切换忙碌',exact:true}).click();
+    await expect(version).toBeDisabled();await expect(dialog.getByRole('button',{name:'目标准确品种',exact:true})).toBeDisabled();
+    const required=await dialog.locator('select.dc-validity').evaluateAll(nodes=>nodes.every(n=>n.matches(':disabled')));
+    expect(required).toBe(true);checks.push('fieldset-disabled');
+    await dialog.getByRole('button',{name:'切换忙碌',exact:true}).click();
+    await dialog.getByLabel('校验说明',{exact:true}).fill('reviewed');
+    await dialog.getByRole('button',{name:'验证提交',exact:true}).click();
+    await expect(dialog.locator('output')).toContainText('"submitted":1');checks.push('valid-submit');
+    expect(errors).toEqual([]);
+    console.log(JSON.stringify({passed:true,baseline,checks,errors}));
+  } finally {await browser.close();}
+})().catch(error=>{console.error(error.message);process.exitCode=1;});

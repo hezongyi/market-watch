@@ -29,20 +29,19 @@ function chartNativeIndicators(widget, doc, req, ui) {
   ];
   const notify = () => events.dispatchEvent(new Event("change"));
   function entryFor(row) {
-    const name = state.names.get(row.studyData?.id || row.id);
-    return (
-      state.entries.find(
-        (entry) =>
-          entry.name === name ||
-          entry.label === name ||
-          entry.name === row.title ||
-          entry.label === row.title ||
-          ((row.title.startsWith("守望 Python ") &&
-            entry.id === row.title.slice("守望 Python ".length)) ||
-            (row.title.startsWith("Python ") &&
-              entry.id === row.title.slice("Python ".length))),
-      ) || null
-    );
+    const nativeId = row.studyData?.id || row.id;
+    // Native normalizes the package suffix (market-watch-1 -> market-watch).
+    // Resolve this exact namespace before any translated/search display label.
+    const pythonId = String(nativeId || "").match(/^MWPython([A-Z]+)@market-watch(?:-1)?$/)?.[1];
+    if (pythonId) return state.entries.find(entry=>entry.source === "Python" && entry.id === pythonId) || null;
+    const name = state.names.get(nativeId);
+    const exact = state.entries.find(entry=>entry.name === name) ||
+      state.entries.find(entry=>entry.name === row.title);
+    if (exact) return exact;
+    const titleId = String(row.title || "").match(/^(?:守望 Python |Python )([A-Z]+)$/)?.[1];
+    if (titleId) return state.entries.find(entry=>entry.source === "Python" && entry.id === titleId) || null;
+    return state.entries.find(entry=>entry.label === name) ||
+      state.entries.find(entry=>entry.label === row.title) || null;
   }
   function annotate(row) {
     const entry = entryFor(row);
@@ -550,30 +549,9 @@ function chartNativeIndicators(widget, doc, req, ui) {
             ),
             ctx.detail && R.createElement(Detail),
           ),
-          R.createElement(
-            "footer",
-            null,
-            R.createElement(
-              "span",
-              { role: "status", "aria-live": "polite" },
-              state.notice || "点击指标名称添加，星标用于收藏。",
-            ),
-            state.latest &&
-              R.createElement(
-                "button",
-                {
-                  type: "button",
-                  onClick: () =>
-                    properties(state.latest.chart, state.latest.id),
-                },
-                "设置刚添加的指标",
-              ),
-            R.createElement(
-              "button",
-              { type: "button", onClick: close },
-              "完成",
-            ),
-          ),
+          state.notice && R.createElement("div", {className:"mw-native-indicator-feedback",role:"status"},
+            state.notice, state.latest && R.createElement("button", {type:"button",onClick:()=>properties(state.latest.chart,state.latest.id)}, "设置刚添加的指标")),
+          R.createElement(ui.components.operationHint, null, "点击指标名称添加，星标用于收藏。"),
         ),
     });
   });

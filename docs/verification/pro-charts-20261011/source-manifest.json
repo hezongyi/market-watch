@@ -1,0 +1,174 @@
+{
+  "baseline": "7b5c61416390d6db2c26ccdde07716b81affc36c",
+  "branch": "fix/pro-charts-20261011",
+  "modified_runtime_source": [
+    {
+      "path": "advanced-host/Dockerfile",
+      "sha256": "1904b0f8ac31945ea9bc2910ff117fd89e01de1f583eb12865a2d1853a824915"
+    },
+    {
+      "path": "advanced-host/bridge.js",
+      "sha256": "394a4da8521dae946207e5ea1e871b23f0eb20e898d6e8301745af8db8c17c97"
+    },
+    {
+      "path": "advanced-host/build-assets.mjs",
+      "sha256": "eb1ed1a2c40dd116fb3fd63d89175ec43c7d04a72680c7929713f5b2b1542792"
+    },
+    {
+      "path": "advanced-host/chart-alerts.js",
+      "sha256": "abce516742360e869a79afffba14ac502152c7b6b8a6dda826293ee0be3cedac"
+    },
+    {
+      "path": "advanced-host/drawing-visibility.js",
+      "sha256": "4e2b57ae86dad4d97ed0e35735ed418edcba5c490b983cc3cd6f4eab5aa09b0c"
+    },
+    {
+      "path": "advanced-host/index.html",
+      "sha256": "46f35f55d57dca7055b7739a24b0f9161e4599eb86266763bf089195c23d0ca3"
+    },
+    {
+      "path": "advanced-host/indicator-picker.css",
+      "sha256": "9ebb409208d0b364489e29bdf8d4e12bb7194f2b2236b122984dd836e95043a6"
+    },
+    {
+      "path": "advanced-host/native-alert-shell.js",
+      "sha256": "75b7052c9e39b218ff97fedac9561abb42fc615cc7ce6f43a3bfb135fa72bc80"
+    },
+    {
+      "path": "advanced-host/native-indicator-dialog.js",
+      "sha256": "965594d4fd2bd95141dc1e93da0b250714e4d30f90bab2322441b7807819519e"
+    },
+    {
+      "path": "advanced-host/native-navigation.js",
+      "sha256": "176be8633690fdb01414d36f567a0f306750a212c433437bf0d1d66d3e1c79af"
+    },
+    {
+      "path": "advanced-host/native-reserve.js",
+      "sha256": "3cb0609be209352afe4a6a2e446024dacffc0d8860817b7e8edcb73e8cc16b7f"
+    },
+    {
+      "path": "advanced-host/native-ui.js",
+      "sha256": "5ab1add49f47ffa7c77c53aebe6d3366eafcfc2c2c4ac9cc49726d5779176dff"
+    },
+    {
+      "path": "advanced-host/patch-native-reserve.mjs",
+      "sha256": "930f5fbe6980d46919c54e171bd951523ae223a968b435089b268abf2907dffa"
+    },
+    {
+      "path": "advanced-host/price-format.js",
+      "sha256": "ff3a3dfd2098b5a86f2423f0809b83bb76f0260e697ccb8a950fa95202515411"
+    },
+    {
+      "path": "backend/alerts/api.py",
+      "sha256": "379f6412d1785c3d58b6c3012444c62d32221d37169dfc4bff4022e0e3f79325"
+    },
+    {
+      "path": "backend/alerts/calendar_admin.py",
+      "sha256": "7bbf04fce59715104f522bd87204e7f0b69e02d67315fb37a7e3435988d3fe22"
+    },
+    {
+      "path": "backend/alerts/chart_alert_api.py",
+      "sha256": "bb68a1d24a2b005f5e2c1608a7e463c2c901fb4b2aedcc5debfef81adaa5b8e7"
+    },
+    {
+      "path": "backend/alerts/chart_alert_message.py",
+      "sha256": "64bb4264253a900f2960aee14a28b23f69e465cd7a43879ba9f1789cecc5df91"
+    },
+    {
+      "path": "backend/alerts/chart_alert_service.py",
+      "sha256": "8a08c0e60a38ebfcd88489688cf8e6d50c8669d0129f36c96889202c3105769e"
+    },
+    {
+      "path": "backend/alerts/history_artifacts.py",
+      "sha256": "9ed16d19c0202a3d2530512f7dd24c44755bfef38c8ceddd064f05be1975f90a"
+    },
+    {
+      "path": "backend/alerts/history_versions.py",
+      "sha256": "6630248e420deb084dd0305e4db2410bb86981d79fc463964e6304670d81245e"
+    },
+    {
+      "path": "backend/alerts/market_calendar.py",
+      "sha256": "fb1826f69614083ad7d50a4518888bdcff3274d8a6211914cbbfe53ef26881a8"
+    },
+    {
+      "path": "backend/alerts/market_data.py",
+      "sha256": "237b2fd729525906c9da88ad67b4f4e59e3dc1d6a8846a835f549cb424618c86"
+    },
+    {
+      "path": "backend/alerts/notify.py",
+      "sha256": "7a5a79715fb431d9274b3c989e2ca525668fbaa46d150d7a367188fc1bc79a17"
+    },
+    {
+      "path": "backend/alerts/publication_schedule.py",
+      "sha256": "5f99fccc069b7968a166b802b10b59018f89587e396825e027c3df9882a7422f"
+    },
+    {
+      "path": "backend/alerts/source_history_store.py",
+      "sha256": "6570e48d325a8755f2010334946173283bc204501486bb099ad1022a544e0419"
+    },
+    {
+      "path": "backend/alerts/transaction_retry.py",
+      "sha256": "8e6d1e6f2c0c409b313e3d72c2e2c593722a603d205b2ef5a83ca16d19604173"
+    },
+    {
+      "path": "web/src/advanced/AdvancedWorkspace.tsx",
+      "sha256": "90a9285f146fd54aa96c2cc9fbb8218cdcea2d9598f97ff42e01e2c0272f10a8"
+    },
+    {
+      "path": "web/src/advanced/ChartAlertDialog.tsx",
+      "sha256": "7998adaacab8e4f5747f4268ca43b507161272257fc89be4c0d6fb559d425dd0"
+    },
+    {
+      "path": "web/src/advanced/ChartAlertsPanel.tsx",
+      "sha256": "aab7eb6788ed326844cec30218df9b5814c4de21c2eb7187f00c492c1839476e"
+    },
+    {
+      "path": "web/src/advanced/advanced.css",
+      "sha256": "ae9c2e5f7cef0c4ece7b9e1be9c64c81c0f22985978acf58aff8426271de544e"
+    },
+    {
+      "path": "web/src/advanced/chart-alerts.css",
+      "sha256": "b1d342ba7eae4cb3c4b6b1fda880371a165f258571338d225fdde364b99b2338"
+    },
+    {
+      "path": "web/src/advanced/chartAlerts.ts",
+      "sha256": "ae30118a95426f9a7fe64a22f49aee8d26009312920b07423c17d94f748d3a52"
+    },
+    {
+      "path": "web/src/main.tsx",
+      "sha256": "ce009b41f7e8ec1ffbbd713b06c7ab79d20b9f0833a22e7d87649b8e1dc0581e"
+    },
+    {
+      "path": "web/src/market-data/CalendarView.tsx",
+      "sha256": "91656f8b6c135d96cb41670200e1847101b48cf7dbbab64b16460a75158bd1e0"
+    },
+    {
+      "path": "web/src/market-data/CompositeRevisions.tsx",
+      "sha256": "c96e18bf9c1a0963d239da48127e9cbb20e8cc12ecefbfcd9bd7a1e6676b03c9"
+    },
+    {
+      "path": "web/src/market-data/NativeControls.tsx",
+      "sha256": "86b574993fbec8adfe677a6e816f5483d860cee524735903f09c5cd1dfd26120"
+    },
+    {
+      "path": "web/src/market-data/OpenChart.tsx",
+      "sha256": "4b47db5a249c841659a201169231ec7fd113abd6efa3ba6206308c49acf706a8"
+    },
+    {
+      "path": "web/src/market-data/Tasks.tsx",
+      "sha256": "4c5c5e976824d62995969c8c7a0741e0f6b95d37b9998db69887d6fd8743b3dd"
+    },
+    {
+      "path": "web/src/market-data/Window.tsx",
+      "sha256": "776ffc93cfe8b4a89eb5d427fecfefabd8094726e612984a6b9edf34a2cc23bc"
+    },
+    {
+      "path": "web/src/market-data/types.ts",
+      "sha256": "eb9d96d36cbdbdbc7912465ee8ecd9d214dc64bc07b48d775f502d9e1f024077"
+    },
+    {
+      "path": "web/src/market-data/window.css",
+      "sha256": "9bdc2322b81c54e2a09d3233ddb39d4a8fdd5b6627d86d273c7ba32dde25b56b"
+    }
+  ]
+}

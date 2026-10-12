@@ -34,6 +34,7 @@ export type AlertDraft = {
   config: AlertConfig;
   requestId: string;
   editing: { id: string; version: number } | null;
+  displayLabel?: string;
 };
 export function ChartAlertsPanel({
   workspaceId,
@@ -147,6 +148,7 @@ export function ChartAlertsPanel({
       config: freshDraft(context),
       requestId: context.request_id,
       editing: null,
+      displayLabel: context.display_label,
     });
     setFormOpen(true);
   }, [context?.request_id]);
@@ -219,6 +221,7 @@ export function ChartAlertsPanel({
         : structuredClone(row.config),
       requestId: crypto.randomUUID(),
       editing: copy ? null : { id: row.id, version: row.version },
+      displayLabel: row.display_label || row.name,
     });
     setFormOpen(true);
   }
@@ -484,15 +487,22 @@ export function ChartAlertsPanel({
                   </span>
                   <span className="alert-row-subtitle">
                     <Clock3 size={12} aria-hidden />
-                    {row.config.instrument} ·{" "}
+                    <span
+                      className="alert-row-identity"
+                      title={row.display_label || row.name}
+                    >
+                      {row.display_label || row.name}
+                    </span>
                     <span className={`alert-state alert-state-${row.status}`}>
                       {row.status === "active" && row.health !== "ready"
                         ? healthNames[row.health]
                         : statuses[row.status]}
                     </span>
-                    {row.config.expires_at
-                      ? " · " + date(row.config.expires_at)
-                      : ""}
+                    {row.config.expires_at && (
+                      <span className="alert-row-expiry">
+                        到期 {date(row.config.expires_at)}
+                      </span>
+                    )}
                   </span>
                 </button>
                 <div className="alert-row-actions">
@@ -642,12 +652,19 @@ export function ChartAlertsPanel({
                         {event.evidence.config.name}
                       </span>
                       <span className="alert-row-subtitle">
-                        {event.evidence.config.instrument} ·{" "}
-                        {new Date(event.occurred_at).toLocaleTimeString(
-                          "zh-CN",
-                          { hour12: false },
-                        )}
-                        {event.evidence.late ? " · 迟到" : ""}
+                        <span
+                          className="alert-row-identity"
+                          title={event.display_label || event.evidence.config.name}
+                        >
+                          {event.display_label || event.evidence.config.name}
+                        </span>
+                        <span className="alert-row-time">
+                          {new Date(event.occurred_at).toLocaleTimeString(
+                            "zh-CN",
+                            { hour12: false },
+                          )}
+                          {event.evidence.late ? " · 迟到" : ""}
+                        </span>
                       </span>
                     </button>
                     {selected === event.id && (
@@ -723,6 +740,7 @@ export function ChartAlertsPanel({
         <ChartAlertDialog
           key={draft.requestId}
           initial={draft.config}
+          displayLabel={draft.displayLabel}
           requestId={draft.requestId}
           editing={draft.editing}
           request={request}

@@ -24,6 +24,7 @@ def test_create_edit_conflict_and_event_confirmation_via_authenticated_http(data
         created = client.post("/api/chart-alerts", json=body)
         assert created.status_code == 201
         row = created.json()
+        assert row["display_label"].startswith("EURUSD · 自建行情 · bid · M5")
         assert row["health"] == "warming" and row["count"] == 0
         assert client.post("/api/chart-alerts", json=body).json()["id"] == row["id"]
         changed = {**body, "config": config(name="different").model_dump(mode="json")}
@@ -46,6 +47,7 @@ def test_create_edit_conflict_and_event_confirmation_via_authenticated_http(data
             consume(db, alert.id, Observation("live", 2, at + 1000, sample(0, 11).left, sample(0, 11).right), detected_at=at + 1001)
         events = client.get("/api/chart-alerts/events").json()
         assert len(events) == 1 and events[0]["evidence"]["rule_version"] == 2
+        assert events[0]["display_label"] == row["display_label"]
         assert client.post(f"/api/notifications/{events[0]['notification_id']}/ack").status_code == 200
         assert client.get("/api/chart-alerts/events").json()[0]["ack_at"] is not None
         assert client.get("/api/signals").json()[0]["id"] == events[0]["id"]

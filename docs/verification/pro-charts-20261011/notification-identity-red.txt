@@ -1,0 +1,97 @@
+FFF..                                                                    [100%]
+=================================== FAILURES ===================================
+_ test_notification_uses_saved_readable_symbol_and_preserves_decimal_threshold[provider-yahoo-YAHOO:JPY_X-JPY=X-USDJPY] _
+
+kind = 'provider', source = 'yahoo', instrument = 'YAHOO:JPY_X'
+symbol = 'JPY=X', shown = 'USDJPY'
+
+    @pytest.mark.parametrize("kind,source,instrument,symbol,shown", [
+        ("provider", "yahoo", "YAHOO:JPY_X", "JPY=X", "USDJPY"),
+        ("provider", "yahoo", "YAHOO:AAPL", "AAPL", "AAPL"),
+        ("managed", "oanda", "managed-eurusd", "EUR_USD", "EURUSD"),
+        ("composite", "composite", "a" * 64, "EURUSD", "EURUSD"),
+    ])
+    def test_notification_uses_saved_readable_symbol_and_preserves_decimal_threshold(
+            kind, source, instrument, symbol, shown):
+        threshold = "1.128313520286396123"
+        signal = SimpleNamespace(
+            id="notification-identity", instrument_id=instrument, occurred_at=1000,
+            price=D("1.13"), threshold=D(threshold),
+            evidence={"chart_alert": True, "market_identity": {
+                "series_kind": kind, "source": source, "symbol": symbol},
+                "config": {"timeframe": "M1", "message": "{symbol} {threshold}",
+                           "condition": {"relation": "above", "left": {"kind": "price"},
+                                         "right": {"kind": "constant", "value": threshold}}},
+                "detected_at": 1001, "left": "1.13", "unit": "price", "late": False})
+        message = signal_message(signal)
+>       assert message.startswith(f"{shown} {threshold}\n{shown} · {source} · M1\n")
+E       AssertionError: assert False
+E        +  where False = <built-in method startswith of str object at 0x7fab212a1e30>('USDJPY 1.128313520286396123\nUSDJPY · yahoo · M1\n')
+E        +    where <built-in method startswith of str object at 0x7fab212a1e30> = 'YAHOO:JPY_X 1.128313520286396123\nYAHOO:JPY_X · yahoo · M1\n价格 高于 1.128313520286396123\n价格 1.13 / 比较值 1.128313520286396123\n市场价格 1.13\n发生时间 1970-01-01T00:00:01+00:00 / 检测延迟 0.001s\n信号 notification-identity\n请使用“确认”停止此事件的后续提醒。'.startswith
+
+backend/tests/test_chart_alert_notifications.py:33: AssertionError
+_ test_notification_uses_saved_readable_symbol_and_preserves_decimal_threshold[provider-yahoo-YAHOO:AAPL-AAPL-AAPL] _
+
+kind = 'provider', source = 'yahoo', instrument = 'YAHOO:AAPL', symbol = 'AAPL'
+shown = 'AAPL'
+
+    @pytest.mark.parametrize("kind,source,instrument,symbol,shown", [
+        ("provider", "yahoo", "YAHOO:JPY_X", "JPY=X", "USDJPY"),
+        ("provider", "yahoo", "YAHOO:AAPL", "AAPL", "AAPL"),
+        ("managed", "oanda", "managed-eurusd", "EUR_USD", "EURUSD"),
+        ("composite", "composite", "a" * 64, "EURUSD", "EURUSD"),
+    ])
+    def test_notification_uses_saved_readable_symbol_and_preserves_decimal_threshold(
+            kind, source, instrument, symbol, shown):
+        threshold = "1.128313520286396123"
+        signal = SimpleNamespace(
+            id="notification-identity", instrument_id=instrument, occurred_at=1000,
+            price=D("1.13"), threshold=D(threshold),
+            evidence={"chart_alert": True, "market_identity": {
+                "series_kind": kind, "source": source, "symbol": symbol},
+                "config": {"timeframe": "M1", "message": "{symbol} {threshold}",
+                           "condition": {"relation": "above", "left": {"kind": "price"},
+                                         "right": {"kind": "constant", "value": threshold}}},
+                "detected_at": 1001, "left": "1.13", "unit": "price", "late": False})
+        message = signal_message(signal)
+>       assert message.startswith(f"{shown} {threshold}\n{shown} · {source} · M1\n")
+E       AssertionError: assert False
+E        +  where False = <built-in method startswith of str object at 0x7fab212a2230>('AAPL 1.128313520286396123\nAAPL · yahoo · M1\n')
+E        +    where <built-in method startswith of str object at 0x7fab212a2230> = 'YAHOO:AAPL 1.128313520286396123\nYAHOO:AAPL · yahoo · M1\n价格 高于 1.128313520286396123\n价格 1.13 / 比较值 1.128313520286396123\n市场价格 1.13\n发生时间 1970-01-01T00:00:01+00:00 / 检测延迟 0.001s\n信号 notification-identity\n请使用“确认”停止此事件的后续提醒。'.startswith
+
+backend/tests/test_chart_alert_notifications.py:33: AssertionError
+_ test_notification_uses_saved_readable_symbol_and_preserves_decimal_threshold[managed-oanda-managed-eurusd-EUR_USD-EURUSD] _
+
+kind = 'managed', source = 'oanda', instrument = 'managed-eurusd'
+symbol = 'EUR_USD', shown = 'EURUSD'
+
+    @pytest.mark.parametrize("kind,source,instrument,symbol,shown", [
+        ("provider", "yahoo", "YAHOO:JPY_X", "JPY=X", "USDJPY"),
+        ("provider", "yahoo", "YAHOO:AAPL", "AAPL", "AAPL"),
+        ("managed", "oanda", "managed-eurusd", "EUR_USD", "EURUSD"),
+        ("composite", "composite", "a" * 64, "EURUSD", "EURUSD"),
+    ])
+    def test_notification_uses_saved_readable_symbol_and_preserves_decimal_threshold(
+            kind, source, instrument, symbol, shown):
+        threshold = "1.128313520286396123"
+        signal = SimpleNamespace(
+            id="notification-identity", instrument_id=instrument, occurred_at=1000,
+            price=D("1.13"), threshold=D(threshold),
+            evidence={"chart_alert": True, "market_identity": {
+                "series_kind": kind, "source": source, "symbol": symbol},
+                "config": {"timeframe": "M1", "message": "{symbol} {threshold}",
+                           "condition": {"relation": "above", "left": {"kind": "price"},
+                                         "right": {"kind": "constant", "value": threshold}}},
+                "detected_at": 1001, "left": "1.13", "unit": "price", "late": False})
+        message = signal_message(signal)
+>       assert message.startswith(f"{shown} {threshold}\n{shown} · {source} · M1\n")
+E       AssertionError: assert False
+E        +  where False = <built-in method startswith of str object at 0x555ddae7d7e0>('EURUSD 1.128313520286396123\nEURUSD · oanda · M1\n')
+E        +    where <built-in method startswith of str object at 0x555ddae7d7e0> = 'managed-eurusd 1.128313520286396123\nmanaged-eurusd · oanda · M1\n价格 高于 1.128313520286396123\n价格 1.13 / 比较值 1.128313520286396123\n市场价格 1.13\n发生时间 1970-01-01T00:00:01+00:00 / 检测延迟 0.001s\n信号 notification-identity\n请使用“确认”停止此事件的后续提醒。'.startswith
+
+backend/tests/test_chart_alert_notifications.py:33: AssertionError
+=========================== short test summary info ============================
+FAILED backend/tests/test_chart_alert_notifications.py::test_notification_uses_saved_readable_symbol_and_preserves_decimal_threshold[provider-yahoo-YAHOO:JPY_X-JPY=X-USDJPY]
+FAILED backend/tests/test_chart_alert_notifications.py::test_notification_uses_saved_readable_symbol_and_preserves_decimal_threshold[provider-yahoo-YAHOO:AAPL-AAPL-AAPL]
+FAILED backend/tests/test_chart_alert_notifications.py::test_notification_uses_saved_readable_symbol_and_preserves_decimal_threshold[managed-oanda-managed-eurusd-EUR_USD-EURUSD]
+3 failed, 2 passed in 0.32s

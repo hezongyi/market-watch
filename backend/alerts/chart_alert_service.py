@@ -290,6 +290,11 @@ def consume(db, alert_id, observation: Observation, *, detected_at=None, baselin
                                  "run": alert.run, "ordinal": trigger.ordinal,
                                  "observation_id": observation.identity, "left": str(observation.left),
                                  "right": str(observation.right) if observation.right is not None else None,
+                                 # The shared legacy signal columns use scale 10.
+                                 # Keep exact chart-rule decimals in immutable
+                                 # evidence for reloads, logs and notifications.
+                                 "price": str(observation.market_price if observation.market_price is not None else observation.left),
+                                 "threshold": str(trigger.threshold),
                                  "unit": config.condition.left.unit,
                                  "market_identity": version.market_identity, "config": version.config,
                                  "detected_at": detected_at, "late": late,
