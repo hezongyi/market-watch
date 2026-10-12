@@ -53,3 +53,43 @@ function chartQuoteScale(quote, symbolInfo) {
     Number.isInteger(Math.log10(scale)) && !symbolInfo.fractional && !symbolInfo.variable_tick_size ?
       scale : symbolInfo.pricescale;
 }
+
+// Native format is captured from the initiating pane. Convert only the pinned
+// formatter's decimal notation, with grouping validated before removing it.
+// This is deliberately independent of an optional/private formatter.parse.
+function chartAlertPricePresentation(chart, price) {
+  const formatter = chart.priceFormatter?.();
+  const text = formatter?.format(price);
+  const normalized = value => String(value || '').replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g,'').replace(/\u2212/g, '-');
+  const decimal = normalized(text);
+  const info = chart.symbolExt?.();
+  if (info?.fractional && /^[+]?\d+'\d+(?:'\d+)?$/.test(decimal)) {
+    const parts = decimal.replace(/^\+/,'').split("'");
+    const scale=info.pricescale, factor=info.minmove2 || 1;
+    const digits=(value,base,second=false)=>{
+      const special=base===2 ? [0,5] : base===4 ? [0,2,5,7] : base===8 && second ? [0,1,2,3,5,6,7,8] : null;
+      return special ? special.indexOf(Number(value)) : Number(value);
+    };
+    const first=digits(parts[1],scale/factor),second=parts.length===3 ? digits(parts[2],factor,true) : 0;
+    if(!Number.isSafeInteger(scale) || scale<=0 || ![1,2,4,8].includes(factor) ||
+        parts.length!==(factor===1 ? 2 : 3) || first<0 || first>=scale/factor || second<0 || second>=factor)
+      throw Error('当前分数报价格式无法确定十进制阈值，请在告警表单中输入价格');
+    // Exact finite decimal conversion, independent of native/private parse.
+    const denominator=BigInt(scale),numerator=BigInt(parts[0])*denominator+BigInt(first*factor+second);
+    let remainder=numerator%denominator,value=String(numerator/denominator),fraction='';
+    for(let place=0;remainder && place<16;place++) {
+      remainder*=10n;fraction+=String(remainder/denominator);remainder%=denominator;
+    }
+    if(remainder) throw Error('分数报价无法用有限十进制表示，请输入价格');
+    if(fraction)value+='.'+fraction;
+    if(Number(value)<=0 || normalized(formatter.format(Number(value)))!==decimal)
+      throw Error('分数报价核对失败，请在告警表单中输入价格');
+    return {text,value};
+  }
+  if (!/^[+-]?(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$/.test(decimal))
+    throw Error('当前报价格式无法确定十进制阈值，请在告警表单中输入价格');
+  const value = decimal.replace(/,/g, '').replace(/^\+/, '');
+  if (!Number.isFinite(Number(value)) || Number(value) <= 0)
+    throw Error('告警价格必须大于零');
+  return {text, value};
+}

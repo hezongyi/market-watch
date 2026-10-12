@@ -1,0 +1,57 @@
+{
+  "environment": "Ubuntu mw-pro-charts-20261011",
+  "cases": [
+    {
+      "name": "native multi-selection nine checkbox edits both drawing masks",
+      "ids": [
+        "v66FT0",
+        "cUFP1K"
+      ],
+      "masks": [
+        5,
+        5
+      ]
+    },
+    {
+      "name": "mixed selection preserves each other bit and native undo/redo macro",
+      "masks": [
+        37,
+        48
+      ]
+    },
+    {
+      "name": "multi-selection legacy migration occurs only on confirmed edit; cancel/undo preserve ranges"
+    },
+    {
+      "name": "period edits preserve manual hidden and hidden group state",
+      "group": "8BFL2D",
+      "masks": [
+        463,
+        463
+      ]
+    },
+    {
+      "name": "adapter opens actual drawing alert form; real UI/API POST201",
+      "id": "1a05f85b-4ce3-4c26-a06c-5a41229e0013",
+      "association": {
+        "workspace_id": "pro-charts-fixture",
+        "chart_id": "66eb6cd9-67c4-4497-be8a-7300c3274f8a",
+        "generation": "0:5",
+        "object_id": "22aa4f49-6c5c-4f8c-b734-01b0dc3cb136",
+        "object_kind": "drawing",
+        "native_object_id": "v66FT0",
+        "chart_index": 0
+      }
+    },
+    {
+      "name": "visibility-only edit preserves alert rule version, geometry, identity and association",
+      "version": 1,
+      "masks": [
+        21,
+        5
+      ]
+    }
+  ],
+  "passed": true,
+  "errors": []
+}

@@ -143,6 +143,7 @@ html:not(.theme-dark) .alert-menu {
 }
 .alert-row-subtitle {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 4px;
   color: var(--alert-muted);
@@ -150,6 +151,20 @@ html:not(.theme-dark) .alert-menu {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+.alert-row-subtitle > svg,
+.alert-row-subtitle .alert-state,
+.alert-row-time {
+  flex-shrink: 0;
+}
+.alert-row-identity {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.alert-row-expiry {
+  flex-basis: 100%;
 }
 .alert-list-count {
   margin: 0;
@@ -164,6 +179,14 @@ html:not(.theme-dark) .alert-menu {
 .alert-state-completed,
 .alert-state-expired {
   color: #d4a148;
+}
+[data-theme="light"] .alert-state-active {
+  color: #147d70;
+}
+[data-theme="light"] .alert-state-paused,
+[data-theme="light"] .alert-state-completed,
+[data-theme="light"] .alert-state-expired {
+  color: #946414;
 }
 .alert-row-actions {
   position: absolute;

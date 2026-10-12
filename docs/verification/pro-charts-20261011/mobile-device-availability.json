@@ -1,0 +1,36 @@
+{
+  "checked_at_utc": "2026-10-11T22:53:00.474656+00:00",
+  "host": "quant-server",
+  "evidence": "Current /sys/bus/usb/devices descriptors and executable availability; no physical Android/iOS connection identified",
+  "tools": {
+    "adb": null,
+    "idevice_id": null,
+    "ideviceinfo": null,
+    "safaridriver": null
+  },
+  "usb_devices": [
+    {
+      "usb_device": "1-1",
+      "vendor": "0627",
+      "product_id": "0001",
+      "manufacturer": "QEMU",
+      "product": "QEMU USB Tablet"
+    },
+    {
+      "usb_device": "usb1",
+      "vendor": "1d6b",
+      "product_id": "0002",
+      "manufacturer": "Linux 5.15.0-190-generic xhci-hcd",
+      "product": "xHCI Host Controller"
+    },
+    {
+      "usb_device": "usb2",
+      "vendor": "1d6b",
+      "product_id": "0003",
+      "manufacturer": "Linux 5.15.0-190-generic xhci-hcd",
+      "product": "xHCI Host Controller"
+    }
+  ],
+  "physical_device_acceptance": "pending",
+  "reason": "No device connection details supplied; browser touch simulation cannot prove physical-device behavior"
+}

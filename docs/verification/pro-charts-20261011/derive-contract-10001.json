@@ -1,0 +1,276 @@
+{
+  "scope": "Ubuntu isolated PostgreSQL; synthetic real-shape M1; nine actual period artifacts",
+  "rows": 10001,
+  "baseline": "7b5c61416390d6db2c26ccdde07716b81affc36c",
+  "baseline_source_sha256": "b34f69ad4a252962e9f733ea1fe10c1df122ef38cf7c410055b9fde477ecdc59",
+  "frames": [
+    "M1",
+    "M5",
+    "M15",
+    "M30",
+    "H1",
+    "H4",
+    "D1",
+    "W1",
+    "MN"
+  ],
+  "phases": {
+    "sql_read_and_wait": 0.4651849493384361,
+    "source_content_access": 8.801324293017387e-05,
+    "encode_json": 0.0890678376890719,
+    "decode_gzip": 0.003028979990631342,
+    "decode_json": 0.020871461369097233,
+    "decode_price_normalization": 0.2209572922438383,
+    "checksum_calendar_cache_and_materialization": 0.1756270588375628,
+    "bucket_keys": 0.05404596962034702,
+    "decimal_aggregation": 0.325532388407737,
+    "coverage_finalize": 0.5474258870817721,
+    "encode_gzip": 0.22373208915814757,
+    "sql_write": 0.15094865206629038,
+    "flush_commit_and_wait": 0.43518080143257976
+  },
+  "ticks": 27,
+  "decode_calls": 1,
+  "reference": [
+    {
+      "frame": "M1",
+      "buckets_compared": 10001,
+      "observed_minutes": 10001,
+      "all_fields_equal": true,
+      "current_sha256": "849fec5ab58af54cf7a0c42adeace0fb1949e31b4024b152a20942241aef7843",
+      "baseline_sha256": "849fec5ab58af54cf7a0c42adeace0fb1949e31b4024b152a20942241aef7843",
+      "seconds": 1.0161126931197941
+    },
+    {
+      "frame": "M5",
+      "buckets_compared": 2007,
+      "observed_minutes": 10001,
+      "all_fields_equal": true,
+      "current_sha256": "df3b31ecbe152659845604a6f91264c5f7622fca8bb86553ed06f777e18b9673",
+      "baseline_sha256": "df3b31ecbe152659845604a6f91264c5f7622fca8bb86553ed06f777e18b9673",
+      "seconds": 0.8332942188717425
+    },
+    {
+      "frame": "M15",
+      "buckets_compared": 669,
+      "observed_minutes": 10001,
+      "all_fields_equal": true,
+      "current_sha256": "942af4db0d214dade8d928c3ecaae0971c79b477743d64c373a329bff13bec01",
+      "baseline_sha256": "942af4db0d214dade8d928c3ecaae0971c79b477743d64c373a329bff13bec01",
+      "seconds": 0.5265184710733593
+    },
+    {
+      "frame": "M30",
+      "buckets_compared": 335,
+      "observed_minutes": 10001,
+      "all_fields_equal": true,
+      "current_sha256": "ba149c52ff36c07606664f7da556b68b7b2eb6292a094c76c9211e20f8513df5",
+      "baseline_sha256": "ba149c52ff36c07606664f7da556b68b7b2eb6292a094c76c9211e20f8513df5",
+      "seconds": 0.5277409991249442
+    },
+    {
+      "frame": "H1",
+      "buckets_compared": 168,
+      "observed_minutes": 10001,
+      "all_fields_equal": true,
+      "current_sha256": "12984327143b8ae4a147cb73a5d057a2d249e9b2c4a07542d5d372ac78e5c66b",
+      "baseline_sha256": "12984327143b8ae4a147cb73a5d057a2d249e9b2c4a07542d5d372ac78e5c66b",
+      "seconds": 0.7773912930861115
+    },
+    {
+      "frame": "H4",
+      "buckets_compared": 44,
+      "observed_minutes": 10001,
+      "all_fields_equal": true,
+      "current_sha256": "32569d8352c415f994b74c79dd246cbd007a64d5a039ae00dec172821ddd9b3a",
+      "baseline_sha256": "32569d8352c415f994b74c79dd246cbd007a64d5a039ae00dec172821ddd9b3a",
+      "seconds": 0.7156088012270629
+    },
+    {
+      "frame": "D1",
+      "buckets_compared": 9,
+      "observed_minutes": 10001,
+      "all_fields_equal": true,
+      "current_sha256": "5a97771291b8c0a1c531b06318bb8abb92008f043a5c8609252dd8559526289e",
+      "baseline_sha256": "5a97771291b8c0a1c531b06318bb8abb92008f043a5c8609252dd8559526289e",
+      "seconds": 0.6874297396279871
+    },
+    {
+      "frame": "W1",
+      "buckets_compared": 2,
+      "observed_minutes": 10001,
+      "all_fields_equal": true,
+      "current_sha256": "8bd554ec38b74559aba9af7dd84ab6563c2bfc476b93bd34e382e4030e66a134",
+      "baseline_sha256": "8bd554ec38b74559aba9af7dd84ab6563c2bfc476b93bd34e382e4030e66a134",
+      "seconds": 0.6401426908560097
+    },
+    {
+      "frame": "MN",
+      "buckets_compared": 1,
+      "observed_minutes": 10001,
+      "all_fields_equal": true,
+      "current_sha256": "5cc62cf30dd1c7491234975ddaf1b77a41dc2358c10c5732b9d0dc1a88736316",
+      "baseline_sha256": "5cc62cf30dd1c7491234975ddaf1b77a41dc2358c10c5732b9d0dc1a88736316",
+      "seconds": 0.7382602831348777
+    }
+  ],
+  "intentional_wait_seconds": 0,
+  "measurement_limit": "Exclusive instrumented wall times; SQL read time includes lock waits. No injected waits. Instrumentation overhead is included; no supplier throughput claim.",
+  "fixture_publish_seconds": 0.7141345022246242,
+  "nine_period_end_to_end_seconds": 3.1671648509800434,
+  "unassigned_python_and_measurement_seconds": 0.4554734705016017,
+  "longest_tick_seconds": 0.5695305857807398,
+  "cache_high_water_bytes": 4566490,
+  "derivation_peak_rss_kib": 218740,
+  "periods": [
+    {
+      "timeframe": "D1",
+      "status": "published",
+      "rows": 9,
+      "complete_rows": 0
+    },
+    {
+      "timeframe": "H1",
+      "status": "published",
+      "rows": 168,
+      "complete_rows": 112
+    },
+    {
+      "timeframe": "H4",
+      "status": "published",
+      "rows": 44,
+      "complete_rows": 0
+    },
+    {
+      "timeframe": "M1",
+      "status": "published",
+      "rows": 10001,
+      "complete_rows": 9953
+    },
+    {
+      "timeframe": "M15",
+      "status": "published",
+      "rows": 669,
+      "complete_rows": 609
+    },
+    {
+      "timeframe": "M30",
+      "status": "published",
+      "rows": 335,
+      "complete_rows": 277
+    },
+    {
+      "timeframe": "M5",
+      "status": "published",
+      "rows": 2007,
+      "complete_rows": 1944
+    },
+    {
+      "timeframe": "MN",
+      "status": "published",
+      "rows": 1,
+      "complete_rows": 0
+    },
+    {
+      "timeframe": "W1",
+      "status": "published",
+      "rows": 2,
+      "complete_rows": 0
+    }
+  ],
+  "progress": {
+    "stage": "derive",
+    "published_periods": 9,
+    "total_periods": 9,
+    "processed_rows": 90009,
+    "total_rows": 90009,
+    "estimated_remaining_seconds": 0,
+    "periods": [
+      {
+        "timeframe": "D1",
+        "status": "published",
+        "processed_rows": 10001,
+        "total_rows": 10001,
+        "cursor": 1547075460000,
+        "work_seconds": 0.5618049106560647,
+        "updated_at": 1791756952011
+      },
+      {
+        "timeframe": "H1",
+        "status": "published",
+        "processed_rows": 10001,
+        "total_rows": 10001,
+        "cursor": 1547075460000,
+        "work_seconds": 0.19352033222094178,
+        "updated_at": 1791756952033
+      },
+      {
+        "timeframe": "H4",
+        "status": "published",
+        "processed_rows": 10001,
+        "total_rows": 10001,
+        "cursor": 1547075460000,
+        "work_seconds": 0.09815911436453462,
+        "updated_at": 1791756952096
+      },
+      {
+        "timeframe": "M1",
+        "status": "published",
+        "processed_rows": 10001,
+        "total_rows": 10001,
+        "cursor": 1547075460000,
+        "work_seconds": 0.5151983606629074,
+        "updated_at": 1791756952125
+      },
+      {
+        "timeframe": "M15",
+        "status": "published",
+        "processed_rows": 10001,
+        "total_rows": 10001,
+        "cursor": 1547075460000,
+        "work_seconds": 0.11685521434992552,
+        "updated_at": 1791756952154
+      },
+      {
+        "timeframe": "M30",
+        "status": "published",
+        "processed_rows": 10001,
+        "total_rows": 10001,
+        "cursor": 1547075460000,
+        "work_seconds": 0.10973711870610714,
+        "updated_at": 1791756952223
+      },
+      {
+        "timeframe": "M5",
+        "status": "published",
+        "processed_rows": 10001,
+        "total_rows": 10001,
+        "cursor": 1547075460000,
+        "work_seconds": 0.2252082573249936,
+        "updated_at": 1791756952269
+      },
+      {
+        "timeframe": "MN",
+        "status": "published",
+        "processed_rows": 10001,
+        "total_rows": 10001,
+        "cursor": 1547075460000,
+        "work_seconds": 0.19481403287500143,
+        "updated_at": 1791756952412
+      },
+      {
+        "timeframe": "W1",
+        "status": "published",
+        "processed_rows": 10001,
+        "total_rows": 10001,
+        "cursor": 1547075460000,
+        "work_seconds": 0.12389744073152542,
+        "updated_at": 1791756952447
+      }
+    ]
+  },
+  "reference_comparison_seconds": 6.479384617879987,
+  "whole_process_peak_rss_kib": 233024,
+  "passed": true,
+  "isolated_schema_removed": true
+}

@@ -1,0 +1,264 @@
+{
+  "environment": "Ubuntu mw-pro-charts-20261011",
+  "delivery": "disabled",
+  "cases": [
+    {
+      "name": "real blank-pane formatted menu/dialog POST201 persists initiating pane after active switch",
+      "label": "在 1.12107 创建价格告警…",
+      "id": "a5be1a10-09f3-41d3-a9d2-dbcef54f754a"
+    },
+    {
+      "name": "real formatter/menu/dialog",
+      "symbol": "MWP:EURUSD",
+      "label": "在 1.12008 创建价格告警…",
+      "value": "1.12008"
+    },
+    {
+      "name": "real formatter/menu/dialog",
+      "symbol": "MWP:USDJPY",
+      "label": "在 65,000.008 创建价格告警…",
+      "value": "65000.008"
+    },
+    {
+      "name": "real formatter/menu/dialog",
+      "symbol": "MWP:XAUUSD",
+      "label": "在 4,000.08 创建价格告警…",
+      "value": "4000.08"
+    },
+    {
+      "name": "real formatter/menu/dialog",
+      "symbol": "MWP:BTCUSDT",
+      "label": "在 65,000.08 创建价格告警…",
+      "value": "65000.08"
+    },
+    {
+      "name": "real Yahoo formatter/menu/dialog has readable AAPL identity",
+      "label": "在 250.00 创建价格告警…"
+    },
+    {
+      "name": "real UI/API POST201 preserves manually entered 18-place decimal",
+      "id": "25936899-62c1-40ad-99e2-8ef6e9ecca8e",
+      "threshold": "1.123456789012345678"
+    },
+    {
+      "name": "actual API read after browser reload preserves threshold/identity/association",
+      "id": "a5be1a10-09f3-41d3-a9d2-dbcef54f754a"
+    },
+    {
+      "name": "persisted manual precision and original name survive reload",
+      "id": "25936899-62c1-40ad-99e2-8ef6e9ecca8e"
+    }
+  ],
+  "alert": {
+    "id": "a5be1a10-09f3-41d3-a9d2-dbcef54f754a",
+    "name": "EURUSD · 组合行情 · bid · H1 告警",
+    "version": 1,
+    "run": 1,
+    "control_revision": 1,
+    "status": "active",
+    "health": "warming",
+    "health_reason": null,
+    "count": 0,
+    "max_triggers": 1,
+    "effective_at": 1791764066408,
+    "expires_at": null,
+    "created_at": 1791764066417,
+    "updated_at": 1791764066417,
+    "config": {
+      "name": "EURUSD · 组合行情 · bid · H1 告警",
+      "instrument": "85eb595180ed9491e1d5e3064aca750933a9ffd787b840d1357645fbbeca3b8a",
+      "series_kind": "composite",
+      "source": "composite",
+      "timeframe": "H1",
+      "mode": "close",
+      "condition": {
+        "relation": "cross_up",
+        "left": {
+          "kind": "price",
+          "value": null,
+          "indicator": null,
+          "line": null
+        },
+        "right": {
+          "kind": "constant",
+          "value": "1.12107",
+          "indicator": null,
+          "line": null
+        },
+        "lower": null,
+        "upper": null
+      },
+      "max_triggers": 1,
+      "expires_at": null,
+      "message": "",
+      "notify_web": true,
+      "notify_ntfy": false,
+      "late_delivery": "log_only",
+      "association": {
+        "workspace_id": "pro-charts-fixture",
+        "chart_id": "66eb6cd9-67c4-4497-be8a-7300c3274f8a",
+        "generation": "0:0",
+        "object_id": null,
+        "object_kind": null,
+        "native_object_id": null,
+        "chart_index": 0
+      },
+      "calculation_version": "chart-python-v1",
+      "calculation_origin": null,
+      "published": false,
+      "composite_revision_id": "a4fc8064-1fda-4252-926e-8cb80c9c0be5",
+      "seam_policy": "reject"
+    },
+    "market_identity": {
+      "instrument": "85eb595180ed9491e1d5e3064aca750933a9ffd787b840d1357645fbbeca3b8a",
+      "instrument_id": "MC:85eb595180ed9491e1d5e3064:EURUSD",
+      "series_kind": "composite",
+      "source": "composite",
+      "symbol": "EURUSD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "timeframe": "H1",
+      "precision": 5,
+      "composite_id": "85eb595180ed9491e1d5e3064aca750933a9ffd787b840d1357645fbbeca3b8a",
+      "composite_revision_id": "a4fc8064-1fda-4252-926e-8cb80c9c0be5",
+      "history_version_id": "95d5f45a-54dd-4e1e-8367-3edd37d5618c",
+      "history_checksum": "45e727222cc21dedd264be9f9330dd7a1482ac8c109c415a3f69629b8baed223",
+      "history_start": 1787836380000,
+      "dataset_id": "1139a661eecac6e400618e4514d405a5b0850eed83d6c966a43584294ae9e36a",
+      "mapping_id": "4e7acb9a9e70bdd20328a86d35744a27145f9503723fed226da5bd7bd6b3a756",
+      "target_dataset_id": "0b158e3efda8b84c303a38295fb3d72a10d631bd80804a590208873727236563",
+      "target_identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:0ec7a178300cdbb9da93ce7b451762a1b57ae4191ed5102d81844752811faf67",
+        "provider_symbol": "EUR_USD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      },
+      "seam": 1791665760000,
+      "rules": {
+        "aggregation": "configured-phase-m1-v1",
+        "seam": "explicit-minute-boundary-v1",
+        "selection": "history-before-T-target-from-T-v1",
+        "tail_revisions": "source-confirmed-replace-audit-v1",
+        "aggregation_calendar": "ny17",
+        "historical_calendar_version": "pro-charts-fixture-v2"
+      },
+      "seam_policy": "reject",
+      "calculation_algorithm": "fixed-indicator-state-v3",
+      "contract": "composite-alert-input-v1",
+      "initial_input_revision": 1
+    },
+    "display_label": "EURUSD · 组合行情 · bid · H1 · COMPOSITE",
+    "condition_summary": "价格 上穿 1.12107",
+    "runtime": {}
+  },
+  "precisionAlert": {
+    "id": "25936899-62c1-40ad-99e2-8ef6e9ecca8e",
+    "name": "EURUSD · 组合行情 · bid · H1 告警",
+    "version": 1,
+    "run": 1,
+    "control_revision": 1,
+    "status": "active",
+    "health": "warming",
+    "health_reason": null,
+    "count": 0,
+    "max_triggers": 1,
+    "effective_at": 1791764105837,
+    "expires_at": null,
+    "created_at": 1791764105860,
+    "updated_at": 1791764105860,
+    "config": {
+      "name": "EURUSD · 组合行情 · bid · H1 告警",
+      "instrument": "85eb595180ed9491e1d5e3064aca750933a9ffd787b840d1357645fbbeca3b8a",
+      "series_kind": "composite",
+      "source": "composite",
+      "timeframe": "H1",
+      "mode": "close",
+      "condition": {
+        "relation": "cross_up",
+        "left": {
+          "kind": "price",
+          "value": null,
+          "indicator": null,
+          "line": null
+        },
+        "right": {
+          "kind": "constant",
+          "value": "1.123456789012345678",
+          "indicator": null,
+          "line": null
+        },
+        "lower": null,
+        "upper": null
+      },
+      "max_triggers": 1,
+      "expires_at": null,
+      "message": "",
+      "notify_web": true,
+      "notify_ntfy": false,
+      "late_delivery": "log_only",
+      "association": {
+        "workspace_id": "pro-charts-fixture",
+        "chart_id": "66eb6cd9-67c4-4497-be8a-7300c3274f8a",
+        "generation": "0:0",
+        "object_id": null,
+        "object_kind": null,
+        "native_object_id": null,
+        "chart_index": 0
+      },
+      "calculation_version": "chart-python-v1",
+      "calculation_origin": null,
+      "published": false,
+      "composite_revision_id": "a4fc8064-1fda-4252-926e-8cb80c9c0be5",
+      "seam_policy": "reject"
+    },
+    "market_identity": {
+      "instrument": "85eb595180ed9491e1d5e3064aca750933a9ffd787b840d1357645fbbeca3b8a",
+      "instrument_id": "MC:85eb595180ed9491e1d5e3064:EURUSD",
+      "series_kind": "composite",
+      "source": "composite",
+      "symbol": "EURUSD",
+      "basis": "bid",
+      "calendar": "ny17",
+      "timeframe": "H1",
+      "precision": 5,
+      "composite_id": "85eb595180ed9491e1d5e3064aca750933a9ffd787b840d1357645fbbeca3b8a",
+      "composite_revision_id": "a4fc8064-1fda-4252-926e-8cb80c9c0be5",
+      "history_version_id": "95d5f45a-54dd-4e1e-8367-3edd37d5618c",
+      "history_checksum": "45e727222cc21dedd264be9f9330dd7a1482ac8c109c415a3f69629b8baed223",
+      "history_start": 1787836380000,
+      "dataset_id": "1139a661eecac6e400618e4514d405a5b0850eed83d6c966a43584294ae9e36a",
+      "mapping_id": "4e7acb9a9e70bdd20328a86d35744a27145f9503723fed226da5bd7bd6b3a756",
+      "target_dataset_id": "0b158e3efda8b84c303a38295fb3d72a10d631bd80804a590208873727236563",
+      "target_identity": {
+        "source": "oanda",
+        "channel": "v20",
+        "environment": "practice",
+        "account_scope": "sha256:0ec7a178300cdbb9da93ce7b451762a1b57ae4191ed5102d81844752811faf67",
+        "provider_symbol": "EUR_USD",
+        "basis": "bid",
+        "calendar_version": "ny17-candidate-v1"
+      },
+      "seam": 1791665760000,
+      "rules": {
+        "aggregation": "configured-phase-m1-v1",
+        "seam": "explicit-minute-boundary-v1",
+        "selection": "history-before-T-target-from-T-v1",
+        "tail_revisions": "source-confirmed-replace-audit-v1",
+        "aggregation_calendar": "ny17",
+        "historical_calendar_version": "pro-charts-fixture-v2"
+      },
+      "seam_policy": "reject",
+      "calculation_algorithm": "fixed-indicator-state-v3",
+      "contract": "composite-alert-input-v1",
+      "initial_input_revision": 1
+    },
+    "display_label": "EURUSD · 组合行情 · bid · H1 · COMPOSITE",
+    "condition_summary": "价格 上穿 1.123456789012345678",
+    "runtime": {}
+  },
+  "passed": true,
+  "errors": []
+}

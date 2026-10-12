@@ -103,6 +103,7 @@ const defaultIndicator = (): IndicatorSpec => ({
 
 export function ChartAlertDialog({
   initial,
+  displayLabel,
   requestId,
   editing,
   theme,
@@ -115,6 +116,7 @@ export function ChartAlertDialog({
   onDelete,
 }: {
   initial: AlertConfig;
+  displayLabel?: string;
   requestId: string;
   editing: { id: string; version: number } | null;
   theme: string;
@@ -151,7 +153,7 @@ export function ChartAlertDialog({
     mounted.current = true;
     if (nativeDialog) {
       nativeDialog({
-        title: `${editing ? "编辑警报" : "创建警报"} · ${initial.instrument}`,
+        title: `${editing ? "编辑警报" : "创建警报"} · ${displayLabel || initial.name}`,
         onClose: () => {
           if (mounted.current) onClose();
         },
@@ -305,7 +307,7 @@ export function ChartAlertDialog({
         ? "编辑消息"
         : page === "notifications"
           ? "通知"
-          : `${editing ? "编辑警报" : "创建警报"} · ${draft.instrument}`,
+          : `${editing ? "编辑警报" : "创建警报"} · ${displayLabel || draft.name}`,
     );
     native.recenter();
   }, [native, page, busy]);
@@ -410,7 +412,7 @@ export function ChartAlertDialog({
                 ? "编辑消息"
                 : page === "notifications"
                   ? "通知"
-                  : `${editing ? "编辑警报" : "创建警报"} · ${draft.instrument}`}
+                  : `${editing ? "编辑警报" : "创建警报"} · ${displayLabel || draft.name}`}
             </h2>
             <button
               type="button"

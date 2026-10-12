@@ -1,0 +1,24 @@
+{
+  "checked_at_utc": "2026-10-11T23:05:29.372816+00:00",
+  "scope": "CPU prototype decision; runtime stays Decimal",
+  "report": "derive-batch-equivalence.json",
+  "sha256": "5fc6a1e0d237ad8aac317d92e453061205e1939feb2964242c2cf502700b9d9c",
+  "cases": 36,
+  "input_minutes": 60000,
+  "observations_per_case": [
+    59390
+  ],
+  "pandas_group_and_finish_seconds": 14.266519542783499,
+  "polars_group_and_finish_seconds": 10.716427920851856,
+  "conversion_seconds": 17.31496892683208,
+  "baseline_pair_add_finish_seconds": 41.20559136476368,
+  "peak_rss_mib": 458.5546875,
+  "all_fields_equal": true,
+  "exact_scaling_and_range_for_corpus": true,
+  "decision": "Keep bounded recoverable Decimal runtime, already below the measured ten-minute target; no additional runtime library dependency",
+  "limits": [
+    "Fixed five-decimal price and two-decimal quantity corpus; generic production range/scale remains unproven",
+    "Prototype reused baseline calendar keys; group-and-finish measurements exclude SQL, queue, leases and recovery",
+    "Whole-process peak includes baseline and both prototype engines; no production speedup claim"
+  ]
+}

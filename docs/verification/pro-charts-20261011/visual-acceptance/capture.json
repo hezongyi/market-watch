@@ -1,0 +1,1092 @@
+{
+  "environment": "Ubuntu quant-server / mw-pro-charts-20261011",
+  "url": "http://localhost:19997/advanced-charts",
+  "supply": "Task synthetic provider I/O; real API, PostgreSQL and licensed chart engine",
+  "screenshots": [
+    {
+      "file": "dark-01-five-charts.png",
+      "requirement": "F1/U6",
+      "notes": "Five real native panes: H1/M5/W1/D1/H4, current fixed composite revision.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:18:41.581Z",
+      "review": "accepted_with_scope",
+      "title": "五图工作区",
+      "visualObservation": "五格均有K线、周期与价格轴，图格边界清楚。W1只有任务历史范围内的少量周线；规律尖峰来自合成数据。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "b6cb6a75e62ebf6875b1e109f7aced648f2597e7f1157dbea7a0b144511ba036"
+    },
+    {
+      "file": "dark-02-symbol-details.png",
+      "requirement": "U3/U4",
+      "notes": "Real quote observation time; no snapshot replay.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:18:44.396Z",
+      "review": "accepted_with_scope",
+      "title": "品种详情",
+      "visualObservation": "观察清单与详情分区稳定，来源行情观察时间独立成行，未核实时段明确标注。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "e9e097376681d68dcbabf07015cce19bbdf77424a40c933ae821646b4e32b670"
+    },
+    {
+      "file": "dark-03-alert-sidebar.png",
+      "requirement": "F3/U2/U8",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:27:21.544Z",
+      "review": "accepted_with_scope",
+      "title": "告警侧栏",
+      "visualObservation": "修复后状态完整可见，长来源说明有省略号；浅色状态文字对比度至少5.0:1，名称和来源可读。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "6cf7dc2f7f9762ea5281aee7e81148b93f5b42d3d806e4f4eee73c4ae36f6fdd"
+    },
+    {
+      "file": "dark-03-alert-expanded.png",
+      "requirement": "F3/U8",
+      "notes": "Keyboard/pointer disclosure exposes full condition, source, status and health.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:27:22.186Z",
+      "review": "accepted_with_scope",
+      "title": "告警展开",
+      "visualObservation": "条件、18位人工阈值、来源、周期、次数及健康原因可展开读取，布局没有重叠。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "cd3a44e126f7f2fbe02817d3c2520ad0388dd7e77969249c210be752057dbf96"
+    },
+    {
+      "file": "dark-04-alert-log.png",
+      "requirement": "F3/U8",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:18:46.148Z",
+      "review": "accepted_with_scope",
+      "title": "告警日志",
+      "visualObservation": "日期分组清楚，修复后时分秒完整可见，长来源说明使用省略号。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "27848d2616cbc93f1bf02d86746019a5ea8bd0e3c12660a383b5994f7e8287a9"
+    },
+    {
+      "file": "dark-04-alert-log-expanded.png",
+      "requirement": "F3/U8",
+      "notes": "Actual stored event values and times; no external delivery.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:18:46.638Z",
+      "review": "accepted_with_scope",
+      "title": "事件展开",
+      "visualObservation": "事件与检测时间、精确值和通知状态完整显示；长小数正常换行，操作按钮可见。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "175c751c853d77633a1b9a570bbc9901de09f62eb07c5bce5efba6564aafb89d"
+    },
+    {
+      "file": "dark-05-price-menu.png",
+      "requirement": "F3/U8",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:18:47.415Z",
+      "review": "accepted_with_scope",
+      "title": "价格右键菜单",
+      "visualObservation": "创建告警与复制价格采用当前图格精度，菜单文字可读，原生菜单层级一致。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "95bafb44df88bd3b96d0527d3b3b6eb7c760d60a20ca18735734c7c5cd9f7cb2"
+    },
+    {
+      "file": "dark-06-price-alert-dialog.png",
+      "requirement": "F3/U8",
+      "notes": "Current initiating chart identity and formatter; draft only.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:18:48.274Z",
+      "review": "accepted_with_scope",
+      "title": "价格告警弹窗",
+      "visualObservation": "标题采用可读品种、来源、basis与周期，比较值焦点明显，取消和创建按钮完整显示。截图只保留草稿。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "7687099bf31ff3bf970cac43230d81f714ce844c980222d3ace1f42706e89810"
+    },
+    {
+      "file": "dark-07-python-indicators.png",
+      "requirement": "F6/U5",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:18:49.362Z",
+      "review": "accepted_with_scope",
+      "title": "八个Python指标",
+      "visualObservation": "八行指标、收藏星标、主副图标记与详情入口完整，Python分类选中状态清楚。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "4103ca38dc0db2403a040cc958f8191c97fb8e2658a8159869a532a2a92b1666"
+    },
+    {
+      "file": "dark-08-python-indicator-detail.png",
+      "requirement": "F6/U5",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:18:49.853Z",
+      "review": "accepted_with_scope",
+      "title": "MACD指标详情",
+      "visualObservation": "右侧用途、计算说明、默认输入与添加操作可读；列表选中状态和返回入口清楚。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "e4a71407f2892f9bb74b06c09c0236605fd84d3322e6d1ac5377d85ae685b77f"
+    },
+    {
+      "file": "dark-09-drawing-nine-periods.png",
+      "requirement": "U7",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:18:50.751Z",
+      "review": "accepted_with_scope",
+      "title": "绘图九周期",
+      "visualObservation": "M1/M5/M15/M30/H1/H4/D1/W1/MN九项均完整显示，选中状态及取消、确认可区分。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "fd074960ce51444031a318d9436b4940b7d1015c634dc59ea4029fed537bc0d1"
+    },
+    {
+      "file": "dark-10-center-calendar.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "交易日历 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:18:51.999Z",
+      "review": "accepted_with_scope",
+      "title": "交易日历列表",
+      "visualObservation": "搜索、来源筛选、核实状态、版本与核实日期排列清楚，同代码的适用身份另行展示。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "f6efa2e50bb8ca82a52fb5db0f2bc0f29413a2c1c7e16865da966b243cbe44e7"
+    },
+    {
+      "file": "dark-11-calendar-expanded.png",
+      "requirement": "F5/U1",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:18:52.655Z",
+      "review": "accepted_with_scope",
+      "title": "展开日历",
+      "visualObservation": "适用范围、常规时段、官方时区、有效范围和核实依据可读，窗口底部提示独立固定。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "7005d33cd81a5706a502fabb7b9c2a98fbd7d84f50e3df7a2d2aa880c1b38a00"
+    },
+    {
+      "file": "dark-11-calendar-bottom.png",
+      "requirement": "U5",
+      "notes": "Actual content scroll to rule evidence and bottom rows.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:18:53.309Z",
+      "review": "accepted_with_scope",
+      "title": "日历滚动到底部",
+      "visualObservation": "实际滚动后末行、身份说明与待核实数量可见，不被固定底部提示遮住。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "218c54c61cb59949dc33616391fc7624e58232657179e068276e98a2b7cd8966"
+    },
+    {
+      "file": "dark-10-center-tasks.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "任务与记录 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:18:54.398Z",
+      "review": "accepted_with_scope",
+      "title": "任务与记录",
+      "visualObservation": "任务状态、周期发布进度、更新时间与操作列可读，分区提示对应任务列表。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "e92067d067a849781754128ed07d62e827760d120b527b277683e2828fc54910"
+    },
+    {
+      "file": "dark-10-center-managed.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "自建行情 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:18:55.476Z",
+      "review": "accepted_with_scope",
+      "title": "自建行情",
+      "visualObservation": "来源、日界、可用范围、维护状态与操作列对齐；多个AUDUSD为本任务独立进度fixture。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "bb8d13ccec11dc5cb8e51e22826400e3da08eb6b1d2157c848004f51919727a7"
+    },
+    {
+      "file": "dark-10-center-sources.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "来源状态 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:18:56.472Z",
+      "review": "accepted_with_scope",
+      "title": "来源状态",
+      "visualObservation": "无采集记录及无匹配历史记录的实际状态明确显示，状态API可读不冒充供应商已连通。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "88853d1d322d6f18f524bc46356ba12ee696d218c9b770a0b3b3abaac65e132f"
+    },
+    {
+      "file": "dark-10-center-composite.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "组合行情 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:18:57.546Z",
+      "review": "accepted_with_scope",
+      "title": "组合行情",
+      "visualObservation": "来源接续、日界、确认尾部恢复中及操作入口可读；这个fixture状态不记为真实实时供源成功。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "3733199cdf3af87040a491ad655346041423ace5ddffe7241d8e7f274e63966c"
+    },
+    {
+      "file": "dark-10-center-platform.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "平台行情 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:18:58.806Z",
+      "review": "accepted_with_scope",
+      "title": "平台行情",
+      "visualObservation": "原生分类、搜索、来源筛选、打开图表与详情入口一致，打开前同步开关说明可见。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "4b20ed30f3b5c042d4fa7a61bae1589d9560e1585962fdb208eccc3b3c90d9cf"
+    },
+    {
+      "file": "dark-12-baseline-dropdown.png",
+      "requirement": "DC1",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:00.142Z",
+      "review": "accepted_with_scope",
+      "title": "新历史基线下拉框",
+      "visualObservation": "展开列表有占位与真实固定M1版本，日界、历史范围及版本短ID可区分，焦点框明确。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "10a12d8845b5049a684771bd98a6fbae2e27fdad6686c716a0dd33fdd136eefe"
+    },
+    {
+      "file": "dark-13-mapping-dropdown.png",
+      "requirement": "DC1",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:00.768Z",
+      "review": "accepted_with_scope",
+      "title": "实时映射版本下拉框",
+      "visualObservation": "OANDA Practice、目标品种和映射短ID可读，展开层显示在表单前方。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "8a5f3c9ebae76d83206e8cef1dbdd395dce1e76310fb41e50c76acdd2cf1ef71"
+    },
+    {
+      "file": "dark-14-target-dropdown.png",
+      "requirement": "DC1",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:02.254Z",
+      "review": "accepted_with_scope",
+      "title": "目标准确品种下拉框",
+      "visualObservation": "账户环境标签明确，真实API返回的目标代码、描述与类别可读，焦点及占位状态清楚。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "77384604a6975388b7438324913044683b1a2cd0f3603b71b3e8b2b614b20376"
+    },
+    {
+      "file": "dark-15-task-progress.png",
+      "requirement": "F4",
+      "notes": "Real committed progress from a new task-only synthetic AUDUSD import.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:06.170Z",
+      "review": "accepted_with_scope",
+      "title": "真实派生任务详情",
+      "visualObservation": "24,002累计观测、两周期进度、近期速度ETA及等待状态可读，界面没有假装任务已经完成。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "427e8cc0192e626b928256f24daa74e9227c90d9eb022dc0aa10cf0aefc45f32"
+    },
+    {
+      "file": "dark-15-task-bottom.png",
+      "requirement": "F4/U5",
+      "notes": "Task detail body scrolled to time records and final fields.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:06.582Z",
+      "review": "accepted_with_scope",
+      "title": "任务详情底部",
+      "visualObservation": "详情实际滚动后时间记录、任务操作与身份完整可见，固定标题和底部提示没有遮住末尾。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "dff538ae324f2517a700d6a4871a5ec5f4147449c556356a53b1ce3cf8046cee"
+    },
+    {
+      "file": "dark-16-calendar-768.png",
+      "requirement": "F5/U1/U5",
+      "notes": "Narrow desktop pointer viewport, not phone emulation.",
+      "viewport": {
+        "width": 768,
+        "height": 800
+      },
+      "capturedAtUtc": "2026-10-12T00:19:07.905Z",
+      "review": "accepted_with_scope",
+      "title": "768px日历展开",
+      "visualObservation": "左侧分区保留，搜索和详情自然换行；官方链接在内容区滚动。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "e4d9da41dde64648084f893fb8cfc76ca9e016acf2bbf79f1e02a5bbbfe2fb24"
+    },
+    {
+      "file": "dark-16-calendar-bottom-768.png",
+      "requirement": "U5",
+      "notes": "Actual scroll to the bottom; narrow desktop pointer viewport.",
+      "viewport": {
+        "width": 768,
+        "height": 800
+      },
+      "capturedAtUtc": "2026-10-12T00:19:08.603Z",
+      "review": "accepted_with_scope",
+      "title": "768px日历底部",
+      "visualObservation": "最后一条规则、待核实数量与时区说明可见，没有横向截断。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "3f35714714537651122480418e4cf4a47135e5c1237439a20c275493523498e9"
+    },
+    {
+      "file": "dark-17-platform-768.png",
+      "requirement": "U5/DC1",
+      "notes": "",
+      "viewport": {
+        "width": 768,
+        "height": 800
+      },
+      "capturedAtUtc": "2026-10-12T00:19:09.758Z",
+      "review": "accepted_with_scope",
+      "title": "768px平台列表",
+      "visualObservation": "分类、来源筛选及商品行收紧到窗口宽度，图表和详情按钮保留。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "570e2755df8ceaa8012179aac8b28248e612389305efeab1128250568404c8a5"
+    },
+    {
+      "file": "dark-18-indicators-768.png",
+      "requirement": "F6/U5",
+      "notes": "",
+      "viewport": {
+        "width": 768,
+        "height": 800
+      },
+      "capturedAtUtc": "2026-10-12T00:19:10.521Z",
+      "review": "accepted_with_scope",
+      "title": "768px指标列表",
+      "visualObservation": "分类和八行Python指标同时显示，来源、主副图及详情入口无重叠。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "20fc5f9b2d92c6740fbe9a5e1e20aaa0c74af1847b2f039dc30ab136bddd99ce"
+    },
+    {
+      "file": "dark-19-indicator-detail-768.png",
+      "requirement": "F6/U5",
+      "notes": "Responsive indicator detail; full panel at narrow width.",
+      "viewport": {
+        "width": 768,
+        "height": 800
+      },
+      "capturedAtUtc": "2026-10-12T00:19:11.038Z",
+      "review": "accepted_with_scope",
+      "title": "768px指标详情",
+      "visualObservation": "详情切为完整内容面板，说明、参数、返回列表和添加入口清楚。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "11448065fbd50ad4b1f9b3b997dc2998fa42d2543ee7ad74afa69067598ea713"
+    },
+    {
+      "file": "dark-16-calendar-375.png",
+      "requirement": "F5/U1/U5",
+      "notes": "Narrow desktop pointer viewport, not phone emulation.",
+      "viewport": {
+        "width": 375,
+        "height": 800
+      },
+      "capturedAtUtc": "2026-10-12T00:19:12.578Z",
+      "review": "accepted_with_scope",
+      "title": "375px日历展开",
+      "visualObservation": "六分区导航换为两行，字段改为单列，文字自然换行，底部提示稳定。此为桌面指针窄屏。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "11420b90441a565d89ea7b5280976f451fe34793bbf7860e3f7be27477dcb3b0"
+    },
+    {
+      "file": "dark-16-calendar-bottom-375.png",
+      "requirement": "U5",
+      "notes": "Actual scroll to the bottom; narrow desktop pointer viewport.",
+      "viewport": {
+        "width": 375,
+        "height": 800
+      },
+      "capturedAtUtc": "2026-10-12T00:19:13.165Z",
+      "review": "accepted_with_scope",
+      "title": "375px日历底部",
+      "visualObservation": "长适用身份和时区文字换行，最后规则和统计可滚动读取。此为桌面指针窄屏。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "1168fd26245ba7c3f9f0d9eed58b33c717a84c5ca8126ec6b007aa3875833a4d"
+    },
+    {
+      "file": "dark-17-platform-375.png",
+      "requirement": "U5/DC1",
+      "notes": "",
+      "viewport": {
+        "width": 375,
+        "height": 800
+      },
+      "capturedAtUtc": "2026-10-12T00:19:14.244Z",
+      "review": "accepted_with_scope",
+      "title": "375px平台列表",
+      "visualObservation": "分类换行，商品、来源与打开/详情入口仍可读，列表没有水平溢出。此为桌面指针窄屏。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "b62713e48a73cb713f939fa2ec2797ad5092471bc50ceb53a6c17e4c2f23b3c3"
+    },
+    {
+      "file": "dark-18-indicators-375.png",
+      "requirement": "F6/U5",
+      "notes": "",
+      "viewport": {
+        "width": 375,
+        "height": 800
+      },
+      "capturedAtUtc": "2026-10-12T00:19:15.055Z",
+      "review": "accepted_with_scope",
+      "title": "375px指标列表",
+      "visualObservation": "分类切换为原生下拉框，八行Python名称、主副图标记与详情入口全部可见。此为桌面指针窄屏。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "a19444a2bb9275dcf108a57dbcbb0d24c454b7082e4a44160275c7b08aa3fcdf"
+    },
+    {
+      "file": "dark-19-indicator-detail-375.png",
+      "requirement": "F6/U5",
+      "notes": "Responsive indicator detail; full panel at narrow width.",
+      "viewport": {
+        "width": 375,
+        "height": 800
+      },
+      "capturedAtUtc": "2026-10-12T00:19:15.512Z",
+      "review": "accepted_with_scope",
+      "title": "375px指标详情",
+      "visualObservation": "用途和计算说明换行，三个输入、版本、添加与返回入口完整。此为桌面指针窄屏。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "29ed4fe664bee6bad7aa72b54500951bb8b233a8f9c0fd089e41754a5183127e"
+    },
+    {
+      "file": "light-01-five-charts.png",
+      "requirement": "F1/U6",
+      "notes": "Five real native panes: H1/M5/W1/D1/H4, current fixed composite revision.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:17.376Z",
+      "review": "accepted_with_scope",
+      "title": "五图工作区",
+      "visualObservation": "五格均有K线、周期与价格轴，图格边界清楚。W1只有任务历史范围内的少量周线；规律尖峰来自合成数据。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "bb51436faada33a8b8cb0249343f94ef0827048d646201add219a5288778416e"
+    },
+    {
+      "file": "light-02-symbol-details.png",
+      "requirement": "U3/U4",
+      "notes": "Real quote observation time; no snapshot replay.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:19.599Z",
+      "review": "accepted_with_scope",
+      "title": "品种详情",
+      "visualObservation": "观察清单与详情分区稳定，来源行情观察时间独立成行，未核实时段明确标注。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "20cdfb497c001a461780a033473d81bb7af4c137d9f48ce382c68735a64ec4c9"
+    },
+    {
+      "file": "light-03-alert-sidebar.png",
+      "requirement": "F3/U2/U8",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:27:22.917Z",
+      "review": "accepted_with_scope",
+      "title": "告警侧栏",
+      "visualObservation": "修复后状态完整可见，长来源说明有省略号；浅色状态文字对比度至少5.0:1，名称和来源可读。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "5937d4c76b696cde649178aadf313a446c64fa463156697b930fbb6ea2ece8b5"
+    },
+    {
+      "file": "light-03-alert-expanded.png",
+      "requirement": "F3/U8",
+      "notes": "Keyboard/pointer disclosure exposes full condition, source, status and health.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:27:23.499Z",
+      "review": "accepted_with_scope",
+      "title": "告警展开",
+      "visualObservation": "条件、18位人工阈值、来源、周期、次数及健康原因可展开读取，布局没有重叠。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "5b29e35dc116cfc5260d02f35c552b5a737135b6da82d7975a0a4b98e92371a3"
+    },
+    {
+      "file": "light-04-alert-log.png",
+      "requirement": "F3/U8",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:21.308Z",
+      "review": "accepted_with_scope",
+      "title": "告警日志",
+      "visualObservation": "日期分组清楚，修复后时分秒完整可见，长来源说明使用省略号。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "a8c7601b9c31f3ed1abaa73303eac4a9eb24f733b1226abfbdb1bfd149d0ca98"
+    },
+    {
+      "file": "light-04-alert-log-expanded.png",
+      "requirement": "F3/U8",
+      "notes": "Actual stored event values and times; no external delivery.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:21.755Z",
+      "review": "accepted_with_scope",
+      "title": "事件展开",
+      "visualObservation": "事件与检测时间、精确值和通知状态完整显示；长小数正常换行，操作按钮可见。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "19e1f5128358068ed93a56968e7de60804166d8e9d7c9b4be4085981e0976e0e"
+    },
+    {
+      "file": "light-05-price-menu.png",
+      "requirement": "F3/U8",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:22.526Z",
+      "review": "accepted_with_scope",
+      "title": "价格右键菜单",
+      "visualObservation": "创建告警与复制价格采用当前图格精度，菜单文字可读，原生菜单层级一致。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "c717118fd5bda08fe2338bd6a4c2fdf991e21702640e36a39b95b4e8dc4af36c"
+    },
+    {
+      "file": "light-06-price-alert-dialog.png",
+      "requirement": "F3/U8",
+      "notes": "Current initiating chart identity and formatter; draft only.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:23.200Z",
+      "review": "accepted_with_scope",
+      "title": "价格告警弹窗",
+      "visualObservation": "标题采用可读品种、来源、basis与周期，比较值焦点明显，取消和创建按钮完整显示。截图只保留草稿。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "b3ff4ad91e4298bc86f160312dc7701f77de93eaeee848543ea31b65930d83ba"
+    },
+    {
+      "file": "light-07-python-indicators.png",
+      "requirement": "F6/U5",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:24.031Z",
+      "review": "accepted_with_scope",
+      "title": "八个Python指标",
+      "visualObservation": "八行指标、收藏星标、主副图标记与详情入口完整，Python分类选中状态清楚。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "f1f77713893d3116d201170a0c46f58b86f080b3889474b0251a5724335f74bb"
+    },
+    {
+      "file": "light-08-python-indicator-detail.png",
+      "requirement": "F6/U5",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:24.578Z",
+      "review": "accepted_with_scope",
+      "title": "MACD指标详情",
+      "visualObservation": "右侧用途、计算说明、默认输入与添加操作可读；列表选中状态和返回入口清楚。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "5885e87e4bb9146b26075de78a0b47ea6bdee2b9515955c993c615d746c60c01"
+    },
+    {
+      "file": "light-09-drawing-nine-periods.png",
+      "requirement": "U7",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:25.351Z",
+      "review": "accepted_with_scope",
+      "title": "绘图九周期",
+      "visualObservation": "M1/M5/M15/M30/H1/H4/D1/W1/MN九项均完整显示，选中状态及取消、确认可区分。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "0779e86e24c1fa8bc3cdbae26b1e1df9edacdb5ada3955b8ca4c0ea2f8247980"
+    },
+    {
+      "file": "light-10-center-calendar.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "交易日历 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:26.570Z",
+      "review": "accepted_with_scope",
+      "title": "交易日历列表",
+      "visualObservation": "搜索、来源筛选、核实状态、版本与核实日期排列清楚，同代码的适用身份另行展示。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "acfe53a7356415138fc811dc830bb683dd47db3213bbe31d813fdb2da9df70b4"
+    },
+    {
+      "file": "light-11-calendar-expanded.png",
+      "requirement": "F5/U1",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:27.194Z",
+      "review": "accepted_with_scope",
+      "title": "展开日历",
+      "visualObservation": "适用范围、常规时段、官方时区、有效范围和核实依据可读，窗口底部提示独立固定。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "a3e567d49e71ebc2f96e9f6b1ab308d95c01f572698491d26baa61f04bdee971"
+    },
+    {
+      "file": "light-11-calendar-bottom.png",
+      "requirement": "U5",
+      "notes": "Actual content scroll to rule evidence and bottom rows.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:27.820Z",
+      "review": "accepted_with_scope",
+      "title": "日历滚动到底部",
+      "visualObservation": "实际滚动后末行、身份说明与待核实数量可见，不被固定底部提示遮住。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "831434d17b932a8535ab293cd2273ccc5bebec19aad51476dc705157792d3948"
+    },
+    {
+      "file": "light-10-center-tasks.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "任务与记录 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:28.901Z",
+      "review": "accepted_with_scope",
+      "title": "任务与记录",
+      "visualObservation": "任务状态、周期发布进度、更新时间与操作列可读，分区提示对应任务列表。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "db447811546e66828a12beef5de1067a0644a7b386318b909ecc95fad3232b86"
+    },
+    {
+      "file": "light-10-center-managed.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "自建行情 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:30.079Z",
+      "review": "accepted_with_scope",
+      "title": "自建行情",
+      "visualObservation": "来源、日界、可用范围、维护状态与操作列对齐；多个AUDUSD为本任务独立进度fixture。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "a621f70f387fbb3e6ae922ddbf41d49267c0ac2d0be6c0dfa6658b1045360b8d"
+    },
+    {
+      "file": "light-10-center-sources.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "来源状态 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:31.154Z",
+      "review": "accepted_with_scope",
+      "title": "来源状态",
+      "visualObservation": "无采集记录及无匹配历史记录的实际状态明确显示，状态API可读不冒充供应商已连通。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "2a19ff0d0ba316567d7194ae49d9a8de67292f16e908173dfdfd9b33bbcca46d"
+    },
+    {
+      "file": "light-10-center-composite.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "组合行情 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:32.189Z",
+      "review": "accepted_with_scope",
+      "title": "组合行情",
+      "visualObservation": "来源接续、日界、确认尾部恢复中及操作入口可读；这个fixture状态不记为真实实时供源成功。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "9c1aa2a629013df8a384b58d4227e7d6b89d8c3bcb305c88b314c101dd56b23a"
+    },
+    {
+      "file": "light-10-center-platform.png",
+      "requirement": "F4/F5/U1/U5/DC1",
+      "notes": "平台行情 live API state",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:33.293Z",
+      "review": "accepted_with_scope",
+      "title": "平台行情",
+      "visualObservation": "原生分类、搜索、来源筛选、打开图表与详情入口一致，打开前同步开关说明可见。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "5058a853d458a67638a1045b09832da7ae0782bca65e267fc81d3e3ac9dd1d2f"
+    },
+    {
+      "file": "light-12-baseline-dropdown.png",
+      "requirement": "DC1",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:34.471Z",
+      "review": "accepted_with_scope",
+      "title": "新历史基线下拉框",
+      "visualObservation": "展开列表有占位与真实固定M1版本，日界、历史范围及版本短ID可区分，焦点框明确。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "58744cadd051045522277ec6c5ff16a29917b9116b80c04809c018cd1908605a"
+    },
+    {
+      "file": "light-13-mapping-dropdown.png",
+      "requirement": "DC1",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:35.100Z",
+      "review": "accepted_with_scope",
+      "title": "实时映射版本下拉框",
+      "visualObservation": "OANDA Practice、目标品种和映射短ID可读，展开层显示在表单前方。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "8ef661bc799fe3d2df0de5cd856872e2b19ca6a2e288e58ba4c0345f48ec57be"
+    },
+    {
+      "file": "light-14-target-dropdown.png",
+      "requirement": "DC1",
+      "notes": "",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:36.416Z",
+      "review": "accepted_with_scope",
+      "title": "目标准确品种下拉框",
+      "visualObservation": "账户环境标签明确，真实API返回的目标代码、描述与类别可读，焦点及占位状态清楚。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "d5babc34047d4c8743f4dd83f6dcc9b35ebc2e94a2e937c58ffb5c8f44d29b22"
+    },
+    {
+      "file": "light-15-task-progress.png",
+      "requirement": "F4",
+      "notes": "Real committed progress from a new task-only synthetic AUDUSD import.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:39.931Z",
+      "review": "accepted_with_scope",
+      "title": "真实派生任务详情",
+      "visualObservation": "24,002累计观测、两周期进度、近期速度ETA及等待状态可读，界面没有假装任务已经完成。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "85d43da023510780d1bc1fa3f4baff4a3364b96294773e3fa4aa91edb15922d5"
+    },
+    {
+      "file": "light-15-task-bottom.png",
+      "requirement": "F4/U5",
+      "notes": "Task detail body scrolled to time records and final fields.",
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "capturedAtUtc": "2026-10-12T00:19:40.401Z",
+      "review": "accepted_with_scope",
+      "title": "任务详情底部",
+      "visualObservation": "详情实际滚动后时间记录、任务操作与身份完整可见，固定标题和底部提示没有遮住末尾。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "4c2b0205a1be639e1b834d6d558d36952641d95b64287ffa56400d9ba1618a21"
+    },
+    {
+      "file": "light-16-calendar-768.png",
+      "requirement": "F5/U1/U5",
+      "notes": "Narrow desktop pointer viewport, not phone emulation.",
+      "viewport": {
+        "width": 768,
+        "height": 800
+      },
+      "capturedAtUtc": "2026-10-12T00:19:41.799Z",
+      "review": "accepted_with_scope",
+      "title": "768px日历展开",
+      "visualObservation": "左侧分区保留，搜索和详情自然换行；官方链接在内容区滚动。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "6977eae2784e2b5f9a068fbbfa70c33aab1ab5ef6cefff3c3b0650281e42d848"
+    },
+    {
+      "file": "light-16-calendar-bottom-768.png",
+      "requirement": "U5",
+      "notes": "Actual scroll to the bottom; narrow desktop pointer viewport.",
+      "viewport": {
+        "width": 768,
+        "height": 800
+      },
+      "capturedAtUtc": "2026-10-12T00:19:42.401Z",
+      "review": "accepted_with_scope",
+      "title": "768px日历底部",
+      "visualObservation": "最后一条规则、待核实数量与时区说明可见，没有横向截断。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "b589e5350146ef03dc372b487f200703b47face004aa27563a76c334d5474433"
+    },
+    {
+      "file": "light-17-platform-768.png",
+      "requirement": "U5/DC1",
+      "notes": "",
+      "viewport": {
+        "width": 768,
+        "height": 800
+      },
+      "capturedAtUtc": "2026-10-12T00:19:43.438Z",
+      "review": "accepted_with_scope",
+      "title": "768px平台列表",
+      "visualObservation": "分类、来源筛选及商品行收紧到窗口宽度，图表和详情按钮保留。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "c67610c634c0f4f43300380eed12d72dcce76a785535faf2c39b35bea624bf86"
+    },
+    {
+      "file": "light-18-indicators-768.png",
+      "requirement": "F6/U5",
+      "notes": "",
+      "viewport": {
+        "width": 768,
+        "height": 800
+      },
+      "capturedAtUtc": "2026-10-12T00:19:44.106Z",
+      "review": "accepted_with_scope",
+      "title": "768px指标列表",
+      "visualObservation": "分类和八行Python指标同时显示，来源、主副图及详情入口无重叠。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "69d85725d4e7f70ab93b5f57b0a9ed91a999ef4ce70f98975573a9990bdfc48b"
+    },
+    {
+      "file": "light-19-indicator-detail-768.png",
+      "requirement": "F6/U5",
+      "notes": "Responsive indicator detail; full panel at narrow width.",
+      "viewport": {
+        "width": 768,
+        "height": 800
+      },
+      "capturedAtUtc": "2026-10-12T00:19:44.569Z",
+      "review": "accepted_with_scope",
+      "title": "768px指标详情",
+      "visualObservation": "详情切为完整内容面板，说明、参数、返回列表和添加入口清楚。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "2282f16d982943a3b4d2b310e58dc007f55bb5cdb6bbeb0e30df38c72cab1033"
+    },
+    {
+      "file": "light-16-calendar-375.png",
+      "requirement": "F5/U1/U5",
+      "notes": "Narrow desktop pointer viewport, not phone emulation.",
+      "viewport": {
+        "width": 375,
+        "height": 800
+      },
+      "capturedAtUtc": "2026-10-12T00:19:45.934Z",
+      "review": "accepted_with_scope",
+      "title": "375px日历展开",
+      "visualObservation": "六分区导航换为两行，字段改为单列，文字自然换行，底部提示稳定。此为桌面指针窄屏。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "531a56126af668779ebd07bfa59fc14bfabab95201491cf229c3fb0a1a37d858"
+    },
+    {
+      "file": "light-16-calendar-bottom-375.png",
+      "requirement": "U5",
+      "notes": "Actual scroll to the bottom; narrow desktop pointer viewport.",
+      "viewport": {
+        "width": 375,
+        "height": 800
+      },
+      "capturedAtUtc": "2026-10-12T00:19:46.501Z",
+      "review": "accepted_with_scope",
+      "title": "375px日历底部",
+      "visualObservation": "长适用身份和时区文字换行，最后规则和统计可滚动读取。此为桌面指针窄屏。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "36dc2f657e0c2d27e456224c79afa971b433bb4e2419d6ffb6b70a4f4df9b8dd"
+    },
+    {
+      "file": "light-17-platform-375.png",
+      "requirement": "U5/DC1",
+      "notes": "",
+      "viewport": {
+        "width": 375,
+        "height": 800
+      },
+      "capturedAtUtc": "2026-10-12T00:19:47.531Z",
+      "review": "accepted_with_scope",
+      "title": "375px平台列表",
+      "visualObservation": "分类换行，商品、来源与打开/详情入口仍可读，列表没有水平溢出。此为桌面指针窄屏。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "4269d3b39499f1df7b3caf010f2a9fa6ccf1cd521233db30f7ab515efff8a98f"
+    },
+    {
+      "file": "light-18-indicators-375.png",
+      "requirement": "F6/U5",
+      "notes": "",
+      "viewport": {
+        "width": 375,
+        "height": 800
+      },
+      "capturedAtUtc": "2026-10-12T00:19:48.323Z",
+      "review": "accepted_with_scope",
+      "title": "375px指标列表",
+      "visualObservation": "分类切换为原生下拉框，八行Python名称、主副图标记与详情入口全部可见。此为桌面指针窄屏。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "3e402b8c7675f1b9814a00d107fd85e799922f47face901415f0046b59bb1294"
+    },
+    {
+      "file": "light-19-indicator-detail-375.png",
+      "requirement": "F6/U5",
+      "notes": "Responsive indicator detail; full panel at narrow width.",
+      "viewport": {
+        "width": 375,
+        "height": 800
+      },
+      "capturedAtUtc": "2026-10-12T00:19:48.741Z",
+      "review": "accepted_with_scope",
+      "title": "375px指标详情",
+      "visualObservation": "用途和计算说明换行，三个输入、版本、添加与返回入口完整。此为桌面指针窄屏。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "ab1d336b10840bf1ac396e604d3f2214c24fa8cbbb4492b280d57dad9ae497cb"
+    },
+    {
+      "file": "mobile-readonly-375.png",
+      "requirement": "F7",
+      "notes": "Chromium touch simulation; physical-device validation belongs to user.",
+      "viewport": {
+        "width": 375,
+        "height": 812
+      },
+      "capturedAtUtc": "2026-10-12T00:19:59.760Z",
+      "review": "accepted_simulation_only",
+      "title": "手机竖屏模拟",
+      "visualObservation": "只读说明与单图可见，编辑入口隐藏，价格轴与底部控件可读。Chromium触摸模拟，未证明实机效果。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "43e0cad0cb2635be89067c2b90f52ac435c86150632e0f78df323d36194be4e6"
+    },
+    {
+      "file": "mobile-readonly-915.png",
+      "requirement": "F7",
+      "notes": "Chromium touch simulation; physical-device validation belongs to user.",
+      "viewport": {
+        "width": 915,
+        "height": 412
+      },
+      "capturedAtUtc": "2026-10-12T00:20:07.786Z",
+      "review": "accepted_simulation_only",
+      "title": "手机横屏模拟",
+      "visualObservation": "只读说明、单图、时间轴和底部控件完整，价格轴可读。Chromium触摸模拟，未证明实机效果。",
+      "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+      "sha256": "4fcb5063e4c7610349b813feed4ae5ce700bd5fcdc215ac94b0d8d0856d71e73"
+    }
+  ],
+  "errors": [],
+  "visualReview": "accepted_with_scope",
+  "progressFixture": "a9ae5719-79d4-49fe-a6f9-b7925be0c5e4",
+  "progressFixtureFinished": true,
+  "capturePassed": true,
+  "finalColorRecapturePassed": true,
+  "reviewMethod": "Agent visual inspection: all 70 final screens via contact sheets; full-size inspection of chart/details, alert/modal/log, calendar, dropdowns, task progress and narrow layouts.",
+  "reviewedAtUtc": "2026-10-12T00:29:40.544307+00:00",
+  "reviewer": "Codex",
+  "reviewDocument": "review.md",
+  "gallery": "index.html",
+  "physicalDeviceValidation": "Not yet verified; user-owned and not blocking development completion",
+  "runtimeManifest": "../runtime.json",
+  "visualFindings": [
+    {
+      "id": "VA1",
+      "status": "fixed",
+      "problem": "Long source label clipped status by 19–60px and event time by 22px.",
+      "fix": "Shrink identity text with ellipsis; keep status/time visible; expiry may occupy an additional line.",
+      "before": "before-dark-03-alert-sidebar.png",
+      "after": "dark-03-alert-sidebar.png",
+      "red": "../alert-subtitle-red.json",
+      "green": "../browser-alert-subtitle.json"
+    },
+    {
+      "id": "VA2",
+      "status": "fixed",
+      "problem": "Light-theme status text contrast was 2.34–2.44:1.",
+      "fix": "Use dark green/ochre in light theme; measured minimum 5.003:1.",
+      "before": "before-contrast-light-03-alert-sidebar.png",
+      "after": "light-03-alert-sidebar.png",
+      "red": "../alert-subtitle-contrast-red.json",
+      "green": "../browser-alert-subtitle.json"
+    }
+  ]
+}

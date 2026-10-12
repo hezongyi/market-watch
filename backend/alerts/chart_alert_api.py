@@ -23,6 +23,7 @@ from .storage import (
     ChartAlertVersion,
     CompositeJudgment,
     Instrument,
+    MarketDataset,
     Notification,
     Outbox,
     SignalRow,
@@ -104,6 +105,21 @@ def dataset_for(config):
     return ensure(meta, config.timeframe)
 
 
+def display_label(db, config, identity):
+    """Readable identity from the saved binding, without resolving a live revision."""
+    from .market_names import display_code
+
+    identity = identity or {}
+    dataset = db.get(MarketDataset, identity["dataset_id"]) if identity.get("dataset_id") else None
+    symbol = dataset.logical_symbol if dataset else identity.get("symbol")
+    if not symbol:
+        symbol = config["instrument"] if config["series_kind"] != "composite" else "组合行情身份已归档"
+    code = display_code(symbol, identity.get("source"))
+    kind = {"provider": "平台行情", "managed": "自建行情", "composite": "组合行情"}[config["series_kind"]]
+    return " · ".join(str(value) for value in (
+        code, kind, identity.get("basis"), config["timeframe"], config["source"].upper()) if value)
+
+
 def alert_dict(db, alert):
     version = current_version(db, alert)
     return {"id": alert.id, "name": alert.name, "version": alert.version,
@@ -114,6 +130,7 @@ def alert_dict(db, alert):
             "expires_at": alert.expires_at, "created_at": alert.created_at,
             "updated_at": alert.updated_at, "config": version.config,
             "market_identity": version.market_identity,
+            "display_label": display_label(db, version.config, version.market_identity),
             "condition_summary": condition_label(version.config["condition"]),
             "runtime": alert.runtime}
 
@@ -177,9 +194,10 @@ def router(authenticated):
             if alert_id:
                 query = query.where(SignalRow.chart_alert_id == alert_id)
             return [{"id": record.id, "alert_id": record.chart_alert_id,
+                     "display_label": display_label(db, record.evidence["config"], record.evidence.get("market_identity")),
                      "occurred_at": record.occurred_at, "detected_at": record.created_at,
-                     "direction": record.direction, "price": str(record.price),
-                     "threshold": str(record.threshold), "evidence": record.evidence,
+                     "direction": record.direction, "price": record.evidence.get("price", str(record.price)),
+                     "threshold": record.evidence.get("threshold", str(record.threshold)), "evidence": record.evidence,
                      "message": signal_message(record), "notification_id": notification.id,
                      "notification_status": notification.status, "ack_at": notification.ack_at,
                      "delivery_status": task.status if task else "web_only"}

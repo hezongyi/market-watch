@@ -68,6 +68,7 @@ export default function AdvancedWorkspace() {
   const [nativeLoads, setNativeLoads] = useState<Record<string, NativeLoad>>(
     {},
   );
+  const [chartFailures,setChartFailures]=useState<{index:number;symbol:string;resolution:string;label:string;error:string;epoch:number}[]>([]);
   const [capacityDialog, setCapacityDialog] = useState<{
     capabilities: HistoryCapabilities;
     usage: number;
@@ -508,10 +509,17 @@ export default function AdvancedWorkspace() {
         return;
       }
       if (m.type === "native-load-reset" && Number.isSafeInteger(m.epoch)) {
+        setChartFailures([]);
         nativeLoadEpoch.current = m.epoch;
         setNativeLoads({});
         setCapacityNotices({});
         setCapacityDialog(null);
+        return;
+      }
+      if (m.type === 'chart-history-failures' && m.epoch===nativeLoadEpoch.current && Array.isArray(m.failures)) {
+        setChartFailures(m.failures.filter((item:any)=>Number.isSafeInteger(item.index) &&
+          item.index>=0 && item.index<8 && typeof item.symbol==='string' && typeof item.resolution==='string' &&
+          typeof item.label==='string' && typeof item.error==='string').map((item:any)=>({...item,epoch:m.epoch})));
         return;
       }
       if (
@@ -1391,6 +1399,8 @@ export default function AdvancedWorkspace() {
   }
   return (
     <main className="advanced-workspace" data-theme={chartTheme}>
+      {mobile && <p className="advanced-readonly-note" role="note">手机只读看盘。编辑图表、绘图和告警请使用桌面浏览器；桌面工作区布局仍保留。</p>}
+      {chartFailures.length>0 && <aside className="advanced-history-failures" aria-label="图格历史加载失败">{chartFailures.map(item=><p key={item.index} role="status">图格 {item.index+1} · {item.label} · {item.resolution}：{item.error}<button onClick={()=>post({type:'retry-chart-history',...item})}>重试此图格</button></p>)}</aside>}
       {(Object.keys(nativeLoads).length > 0 ||
         Object.keys(capacityNotices).length > 0) && (
         <HistoryLoadingNotice

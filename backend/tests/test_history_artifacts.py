@@ -207,9 +207,9 @@ def test_artifact_reuse_requires_compatible_version_price_rules(database, monkey
         pass
     calls = []
     original = history_artifacts._add
-    def track(state, row, instrument):
+    def track(state, row, instrument, **kwargs):
         calls.append(row["timestamp"])
-        return original(state, row, instrument)
+        return original(state, row, instrument, **kwargs)
     monkeypatch.setattr(history_artifacts, "_add", track)
     finish(child)
     assert 0 in calls and 60000 in calls

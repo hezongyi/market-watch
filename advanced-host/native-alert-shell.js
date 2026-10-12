@@ -109,7 +109,7 @@ async function nativeAlertShell(widget, { mount, unmount, report }) {
       state.pages.splice(1, 0, {
         name: "alerts",
         title: "警报",
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="14" cy="15" r="8"/><path d="M14 10v5h4M5 6l3-3M20 3l3 3M9 23l-2 2M19 23l2 2"/></svg>',
+        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.5"><g transform="translate(8 8)"><circle cx="14" cy="15" r="8"/><path d="M14 10v5h4M5 6l3-3M20 3l3 3M9 23l-2 2M19 23l2 2"/></g></svg>',
         widgets: [{ type: "alerts" }],
       });
     return state;

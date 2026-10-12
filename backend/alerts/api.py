@@ -18,7 +18,7 @@ from sqlalchemy import delete, func, select
 from . import business
 from .business import WatchInput
 from .calendar_profile import closures_from
-from .chart_alert_message import signal_message
+from .chart_alert_message import signal_message, signal_title
 from .chart_series import is_gold
 from .config import settings
 from .domain import TIMEFRAMES, calendar_for, previous_session
@@ -650,7 +650,7 @@ def sync_device(device_id=Depends(device_auth)):
                 {
                     "id": n.id,
                     "signal_id": s.id,
-                    "title": f"{s.instrument_id} · {s.reason}",
+                    "title": signal_title(s),
                     "message": signal_message(s) if s.evidence.get("chart_alert") else f"价格 {s.price} / 阈值 {s.threshold}",
                     "occurred_at": s.occurred_at,
                 }

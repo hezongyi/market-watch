@@ -8,6 +8,10 @@ export type NativeUi = {
   pick: (options: Record<string, any>) => Promise<any | null>;
 };
 export const NativeUiContext = createContext<NativeUi | null>(null);
+export function NativeOperationHint({children}: {children: string}) {
+  const ui = useContext(NativeUiContext);
+  return ui ? <NativeSlot kind="operationHint" props={{children}} className="dc-operation-hint" /> : <footer className="dc-operation-hint">{children}</footer>;
+}
 export function NativeSlot({ kind, props, className = "" }: { kind: string; props: Record<string, any>; className?: string }) {
   const ui = useContext(NativeUiContext), node = useRef<HTMLDivElement>(null);
   const instance = useRef<ReturnType<NativeUi["mount"]> | null>(null);
@@ -64,22 +68,50 @@ function options(children: ReactNode): { value: string; content: ReactNode; disa
 }
 export function NativeSelect(props: SelectHTMLAttributes<HTMLSelectElement>) {
   const ui = useContext(NativeUiContext), generated = useId(), outer=useRef<HTMLDivElement>(null);
+  const trigger=useRef<HTMLButtonElement|null>(null);
   const [label,setLabel]=useState(props["aria-label"] || "");
+  const [invalid,setInvalid]=useState(false);
+  const id = props.id || `dc-select-${generated.replace(/[^a-zA-Z0-9-]/g, "")}`;
   useLayoutEffect(()=>{
-    const node=outer.current?.closest("label") || (props.id ? document.querySelector<HTMLLabelElement>(`label[for="${CSS.escape(props.id)}"]`) : null);
-    if(node && !props["aria-label"]) setLabel([...node.childNodes].filter(n=>n.nodeType===Node.TEXT_NODE).map(n=>n.textContent).join(" ").trim());
-  },[props["aria-label"],props.id]);
+    const doc=outer.current?.ownerDocument;
+    const node=outer.current?.closest("label") || doc?.querySelector<HTMLLabelElement>(`label[for="${CSS.escape(id)}"]`);
+    if(!node) return;
+    if(!props["aria-label"]) setLabel([...node.childNodes].filter(n=>n.nodeType===Node.TEXT_NODE).map(n=>n.textContent).join(" ").trim());
+    // Explicitly associate the label with the native button, so the required
+    // proxy select can never become the label's default activation target.
+    const previous=node.getAttribute("for");
+    node.htmlFor=id;
+    return()=>{if(previous===null) node.removeAttribute("for");else node.setAttribute("for",previous);};
+  },[ui,props["aria-label"],id]);
+  useLayoutEffect(()=>{if(props.value || props.disabled) setInvalid(false);},[props.value,props.disabled]);
   if (!ui) return <select {...props} />;
   const items = options(props.children);
   const value = String(props.value ?? props.defaultValue ?? items[0]?.value ?? "");
-  const id = props.id || `dc-select-${generated.replace(/[^a-zA-Z0-9-]/g, "")}`;
-  const change = (next: string) => props.onChange?.({ target: { value: next }, currentTarget: { value: next } } as any);
+  const change = (next: string) => {
+    setInvalid(false);
+    props.onChange?.({ target: { value: next }, currentTarget: { value: next } } as any);
+  };
+  const describedby=[props["aria-describedby"],invalid ? `${id}-error` : ""].filter(Boolean).join(" ") || undefined;
   return <div ref={outer} className="dc-select-control">
     <NativeSlot kind="select" props={{ id, value, items, onChange: change, disabled: props.disabled,
-      "aria-label": label, "aria-labelledby": props["aria-labelledby"], "aria-describedby": props["aria-describedby"],
-      "aria-invalid": props["aria-invalid"], size: "small", className: "dc-native-select" }} />
+      reference:(node:HTMLButtonElement|null)=>{trigger.current=node;},
+      "aria-label": props["aria-label"] || label, "aria-labelledby": props["aria-labelledby"], "aria-describedby": describedby,
+      "aria-invalid": invalid || props["aria-invalid"], size: "small", className: "dc-native-select" }} />
     {props.required && <select className="dc-validity" aria-hidden="true" tabIndex={-1} required value={value} disabled={props.disabled}
-      onChange={props.onChange} onInvalid={()=>document.getElementById(id)?.focus()}>{props.children}</select>}
+      name={props.name} form={props.form} onChange={props.onChange} onInvalid={event=>{
+        event.preventDefault();setInvalid(true);
+        const form=event.currentTarget.form;
+        // Validation dispatches invalid to every field. Keep focus on the first.
+        if(!form || form.querySelector("input:invalid,select:invalid,textarea:invalid") === event.currentTarget) {
+          const field=event.currentTarget;
+          // The browser focuses the first non-cancelled ordinary input after
+          // dispatching every invalid event. Restore our visible first field
+          // after that validation step, rather than letting a later input win.
+          requestAnimationFrame(()=>{if(field.isConnected && field.matches(":invalid")) trigger.current?.focus();});
+        }
+        props.onInvalid?.(event);
+      }}>{props.children}</select>}
+    {invalid && <small id={`${id}-error`} className="dc-field-error" role="alert">请选择{props["aria-label"] || label || "必填选项"}</small>}
   </div>;
 }
 

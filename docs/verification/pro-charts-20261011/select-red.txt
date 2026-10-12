@@ -1,0 +1,26 @@
+locator.click: Timeout 3000ms exceeded.
+Call log:
+[2m  - waiting for getByRole('option', { name: '固定版本二', exact: true })[22m
+[2m    - locator resolved to <div role="option" aria-selected="false" class="item-jFqVJoPk" id="id_dc-select-r0_item_published-v2">…</div>[22m
+[2m  - attempting click action[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is visible, enabled and stable[22m
+[2m      - scrolling into view if needed[22m
+[2m      - done scrolling[22m
+[2m      - <span class="button-children-tFul0OhX">…</span> from <div data-focus-trap="true" data-id="u8En8h1Mpswrr4461Z03f">…</div> subtree intercepts pointer events[22m
+[2m    - retrying click action[22m
+[2m    - waiting 20ms[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is visible, enabled and stable[22m
+[2m      - scrolling into view if needed[22m
+[2m      - done scrolling[22m
+[2m      - <span class="button-children-tFul0OhX">…</span> from <div data-focus-trap="true" data-id="u8En8h1Mpswrr4461Z03f">…</div> subtree intercepts pointer events[22m
+[2m    - retrying click action[22m
+[2m      - waiting 100ms[22m
+[2m    5 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is visible, enabled and stable[22m
+[2m      - scrolling into view if needed[22m
+[2m      - done scrolling[22m
+[2m      - <span class="button-children-tFul0OhX">…</span> from <div data-focus-trap="true" data-id="u8En8h1Mpswrr4461Z03f">…</div> subtree intercepts pointer events[22m
+[2m    - retrying click action[22m
+[2m      - waiting 500ms[22m

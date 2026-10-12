@@ -1,0 +1,32 @@
+const {product}=require('./pro-charts-support.cjs');
+const assert=require('node:assert/strict'),fs=require('node:fs');
+(async()=>{const p=await product(),r={environment:'Ubuntu mw-pro-charts-20261011',checks:[]};
+ try{
+  await p.ui.getByRole('button',{name:'指标',exact:true}).click();
+  await p.ui.getByRole('button',{name:'我的 Python',exact:true}).click();
+  const rows=p.ui.locator('.mw-native-study-row');await p.expect(rows).toHaveCount(8);
+  r.python=await rows.evaluateAll(ns=>ns.map(n=>({id:n.dataset.nativeStudyId,label:n.textContent})));assert.ok(r.python.every(s=>s.label.includes('Python')));
+  const macd=p.ui.locator('.mw-native-study-row[data-native-study-id="MWPythonMACD@market-watch"]');
+  await macd.hover();await macd.getByLabel('添加到收藏',{exact:true}).click();
+  await p.ui.getByRole('button',{name:'收藏',exact:true}).click();await p.expect(macd).toBeVisible();
+  await macd.locator('[role="option"]').click();
+  await p.host.waitForFunction(()=>widget.activeChart().getAllStudies().some(s=>s.name==='守望 Python MACD'),null,{timeout:30000});
+  await p.ui.getByRole('button',{name:'当前图表已添加',exact:true}).click();
+  await p.expect(p.ui.locator('.mw-native-added')).toContainText('Python');
+  await p.ui.getByRole('button',{name:'内置指标',exact:true}).click();
+  assert.equal(await p.ui.locator('[data-native-study-id^="MWPython"]').count(),0);
+  await p.ui.getByRole('button',{name:'全部指标',exact:true}).click();
+  const dialog=p.ui.locator('[data-name="indicators-dialog"]');await dialog.getByRole('searchbox').fill('MACD');
+  await p.expect(macd).toBeVisible();assert.ok(await rows.count()>=2);
+  r.checks.push('all eight Python identities; native exclusion; MACD collision search; favorite; real add/current category');
+  r.footer=await dialog.locator('[class*="footer-"]').allTextContents();assert.ok(r.footer.some(s=>s.includes('星标')));
+  await p.ui.getByRole('button',{name:'关闭指标窗口',exact:true}).click();
+  await p.host.evaluate(()=>new Promise((ok,bad)=>widget.saveChartToServer(ok,bad)));
+  await p.page.reload();await p.page.locator('iframe[title="专业图表工作区"]').waitFor();
+  const restored=p.page.frames().find(f=>f.url().startsWith('http://localhost:19998/?'));
+  await restored.waitForFunction(()=>typeof ready!=='undefined'&&ready&&!loading&&widget.activeChart().dataReady(),null,{timeout:60000});
+  r.restored=await restored.evaluate(()=>widget.activeChart().getAllStudies());assert.ok(r.restored.some(s=>s.name==='守望 Python MACD'));
+  r.checks.push('real workspace server save and reload restores stable Python identity');
+  assert.deepEqual(p.errors,[]);r.passed=true;
+ }catch(e){r.failure=e.message;throw e;}finally{r.errors=p.errors;fs.writeFileSync('docs/verification/pro-charts-20261011/browser-indicators.json',JSON.stringify(r,null,2));await p.browser.close();}
+})().catch(e=>{console.error(e);process.exitCode=1});

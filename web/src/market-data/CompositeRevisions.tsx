@@ -96,7 +96,7 @@ export function CompositeRevisions({id,active,onChanged}:{id:string;active:strin
       <label>拼接时刻（UTC）<NativeInput type="datetime-local" required value={seam} onChange={e=>setSeam(e.target.value)} disabled={busy}/></label>
       <label className="dc-inline-check"><NativeInput type="checkbox" checked={nonDay} onChange={e=>setNonDay(e.target.checked)} disabled={busy}/>
         明确使用非日界分钟拼接规则</label>
-      <label>修订原因<textarea required minLength={3} maxLength={1000} value={reason} onChange={e=>setReason(e.target.value)} disabled={busy}/></label>
+      <label>修订原因<textarea aria-label="修订原因" required minLength={3} maxLength={1000} value={reason} onChange={e=>setReason(e.target.value)} disabled={busy}/></label>
       <div className="dc-actions"><button className="primary" disabled={busy||!!options.error||!selected||!mapping}>
         {busy?"处理中…":"提交修订准备"}</button></div>
     </form>

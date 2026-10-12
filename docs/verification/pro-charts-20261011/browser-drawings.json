@@ -1,0 +1,105 @@
+{
+  "environment": "Ubuntu mw-pro-charts-20261011",
+  "cases": [
+    {
+      "name": "real native nine checkbox synchronized pane visibility",
+      "theme": "Dark",
+      "edited": [
+        [
+          {
+            "id": "HhCycb",
+            "mask": 5,
+            "hidden": false
+          }
+        ],
+        [
+          {
+            "id": "HhCycb",
+            "mask": 5,
+            "hidden": true
+          }
+        ],
+        [
+          {
+            "id": "HhCycb",
+            "mask": 5,
+            "hidden": false
+          }
+        ]
+      ]
+    },
+    {
+      "name": "real native nine checkbox synchronized pane visibility",
+      "theme": "Light",
+      "edited": [
+        [
+          {
+            "id": "HhCycb",
+            "mask": 5,
+            "hidden": false
+          }
+        ],
+        [
+          {
+            "id": "HhCycb",
+            "mask": 5,
+            "hidden": true
+          }
+        ],
+        [
+          {
+            "id": "HhCycb",
+            "mask": 5,
+            "hidden": false
+          }
+        ]
+      ]
+    },
+    {
+      "name": "independent H1/H4/day/week/month bit",
+      "resolution": "60",
+      "bit": 16
+    },
+    {
+      "name": "independent H1/H4/day/week/month bit",
+      "resolution": "240",
+      "bit": 32
+    },
+    {
+      "name": "independent H1/H4/day/week/month bit",
+      "resolution": "1D",
+      "bit": 64
+    },
+    {
+      "name": "independent H1/H4/day/week/month bit",
+      "resolution": "1W",
+      "bit": 128
+    },
+    {
+      "name": "independent H1/H4/day/week/month bit",
+      "resolution": "1M",
+      "bit": 256
+    },
+    {
+      "name": "native clipboard copies mask"
+    },
+    {
+      "name": "real server workspace save/reload",
+      "saved": [
+        {
+          "id": "HhCycb",
+          "mask": 5
+        },
+        {
+          "id": "XiPNDQ",
+          "mask": 5
+        }
+      ]
+    },
+    {
+      "name": "native cross-symbol drawing isolation and return"
+    }
+  ],
+  "passed": true,
+  "errors": []
+}

@@ -5,7 +5,7 @@ from decimal import Decimal
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
-from sqlalchemy import func, select
+from sqlalchemy import case, func, select
 
 from .calendar_profile import closures_from
 from .chart_data import FRAMES, bounds, chart_rows
@@ -259,12 +259,29 @@ def renew_demand(db, client, inst, *, composite_revision_id=None):
     if not live_source and not composite and not inst.enabled and not (plan and plan.realtime_enabled):
         return
     ident = demand_id(client, inst.id, composite_revision_id=composite_revision_id)
-    demand = db.get(MarketDemand, ident)
-    if not demand:
-        demand = MarketDemand(id=ident, instrument_id=inst.id, composite_revision_id=composite_revision_id)
-        db.add(demand)
-    demand.expires = now_ms() + 120000
-    demand.updated_at = now_ms()
+    from .history_retention import lock_reference_values
+    from .source_history_store import _insert
+
+    # Core INSERT does not run the ORM reference guard. Fence the same managed
+    # dataset reference before acquiring the lease row; permanent composite
+    # definitions already retain their own fixed history and mappings.
+    with db.no_autoflush:
+        lock_reference_values(db, inst.id)
+    stamp = now_ms()
+    insert = _insert(db)(MarketDemand).values(id=ident, instrument_id=inst.id,
+        composite_revision_id=composite_revision_id, expires=stamp + 120000, updated_at=stamp)
+    incoming = insert.excluded
+    statement = insert.on_conflict_do_update(index_elements=[MarketDemand.id], set_={
+        "expires": case((MarketDemand.expires < incoming.expires, incoming.expires),
+                        else_=MarketDemand.expires),
+        "updated_at": case((MarketDemand.updated_at < incoming.updated_at, incoming.updated_at),
+                           else_=MarketDemand.updated_at),
+    }, where=(MarketDemand.instrument_id == incoming.instrument_id) &
+        MarketDemand.composite_revision_id.is_not_distinct_from(incoming.composite_revision_id))
+    demand = db.scalars(statement.returning(MarketDemand),
+        execution_options={"populate_existing": True}).one_or_none()
+    if demand is None:
+        raise ValueError("需求租约身份冲突，请重新打开所选行情")
 
 
 def read_cached_history(body: HistoryQuery):

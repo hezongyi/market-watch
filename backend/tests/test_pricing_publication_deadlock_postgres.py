@@ -32,7 +32,10 @@ pytestmark = pytest.mark.skipif(
 
 
 @pytest.mark.parametrize("status", ["pending", "complete", "cancelled"])
-def test_publisher_plan_progress_does_not_deadlock_confirmed_pricing(provider_pg, monkeypatch, status):
+@pytest.mark.parametrize("realtime_enabled", [True, False])
+def test_publisher_plan_progress_does_not_deadlock_confirmed_pricing(
+    provider_pg, monkeypatch, status, realtime_enabled
+):
     factory, engine = provider_pg
     monkeypatch.setattr(settings, "oanda_resident_symbols", "EUR_USD")
     monkeypatch.setattr(settings, "oanda_recovery_minutes", 2)
@@ -51,7 +54,7 @@ def test_publisher_plan_progress_does_not_deadlock_confirmed_pricing(provider_pg
         instrument_id = db.get(MarketDataset, identity.key).instrument_id
         db.add(ChartHistoryPlan(
             instrument_id=instrument_id, target_start=0, target_end=120000,
-            cursor=120000, realtime_end=0, status=status, realtime_enabled=True,
+            cursor=120000, realtime_end=0, status=status, realtime_enabled=realtime_enabled,
         ))
         db.flush()
         publication_schedule.request(db, instrument_id, frames=("M1",), approved=True)
@@ -59,21 +62,33 @@ def test_publisher_plan_progress_does_not_deadlock_confirmed_pricing(provider_pg
 
     publisher_locked = threading.Event()
     confirmation_locked = threading.Event()
+    publisher_dataset_locked = threading.Event()
     original_publisher = managed_dataset.publish_frame
 
     def publish(db, inst, plan, frame, stamp):
-        # tick has already acquired its production Instrument lock. A real
-        # confirmation now takes its dataset lock before requesting Instrument.
+        # Legacy publishers own only Instrument here; confirmation can take
+        # Dataset and expose the inverse flush lock. Ordered publishers own
+        # Dataset too, so rendezvous on the confirmation's attempted lock.
         publisher_locked.set()
         assert confirmation_locked.wait(5)
         return original_publisher(db, inst, plan, frame, stamp)
 
     def observe_lock(connection, cursor, statement, parameters, context, executemany):
+        if (threading.current_thread().name.startswith("publisher")
+                and "FROM market_datasets" in statement and "FOR UPDATE" in statement):
+            publisher_dataset_locked.set()
         if (threading.current_thread().name.startswith("confirmation")
                 and "FROM market_datasets" in statement and "FOR UPDATE" in statement):
             confirmation_locked.set()
 
+    def observe_attempt(connection, cursor, statement, parameters, context, executemany):
+        if (publisher_dataset_locked.is_set()
+                and threading.current_thread().name.startswith("confirmation")
+                and "FROM market_datasets" in statement and "FOR UPDATE" in statement):
+            confirmation_locked.set()
+
     event.listen(engine, "after_cursor_execute", observe_lock)
+    event.listen(engine, "before_cursor_execute", observe_attempt)
     try:
         with ThreadPoolExecutor(max_workers=1, thread_name_prefix="publisher") as publisher_pool:
             published = publisher_pool.submit(publication_schedule.tick, publish,
@@ -95,6 +110,7 @@ def test_publisher_plan_progress_does_not_deadlock_confirmed_pricing(provider_pg
             assert db.get(PricingOwner, ownership[0]).epoch == epoch
     finally:
         event.remove(engine, "after_cursor_execute", observe_lock)
+        event.remove(engine, "before_cursor_execute", observe_attempt)
 
 
 @pytest.mark.parametrize("change", [

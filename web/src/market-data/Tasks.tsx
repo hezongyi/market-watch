@@ -61,6 +61,12 @@ export function Tasks() {
         }}
       />
       <p className="dc-task-scope">历史行情维护任务与记录 · 状态每 10 秒更新</p>
+      {rows.at && (
+        <p className="dc-task-snapshot">
+          最近读取：{time(rows.at)} ·
+          已加载任务保持原位，刷新列表重新应用状态筛选。
+        </p>
+      )}
       <MarketTabs
         label="任务状态"
         value={status}
@@ -153,12 +159,6 @@ export function Tasks() {
           )}
         </div>
       </div>
-      {rows.at && (
-        <p className="dc-task-snapshot">
-          最近更新：{time(rows.at)} ·
-          已加载任务保持原位，刷新列表重新应用状态筛选。
-        </p>
-      )}
       {detail.opened && task && (
         <DetailPanel
           title={`${task.dataset.display_symbol || task.dataset.logical_symbol} · ${taskKind(task.task_kind)}`}
@@ -213,6 +213,8 @@ function TaskRow({
               ? `下次尝试：${time(task.next_at)}`
               : task.status === "configuration_error"
                 ? taskError(task.error || "", task.status)
+                : task.status === "deriving" && task.derivation
+                  ? `历史读取完成 · 周期发布 ${task.derivation.published_periods}/${task.derivation.total_periods}`
                 : `已查询至 ${time(task.cursor)}`}
         </small>
       </div>
@@ -262,6 +264,17 @@ function TaskDetails({
         <dt>已查询至</dt>
         <dd>{time(task.cursor)}</dd>
       </dl>
+      {task.derivation?.stage === "derive" && <>
+        <h3>周期派生</h3>
+        <p>历史读取完成；已发布 {task.derivation.published_periods}/{task.derivation.total_periods} 个周期。</p>
+        {task.derivation.processed_rows !== null && task.derivation.total_rows !== null &&
+          <p>已处理 {task.derivation.processed_rows.toLocaleString()} / {task.derivation.total_rows.toLocaleString()} 行观测（各周期合计）。</p>}
+        {task.derivation.estimated_remaining_seconds !== null && task.derivation.estimated_remaining_seconds > 0 &&
+          <p>按近期处理速度估算，还需约 {Math.max(1,Math.ceil(task.derivation.estimated_remaining_seconds / 60))} 分钟；供源、并发和暂停会影响耗时。</p>}
+        <dl className="dc-task-details">{task.derivation.periods.map(period=><div key={period.timeframe}>
+          <dt>{period.timeframe}</dt><dd>{period.status === "published" ? "已发布" : "待派生"} · {period.processed_rows === null ? "进度未记录" : `${period.processed_rows.toLocaleString()} / ${period.total_rows?.toLocaleString() ?? "未知"} 行`} · 已处理至 {time(period.cursor)}</dd>
+        </div>)}</dl>
+      </>}
       <h3>时间记录</h3>
       <dl className="dc-task-details">
         {[
