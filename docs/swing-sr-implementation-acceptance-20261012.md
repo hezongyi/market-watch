@@ -14,12 +14,22 @@ Swing 支撑阻力指标已接入 Python 计算、历史分页、共享实时更
 
 - `backend/alerts/swing_sr.py`：严格对称窗口，两侧独立 strength（默认 5，整数 1–500），平局拒绝，同价新事件计数；累计同类柱数间隔，缺口不跨段配对；整数显示采用精确 ROUND_HALF_UP。确认时间为右窗口末柱结束，候选由确认检查点克隆重算，不写入持久确认状态。
 - `chart_indicators.py`：显式 `series_presentation_v1` 与受校验的公开展示白名单；普通指标继续使用原协议。价格直接取 OANDA 原值，没有平移或校正到 FXCM。
-- managed、provider 与 fixed-history：统计固定完整输入起点，分页只裁剪显示；候选和展示保持同一评估截止点。provider 读取和共享 worker 使用可重复读快照，可见柱、指标、展示采用同一 revision 并排除观察时刻之后的行。
+- managed、provider 与 fixed-history：统计固定完整输入起点，分页只裁剪显示；候选和展示保持同一评估截止点。provider 读取和共享 worker 使用可重复读快照，可见柱、指标、展示采用同一 revision；共享 worker 排除观察时刻之后的行。
 - `indicators.js`、`bridge.js`：四条原生 circles，high_left／low_left 各自固定负偏移；四 plot 历史请求合并。显示开关和位置作为 Boolean／Text study 输入保存，计算参数和缓存键只包含两项 strength。
 - `swing-sr-display.js`：每 study 最多两条有限水平桥，归属 study，不保存、不进 undo；随候选、隐藏、删除、参数、系列身份和多图生命周期同步。统计默认置于应用自有的实例名称下方，可选 pane 左下卡片；通过公开 pane adapter 定位，不读取许可库私有 DOM 类名。
 - `drawing-projection.js`：遵循原生 `isSavingEnabled()`，不将推导桥写回工作区，普通用户画线仍保留。
 - `study-templates.js`：原生指标入口被既有自定义入口关闭后，模板按钮也消失；新增公开 API 工具栏入口，复用 `nativePreferences` 和原有 preferences API，支持命名保存、应用、覆盖确认、删除及只读模式。覆盖确认前关闭 HTML 模态保存弹窗，避免原生确认按钮被顶层弹窗拦截；取消后恢复名称和表单。
-- 展示快照按完整系列身份、周期、参数、请求次序、截止柱、统计起点和 revision 管理；旧响应、旧参数和不完整统计范围不能覆盖较新展示。
+- 展示快照按完整系列身份、周期、参数、请求次序、截止柱、统计起点和 revision 管理；published／provider 的单调数值 revision 优先于请求／到达次序，使用 BigInt 精确比较。拒绝旧实时快照同时阻止原生 plot 回调；hash revision 保留原有请求／generation fencing。
+
+## PR #51 阻塞修复验收
+
+首次 review 在 `e34ab96` 找到两个此前验收遗漏的 P2：Swing 全量统计输入被误用作 `has_more`，以及新订阅重播的旧 worker snapshot 覆盖新 HTTP revision。本轮已分别修复：分页边界按 `before` 前的有效行判断，完整范围继续用于统计；数值 source revision 按版本顺序接收，旧 snapshot 不再更新桥、统计或原生曲线。更新的 revision 仍允许缩短末尾，以保留真实修订／撤回行为。
+
+- 红／绿回归：`test_published_page_keeps_full_statistics` 增加起点、短页、空页与完整统计断言；`swing-sr-adapter.cjs` 增加旧 revision、超过 JS Number 精度的 revision、新 revision 缩尾，以及实际 bridge message handler／native callback 验证。两项在修复前失败、修复后通过；撤掉 bridge 拒绝逻辑会单独触发 native callback 回归失败。
+- 相关 Python 回归扩大到 `test_market_stream.py` 和 `test_market_stream_history_windows.py`：**318 passed**；任务专属 PostgreSQL schema：**6 passed**。Swing adapter、统一 market stream Node 回归、Ruff 与 diff 空白检查通过。
+- Ubuntu Docker 重新构建 api／chart 并更新本任务容器。实际登录网页重跑完整 `swing-sr-application.browser.cjs`，**12 项断言组通过，errors=[]**。真实 datafeed 的 `countBack=5000` 返回4002根且 `noData=true`；最早一页仍保持完整最新统计。
+- 网页注入旧 revision 事件，通过实际消息处理器验证展示 snapshot 未改变、原生回调次数0；实际 worker SSE 的撤回、恢复、确认、双图共享、工作区／模板和旧八指标恢复均再次通过。注入用例与真实 worker SSE 用例在证据中明确区分。
+- 逐张打开深色、双图、375px浅色及 blocker截图检查；双图截图改为两图加载并收到恢复 SSE 后拍摄，避免把尚未绘出的曲线当作验收证据。新图和脱敏断言位于[浏览器证据](verification/swing-sr-v1-20261012/README.md)。
 
 ## 第 7 节验收矩阵审计
 

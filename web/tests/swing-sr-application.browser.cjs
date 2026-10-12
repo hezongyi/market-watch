@@ -98,6 +98,16 @@ with transaction() as db:
       limit: 175, indicators: [spec], provisional: true,
     });
     const presentation = numerical.indicators[0].presentation;
+    const earliest = await api('charts/data', {
+      instrument: 'EURUSD', series_kind: 'managed', timeframe: 'H4', published: true,
+      before: numerical.origin + 1, limit: 175, indicators: [spec], provisional: true,
+    });
+    assert.equal(earliest.bars.length,1);
+    assert.equal(earliest.bars[0].start,numerical.origin);
+    assert.equal(earliest.has_more,false,'the published origin must terminate Swing pagination');
+    assert.deepEqual(earliest.indicators[0].presentation,presentation,
+      'the earliest viewport still uses the full current statistics');
+    validations.push('published Swing origin ends pagination while preserving full statistics');
     for (const [side, count, sum, intervals, integer] of [
       ['high', 264, 3989, 263, 15], ['low', 249, 3978, 248, 16],
     ]) {
@@ -121,6 +131,45 @@ with transaction() as db:
     validations.push('native Python catalog lists nine identities and adds Swing through real UI');
     await chart.waitForFunction(() => document.querySelector('.mw-swing-row')?.textContent.includes('高点 15根'));
     await chart.waitForFunction(() => widget.activeChart().getAllShapes().length === 2);
+    const historyBoundary=await chart.evaluate(async()=>{
+      const ticker=[...subscriptions.values()].find(sub=>decode(sub.symbol).spec?.name==='SWING_SR_V1').symbol;
+      const result=await new Promise((resolve,reject)=>feed.getBars({ticker},'240',
+        {to:Math.floor(Date.now()/1000),countBack:5000,firstDataRequest:false},
+        (bars,meta)=>resolve({count:bars.length,first:bars[0]?.time,last:bars.at(-1)?.time,meta}),reject));
+      return result;
+    });
+    assert.equal(historyBoundary.count,4002);
+    assert.equal(historyBoundary.first,numerical.origin);
+    assert.equal(historyBoundary.meta.noData,true,'native datafeed must stop after the published origin');
+    validations.push('actual native Swing datafeed traverses 4002 bars and terminates an oversized countBack');
+    const staleSnapshot=await chart.evaluate(async()=>{
+      const live=[...subscriptions.values()].find(sub=>decode(sub.symbol).spec?.name==='SWING_SR_V1');
+      const identity=decode(live.symbol),symbol=MWSeries.encode(identity.symbol,identity.series_kind);
+      const previous=swingStore().get(symbol,live.res,identity.spec.params);
+      const acceptedRevision=previous.presentation.history_revision;
+      const staleRevision=(BigInt(acceptedRevision)-1n).toString();
+      const probe='swing-revision-acceptance-'+crypto.randomUUID();
+      let callbacks=0;
+      subscriptions.set(probe,{...live,marketListener:probe,marketSequence:0,cb:()=>{callbacks++;}});
+      const bar=previous.bars.at(-1);
+      try {
+        dispatchEvent(new MessageEvent('message',{source:parent,origin:parentOrigin,
+          data:{channel:'mw-chart-v1',type:'market-event',event:{type:'bars',listener:probe,
+            generation:live.marketGeneration,sequence:1,bars:[bar],
+            indicators:[{name:'SWING_SR_V1',params:identity.spec.params,
+              presentation:{...previous.presentation,history_revision:staleRevision},
+              series:['high','high_left','low','low_left'].map(key=>({key,
+                values:[{time:bar.chart_time ?? bar.start,value:999}]}))}]}}}));
+        await new Promise(resolve=>setTimeout(resolve,0));
+        const current=swingStore().get(symbol,live.res,identity.spec.params);
+        return {acceptedRevision,staleRevision,currentRevision:current.presentation.history_revision,
+          unchanged:current===previous,callbacks};
+      } finally {subscriptions.delete(probe);}
+    });
+    assert.equal(staleSnapshot.unchanged,true,'the rendered display must retain its accepted snapshot');
+    assert.equal(staleSnapshot.callbacks,0,'a stale replay cannot reach native plots');
+    validations.push('real browser message handler rejects older revision for both display and native plots');
+    await page.screenshot({path:path.join(ROOT,'artifacts/swing-review-blockers.png')});
     const firstShared=sharedTasks(await chart.evaluate(()=>clientId));
     assert.ok(firstShared.some(task=>task.params.high_strength===5 && task.params.low_strength===5 && task.listeners===4),
       'four native plot subscriptions must share one durable calculation task');
@@ -233,7 +282,6 @@ with transaction() as db:
     await chart.waitForFunction(() => document.querySelectorAll('.mw-swing-row').length === 2 &&
       widget.chart(0).getAllStudies().length===1 && widget.chart(1).getAllStudies().length===1 &&
       widget.chart(0).getAllShapes().length === 2 && widget.chart(1).getAllShapes().length === 2);
-    await page.screenshot({ path: path.join(ROOT, 'artifacts/swing-application-two-charts.png') });
     await save(chart);
     const multi = await inputs(chart);
     await page.reload();
@@ -265,6 +313,9 @@ with transaction() as db:
     tick('restore');
     await chart.waitForFunction(()=>[0,1].every(index=>widget.chart(index).getAllShapes().some(shape=>
       widget.chart(index).getShapeById(shape.id).getPoints()[0].price===1.1242)),null,{timeout:30000});
+    await save(chart);
+    await chart.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    await page.screenshot({ path: path.join(ROOT, 'artifacts/swing-application-two-charts.png') });
     console.log("Acceptance checkpoint", validations.length+1);
     validations.push('two same-strength charts share four native subscriptions and one server task; both receive withdrawal and restoration');
     await chart.evaluate(()=>widget.setLayout('s'));
@@ -355,7 +406,7 @@ with transaction() as db:
     assert.deepEqual(errors, []);
     fs.writeFileSync(path.join(ROOT, 'artifacts/swing-application-acceptance.json'), JSON.stringify({
       passed: true, app: APP, chart: CHART, presentation, workspace: workspace.id,
-      template: template.id, expected, legacy, requests, errors, validations, defaultStyles, geometry, screenshotGeometry,firstShared, multiShared,timing,
+      template: template.id, expected, legacy, requests, errors, validations, defaultStyles, geometry, screenshotGeometry,firstShared, multiShared,timing,historyBoundary,staleSnapshot,
     }, null, 2));
     console.log('Swing Docker app: frozen values, shared SSE rollback/confirmation, workspace, preferences template and two charts passed');
   } catch (error) {

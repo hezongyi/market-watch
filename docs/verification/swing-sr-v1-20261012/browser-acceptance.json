@@ -44,11 +44,14 @@
         "display_integer": 16
       }
     },
-    "history_revision": "102",
+    "history_revision": "116",
     "history_complete": true
   },
   "validations": [
+    "published Swing origin ends pagination while preserving full statistics",
     "native Python catalog lists nine identities and adds Swing through real UI",
+    "actual native Swing datafeed traverses 4002 bars and terminates an oversized countBack",
+    "real browser message handler rejects older revision for both display and native plots",
     "four circles and finite horizontal bridges",
     "actual shared SSE withdrawal, restore and confirmation",
     "workspace and preferences template restore strengths, display settings and styles",
@@ -72,14 +75,14 @@
     }
   },
   "timing": [
-    166.09999990463257,
-    225.80000019073486,
-    171.09999990463257,
-    308.90000009536743,
-    320
+    275.40000009536743,
+    288.69999980926514,
+    163.59999990463257,
+    180.19999980926514,
+    324.40000009536743
   ],
   "errors": [],
-  "scope": "Ubuntu task-local frozen OANDA fixture; integrated origin/main 7f80f72",
+  "scope": "Ubuntu task-local frozen OANDA fixture; origin/main 7f80f72; PR #51 blocker fixes",
   "shared_tasks": [
     {
       "params": {
@@ -87,6 +90,13 @@
         "low_strength": 7
       },
       "listeners": 4
+    },
+    {
+      "params": {
+        "high_strength": 5,
+        "low_strength": 5
+      },
+      "listeners": 0
     }
   ],
   "template_dialog_checks": [
@@ -97,5 +107,20 @@
     "delete cancel",
     "delete confirm",
     "dispose and reload"
-  ]
+  ],
+  "historyBoundary": {
+    "count": 4002,
+    "first": 1710478800000,
+    "last": 1791766800000,
+    "meta": {
+      "noData": true
+    }
+  },
+  "staleSnapshot": {
+    "acceptedRevision": "116",
+    "staleRevision": "115",
+    "currentRevision": "116",
+    "unchanged": true,
+    "callbacks": 0
+  }
 }

@@ -5,6 +5,14 @@ function swingSnapshotKey(symbol, resolution, params) {
   return JSON.stringify([symbol, resolution, params.high_strength, params.low_strength]);
 }
 
+// Published/provider revisions are monotonic database counters. Hash revisions
+// have no numeric order and retain the request/generation fences below.
+function swingRevisionOrder(next, previous) {
+  if (!/^\d+$/.test(String(next)) || !/^\d+$/.test(String(previous))) return null;
+  const a=BigInt(next),b=BigInt(previous);
+  return a < b ? -1 : a > b ? 1 : 0;
+}
+
 function swingSnapshotStore() {
   const records = new Map();
   let sequence = 0;
@@ -13,6 +21,7 @@ function swingSnapshotStore() {
     clear: () => records.clear(),
     get: (symbol, resolution, params) => records.get(swingSnapshotKey(symbol, resolution, params)),
     publish(symbol, resolution, page, ticket) {
+      let accepted=false;
       for (const result of page.indicators || []) {
         const p = result.presentation;
         if (result.name !== 'SWING_SR_V1' || p?.render_profile !== 'swing_sr_v1') continue;
@@ -20,7 +29,10 @@ function swingSnapshotStore() {
         const previous = records.get(key);
         const revision=p.history_revision ?? page.history_revision ?? page.revision ?? null;
         const sameRevision=previous?.presentation.history_revision===revision;
-        if (previous && (ticket < previous.ticket || sameRevision &&
+        const order=previous ? swingRevisionOrder(revision,previous.presentation.history_revision) : null;
+        // A source revision wins over request/arrival order, including repairs
+        // that retract the latest bar. Unknown revisions retain ticket fencing.
+        if (previous && (order===-1 || (order!==1 && ticket < previous.ticket) || sameRevision &&
           p.as_of_bar_time < previous.presentation.as_of_bar_time)) continue;
         // Never replace a complete range by a warmup/page-local statistic.
         if (previous && sameRevision && p.statistics_origin > previous.presentation.statistics_origin) continue;
@@ -28,7 +40,9 @@ function swingSnapshotStore() {
           history_revision:revision,
           history_complete:p.history_complete ?? !(page.indicator_progress || []).some(s=>s.status!=='complete'),
         }, bars:page.bars || []});
+        accepted=true;
       }
+      return accepted;
     },
   };
 }

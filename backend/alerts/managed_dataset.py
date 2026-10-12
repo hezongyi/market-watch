@@ -683,7 +683,9 @@ def data(body):
             db, inst, body.timeframe, now_ms() + 1 if swing else before, max(1, count),
             dataset_start=body.dataset_start
         )
-        visible = [row for row in rows if row["start"] < before][-body.limit :]
+        eligible = [row for row in rows if row["start"] < before]
+        visible = eligible[-body.limit :]
+        has_more = len(eligible) > body.limit
         left = max(pub.start, body.dataset_start or pub.start) if pub else None
         revision = pub.revision if pub else 0
         from .volume import metadata
@@ -718,7 +720,7 @@ def data(body):
         bars=visible,
         indicators=indicators,
         origin=left,
-        has_more=len(rows) > body.limit,
+        has_more=has_more,
         bounded_history=True,
         history_revision=str(revision),
         history_check=history_check,

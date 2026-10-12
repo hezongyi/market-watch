@@ -2374,7 +2374,7 @@ addEventListener("message", async (e) => {
     } else if(event.type==='bars' && !sub.historical && !sub.needsHistoryReload) {
       const identity=decode(sub.symbol);
       if(identity.spec?.name==='SWING_SR_V1') {
-        swingStore().publish(MWSeries.encode(identity.symbol,identity.series_kind),sub.res,event,swingStore().ticket());
+        if(!swingStore().publish(MWSeries.encode(identity.symbol,identity.series_kind),sub.res,event,swingStore().ticket())) return;
         swingDisplay?.refresh();
       }
       const rows=barsOf(event,sub.res,sub.symbol);

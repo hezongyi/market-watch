@@ -59,9 +59,26 @@ store.clear();assert.equal(store.get('MWP:EURUSD','240',params),undefined);
 store.publish('MWP:EURUSD','240',page(params,p),store.ticket());
 store.publish('MWP:EURUSD','240',{...page(params,{...p,as_of_bar_time:50,statistics_origin:25}),history_revision:'corrected'},store.ticket());
 assert.equal(store.get('MWP:EURUSD','240',params).presentation.as_of_bar_time,50,'new revision invalidates the old range');
+store.clear();
+const earlierRead=store.ticket();
+store.publish('MWP:EURUSD','240',{...page(params,p),history_revision:'11'},store.ticket());
+store.publish('MWP:EURUSD','240',{...page(params,p),history_revision:'10'},store.ticket());
+assert.equal(store.get('MWP:EURUSD','240',params).presentation.history_revision,'11',
+  'a replayed older source revision cannot overwrite accepted HTTP history');
+store.publish('MWP:EURUSD','240',{...page(params,{...p,as_of_bar_time:50}),history_revision:'12'},earlierRead);
+assert.equal(store.get('MWP:EURUSD','240',params).presentation.as_of_bar_time,50,
+  'an authoritative newer revision wins over arrival tickets and may retract the old tail');
+store.clear();
+store.publish('MWP:EURUSD','240',{...page(params,p),history_revision:'9007199254740993'},store.ticket());
+store.publish('MWP:EURUSD','240',{...page(params,p),history_revision:'9007199254740992'},store.ticket());
+assert.equal(store.get('MWP:EURUSD','240',params).presentation.history_revision,'9007199254740993',
+  'database revision comparison must not lose bigint precision');
+const handlers={},messages=[];
+const bridgeParent={postMessage:message=>messages.push(message)};
 const bridgeContext=vm.createContext({document:{createElement:()=>({}),head:{append:()=>{}}},
   URL,URLSearchParams,Map,Set,Promise,Date,Intl,Error,location:{search:'?parent=http://localhost'},
-  parent:{postMessage(){}},crypto:{randomUUID:()=> 'fixture'},addEventListener(){},setTimeout,clearTimeout,
+  parent:bridgeParent,crypto:{randomUUID:()=> 'fixture'},
+  addEventListener:(name,handler)=>{handlers[name]=handler},setTimeout,clearTimeout,
   btoa:value=>Buffer.from(value).toString('base64'),atob:value=>Buffer.from(value,'base64').toString()});
 for(const file of ['series.js','swing-sr-display.js','bridge.js'])
   vm.runInContext(fs.readFileSync(path.join(root,'advanced-host',file),'utf8'),bridgeContext);
@@ -74,6 +91,31 @@ vm.runInContext('request=(q)=>{testRequests.push(q);return Promise.resolve(page)
  await vm.runInContext("Promise.all(tickers.map(t=>query(t,'240',{limit:175})))",bridgeContext);
  assert.equal(bridgeContext.testRequests.length,1,'four plots share one in-flight calculation request');
  assert.equal(bridgeContext.testRequests[0].indicators.length,1);
+ // An accepted HTTP response registers a fresh generation against an existing
+ // worker task. That task can replay a retained snapshot from before the HTTP
+ // revision; test the actual message handler and native callback together.
+ const snapshot=(revision,value)=>({cache_revision:Number(revision),as_of:1000000,
+   bars:[{start:720000,end:780000,open:1,high:2,low:1,close:1.5}],
+   indicators:[{name:'SWING_SR_V1',params,
+     presentation:{...p,history_revision:revision,as_of_bar_time:720000,current:{high:{price:value}}},
+     series:['high','high_left','low','low_left'].map(key=>({key,values:[{time:720000,value}]}))}]});
+ bridgeContext.page=snapshot('11',1.12);
+ await vm.runInContext("query(tickers[0],'240',{limit:1,before:780000})",bridgeContext);
+ vm.runInContext(`globalThis.received=[];
+   lastHistory.set(tickers[0]+'|240',720000);
+   feed.subscribeBars({ticker:tickers[0]},'240',bar=>received.push(bar),'swing-live',()=>{});
+   acceptMarketHistory(tickers[0],'240',page);`,bridgeContext);
+ const registration=messages.filter(row=>row.type==='market-subscribe').at(-1).args;
+ const deliver=(revision,value,sequence)=>handlers.message({source:bridgeParent,origin:'http://localhost',
+   data:{channel:'mw-chart-v1',type:'market-event',event:{...snapshot(revision,value),type:'bars',
+     listener:registration.listener,generation:registration.generation,sequence}}});
+ await deliver('10',1.13,1);
+ assert.equal(vm.runInContext("swingStore().get('MWP:EURUSD','240',decode(tickers[0]).spec.params).presentation.history_revision",bridgeContext),'11');
+ assert.equal(bridgeContext.received.length,0,'stale revision cannot roll back the native plot callback');
+ await deliver('12',1.14,2);
+ assert.equal(vm.runInContext("swingStore().get('MWP:EURUSD','240',decode(tickers[0]).spec.params).presentation.history_revision",bridgeContext),'12');
+ assert.equal(bridgeContext.received.at(-1).close,1.14,'new authoritative revision still reaches native plots');
+ vm.runInContext("feed.unsubscribeBars('swing-live')",bridgeContext);
  console.log('Swing four-plot datafeed request coalescing passed');
 })().catch(error=>{console.error(error);process.exitCode=1});
 console.log('Swing adapter: 4 circles, independent offsets, display-only inputs, old 8 studies and snapshot fences passed');

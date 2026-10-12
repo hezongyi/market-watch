@@ -280,6 +280,7 @@ def test_provider_page_keeps_full_statistics_and_source_chart_labels(database, m
     older = cache.data(query.model_copy(update={"before": rows[6]["start"]}))
     assert latest["indicators"][0]["presentation"] == older["indicators"][0]["presentation"]
     assert len(older["bars"]) == 3
+
     assert older["bars"][-1]["start"] < latest["bars"][0]["start"]
     p = latest["indicators"][0]["presentation"]
     assert p["current"]["high"]["pivot_chart_time"] == rows[-2]["chart_time"]
@@ -330,6 +331,18 @@ def test_published_page_keeps_full_statistics(database):
     older = managed_dataset.data(query.model_copy(update={"before": rows[6]["start"]}))
     assert latest["indicators"][0]["presentation"] == older["indicators"][0]["presentation"]
     assert len(older["bars"]) == 3
+
+    # Swing computes from the full range even for an old viewport. Pagination
+    # must still end at the requested prefix, including short and empty pages.
+    assert latest["has_more"] is True
+    for before, expected in [(180000, [0, 60000, 120000]), (60000, [0]), (1, [0])]:
+        earliest = managed_dataset.data(query.model_copy(update={"before": before}))
+        assert [row["start"] for row in earliest["bars"]] == expected
+        assert earliest["has_more"] is False
+        assert earliest["indicators"][0]["presentation"] == latest["indicators"][0]["presentation"]
+    empty = managed_dataset.data(query.model_copy(update={"before": 1, "dataset_start": 60000}))
+    assert empty["bars"] == []
+    assert empty["has_more"] is False
 
 
 def test_fixed_composite_preview_is_page_independent_and_never_persisted(database, monkeypatch):
