@@ -1,0 +1,30 @@
+{
+  "project": "mw-v1250-restore-20261013",
+  "task": "mw-v1250-restore-20261013",
+  "apply": true,
+  "containers": [
+    "mw-v1250-restore-20261013-pg-1"
+  ],
+  "volumes": [
+    "mw-v1250-restore-20261013_pg"
+  ],
+  "networks": [
+    "2d06dddc2d54"
+  ],
+  "retained_images": []
+}
+{"task": "mw-v1250-restore-20261013", "completed_at": "2026-10-13T01:07:35.559305+00:00"}
+{
+  "apply": true,
+  "automatic": false,
+  "images": [
+    {
+      "id": "sha256:04bcc90e5d90f16ae96ec90041aa8f0389ab8f17483ec7bcae07bb3c3a7791cc",
+      "task": "mw-v1250-restore-20261013",
+      "refs": [
+        "market-watch-restore:v1.25.0"
+      ]
+    }
+  ]
+}
+{"archive": "/home/quant/.local/share/market-watch-docker/archives/mw-v1250-restore-20261013-20261013T010713-cae315f9", "restore_verified": true}
