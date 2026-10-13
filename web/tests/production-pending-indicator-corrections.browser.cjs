@@ -3,14 +3,31 @@ const {chromium,expect}=require('@playwright/test');
 const fs=require('node:fs'),assert=require('node:assert/strict'),{execFileSync}=require('node:child_process');
 const base='http://127.0.0.1:20271',origin='http://127.0.0.1:20272';
 const privateDir='/tmp/mw-pending-fixes-20261013-private';
-function mutate(action,at){
+let mutationSequence=0;
+async function mutate(action,at){
+ if(process.env.MW_INDICATOR_MUTATIONS_EXTERNAL==='true'){
+  const sequence=++mutationSequence;
+  fs.writeFileSync(privateDir+'/indicator-mutation-request.json',JSON.stringify({sequence,action,at}));
+  const deadline=Date.now()+60000;
+  while(Date.now()<deadline){
+   if(fs.existsSync(privateDir+'/indicator-mutation-complete.json') &&
+    JSON.parse(fs.readFileSync(privateDir+'/indicator-mutation-complete.json')).sequence===sequence)return;
+   await new Promise(resolve=>setTimeout(resolve,200));
+  }
+  throw Error('Timed out waiting for task-local fixture mutation');
+ }
  const command=`docker compose --env-file ${privateDir}/acceptance.env -p mw-pending-fixes-20261013 -f deploy/ubuntu/production-ux.acceptance.yaml -f ${privateDir}/indicator-fixture.override.yaml run --rm --no-deps seed python /fixture/production_pending_indicator_fixture.py ${action}${at?' '+at:''}`;
  execFileSync('sg',['docker','-c',command],{stdio:'pipe',timeout:30000});
 }
 (async()=>{
  const browser=await chromium.launch({executablePath:chromium.executablePath(),args:['--no-sandbox']});
- const page=await browser.newPage({viewport:{width:1600,height:1100}}),errors=[],resets=[];
+ const page=await browser.newPage({viewport:{width:1600,height:1100}}),errors=[],fixedReads=[];
  page.on('pageerror',e=>errors.push(e.message));
+ page.on('response',async response=>{
+  if(response.url()!==base+'/api/charts/data')return;
+  try {const q=response.request().postDataJSON();if(q.series_kind==='history')
+   fixedReads.push({q,data:await response.json()});}catch{}
+ });
  try {
   await page.goto(base+'/advanced-charts');
   await page.getByLabel('管理员密码').fill(fs.readFileSync(privateDir+'/password','utf8'));
@@ -22,6 +39,7 @@ function mutate(action,at){
   await host.waitForFunction(()=>widget.chartsCount()===1&&widget.activeChart().dataReady());
   await host.evaluate(()=>new Promise(resolve=>widget.activeChart().setSymbol('BTCUSDT',resolve)));
   await host.evaluate(()=>new Promise(resolve=>widget.activeChart().setResolution('1',resolve)));
+  if(process.env.MW_TEST_FIXED_ONLY!=='true'){
   await host.evaluate(async()=>{
    const chart=widget.activeChart();for(const s of chart.getAllStudies())chart.removeEntity(s.id);
    globalThis.correctionIds=[];
@@ -31,7 +49,7 @@ function mutate(action,at){
    addEventListener('message',e=>{if(e.data?.type==='market-event'&&e.data.event?.type==='reset')correctionResets.push(e.data.event.reason);});
   });
   const snapshot=()=>host.evaluate(()=>{
-   const chart=widget.activeChart(),key=chart.symbol()+'|1';
+   const chart=widget.activeChart(),key=indicatorKey(chart.symbol(),'1');
    return {binding:indicatorBindings.get(key),demand:indicatorDependencyOrigins.get(key),
     studies:correctionIds.map(id=>{const study=chart._chartWidget.model().model().dataSourceForId(id);
      return {count:study.data().size(),last:study.data().last()?.value[1]};}),resets:correctionResets};
@@ -39,26 +57,51 @@ function mutate(action,at){
   await expect.poll(async()=>(await snapshot()).studies.every(s=>s.count>100),{timeout:60000}).toBe(true);
   await expect.poll(async()=>!!(await snapshot()).binding.dependencyRevision,{timeout:15000}).toBe(true);
   const initial=await snapshot();assert.equal(initial.studies[0].last,10);
-  mutate('tail');
+  await mutate('tail');
   await expect.poll(async()=>(await snapshot()).studies[0].last,{timeout:30000}).toBeGreaterThan(10);
   const afterTail=await snapshot();
   assert.equal(afterTail.binding.inputRevision,initial.binding.inputRevision);
   const prefix=initial.binding.calculationStart;
   assert.ok(prefix<initial.binding.firstStart,'repair must precede loaded price window');
-  mutate('prefix',prefix);
+  await mutate('prefix',prefix);
   await expect.poll(async()=>(await snapshot()).binding.correctionVersion,{timeout:30000}).toBeGreaterThan(afterTail.binding.correctionVersion);
   await expect.poll(async()=>(await snapshot()).studies[1].last,{timeout:30000}).not.toBe(afterTail.studies[1].last);
+  console.log('tail and prefix updates accepted');
   const corrected=await snapshot();assert.deepEqual(corrected.resets,[],'prefix-only repair must not reset price chart');
   const expected=await host.evaluate(async()=>{
-   const chart=widget.activeChart(),binding=indicatorBindings.get(chart.symbol()+'|1');
+   const chart=widget.activeChart(),binding=indicatorBindings.get(indicatorKey(chart.symbol(),'1'));
    const page=await query(chart.symbol(),'1',{before:binding.lastStart+1,limit:2,
     indicators:[{name:'EMA',params:{period:300}},{name:'LWMA',params:{period:5}}],provisional:true});
    return page.indicators.map(i=>({name:i.name,last:i.series[0].values.at(-1).value}));
   });
   for(const [i,name] of ['LWMA','EMA'].entries())assert.equal(corrected.studies[i].last,expected.find(x=>x.name===name).last);
+  }
+  const catalog=await(await page.request.get(base+'/api/market-data/series/search?query=EURUSD')).json();
+  console.log('managed values match Python');
+  const history=catalog.find(row=>row.series_kind==='history');assert.ok(history);
+  await host.evaluate(ticker=>widget.activeChart().setSymbol(ticker),history.ticker);
+  await host.waitForFunction(ticker=>MWSeries.same(widget.activeChart().symbol(),ticker)&&widget.activeChart().dataReady(),history.ticker,{timeout:60000});
+  console.log('fixed history accepted');
+  await host.evaluate(async()=>{
+   const chart=widget.activeChart();for(const study of chart.getAllStudies())chart.removeEntity(study.id);
+   globalThis.coldIds=[];
+   for(const period of [41,43])coldIds.push(await chart.createStudy('守望 Python LWMA',false,false,{period}));
+  });
+  console.log('cold start '+JSON.stringify(await host.evaluate(()=>({symbol:widget.activeChart().symbol(),resolution:widget.activeChart().resolution(),coordinator:indicatorCoordinator.diagnostics(),mainSize:widget.activeChart()._chartWidget.model().model().mainSeries().data().size(),bindings:[...indicatorBindings],studies:coldIds.map(id=>((()=>{const study=widget.activeChart()._chartWidget.model().model().dataSourceForId(id),api=study._chartApi,engine=api.chartApi()._studyEngine,session=api.sessionId(),item=engine._studiesCache[session][study.sourceId()];
+ return {scope:MWNativeIndicatorResults.scope(widget.activeChart(),id),size:study.data().size(),item:{id:item.metainfo.id,completed:item.completed,started:item.engine?.isStarted?.()},parent:engine._getSeriesData(session,item.parentId)?.length};})()))}))));
+  await expect.poll(()=>host.evaluate(()=>coldIds.every(id=>widget.activeChart()._chartWidget.model().model().dataSourceForId(id).data().size()>20)),
+   {timeout:90000}).toBe(true);
+  for(const [index,period] of [41,43].entries()){
+   const completed=fixedReads.flatMap(row=>row.data.indicators || []).filter(i=>i.name==='LWMA'&&i.params.period===period&&i.calculation?.status==='complete').at(-1);
+   assert.ok(completed,'cold parameter run must complete');
+   const value=await host.evaluate(index=>widget.activeChart()._chartWidget.model().model().dataSourceForId(coldIds[index]).data().last().value[1],index);
+   assert.equal(value,completed.series[0].values.at(-1).value);
+  }
+  assert.ok(fixedReads.some(row=>row.data.indicator_progress?.some(run=>run.status!=='complete')),
+   'actual fixed calculation must exercise preparing to completed');
   assert.deepEqual(errors,[]);
   const report={passed:true,scope:'Ubuntu task-local synthetic published M1 inputs, actual HTTP/PG/shared stream worker/Python/native chart',
-   checks:['same-time tail update without confirmed input revision','recursive prefix repair outside loaded window','Python numeric agreement after repair','no price chart reset'],errors};
+   checks:['same-time tail update without confirmed input revision','recursive prefix repair outside loaded window','Python numeric agreement after repair','no price chart reset','real cold fixed runs: independent parameters pending to complete'],errors};
   fs.writeFileSync(privateDir+'/pr55-indicator-corrections.json',JSON.stringify(report,null,2));
   console.log('PASS actual indicator corrections '+JSON.stringify(report));
  } finally {await browser.close();}

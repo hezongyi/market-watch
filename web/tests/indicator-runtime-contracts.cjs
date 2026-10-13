@@ -12,7 +12,7 @@ function harness({binding={revision:'fixed-1',inputRevision:7,calculationStart:1
   applyBatch:async(handle,batch)=>{revisions.set(handle.id,batch.inputRevision);batches.push({id:handle.id,...batch});coverage.set(handle.id,{...batch.coverage,generation:1});return true;}};
  class Clock extends Date{static now(){return clock;}}
  const context={MWNativeIndicatorResults:adapter,queueMicrotask,Date:Clock,setInterval:()=>1,clearInterval(){},
-  indicatorBindings:new Map(),indicatorCoordinator:undefined,decode:()=>({series_kind:'composite'})};
+  indicatorKey:(ticker,res)=>ticker+'|'+res,indicatorBindings:new Map(),indicatorCoordinator:undefined,decode:()=>({series_kind:'composite'})};
  const bridge=fs.readFileSync(root+'/advanced-host/bridge.js','utf8');
  const bindingSource=bridge.slice(bridge.indexOf('function rememberIndicatorBinding('),bridge.indexOf('function startIndicatorCoordinator('));
  vm.runInNewContext(bindingSource+fs.readFileSync(root+'/advanced-host/indicator-coordinator.js','utf8'),context);
@@ -34,6 +34,13 @@ function page(specs,pendingPeriod=null,value=10){
 }
 (async()=>{
  const bridge=fs.readFileSync(root+'/advanced-host/bridge.js','utf8');
+ const canonicalContext={atob:s=>Buffer.from(s,'base64').toString('utf8')};
+ vm.runInNewContext(fs.readFileSync(root+'/advanced-host/series.js','utf8')+';const decode=MWSeries.decode;'+bridge.slice(bridge.indexOf('function indicatorKey('),bridge.indexOf('let studyTemplates;')),
+  canonicalContext);
+ const fixed='MWH:D2302701-1248-453A-804F-3422D4DAD6DD';
+ assert.equal(canonicalContext.indicatorKey(fixed,'1'),fixed.toLowerCase().replace('mwh:','MWH:')+'|1',
+  'native uppercase fixed symbol must match canonical datafeed binding');
+
  const querySource=bridge.slice(bridge.indexOf('function query('),bridge.indexOf('// Share only in-flight planning reads;'));
  let requests=0;
  const queryContext={decode:()=>({symbol:'TEST',series_kind:'managed'}),frames:{'1':'M1'},
@@ -85,8 +92,8 @@ function page(specs,pendingPeriod=null,value=10){
  Object.assign(fallback.context.indicatorBindings.get(key),{firstStart:2000,dependencyRevision:'old'});
  Object.assign(fallback.context,{indicatorDependencyOrigins:new Map([[key,1000]]),
   query:async()=>({history_check:{revision:'new'}}),first:{symbol:ticker,res:'5'},identity:{series_kind:'composite'},result:{bars:[]}});
- const pollSource=bridge.slice(bridge.indexOf('        const dependencyOrigin=indicatorDependencyOrigins.get(first.symbol'),
-  bridge.indexOf('        const bars = barsOf(result, first.res, first.symbol);',bridge.indexOf('        const dependencyOrigin=indicatorDependencyOrigins.get(first.symbol')));
+ const pollSource=bridge.slice(bridge.indexOf('        const dependencyOrigin=indicatorDependencyOrigins.get(indicatorKey(first.symbol'),
+  bridge.indexOf('        const bars = barsOf(result, first.res, first.symbol);',bridge.indexOf('        const dependencyOrigin=indicatorDependencyOrigins.get(indicatorKey(first.symbol')));
  vm.runInNewContext('async function prefixPoll(){'+pollSource+'}',fallback.context);
  await fallback.context.prefixPoll();await fallback.context.prefixPoll();
  assert.equal(fallback.context.indicatorBindings.get(key).dependencyRevision,'new');

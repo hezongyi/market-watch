@@ -30,6 +30,16 @@ with transaction() as db:
     else:
         if not pub or pub.complete_count != 1199:
             raise RuntimeError('Requires this task synthetic publication')
+        if sys.argv[1] == 'reset':
+            for at in (pub.start, pub.end-60000):
+                row = db.get(ChartPublishedBar, ('BTCUSDT', 'M1', at))
+                row.payload = {**row.payload, 'high':'11', 'close':'10'}
+                row.revision += 1
+            pub.revision += 1
+            pub.updated_at = now_ms()
+            print('Reset task-local synthetic test values')
+            db.commit()
+            sys.exit(0)
         at = pub.end-60000 if sys.argv[1] == 'tail' else int(sys.argv[2])
         if not pub.start <= at < pub.end:
             raise RuntimeError('Outside synthetic publication')

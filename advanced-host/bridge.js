@@ -22,6 +22,10 @@ function swingStore() {return swingSnapshots ||= swingSnapshotStore();}
 let swingDisplay, indicatorCoordinator;
 const indicatorBindings=new Map();
 const indicatorDependencyOrigins=new Map();
+function indicatorKey(ticker,res){
+  const id=decode(ticker);
+  return MWSeries.encode(id.symbol,id.series_kind)+'|'+res;
+}
 let studyTemplates;
 function showNextNotice() {
   if (!ready || noticeDialogOpen) return;
@@ -177,15 +181,15 @@ function registerMarketBar(sub) {
     loaded_before:state.last ?? sub.last ?? null,
     history_revision:state.history_revision ?? null,history_tail_revision:state.history_tail_revision ?? null,
     observed_at:state.observed_at || 0,
-    dependency_origin:indicatorDependencyOrigins.get(sub.symbol+'|'+sub.res) ?? null,
+    dependency_origin:indicatorDependencyOrigins.get(indicatorKey(sub.symbol,sub.res)) ?? null,
     dependency_observed_at:state.dependency_observed_at ?? null,
-    dependency_before:indicatorBindings.get(sub.symbol+'|'+sub.res)?.dependencyBefore ?? null,
-    dependency_revision:indicatorBindings.get(sub.symbol+'|'+sub.res)?.dependencyRevision ?? null,
+    dependency_before:indicatorBindings.get(indicatorKey(sub.symbol,sub.res))?.dependencyBefore ?? null,
+    dependency_revision:indicatorBindings.get(indicatorKey(sub.symbol,sub.res))?.dependencyRevision ?? null,
     binding:state.binding || null,initial_input_revision:state.input_revision ?? null,initial_indicator_pending:!!sub.initialIndicatorPending,historical:!!sub.historical}});
 }
 function rememberIndicatorBinding(ticker,res,page,{correction=false}={}) {
   if(decode(ticker).spec)return;
-  const key=ticker+'|'+res,old=indicatorBindings.get(key) || {};
+  const key=indicatorKey(ticker,res),old=indicatorBindings.get(key) || {};
   const provider=decode(ticker).series_kind==='provider';
   // Realtime fixed/managed bars do not expose a numeric cache revision. Track
   // the accepted last candle's actual input, not page-wide history hashes that
@@ -215,7 +219,7 @@ function startIndicatorCoordinator(catalog) {
     read:(symbol,res,args,current)=>query(symbol,res,args,Date.now()+30000,current),
     identity:{
       binding:(ticker,res)=>{
-        const id=decode(ticker),key=ticker+'|'+res,base=indicatorBindings.get(key);
+        const id=decode(ticker),key=indicatorKey(ticker,res),base=indicatorBindings.get(key);
         if(!base)return null;
         const session=managedSessions.get(id.symbol+'|'+res);
         return {...base,revision:base.revision || (id.series_kind==='history'?id.symbol:
@@ -228,7 +232,7 @@ function startIndicatorCoordinator(catalog) {
             provisional:true}};
       },
       chartTime:(bar,res,ticker)=>stamp(bar,res,decode(ticker).symbol),
-      remember:(ticker,res,page)=>{const old=indicatorBindings.get(ticker+'|'+res);if(old)
+      remember:(ticker,res,page)=>{const old=indicatorBindings.get(indicatorKey(ticker,res));if(old)
         Object.assign(old,{calculationStart:page.calculation_origin ?? page.origin ?? old.calculationStart,
           dependencyBefore:page.dependency_before ?? old.dependencyBefore,
           dependencyRevision:page.dependency_revision ?? old.dependencyRevision});},
@@ -238,13 +242,13 @@ function startIndicatorCoordinator(catalog) {
     report:error=>{if(error.code!=='HISTORY_CANCELLED')send({type:'error',error:'指标读取失败：'+String(error)});},
     presentation:(ticker,res,page)=>{swingStore().publish(ticker,res,page,swingStore().ticket());swingDisplay?.refresh();},
     demand:rows=>{
-      const next=new Map(rows.map(row=>[row.ticker+'|'+row.resolution,row.origin]));
+      const next=new Map(rows.map(row=>[indicatorKey(row.ticker,row.resolution),row.origin]));
       const changed=new Set([...indicatorDependencyOrigins.keys(),...next.keys()].filter(key=>indicatorDependencyOrigins.get(key)!==next.get(key)));
-      for(const row of rows)if(row.dependencyRevision)changed.add(row.ticker+'|'+row.resolution);
+      for(const row of rows)if(row.dependencyRevision)changed.add(indicatorKey(row.ticker,row.resolution));
       indicatorDependencyOrigins.clear();for(const [key,origin] of next)indicatorDependencyOrigins.set(key,origin);
       // This is per-consumer correction evidence on the existing price task.
       // It neither subscribes auxiliary plots nor computes indicators in SSE.
-      for(const sub of subscriptions.values())if(!decode(sub.symbol).spec && changed.has(sub.symbol+'|'+sub.res))registerMarketBar(sub);
+      for(const sub of subscriptions.values())if(!decode(sub.symbol).spec && changed.has(indicatorKey(sub.symbol,sub.res)))registerMarketBar(sub);
     },
   });
 }
@@ -1527,8 +1531,8 @@ async function tick() {
             ? { revision_before: first.historyBefore }
             : {}),
         });
-        const dependencyOrigin=indicatorDependencyOrigins.get(first.symbol+'|'+first.res);
-        const acceptedBinding=indicatorBindings.get(first.symbol+'|'+first.res);
+        const dependencyOrigin=indicatorDependencyOrigins.get(indicatorKey(first.symbol,first.res));
+        const acceptedBinding=indicatorBindings.get(indicatorKey(first.symbol,first.res));
         if(!identity.spec && dependencyOrigin!=null && acceptedBinding?.firstStart>dependencyOrigin){
           const dependencyPage=await query(first.symbol,first.res,{limit:1,track_history:true,
             revision_before:acceptedBinding.firstStart,revision_after:null,
@@ -2461,7 +2465,7 @@ addEventListener("message", async (e) => {
     const acceptedState=marketHistoryState.get(sub.symbol+'|'+sub.res+'|'+(sub.window || ''));
     if(event.dependency_observed_at!=null && acceptedState)acceptedState.dependency_observed_at=event.dependency_observed_at;
     if(event.dependency_revision!=null){
-      const binding=indicatorBindings.get(sub.symbol+'|'+sub.res);if(binding)binding.dependencyRevision=event.dependency_revision;
+      const binding=indicatorBindings.get(indicatorKey(sub.symbol,sub.res));if(binding)binding.dependencyRevision=event.dependency_revision;
     }
     if(event.indicator_correction){
       if(event.initial_input_revision!=null && acceptedState)acceptedState.input_revision=event.initial_input_revision;
