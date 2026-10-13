@@ -2,6 +2,8 @@
 
 个人外汇、黄金和比特币监控网站。当前源码版本 **v1.25.0**，新增通用 Python 原生指标结果接口，修复 fixed 冷加载与 managed 历史更正后的指标重算；保留可选 ATR 告警偏移、Supertrend、Swing 及既有 UX 修复。范围与限制见 [最终复审证据](docs/issues/production-pending-pr55-review-fixes-20261013.md) 和 [源码清单](deploy/releases/v1.25.0-source.json)。原预警系统验收见[交付矩阵](docs/acceptance-matrix.md)。
 
+当前生产已从 v1.23.0 升级到 **v1.25.0**：12 个常驻服务、API healthy，Yahoo 默认开启并实际读取验证；迁移、备份完整恢复、生产浏览器及回滚记录见 [生产交付](docs/pending-v1.25.0-production-delivery.md)。组合缺分钟仍保持 unknown/stale，`Load failed` 未复现，暂不处理。
+
 v1.14.1 保留固定自建历史、实时接续组合及可审计修订；部署前需迁移至 `aq44_aggregation_service_order`，按发布身份执行覆盖 `--until-complete --verify`。应用回退及重新升级步骤见 [发布说明](docs/verification/issue-13/release-pr.md)；本次为源码发布。
 
 v1.13.0 新增主图空白处双击最大化／恢复，并加强 Ubuntu 验收退役的 PG/TLS 镜像身份校验；发布范围见 [v1.13.0 交付](docs/chart-maximize-v1.13.0-source-delivery.md)。

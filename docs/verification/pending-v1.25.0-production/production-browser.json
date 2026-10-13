@@ -1,0 +1,313 @@
+{
+  "indicator_responses": [
+    {
+      "indicators": [
+        {
+          "id": "EMA",
+          "name": "EMA",
+          "rows": 0
+        }
+      ]
+    },
+    {
+      "indicators": [
+        {
+          "id": "EMA",
+          "name": "EMA",
+          "rows": 0
+        }
+      ]
+    }
+  ],
+  "scope": "Unraid formal production; Ubuntu browser; existing workspace, read-only UI and market subscriptions; preference migration and native preference saves suppressed",
+  "passed": true,
+  "cases": [
+    "HTTPS administrator login and Secure/HttpOnly session",
+    "Existing production chart ready, one alert business root, actual bars/quotes through authenticated SSE",
+    "Deployed generic Python EMA channel returns finite native crosshair values",
+    "Reload restores original five-chart workspace; transient study not saved",
+    "390px home has no horizontal overflow"
+  ],
+  "errors": [],
+  "http_errors": [],
+  "credential_leaks": [],
+  "unexpected_writes": [],
+  "blocked_preference_saves": [
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "kind": "setting",
+      "name": "widgetbar.layout-settings"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "kind": "setting",
+      "name": "widgetbar.layout-settings"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "kind": "setting",
+      "name": "chart.lastUsedTimeBasedResolution"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "kind": "setting",
+      "name": "widgetbar.layout-settings"
+    }
+  ],
+  "started_at": "2026-10-13T01:11:46.755Z",
+  "existing_workspaces": [
+    {
+      "id": "9826f739-a3e8-471a-b852-2fdf1bf72947",
+      "revision": 81
+    },
+    {
+      "id": "dcb312bb-b8ca-4b9c-b981-51cce1dbde6e",
+      "revision": 251
+    }
+  ],
+  "calendar_rows": 295,
+  "health": {
+    "time": 1791853907832,
+    "pending_notifications": 0,
+    "backup": {
+      "status": "recent",
+      "at": 1791853232919,
+      "bytes": 1261099745
+    },
+    "market_incidents": [
+      {
+        "instrument": "BTCUSDT",
+        "errors_24h": 4,
+        "last_error_at": 1791838930057,
+        "last_recovered_at": 1791838937363,
+        "current_error": false
+      },
+      {
+        "instrument": "EURUSD",
+        "errors_24h": 27,
+        "last_error_at": 1791853041646,
+        "last_recovered_at": 1791853550563,
+        "current_error": false
+      },
+      {
+        "instrument": "XAUUSD",
+        "errors_24h": 30,
+        "last_error_at": 1791852992493,
+        "last_recovered_at": 1791853551492,
+        "current_error": false
+      },
+      {
+        "instrument": "MD:08cb37ede9a86cb9a71c4b8ac:XAUUSD",
+        "errors_24h": 0,
+        "last_error_at": null,
+        "last_recovered_at": null,
+        "current_error": false
+      },
+      {
+        "instrument": "MD:7fd3d31e7c7c0e43be3df53eb:EURUSD",
+        "errors_24h": 0,
+        "last_error_at": null,
+        "last_recovered_at": null,
+        "current_error": false
+      }
+    ],
+    "last_notification_test": {
+      "status": "notification_test_accepted",
+      "at": 1791811262477
+    },
+    "workers": {
+      "import_heartbeat": 1790967614023,
+      "market_heartbeat": 1791853895726,
+      "notify_heartbeat": 1791853849303
+    },
+    "worker_status": {
+      "market_heartbeat": "running",
+      "notify_heartbeat": "running",
+      "import_heartbeat": "stale"
+    },
+    "history_services": [
+      {
+        "id": "history_versions",
+        "label": "自建历史发布",
+        "role": "current",
+        "status": "running",
+        "heartbeat_at": 1791853882361,
+        "last_success_at": 1791853882361,
+        "state": "idle",
+        "errors": [],
+        "impact": "历史导入、派生与发布可能延迟",
+        "stale_after_seconds": 300,
+        "task_counts": {
+          "published": 15
+        },
+        "recent_tasks": [
+          {
+            "id": "a24db3d3-d1fe-4fc9-a461-b55d07eb4a0c",
+            "state": "published",
+            "cursor": 1791850440000,
+            "start": 1609452000000,
+            "end": 1791850440000,
+            "updated_at": 1791850639140
+          },
+          {
+            "id": "8932e4e3-34bc-4b1a-aeba-f8cf0f33300d",
+            "state": "published",
+            "cursor": 1791850440000,
+            "start": 1609452000000,
+            "end": 1791850440000,
+            "updated_at": 1791850581949
+          },
+          {
+            "id": "a59aed78-99b5-49e8-a2a9-a7792ddde850",
+            "state": "published",
+            "cursor": 1791850440000,
+            "start": 1609452000000,
+            "end": 1791850440000,
+            "updated_at": 1791850532626
+          },
+          {
+            "id": "0b68ae6c-5225-4797-be53-54c68634d9ed",
+            "state": "published",
+            "cursor": 1791764100000,
+            "start": 1609452000000,
+            "end": 1791764100000,
+            "updated_at": 1791765684584
+          },
+          {
+            "id": "7fc29e0c-33d5-440c-be2a-7c876a65983e",
+            "state": "published",
+            "cursor": 1791764100000,
+            "start": 1609452000000,
+            "end": 1791764100000,
+            "updated_at": 1791765199632
+          }
+        ],
+        "task_scope": null
+      },
+      {
+        "id": "chart_history",
+        "label": "图表历史补齐",
+        "role": "current",
+        "status": "running",
+        "heartbeat_at": 1791853885930,
+        "last_success_at": 1791853885930,
+        "state": "idle",
+        "errors": [],
+        "impact": "来源目录刷新、旧绑定图表历史与导入任务可能延迟",
+        "stale_after_seconds": 300,
+        "task_counts": {
+          "complete": 568
+        },
+        "recent_tasks": [
+          {
+            "id": "94523159-c49e-4f1a-a6a9-26e2fecc8b99",
+            "state": "complete",
+            "cursor": 1791491160000,
+            "start": 1791484680000,
+            "end": 1791491160000
+          },
+          {
+            "id": "39b9c475-f289-453b-9021-a237c59cc9f4",
+            "state": "complete",
+            "cursor": 1791477480000,
+            "start": 1791470280000,
+            "end": 1791477480000
+          },
+          {
+            "id": "d9e7e06d-1bdb-4c1f-9464-3d36e013cba2",
+            "state": "complete",
+            "cursor": 1791470280000,
+            "start": 1791463080000,
+            "end": 1791470280000
+          },
+          {
+            "id": "7cb5678c-36e1-4cda-9d70-2a3aa70a2dae",
+            "state": "complete",
+            "cursor": 1791484680000,
+            "start": 1791477480000,
+            "end": 1791484680000
+          },
+          {
+            "id": "51d36361-5058-4843-bfe3-dc412ed7ceb5",
+            "state": "complete",
+            "cursor": 1791155100000,
+            "start": 1791155040000,
+            "end": 1791155100000
+          }
+        ],
+        "task_scope": "共享旧版历史队列（排除实时修复）"
+      },
+      {
+        "id": "native_history",
+        "label": "平台图表加载",
+        "role": "current",
+        "status": "running",
+        "heartbeat_at": 1791853884358,
+        "last_success_at": 1791853884358,
+        "state": "idle",
+        "errors": [],
+        "impact": "平台原生历史分页可能等待或过期",
+        "stale_after_seconds": 300,
+        "task_counts": {
+          "cancelled": 8,
+          "expired": 1
+        },
+        "recent_tasks": [
+          {
+            "id": "1dbb738f-37c6-49e4-aad4-27e40a4271db",
+            "state": "cancelled",
+            "pages": 1,
+            "stalls": 0
+          },
+          {
+            "id": "7582ebbf-26e6-40a9-b885-d04f0aaa1980",
+            "state": "cancelled",
+            "pages": 1,
+            "stalls": 0
+          },
+          {
+            "id": "21af825b-a5ed-4eac-8ffd-61aa05b7fc07",
+            "state": "cancelled",
+            "pages": 1,
+            "stalls": 0
+          },
+          {
+            "id": "6332be39-5ecf-4773-ad3c-bcebeb5ddf10",
+            "state": "cancelled",
+            "pages": 1,
+            "stalls": 0
+          },
+          {
+            "id": "52750c23-68c7-40ae-a01a-d623a3e05801",
+            "state": "expired",
+            "pages": 1,
+            "stalls": 0
+          }
+        ],
+        "task_scope": null
+      }
+    ],
+    "legacy_import": {
+      "id": "legacy_import",
+      "label": "兼容补数链路",
+      "role": "compatibility",
+      "status": "disabled",
+      "heartbeat_at": null,
+      "last_success_at": null,
+      "state": null,
+      "errors": [],
+      "impact": "旧版自动补数可能延迟；不代表现行历史服务故障",
+      "stale_after_seconds": 300,
+      "task_counts": {},
+      "recent_tasks": [],
+      "task_scope": null
+    },
+    "blocked_notifications": 0,
+    "delivery_enabled": true,
+    "ntfy_configured": true,
+    "mobile_condition": "开启即时投递；不要从最近任务划掉 ntfy。手机送达状态未知。"
+  },
+  "chart_count": 5,
+  "native_result_enabled": true,
+  "logout_verified": true
+}

@@ -1,6 +1,10 @@
 # Unraid 生产部署与升级
 
-## 当前正式生产：v1.20.0（2026-10-11）
+## 当前正式生产：v1.25.0（2026-10-13）
+
+PR #55 已合并，附注 tag `v1.25.0` 指向 `027aa7095a34972d8a644a89a16ad79d4b6297df`。Unraid `192.168.7.33`、project `market-watch`、根目录 `/mnt/user/appdata/market-watch`，active-release `releases/v1.25.0-027aa70`。12 个常驻服务运行、API healthy、零重启；Yahoo 配置与真实读取通过。Ubuntu PG14 已完整恢复最终备份并验证 as46 迁移，生产 schema 为 `as46_provider_price_confirmation`。旧 v1.23.0 镜像与回滚配置保留。启动与回滚、备份及浏览器限制见 [生产交付](../docs/pending-v1.25.0-production-delivery.md) 和 [固定镜像清单](releases/v1.25.0-production.json)。以下保留历史记录，以此处最新交付为准。
+
+## 历史正式生产：v1.20.0（2026-10-11）
 
 PR #38 已合并，附注标签 v1.20.0 指向 `73356b7`。当前生产为 unraid `192.168.7.33` 的独立 project `market-watch`，根目录 `/mnt/user/appdata/market-watch`，active-release `releases/v1.20.0-73356b7`。四类镜像在 Ubuntu 按 purpose=release 独立构建，生产固定实际 Image ID，Yahoo 默认启用；schema 保持 `ar45_market_stream`，12 个常驻服务运行、API healthy、备份实际恢复通过。
 
