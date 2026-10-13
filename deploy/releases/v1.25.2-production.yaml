@@ -1,0 +1,150 @@
+# Standalone production release template. Pin immutable image references in the release env.
+# Yahoo stays enabled across image upgrades; no extra overlay is required.
+name: market-watch
+x-app: &app
+  image: sha256:74ae7a15b42f7acf7e637ebf4435b4ea7d3b788c5624e14116de99154cf832a6
+  env_file: .env
+  environment:
+    ALERTS_YAHOO_ENABLED: "true"
+    ALERTS_DATABASE_POOL_SIZE: "2"
+    ALERTS_DATABASE_MAX_OVERFLOW: "0"
+  restart: unless-stopped
+services:
+  migrate:
+    image: sha256:74ae7a15b42f7acf7e637ebf4435b4ea7d3b788c5624e14116de99154cf832a6
+    <<: *app
+    command: ["alembic", "upgrade", "head"]
+    restart: "no"
+  api:
+    <<: *app
+    environment:
+      ALERTS_YAHOO_ENABLED: "true"
+      ALERTS_COOKIE_SECURE: "true"
+      ALERTS_OANDA_STREAM_ENABLED: "true"
+      ALERTS_DATABASE_POOL_SIZE: "2"
+      ALERTS_DATABASE_MAX_OVERFLOW: "0"
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-api
+      ALERTS_HISTORY_HEALTH_WORKERS: '["history_versions","chart_history","native_history"]'
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/readyz', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+  realtime-worker:
+    <<: *app
+    command: ["python", "-m", "alerts.realtime_worker"]
+    environment:
+      ALERTS_YAHOO_ENABLED: "true"
+      ALERTS_DELIVERY_ENABLED: "false"
+      ALERTS_DATABASE_POOL_SIZE: "2"
+      ALERTS_DATABASE_MAX_OVERFLOW: "0"
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-realtime
+    depends_on:
+      api: {condition: service_healthy}
+  chart-history-worker:
+    <<: *app
+    command: ["python", "-m", "alerts.chart_history_worker"]
+    environment:
+      ALERTS_YAHOO_ENABLED: "true"
+      ALERTS_DELIVERY_ENABLED: "false"
+      ALERTS_DATABASE_POOL_SIZE: "2"
+      ALERTS_DATABASE_MAX_OVERFLOW: "0"
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-history
+    depends_on:
+      api: {condition: service_healthy}
+  chart-aggregation-worker:
+    <<: *app
+    command: ["python", "-m", "alerts.chart_aggregation_worker"]
+    environment:
+      ALERTS_YAHOO_ENABLED: "true"
+      ALERTS_DELIVERY_ENABLED: "false"
+      ALERTS_DATABASE_POOL_SIZE: "2"
+      ALERTS_DATABASE_MAX_OVERFLOW: "0"
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-aggregation
+    depends_on:
+      api: {condition: service_healthy}
+  native-history-worker:
+    <<: *app
+    command: ["python", "-m", "alerts.native_history_loads"]
+    environment:
+      ALERTS_OANDA_STREAM_ENABLED: "true"
+      ALERTS_YAHOO_ENABLED: "true"
+      ALERTS_DELIVERY_ENABLED: "false"
+      ALERTS_DATABASE_POOL_SIZE: "2"
+      ALERTS_DATABASE_MAX_OVERFLOW: "0"
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-native-history
+    depends_on:
+      api: {condition: service_healthy}
+  history-worker:
+    <<: *app
+    command: ["python", "-m", "alerts.history_versions", "--without-composite-aggregates"]
+    environment:
+      ALERTS_YAHOO_ENABLED: "true"
+      ALERTS_DELIVERY_ENABLED: "false"
+      ALERTS_DATABASE_POOL_SIZE: "2"
+      ALERTS_DATABASE_MAX_OVERFLOW: "0"
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-history-versions
+    depends_on:
+      api: {condition: service_healthy}
+  composite-aggregate-worker:
+    <<: *app
+    command: ["python", "-m", "alerts.composite_aggregate_worker"]
+    environment:
+      ALERTS_YAHOO_ENABLED: "true"
+      ALERTS_DELIVERY_ENABLED: "false"
+      ALERTS_DATABASE_POOL_SIZE: "2"
+      ALERTS_DATABASE_MAX_OVERFLOW: "0"
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-composite
+    depends_on:
+      api: {condition: service_healthy}
+  pricing-worker:
+    <<: *app
+    command: ["python", "-m", "alerts.oanda_worker"]
+    environment:
+      ALERTS_YAHOO_ENABLED: "true"
+      ALERTS_DELIVERY_ENABLED: "false"
+      ALERTS_OANDA_STREAM_ENABLED: "true"
+      ALERTS_OANDA_RESIDENT_SYMBOLS: "EUR_USD,XAU_USD"
+      ALERTS_DATABASE_POOL_SIZE: "2"
+      ALERTS_DATABASE_MAX_OVERFLOW: "0"
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-pricing
+    depends_on:
+      api: {condition: service_healthy}
+  market-stream-worker:
+    <<: *app
+    command: ["python", "-m", "alerts.market_stream_worker"]
+    environment:
+      ALERTS_YAHOO_ENABLED: "true"
+      ALERTS_DELIVERY_ENABLED: "false"
+      ALERTS_DATABASE_POOL_SIZE: "2"
+      ALERTS_DATABASE_MAX_OVERFLOW: "0"
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-stream
+    depends_on:
+      api: {condition: service_healthy}
+  notify-worker:
+    <<: *app
+    command: ["python", "-m", "alerts.notify"]
+    depends_on:
+      api: {condition: service_healthy}
+  web:
+    image: sha256:18e551805b53e7aa2929432ee056e6edeae1869067da6df4448509abd134adcd
+    ports: ["192.168.7.33:18080:80"]
+    depends_on:
+      api: {condition: service_healthy}
+    restart: unless-stopped
+  chart-origin:
+    image: sha256:6099798549f3f130a0f795b77469fbf737fbc79dbc2e01bfcd7035b271f882f2
+    ports: ["192.168.7.33:18083:80"]
+    restart: unless-stopped
+  backup:
+    image: sha256:53c5ffbb4edf0322411618d798b33c57df09b8122ee077ef3a619dca9291c2cd
+    env_file: .env
+    environment:
+      ALERTS_POSTGRES_BIN_DIR: /usr/local/bin
+      ALERTS_DELIVERY_ENABLED: "false"
+    volumes: ["/mnt/user/backup/market-watch:/backups"]
+    profiles: [maintenance]
+    restart: "no"

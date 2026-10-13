@@ -2,7 +2,7 @@
 
 v1.25.1 标签因发布命令未成功合并而指向旧 main 845dcff，保留但不构建、不部署；本次修复改用 v1.25.2。
 
-兼容补丁同步 Python/web 与锁文件根版本，最终 main 合并提交创建不可移动附注标签 v1.25.2。受测应用提交 6b02eea；最新 main 整合仅带入生产交付文档，无依赖或迁移变化。190 项相关回归、真实 PostgreSQL 和生产输入回放见 [验收证据](verification/sparse-alerts-20261013/README.md)。正式生产使用 clean tag 独立 release 镜像，备份实际恢复、固定镜像及切换证据另行记录；保留 v1.25.0 回滚材料和全部历史标签。
+兼容补丁同步 Python/web 与锁文件根版本，最终 main 合并提交创建不可移动附注标签 v1.25.2。受测应用提交 6b02eea；最新 main 整合仅带入生产交付文档，无依赖或迁移变化。190 项相关回归、真实 PostgreSQL 和生产输入回放见 [验收证据](verification/sparse-alerts-20261013/README.md)。正式生产使用 clean tag 独立 release 镜像，备份实际恢复、固定镜像及切换证据另行记录；保留 v1.25.0 回滚材料和全部历史标签。PR #57 已合并、v1.25.2 已推送并上线；实际记录见 [生产交付](sparse-alerts-v1.25.2-production-delivery.md)。
 
 # 版本维护
 

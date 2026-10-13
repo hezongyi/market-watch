@@ -1,0 +1,61 @@
+{
+  "project": "mw-sparse-alerts-20261013",
+  "task": "mw-sparse-alerts-20261013",
+  "apply": true,
+  "containers": [
+    "mw-sparse-alerts-20261013-native-history-worker-1",
+    "mw-sparse-alerts-20261013-api-1",
+    "mw-sparse-alerts-20261013-web-1",
+    "mw-sparse-alerts-20261013-pg-1"
+  ],
+  "volumes": [
+    "mw-sparse-alerts-20261013_pg-data"
+  ],
+  "networks": [
+    "ad8e2334c7ef"
+  ],
+  "retained_images": []
+}
+{"task": "mw-sparse-alerts-20261013", "completed_at": "2026-10-13T03:11:40.088644+00:00"}
+{
+  "apply": true,
+  "automatic": false,
+  "images": [
+    {
+      "id": "sha256:14ded9494b747277565f522bb1c1f78c5c52e1148cc5b2a516c8a7d12f79739f",
+      "task": "mw-sparse-alerts-20261013",
+      "refs": [
+        "sha256:14ded9494b747277565f522bb1c1f78c5c52e1148cc5b2a516c8a7d12f79739f"
+      ]
+    },
+    {
+      "id": "sha256:71c278d96773213f9dde649e8730d93126bcada38c91bf30b6a10b1706e0e492",
+      "task": "mw-sparse-alerts-20261013",
+      "refs": [
+        "sha256:71c278d96773213f9dde649e8730d93126bcada38c91bf30b6a10b1706e0e492"
+      ]
+    },
+    {
+      "id": "sha256:74ddc3691fd8224dcaf7cb887a0c55f53e8e445bbb9c5e8327410d0f99331714",
+      "task": "mw-sparse-alerts-20261013",
+      "refs": [
+        "market-watch-api:sparse-alerts-20261013"
+      ]
+    },
+    {
+      "id": "sha256:998fcf5a8b43443dc0d837708108ed469bf2041651a3efee4b9e795dc4496e2d",
+      "task": "mw-sparse-alerts-20261013",
+      "refs": [
+        "sha256:998fcf5a8b43443dc0d837708108ed469bf2041651a3efee4b9e795dc4496e2d"
+      ]
+    },
+    {
+      "id": "sha256:fbf9f6f8170c0c88b9bcc1a3a2b5caff7b998485f71eb81f21ae2054609e9bfe",
+      "task": "mw-sparse-alerts-20261013",
+      "refs": [
+        "market-watch-web:sparse-alerts-20261013"
+      ]
+    }
+  ]
+}
+{"archive": "/home/quant/.local/share/market-watch-docker/archives/mw-sparse-alerts-20261013-20261013T031013-b60e2fdb", "restore_verified": true}

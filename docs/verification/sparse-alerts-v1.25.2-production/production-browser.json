@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "scope": "Unraid formal production; Ubuntu browser; existing workspace, read-only UI and market subscriptions; preference migration and native preference saves suppressed",
+  "cases": [
+    "HTTPS administrator login and Secure/HttpOnly session",
+    "Actual production alert detail displays normal current quote",
+    "Existing production chart ready, one alert business root, actual bars/quotes through authenticated SSE",
+    "Live production verified session label is correct",
+    "Dashboard, signals, replay and settings pages loaded; six data-center tabs and live status read",
+    "390px home has no horizontal overflow"
+  ],
+  "errors": [],
+  "http_errors": [],
+  "credential_leaks": [],
+  "unexpected_writes": [],
+  "logout_verified": true,
+  "chart_count": 5,
+  "calendar_rows": 295,
+  "alert_panel_text": "价格 下穿 1.11546\n\ncomposite · D1 · 收盘确认\n\n监控中 · 已触发 0 / 1 次\n\n数据就绪\n\n当前报价：正常\n\n版本 1 · 生效 2026/10/12 14:34:39\n\n定位图表",
+  "verified_scheduled_open_displayed": true
+}
