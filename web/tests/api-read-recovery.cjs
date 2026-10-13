@@ -1,0 +1,44 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict'),ts=require('typescript');
+const code=ts.transpileModule(fs.readFileSync('src/api.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+let calls=0,mode='network';const scheduled=[];
+ const context={exports:{},Response,ReadableStream,DOMException,AbortController,performance,Date,Map,Set,Promise,TypeError,
+ setTimeout:(fn,ms)=>{scheduled.push(ms);return setTimeout(fn,ms>=30000?(mode==='timeout'?1:1000000):0);},clearTimeout,Math,fetch:async(url,init)=>{
+  calls++;
+  if(mode==='timeout')return new Promise((resolve,reject)=>init.signal.addEventListener('abort',()=>reject(init.signal.reason),{once:true}));
+  if(mode==='network' && calls<3)throw new TypeError('Load failed');
+  if(mode==='body' && calls<3)return new Response(new ReadableStream({start(controller){controller.error(new TypeError('Load failed'));}}));
+  if(mode==='invalid')return new Response('not json');
+  if(mode==='auth')return new Response('{"detail":"denied"}',{status:401,headers:{'content-type':'application/json'}});
+  if(mode==='post')throw new TypeError('Load failed');
+  if(mode==='busy')return new Response('{"detail":"busy"}',{status:503,headers:{'Retry-After':'30'}});
+  return new Response('{"bars":[1]}',{headers:{'content-type':'application/json'}});
+ }};
+vm.runInNewContext(code,context);const {api,apiErrorDetails,apiRequestDiagnostics}=context.exports;
+(async()=>{
+ const replies=await Promise.all([api('/charts/data',{instrument:'private'}),api('/charts/data',{instrument:'private'})]);
+ assert.equal(calls,3,'shared read has one bounded retry sequence');assert.deepEqual(JSON.parse(JSON.stringify(replies)),[{bars:[1]},{bars:[1]}]);
+ mode='invalid';calls=0;await assert.rejects(api('/charts/data',{}),e=>e.code==='INVALID_RESPONSE');assert.equal(calls,1);assert.equal(apiRequestDiagnostics().at(-1).outcome,'payload');
+ mode='body';calls=0;await api('/charts/data',{});assert.equal(calls,3,'body transport failures share the bounded retry path');
+ mode='auth';calls=0;await assert.rejects(api('/session'),e=>e.status===401);assert.equal(calls,1,'authentication is not retried');
+ mode='post';calls=0;await assert.rejects(api('/advanced-charts/preferences/save',{content:'private'}),TypeError);assert.equal(calls,1,'writes are not retried');
+ mode='busy';calls=0;await assert.rejects(api('/charts/data',{}),e=>e.status===503);assert.equal(calls,1,'supplier cooldown is preserved');
+ const cancelled=new AbortController();cancelled.abort();calls=0;await assert.rejects(api('/charts/data',{},cancelled.signal),e=>e.name==='AbortError');assert.equal(calls,0);
+ assert.equal(apiErrorDetails(new DOMException('budget','TimeoutError')).code,'HISTORY_TIMEOUT');
+ assert.equal(apiErrorDetails(new TypeError('Load failed')).code,'NETWORK_FAILED');
+ mode='timeout';calls=0;await assert.rejects(api('/charts/data',{}),e=>e.name==='TimeoutError');assert.equal(calls,1);assert.equal(apiRequestDiagnostics().at(-1).outcome,'timeout');
+ mode='ok';await api('/charts/data',{native_history:{chart_count:1}});assert.equal(scheduled.at(-1),610000);
+ mode='ok';await api('/market-data/composites/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa?account=secret');
+ mode='ok';await api('/market-data/quotes/OANDA%3AEUR_USD?account=secret');
+ assert.equal(apiRequestDiagnostics().at(-1).path,'/market-data/quotes/:id','encoded series identities are redacted');
+ assert.equal(apiRequestDiagnostics().at(-2).path,'/market-data/composites/:id');
+ await api('/market-data/quotes/MWP%3ABTCUSDT');
+ assert.equal(apiRequestDiagnostics().at(-1).path,'/market-data/quotes/:id');
+ await api('/market-data/composites/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+ assert.equal(apiRequestDiagnostics().at(-1).path,'/market-data/composites/:id');
+ await api('/market-data/quotes/OANDA%3A%ZZ');
+ assert.equal(apiRequestDiagnostics().at(-1).path,'/market-data/quotes/:id','invalid encoding is conservatively redacted');
+ const diagnostics=apiRequestDiagnostics();
+ assert.equal(JSON.stringify(diagnostics).includes('secret'),false);assert.equal(JSON.stringify(diagnostics).includes('private'),false);
+ assert.deepEqual(Array.from(diagnostics.slice(0,3),r=>r.outcome),['network','network','ok']);
+ console.log('PASS read recovery: shared bounded retry, HTTP/auth/cooldown, writes, cancellation, timeout classification and redacted diagnostics');
+})().catch(e=>{console.error(e);process.exitCode=1});

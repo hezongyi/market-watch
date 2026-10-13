@@ -109,6 +109,7 @@ class DataQuery(BaseModel):
     published: bool = False
     dataset_start: int | None = Field(default=None, ge=0)
     calculation_origin: int | None = Field(default=None, ge=0)
+    dependency_before: int | None = Field(default=None, gt=0)
     provisional: bool = True
     composite_revision_id: str | None = Field(default=None, max_length=36)
     input_revision: int | None = Field(default=None, ge=0)
@@ -806,6 +807,8 @@ def data_sync(body: DataQuery):
         if body.published:
             return published_data(body)
         with transaction() as db:
+            if (body.indicators or body.dependency_before) and db.get_bind().dialect.name == "postgresql":
+                db.connection(execution_options={"isolation_level": "REPEATABLE READ"})
             inst = db.get(Instrument, body.instrument)
             if not inst:
                 raise HTTPException(404, "品种不存在")
@@ -877,6 +880,9 @@ def data_sync(body: DataQuery):
                 )
             visible = [x for x in all_rows if x["start"] < before][-body.limit :]
             history_snapshot = history_check(db, inst, source, visible, body)
+            dependency = history_check(db, inst, source, visible, body.model_copy(update={
+                "indicators": [], "track_history": True, "revision_before": body.dependency_before,
+                "revision_after": all_rows[0]["start"] if all_rows else 0})) if body.dependency_before else None
             # No lazy ORM reads during CPU work after returning the connection.
             db.expunge(inst)
         if not cache_hit:
@@ -941,6 +947,8 @@ def data_sync(body: DataQuery):
             )
         return {
             "history_check": history_snapshot,
+            "dependency_before": body.dependency_before,
+            "dependency_revision": dependency["revision"] if dependency else None,
             "history_revision": revision,
             "bars": visible,
             "indicators": indicators,

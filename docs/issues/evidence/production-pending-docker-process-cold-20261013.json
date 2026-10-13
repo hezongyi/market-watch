@@ -1,0 +1,54 @@
+{
+  "environment": "Ubuntu task-owned Docker mw-pending-fixes-20261013, loopback HTTP, actual PostgreSQL/Python, same synthetic M5 source and period5",
+  "limitations": [
+    "fresh browser context per sample; backend cache remains warm/resident",
+    "first valid data/next animation frames are not paint timestamps; optional firstIndicatorPixelMs polls actual canvas pixels in large plot canvases after temporary magenta line overrides; scans add CPU/heap overhead, so pixel-run timings and heap are not directly comparable to uninstrumented runs",
+    "CDP task/script/layout metrics include the renderer and parent UI",
+    "heap samples cover the browser frame, not backend memory",
+    "optional acceptance wrapper SQL spans include driver/roundtrip; calculation CPU is thread CPU, backend span excludes final body transfer; sums can overlap concurrent reads",
+    "optional pagination timings wait for actual main-history extension and all indicator first times to align; only up to five pages in the 1500-bar synthetic fixture, percentile sample sizes are reported",
+    "repetitions reported per sample; no claimed performance ratio or full stage-D completion",
+    "process restart only, not fully cold end-to-end database/source test; only new-python count8 sampled"
+  ],
+  "measurements": [
+    {
+      "lane": "new-python",
+      "count": 8,
+      "paginationSamples": [
+        {
+          "ms": 478.59999990463257,
+          "barsBefore": 962,
+          "barsAfter": 1511
+        }
+      ],
+      "paginationP50Ms": 478.59999990463257,
+      "paginationP95Ms": 478.59999990463257,
+      "firstIndicatorPixelMs": 526.7000002861023,
+      "firstValidDataMs": 526.7000002861023,
+      "allValidDataMs": 526.7000002861023,
+      "nextAnimationFramesMs": 574.9000000953674,
+      "cachedNavigationP50Ms": 33.30000019073486,
+      "cachedNavigationP95Ms": 45.30000019073486,
+      "emptyDataFrames": 0,
+      "chartResets": 0,
+      "peakJsHeapBytes": 150551805,
+      "TaskDurationSeconds": 1.325969,
+      "ScriptDurationSeconds": 0.572244,
+      "LayoutDurationSeconds": 0.028121,
+      "RecalcStyleDurationSeconds": 0.03231,
+      "httpReads": 6,
+      "indicatorHttpReads": 3,
+      "httpResponseBytes": 1531125,
+      "httpKinds": {
+        "history-loads": 1,
+        "data": 3,
+        "reserve": 2
+      },
+      "httpDurationMedianMs": 148.692,
+      "httpBodyMedianMs": 4.462000000000003,
+      "repetition": 0,
+      "expectedHistoryCancellations": 0
+    }
+  ],
+  "conditions": "task API and PostgreSQL restarted before this run; persisted synthetic DB and host OS page cache retained; browser setup reads main-chart data before indicator timer starts"
+}

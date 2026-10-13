@@ -1,0 +1,186 @@
+{
+  "environment": "Ubuntu task-owned Docker mw-pending-fixes-20261013, loopback HTTP, actual PostgreSQL/Python, same synthetic M5 source; indicatorSet reported per sample",
+  "limitations": [
+    "fresh browser context per sample; backend cache remains warm/resident",
+    "first valid data/next animation frames are not paint timestamps; optional firstIndicatorPixelMs polls actual canvas pixels in large plot canvases after temporary magenta line overrides; scans add CPU/heap overhead, so pixel-run timings and heap are not directly comparable to uninstrumented runs",
+    "CDP task/script/layout metrics include the renderer and parent UI",
+    "heap samples cover the browser frame, not backend memory",
+    "optional acceptance wrapper SQL spans include driver/roundtrip; calculation CPU is thread CPU, backend span excludes final body transfer; sums can overlap concurrent reads",
+    "optional pagination timings wait for actual main-history extension and all indicator first times to align; page/sample sizes reported; source size and maximum page count are configurable, only completed extensions contribute",
+    "repetitions reported per sample; no claimed performance ratio or full stage-D completion",
+    "Final mixed algorithms each one sample/5 pages, resident processes; same pinned source hash as final 9-sample run."
+  ],
+  "measurements": [
+    {
+      "lane": "new-python",
+      "count": 4,
+      "indicatorSet": [
+        "LWMA",
+        "EMA",
+        "SMA",
+        "BBANDS"
+      ],
+      "paginationSamples": [
+        {
+          "ms": 1451,
+          "barsBefore": 1404,
+          "barsAfter": 2574
+        },
+        {
+          "ms": 1203,
+          "barsBefore": 2574,
+          "barsAfter": 3978
+        },
+        {
+          "ms": 1157,
+          "barsBefore": 3978,
+          "barsAfter": 5382
+        },
+        {
+          "ms": 1188,
+          "barsBefore": 5382,
+          "barsAfter": 6786
+        },
+        {
+          "ms": 957,
+          "barsBefore": 6786,
+          "barsAfter": 7588
+        }
+      ],
+      "paginationP50Ms": 1188,
+      "paginationP95Ms": 1451,
+      "firstIndicatorPixelMs": 4404,
+      "firstValidDataMs": 4205,
+      "allValidDataMs": 4205,
+      "nextAnimationFramesMs": 4453,
+      "cachedNavigationP50Ms": 46,
+      "cachedNavigationP95Ms": 102,
+      "emptyDataFrames": 0,
+      "cachedEmptyDataFrames": 0,
+      "paginationEmptyDataFrames": 0,
+      "chartResets": 0,
+      "peakJsHeapBytes": null,
+      "peakCdpJsHeapBytes": 138656956,
+      "cdpHeapSamples": 114,
+      "TaskDurationSeconds": 7.545559,
+      "ScriptDurationSeconds": 3.871038,
+      "LayoutDurationSeconds": 0.081773,
+      "RecalcStyleDurationSeconds": 0.193206,
+      "httpReads": 18,
+      "indicatorHttpReads": 6,
+      "httpResponseBytes": 8252067,
+      "httpRequestsStarted": 18,
+      "indicatorHttpRequestsStarted": 7,
+      "httpRequestsFailed": 1,
+      "indicatorHttpRequestsFailed": 1,
+      "httpRequestsUnsettled": 0,
+      "indicatorHttpRequestsUnsettled": 0,
+      "httpKinds": {
+        "reserve": 7,
+        "data": 6,
+        "history-loads": 5
+      },
+      "httpDurationMedianMs": 184.115,
+      "httpBodyMedianMs": 7.326000000000022,
+      "repetition": 0,
+      "cacheCondition": "resident API/PG, fresh browser",
+      "profiledHttpReads": 18,
+      "backendMs": 8703.297,
+      "sqlDriverMs": 1145.5,
+      "calculationMs": 1681.998,
+      "calculationCpuMs": 732.4680000000001,
+      "sqlQueries": 302,
+      "pythonCalculations": 24,
+      "apiPeakRssKiB": 326244,
+      "expectedHistoryCancellations": 0
+    },
+    {
+      "lane": "new-python",
+      "count": 8,
+      "indicatorSet": [
+        "LWMA",
+        "EMA",
+        "SMA",
+        "BBANDS",
+        "RSI",
+        "MACD",
+        "ATR",
+        "STOCH"
+      ],
+      "paginationSamples": [
+        {
+          "ms": 1487,
+          "barsBefore": 1404,
+          "barsAfter": 2574
+        },
+        {
+          "ms": 1901,
+          "barsBefore": 2574,
+          "barsAfter": 3978
+        },
+        {
+          "ms": 2076,
+          "barsBefore": 3978,
+          "barsAfter": 5382
+        },
+        {
+          "ms": 2181,
+          "barsBefore": 5382,
+          "barsAfter": 6786
+        },
+        {
+          "ms": 1744,
+          "barsBefore": 6786,
+          "barsAfter": 8190
+        }
+      ],
+      "paginationP50Ms": 1901,
+      "paginationP95Ms": 2181,
+      "firstIndicatorPixelMs": 3273,
+      "firstValidDataMs": 2986,
+      "allValidDataMs": 2986,
+      "nextAnimationFramesMs": 3342,
+      "cachedNavigationP50Ms": 34,
+      "cachedNavigationP95Ms": 86,
+      "emptyDataFrames": 0,
+      "cachedEmptyDataFrames": 0,
+      "paginationEmptyDataFrames": 0,
+      "chartResets": 0,
+      "peakJsHeapBytes": null,
+      "peakCdpJsHeapBytes": 223925756,
+      "cdpHeapSamples": 135,
+      "TaskDurationSeconds": 9.024617000000001,
+      "ScriptDurationSeconds": 4.167116,
+      "LayoutDurationSeconds": 0.245307,
+      "RecalcStyleDurationSeconds": 0.27023800000000003,
+      "httpReads": 17,
+      "indicatorHttpReads": 6,
+      "httpResponseBytes": 12181977,
+      "httpRequestsStarted": 18,
+      "indicatorHttpRequestsStarted": 7,
+      "httpRequestsFailed": 1,
+      "indicatorHttpRequestsFailed": 1,
+      "httpRequestsUnsettled": 0,
+      "indicatorHttpRequestsUnsettled": 0,
+      "httpKinds": {
+        "reserve": 6,
+        "data": 6,
+        "history-loads": 5
+      },
+      "httpDurationMedianMs": 233.413,
+      "httpBodyMedianMs": 7.785000000000025,
+      "repetition": 0,
+      "cacheCondition": "resident API/PG, fresh browser",
+      "profiledHttpReads": 17,
+      "backendMs": 9454.402,
+      "sqlDriverMs": 1023.972,
+      "calculationMs": 2362.179,
+      "calculationCpuMs": 1506.103,
+      "sqlQueries": 291,
+      "pythonCalculations": 48,
+      "apiPeakRssKiB": 340136,
+      "expectedHistoryCancellations": 0
+    }
+  ],
+  "implementation": "final event+readiness+versioned in-flight reuse"
+}

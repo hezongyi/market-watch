@@ -1,0 +1,365 @@
+{
+  "environment": "Ubuntu task-owned Docker mw-pending-fixes-20261013, loopback HTTP, actual PostgreSQL/Python, same synthetic M5 source and period5",
+  "limitations": [
+    "fresh browser context per sample; backend cache remains warm/resident",
+    "first valid data/next animation frames are not paint timestamps; optional firstIndicatorPixelMs polls actual canvas pixels in large plot canvases after temporary magenta line overrides; scans add CPU/heap overhead, so pixel-run timings and heap are not directly comparable to uninstrumented runs",
+    "CDP task/script/layout metrics include the renderer and parent UI",
+    "heap samples cover the browser frame, not backend memory",
+    "optional acceptance wrapper SQL spans include driver/roundtrip; calculation CPU is thread CPU, backend span excludes final body transfer; sums can overlap concurrent reads",
+    "optional pagination timings wait for actual main-history extension and all indicator first times to align; only up to five pages in the 1500-bar synthetic fixture, percentile sample sizes are reported",
+    "repetitions reported per sample; no claimed performance ratio or full stage-D completion",
+    "some samples overlapped short independent native correctness/UI probes on the same host; retain measurements without speedup claim"
+  ],
+  "measurements": [
+    {
+      "lane": "native",
+      "count": 1,
+      "paginationSamples": [
+        {
+          "ms": 71,
+          "barsBefore": 958,
+          "barsAfter": 1341
+        },
+        {
+          "ms": 312,
+          "barsBefore": 1341,
+          "barsAfter": 1510
+        }
+      ],
+      "paginationP50Ms": 312,
+      "paginationP95Ms": 312,
+      "firstIndicatorPixelMs": 311.2999997138977,
+      "firstValidDataMs": 271.59999990463257,
+      "allValidDataMs": 271.59999990463257,
+      "nextAnimationFramesMs": 347.7999997138977,
+      "cachedNavigationP50Ms": 33.69999980926514,
+      "cachedNavigationP95Ms": 53,
+      "emptyDataFrames": 0,
+      "chartResets": 0,
+      "peakJsHeapBytes": 119153501,
+      "TaskDurationSeconds": 1.0477729999999998,
+      "ScriptDurationSeconds": 0.428649,
+      "LayoutDurationSeconds": 0.008744,
+      "RecalcStyleDurationSeconds": 0.031034,
+      "httpReads": 4,
+      "indicatorHttpReads": 0,
+      "httpResponseBytes": 273459,
+      "httpKinds": {
+        "history-loads": 2,
+        "reserve": 2
+      },
+      "httpDurationMedianMs": 147.075,
+      "httpBodyMedianMs": 12.22099999999999,
+      "repetition": 0,
+      "expectedHistoryCancellations": 1
+    },
+    {
+      "lane": "native",
+      "count": 4,
+      "paginationSamples": [
+        {
+          "ms": 78.7999997138977,
+          "barsBefore": 958,
+          "barsAfter": 1341
+        },
+        {
+          "ms": 263.1000003814697,
+          "barsBefore": 1341,
+          "barsAfter": 1510
+        }
+      ],
+      "paginationP50Ms": 263.1000003814697,
+      "paginationP95Ms": 263.1000003814697,
+      "firstIndicatorPixelMs": 248.80000019073486,
+      "firstValidDataMs": 248.90000009536743,
+      "allValidDataMs": 248.90000009536743,
+      "nextAnimationFramesMs": 270,
+      "cachedNavigationP50Ms": 33.59999990463257,
+      "cachedNavigationP95Ms": 51.200000286102295,
+      "emptyDataFrames": 0,
+      "chartResets": 0,
+      "peakJsHeapBytes": 111584293,
+      "TaskDurationSeconds": 0.9468920000000001,
+      "ScriptDurationSeconds": 0.381065,
+      "LayoutDurationSeconds": 0.013968,
+      "RecalcStyleDurationSeconds": 0.02732,
+      "httpReads": 4,
+      "indicatorHttpReads": 0,
+      "httpResponseBytes": 284432,
+      "httpKinds": {
+        "history-loads": 2,
+        "reserve": 2
+      },
+      "httpDurationMedianMs": 138.456,
+      "httpBodyMedianMs": 3.040999999999997,
+      "repetition": 0,
+      "expectedHistoryCancellations": 1
+    },
+    {
+      "lane": "native",
+      "count": 8,
+      "paginationSamples": [
+        {
+          "ms": 204.89999961853027,
+          "barsBefore": 1341,
+          "barsAfter": 1510
+        }
+      ],
+      "paginationP50Ms": 204.89999961853027,
+      "paginationP95Ms": 204.89999961853027,
+      "firstIndicatorPixelMs": 265.59999990463257,
+      "firstValidDataMs": 265.59999990463257,
+      "allValidDataMs": 265.59999990463257,
+      "nextAnimationFramesMs": 335.80000019073486,
+      "cachedNavigationP50Ms": 33.59999990463257,
+      "cachedNavigationP95Ms": 60,
+      "emptyDataFrames": 0,
+      "chartResets": 0,
+      "peakJsHeapBytes": 133677077,
+      "TaskDurationSeconds": 1.0579699999999999,
+      "ScriptDurationSeconds": 0.40837199999999996,
+      "LayoutDurationSeconds": 0.054645,
+      "RecalcStyleDurationSeconds": 0.039876,
+      "httpReads": 2,
+      "indicatorHttpReads": 0,
+      "httpResponseBytes": 133705,
+      "httpKinds": {
+        "history-loads": 2
+      },
+      "httpDurationMedianMs": 98.192,
+      "httpBodyMedianMs": 4.299999999999997,
+      "repetition": 0,
+      "expectedHistoryCancellations": 0
+    },
+    {
+      "lane": "old-python",
+      "count": 1,
+      "paginationSamples": [
+        {
+          "ms": 433.40000009536743,
+          "barsBefore": 967,
+          "barsAfter": 1510
+        }
+      ],
+      "paginationP50Ms": 433.40000009536743,
+      "paginationP95Ms": 433.40000009536743,
+      "firstIndicatorPixelMs": 615.7999997138977,
+      "firstValidDataMs": 615.7999997138977,
+      "allValidDataMs": 615.7999997138977,
+      "nextAnimationFramesMs": 645.8999996185303,
+      "cachedNavigationP50Ms": 33.30000019073486,
+      "cachedNavigationP95Ms": 35.69999980926514,
+      "emptyDataFrames": 19,
+      "chartResets": 0,
+      "peakJsHeapBytes": 167612741,
+      "TaskDurationSeconds": 1.192426,
+      "ScriptDurationSeconds": 0.601908,
+      "LayoutDurationSeconds": 0.008407,
+      "RecalcStyleDurationSeconds": 0.018462,
+      "httpReads": 6,
+      "indicatorHttpReads": 3,
+      "httpResponseBytes": 674345,
+      "httpKinds": {
+        "history-loads": 4,
+        "reserve": 2
+      },
+      "httpDurationMedianMs": 185.907,
+      "httpBodyMedianMs": 1.5560000000000116,
+      "repetition": 0,
+      "expectedHistoryCancellations": 0
+    },
+    {
+      "lane": "old-python",
+      "count": 4,
+      "paginationSamples": [
+        {
+          "ms": 930.4000000953674,
+          "barsBefore": 967,
+          "barsAfter": 1510
+        }
+      ],
+      "paginationP50Ms": 930.4000000953674,
+      "paginationP95Ms": 930.4000000953674,
+      "firstIndicatorPixelMs": 1092.4000000953674,
+      "firstValidDataMs": 984.7000002861023,
+      "allValidDataMs": 984.7000002861023,
+      "nextAnimationFramesMs": 1181.9000000953674,
+      "cachedNavigationP50Ms": 40.90000009536743,
+      "cachedNavigationP95Ms": 99.2000002861023,
+      "emptyDataFrames": 32,
+      "chartResets": 0,
+      "peakJsHeapBytes": 243949920,
+      "TaskDurationSeconds": 2.570202,
+      "ScriptDurationSeconds": 1.272816,
+      "LayoutDurationSeconds": 0.031431,
+      "RecalcStyleDurationSeconds": 0.045024,
+      "httpReads": 6,
+      "indicatorHttpReads": 3,
+      "httpResponseBytes": 674345,
+      "httpKinds": {
+        "history-loads": 4,
+        "reserve": 2
+      },
+      "httpDurationMedianMs": 277.033,
+      "httpBodyMedianMs": 3.241999999999962,
+      "repetition": 0,
+      "expectedHistoryCancellations": 0
+    },
+    {
+      "lane": "old-python",
+      "count": 8,
+      "paginationSamples": [
+        {
+          "ms": 334.2000002861023,
+          "barsBefore": 908,
+          "barsAfter": 1476
+        },
+        {
+          "ms": 341,
+          "barsBefore": 1476,
+          "barsAfter": 1510
+        }
+      ],
+      "paginationP50Ms": 341,
+      "paginationP95Ms": 341,
+      "firstIndicatorPixelMs": 602,
+      "firstValidDataMs": 514.8999996185303,
+      "allValidDataMs": 514.8999996185303,
+      "nextAnimationFramesMs": 776,
+      "cachedNavigationP50Ms": 32.799999713897705,
+      "cachedNavigationP95Ms": 82.19999980926514,
+      "emptyDataFrames": 13,
+      "chartResets": 0,
+      "peakJsHeapBytes": 151340111,
+      "TaskDurationSeconds": 1.911718,
+      "ScriptDurationSeconds": 0.687282,
+      "LayoutDurationSeconds": 0.070465,
+      "RecalcStyleDurationSeconds": 0.061233,
+      "httpReads": 8,
+      "indicatorHttpReads": 4,
+      "httpResponseBytes": 672859,
+      "httpKinds": {
+        "history-loads": 7,
+        "reserve": 1
+      },
+      "httpDurationMedianMs": 109.991,
+      "httpBodyMedianMs": 3.3339999999999748,
+      "repetition": 0,
+      "expectedHistoryCancellations": 0
+    },
+    {
+      "lane": "new-python",
+      "count": 1,
+      "paginationSamples": [
+        {
+          "ms": 417.59999990463257,
+          "barsBefore": 961,
+          "barsAfter": 1510
+        }
+      ],
+      "paginationP50Ms": 417.59999990463257,
+      "paginationP95Ms": 417.59999990463257,
+      "firstIndicatorPixelMs": 604.9000000953674,
+      "firstValidDataMs": 604.9000000953674,
+      "allValidDataMs": 604.9000000953674,
+      "nextAnimationFramesMs": 655.4000000953674,
+      "cachedNavigationP50Ms": 33.5,
+      "cachedNavigationP95Ms": 48,
+      "emptyDataFrames": 0,
+      "chartResets": 0,
+      "peakJsHeapBytes": 125093377,
+      "TaskDurationSeconds": 1.2337609999999999,
+      "ScriptDurationSeconds": 0.544286,
+      "LayoutDurationSeconds": 0.025213,
+      "RecalcStyleDurationSeconds": 0.024337,
+      "httpReads": 6,
+      "indicatorHttpReads": 3,
+      "httpResponseBytes": 1517985,
+      "httpKinds": {
+        "data": 3,
+        "history-loads": 2,
+        "reserve": 1
+      },
+      "httpDurationMedianMs": 219.928,
+      "httpBodyMedianMs": 14.90100000000001,
+      "repetition": 0,
+      "expectedHistoryCancellations": 0
+    },
+    {
+      "lane": "new-python",
+      "count": 4,
+      "paginationSamples": [
+        {
+          "ms": 285.59999990463257,
+          "barsBefore": 1341,
+          "barsAfter": 1510
+        }
+      ],
+      "paginationP50Ms": 285.59999990463257,
+      "paginationP95Ms": 285.59999990463257,
+      "firstIndicatorPixelMs": 822.2000002861023,
+      "firstValidDataMs": 822.3000001907349,
+      "allValidDataMs": 822.3000001907349,
+      "nextAnimationFramesMs": 865.4000000953674,
+      "cachedNavigationP50Ms": 33.5,
+      "cachedNavigationP95Ms": 58.59999990463257,
+      "emptyDataFrames": 0,
+      "chartResets": 0,
+      "peakJsHeapBytes": 310637225,
+      "TaskDurationSeconds": 1.539678,
+      "ScriptDurationSeconds": 0.766977,
+      "LayoutDurationSeconds": 0.011927,
+      "RecalcStyleDurationSeconds": 0.027808,
+      "httpReads": 5,
+      "indicatorHttpReads": 3,
+      "httpResponseBytes": 1418023,
+      "httpKinds": {
+        "reserve": 1,
+        "data": 3,
+        "history-loads": 1
+      },
+      "httpDurationMedianMs": 124.791,
+      "httpBodyMedianMs": 5.1640000000000015,
+      "repetition": 0,
+      "expectedHistoryCancellations": 0
+    },
+    {
+      "lane": "new-python",
+      "count": 8,
+      "paginationSamples": [
+        {
+          "ms": 1190.0999999046326,
+          "barsBefore": 967,
+          "barsAfter": 1510
+        }
+      ],
+      "paginationP50Ms": 1190.0999999046326,
+      "paginationP95Ms": 1190.0999999046326,
+      "firstIndicatorPixelMs": 1206.9000000953674,
+      "firstValidDataMs": 1071.1999998092651,
+      "allValidDataMs": 1071.1999998092651,
+      "nextAnimationFramesMs": 1312.5,
+      "cachedNavigationP50Ms": 44.299999713897705,
+      "cachedNavigationP95Ms": 115.2000002861023,
+      "emptyDataFrames": 0,
+      "chartResets": 0,
+      "peakJsHeapBytes": 228498529,
+      "TaskDurationSeconds": 2.8336360000000003,
+      "ScriptDurationSeconds": 1.225452,
+      "LayoutDurationSeconds": 0.076465,
+      "RecalcStyleDurationSeconds": 0.08234999999999999,
+      "httpReads": 6,
+      "indicatorHttpReads": 3,
+      "httpResponseBytes": 1528929,
+      "httpKinds": {
+        "history-loads": 1,
+        "data": 3,
+        "reserve": 2
+      },
+      "httpDurationMedianMs": 645.122,
+      "httpBodyMedianMs": 12.788999999999987,
+      "repetition": 0,
+      "expectedHistoryCancellations": 0
+    }
+  ]
+}

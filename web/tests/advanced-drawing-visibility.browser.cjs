@@ -40,7 +40,33 @@ const root=path.resolve(__dirname,'../../advanced-host'),origin='https://mw-peri
   const ui=page.frames().find(f=>f!==page.mainFrame());
   await page.evaluate(id=>widget.chart(0).showPropertiesDialog(id),id);
   await ui.getByText('可见范围',{exact:true}).click();
-  // Nine native checkable definitions, no continuous category range controls.
+  // Native ranges coexist with nine independent checkable definitions.
+  const minuteRange=ui.locator('[data-qa-id="property-dialog-item MWDrawingRangeminutes"]');
+  await expect(minuteRange.locator('input[name=from-input]')).toHaveValue('1');
+  const track=await minuteRange.locator('[class^=rangeSliderMiddleWrap]').boundingBox();
+  const thumb=await minuteRange.locator('[class^=pointer-]').first().boundingBox();
+  await page.mouse.move(thumb.x+thumb.width/2,thumb.y+thumb.height/2);await page.mouse.down();
+  await page.mouse.move(track.x+track.width*0.4,thumb.y+thumb.height/2,{steps:8});await page.mouse.up();
+  await expect(minuteRange.locator('input[name=from-input]')).not.toHaveValue('1');
+  await expect(ui.getByLabel('M1',{exact:true})).not.toBeChecked();
+  await minuteRange.locator('input[name=from-input]').fill('1');await minuteRange.locator('input[name=from-input]').press('Tab');
+  await expect(ui.getByLabel('M1',{exact:true})).toBeChecked();
+  await minuteRange.locator('input[name=from-input]').fill('5');
+  await minuteRange.locator('input[name=from-input]').press('Tab');
+  await expect(ui.getByLabel('M1',{exact:true})).not.toBeChecked();
+  await expect(ui.getByLabel('M15',{exact:true})).toBeChecked();
+  await ui.getByLabel('M15',{exact:true}).uncheck();
+  await expect(ui.getByText('自定义周期：M5、M30',{exact:true})).toBeVisible();
+  await expect(minuteRange.locator('input[name=from-input]')).toHaveValue('5');
+  await expect(minuteRange.locator('input[name=to-input]')).toHaveValue('30');
+  await ui.getByRole('button',{name:'确认',exact:true}).click();
+  const rangeEdited=await read();assert.ok(rangeEdited.every(s=>s[0].mask===506));
+  await page.evaluate(id=>widget.chart(0).showPropertiesDialog(id),id);
+  await ui.getByText('可见范围',{exact:true}).click();
+  await expect(ui.getByLabel('M15',{exact:true})).not.toBeChecked();
+  await expect(ui.getByText('自定义周期：M5、M30',{exact:true})).toBeVisible();
+  // Reopening must not fill the hole. Restore only via explicit precision edits.
+  await ui.getByLabel('M1',{exact:true}).check();await ui.getByLabel('M15',{exact:true}).check();
   for(const label of ['M1','M5','M15','M30','H1','H4','D1','W1','MN'])await expect(ui.getByLabel(label,{exact:true})).toBeChecked();
   for(const label of ['M5','M30','H1','H4','D1','W1','MN'])await ui.getByLabel(label,{exact:true}).uncheck();
   await ui.getByRole('button',{name:'确认',exact:true}).click();
@@ -70,6 +96,42 @@ const root=path.resolve(__dirname,'../../advanced-host'),origin='https://mw-peri
   await expect(ui.getByLabel('M5',{exact:true})).toBeChecked();await expect(ui.getByLabel('M1',{exact:true})).not.toBeChecked();await expect(ui.getByLabel('H1',{exact:true})).not.toBeChecked();
   await ui.getByRole('button',{name:'取消',exact:true}).click();
   assert.equal((await read())[0].find(s=>s.id===legacy).mask,-1,'cancel preserves legacy range');
+  // An unsupported minute range remains empty; no nearest-period substitution.
+  await page.evaluate(id=>widget.chart(0).showPropertiesDialog(id),legacy);await ui.getByText('可见范围',{exact:true}).click();
+  await minuteRange.locator('input[name=from-input]').fill('2');await minuteRange.locator('input[name=from-input]').press('Tab');
+  await minuteRange.locator('input[name=to-input]').fill('4');await minuteRange.locator('input[name=to-input]').press('Tab');
+  await expect(ui.getByText('该范围没有可用的已选周期',{exact:true})).toBeVisible();
+  for(const label of ['M1','M5','M15','M30'])await expect(ui.getByLabel(label,{exact:true})).not.toBeChecked();
+  await expect(minuteRange.locator('input[name=from-input]')).toHaveValue('2');
+  await expect(minuteRange.locator('input[name=to-input]')).toHaveValue('4');
+  await ui.getByRole('button',{name:'取消',exact:true}).click();
+  assert.equal((await read())[0].find(s=>s.id===legacy).mask,-1);
+  // Exercise the native multi-object collector and undo applier together, with
+  // mixed day/hour selections that a range edit must preserve independently.
+  const multi=await page.evaluate(()=>{
+    const win=widget._innerWindow();let req;
+    win.webpackChunktradingview.push([['mw-visibility-test'],{},r=>{req=r}]);
+    const chart=widget.chart(0),undo=chart._chartWidget.model(),model=undo.model();
+    const objects=chart.getAllShapes().slice(0,2).map(s=>model.dataSourceForId(s.id).properties().childs().intervalsVisibilities.childs());
+    objects[0].mwMask.setValue(5|64);objects[1].mwMask.setValue(2|16);
+    const collected=Object.fromEntries(Object.keys(objects[0]).map(k=>[k,objects.map(o=>o[k])]));
+    const definitions=req(887608).getSelectionIntervalsVisibilitiesPropertiesDefinition(collected,undo).definitions;
+    const range=definitions.find(d=>d.id==='MWDrawingRangeminutes');
+    window.multiRange=range;
+    const mixed=range.properties.from.value();
+    range.properties.from.setValue(5);
+    return {mixed,masks:objects.map(o=>o.mwMask.value()),ids:chart.getAllShapes().slice(0,2).map(s=>s.id)};
+  });
+  assert.equal(multi.mixed,'mixed');assert.deepEqual(multi.masks,[70,18]);
+  await page.evaluate(()=>widget.undo());
+  assert.deepEqual((await read())[0].filter(s=>multi.ids.includes(s.id)).map(s=>s.mask),[69,18]);
+  await page.evaluate(()=>widget.redo());
+  assert.deepEqual((await read())[0].filter(s=>multi.ids.includes(s.id)).map(s=>s.mask),[70,18]);
+  await page.setViewportSize({width:430,height:800});
+  await page.evaluate(id=>widget.chart(0).showPropertiesDialog(id),legacy);
+  await ui.getByText('可见范围',{exact:true}).click();
+  await expect(minuteRange.locator('input[name=from-input]')).toBeVisible();
+  await ui.getByRole('button',{name:'取消',exact:true}).click();
   assert.deepEqual(errors,[]);console.log(JSON.stringify({passed:true,edited,undone,saved,restored,errors}));
  } finally {await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1});

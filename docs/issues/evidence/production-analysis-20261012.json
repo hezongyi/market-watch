@@ -1,0 +1,409 @@
+{
+  "date": "2026-10-12",
+  "release": "v1.23.0",
+  "commit": "463b863482a908c3d7317f5e191e4f291f1a6d4a",
+  "scope": "Read-only production investigation; no product fixes or deployment",
+  "viewport": {
+    "width": 1900,
+    "height": 1000
+  },
+  "drawing_visibility": {
+    "checkbox_count": 9,
+    "slider_count": 0,
+    "narrow_media_matches": false
+  },
+  "alert": {
+    "revision": "a3c66706…",
+    "active_chart_revision": "9959ebb0…",
+    "active_daily_page_count": 300,
+    "old_daily_page_count": 30,
+    "latest_closed_day": {
+      "start_utc": "2026-10-08T21:00:00Z",
+      "end_utc": "2026-10-09T21:00:00Z",
+      "time_closed": true,
+      "source_confirmed": true,
+      "coverage_complete": false,
+      "observed_minutes": 1430,
+      "unknown_minutes": 10,
+      "missing_utc": [
+        "2026-10-08T21:00:00Z",
+        "2026-10-08T21:01:00Z",
+        "2026-10-08T21:02:00Z",
+        "2026-10-08T21:03:00Z",
+        "2026-10-08T21:06:00Z",
+        "2026-10-08T21:07:00Z",
+        "2026-10-08T21:08:00Z",
+        "2026-10-08T21:09:00Z",
+        "2026-10-08T21:13:00Z",
+        "2026-10-08T21:19:00Z"
+      ]
+    },
+    "target_calendar_profile_empty": true,
+    "cause_of_missing_observations": "Not yet established"
+  },
+  "swing": {
+    "top_height_default_px": 44,
+    "top_height_bottom_left_px": 0
+  },
+  "lwma_default": {
+    "period": 20,
+    "color": "#42a5f5"
+  },
+  "drags": [
+    {
+      "scenario": "LWMA, Swing and native WMA",
+      "python_period": 20,
+      "native_period": 20,
+      "autoscale": true,
+      "sample_interval_ms": 60,
+      "sample_count": 153,
+      "python_zero_pixel_samples": 11,
+      "native_zero_pixel_samples": 0,
+      "zero_pixel_intervals": [
+        {
+          "start": 1791817428045,
+          "until": 1791817428517,
+          "duration_ms": 472,
+          "samples": 7,
+          "native_pixel_min": 675
+        },
+        {
+          "start": 1791817429312,
+          "until": 1791817429564,
+          "duration_ms": 252,
+          "samples": 4,
+          "native_pixel_min": 658
+        }
+      ],
+      "history_events": [
+        {
+          "at": 1791817428019,
+          "type": "getBars",
+          "name": "SWING_SR_V1",
+          "count": 218,
+          "first": false,
+          "to": 1789556400
+        },
+        {
+          "at": 1791817428028,
+          "type": "getBars",
+          "name": "SWING_SR_V1",
+          "count": 218,
+          "first": false,
+          "to": 1789556400
+        },
+        {
+          "at": 1791817428028,
+          "type": "getBars",
+          "name": "SWING_SR_V1",
+          "count": 218,
+          "first": false,
+          "to": 1789556400
+        },
+        {
+          "at": 1791817428028,
+          "type": "getBars",
+          "name": "SWING_SR_V1",
+          "count": 218,
+          "first": false,
+          "to": 1789556400
+        },
+        {
+          "at": 1791817428029,
+          "type": "getBars",
+          "name": "LWMA",
+          "count": 218,
+          "first": false,
+          "to": 1789556400
+        },
+        {
+          "at": 1791817428298,
+          "type": "historyCallback",
+          "name": "SWING_SR_V1",
+          "ms": 279,
+          "rows": 218,
+          "finite": 218
+        },
+        {
+          "at": 1791817428299,
+          "type": "historyCallback",
+          "name": "SWING_SR_V1",
+          "ms": 271,
+          "rows": 218,
+          "finite": 218
+        },
+        {
+          "at": 1791817428301,
+          "type": "historyCallback",
+          "name": "SWING_SR_V1",
+          "ms": 273,
+          "rows": 218,
+          "finite": 218
+        },
+        {
+          "at": 1791817428302,
+          "type": "historyCallback",
+          "name": "SWING_SR_V1",
+          "ms": 274,
+          "rows": 218,
+          "finite": 218
+        },
+        {
+          "at": 1791817428404,
+          "type": "historyCallback",
+          "name": "LWMA",
+          "ms": 375,
+          "rows": 218,
+          "finite": 218
+        },
+        {
+          "at": 1791817429318,
+          "type": "getBars",
+          "name": "SWING_SR_V1",
+          "count": 56,
+          "first": false,
+          "to": 1788426000
+        },
+        {
+          "at": 1791817429318,
+          "type": "getBars",
+          "name": "SWING_SR_V1",
+          "count": 56,
+          "first": false,
+          "to": 1788426000
+        },
+        {
+          "at": 1791817429319,
+          "type": "getBars",
+          "name": "SWING_SR_V1",
+          "count": 56,
+          "first": false,
+          "to": 1788426000
+        },
+        {
+          "at": 1791817429319,
+          "type": "getBars",
+          "name": "SWING_SR_V1",
+          "count": 56,
+          "first": false,
+          "to": 1788426000
+        },
+        {
+          "at": 1791817429319,
+          "type": "getBars",
+          "name": "LWMA",
+          "count": 56,
+          "first": false,
+          "to": 1788426000
+        },
+        {
+          "at": 1791817429488,
+          "type": "historyCallback",
+          "name": "LWMA",
+          "ms": 169,
+          "rows": 56,
+          "finite": 56
+        },
+        {
+          "at": 1791817429500,
+          "type": "historyCallback",
+          "name": "SWING_SR_V1",
+          "ms": 182,
+          "rows": 56,
+          "finite": 56
+        },
+        {
+          "at": 1791817429503,
+          "type": "historyCallback",
+          "name": "SWING_SR_V1",
+          "ms": 185,
+          "rows": 56,
+          "finite": 56
+        },
+        {
+          "at": 1791817429504,
+          "type": "historyCallback",
+          "name": "SWING_SR_V1",
+          "ms": 185,
+          "rows": 56,
+          "finite": 56
+        },
+        {
+          "at": 1791817429505,
+          "type": "historyCallback",
+          "name": "SWING_SR_V1",
+          "ms": 186,
+          "rows": 56,
+          "finite": 56
+        }
+      ],
+      "reset_events": [],
+      "interpretation": "Temporary curve disappearance aligned with independent indicator history reads; valid=positive-volume marker, finite close alone does not establish valid output"
+    },
+    {
+      "scenario": "LWMA and native WMA only",
+      "python_period": 20,
+      "native_period": 20,
+      "autoscale": true,
+      "sample_interval_ms": 60,
+      "sample_count": 109,
+      "python_zero_pixel_samples": 9,
+      "native_zero_pixel_samples": 0,
+      "zero_pixel_intervals": [
+        {
+          "start": 1791818406010,
+          "until": 1791818406186,
+          "duration_ms": 176,
+          "samples": 3,
+          "native_pixel_min": 610
+        },
+        {
+          "start": 1791818406430,
+          "until": 1791818406588,
+          "duration_ms": 158,
+          "samples": 3,
+          "native_pixel_min": 608
+        },
+        {
+          "start": 1791818411820,
+          "until": 1791818411996,
+          "duration_ms": 176,
+          "samples": 3,
+          "native_pixel_min": 633
+        }
+      ],
+      "history_events": [
+        {
+          "at": 1791818405991,
+          "type": "getBars",
+          "name": "LWMA",
+          "count": 218,
+          "first": false
+        },
+        {
+          "at": 1791818406133,
+          "type": "historyCallback",
+          "name": "LWMA",
+          "ms": 142,
+          "rows": 218,
+          "valid": 14
+        },
+        {
+          "at": 1791818406388,
+          "type": "getBars",
+          "name": "LWMA",
+          "count": 51,
+          "first": false
+        },
+        {
+          "at": 1791818406540,
+          "type": "historyCallback",
+          "name": "LWMA",
+          "ms": 152,
+          "rows": 51,
+          "valid": 0
+        },
+        {
+          "at": 1791818410944,
+          "type": "getBars",
+          "name": "composite",
+          "count": 239,
+          "first": true
+        },
+        {
+          "at": 1791818410945,
+          "type": "getBars",
+          "name": "LWMA",
+          "count": 220,
+          "first": true
+        },
+        {
+          "at": 1791818411469,
+          "type": "historyCallback",
+          "name": "LWMA",
+          "ms": 524,
+          "rows": 220,
+          "valid": 27
+        },
+        {
+          "at": 1791818411488,
+          "type": "historyCallback",
+          "name": "composite",
+          "ms": 544,
+          "rows": 239,
+          "valid": 219
+        },
+        {
+          "at": 1791818411774,
+          "type": "getBars",
+          "name": "LWMA",
+          "count": 218,
+          "first": false
+        },
+        {
+          "at": 1791818411941,
+          "type": "historyCallback",
+          "name": "LWMA",
+          "ms": 167,
+          "rows": 218,
+          "valid": 20
+        }
+      ],
+      "reset_events": [
+        {
+          "at": 1791818410943,
+          "type": "stream",
+          "event": "reset",
+          "reason": "indicator_progress"
+        }
+      ],
+      "interpretation": "Temporary curve disappearance aligned with independent indicator history reads; valid=positive-volume marker, finite close alone does not establish valid output"
+    }
+  ],
+  "load_failed": {
+    "spontaneous_reproduction": false,
+    "network_cause": "Not yet established",
+    "simulated_notice_test": {
+      "same_persistent_error_repeats": false,
+      "same_error_after_clear_repeats": true
+    },
+    "webkit_control_and_production_https": "Local inspection environment failed; excluded from production evidence"
+  },
+  "composite_list": {
+    "before": {
+      "container_width": 920,
+      "main_width": 314,
+      "row_height": 75,
+      "grid_columns": "314px 50px 84px 384px"
+    },
+    "detail": {
+      "container_width": 560,
+      "main_width": 0,
+      "row_height": 543,
+      "grid_columns": "0px 50px 84px 338px"
+    },
+    "candidate": {
+      "container_width": 560,
+      "main_width": 324,
+      "row_height": 151,
+      "grid_columns": "324px 180px"
+    },
+    "candidate_scope": "Temporary browser CSS only; not a product implementation"
+  },
+  "completion": {
+    "server_layout_restored": {
+      "charts": 5,
+      "layout": "2-3",
+      "studyCounts": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "swingInfo": 0
+    },
+    "logout_http_status": 200,
+    "completed_at": "2026-10-12T15:35:43.057Z"
+  }
+}

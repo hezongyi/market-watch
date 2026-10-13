@@ -1,0 +1,191 @@
+{
+  "environment": "Ubuntu task-owned Docker mw-pending-fixes-20261013, loopback HTTP, actual PostgreSQL/Python, same synthetic M5 source; indicatorSet reported per sample",
+  "limitations": [
+    "fresh browser context per sample; backend cache remains warm/resident",
+    "first valid data/next animation frames are not paint timestamps; optional firstIndicatorPixelMs polls actual canvas pixels in large plot canvases after temporary magenta line overrides; scans add CPU/heap overhead, so pixel-run timings and heap are not directly comparable to uninstrumented runs",
+    "CDP task/script/layout metrics include the renderer and parent UI",
+    "heap samples cover the browser frame, not backend memory",
+    "optional acceptance wrapper SQL spans include driver/roundtrip; calculation CPU is thread CPU, backend span excludes final body transfer; sums can overlap concurrent reads",
+    "optional pagination timings wait for actual main-history extension and all indicator first times to align; only up to five pages in the 1500-bar synthetic fixture, percentile sample sizes are reported",
+    "repetitions reported per sample; no claimed performance ratio or full stage-D completion",
+    "only one sample per Python lane/count4,8; no mixed native counterpart and no cold/steady-state ratio"
+  ],
+  "measurements": [
+    {
+      "lane": "old-python",
+      "count": 4,
+      "indicatorSet": [
+        "LWMA",
+        "EMA",
+        "SMA",
+        "BBANDS"
+      ],
+      "paginationSamples": [
+        {
+          "ms": 802.8000001907349,
+          "barsBefore": 962,
+          "barsAfter": 1511
+        }
+      ],
+      "paginationP50Ms": 802.8000001907349,
+      "paginationP95Ms": 802.8000001907349,
+      "firstValidDataMs": 392.7000002861023,
+      "allValidDataMs": 1193.5,
+      "nextAnimationFramesMs": 1232.3000001907349,
+      "cachedNavigationP50Ms": 33.30000019073486,
+      "cachedNavigationP95Ms": 37,
+      "emptyDataFrames": 27,
+      "chartResets": 0,
+      "peakJsHeapBytes": 88170432,
+      "TaskDurationSeconds": 1.500504,
+      "ScriptDurationSeconds": 0.443219,
+      "LayoutDurationSeconds": 0.026252,
+      "RecalcStyleDurationSeconds": 0.045155,
+      "httpReads": 14,
+      "indicatorHttpReads": 12,
+      "httpResponseBytes": 2532014,
+      "httpKinds": {
+        "history-loads": 14
+      },
+      "httpDurationMedianMs": 339.096,
+      "httpBodyMedianMs": 5.771999999999991,
+      "repetition": 0,
+      "expectedHistoryCancellations": 0
+    },
+    {
+      "lane": "old-python",
+      "count": 8,
+      "indicatorSet": [
+        "LWMA",
+        "EMA",
+        "SMA",
+        "BBANDS",
+        "RSI",
+        "MACD",
+        "ATR",
+        "STOCH"
+      ],
+      "paginationSamples": [
+        {
+          "ms": 2034.1000003814697,
+          "barsBefore": 962,
+          "barsAfter": 1511
+        }
+      ],
+      "paginationP50Ms": 2034.1000003814697,
+      "paginationP95Ms": 2034.1000003814697,
+      "firstValidDataMs": 857.3000001907349,
+      "allValidDataMs": 3311.300000190735,
+      "nextAnimationFramesMs": 3357.5,
+      "cachedNavigationP50Ms": 34.700000286102295,
+      "cachedNavigationP95Ms": 59.59999990463257,
+      "emptyDataFrames": 92,
+      "chartResets": 0,
+      "peakJsHeapBytes": 102478248,
+      "TaskDurationSeconds": 3.095094,
+      "ScriptDurationSeconds": 0.919823,
+      "LayoutDurationSeconds": 0.110721,
+      "RecalcStyleDurationSeconds": 0.130847,
+      "httpReads": 28,
+      "indicatorHttpReads": 26,
+      "httpResponseBytes": 5302004,
+      "httpKinds": {
+        "history-loads": 28
+      },
+      "httpDurationMedianMs": 469.232,
+      "httpBodyMedianMs": 5.014999999999986,
+      "repetition": 0,
+      "expectedHistoryCancellations": 0
+    },
+    {
+      "lane": "new-python",
+      "count": 4,
+      "indicatorSet": [
+        "LWMA",
+        "EMA",
+        "SMA",
+        "BBANDS"
+      ],
+      "paginationSamples": [
+        {
+          "ms": 632.5999999046326,
+          "barsBefore": 962,
+          "barsAfter": 1511
+        }
+      ],
+      "paginationP50Ms": 632.5999999046326,
+      "paginationP95Ms": 632.5999999046326,
+      "firstValidDataMs": 516,
+      "allValidDataMs": 516,
+      "nextAnimationFramesMs": 570.6999998092651,
+      "cachedNavigationP50Ms": 33.700000286102295,
+      "cachedNavigationP95Ms": 50.700000286102295,
+      "emptyDataFrames": 0,
+      "chartResets": 0,
+      "peakJsHeapBytes": 88260436,
+      "TaskDurationSeconds": 1.113483,
+      "ScriptDurationSeconds": 0.36635,
+      "LayoutDurationSeconds": 0.022861,
+      "RecalcStyleDurationSeconds": 0.034575,
+      "httpReads": 6,
+      "indicatorHttpReads": 3,
+      "httpResponseBytes": 2615568,
+      "httpKinds": {
+        "history-loads": 1,
+        "data": 3,
+        "reserve": 2
+      },
+      "httpDurationMedianMs": 250.217,
+      "httpBodyMedianMs": 5.574000000000012,
+      "repetition": 0,
+      "expectedHistoryCancellations": 0
+    },
+    {
+      "lane": "new-python",
+      "count": 8,
+      "indicatorSet": [
+        "LWMA",
+        "EMA",
+        "SMA",
+        "BBANDS",
+        "RSI",
+        "MACD",
+        "ATR",
+        "STOCH"
+      ],
+      "paginationSamples": [
+        {
+          "ms": 997.5999999046326,
+          "barsBefore": 962,
+          "barsAfter": 1511
+        }
+      ],
+      "paginationP50Ms": 997.5999999046326,
+      "paginationP95Ms": 997.5999999046326,
+      "firstValidDataMs": 1152.6999998092651,
+      "allValidDataMs": 1152.6999998092651,
+      "nextAnimationFramesMs": 1210.5999999046326,
+      "cachedNavigationP50Ms": 34.39999961853027,
+      "cachedNavigationP95Ms": 70.40000009536743,
+      "emptyDataFrames": 0,
+      "chartResets": 0,
+      "peakJsHeapBytes": 108712521,
+      "TaskDurationSeconds": 2.037455,
+      "ScriptDurationSeconds": 0.714057,
+      "LayoutDurationSeconds": 0.065321,
+      "RecalcStyleDurationSeconds": 0.072272,
+      "httpReads": 6,
+      "indicatorHttpReads": 3,
+      "httpResponseBytes": 4193295,
+      "httpKinds": {
+        "history-loads": 1,
+        "data": 3,
+        "reserve": 2
+      },
+      "httpDurationMedianMs": 420.853,
+      "httpBodyMedianMs": 10.329000000000008,
+      "repetition": 0,
+      "expectedHistoryCancellations": 0
+    }
+  ]
+}

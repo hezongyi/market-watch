@@ -55,8 +55,10 @@ function swingDisplayInputs(study) {
   if(typeof input.show_average_spacing!=='boolean') {
     input.show_average_spacing=true;repairs.push({id:'show_average_spacing',value:true});
   }
-  if(!['below_name','bottom_left'].includes(input.statistics_position)) {
-    input.statistics_position='below_name';repairs.push({id:'statistics_position',value:'below_name'});
+  // Migrate the old display placement without changing hidden statistics or
+  // strengths. Persist through native inputs so templates and reload agree.
+  if(input.statistics_position!=='bottom_left') {
+    input.statistics_position='bottom_left';repairs.push({id:'statistics_position',value:'bottom_left'});
   }
   if(repairs.length) study.setInputValues(repairs);
   const params = {high_strength:input.high_strength,low_strength:input.low_strength};

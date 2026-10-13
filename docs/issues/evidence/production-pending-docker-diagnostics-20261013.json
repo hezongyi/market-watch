@@ -1,0 +1,21 @@
+{
+  "environment": "Ubuntu task-owned Docker mw-pending-fixes-20261013, built web and actual API",
+  "passed": true,
+  "checks": [
+    "encoded synthetic series identity redacted in built diagnostic path",
+    "query omitted",
+    "HTTP 404 classified without retry",
+    "bounded diagnostic copy isolated from caller mutation",
+    "no pageerrors"
+  ],
+  "failedVersionRead": {
+    "at": 1791842383710,
+    "path": "/market-data/versions/:id",
+    "method": "GET",
+    "elapsedMs": 25,
+    "attempt": 1,
+    "outcome": "http",
+    "status": 404
+  },
+  "pageerrors": []
+}

@@ -9,7 +9,7 @@ import talib
 CATALOG = {
     "SMA": {"label": "SMA 简单均线", "pane": "main", "params": {"period": 20}},
     "EMA": {"label": "EMA 指数均线", "pane": "main", "params": {"period": 20}},
-    "LWMA": {"label": "LWMA 线性加权均线", "pane": "main", "params": {"period": 20}},
+    "LWMA": {"label": "LWMA 线性加权均线", "pane": "main", "params": {"period": 5}},
     "BBANDS": {"label": "布林带", "pane": "main", "params": {"period": 20, "deviation": 2}},
     "RSI": {"label": "相对强弱指数", "pane": "sub", "params": {"period": 14}, "levels": [30, 70]},
     "MACD": {

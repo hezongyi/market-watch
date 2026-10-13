@@ -3,6 +3,7 @@ const fs = require("node:fs");
 const vm = require("node:vm");
 const pending = [];
 const context = vm.createContext({
+  document: {createElement: () => ({}), head: {append() {}}},
   URL,
   URLSearchParams,
   Map,

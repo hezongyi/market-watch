@@ -421,6 +421,7 @@ def delivery(db, task, sub, payload, cursors):
         return {"type": "reset", "reason": "binding_changed", "resolved_revision_id": revision}
     state["binding"] = revision
     before, after = state.get("loaded_before"), state.get("loaded_after")
+    dependency_origin = state.get("dependency_origin")
     check = None
     if before is not None:
         query = query.model_copy(update={"track_history": True, "revision_before": before,
@@ -433,6 +434,7 @@ def delivery(db, task, sub, payload, cursors):
                     1 if state.get("historical") else 0]
                 floor = (page["origin"] if query.indicators else
                          period(after, query.timeframe, page["calendar"])[0] if after is not None else 0)
+                previous_input_revision = state["initial_input_revision"]
                 changed = db.scalar(select(CompositeMinuteInput.start).where(
                     CompositeMinuteInput.revision_id == page["revision_id"],
                     CompositeMinuteInput.input_revision > state["initial_input_revision"],
@@ -441,17 +443,44 @@ def delivery(db, task, sub, payload, cursors):
                 state["initial_input_revision"] = page["input_revision"]
                 if changed is not None:
                     return {"type": "reset", "reason": "history_changed"}
+                if dependency_origin is not None and dependency_origin < floor:
+                    prefix = db.scalar(select(CompositeMinuteInput.start).where(
+                        CompositeMinuteInput.revision_id == page["revision_id"],
+                        CompositeMinuteInput.input_revision > previous_input_revision,
+                        CompositeMinuteInput.input_revision <= page["input_revision"],
+                        CompositeMinuteInput.start >= dependency_origin, CompositeMinuteInput.start < floor).limit(1))
+                    if prefix is not None:
+                        page["indicator_correction"] = True
             check = fixed_check(db, check_page, query, {"calendar": page["calendar"]})
         elif query.series_kind == "managed" and check_page.get("bars"):
             inst = db.get(Instrument, query.instrument)
             if query.published:
                 from .managed_dataset import published_history_check
                 from .storage import ChartPublication
-                check = published_history_check(db, inst, db.get(ChartPublication,
-                    (inst.id, query.timeframe)), check_page["bars"], query)
+                publication = db.get(ChartPublication, (inst.id, query.timeframe))
+                check = published_history_check(db, inst, publication, check_page["bars"], query)
+                if dependency_origin is not None and state.get("dependency_before"):
+                    dependency = published_history_check(db, inst, publication, check_page["bars"],
+                        query.model_copy(update={"indicators": [], "revision_after": None,
+                            "dataset_start": max(query.dataset_start or 0, dependency_origin),
+                            "revision_before": state["dependency_before"]}))
+                    previous = state.get("dependency_revision")
+                    if dependency and previous and previous != dependency["revision"]:
+                        page["indicator_correction"] = True
+                    if dependency:
+                        state["dependency_revision"] = dependency["revision"]
             else:
                 source = "M15" if query.timeframe == "M30" else "D1" if query.timeframe in ("W1", "MN") else query.timeframe
                 check = managed_check(db, inst, source, check_page["bars"], query)
+                if dependency_origin is not None and after is not None and dependency_origin < after:
+                    from .storage import Bar
+                    observed = state.get("dependency_observed_at") or state.get("observed_at", 0)
+                    changed_at = db.scalar(select(func.max(Bar.received_at)).where(
+                        Bar.instrument_id == inst.id, Bar.timeframe == source,
+                        Bar.start >= dependency_origin, Bar.start < after, Bar.received_at > observed))
+                    if changed_at is not None:
+                        page["indicator_correction"] = True
+                        state["dependency_observed_at"] = changed_at
         elif query.series_kind == "provider":
             dataset = db.get(ProviderDataset, task.identity["dataset_id"])
             # Recursive provider studies read the fixed prefix preceding the
@@ -463,6 +492,15 @@ def delivery(db, task, sub, payload, cursors):
                 ProviderBar.revision > 1, ProviderBar.changed_at > state.get("observed_at", 0)).limit(1))
             if changed is not None or dataset.metadata_json.get("invalidated_at", 0) > state.get("observed_at", 0):
                 return {"type": "reset", "reason": "history_changed"}
+            if dependency_origin is not None and dependency_origin < floor:
+                observed = state.get("dependency_observed_at") or state.get("observed_at", 0)
+                changed_at = db.scalar(select(func.max(ProviderBar.changed_at)).where(
+                    ProviderBar.dataset_id == dataset.id,
+                    ProviderBar.start >= dependency_origin, ProviderBar.start < floor,
+                    ProviderBar.revision > 1, ProviderBar.changed_at > observed))
+                if changed_at is not None:
+                    page["indicator_correction"] = True
+                    state["dependency_observed_at"] = changed_at
     if check:
         # Historical pages do not receive tail-bar callbacks. Preserve the HTTP
         # prefix credential and separately validate its excluded, accepted bar.
@@ -487,8 +525,10 @@ def delivery(db, task, sub, payload, cursors):
         state["progress"] = progress
         return {"type": "reset", "reason": "indicator_progress"}
     state["progress"] = progress
+    evidence = {name: page[name] for name in ("indicator_correction",) if name in page}
+    evidence.update({name: state[name] for name in ("dependency_observed_at", "dependency_revision", "initial_input_revision") if state.get(name) is not None})
     if state.get("historical"):
-        return {"type": "status", "status": "history_current"}
+        return {"type": "status", "status": "history_current", **evidence}
     cursor = state.get("cursor", 0)
     if cursor and page.get("recovery_floor") is not None and cursor < page["recovery_floor"]:
         return {"type": "reset", "reason": "history_gap"}
@@ -514,6 +554,7 @@ def delivery(db, task, sub, payload, cursors):
         if name in state:
             page[name] = state[name]
     page.pop("latest_bar", None)
+    page.update(evidence)
     return page
 
 

@@ -36,6 +36,8 @@ pytestmark = pytest.mark.skipif(not os.getenv("TEST_POSTGRES_URL"),
     contracts.test_slow_consumer_does_not_block_fast_delivery_and_replay_is_bounded,
     contracts.test_composite_history_snapshot_budget_allows_windowed_native_delivery,
     contracts.test_recursive_study_feeds_deliver_only_values_for_accepted_tail_bars,
+    contracts.test_external_indicator_prefix_is_consumer_state_not_shared_calculation,
+    contracts.test_published_external_prefix_uses_accepted_snapshot_and_preserves_tail,
 ])
 def test_durable_contract(provider_pg, contract):
     # These managed contracts use the same baseline instrument catalogue as
@@ -44,6 +46,65 @@ def test_durable_contract(provider_pg, contract):
 
     storage.bootstrap(provider_pg[1])
     contract(provider_pg[0])
+
+
+def test_published_indicator_prefix_proof_matches_inputs_during_concurrent_repair(provider_pg, monkeypatch):
+    from types import SimpleNamespace
+    from alerts import managed_dataset
+    from alerts.chart_api import DataQuery
+    from alerts.storage import ChartPublication, ChartPublishedBar, Instrument
+
+    factory, _ = provider_pg
+    with factory.begin() as db:
+        db.add(Instrument(id="PREFIX_TEST", label="Prefix test", source="binance", symbol="PREFIX_TEST",
+            basis="trade", calendar="utc0", precision=2, enabled=False, calendar_profile={}))
+        db.flush()
+        db.add(ChartPublication(instrument_id="PREFIX_TEST", timeframe="M1", start=60000,
+            end=360000, complete_count=5, initialized=True, revision=1))
+        for start in (60000, 120000, 180000, 240000, 300000):
+            payload = dict(start=start, end=start+60000, open="10", high="11", low="9",
+                           close="10", complete=True, volume=None)
+            db.add(ChartPublishedBar(instrument_id="PREFIX_TEST", timeframe="M1", start=start,
+                end=start+60000, complete=True, payload=payload, revision=1))
+    query = DataQuery(instrument="PREFIX_TEST", series_kind="managed", timeframe="M1", published=True,
+        dataset_start=60000, before=360000, limit=2, dependency_before=240000,
+        indicators=[{"name": "EMA", "params": {"period": 2}}])
+    before = managed_dataset.data(query)
+    read_rows = managed_dataset.read_rows
+    repairs = []
+
+    def repair_after_input_read(*args, **kwargs):
+        rows = read_rows(*args, **kwargs)
+        if not repairs:
+            # Commit on a second PostgreSQL connection after the reader accepts
+            # its inputs, before it reads the dependency fingerprint.
+            with factory.begin() as db:
+                row = db.get(ChartPublishedBar, ("PREFIX_TEST", "M1", 120000))
+                row.payload = {**row.payload, "high": "101", "close": "100"}
+                row.revision += 1
+                db.get(ChartPublication, ("PREFIX_TEST", "M1")).revision += 1
+            repairs.append(True)
+        return rows
+
+    monkeypatch.setattr(managed_dataset, "read_rows", repair_after_input_read)
+    accepted = managed_dataset.data(query)
+    monkeypatch.setattr(managed_dataset, "read_rows", read_rows)
+    current = managed_dataset.data(query)
+    assert repairs == [True]
+    assert accepted["indicators"] == before["indicators"], "accepted values retain their old input snapshot"
+    assert accepted["dependency_revision"] == before["dependency_revision"], \
+        "the prefix proof must describe those same inputs, not the concurrent repair"
+    assert current["dependency_revision"] != accepted["dependency_revision"]
+    assert current["indicators"] != accepted["indicators"]
+    state = dict(history_accepted=True, historical=True, loaded_before=300000, loaded_after=240000,
+        dependency_origin=60000, dependency_before=240000, dependency_revision=accepted["dependency_revision"],
+        cursor=300000)
+    task = SimpleNamespace(query=query.model_copy(update={"indicators": []}).model_dump(), identity={})
+    sub = SimpleNamespace(listener="external", generation=1, state=state)
+    with factory.begin() as db:
+        event = stream.delivery(db, task, sub, {"type": "bars", "bars": [{"start": 300000}]}, {})
+    assert event["indicator_correction"], "the first subscription delivery must detect the intervening repair"
+    assert event["dependency_revision"] == current["dependency_revision"]
 
 
 def test_concurrent_clients_and_workers_share_one_task_and_one_claim(provider_pg):
@@ -70,6 +131,7 @@ def test_concurrent_clients_and_workers_share_one_task_and_one_claim(provider_pg
     worker_contracts.test_indicator_initialization_is_shared_and_completion_requests_history_recovery,
     worker_contracts.test_correction_to_previously_streamed_bar_requires_native_history_reset,
     worker_contracts.test_historical_window_credentials_do_not_expand_to_realtime_tail,
+    worker_contracts.test_external_composite_prefix_correction_preserves_shared_main_task,
 ])
 def test_worker_contract_postgres(provider_pg, monkeypatch, contract):
     contract(provider_pg[0], monkeypatch)

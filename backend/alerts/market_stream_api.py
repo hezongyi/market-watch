@@ -41,6 +41,11 @@ class Subscription(Consumer):
     observed_at: int = Field(default=0, ge=0)
     initial_input_revision: int | None = Field(default=None, ge=0)
     initial_indicator_pending: bool = False
+    # Consumer evidence only: the shared price task still has no indicator IO.
+    dependency_origin: int | None = Field(default=None, ge=0)
+    dependency_observed_at: int | None = Field(default=None, ge=0)
+    dependency_before: int | None = Field(default=None, gt=0)
+    dependency_revision: str | None = Field(default=None, max_length=128)
 
 
 def resolve(body):

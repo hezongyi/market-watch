@@ -17,6 +17,33 @@ type Revision = {id:string;request_id:string;parent_revision_id:string|null;hist
 const statuses:Record<string,string>={confirming_m1:"查询接续M1",publishing_periods:"准备九周期产物",
   initializing_indicators:"完整初始化指标",algorithm_changed:"算法已改变，需重新准备",ready:"可启用"};
 const utcInput=(at:number)=>new Date(at).toISOString().slice(0,16);
+type RecheckResult = {status:string;observations:number|null;finished_at:number|null};
+
+function SourceRecheck({id,revision}:{id:string;revision:Revision}) {
+  const [start,setStart]=useState(""),[end,setEnd]=useState(""),[busy,setBusy]=useState(false),
+    [error,setError]=useState(""),[result,setResult]=useState<RecheckResult|null>(null);
+  const request=useRef<{signature:string;body:unknown}|null>(null);
+  async function submit(event:React.FormEvent) {
+    event.preventDefault();if(busy)return;setBusy(true);setError("");
+    const fields={start:Date.parse(start+":00Z"),end:Date.parse(end+":00Z")},signature=JSON.stringify(fields);
+    if(request.current?.signature!==signature)request.current={signature,body:{...fields,request_id:crypto.randomUUID()}};
+    try {
+      const value=await api<RecheckResult>(`/market-data/composites/${id}/revisions/${revision.id}/recheck`,request.current.body);
+      setResult(value);
+      if(value.finished_at!==null)request.current=null;
+    }catch(error){setError(String(error));}finally{setBusy(false);}
+  }
+  return <DetailDisclosure title="复核来源缺分钟">
+    <p>输入已结束的缺口区间（UTC），最多24小时。每修订每天最多3次、间隔1分钟；只登记真实来源观测。</p>
+    <form className="dc-form" onSubmit={submit}>
+      <label>复核开始（UTC）<NativeInput type="datetime-local" required value={start} min={utcInput(revision.seam)} onChange={e=>{setStart(e.target.value);setResult(null);}} disabled={busy}/></label>
+      <label>复核结束（UTC）<NativeInput type="datetime-local" required value={end} onChange={e=>{setEnd(e.target.value);setResult(null);}} disabled={busy}/></label>
+      <button type="submit" disabled={busy}>{busy?"正在核对来源…":"复核此区间"}</button>
+    </form>
+    {error&&<p role="alert">{error}</p>}
+    {result&&<p role="status">核对状态：{result.status} · 返回 {result.observations??0} 个观测分钟。缺失分钟仍为未知，请在来源查询记录核对结果。</p>}
+  </DetailDisclosure>;
+}
 
 export function CompositeRevisions({id,active,onChanged}:{id:string;active:string;onChanged:()=>void}) {
   const [refresh,setRefresh]=useState(0),[listPage,setListPage]=useState(1),[version,setVersion]=useState(""),[mapping,setMapping]=useState(""),
@@ -110,6 +137,7 @@ export function CompositeRevisions({id,active,onChanged}:{id:string;active:strin
         {row.change.affected_rules.map(item=><span key={item.id}> {item.name}；</span>)}</p>}
       <DetailDisclosure title={<>查看固定输入依据</>}><p>修订 {row.id} · 历史 {row.history_version_id}</p>
         <p>准备截止 {time(row.preparation.cutoff)} · 固定输入 {row.preparation.input_revision??"等待M1查询"}</p></DetailDisclosure>
+      <SourceRecheck id={id} revision={row}/>
       {row.change&&!row.activated_at&&row.id!==active&&<button type="button"
         disabled={busy||!row.preparation.ready||!!revisions.error||row.parent_revision_id!==active}
         onClick={()=>void activate(row)}>启用此修订</button>}

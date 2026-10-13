@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-13",
+  "purpose": "Read-only runtime and contract inspection for a proposed native custom-indicator result adapter",
+  "source_reference_commit": "1b3e4a2",
+  "library_entry": "library.e2f8b3a016c9e1a0b7a5.js",
+  "environment": {
+    "host": "Ubuntu local Chromium",
+    "fixture": "Existing web/tests/fixtures/native-history.html, controlled candles",
+    "delivery": "Playwright in-memory resource fulfillment; no service deployment",
+    "production_access": false,
+    "product_code_changes": false,
+    "vendor_changes": false,
+    "external_result_injection": false
+  },
+  "public_contract": {
+    "custom_indicator_init": "synchronous void",
+    "custom_indicator_main": "synchronous plot result or null",
+    "public_replace_study_results_method": false,
+    "public_wma_helper": "PineJS.Std.wma",
+    "datafeed_bar_fields": ["time", "open", "high", "low", "close", "volume"]
+  },
+  "runtime_observations": {
+    "study": "Moving Average Weighted",
+    "study_row_count": 300,
+    "study_has_parent_main_series": true,
+    "study_engine_cache_present": true,
+    "native_timescale_fill_indexes_present": true,
+    "native_messager_methods_present": ["onStudyLoading", "onDataUpdate", "onStudyCompleted", "onStudyError", "onClearData"],
+    "native_study_update_stages": ["identity and turnaround validation", "queued data unpacking", "plot offset processing", "data merge", "pane and price-range update", "data events"],
+    "plot_list_merge": "prepend, append and update merge; empty batch does not remove old values",
+    "plot_list_remove": "removes tail from the requested index; not an arbitrary interval replacement",
+    "page_errors": []
+  },
+  "verified": "Current native library has a per-study result-update path and actual runtime data container",
+  "not_verified": ["New adapter implementation", "External Python result submission", "Atomic full or interval replacement", "Correction and retraction behavior", "Performance improvement", "Full product or production acceptance"]
+}

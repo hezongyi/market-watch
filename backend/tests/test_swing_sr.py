@@ -216,7 +216,7 @@ def test_catalog_display_and_strength_contract():
     assert [item["key"] for item in catalog["series"]] == ["high", "high_left", "low", "low_left"]
     assert history_requirement(SPEC) == 10
     assert history_requirement(SPEC | {"params": {"high_strength": 9, "low_strength": 3}}) == 18
-    assert validate_display(SPEC["name"], {})["statistics_position"] == "below_name"
+    assert validate_display(SPEC["name"], {})["statistics_position"] == "bottom_left"
     for bad in (
         {"hh_source": "close"},
         {"show_average_spacing": 1},

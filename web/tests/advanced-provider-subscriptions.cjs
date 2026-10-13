@@ -38,6 +38,8 @@ const flush=()=>new Promise(resolve=>setImmediate(resolve));
   streams[0].onmessage({data:JSON.stringify({listener:'three',type:'bars',cursor:12000,revision:3,as_of:1000,
     loaded_before:12000,history_revision:'loaded-prefix',history_tail_revision:'delivered-tail',
     initial_input_revision:4})});
+  streams[0].onmessage({data:JSON.stringify({listener:'three',type:'status',sequence:2,
+    initial_input_revision:5,dependency_observed_at:2000,dependency_revision:'accepted-prefix'})});
   streams[0].onopen({});await flush();await flush();
   const resumed=calls.filter(c=>c.path.endsWith('/subscribe')&&c.args.listener==='three').at(-1);
   assert.equal(resumed.args.cursor,12000,'reconnect restores the last delivered cursor');
@@ -46,7 +48,9 @@ const flush=()=>new Promise(resolve=>setImmediate(resolve));
   assert.equal(resumed.args.history_revision,'loaded-prefix');
   assert.equal(resumed.args.history_tail_revision,'delivered-tail',
     'reconnect retains the tail credential accepted from realtime delivery');
-  assert.equal(resumed.args.initial_input_revision,4);
+  assert.equal(resumed.args.initial_input_revision,5);
+  assert.equal(resumed.args.dependency_observed_at,2000);
+  assert.equal(resumed.args.dependency_revision,'accepted-prefix');
   streams[0].readyState=2;
   streams[0].onerror({});
   assert.equal(timers.size,1,'terminal EventSource errors schedule transport recovery');
@@ -58,7 +62,7 @@ const flush=()=>new Promise(resolve=>setImmediate(resolve));
   assert.equal(replaced.args.history_tail_revision,'delivered-tail',
     'terminal transport replacement must preserve the same accepted tail credential');
   streams[0].onmessage({data:JSON.stringify({listener:'two',type:'bars'})});
-  assert.equal(received.length,2,'delayed events for canceled listeners are ignored');
+  assert.equal(received.length,3,'delayed events for canceled listeners are ignored');
   streams[1].readyState=2;streams[1].onerror({});
   await transport.clear();assert.equal(streams[1].closed,true);
   assert.equal(timers.size,0,'canceling the final listener cancels reconnection');

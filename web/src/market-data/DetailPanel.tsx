@@ -55,7 +55,8 @@ export function DetailPanel({
     const fit = () => {
       if (!target || !panel.current) return;
       const box = { width: target.clientWidth, height: target.clientHeight };
-      const full = box.width < 900;
+      // Keep a readable compact list next to the 360px detail surface.
+      const full = box.width < 560 + 360;
       target.setAttribute("data-detail-mode", full ? "full" : "side");
       for (const child of Array.from(target.children)) {
         if (!(child instanceof HTMLElement) || child === panel.current)

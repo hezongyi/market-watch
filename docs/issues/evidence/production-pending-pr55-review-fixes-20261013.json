@@ -1,0 +1,120 @@
+{
+  "product_commit": "7a567f0",
+  "main_base": "687fb0c",
+  "backend": {
+    "integration": 208,
+    "final_related": 136,
+    "postgres_concurrent_prefix_test": true
+  },
+  "javascript_contract_scripts": 7,
+  "independent_review": {
+    "standards_violations": 0,
+    "spec_blockers": 0,
+    "optional_smells": 1
+  },
+  "deployed_host_asset": "/host.c2a76a49c9fdc16c.js",
+  "deployed_host_sha256": "c2a76a49c9fdc16c4adac66d70588b8f7ace59171b427d942feebc48f0284295",
+  "api_source_match": true,
+  "indicator_end_to_end": {
+    "passed": true,
+    "scope": "Ubuntu task-local synthetic published M1 inputs, actual HTTP/PG/shared stream worker/Python/native chart",
+    "checks": [
+      "same-time tail update without confirmed input revision",
+      "recursive prefix repair outside loaded window",
+      "Python numeric agreement after repair",
+      "no price chart reset",
+      "real cold fixed runs: independent parameters pending to complete"
+    ],
+    "errors": []
+  },
+  "merged": false,
+  "production_released": false,
+  "load_failed": "not reproduced; deferred",
+  "limits": [
+    "synthetic isolated data; no production source/coverage recovery claim",
+    "prior performance matrix not remeasured on these fixes",
+    "no long stability observation"
+  ],
+  "product_browser": {
+    "environment": "Ubuntu task-owned Docker mw-pending-fixes-20261013; actual HTTP/API/PostgreSQL/Python and licensed chart",
+    "passed": true,
+    "checks": [
+      "real PostgreSQL/Python multi-output reads and native result values",
+      "LWMA period5/white",
+      "Swing card reserves no top height",
+      "hide/show releases demand",
+      "parameter change retains Python agreement",
+      "cached navigation retains curves",
+      "five Swing panes: light/dark, collapse, maximize",
+      "saved migration and hidden choice preserve strengths",
+      "real saved workspace reload"
+    ],
+    "requests": 6,
+    "batchedReads": 2,
+    "errors": []
+  },
+  "ui_browser": {
+    "environment": "Ubuntu task-owned Docker mw-pending-fixes-20261013; actual native host, data-center and HTTP",
+    "passed": true,
+    "checks": [
+      "native drawing template UI save/apply with real persisted preferences preserves non-contiguous mask",
+      "native drawing range controls in Docker",
+      "non-contiguous mask survives persisted drawing property template",
+      "repeat acceptance correctly reaches the three-read quota; no new source read",
+      "real composite list detail/focus",
+      "real Docker detail at widths 1600/1250/980/720 in light/dark",
+      "source-recheck form through real HTTP and audited provider configuration failure",
+      "failed source response preserves unknown",
+      "non-modal right-bottom notice in deployed host"
+    ],
+    "geometry": {
+      "main": 440,
+      "row": 560,
+      "overflow": false,
+      "mode": "side"
+    },
+    "responsive": [
+      {
+        "theme": "Light",
+        "width": 1600,
+        "mode": "side"
+      },
+      {
+        "theme": "Light",
+        "width": 1250,
+        "mode": "side"
+      },
+      {
+        "theme": "Light",
+        "width": 980,
+        "mode": "full"
+      },
+      {
+        "theme": "Light",
+        "width": 720,
+        "mode": "full"
+      },
+      {
+        "theme": "Dark",
+        "width": 1600,
+        "mode": "side"
+      },
+      {
+        "theme": "Dark",
+        "width": 1250,
+        "mode": "side"
+      },
+      {
+        "theme": "Dark",
+        "width": 980,
+        "mode": "full"
+      },
+      {
+        "theme": "Dark",
+        "width": 720,
+        "mode": "full"
+      }
+    ],
+    "errors": []
+  }
+}

@@ -24,6 +24,76 @@ def register(owner, client="page", listener="chart", generation=1, state=None):
                            {"instrument": "EURUSD", "timeframe": "M1"}, state or {})
 
 
+def test_external_indicator_prefix_is_consumer_state_not_shared_calculation(database):
+    from types import SimpleNamespace
+    from alerts.chart_api import DataQuery
+    from alerts.market_stream_api import Subscription
+    from alerts.storage import ProviderDataset, ProviderBar
+
+    query = DataQuery(instrument="OANDA:TEST", series_kind="provider", timeframe="M1")
+    body = Subscription(client="page", listener="chart", generation=1, kind="bars", query=query,
+                        dependency_origin=10 * 60000)
+    assert body.query.indicators == [], "dependency evidence must not start a second Python calculator"
+    with database.begin() as db:
+        db.add(ProviderDataset(id="dependency-test", source="oanda", symbol="TEST", timeframe="M1",
+            metadata_json={}, coverage=[], revision=2, updated_at=2000))
+        db.flush()
+        db.add(ProviderBar(dataset_id="dependency-test", start=20 * 60000, chart_time=20 * 60000,
+            complete=True, payload={}, observed_at=2000, changed_at=2000, revision=2))
+        db.flush()
+        task = SimpleNamespace(query=query.model_dump(), identity={"dataset_id": "dependency-test"})
+        state = dict(history_accepted=True, historical=True, loaded_before=25 * 60000,
+                     loaded_after=24 * 60000, observed_at=1000, cursor=25 * 60000)
+        payload = {"type": "bars", "bars": [{"start": 30 * 60000, "chart_time": 30 * 60000}]}
+        plain = SimpleNamespace(listener="plain", generation=1, state=state)
+        external = SimpleNamespace(listener="external", generation=1,
+            state={**state, "dependency_origin": body.dependency_origin})
+        assert stream.delivery(db, task, plain, payload, {})["type"] == "status"
+        cursors = {}
+        event = stream.delivery(db, task, external, payload, cursors)
+        assert event["type"] == "status" and event["indicator_correction"]
+        assert not stream.delivery(db, task, external, payload, cursors).get("indicator_correction"), "same evidence must not repeatedly withdraw results"
+
+
+def test_published_external_prefix_uses_accepted_snapshot_and_preserves_tail(database):
+    from types import SimpleNamespace
+    from alerts.chart_api import DataQuery
+    from alerts.managed_dataset import published_history_check
+    from alerts.storage import ChartPublication, ChartPublishedBar, Instrument
+    query = DataQuery(instrument="BTCUSDT", series_kind="managed", timeframe="M1", published=True)
+    with database.begin() as db:
+        publication = ChartPublication(instrument_id="BTCUSDT", timeframe="M1", start=60000,
+            end=360000, complete_count=5, initialized=True, revision=1)
+        db.add(publication)
+        for start in (60000, 120000, 180000, 240000, 300000):
+            db.add(ChartPublishedBar(instrument_id="BTCUSDT", timeframe="M1", start=start,
+                end=start+60000, complete=True, payload={}, revision=1))
+        db.flush()
+        tail = {"start": 300000}
+        credential = published_history_check(db, db.get(Instrument, "BTCUSDT"), publication, [tail],
+            query.model_copy(update={"track_history": True, "revision_before": 240000}))
+        state = dict(history_accepted=True, historical=False, loaded_before=300000,
+            loaded_after=240000, dependency_origin=60000, dependency_before=240000,
+            dependency_revision=credential["revision"], cursor=300000)
+        task = SimpleNamespace(query=query.model_dump(), identity={})
+        sub = SimpleNamespace(listener="external", generation=1, state=state)
+        cursors = {}
+        payload = {"type": "bars", "bars": [tail]}
+        assert not stream.delivery(db, task, sub, payload, cursors).get("indicator_correction")
+        db.get(ChartPublishedBar, ("BTCUSDT", "M1", 120000)).revision += 1
+        db.flush()
+        corrected = stream.delivery(db, task, sub, payload, cursors)
+        assert corrected["type"] == "bars" and corrected["bars"] == [tail]
+        assert corrected["indicator_correction"]
+        assert corrected["dependency_revision"] != state["dependency_revision"]
+        assert not stream.delivery(db, task, sub, payload, cursors).get("indicator_correction")
+        # Staging changes and normal tail appends cannot alter published prefix proof.
+        db.add(ChartPublishedBar(instrument_id="BTCUSDT", timeframe="M1", start=360000,
+            end=420000, complete=True, payload={}, revision=1))
+        db.flush()
+        assert not stream.delivery(db, task, sub, {"type": "bars", "bars": [{"start": 360000}]}, cursors).get("indicator_correction")
+
+
 def test_multiple_pages_share_one_calculation_and_session_scopes_listeners(database):
     owner = session(database)
     other = session(database, "other")

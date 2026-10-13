@@ -1,0 +1,31 @@
+{
+  "version": "1.25.0",
+  "release_tag": "v1.25.0",
+  "previous_source_tag": "v1.24.0",
+  "pull_request": "https://github.com/hezongyi/market-watch/pull/55",
+  "tested_application_commit": "7a567f0",
+  "final_review_commit": "e6308f79d18241dce978f7bb57b37d441eb80a09",
+  "source_commit_resolution": "Resolve annotated v1.25.0^{commit}; targets PR #55 main merge including version metadata.",
+  "verification_record": "docs/issues/production-pending-pr55-review-fixes-20261013.md",
+  "verification": {
+    "main_integrated_python_passed": 208,
+    "final_related_python_passed": 136,
+    "test_sets_overlap": true,
+    "js_contract_scripts_passed": 7,
+    "postgres_concurrency_passed": true,
+    "runtime_browser_passed": true,
+    "standards_remaining_blockers": 0,
+    "spec_remaining_blockers": 0
+  },
+  "new_migrations": [],
+  "production_upgrade_from_v1.23.0_migrations": [
+    "as46_provider_price_confirmation"
+  ],
+  "application_dependencies_changed": false,
+  "production_deployment": "Authorized; exact merged-source images, backup restore, migration and rollout evidence recorded separately.",
+  "limitations": [
+    "Load failed not reproduced; deferred as instructed",
+    "Missing minutes remain unknown/stale",
+    "No renewed 27-sample performance or 135-page matrix or long-term observation"
+  ]
+}

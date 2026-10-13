@@ -381,6 +381,51 @@ def test_historical_window_credentials_do_not_expand_to_realtime_tail(database, 
         "corrections inside the unchanged historical window still require reload"
 
 
+def test_external_composite_prefix_correction_preserves_shared_main_task(database, monkeypatch):
+    composite, revision, seam = populated(database, monkeypatch)
+    owner = session(database)
+    query = DataQuery(instrument=composite, series_kind="composite", timeframe="M1", provisional=False)
+    identity, serialized = resolve(Subscription(client="page", listener="chart", generation=1,
+        kind="bars", query=query, dependency_origin=seam))
+    state = {"cursor": seam + 540000, "loaded_after": seam + 300000, "loaded_before": seam + 540000,
+             "initial_input_revision": 1, "historical": True}
+    external = stream.register(owner, "page", "chart", 1, identity, serialized,
+                               {**state, "dependency_origin": seam})
+    plain = stream.register(owner, "other", "chart", 1, identity, serialized, state)
+    assert external["task_id"] == plain["task_id"] and not serialized["indicators"]
+    calculator, a, b = Calculator(), {}, {}
+    work = stream.claim()
+    payload, _ = calculator.build(work)
+    stream.commit(work, payload, delay_ms=0)
+    assert stream.events(owner, "page", a)[0]["type"] == "status"
+    assert stream.events(owner, "other", b)[0]["type"] == "status"
+    with database.begin() as db:
+        correction(db, revision, seam + 60000, 201000000, "1.119")
+    work = stream.claim()
+    payload, _ = calculator.build(work)
+    stream.commit(work, payload, delay_ms=0)
+    event = stream.events(owner, "page", a)[0]
+    assert event["type"] == "status" and event["indicator_correction"]
+    assert stream.events(owner, "other", b)[0]["type"] == "status"
+    with database.begin() as db:
+        correction(db, revision, seam + 600000, 202000000)
+    work = stream.claim()
+    payload, _ = calculator.build(work)
+    stream.commit(work, payload, delay_ms=0)
+    event = stream.events(owner, "page", a)[0]
+    assert event["type"] == "status" and not event.get("indicator_correction")
+    # Browser reconnects persist the delivered credential, not the original one.
+    stream.register(owner, "page", "chart", 1, identity, serialized,
+        {**state, "dependency_origin": seam, "initial_input_revision": event["initial_input_revision"],
+         "sequence": event["sequence"]})
+    with database.begin() as db:
+        correction(db, revision, seam + 660000, 203000000)
+    work = stream.claim()
+    payload, _ = calculator.build(work)
+    stream.commit(work, payload, delay_ms=0)
+    assert not stream.events(owner, "page", {})[0].get("indicator_correction")
+
+
 def test_published_stream_signal_uses_publication_evidence_without_scanning_staging_history(database):
     from alerts.storage import ChartPublication
     from sqlalchemy import event

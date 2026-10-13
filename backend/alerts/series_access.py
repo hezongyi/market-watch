@@ -167,9 +167,14 @@ def chart_data(db, body, *, realtime=None):
         page["history_revision"] = hashlib.sha256(json.dumps([page["history_revision"],
             [[item["run_id"], item["cursor"]] for item in indicator_progress]], sort_keys=True).encode()).hexdigest()
     check = history_check(db, page, body, meta)
+    dependency = history_check(db, page, body.model_copy(update={"indicators": [],
+        "track_history": True, "revision_before": body.dependency_before,
+        "revision_after": page["origin"]}), meta) if body.dependency_before else None
     return {**page, "history_check": check, "basis": meta["basis"], "calendar": meta["calendar"], "precision": meta["precision"],
         "volume_kind": meta["volume_kind"], "volume_unit": meta["volume_unit"],
         "indicators": indicators, "indicator_progress": indicator_progress,
+        "dependency_before": body.dependency_before,
+        "dependency_revision": dependency["revision"] if dependency else None,
         "future": future_grid(inst, body.timeframe, page["bars"][-1]["end"]) if page["bars"] else [],
         "bounded_history": True, "as_of": stamp, "series_kind": body.series_kind, "symbol": meta["symbol"]}
 

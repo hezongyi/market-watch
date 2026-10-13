@@ -14,6 +14,7 @@ from .composite_center import (
 from .composite_chart import chart_page
 from .composite_definitions import ProductMatch, first_use, save_mapping
 from .storage import Instrument, transaction
+from .composite_recheck import RecheckRequest
 
 
 class MappingRequest(BaseModel):
@@ -103,6 +104,19 @@ def router(authenticated):
             return report(db, composite_id, revision_id)
 
         return invoke(command)
+
+    @routes.post("/composites/{composite_id}/revisions/{revision_id}/recheck")
+    def recheck_source(composite_id: str, revision_id: str, body: RecheckRequest):
+        from .composite_recheck import recheck
+        from .history_sources import HistorySources
+
+        adapter = HistorySources()
+        try:
+            return recheck(composite_id, revision_id, body, adapter)
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
+        finally:
+            adapter.close()
 
     @routes.get("/center/composites")
     def composites(query: str = "", page: int = 1, page_size: int = 25, dataset_id: str | None = None):

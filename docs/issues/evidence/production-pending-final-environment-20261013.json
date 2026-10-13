@@ -1,0 +1,50 @@
+{
+  "environment": "Ubuntu quant-server; task-owned loopback Docker mw-pending-fixes-20261013",
+  "readyzHttpStatus": 200,
+  "runningServices": [
+    "pg",
+    "api",
+    "web",
+    "chart-origin",
+    "history-worker",
+    "chart-history-worker",
+    "native-history-worker"
+  ],
+  "apiCommand": [
+    "uvicorn",
+    "alerts.api:app",
+    "--host",
+    "0.0.0.0",
+    "--port",
+    "8000"
+  ],
+  "nativeWorkerCommand": [
+    "python",
+    "-m",
+    "alerts.native_history_loads"
+  ],
+  "apiMounts": [],
+  "nativeWorkerMounts": [],
+  "profilingOverlayRemoved": true,
+  "fixedClockAndPinnedSourceRemoved": true,
+  "productionChanged": false,
+  "finalChartImageConfigSha256": "ba43207cee705e46636309b6d224560383df678c4d67683fcdfefd2ca9a33fe8",
+  "finalCoordinator": "onDataLoaded + dataReady + versioned in-flight read reuse",
+  "finalDockerProductPassed": true,
+  "runningChartImageId": "sha256:a1098f9fcaa5c321f4b78b80511c6dc103b381caded26b37a09a4941f0c9971a",
+  "lastVerification": "After P2 unknown-range guard: API/three-worker normal Compose rebuild/recreate, running API file matches source, 54 backend tests including 12 actual PostgreSQL, real product and UI browser regressions; UI close-wait first attempt timeout/retry retained",
+  "runningWebImageId": "sha256:a9159bc6627e625097323d76756df72b766cdd814ac2747e876f9be3f5b5d94a",
+  "finalWebImageConfigSha256": "c7a30e144faeca3d4aaa3b7fea1797664acbc7afc7276f3dded1b386effa436e",
+  "finalDockerDiagnosticsPassed": true,
+  "runningApiImageId": "sha256:5977a6df9dfb0b220eb8a438b2a5ae682f55761ccf7d9c16177c53f91cb1ccd1",
+  "runningBackendWorkerImageIds": {
+    "history-worker": "sha256:5977a6df9dfb0b220eb8a438b2a5ae682f55761ccf7d9c16177c53f91cb1ccd1",
+    "chart-history-worker": "sha256:5977a6df9dfb0b220eb8a438b2a5ae682f55761ccf7d9c16177c53f91cb1ccd1",
+    "native-history-worker": "sha256:5977a6df9dfb0b220eb8a438b2a5ae682f55761ccf7d9c16177c53f91cb1ccd1"
+  },
+  "finalDockerUiPassed": true,
+  "loadFailedObservedInReviewAcceptance": false,
+  "loadFailedDisposition": "Deferred per explicit user instruction when not reproduced",
+  "fixedClockEnvironmentAbsent": true,
+  "pinnedSourceEnvironmentAbsent": true
+}
