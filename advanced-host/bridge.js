@@ -84,6 +84,43 @@ const quoteSubscriptions = new Map();
 const marketPollingFallback = new URLSearchParams(location.search).get('marketPolling') === '1';
 const marketHistoryState = new Map();
 let marketGeneration = 0;
+const compositeDisplayBatches=chartDisplayBatches({
+  accept:acceptMarketBars,
+  owners:key=>[...subscriptions.values()].filter(sub=>!sub.marketPaused && !sub.historical &&
+    !sub.needsHistoryReload && !decode(sub.symbol).spec && indicatorKey(sub.symbol,sub.res)===key),
+  settle:(key,current)=>indicatorCoordinator?.settle((ticker,res)=>indicatorKey(ticker,res)===key,current),
+  report:(key,error,reload)=>{
+    send({type:'feed-poll-state',key:'display:'+key,error:error ? String(error) : ''});
+    if(reload)for(const sub of subscriptions.values())if(indicatorKey(sub.symbol,sub.res)===key){
+      sub.needsHistoryReload=true;void recoverMarketBar(sub);
+    }
+  },
+});
+
+function acceptMarketBars(sub,event) {
+  if(event.as_of!=null && event.as_of<(sub.displayAsOf ?? -Infinity))return;
+  sub.displayAsOf=event.as_of ?? sub.displayAsOf;
+  const identity=decode(sub.symbol);
+  if(identity.spec?.name==='SWING_SR_V1') {
+    if(!swingStore().publish(MWSeries.encode(identity.symbol,identity.series_kind),sub.res,event,swingStore().ticket()))return;
+    swingDisplay?.refresh();
+  }
+  const rows=barsOf(event,sub.res,sub.symbol);
+  for(const bar of rows)if(bar.time>=sub.last){
+    sub.cb({...bar});observeRangeBars(sub.symbol,sub.res,event.bars,[bar],sub.window);sub.last=bar.time;
+  }
+  const state=marketHistoryState.get(sub.symbol+'|'+sub.res+'|'+(sub.window || ''));
+  if(state){
+    if(event.loaded_before!=null)state.last=event.loaded_before;
+    if(event.history_revision!=null)state.history_revision=event.history_revision;
+    if(event.history_tail_revision!=null)state.history_tail_revision=event.history_tail_revision;
+    if(event.initial_input_revision!=null)state.input_revision=event.initial_input_revision;
+    if(event.display_snapshot_id!=null)state.display_snapshot_id=event.display_snapshot_id;
+  }
+  rememberIndicatorBinding(sub.symbol,sub.res,event);
+  if(event.pending?.length)send({type:'status',text:event.pending.join('；')});
+  send({type:'feed-poll-state',key:sub.symbol+'|'+sub.res,error:event.status?.error || ''});
+}
 
 function quoteTimeText(stamp, meta) {
   if (!Number.isFinite(stamp)) return "";
@@ -185,7 +222,9 @@ function registerMarketBar(sub) {
     dependency_observed_at:state.dependency_observed_at ?? null,
     dependency_before:indicatorBindings.get(indicatorKey(sub.symbol,sub.res))?.dependencyBefore ?? null,
     dependency_revision:indicatorBindings.get(indicatorKey(sub.symbol,sub.res))?.dependencyRevision ?? null,
-    binding:state.binding || null,initial_input_revision:state.input_revision ?? null,initial_indicator_pending:!!sub.initialIndicatorPending,historical:!!sub.historical}});
+    binding:state.binding || null,initial_input_revision:state.input_revision ?? null,
+    display_snapshot_id:state.display_snapshot_id ?? null,
+    initial_indicator_pending:!!sub.initialIndicatorPending,historical:!!sub.historical}});
 }
 function rememberIndicatorBinding(ticker,res,page,{correction=false}={}) {
   if(decode(ticker).spec)return;
@@ -194,7 +233,7 @@ function rememberIndicatorBinding(ticker,res,page,{correction=false}={}) {
   // Realtime fixed/managed bars do not expose a numeric cache revision. Track
   // the accepted last candle's actual input, not page-wide history hashes that
   // change with pagination or indicator preparation progress.
-  const latest=page.bars?.reduce((last,bar)=>!last || bar.start>last.start ? bar : last,null);
+  const latest=(page.latest_bar ?? page.bars)?.reduce((last,bar)=>!last || bar.start>last.start ? bar : last,null);
   const hasTail=latest && latest.start>=(old.lastStart ?? -Infinity);
   const tailToken=hasTail ? JSON.stringify([latest.start,latest.open,latest.high,latest.low,latest.close,
     latest.complete,latest.revision,latest.volume,latest.volume_complete,latest.source_confirmed,latest.coverage_complete]) : old.tailToken;
@@ -202,6 +241,7 @@ function rememberIndicatorBinding(ticker,res,page,{correction=false}={}) {
   indicatorBindings.set(key,{...old,
     revision:page.revision_id ?? old.revision,
     inputRevision:page.input_revision ?? page.initial_input_revision ?? old.inputRevision,
+    displaySnapshot:hasTail ? page.display_snapshot_id ?? old.displaySnapshot : old.displaySnapshot ?? page.display_snapshot_id,
     // A main provider page's start follows the viewport. Only a Python result
     // may establish the calculation origin; later price pagination preserves it.
     calculationStart:provider && !page.indicators?.length ? old.calculationStart :
@@ -211,12 +251,14 @@ function rememberIndicatorBinding(ticker,res,page,{correction=false}={}) {
     firstStart:page.bars?.length ? Math.min(old.firstStart ?? Infinity,...page.bars.map(bar=>bar.start)) : old.firstStart,
     lastStart:page.bars?.length ? Math.max(old.lastStart ?? -Infinity,...page.bars.map(bar=>bar.start)) : old.lastStart,
     correctionVersion:correction ? (old.correctionVersion || 0)+1 : old.correctionVersion || 0,
+    correctionStart:correction ? page.affected_chart_time : old.correctionStart,
   });
   void indicatorCoordinator?.sync();
 }
 function startIndicatorCoordinator(catalog) {
   indicatorCoordinator=chartIndicatorCoordinator(widget,catalog,{
     read:(symbol,res,args,current)=>query(symbol,res,args,Date.now()+30000,current),
+    recover:(ticker,res,token)=>recoverDisplaySnapshot(ticker,res,token),
     identity:{
       binding:(ticker,res)=>{
         const id=decode(ticker),key=indicatorKey(ticker,res),base=indicatorBindings.get(key);
@@ -227,6 +269,7 @@ function startIndicatorCoordinator(catalog) {
           calculationStart:base.calculationStart ?? session?.start ?? 0,
           before:Number.isFinite(base.lastStart) ? base.lastStart+1 : undefined,
           query:{...(base.revision && id.series_kind==='composite'?{composite_revision_id:base.revision}:{}),
+            ...(base.displaySnapshot && id.series_kind==='composite'?{display_snapshot_id:base.displaySnapshot}:{}),
             ...(id.series_kind==='provider' && base.calculationStart?{calculation_origin:base.calculationStart}:{}),
             ...(['managed','history','composite'].includes(id.series_kind) && base.firstStart>0 ? {dependency_before:base.firstStart}:{}),
             provisional:true}};
@@ -252,6 +295,41 @@ function startIndicatorCoordinator(catalog) {
     },
   });
 }
+const displayRecoveries=new Map();
+async function recoverDisplaySnapshot(ticker,res,token){
+  const key=indicatorKey(ticker,res),previous=displayRecoveries.get(key);
+  if(previous?.token===token)return previous.promise;
+  const epoch=workspaceEpoch;
+  const promise=(async()=>{
+    compositeDisplayBatches.cancel(key);
+    for(const sub of subscriptions.values())if(indicatorKey(sub.symbol,sub.res)===key){
+      sub.needsHistoryReload=true;
+      sub.marketGeneration=++marketGeneration;sub.marketSequence=0;
+    }
+    cache.clear();
+    for(let attempt=0;attempt<3 && epoch===workspaceEpoch;attempt++){
+      try{
+        const restored=await reloadHistory(ticker,res);
+        if(restored){
+          for(const sub of subscriptions.values())if(indicatorKey(sub.symbol,sub.res)===key){
+            sub.needsHistoryReload=false;registerMarketBar(sub);
+          }
+          return;
+        }
+      }catch(error){
+        if(attempt===2)throw error;
+      }
+      await new Promise(resolve=>setTimeout(resolve,1000*2**attempt));
+    }
+    if(epoch===workspaceEpoch)throw Error('展示快照恢复失败，请重试指标');
+  })();
+  displayRecoveries.set(key,{token,promise});
+  promise.catch(error=>send({type:'feed-poll-state',key:'display:'+key,error:String(error)}));
+  // Keep only the latest credential per scope; old failed recovery cannot
+  // continuously reset a chart. A later accepted snapshot gets a new attempt.
+  if(displayRecoveries.size>64)displayRecoveries.delete(displayRecoveries.keys().next().value);
+  return promise;
+}
 function acceptMarketHistory(ticker,res,page,window = '', acceptedRows) {
   rememberIndicatorBinding(ticker,res,page);
   if(marketPollingFallback) return;
@@ -264,6 +342,7 @@ function acceptMarketHistory(ticker,res,page,window = '', acceptedRows) {
     accepted:true,empty:!bars.length,
     last:bars.length ? Math.max(old.last || 0,bars.at(-1).start) : null,observed_at:page.as_of || Date.now(),
     input_revision:page.input_revision ?? null,
+    display_snapshot_id:page.display_snapshot_id ?? old.display_snapshot_id,
     binding:page.revision_id || null,history_revision:page.history_check?.next_revision || null,
     dependency_observed_at:old.dependency_observed_at ?? null,
     history_tail_revision:page.history_check?.next_tail_revision || null});
@@ -294,6 +373,7 @@ function synchronizeMarketVisibility() {
     if(!sub.marketListener) continue;
     const visible=hasHistoryViewer({instrument:sub.symbol,timeframe:frames[sub.res]});
     if(!visible && !sub.marketPaused) {
+      compositeDisplayBatches.cancel(indicatorKey(sub.symbol,sub.res));
       sub.marketPaused=true;
       clearTimeout(sub.marketRetry);
       send({type:'market-unsubscribe',args:{client:clientId,listener:sub.marketListener,generation:sub.marketGeneration}});
@@ -665,6 +745,8 @@ function query(ticker, res, args, expires = Infinity, current = () => true) {
       return page;
     })
     .catch(error=>{
+      if(epoch===workspaceEpoch && error.code==='DISPLAY_SNAPSHOT_EXPIRED' && q.display_snapshot_id && !q.indicators?.length)
+        void recoverDisplaySnapshot(ticker,res,q.display_snapshot_id);
       if(epoch===workspaceEpoch && Date.now()>=expires)
         throw Object.assign(Error('历史复核时间预算已耗尽'), {code:'HISTORY_TIMEOUT'});
       throw error;
@@ -1038,7 +1120,11 @@ const feed = {
         const pageBudget=capabilities?.task_pages || 300;
         const reserveStarted=globalThis.performance?.now() || 0;
         let before=p.to*1000 + (['1D','1W','1M'].includes(res) ? 2*86400000 : 0);
-        let rows=[], rawRows=[], boundary=false, fixed={};
+        const acceptedSnapshot=indicatorBindings.get(indicatorKey(s.ticker,res));
+        let rows=[], rawRows=[], boundary=false, fixed=identity.series_kind==='composite' &&
+          !p.firstDataRequest && acceptedSnapshot?.displaySnapshot &&
+          ![...subscriptions.values()].some(sub=>sub.needsHistoryReload && indicatorKey(sub.symbol,sub.res)===indicatorKey(s.ticker,res)) ?
+          {composite_revision_id:acceptedSnapshot.revision,display_snapshot_id:acceptedSnapshot.displaySnapshot} : {};
         for (let partition=0; rows.length<requested; partition++) {
           if(partition>=pageBudget) throw Object.assign(Error('固定历史分页预算已耗尽，请缩小范围后重试'),{code:'HISTORY_PAGE_BUDGET'});
           const page=await query(s.ticker,res,{before,limit:Math.min(2000,requested-rows.length),...fixed},deadline,current);
@@ -1050,7 +1136,8 @@ const feed = {
             fixedHistoryStarts.set(historyKey,Math.min(fixedHistoryStarts.get(historyKey)??Infinity,page.bars[0].start));
           rawRows.push(...page.bars);
           rows=barsOf(page,res,s.ticker).filter(bar=>bar.time<p.to*1000).concat(rows);
-          if (page.revision_id) fixed={composite_revision_id:page.revision_id,input_revision:page.input_revision};
+          if (page.revision_id) fixed={composite_revision_id:page.revision_id,
+            ...(page.display_snapshot_id ? {display_snapshot_id:page.display_snapshot_id} : {input_revision:page.input_revision})};
           boundary=page.has_more===false && !page.pending?.length;
           if (page.pending?.length) {
             send({type:'status',text:page.pending.join('；')});
@@ -1080,8 +1167,8 @@ const feed = {
       if (!Number.isSafeInteger(requested)) throw Error('无效历史根数');
       const key=symbol+'|'+res, epoch=workspaceEpoch;
       let session=managedSessions.get(key);
-      const indicatorKey=identity.spec ? JSON.stringify(identity.spec) : null;
-      if (!session || indicatorKey && !session.indicators?.has(indicatorKey)) {
+      const studyKey=identity.spec ? JSON.stringify(identity.spec) : null;
+      if (!session || studyKey && !session.indicators?.has(studyKey)) {
         const geometry=datasetGeometry(s.ticker,res);
         const dataset=await request({op:'dataset',args:{instrument:symbol,timeframe:frames[res],
           ...geometry, ...(identity.spec ? {indicators:[identity.spec]} : {})}},'market');
@@ -1097,7 +1184,7 @@ const feed = {
           return;
         }
         session ||= {start:dataset.start,revision:dataset.revision,indicators:new Set()};
-        if(indicatorKey) session.indicators.add(indicatorKey);
+        if(studyKey) session.indicators.add(studyKey);
         managedSessions.set(key,session);
       }
       let before=p.to*1000 + (['1D','1W','1M'].includes(res) ? 2*86400000 : 0);
@@ -1172,6 +1259,7 @@ const feed = {
   },
   unsubscribeBars: id => {
     const sub=subscriptions.get(id);
+    if(sub)compositeDisplayBatches.cancel(indicatorKey(sub.symbol,sub.res));
     clearTimeout(sub?.marketRetry);
     if(sub?.marketListener)
       send({type:'market-unsubscribe',args:{client:clientId,listener:sub.marketListener,generation:sub.marketGeneration}});
@@ -2136,7 +2224,6 @@ function boot(
         }
       }
     }
-    MWDrawingVisibility.install(widget._innerWindow());
     widget.headerReady().then(async()=>{
         studyTemplates=chartStudyTemplates(widget,prefs.templates,readonly,
           error=>send({type:'error',error:String(error)}));
@@ -2468,10 +2555,12 @@ addEventListener("message", async (e) => {
       const binding=indicatorBindings.get(indicatorKey(sub.symbol,sub.res));if(binding)binding.dependencyRevision=event.dependency_revision;
     }
     if(event.indicator_correction){
+      compositeDisplayBatches.cancel(indicatorKey(sub.symbol,sub.res));
       if(event.initial_input_revision!=null && acceptedState)acceptedState.input_revision=event.initial_input_revision;
       rememberIndicatorBinding(sub.symbol,sub.res,event,{correction:true});
     }
     if(event.type==='reset') {
+      compositeDisplayBatches.cancel(indicatorKey(sub.symbol,sub.res));
       rememberIndicatorBinding(sub.symbol,sub.res,event,{correction:true});
       // Fence the old generation while asynchronous native recovery runs.
       // Its replacement is registered only after the new history is accepted.
@@ -2487,25 +2576,12 @@ addEventListener("message", async (e) => {
       await recoverMarketBar(sub);
     } else if(event.type==='bars' && !sub.historical && !sub.needsHistoryReload) {
       const identity=decode(sub.symbol);
-      if(identity.spec?.name==='SWING_SR_V1') {
-        if(!swingStore().publish(MWSeries.encode(identity.symbol,identity.series_kind),sub.res,event,swingStore().ticket())) return;
-        swingDisplay?.refresh();
-      }
-      const rows=barsOf(event,sub.res,sub.symbol);
-      for(const bar of rows) if(bar.time>=sub.last) {
-        sub.cb({...bar}); observeRangeBars(sub.symbol,sub.res,event.bars,[bar],sub.window);sub.last=bar.time;
-      }
-      const state=marketHistoryState.get(sub.symbol+'|'+sub.res+'|'+(sub.window || ''));
-      if(state) {
-        if(event.loaded_before != null) state.last=event.loaded_before;
-        if(event.history_revision != null) state.history_revision=event.history_revision;
-        if(event.history_tail_revision != null) state.history_tail_revision=event.history_tail_revision;
-        if(event.initial_input_revision != null) state.input_revision=event.initial_input_revision;
-      }
-      rememberIndicatorBinding(sub.symbol,sub.res,event);
-      if(event.pending?.length) send({type:'status',text:event.pending.join('；')});
-      if(event.status?.error) send({type:'feed-poll-state',key:sub.symbol+'|'+sub.res,error:event.status.error});
-      else send({type:'feed-poll-state',key:sub.symbol+'|'+sub.res,error:''});
+      if(identity.series_kind==='composite' && !identity.spec && event.display_snapshot_id){
+        const generation=sub.marketGeneration;
+        compositeDisplayBatches.enqueue(indicatorKey(sub.symbol,sub.res),sub,event,
+          ()=>[...subscriptions.values()].includes(sub) && sub.marketGeneration===generation &&
+            !sub.marketPaused && !sub.needsHistoryReload);
+      }else acceptMarketBars(sub,event);
     } else if(event.type==='status' && event.error) {
       send({type:'feed-poll-state',key:sub.symbol+'|'+sub.res,error:event.error});
     }
@@ -2561,6 +2637,10 @@ addEventListener("message", async (e) => {
   } else if (m.type === "cancel-history") {
     MWNativeNavigation.cancelAll();
   } else if(m.type==='retry-chart-indicators' && m.epoch===workspaceEpoch && Number.isSafeInteger(m.index)) {
+    if(ready && m.index>=0 && m.index<widget.chartsCount()){
+      const chart=widget.chart(m.index);
+      displayRecoveries.delete(indicatorKey(chart.symbol(),chart.resolution()));
+    }
     void indicatorCoordinator?.retry(m.index);
   } else if (m.type === 'retry-chart-history' && ready && !loading && m.epoch===workspaceEpoch &&
       Number.isSafeInteger(m.index) && m.index>=0 && m.index<widget.chartsCount()) {
@@ -2585,6 +2665,7 @@ addEventListener("message", async (e) => {
 send({ type: "loaded" });
 
 addEventListener("pagehide", () => {
+  compositeDisplayBatches.dispose();
   indicatorCoordinator?.dispose();
   ordinaryNotices?.dispose();
   alertUI?.destroy();

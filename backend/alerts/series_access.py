@@ -120,6 +120,14 @@ def chart_data(db, body, *, realtime=None):
             # source observation throughout the history/aggregation read.
             _live_observation = (db.get(LiveState, mapping.target_dataset_id),
                                  db.get(PricingOwner, account_key(settings.oanda_account_id)))
+            # First-use adoption needs a write lock. Take it before a shared
+            # read lock; two first readers cannot safely upgrade together.
+            if _live_observation[0]:
+                from .display_observations import handover_legacy
+
+                handover_legacy(db, _live_observation[0])
+            db.scalar(select(LiveState).where(LiveState.dataset_id == mapping.target_dataset_id)
+                .with_for_update(read=True).execution_options(populate_existing=True))
     # Evaluate freshness after the source snapshot, never before IO that can
     # read a newly received quote and mistake it for future data.
     stamp = now_ms()
@@ -138,9 +146,18 @@ def chart_data(db, body, *, realtime=None):
                 raise ValueError("首次使用身份与候选不一致")
         if not composite:
             raise ValueError("组合尚未建立；请从图表实际使用入口打开")
+        snapshot = None
+        if body.display_snapshot_id:
+            from .display_snapshots import resolve
+
+            if not body.provisional or body.input_revision is not None:
+                raise ValueError('展示快照必须按展示模式读取；固定确认输入请使用 input_revision')
+            selected = db.get(CompositeRevision, body.composite_revision_id or composite.active_revision_id)
+            snapshot = resolve(db, body.display_snapshot_id, selected, body.timeframe, stamp)
         page = composite_page(db, composite.id, body.timeframe, before=body.before, count=body.limit,
             revision_id=body.composite_revision_id, input_revision=body.input_revision,
-            provisional=body.provisional and body.input_revision is None, now=stamp, realtime=realtime)
+            provisional=body.provisional and body.input_revision is None, now=stamp, realtime=realtime,
+            display_snapshot=snapshot)
         selected = db.get(CompositeRevision, page["revision_id"])
         parent = db.get(HistoryVersion, selected.history_version_id)
         meta["calendar"] = selected.rules["aggregation_calendar"]

@@ -12,7 +12,7 @@ pytestmark = pytest.mark.skipif(not os.getenv("TEST_POSTGRES_URL"), reason="Requ
 
 @pytest.mark.parametrize("contract", [
     contracts.test_fixed_reader_uses_history_before_T_target_after_T_and_previous_input_prices,
-    contracts.test_stream_tail_is_provisional_and_expired_owner_is_excluded,
+    contracts.test_accepted_stream_tail_remains_provisional_after_owner_expires,
 ])
 def test_postgres_composite_series(provider_pg, monkeypatch, contract):
     contract(provider_pg[0], monkeypatch)

@@ -22,6 +22,7 @@ from .source_history_store import _insert
 from .storage import (
     CompositeMinuteInput,
     CompositeRevision,
+    DisplaySnapshot,
     FixedIndicatorBlock,
     FixedIndicatorRun,
     HistoryReclamation,
@@ -266,7 +267,7 @@ def outputs(db, run, start, end):
     return sorted(rows, key=lambda row: row["start"])
 
 
-def chart_results(db, page, specs, *, provisional=False, stamp=None):
+def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='display'):
     results, progress = [], []
     if not page["bars"]:
         return results, progress
@@ -293,10 +294,25 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None):
             from .composite_chart import chart_page
 
             latest = chart_page(db, page["composite_id"], run.timeframe, count=1,
-                                revision_id=run.revision_id, provisional=True, now=stamp)
+                                revision_id=run.revision_id, provisional=True, now=stamp,
+                                display_snapshot=(db.get(DisplaySnapshot,
+                                    page['display_snapshot_id']) if page.get('display_snapshot_id') else None))
             if latest["input_revision"] == run.input_revision:
                 tail = latest["bars"]
-        if run.status == "complete" and provisional and (end > run.target_end or tail is not page["bars"]):
+        if provisional and purpose == 'display' and run.revision_id:
+            from .display_indicators import suffix
+
+            display_page = page if tail is page['bars'] else {**page, 'bars': sorted(
+                {bar['start']: bar for bar in [*page['bars'], *tail]}.values(), key=lambda bar: bar['start'])}
+            repaired = suffix(db, run, display_page, stamp=stamp or now_ms())
+            if repaired:
+                status['display_status'] = 'pending' if repaired['pending'] else 'complete'
+                status['affected_start'] = repaired['affected']
+                if not repaired['pending']:
+                    rows = [row for row in rows if row['start'] < repaired['affected']]
+                    rows += [row for row in repaired['rows'] if start <= row['start'] < end]
+                    display = repaired['display'] or display
+        elif run.status == "complete" and provisional and (end > run.target_end or tail is not page["bars"]):
             _, _, phase, profiles = _context(db, run)
             engine = IndicatorState(run.spec, run.state)
             for bar in tail:

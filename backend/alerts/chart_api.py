@@ -113,6 +113,7 @@ class DataQuery(BaseModel):
     provisional: bool = True
     composite_revision_id: str | None = Field(default=None, max_length=36)
     input_revision: int | None = Field(default=None, ge=0)
+    display_snapshot_id: str | None = Field(default=None, min_length=64, max_length=64)
     native_history: NativeHistory | None = None
     history_observation: HistoryObservation | None = None
     native_reserve: NativeReserve | None = None

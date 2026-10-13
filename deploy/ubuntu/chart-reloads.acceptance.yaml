@@ -1,0 +1,97 @@
+# Ubuntu-only. Task-owned images must be built with mw-docker; no inline builds.
+name: mw-chart-reloads-20261013
+services:
+  postgres:
+    image: postgres:14-bookworm
+    restart: "no"
+    environment:
+      POSTGRES_DB: chartreloads
+      POSTGRES_USER: chartreloads
+      POSTGRES_PASSWORD: ${MW_ACCEPTANCE_DB_PASSWORD:?Set a development-only password}
+    ports: ["127.0.0.1:20290:5432"]
+    volumes: ["postgres-data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U chartreloads -d chartreloads"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  migrate:
+    image: ${MW_API_IMAGE:?Build the task-owned API image}
+    restart: "no"
+    command: [alembic, upgrade, head]
+    environment: &backend-env
+      ALERTS_DATABASE_URL: postgresql+psycopg://chartreloads:${MW_ACCEPTANCE_DB_PASSWORD}@postgres/chartreloads
+      ALERTS_COOKIE_SECURE: "false"
+      ALERTS_ADMIN_PASSWORD_HASH: ${MW_BACKEND_LOGIN_HASH:?Set an acceptance-only login hash}
+      ALERTS_DELIVERY_ENABLED: "false"
+      ALERTS_MCP_ENABLED: "false"
+      ALERTS_YAHOO_ENABLED: "false"
+      ALERTS_INITIAL_HISTORY_DAYS: "0"
+      ALERTS_FX_SOURCE: oanda
+      ALERTS_OANDA_STREAM_ENABLED: "false"
+      ALERTS_DATABASE_POOL_SIZE: "2"
+      ALERTS_DATABASE_MAX_OVERFLOW: "0"
+    depends_on:
+      postgres: {condition: service_healthy}
+  api:
+    image: ${MW_API_IMAGE:?Build the task-owned API image}
+    restart: "no"
+    # Optional restricted Ubuntu source config. Never put it in the repository.
+    env_file:
+      - path: ${MW_CHART_RELOAD_SOURCE_ENV:-/tmp/mw-chart-reload-implementation-20261013/source.env}
+        required: false
+        format: raw
+    environment: *backend-env
+    ports: ["127.0.0.1:20289:8000"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8000/readyz', timeout=3)"]
+      interval: 3s
+      timeout: 4s
+      retries: 20
+  market-stream-worker:
+    image: ${MW_API_IMAGE:?Build the task-owned API image}
+    restart: "no"
+    command: [python, -m, alerts.market_stream_worker]
+    env_file:
+      - path: ${MW_CHART_RELOAD_SOURCE_ENV:-/tmp/mw-chart-reload-implementation-20261013/source.env}
+        required: false
+        format: raw
+    environment: *backend-env
+    depends_on:
+      api: {condition: service_healthy}
+  history-state-worker:
+    image: ${MW_API_IMAGE:?Build the task-owned API image}
+    restart: "no"
+    command: [python, -m, alerts.history_versions]
+    env_file:
+      - path: ${MW_CHART_RELOAD_SOURCE_ENV:-/tmp/mw-chart-reload-implementation-20261013/source.env}
+        required: false
+        format: raw
+    environment: *backend-env
+    depends_on:
+      api: {condition: service_healthy}
+  native-history-worker:
+    image: ${MW_API_IMAGE:?Build the task-owned API image}
+    restart: "no"
+    command: [python, -m, alerts.native_history_loads]
+    env_file:
+      - path: ${MW_CHART_RELOAD_SOURCE_ENV:-/tmp/mw-chart-reload-implementation-20261013/source.env}
+        required: false
+        format: raw
+    environment: *backend-env
+    depends_on:
+      api: {condition: service_healthy}
+  web:
+    image: ${MW_WEB_IMAGE:?Build the task-owned web image}
+    restart: "no"
+    ports: ["127.0.0.1:20287:80"]
+    depends_on:
+      api: {condition: service_healthy}
+  chart-origin:
+    image: ${MW_CHART_IMAGE:?Build the task-owned chart image}
+    restart: "no"
+    ports: ["127.0.0.1:20288:80"]
+volumes:
+  postgres-data:

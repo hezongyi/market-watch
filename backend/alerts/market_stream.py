@@ -423,6 +423,7 @@ def delivery(db, task, sub, payload, cursors):
     before, after = state.get("loaded_before"), state.get("loaded_after")
     dependency_origin = state.get("dependency_origin")
     check = None
+    display_verified = False
     if before is not None:
         query = query.model_copy(update={"track_history": True, "revision_before": before,
                                          "revision_after": after})
@@ -435,13 +436,26 @@ def delivery(db, task, sub, payload, cursors):
                 floor = (page["origin"] if query.indicators else
                          period(after, query.timeframe, page["calendar"])[0] if after is not None else 0)
                 previous_input_revision = state["initial_input_revision"]
+                if state.get('display_snapshot_id') and page.get('display_snapshot_id'):
+                    from .display_changes import changed_buckets
+
+                    differences = changed_buckets(db, query.instrument, page['revision_id'], query.timeframe,
+                        state['display_snapshot_id'], page['display_snapshot_id'], floor, cutoff, now_ms())
+                    display_verified = differences is not None
+                    if differences:
+                        from .series_access import fixed_label
+
+                        left = min(differences)
+                        right = period(left, query.timeframe, page['calendar'])[1]
+                        return {'type': 'reset', 'reason': 'history_changed', 'affected_start': left,
+                            'affected_chart_time': fixed_label({'start': left, 'end': right}, query.timeframe, page['calendar'])}
                 changed = db.scalar(select(CompositeMinuteInput.start).where(
                     CompositeMinuteInput.revision_id == page["revision_id"],
                     CompositeMinuteInput.input_revision > state["initial_input_revision"],
                     CompositeMinuteInput.input_revision <= page["input_revision"],
                     CompositeMinuteInput.start >= floor, CompositeMinuteInput.start < cutoff).limit(1))
                 state["initial_input_revision"] = page["input_revision"]
-                if changed is not None:
+                if changed is not None and not display_verified:
                     return {"type": "reset", "reason": "history_changed"}
                 if dependency_origin is not None and dependency_origin < floor:
                     prefix = db.scalar(select(CompositeMinuteInput.start).where(
@@ -515,7 +529,7 @@ def delivery(db, task, sub, payload, cursors):
         if check.get("next_tail_revision"):
             state["history_tail_revision"] = (check["tail_revision"] if state.get("historical") else
                                              check["next_tail_revision"])
-        if previous and previous != check["revision"]:
+        if previous and previous != check["revision"] and not display_verified:
             return {"type": "reset", "reason": "history_changed"}
     progress = [(item.get("id"), min(item.get("cursor", 0), before or item.get("cursor", 0)),
                  item.get("status")) for item in page.get("indicator_progress", [])]
@@ -550,6 +564,8 @@ def delivery(db, task, sub, payload, cursors):
     if page["bars"]:
         state["cursor"] = page["bars"][-1].get("chart_time", page["bars"][-1]["start"])
         state["loaded_before"] = page["bars"][-1]["start"]
+    if page.get('display_snapshot_id'):
+        state['display_snapshot_id'] = page['display_snapshot_id']
     for name in ("loaded_before", "history_revision", "history_tail_revision", "initial_input_revision"):
         if name in state:
             page[name] = state[name]

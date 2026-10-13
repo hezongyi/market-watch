@@ -299,6 +299,9 @@ def begin_connection(ownership, identities, *, now=None):
             state = db.get(LiveState, identity.key)
             if not state:
                 raise ValueError("Unregistered live dataset")
+            from .display_observations import handover_legacy
+
+            handover_legacy(db, state)
             state.epoch = owner.epoch
             state.connection = "connecting"
             state.ready = False
@@ -353,6 +356,9 @@ def publish_event(ownership, epoch, event, identities, *, now=None):
         state = db.get(LiveState, event.identity.key)
         if state.epoch != epoch:
             raise TimeoutError("Quote generation is obsolete")
+        from .display_observations import handover_legacy
+
+        handover_legacy(db, state)
         previous = state.quote
         if previous and event.source_time < previous["source_time"]:
             return "rejected_old_source"
@@ -392,6 +398,9 @@ def publish_event(ownership, epoch, event, identities, *, now=None):
             state.forming = forming
         dataset = db.get(MarketDataset, event.identity.key)
         inst = db.get(Instrument, dataset.instrument_id)
+        from .display_observations import accept
+
+        accept(db, state, event, stamp=stamp, profile=inst.calendar_profile)
         inst.last_received = event.received_at
         inst.quality = "receiving" if state.ready else "recovering"
         if (not event.tradeable or event.bid is None or event.ask is None or
@@ -462,6 +471,22 @@ def confirmation_window(ownership, epoch, identity, *, now=None):
         cutoff = (stamp - 5000) // 60000 * 60000
         start = state.recovery_cursor if not state.ready else max(0, state.confirmed_end - 2 * 60000)
         start = min(start, cutoff - 2 * 60000)
+        # A later confirmed minute is not proof that earlier observations were
+        # confirmed. Keep shared backfill demand across connections/restarts.
+        from .source_registry import collection_identity
+        from .storage import ObservedMinute, SourceMinute
+        from sqlalchemy import exists
+
+        pending = db.scalar(select(ObservedMinute.start).outerjoin(LiveMinute,
+            (LiveMinute.dataset_id == ObservedMinute.dataset_id) & (LiveMinute.start == ObservedMinute.start)).where(
+            ObservedMinute.dataset_id == identity.key, ObservedMinute.start < cutoff,
+            (LiveMinute.last_attempt.is_(None)) | (LiveMinute.last_attempt <= stamp - 60000),
+            ~exists(select(SourceMinute.start).where(
+                SourceMinute.source_id == collection_identity(identity).key,
+                SourceMinute.start == ObservedMinute.start)))
+            .order_by(ObservedMinute.start).limit(1))
+        if pending is not None:
+            start = min(start, pending)
         # Bound the fenced ingestion transaction so heartbeat publishing and
         # lease renewal do not wait behind an entire multi-day recovery.
         end = min(cutoff, start + 240 * 60000)

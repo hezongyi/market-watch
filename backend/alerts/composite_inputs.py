@@ -71,6 +71,9 @@ def apply_minutes(db, recorded, *, revision_id=None, reason="live_confirmation")
             output.append({"revision_id": revision.id, "input_revision": prep.input_revision,
                            "changed_minutes": len(changes)})
     db.flush()
+    from .display_observations import retire_confirmed
+
+    retire_confirmed(db, recorded['source_id'], [item['start'] for item in recorded['minutes']])
     return output
 
 

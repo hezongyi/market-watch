@@ -42,6 +42,27 @@ class IndicatorState:
             return self.state.get("atr") is not None
         return all(value is not None for value in values.values())
 
+    def display_step(self, row, *, provisional_dependency=False):
+        """Advance an isolated display chain, preserving preview event semantics.
+
+        Callers own the copied state. This is deliberately separate from the
+        one-row provisional trial used by alert evaluation.
+        """
+        if self.name == 'SWING_SR_V1':
+            from .swing_sr import SwingState
+
+            engine = SwingState(self.params, self.state or None)
+            admitted = row.get('display_coverage_complete', not row.get('source_confirmed', row['complete']) or row['complete'])
+            values, _ = engine.step({**row, 'complete': row['complete'] if admitted else False,
+                'gap_before': row.get('gap_before') or not admitted},
+                provisional=admitted and (provisional_dependency or not row['complete']))
+            self.state, self.last_presentation = engine.state, engine.presentation()
+            return values
+        # Source-confirmed but incomplete coverage remains a real dependency
+        # gap. Admission is for observed prices, not every incomplete bucket.
+        admitted = row.get('display_coverage_complete', not row.get('source_confirmed', row['complete']) or row['complete'])
+        return self.step({**row, 'complete': admitted})
+
     def step(self, row, *, provisional=False):
         if self.name == "SWING_SR_V1":
             from .swing_sr import SwingState

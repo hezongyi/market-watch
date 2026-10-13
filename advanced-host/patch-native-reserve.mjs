@@ -169,29 +169,34 @@ replacements.push([
   'pricescale:globalThis.parent?.chartQuoteScale?.(t,i)??i.pricescale,minmov:i.minmov,minmove2:i.minmove2||0,fractional:i.fractional||!1',
 ]);
 const quoteScaleHooks = replacements.map(pair => [...pair]);
-const endPair = replacements.find(pair => pair[0] === 's.endOfData=!0),e.onHistoryCallback(s)');
-endPair[1] = endPair[1].replace('this._symbolInfo.ticker?.startsWith("MWP:")', `${runtime}?.eligible(this._symbolInfo)`);
-// Drawing masks use each source model's interval and the native property tree.
-replacements.push(
+const endIndex = replacements.findIndex(pair => pair[0] === 's.endOfData=!0),e.onHistoryCallback(s)');
+replacements[endIndex] = [replacements[endIndex][0], replacements[endIndex][1].replace('this._symbolInfo.ticker?.startsWith("MWP:")', `${runtime}?.eligible(this._symbolInfo)`)];
+// Historical mask hooks are recognized for removal only; new bundles retain native ranges.
+const oldDrawingPairs = [
   ['function d(e,t){const i=t.childs();switch(e.kind())',
    'function d(e,t){const mw=globalThis.parent?.MWDrawingVisibility?.actual(e,t);if(mw!==undefined)return mw;const i=t.childs();switch(e.kind())'],
   ['calcIsActualInterval(){const e=this._isActualInterval,t=this._properties,i=this._model.mainSeries();',
    'calcIsActualInterval(){globalThis.parent?.MWDrawingVisibility?.ensure(this._properties.childs().intervalsVisibilities);const e=this._isActualInterval,t=this._properties,i=this._model.mainSeries();'],
-);
-const drawingVisibilityHooks = replacements.map(pair=>[...pair]);
+];
+const drawingVisibilityHooks = [...replacements, ...oldDrawingPairs].map(pair=>[...pair]);
 replacements.push([
   '_createStudy(e,t,i,s,r,o,a,l){this._studiesCache[s][r].completed=!1;',
   '_createStudy(e,t,i,s,r,o,a,l){if(globalThis.parent?.MWNativeIndicatorResults?.start(this,e,t,i,s,r,o,a,l))return;this._studiesCache[s][r].completed=!1;',
 ]);
+// Recognize previously installed masks so a dirty licensed asset can be
+// restored to the verified original before applying the current hooks.
+const previousDrawingIndicatorHooks = [...drawingVisibilityHooks, replacements.at(-1)].map(pair => [...pair]);
 const digest = text => createHash('sha256').update(text).digest('hex');
 if (digest(source) !== expected) {
-  const installed = [replacements, drawingVisibilityHooks, quoteScaleHooks, maximizedHooks, productionV112Hooks, legacySyncHooks, previousSyncHooks, legacyPreviousSyncHooks, rangeHooks, legacyRangeHooks, previous, continuousHooks, continuousV9, continuousV8, continuousV7, continuousV6, continuousV5, continuousV4, continuousV3, continuousV2, continuousV1, legacy].find(candidate=>
-    candidate.every(([,after])=>source.split(after).length===2));
-  if (!installed) throw Error('Incomplete native hooks: restore the verified original bundle before installing');
-  let original = source;
-  for (const [before, after] of installed) original = original.replace(after, before);
-  if (digest(original) !== expected)
-    throw Error('Unsupported licensed bundle: supply the original verified v31.1.0 distribution');
+  const candidates = [replacements, previousDrawingIndicatorHooks, drawingVisibilityHooks, quoteScaleHooks, maximizedHooks, productionV112Hooks, legacySyncHooks, previousSyncHooks, legacyPreviousSyncHooks, rangeHooks, legacyRangeHooks, previous, continuousHooks, continuousV9, continuousV8, continuousV7, continuousV6, continuousV5, continuousV4, continuousV3, continuousV2, continuousV1, legacy];
+  let installed, original;
+  for (const candidate of candidates) {
+    if (!candidate.every(([,after])=>source.split(after).length===2)) continue;
+    let restored=source;
+    for (const [before,after] of candidate) restored=restored.replace(after,before);
+    if (digest(restored)===expected) {installed=candidate;original=restored;break;}
+  }
+  if (!installed) throw Error('Incomplete or unsupported native hooks: restore the verified original bundle before installing');
   if (disabled) {writeFileSync(file, original);console.log('Restored verified original native bundle');process.exit(0);}
   if (installed === replacements) {
     console.log('Verified existing continuous native hooks');process.exit(0);

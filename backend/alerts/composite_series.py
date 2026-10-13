@@ -59,7 +59,7 @@ def aggregate(minutes, frame, *, phase, seam, segments, revision_id, input_revis
     output = []
     for (left, right), members in sorted(groups.items()):
         observed = {row["timestamp"]: row for row in members}
-        unknown, closed, conflicts = 0, 0, 0
+        unknown, closed, conflicts, display_missing = 0, 0, 0, 0
         for at in range(left, right, 60000):
             segment = segments["history" if at < seam else "target"]
             is_closed = _closed(at, segment, phase)
@@ -70,6 +70,7 @@ def aggregate(minutes, frame, *, phase, seam, segments, revision_id, input_revis
                 closed += 1
             else:
                 unknown += 1
+                display_missing += int(at <= members[-1]['timestamp'])
         coverage = unknown == 0 and left >= history_start
         confirmed = all(row["complete"] for row in members)
         time_closed = right <= now
@@ -100,6 +101,7 @@ def aggregate(minutes, frame, *, phase, seam, segments, revision_id, input_revis
             "volume_complete": complete and compatible and volumes,
             "complete": complete, "time_closed": time_closed, "source_confirmed": confirmed,
             "coverage_complete": coverage, "observed_minutes": len(members), "unknown_minutes": unknown,
+            "display_coverage_complete": display_missing == 0 and left >= history_start,
             "confirmed_closed_minutes": closed, "session_conflict": bool(conflicts), "conflict_minutes": conflicts,
             "seam_crossing": left < seam < right, "seam_at_start": left == seam,
             "mixed_source": len(sources) > 1, "composite_revision_id": revision_id,
@@ -108,7 +110,7 @@ def aggregate(minutes, frame, *, phase, seam, segments, revision_id, input_revis
 
 
 def read_window(db, composite_id, frame, start, end, *, revision_id=None, input_revision=None,
-                provisional=False, now=None, permission_scope="workspace:default", realtime=None):
+                provisional=False, now=None, permission_scope="workspace:default", realtime=None, display_snapshot=None):
     """Read a bounded minute partition; outer pagination/materialization owns long history."""
     stamp = now_ms() if now is None else now
     composite = db.get(MarketComposite, composite_id)
@@ -128,7 +130,7 @@ def read_window(db, composite_id, frame, start, end, *, revision_id=None, input_
     target = db.get(MarketDataset, mapping.target_dataset_id)
     target_inst = db.get(Instrument, target.instrument_id)
     prep = db.get(CompositePreparation, revision.id)
-    value = prep.input_revision if input_revision is None else input_revision
+    value = display_snapshot.input_revision if display_snapshot else prep.input_revision if input_revision is None else input_revision
     if not 0 <= value <= prep.input_revision:
         raise ValueError("Invalid fixed composite input revision")
     phase = revision.rules["aggregation_calendar"]
@@ -161,37 +163,26 @@ def read_window(db, composite_id, frame, start, end, *, revision_id=None, input_
     if realtime and state is None:
         state = realtime.initialize(revision, frame, left, version, segments, value, minutes)
     if state:
-        # The old temporary minute is removed even when no new quote arrives,
-        # owner validity changes, or the next minute is not yet REST-confirmed.
+        # Replace the mutable overlay from durable observations. Removing it
+        # here is cache housekeeping, never a freshness-based display eviction.
         for at in list(state.stats["target"]["provisional"]):
             state.remove(at)
     if provisional:
-        from .config import settings
-        from .history_catalog import account_scope
-        from .live_pricing import account_key
-        from .live_session import session_status
+        from .display_observations import read
 
-        live = db.get(LiveState, target.id)
-        owner = db.get(PricingOwner, account_key(settings.oanda_account_id))
-        forming = live.forming if live else {}
-        if (owner and owner.error not in ('unauthorized', 'provider_maintenance')
-                and session_status(target.identity, target_meta['profile'], stamp)['market_session'] != 'closed'
-                and owner.token and owner.expires > stamp and live and owner.epoch == live.epoch
-                and target.identity["account_scope"] == account_scope()
-                and live.connection in ("connected", "recovering") and forming and live.quote.get("tradeable")
-                and live.quote.get("bid") is not None and live.quote.get("ask") is not None
-                and Decimal(live.quote["ask"]) >= Decimal(live.quote["bid"])
-                and 0 <= stamp - live.quote.get("source_time", 0) <= 15000
-                and 0 <= stamp - live.received_at <= 15000
-                and forming.get("connection_epoch") == live.epoch
-                and tail_left <= forming["start"] < right
-                and not (forming["start"] in state.rows if state else
-                         any(row["timestamp"] == forming["start"] for row in minutes))):
-            minutes.append({**forming, "timestamp": forming["start"], "segment": "target",
-                "source_id": target_meta["source_id"], "volume_kind": "unavailable", "volume_unit": None,
-                "provisional_input": {"epoch": live.epoch, "live_revision": live.revision,
-                    "observed_at": live.received_at, "minute": dict(forming)}})
-            minutes.sort(key=lambda row: row["timestamp"])
+        if display_snapshot:
+            from .display_snapshots import observations
+
+            observed = observations(display_snapshot, tail_left, right)
+        else:
+            observed = read(db, target.id, revision.id, value, tail_left, right, now=stamp)
+        for observation in observed:
+            at = observation['start']
+            if not (at in state.rows if state else
+                    any(row['timestamp'] == at for row in minutes)):
+                minutes.append({**observation, 'timestamp': at, 'segment': 'target',
+                    'source_id': target_meta['source_id'], 'volume_kind': 'unavailable', 'volume_unit': None})
+        minutes.sort(key=lambda row: row['timestamp'])
     if state:
         for row in minutes:
             state.replace(row)

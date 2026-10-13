@@ -26,7 +26,7 @@ print(json.dumps(dict(catalog={k:public_catalog()[k] for k in ["LWMA","SWING_SR_
   await page.route('**/*',r=>{
    const u=new URL(r.request().url());if(u.origin!==origin)return r.fulfill({status:204,body:''});
    if(u.pathname==='/product') {
-    const fixture=html.replace('<script src="/indicators.js">','<script src="/series.js"></script><script src="/swing-sr-display.js"></script><script src="/bridge.js"></script><script src="/indicators.js">')
+    const fixture=html.replace('<script src="/indicators.js">','<script src="/series.js"></script><script src="/swing-sr-display.js"></script><script src="/composite-display-batches.js"></script><script src="/bridge.js"></script><script src="/indicators.js">')
       .replaceAll('subscriptions','fixtureSubscriptions').replace('const feed=','const fixtureFeed=').replace('datafeed:feed','datafeed:fixtureFeed')
       .replace('const widget=new TradingView.widget(','widget=new TradingView.widget(').replace('let ready=false;','ready=false;');
     return r.fulfill({contentType:'text/html; charset=utf-8',body:fixture});
@@ -70,6 +70,12 @@ print(json.dumps(dict(catalog={k:public_catalog()[k] for k in ["LWMA","SWING_SR_
   assert.equal(await submit(rows.slice(0,-2),6,'5'),true);assert.equal((await read()).size,accepted.size-2,'snapshot shortening really removes tail');
   assert.equal(await submit([],7,'6'),true);assert.equal((await read()).size,0,'empty snapshot really removes all rows');
   assert.equal(await submit(rows,8,'7'),true);
+  const stablePrefix=await read();
+  assert.equal(await page.evaluate(start=>MWNativeIndicatorResults.invalidate(handle,[start,Number.MAX_VALUE],'7'),rows.at(-2).time),true);
+  const withdrawnSuffix=await read();
+  assert.equal(withdrawnSuffix.size,stablePrefix.size-2,'range correction withdraws only its affected suffix');
+  assert.deepEqual(withdrawnSuffix.first,stablePrefix.first,'unaffected native prefix survives correction');
+  assert.equal(await submit(rows,10,'8'),true,'complete dependent suffix can be restored in one batch');
   await page.evaluate(()=>{
     const previous=handle;
     handle=MWNativeIndicatorResults.attach(widget.activeChart(),resultId,{...previous.identity,algorithmVersion:'2'});

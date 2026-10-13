@@ -1,9 +1,9 @@
 /* Main-chart ranges drive Python demand. One read includes all plots; shared
  * results stay time-keyed until the native adapter maps them to current indexes. */
-function chartIndicatorCoordinator(widget,catalog,{read,identity,report=()=>{},status=()=>{},presentation=()=>{},demand=()=>{}}) {
+function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=()=>{},status=()=>{},presentation=()=>{},demand=()=>{}}) {
   const results=globalThis.MWNativeIndicatorResults;
   read=chartIndicatorReadBatch(read);
-  const consumers=new Map(),shared=new Map(),charts=new WeakMap(),rangeEvents=new Map();
+  const consumers=new Map(),shared=new Map(),charts=new WeakMap(),rangeEvents=new Map(),operations=new Set();
   let chartSequence=0;
   let disposed=false,timer,syncQueued=false,demandSignature;
   function publishDemand(){
@@ -81,7 +81,7 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,report=()=>{},s
       consumer.generation=scope.generation;
     }
     if(corrected){
-      const withdrawn=await results.invalidate(consumer.handle,[-Number.MAX_VALUE,Number.MAX_VALUE],String(binding.inputRevision ?? binding.tailVersion ?? 0));
+      const withdrawn=await results.invalidate(consumer.handle,[binding.correctionStart ?? -Number.MAX_VALUE,Number.MAX_VALUE],String(binding.inputRevision ?? binding.tailVersion ?? 0));
       // A native reset can replace the binding while its withdrawal is queued.
       // Do not acknowledge that correction until the current generation really
       // withdrew it; the next sync must retry against the replacement handle.
@@ -94,10 +94,12 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,report=()=>{},s
     if(!chart.dataReady())return;
     scope=results.scope(chart,consumer.id);if(!scope)return;
     consumer.generation=scope.generation;
-    const signature=JSON.stringify([scope.generation,nextIdentity,binding.inputRevision,scope.first,scope.last,scope.count,binding.tailVersion,binding.correctionVersion,
+    const signature=JSON.stringify([scope.generation,nextIdentity,binding.inputRevision,scope.first,scope.last,scope.count,binding.tailVersion,binding.correctionVersion,binding.displaySnapshot,
       inputs.showsignals,inputs.highlighting]);
+    consumer.requested=signature;
     if(consumer.failedSignature===signature && consumer.retryAt>Date.now())return;
-    if(consumer.accepted===signature || consumer.pending===signature)return;
+    if(consumer.accepted===signature)return;
+    if(consumer.pending===signature)return;
     consumer.inputRevision=binding.inputRevision;consumer.correctionVersion=binding.correctionVersion;
     consumer.pending=signature;
     // The adapter knows whether native restart retained these results. A
@@ -115,12 +117,12 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,report=()=>{},s
     const requestBefore=prepend ? previous.sourceFirst ?? previous.first : binding.before ?? scope.last+1;
     const unchangedBinding=()=>{
       const latest=identity.binding(chart.symbol(),scope.resolution);
-      return latest && ['revision','inputRevision','tailVersion','correctionVersion','before'].every(key=>latest[key]===binding[key]) &&
+      return latest && ['revision','inputRevision','tailVersion','correctionVersion','before','displaySnapshot'].every(key=>latest[key]===binding[key]) &&
         (!binding.calculationStart || latest.calculationStart===binding.calculationStart);
     };
     const current=()=>!disposed && consumers.get(consumer.key)===consumer &&
       results.scope(chart,consumer.id)?.generation===scope.generation && consumer.pending===signature && unchangedBinding();
-    const key=JSON.stringify([nextIdentity,binding.inputRevision,scope.first,scope.last,scope.count,binding.tailVersion,binding.correctionVersion,
+    const key=JSON.stringify([nextIdentity,binding.inputRevision,scope.first,scope.last,scope.count,binding.tailVersion,binding.correctionVersion,binding.displaySnapshot,
       inputs.showsignals,inputs.highlighting,requestFirst,requestBefore]);consumer.cacheKey=key;
     let cached=shared.get(key);
     if(!cached){
@@ -133,14 +135,15 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,report=()=>{},s
           if(Date.now()>deadline)throw Error('指标范围读取超时');
           const page=await read(chart.symbol(),scope.resolution,{before,limit:2000,
             indicators:[{name:scope.name,params}],...binding.query},sharedCurrent,
-            JSON.stringify([binding.revision,binding.calculationStart,binding.inputRevision,binding.tailVersion,binding.correctionVersion]));
+            JSON.stringify([binding.revision,binding.calculationStart,binding.inputRevision,binding.tailVersion,binding.correctionVersion,binding.displaySnapshot]));
+          if(binding.displaySnapshot && page.display_snapshot_id!==binding.displaySnapshot)return null;
           const result=page.indicators?.find(item=>item.name===scope.name && canonical(item.params)===canonical(params));
           if(!result)throw Error('Python 指标结果未返回');
           // Fixed-result progress is keyed by run_id/id, not name. Different
           // parameters of one algorithm can have independent pending runs.
           const progress=result.calculation ||
             (page.indicators.length===1 ? page.indicator_progress?.find(item=>item.id===(result.id || scope.name)) : undefined);
-          if(progress && progress.status!=='complete')return {pending:true};
+          if(progress && (progress.display_status ?? progress.status)!=='complete')return {pending:true};
           if(page.input_revision!==undefined && binding.inputRevision!==undefined && page.input_revision!==binding.inputRevision)return null;
           rows.push(...rowsFor(result,page,meta,params,inputs,scope.resolution,chart.symbol()).rows);
           // Keep only result identity/revision/presentation in the shared cache.
@@ -181,16 +184,27 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,report=()=>{},s
         sourceFirst:tail ? previous.sourceFirst : batch.rows.find(row=>row.time>=scope.first)?.sourceTime,
         correctionVersion:binding.correctionVersion,inputRevision:binding.inputRevision,tailVersion:binding.tailVersion};
       const accepted=await results.applyBatch(consumer.handle,{identity:consumer.handle.identity,
+        current,displaySnapshot:binding.displaySnapshot,
         generation:consumer.handle.generation,sequence:++consumer.sequence,inputRevision:revision,
         kind:prepend?'prepend':tail?'append':'snapshot',rows:batch.rows,offsets,coverage});
       if(accepted){consumer.acceptedScope={...coverage,generation:consumer.handle.generation};
-        consumer.accepted=JSON.stringify([consumer.handle.generation,nextIdentity,binding.inputRevision,scope.first,scope.last,scope.count,binding.tailVersion,binding.correctionVersion,inputs.showsignals,inputs.highlighting]);
+        consumer.accepted=JSON.stringify([consumer.handle.generation,nextIdentity,binding.inputRevision,scope.first,scope.last,scope.count,binding.tailVersion,binding.correctionVersion,binding.displaySnapshot,inputs.showsignals,inputs.highlighting]);
+        consumer.requested=consumer.accepted;
         consumer.failures=0;consumer.retryAt=0;status(consumer,'ready');
         for(const {page} of batch.pages)presentation(chart.symbol(),scope.resolution,{...page,indicators:[{name:scope.name,params,presentation:page.presentation}]});}
     }catch(error){if(current()){
       consumer.failedSignature=signature;
+      if(error.code==='DISPLAY_SNAPSHOT_EXPIRED' && recover){
+        // A replacement price read owns its new credential. Never retry the
+        // indicator by silently substituting a newer snapshot under old prices.
+        consumer.retryAt=Infinity;
+        await recover(chart.symbol(),scope.resolution,binding.displaySnapshot);
+        consumer.retryAt=0;
+        return;
+      }
       consumer.failures=(consumer.failures || 0)+1;
-      consumer.retryAt=consumer.failures>=3?Infinity:Date.now()+1000*2**consumer.failures;
+      consumer.retryAt=['DISPLAY_SUFFIX_CAPACITY_EXCEEDED','DISPLAY_REPLAY_FAILED'].includes(error.code) || consumer.failures>=3 ?
+        Infinity:Date.now()+1000*2**consumer.failures;
       status(consumer,'error',error);report(error,consumer);
     }}
     finally{if(consumer.pending===signature)consumer.pending=null;prune();}
@@ -219,7 +233,11 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,report=()=>{},s
           let consumer=consumers.get(key);
           if(!consumer){consumer={key,id:study.id,chart,index,meta,params,inputs,sequence:0};consumers.set(key,consumer);}
           else Object.assign(consumer,{chart,index,meta,params,inputs});
-          work.push(prepare(consumer,scope).catch(error=>report(error,consumer)));
+          const operation={ticker:chart.symbol(),resolution:chart.resolution()};
+          operation.promise=prepare(consumer,scope).catch(error=>report(error,consumer));
+          operations.add(operation);
+          operation.promise.finally(()=>operations.delete(operation));
+          work.push(operation.promise);
         }
       }
       for(const [owner,unsubscribe] of rangeEvents)if(!liveCharts.has(owner)){
@@ -231,8 +249,22 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,report=()=>{},s
       if(!disposed)publishDemand();
     }
   }
+  async function settle(matches,current=()=>true){
+    // A simultaneous sync may have deduplicated against an older pending read.
+    // Await that actual operation rather than its fast no-op replacement.
+    while(!disposed && current()){
+      // Start/retry the accepted credential, including a pending background
+      // suffix. The display queue supplies the cancellation/deadline predicate.
+      void sync();
+      const active=[...operations].filter(op=>matches(op.ticker,op.resolution));
+      await Promise.allSettled(active.map(op=>op.promise));
+      const relevant=[...consumers.values()].filter(c=>matches(c.chart.symbol(),c.chart.resolution()));
+      if(relevant.every(c=>c.chart.dataReady() && c.accepted && c.accepted===c.requested))return;
+      await new Promise(resolve=>setTimeout(resolve,100));
+    }
+  }
   timer=setInterval(()=>void sync(),500);
-  return {sync,retry(index){for(const c of consumers.values())if(c.index===index){c.retryAt=0;c.failures=0;c.accepted=null;}return sync();},dispose(){disposed=true;clearInterval(timer);for(const unsubscribe of rangeEvents.values())unsubscribe();rangeEvents.clear();for(const consumer of consumers.values())detach(consumer);shared.clear();publishDemand();},
+  return {sync,settle,retry(index){for(const c of consumers.values())if(c.index===index){c.retryAt=0;c.failures=0;c.accepted=null;}return sync();},dispose(){disposed=true;clearInterval(timer);for(const unsubscribe of rangeEvents.values())unsubscribe();rangeEvents.clear();for(const consumer of consumers.values())detach(consumer);shared.clear();publishDemand();},
     diagnostics:()=>({consumers:consumers.size,shared:shared.size,rows:[...shared.values()].reduce((n,r)=>n+r.rows.length,0)})};
 }
 
@@ -267,7 +299,7 @@ function chartIndicatorReadBatch(read) {
             const next=await read(ticker,resolution,{...query,indicators:specs.slice(offset,offset+12)},alive);
             if(!page)page=next;
             else {
-              const revision=item=>JSON.stringify([item.input_revision,item.cache_revision,item.revision,item.calculation_origin,item.origin]);
+              const revision=item=>JSON.stringify([item.input_revision,item.cache_revision,item.revision,item.calculation_origin,item.origin,item.display_snapshot_id]);
               if(revision(page)!==revision(next))throw Error('批量指标输入在读取期间改变，请重试');
               page={...page,indicators:[...(page.indicators || []),...(next.indicators || [])],
                 indicator_progress:[...(page.indicator_progress || []),...(next.indicator_progress || [])]};

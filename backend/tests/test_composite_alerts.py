@@ -293,6 +293,15 @@ def forming(database, revision, at, stamp, price="1.11", epoch=1):
         state.quote = {"source_time": stamp, "bid": price, "ask": str(float(price) + .001), "tradeable": True}
         state.forming = {"start": at, "end": at + 60000, "open": price, "high": price, "low": price,
                          "close": price, "complete": False, "connection_epoch": epoch, "volume": None}
+        from alerts.display_observations import accept
+        from alerts.market_contracts import DatasetIdentity, QuoteEvent
+        from alerts.storage import MarketDataset, Instrument
+
+        dataset = db.get(MarketDataset, target)
+        accept(db, state, QuoteEvent(identity=DatasetIdentity.model_validate(dataset.identity),
+            bid=price, ask=str(float(price) + .001), tradeable=True, source_time=stamp,
+            received_at=stamp, sequence=1, connection_epoch=epoch), stamp=stamp,
+            profile=db.get(Instrument, dataset.instrument_id).calendar_profile)
 
 
 def test_explicit_sampled_quote_mode_never_mutates_confirmed_state_and_requires_valid_owner(database, monkeypatch):

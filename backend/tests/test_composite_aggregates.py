@@ -172,4 +172,4 @@ def test_materialized_page_overlays_only_valid_provisional_stream_and_never_pers
         db.get(PricingOwner, owner[0]).expires = 0
     with database.begin() as db:
         expired = chart_page(db, composite, "M1", count=3, provisional=True, now=200010000)
-        assert expired["bars"] == confirmed["bars"]
+        assert expired["bars"] == sampled["bars"], 'accepted display prices survive owner expiry'
