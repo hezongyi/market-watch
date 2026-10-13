@@ -1,0 +1,28 @@
+{
+  "raw_profile_empty": true,
+  "effective_profile_available": true,
+  "raw_closed_minutes": [],
+  "effective_closed_minutes": [
+    "2026-10-11T21:00:00+00:00",
+    "2026-10-11T21:01:00+00:00",
+    "2026-10-11T21:02:00+00:00",
+    "2026-10-11T21:03:00+00:00"
+  ],
+  "session_at_bucket_start": {
+    "market_session": "closed",
+    "next_session_at": 1791752640000,
+    "calendar_verified": true
+  },
+  "current_composite_status": "receiving",
+  "compatibility_instrument_quality": "waiting",
+  "compatibility_instrument_last_received": null,
+  "prepared": "queried",
+  "current_composite_health": {
+    "connection": "connected",
+    "quote_ready": true,
+    "confirmed_tail_ready": true,
+    "market_session": "scheduled_open",
+    "calendar_verified": true,
+    "strategy_readiness": "pending_dependency_validation"
+  }
+}

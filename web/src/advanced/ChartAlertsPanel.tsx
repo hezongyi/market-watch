@@ -608,6 +608,9 @@ export function ChartAlertsPanel({
                       {healthNames[row.health]}
                       {row.health_reason ? "：" + row.health_reason : ""}
                     </p>
+                    {row.config.series_kind === "composite" && typeof row.runtime.quote_health === "string" && (
+                      <p>当前报价：{row.runtime.quote_health === "ready" ? "正常" : "暂不可用或已过期"}</p>
+                    )}
                     {row.config.condition.offset && offsetSnapshot(row.runtime.offset) && (
                       <p>{offsetSnapshot(row.runtime.offset)}</p>
                     )}

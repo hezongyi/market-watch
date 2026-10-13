@@ -1,0 +1,37 @@
+{
+  "http_status": 200,
+  "source": "OANDA Practice",
+  "same_account_endpoint_as_confirmation": true,
+  "symbol": "EUR_USD",
+  "params": {
+    "granularity": "D",
+    "price": "B",
+    "smooth": "false",
+    "from": "1791752400",
+    "to": "1791838800",
+    "dailyAlignment": 17,
+    "alignmentTimezone": "America/New_York"
+  },
+  "returned_in_bucket": 1,
+  "native_d1": [
+    {
+      "start": 1791752400000,
+      "complete": true,
+      "bid": {
+        "o": "1.11850",
+        "h": "1.12167",
+        "l": "1.11521",
+        "c": "1.11549"
+      }
+    }
+  ],
+  "composite_observed_m1_count": 1425,
+  "composite_observed_ohlc": {
+    "o": "1.1185",
+    "h": "1.12167",
+    "l": "1.11521",
+    "c": "1.11549"
+  },
+  "ohlc_match": true,
+  "production_mutated": false
+}

@@ -1,0 +1,27 @@
+{
+  "same_captured_1425_inputs": true,
+  "only_profile_changed": true,
+  "production_mutated": false,
+  "results": [
+    {
+      "case": "stored_profile",
+      "observed_minutes": 1425,
+      "unknown_minutes": 15,
+      "confirmed_closed_minutes": 0,
+      "coverage_complete": false,
+      "conflict_minutes": 0,
+      "time_closed": true,
+      "source_confirmed": true
+    },
+    {
+      "case": "effective_live_profile",
+      "observed_minutes": 1425,
+      "unknown_minutes": 11,
+      "confirmed_closed_minutes": 4,
+      "coverage_complete": false,
+      "conflict_minutes": 0,
+      "time_closed": true,
+      "source_confirmed": true
+    }
+  ]
+}
