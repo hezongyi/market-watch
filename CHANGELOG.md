@@ -1,5 +1,13 @@
 # 更新日志
 
+## [1.25.0] - 2026-10-13
+
+- 新增通用 Python 原生指标结果接口和有界 composite 来源重检，fixed 冷加载按实际 calculation/run 跟踪 pending 至 complete。
+- managed 同柱 OHLC／完整性及窗口外递归前缀更正触发重读与重算；发布输入和证明使用一致快照，重连保留交付水位并去重。
+- 修复父工作区 calculation origin／dependency before 转发及原生大写 UUID 身份，禁用已完成 managed 结果短时响应缓存。
+- main 整合 Python 208 passed、最终相关 Python 136 passed（集合重叠）、七项 JS contract 及实际 PostgreSQL／Ubuntu Docker 网页复验通过；两轴复审无阻断。详见 [复审证据](docs/issues/production-pending-pr55-review-fixes-20261013.md)。
+- 本 PR 无新增依赖或 migration；从生产 v1.23.0 升级需带入 v1.24.0 的 `as46_provider_price_confirmation`。`Load failed` 未复现，按用户要求暂不处理；历史缺分钟仍保持 unknown/stale，未宣称长期性能或生产告警恢复。
+
 ## [1.24.0] - 2026-10-12
 
 - 价格与画线告警新增可选 ATR 突破偏移，默认关闭，开启预填 D1 / 14 / 0.2；支持跨周期及原生创建、编辑、快照和通知显示，拖线保留配置。
