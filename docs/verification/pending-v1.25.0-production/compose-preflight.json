@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "service_definitions": 14,
+  "backend_yahoo_true": [
+    "api",
+    "chart-aggregation-worker",
+    "chart-history-worker",
+    "composite-aggregate-worker",
+    "history-worker",
+    "market-stream-worker",
+    "migrate",
+    "native-history-worker",
+    "notify-worker",
+    "pricing-worker",
+    "realtime-worker"
+  ],
+  "only_effective_config_change": "four exact image references",
+  "private_env_sha256": "adc184f9b0fc476e29bf1536959d5efd03e9363dcc20f7afc6172323fdf128cf"
+}

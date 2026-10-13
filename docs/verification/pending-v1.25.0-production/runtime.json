@@ -1,0 +1,343 @@
+{
+  "passed": true,
+  "at": 1791853986057,
+  "environment": "unraid formal production",
+  "services": [
+    {
+      "service": "api",
+      "image_id": "sha256:500bde6df1b53c7aaa0a0c16d2503007d6c0229d58e2465165d7413f23c910a0",
+      "running": true,
+      "restart_count": 0,
+      "health": "healthy",
+      "source_commit": "027aa7095a34972d8a644a89a16ad79d4b6297df",
+      "purpose": "release"
+    },
+    {
+      "service": "pricing-worker",
+      "image_id": "sha256:500bde6df1b53c7aaa0a0c16d2503007d6c0229d58e2465165d7413f23c910a0",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "027aa7095a34972d8a644a89a16ad79d4b6297df",
+      "purpose": "release"
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "image_id": "sha256:500bde6df1b53c7aaa0a0c16d2503007d6c0229d58e2465165d7413f23c910a0",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "027aa7095a34972d8a644a89a16ad79d4b6297df",
+      "purpose": "release"
+    },
+    {
+      "service": "chart-history-worker",
+      "image_id": "sha256:500bde6df1b53c7aaa0a0c16d2503007d6c0229d58e2465165d7413f23c910a0",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "027aa7095a34972d8a644a89a16ad79d4b6297df",
+      "purpose": "release"
+    },
+    {
+      "service": "history-worker",
+      "image_id": "sha256:500bde6df1b53c7aaa0a0c16d2503007d6c0229d58e2465165d7413f23c910a0",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "027aa7095a34972d8a644a89a16ad79d4b6297df",
+      "purpose": "release"
+    },
+    {
+      "service": "composite-aggregate-worker",
+      "image_id": "sha256:500bde6df1b53c7aaa0a0c16d2503007d6c0229d58e2465165d7413f23c910a0",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "027aa7095a34972d8a644a89a16ad79d4b6297df",
+      "purpose": "release"
+    },
+    {
+      "service": "native-history-worker",
+      "image_id": "sha256:500bde6df1b53c7aaa0a0c16d2503007d6c0229d58e2465165d7413f23c910a0",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "027aa7095a34972d8a644a89a16ad79d4b6297df",
+      "purpose": "release"
+    },
+    {
+      "service": "realtime-worker",
+      "image_id": "sha256:500bde6df1b53c7aaa0a0c16d2503007d6c0229d58e2465165d7413f23c910a0",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "027aa7095a34972d8a644a89a16ad79d4b6297df",
+      "purpose": "release"
+    },
+    {
+      "service": "notify-worker",
+      "image_id": "sha256:500bde6df1b53c7aaa0a0c16d2503007d6c0229d58e2465165d7413f23c910a0",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "027aa7095a34972d8a644a89a16ad79d4b6297df",
+      "purpose": "release"
+    },
+    {
+      "service": "market-stream-worker",
+      "image_id": "sha256:500bde6df1b53c7aaa0a0c16d2503007d6c0229d58e2465165d7413f23c910a0",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "027aa7095a34972d8a644a89a16ad79d4b6297df",
+      "purpose": "release"
+    },
+    {
+      "service": "web",
+      "image_id": "sha256:d061b7ce4347d66d09e6e5da15c55b4032b0f47037eda1bbf6827fb983ba74ef",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "027aa7095a34972d8a644a89a16ad79d4b6297df",
+      "purpose": "release"
+    },
+    {
+      "service": "chart-origin",
+      "image_id": "sha256:1545f32f8cc1d69995e51f58120a93d2dfb8b8811d55c56184de8a5c062c4f3d",
+      "running": true,
+      "restart_count": 0,
+      "health": null,
+      "source_commit": "027aa7095a34972d8a644a89a16ad79d4b6297df",
+      "purpose": "release"
+    }
+  ],
+  "actual_settings": [
+    {
+      "service": "api",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": true,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "pricing-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": true,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "chart-history-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "history-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "composite-aggregate-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "native-history-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "realtime-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "notify-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    },
+    {
+      "service": "market-stream-worker",
+      "yahoo_enabled": true,
+      "oanda_stream_enabled": false,
+      "proxy_configured": true,
+      "database_pool_size": 2,
+      "database_max_overflow": 0
+    }
+  ],
+  "readyz": {
+    "status": "ready",
+    "time": 1791853981870
+  },
+  "http_status": {
+    "https://trade.kookvv.com:8443/": "200",
+    "https://charts.kookvv.com:8443/": "200"
+  },
+  "api_version": "1.25.0",
+  "schema": "as46_provider_price_confirmation",
+  "workspace_and_saved_alert_configuration_and_account_notification_preserved": true,
+  "alert_mutable_execution_fields_excluded": [
+    "health_reason",
+    "runtime"
+  ],
+  "password_change_events_added": 0,
+  "notification_test_events_added": 0,
+  "post_state": {
+    "alert_configuration_fingerprint": "8ce8e36b6aaea0107a5aa02fb283440512a0f069bf290548453dd6072b255cd1",
+    "at": 1791853980355,
+    "schema": "as46_provider_price_confirmation",
+    "fingerprints": {
+      "advanced_chart_workspaces": "af8539fedc95ce97d5cdb7ffd7d612a384a10573114cd8d4bf050b41edc2e703",
+      "advanced_chart_preferences": "806243b3fd9c85322dc18454fecae96b9e5ef7ef5e28b6b16a5d403920a5a8a8",
+      "chart_workspaces": "3ce55615000c89e4f983eb202e5e1b1c6bded01ea4e6e15ffa6e99e5fd904e52",
+      "watches": "3e812064ffac0a72173046404646083352c6aba5fef24b2487293149d3a768ec",
+      "chart_alerts": "c454349853d928855ad9047e9e002d94337d37066436dfcfa8bcd27bbbffc2dc",
+      "chart_alert_versions": "86dc29456017f02e0fd670e1de9c7f4227c124be8d4bdd91be904f2d29a7ab77",
+      "chart_alert_actions": "cd469135d0d3af555be3e820368413c76bc1fa2a1d6b7cd89083c33c1720a65e",
+      "market_composites": "ac367273492badf8b3e8416e2f465c51dcf0224232cc0500f7b53e9577bbe0aa",
+      "market_composite_revisions": "66e998a5b5c4d79758fd892b9f3f17c63557f45872431c0cbc96109708c8015b",
+      "market_realtime_mappings": "ea41a173bd45df4f86557fd8fcfb36bee876a9ac0492d0921e126547c836efe2"
+    },
+    "preferences": {
+      "auth.admin": "6222c393fa55752cefda8eee7783670a354c896b66fa76d4a9570d477da88302",
+      "notifications": "f9d4d431ac3196873f33874a2fb3bc1772805265dc38ec51cabb910a2e2b34c8"
+    },
+    "notification_tests": 7,
+    "password_changes": 2,
+    "heartbeats": {
+      "market_heartbeat": 1791853974966,
+      "notify_heartbeat": 1791853969411,
+      "market_stream_heartbeat": null
+    },
+    "all_table_counts": {
+      "ack_grants": 2,
+      "advanced_chart_preferences": 33,
+      "advanced_chart_workspaces": 2,
+      "agent_credentials": 0,
+      "agent_operations": 0,
+      "alembic_version": 1,
+      "audit_events": 764633,
+      "candles": 9058831,
+      "chart_aggregation_jobs": 0,
+      "chart_aggregation_state": 40,
+      "chart_alert_actions": 5,
+      "chart_alert_versions": 2,
+      "chart_alerts": 2,
+      "chart_history_plans": 8,
+      "chart_indicator_templates": 0,
+      "chart_publication_jobs": 20,
+      "chart_publication_state": 72,
+      "chart_publications": 60,
+      "chart_published_bars": 74222,
+      "chart_viewport_demands": 0,
+      "chart_workspaces": 1,
+      "delivery_attempts": 2,
+      "device_receipts": 0,
+      "devices": 0,
+      "import_jobs": 823,
+      "instruments": 135,
+      "market_composite_activations": 1,
+      "market_composite_aggregate_bars": 28566,
+      "market_composite_aggregate_tasks": 18,
+      "market_composite_input_events": 2650,
+      "market_composite_judgments": 0,
+      "market_composite_minute_inputs": 6203,
+      "market_composite_minutes": 6203,
+      "market_composite_preparations": 2,
+      "market_composite_read_attempts": 2,
+      "market_composite_revision_changes": 1,
+      "market_composite_revisions": 2,
+      "market_composite_watch_bindings": 0,
+      "market_composite_watch_judgments": 0,
+      "market_composites": 1,
+      "market_coverage_checkpoints": 9,
+      "market_coverage_projection": 19339,
+      "market_coverage_quarantine": 0,
+      "market_data_coverage": 113691,
+      "market_data_demand": 210,
+      "market_dataset_maintenance": 3,
+      "market_dataset_reclamations": 0,
+      "market_dataset_sources": 130,
+      "market_datasets": 130,
+      "market_fixed_indicator_blocks": 1062,
+      "market_fixed_indicator_runs": 226,
+      "market_history_artifact_blocks": 44782,
+      "market_history_artifacts": 135,
+      "market_history_chunks": 6075,
+      "market_history_read_attempts": 6302,
+      "market_history_reclamations": 0,
+      "market_history_runs": 15,
+      "market_history_versions": 15,
+      "market_instrument_catalog": 285,
+      "market_live_minutes": 17646,
+      "market_live_states": 127,
+      "market_pricing_owners": 1,
+      "market_realtime_mappings": 1,
+      "market_source_blobs": 1420,
+      "market_source_fetches": 1475,
+      "market_source_minute_revisions": 11586,
+      "market_source_minutes": 11586,
+      "market_source_series": 130,
+      "market_stream_clients": 2,
+      "market_stream_results": 757,
+      "market_stream_subscriptions": 35,
+      "market_stream_tasks": 20,
+      "native_history_loads": 10,
+      "notifications": 2,
+      "outbox": 2,
+      "preferences": 22,
+      "provider_bars": 994680,
+      "provider_datasets": 36,
+      "provider_interests": 21,
+      "quotes": 2,
+      "replays": 7,
+      "sessions": 11,
+      "signals": 2,
+      "volume_backfill_jobs": 1,
+      "volume_backfill_segments": 32,
+      "watches": 7,
+      "weekly_history_requests": 0
+    },
+    "counts": {
+      "candles": 9058831,
+      "provider_bars": 994680,
+      "chart_published_bars": 74222,
+      "chart_alerts": 2,
+      "advanced_chart_workspaces": 2
+    },
+    "version": "1.25.0",
+    "yahoo_enabled": true,
+    "proxy_configured": true,
+    "unknown_composite_errors": 1823,
+    "routing_repairs": 1
+  }
+}
