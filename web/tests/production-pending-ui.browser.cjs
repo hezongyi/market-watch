@@ -116,9 +116,10 @@ const base='http://127.0.0.1:20271',origin='http://127.0.0.1:20272',out='/tmp/mw
   await page.keyboard.press('Escape');await expect(ui.locator('.dc-detail-panel')).toHaveCount(0);
   await page.keyboard.press('Escape');await expect(ui.locator('.dc-window')).toHaveCount(0);
   await page.evaluate(origin=>document.querySelector('iframe').contentWindow.postMessage({channel:'mw-chart-v1',type:'notifications',notices:[{id:'test-network',text:'Synthetic transient network check'}]},origin),origin);
-  await expect(host.locator('.mw-chart-notice')).toHaveCount(1);
+  const syntheticNotice=host.locator('.mw-chart-notice').filter({hasText:'Synthetic transient network check'});
+  await expect(syntheticNotice).toHaveCount(1);
   assert.ok((await host.locator('.mw-chart-notices').boundingBox()).x>800);
-  await host.getByRole('button',{name:'关闭图表提示'}).click();
+  await syntheticNotice.getByRole('button',{name:'关闭图表提示'}).click();
   assert.deepEqual(errors,[]);checks.push('non-modal right-bottom notice in deployed host');
   const evidence={environment:'Ubuntu task-owned Docker mw-pending-fixes-20261013; actual native host, data-center and HTTP',passed:true,checks,geometry,responsive,errors};
   fs.writeFileSync(out+'/docker-ui.json',JSON.stringify(evidence,null,2));console.log('PASS Docker native UI',JSON.stringify(evidence));

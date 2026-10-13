@@ -3,6 +3,7 @@ const {chromium,expect}=require('@playwright/test');
 const fs=require('node:fs'),assert=require('node:assert/strict'),{execFileSync}=require('node:child_process');
 const base='http://127.0.0.1:20271',origin='http://127.0.0.1:20272';
 const privateDir='/tmp/mw-pending-fixes-20261013-private';
+const coldPeriods=[Number(process.env.MW_COLD_PERIOD || 73),Number(process.env.MW_COLD_PERIOD || 73)+2];
 let mutationSequence=0;
 async function mutate(action,at){
  if(process.env.MW_INDICATOR_MUTATIONS_EXTERNAL==='true'){
@@ -39,7 +40,6 @@ async function mutate(action,at){
   await host.waitForFunction(()=>widget.chartsCount()===1&&widget.activeChart().dataReady());
   await host.evaluate(()=>new Promise(resolve=>widget.activeChart().setSymbol('BTCUSDT',resolve)));
   await host.evaluate(()=>new Promise(resolve=>widget.activeChart().setResolution('1',resolve)));
-  if(process.env.MW_TEST_FIXED_ONLY!=='true'){
   await host.evaluate(async()=>{
    const chart=widget.activeChart();for(const s of chart.getAllStudies())chart.removeEntity(s.id);
    globalThis.correctionIds=[];
@@ -66,7 +66,6 @@ async function mutate(action,at){
   await mutate('prefix',prefix);
   await expect.poll(async()=>(await snapshot()).binding.correctionVersion,{timeout:30000}).toBeGreaterThan(afterTail.binding.correctionVersion);
   await expect.poll(async()=>(await snapshot()).studies[1].last,{timeout:30000}).not.toBe(afterTail.studies[1].last);
-  console.log('tail and prefix updates accepted');
   const corrected=await snapshot();assert.deepEqual(corrected.resets,[],'prefix-only repair must not reset price chart');
   const expected=await host.evaluate(async()=>{
    const chart=widget.activeChart(),binding=indicatorBindings.get(indicatorKey(chart.symbol(),'1'));
@@ -75,23 +74,18 @@ async function mutate(action,at){
    return page.indicators.map(i=>({name:i.name,last:i.series[0].values.at(-1).value}));
   });
   for(const [i,name] of ['LWMA','EMA'].entries())assert.equal(corrected.studies[i].last,expected.find(x=>x.name===name).last);
-  }
   const catalog=await(await page.request.get(base+'/api/market-data/series/search?query=EURUSD')).json();
-  console.log('managed values match Python');
   const history=catalog.find(row=>row.series_kind==='history');assert.ok(history);
   await host.evaluate(ticker=>widget.activeChart().setSymbol(ticker),history.ticker);
   await host.waitForFunction(ticker=>MWSeries.same(widget.activeChart().symbol(),ticker)&&widget.activeChart().dataReady(),history.ticker,{timeout:60000});
-  console.log('fixed history accepted');
-  await host.evaluate(async()=>{
+  await host.evaluate(async periods=>{
    const chart=widget.activeChart();for(const study of chart.getAllStudies())chart.removeEntity(study.id);
    globalThis.coldIds=[];
-   for(const period of [41,43])coldIds.push(await chart.createStudy('守望 Python LWMA',false,false,{period}));
-  });
-  console.log('cold start '+JSON.stringify(await host.evaluate(()=>({symbol:widget.activeChart().symbol(),resolution:widget.activeChart().resolution(),coordinator:indicatorCoordinator.diagnostics(),mainSize:widget.activeChart()._chartWidget.model().model().mainSeries().data().size(),bindings:[...indicatorBindings],studies:coldIds.map(id=>((()=>{const study=widget.activeChart()._chartWidget.model().model().dataSourceForId(id),api=study._chartApi,engine=api.chartApi()._studyEngine,session=api.sessionId(),item=engine._studiesCache[session][study.sourceId()];
- return {scope:MWNativeIndicatorResults.scope(widget.activeChart(),id),size:study.data().size(),item:{id:item.metainfo.id,completed:item.completed,started:item.engine?.isStarted?.()},parent:engine._getSeriesData(session,item.parentId)?.length};})()))}))));
+   for(const period of periods)coldIds.push(await chart.createStudy('守望 Python LWMA',false,false,{period}));
+  },coldPeriods);
   await expect.poll(()=>host.evaluate(()=>coldIds.every(id=>widget.activeChart()._chartWidget.model().model().dataSourceForId(id).data().size()>20)),
    {timeout:90000}).toBe(true);
-  for(const [index,period] of [41,43].entries()){
+  for(const [index,period] of coldPeriods.entries()){
    const completed=fixedReads.flatMap(row=>row.data.indicators || []).filter(i=>i.name==='LWMA'&&i.params.period===period&&i.calculation?.status==='complete').at(-1);
    assert.ok(completed,'cold parameter run must complete');
    const value=await host.evaluate(index=>widget.activeChart()._chartWidget.model().model().dataSourceForId(coldIds[index]).data().last().value[1],index);
