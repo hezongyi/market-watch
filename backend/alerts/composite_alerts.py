@@ -144,7 +144,8 @@ def operands(db, page, config, now):
             values.append(Decimal(str(bar["close"])))
             dependencies.append({"kind": "price", "start": bar["start"], "end": bar["end"],
                 "coverage_complete": bar["coverage_complete"], "source_confirmed": bar["source_confirmed"],
-                "seam_dependency": bar.get("seam_crossing", False)})
+                "seam_dependency": bar.get("seam_crossing", False),
+                **({"price_confirmation": bar["price_confirmation"]} if bar.get("price_confirmation") else {})})
         elif operand.kind == "indicator":
             spec = operand.indicator.model_dump(exclude={"output"})
             result = prepared[digest(spec)]
@@ -226,6 +227,7 @@ def evaluate(db, alert, version, config, now):
 
     identity = version.market_identity
     runtime = dict(alert.runtime)
+    runtime.pop("price_confirmation_request", None)
     if identity.get("contract") != CONTRACT or identity.get("calculation_algorithm") != ALGORITHM:
         return wait(alert, runtime, "blocked", "组合或指标算法契约已改变，请显式编辑规则生成新版本")
     revision = db.get(CompositeRevision, identity["composite_revision_id"])
@@ -241,6 +243,9 @@ def evaluate(db, alert, version, config, now):
     # them in order before shared artifact reads, avoiding reader lock upgrades.
     list(db.scalars(select(MarketDataset.id).where(MarketDataset.id.in_(
         sorted({identity["dataset_id"], target.id}))).order_by(MarketDataset.id).with_for_update()))
+    from .composite_quotes import live_snapshot
+
+    runtime["quote_health"] = "ready" if live_snapshot(db, revision, now=now)["quote_ready"] else "stale"
     prep = db.get(CompositePreparation, revision.id)
     value = prep.input_revision
     runtime.update(composite_revision_id=revision.id, input_revision=value,
@@ -288,17 +293,30 @@ def evaluate(db, alert, version, config, now):
     bar = page["bars"][-1]
     if bar["start"] < revision.seam:
         return wait(alert, runtime, "warming", "只有固定历史可读，尚无接续来源确认输入")
-    if config.mode == "close" and not (bar["time_closed"] and bar["source_confirmed"] and bar["coverage_complete"]):
+    if config.mode == "close" and not bar["coverage_complete"]:
+        from .composite_price_confirmation import confirmation, eligible
+
+        if eligible(config, revision, bar):
+            proof = confirmation(db, target.identity, phase, bar, runtime)
+            if proof:
+                # Keep fixed bars and minute coverage intact. Only this rule's
+                # OHLC dependency gains the independently matched source proof.
+                bar = dict(bar, price_confirmation=proof)
+                page["bars"][-1] = bar
+    if config.mode == "close" and not (bar["time_closed"] and bar["source_confirmed"]
+            and (bar["coverage_complete"] or bar.get("price_confirmation"))):
         from datetime import datetime, timezone
 
-        label = lambda stamp: datetime.fromtimestamp(stamp / 1000, timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+        def label(stamp):
+            return datetime.fromtimestamp(stamp / 1000, timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
         runtime["coverage_dependency"] = {key: bar.get(key) for key in (
             "start", "end", "time_closed", "source_confirmed", "coverage_complete", "observed_minutes", "unknown_minutes")}
         reason = (f"判定柱 {label(bar['start'])} 至 {label(bar['end'])}："
                   f"观测 {bar.get('observed_minutes', 0)} 分钟，未知 {bar.get('unknown_minutes', 0)} 分钟；"
                   "时间结束、来源确认或覆盖依赖未满足；缺失观测不作为闭市证据")
-        return wait(alert, runtime, "stale", reason)
+        return wait(alert, runtime, "coverage_pending", reason, reset=False)
     runtime.pop("coverage_dependency", None)
+    runtime.pop("price_confirmation_request", None)
     if config.mode == "close" and live.confirmed_end < bar["end"]:
         return wait(alert, runtime, "stale", "实时来源确认水位尚未覆盖判定柱")
     quote = live.quote if live else {}
@@ -314,7 +332,7 @@ def evaluate(db, alert, version, config, now):
         closed_end = live.forming["start"]
         if not confirmed_window(db, revision, max(identity["history_start"], bar["start"]), closed_end,
                                 value, phase, profiles):
-            return wait(alert, runtime, "stale", "临时桶之前仍有未确认分钟，完整依赖未恢复")
+            return wait(alert, runtime, "coverage_pending", "临时桶之前仍有未确认分钟，完整依赖未恢复")
     expected = period(max(0, now - 30000), config.timeframe, phase)[0]
     if config.mode == "close" and bar["end"] < expected:
         return wait(alert, runtime, "stale", "判定周期尚无新鲜完整收盘；旧输入不补发事件")
@@ -388,7 +406,8 @@ def evaluate(db, alert, version, config, now):
         "correction_from": earliest, "baseline_reason": outcome if baseline else None,
         "observation_gap_ms": observation_gap,
         "source_epoch": live.epoch, "quote": dict(quote) if config.mode == "intrabar" else None,
-        "observation_basis": "complete_close" if config.mode == "close" else "sampled_bid_quote"}
+        "observation_basis": ("native_confirmed_close" if bar.get("price_confirmation") else "complete_close")
+            if config.mode == "close" else "sampled_bid_quote"}
     if resolved:
         evidence["offset"] = resolved
     sample = Observation(f"bar:{bar['start']}" if config.mode == "close" else f"sample:{sequence}",

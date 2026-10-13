@@ -59,7 +59,8 @@ def live(database, revision, stamp, confirmed_end, *, epoch=1, connected=True):
         state.ready, state.connection, state.epoch = connected, "connected" if connected else "disconnected", epoch
         state.heartbeat_at = state.received_at = stamp
         state.confirmed_end, state.error = confirmed_end, None
-        state.quote = {"source_time": stamp, "bid": "1.11", "ask": "1.111", "tradeable": True}
+        state.quote = {"source_time": stamp, "bid": "1.11", "ask": "1.111", "tradeable": True,
+                       "connection_epoch": epoch}
 
 
 def armed(database, monkeypatch, **changes):

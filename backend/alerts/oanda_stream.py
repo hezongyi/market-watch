@@ -283,6 +283,56 @@ class OandaPractice:
                 observed_at=observed, result=result, volume_kind="price_count", volume_unit="quotes",
                 checkpoint=start)
 
+    def confirm_daily_price(self, source, start, end):
+        """Independent complete D1 OHLC, bound to the same practice account."""
+        import hashlib
+
+        from .composite_price_confirmation import CONTRACT
+        from .native_series import OandaParameters, interval_end, session_start
+
+        if (source.source, source.channel, source.environment, source.basis, source.account_scope) != (
+                "oanda", "v20", "practice", "bid",
+                "sha256:" + hashlib.sha256(self.account_id.encode()).hexdigest()):
+            raise ValueError("Native price confirmation requires the same OANDA account and BID identity")
+        parameters = dict(source.parameters)
+        if parameters.pop("granularity", None) != "D":
+            raise ValueError("Only native daily price confirmation is supported")
+        native = OandaParameters.model_validate(parameters).model_dump()
+        if (native["price"] != "B" or native["smooth"] or session_start(start, native) != start
+                or interval_end(start, "D1", native) != end):
+            raise ValueError("Native price confirmation alignment mismatch")
+        if not 0 <= start < end <= self.clock():
+            return None
+        with request_slot("oanda"):
+            response = self.rest_get(
+                f"https://api-fxpractice.oanda.com/v3/accounts/{self.account_id}"
+                f"/instruments/{source.provider_symbol}/candles", headers=self.headers,
+                params={"granularity": "D", **native, "smooth": "false",
+                        "from": str(Decimal(start) / 1000), "to": str(Decimal(end) / 1000)})
+        response.raise_for_status()
+        raw = response.json()
+        if raw.get("instrument") != source.provider_symbol or raw.get("granularity") != "D":
+            raise ValueError("Native daily response identity mismatch")
+        if not isinstance(raw.get("candles"), list):
+            raise ValueError("Invalid native daily candles")
+        matches = [candle for candle in raw["candles"] if timestamp(candle["time"]) == start]
+        if len(matches) > 1:
+            raise ValueError("Duplicate native daily candles")
+        if not matches:
+            return None
+        candle = matches[0]
+        if type(candle["complete"]) is not bool:
+            raise ValueError("Invalid native daily complete flag")
+        if not candle["complete"]:
+            return None
+        prices = candle["bid"]
+        row = MinuteRow(timestamp=start, complete=True,
+            **{name: prices[key] for name, key in
+               (("open", "o"), ("high", "h"), ("low", "l"), ("close", "c"))})
+        return {"contract": CONTRACT, "source_id": source.key, "start": start, "end": end,
+                "complete": True, "observed_at": self.clock(),
+                **row.model_dump(include={"open", "high", "low", "close"})}
+
     def stream(self, identities, *, epoch, stopped=None):
         decoder = NDJSONDecoder()
         sequence = 0

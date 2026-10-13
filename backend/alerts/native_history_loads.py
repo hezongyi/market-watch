@@ -229,6 +229,7 @@ def once():
 
 
 def main():
+    from .composite_price_confirmation import once as confirm_price
     from .provider_chart import warm_clients
     from .worker_health import Pulse
 
@@ -239,7 +240,9 @@ def main():
     while True:
         try:
             pulse.start()
+            confirmed = confirm_price()
             worked = once()
+            worked = worked or confirmed
             pulse.finish(worked=worked)
         except Exception as exc:
             pulse.finish(errors=[type(exc).__name__])

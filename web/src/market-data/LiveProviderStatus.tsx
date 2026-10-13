@@ -8,7 +8,8 @@ type Provider = {
   connection_started_at?: number | null; authentication_probe_at?: number | null; error_observed_at?: number | null;
 };
 type Live = {
-  dataset_id: string; logical_symbol: string; quality: string; market_session: string;
+  dataset_id: string; logical_symbol: string; quality: string;
+  market_session: "closed" | "scheduled_open" | "unknown"; calendar_verified: boolean;
   next_session_at: number | null; authentication_hold: boolean; connection_error: string | null;
   error: string | null; connection: string; quote_ready: boolean; candle_ready: boolean; recovery_ready: boolean;
   quote: { source_time?: number } | null; received_at: number | null; heartbeat_at: number | null;
@@ -33,7 +34,7 @@ function ScheduledCheck({ at }: { at?: number | null }) {
 }
 function Session({ row }: { row: Live }) {
   return <>
-    <span className="dc-source-session">{row.market_session === "closed" ? "闭市" : row.market_session === "open" ? "已核实交易时段" : "时段尚未核实"}</span>
+    <span className="dc-source-session">{row.market_session === "closed" ? "闭市" : row.market_session === "scheduled_open" && row.calendar_verified ? "已核实交易时段" : "时段尚未核实"}</span>
     {row.market_session === "closed" && row.next_session_at ? <small>{row.next_session_at <= Date.now() ? "记录的下一时段时间（已过期）" : "已核实下一时段"}：{statusTime(row.next_session_at)}</small> : null}
   </>;
 }

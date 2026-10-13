@@ -153,6 +153,7 @@ export const healthNames: Record<string, string> = {
   warming: "等待数据 / 预热",
   ready: "数据就绪",
   stale: "数据陈旧 / 缺口",
+  coverage_pending: "判定依赖待核实",
   blocked: "等待处理",
   error: "判定失败",
 };

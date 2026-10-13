@@ -1,0 +1,25 @@
+{
+  "version": "1.25.2",
+  "release_tag": "v1.25.2",
+  "previous_source_tag": "v1.25.0",
+  "tested_application_commit": "6b02eea",
+  "source_commit_resolution": "Resolve annotated v1.25.2^{commit}; targets final main merge.",
+  "verification_record": "docs/verification/sparse-alerts-20261013/README.md",
+  "verification": {
+    "related_python_passed": 190,
+    "postgres_group_passed": 28,
+    "additional_postgres_confirmation_passed": 10,
+    "test_sets_overlap": true,
+    "production_input_replay_passed": true,
+    "compiled_source_status_browser_passed": true
+  },
+  "new_migrations": [],
+  "application_dependencies_changed": false,
+  "production_deployment": "Authorized; clean tag release images, backup restore and rollout evidence recorded separately.",
+  "limitations": [
+    "Unknown M1 coverage remains unchanged; confirmation applies only to eligible D1 price dependencies",
+    "No synthetic bars or assumed closed minutes",
+    "No historical notification catch-up",
+    "Load failed not reproduced; deferred as instructed"
+  ]
+}
