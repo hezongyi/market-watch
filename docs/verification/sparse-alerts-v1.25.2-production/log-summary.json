@@ -1,0 +1,82 @@
+{
+  "services": [
+    {
+      "service": "api",
+      "tracebacks": 1,
+      "history_turn_failures": 0,
+      "http_error_lines": 2
+    },
+    {
+      "service": "pricing-worker",
+      "tracebacks": 0,
+      "history_turn_failures": 0,
+      "http_error_lines": 0
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "tracebacks": 0,
+      "history_turn_failures": 0,
+      "http_error_lines": 0
+    },
+    {
+      "service": "chart-history-worker",
+      "tracebacks": 0,
+      "history_turn_failures": 0,
+      "http_error_lines": 0
+    },
+    {
+      "service": "history-worker",
+      "tracebacks": 0,
+      "history_turn_failures": 0,
+      "http_error_lines": 0
+    },
+    {
+      "service": "composite-aggregate-worker",
+      "tracebacks": 0,
+      "history_turn_failures": 0,
+      "http_error_lines": 0
+    },
+    {
+      "service": "native-history-worker",
+      "tracebacks": 0,
+      "history_turn_failures": 0,
+      "http_error_lines": 0
+    },
+    {
+      "service": "realtime-worker",
+      "tracebacks": 0,
+      "history_turn_failures": 0,
+      "http_error_lines": 0
+    },
+    {
+      "service": "notify-worker",
+      "tracebacks": 0,
+      "history_turn_failures": 0,
+      "http_error_lines": 0
+    },
+    {
+      "service": "market-stream-worker",
+      "tracebacks": 0,
+      "history_turn_failures": 0,
+      "http_error_lines": 0
+    },
+    {
+      "service": "web",
+      "tracebacks": 0,
+      "history_turn_failures": 0,
+      "http_error_lines": 12
+    },
+    {
+      "service": "chart-origin",
+      "tracebacks": 0,
+      "history_turn_failures": 0,
+      "http_error_lines": 0
+    }
+  ],
+  "interpretation": {
+    "api_traceback": "One chart request cancelled during browser navigation: asyncio.exceptions.CancelledError in query_chart",
+    "http_401": "Expected anonymous /api/session checks before login",
+    "http_499": "Client navigation cancelled requests; final browser reports zero HTTP errors",
+    "worker_failures": 0
+  }
+}

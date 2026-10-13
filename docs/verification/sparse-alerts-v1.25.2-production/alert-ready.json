@@ -1,0 +1,74 @@
+{
+  "alert_id": "da551932-8e64-488f-a961-d1cc1b32ac7d",
+  "status": "active",
+  "health": "ready",
+  "reason": null,
+  "count": 0,
+  "quote_health": "ready",
+  "state": {
+    "sequence": 1791838800000,
+    "left": "1.11549",
+    "right": "1.11546",
+    "count": 0
+  },
+  "original_d1_coverage": [
+    {
+      "start": 1791752400000,
+      "end": 1791838800000,
+      "observed_minutes": 1425,
+      "unknown_minutes": 15,
+      "coverage_complete": false
+    }
+  ],
+  "event_counts": {
+    "signals": 2,
+    "notifications": 2,
+    "delivery_attempts": 2,
+    "market_composite_judgments": 3
+  },
+  "judgments": [
+    {
+      "outcome": "recovery_baseline",
+      "event_time": 1791838800000,
+      "signal_id": null,
+      "observation_basis": "native_confirmed_close",
+      "price_confirmation_kind": "native_ohlc_match"
+    },
+    {
+      "outcome": "recovery_baseline",
+      "event_time": 1791838800000,
+      "signal_id": null,
+      "observation_basis": "native_confirmed_close",
+      "price_confirmation_kind": "native_ohlc_match"
+    },
+    {
+      "outcome": "recovery_baseline",
+      "event_time": 1791838800000,
+      "signal_id": null,
+      "observation_basis": "native_confirmed_close",
+      "price_confirmation_kind": "native_ohlc_match"
+    }
+  ],
+  "confirmation": [
+    {
+      "result": "data",
+      "start": 1791752400000,
+      "end": 1791838800000,
+      "fetched_at": 1791862030741,
+      "checksum_verified": true,
+      "evidence": {
+        "close": "1.11549",
+        "complete": true,
+        "contract": "account-native-ohlc-v1",
+        "end": 1791838800000,
+        "high": "1.12167",
+        "low": "1.11521",
+        "observed_at": 1791862030728,
+        "open": "1.11850",
+        "source_id": "b42d95cee0aada4ea6b1cdb9d71fc4cdc84a162511c35f07612ee99f3fdbfa34",
+        "start": 1791752400000
+      }
+    }
+  ],
+  "historical_notification_catchup": false
+}
