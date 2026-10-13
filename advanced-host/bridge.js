@@ -296,39 +296,67 @@ function startIndicatorCoordinator(catalog) {
   });
 }
 const displayRecoveries=new Map();
-async function recoverDisplaySnapshot(ticker,res,token){
+async function recoverDisplaySnapshot(ticker,res,token,retry=false){
   const key=indicatorKey(ticker,res),previous=displayRecoveries.get(key);
-  if(previous?.token===token)return previous.promise;
+  if(previous?.token===token && (!retry || previous.state!=='error'))return previous.promise;
   const epoch=workspaceEpoch;
-  const promise=(async()=>{
+  const charts=ready ? Array.from({length:widget.chartsCount()},(_,index)=>({index,chart:widget.chart(index)}))
+    .filter(({chart})=>chartUsesSymbol(chart,ticker,res)) : [];
+  const entry={token,state:'preparing',prune(){
+    for(let offset=charts.length-1;offset>=0;offset--){
+      const {index,chart}=charts[offset];
+      if(epoch===workspaceEpoch && index<widget.chartsCount() &&
+          (widget.chart(index)._chartWidget || widget.chart(index))===(chart._chartWidget || chart) && chartUsesSymbol(chart,ticker,res))continue;
+      charts.splice(offset,1);
+      if(epoch===workspaceEpoch)send({type:'chart-indicator-state',epoch,index,id:'display-snapshot:'+key,name:'行情快照',state:'removed',error:''});
+    }
+    if(!charts.length && displayRecoveries.get(key)===entry){
+      displayRecoveries.delete(key);send({type:'feed-poll-state',key:'display:'+key,error:''});
+    }
+  }};
+  const current=()=>epoch===workspaceEpoch && displayRecoveries.get(key)===entry && ready &&
+    charts.some(({index,chart})=>index<widget.chartsCount() && (widget.chart(index)._chartWidget || widget.chart(index))===(chart._chartWidget || chart) && chartUsesSymbol(chart,ticker,res));
+  const notify=(state,error='')=>{for(const {index,chart} of charts)
+    if(index<widget.chartsCount() && (widget.chart(index)._chartWidget || widget.chart(index))===(chart._chartWidget || chart) && (state==='removed' || chartUsesSymbol(chart,ticker,res)))
+      send({type:'chart-indicator-state',epoch,index,id:'display-snapshot:'+key,name:'行情快照',state,error});};
+  displayRecoveries.set(key,entry);
+  entry.promise=(async()=>{
+    if(!current())return;
+    notify('preparing');
     compositeDisplayBatches.cancel(key);
     for(const sub of subscriptions.values())if(indicatorKey(sub.symbol,sub.res)===key){
       sub.needsHistoryReload=true;
       sub.marketGeneration=++marketGeneration;sub.marketSequence=0;
     }
     cache.clear();
-    for(let attempt=0;attempt<3 && epoch===workspaceEpoch;attempt++){
+    for(let attempt=0;attempt<3 && current();attempt++){
       try{
-        const restored=await reloadHistory(ticker,res);
+        const restored=await reloadHistory(ticker,res,chart=>current() && charts.some(item=>(item.chart._chartWidget || item.chart)===(chart._chartWidget || chart)));
+        if(!current())return;
         if(restored){
           for(const sub of subscriptions.values())if(indicatorKey(sub.symbol,sub.res)===key){
             sub.needsHistoryReload=false;registerMarketBar(sub);
           }
+          entry.state='ready';notify('ready');send({type:'feed-poll-state',key:'display:'+key,error:''});
           return;
         }
       }catch(error){
+        if(!current())return;
         if(attempt===2)throw error;
       }
-      await new Promise(resolve=>setTimeout(resolve,1000*2**attempt));
+      if(attempt<2)await new Promise(resolve=>setTimeout(resolve,1000*2**attempt));
     }
-    if(epoch===workspaceEpoch)throw Error('展示快照恢复失败，请重试指标');
+    if(current())throw Error('展示快照恢复失败，请重试指标');
   })();
-  displayRecoveries.set(key,{token,promise});
-  promise.catch(error=>send({type:'feed-poll-state',key:'display:'+key,error:String(error)}));
-  // Keep only the latest credential per scope; old failed recovery cannot
-  // continuously reset a chart. A later accepted snapshot gets a new attempt.
+  const cancel=()=>{if(!current() && displayRecoveries.get(key)===entry){
+    displayRecoveries.delete(key);if(epoch===workspaceEpoch)notify('removed');
+  }};
+  entry.promise.then(cancel,error=>{if(current()){
+    entry.state='error';notify('error',String(error));
+    send({type:'feed-poll-state',key:'display:'+key,error:String(error)});
+  }else cancel();});
   if(displayRecoveries.size>64)displayRecoveries.delete(displayRecoveries.keys().next().value);
-  return promise;
+  return entry.promise;
 }
 function acceptMarketHistory(ticker,res,page,window = '', acceptedRows) {
   rememberIndicatorBinding(ticker,res,page);
@@ -368,6 +396,7 @@ async function recoverMarketBar(sub) {
   } finally {sub.marketRecovering=false;}
 }
 function synchronizeMarketVisibility() {
+  for(const recovery of displayRecoveries.values())recovery.prune();
   if(marketPollingFallback || !ready || loading) return;
   for(const sub of subscriptions.values()) {
     if(!sub.marketListener) continue;
@@ -2639,7 +2668,14 @@ addEventListener("message", async (e) => {
   } else if(m.type==='retry-chart-indicators' && m.epoch===workspaceEpoch && Number.isSafeInteger(m.index)) {
     if(ready && m.index>=0 && m.index<widget.chartsCount()){
       const chart=widget.chart(m.index);
-      displayRecoveries.delete(indicatorKey(chart.symbol(),chart.resolution()));
+      const symbol=chart.symbol(),resolution=chart.resolution();
+      const recovery=displayRecoveries.get(indicatorKey(symbol,resolution));
+      if(recovery?.state==='error'){
+        try{await recoverDisplaySnapshot(symbol,resolution,recovery.token,true);}catch{return;}
+        if(m.epoch!==workspaceEpoch || !ready || m.index>=widget.chartsCount() ||
+            (widget.chart(m.index)._chartWidget || widget.chart(m.index))!==(chart._chartWidget || chart) ||
+            chart.symbol()!==symbol || chart.resolution()!==resolution)return;
+      }
     }
     void indicatorCoordinator?.retry(m.index);
   } else if (m.type === 'retry-chart-history' && ready && !loading && m.epoch===workspaceEpoch &&

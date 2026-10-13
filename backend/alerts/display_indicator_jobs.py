@@ -42,7 +42,13 @@ def pack(rows):
     return gzip.compress(json.dumps(rows, separators=(',', ':'), allow_nan=False).encode(), mtime=0)
 
 
-def request(db, run, snapshot, affected, cursor, end, checkpoint):
+def fault_token(task):
+    from .fixed_indicators import digest
+
+    return digest([task.id, task.error, task.next_at, task.lease_token])
+
+
+def request(db, run, snapshot, affected, cursor, end, checkpoint, *, retry=None):
     from .fixed_indicators import digest
 
     ident = digest([snapshot.id, run.id, affected, cursor, end])
@@ -52,7 +58,7 @@ def request(db, run, snapshot, affected, cursor, end, checkpoint):
             db.execute(text('SELECT pg_advisory_xact_lock(8675312)'))
             task = db.get(DisplayIndicatorTask, ident)
         if task:
-            return request(db, run, snapshot, affected, cursor, end, checkpoint)
+            return request(db, run, snapshot, affected, cursor, end, checkpoint, retry=retry)
         db.execute(delete(DisplayIndicatorTask).where(DisplayIndicatorTask.snapshot_id.in_(
             select(DisplaySnapshot.id).where(DisplaySnapshot.expires_at < now_ms()))))
         count = db.scalar(select(func.count()).select_from(DisplayIndicatorTask))
@@ -66,14 +72,25 @@ def request(db, run, snapshot, affected, cursor, end, checkpoint):
             output=pack([]), status='pending', lease_until=0, next_at=0)
             .on_conflict_do_nothing(index_elements=['id']))
         task = db.get(DisplayIndicatorTask, ident)
+    restarted = None
+    if retry and ident in retry:
+        if db.bind.dialect.name == 'postgresql':
+            db.execute(text('SELECT pg_advisory_xact_lock(8675312)'))
+        task = db.scalar(select(DisplayIndicatorTask).where(DisplayIndicatorTask.id == ident)
+            .with_for_update().execution_options(populate_existing=True))
+        # A fault token authorizes one restart of that exact terminal attempt.
+        # Polling and duplicate/stale user actions cannot reset a newer fault.
+        if task.status == 'error' and fault_token(task) == retry[ident]:
+            restarted = {ident: retry[ident]}
+            task.status, task.error, task.next_at = 'pending', None, 0
+            task.lease_token, task.lease_until = None, 0
     if task.status != 'complete':
         if task.status == 'error':
-            if task.error == 'DisplayOutputLimit':
-                raise DisplayOutputLimit()
-            if task.error == 'DisplayTaskCapacity':
-                raise DisplayTaskCapacity()
-            raise DisplayReplayFailure()
-        return {'pending': True, 'affected': affected, 'task_id': ident}
+            error = (DisplayOutputLimit() if task.error == 'DisplayOutputLimit' else
+                DisplayTaskCapacity() if task.error == 'DisplayTaskCapacity' else DisplayReplayFailure())
+            error.display_retry = {ident: fault_token(task)}
+            raise error
+        return {'pending': True, 'affected': affected, 'task_id': ident, 'restarted': restarted}
     return {'pending': False, 'affected': affected, 'task_id': ident,
             'rows': json.loads(gzip.decompress(task.output)), 'display': task.presentation}
 
@@ -165,5 +182,5 @@ def tick():
                     task.error, task.status = type(error).__name__, 'error'
                 elif isinstance(error, (ValueError, TypeError, KeyError)) or failures >= MAX_FAILURES:
                     task.status = 'error'
-                task.lease_token, task.lease_until = None, 0
+                task.lease_token, task.lease_until = (uid() if task.status == 'error' else None), 0
     return True

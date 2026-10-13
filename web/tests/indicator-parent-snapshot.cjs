@@ -23,7 +23,14 @@ const token='a'.repeat(64),query={instrument:'test-composite',series_kind:'compo
   assert.equal(requests.length,count,'invalid or wrong-series credential must not reach HTTP');
   assert.equal(replies.at(-1).errorDetails.code,'INVALID_HISTORY_REQUEST');
  }
+ const retry={['b'.repeat(64)]:'c'.repeat(64)};
+ await context.handle({id:4,query:{...query,display_retry:retry}});
+ assert.deepEqual(requests.at(-1).body.display_retry,retry);
+ for(const display_retry of [[],{'bad':'bad'},{['b'.repeat(64)]:null}]){
+  const count=requests.length;await context.handle({id:5,query:{...query,display_retry}});
+  assert.equal(requests.length,count);assert.equal(replies.at(-1).errorDetails.code,'INVALID_HISTORY_REQUEST');
+ }
  const {display_snapshot_id,...ordinary}=query;
- await context.handle({id:3,query:ordinary});assert.equal(requests.length,2);
+ await context.handle({id:3,query:ordinary});assert.equal(requests.length,3);
  console.log('PASS actual parent snapshot forwarding and identity validation');
 })().catch(e=>{console.error(e);process.exitCode=1;});

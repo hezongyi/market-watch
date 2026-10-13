@@ -68,8 +68,10 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
   }
   async function prepare(consumer,scope){
     const {chart,meta,params,inputs}=consumer;
+    const ticker=chart.symbol();
     const binding=identity.binding(chart.symbol(),scope.resolution);
     if(!binding)return;
+    if(consumer.retrySnapshot!==binding.displaySnapshot){consumer.displayRetry=null;consumer.failedRetry=null;consumer.retrySnapshot=binding.displaySnapshot;}
     const nextIdentity=scopeIdentity(chart,scope,params,meta.version,binding);
     // A genuine input revision change withdraws dependent values before recompute.
     // A reset may remove/recreate the coordinator consumer while the adapter
@@ -120,10 +122,10 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
       return latest && ['revision','inputRevision','tailVersion','correctionVersion','before','displaySnapshot'].every(key=>latest[key]===binding[key]) &&
         (!binding.calculationStart || latest.calculationStart===binding.calculationStart);
     };
-    const current=()=>!disposed && consumers.get(consumer.key)===consumer &&
+    const current=()=>!disposed && chart.symbol()===ticker && chart.resolution()===scope.resolution && consumers.get(consumer.key)===consumer &&
       results.scope(chart,consumer.id)?.generation===scope.generation && consumer.pending===signature && unchangedBinding();
     const key=JSON.stringify([nextIdentity,binding.inputRevision,scope.first,scope.last,scope.count,binding.tailVersion,binding.correctionVersion,binding.displaySnapshot,
-      inputs.showsignals,inputs.highlighting,requestFirst,requestBefore]);consumer.cacheKey=key;
+      inputs.showsignals,inputs.highlighting,requestFirst,requestBefore,consumer.displayRetry]);consumer.cacheKey=key;
     let cached=shared.get(key);
     if(!cached){
       const promise=(async()=>{
@@ -134,7 +136,8 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
           if(!sharedCurrent())return null;
           if(Date.now()>deadline)throw Error('指标范围读取超时');
           const page=await read(chart.symbol(),scope.resolution,{before,limit:2000,
-            indicators:[{name:scope.name,params}],...binding.query},sharedCurrent,
+            indicators:[{name:scope.name,params}],...binding.query,
+            ...(consumer.displayRetry ? {display_retry:consumer.displayRetry} : {})},sharedCurrent,
             JSON.stringify([binding.revision,binding.calculationStart,binding.inputRevision,binding.tailVersion,binding.correctionVersion,binding.displaySnapshot]));
           if(binding.displaySnapshot && page.display_snapshot_id!==binding.displaySnapshot)return null;
           const result=page.indicators?.find(item=>item.name===scope.name && canonical(item.params)===canonical(params));
@@ -190,7 +193,7 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
       if(accepted){consumer.acceptedScope={...coverage,generation:consumer.handle.generation};
         consumer.accepted=JSON.stringify([consumer.handle.generation,nextIdentity,binding.inputRevision,scope.first,scope.last,scope.count,binding.tailVersion,binding.correctionVersion,binding.displaySnapshot,inputs.showsignals,inputs.highlighting]);
         consumer.requested=consumer.accepted;
-        consumer.failures=0;consumer.retryAt=0;status(consumer,'ready');
+        consumer.failures=0;consumer.retryAt=0;consumer.displayRetry=null;consumer.failedRetry=null;status(consumer,'ready');
         for(const {page} of batch.pages)presentation(chart.symbol(),scope.resolution,{...page,indicators:[{name:scope.name,params,presentation:page.presentation}]});}
     }catch(error){if(current()){
       consumer.failedSignature=signature;
@@ -198,10 +201,15 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
         // A replacement price read owns its new credential. Never retry the
         // indicator by silently substituting a newer snapshot under old prices.
         consumer.retryAt=Infinity;
-        await recover(chart.symbol(),scope.resolution,binding.displaySnapshot);
-        consumer.retryAt=0;
+        try {
+          await recover(chart.symbol(),scope.resolution,binding.displaySnapshot);
+          consumer.retryAt=0;
+        } catch(recoveryError) {
+          if(current()){status(consumer,'error',recoveryError);report(recoveryError,consumer);}
+        }
         return;
       }
+      consumer.failedRetry=error.display_retry;
       consumer.failures=(consumer.failures || 0)+1;
       consumer.retryAt=['DISPLAY_SUFFIX_CAPACITY_EXCEEDED','DISPLAY_REPLAY_FAILED'].includes(error.code) || consumer.failures>=3 ?
         Infinity:Date.now()+1000*2**consumer.failures;
@@ -264,7 +272,7 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
     }
   }
   timer=setInterval(()=>void sync(),500);
-  return {sync,settle,retry(index){for(const c of consumers.values())if(c.index===index){c.retryAt=0;c.failures=0;c.accepted=null;}return sync();},dispose(){disposed=true;clearInterval(timer);for(const unsubscribe of rangeEvents.values())unsubscribe();rangeEvents.clear();for(const consumer of consumers.values())detach(consumer);shared.clear();publishDemand();},
+  return {sync,settle,retry(index){for(const c of consumers.values())if(c.index===index){c.retryAt=0;c.failures=0;c.accepted=null;shared.delete(c.cacheKey);c.displayRetry=c.failedRetry;}return sync();},dispose(){disposed=true;clearInterval(timer);for(const unsubscribe of rangeEvents.values())unsubscribe();rangeEvents.clear();for(const consumer of consumers.values())detach(consumer);shared.clear();publishDemand();},
     diagnostics:()=>({consumers:consumers.size,shared:shared.size,rows:[...shared.values()].reduce((n,r)=>n+r.rows.length,0)})};
 }
 

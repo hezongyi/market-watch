@@ -267,8 +267,8 @@ def outputs(db, run, start, end):
     return sorted(rows, key=lambda row: row["start"])
 
 
-def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='display'):
-    results, progress = [], []
+def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='display', display_retry=None):
+    results, progress, display_errors, restarted = [], [], [], {}
     if not page["bars"]:
         return results, progress
     for spec in specs:
@@ -304,8 +304,15 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='di
 
             display_page = page if tail is page['bars'] else {**page, 'bars': sorted(
                 {bar['start']: bar for bar in [*page['bars'], *tail]}.values(), key=lambda bar: bar['start'])}
-            repaired = suffix(db, run, display_page, stamp=stamp or now_ms())
+            try:
+                repaired = suffix(db, run, display_page, stamp=stamp or now_ms(), retry=display_retry)
+            except ValueError as error:
+                if not hasattr(error, 'display_retry'):
+                    raise
+                display_errors.append(error)
+                continue
             if repaired:
+                restarted.update(repaired.get('restarted') or {})
                 status['display_status'] = 'pending' if repaired['pending'] else 'complete'
                 status['affected_start'] = repaired['affected']
                 if not repaired['pending']:
@@ -344,4 +351,8 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='di
                         "dependencies": [{key: row.get(key) for key in
                             ("start", "dependency_origin", "seam_dependency", "initialized", "provisional")} for row in rows]})
         progress.append(status)
+    if display_errors:
+        error = display_errors[0]
+        error.display_retry = restarted | {key: value for fault in display_errors for key, value in fault.display_retry.items()}
+        raise error
     return results, progress

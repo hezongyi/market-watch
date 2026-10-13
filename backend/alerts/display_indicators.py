@@ -5,7 +5,7 @@ from .indicator_state import IndicatorState
 MAX_REPLAY_ROWS = 4000
 
 
-def suffix(db, run, page, *, stamp):
+def suffix(db, run, page, *, stamp, retry=None):
     from . import fixed_indicators as jobs
     from .composite_chart import chart_page
     from .composite_series import period
@@ -51,7 +51,7 @@ def suffix(db, run, page, *, stamp):
         if snapshot:
             from .display_indicator_jobs import request
 
-            return request(db, run, snapshot, affected, cursor, end, checkpoint)
+            return request(db, run, snapshot, affected, cursor, end, checkpoint, retry=retry)
         return {'pending': True, 'affected': affected}
     # Retain the caller's accepted page projection (also allows callers with
     # in-memory pages to use the same public result interface).

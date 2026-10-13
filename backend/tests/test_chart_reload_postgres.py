@@ -184,3 +184,42 @@ def test_additive_display_migrations_roundtrip_and_preserve_observations(provide
         with pytest.raises(RuntimeError, match='backup'):
             modules[0].downgrade()
         assert inspect(conn).has_table('market_observed_minutes')
+
+
+def test_terminal_task_retry(provider_pg, monkeypatch):
+    from test_chart_reload_diagnosis import test_terminal_display_task_explicit_retry
+    test_terminal_display_task_explicit_retry(provider_pg[0], monkeypatch)
+
+
+def test_batched_terminal_task_retry(provider_pg, monkeypatch):
+    from test_chart_reload_diagnosis import test_batched_terminal_display_tasks_retry_together
+    test_batched_terminal_display_tasks_retry_together(provider_pg[0], monkeypatch)
+
+
+def test_concurrent_terminal_retry_is_idempotent(provider_pg, monkeypatch):
+    from concurrent.futures import ThreadPoolExecutor
+    from alerts import display_indicator_jobs as jobs
+    from alerts.storage import DisplayIndicatorTask, DisplaySnapshot, FixedIndicatorRun
+    from test_chart_reload_diagnosis import test_display_replay_budget_uses_shared_background_job
+    factory = provider_pg[0]
+    test_display_replay_budget_uses_shared_background_job(factory, monkeypatch, 'failures')
+    with factory.begin() as db:
+        task = db.query(DisplayIndicatorTask).one()
+        retry = {task.id: jobs.fault_token(task)}
+        args = (task.affected, task.cursor, task.end, task.state)
+        snapshot_id, run_id = task.snapshot_id, task.run_id
+    def restart():
+        with factory.begin() as db:
+            return jobs.request(db, db.get(FixedIndicatorRun, run_id),
+                db.get(DisplaySnapshot, snapshot_id), *args, retry=retry)
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results = list(pool.map(lambda _: restart(), range(2)))
+    assert all(result['pending'] for result in results)
+    with factory.begin() as db:
+        task = db.query(DisplayIndicatorTask).one()
+        assert task.status == 'pending' and task.error is None and task.lease_token is None
+
+
+def test_mixed_stale_retry_rollback(provider_pg, monkeypatch):
+    from test_chart_reload_diagnosis import test_mixed_stale_display_retry_survives_transaction_rollback
+    test_mixed_stale_display_retry_survives_transaction_rollback(provider_pg[0], monkeypatch)

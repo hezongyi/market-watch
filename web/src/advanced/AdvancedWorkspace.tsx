@@ -1138,6 +1138,10 @@ export default function AdvancedWorkspace() {
             (q.series_kind !== "composite" ||
               typeof q.display_snapshot_id !== "string" ||
               !/^[a-f0-9]{64}$/.test(q.display_snapshot_id))) ||
+          (q.display_retry !== undefined && (q.series_kind !== "composite" ||
+            !q.display_retry || typeof q.display_retry !== "object" || Array.isArray(q.display_retry) ||
+            Object.keys(q.display_retry).length > 12 || Object.entries(q.display_retry).some(([id,token])=>
+              !/^[a-f0-9]{64}$/.test(id) || typeof token !== "string" || !/^[a-f0-9]{64}$/.test(token)))) ||
           !frames.has(q.timeframe) ||
           !Number.isInteger(q.limit) ||
           q.limit < 1 ||
@@ -1246,6 +1250,7 @@ export default function AdvancedWorkspace() {
                       composite_revision_id: q.composite_revision_id,
                       input_revision: q.input_revision,
                       display_snapshot_id: q.display_snapshot_id,
+                      display_retry: q.display_retry,
                     }
                   : {}),
                 ...(typeof q.dataset_start === "number"

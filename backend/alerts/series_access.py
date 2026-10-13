@@ -176,7 +176,7 @@ def chart_data(db, body, *, realtime=None):
         from .fixed_indicators import chart_results
 
         indicators, indicator_progress = chart_results(db, page, body.indicators,
-            provisional=body.provisional and body.input_revision is None, stamp=stamp)
+            provisional=body.provisional and body.input_revision is None, stamp=stamp, display_retry=body.display_retry)
         if any(item["status"] != "complete" for item in indicator_progress):
             page["pending"].append("指标正在从固定输入起点初始化或修复；已计算区间可读，未完成区间不截断预热")
     page["indicator_progress"] = indicator_progress

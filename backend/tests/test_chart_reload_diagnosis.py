@@ -383,3 +383,122 @@ def test_legacy_quote_handover_never_copies_uncertified_forming(database, monkey
             assert page['bars'][-1]['start'] == at // 60000 * 60000
             assert all(observed.content[key] == '1.10' for key in ('open', 'high', 'low', 'close'))
         assert db.get(LiveState, ident.key).ready is False, 'display handover cannot restore live alert readiness'
+
+
+def test_terminal_display_task_explicit_retry(database, monkeypatch):
+    from alerts import composite_series, display_indicator_jobs as jobs
+    from alerts.storage import DisplayIndicatorTask, DisplaySnapshot, FixedIndicatorRun
+    healthy = composite_series.read_window
+    test_display_replay_budget_uses_shared_background_job(database, monkeypatch, 'failures')
+    monkeypatch.setattr(composite_series, 'read_window', healthy)
+    with database.begin() as db:
+        task = db.query(DisplayIndicatorTask).one()
+        run, snapshot = db.get(FixedIndicatorRun, task.run_id), db.get(DisplaySnapshot, task.snapshot_id)
+        with pytest.raises(jobs.DisplayReplayFailure) as caught:
+            jobs.request(db, run, snapshot, task.affected, task.cursor, task.end, task.state)
+        retry = caught.value.display_retry
+        args = (task.affected, task.cursor, task.end, task.state)
+        assert jobs.request(db, run, snapshot, *args, retry=retry)['pending']
+        assert task.error is None and task.lease_token is None
+        assert jobs.request(db, run, snapshot, *args, retry=retry)['pending']
+    assert jobs.tick()
+    with database.begin() as db:
+        task = db.query(DisplayIndicatorTask).one()
+        assert task.status == 'complete'
+        assert jobs.request(db, db.get(FixedIndicatorRun, task.run_id),
+            db.get(DisplaySnapshot, task.snapshot_id), *args, retry=retry)['pending'] is False
+        task.status, task.error, task.lease_token = 'error', 'RuntimeError:3', 'new-failure'
+    with database.begin() as db:
+        task = db.query(DisplayIndicatorTask).one()
+        with pytest.raises(jobs.DisplayReplayFailure):
+            jobs.request(db, db.get(FixedIndicatorRun, task.run_id),
+                db.get(DisplaySnapshot, task.snapshot_id), *args, retry=retry)
+        assert task.lease_token == 'new-failure'
+
+
+def test_batched_terminal_display_tasks_retry_together(database, monkeypatch):
+    from alerts import composite_series, display_indicator_jobs as jobs, fixed_indicators as fixed
+    from alerts.composite_chart import chart_page
+    from alerts.storage import DisplayIndicatorTask, FixedIndicatorRun, DisplaySnapshot
+    healthy = composite_series.read_window
+    test_display_replay_budget_uses_shared_background_job(database, monkeypatch, 'failures')
+    monkeypatch.setattr(composite_series, 'read_window', healthy)
+    with database.begin() as db:
+        task = db.query(DisplayIndicatorTask).one()
+        run, snapshot = db.get(FixedIndicatorRun, task.run_id), db.get(DisplaySnapshot, task.snapshot_id)
+        page = chart_page(db, db.get(CompositeRevision, run.revision_id).composite_id, 'M1', provisional=True,
+            now=snapshot.content['now'], display_snapshot=snapshot)
+        second_spec = {'name': 'EMA', 'params': {'period': 2}}
+        fixed.chart_results(db, page, [second_spec], provisional=True, stamp=snapshot.content['now'])
+        db.flush()
+        tasks = db.query(DisplayIndicatorTask).all()
+        assert len(tasks) == 2
+        for item in tasks:
+            item.status, item.error, item.lease_token = 'error', 'RuntimeError:3', 'fault-' + item.id[:8]
+        specs = [run.spec, second_spec]
+        with pytest.raises(jobs.DisplayReplayFailure) as caught:
+            fixed.chart_results(db, page, specs, provisional=True, stamp=snapshot.content['now'])
+        assert len(caught.value.display_retry) == 2
+        retry = caught.value.display_retry
+    with database.begin() as db:
+        _, progress = fixed.chart_results(db, page, specs, provisional=True,
+            stamp=snapshot.content['now'], display_retry=retry)
+        assert len(progress) == 2
+        assert all(item['display_status'] == 'pending' for item in progress)
+    with database.begin() as db:
+        assert all(item.status == 'pending' for item in db.query(DisplayIndicatorTask))
+
+
+def test_mixed_stale_display_retry_survives_transaction_rollback(database, monkeypatch):
+    from alerts import display_indicator_jobs as jobs, fixed_indicators as fixed
+    from alerts.storage import DisplayIndicatorTask, FixedIndicatorRun, DisplaySnapshot
+    from alerts.composite_chart import chart_page
+    test_batched_terminal_display_tasks_retry_together(database, monkeypatch)
+    with database.begin() as db:
+        tasks = list(db.query(DisplayIndicatorTask))
+        specs = []
+        for task in tasks:
+            task.status, task.error, task.lease_token = 'error', 'RuntimeError:3', 'fault-' + task.id[:8]
+            run = db.get(FixedIndicatorRun, task.run_id)
+            specs.append(run.spec)
+        snapshot = db.get(DisplaySnapshot, tasks[0].snapshot_id)
+        page = chart_page(db, db.get(CompositeRevision, run.revision_id).composite_id,
+            'M1', provisional=True, now=snapshot.content['now'], display_snapshot=snapshot)
+        retry = {task.id: jobs.fault_token(task) for task in tasks}
+        tasks[1].lease_token = 'another-user-failure'
+    with pytest.raises(jobs.DisplayReplayFailure) as caught:
+        with database.begin() as db:
+            fixed.chart_results(db, page, specs, provisional=True,
+                stamp=snapshot.content['now'], display_retry=retry)
+    retry = caught.value.display_retry
+    assert len(retry) == 2, 'must return credentials for attempted restarts rolled back with a sibling fault'
+    with database.begin() as db:
+        assert all(task.status == 'error' for task in db.query(DisplayIndicatorTask))
+        _, progress = fixed.chart_results(db, page, specs, provisional=True,
+            stamp=snapshot.content['now'], display_retry=retry)
+        assert all(item['display_status'] == 'pending' for item in progress)
+    with database.begin() as db:
+        assert all(task.status == 'pending' for task in db.query(DisplayIndicatorTask))
+
+
+def test_display_retry_crosses_api_error_boundary(database, monkeypatch):
+    from fastapi import HTTPException
+    from alerts.chart_api import data_sync
+    from alerts import display_indicator_jobs as jobs
+    retry = {'a' * 64: 'b' * 64}
+    body = DataQuery(instrument='composite', series_kind='composite', timeframe='M1',
+        display_snapshot_id='c' * 64, display_retry=retry,
+        indicators=[{'name': 'EMA', 'params': {'period': 2}}])
+    def failure(db, query):
+        assert query.display_retry == retry
+        error = jobs.DisplayReplayFailure()
+        error.display_retry = retry
+        raise error
+    monkeypatch.setattr(series_access, 'chart_data', failure)
+    with pytest.raises(HTTPException) as caught:
+        data_sync(body)
+    assert caught.value.status_code == 422
+    assert caught.value.detail['display_retry'] == retry
+    assert caught.value.detail['code'] == 'DISPLAY_REPLAY_FAILED'
+    with pytest.raises(ValueError):
+        DataQuery(instrument='x', timeframe='M1', display_retry=retry)
