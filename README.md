@@ -1,6 +1,6 @@
 # 守望 · Market Watch
 
-个人外汇、黄金和比特币监控网站。当前源码版本 **v1.25.1**，修复稀疏分钟柱导致组合 D1 价格告警被误标 stale，以及已核实交易时段的来源文案。价格确认使用同账户原生完整日线证据，保留缺分钟和指标完整性限制；见 [验收证据](docs/verification/sparse-alerts-20261013/README.md) 和 [源码清单](deploy/releases/v1.25.1-source.json)。
+个人外汇、黄金和比特币监控网站。当前源码版本 **v1.25.2**，修复稀疏分钟柱导致组合 D1 价格告警被误标 stale，以及已核实交易时段的来源文案。价格确认使用同账户原生完整日线证据，保留缺分钟和指标完整性限制；见 [验收证据](docs/verification/sparse-alerts-20261013/README.md) 和 [源码清单](deploy/releases/v1.25.2-source.json)。
 
 当前生产已从 v1.23.0 升级到 **v1.25.0**：12 个常驻服务、API healthy，Yahoo 默认开启并实际读取验证；迁移、备份完整恢复、生产浏览器及回滚记录见 [生产交付](docs/pending-v1.25.0-production-delivery.md)。组合缺分钟仍保持 unknown/stale，`Load failed` 未复现，暂不处理。
 
