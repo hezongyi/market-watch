@@ -110,6 +110,15 @@ def register(session_hash, client, listener, generation, identity, query, state)
             old = MarketStreamSubscription(id=ident, client_id=owner.id, listener=listener)
             db.add(old)
         state = dict(state)
+        if not fresh and old.state.get("provider_acceptance"):
+            from .provider_acceptance import merge
+            # onopen may replay the original registration after an ack. Keep
+            # newer per-bar acceptance instead of rolling it back with it.
+            newer = [r for r in old.state["provider_acceptance"] if
+                old.state.get("provider_acceptance_sequences", {}).get(str(r["start"]), 0)
+                > state.get("sequence", 0)]
+            state["provider_acceptance"] = merge(state.get("provider_acceptance", []), newer)
+            state["provider_acceptance_sequences"] = old.state.get("provider_acceptance_sequences", {})
         if state.get("result_epoch") and state["result_epoch"] != task.result_epoch:
             state["sequence"] = max(0, task.sequence - 1)
             state["initial_snapshot"] = True
@@ -155,6 +164,57 @@ def cancel(session_hash, client, listener, generation):
                 MarketStreamSubscription.task_id == task_id,
                 MarketStreamSubscription.active.is_(True), MarketStreamSubscription.expires > now_ms()).limit(1)):
             _release_demand(db, task)
+
+
+def accept_provider(session_hash, client, listener, generation, result_epoch, sequence, receipts):
+    """Only the current consumer may acknowledge values from a retained result.
+
+    Never reread mutable provider bars to mint acceptance: a repair can commit
+    between publication and this acknowledgement.
+    """
+    from .provider_acceptance import BATCH, merge, receipts as bar_receipts
+
+    if not receipts or len(receipts) > BATCH:
+        raise ValueError("无效行情接受批次")
+    with transaction() as db:
+        owner = _existing_client(db, session_hash, client)
+        sub = db.scalar(select(MarketStreamSubscription).where(
+            MarketStreamSubscription.id == digest([owner.id, listener])).with_for_update())
+        if not sub or not sub.active or sub.generation != generation or sub.expires <= now_ms():
+            return {"ok": False, "stale": True}
+        task = db.get(MarketStreamTask, sub.task_id, options=[defer(MarketStreamTask.payload)])
+        if (task.result_epoch != result_epoch or task.identity.get("kind") != "bars"
+                or task.identity.get("series_kind") != "provider"):
+            return {"ok": False, "stale": True}
+        row = db.get(MarketStreamResult, (task.id, sequence))
+        if not row:
+            return {"ok": False, "stale": True}
+        # A fresh binding can receive the retained full snapshot rather than
+        # that sequence's delta. Both describe the same committed sequence.
+        payload = row.payload
+        requested = {receipt["start"] for receipt in receipts}
+        expected = {r["start"]: r["fingerprint"] for r in bar_receipts(
+            [bar for bar in payload.get("bars", []) if bar["start"] in requested],
+            bool(task.query.get("indicators")))}
+        if sequence == task.sequence and any(expected.get(r["start"]) != r["fingerprint"] for r in receipts):
+            expected = {r["start"]: r["fingerprint"] for r in bar_receipts(
+                [bar for bar in task.payload.get("bars", []) if bar["start"] in requested],
+                bool(task.query.get("indicators")))}
+        state = dict(sub.state)
+        accepted = []
+        sequences = dict(state.get("provider_acceptance_sequences", {}))
+        for receipt in receipts:
+            start = receipt["start"]
+            if expected.get(start) != receipt["fingerprint"]:
+                return {"ok": False, "stale": True}
+            if sequence >= sequences.get(str(start), 0):
+                accepted.append(receipt)
+                sequences[str(start)] = sequence
+        state["provider_acceptance"] = merge(state.get("provider_acceptance", []), accepted)
+        state["provider_acceptance_sequences"] = {
+            str(r["start"]): sequences.get(str(r["start"]), 0) for r in state["provider_acceptance"]}
+        sub.state = state
+        return {"ok": True}
 
 
 def _release_demand(db, task, *, keep_revision=None):
@@ -496,15 +556,21 @@ def delivery(db, task, sub, payload, cursors):
                         page["indicator_correction"] = True
                         state["dependency_observed_at"] = changed_at
         elif query.series_kind == "provider":
+            from .provider_acceptance import LIMIT, fingerprint
             dataset = db.get(ProviderDataset, task.identity["dataset_id"])
             # Recursive provider studies read the fixed prefix preceding the
             # visible window. Match Calculator's per-study input boundaries.
             floor = min(spec.get("calculation_origin") or 0 for spec in query.indicators) if query.indicators else (after or 0)
-            changed = db.scalar(select(ProviderBar.start).where(ProviderBar.dataset_id == dataset.id,
+            # A callback acknowledgement covers precisely these bar values,
+            # not every row changed since the initial HTTP page observation.
+            accepted = {r["start"]: r["fingerprint"] for r in sub.state.get("provider_acceptance", [])}
+            changed = list(db.scalars(select(ProviderBar).where(ProviderBar.dataset_id == dataset.id,
                 ProviderBar.start >= floor,
                 (ProviderBar.start <= before if state.get("historical") else ProviderBar.start < before),
-                ProviderBar.revision > 1, ProviderBar.changed_at > state.get("observed_at", 0)).limit(1))
-            if changed is not None or dataset.metadata_json.get("invalidated_at", 0) > state.get("observed_at", 0):
+                ProviderBar.revision > 1, ProviderBar.changed_at > state.get("observed_at", 0)).limit(LIMIT + 1)))
+            if (len(changed) > LIMIT or any(not accepted.get(row.start) or
+                    accepted[row.start] != fingerprint(row.payload, bool(query.indicators)) for row in changed)
+                    or dataset.metadata_json.get("invalidated_at", 0) > state.get("observed_at", 0)):
                 return {"type": "reset", "reason": "history_changed"}
             if dependency_origin is not None and dependency_origin < floor:
                 observed = state.get("dependency_observed_at") or state.get("observed_at", 0)
@@ -570,6 +636,9 @@ def delivery(db, task, sub, payload, cursors):
         if name in state:
             page[name] = state[name]
     page.pop("latest_bar", None)
+    if query.series_kind == "provider":
+        from .provider_acceptance import BATCH, receipts
+        page["provider_acceptance"] = receipts(page["bars"], bool(query.indicators), limit=BATCH)
     page.update(evidence)
     return page
 

@@ -1,0 +1,285 @@
+{
+  "series": "composite",
+  "source": "OANDA Practice EURUSD bid",
+  "environment": "Unraid production v1.25.3; browser on Ubuntu",
+  "startedAt": "2026-10-14T01:14:24.702Z",
+  "endedAt": "2026-10-14T01:22:07.581Z",
+  "durationSeconds": 462.879,
+  "pageErrors": [],
+  "failedHTTPResponses": [],
+  "automaticSaveRequestsBlocked": 4,
+  "analysis": {
+    "sample_count": 2165,
+    "elapsed_seconds": 450.885,
+    "sampling_errors": [],
+    "resets": [
+      {
+        "at": 1791940509645,
+        "kind": "reloadHistory",
+        "resolution": "5"
+      },
+      {
+        "at": 1791940509646,
+        "kind": "resetData",
+        "index": 1
+      },
+      {
+        "at": 1791940509651,
+        "kind": "reloadHistory",
+        "resolution": "1"
+      },
+      {
+        "at": 1791940510151,
+        "kind": "reloadHistory",
+        "resolution": "1"
+      },
+      {
+        "at": 1791940510152,
+        "kind": "resetData",
+        "index": 0
+      },
+      {
+        "at": 1791940569941,
+        "kind": "reloadHistory",
+        "resolution": "1"
+      },
+      {
+        "at": 1791940569941,
+        "kind": "resetData",
+        "index": 0
+      },
+      {
+        "at": 1791940630232,
+        "kind": "reloadHistory",
+        "resolution": "1"
+      },
+      {
+        "at": 1791940630233,
+        "kind": "resetData",
+        "index": 0
+      },
+      {
+        "at": 1791940692681,
+        "kind": "reloadHistory",
+        "resolution": "1"
+      },
+      {
+        "at": 1791940692681,
+        "kind": "resetData",
+        "index": 0
+      },
+      {
+        "at": 1791940753242,
+        "kind": "reloadHistory",
+        "resolution": "1"
+      },
+      {
+        "at": 1791940753243,
+        "kind": "resetData",
+        "index": 0
+      },
+      {
+        "at": 1791940870261,
+        "kind": "reloadHistory",
+        "resolution": "1"
+      },
+      {
+        "at": 1791940870263,
+        "kind": "resetData",
+        "index": 0
+      }
+    ],
+    "m1": [
+      {
+        "index": 0,
+        "series_kind": "MWC",
+        "first_bar_time": 1791940440,
+        "last_bar_time": 1791940860,
+        "new_minutes": 7,
+        "price_updates": 113,
+        "bars_before": 256,
+        "bars_after": 189,
+        "not_ready_samples": 0,
+        "empty_tail_samples": 0,
+        "bar_time_regressions": [],
+        "bar_count_shrinks": [
+          {
+            "at": 1791940511024,
+            "old": 257,
+            "new": 63
+          },
+          {
+            "at": 1791940570199,
+            "old": 190,
+            "new": 63
+          },
+          {
+            "at": 1791940630445,
+            "old": 190,
+            "new": 63
+          },
+          {
+            "at": 1791940693067,
+            "old": 190,
+            "new": 63
+          },
+          {
+            "at": 1791940753945,
+            "old": 190,
+            "new": 63
+          },
+          {
+            "at": 1791940870465,
+            "old": 191,
+            "new": 63
+          }
+        ],
+        "spacing_changes": [],
+        "range_jumps_over_one_minute": [],
+        "backward_range_moves": [],
+        "close_first": 1.1204,
+        "close_last": 1.12021,
+        "study_names": []
+      }
+    ],
+    "visual": {
+      "samples": 2197,
+      "sampling_errors": [],
+      "all_canvas_empty_samples": 0,
+      "all_colored_pixels_absent_samples": 0,
+      "canvas_counts": [
+        10
+      ],
+      "minimum_nonbackground": 439,
+      "minimum_colored": 284,
+      "m1_candle_disappearance_events": [
+        {
+          "first_blank_at": 1791940510463,
+          "last_blank_at": 1791940510886,
+          "previous_visible_at": 1791940510236,
+          "next_visible_at": 1791940511103,
+          "blank_samples": 3,
+          "minimum_blank_ms": 423,
+          "maximum_blank_ms": 867
+        },
+        {
+          "first_blank_at": 1791940753339,
+          "last_blank_at": 1791940753781,
+          "previous_visible_at": 1791940753131,
+          "next_visible_at": 1791940753986,
+          "blank_samples": 3,
+          "minimum_blank_ms": 442,
+          "maximum_blank_ms": 855
+        }
+      ]
+    },
+    "renderer": {
+      "frame_gaps_over_50ms": 71,
+      "max_gap_ms": 2116.5999999999767,
+      "frame_gaps_over_250ms": 9
+    }
+  },
+  "video_analysis": {
+    "sample_rate_hz": 10,
+    "samples": 4808,
+    "duration_seconds": 480.8,
+    "m1_crop": {
+      "x": 59,
+      "y": 42,
+      "width": 524,
+      "height": 410
+    },
+    "candle_absence_events": [
+      {
+        "video_start_seconds": 62.5,
+        "video_end_seconds": 63.2,
+        "blank_samples": 7,
+        "blank_seconds": 0.7,
+        "colored_before": 1561,
+        "colored_after": 1581
+      },
+      {
+        "video_start_seconds": 122.1,
+        "video_end_seconds": 122.4,
+        "blank_samples": 3,
+        "blank_seconds": 0.3,
+        "colored_before": 1638,
+        "colored_after": 1718
+      },
+      {
+        "video_start_seconds": 182.4,
+        "video_end_seconds": 182.5,
+        "blank_samples": 1,
+        "blank_seconds": 0.1,
+        "colored_before": 1668,
+        "colored_after": 1687
+      },
+      {
+        "video_start_seconds": 244.8,
+        "video_end_seconds": 245.2,
+        "blank_samples": 4,
+        "blank_seconds": 0.4,
+        "colored_before": 1694,
+        "colored_after": 1675
+      },
+      {
+        "video_start_seconds": 305.4,
+        "video_end_seconds": 306.0,
+        "blank_samples": 6,
+        "blank_seconds": 0.6,
+        "colored_before": 1661,
+        "colored_after": 1662
+      },
+      {
+        "video_start_seconds": 422.4,
+        "video_end_seconds": 422.6,
+        "blank_samples": 2,
+        "blank_seconds": 0.2,
+        "colored_before": 1673,
+        "colored_after": 1690
+      }
+    ],
+    "method": "Actual recorded M1 viewport, 10Hz decoded crop; candle red/green pixels vanish between populated frames; excludes initial page load and navigation."
+  },
+  "server_history_resets": [
+    {
+      "at": 1791940509644,
+      "reason": "history_changed",
+      "affected_start": 1791940200000
+    },
+    {
+      "at": 1791940509651,
+      "reason": "history_changed",
+      "affected_start": 1791940440000
+    },
+    {
+      "at": 1791940569941,
+      "reason": "history_changed",
+      "affected_start": 1791940500000
+    },
+    {
+      "at": 1791940630232,
+      "reason": "history_changed",
+      "affected_start": 1791940560000
+    },
+    {
+      "at": 1791940692680,
+      "reason": "history_changed",
+      "affected_start": 1791940620000
+    },
+    {
+      "at": 1791940753242,
+      "reason": "history_changed",
+      "affected_start": 1791940680000
+    },
+    {
+      "at": 1791940870261,
+      "reason": "history_changed",
+      "affected_start": 1791940800000
+    }
+  ],
+  "passed_no_time_regression": true,
+  "passed_no_backward_view_movement": true,
+  "passed_no_flicker": false,
+  "studies_added": false
+}

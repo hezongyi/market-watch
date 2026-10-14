@@ -10,7 +10,7 @@ const context = vm.createContext({document:{createElement:()=>({}),head:{append:
   atob:s=>Buffer.from(s,'base64').toString('utf8'),
   addEventListener:(name,callback)=>{handlers[name]=callback},
   setTimeout, clearTimeout, queueMicrotask});
-for (const file of ['series.js','price-format.js','bridge.js'])
+for (const file of ['series.js','price-format.js','composite-display-batches.js','bridge.js'])
   vm.runInContext(fs.readFileSync(path.join(__dirname,'../../advanced-host',file),'utf8'),context);
 const evaluate = source => vm.runInContext(source, context);
 const deliver = event => handlers.message({source:parent,origin:'http://localhost',
@@ -37,6 +37,56 @@ const deliver = event => handlers.message({source:parent,origin:'http://localhos
   evaluate("feed.unsubscribeBars('chart')");
   await deliver({...event,sequence:4});
   assert.equal(context.received.length,2,'late event after unsubscribe has no native callback');
+  evaluate(`globalThis.providerTicker='MWP:EURUSD';
+    lastHistory.set(providerTicker+'|1|',60000);
+    marketHistoryState.set(providerTicker+'|1|',{accepted:true,first:60000,last:60000,observed_at:1000});
+    feed.subscribeBars({ticker:providerTicker},'1',bar=>received.push(bar),'provider-accepted',()=>{});`);
+  const platform=sent.filter(row=>row.type==='market-subscribe').at(-1).args;
+  const receipt={start:60000,fingerprint:'a'.repeat(64)};
+  await deliver({listener:platform.listener,generation:platform.generation,result_epoch:'epoch',
+    sequence:1,type:'bars',bars:event.bars,provider_acceptance:[receipt]});
+  const acceptedMessage=sent.filter(row=>row.type==='market-accept').at(-1);
+  assert.deepEqual(JSON.parse(JSON.stringify(acceptedMessage.args.provider_acceptance)),[receipt]);
+  assert.equal(acceptedMessage.args.generation,platform.generation);
+  const beforeAck=sent.filter(row=>row.type==='market-accept').length;
+  await deliver({listener:platform.listener,generation:platform.generation+1,result_epoch:'epoch',
+    sequence:2,type:'bars',bars:event.bars,provider_acceptance:[receipt]});
+  assert.equal(sent.filter(row=>row.type==='market-accept').length,beforeAck,'stale generation cannot acknowledge');
+  evaluate(`subscriptions.get('provider-accepted').cb=()=>false;`);
+  await deliver({listener:platform.listener,generation:platform.generation,result_epoch:'epoch',
+    sequence:2,type:'bars',bars:event.bars,provider_acceptance:[receipt]});
+  assert.equal(sent.filter(row=>row.type==='market-accept').length,beforeAck,'rejected callback cannot acknowledge');
+  evaluate(`subscriptions.get('provider-accepted').cb=()=>{throw Error('native callback failed')};`);
+  await assert.rejects(()=>deliver({listener:platform.listener,generation:platform.generation,result_epoch:'epoch',
+    sequence:3,type:'bars',bars:event.bars,provider_acceptance:[receipt]}),/native callback failed/);
+  assert.equal(sent.filter(row=>row.type==='market-accept').length,beforeAck,'throwing callback cannot acknowledge');
+  evaluate("feed.unsubscribeBars('provider-accepted')");
+  evaluate(`{
+    const count=200000;
+    let reads=0;
+    const bars=Array.from({length:count},(_,index)=>({
+      get start(){
+        if(++reads>count*10)throw Error('History acceptance repeatedly scans the full page');
+        return index*60000;
+      },chart_time:index*60000+1000,open:1,high:2,low:0,close:1,
+    }));
+    const receipts=Array.from({length:2048},(_,index)=>({
+      start:(count-2048+index)*60000,fingerprint:'b'.repeat(64),
+    }));
+    acceptMarketHistory('MWP:WIDE','1',{bars,as_of:1000,provider_acceptance:receipts},'',
+      bars.map(bar=>({time:bar.chart_time})));
+    const state=marketHistoryState.get('MWP:WIDE|1|');
+    if(state.provider_acceptance.length!==2048)throw Error('Wide history lost accepted receipts');
+    if(state.first!==0 || state.last!==(count-1)*60000)throw Error('Wide history was truncated');
+    const binding=indicatorBindings.get('MWP:WIDE|1');
+    if(binding.firstStart!==0 || binding.lastStart!==(count-1)*60000)
+      throw Error('Wide history lost indicator input bounds');
+    acceptMarketHistory('MWP:PARTIAL','1',{bars:bars.slice(-2),as_of:1000,
+      provider_acceptance:receipts.slice(-2)},'',[{time:bars.at(-1).chart_time}]);
+    const partial=marketHistoryState.get('MWP:PARTIAL|1|').provider_acceptance;
+    if(partial.length!==1 || partial[0].start!==(count-1)*60000)
+      throw Error('Receipt filtering must use accepted chart times and input starts');
+  }`);
   context.indicatorTicker='MWPY_'+Buffer.from(JSON.stringify({symbol:context.symbol,
     spec:{name:'EMA',params:{period:2}},key:'value'})).toString('base64');
   evaluate(`lastHistory.set(indicatorTicker+'|1',60000);

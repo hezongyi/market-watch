@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:14-bookworm
+    environment:
+      POSTGRES_DB: alerts
+      POSTGRES_USER: alerts
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?private tests.env required}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U alerts]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+  tests:
+    image: market-watch-api:native-update-20261014
+    working_dir: /workspace
+    user: "10001:10001"
+    environment:
+      PYTHONPATH: /workspace/backend
+      PYTHONDONTWRITEBYTECODE: "1"
+      TEST_POSTGRES_URL: ${TEST_POSTGRES_URL:?private tests.env required}
+      ALERTS_DELIVERY_ENABLED: "false"
+      ALERTS_YAHOO_ENABLED: "false"
+    volumes:
+      - ../..:/workspace:ro
+    depends_on:
+      postgres: {condition: service_healthy}
+    command: [python, -m, pytest, -p, no:cacheprovider, backend/tests/test_native_update_diagnosis.py, -q]
+volumes:
+  postgres-data:

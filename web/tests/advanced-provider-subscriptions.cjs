@@ -74,6 +74,32 @@ const flush=()=>new Promise(resolve=>setImmediate(resolve));
   assert.equal(calls.filter(c=>c.path.endsWith('/subscribe')&&c.args.listener==='watchlist').at(-1)
     .args.binding,'accepted-revision','quote reconnect retains the previously delivered binding');
   await transport.clear();
+  const ackCalls=[],ackStreams=[];
+  const ackTransport=factory(async(path,args)=>ackCalls.push({path,args}),()=>{
+    const stream={close(){},onmessage:null};ackStreams.push(stream);return stream;
+  },()=>{},error=>{throw error},
+  {subscribe:'/charts/stream/subscribe',unsubscribe:'/charts/stream/unsubscribe'});
+  await ackTransport.subscribe({client:'native',listener:'price',generation:1,sequence:0});
+  const fingerprint='a'.repeat(64);
+  ackStreams[0].onmessage({data:JSON.stringify({listener:'price',generation:1,sequence:1,
+    result_epoch:'epoch',type:'bars',bars:[{start:60000}],
+    provider_acceptance:[{start:60000,fingerprint}]})});
+  assert.equal(ackCalls.filter(c=>c.path.endsWith('/accept')).length,0,
+    'receiving an SSE payload alone does not acknowledge native acceptance');
+  await ackTransport.accept({client:'native',listener:'price',generation:1,sequence:1,
+    result_epoch:'epoch',provider_acceptance:[{start:60000,fingerprint}]});
+  assert.equal(ackCalls.filter(c=>c.path.endsWith('/accept')).length,1);
+  ackStreams[0].onopen({});await flush();await flush();
+  const resumedAck=ackCalls.filter(c=>c.path.endsWith('/subscribe')).at(-1).args;
+  assert.equal(resumedAck.provider_acceptance[0].fingerprint,fingerprint,
+    'reconnect carries the successful native acknowledgement');
+  await ackTransport.accept({client:'native',listener:'price',generation:2,sequence:1,
+    result_epoch:'epoch',provider_acceptance:[{start:60000,fingerprint}]});
+  await ackTransport.accept({client:'native',listener:'price',generation:1,sequence:1,
+    result_epoch:'other',provider_acceptance:[{start:60000,fingerprint}]});
+  assert.equal(ackCalls.filter(c=>c.path.endsWith('/accept')).length,1,
+    'stale generation and epoch cannot acknowledge a different native cache');
+  await ackTransport.clear();
   assert.equal(errors.length,0);
   let finish;
   const pending=new Promise(resolve=>finish=resolve);

@@ -1,0 +1,233 @@
+{
+  "series": "platform",
+  "source": "OANDA Practice EURUSD bid",
+  "environment": "Unraid production v1.25.3; browser on Ubuntu",
+  "startedAt": "2026-10-14T01:22:31.269Z",
+  "endedAt": "2026-10-14T01:28:00.626Z",
+  "durationSeconds": 329.357,
+  "pageErrors": [],
+  "failedHTTPResponses": [],
+  "automaticSaveRequestsBlocked": 4,
+  "analysis": {
+    "sample_count": 1534,
+    "elapsed_seconds": 322.058,
+    "sampling_errors": [],
+    "resets": [
+      {
+        "at": 1791941007655,
+        "kind": "reloadHistory",
+        "resolution": "1"
+      },
+      {
+        "at": 1791941007656,
+        "kind": "resetData",
+        "index": 0
+      },
+      {
+        "at": 1791941072780,
+        "kind": "reloadHistory",
+        "resolution": "1"
+      },
+      {
+        "at": 1791941072783,
+        "kind": "resetData",
+        "index": 0
+      },
+      {
+        "at": 1791941121820,
+        "kind": "reloadHistory",
+        "resolution": "1"
+      },
+      {
+        "at": 1791941121821,
+        "kind": "resetData",
+        "index": 0
+      },
+      {
+        "at": 1791941126733,
+        "kind": "reloadHistory",
+        "resolution": "5"
+      },
+      {
+        "at": 1791941126734,
+        "kind": "resetData",
+        "index": 1
+      },
+      {
+        "at": 1791941186155,
+        "kind": "reloadHistory",
+        "resolution": "1"
+      },
+      {
+        "at": 1791941186156,
+        "kind": "resetData",
+        "index": 0
+      },
+      {
+        "at": 1791941249697,
+        "kind": "reloadHistory",
+        "resolution": "1"
+      },
+      {
+        "at": 1791941249698,
+        "kind": "resetData",
+        "index": 0
+      }
+    ],
+    "m1": [
+      {
+        "index": 0,
+        "series_kind": "MWP",
+        "first_bar_time": 1791940920,
+        "last_bar_time": 1791941220,
+        "new_minutes": 5,
+        "price_updates": 22,
+        "bars_before": 256,
+        "bars_after": 189,
+        "not_ready_samples": 0,
+        "empty_tail_samples": 0,
+        "bar_time_regressions": [],
+        "bar_count_shrinks": [
+          {
+            "at": 1791941008057,
+            "old": 257,
+            "new": 189
+          },
+          {
+            "at": 1791941073179,
+            "old": 190,
+            "new": 126
+          },
+          {
+            "at": 1791941122026,
+            "old": 190,
+            "new": 126
+          },
+          {
+            "at": 1791941186514,
+            "old": 190,
+            "new": 126
+          },
+          {
+            "at": 1791941250053,
+            "old": 190,
+            "new": 126
+          }
+        ],
+        "spacing_changes": [],
+        "range_jumps_over_one_minute": [],
+        "backward_range_moves": [],
+        "close_first": 1.12017,
+        "close_last": 1.12029,
+        "study_names": []
+      }
+    ],
+    "visual": {
+      "samples": 1559,
+      "sampling_errors": [],
+      "all_canvas_empty_samples": 0,
+      "all_colored_pixels_absent_samples": 0,
+      "canvas_counts": [
+        10
+      ],
+      "minimum_nonbackground": 1992,
+      "minimum_colored": 338,
+      "m1_candle_disappearance_events": []
+    },
+    "renderer": {
+      "frame_gaps_over_50ms": 178,
+      "max_gap_ms": 2249.9000000000233,
+      "frame_gaps_over_250ms": 5
+    }
+  },
+  "video_analysis": {
+    "sample_rate_hz": 10,
+    "samples": 3572,
+    "duration_seconds": 357.2,
+    "m1_crop": {
+      "x": 59,
+      "y": 42,
+      "width": 524,
+      "height": 410
+    },
+    "candle_absence_events": [
+      {
+        "video_start_seconds": 84.0,
+        "video_end_seconds": 84.2,
+        "blank_samples": 2,
+        "blank_seconds": 0.2,
+        "colored_before": 1870,
+        "colored_after": 1787
+      },
+      {
+        "video_start_seconds": 149.2,
+        "video_end_seconds": 149.6,
+        "blank_samples": 4,
+        "blank_seconds": 0.4,
+        "colored_before": 1980,
+        "colored_after": 1969
+      },
+      {
+        "video_start_seconds": 198.3,
+        "video_end_seconds": 198.5,
+        "blank_samples": 2,
+        "blank_seconds": 0.2,
+        "colored_before": 2034,
+        "colored_after": 2059
+      },
+      {
+        "video_start_seconds": 262.5,
+        "video_end_seconds": 262.8,
+        "blank_samples": 3,
+        "blank_seconds": 0.3,
+        "colored_before": 2030,
+        "colored_after": 2051
+      },
+      {
+        "video_start_seconds": 326.0,
+        "video_end_seconds": 326.3,
+        "blank_samples": 3,
+        "blank_seconds": 0.3,
+        "colored_before": 2022,
+        "colored_after": 2055
+      }
+    ],
+    "method": "Actual recorded M1 viewport, 10Hz decoded crop; candle red/green pixels vanish between populated frames; excludes initial page load and navigation."
+  },
+  "server_history_resets": [
+    {
+      "at": 1791941007654,
+      "reason": "history_changed",
+      "affected_start": null
+    },
+    {
+      "at": 1791941072778,
+      "reason": "history_changed",
+      "affected_start": null
+    },
+    {
+      "at": 1791941121820,
+      "reason": "history_changed",
+      "affected_start": null
+    },
+    {
+      "at": 1791941126733,
+      "reason": "history_changed",
+      "affected_start": null
+    },
+    {
+      "at": 1791941186154,
+      "reason": "history_changed",
+      "affected_start": null
+    },
+    {
+      "at": 1791941249697,
+      "reason": "history_changed",
+      "affected_start": null
+    }
+  ],
+  "passed_no_time_regression": true,
+  "passed_no_backward_view_movement": true,
+  "passed_no_flicker": false,
+  "studies_added": false
+}
