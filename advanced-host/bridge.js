@@ -254,6 +254,11 @@ function rememberIndicatorBinding(ticker,res,page,{correction=false}={}) {
   const tailToken=hasTail ? JSON.stringify([latest.start,latest.open,latest.high,latest.low,latest.close,
     latest.complete,latest.revision,latest.volume,latest.volume_complete,latest.source_confirmed,latest.coverage_complete]) : old.tailToken;
   const tailChanged=hasTail && tailToken!==old.tailToken;
+  let firstStart=old.firstStart,lastStart=old.lastStart;
+  for(const bar of page.bars || []) {
+    firstStart=Math.min(firstStart ?? Infinity,bar.start);
+    lastStart=Math.max(lastStart ?? -Infinity,bar.start);
+  }
   indicatorBindings.set(key,{...old,
     revision:page.revision_id ?? old.revision,
     inputRevision:page.input_revision ?? page.initial_input_revision ?? old.inputRevision,
@@ -264,8 +269,7 @@ function rememberIndicatorBinding(ticker,res,page,{correction=false}={}) {
       page.calculation_origin ?? page.origin ?? old.calculationStart,
     tailVersion:page.cache_revision ?? page.revision ?? (tailChanged ? (old.tailVersion || 0)+1 : old.tailVersion ?? 0),
     tailToken,
-    firstStart:page.bars?.length ? Math.min(old.firstStart ?? Infinity,...page.bars.map(bar=>bar.start)) : old.firstStart,
-    lastStart:page.bars?.length ? Math.max(old.lastStart ?? -Infinity,...page.bars.map(bar=>bar.start)) : old.lastStart,
+    firstStart,lastStart,
     correctionVersion:correction ? (old.correctionVersion || 0)+1 : old.correctionVersion || 0,
     correctionStart:correction ? page.affected_chart_time : old.correctionStart,
   });

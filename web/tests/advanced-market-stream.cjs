@@ -62,7 +62,7 @@ const deliver = event => handlers.message({source:parent,origin:'http://localhos
   assert.equal(sent.filter(row=>row.type==='market-accept').length,beforeAck,'throwing callback cannot acknowledge');
   evaluate("feed.unsubscribeBars('provider-accepted')");
   evaluate(`{
-    const count=20000;
+    const count=200000;
     let reads=0;
     const bars=Array.from({length:count},(_,index)=>({
       get start(){
@@ -78,6 +78,9 @@ const deliver = event => handlers.message({source:parent,origin:'http://localhos
     const state=marketHistoryState.get('MWP:WIDE|1|');
     if(state.provider_acceptance.length!==2048)throw Error('Wide history lost accepted receipts');
     if(state.first!==0 || state.last!==(count-1)*60000)throw Error('Wide history was truncated');
+    const binding=indicatorBindings.get('MWP:WIDE|1');
+    if(binding.firstStart!==0 || binding.lastStart!==(count-1)*60000)
+      throw Error('Wide history lost indicator input bounds');
     acceptMarketHistory('MWP:PARTIAL','1',{bars:bars.slice(-2),as_of:1000,
       provider_acceptance:receipts.slice(-2)},'',[{time:bars.at(-1).chart_time}]);
     const partial=marketHistoryState.get('MWP:PARTIAL|1|').provider_acceptance;
