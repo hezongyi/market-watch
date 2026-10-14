@@ -4,6 +4,7 @@ from types import SimpleNamespace
 import pytest
 from alerts import market_stream as stream, provider_cache as cache
 from alerts.chart_api import DataQuery
+from alerts.provider_acceptance import receipts
 from test_provider_cache import META, seed
 from test_provider_postgres import provider_pg
 
@@ -26,7 +27,8 @@ def test_previous_minute_requires_reset_only_for_native_change(provider_pg, monk
     clock[0] += 1000
     seed(META, "M1", 120000, {"bars": [{**first, **change}], "history_boundary": False})
     state = dict(history_accepted=True, historical=False, loaded_after=60000,
-                 loaded_before=120000, cursor=120000, observed_at=accepted["as_of"])
+                 loaded_before=120000, cursor=120000, observed_at=accepted["as_of"],
+                 provider_acceptance=receipts(accepted["bars"]))
     query = DataQuery(instrument=META["id"], series_kind="provider", timeframe="M1")
     with factory.begin() as db:
         event = stream.delivery(db, SimpleNamespace(query=query.model_dump(), identity={"dataset_id": key}),

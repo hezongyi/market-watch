@@ -25,6 +25,7 @@ from .config import settings
 from .market_resources import LANE, lane
 from .provider_capabilities import SOURCES, frames, fresh_seconds, page_capacity, versions
 from .provider_changes import ChangeSummary
+from .provider_acceptance import receipts as provider_receipts
 from .provider_history_policy import CapacityExceeded, capacity, optional_bars
 from .storage import ProviderBar, ProviderDataset, now_ms, transaction, uid
 from .volume import metadata as volume_metadata
@@ -821,6 +822,7 @@ def data(body):
         for k, v in {
             **page,
             "bars": visible,
+            "provider_acceptance": provider_receipts(visible, bool(body.indicators)),
             "history_dependency_first": prefix[0].get("chart_time", prefix[0]["start"]) if prefix else before,
             "calculation_origin": body.calculation_origin if body.calculation_origin is not None else prefix[0]["start"] if prefix else None,
             "indicators": indicators,

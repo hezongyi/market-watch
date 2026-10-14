@@ -97,6 +97,11 @@ const compositeDisplayBatches=chartDisplayBatches({
   },
 });
 
+function mergeProviderAcceptance(previous,current) {
+  const receipts=new Map((previous || []).map(row=>[row.start,row]));
+  for(const row of current || [])receipts.set(row.start,row);
+  return [...receipts.values()].sort((a,b)=>a.start-b.start).slice(-2048);
+}
 function acceptMarketBars(sub,event) {
   if(event.as_of!=null && event.as_of<(sub.displayAsOf ?? -Infinity))return;
   sub.displayAsOf=event.as_of ?? sub.displayAsOf;
@@ -106,17 +111,27 @@ function acceptMarketBars(sub,event) {
     swingDisplay?.refresh();
   }
   const rows=barsOf(event,sub.res,sub.symbol);
+  const acceptedTimes=new Set();
   for(const bar of rows)if(bar.time>=sub.last){
-    sub.cb({...bar});observeRangeBars(sub.symbol,sub.res,event.bars,[bar],sub.window);sub.last=bar.time;
+    if(sub.cb({...bar}) === false)break;
+    acceptedTimes.add(bar.time);
+    observeRangeBars(sub.symbol,sub.res,event.bars,[bar],sub.window);sub.last=bar.time;
   }
+  const acceptedStarts=new Set((event.bars || []).filter(bar=>
+    acceptedTimes.has(bar.chart_time ?? stamp(bar,sub.res,identity.symbol))).map(bar=>bar.start));
+  const receipts=(event.provider_acceptance || []).filter(row=>acceptedStarts.has(row.start));
   const state=marketHistoryState.get(sub.symbol+'|'+sub.res+'|'+(sub.window || ''));
   if(state){
-    if(event.loaded_before!=null)state.last=event.loaded_before;
+    if(receipts.length)state.provider_acceptance=mergeProviderAcceptance(state.provider_acceptance,receipts);
+    if(event.loaded_before!=null && acceptedTimes.size===rows.length)state.last=event.loaded_before;
     if(event.history_revision!=null)state.history_revision=event.history_revision;
     if(event.history_tail_revision!=null)state.history_tail_revision=event.history_tail_revision;
     if(event.initial_input_revision!=null)state.input_revision=event.initial_input_revision;
     if(event.display_snapshot_id!=null)state.display_snapshot_id=event.display_snapshot_id;
   }
+  if(identity.series_kind==='provider' && receipts.length)send({type:'market-accept',args:{
+    client:clientId,listener:sub.marketListener,generation:sub.marketGeneration,
+    result_epoch:event.result_epoch,sequence:event.sequence,provider_acceptance:receipts}});
   rememberIndicatorBinding(sub.symbol,sub.res,event);
   if(event.pending?.length)send({type:'status',text:event.pending.join('；')});
   send({type:'feed-poll-state',key:sub.symbol+'|'+sub.res,error:event.status?.error || ''});
@@ -218,6 +233,7 @@ function registerMarketBar(sub) {
     loaded_before:state.last ?? sub.last ?? null,
     history_revision:state.history_revision ?? null,history_tail_revision:state.history_tail_revision ?? null,
     observed_at:state.observed_at || 0,
+    provider_acceptance:state.provider_acceptance || [],
     dependency_origin:indicatorDependencyOrigins.get(indicatorKey(sub.symbol,sub.res)) ?? null,
     dependency_observed_at:state.dependency_observed_at ?? null,
     dependency_before:indicatorBindings.get(indicatorKey(sub.symbol,sub.res))?.dependencyBefore ?? null,
@@ -369,6 +385,8 @@ function acceptMarketHistory(ticker,res,page,window = '', acceptedRows) {
   marketHistoryState.set(key,{first:bars.length ? Math.min(old.first ?? Infinity,bars[0].start) : null,
     accepted:true,empty:!bars.length,
     last:bars.length ? Math.max(old.last || 0,bars.at(-1).start) : null,observed_at:page.as_of || Date.now(),
+    provider_acceptance:mergeProviderAcceptance(old.provider_acceptance,
+      (page.provider_acceptance || []).filter(row=>bars.some(bar=>bar.start===row.start))),
     input_revision:page.input_revision ?? null,
     display_snapshot_id:page.display_snapshot_id ?? old.display_snapshot_id,
     binding:page.revision_id || null,history_revision:page.history_check?.next_revision || null,

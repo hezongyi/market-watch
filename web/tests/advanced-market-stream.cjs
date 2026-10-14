@@ -37,6 +37,30 @@ const deliver = event => handlers.message({source:parent,origin:'http://localhos
   evaluate("feed.unsubscribeBars('chart')");
   await deliver({...event,sequence:4});
   assert.equal(context.received.length,2,'late event after unsubscribe has no native callback');
+  evaluate(`globalThis.providerTicker='MWP:EURUSD';
+    lastHistory.set(providerTicker+'|1|',60000);
+    marketHistoryState.set(providerTicker+'|1|',{accepted:true,first:60000,last:60000,observed_at:1000});
+    feed.subscribeBars({ticker:providerTicker},'1',bar=>received.push(bar),'provider-accepted',()=>{});`);
+  const platform=sent.filter(row=>row.type==='market-subscribe').at(-1).args;
+  const receipt={start:60000,fingerprint:'a'.repeat(64)};
+  await deliver({listener:platform.listener,generation:platform.generation,result_epoch:'epoch',
+    sequence:1,type:'bars',bars:event.bars,provider_acceptance:[receipt]});
+  const acceptedMessage=sent.filter(row=>row.type==='market-accept').at(-1);
+  assert.deepEqual(JSON.parse(JSON.stringify(acceptedMessage.args.provider_acceptance)),[receipt]);
+  assert.equal(acceptedMessage.args.generation,platform.generation);
+  const beforeAck=sent.filter(row=>row.type==='market-accept').length;
+  await deliver({listener:platform.listener,generation:platform.generation+1,result_epoch:'epoch',
+    sequence:2,type:'bars',bars:event.bars,provider_acceptance:[receipt]});
+  assert.equal(sent.filter(row=>row.type==='market-accept').length,beforeAck,'stale generation cannot acknowledge');
+  evaluate(`subscriptions.get('provider-accepted').cb=()=>false;`);
+  await deliver({listener:platform.listener,generation:platform.generation,result_epoch:'epoch',
+    sequence:2,type:'bars',bars:event.bars,provider_acceptance:[receipt]});
+  assert.equal(sent.filter(row=>row.type==='market-accept').length,beforeAck,'rejected callback cannot acknowledge');
+  evaluate(`subscriptions.get('provider-accepted').cb=()=>{throw Error('native callback failed')};`);
+  await assert.rejects(()=>deliver({listener:platform.listener,generation:platform.generation,result_epoch:'epoch',
+    sequence:3,type:'bars',bars:event.bars,provider_acceptance:[receipt]}),/native callback failed/);
+  assert.equal(sent.filter(row=>row.type==='market-accept').length,beforeAck,'throwing callback cannot acknowledge');
+  evaluate("feed.unsubscribeBars('provider-accepted')");
   context.indicatorTicker='MWPY_'+Buffer.from(JSON.stringify({symbol:context.symbol,
     spec:{name:'EMA',params:{period:2}},key:'value'})).toString('base64');
   evaluate(`lastHistory.set(indicatorTicker+'|1',60000);

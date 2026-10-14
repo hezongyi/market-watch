@@ -104,6 +104,22 @@ export function providerSubscriptions(
     };
   }
   return {
+    accept(args: Subscription) {
+      const current = desired.get(keyOf(args));
+      if (disposed || !current || current.generation !== args.generation ||
+          current.result_epoch !== args.result_epoch || !Array.isArray(args.provider_acceptance))
+        return Promise.resolve();
+      // This message comes from the host after successful native callbacks,
+      // independently of EventSource receipt. Preserve it on reconnect too.
+      const values = new Map<number, any>();
+      for (const row of (current.provider_acceptance as any[] || [])) values.set(row.start, row);
+      for (const row of args.provider_acceptance) values.set(row.start, row);
+      current.provider_acceptance = [...values.values()].sort((a,b)=>a.start-b.start).slice(-2048);
+      return enqueue(args, async () => {
+        if (disposed || desired.get(keyOf(args)) !== current) return;
+        await request('/charts/stream/accept', args);
+      });
+    },
     subscribe(args: Subscription) {
       if (disposed) return Promise.resolve();
       desired.set(keyOf(args), args);

@@ -1,0 +1,25 @@
+services:
+  api:
+    image: market-watch-api:native-update-20261014
+    user: '1000:1000'
+    working_dir: /workspace
+    environment:
+      PYTHONPATH: /workspace/backend:/workspace/deploy/native-update
+      PYTHONDONTWRITEBYTECODE: "1"
+      ALERTS_DATABASE_URL: ${TEST_POSTGRES_URL:?private tests.env required}
+      ALERTS_COOKIE_SECURE: "false"
+      ALERTS_DELIVERY_ENABLED: "false"
+      ALERTS_YAHOO_ENABLED: "false"
+    volumes:
+      - ../..:/workspace:ro
+      - /home/quant/.local/state/mw-native-update-20261014/browser-acceptance:/private:ro
+    command: [uvicorn, fixture:app, --host, 0.0.0.0, --port, '8000']
+    depends_on:
+      postgres: {condition: service_healthy}
+  web:
+    image: market-watch-web:native-update-20261014
+    ports: ['127.0.0.1:17443:80']
+    depends_on: [api]
+  chart:
+    image: market-watch-chart-origin:native-update-20261014
+    ports: ['127.0.0.1:17444:80']

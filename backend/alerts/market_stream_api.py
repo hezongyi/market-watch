@@ -23,6 +23,18 @@ class Consumer(BaseModel):
     generation: int = Field(ge=1, le=2**53 - 1)
 
 
+class ProviderReceipt(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    start: int = Field(ge=0, le=2**53 - 1)
+    fingerprint: str = Field(pattern=r"^[a-f0-9]{64}$")
+
+
+class ProviderAcceptance(Consumer):
+    result_epoch: str = Field(min_length=1, max_length=36)
+    sequence: int = Field(ge=1, le=2**53 - 1)
+    provider_acceptance: list[ProviderReceipt] = Field(min_length=1, max_length=128)
+
+
 class Subscription(Consumer):
     kind: str = Field(pattern="^(bars|quotes)$")
     query: DataQuery
@@ -47,6 +59,7 @@ class Subscription(Consumer):
     dependency_observed_at: int | None = Field(default=None, ge=0)
     dependency_before: int | None = Field(default=None, gt=0)
     dependency_revision: str | None = Field(default=None, max_length=128)
+    provider_acceptance: list[ProviderReceipt] = Field(default_factory=list, max_length=2048)
 
 
 def resolve(body):
@@ -124,6 +137,15 @@ def router(authenticated):
     def unsubscribe(body: Consumer, request: Request):
         stream.cancel(session_hash(request), body.client, body.listener, body.generation)
         return {"ok": True}
+
+    @r.post("/accept")
+    def accept(body: ProviderAcceptance, request: Request):
+        try:
+            return stream.accept_provider(session_hash(request), body.client, body.listener,
+                body.generation, body.result_epoch, body.sequence,
+                [row.model_dump() for row in body.provider_acceptance])
+        except PermissionError:
+            raise HTTPException(403, "行情接受会话已结束") from None
 
     @r.get("/events")
     async def events(request: Request, client: str):

@@ -438,6 +438,7 @@ export default function AdvancedWorkspace() {
       if (
         m.type === "market-subscribe" ||
         m.type === "market-unsubscribe" ||
+        m.type === "market-accept" ||
         m.type === "provider-subscribe" || m.type === "provider-unsubscribe"
       ) {
         const args = m.args;
@@ -450,7 +451,9 @@ export default function AdvancedWorkspace() {
           return;
         try {
           const transport = m.type.startsWith('provider-') ? legacyProvider : provider;
-          if (m.type.endsWith('-subscribe')) {
+          if (m.type === 'market-accept') {
+            await provider.accept(args);
+          } else if (m.type.endsWith('-subscribe')) {
             await transport.subscribe(args);
           } else {
             await transport.unsubscribe(args);

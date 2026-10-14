@@ -1,0 +1,789 @@
+{
+  "status": "completed",
+  "environment": "Ubuntu headless browser observing existing Unraid production; no deployment or configuration changes",
+  "startedAt": "2026-10-14T04:59:31.331Z",
+  "endedAt": "2026-10-14T05:09:31.439Z",
+  "durationSeconds": 600.108,
+  "charts": [
+    {
+      "index": 0,
+      "seriesKind": "MWP",
+      "resolution": "1",
+      "studies": []
+    },
+    {
+      "index": 1,
+      "seriesKind": "MWP",
+      "resolution": "5",
+      "studies": []
+    },
+    {
+      "index": 2,
+      "seriesKind": "MWP",
+      "resolution": "1W",
+      "studies": []
+    },
+    {
+      "index": 3,
+      "seriesKind": "MWP",
+      "resolution": "1D",
+      "studies": []
+    },
+    {
+      "index": 4,
+      "seriesKind": "MWP",
+      "resolution": "240",
+      "studies": []
+    }
+  ],
+  "mainBusinessEvents": {
+    "quotes": 1687,
+    "bars": 205,
+    "reset": 13
+  },
+  "heartbeats": 1115,
+  "sseTransportErrors": 0,
+  "resetReasons": {
+    "history_changed": 13
+  },
+  "resetsByTimeframe": {
+    "H4": 1,
+    "M1": 10,
+    "M5": 2
+  },
+  "nativeResetDataCount": 13,
+  "nativeResetDataByResolution": {
+    "240": 1,
+    "1": 10,
+    "5": 2
+  },
+  "legacySSEMessages": 0,
+  "pageErrors": 0,
+  "failedHTTPResponsesInWindow": [],
+  "blockedAutomaticWrites": {
+    "/api/advanced-charts/preferences/save": 3,
+    "/api/advanced-charts/native-charts/save": 1
+  },
+  "resetDetails": [
+    {
+      "sourceChangesToConfirmedBarAfterDelivery": 0,
+      "at": 1791954018469,
+      "timeSingapore": "2026-10-14T13:00:18.469+08:00",
+      "relativeSeconds": 47.138,
+      "frame": "H4",
+      "series_kind": "provider",
+      "reason": "history_changed",
+      "sequence": 4,
+      "generation": 37,
+      "effective_before": 1791954000000,
+      "accepted_observed_at": 1791953963640,
+      "lastSourceMatch": null,
+      "handoff": {
+        "at": 1791954004878,
+        "oldBarStart": 1791939600000,
+        "oldBarEnd": 1791954000000,
+        "completeBefore": false,
+        "completeAfter": true,
+        "nativeProjectionDifference": "mixed",
+        "changedFields": [
+          "close",
+          "complete",
+          "volume",
+          "volume_complete"
+        ],
+        "appendAt": 1791954004878,
+        "oldConfirmedAndNewBarSentTogether": true,
+        "confirmedOldBarDeliveredBeforeReset": true
+      },
+      "secondsAfterLastBars": 13.591
+    },
+    {
+      "sourceChangesToConfirmedBarAfterDelivery": 0,
+      "at": 1791954035031,
+      "timeSingapore": "2026-10-14T13:00:35.031+08:00",
+      "relativeSeconds": 63.7,
+      "frame": "M1",
+      "series_kind": "provider",
+      "reason": "history_changed",
+      "sequence": 4,
+      "generation": 39,
+      "effective_before": 1791954000000,
+      "accepted_observed_at": 1791953964336,
+      "lastSourceMatch": null,
+      "handoff": {
+        "at": 1791954006508,
+        "oldBarStart": 1791953940000,
+        "oldBarEnd": 1791954000000,
+        "completeBefore": false,
+        "completeAfter": true,
+        "nativeProjectionDifference": "mixed",
+        "changedFields": [
+          "close",
+          "complete",
+          "volume",
+          "volume_complete"
+        ],
+        "appendAt": 1791954006508,
+        "oldConfirmedAndNewBarSentTogether": true,
+        "confirmedOldBarDeliveredBeforeReset": true
+      },
+      "secondsAfterLastBars": 28.523
+    },
+    {
+      "sourceChangesToConfirmedBarAfterDelivery": 0,
+      "at": 1791954040929,
+      "timeSingapore": "2026-10-14T13:00:40.929+08:00",
+      "relativeSeconds": 69.598,
+      "frame": "M5",
+      "series_kind": "provider",
+      "reason": "history_changed",
+      "sequence": 5,
+      "generation": 16,
+      "effective_before": 1791954000000,
+      "accepted_observed_at": 1791953959655,
+      "lastSourceMatch": {
+        "at": 1791954026099,
+        "frame": "M5",
+        "start": 1791953700000,
+        "end": 1791954000000,
+        "kind": "mixed",
+        "changed_at": 1791954024090,
+        "old_revision": 3,
+        "new_revision": 4,
+        "changed_fields": [
+          "complete",
+          "price_confirmed_at",
+          "revision",
+          "changed_at",
+          "observed_at"
+        ],
+        "payload_fields": [
+          "volume_complete",
+          "volume",
+          "close",
+          "complete"
+        ],
+        "complete_before": false,
+        "complete_after": true
+      },
+      "handoff": {
+        "at": 1791954025759,
+        "oldBarStart": 1791953700000,
+        "oldBarEnd": 1791954000000,
+        "completeBefore": false,
+        "completeAfter": true,
+        "nativeProjectionDifference": "mixed",
+        "changedFields": [
+          "close",
+          "complete",
+          "volume",
+          "volume_complete"
+        ],
+        "appendAt": 1791954025759,
+        "oldConfirmedAndNewBarSentTogether": true,
+        "confirmedOldBarDeliveredBeforeReset": true
+      },
+      "secondsAfterLastBars": 15.17
+    },
+    {
+      "sourceChangesToConfirmedBarAfterDelivery": 0,
+      "at": 1791954085098,
+      "timeSingapore": "2026-10-14T13:01:25.098+08:00",
+      "relativeSeconds": 113.767,
+      "frame": "M1",
+      "series_kind": "provider",
+      "reason": "history_changed",
+      "sequence": 7,
+      "generation": 70,
+      "effective_before": 1791954060000,
+      "accepted_observed_at": 1791954032526,
+      "lastSourceMatch": {
+        "at": 1791954070113,
+        "frame": "M1",
+        "start": 1791954000000,
+        "end": 1791954060000,
+        "kind": "volume",
+        "changed_at": 1791954067656,
+        "old_revision": 3,
+        "new_revision": 4,
+        "changed_fields": [
+          "complete",
+          "price_confirmed_at",
+          "revision",
+          "changed_at",
+          "observed_at"
+        ],
+        "payload_fields": [
+          "volume_complete",
+          "volume",
+          "complete"
+        ],
+        "complete_before": false,
+        "complete_after": true
+      },
+      "handoff": {
+        "at": 1791954069909,
+        "oldBarStart": 1791954000000,
+        "oldBarEnd": 1791954060000,
+        "completeBefore": false,
+        "completeAfter": true,
+        "nativeProjectionDifference": "volume",
+        "changedFields": [
+          "complete",
+          "volume",
+          "volume_complete"
+        ],
+        "appendAt": 1791954069909,
+        "oldConfirmedAndNewBarSentTogether": true,
+        "confirmedOldBarDeliveredBeforeReset": true
+      },
+      "secondsAfterLastBars": 15.189
+    },
+    {
+      "sourceChangesToConfirmedBarAfterDelivery": 0,
+      "at": 1791954148911,
+      "timeSingapore": "2026-10-14T13:02:28.911+08:00",
+      "relativeSeconds": 177.58,
+      "frame": "M1",
+      "series_kind": "provider",
+      "reason": "history_changed",
+      "sequence": 11,
+      "generation": 88,
+      "effective_before": 1791954120000,
+      "accepted_observed_at": 1791954083510,
+      "lastSourceMatch": {
+        "at": 1791954134103,
+        "frame": "M1",
+        "start": 1791954060000,
+        "end": 1791954120000,
+        "kind": "mixed",
+        "changed_at": 1791954132598,
+        "old_revision": 4,
+        "new_revision": 5,
+        "changed_fields": [
+          "complete",
+          "price_confirmed_at",
+          "revision",
+          "changed_at",
+          "observed_at"
+        ],
+        "payload_fields": [
+          "volume_complete",
+          "volume",
+          "close",
+          "complete"
+        ],
+        "complete_before": false,
+        "complete_after": true
+      },
+      "handoff": {
+        "at": 1791954134103,
+        "oldBarStart": 1791954060000,
+        "oldBarEnd": 1791954120000,
+        "completeBefore": false,
+        "completeAfter": true,
+        "nativeProjectionDifference": "mixed",
+        "changedFields": [
+          "close",
+          "complete",
+          "volume",
+          "volume_complete"
+        ],
+        "appendAt": 1791954134103,
+        "oldConfirmedAndNewBarSentTogether": true,
+        "confirmedOldBarDeliveredBeforeReset": true
+      },
+      "secondsAfterLastBars": 14.808
+    },
+    {
+      "sourceChangesToConfirmedBarAfterDelivery": 0,
+      "at": 1791954213102,
+      "timeSingapore": "2026-10-14T13:03:33.102+08:00",
+      "relativeSeconds": 241.771,
+      "frame": "M1",
+      "series_kind": "provider",
+      "reason": "history_changed",
+      "sequence": 15,
+      "generation": 91,
+      "effective_before": 1791954180000,
+      "accepted_observed_at": 1791954147775,
+      "lastSourceMatch": {
+        "at": 1791954182105,
+        "frame": "M1",
+        "start": 1791954120000,
+        "end": 1791954180000,
+        "kind": "mixed",
+        "changed_at": 1791954180838,
+        "old_revision": 3,
+        "new_revision": 4,
+        "changed_fields": [
+          "complete",
+          "price_confirmed_at",
+          "revision",
+          "changed_at",
+          "observed_at"
+        ],
+        "payload_fields": [
+          "volume_complete",
+          "volume",
+          "high",
+          "close",
+          "complete"
+        ],
+        "complete_before": false,
+        "complete_after": true
+      },
+      "handoff": {
+        "at": 1791954182472,
+        "oldBarStart": 1791954120000,
+        "oldBarEnd": 1791954180000,
+        "completeBefore": false,
+        "completeAfter": true,
+        "nativeProjectionDifference": "mixed",
+        "changedFields": [
+          "close",
+          "complete",
+          "high",
+          "volume",
+          "volume_complete"
+        ],
+        "appendAt": 1791954197615,
+        "oldConfirmedAndNewBarSentTogether": false,
+        "confirmedOldBarDeliveredBeforeReset": true
+      },
+      "secondsAfterLastBars": 15.487
+    },
+    {
+      "sourceChangesToConfirmedBarAfterDelivery": 0,
+      "at": 1791954261733,
+      "timeSingapore": "2026-10-14T13:04:21.733+08:00",
+      "relativeSeconds": 290.402,
+      "frame": "M1",
+      "series_kind": "provider",
+      "reason": "history_changed",
+      "sequence": 18,
+      "generation": 94,
+      "effective_before": 1791954240000,
+      "accepted_observed_at": 1791954211799,
+      "lastSourceMatch": {
+        "at": 1791954246108,
+        "frame": "M1",
+        "start": 1791954180000,
+        "end": 1791954240000,
+        "kind": "mixed",
+        "changed_at": 1791954244855,
+        "old_revision": 3,
+        "new_revision": 4,
+        "changed_fields": [
+          "complete",
+          "price_confirmed_at",
+          "revision",
+          "changed_at",
+          "observed_at"
+        ],
+        "payload_fields": [
+          "low",
+          "volume_complete",
+          "volume",
+          "close",
+          "complete"
+        ],
+        "complete_before": false,
+        "complete_after": true
+      },
+      "handoff": {
+        "at": 1791954246483,
+        "oldBarStart": 1791954180000,
+        "oldBarEnd": 1791954240000,
+        "completeBefore": false,
+        "completeAfter": true,
+        "nativeProjectionDifference": "mixed",
+        "changedFields": [
+          "close",
+          "complete",
+          "low",
+          "volume",
+          "volume_complete"
+        ],
+        "appendAt": 1791954246483,
+        "oldConfirmedAndNewBarSentTogether": true,
+        "confirmedOldBarDeliveredBeforeReset": true
+      },
+      "secondsAfterLastBars": 15.25
+    },
+    {
+      "sourceChangesToConfirmedBarAfterDelivery": 0,
+      "at": 1791954320470,
+      "timeSingapore": "2026-10-14T13:05:20.470+08:00",
+      "relativeSeconds": 349.139,
+      "frame": "M5",
+      "series_kind": "provider",
+      "reason": "history_changed",
+      "sequence": 25,
+      "generation": 73,
+      "effective_before": 1791954300000,
+      "accepted_observed_at": 1791954039551,
+      "lastSourceMatch": {
+        "at": 1791954306111,
+        "frame": "M5",
+        "start": 1791954000000,
+        "end": 1791954300000,
+        "kind": "mixed",
+        "changed_at": 1791954303825,
+        "old_revision": 16,
+        "new_revision": 17,
+        "changed_fields": [
+          "complete",
+          "price_confirmed_at",
+          "revision",
+          "changed_at",
+          "observed_at"
+        ],
+        "payload_fields": [
+          "volume_complete",
+          "volume",
+          "close",
+          "complete"
+        ],
+        "complete_before": false,
+        "complete_after": true
+      },
+      "handoff": {
+        "at": 1791954306454,
+        "oldBarStart": 1791954000000,
+        "oldBarEnd": 1791954300000,
+        "completeBefore": false,
+        "completeAfter": true,
+        "nativeProjectionDifference": "mixed",
+        "changedFields": [
+          "close",
+          "complete",
+          "volume",
+          "volume_complete"
+        ],
+        "appendAt": 1791954306454,
+        "oldConfirmedAndNewBarSentTogether": true,
+        "confirmedOldBarDeliveredBeforeReset": true
+      },
+      "secondsAfterLastBars": 14.016
+    },
+    {
+      "sourceChangesToConfirmedBarAfterDelivery": 0,
+      "at": 1791954326351,
+      "timeSingapore": "2026-10-14T13:05:26.351+08:00",
+      "relativeSeconds": 355.02,
+      "frame": "M1",
+      "series_kind": "provider",
+      "reason": "history_changed",
+      "sequence": 22,
+      "generation": 97,
+      "effective_before": 1791954300000,
+      "accepted_observed_at": 1791954260202,
+      "lastSourceMatch": {
+        "at": 1791954310112,
+        "frame": "M1",
+        "start": 1791954240000,
+        "end": 1791954300000,
+        "kind": "metadata",
+        "changed_at": 1791954309516,
+        "old_revision": 4,
+        "new_revision": 5,
+        "changed_fields": [
+          "complete",
+          "price_confirmed_at",
+          "revision",
+          "changed_at",
+          "observed_at"
+        ],
+        "payload_fields": [
+          "volume_complete",
+          "complete"
+        ],
+        "complete_before": false,
+        "complete_after": true
+      },
+      "handoff": {
+        "at": 1791954311327,
+        "oldBarStart": 1791954240000,
+        "oldBarEnd": 1791954300000,
+        "completeBefore": false,
+        "completeAfter": true,
+        "nativeProjectionDifference": "metadata",
+        "changedFields": [
+          "complete",
+          "volume_complete"
+        ],
+        "appendAt": 1791954311327,
+        "oldConfirmedAndNewBarSentTogether": true,
+        "confirmedOldBarDeliveredBeforeReset": true
+      },
+      "secondsAfterLastBars": 15.024
+    },
+    {
+      "sourceChangesToConfirmedBarAfterDelivery": 0,
+      "at": 1791954390271,
+      "timeSingapore": "2026-10-14T13:06:30.271+08:00",
+      "relativeSeconds": 418.94,
+      "frame": "M1",
+      "series_kind": "provider",
+      "reason": "history_changed",
+      "sequence": 27,
+      "generation": 103,
+      "effective_before": 1791954360000,
+      "accepted_observed_at": 1791954324779,
+      "lastSourceMatch": {
+        "at": 1791954374114,
+        "frame": "M1",
+        "start": 1791954300000,
+        "end": 1791954360000,
+        "kind": "mixed",
+        "changed_at": 1791954373145,
+        "old_revision": 3,
+        "new_revision": 4,
+        "changed_fields": [
+          "complete",
+          "price_confirmed_at",
+          "revision",
+          "changed_at",
+          "observed_at"
+        ],
+        "payload_fields": [
+          "volume_complete",
+          "volume",
+          "close",
+          "complete"
+        ],
+        "complete_before": false,
+        "complete_after": true
+      },
+      "handoff": {
+        "at": 1791954374230,
+        "oldBarStart": 1791954300000,
+        "oldBarEnd": 1791954360000,
+        "completeBefore": false,
+        "completeAfter": true,
+        "nativeProjectionDifference": "mixed",
+        "changedFields": [
+          "close",
+          "complete",
+          "volume",
+          "volume_complete"
+        ],
+        "appendAt": 1791954374230,
+        "oldConfirmedAndNewBarSentTogether": true,
+        "confirmedOldBarDeliveredBeforeReset": true
+      },
+      "secondsAfterLastBars": 16.041
+    },
+    {
+      "sourceChangesToConfirmedBarAfterDelivery": 0,
+      "at": 1791954438894,
+      "timeSingapore": "2026-10-14T13:07:18.894+08:00",
+      "relativeSeconds": 467.563,
+      "frame": "M1",
+      "series_kind": "provider",
+      "reason": "history_changed",
+      "sequence": 31,
+      "generation": 106,
+      "effective_before": 1791954420000,
+      "accepted_observed_at": 1791954388972,
+      "lastSourceMatch": {
+        "at": 1791954422119,
+        "frame": "M1",
+        "start": 1791954360000,
+        "end": 1791954420000,
+        "kind": "mixed",
+        "changed_at": 1791954421606,
+        "old_revision": 2,
+        "new_revision": 3,
+        "changed_fields": [
+          "complete",
+          "price_confirmed_at",
+          "revision",
+          "changed_at",
+          "observed_at"
+        ],
+        "payload_fields": [
+          "volume_complete",
+          "volume",
+          "high",
+          "complete"
+        ],
+        "complete_before": false,
+        "complete_after": true
+      },
+      "handoff": {
+        "at": 1791954422852,
+        "oldBarStart": 1791954360000,
+        "oldBarEnd": 1791954420000,
+        "completeBefore": false,
+        "completeAfter": true,
+        "nativeProjectionDifference": "mixed",
+        "changedFields": [
+          "complete",
+          "high",
+          "volume",
+          "volume_complete"
+        ],
+        "appendAt": 1791954422852,
+        "oldConfirmedAndNewBarSentTogether": true,
+        "confirmedOldBarDeliveredBeforeReset": true
+      },
+      "secondsAfterLastBars": 16.042
+    },
+    {
+      "sourceChangesToConfirmedBarAfterDelivery": 0,
+      "at": 1791954504668,
+      "timeSingapore": "2026-10-14T13:08:24.668+08:00",
+      "relativeSeconds": 533.337,
+      "frame": "M1",
+      "series_kind": "provider",
+      "reason": "history_changed",
+      "sequence": 36,
+      "generation": 109,
+      "effective_before": 1791954480000,
+      "accepted_observed_at": 1791954437188,
+      "lastSourceMatch": {
+        "at": 1791954488121,
+        "frame": "M1",
+        "start": 1791954420000,
+        "end": 1791954480000,
+        "kind": "mixed",
+        "changed_at": 1791954486917,
+        "old_revision": 4,
+        "new_revision": 5,
+        "changed_fields": [
+          "complete",
+          "price_confirmed_at",
+          "revision",
+          "changed_at",
+          "observed_at"
+        ],
+        "payload_fields": [
+          "low",
+          "volume_complete",
+          "volume",
+          "close",
+          "complete"
+        ],
+        "complete_before": false,
+        "complete_after": true
+      },
+      "handoff": {
+        "at": 1791954488548,
+        "oldBarStart": 1791954420000,
+        "oldBarEnd": 1791954480000,
+        "completeBefore": false,
+        "completeAfter": true,
+        "nativeProjectionDifference": "mixed",
+        "changedFields": [
+          "close",
+          "complete",
+          "low",
+          "volume",
+          "volume_complete"
+        ],
+        "appendAt": 1791954488548,
+        "oldConfirmedAndNewBarSentTogether": true,
+        "confirmedOldBarDeliveredBeforeReset": true
+      },
+      "secondsAfterLastBars": 16.12
+    },
+    {
+      "sourceChangesToConfirmedBarAfterDelivery": 0,
+      "at": 1791954569889,
+      "timeSingapore": "2026-10-14T13:09:29.889+08:00",
+      "relativeSeconds": 598.558,
+      "frame": "M1",
+      "series_kind": "provider",
+      "reason": "history_changed",
+      "sequence": 39,
+      "generation": 112,
+      "effective_before": 1791954540000,
+      "accepted_observed_at": 1791954502726,
+      "lastSourceMatch": {
+        "at": 1791954554122,
+        "frame": "M1",
+        "start": 1791954480000,
+        "end": 1791954540000,
+        "kind": "mixed",
+        "changed_at": 1791954552776,
+        "old_revision": 3,
+        "new_revision": 4,
+        "changed_fields": [
+          "complete",
+          "price_confirmed_at",
+          "revision",
+          "changed_at",
+          "observed_at"
+        ],
+        "payload_fields": [
+          "low",
+          "volume_complete",
+          "volume",
+          "close",
+          "complete"
+        ],
+        "complete_before": false,
+        "complete_after": true
+      },
+      "handoff": {
+        "at": 1791954554375,
+        "oldBarStart": 1791954480000,
+        "oldBarEnd": 1791954540000,
+        "completeBefore": false,
+        "completeAfter": true,
+        "nativeProjectionDifference": "mixed",
+        "changedFields": [
+          "close",
+          "complete",
+          "low",
+          "volume",
+          "volume_complete"
+        ],
+        "appendAt": 1791954554375,
+        "oldConfirmedAndNewBarSentTogether": true,
+        "confirmedOldBarDeliveredBeforeReset": true
+      },
+      "secondsAfterLastBars": 15.514
+    }
+  ],
+  "resetHandoffNativeDifferences": {
+    "mixed": 11,
+    "volume": 1,
+    "metadata": 1
+  },
+  "resetsWithPriorConfirmedHandoff": 13,
+  "resetLagAfterBarsSeconds": {
+    "min": 13.591,
+    "max": 28.523
+  },
+  "sourceProbe": {
+    "startedAt": "2026-10-14T05:00:22.208000+00:00",
+    "samplingIntervalSeconds": 2,
+    "barsPerDataset": 16,
+    "sampledChangeCounts": {
+      "mixed": 124,
+      "inserted": 11,
+      "volume": 35,
+      "metadata": 1
+    },
+    "coverageLimitation": "Source probe started after SSE observation; polling can coalesce intervening commits and covers only latest 16 rows per dataset."
+  },
+  "limitations": [
+    "One platform EURUSD five-chart workspace without studies or dragging; not all production clients or composite chart bars.",
+    "No recording or native callback instrumentation; bars delivery plus native resetData are measured, not paint/flicker acceptance."
+  ],
+  "confirmedRowsReadOnlyVerification": {
+    "rows": 13,
+    "qualifies_stale_observation": 13,
+    "last_change_before_confirmed_delivery": 13,
+    "native_projection_matches_delivered": 13
+  },
+  "m1ResetIntervalsSeconds": {
+    "min": 48.623,
+    "max": 65.774,
+    "median": 63.92
+  },
+  "sourceModulesMatchedProduction": true
+}
