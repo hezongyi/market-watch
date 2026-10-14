@@ -382,11 +382,12 @@ function acceptMarketHistory(ticker,res,page,window = '', acceptedRows) {
   const bars=(page.bars || []).filter(bar=>!acceptedTimes ||
     acceptedTimes.has(bar.chart_time ?? stamp(bar,res,decode(ticker).symbol)));
   if(!bars.length && old.accepted && !old.empty) return;
+  const acceptedStarts=new Set(bars.map(bar=>bar.start));
   marketHistoryState.set(key,{first:bars.length ? Math.min(old.first ?? Infinity,bars[0].start) : null,
     accepted:true,empty:!bars.length,
     last:bars.length ? Math.max(old.last || 0,bars.at(-1).start) : null,observed_at:page.as_of || Date.now(),
     provider_acceptance:mergeProviderAcceptance(old.provider_acceptance,
-      (page.provider_acceptance || []).filter(row=>bars.some(bar=>bar.start===row.start))),
+      (page.provider_acceptance || []).filter(row=>acceptedStarts.has(row.start))),
     input_revision:page.input_revision ?? null,
     display_snapshot_id:page.display_snapshot_id ?? old.display_snapshot_id,
     binding:page.revision_id || null,history_revision:page.history_check?.next_revision || null,

@@ -61,6 +61,29 @@ const deliver = event => handlers.message({source:parent,origin:'http://localhos
     sequence:3,type:'bars',bars:event.bars,provider_acceptance:[receipt]}),/native callback failed/);
   assert.equal(sent.filter(row=>row.type==='market-accept').length,beforeAck,'throwing callback cannot acknowledge');
   evaluate("feed.unsubscribeBars('provider-accepted')");
+  evaluate(`{
+    const count=20000;
+    let reads=0;
+    const bars=Array.from({length:count},(_,index)=>({
+      get start(){
+        if(++reads>count*10)throw Error('History acceptance repeatedly scans the full page');
+        return index*60000;
+      },chart_time:index*60000+1000,open:1,high:2,low:0,close:1,
+    }));
+    const receipts=Array.from({length:2048},(_,index)=>({
+      start:(count-2048+index)*60000,fingerprint:'b'.repeat(64),
+    }));
+    acceptMarketHistory('MWP:WIDE','1',{bars,as_of:1000,provider_acceptance:receipts},'',
+      bars.map(bar=>({time:bar.chart_time})));
+    const state=marketHistoryState.get('MWP:WIDE|1|');
+    if(state.provider_acceptance.length!==2048)throw Error('Wide history lost accepted receipts');
+    if(state.first!==0 || state.last!==(count-1)*60000)throw Error('Wide history was truncated');
+    acceptMarketHistory('MWP:PARTIAL','1',{bars:bars.slice(-2),as_of:1000,
+      provider_acceptance:receipts.slice(-2)},'',[{time:bars.at(-1).chart_time}]);
+    const partial=marketHistoryState.get('MWP:PARTIAL|1|').provider_acceptance;
+    if(partial.length!==1 || partial[0].start!==(count-1)*60000)
+      throw Error('Receipt filtering must use accepted chart times and input starts');
+  }`);
   context.indicatorTicker='MWPY_'+Buffer.from(JSON.stringify({symbol:context.symbol,
     spec:{name:'EMA',params:{period:2}},key:'value'})).toString('base64');
   evaluate(`lastHistory.set(indicatorTicker+'|1',60000);
