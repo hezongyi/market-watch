@@ -1,0 +1,23 @@
+{
+  "version": "1.25.3",
+  "source_commit": "6679a70d0d38f5b3d786d1d022f65065a4b8fc28",
+  "files": [
+    "database-restore.json",
+    "config-restored.json",
+    "production-state.json",
+    "production-runtime.json",
+    "production-browser.json",
+    "production-chart-assets.json",
+    "yahoo-read.json",
+    "backup-manifest.json"
+  ],
+  "private_artifacts_excluded": [
+    "env",
+    "credentials",
+    "database_dump",
+    "licensed_library",
+    "full_browser_state",
+    "raw_logs"
+  ],
+  "read_only_production_browser": true
+}
