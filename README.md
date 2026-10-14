@@ -1,8 +1,8 @@
 # 守望 · Market Watch
 
-个人外汇、黄金和比特币监控网站。当前源码及生产版本 **v1.25.3**，价格与 Supertrend 共用持久展示快照，跨分钟和重连保留未确认柱，修复恢复重试，并恢复绘图原生可见周期范围。见 [实施验收](docs/chart-reload-implementation-20261013.md)。
+个人外汇、黄金和比特币监控网站。当前源码版本 **v1.25.4**，修复平台主 SSE 已接收尾柱确认引发的重复 reset，保留真实历史更正恢复，并修复大历史登记性能与范围计算。见 [修复与验收](docs/verification/main-sse-reset-fix-20261014/README.md) 和 [PR 复审](docs/verification/pr62-review-fixes-20261014/README.md)。
 
-生产 12 个常驻服务运行、API healthy，Yahoo 保持开启；最终备份在 Ubuntu 完整恢复后验证新增迁移。工作区、规则、账号和通知配置保持一致。生产登录后页面验收待当前密码，已完成图表资源及运行检查；固定镜像与回滚记录见 [生产交付](docs/chart-reloads-v1.25.3-production-delivery.md)。
+当前生产版本仍为 v1.25.3；v1.25.4 发布后的运行、登录网页与 Supertrend 验收另行记录。原生产配置、固定镜像与回滚记录见 [v1.25.3 交付](docs/chart-reloads-v1.25.3-production-delivery.md)。
 
 v1.14.1 保留固定自建历史、实时接续组合及可审计修订；部署前需迁移至 `aq44_aggregation_service_order`，按发布身份执行覆盖 `--until-complete --verify`。应用回退及重新升级步骤见 [发布说明](docs/verification/issue-13/release-pr.md)；本次为源码发布。
 
