@@ -1,0 +1,24 @@
+{
+  "sampleRateHz": 10,
+  "decodedFrames": 9194,
+  "videoDurationSeconds": 919.4,
+  "firstStableCandleFrameSeconds": 2.4,
+  "populatedChartCoverageSeconds": 917.0,
+  "crop": {
+    "x": 80,
+    "y": 150,
+    "width": 1000,
+    "height": 600,
+    "scaledWidth": 250,
+    "scaledHeight": 150
+  },
+  "absenceThresholdPixels": 500,
+  "minimumCandlePixelsAfterStartup": 14500,
+  "medianCandlePixelsAfterStartup": 14766.0,
+  "candleAbsenceEvents": [],
+  "nativeTailDistinctTimes": 16,
+  "nativeTailBackwards": 0,
+  "nativeEmptySamples": 0,
+  "nativeNotReadySamples": 0,
+  "method": "Decode actual browser video at 10 Hz; count red/green candle pixels in fixed chart-only crop. Exclude initialization until 1 s populated; flag count below 500. Full recording includes the complete 900 s observation. Does not exclude startup-to-observation chart activity."
+}

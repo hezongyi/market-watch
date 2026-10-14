@@ -22,7 +22,7 @@ HTTP 平台历史返回按柱的原生 OHLC、合法 volume、chart_time 指纹�
 - `mw-docker` 前端构建通过 TypeScript 与 Vite；chart 构建通过既有 licensed reserve/toolset 校验。
 - [真实原生图表](native-browser.json)：Ubuntu Docker 内受控供源、实际 PostgreSQL、已构建 web/chart、真实 HTTP/SSE/原生缓存。5 次加速正常分钟交接（metadata/价格/volume）及每次之后的下一轮尾柱更新，**0 次 resetData**；注入前一根 close 更正及其他旧柱 volume 更正，**2 次 resetData**；11 次 ack 均成功，零 pageerror。整理可重复脚本后再次执行同样通过。
 
-没有进行修复后的生产监测或录屏，不把加速交接称为 10 分钟实时验收或全面无闪验收。组合 K 线逻辑未改，既有共享合同回归通过；指标、多图/拖动/预热联合长期验收及更正恢复画面连续仍不在本次证据范围。
+后续完成了 [M1 连续 15 分钟观察及录屏](../main-sse-reset-m1-15m-20261014/README.md)：Ubuntu 受控供源按真实 60 秒交接，15 次换柱、74 次接收确认，0 reset、0 原生重置、0 数据清空；录屏 10 Hz 解码未观察到 K 线消失。未进行修复后的生产监测，不把受控单图结果称为生产或全面无闪验收。组合 K 线逻辑未改，既有共享合同回归通过；指标、多图/拖动/预热联合长期验收及更正恢复画面连续仍不在本次证据范围。
 
 ## Ubuntu 本机隔离实例
 
