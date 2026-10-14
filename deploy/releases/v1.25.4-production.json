@@ -1,0 +1,223 @@
+{
+  "version": "1.25.4",
+  "release_tag": "v1.25.4",
+  "source_commit": "42b4864b0153ed4419c35d17f77241b163735ad4",
+  "pull_requests": [
+    "https://github.com/hezongyi/market-watch/pull/62",
+    "https://github.com/hezongyi/market-watch/pull/63"
+  ],
+  "previous_production": "v1.25.3",
+  "production_host": "192.168.7.33",
+  "project": "market-watch",
+  "active_release": "releases/v1.25.4-42b4864",
+  "images": {
+    "market-watch-api:v1.25.4": {
+      "production_id": "sha256:b45054a7529265bd8031b2cf7662eea7ec3f7a414bd11e9316f54a4d623dc40f",
+      "ubuntu_id": "sha256:e7dc638edac750d6d4295e0342560d841ec5ca979919b635a4978cc983b3ec5b",
+      "rootfs_matches_ubuntu": true,
+      "effective_config_matches_ubuntu": true,
+      "legacy_empty_config_fields": [
+        "AttachStderr",
+        "AttachStdin",
+        "AttachStdout",
+        "Domainname",
+        "Hostname",
+        "Image",
+        "OpenStdin",
+        "StdinOnce",
+        "Tty"
+      ],
+      "diff_ids": [
+        "sha256:34467cc93912af891dfee8a3902adf9b4f355a9bca4eaa46f658d1181a21de0d",
+        "sha256:b3445de4503d21b3ebc42db2f284bc6c8ad96184ea91ce55fb57f5e87910e1f2",
+        "sha256:546c86e4df2dc808fcf1953c346bfeef32f4c953933634d57c1d38730b750e9c",
+        "sha256:6b6ff8eb9da6c277f4b33452c77d59f8b5ff04e0bcca1a3054570b9db343da79",
+        "sha256:4c26d5ab76a91c6629679e9f7bb38dbc0ddbe3f33c6357ce2391eddb18f864aa",
+        "sha256:6e4f6f90f0e22588121cd0f97da665fa1260c1620a4aac4292bda398de71bc52",
+        "sha256:050ea26930049f80ae9860814bb33bacc381ed2e39d9a052351e354cb4b4da3e",
+        "sha256:d471b8e989e11d71833992f31cf6898f05e5a83c987a10017e394d209a2bb520",
+        "sha256:f5a87883f111427fa848cc3e2d7b629790bf0f1ec3b8ed2396fc4fac62e2b21e",
+        "sha256:55b64f42c0c824a40752c7f57ba3a1044bf0dfcbae242553841673edb0d5d9cc",
+        "sha256:734870078fee87a910179a7dbd30b5924556e886766a9961284129407c7b1001",
+        "sha256:6178bf06fb893cd7cc342887a20058ae495196d8e5923bbea6569f1637cd4d71",
+        "sha256:d149051172db2fc2186006c7aa4340b78fa5dbc2e71e0a6f504eab9ff2efaa99",
+        "sha256:4a43b935cefd823d0cab958a6256ee2aad2a7f17974eaa93612df156322ee9c5",
+        "sha256:3cafec6b4d8cfc1f9acab5c4373297fa306463c376c9dc8a80e2de2633709d69",
+        "sha256:6000adae38a7162de51f176e37f3956b4e945b96013813fd47d2efad0b6f0680"
+      ],
+      "labels": {
+        "io.market-watch.built-at": "2026-10-14T07:32:45.348625+00:00",
+        "io.market-watch.commit": "42b4864b0153ed4419c35d17f77241b163735ad4",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-v1254-release-build",
+        "io.market-watch.purpose": "release",
+        "io.market-watch.task": "mw-v1254-release-20261014"
+      }
+    },
+    "market-watch-web:v1.25.4": {
+      "production_id": "sha256:f126bda9f63dd397bffd7a7da78364f5aeae124cb9ee3573db8f2bea5dc68050",
+      "ubuntu_id": "sha256:53ee8622dca4723886996b9cc71b3a424532a0e87b348a6280d80e39bab4f4ea",
+      "rootfs_matches_ubuntu": true,
+      "effective_config_matches_ubuntu": true,
+      "legacy_empty_config_fields": [
+        "AttachStderr",
+        "AttachStdin",
+        "AttachStdout",
+        "Domainname",
+        "Hostname",
+        "Image",
+        "OpenStdin",
+        "StdinOnce",
+        "Tty",
+        "User"
+      ],
+      "diff_ids": [
+        "sha256:989e799e634906e94dc9a5ee2ee26fc92ad260522990f26e707861a5f52bf64e",
+        "sha256:a2738b08d7114c9d5581dd5482d3b5cc297fcf73b8d330c3ba38d24c43939119",
+        "sha256:47a53288c3ef0ee51df84ef47d217f18c1762412532fded9af1fd88ecee14294",
+        "sha256:9e707aa6db4786355904a1b794c80f378b690f8f0384af56117708a23a91f1da",
+        "sha256:a3446cc6c821fa11b704a45811ab554675f0327307af71b3f4ff5a70c7a4eec8",
+        "sha256:42608b42cb5e68548abf1c71aa851acfd65816d0ceaff6ee85849c7c478463f0",
+        "sha256:53c769b49ca0a2f0f6cf5e4a807af8933cec6cde9302d56d91a78bc38ea407a8",
+        "sha256:f76f397f2ce6b266573b70eb60ef1335e9984a1941eedd2a3505af4870c3afa0",
+        "sha256:eeb4ac03305fe58177add0f31574c3942f9dd365972c12bf229e596598a9b833",
+        "sha256:b10f406e7557c3d932a622eaf2b40d63102a0df9230adb21454d088a743355f0"
+      ],
+      "labels": {
+        "io.market-watch.built-at": "2026-10-14T07:42:25.898663+00:00",
+        "io.market-watch.commit": "42b4864b0153ed4419c35d17f77241b163735ad4",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-v1254-release-build",
+        "io.market-watch.purpose": "release",
+        "io.market-watch.task": "mw-v1254-release-20261014",
+        "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+      }
+    },
+    "market-watch-chart-origin:v1.25.4": {
+      "production_id": "sha256:5744fde8b28529aa4e5558b92934c5bfaca133c65fcb8e034b692034b8fdc444",
+      "ubuntu_id": "sha256:2c2e945715c8522c4af7ffca8e43d1a7395bf8e07c54994272d78e6d80d39ab5",
+      "rootfs_matches_ubuntu": true,
+      "effective_config_matches_ubuntu": true,
+      "legacy_empty_config_fields": [
+        "AttachStderr",
+        "AttachStdin",
+        "AttachStdout",
+        "Domainname",
+        "Hostname",
+        "Image",
+        "OpenStdin",
+        "StdinOnce",
+        "Tty",
+        "User"
+      ],
+      "diff_ids": [
+        "sha256:989e799e634906e94dc9a5ee2ee26fc92ad260522990f26e707861a5f52bf64e",
+        "sha256:a2738b08d7114c9d5581dd5482d3b5cc297fcf73b8d330c3ba38d24c43939119",
+        "sha256:47a53288c3ef0ee51df84ef47d217f18c1762412532fded9af1fd88ecee14294",
+        "sha256:9e707aa6db4786355904a1b794c80f378b690f8f0384af56117708a23a91f1da",
+        "sha256:a3446cc6c821fa11b704a45811ab554675f0327307af71b3f4ff5a70c7a4eec8",
+        "sha256:42608b42cb5e68548abf1c71aa851acfd65816d0ceaff6ee85849c7c478463f0",
+        "sha256:53c769b49ca0a2f0f6cf5e4a807af8933cec6cde9302d56d91a78bc38ea407a8",
+        "sha256:f76f397f2ce6b266573b70eb60ef1335e9984a1941eedd2a3505af4870c3afa0",
+        "sha256:d16f33c5058a8af5025c5a330bb313bf7e4fa6b6710548e403ac9c588ba7b533",
+        "sha256:98d0ae6f53c9c7eafe7172faf5c68c2d111b773f3daf490f83e8ac566a2e9561",
+        "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"
+      ],
+      "labels": {
+        "io.market-watch.built-at": "2026-10-14T15:32:12.448293+00:00",
+        "io.market-watch.commit": "42b4864b0153ed4419c35d17f77241b163735ad4",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-v1254-release-build",
+        "io.market-watch.purpose": "release",
+        "io.market-watch.task": "mw-v1254-release-20261014",
+        "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+      }
+    },
+    "market-watch-backup:v1.25.4": {
+      "production_id": "sha256:a623841914cba2b3dd04596cd1bc8f087886a28622cc34292105a717d5f8d009",
+      "ubuntu_id": "sha256:0b89f7ff6810a0c9b62e01b12cedd6700f8fdfc5de50c93f0d6968ffe786f1ef",
+      "rootfs_matches_ubuntu": true,
+      "effective_config_matches_ubuntu": true,
+      "legacy_empty_config_fields": [
+        "AttachStderr",
+        "AttachStdin",
+        "AttachStdout",
+        "Domainname",
+        "Hostname",
+        "Image",
+        "OpenStdin",
+        "StdinOnce",
+        "Tty"
+      ],
+      "diff_ids": [
+        "sha256:34467cc93912af891dfee8a3902adf9b4f355a9bca4eaa46f658d1181a21de0d",
+        "sha256:b3445de4503d21b3ebc42db2f284bc6c8ad96184ea91ce55fb57f5e87910e1f2",
+        "sha256:546c86e4df2dc808fcf1953c346bfeef32f4c953933634d57c1d38730b750e9c",
+        "sha256:6b6ff8eb9da6c277f4b33452c77d59f8b5ff04e0bcca1a3054570b9db343da79",
+        "sha256:4c26d5ab76a91c6629679e9f7bb38dbc0ddbe3f33c6357ce2391eddb18f864aa",
+        "sha256:6e4f6f90f0e22588121cd0f97da665fa1260c1620a4aac4292bda398de71bc52",
+        "sha256:050ea26930049f80ae9860814bb33bacc381ed2e39d9a052351e354cb4b4da3e",
+        "sha256:d471b8e989e11d71833992f31cf6898f05e5a83c987a10017e394d209a2bb520",
+        "sha256:f5a87883f111427fa848cc3e2d7b629790bf0f1ec3b8ed2396fc4fac62e2b21e",
+        "sha256:55b64f42c0c824a40752c7f57ba3a1044bf0dfcbae242553841673edb0d5d9cc",
+        "sha256:734870078fee87a910179a7dbd30b5924556e886766a9961284129407c7b1001",
+        "sha256:6178bf06fb893cd7cc342887a20058ae495196d8e5923bbea6569f1637cd4d71",
+        "sha256:d149051172db2fc2186006c7aa4340b78fa5dbc2e71e0a6f504eab9ff2efaa99",
+        "sha256:4a43b935cefd823d0cab958a6256ee2aad2a7f17974eaa93612df156322ee9c5",
+        "sha256:3cafec6b4d8cfc1f9acab5c4373297fa306463c376c9dc8a80e2de2633709d69",
+        "sha256:6000adae38a7162de51f176e37f3956b4e945b96013813fd47d2efad0b6f0680",
+        "sha256:bc8a6ae89795cd093a62c351ad0ce19dba5cf5d9fc3ae7ea52d5bd90d58e6a2e",
+        "sha256:bf2f09aea36ffae76ad088e0db46d9fe7380fb2001575ff1957a678bea026ba6",
+        "sha256:dabab30e2fb51d46d14e84cefd8dd6ecf90458de7bb007eb2b325fcefadee4d4",
+        "sha256:896c59cc1684c94b03308e3b3a41315104fb73615147ea33c3f044da768d811a",
+        "sha256:b9b548b3828be47885e2f5cb68d6003ef83a59e7813ade5a3b827cfdb511e692",
+        "sha256:79d1009f55ce5241a80d7678d39332cc9ac036a6ef6487e6c6a58980c3bb5de0",
+        "sha256:d6aa4b1ae70169320f9e4130b43c44b3eadf163bde338433203fc8f330f9f941"
+      ],
+      "labels": {
+        "io.market-watch.built-at": "2026-10-14T15:32:30.113900+00:00",
+        "io.market-watch.commit": "42b4864b0153ed4419c35d17f77241b163735ad4",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-v1254-release-build",
+        "io.market-watch.purpose": "release",
+        "io.market-watch.task": "mw-v1254-release-20261014"
+      }
+    }
+  },
+  "backup_files": {
+    "dump": "alerts-20261014T153646075482Z.dump",
+    "config": "config-20261014T154217Z-CcwuGq.tar.gz"
+  },
+  "database_restore": {
+    "verified": true,
+    "tables_in_manifest": 89,
+    "public_tables": 90,
+    "schema": "au48_display_indicator_tasks",
+    "business_fingerprints_verified": 10,
+    "database_bytes": 9870765403,
+    "environment": "Ubuntu isolated Docker mw-v1254-restore",
+    "bytes": 2755261219,
+    "sha256": "666a299c6457fdfebc9cdcba587808d178de44819a58874de9362795dc0a03fb",
+    "schema_before": "au48_display_indicator_tasks",
+    "schema_after": "au48_display_indicator_tasks",
+    "schema_unchanged": true
+  },
+  "maintenance": {
+    "started_at": "2026-10-14T15:36:44Z",
+    "switched_at": "2026-10-14T15:52:18Z",
+    "duration_seconds": 934.0,
+    "includes_final_backup_and_full_restore_verification": true
+  },
+  "private_env_preserved": true,
+  "backend_yahoo_enabled": true,
+  "native_history_oanda_enabled": true,
+  "verification": "docs/verification/main-sse-reset-v1.25.4-production"
+}

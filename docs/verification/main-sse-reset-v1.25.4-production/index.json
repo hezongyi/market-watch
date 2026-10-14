@@ -1,0 +1,31 @@
+{
+  "version": "1.25.4",
+  "source_commit": "42b4864b0153ed4419c35d17f77241b163735ad4",
+  "files": [
+    "database-restore.json",
+    "config-restored.json",
+    "production-state.json",
+    "production-runtime.json",
+    "production-browser.json",
+    "production-chart-assets.json",
+    "yahoo-read.json",
+    "maintenance.json",
+    "runtime-log-summary.json",
+    "backup-manifest.json",
+    "m1-analysis.json",
+    "m1-study-analysis.json",
+    "m1-video-analysis.json",
+    "cleanup.json"
+  ],
+  "private_artifacts_excluded": [
+    "env",
+    "credentials",
+    "database_dump",
+    "licensed_library",
+    "full_browser_state",
+    "raw_logs",
+    "raw_video",
+    "screenshots"
+  ],
+  "read_only_production_browser": true
+}

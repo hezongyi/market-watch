@@ -1,0 +1,52 @@
+{
+  "web": {
+    "tracebacks": 0,
+    "error_lines": 0
+  },
+  "native-history-worker": {
+    "tracebacks": 0,
+    "error_lines": 0
+  },
+  "chart-history-worker": {
+    "tracebacks": 0,
+    "error_lines": 0
+  },
+  "chart-aggregation-worker": {
+    "tracebacks": 0,
+    "error_lines": 0
+  },
+  "composite-aggregate-worker": {
+    "tracebacks": 0,
+    "error_lines": 0
+  },
+  "realtime-worker": {
+    "tracebacks": 0,
+    "error_lines": 0
+  },
+  "notify-worker": {
+    "tracebacks": 0,
+    "error_lines": 0
+  },
+  "pricing-worker": {
+    "tracebacks": 0,
+    "error_lines": 0
+  },
+  "history-worker": {
+    "tracebacks": 0,
+    "error_lines": 0
+  },
+  "market-stream-worker": {
+    "tracebacks": 0,
+    "error_lines": 0
+  },
+  "chart-origin": {
+    "tracebacks": 0,
+    "error_lines": 0
+  },
+  "api": {
+    "tracebacks": 3,
+    "error_lines": 3,
+    "classification": "3 request disconnect cancellations in chart_api.query_chart; no observed browser HTTP failure",
+    "exception_type": "asyncio.exceptions.CancelledError"
+  }
+}

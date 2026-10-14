@@ -1,0 +1,151 @@
+{
+  "version": "1.25.4",
+  "video": "page@9f53adf3dbfe29b45c611ce570a5f112.webm",
+  "sample_rate_hz": 10,
+  "frames": 9840,
+  "video_duration_seconds": 984.0,
+  "populated_duration_seconds": 955.2,
+  "crop": {
+    "x": 80,
+    "y": 145,
+    "width": 1020,
+    "height": 770
+  },
+  "candle_minimum_pixels": 792,
+  "supertrend_minimum_pixels": 2,
+  "candle_disappearance_events": [],
+  "supertrend_line_minimum_pixels": 2,
+  "method": "10 Hz recorded single main pane, distinct native candle and Python Supertrend colors; stable initial populated frame excludes navigation/loading",
+  "limitation": "About 100 ms temporal resolution; no claim for shorter/local redraw flicker. Supertrend line proxy rejects dense 11x11 color neighborhoods (Buy/Sell backgrounds), may include sparse marker edges/text; corroborated with native study data and inspected frames.",
+  "strict_color_candidates": [
+    {
+      "start_seconds": 757.9,
+      "end_seconds": 758.0,
+      "duration_seconds": 0.1,
+      "pixels_before": 115,
+      "pixels_after": 118
+    },
+    {
+      "start_seconds": 763.0,
+      "end_seconds": 763.1,
+      "duration_seconds": 0.1,
+      "pixels_before": 114,
+      "pixels_after": 118
+    },
+    {
+      "start_seconds": 783.5,
+      "end_seconds": 783.6,
+      "duration_seconds": 0.1,
+      "pixels_before": 112,
+      "pixels_after": 119
+    },
+    {
+      "start_seconds": 788.6,
+      "end_seconds": 788.7,
+      "duration_seconds": 0.1,
+      "pixels_before": 117,
+      "pixels_after": 119
+    },
+    {
+      "start_seconds": 809.1,
+      "end_seconds": 809.2,
+      "duration_seconds": 0.1,
+      "pixels_before": 112,
+      "pixels_after": 118
+    },
+    {
+      "start_seconds": 814.2,
+      "end_seconds": 814.3,
+      "duration_seconds": 0.1,
+      "pixels_before": 112,
+      "pixels_after": 118
+    }
+  ],
+  "supertrend_disappearance_events": [],
+  "supertrend_line_strict_color_candidates": [
+    {
+      "start_seconds": 757.9,
+      "end_seconds": 758.0,
+      "duration_seconds": 0.1,
+      "pixels_before": 96,
+      "pixels_after": 90
+    },
+    {
+      "start_seconds": 763.0,
+      "end_seconds": 763.1,
+      "duration_seconds": 0.1,
+      "pixels_before": 90,
+      "pixels_after": 90
+    },
+    {
+      "start_seconds": 783.5,
+      "end_seconds": 783.6,
+      "duration_seconds": 0.1,
+      "pixels_before": 92,
+      "pixels_after": 91
+    },
+    {
+      "start_seconds": 788.6,
+      "end_seconds": 788.7,
+      "duration_seconds": 0.1,
+      "pixels_before": 89,
+      "pixels_after": 91
+    },
+    {
+      "start_seconds": 809.1,
+      "end_seconds": 809.2,
+      "duration_seconds": 0.1,
+      "pixels_before": 94,
+      "pixels_after": 90
+    },
+    {
+      "start_seconds": 814.2,
+      "end_seconds": 814.3,
+      "duration_seconds": 0.1,
+      "pixels_before": 94,
+      "pixels_after": 90
+    }
+  ],
+  "supertrend_line_disappearance_events": [],
+  "candidate_validation": [
+    {
+      "video_seconds": 757.9,
+      "frame_index": 7580,
+      "compression_tolerant_supertrend_green_pixels": 450,
+      "visual_triplet_review": "line and markers remain visible; colors soften in this compressed frame"
+    },
+    {
+      "video_seconds": 763.0,
+      "frame_index": 7631,
+      "compression_tolerant_supertrend_green_pixels": 450,
+      "visual_triplet_review": "line and markers remain visible; colors soften in this compressed frame"
+    },
+    {
+      "video_seconds": 783.5,
+      "frame_index": 7836,
+      "compression_tolerant_supertrend_green_pixels": 568,
+      "visual_triplet_review": "line and markers remain visible; colors soften in this compressed frame"
+    },
+    {
+      "video_seconds": 788.6,
+      "frame_index": 7887,
+      "compression_tolerant_supertrend_green_pixels": 568,
+      "visual_triplet_review": "line and markers remain visible; colors soften in this compressed frame"
+    },
+    {
+      "video_seconds": 809.1,
+      "frame_index": 8092,
+      "compression_tolerant_supertrend_green_pixels": 602,
+      "visual_triplet_review": "line and markers remain visible; colors soften in this compressed frame"
+    },
+    {
+      "video_seconds": 814.2,
+      "frame_index": 8143,
+      "compression_tolerant_supertrend_green_pixels": 602,
+      "visual_triplet_review": "line and markers remain visible; colors soften in this compressed frame"
+    }
+  ],
+  "verified_supertrend_disappearance_events": [],
+  "analysis_note": "Exact RGB threshold produced six single-frame candidates due to video color compression. All six inspected with preceding/following frames; trend line and markers remained visible. Compression-tolerant green detected 450–602 pixels in each candidate. No confirmed disappearance.",
+  "candidate_triplets_sha256": "897f402f70bd05f57399beccea61326afffcb80140696253d012db5be8d3ab1d"
+}

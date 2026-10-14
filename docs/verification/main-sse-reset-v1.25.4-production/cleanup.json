@@ -1,0 +1,15 @@
+{
+  "production_import_tars_removed": [
+    "api.tar",
+    "web.tar",
+    "chart.tar",
+    "backup.tar",
+    "source.tar.gz"
+  ],
+  "production_rollback_images_and_backups_retained": true,
+  "ubuntu_restore_project": "mw-v1254-restore",
+  "ubuntu_restore_stopped": true,
+  "ubuntu_restore_volume_retained": true,
+  "retire_preview": "Only registered acceptance tasks with matching project can retire",
+  "no_global_prune": true
+}
