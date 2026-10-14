@@ -2,7 +2,7 @@
 
 个人外汇、黄金和比特币监控网站。当前源码版本 **v1.25.4**，修复平台主 SSE 已接收尾柱确认引发的重复 reset，保留真实历史更正恢复，并修复大历史登记性能与范围计算。见 [修复与验收](docs/verification/main-sse-reset-fix-20261014/README.md) 和 [PR 复审](docs/verification/pr62-review-fixes-20261014/README.md)。
 
-当前生产版本仍为 v1.25.3；v1.25.4 发布后的运行、登录网页与 Supertrend 验收另行记录。原生产配置、固定镜像与回滚记录见 [v1.25.3 交付](docs/chart-reloads-v1.25.3-production-delivery.md)。
+当前生产版本为 **v1.25.4**。已在 Unraid 正式切换并登录网页验收，EURUSD M1＋Python Supertrend 实际观察约 15 分 40 秒，0 reset、0 数据清空；录屏分析与适用边界见 [生产交付](docs/main-sse-reset-v1.25.4-production-delivery.md)。固定镜像、完整备份恢复校验及回滚记录见同文。
 
 v1.14.1 保留固定自建历史、实时接续组合及可审计修订；部署前需迁移至 `aq44_aggregation_service_order`，按发布身份执行覆盖 `--until-complete --verify`。应用回退及重新升级步骤见 [发布说明](docs/verification/issue-13/release-pr.md)；本次为源码发布。
 

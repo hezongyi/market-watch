@@ -1,0 +1,47 @@
+{
+  "sample_count": 4533,
+  "elapsed_seconds": 934.08,
+  "sampling_errors": [],
+  "resets": [],
+  "m1": [
+    {
+      "index": 0,
+      "series_kind": "MWP",
+      "first_bar_time": 1791993240,
+      "last_bar_time": 1791994140,
+      "new_minutes": 15,
+      "price_updates": 55,
+      "bars_before": 465,
+      "bars_after": 480,
+      "not_ready_samples": 0,
+      "empty_tail_samples": 0,
+      "bar_time_regressions": [],
+      "bar_count_shrinks": [],
+      "spacing_changes": [],
+      "range_jumps_over_one_minute": [],
+      "backward_range_moves": [],
+      "close_first": 1.11224,
+      "close_last": 1.11221,
+      "study_names": [
+        "守望 Python SUPERTREND_PINE_V1"
+      ]
+    }
+  ],
+  "visual": {
+    "samples": 4547,
+    "sampling_errors": [],
+    "all_canvas_empty_samples": 0,
+    "all_colored_pixels_absent_samples": 0,
+    "canvas_counts": [
+      2
+    ],
+    "minimum_nonbackground": 768,
+    "minimum_colored": 710,
+    "m1_candle_disappearance_events": []
+  },
+  "renderer": {
+    "frame_gaps_over_50ms": 94,
+    "max_gap_ms": 1050,
+    "frame_gaps_over_250ms": 12
+  }
+}

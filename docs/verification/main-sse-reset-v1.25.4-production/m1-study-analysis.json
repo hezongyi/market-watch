@@ -1,0 +1,36 @@
+{
+  "version": "1.25.4",
+  "duration_seconds": 939.659,
+  "status": "completed",
+  "studies": [
+    {
+      "chart_index": 0,
+      "study_name": "守望 Python SUPERTREND_PINE_V1",
+      "samples": 4533,
+      "empty_data_samples": 0,
+      "min_size": 465,
+      "max_size": 480,
+      "last_values_changed": 55
+    }
+  ],
+  "shared_sse_delivered_event_counts": {
+    "quotes": 3405,
+    "bars": 63
+  },
+  "sse_reset_reasons": {},
+  "ack_status_counts": {
+    "200": 61
+  },
+  "event_evidence_method": "parent receives actual shared SSE events through market-event; heartbeat EventSource probe is separate",
+  "native_reset_count": 0,
+  "page_error_count": 0,
+  "failed_responses_count": 0,
+  "sampling_errors_count": 0,
+  "observation_only_shared_event_counts": {
+    "quotes": 3376,
+    "bars": 60
+  },
+  "observation_only_ack_status_counts": {
+    "200": 58
+  }
+}

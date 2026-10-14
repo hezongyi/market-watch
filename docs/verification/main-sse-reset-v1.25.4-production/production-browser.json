@@ -1,0 +1,46 @@
+{
+  "version": "1.25.4",
+  "checkedAt": "2026-10-14T15:53:55.623Z",
+  "errors": [],
+  "failedResponses": [],
+  "blockedWrites": [],
+  "overflow": false,
+  "secureCookie": true,
+  "httpOnlyCookie": true,
+  "chartOrigin": "blob:https://charts.kookvv.com:8443/f9bd5898-30aa-48e1-b28c-b3bd5419cd0f",
+  "chartCanvasCount": 7,
+  "chartState": {
+    "ready": true,
+    "readonly": true,
+    "charts": [
+      {
+        "resolution": "60",
+        "studies": [],
+        "visibleRange": {
+          "from": 1791496800,
+          "to": 1792026000
+        },
+        "series_kind": "MWC"
+      }
+    ]
+  },
+  "successfulAPIPaths": {
+    "/api/login": 1,
+    "/api/candles": 1,
+    "/api/events": 1,
+    "/api/session-range": 1,
+    "/api/session": 4,
+    "/api/advanced-charts/workspaces": 1,
+    "/api/advanced-charts/catalog": 1,
+    "/api/advanced-charts/preferences": 1,
+    "/api/charts/history-capabilities": 1,
+    "/api/market-data/resolve": 25,
+    "/api/charts/data": 10,
+    "/api/charts/stream/subscribe": 20,
+    "/api/charts/stream/unsubscribe": 14,
+    "/api/chart-alerts": 3,
+    "/api/chart-alerts/events": 3,
+    "/api/market-data/quotes": 10,
+    "/api/charts/stream/events": 1
+  }
+}

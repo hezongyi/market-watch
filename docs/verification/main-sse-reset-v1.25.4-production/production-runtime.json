@@ -1,0 +1,131 @@
+{
+  "version": "1.25.4",
+  "services": {
+    "web": {
+      "image": "sha256:f126bda9f63dd397bffd7a7da78364f5aeae124cb9ee3573db8f2bea5dc68050",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "native-history-worker": {
+      "image": "sha256:b45054a7529265bd8031b2cf7662eea7ec3f7a414bd11e9316f54a4d623dc40f",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "chart-history-worker": {
+      "image": "sha256:b45054a7529265bd8031b2cf7662eea7ec3f7a414bd11e9316f54a4d623dc40f",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "chart-aggregation-worker": {
+      "image": "sha256:b45054a7529265bd8031b2cf7662eea7ec3f7a414bd11e9316f54a4d623dc40f",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "composite-aggregate-worker": {
+      "image": "sha256:b45054a7529265bd8031b2cf7662eea7ec3f7a414bd11e9316f54a4d623dc40f",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "realtime-worker": {
+      "image": "sha256:b45054a7529265bd8031b2cf7662eea7ec3f7a414bd11e9316f54a4d623dc40f",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "notify-worker": {
+      "image": "sha256:b45054a7529265bd8031b2cf7662eea7ec3f7a414bd11e9316f54a4d623dc40f",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "pricing-worker": {
+      "image": "sha256:b45054a7529265bd8031b2cf7662eea7ec3f7a414bd11e9316f54a4d623dc40f",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "history-worker": {
+      "image": "sha256:b45054a7529265bd8031b2cf7662eea7ec3f7a414bd11e9316f54a4d623dc40f",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "market-stream-worker": {
+      "image": "sha256:b45054a7529265bd8031b2cf7662eea7ec3f7a414bd11e9316f54a4d623dc40f",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "chart-origin": {
+      "image": "sha256:5744fde8b28529aa4e5558b92934c5bfaca133c65fcb8e034b692034b8fdc444",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "api": {
+      "image": "sha256:b45054a7529265bd8031b2cf7662eea7ec3f7a414bd11e9316f54a4d623dc40f",
+      "status": "running",
+      "restarts": 0,
+      "health": "healthy"
+    }
+  },
+  "yahoo": {
+    "native-history-worker": {
+      "enabled": true,
+      "proxy_configured": true,
+      "oanda_stream_enabled": true
+    },
+    "chart-history-worker": {
+      "enabled": true,
+      "proxy_configured": true,
+      "oanda_stream_enabled": false
+    },
+    "chart-aggregation-worker": {
+      "enabled": true,
+      "proxy_configured": true,
+      "oanda_stream_enabled": false
+    },
+    "composite-aggregate-worker": {
+      "enabled": true,
+      "proxy_configured": true,
+      "oanda_stream_enabled": false
+    },
+    "realtime-worker": {
+      "enabled": true,
+      "proxy_configured": true,
+      "oanda_stream_enabled": false
+    },
+    "notify-worker": {
+      "enabled": true,
+      "proxy_configured": true,
+      "oanda_stream_enabled": false
+    },
+    "pricing-worker": {
+      "enabled": true,
+      "proxy_configured": true,
+      "oanda_stream_enabled": true
+    },
+    "history-worker": {
+      "enabled": true,
+      "proxy_configured": true,
+      "oanda_stream_enabled": false
+    },
+    "market-stream-worker": {
+      "enabled": true,
+      "proxy_configured": true,
+      "oanda_stream_enabled": false
+    },
+    "api": {
+      "enabled": true,
+      "proxy_configured": true,
+      "oanda_stream_enabled": true
+    }
+  },
+  "source_hashes_verified": true,
+  "backend_modules": 367
+}
