@@ -1,0 +1,21 @@
+{
+  "verified": true,
+  "tables_in_manifest": 86,
+  "public_tables": 87,
+  "schema": "as46_provider_price_confirmation",
+  "database_bytes": 9546616155,
+  "environment": "Ubuntu isolated Docker mw-v1253-restore",
+  "bytes": 2513986657,
+  "sha256": "0f6e8b22168f7906a1b78d6260a7eb16967f1a02da3961ec964f0b31b2b028a6",
+  "schema_before": "as46_provider_price_confirmation",
+  "schema_after": "au48_display_indicator_tasks",
+  "migration_verified": true,
+  "business_fingerprints_preserved": true,
+  "auth_and_notifications_preserved": true,
+  "old_table_counts_preserved_by_migration": true,
+  "new_tables": {
+    "market_display_indicator_tasks": 0,
+    "market_display_snapshots": 0,
+    "market_observed_minutes": 0
+  }
+}

@@ -1,8 +1,8 @@
 # 守望 · Market Watch
 
-个人外汇、黄金和比特币监控网站。当前源码版本 **v1.25.2**，修复稀疏分钟柱导致组合 D1 价格告警被误标 stale，以及已核实交易时段的来源文案。价格确认使用同账户原生完整日线证据，保留缺分钟和指标完整性限制；见 [验收证据](docs/verification/sparse-alerts-20261013/README.md) 和 [源码清单](deploy/releases/v1.25.2-source.json)。
+个人外汇、黄金和比特币监控网站。当前源码及生产版本 **v1.25.3**，价格与 Supertrend 共用持久展示快照，跨分钟和重连保留未确认柱，修复恢复重试，并恢复绘图原生可见周期范围。见 [实施验收](docs/chart-reload-implementation-20261013.md)。
 
-当前生产已升级到 **v1.25.2**：12 个常驻服务、API healthy，活动组合 D1 告警与当前报价均 ready，交易时段显示已核实；Yahoo 保持开启且真实读取通过。备份完整恢复、生产网页与回滚记录见 [生产交付](docs/sparse-alerts-v1.25.2-production-delivery.md)。`Load failed` 未复现，暂不处理。
+生产 12 个常驻服务运行、API healthy，Yahoo 保持开启；最终备份在 Ubuntu 完整恢复后验证新增迁移。工作区、规则、账号和通知配置保持一致。生产登录后页面验收待当前密码，已完成图表资源及运行检查；固定镜像与回滚记录见 [生产交付](docs/chart-reloads-v1.25.3-production-delivery.md)。
 
 v1.14.1 保留固定自建历史、实时接续组合及可审计修订；部署前需迁移至 `aq44_aggregation_service_order`，按发布身份执行覆盖 `--until-complete --verify`。应用回退及重新升级步骤见 [发布说明](docs/verification/issue-13/release-pr.md)；本次为源码发布。
 
