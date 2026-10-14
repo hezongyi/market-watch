@@ -85,6 +85,8 @@ class Bucket:
         unknown = ((self.right - self.left) // 60000 - len(self.rows)
                    - (len(self.closed) - self.conflicts) + self.incomplete)
         coverage = unknown == 0 and self.left >= self.history_start
+        display_missing = ((self.times[-1] + 60000 - self.left) // 60000 - len(self.rows)
+            - sum(at <= self.times[-1] for at in self.closed) + self.conflicts)
         confirmed, time_closed = self.incomplete == 0, self.right <= now
         units = [unit for unit, count in self.units.items() if count]
         compatible = len([s for s, count in self.sources.items() if count]) == 1 and len(units) == 1
@@ -114,6 +116,7 @@ class Bucket:
             "volume_complete": complete and compatible and volumes, "complete": complete,
             "time_closed": time_closed, "source_confirmed": confirmed, "coverage_complete": coverage,
             "observed_minutes": len(self.rows), "unknown_minutes": unknown,
+            "display_coverage_complete": display_missing == 0 and self.left >= self.history_start,
             "confirmed_closed_minutes": len(self.closed) - self.conflicts,
             "session_conflict": bool(self.conflicts), "conflict_minutes": self.conflicts,
             "seam_crossing": self.left < self.seam < self.right, "seam_at_start": self.left == self.seam,
@@ -172,7 +175,7 @@ class CurrentBuckets:
         self.builds += 1
         return state
 
-    def page(self, db, composite, revision, prep, version, frame, count, stamp, permission_scope):
+    def page(self, db, composite, revision, prep, version, frame, count, stamp, permission_scope, *, display_snapshot=None):
         """Reuse the confirmed tail; quote updates read only the current bucket.
 
         Confirmed deltas rebuild affected buckets, while the active bucket's
@@ -219,15 +222,17 @@ class CurrentBuckets:
         while len(self.pages) > self.limit or sum(len(item[2]["bars"]) for item in self.pages.values()) > 16000:
             self.pages.pop(next(iter(self.pages)))
         mapping = db.get(RealtimeMapping, revision.mapping_id)
-        live = db.get(LiveState, mapping.target_dataset_id)
-        forming = live.forming if live else {}
-        candidates = [forming["start"]] if forming and forming["start"] >= revision.seam else []
+        from .display_observations import read as observed_rows
+
+        observations = display_snapshot.content['observations'] if display_snapshot else observed_rows(
+            db, mapping.target_dataset_id, revision.id, prep.input_revision, revision.seam, stamp + 1)
+        candidates = [row['start'] for row in observations]
         # Also refresh the last confirmed bucket's time closure without a quote.
         if base["bars"] and not base["bars"][-1]["time_closed"]:
             candidates.append(base["bars"][-1]["start"])
         for left, right in sorted({period(at, frame, phase) for at in candidates}):
             updated = read_window(db, composite.id, frame, left, right, revision_id=revision.id,
-                provisional=True, now=stamp, permission_scope=permission_scope, realtime=self)["bars"]
+                provisional=True, now=stamp, permission_scope=permission_scope, realtime=self, display_snapshot=display_snapshot)["bars"]
             base["bars"] = sorted([bar for bar in base["bars"] if bar["start"] != left] + updated,
                                   key=lambda bar: bar["start"])[-count:]
         # Every output carries the current fixed input credential, including
@@ -237,4 +242,9 @@ class CurrentBuckets:
             for segment in bar["segments"]:
                 if segment["segment"] == "target":
                     segment["input"]["input_revision"] = prep.input_revision
+        if display_snapshot:
+            base['display_snapshot_id'] = display_snapshot.id
+            if display_snapshot.content.get('degraded'):
+                base['pending'] = [*base.get('pending', []),
+                    '待确认观测容量已满，已保留现有图表并暂停追加；确认补齐后恢复']
         return base

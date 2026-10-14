@@ -135,6 +135,7 @@ const MWNativeIndicatorResultsAdapter = (() => {
     if(!current(binding) || handle.generation!==binding.generation)return false;
     if(batch.generation!==handle.generation || batch.sequence<=binding.sequence)return false;
     if(fingerprint(batch.identity)!==fingerprint(handle.identity))return false;
+    if(batch.current && !batch.current())return false;
     const next=numericRevision(batch.inputRevision),old=numericRevision(binding.revision);
     if(next===null || old!==null && next<old)return false;
     if(!Number.isSafeInteger(batch.sequence) || !['snapshot','prepend','append','replaceRange'].includes(batch.kind))

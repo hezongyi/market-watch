@@ -67,6 +67,10 @@ def test_additive_migration_and_downgrade_snapshot_protection(provider_pg, monke
     migration = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(migration)
     with engine.begin() as conn:
+        from alerts.storage import DisplayIndicatorTask
+
+        # Reconstruct the older migration's schema before testing its upgrade.
+        DisplayIndicatorTask.__table__.drop(conn)
         FixedIndicatorBlock.__table__.drop(conn)
         FixedIndicatorRun.__table__.drop(conn)
         migration.op = Operations(MigrationContext.configure(conn))

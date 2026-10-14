@@ -131,7 +131,7 @@ def confirmed_window(db, revision, start, end, value, phase, profiles):
 def operands(db, page, config, now):
     """Return indexed values and complete dependency manifests, no vector truncation."""
     specs = [indicator.model_dump(exclude={"output"}) for indicator in config.indicators()]
-    results, progress = chart_results(db, page, specs, provisional=config.mode == "intrabar", stamp=now)
+    results, progress = chart_results(db, page, specs, provisional=config.mode == "intrabar", stamp=now, purpose='alert')
     prepared = {digest({key: result[key] for key in ("name", "version", "params")}): result for result in results}
     bar = page["bars"][-1]
     values, dependencies = [], []

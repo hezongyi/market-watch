@@ -40,6 +40,7 @@ class Subscription(Consumer):
     binding: str | None = Field(default=None, max_length=64)
     observed_at: int = Field(default=0, ge=0)
     initial_input_revision: int | None = Field(default=None, ge=0)
+    display_snapshot_id: str | None = Field(default=None, min_length=64, max_length=64)
     initial_indicator_pending: bool = False
     # Consumer evidence only: the shared price task still has no indicator IO.
     dependency_origin: int | None = Field(default=None, ge=0)
@@ -53,7 +54,7 @@ def resolve(body):
     query = body.query.model_copy(update={"client": None, "before": None, "limit": 2000,
         "track_history": False, "from_time": None, "count_back": None,
         "first_data_request": False, "revision_before": None, "revision_after": None,
-        "native_history": None, "history_observation": None, "native_reserve": None})
+        "native_history": None, "history_observation": None, "native_reserve": None, "display_snapshot_id": None})
     if query.timeframe not in FRAMES:
         raise ValueError("不支持的周期")
     for spec in query.indicators:

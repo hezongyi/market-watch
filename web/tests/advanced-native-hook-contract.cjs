@@ -28,6 +28,7 @@ try {
   run();
   const installed = fs.readFileSync(file, "utf8");
   assert.notEqual(digest(installed), digest(original));
+  assert.ok(!installed.includes('MWDrawingVisibility'), 'native ranges have no custom mask hooks');
   assert.ok(installed.includes('Object.assign(this._chartWidgetCollection.state('));
   assert.ok(installed.includes('_mwBarRangeMapping:globalThis.parent.MWBarRangeMapping.snapshot()'));
 
@@ -54,7 +55,7 @@ try {
   execFileSync(process.execPath,[navigation,file]); run();
   assert.equal(fs.readFileSync(file,'utf8'),installed);
   run('--disable');
-  for (const ref of ['v1.8.0', 'ed149e1']) {
+  for (const ref of ['v1.8.0', 'ed149e1', 'v1.25.2']) {
     const known = path.join(temp, ref.replaceAll('.', '-') + '.mjs');
     fs.writeFileSync(known, execFileSync('git', ['show', ref + ':advanced-host/patch-native-reserve.mjs'], {cwd:root}));
     execFileSync(process.execPath, [known, file]);
@@ -115,6 +116,7 @@ try {
     'charting_library/bundles/restricted-toolset.4fbfc823d8551bbb3e53.js'), toolset);
   for (const source of [original, installed]) {
     fs.writeFileSync(assetBundle, source);
+    execFileSync(process.execPath, [path.join(root, "web/scripts/build-alert-ui.mjs"), assets], {cwd:path.join(root,"web")});
     execFileSync(process.execPath, [path.join(assets, "build-assets.mjs")]);
     const html = fs.readFileSync(path.join(assets, "index.html"), "utf8");
     const version = crypto.createHash('sha256').update(source).update(toolset).digest('hex').slice(0, 16);

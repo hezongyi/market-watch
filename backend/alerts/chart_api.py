@@ -5,6 +5,7 @@ import copy
 import hashlib
 import json
 import math
+import re
 import threading
 import time
 from collections import OrderedDict
@@ -113,9 +114,20 @@ class DataQuery(BaseModel):
     provisional: bool = True
     composite_revision_id: str | None = Field(default=None, max_length=36)
     input_revision: int | None = Field(default=None, ge=0)
+    display_snapshot_id: str | None = Field(default=None, min_length=64, max_length=64)
+    display_retry: dict[str, str] | None = Field(default=None, max_length=12)
     native_history: NativeHistory | None = None
     history_observation: HistoryObservation | None = None
     native_reserve: NativeReserve | None = None
+
+    @model_validator(mode="after")
+    def validate_display_retry(self):
+        if self.display_retry is not None and (self.series_kind != 'composite' or
+                not self.display_snapshot_id or not self.indicators or any(
+                    not re.fullmatch(r'[a-f0-9]{64}', key) or not re.fullmatch(r'[a-f0-9]{64}', value)
+                    for key, value in self.display_retry.items())):
+            raise ValueError('展示任务重试须绑定组合快照、指标与故障凭据')
+        return self
 
     @model_validator(mode="before")
     @classmethod
@@ -966,6 +978,8 @@ def data_sync(body: DataQuery):
         }
     except (ValueError, TypeError, KeyError, AttributeError) as e:
         detail = {"code": e.code, "message": str(e)} if hasattr(e, "code") else str(e)
+        if hasattr(e, "display_retry"):
+            detail["display_retry"] = e.display_retry
         raise HTTPException(422, detail) from e
 
 

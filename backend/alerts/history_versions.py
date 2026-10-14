@@ -402,6 +402,7 @@ def worker_tick(adapter, *, version_id=None, without_composite_aggregates=False,
         from .composite_preparation import preparation_tick
         from .composite_revisions import preparation_tick as revision_tick
         from .fixed_indicators import indicator_tick
+        from .display_indicator_jobs import tick as display_indicator_tick
         from .history_maintenance import schedule_tick
 
         phase("schedule", schedule_tick)
@@ -409,6 +410,7 @@ def worker_tick(adapter, *, version_id=None, without_composite_aggregates=False,
         if not without_composite_aggregates:
             phase("composite_aggregates", aggregate_tick)
         phase("indicators", indicator_tick)
+        phase("display_indicators", display_indicator_tick)
         phase("revisions", revision_tick)
     phase("import", lambda: import_page(adapter, version_id=version_id))
     pulse.finish(errors=errors, worked=worked)

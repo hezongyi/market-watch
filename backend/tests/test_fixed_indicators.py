@@ -296,6 +296,40 @@ def test_provisional_chart_value_never_advances_durable_confirmed_state(database
         assert all(row["time"] < forming["start"] for row in second[0]["series"][0]["values"])
 
 
+@pytest.mark.parametrize('name', ['EMA', SUPERTREND_NAME])
+@pytest.mark.parametrize('later_confirmed', [False, True])
+def test_observed_suffix_replays_all_recursive_dependencies(database, monkeypatch, name, later_confirmed):
+    composite, revision, seam = populated(database, monkeypatch)
+    if later_confirmed:
+        add_tail(database, revision, [minute(seam + 720000, close='1.114', volume='3')])
+    aggregates(revision, 'M1')
+    spec = {'name': name, 'params': {'period': 2}}
+    stamp = seam + 850000
+    with database.begin() as db:
+        page = chart_page(db, composite, 'M1', now=stamp, count=20)
+        ident = jobs.request(db, page, spec, stamp=stamp).id
+    drain(ident)
+    pending = [{**page['bars'][-1], 'start': seam + i * 60000, 'end': seam + (i + 1) * 60000,
+        'close': str(1.111 + n * .001), 'complete': False, 'source_confirmed': False,
+        'coverage_complete': False, 'volume': None}
+        for n, i in enumerate([10, 11] if later_confirmed else [10, 11, 12])]
+    page['bars'] = sorted([*page['bars'], *pending], key=lambda bar: bar['start'])
+    reference = calculate([{**bar, 'complete': True} for bar in page['bars']], spec)
+    with database.begin() as db:
+        run = db.get(FixedIndicatorRun, ident)
+        original = copy.deepcopy(run.state)
+        actual, _ = jobs.chart_results(db, page, [spec], provisional=True, stamp=stamp)
+        assert run.state == original
+    for series in reference['series']:
+        wanted = [(point['time'], point['value']) for point in series['values'] if point['time'] >= pending[0]['start']]
+        found = next(item for item in actual[0]['series'] if item['key'] == series['key'])['values']
+        found = [(point['time'], point['value']) for point in found if point['time'] >= pending[0]['start']]
+        assert [at for at, _ in found] == [at for at, _ in wanted]
+        assert [value for _, value in found] == pytest.approx([value for _, value in wanted], abs=1e-10)
+    suffix = [row for row in actual[0]['dependencies'] if row['start'] >= pending[0]['start']]
+    assert all(row['provisional'] for row in suffix)
+
+
 def test_worker_never_reinterprets_pending_state_from_an_older_algorithm(database, monkeypatch):
     version = history(database, monkeypatch, count=40)
     page = data_sync(DataQuery(instrument=version, series_kind="history", timeframe="M1", indicators=[SPEC]))

@@ -475,6 +475,47 @@ class LiveState(Base):
     received_at: Mapped[int] = mapped_column(BigInteger, default=0)
 
 
+class ObservedMinute(Base):
+    """Accepted display observations; epoch fragments never claim confirmation."""
+    __tablename__ = "market_observed_minutes"
+    dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), primary_key=True)
+    start: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    epoch: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    content: Mapped[dict] = mapped_column(JSON)
+    observed_at: Mapped[int] = mapped_column(BigInteger)
+    sequence: Mapped[int] = mapped_column(BigInteger)
+
+
+class DisplaySnapshot(Base):
+    __tablename__ = 'market_display_snapshots'
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    revision_id: Mapped[str] = mapped_column(ForeignKey('market_composite_revisions.id'), index=True)
+    timeframe: Mapped[str] = mapped_column(String(4))
+    input_revision: Mapped[int] = mapped_column(BigInteger)
+    content: Mapped[dict] = mapped_column(JSON)
+    expires_at: Mapped[int] = mapped_column(BigInteger, index=True)
+    size_bytes: Mapped[int] = mapped_column(BigInteger)
+
+
+class DisplayIndicatorTask(Base):
+    __tablename__ = 'market_display_indicator_tasks'
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    snapshot_id: Mapped[str] = mapped_column(ForeignKey('market_display_snapshots.id', ondelete='CASCADE'), index=True)
+    run_id: Mapped[str] = mapped_column(ForeignKey('market_fixed_indicator_runs.id', ondelete='CASCADE'))
+    affected: Mapped[int] = mapped_column(BigInteger)
+    cursor: Mapped[int] = mapped_column(BigInteger)
+    end: Mapped[int] = mapped_column(BigInteger)
+    state: Mapped[dict] = mapped_column(JSON)
+    dependent: Mapped[bool] = mapped_column(default=False)
+    output: Mapped[bytes] = mapped_column(LargeBinary)
+    presentation: Mapped[dict | None] = mapped_column(JSON)
+    status: Mapped[str] = mapped_column(String(16), default='pending', index=True)
+    lease_token: Mapped[str | None] = mapped_column(String(36))
+    lease_until: Mapped[int] = mapped_column(BigInteger, default=0)
+    next_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    error: Mapped[str | None] = mapped_column(String(64))
+
+
 class LiveMinute(Base):
     __tablename__ = "market_live_minutes"
     __table_args__ = (UniqueConstraint("dataset_id", "start"),)

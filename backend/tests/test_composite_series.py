@@ -119,7 +119,7 @@ def test_fixed_reader_uses_history_before_T_target_after_T_and_previous_input_pr
         assert missing["bars"] == []
 
 
-def test_stream_tail_is_provisional_and_expired_owner_is_excluded(database, monkeypatch):
+def test_accepted_stream_tail_remains_provisional_after_owner_expires(database, monkeypatch):
     from alerts import live_pricing as live
     from alerts.market_contracts import QuoteEvent
     from alerts.storage import PricingOwner
@@ -146,4 +146,6 @@ def test_stream_tail_is_provisional_and_expired_owner_is_excluded(database, monk
         assert bar["segments"][0]["provisional_minutes"][0]["epoch"] == epoch
         db.get(PricingOwner, ownership[0]).expires = 0
     with database.begin() as db:
-        assert read_window(db, composite_id, "M1", start, start + 60000, provisional=True, now=200010000)["bars"] == []
+        retained = read_window(db, composite_id, "M1", start, start + 60000, provisional=True, now=200010000)
+        assert retained['bars'] == sampled['bars']
+        assert not retained['bars'][0]['source_confirmed']

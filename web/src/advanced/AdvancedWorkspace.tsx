@@ -1134,6 +1134,14 @@ export default function AdvancedWorkspace() {
             !["provider", "managed", "history", "composite"].includes(
               q.series_kind,
             )) ||
+          (q.display_snapshot_id !== undefined &&
+            (q.series_kind !== "composite" ||
+              typeof q.display_snapshot_id !== "string" ||
+              !/^[a-f0-9]{64}$/.test(q.display_snapshot_id))) ||
+          (q.display_retry !== undefined && (q.series_kind !== "composite" ||
+            !q.display_retry || typeof q.display_retry !== "object" || Array.isArray(q.display_retry) ||
+            Object.keys(q.display_retry).length > 12 || Object.entries(q.display_retry).some(([id,token])=>
+              !/^[a-f0-9]{64}$/.test(id) || typeof token !== "string" || !/^[a-f0-9]{64}$/.test(token)))) ||
           !frames.has(q.timeframe) ||
           !Number.isInteger(q.limit) ||
           q.limit < 1 ||
@@ -1241,6 +1249,8 @@ export default function AdvancedWorkspace() {
                       client: q.client,
                       composite_revision_id: q.composite_revision_id,
                       input_revision: q.input_revision,
+                      display_snapshot_id: q.display_snapshot_id,
+                      display_retry: q.display_retry,
                     }
                   : {}),
                 ...(typeof q.dataset_start === "number"
@@ -1413,7 +1423,7 @@ export default function AdvancedWorkspace() {
   return (
     <main className="advanced-workspace" data-theme={chartTheme}>
       {mobile && <p className="advanced-readonly-note" role="note">手机只读看盘。编辑图表、绘图和告警请使用桌面浏览器；桌面工作区布局仍保留。</p>}
-      {Object.keys(indicatorStates).length>0 && <aside className="advanced-history-failures" aria-label="图格指标状态">{Object.entries(indicatorStates).map(([key,item])=><p key={key} role="status">图格 {item.index+1} · {item.name}：{item.state==='preparing'?'正在准备指标':item.error}{item.state==='error' && <button onClick={()=>post({type:'retry-chart-indicators',index:item.index,epoch:item.epoch})}>重试指标</button>}</p>)}</aside>}
+      {Object.values(indicatorStates).some(item=>item.state==='error') && <aside className="advanced-history-failures" aria-label="图格指标状态">{Object.entries(indicatorStates).filter(([,item])=>item.state==='error').map(([key,item])=><p key={key} role="status">图格 {item.index+1} · {item.name}：{item.error}<button onClick={()=>post({type:'retry-chart-indicators',index:item.index,epoch:item.epoch})}>重试指标</button></p>)}</aside>}
       {chartFailures.length>0 && <aside className="advanced-history-failures" aria-label="图格历史加载失败">{chartFailures.map(item=><p key={item.index} role="status">图格 {item.index+1} · {item.label} · {item.resolution}：{item.error}<button onClick={()=>post({type:'retry-chart-history',...item})}>重试此图格</button></p>)}</aside>}
       {(Object.keys(nativeLoads).length > 0 ||
         Object.keys(capacityNotices).length > 0) && (
