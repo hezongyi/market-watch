@@ -24,6 +24,7 @@ from .chart_indicators import calculate, history_requirement
 from .config import settings
 from .market_resources import LANE, lane
 from .provider_capabilities import SOURCES, frames, fresh_seconds, page_capacity, versions
+from .provider_changes import ChangeSummary
 from .provider_history_policy import CapacityExceeded, capacity, optional_bars
 from .storage import ProviderBar, ProviderDataset, now_ms, transaction, uid
 from .volume import metadata as volume_metadata
@@ -299,6 +300,7 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
         start = 0
     changed = []
     useful_bars = False
+    observation = ChangeSummary() if settings.platform_native_update_diagnostics else None
     with budget_transaction() as db:
         dataset = db.scalar(
             select(ProviderDataset).where(ProviderDataset.id == key).with_for_update()
@@ -324,6 +326,8 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
                 ProviderBar.chart_time < before,
                 ProviderBar.start.not_in([bar["start"] for bar in rows])))
             if removed.rowcount:
+                if observation:
+                    observation.counts["deleted"] += removed.rowcount
                 dataset.metadata_json = {**dataset.metadata_json, "invalidated_at":observed_at}
                 dataset.revision += 1
         existing = (
@@ -343,11 +347,15 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
         for bar in rows:
             old = existing.get(bar["start"])
             if old and (old.observed_at > observed_at or old.complete and not bar["complete"] and not page.get("revalidation") and not dataset.metadata_json.get("revalidation_generation") == dataset.generation):
+                if observation:
+                    observation.counts["rejected"] += 1
                 continue
             if old and old.payload.get("volume") is not None and bar.get("volume") is None and all(
                     old.payload.get(k) == bar.get(k) for k in ("open", "high", "low", "close", "complete", "end")):
                 bar = {**bar, "volume": old.payload.get("volume"),
                        "volume_complete": old.payload.get("volume_complete", False)}
+            if observation:
+                observation.accept(old.payload if old else None, bar, observed_at)
             revision = 1
             useful_bars |= old is None or old.payload != bar
             if old:
@@ -403,6 +411,11 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
             dataset.latest_at = max(dataset.latest_at, observed_at)
         if values:
             dataset.revision += 1
+        report = observation.report(dataset.source, dataset.timeframe, dataset.revision, key) if observation else None
+    # Only successful transactions enter the observation stream. This summary
+    # counts one supplier commit, independently of how many charts consume it.
+    if report:
+        log.info("provider-change-summary %s", json.dumps(report, sort_keys=True))
     progress = PAGE_PROGRESS.get()
     if progress is not None:
         progress["advanced"] = bool(dataset.coverage != original_coverage or
@@ -739,8 +752,27 @@ def data(body):
     native = body.native_history is not None
     if native:
         latest = body.before is None or before >= now - 120000
+    calculation_limit = capacity() if body.indicators else 0
 
-    def activate_ready(db, page):
+    def freeze_ready(db, page):
+        # The visible page, metadata version and full recursive prefix must
+        # describe one observation. ProviderBar is mutable: reading its prefix
+        # after this transaction cannot recover the page's earlier revision.
+        if body.indicators and page["bars"]:
+            swing = any(spec.get("name") == "SWING_SR_V1" for spec in body.indicators)
+            maximum = calculation_limit
+            prefix = list(db.scalars(select(ProviderBar.payload).where(
+                ProviderBar.dataset_id == page["dataset_id"],
+                ProviderBar.start <= (2**63 - 1 if swing else page["bars"][-1]["start"]),
+                ProviderBar.start >= (body.calculation_origin or 0),
+            ).order_by(ProviderBar.start).limit(maximum + 1)))
+            if len(prefix) > maximum:
+                raise CapacityExceeded(f"指标固定前缀超过历史容量 {maximum:,} 根，请调整容量后重试")
+            if prefix and body.calculation_origin is not None and prefix[0]["start"] != body.calculation_origin:
+                raise ValueError("指标固定历史起点缺失，请刷新并核对数据集")
+            page["_calculation_prefix"] = prefix
+        if not body.client:
+            return
         from .provider_service import activate
         try:
             # Reuse the completed snapshot's connection. A failed optional
@@ -753,7 +785,7 @@ def data(body):
             log.warning("Provider optional activation failed source=%s frame=%s",
                         meta["source"], body.timeframe, exc_info=False)
 
-    callback = activate_ready if body.client else None
+    callback = freeze_ready if body.client or body.indicators else None
     page = (native_read(meta, body, before, count, extra, latest, on_ready=callback) if native else
             read(meta, body.timeframe, before, count + extra, latest=latest, on_ready=callback))
     if meta["source"] == "oanda":
@@ -763,28 +795,9 @@ def data(body):
     output_count = page.get("mandatory_count", count)
     visible = page["bars"] if native and not body.indicators else page["bars"][-output_count:]
     first = visible[0]["start"] if visible else before
-    prefix = page["bars"]
+    prefix = page.pop("_calculation_prefix", page["bars"])
     if body.indicators and prefix:
-        # One source prefix for all pages and live updates. A viewport's
-        # warmup window cannot define a recursive EMA/RSI/MACD seed.
-        swing = any(spec.get("name") == "SWING_SR_V1" for spec in body.indicators)
-        with budget_transaction(isolation_level="REPEATABLE READ") as db:
-            dataset = db.get(ProviderDataset, page["dataset_id"]) if swing else None
-            prefix = [row.payload for row in db.scalars(select(ProviderBar).where(
-                ProviderBar.dataset_id == page["dataset_id"],
-                ProviderBar.start <= (2**63 - 1 if swing else prefix[-1]["start"]),
-                ProviderBar.start >= (body.calculation_origin or 0),
-            ).order_by(ProviderBar.start))]
-            if dataset is not None:
-                # Values, display and visible candles use the same revision,
-                # even when provider publication races the original page read.
-                by_start = {row["start"]: row for row in prefix}
-                if any(row["start"] not in by_start for row in visible):
-                    raise ValueError("行情历史已修订，请重新加载")
-                visible = [by_start[row["start"]] for row in visible]
-                page["cache_revision"], page["as_of"] = dataset.revision, dataset.updated_at
-        if prefix and body.calculation_origin is not None and prefix[0]["start"] != body.calculation_origin:
-            raise ValueError("指标固定历史起点缺失，请刷新并核对数据集")
+        # Compute outside the short database observation, using frozen inputs.
         prefix = calculation_rows(prefix, meta, body.instrument)
     indicators = []
     for spec in body.indicators:

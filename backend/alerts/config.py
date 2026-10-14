@@ -66,6 +66,7 @@ class Settings(BaseSettings):
     initial_history_days: int = Field(default=180, ge=0, le=366)
     postgres_bin_dir: str = ""
     provider_request_seconds: float = Field(default=8, ge=1, le=30)
+    platform_native_update_diagnostics: bool = False
     provider_fresh_seconds: int = Field(default=15, ge=1, le=60)
     native_history_max_bars: int = Field(default=1000000, ge=20000, le=1000000)
     native_history_default_bars: int = Field(default=200000, ge=20000, le=1000000)

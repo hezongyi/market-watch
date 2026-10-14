@@ -10,7 +10,7 @@ const context = vm.createContext({document:{createElement:()=>({}),head:{append:
   atob:s=>Buffer.from(s,'base64').toString('utf8'),
   addEventListener:(name,callback)=>{handlers[name]=callback},
   setTimeout, clearTimeout, queueMicrotask});
-for (const file of ['series.js','price-format.js','bridge.js'])
+for (const file of ['series.js','price-format.js','composite-display-batches.js','bridge.js'])
   vm.runInContext(fs.readFileSync(path.join(__dirname,'../../advanced-host',file),'utf8'),context);
 const evaluate = source => vm.runInContext(source, context);
 const deliver = event => handlers.message({source:parent,origin:'http://localhost',
