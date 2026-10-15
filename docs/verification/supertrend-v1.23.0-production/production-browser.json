@@ -1,0 +1,175 @@
+{
+  "scope": "Unraid formal production; Ubuntu browser; existing workspace, read-only UI and market subscriptions; preference migration and native preference saves suppressed",
+  "passed": true,
+  "cases": [
+    "HTTPS administrator login and Secure/HttpOnly session",
+    "Existing production chart ready, one alert business root, actual bars/quotes through authenticated SSE",
+    "Production server reload restores original five-chart layout; verification studies were never saved",
+    "Production native Supertrend x2 and Swing: finite crosshair values, Boolean settings, independent inputs/styles, study-template restoration, dark/light screenshots; session-only changes",
+    "Deployed native alert sidebar/dialog, message cancel and notification Escape restore entry focus; no alert saved",
+    "Production data center retains six sections and source-status actual read",
+    "Native indicator window coexists with alerts",
+    "390px production home has no horizontal overflow"
+  ],
+  "errors": [],
+  "http_errors": [],
+  "credential_leaks": [],
+  "unexpected_writes": [],
+  "blocked_preference_saves": [
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "kind": "setting",
+      "name": "widgetbar.layout-settings"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "kind": "setting",
+      "name": "widgetbar.layout-settings"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "kind": "setting",
+      "name": "chart.syncCrosshair"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "kind": "setting",
+      "name": "properties_dialog.active_tab.study"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "kind": "setting",
+      "name": "current_theme.name"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "kind": "setting",
+      "name": "chartproperties"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "kind": "setting",
+      "name": "chartproperties.mainSeriesProperties"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "kind": "setting",
+      "name": "mw.theme"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "kind": "setting",
+      "name": "widgetbar.layout-settings"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "kind": "setting",
+      "name": "widgetbar.layout-settings"
+    }
+  ],
+  "started_at": "2026-10-12T13:07:20.148Z",
+  "existing_workspaces": [
+    {
+      "id": "9826f739-a3e8-471a-b852-2fdf1bf72947",
+      "revision": 16
+    },
+    {
+      "id": "dcb312bb-b8ca-4b9c-b981-51cce1dbde6e",
+      "revision": 251
+    }
+  ],
+  "calendar_rows": 299,
+  "chart_count": 5,
+  "native_study_inputs": [
+    {
+      "name": "守望 Python SWING_SR_V1",
+      "inputs": [
+        {
+          "id": "high_strength",
+          "value": 3
+        },
+        {
+          "id": "low_strength",
+          "value": 7
+        },
+        {
+          "id": "hh_source",
+          "value": "high"
+        },
+        {
+          "id": "ll_source",
+          "value": "low"
+        },
+        {
+          "id": "show_average_spacing",
+          "value": false
+        },
+        {
+          "id": "statistics_position",
+          "value": "bottom_left"
+        }
+      ]
+    },
+    {
+      "name": "守望 Python SUPERTREND_PINE_V1",
+      "inputs": [
+        {
+          "id": "period",
+          "value": 7
+        },
+        {
+          "id": "source",
+          "value": "ohlc4"
+        },
+        {
+          "id": "multiplier",
+          "value": 2
+        },
+        {
+          "id": "changeATR",
+          "value": false
+        },
+        {
+          "id": "showsignals",
+          "value": true
+        },
+        {
+          "id": "highlighting",
+          "value": true
+        }
+      ]
+    },
+    {
+      "name": "守望 Python SUPERTREND_PINE_V1",
+      "inputs": [
+        {
+          "id": "period",
+          "value": 10
+        },
+        {
+          "id": "source",
+          "value": "hl2"
+        },
+        {
+          "id": "multiplier",
+          "value": 3
+        },
+        {
+          "id": "changeATR",
+          "value": true
+        },
+        {
+          "id": "showsignals",
+          "value": false
+        },
+        {
+          "id": "highlighting",
+          "value": false
+        }
+      ]
+    }
+  ],
+  "logout_verified": true,
+  "single_chart_fixture": "Sanitized isolated acceptance chart state loaded only in production browser memory; main series changed to actual production MWP:EURUSD D1",
+  "screenshots_manually_inspected": true
+}

@@ -1,0 +1,14 @@
+{
+  "database": {
+    "path": "/mnt/user/backup/market-watch/alerts-20261012T122947693583Z.dump",
+    "bytes": 1032356057,
+    "sha256": "81226d36a4cd2eb0fb4c71ec0a2ac0e36d2960a21099d4e1d6beb6cebc3b150c"
+  },
+  "configuration": {
+    "path": "/mnt/user/backup/market-watch/config-20261012T123157Z-h6D5R6.tar.gz",
+    "bytes": 123693718,
+    "sha256": "5f6ce3c7395c60d1b4a4fd289b28d441d1baa234734420760d3236255d02604e"
+  },
+  "rollback_entry": "bash deploy/supertrend-v1.23.0-switch-20261012/rollback.sh",
+  "production_db_overwritten": false
+}

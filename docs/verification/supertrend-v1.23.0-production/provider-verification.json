@@ -1,0 +1,43 @@
+{
+  "passed": true,
+  "at": 1791809886022,
+  "oanda": [
+    {
+      "logical_symbol": "EURUSD",
+      "quality": "healthy",
+      "connection": "connected",
+      "connection_epoch": 420,
+      "heartbeat_at": 1791809881877,
+      "last_confirmed_m1": 1791809820000,
+      "recovery_ready": true,
+      "error": null,
+      "market_session": "scheduled_open",
+      "calendar_verified": true,
+      "authentication_hold": false,
+      "connection_error": null,
+      "quote_age_ms": 1702,
+      "quote_ready": true,
+      "candle_ready": true
+    },
+    {
+      "logical_symbol": "XAUUSD",
+      "quality": "healthy",
+      "connection": "connected",
+      "connection_epoch": 420,
+      "heartbeat_at": 1791809881877,
+      "last_confirmed_m1": 1791809820000,
+      "recovery_ready": true,
+      "error": null,
+      "market_session": "scheduled_open",
+      "calendar_verified": true,
+      "authentication_hold": false,
+      "connection_error": null,
+      "quote_age_ms": 1059,
+      "quote_ready": true,
+      "candle_ready": true
+    }
+  ],
+  "yahoo_enabled": true,
+  "desired_targets_preserved": true,
+  "existing_composite_limit": "existing composite data may remain waiting; no complete composite-chain acceptance claimed"
+}
