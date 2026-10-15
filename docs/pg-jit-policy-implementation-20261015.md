@@ -28,6 +28,8 @@
 postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
 ```
 
+评估脚本的 Compose 也纳入同一镜像和 healthcheck 检查，其应用不设置连接门禁：`measure.py` 自行核验版本／JIT 能力，避免在内存对照连接中预加载 LLVM。
+
 数据库 healthcheck 除 readiness 外，实际检查 `server_version_num=140024`、`pg_jit_available()`。应用验收入口显式设置 `ALERTS_DATABASE_EXPECTED_VERSION=140024`，实际新连接版本不符时失败，配置该门禁却指向 SQLite 也失败。该选项不用于生产或旧版回滚。
 
 PG14 的 `pg_jit_available()` 会在当前 jit=off 时返回 false，因此验收探测会临时 on，检查 provider 后恢复继承值，再应用显式模式。这会加载 LLVM，仅是验收门禁；不将 false 误报为当前镜像不支持 JIT。
@@ -42,7 +44,7 @@ PG14 的 `pg_jit_available()` 会在当前 jit=off 时返回 false，因此验�
 
 - 新配置／连接测试：**27 passed**。真实连接验证三态、布尔兼容、URL 与环境参数保留、pool rollback、错误版本拒绝、能力探测后恢复 off；未使用虚假的 SQLAlchemy SQLite 连接来代替 PG 行为。
 - 加上既有 PG 并发通知、覆盖／聚合与组合聚合契约：**42 passed**，无跳过。真实通知投递关闭。
-- 部署配置及生命周期：**62 passed，35 subtests passed**。实际 Docker Compose 展开检查 PG 固定镜像／门禁、生产默认 off、指定服务覆盖、Yahoo 保持启用、新 PG14 卷与旧 PG17 卷隔离。展开时仅移除私有 env_file 输入，不读取真实凭据。
+- 部署配置及生命周期：**62 passed，36 subtests passed**。实际 Docker Compose 展开检查 PG 固定镜像／门禁、生产默认 off、指定服务覆盖、Yahoo 保持启用、新 PG14 卷与旧 PG17 卷隔离。展开时仅移除私有 env_file 输入，不读取真实凭据。
 - Ruff、shell 语法与 diff whitespace 检查通过。
 
 原始输出、源文件摘要和测试镜像 ID 见 [验证证据](verification/pg-jit-policy-20261015/summary.json)。旧 JIT 性能及内存数据保留在评估报告中，本轮不将 1000 次短测视为长期内存稳定性证明。

@@ -11,6 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 PINNED_PG = 'postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872'
+BENCHMARK_COMPOSE = Path('scripts/pg_jit_reassessment/compose.yaml')
 
 
 @unittest.skipUnless(shutil.which('docker'), 'Requires Docker Compose CLI')
@@ -34,8 +35,8 @@ class DatabaseComposeTests(unittest.TestCase):
                     values[name] = f'market-watch-{component}:fixture'
                 elif name.endswith('PORT'):
                     values[name] = '18000'
-                elif name.endswith(('DIR', 'ENV')):
-                    values[name] = directory if name.endswith('DIR') else str(fixture)
+                elif name.endswith(('DIR', 'ENV')) or name == 'MW_JIT_RESULTS':
+                    values[name] = str(fixture) if name.endswith('ENV') else directory
                 elif 'DATABASE_URL' in name or name == 'TEST_POSTGRES_URL':
                     values[name] = 'postgresql+psycopg://fixture@postgres/fixture'
                 else:
@@ -68,6 +69,7 @@ class DatabaseComposeTests(unittest.TestCase):
 
     def test_maintained_acceptance_databases_and_connections_use_pg1424(self):
         candidates = list(ROOT.glob('compose*.yaml')) + list((ROOT/'deploy/ubuntu').glob('*.yaml')) + list((ROOT/'deploy/native-update').glob('*.yaml'))
+        candidates.append(ROOT / BENCHMARK_COMPOSE)
         entries = [[p.relative_to(ROOT)] for p in candidates if 'image: postgres:' in p.read_text()]
         entries.extend([[Path('compose.acceptance.yaml')],
                         [Path('deploy/native-update/compose.tests.yaml'),Path('deploy/native-update/compose.acceptance.yaml')]])
@@ -83,6 +85,12 @@ class DatabaseComposeTests(unittest.TestCase):
                         self.assertIn('140024',health)
                         self.assertIn('pg_jit_available()',health)
                     if image.startswith('market-watch-api:') and 'sink' not in name:
+                        if paths == [BENCHMARK_COMPOSE] and name == 'assessment':
+                            # measure.py gates the actual version/provider itself;
+                            # a connect probe would preload LLVM into RSS controls.
+                            self.assertNotIn('ALERTS_DATABASE_EXPECTED_VERSION',service['environment'])
+                            self.assertIn('/workspace/scripts/pg_jit_reassessment/measure.py',service['command'])
+                            continue
                         self.assertEqual(service['environment'].get('ALERTS_DATABASE_EXPECTED_VERSION'),'140024',name)
 
     def test_production_defaults_off_even_with_generic_inherit_setting(self):
