@@ -17,6 +17,22 @@ jobs:
     name: backend
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    env:
+      TEST_POSTGRES_URL: postgresql+psycopg://ci:ci@127.0.0.1:5432/ci
+    services:
+      postgres:
+        image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+        env:
+          POSTGRES_DB: ci
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d ci"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
     steps:
       - name: Check out source
         uses: actions/checkout@v4
