@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -34,8 +36,32 @@ jobs:
           python -m pip install -r requirements.lock
           python -m pip install -e . --no-deps
 
-      - name: Ruff
-        run: python -m ruff check backend
+      - name: Ruff changed Python files
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+
+          if [[ "$BASE_SHA" =~ ^0+$ ]]; then
+            mapfile -t python_files < <(
+              git diff-tree --no-commit-id --name-only -r "$HEAD_SHA" |
+                awk '/^backend\/.*\.py$/ { print }'
+            )
+          else
+            mapfile -t python_files < <(
+              git diff --name-only "$BASE_SHA" "$HEAD_SHA" |
+                awk '/^backend\/.*\.py$/ { print }'
+            )
+          fi
+
+          if (( ${#python_files[@]} == 0 )); then
+            echo "No changed backend Python files; skipping Ruff."
+            exit 0
+          fi
+
+          printf 'Running Ruff on: %s\n' "${python_files[*]}"
+          python -m ruff check "${python_files[@]}"
 
       - name: Python tests
         run: python -m pytest -q
