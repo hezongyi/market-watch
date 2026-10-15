@@ -661,9 +661,10 @@
   },
   "ci_baseline_repair": {
     "commit": "3b502eb8e159d51c8a05416c34c5ba8482987a15",
-    "github_run": "38818643314",
-    "status": "backend_pending",
+    "github_run": "38819011830",
+    "status": "backend_green",
     "previous_backend": "31 failed, 2364 passed, 11 skipped",
-    "targeted": "migration/provider_calculation/history_replay/composite_recovery/worker_health/market_demand barriers covered"
+    "targeted": "migration/provider_calculation/history_replay/composite_recovery/worker_health/market_demand barriers covered",
+    "result": "2395 passed, 11 skipped, 50 warnings"
   }
 }

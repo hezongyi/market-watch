@@ -197,4 +197,4 @@ test_market_demand_postgres.py::test_same_key_first_registration_commits_both_re
 test_health.py::test_catalog_fault_does_not_stop_import_or_report_false_success: 1 passed
 ```
 
-此前 PR CI 的 31 项失败已逐项覆盖：迁移 head、provider chart calculation、组合恢复、worker health、history replay 兼容 seam，以及 market-demand PostgreSQL 并发 barrier。新的 GitHub Actions 全量 backend run `38818643314` 正在执行，最终状态以该 run 为准；生产切换、正式 tag 和部署仍未执行。
+此前 PR CI 的 31 项失败已逐项覆盖：迁移 head、provider chart calculation、组合恢复、worker health、history replay 兼容 seam，以及 market-demand PostgreSQL 并发 barrier。GitHub Actions 全量 backend run `38819011830` 已通过（`2395 passed, 11 skipped, 50 warnings`，约 11 分 57 秒），Web 和 Compose 同样通过；生产切换、正式 tag 和部署仍未执行。
