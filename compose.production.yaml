@@ -4,17 +4,20 @@ name: market-watch
 x-app: &app
   image: ${MW_API_IMAGE:?Set the immutable api release image}
   env_file: .env
-  environment:
+  environment: &app-environment
     ALERTS_YAHOO_ENABLED: "true"
     ALERTS_DATABASE_POOL_SIZE: "2"
     ALERTS_DATABASE_MAX_OVERFLOW: "0"
-    ALERTS_DATABASE_JIT: "false"
+    ALERTS_DATABASE_JIT: ${MW_PRODUCTION_DATABASE_JIT:-off}
   restart: unless-stopped
 services:
   migrate:
     image: ${MW_API_IMAGE:?Set the immutable api release image}
     <<: *app
     command: ["alembic", "upgrade", "head"]
+    environment:
+      <<: *app-environment
+      ALERTS_DATABASE_JIT: ${MW_MIGRATE_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
     restart: "no"
   api:
     <<: *app
@@ -24,7 +27,7 @@ services:
       ALERTS_OANDA_STREAM_ENABLED: "true"
       ALERTS_DATABASE_POOL_SIZE: "2"
       ALERTS_DATABASE_MAX_OVERFLOW: "0"
-      ALERTS_DATABASE_JIT: "false"
+      ALERTS_DATABASE_JIT: ${MW_API_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
       ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-api
       ALERTS_HISTORY_HEALTH_WORKERS: '["history_versions","chart_history","native_history"]'
     depends_on:
@@ -43,7 +46,7 @@ services:
       ALERTS_DELIVERY_ENABLED: "false"
       ALERTS_DATABASE_POOL_SIZE: "2"
       ALERTS_DATABASE_MAX_OVERFLOW: "0"
-      ALERTS_DATABASE_JIT: "false"
+      ALERTS_DATABASE_JIT: ${MW_REALTIME_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
       ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-realtime
     depends_on:
       api: {condition: service_healthy}
@@ -55,7 +58,7 @@ services:
       ALERTS_DELIVERY_ENABLED: "false"
       ALERTS_DATABASE_POOL_SIZE: "2"
       ALERTS_DATABASE_MAX_OVERFLOW: "0"
-      ALERTS_DATABASE_JIT: "false"
+      ALERTS_DATABASE_JIT: ${MW_CHART_HISTORY_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
       ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-history
     depends_on:
       api: {condition: service_healthy}
@@ -67,7 +70,7 @@ services:
       ALERTS_DELIVERY_ENABLED: "false"
       ALERTS_DATABASE_POOL_SIZE: "2"
       ALERTS_DATABASE_MAX_OVERFLOW: "0"
-      ALERTS_DATABASE_JIT: "false"
+      ALERTS_DATABASE_JIT: ${MW_CHART_AGGREGATION_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
       ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-aggregation
     depends_on:
       api: {condition: service_healthy}
@@ -79,7 +82,7 @@ services:
       ALERTS_DELIVERY_ENABLED: "false"
       ALERTS_DATABASE_POOL_SIZE: "2"
       ALERTS_DATABASE_MAX_OVERFLOW: "0"
-      ALERTS_DATABASE_JIT: "false"
+      ALERTS_DATABASE_JIT: ${MW_NATIVE_HISTORY_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
       ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-native-history
     depends_on:
       api: {condition: service_healthy}
@@ -91,7 +94,7 @@ services:
       ALERTS_DELIVERY_ENABLED: "false"
       ALERTS_DATABASE_POOL_SIZE: "2"
       ALERTS_DATABASE_MAX_OVERFLOW: "0"
-      ALERTS_DATABASE_JIT: "false"
+      ALERTS_DATABASE_JIT: ${MW_HISTORY_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
       ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-history-versions
     depends_on:
       api: {condition: service_healthy}
@@ -103,7 +106,7 @@ services:
       ALERTS_DELIVERY_ENABLED: "false"
       ALERTS_DATABASE_POOL_SIZE: "2"
       ALERTS_DATABASE_MAX_OVERFLOW: "0"
-      ALERTS_DATABASE_JIT: "false"
+      ALERTS_DATABASE_JIT: ${MW_COMPOSITE_AGGREGATE_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
       ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-composite
     depends_on:
       api: {condition: service_healthy}
@@ -117,7 +120,7 @@ services:
       ALERTS_OANDA_RESIDENT_SYMBOLS: "EUR_USD,XAU_USD"
       ALERTS_DATABASE_POOL_SIZE: "2"
       ALERTS_DATABASE_MAX_OVERFLOW: "0"
-      ALERTS_DATABASE_JIT: "false"
+      ALERTS_DATABASE_JIT: ${MW_PRICING_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
       ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-pricing
     depends_on:
       api: {condition: service_healthy}
@@ -129,13 +132,16 @@ services:
       ALERTS_DELIVERY_ENABLED: "false"
       ALERTS_DATABASE_POOL_SIZE: "2"
       ALERTS_DATABASE_MAX_OVERFLOW: "0"
-      ALERTS_DATABASE_JIT: "false"
+      ALERTS_DATABASE_JIT: ${MW_MARKET_STREAM_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
       ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-stream
     depends_on:
       api: {condition: service_healthy}
   notify-worker:
     <<: *app
     command: ["python", "-m", "alerts.notify"]
+    environment:
+      <<: *app-environment
+      ALERTS_DATABASE_JIT: ${MW_NOTIFY_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
     depends_on:
       api: {condition: service_healthy}
   web:
@@ -154,6 +160,8 @@ services:
     environment:
       ALERTS_POSTGRES_BIN_DIR: /usr/local/bin
       ALERTS_DELIVERY_ENABLED: "false"
+      ALERTS_YAHOO_ENABLED: "true"
+      ALERTS_DATABASE_JIT: ${MW_BACKUP_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
     volumes: ["/mnt/user/backup/market-watch:/backups"]
     profiles: [maintenance]
     restart: "no"

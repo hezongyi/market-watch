@@ -2,17 +2,19 @@
 name: mw-chart-maximize-20261007
 services:
   pg:
-    image: postgres:14-bookworm
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
     environment:
       POSTGRES_DB: chart_maximize
       POSTGRES_USER: chart_maximize
       POSTGRES_PASSWORD: ${MAXIMIZE_DB_PASSWORD:?Run scripts/prepare_chart_maximize_acceptance.py}
     volumes: [maximize-pg:/var/lib/postgresql/data]
     healthcheck:
-      test: [CMD-SHELL, pg_isready -U chart_maximize]
+      test: [CMD-SHELL, "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\" && test \"$$(PGOPTIONS='-c jit=on' psql -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\" -Atqc \"SELECT current_setting('server_version_num') = '140024' AND pg_jit_available()\")\" = t"]
       interval: 2s
       retries: 30
   migrate:
+    environment:
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
     build: .
     image: market-watch-api:chart-maximize-v1121-20261007
     command: [alembic, upgrade, head]
@@ -22,6 +24,8 @@ services:
     depends_on:
       pg: {condition: service_healthy}
   seed:
+    environment:
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
     image: market-watch-api:chart-maximize-v1121-20261007
     command: [python, /fixtures/seed.py]
     env_file:
@@ -31,6 +35,8 @@ services:
     depends_on:
       migrate: {condition: service_completed_successfully}
   api:
+    environment:
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
     image: market-watch-api:chart-maximize-v1121-20261007
     env_file:
       - path: /tmp/mw-chart-maximize-20261007/api.env

@@ -2,6 +2,16 @@
 
 本工具只连接 Ubuntu 本机 `/var/run/docker.sock`。Unraid仍为生产环境，不使用本工具创建开发/验收实例。所有构建明确指定专用 `market-watch-ubuntu` builder。
 
+## PostgreSQL 验收基线
+
+维护中的开发和验收 Compose 使用 PostgreSQL 14.24，固定引用 `postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872`。数据库 healthcheck 实际查询 `server_version_num=140024` 和 JIT provider；不只依赖 `pg_isready` 或镜像标签。应用侧设置 `ALERTS_DATABASE_EXPECTED_VERSION=140024` 后，每个新连接也检查实际服务器版本与 JIT 能力；SQLite 或其他版本会拒绝连接。基线更新必须同步 Compose、检查值及工具镜像白名单，不能自动跟随可变标签。
+
+`pg_jit_available()` 在当前连接 `jit=off` 时也返回 false。验收检查会临时允许 JIT 探测 provider，再恢复连接的继承或显式策略；这一探测会加载 LLVM，仅用于验收。生产和旧版本回滚不配置 `ALERTS_DATABASE_EXPECTED_VERSION`。
+
+根 `compose.yaml` 的新默认数据库使用 **postgres14-data**，不复用此前 PG17 的 **postgres-data**。已有 PG17 容器和 volume 保留，不执行原地降级；PG17 兼容性测试使用明确的单独配置与新任务，不作为当前验收默认值。请按既有规则给每次验收指定新的 project。
+
+JIT 应用默认 `inherit`，可选 `on` / `off`，兼容旧 `true` / `false`。继承会保留数据库、角色、URL 和 `PGOPTIONS` 的设置；显式模式仅改变该应用连接的 JIT，不覆盖已有 `search_path`、`statement_timeout` 等参数。配置及连接回归入口见 [JIT 策略交付](../../docs/pg-jit-policy-implementation-20261015.md)。
+
 ## 已安装组件
 
 - 用户级 Buildx：`~/.docker/cli-plugins/docker-buildx`（Ubuntu官方 `docker-buildx`包）。
@@ -53,7 +63,7 @@ mw-docker retire --task mw-issue42 --project mw-issue42
 mw-docker retire --task mw-issue42 --project mw-issue42 --apply
 ```
 
-只支持由本工具登记、镜像归属匹配的acceptance项目，以及单个本项目拥有的PG14数据volume。数据库支持 `postgres:14-bookworm` / `postgres:14` 引用及其 `docker.io/library/` 别名，但必须核对容器实际镜像 ID，以及已审查的官方 RepoDigest `postgres@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872`；仅有 tag 或来自其他仓库的同名 digest 不足以通过。Compose service 可叫 `pg`，不依赖必须命名 `postgres`。TLS service 使用共享的 `nginx:1.28-alpine` 时，也必须核对固定官方 manifest digest 和容器实际镜像 ID。PG/TLS 共享基础镜像不得带 `io.market-watch.*` 任务或发布归属标签；仅移除本项目容器，共享基础镜像保留。基础镜像更新后，未知 digest 会拒绝退役，需审查并更新允许的 digest 后重试。应用镜像仍要求 managed、task、project、acceptance 用途全部匹配；所有镜像检查读取容器实际 ID，不信任可变 tag。归档私有inspect、配置和bind材料，停止应用写入，导出所有非template库及全局角色；在该Ubuntu PG上新建临时库实际恢复，核对所有public表行数和来源稳定性。恢复检查覆盖所有非系统schema的表行数及排序后JSON内容SHA256，来源库也再次核对，避免同数异内容或独立故障schema漏验。成功后重新核对容器、卷、网络和其他引用，删除明确资源，再登记task完成和删除无引用任务镜像。
+只支持由本工具登记、镜像归属匹配的acceptance项目，以及单个本项目拥有的PG14数据volume。数据库支持固定的 `postgres:14.24-bookworm@sha256:…`，也兼容旧 `postgres:14-bookworm` / `postgres:14` 引用及其 `docker.io/library/` 别名，但必须核对容器实际镜像 ID，以及已审查的官方 RepoDigest `postgres@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872`；仅有 tag 或来自其他仓库的同名 digest 不足以通过。Compose service 可叫 `pg`，不依赖必须命名 `postgres`。TLS service 使用共享的 `nginx:1.28-alpine` 时，也必须核对固定官方 manifest digest 和容器实际镜像 ID。PG/TLS 共享基础镜像不得带 `io.market-watch.*` 任务或发布归属标签；仅移除本项目容器，共享基础镜像保留。基础镜像更新后，未知 digest 会拒绝退役，需审查并更新允许的 digest 后重试。应用镜像仍要求 managed、task、project、acceptance 用途全部匹配；所有镜像检查读取容器实际 ID，不信任可变 tag。归档私有inspect、配置和bind材料，停止应用写入，导出所有非template库及全局角色；在该Ubuntu PG上新建临时库实际恢复，核对所有public表行数和来源稳定性。恢复检查覆盖所有非系统schema的表行数及排序后JSON内容SHA256，来源库也再次核对，避免同数异内容或独立故障schema漏验。成功后重新核对容器、卷、网络和其他引用，删除明确资源，再登记task完成和删除无引用任务镜像。
 
 共享卷、外部卷、非PG卷、bind数据库和外部数据库需要单独审查，不自动删除。验证失败保留卷；删除容器前失败会尝试重启原先运行的容器。归档位于`~/.local/share/market-watch-docker/archives/`，权限0700；包含角色凭据及env，严禁提交仓库。
 
@@ -73,7 +83,7 @@ mw-docker cleanup --task mw-issue42 --apply  # 精确引用，无force
 
 ## 定时任务和本地告警
 
-首次安装（Ubuntu amd64，已有`postgres:14-bookworm`基础镜像；从Ubuntu包及SHA256固定的官方Moby发布包准备组件）：
+首次安装（Ubuntu amd64，已有上述固定 PG14.24 基础镜像；从Ubuntu包及SHA256固定的官方Moby发布包准备组件）：
 
 ```bash
 bash deploy/ubuntu/bootstrap-builder.sh

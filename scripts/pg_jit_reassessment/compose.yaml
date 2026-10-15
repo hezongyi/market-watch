@@ -1,7 +1,8 @@
+# Local PG14 baseline uses a new volume; existing PG17 postgres-data is never reused.
 name: mw-pg-jit-reassessment-20261015
 services:
   postgres:
-    image: postgres:14-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
     environment:
       POSTGRES_DB: jit_assessment
       POSTGRES_USER: assessment
@@ -36,7 +37,7 @@ services:
       postgres: {condition: service_healthy}
     command: [python, /workspace/scripts/pg_jit_reassessment/measure.py]
 volumes:
-  postgres-data:
+  postgres14-data:
 networks:
   default:
     internal: true

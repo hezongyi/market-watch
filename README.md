@@ -32,6 +32,8 @@ Android APK 的个人使用、低维护选型与手机界面分析见 [讨论与
 
 Ubuntu为开发机，`.env`使用独立开发库，真实手机投递关闭。生产沿用已测试的ntfy.sh主题。凭据存放在受限文件中，不提交Git，也不通过网站提供。
 
+生产 PostgreSQL 已只读核实为 14.24；Market Watch 数据库和角色保留临时 `jit=off`。源码的应用默认策略为继承，可按服务显式开启或关闭。Ubuntu 开发／验收统一固定 PG14.24，根 Compose 使用新的 `postgres14-data`，不复用旧 PG17 数据目录。实现、验证和生产后续灰度范围见 [JIT 策略交付](docs/pg-jit-policy-implementation-20261015.md)。
+
 使用方法见[操作指南](docs/operating-guide.md)，版本、升级与回退见[Unraid部署](deploy/remote-docker.md)。
 
 ## 指标预警

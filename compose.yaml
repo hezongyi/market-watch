@@ -1,14 +1,15 @@
+# Local PG14 baseline uses a new volume; existing PG17 postgres-data is never reused.
 name: trading-alerts
 services:
   postgres:
-    image: postgres:17-alpine
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
     environment:
       POSTGRES_DB: alerts
       POSTGRES_USER: alerts
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
-    volumes: ["postgres-data:/var/lib/postgresql/data"]
+    volumes: ["postgres14-data:/var/lib/postgresql/data"]
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U alerts"]
+      test: [CMD-SHELL, "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\" && test \"$$(PGOPTIONS='-c jit=on' psql -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\" -Atqc \"SELECT current_setting('server_version_num') = '140024' AND pg_jit_available()\")\" = t"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -19,6 +20,7 @@ services:
     env_file: .env
     environment:
       ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
     depends_on:
       postgres: {condition: service_healthy}
   api:
@@ -26,6 +28,7 @@ services:
     env_file: .env
     environment:
       ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
       ALERTS_COOKIE_SECURE: "true"
       ALERTS_HISTORY_HEALTH_WORKERS: '["legacy_import"]'
     depends_on:
@@ -43,6 +46,7 @@ services:
     env_file: .env
     environment:
       ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
     depends_on:
       api: {condition: service_healthy}
     restart: unless-stopped
@@ -52,6 +56,7 @@ services:
     env_file: .env
     environment:
       ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
     depends_on:
       api: {condition: service_healthy}
     restart: unless-stopped
@@ -61,6 +66,7 @@ services:
     env_file: .env
     environment:
       ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
     depends_on:
       api: {condition: service_healthy}
     restart: unless-stopped
@@ -70,6 +76,7 @@ services:
     env_file: .env
     environment:
       ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
     depends_on:
       api: {condition: service_healthy}
     restart: unless-stopped
@@ -80,4 +87,4 @@ services:
       api: {condition: service_healthy}
     restart: unless-stopped
 volumes:
-  postgres-data:
+  postgres14-data:

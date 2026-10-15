@@ -2,17 +2,19 @@
 name: mw-native-alert-ui-runtime
 services:
   pg:
-    image: postgres:14-bookworm
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
     environment:
       POSTGRES_DB: native_alert_ui
       POSTGRES_USER: native_alert_ui
       POSTGRES_PASSWORD: ${MW_NATIVE_ALERT_UI_DB_PASSWORD:?Run prepare_native_alert_ui_acceptance.py}
     volumes: ["native-alert-ui-runtime-pg:/var/lib/postgresql/data"]
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U native_alert_ui"]
+      test: [CMD-SHELL, "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\" && test \"$$(PGOPTIONS='-c jit=on' psql -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\" -Atqc \"SELECT current_setting('server_version_num') = '140024' AND pg_jit_available()\")\" = t"]
       interval: 2s
       retries: 30
   migrate:
+    environment:
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
     build: .
     image: market-watch-api:native-alert-ui-runtime
     command: ["alembic", "upgrade", "head"]
@@ -22,6 +24,8 @@ services:
     depends_on:
       pg: {condition: service_healthy}
   api:
+    environment:
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
     image: market-watch-api:native-alert-ui-runtime
     env_file:
       - path: /tmp/mw-native-alert-ui-runtime/api.env
@@ -33,6 +37,8 @@ services:
       interval: 3s
       retries: 30
   market-worker:
+    environment:
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
     image: market-watch-api:native-alert-ui-runtime
     command: ["python", "-m", "alerts.market", "--instrument", "BTCUSDT"]
     env_file:
@@ -41,6 +47,8 @@ services:
     depends_on:
       migrate: {condition: service_completed_successfully}
   market-stream-worker:
+    environment:
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
     image: market-watch-api:native-alert-ui-runtime
     command: ["python", "-m", "alerts.market_stream_worker"]
     env_file:
@@ -49,6 +57,8 @@ services:
     depends_on:
       migrate: {condition: service_completed_successfully}
   history-worker:
+    environment:
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
     image: market-watch-api:native-alert-ui-runtime
     command: ["python", "-m", "alerts.native_history_loads"]
     env_file:
@@ -57,6 +67,8 @@ services:
     depends_on:
       migrate: {condition: service_completed_successfully}
   managed-history-worker:
+    environment:
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
     image: market-watch-api:native-alert-ui-runtime
     command: ["python", "-m", "alerts.chart_history_worker"]
     env_file:
@@ -65,6 +77,8 @@ services:
     depends_on:
       api: {condition: service_healthy}
   aggregation-worker:
+    environment:
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
     image: market-watch-api:native-alert-ui-runtime
     command: ["python", "-m", "alerts.chart_aggregation_worker"]
     env_file:
@@ -109,6 +123,7 @@ services:
       - path: /tmp/mw-native-alert-ui-runtime/api.env
         format: raw
     environment:
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
       ALERTS_DELIVERY_ENABLED: "true"
       ALERTS_NTFY_URL: http://notification-sink:8080
       ALERTS_NTFY_TOPIC: native-alert-ui-runtime-fixture

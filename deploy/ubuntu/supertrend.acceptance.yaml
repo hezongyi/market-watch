@@ -2,7 +2,7 @@
 name: mw-supertrend-20261012
 services:
   postgres:
-    image: postgres:14-bookworm
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
     restart: "no"
     environment:
       POSTGRES_DB: supertrend
@@ -11,7 +11,7 @@ services:
     ports: ["127.0.0.1:20190:5432"]
     volumes: ["postgres-data:/var/lib/postgresql/data"]
     healthcheck:
-      test: [CMD-SHELL, "pg_isready -U supertrend -d supertrend"]
+      test: [CMD-SHELL, "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\" && test \"$$(PGOPTIONS='-c jit=on' psql -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\" -Atqc \"SELECT current_setting('server_version_num') = '140024' AND pg_jit_available()\")\" = t"]
       interval: 3s
       timeout: 3s
       retries: 20
@@ -21,6 +21,7 @@ services:
     command: [alembic, upgrade, head]
     environment: &backend-env
       ALERTS_DATABASE_URL: postgresql+psycopg://supertrend:${MW_ACCEPTANCE_DB_PASSWORD}@postgres/supertrend
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
       ALERTS_COOKIE_SECURE: "false"
       ALERTS_ADMIN_PASSWORD_HASH: ${MW_BACKEND_LOGIN_HASH:?Set an acceptance-only login hash}
       ALERTS_DELIVERY_ENABLED: "false"

@@ -6,6 +6,7 @@ x-api: &api
     - path: ${MW_SWING_PRIVATE_DIR:?Run prepare-swing-sr.py}/api.env
       format: raw
   environment:
+    ALERTS_DATABASE_EXPECTED_VERSION: "140024"
     ALERTS_DATABASE_APPLICATION_NAME: mw-swing-sr-20261012
     ALERTS_DELIVERY_ENABLED: "false"
     ALERTS_YAHOO_ENABLED: "false"
@@ -14,14 +15,14 @@ x-api: &api
   restart: "no"
 services:
   postgres:
-    image: postgres:14-bookworm
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
     env_file:
       - path: ${MW_SWING_PRIVATE_DIR}/postgres.env
         format: raw
     volumes: [swing-postgres:/var/lib/postgresql/data]
     networks: [swing]
     healthcheck:
-      test: [CMD-SHELL, pg_isready -U swing -d swing]
+      test: [CMD-SHELL, "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\" && test \"$$(PGOPTIONS='-c jit=on' psql -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\" -Atqc \"SELECT current_setting('server_version_num') = '140024' AND pg_jit_available()\")\" = t"]
       interval: 3s
       timeout: 3s
       retries: 30
@@ -52,6 +53,7 @@ services:
     <<: *api
     profiles: [verification]
     environment:
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
       PYTHONPATH: /app/backend:/verification/backend/tests
       ALERTS_DATABASE_APPLICATION_NAME: mw-swing-sr-20261012
       ALERTS_DELIVERY_ENABLED: "false"

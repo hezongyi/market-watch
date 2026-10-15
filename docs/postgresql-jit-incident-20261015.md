@@ -2,7 +2,7 @@
 
 ## 结论
 
-Unraid 上原 `postgresql14` 容器运行 PostgreSQL 14.10。故障发生在启动 Market Watch 构建后，持续聚合查询触发 PostgreSQL JIT 内联路径，后端进程内存持续增长，最终耗尽宿主机资源并导致 SSH/网络不可用。应用容器不会自动选择或升级 PostgreSQL；它通过 `ALERTS_DATABASE_URL` 连接独立的 Unraid 数据库容器。
+Unraid 上原 `postgresql14` 容器运行 PostgreSQL 14.10。故障发生在启动 Market Watch 构建后，持续聚合查询与宿主机资源耗尽、SSH/网络不可用同时出现。14.10 包含官方在 14.11 修复的 JIT 内联内存泄漏，因此关闭 JIT 和升级版本作为止血及修复措施。现有记录不包含足以证明唯一根因的完整进程采样，不把版本与症状吻合视为对全部因果链的证明。应用通过 `ALERTS_DATABASE_URL` 连接独立的 Unraid 数据库容器，应用升级不自动升级该数据库。
 
 ## 已完成的生产修复
 
@@ -18,7 +18,9 @@ Unraid 上原 `postgresql14` 容器运行 PostgreSQL 14.10。故障发生在启�
 
 ## 持久修复
 
-应用数据库连接新增 `ALERTS_DATABASE_JIT`，默认关闭，并在所有生产服务中显式设置为 `false`。备份客户端基线固定到已核验的 PostgreSQL 14.24 镜像，避免未来构建重新使用可变的 `postgres:14-bookworm` 标签。
+应用连接支持 `ALERTS_DATABASE_JIT=inherit|on|off`，默认继承，兼容旧布尔值。连接级覆盖不替换 URL 中其他 PostgreSQL options，且在连接池事务回滚后仍然有效。生产模板默认仍为 off，通过 `MW_PRODUCTION_DATABASE_JIT` 或各服务变量控制，当前生产数据库和角色关闭设置不自动撤销。
+
+维护中的 Ubuntu 开发／验收模板与备份客户端固定到已核验的 PostgreSQL 14.24 digest。验收同时校验实际服务端版本及 JIT provider，生产数据库仍独立维护。评估显示 JIT 收益因查询而异，短测不证明长期零内存增长，详见 [重新评估](pg-jit-reassessment-20261015.md) 和 [实施与验证](pg-jit-policy-implementation-20261015.md)。
 
 ## 回滚
 

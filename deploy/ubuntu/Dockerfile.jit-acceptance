@@ -1,0 +1,4 @@
+# Reuse verified dependencies; install this worktree's application code and tests.
+FROM market-watch-api:v1.25.4
+COPY backend /app/backend
+COPY backend/alerts /usr/local/lib/python3.11/site-packages/alerts

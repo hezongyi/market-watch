@@ -17,7 +17,7 @@ if ! run_docker buildx version >/dev/null 2>&1; then
   install -m 0755 "$plugin" "$HOME/.docker/cli-plugins/docker-buildx"
 fi
 if ! run_docker image inspect market-watch-buildkit:0.33.1-official >/dev/null 2>&1; then
-  run_docker image inspect postgres:14-bookworm >/dev/null
+  run_docker image inspect postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872 >/dev/null
   curl -fL --retry 2 --connect-timeout 15 --max-time 180 \
     -o "$bootstrap_dir/buildkit.tar.gz" \
     https://github.com/moby/buildkit/releases/download/v0.33.1/buildkit-v0.33.1.linux-amd64.tar.gz
@@ -25,7 +25,7 @@ if ! run_docker image inspect market-watch-buildkit:0.33.1-official >/dev/null 2
     "$bootstrap_dir/buildkit.tar.gz" | sha256sum --check
   tar -xzf "$bootstrap_dir/buildkit.tar.gz" -C "$bootstrap_dir"
   cat > "$bootstrap_dir/Dockerfile" <<'EOF'
-FROM postgres:14-bookworm
+FROM postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
 COPY bin/buildkitd bin/buildctl bin/buildkit-runc /usr/local/bin/
 ENTRYPOINT ["/usr/local/bin/buildkitd"]
 CMD []

@@ -23,6 +23,7 @@ BUILDER = "market-watch-ubuntu"
 PREFIX = "io.market-watch."
 STATE = Path.home() / ".local/share/market-watch-docker"
 DOCKER = ["/usr/bin/docker", "--host", "unix:///var/run/docker.sock"]
+PG14_IMAGE = "postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872"
 
 
 def now():
@@ -448,7 +449,7 @@ def retirement_postgres(container):
         return reference == container["Image"] and service in ("postgres", "pg")
     return bool(
         re.fullmatch(
-            r"(?:docker.io/library/)?postgres:14(?:-bookworm)?(?:@sha256:[a-f0-9]{64})?",
+            r"(?:docker.io/library/)?postgres:(?:14(?:-bookworm)?|14\.24-bookworm)(?:@sha256:[a-f0-9]{64})?",
             container["Config"]["Image"],
         )
     )
@@ -850,7 +851,7 @@ def storage_sizes(docker):
         "type=bind,src=/var/log,dst=/logs,readonly",
         "--entrypoint",
         "sh",
-        "postgres:14-bookworm",
+        PG14_IMAGE,
         "-c",
         cmd,
         check=False,

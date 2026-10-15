@@ -950,20 +950,48 @@ class Replay(Base):
 
 def make_engine(url):
     if url.startswith("sqlite"):
+        if settings.database_expected_version is not None:
+            raise RuntimeError('PostgreSQL acceptance version gate cannot use SQLite')
         engine = create_engine(url, connect_args={"check_same_thread": False})
     else:
-        jit = "on" if settings.database_jit else "off"
+        jit, expected_version = settings.database_jit, settings.database_expected_version
         engine = create_engine(
             url,
             pool_size=settings.database_pool_size,
             max_overflow=settings.database_max_overflow,
             pool_timeout=settings.database_pool_timeout,
             pool_pre_ping=True,
-            connect_args={
-                "application_name": settings.database_application_name,
-                "options": f"-c jit={jit}",
-            },
+            connect_args={"application_name": settings.database_application_name},
         )
+        if jit != 'inherit' or expected_version is not None:
+
+            @event.listens_for(engine, 'connect')
+            def configure_postgresql(dbapi, _):
+                # A session SET inside a transaction is undone by pool rollback.
+                # Preserve libpq URL/PGOPTIONS settings and persist only our SET.
+                autocommit = dbapi.autocommit
+                dbapi.autocommit = True
+                try:
+                    with dbapi.cursor() as cursor:
+                        if expected_version is not None:
+                            cursor.execute('SHOW server_version_num')
+                            actual_version = int(cursor.fetchone()[0])
+                            if actual_version != expected_version:
+                                raise RuntimeError('PostgreSQL version mismatch: '
+                                                   f'expected {expected_version}, got {actual_version}')
+                            cursor.execute('SHOW jit')
+                            inherited_jit = cursor.fetchone()[0]
+                            # pg_jit_available() returns false when jit=off.
+                            # Probe with JIT enabled, then restore the final policy.
+                            cursor.execute('SET SESSION jit=on')
+                            cursor.execute('SELECT pg_jit_available()')
+                            if not cursor.fetchone()[0]:
+                                raise RuntimeError('PostgreSQL JIT provider unavailable')
+                            cursor.execute(f'SET SESSION jit={inherited_jit}')
+                        if jit != 'inherit':
+                            cursor.execute(f'SET SESSION jit={jit}')
+                finally:
+                    dbapi.autocommit = autocommit
     if url.startswith("sqlite"):
 
         @event.listens_for(engine, "connect")
