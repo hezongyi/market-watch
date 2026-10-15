@@ -1,0 +1,166 @@
+{
+  "started_at": "2026-10-15T13:53:18.015325+00:00",
+  "host": "Ubuntu local Docker",
+  "checks": {
+    "both_ready_and_real_login": true,
+    "different_pg_containers_volumes_credentials": true,
+    "mw-delivery-r1-20261015/no_other_sentinel": true,
+    "mw-delivery-r1-20261015/postgres/network": true,
+    "mw-delivery-r1-20261015/postgres/limits_and_log_rotation": true,
+    "mw-delivery-r1-20261015/api/network": true,
+    "mw-delivery-r1-20261015/api/limits_and_log_rotation": true,
+    "mw-delivery-r1-20261015/tls/network": true,
+    "mw-delivery-r1-20261015/tls/limits_and_log_rotation": true,
+    "mw-delivery-r1-20261015/internal_backend_network": true,
+    "mw-delivery-r1-20261015/api_has_no_default_route": true,
+    "mw-delivery-r1-20261015/api_actual_cgroup_limits": true,
+    "mw-delivery-r1b-20261015/no_other_sentinel": true,
+    "mw-delivery-r1b-20261015/postgres/network": true,
+    "mw-delivery-r1b-20261015/postgres/limits_and_log_rotation": true,
+    "mw-delivery-r1b-20261015/api/network": true,
+    "mw-delivery-r1b-20261015/api/limits_and_log_rotation": true,
+    "mw-delivery-r1b-20261015/tls/network": true,
+    "mw-delivery-r1b-20261015/tls/limits_and_log_rotation": true,
+    "mw-delivery-r1b-20261015/internal_backend_network": true,
+    "mw-delivery-r1b-20261015/api_has_no_default_route": true,
+    "mw-delivery-r1b-20261015/api_actual_cgroup_limits": true,
+    "ordinary_restart_keeps_pg_container_volume_credentials": true,
+    "ordinary_restart_keeps_user_write": true,
+    "reset_without_apply_changes_no_private_files": true,
+    "reset_keeps_pg_volume_credentials": true,
+    "reset_uses_new_database": true,
+    "new_database_has_no_old_user_write": true,
+    "old_database_still_has_user_write": true,
+    "other_instance_unchanged_after_stop_restart_reset": true,
+    "real_restore_all_business_table_counts_and_contents_match": true,
+    "mw-delivery-r1-20261015/pg_schema_fixture": true,
+    "mw-delivery-r1b-20261015/pg_schema_fixture": true,
+    "mw-delivery-r1-20261015/real_reprepare_preserves_credentials": true,
+    "mw-delivery-r1b-20261015/real_reprepare_preserves_credentials": true
+  },
+  "actions_seconds": {
+    "mw-delivery-r1-20261015/stop": 3.467,
+    "mw-delivery-r1-20261015/up": 28.89,
+    "mw-delivery-r1-20261015/reset": 0.684,
+    "mw-delivery-r1-20261015/reset/apply": 37.263
+  },
+  "restore": {
+    "database": "preview_restore_1792072478",
+    "table_count": 90,
+    "dump_bytes": 354416,
+    "dump_sha256": "bf3d47f16592142dac18a0461c1ad621e3d0b948d6cf717cfd06b8dd6e50d78d",
+    "all_table_counts_and_contents_match": true,
+    "retained_privately": true,
+    "own_writers_stopped_during_dump_and_comparison": true
+  },
+  "instances": [
+    {
+      "project": "mw-delivery-r1-20261015",
+      "url": "http://localhost:18861",
+      "database": "preview_43cec836e24b",
+      "dataset": "d1-v1-ef528135a493",
+      "pg_volume": "mw-delivery-r1-20261015_postgres-data",
+      "metrics": {
+        "pg_version": "140024",
+        "jit": "on",
+        "jit_provider": true,
+        "schema_revision": "au48_display_indicator_tasks",
+        "database_bytes": 16108891,
+        "candles": 5760,
+        "published_bars": 5760,
+        "enabled_instruments": 0
+      },
+      "containers": [
+        {
+          "service": "postgres",
+          "image_id": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+          "healthy": true,
+          "restart_count": 0,
+          "oom_killed": false
+        },
+        {
+          "service": "api",
+          "image_id": "sha256:161a627e5310a67de27303750e9d4b05547b6faa99a958f55c07c401f8dcd102",
+          "healthy": true,
+          "restart_count": 0,
+          "oom_killed": false
+        },
+        {
+          "service": "tls",
+          "image_id": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+          "healthy": true,
+          "restart_count": 0,
+          "oom_killed": false
+        }
+      ],
+      "api_source": {
+        "commit": "dfa0568ab43c16f19d78d6ed980fa203fcef2473",
+        "dirty": "true",
+        "task": "mw-delivery-r1-20261015",
+        "project": "mw-delivery-r1-20261015",
+        "purpose": "acceptance"
+      }
+    },
+    {
+      "project": "mw-delivery-r1b-20261015",
+      "url": "http://localhost:18862",
+      "database": "preview",
+      "dataset": "d1-v1-ef528135a493",
+      "pg_volume": "mw-delivery-r1b-20261015_postgres-data",
+      "metrics": {
+        "pg_version": "140024",
+        "jit": "on",
+        "jit_provider": true,
+        "schema_revision": "au48_display_indicator_tasks",
+        "database_bytes": 16141659,
+        "candles": 5760,
+        "published_bars": 5760,
+        "enabled_instruments": 0
+      },
+      "containers": [
+        {
+          "service": "postgres",
+          "image_id": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+          "healthy": true,
+          "restart_count": 0,
+          "oom_killed": false
+        },
+        {
+          "service": "api",
+          "image_id": "sha256:92077c95561cca4e1ad8a47a2ab7718e5b0912965ad68b5909d36bdb137ed07c",
+          "healthy": true,
+          "restart_count": 0,
+          "oom_killed": false
+        },
+        {
+          "service": "tls",
+          "image_id": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+          "healthy": true,
+          "restart_count": 0,
+          "oom_killed": false
+        }
+      ],
+      "api_source": {
+        "commit": "dfa0568ab43c16f19d78d6ed980fa203fcef2473",
+        "dirty": "true",
+        "task": "mw-delivery-r1b-20261015",
+        "project": "mw-delivery-r1b-20261015",
+        "purpose": "acceptance"
+      }
+    }
+  ],
+  "host_available_bytes": {
+    "disk": 32933355520,
+    "memory": 10721280000
+  },
+  "finished_at": "2026-10-15T13:55:13.977281+00:00",
+  "source": {
+    "base_commit": "dfa0568ab43c16f19d78d6ed980fa203fcef2473",
+    "worktree_dirty": true,
+    "tool_sha256": {
+      "deploy/ubuntu/mw_docker.py": "c937c483d5e669974114cf9cb2f0415fbb4c7a054e7eb1c19aa8c2764a0ef4bd",
+      "deploy/ubuntu/mw_preview.py": "a040b4017afd2baff41f97cecc56fbd423aecd2db6c648912942c8816fd33715",
+      "deploy/ubuntu/d1_seed.py": "ef528135a493d770a8646ed9162fb7e2d93ade64e4cea5703ad28ee5721f44ff"
+    }
+  }
+}

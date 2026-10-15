@@ -22,6 +22,7 @@ state_dir="$HOME/.local/share/market-watch-docker"
 mkdir -p "$install_dir" "$bin_dir" "$unit_dir" "$state_dir"
 chmod 700 "$state_dir"
 install -m 0755 "$repo_dir/deploy/ubuntu/mw_docker.py" "$bin_dir/mw-docker"
+install -m 0644 "$repo_dir/deploy/ubuntu/mw_preview.py" "$bin_dir/mw_preview.py"
 install -m 0755 "$repo_dir/deploy/ubuntu/docker_guard.py" "$install_dir/docker_guard.py"
 # Preserve any existing executable wrapper rather than overwriting another tool.
 if [[ -e "$bin_dir/docker" ]] && ! rg -q 'market-watch-docker/docker_guard.py' "$bin_dir/docker"; then

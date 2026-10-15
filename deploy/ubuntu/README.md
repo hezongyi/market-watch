@@ -2,6 +2,10 @@
 
 本工具只连接 Ubuntu 本机 `/var/run/docker.sock`。Unraid仍为生产环境，不使用本工具创建开发/验收实例。所有构建明确指定专用 `market-watch-ubuntu` builder。
 
+并行开发、数据基线、镜像复用及发布提效的盘点与分阶段方案，见 [2026-10-15 提效方案](../../docs/development-acceptance-release-efficiency-plan-20261015.md)。本分支已实现下文的轻量 `preview`；镜像提升和新生产发布通道仍待实施。
+
+验收并发由用户手动控制，不实现槽位或自动排队命令。agent 启动前检查 project、端口及资源余量；需要错峰时报告用户，不自动停止其他任务。沿用的 `ops.lock` 串行执行工具的资源变更命令（包括 preview 启停）；命令结束即释放，两个已启动实例可同时验收，不占用任何长期槽位。
+
 ## PostgreSQL 验收基线
 
 维护中的开发和验收 Compose 使用 PostgreSQL 14.24，固定引用 `postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872`。数据库 healthcheck 实际查询 `server_version_num=140024` 和 JIT provider；不只依赖 `pg_isready` 或镜像标签。应用侧设置 `ALERTS_DATABASE_EXPECTED_VERSION=140024` 后，每个新连接也检查实际服务器版本与 JIT 能力；SQLite 或其他版本会拒绝连接。基线更新必须同步 Compose、检查值及工具镜像白名单，不能自动跟随可变标签。
@@ -53,6 +57,41 @@ docker compose --env-file /private/issue42.env -p mw-issue42 \
 ```
 
 更换项目请使用新的task；已结束任务不能复用。只有本机许可库已准备完整时才构建chart。已有Dockerfile保持依赖安装在源码COPY之前；本次不修改应用、数据库结构及图表资源产物。
+
+## 轻量验收与任务 PG 复用
+
+以下命令使用本分支代码。**目前没有覆盖主机安装版**，该版本含尚未合入 main 的 OCI 构建缓存优化；不要直接运行安装脚本覆盖它。构建继续使用现有 `mw-docker build`，preview 先显式运行工作树脚本。脚本解释器需要 `argon2-cffi`（见锁定依赖），UI 另需 `openssl`；不需要在主机安装应用数据库依赖。
+
+```bash
+# 从本任务 worktree 执行；先只读检查现有 project/端口、磁盘和内存。
+mw-docker build --repo . --component api --tag market-watch-api:issue-42 \
+  --task mw-issue42 --project mw-issue42 --purpose acceptance
+python3 deploy/ubuntu/mw_docker.py preview prepare \
+  --task mw-issue42 --project mw-issue42 --repo . \
+  --api-image market-watch-api:issue-42 --port 18443
+python3 deploy/ubuntu/mw_docker.py preview up --task mw-issue42 --project mw-issue42
+python3 deploy/ubuntu/mw_docker.py preview status --task mw-issue42 --project mw-issue42
+python3 deploy/ubuntu/mw_docker.py preview stop --task mw-issue42 --project mw-issue42
+# 再次 up 复用同一 PG volume、凭据和用户写入，不重复覆盖种子。
+```
+
+首次使用前需已有本地固定 PG14.24 和 Nginx 镜像（digest 见脚本）；`up` 不自动 pull 或 build。默认 R1 是 PG + API + 64 MiB Nginx 网关：仅网关发布 `127.0.0.1:18443`，PG/API 仅连接 internal 网络，后端无默认出网路由。默认禁用通知、Yahoo 和 OANDA stream，连接 JIT 为 `inherit`。这个 API-only 地址是 **HTTP**；UI 才使用 HTTPS。
+
+私有状态保存在 `~/.local/share/market-watch-docker/previews/<TASK>/`，包括 `preview.json`、`credentials.json`、`compose.json`、固定 seed、启动时固定实际 image ID 的 `run.json` 和脱敏的 `last-run.json`。目录 0700、凭据 0600；登录密码从私有文件本地读取，不提交或粘贴到 PR。相同参数再次 `prepare` 不改文件；参数变化拒绝覆盖，使用新 task，或在原 tag 下重构建同任务镜像后 `up`。种子文件变化应新建 task，不静默改已有 dataset。
+
+需要 UI 时在 `prepare` 追加 `--web-image market-watch-web:issue-42 --chart-image market-watch-chart-origin:issue-42 --chart-port 17444`；先按上文构建两镜像，web 构建参数必须为 `VITE_ADVANCED_CHART_ORIGIN=https://localhost:17444` 且写入图表 origin 标签。UI 的两个独立端口都只绑定回环；证书自签名。当前主机旧工具不写该新标签，UI 入口须在工具版本对齐后使用，不能跳过标签检查。按需追加 `--worker chart-history` 等，最多三个必要 worker；本轮 UI/worker 仅通过 Compose 展开，尚无真实业务链验收证据。
+
+```bash
+# reset 默认只展示计划；显式 apply 在同一 PG 中新建任务数据库。
+python3 deploy/ubuntu/mw_docker.py preview reset --task mw-issue42 --project mw-issue42
+python3 deploy/ubuntu/mw_docker.py preview reset --task mw-issue42 --project mw-issue42 --apply
+```
+
+重置先停本任务写入者，保留旧库和 volume，记录 `reset_history`，对新库 migrate/seed 后才启服务；失败时保留新旧库且不启动写入者，修正后重试 `up`，不要手工删卷。旧库仍可通过任务 PG 导出，**目前不提供一键切回旧库**。普通 `up` 可能执行新镜像的迁移，并非数据库回滚；包含 schema 的改动必须另做迁移兼容验证。重复 reset 会占用额外空间；退役归档覆盖所有非模板数据库，不能只备份当前库。
+
+当前 D1 是固定时点、四个合成品种、M1/H1 各 720 条的生成器，共 5760 candles 和 5760 published bars。首次生成、后续按 dataset marker 复用；未知 candles 或不同 marker 拒绝覆盖。它只支持功能 smoke，不能代表完整交易日历、实时供源、D2/R2 或生产规模。
+
+资源上限：API-only R1 常驻合计 1088 MiB / 0.65 CPU，UI 另加 128 MiB / 0.1 CPU；PG/API/worker/网关均有内存、CPU 和 10 MiB × 3 日志轮转。启动保守门槛为可用磁盘 ≥23 GiB、内存 ≥3.25 GiB；worker 配置为 ≥26 GiB / ≥5 GiB；5 分钟负载 >4 拒绝新启动。检查不预留资源、不代替用户协调并发；root/Docker 状态目录在不同分区时还需人工检查 Docker 分区。`stop` 保留所有数据；任务退役仍走下文归档和实际恢复入口。
 
 ## 验收结束
 

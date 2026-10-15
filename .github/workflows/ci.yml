@@ -52,6 +52,11 @@ jobs:
           python -m pip install -r requirements.lock
           python -m pip install -e . --no-deps
 
+      - name: Ubuntu tooling checks
+        run: |
+          python -m ruff check deploy/ubuntu/mw_docker.py deploy/ubuntu/mw_preview.py deploy/ubuntu/d1_seed.py tests/ops/test_preview.py
+          python -m pytest -q tests/ops
+
       - name: Detect backend test changes
         id: backend_changes
         env:
