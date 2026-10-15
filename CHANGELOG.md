@@ -1,5 +1,13 @@
 # 更新日志
 
+## [1.25.7] - 2026-10-15
+
+- 新增带账户租约、代际和需求修订隔离的 OANDA 批量 REST candle 采集路径；默认保持 `stream`，可通过 `ALERTS_OANDA_ACQUISITION_MODE=rest_batch` 显式启用。
+- 组合行情以确认 M1 作为固定输入按组合日历聚合，各周期平台行情通过同一 REST owner/cache 获取，形成中 M1 仅作为临时快照，不覆盖确认数据。
+- 补齐恢复、provider 计算前缀、历史回放、图表 worker 首轮刷新及 PostgreSQL 需求并发基线契约；Ubuntu Docker CI 全量通过。
+- 生产配置、数据库、通知及 Yahoo 默认保持现状；本版本需要按发布清单完成备份、恢复证据和上线后观察。
+
+
 ## [1.25.5] - 2026-10-15
 
 - 应用 JIT 策略默认继承 PostgreSQL，支持显式 on/off 并兼容旧布尔值；保留 URL／PGOPTIONS 的其他设置，连接池 rollback 后策略持续生效。
