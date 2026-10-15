@@ -30,6 +30,19 @@ from test_fixed_indicators import add_tail, history
 from test_market_contracts import identity, minute
 
 
+def rest_forming(database, revision, at, stamp, price="1.11", epoch=1, sequence=1):
+    live(database, revision, stamp, at, epoch=epoch)
+    with database.begin() as db:
+        target = db.get(RealtimeMapping, db.get(CompositeRevision, revision).mapping_id).target_dataset_id
+        state = db.get(LiveState, target)
+        state.quote = {}
+        state.forming = {"start": at, "end": at + 60000, "open": price, "high": price,
+            "low": price, "close": price, "complete": False, "connection_epoch": epoch,
+            "volume": 3, "acquisition_mode": "rest_batch",
+            "source_identity": {"source": "oanda", "channel": "v20", "provider_symbol": "EUR_USD"},
+            "observation": {"received_at": stamp, "sequence": sequence}}
+
+
 def test_sma_uses_fixed_history_and_exact_declared_windows(database, monkeypatch):
     composite, revision, seam, stamp = continuous(database, monkeypatch)
     ids = []
@@ -126,6 +139,22 @@ def test_sampled_price_requires_quote_epoch_and_baselines_recovery(database, mon
             state.quote = {**state.quote, "connection_epoch": 2}
             result = evaluate(db, ident, now=stamp + delta)
             assert bool(result) == (delta == 3000)
+
+
+def test_candle_close_sample_drives_tick_watch_without_bid_ask(database, monkeypatch):
+    ident, _, revision, seam, _ = armed(database, monkeypatch, timeframe="tick")
+    at, stamp = seam + 600000, seam + 600010
+    rest_forming(database, revision, at, stamp)
+    with database.begin() as db:
+        assert evaluate(db, ident, now=stamp) is None
+        binding = db.get(CompositeWatchBinding, ident)
+        assert binding.health == "ready"
+        assert binding.runtime["dependencies"][0]["kind"] == "sampled_candle_close"
+    rest_forming(database, revision, at, stamp + 2000, price="1.119", sequence=2)
+    with database.begin() as db:
+        assert evaluate(db, ident, now=stamp + 2000) is not None
+        signal = db.scalar(select(SignalRow))
+        assert signal and signal.evidence["observation_basis"] == "sampled_candle_close"
 
 
 def test_full_origin_warmup_is_batched_and_keeps_checkpoint(database, monkeypatch):

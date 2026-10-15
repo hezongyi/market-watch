@@ -212,15 +212,17 @@ def safe_step(db, watch, binding, runtime, revision, state, bar, value, now, *, 
 
 
 def judgment(db, watch, binding, runtime, value, sequence, outcome, evidence, signal=None):
+    from .composite_quotes import json_safe
+
     ident = digest([watch.id, watch.rule["version"], binding.revision_id, value, sequence,
         runtime.get("epoch"), outcome])
     if not db.get(CompositeWatchJudgment, ident):
         db.add(CompositeWatchJudgment(id=ident, watch_id=watch.id, revision_id=binding.revision_id,
             history_version_id=binding.history_version_id, input_revision=value, event_time=sequence,
             outcome=outcome, signal_id=signal.id if signal else None,
-            evidence={"market_identity": binding.market_identity, "rule": watch.rule,
+            evidence=json_safe({"market_identity": binding.market_identity, "rule": watch.rule,
                 "input_revision": value, "dependencies": runtime.get("dependencies", []),
-                "formation_origin": runtime.get("formation_origin"), **evidence}))
+                "formation_origin": runtime.get("formation_origin"), **evidence})))
 
 
 def publish_signal(db, watch, binding, runtime, value, signal):
@@ -236,7 +238,8 @@ def publish_signal(db, watch, binding, runtime, value, signal):
     signal = replace(signal, evidence={**signal.evidence, "market_identity": binding.market_identity,
         "input_revision": value, "dependencies": copy.deepcopy(runtime.get("dependencies", [])),
         "formation_origin": runtime.get("formation_origin"), "previous_day": runtime.get("previous_day"),
-        "source_epoch": runtime["epoch"], "observation_basis": binding.market_identity["observation_mode"]})
+        "source_epoch": runtime["epoch"], "observation_basis": runtime.get(
+            "observation_basis", binding.market_identity["observation_mode"])})
     record = record_signal(db, watch, db.get(Instrument, watch.instrument_id), signal, event_key=key)
     return record
 
@@ -393,53 +396,69 @@ def evaluate(db, watch_id, *, now=None):
 
 def evaluate_tick(db, watch, binding, runtime, revision, value, live, now):
     from .composite_alerts import confirmed_window
+    from .composite_quotes import observation_evidence, sampled_observation
 
-    quote = live["quote"]
-    if not live["quote_ready"] or quote["source_time"] < revision.seam:
-        return waiting(watch, binding, runtime, "stale", "抽样报价过期、世代不符或不可交易；不追认未观测触价")
+    sample = sampled_observation(live)
+    if sample is None or sample["source_start"] < revision.seam:
+        return waiting(watch, binding, runtime, "stale", "当前价格采样过期、世代不符或来源未就绪；不追认未观测触价")
     version = db.get(HistoryVersion, revision.history_version_id)
     target = db.get(MarketDataset, db.get(RealtimeMapping, revision.mapping_id).target_dataset_id)
     profile = db.get(Instrument, target.instrument_id).calendar_profile
-    minute_start = quote["source_time"] // 60000 * 60000
+    minute_start = sample["source_start"]
     profiles = [(version.start, revision.seam, version.manifest.get("calendar_profile", {})),
                 (revision.seam, now + 1, profile)]
     if not confirmed_window(db, revision, max(revision.seam, minute_start - 60000), minute_start,
                             value, revision.rules["aggregation_calendar"], profiles):
-        return waiting(watch, binding, runtime, "stale", "报价之前仍有未确认分钟，等待完整依赖恢复")
-    sequence = quote["source_time"]
-    prior_at = watch.state.get("quote_at", 0)
+        return waiting(watch, binding, runtime, "采样之前仍有未确认分钟，等待完整依赖恢复")
+    sequence = sample["sequence"]
+    mode = sample["observation_mode"]
+    value_key, at_key = (("sample_close", "sample_at") if mode == "candle_close_sample"
+                         else ("quote", "quote_at"))
+    prior_at = watch.state.get(at_key, 0)
     processed = runtime.get("processed_input_revision", value)
     correction = db.scalar(select(func.min(CompositeMinuteInput.start)).where(
         CompositeMinuteInput.revision_id == revision.id, CompositeMinuteInput.input_revision > processed,
         CompositeMinuteInput.input_revision <= value,
         CompositeMinuteInput.start < runtime.get("confirmed_end", minute_start))) if value > processed else None
+    mode_changed = watch.state.get("observation_mode") not in (None, mode)
     recovering = bool(runtime.get("recovering") or runtime.pop("closed", False) or correction is not None or
-        runtime.get("epoch", live["connection_epoch"]) != live["connection_epoch"] or sequence - prior_at > 15000)
+        runtime.get("epoch", live["connection_epoch"]) != live["connection_epoch"] or
+        mode_changed or sequence - prior_at > 15000)
     if sequence < prior_at:
-        return waiting(watch, binding, runtime, "stale", "旧时间报价不回退判断水位")
+        return waiting(watch, binding, runtime, "stale", "旧时间采样不回退判断水位")
     if sequence == prior_at and not recovering:
         return None
-    prior = watch.state.get("quote")
-    price = Decimal(quote["bid"])
+    prior = watch.state.get(value_key)
+    price = sample["value"]
     rule = rule_from(watch.rule)
     runtime["epoch"] = live["connection_epoch"]
-    runtime["dependencies"] = [{"kind": "sampled_bid", "quote": quote, "received_at": live["received_at"]}]
+    runtime["observation_basis"] = ("sampled_bid_quote" if mode == "stream_quote"
+                                     else "sampled_candle_close")
+    runtime["dependencies"] = [{"kind": sample["kind"], "observation_mode": mode,
+                                 "source_start": sample["source_start"],
+                                 "source_identity": sample.get("source_identity"),
+                                 "received_at": sample["observed_at"]}]
     signal = None
     if prior is not None and not recovering and sequence > watch.armed_at:
         for up in (True, False):
             direction = "buy" if up else "sell"
             if rule.direction in ("both", direction) and crossed(Decimal(prior), price, rule.level, up, rule.touch):
                 signal = Signal(direction, instant(sequence), price, rule.level,
-                    "抽样Bid报价上穿" if up else "抽样Bid报价下穿",
-                    {"previous_price": prior, "previous_at": prior_at, "quote": quote,
-                        "observation_gap_ms": sequence - prior_at, "timing": "between_observations"})
+                    "当前价格采样上穿" if up else "当前价格采样下穿",
+                    {"previous_price": prior, "previous_at": prior_at,
+                        "observation_mode": mode, "sample": observation_evidence(sample),
+                        "observation_gap_ms": sequence - prior_at,
+                        "timing": "between_observations"})
                 break
-    watch.state = {"quote": str(price), "quote_at": sequence}
+    watch.state = ({"sample_close": str(price), "sample_at": sequence,
+                    "observation_mode": mode} if mode == "candle_close_sample" else
+                   {"quote": str(price), "quote_at": sequence,
+                    "observation_mode": mode})
     runtime.update(recovering=False, processed_input_revision=value, confirmed_end=minute_start,
                    readiness={"ready": True, "status": "ready", "dependencies": runtime["dependencies"]})
     record = publish_signal(db, watch, binding, runtime, value, signal) if signal else None
     judgment(db, watch, binding, runtime, value, sequence, "triggered" if record else "recovery_baseline" if recovering else "evaluated",
-        {"quote": quote, "previous_price": prior, "previous_at": prior_at}, record)
+        {"sample": observation_evidence(sample), "previous_price": prior, "previous_at": prior_at}, record)
     binding.health, binding.health_reason, watch.paused_reason = "ready", None, None
     binding.runtime = runtime
     return record

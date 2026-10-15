@@ -489,3 +489,51 @@ def evaluate_quote(db, instrument, at, bid, ask):
                 )
                 record_signal(db, watch, instrument, signal)
                 break
+
+
+def evaluate_close_sample(db, instrument, at, close, *, received_at=None,
+                          sequence=None, source_identity=None, interval_ms=None):
+    """Evaluate a tick rule from two observed M1 close snapshots.
+
+    REST candles have no bid/ask or tick timestamp. ``at`` is the observation
+    clock (the response receive time); candle identity and response metadata
+    remain separate evidence. The first valid sample establishes a baseline.
+    """
+    close = Decimal(str(close))
+    if not close.is_finite() or close <= 0:
+        raise ValueError("Invalid candle close")
+    received_at = at if received_at is None else received_at
+    for watch in db.scalars(
+        select(Watch).where(Watch.instrument_id == instrument.id, Watch.status == "active")
+        .with_for_update()
+    ).all():
+        rule = rule_from(watch.rule)
+        if rule.timeframe != "tick" or at <= watch.armed_at:
+            continue
+        prior = watch.state.get("sample_close")
+        prior_at = watch.state.get("sample_at")
+        watch.state = {**watch.state, "sample_close": str(close), "sample_at": at,
+                       "observation_mode": "candle_close_sample", "received_at": received_at,
+                       **({"sequence": sequence} if sequence is not None else {})}
+        watch.paused_reason = None
+        if prior is None or prior_at is None or at <= prior_at:
+            continue
+        for up in (True, False):
+            direction = "buy" if up else "sell"
+            if rule.direction not in ("both", direction) or not crossed(
+                    Decimal(prior), close, rule.level, up, rule.touch):
+                continue
+            evidence = {"previous_price": prior, "previous_at": prior_at,
+                        "observation_gap_ms": at - prior_at,
+                        "timing": "between_candle_observations",
+                        "observation_mode": "candle_close_sample",
+                        "received_at": received_at, "interval_ms": interval_ms,
+                        "rule_version": rule.version}
+            if sequence is not None:
+                evidence["sequence"] = sequence
+            if source_identity is not None:
+                evidence["source_identity"] = source_identity
+            record_signal(db, watch, instrument, Signal(
+                direction, instant(at), close, rule.level,
+                "当前价格采样上穿" if up else "当前价格采样下穿", evidence))
+            break

@@ -243,9 +243,16 @@ def evaluate(db, alert, version, config, now):
     # them in order before shared artifact reads, avoiding reader lock upgrades.
     list(db.scalars(select(MarketDataset.id).where(MarketDataset.id.in_(
         sorted({identity["dataset_id"], target.id}))).order_by(MarketDataset.id).with_for_update()))
-    from .composite_quotes import live_snapshot
+    from .composite_quotes import (
+        json_safe,
+        live_snapshot,
+        observation_evidence,
+        sampled_observation,
+    )
 
-    runtime["quote_health"] = "ready" if live_snapshot(db, revision, now=now)["quote_ready"] else "stale"
+    live_view = live_snapshot(db, revision, now=now)
+    runtime["quote_health"] = "ready" if live_view.get("sample_ready") else "stale"
+    runtime["observation_mode"] = live_view.get("observation_mode", "stream_quote")
     prep = db.get(CompositePreparation, revision.id)
     value = prep.input_revision
     runtime.update(composite_revision_id=revision.id, input_revision=value,
@@ -320,13 +327,13 @@ def evaluate(db, alert, version, config, now):
     if config.mode == "close" and live.confirmed_end < bar["end"]:
         return wait(alert, runtime, "stale", "实时来源确认水位尚未覆盖判定柱")
     quote = live.quote if live else {}
+    live_sample = sampled_observation(live_view)
     if config.mode == "intrabar":
-        if (not owned or not quote.get("tradeable") or quote.get("bid") is None or quote.get("ask") is None or
-                Decimal(quote["ask"]) < Decimal(quote["bid"]) or
-                not 0 <= now - quote.get("source_time", 0) <= 15000 or not 0 <= now - live.received_at <= 15000):
-            return wait(alert, runtime, "stale", "抽样报价过期、不可交易或价差无效；不重建未观测触价")
-        if not live.forming or period(live.forming["start"], config.timeframe, phase)[0] != bar["start"] or bar["source_confirmed"]:
-            return wait(alert, runtime, "warming", "等待有效临时桶与报价对齐")
+        if not owned or live_sample is None:
+            return wait(alert, runtime, "stale", "当前价格采样过期或来源未就绪；不重建未观测触价")
+        if (not live.forming or period(live.forming["start"], config.timeframe, phase)[0] != bar["start"]
+                or bar["source_confirmed"] or live_sample["source_start"] < revision.seam):
+            return wait(alert, runtime, "warming", "等待有效临时桶与当前价格采样对齐")
         # Unknown current M1 is expected for provisional observation; any earlier
         # unknown minute in that bucket still fences the strategy.
         closed_end = live.forming["start"]
@@ -344,7 +351,7 @@ def evaluate(db, alert, version, config, now):
     if config.mode == "intrabar":
         for index, operand in enumerate((config.condition.left, config.condition.right)):
             if operand and operand.kind == "price":
-                values[index] = Decimal(quote["bid"])
+                values[index] = live_sample["value"]
     if any(item["status"] != "complete" for item in progress):
         return wait(alert, runtime, "warming", "指标完整初始化或修订修复尚未完成", reset=False)
     if values[0] is None or config.condition.right and values[1] is None:
@@ -356,7 +363,7 @@ def evaluate(db, alert, version, config, now):
         from .chart_alert_offsets import OffsetComputing, OffsetPending, apply
         try:
             resolved = atr_offset(db, identity, config, bar, value, now, profiles, runtime)
-            observation_at = bar["end"] if config.mode == "close" else quote["source_time"]
+            observation_at = bar["end"] if config.mode == "close" else live_sample["sequence"]
             if resolved["confirmation_watermark"] > observation_at:
                 raise OffsetPending("ATR 递归输入确认晚于观察时点，等待安全恢复基准")
             values[1] = apply(values[1], resolved)
@@ -364,7 +371,7 @@ def evaluate(db, alert, version, config, now):
         except OffsetPending as exc:
             return wait(alert, runtime, "warming", str(exc), reset=not isinstance(exc, OffsetComputing))
     previous = page["bars"][-2] if len(page["bars"]) > 1 else None
-    sequence = bar["end"] if config.mode == "close" else quote["source_time"]
+    sequence = bar["end"] if config.mode == "close" else live_sample["sequence"]
     old_end = runtime.get("confirmed_end", 0)
     previous_input = runtime.get("processed_input_revision", value)
     correction_end = max(old_end, runtime.get("offset", {}).get("reference_end", 0))
@@ -405,13 +412,16 @@ def evaluate(db, alert, version, config, now):
         "seam_policy": config.seam_policy, "previous_state": before_state, "recovery": recovering,
         "correction_from": earliest, "baseline_reason": outcome if baseline else None,
         "observation_gap_ms": observation_gap,
-        "source_epoch": live.epoch, "quote": dict(quote) if config.mode == "intrabar" else None,
+        "source_epoch": live.epoch, "quote": dict(quote) if config.mode == "intrabar" and live_sample["kind"] == "sampled_bid" else None,
+        "sample": observation_evidence(live_sample) if config.mode == "intrabar" else None,
         "observation_basis": ("native_confirmed_close" if bar.get("price_confirmation") else "complete_close")
-            if config.mode == "close" else "sampled_bid_quote"}
+            if config.mode == "close" else ("sampled_bid_quote" if live_sample["kind"] == "sampled_bid"
+                                              else "sampled_candle_close")}
     if resolved:
         evidence["offset"] = resolved
     sample = Observation(f"bar:{bar['start']}" if config.mode == "close" else f"sample:{sequence}",
-        sequence, sequence, values[0], values[1], Decimal(str(quote["bid"] if config.mode == "intrabar" else bar["close"])), evidence)
+        sequence, sequence, values[0], values[1],
+        live_sample["value"] if config.mode == "intrabar" else Decimal(str(bar["close"])), evidence)
     alert.runtime = runtime
     signal = consume(db, alert.id, sample, detected_at=now, baseline=baseline, expected_version=alert.version)
     runtime = dict(alert.runtime)
@@ -420,8 +430,8 @@ def evaluate(db, alert, version, config, now):
         db.add(CompositeJudgment(id=judgment_id, alert_version_id=version.id, revision_id=revision.id,
             history_version_id=identity["history_version_id"], input_revision=value, event_time=sequence,
             outcome="triggered" if signal else outcome, signal_id=signal.id if signal else None,
-            evidence={**evidence, "left": str(values[0]), "right": str(values[1]) if values[1] is not None else None,
-                      "rule_version": alert.version, "rule": version.config}))
+            evidence=json_safe({**evidence, "left": str(values[0]), "right": str(values[1]) if values[1] is not None else None,
+                      "rule_version": alert.version, "rule": version.config})))
     runtime.update(processed_input_revision=value, confirmed_end=bar["end"] if config.mode == "close" else
         max(runtime.get("confirmed_end", 0), previous["end"] if previous and previous["source_confirmed"] else 0),
         epoch=live.epoch, recovering=False, last_start=bar["start"],

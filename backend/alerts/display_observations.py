@@ -16,6 +16,25 @@ MAX_MINUTES = 4096
 MAX_GLOBAL_MINUTES = 32768
 
 
+def _has_capacity(db, dataset_id, stamp):
+    if db.bind.dialect.name == 'postgresql':
+        db.execute(text('SELECT pg_advisory_xact_lock(8675311)'))
+    size = db.scalar(select(func.count()).select_from(ObservedMinute).where(
+        ObservedMinute.dataset_id == dataset_id))
+    total = db.scalar(select(func.count()).select_from(ObservedMinute))
+    status_key = 'display_capacity:' + dataset_id
+    exhausted = db.get(Preference, status_key)
+    if size >= MAX_MINUTES or total >= MAX_GLOBAL_MINUTES:
+        if not exhausted:
+            db.add(Audit(kind='display_capacity_exhausted', details={
+                'dataset': dataset_id, 'limit': MAX_MINUTES, 'effective_at': stamp}))
+            db.add(Preference(key=status_key, value={'at': stamp, 'reason': 'capacity_exhausted'}))
+        return False
+    if exhausted:
+        db.delete(exhausted)
+    return True
+
+
 def accept(db, state, event, *, stamp, profile):
     from .live_session import session_status
 
@@ -29,21 +48,8 @@ def accept(db, state, event, *, stamp, profile):
     key = (state.dataset_id, start, state.epoch)
     observation = db.get(ObservedMinute, key)
     if not observation:
-        if db.bind.dialect.name == 'postgresql':
-            db.execute(text('SELECT pg_advisory_xact_lock(8675311)'))
-        size = db.scalar(select(func.count()).select_from(ObservedMinute).where(
-            ObservedMinute.dataset_id == state.dataset_id))
-        total = db.scalar(select(func.count()).select_from(ObservedMinute))
-        status_key = 'display_capacity:' + state.dataset_id
-        exhausted = db.get(Preference, status_key)
-        if size >= MAX_MINUTES or total >= MAX_GLOBAL_MINUTES:
-            if not exhausted:
-                db.add(Audit(kind='display_capacity_exhausted', details={
-                    'dataset': state.dataset_id, 'limit': MAX_MINUTES, 'effective_at': stamp}))
-                db.add(Preference(key=status_key, value={'at': stamp, 'reason': 'capacity_exhausted'}))
+        if not _has_capacity(db, state.dataset_id, stamp):
             return
-        if exhausted:
-            db.delete(exhausted)
         observation = ObservedMinute(dataset_id=state.dataset_id, start=start, epoch=state.epoch,
             content={'start': start, 'end': start + 60000, 'open': event.bid,
                 'high': event.bid, 'low': event.bid, 'close': event.bid,
@@ -55,6 +61,58 @@ def accept(db, state, event, *, stamp, profile):
         observation.content = {**old, 'high': str(max(Decimal(old['high']), Decimal(event.bid))),
             'low': str(min(Decimal(old['low']), Decimal(event.bid))), 'close': event.bid}
     observation.observed_at, observation.sequence = event.received_at, event.sequence
+    return observation
+
+
+def accept_rest(db, state, sample, *, stamp, profile):
+    """Replace supplier OHLCV atomically under the caller's fenced owner lock.
+
+    Unlike stream samples, a supplier revision may shrink high/low or volume.
+    Display credentials copy this content, so later replacement cannot mutate
+    the meaning of an already returned snapshot token.
+    """
+    from .live_session import session_status
+    from .oanda_rest_batch import CandleSpec, CloseObservation
+    from .source_registry import collection_identity
+    from .storage import LiveState, MarketDataset, SourceMinute
+
+    sample = CloseObservation.model_validate(sample)
+    state = db.scalar(select(LiveState).where(LiveState.dataset_id == state.dataset_id)
+        .with_for_update().execution_options(populate_existing=True))
+    dataset = db.get(MarketDataset, state.dataset_id)
+    if CandleSpec.from_dataset(dataset.identity) != sample.spec:
+        raise ValueError('REST display source identity mismatch')
+    if (state.epoch != sample.generation or sample.committed_at != stamp
+            or not 0 <= stamp - sample.received_at <= 15000
+            or session_status(dataset.identity, profile, stamp)['market_session'] == 'closed'):
+        return
+    source = collection_identity(dataset.identity)
+    if db.get(SourceMinute, (source.key, sample.candle.start)):
+        return  # Confirmed heads cannot be downgraded to provisional.
+    key = (state.dataset_id, sample.candle.start, state.epoch)
+    observation = db.get(ObservedMinute, key)
+    if observation and (observation.sequence >= sample.sequence
+                        or observation.observed_at >= sample.received_at):
+        return
+    if state.forming and (state.forming['start'] > sample.candle.start or
+            state.forming.get('acquisition_mode') == 'rest_batch'
+            and state.forming.get('connection_epoch') == sample.generation
+            and state.forming.get('sequence', 0) >= sample.sequence):
+        return
+    if not observation:
+        if not _has_capacity(db, state.dataset_id, stamp):
+            return
+        observation = ObservedMinute(dataset_id=state.dataset_id, start=sample.candle.start,
+            epoch=state.epoch)
+        db.add(observation)
+    observation.content = {**sample.candle.model_dump(), 'volume_kind': 'price_count',
+        'volume_unit': 'quotes', 'volume_complete': False, 'observation_complete': False,
+        'connection_epoch': sample.generation, 'sequence': sample.sequence, 'source': 'oanda',
+        'source_identity': sample.spec.identity.model_dump(), 'acquisition_mode': 'rest_batch',
+        'protocol_version': sample.protocol_version, 'observation': sample.model_dump(mode='json'),
+        'snapshot_id': sample.snapshot_id}
+    observation.observed_at, observation.sequence = sample.received_at, sample.sequence
+    state.forming = dict(observation.content)
     return observation
 
 

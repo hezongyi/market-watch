@@ -1,0 +1,122 @@
+{
+  "artifact": "runtime-live-window",
+  "host": "Ubuntu local Docker",
+  "project": "mw-oanda-rest-runtime-20261015",
+  "image_tag": "market-watch-api:oanda-rest-batch-20261015-r5",
+  "duration_samples": 90,
+  "sample_period_seconds": 2,
+  "active_instruments": [
+    "AUD_JPY",
+    "AUD_USD",
+    "EUR_GBP",
+    "EUR_JPY",
+    "EUR_USD",
+    "GBP_JPY",
+    "GBP_USD",
+    "NZD_USD",
+    "USD_CAD",
+    "USD_CHF",
+    "USD_JPY",
+    "XAU_USD"
+  ],
+  "all_connected_ready": true,
+  "symbols": {
+    "AUD_JPY": {
+      "samples": 90,
+      "revision_delta": 98,
+      "sample_interval_ms_median": 2125,
+      "sample_interval_ms_max": 2226,
+      "received_gap_ms_max": 4138,
+      "errors": []
+    },
+    "AUD_USD": {
+      "samples": 90,
+      "revision_delta": 97,
+      "sample_interval_ms_median": 2125,
+      "sample_interval_ms_max": 2226,
+      "received_gap_ms_max": 4138,
+      "errors": []
+    },
+    "EUR_GBP": {
+      "samples": 90,
+      "revision_delta": 98,
+      "sample_interval_ms_median": 2125,
+      "sample_interval_ms_max": 2226,
+      "received_gap_ms_max": 4138,
+      "errors": []
+    },
+    "EUR_JPY": {
+      "samples": 90,
+      "revision_delta": 98,
+      "sample_interval_ms_median": 2125,
+      "sample_interval_ms_max": 2226,
+      "received_gap_ms_max": 4138,
+      "errors": []
+    },
+    "EUR_USD": {
+      "samples": 90,
+      "revision_delta": 97,
+      "sample_interval_ms_median": 2125,
+      "sample_interval_ms_max": 2226,
+      "received_gap_ms_max": 4138,
+      "errors": []
+    },
+    "GBP_JPY": {
+      "samples": 90,
+      "revision_delta": 98,
+      "sample_interval_ms_median": 2125,
+      "sample_interval_ms_max": 2226,
+      "received_gap_ms_max": 4138,
+      "errors": []
+    },
+    "GBP_USD": {
+      "samples": 90,
+      "revision_delta": 98,
+      "sample_interval_ms_median": 2125,
+      "sample_interval_ms_max": 2226,
+      "received_gap_ms_max": 4138,
+      "errors": []
+    },
+    "NZD_USD": {
+      "samples": 90,
+      "revision_delta": 96,
+      "sample_interval_ms_median": 2125,
+      "sample_interval_ms_max": 2226,
+      "received_gap_ms_max": 7951,
+      "errors": []
+    },
+    "USD_CAD": {
+      "samples": 90,
+      "revision_delta": 93,
+      "sample_interval_ms_median": 2125,
+      "sample_interval_ms_max": 2226,
+      "received_gap_ms_max": 10054,
+      "errors": []
+    },
+    "USD_CHF": {
+      "samples": 90,
+      "revision_delta": 94,
+      "sample_interval_ms_median": 2125,
+      "sample_interval_ms_max": 2226,
+      "received_gap_ms_max": 7836,
+      "errors": []
+    },
+    "USD_JPY": {
+      "samples": 90,
+      "revision_delta": 98,
+      "sample_interval_ms_median": 2125,
+      "sample_interval_ms_max": 2226,
+      "received_gap_ms_max": 4138,
+      "errors": []
+    },
+    "XAU_USD": {
+      "samples": 90,
+      "revision_delta": 98,
+      "sample_interval_ms_median": 2125,
+      "sample_interval_ms_max": 2226,
+      "received_gap_ms_max": 4138,
+      "errors": []
+    }
+  },
+  "raw_sample_path": "private temporary evidence omitted"
+}
