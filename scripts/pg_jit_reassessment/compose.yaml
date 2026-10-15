@@ -1,0 +1,42 @@
+name: mw-pg-jit-reassessment-20261015
+services:
+  postgres:
+    image: postgres:14-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+    environment:
+      POSTGRES_DB: jit_assessment
+      POSTGRES_USER: assessment
+      POSTGRES_HOST_AUTH_METHOD: trust
+    command: [postgres, -c, shared_buffers=128MB, -c, max_connections=12, -c, jit=on]
+    mem_limit: 1536m
+    cpus: 2
+    volumes: [postgres-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U assessment -d jit_assessment]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  assessment:
+    image: ${MW_JIT_IMAGE:-market-watch-api:pg-jit-reassessment-20261015}
+    user: "0:0"
+    pid: service:postgres
+    environment:
+      PYTHONPATH: /workspace/backend
+      PYTHONDONTWRITEBYTECODE: "1"
+      ALERTS_DATABASE_URL: postgresql+psycopg://assessment@postgres/jit_assessment
+      ALERTS_DELIVERY_ENABLED: "false"
+      ALERTS_YAHOO_ENABLED: "false"
+      ALERTS_OANDA_STREAM_ENABLED: "false"
+      OPENBLAS_NUM_THREADS: "1"
+    mem_limit: 768m
+    cpus: 2
+    volumes:
+      - ../..:/workspace:ro
+      - ${MW_JIT_RESULTS:?Set task results directory}:/results
+    depends_on:
+      postgres: {condition: service_healthy}
+    command: [python, /workspace/scripts/pg_jit_reassessment/measure.py]
+volumes:
+  postgres-data:
+networks:
+  default:
+    internal: true
