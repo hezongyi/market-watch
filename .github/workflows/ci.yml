@@ -57,10 +57,11 @@ jobs:
           python - <<'PY'
           import os
 
-          import psycopg
+          from sqlalchemy import create_engine, text
 
-          with psycopg.connect(os.environ["TEST_POSTGRES_URL"]) as connection:
-              version = connection.execute("SHOW server_version_num").fetchone()[0]
+          engine = create_engine(os.environ["TEST_POSTGRES_URL"])
+          with engine.connect() as connection:
+              version = connection.execute(text("SHOW server_version_num")).scalar_one()
           if version != "140024":
               raise SystemExit(f"expected PostgreSQL 14.24 (140024), got {version}")
           print(f"PostgreSQL server_version_num={version}")
