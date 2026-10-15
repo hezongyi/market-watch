@@ -827,7 +827,27 @@ def data(body):
     output_count = page.get("mandatory_count", count)
     visible = page["bars"] if native and not body.indicators else page["bars"][-output_count:]
     first = visible[0]["start"] if visible else before
-    prefix = page.pop("_calculation_prefix", page["bars"])
+    prefix = page.pop("_calculation_prefix", None)
+    if body.indicators and prefix is None and page["bars"]:
+        # ``read`` normally invokes ``freeze_ready`` while its repeatable-read
+        # snapshot is open.  Keep the data adapter correct for alternate read
+        # implementations (and lightweight test suppliers) that return a page
+        # without that callback: recursive studies must still use the complete
+        # persisted source prefix, independent of viewport page size.
+        swing = any(spec.get("name") == "SWING_SR_V1" for spec in body.indicators)
+        maximum = calculation_limit
+        with budget_transaction(isolation_level="REPEATABLE READ") as db:
+            prefix = list(db.scalars(select(ProviderBar.payload).where(
+                ProviderBar.dataset_id == page["dataset_id"],
+                ProviderBar.start <= (2**63 - 1 if swing else page["bars"][-1]["start"]),
+                ProviderBar.start >= (body.calculation_origin or 0),
+            ).order_by(ProviderBar.start).limit(maximum + 1)))
+        if len(prefix) > maximum:
+            raise CapacityExceeded(f"指标固定前缀超过历史容量 {maximum:,} 根，请调整容量后重试")
+        if prefix and body.calculation_origin is not None and prefix[0]["start"] != body.calculation_origin:
+            raise ValueError("指标固定历史起点缺失，请刷新并核对数据集")
+    if prefix is None:
+        prefix = page["bars"]
     if body.indicators and prefix:
         # Compute outside the short database observation, using frozen inputs.
         prefix = calculation_rows(prefix, meta, body.instrument)

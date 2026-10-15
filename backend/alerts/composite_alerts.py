@@ -321,7 +321,12 @@ def evaluate(db, alert, version, config, now):
         reason = (f"判定柱 {label(bar['start'])} 至 {label(bar['end'])}："
                   f"观测 {bar.get('observed_minutes', 0)} 分钟，未知 {bar.get('unknown_minutes', 0)} 分钟；"
                   "时间结束、来源确认或覆盖依赖未满足；缺失观测不作为闭市证据")
-        return wait(alert, runtime, "coverage_pending", reason, reset=False)
+        # A transport outage leaves the strategy in recovery mode.  Keep that
+        # state stale until an explicit source observation closes the gap;
+        # ``coverage_pending`` is reserved for a healthy source with a known
+        # sparse/unknown coverage dependency (for example native D1 proof).
+        status = "stale" if alert.health == "stale" and runtime.get("recovering") else "coverage_pending"
+        return wait(alert, runtime, status, reason, reset=False)
     runtime.pop("coverage_dependency", None)
     runtime.pop("price_confirmation_request", None)
     if config.mode == "close" and live.confirmed_end < bar["end"]:

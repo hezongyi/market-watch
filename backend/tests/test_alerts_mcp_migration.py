@@ -11,7 +11,10 @@ from alerts.storage import HistoryVersion, Instrument
 from sqlalchemy import create_engine, inspect, text
 
 ROOT = Path(__file__).resolve().parents[2]
-HEAD = "as46_provider_price_confirmation"
+# The display-observation and bounded-indicator-task migrations are part of the
+# current single line of deployed schema.  Keep the upgrade-path contract tied
+# to the actual Alembic head so new branches cannot silently regress it.
+HEAD = "au48_display_indicator_tasks"
 
 
 def configuration():
