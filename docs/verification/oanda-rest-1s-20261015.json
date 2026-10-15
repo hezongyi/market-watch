@@ -658,5 +658,12 @@
       "no browser long-run real-supplier chart acceptance",
       "repository backend CI is not green: 31 failed, 2364 passed, 11 skipped; failures are classified in the verification report"
     ]
+  },
+  "ci_baseline_repair": {
+    "commit": "3b502eb8e159d51c8a05416c34c5ba8482987a15",
+    "github_run": "38818643314",
+    "status": "backend_pending",
+    "previous_backend": "31 failed, 2364 passed, 11 skipped",
+    "targeted": "migration/provider_calculation/history_replay/composite_recovery/worker_health/market_demand barriers covered"
   }
 }

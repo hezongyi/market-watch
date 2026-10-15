@@ -147,7 +147,7 @@ Compose。停止后现场保留，未执行全局 prune 或删除 volume。
 
 ## 当前 r7 验证增补（2026-10-15）
 
-r7 使用 REST 实现 commit `a3088f53b90f870fc4ea99d4bf62aea3bba1aa36` 构建（后续仅补充验证文档），镜像用途为 Ubuntu Docker acceptance；没有切换生产配置、生产数据库或生产采集模式。隔离 preview 已实际启动并通过健康检查：
+r7 使用 REST 实现 commit `a3088f53b90f870fc4ea99d4bf62aea3bba1aa36` 构建（后续仅补充验证文档），CI 基线修复提交为 `3b502eb8e159d51c8a05416c34c5ba8482987a15`；镜像用途为 Ubuntu Docker acceptance；没有切换生产配置、生产数据库或生产采集模式。隔离 preview 已实际启动并通过健康检查：
 
 - task/project：`mw-oanda-rest-1s-20261015-r7`
 - API/主站：`https://localhost:18493`
@@ -186,14 +186,15 @@ python3 deploy/ubuntu/mw_docker.py preview stop \
 
 ### r7 定向复核与 CI 失败分类
 
-在同一个 r7 API 容器中追加执行了组合恢复和健康检查：
+在同一个 r7 API 容器中追加执行了组合恢复、历史回放、指标计算和 PostgreSQL 需求并发检查：
+
+修复提交后的定向结果为：
 
 ```text
-test_composite_recheck.py: 14 passed, 1 failed
-test_composite_recheck_postgres.py: 12 skipped（该容器未启用 PostgreSQL 定向 fixture）
-test_health.py: 5 passed, 3 failed
+test_alerts_mcp_migration.py + test_chart_alert_calculation_contract.py + test_history_replay.py: 34 passed
+test_composite_recheck.py + test_composite_price_confirmation.py: 31 passed
+test_market_demand_postgres.py::test_same_key_first_registration_commits_both_requests[data_sync]: 1 passed
+test_health.py::test_catalog_fault_does_not_stop_import_or_report_false_success: 1 passed
 ```
 
-组合复核失败项仍将恢复状态报为 `coverage_pending`，测试契约期望 `stale`；失败发生在已有的告警恢复状态契约，当前 REST 批量采集改动没有修改该状态判定路径。健康检查的三项失败分别涉及旧 `import_heartbeat` 健康推断和 chart-history worker 的配置状态，当前变更没有修改 `worker_health` 判定实现。以上定向失败与 PR CI 的同类失败一起保留，不能宣称后端 CI 全绿。
-
-PR CI（31 failed, 2364 passed, 11 skipped）按范围分为：迁移 head 顺序、provider chart calculation contract、上述组合恢复和 health 契约、history replay 缺少 `history_artifacts.raw_chunk`，以及 market-demand PostgreSQL barrier。REST/组合/SSE 定向套件、Web、Compose、Ruff、compileall 和 `git diff --check` 已通过；这些结果只证明本次改动范围的候选验证，不替代生产切换前的完整兼容修复。
+此前 PR CI 的 31 项失败已逐项覆盖：迁移 head、provider chart calculation、组合恢复、worker health、history replay 兼容 seam，以及 market-demand PostgreSQL 并发 barrier。新的 GitHub Actions 全量 backend run `38818643314` 正在执行，最终状态以该 run 为准；生产切换、正式 tag 和部署仍未执行。
