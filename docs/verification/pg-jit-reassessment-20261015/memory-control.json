@@ -1,0 +1,186 @@
+{
+  "off": {
+    "plan": {
+      "Plan": {
+        "Node Type": "Aggregate",
+        "Strategy": "Plain",
+        "Partial Mode": "Simple",
+        "Parallel Aware": false,
+        "Async Capable": false,
+        "Startup Cost": 0.28,
+        "Total Cost": 0.29,
+        "Plan Rows": 1,
+        "Plan Width": 32,
+        "Actual Startup Time": 0.019,
+        "Actual Total Time": 0.019,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Plans": [
+          {
+            "Node Type": "Function Scan",
+            "Parent Relationship": "Outer",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Function Name": "generate_series",
+            "Alias": "s",
+            "Startup Cost": 0.0,
+            "Total Cost": 0.1,
+            "Plan Rows": 10,
+            "Plan Width": 4,
+            "Actual Startup Time": 0.007,
+            "Actual Total Time": 0.008,
+            "Actual Rows": 10,
+            "Actual Loops": 1
+          }
+        ]
+      },
+      "Planning Time": 0.103,
+      "Triggers": [],
+      "Execution Time": 0.035
+    },
+    "points": [
+      {
+        "iteration": 1,
+        "VmHWM": 15712,
+        "VmRSS": 15712,
+        "cpu_seconds": 0.0
+      },
+      {
+        "iteration": 10,
+        "VmHWM": 15712,
+        "VmRSS": 15712,
+        "cpu_seconds": 0.0
+      },
+      {
+        "iteration": 50,
+        "VmHWM": 15712,
+        "VmRSS": 15712,
+        "cpu_seconds": 0.0
+      },
+      {
+        "iteration": 100,
+        "VmHWM": 15712,
+        "VmRSS": 15712,
+        "cpu_seconds": 0.0
+      },
+      {
+        "iteration": 250,
+        "VmHWM": 15712,
+        "VmRSS": 15712,
+        "cpu_seconds": 0.03
+      },
+      {
+        "iteration": 500,
+        "VmHWM": 15712,
+        "VmRSS": 15712,
+        "cpu_seconds": 0.06
+      },
+      {
+        "iteration": 1000,
+        "VmHWM": 15712,
+        "VmRSS": 15712,
+        "cpu_seconds": 0.13
+      }
+    ]
+  },
+  "on": {
+    "plan": {
+      "Plan": {
+        "Node Type": "Aggregate",
+        "Strategy": "Plain",
+        "Partial Mode": "Simple",
+        "Parallel Aware": false,
+        "Async Capable": false,
+        "Startup Cost": 0.28,
+        "Total Cost": 0.29,
+        "Plan Rows": 1,
+        "Plan Width": 32,
+        "Actual Startup Time": 28.66,
+        "Actual Total Time": 28.661,
+        "Actual Rows": 1,
+        "Actual Loops": 1,
+        "Plans": [
+          {
+            "Node Type": "Function Scan",
+            "Parent Relationship": "Outer",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Function Name": "generate_series",
+            "Alias": "s",
+            "Startup Cost": 0.0,
+            "Total Cost": 0.1,
+            "Plan Rows": 10,
+            "Plan Width": 4,
+            "Actual Startup Time": 28.648,
+            "Actual Total Time": 28.649,
+            "Actual Rows": 10,
+            "Actual Loops": 1
+          }
+        ]
+      },
+      "Planning Time": 0.062,
+      "Triggers": [],
+      "JIT": {
+        "Functions": 5,
+        "Options": {
+          "Inlining": true,
+          "Optimization": true,
+          "Expressions": true,
+          "Deforming": true
+        },
+        "Timing": {
+          "Generation": 0.185,
+          "Inlining": 6.647,
+          "Optimization": 12.211,
+          "Emission": 9.772,
+          "Total": 28.815
+        }
+      },
+      "Execution Time": 28.892
+    },
+    "points": [
+      {
+        "iteration": 1,
+        "VmHWM": 93116,
+        "VmRSS": 92924,
+        "cpu_seconds": 0.11
+      },
+      {
+        "iteration": 10,
+        "VmHWM": 93568,
+        "VmRSS": 93240,
+        "cpu_seconds": 0.35
+      },
+      {
+        "iteration": 50,
+        "VmHWM": 94160,
+        "VmRSS": 93844,
+        "cpu_seconds": 1.4
+      },
+      {
+        "iteration": 100,
+        "VmHWM": 94780,
+        "VmRSS": 94452,
+        "cpu_seconds": 2.79
+      },
+      {
+        "iteration": 250,
+        "VmHWM": 94780,
+        "VmRSS": 94452,
+        "cpu_seconds": 6.82
+      },
+      {
+        "iteration": 500,
+        "VmHWM": 96720,
+        "VmRSS": 95980,
+        "cpu_seconds": 13.59
+      },
+      {
+        "iteration": 1000,
+        "VmHWM": 97108,
+        "VmRSS": 96716,
+        "cpu_seconds": 27.17
+      }
+    ]
+  }
+}

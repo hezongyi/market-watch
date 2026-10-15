@@ -1,7 +1,7 @@
 # Ubuntu-only isolated UX acceptance project. Build every app image via mw-docker.
 services:
   pg:
-    image: postgres:14-bookworm
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
     restart: "no"
     environment:
       POSTGRES_DB: production_ux_acceptance
@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: ${MW_UX_DB_PASSWORD:?Set acceptance-only password}
     volumes: [pg-data:/var/lib/postgresql/data]
     healthcheck:
-      test: [CMD-SHELL, pg_isready -U ux_acceptance -d production_ux_acceptance]
+      test: [CMD-SHELL, "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\" && test \"$$(PGOPTIONS='-c jit=on' psql -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\" -Atqc \"SELECT current_setting('server_version_num') = '140024' AND pg_jit_available()\")\" = t"]
       interval: 3s
       retries: 20
   migrate:
@@ -18,6 +18,7 @@ services:
     command: [alembic, upgrade, head]
     environment: &backend
       ALERTS_DATABASE_URL: postgresql+psycopg://ux_acceptance:${MW_UX_DB_PASSWORD}@pg/production_ux_acceptance
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
       ALERTS_ADMIN_PASSWORD_HASH: ${MW_UX_LOGIN_HASH:?Set acceptance-only hash}
       ALERTS_COOKIE_SECURE: "false"
       ALERTS_DELIVERY_ENABLED: "false"
@@ -93,6 +94,7 @@ services:
     environment:
       <<: *backend
       TEST_POSTGRES_URL: postgresql+psycopg://ux_acceptance:${MW_UX_DB_PASSWORD}@pg/production_ux_acceptance
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
     entrypoint: [python, -m, pytest]
     working_dir: /repo
     volumes: [../..:/repo:ro]

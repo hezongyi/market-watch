@@ -5,6 +5,7 @@ x-api: &api
   env_file: ${MW_ACCEPTANCE_ENV:?Use a private Ubuntu development env file}
   environment:
     ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD:?Set development-only password}@postgres/alerts
+    ALERTS_DATABASE_EXPECTED_VERSION: "140024"
     ALERTS_COOKIE_SECURE: "false"
     ALERTS_DELIVERY_ENABLED: "false"
   restart: "no"
@@ -12,7 +13,7 @@ x-api: &api
     migrate: {condition: service_completed_successfully}
 services:
   postgres:
-    image: postgres:14-bookworm
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
     environment:
       POSTGRES_DB: alerts
       POSTGRES_USER: alerts
@@ -20,7 +21,7 @@ services:
     volumes: ["postgres-data:/var/lib/postgresql/data"]
     ports: ["127.0.0.1:15645:5432"]
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U alerts -d alerts"]
+      test: [CMD-SHELL, "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\" && test \"$$(PGOPTIONS='-c jit=on' psql -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\" -Atqc \"SELECT current_setting('server_version_num') = '140024' AND pg_jit_available()\")\" = t"]
       interval: 3s
       timeout: 3s
       retries: 20
@@ -53,6 +54,7 @@ services:
     profiles: ["verification"]
     environment:
       TEST_POSTGRES_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
       ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
       ALERTS_DELIVERY_ENABLED: "false"
       PYTHONPATH: /app/backend

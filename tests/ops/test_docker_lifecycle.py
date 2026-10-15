@@ -303,6 +303,17 @@ class RetirementPostgresIdentityTests(unittest.TestCase):
     def test_verified_official_pg_alias_allowed(self):
         self.validate()
 
+    def test_pinned_pg1424_reference_allowed(self):
+        self.container['Config']['Image'] = m.PG14_IMAGE
+        self.assertTrue(m.retirement_postgres(self.container))
+        self.validate()
+
+    def test_pinned_pg1424_still_requires_reviewed_actual_digest(self):
+        self.container['Config']['Image'] = m.PG14_IMAGE
+        self.image['RepoDigests'] = ['postgres@sha256:' + 'f' * 64]
+        with self.assertRaises(ValueError):
+            self.validate()
+
     def test_fixed_pg_id_requires_actual_image_and_official_digest(self):
         fixed = 'sha256:' + 'a' * 64
         self.container['Image'] = self.container['Config']['Image'] = fixed
@@ -418,7 +429,9 @@ class RetainedDependencyTests(unittest.TestCase):
     def test_automatic_cleanup_preserves_recorded_retained_dependency(self):
         image = {'Id': self.ident}
         docker = SimpleNamespace(images=lambda: [image], containers=lambda: [], run=mock.Mock())
-        with mock.patch.object(m, 'task_records', return_value={'mw-test': {'retained_images': [self.ident]}}), \
+        with tempfile.TemporaryDirectory(prefix='mw-cleanup-test-') as directory, \
+             mock.patch.object(m, 'STATE', Path(directory)), \
+             mock.patch.object(m, 'task_records', return_value={'mw-test': {'retained_images': [self.ident]}}), \
              mock.patch.object(m, 'candidates', return_value=[{'id': self.ident}]), \
              mock.patch('builtins.print'):
             self.assertEqual(m.cleanup(docker, automatic=True, apply=True), [])

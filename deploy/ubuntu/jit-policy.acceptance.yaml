@@ -1,0 +1,44 @@
+# Ubuntu-only policy verification; no supplier traffic or published ports.
+name: mw-pr65-revision-20261015
+services:
+  postgres:
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+    environment:
+      POSTGRES_DB: jit_policy
+      POSTGRES_USER: assessment
+      POSTGRES_HOST_AUTH_METHOD: trust
+    command: [postgres, -c, max_connections=12, -c, jit=on]
+    mem_limit: 768m
+    cpus: 1
+    volumes: [postgres-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U assessment -d jit_policy && test \"$$(PGOPTIONS='-c jit=on' psql -U assessment -d jit_policy -Atqc \"SELECT current_setting('server_version_num') = '140024' AND pg_jit_available()\")\" = t"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  tests:
+    image: ${MW_JIT_TEST_IMAGE:-market-watch-api:pr65-revision-20261015}
+    working_dir: /workspace
+    environment:
+      PYTHONPATH: /app/backend
+      PYTHONDONTWRITEBYTECODE: "1"
+      ALERTS_DATABASE_URL: postgresql+psycopg://assessment@postgres/jit_policy
+      TEST_POSTGRES_URL: postgresql+psycopg://assessment@postgres/jit_policy
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
+      ALERTS_DATABASE_JIT: inherit
+      ALERTS_DELIVERY_ENABLED: "false"
+      ALERTS_YAHOO_ENABLED: "false"
+      ALERTS_OANDA_STREAM_ENABLED: "false"
+      OPENBLAS_NUM_THREADS: "1"
+    volumes:
+      - ../..:/workspace:ro
+    depends_on:
+      postgres: {condition: service_healthy}
+    command: [python, -m, pytest, -q, -p, "no:cacheprovider", backend/tests/test_config.py, backend/tests/test_database_pool.py, backend/tests/test_database_jit_postgres.py]
+    mem_limit: 768m
+    cpus: 1
+volumes:
+  postgres-data:
+networks:
+  default:
+    internal: true

@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -11,6 +11,23 @@ class Settings(BaseSettings):
     database_max_overflow: int = Field(default=0, ge=0, le=20)
     database_pool_timeout: int = Field(default=15, ge=1, le=120)
     database_application_name: str = "market-watch"
+    # Inherit the server/database/role policy unless this service opts in or out.
+    database_jit: Literal['inherit', 'on', 'off'] = 'inherit'
+    # Acceptance-only gate; production and explicit old-version rollback omit it.
+    database_expected_version: int | None = Field(default=None, gt=0)
+
+    @field_validator('database_jit', mode='before')
+    @classmethod
+    def normalize_database_jit(cls, value):
+        if isinstance(value, bool):
+            return 'on' if value else 'off'
+        if isinstance(value, str):
+            value = value.strip().lower()
+            return {'true': 'on', 'false': 'off', '1': 'on', '0': 'off',
+                    'yes': 'on', 'no': 'off', 'y': 'on', 'n': 'off',
+                    't': 'on', 'f': 'off'}.get(value, value)
+        return value
+
     mcp_enabled: bool = False
     mcp_allowed_hosts: list[str] = ["localhost", "localhost:*", "127.0.0.1", "127.0.0.1:*", "[::1]", "[::1]:*"]
     mcp_allowed_origins: list[str] = ["http://localhost", "http://localhost:*", "http://127.0.0.1", "http://127.0.0.1:*"]

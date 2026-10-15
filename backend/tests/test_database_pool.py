@@ -5,18 +5,25 @@ from sqlalchemy.exc import TimeoutError
 from sqlalchemy.pool import QueuePool
 
 
+def test_acceptance_gate_cannot_silently_use_sqlite(monkeypatch):
+    monkeypatch.setattr(storage.settings, 'database_expected_version', 140024)
+    with pytest.raises(RuntimeError, match='cannot use SQLite'):
+        storage.make_engine('sqlite://')
+
+
 def test_configured_pool_cannot_exceed_connection_budget(monkeypatch):
     monkeypatch.setattr(storage.settings, "database_pool_size", 2)
     monkeypatch.setattr(storage.settings, "database_max_overflow", 0)
     monkeypatch.setattr(storage.settings, "database_pool_timeout", 1)
+    monkeypatch.setattr(storage.settings, "database_jit", "inherit")
+    monkeypatch.setattr(storage.settings, "database_expected_version", None)
 
     def local_transport(url, **options):
         # Keep the production PostgreSQL pool settings, use local DB handles so
         # exhausting the acceptance pool cannot consume shared server slots.
-        assert (
-            options.pop("connect_args")["application_name"]
-            == storage.settings.database_application_name
-        )
+        connect_args = options.pop("connect_args")
+        assert connect_args["application_name"] == storage.settings.database_application_name
+        assert "options" not in connect_args
         return create_engine("sqlite://", poolclass=QueuePool, **options)
 
     monkeypatch.setattr(storage, "create_engine", local_transport)

@@ -1,0 +1,25 @@
+{
+  "verified_date_utc": "2026-10-15",
+  "method": "ssh unraid -> docker exec -i -u postgres postgresql14 psql; read-only SELECT",
+  "container": "postgresql14",
+  "server_version": "14.24 (Debian 14.24-1.pgdg12+2)",
+  "server_version_num": 140024,
+  "postgres_database_jit": "on",
+  "pg_db_role_setting": [
+    {
+      "database": "market_watch",
+      "role": "market_watch_app",
+      "settings": [
+        "jit=off"
+      ]
+    },
+    {
+      "database": "market_watch",
+      "role": "*",
+      "settings": [
+        "jit=off"
+      ]
+    }
+  ],
+  "changed_production": false
+}

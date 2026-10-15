@@ -13,6 +13,7 @@ x-api: &api
     - path: ${MW_ACCEPTANCE_ENV:?Set a restricted development-only env file}
       format: raw
   environment:
+    ALERTS_DATABASE_EXPECTED_VERSION: "140024"
     ALERTS_DELIVERY_ENABLED: "false"
     ALERTS_DATABASE_POOL_SIZE: "1"
     ALERTS_DATABASE_MAX_OVERFLOW: "0"

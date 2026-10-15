@@ -9,17 +9,19 @@ x-backend: &backend
   restart: "no"
 services:
   pg:
-    image: postgres:14-bookworm
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
     env_file:
       - path: ${MW_ATR_PRIVATE_DIR}/postgres.env
         format: raw
     volumes: [atr-postgres:/var/lib/postgresql/data]
     networks: [atr]
     healthcheck:
-      test: [CMD-SHELL, pg_isready -U atr -d atr]
+      test: [CMD-SHELL, "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\" && test \"$$(PGOPTIONS='-c jit=on' psql -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\" -Atqc \"SELECT current_setting('server_version_num') = '140024' AND pg_jit_available()\")\" = t"]
       interval: 3s
       retries: 30
   migrate:
+    environment:
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
     <<: *backend
     command: [alembic, upgrade, head]
     depends_on:
@@ -28,6 +30,7 @@ services:
     <<: *backend
     command: [python, /fixture/api.py, api]
     environment:
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
       ALERTS_MARKET_POLL_SECONDS: "3"
       ALERTS_PROVIDER_FRESH_SECONDS: "3"
     volumes:
@@ -43,6 +46,7 @@ services:
     <<: *backend
     command: [python, /fixture/api.py, worker]
     environment:
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
       ALERTS_MARKET_POLL_SECONDS: "3"
       ALERTS_PROVIDER_FRESH_SECONDS: "3"
     volumes:
@@ -56,6 +60,7 @@ services:
     environment:
       PYTHONPATH: /app/backend:/verification/backend/tests
       TEST_POSTGRES_URL: ${MW_ATR_TEST_POSTGRES_URL:?Private Compose env}
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
       CHART_ALERT_TEST_DATABASE_URL: ${MW_ATR_TEST_POSTGRES_URL}
     volumes:
       - ../../backend/tests:/verification/backend/tests:ro
@@ -84,6 +89,7 @@ services:
     profiles: [notification]
     command: [python, -m, alerts.notify]
     environment:
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
       ALERTS_DELIVERY_ENABLED: "true"
     depends_on:
       api: {condition: service_healthy}

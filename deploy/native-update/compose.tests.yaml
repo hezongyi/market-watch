@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:14-bookworm
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
     environment:
       POSTGRES_DB: alerts
       POSTGRES_USER: alerts
@@ -8,7 +8,7 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: [CMD-SHELL, pg_isready -U alerts]
+      test: [CMD-SHELL, "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\" && test \"$$(PGOPTIONS='-c jit=on' psql -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\" -Atqc \"SELECT current_setting('server_version_num') = '140024' AND pg_jit_available()\")\" = t"]
       interval: 2s
       timeout: 3s
       retries: 20
@@ -19,7 +19,9 @@ services:
     environment:
       PYTHONPATH: /workspace/backend
       PYTHONDONTWRITEBYTECODE: "1"
+      ALERTS_DATABASE_URL: ${TEST_POSTGRES_URL:?private tests.env required}
       TEST_POSTGRES_URL: ${TEST_POSTGRES_URL:?private tests.env required}
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
       ALERTS_DELIVERY_ENABLED: "false"
       ALERTS_YAHOO_ENABLED: "false"
     volumes:
