@@ -52,6 +52,28 @@ jobs:
           python -m pip install -r requirements.lock
           python -m pip install -e . --no-deps
 
+      - name: Detect backend test changes
+        id: backend_changes
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+
+          if [[ "$BASE_SHA" =~ ^0+$ ]]; then
+            changed_files="$(git diff-tree --root --no-commit-id --name-only -r "$HEAD_SHA")"
+          else
+            changed_files="$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")"
+          fi
+
+          if printf '%s\n' "$changed_files" | grep -Eq '^(backend/|migrations/|pyproject\.toml$|requirements\.lock$|alembic\.ini$|Dockerfile$)'; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Backend test inputs changed; full backend checks will run."
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No backend test inputs changed; full backend checks will be skipped."
+          fi
+
       - name: Verify PostgreSQL service version
         run: |
           python - <<'PY'
@@ -67,6 +89,7 @@ jobs:
           print(f"PostgreSQL server_version_num={version}")
 
       - name: Ruff changed Python files
+        if: steps.backend_changes.outputs.changed == 'true'
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -94,7 +117,12 @@ jobs:
           python -m ruff check "${python_files[@]}"
 
       - name: Python tests
+        if: steps.backend_changes.outputs.changed == 'true'
         run: python -m pytest -q
+
+      - name: Backend checks skipped
+        if: steps.backend_changes.outputs.changed != 'true'
+        run: echo "Backend checks are not needed for this change set."
 
   web:
     name: web
