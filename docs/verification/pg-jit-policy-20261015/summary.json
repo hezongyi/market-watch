@@ -10,12 +10,25 @@
     "backend/alerts/config.py": "f39cb97bfe7b95a7b3a73d78c93357fa139d29862caeec5c64036ac1c92484c5",
     "backend/alerts/storage.py": "89ba3e19c0dabeb8bbbc6e7c5db5a6c4fe6a78bbbdc60d52ddafcedc052d680b",
     "compose.production.yaml": "40cbe71dacba5620b6c804b3040a9b2192a335ec7438d379ecb1a1c0b35cbdd9",
-    "deploy/ubuntu/jit-policy.acceptance.yaml": "61cea42a43c1806ef4faca2410286f7f122c3b85aecf649adb5b2e3699f31270"
+    "deploy/ubuntu/jit-policy.acceptance.yaml": "61cea42a43c1806ef4faca2410286f7f122c3b85aecf649adb5b2e3699f31270",
+    "scripts/pg_jit_reassessment/compose.yaml": "e9d0d80d113322a86dd6942810154e531ebf42a7363036f051991bd67c7631ae",
+    "tests/ops/test_database_compose.py": "1d444a46236f468b6cb89769ccd589046bf3cc0b435629ff5dd48ddbff6a47e8"
   },
   "connection_tests_passed": 27,
   "business_suite_passed": 42,
   "production_changed": false,
   "long_term_memory_stability_proven": false,
   "deployment_tests_passed": 62,
-  "deployment_subtests_passed": 36
+  "deployment_subtests_passed": 36,
+  "review": {
+    "base": "dbb55c1c9f34d785ddf825f8ea539b0759f6e948",
+    "implementation_head": "a90f0c5dd605bd0ba61f4e38fa7aa496b12d5af8",
+    "standards_unresolved": 0,
+    "spec_unresolved": 0,
+    "fixed_findings": [
+      "P2: reassessment Compose referenced an undefined PostgreSQL volume; fixed and added to rendered configuration checks."
+    ]
+  },
+  "cleanup": "cleanup.json",
+  "production_readonly_verification": "production-readonly.json"
 }

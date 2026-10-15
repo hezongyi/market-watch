@@ -67,4 +67,6 @@ mw-docker retire --task mw-pr65-jit-rerun --project mw-pr65-jit-rerun --apply
 
 本轮执行器的用户目录只读，临时启动器将原工具的台账与 Docker CLI 元数据放在 `/tmp/mw-pr65-revision-20261015/`；使用现有本机 socket 权限和仓库同一构建／归属／归档／恢复校验逻辑，没有修改已安装工具。实际命令入口为 `python /tmp/mw-pr65-revision-20261015/mw-docker-task.py build|retire ...`。
 
-PR 审阅期间保留本任务隔离 PG，供必要的复核；最终退役与审查结果在本文件后续记录。无生产操作。
+本轮已先预览，再按任务归档数据库并实际恢复，逐表行数与内容指纹均一致（`restore_verified=true`）。两个容器、专属网络、volume 和无引用专属应用镜像已清理；[清理证据](verification/pg-jit-policy-20261015/cleanup.json) 记录私有归档路径。归档位于临时任务目录，不是生产回滚备份。
+
+独立双轴审查最初均发现复测 Compose 卷声明不一致的同一个 P2，已修复并纳入实际展开检查；Standards 与 Spec 最终均为 0 项未解决发现，见 [最终审查报告](pg-jit-pr65-review-20261015.md)。再次只读核实 Unraid 生产为 PG14.24，实例默认 JIT on、Market Watch 数据库及库内应用角色仍为 off，见 [生产只读结果](verification/pg-jit-policy-20261015/production-readonly.json)。本轮未部署、未修改生产设置，PR 未自动合并。

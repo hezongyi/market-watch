@@ -1,0 +1,22 @@
+{
+  "project": "mw-pr65-revision-20261015",
+  "archive": "/tmp/mw-pr65-revision-20261015/lifecycle/archives/mw-pr65-revision-20261015-20261015T091645-c95b937b",
+  "restore_verified": true,
+  "backup_databases": [
+    {
+      "database": "jit_policy",
+      "sha256": "f602bb6197cb4cd18d8510f088e97a55215420d87842fb6ad3b82d8da7e68281",
+      "actual_restore_verified": true
+    },
+    {
+      "database": "postgres",
+      "sha256": "cc5c8ae18e025ba9c21a3e69a41b39f0596d19ccace110dcefb8a0922c56e355",
+      "actual_restore_verified": true
+    }
+  ],
+  "remaining_project_containers": 0,
+  "remaining_project_volumes": 0,
+  "remaining_project_networks": 0,
+  "task_image_removed": true,
+  "production_changed": false
+}
