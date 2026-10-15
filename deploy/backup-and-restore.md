@@ -15,6 +15,8 @@
 
 设置 `ALERTS_DATABASE_URL` 指向要备份的数据库，并使同主版本的 `pg_dump` / `pg_restore` 位于 PATH，或通过 `ALERTS_POSTGRES_BIN_DIR` 指定目录。连接凭据只传入子进程环境，不进入命令行、备份清单或网页。
 
+PostgreSQL 这条流程生成的是 **全量逻辑备份**（`pg_dump --format=custom`），不是文件系统快照，也不是增量/WAL 备份。`REPEATABLE READ` 与 `pg_export_snapshot()` 只用于让 dump 读取同一份 MVCC 数据视图；它仍需读取并导出全库内容。归档里的压缩大小不能改变其全量性质。
+
 运行相同备份命令生成 `.dump` 和 `.dump.json`。`pg_dump` 使用导出的 REPEATABLE READ 快照，清单记录数与导出使用同一快照。普通备份检查归档可读性，**实际恢复**需执行：
 
 ```bash

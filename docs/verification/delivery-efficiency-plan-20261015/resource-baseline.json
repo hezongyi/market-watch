@@ -1,0 +1,1235 @@
+{
+  "schema_version": 1,
+  "source_commit": "1bfcbbf286458328512631ff85f54eea3787dc95",
+  "audit_window_utc": {
+    "started": "2026-10-15T09:32:00.444496+00:00",
+    "last_production_query": "2026-10-15T09:38:10.372901+00:00"
+  },
+  "scope": {
+    "runtime_operations": "read_only",
+    "only_repository_documentation_written": true,
+    "created_test_or_restore_containers": false,
+    "started_stopped_or_deleted_containers": false,
+    "performed_backup_or_restore": false,
+    "modified_production_configuration": false,
+    "created_worktree": "market-watch-delivery-efficiency-20261015"
+  },
+  "units": {
+    "docker_df": "Docker human-readable decimal units; not independent physical allocations",
+    "memory_and_budget": "bytes in this file; GiB=2^30 in the plan",
+    "table_rows": "pg_stat_user_tables estimates, not exact counts"
+  },
+  "ubuntu": {
+    "hostname": "quant-server",
+    "sample_started_utc": "2026-10-15T09:32:00.444496+00:00",
+    "sample_finished_utc": "2026-10-15T09:32:17.921206+00:00",
+    "docker": {
+      "Name": "quant-server",
+      "ServerVersion": "29.1.3",
+      "DockerRootDir": "/var/lib/docker",
+      "Driver": "overlayfs",
+      "DriverStatus": [
+        [
+          "driver-type",
+          "io.containerd.snapshotter.v1"
+        ]
+      ],
+      "NCPU": 4,
+      "MemTotal": 16760881152,
+      "LoggingDriver": "json-file",
+      "CgroupVersion": "2",
+      "Architecture": "x86_64",
+      "OSType": "linux",
+      "Containers": 34,
+      "ContainersRunning": 3,
+      "ContainersPaused": 0,
+      "ContainersStopped": 31,
+      "Images": 125
+    },
+    "memory_bytes": {
+      "MemTotal": 16760881152,
+      "MemAvailable": 12110143488,
+      "Cached": 9350844416,
+      "SwapTotal": 4294963200,
+      "SwapFree": 4293902336,
+      "Dirty": 1855488
+    },
+    "loadavg": "2.43 1.13 1.01 1/553 606150",
+    "root_filesystem": {
+      "type": "ext4",
+      "total_bytes": 152112480256,
+      "used_bytes": 108966379520,
+      "available_bytes": 35344695296
+    },
+    "container_state_counts": {
+      "created": 3,
+      "exited": 30,
+      "running": 1
+    },
+    "sampling_note": "docker info initially saw 3 running containers; the later inspect/stats/df sample saw only the builder running. Other tasks may change independently.",
+    "docker_system_df": "TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE\nImages          125       19        18.03GB   -8.291e+09B (-45%)\nContainers      34        1         1.2MB     1.139MB (94%)\nLocal Volumes   8         8         5.835GB   0B (0%)\nBuild Cache     131       0         3.505GB   355.9kB\n",
+    "docker_df_warning": "Negative image reclaimable value (-8.291e+09B) is invalid for capacity planning; no reclaim estimate inferred.",
+    "image_counts": {
+      "unique_ids": 125,
+      "managed": 119,
+      "without_tags": 96,
+      "purpose": {
+        "acceptance": 105,
+        "release": 9,
+        "development": 5,
+        "unmanaged": 6
+      },
+      "automatic_eligible_at_audit": 0
+    },
+    "task_record_counts": {
+      "total": 109,
+      "completed": 99,
+      "not_completed": 10
+    },
+    "preserved_projects": [
+      {
+        "project": "mw-android-mobile-20261013",
+        "containers": [
+          {
+            "name": "mw-android-mobile-20261013-api-1",
+            "status": "exited",
+            "service": "api",
+            "image_ref": "market-watch-api:android-mobile-20261013"
+          },
+          {
+            "name": "mw-android-mobile-20261013-migrate-1",
+            "status": "exited",
+            "service": "migrate",
+            "image_ref": "market-watch-api:android-mobile-20261013"
+          },
+          {
+            "name": "mw-android-mobile-20261013-web-1",
+            "status": "exited",
+            "service": "web",
+            "image_ref": "market-watch-web:android-mobile-20261013"
+          },
+          {
+            "name": "mw-android-mobile-20261013-chart-origin-1",
+            "status": "exited",
+            "service": "chart-origin",
+            "image_ref": "market-watch-chart-origin:android-mobile-20261013"
+          },
+          {
+            "name": "mw-android-mobile-20261013-tls-1",
+            "status": "exited",
+            "service": "tls",
+            "image_ref": "nginx:1.28-alpine"
+          },
+          {
+            "name": "mw-android-mobile-20261013-postgres-1",
+            "status": "exited",
+            "service": "postgres",
+            "image_ref": "postgres:14-bookworm"
+          }
+        ],
+        "state_counts": {
+          "exited": 6
+        },
+        "central_tasks": [
+          {
+            "task": "mw-android-mobile-20261013",
+            "purpose": "acceptance",
+            "completed_at": null
+          }
+        ],
+        "volumes": [
+          {
+            "name": "mw-android-mobile-20261013_mobile-postgres",
+            "docker_reported_size": "75.74MB"
+          }
+        ],
+        "all_containers_have_memory_limit": false,
+        "all_containers_have_cpu_limit": false,
+        "cleanup_authorized": false
+      },
+      {
+        "project": "mw-chart-reloads-20261013",
+        "containers": [
+          {
+            "name": "mw-chart-reloads-20261013-web-1",
+            "status": "exited",
+            "service": "web",
+            "image_ref": "market-watch-web:chart-reloads-20261013"
+          },
+          {
+            "name": "mw-chart-reloads-20261013-market-stream-worker-1",
+            "status": "exited",
+            "service": "market-stream-worker",
+            "image_ref": "market-watch-api:chart-reloads-20261013"
+          },
+          {
+            "name": "mw-chart-reloads-20261013-native-history-worker-1",
+            "status": "exited",
+            "service": "native-history-worker",
+            "image_ref": "market-watch-api:chart-reloads-20261013"
+          },
+          {
+            "name": "mw-chart-reloads-20261013-history-state-worker-1",
+            "status": "exited",
+            "service": "history-state-worker",
+            "image_ref": "market-watch-api:chart-reloads-20261013"
+          },
+          {
+            "name": "mw-chart-reloads-20261013-api-1",
+            "status": "exited",
+            "service": "api",
+            "image_ref": "market-watch-api:chart-reloads-20261013"
+          },
+          {
+            "name": "mw-chart-reloads-20261013-migrate-1",
+            "status": "exited",
+            "service": "migrate",
+            "image_ref": "market-watch-api:chart-reloads-20261013"
+          },
+          {
+            "name": "mw-chart-reloads-20261013-chart-origin-1",
+            "status": "exited",
+            "service": "chart-origin",
+            "image_ref": "market-watch-chart-origin:chart-reloads-20261013"
+          },
+          {
+            "name": "mw-chart-reloads-20261013-postgres-1",
+            "status": "exited",
+            "service": "postgres",
+            "image_ref": "postgres:14-bookworm"
+          }
+        ],
+        "state_counts": {
+          "exited": 8
+        },
+        "central_tasks": [
+          {
+            "task": "mw-chart-reloads-20261013",
+            "purpose": "acceptance",
+            "completed_at": null
+          }
+        ],
+        "volumes": [
+          {
+            "name": "mw-chart-reloads-20261013_postgres-data",
+            "docker_reported_size": "186.1MB"
+          }
+        ],
+        "all_containers_have_memory_limit": false,
+        "all_containers_have_cpu_limit": false,
+        "cleanup_authorized": false
+      },
+      {
+        "project": "mw-indicator-latency-20261015",
+        "containers": [
+          {
+            "name": "mw-indicator-latency-20261015-api-1",
+            "status": "created",
+            "service": "api",
+            "image_ref": "market-watch-api:indicator-latency-20261015"
+          },
+          {
+            "name": "mw-indicator-latency-20261015-migrate-1",
+            "status": "exited",
+            "service": "migrate",
+            "image_ref": "market-watch-api:indicator-latency-20261015"
+          },
+          {
+            "name": "mw-indicator-latency-20261015-chart-origin-1",
+            "status": "created",
+            "service": "chart-origin",
+            "image_ref": "market-watch-chart-origin:indicator-latency-20261015"
+          },
+          {
+            "name": "mw-indicator-latency-20261015-web-1",
+            "status": "created",
+            "service": "web",
+            "image_ref": "market-watch-web:indicator-latency-20261015"
+          },
+          {
+            "name": "mw-indicator-latency-20261015-pg-1",
+            "status": "exited",
+            "service": "pg",
+            "image_ref": "postgres:14-bookworm"
+          }
+        ],
+        "state_counts": {
+          "created": 3,
+          "exited": 2
+        },
+        "central_tasks": [
+          {
+            "task": "mw-indicator-latency-20261015",
+            "purpose": "acceptance",
+            "completed_at": null
+          }
+        ],
+        "volumes": [
+          {
+            "name": "mw-indicator-latency-20261015_pg-data",
+            "docker_reported_size": "55.47MB"
+          }
+        ],
+        "all_containers_have_memory_limit": false,
+        "all_containers_have_cpu_limit": false,
+        "cleanup_authorized": false
+      },
+      {
+        "project": "mw-mt4-20261011",
+        "containers": [
+          {
+            "name": "mw-mt4-20261011-native-history-worker-1",
+            "status": "exited",
+            "service": "native-history-worker",
+            "image_ref": "market-watch-api:mt4-20261011"
+          },
+          {
+            "name": "mw-mt4-20261011-api-1",
+            "status": "exited",
+            "service": "api",
+            "image_ref": "market-watch-api:mt4-20261011"
+          },
+          {
+            "name": "mw-mt4-20261011-migrate-1",
+            "status": "exited",
+            "service": "migrate",
+            "image_ref": "market-watch-api:mt4-20261011"
+          },
+          {
+            "name": "mw-mt4-20261011-web-1",
+            "status": "exited",
+            "service": "web",
+            "image_ref": "market-watch-web:mt4-20261011"
+          },
+          {
+            "name": "mw-mt4-20261011-chart-origin-1",
+            "status": "exited",
+            "service": "chart-origin",
+            "image_ref": "market-watch-chart-origin:mt4-20261011"
+          },
+          {
+            "name": "mw-mt4-20261011-tls-1",
+            "status": "exited",
+            "service": "tls",
+            "image_ref": "nginx:1.28-alpine"
+          },
+          {
+            "name": "mw-mt4-20261011-pg-1",
+            "status": "exited",
+            "service": "pg",
+            "image_ref": "postgres:14-bookworm"
+          }
+        ],
+        "state_counts": {
+          "exited": 7
+        },
+        "central_tasks": [
+          {
+            "task": "mw-mt4-20261011",
+            "purpose": "acceptance",
+            "completed_at": null
+          }
+        ],
+        "volumes": [
+          {
+            "name": "mw-mt4-20261011_mt4-pg",
+            "docker_reported_size": "564.3MB"
+          }
+        ],
+        "all_containers_have_memory_limit": false,
+        "all_containers_have_cpu_limit": false,
+        "cleanup_authorized": false
+      },
+      {
+        "project": "mw-native-update-20261014",
+        "containers": [
+          {
+            "name": "mw-native-update-20261014-chart-1",
+            "status": "exited",
+            "service": "chart",
+            "image_ref": "market-watch-chart-origin:native-update-20261014"
+          },
+          {
+            "name": "mw-native-update-20261014-api-1",
+            "status": "exited",
+            "service": "api",
+            "image_ref": "market-watch-api:native-update-20261014"
+          },
+          {
+            "name": "mw-native-update-20261014-web-1",
+            "status": "exited",
+            "service": "web",
+            "image_ref": "market-watch-web:native-update-20261014"
+          },
+          {
+            "name": "mw-native-update-20261014-postgres-1",
+            "status": "exited",
+            "service": "postgres",
+            "image_ref": "postgres:14-bookworm"
+          }
+        ],
+        "state_counts": {
+          "exited": 4
+        },
+        "central_tasks": [
+          {
+            "task": "mw-native-update-20261014",
+            "purpose": "development",
+            "completed_at": null
+          }
+        ],
+        "volumes": [
+          {
+            "name": "mw-native-update-20261014_postgres-data",
+            "docker_reported_size": "444.7MB"
+          }
+        ],
+        "all_containers_have_memory_limit": false,
+        "all_containers_have_cpu_limit": false,
+        "cleanup_authorized": false
+      },
+      {
+        "project": "mw-oanda-rest-1s-20261015",
+        "containers": [
+          {
+            "name": "mw-oanda-rest-1s-20261015-bench-1",
+            "status": "exited",
+            "service": "bench",
+            "image_ref": "market-watch-api:v1.25.4"
+          },
+          {
+            "name": "mw-oanda-rest-1s-20261015-batch-1",
+            "status": "exited",
+            "service": "batch",
+            "image_ref": "market-watch-api:v1.25.4"
+          },
+          {
+            "name": "mw-oanda-rest-1s-20261015-pg-1",
+            "status": "exited",
+            "service": "pg",
+            "image_ref": "postgres:14-bookworm"
+          }
+        ],
+        "state_counts": {
+          "exited": 3
+        },
+        "central_tasks": [],
+        "volumes": [
+          {
+            "name": "mw-oanda-rest-1s-20261015_pgdata",
+            "docker_reported_size": "68.19MB"
+          }
+        ],
+        "all_containers_have_memory_limit": false,
+        "all_containers_have_cpu_limit": false,
+        "cleanup_authorized": false
+      }
+    ],
+    "builder": {
+      "name": "market-watch-ubuntu",
+      "status": "running",
+      "version": "v0.33.1",
+      "docker_reported_state_volume_size": "4.441GB",
+      "gc_target_gib": 8,
+      "gc_min_free_gib": 20,
+      "max_parallelism": 2,
+      "runtime_limits_present": false,
+      "stats_sample": [
+        {
+          "BlockIO": "1.18GB / 687MB",
+          "CPUPerc": "0.00%",
+          "Container": "5b5b72d564259ae26a5ca9cb1559b0b049949d2a05ce3dd15b5342b47ac62c7d",
+          "ID": "5b5b72d56425",
+          "MemPerc": "2.68%",
+          "MemUsage": "428.6MiB / 15.61GiB",
+          "Name": "buildx_buildkit_market-watch-ubuntu0",
+          "NetIO": "2.4kB / 126B",
+          "PIDs": "14"
+        }
+      ]
+    },
+    "timers": "NEXT                        LEFT       LAST                        PASSED       UNIT                             ACTIVATES\nThu 2026-10-15 09:45:10 UTC 12min left Thu 2026-10-15 09:31:05 UTC 1min 12s ago market-watch-disk-check.timer    market-watch-disk-check.service\nFri 2026-10-16 04:24:38 UTC 18h left   Thu 2026-10-15 04:21:05 UTC 5h 11min ago market-watch-disk-daily.timer    market-watch-disk-daily.service\nFri 2026-10-16 04:41:29 UTC 19h left   Thu 2026-10-15 04:40:05 UTC 4h 52min ago market-watch-image-cleanup.timer market-watch-image-cleanup.service\n\n3 timers listed.\n",
+    "tool_versions": {
+      "repository_sha256": "6432b8704035a0f8d141f5d0badf5757786d5ea2d171c38c9b7317da6194a9da",
+      "installed_sha256": "29ae5bb0c449edd294e501dab26b234b9ec4859a5bbd01928943e93bc6c4bdad",
+      "differences": [
+        "Installed tool includes bounded OCI base cache changes not in this main snapshot.",
+        "Installed retirement detector lacks the explicit 14.24-bookworm tag alternative present in main.",
+        "Installed detailed monitor still refers to postgres:14-bookworm; main uses the fixed PG14.24 image."
+      ],
+      "modified_by_this_audit": false
+    },
+    "directory_sizes": [
+      {
+        "path": "/home/quant/repos",
+        "allocated_bytes": 29867720704,
+        "coverage": "lower_bound; permission denied in one historical acceptance backups directory"
+      },
+      {
+        "path": "/home/quant/repos/.production",
+        "allocated_bytes": 8728449024,
+        "coverage": "du read-only; nested under repos, do not add twice"
+      },
+      {
+        "path": "/home/quant/repos/.acceptance",
+        "allocated_bytes": 983228416,
+        "coverage": "lower_bound; one historical backups directory unreadable"
+      },
+      {
+        "path": "/home/quant/.local/share/market-watch-docker",
+        "allocated_bytes": 2821513216,
+        "coverage": "du read-only"
+      },
+      {
+        "path": "/home/quant/.local/share/market-watch-docker/archives",
+        "allocated_bytes": 1924235264,
+        "coverage": "nested under lifecycle state, do not add twice"
+      },
+      {
+        "path": "/tmp",
+        "allocated_bytes": 738590720,
+        "coverage": "lower_bound; system-private directories unreadable"
+      },
+      {
+        "path": "/home/quant/.cache",
+        "allocated_bytes": 562368512,
+        "coverage": "du read-only"
+      }
+    ],
+    "historical_monitor": {
+      "at": "2026-10-15T04:21:05.781727+00:00",
+      "available_bytes": 13193625600,
+      "restore_volumes_then": {
+        "mw-v1253-restore_restore-data": 10647613440,
+        "mw-v1254-restore_restore-data": 10971607040
+      },
+      "current_inventory_contains_these_restore_resources": false,
+      "note": "Historical observation only. This audit did not retire or delete either project."
+    }
+  },
+  "unraid": {
+    "hostname": "unraid-aio",
+    "version": "version=\"6.11.5\"",
+    "sample_started_utc": "2026-10-15T09:32:00.453672+00:00",
+    "sample_finished_utc": "2026-10-15T09:32:51.246331+00:00",
+    "docker": {
+      "Name": "unraid-aio",
+      "ServerVersion": "20.10.21",
+      "DockerRootDir": "/var/lib/docker",
+      "Driver": "btrfs",
+      "DriverStatus": [
+        [
+          "Build Version",
+          "Btrfs v5.10.1 "
+        ],
+        [
+          "Library Version",
+          "102"
+        ]
+      ],
+      "NCPU": 6,
+      "MemTotal": 33534746624,
+      "LoggingDriver": "json-file",
+      "CgroupVersion": "1",
+      "Architecture": "x86_64",
+      "OSType": "linux",
+      "Containers": 41,
+      "ContainersRunning": 33,
+      "ContainersPaused": 0,
+      "ContainersStopped": 8,
+      "Images": 336
+    },
+    "memory_bytes": {
+      "MemTotal": 33534746624,
+      "MemAvailable": 3896930304,
+      "Cached": 5128667136,
+      "SwapTotal": 0,
+      "SwapFree": 0,
+      "Dirty": 1404928
+    },
+    "loadavg": "5.59 3.48 2.82 2/1868 2416",
+    "docker_filesystem": {
+      "device": "/dev/loop2",
+      "type": "btrfs",
+      "total_bytes": 53687091200,
+      "used_bytes": 32828026880,
+      "available_bytes": 19875090432
+    },
+    "postgres_filesystem": {
+      "device": "/dev/md1",
+      "type": "xfs",
+      "mount": "/mnt/disk1",
+      "total_bytes": 499862622208,
+      "used_bytes": 344664129536,
+      "available_bytes": 155198492672
+    },
+    "other_filesystem_pressure": [
+      {
+        "mount": "/mnt/disk3",
+        "percent_used": 93
+      }
+    ],
+    "docker_system_df": "TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE\nImages          144       30        29.24GB   16.12GB (55%)\nContainers      41        33        306.5MB   247.7kB (0%)\nLocal Volumes   8         1         34.74MB   34.74MB (100%)\nBuild Cache     44        0         8.156MB   8.156MB\n",
+    "image_accounting": {
+      "image_inspect_unique_ids_including_intermediates": 336,
+      "docker_system_df_images": 144,
+      "market_watch_release_labeled_images": 71
+    },
+    "active_release": "releases/v1.25.4-42b4864",
+    "market_watch_container_states": {
+      "exited": 1,
+      "running": 12
+    },
+    "market_watch_containers": [
+      {
+        "name": "market-watch-migrate-1",
+        "image_ref": "sha256:b45054a7529265bd8031b2cf7662eea7ec3f7a414bd11e9316f54a4d623dc40f",
+        "status": "exited",
+        "health": null,
+        "restart_count": 0,
+        "nonsecret_config": {
+          "ALERTS_DATABASE_POOL_SIZE": "2",
+          "ALERTS_DELIVERY_ENABLED": "true",
+          "ALERTS_YAHOO_ENABLED": "true",
+          "ALERTS_DATABASE_MAX_OVERFLOW": "0"
+        },
+        "log_config": {
+          "Type": "json-file",
+          "Config": {
+            "max-file": "1",
+            "max-size": "50m"
+          }
+        }
+      },
+      {
+        "name": "market-watch-web-1",
+        "image_ref": "sha256:f126bda9f63dd397bffd7a7da78364f5aeae124cb9ee3573db8f2bea5dc68050",
+        "status": "running",
+        "health": null,
+        "restart_count": 0,
+        "nonsecret_config": {},
+        "log_config": {
+          "Type": "json-file",
+          "Config": {
+            "max-file": "1",
+            "max-size": "50m"
+          }
+        }
+      },
+      {
+        "name": "market-watch-native-history-worker-1",
+        "image_ref": "sha256:b45054a7529265bd8031b2cf7662eea7ec3f7a414bd11e9316f54a4d623dc40f",
+        "status": "running",
+        "health": null,
+        "restart_count": 0,
+        "nonsecret_config": {
+          "ALERTS_YAHOO_ENABLED": "true",
+          "ALERTS_DATABASE_MAX_OVERFLOW": "0",
+          "ALERTS_DELIVERY_ENABLED": "false",
+          "ALERTS_DATABASE_POOL_SIZE": "2"
+        },
+        "log_config": {
+          "Type": "json-file",
+          "Config": {
+            "max-file": "1",
+            "max-size": "50m"
+          }
+        }
+      },
+      {
+        "name": "market-watch-chart-history-worker-1",
+        "image_ref": "sha256:b45054a7529265bd8031b2cf7662eea7ec3f7a414bd11e9316f54a4d623dc40f",
+        "status": "running",
+        "health": null,
+        "restart_count": 0,
+        "nonsecret_config": {
+          "ALERTS_DELIVERY_ENABLED": "false",
+          "ALERTS_DATABASE_POOL_SIZE": "2",
+          "ALERTS_DATABASE_MAX_OVERFLOW": "0",
+          "ALERTS_YAHOO_ENABLED": "true"
+        },
+        "log_config": {
+          "Type": "json-file",
+          "Config": {
+            "max-file": "1",
+            "max-size": "50m"
+          }
+        }
+      },
+      {
+        "name": "market-watch-chart-aggregation-worker-1",
+        "image_ref": "sha256:b45054a7529265bd8031b2cf7662eea7ec3f7a414bd11e9316f54a4d623dc40f",
+        "status": "running",
+        "health": null,
+        "restart_count": 0,
+        "nonsecret_config": {
+          "ALERTS_DATABASE_POOL_SIZE": "2",
+          "ALERTS_YAHOO_ENABLED": "true",
+          "ALERTS_DELIVERY_ENABLED": "false",
+          "ALERTS_DATABASE_MAX_OVERFLOW": "0"
+        },
+        "log_config": {
+          "Type": "json-file",
+          "Config": {
+            "max-file": "1",
+            "max-size": "50m"
+          }
+        }
+      },
+      {
+        "name": "market-watch-composite-aggregate-worker-1",
+        "image_ref": "sha256:b45054a7529265bd8031b2cf7662eea7ec3f7a414bd11e9316f54a4d623dc40f",
+        "status": "running",
+        "health": null,
+        "restart_count": 0,
+        "nonsecret_config": {
+          "ALERTS_YAHOO_ENABLED": "true",
+          "ALERTS_DATABASE_POOL_SIZE": "2",
+          "ALERTS_DATABASE_MAX_OVERFLOW": "0",
+          "ALERTS_DELIVERY_ENABLED": "false"
+        },
+        "log_config": {
+          "Type": "json-file",
+          "Config": {
+            "max-file": "1",
+            "max-size": "50m"
+          }
+        }
+      },
+      {
+        "name": "market-watch-realtime-worker-1",
+        "image_ref": "sha256:b45054a7529265bd8031b2cf7662eea7ec3f7a414bd11e9316f54a4d623dc40f",
+        "status": "running",
+        "health": null,
+        "restart_count": 0,
+        "nonsecret_config": {
+          "ALERTS_YAHOO_ENABLED": "true",
+          "ALERTS_DATABASE_POOL_SIZE": "2",
+          "ALERTS_DELIVERY_ENABLED": "false",
+          "ALERTS_DATABASE_MAX_OVERFLOW": "0"
+        },
+        "log_config": {
+          "Type": "json-file",
+          "Config": {
+            "max-file": "1",
+            "max-size": "50m"
+          }
+        }
+      },
+      {
+        "name": "market-watch-notify-worker-1",
+        "image_ref": "sha256:b45054a7529265bd8031b2cf7662eea7ec3f7a414bd11e9316f54a4d623dc40f",
+        "status": "running",
+        "health": null,
+        "restart_count": 0,
+        "nonsecret_config": {
+          "ALERTS_YAHOO_ENABLED": "true",
+          "ALERTS_DATABASE_POOL_SIZE": "2",
+          "ALERTS_DATABASE_MAX_OVERFLOW": "0",
+          "ALERTS_DELIVERY_ENABLED": "true"
+        },
+        "log_config": {
+          "Type": "json-file",
+          "Config": {
+            "max-file": "1",
+            "max-size": "50m"
+          }
+        }
+      },
+      {
+        "name": "market-watch-pricing-worker-1",
+        "image_ref": "sha256:b45054a7529265bd8031b2cf7662eea7ec3f7a414bd11e9316f54a4d623dc40f",
+        "status": "running",
+        "health": null,
+        "restart_count": 0,
+        "nonsecret_config": {
+          "ALERTS_DATABASE_MAX_OVERFLOW": "0",
+          "ALERTS_DATABASE_POOL_SIZE": "2",
+          "ALERTS_DELIVERY_ENABLED": "false",
+          "ALERTS_YAHOO_ENABLED": "true"
+        },
+        "log_config": {
+          "Type": "json-file",
+          "Config": {
+            "max-file": "1",
+            "max-size": "50m"
+          }
+        }
+      },
+      {
+        "name": "market-watch-history-worker-1",
+        "image_ref": "sha256:b45054a7529265bd8031b2cf7662eea7ec3f7a414bd11e9316f54a4d623dc40f",
+        "status": "running",
+        "health": null,
+        "restart_count": 0,
+        "nonsecret_config": {
+          "ALERTS_YAHOO_ENABLED": "true",
+          "ALERTS_DATABASE_MAX_OVERFLOW": "0",
+          "ALERTS_DATABASE_POOL_SIZE": "2",
+          "ALERTS_DELIVERY_ENABLED": "false"
+        },
+        "log_config": {
+          "Type": "json-file",
+          "Config": {
+            "max-file": "1",
+            "max-size": "50m"
+          }
+        }
+      },
+      {
+        "name": "market-watch-market-stream-worker-1",
+        "image_ref": "sha256:b45054a7529265bd8031b2cf7662eea7ec3f7a414bd11e9316f54a4d623dc40f",
+        "status": "running",
+        "health": null,
+        "restart_count": 0,
+        "nonsecret_config": {
+          "ALERTS_DATABASE_MAX_OVERFLOW": "0",
+          "ALERTS_DATABASE_POOL_SIZE": "2",
+          "ALERTS_DELIVERY_ENABLED": "false",
+          "ALERTS_YAHOO_ENABLED": "true"
+        },
+        "log_config": {
+          "Type": "json-file",
+          "Config": {
+            "max-file": "1",
+            "max-size": "50m"
+          }
+        }
+      },
+      {
+        "name": "market-watch-chart-origin-1",
+        "image_ref": "sha256:5744fde8b28529aa4e5558b92934c5bfaca133c65fcb8e034b692034b8fdc444",
+        "status": "running",
+        "health": null,
+        "restart_count": 0,
+        "nonsecret_config": {},
+        "log_config": {
+          "Type": "json-file",
+          "Config": {
+            "max-file": "1",
+            "max-size": "50m"
+          }
+        }
+      },
+      {
+        "name": "market-watch-api-1",
+        "image_ref": "sha256:b45054a7529265bd8031b2cf7662eea7ec3f7a414bd11e9316f54a4d623dc40f",
+        "status": "running",
+        "health": "healthy",
+        "restart_count": 0,
+        "nonsecret_config": {
+          "ALERTS_YAHOO_ENABLED": "true",
+          "ALERTS_DATABASE_MAX_OVERFLOW": "0",
+          "ALERTS_DATABASE_POOL_SIZE": "2",
+          "ALERTS_DELIVERY_ENABLED": "true"
+        },
+        "log_config": {
+          "Type": "json-file",
+          "Config": {
+            "max-file": "1",
+            "max-size": "50m"
+          }
+        }
+      }
+    ],
+    "postgres_containers": [
+      {
+        "name": "postgresql14",
+        "status": "running",
+        "image_ref": "postgres@sha256:dcc2ca942d8518144f387a0c2630188427835f984caaed0418b986928e761809",
+        "mounts": [
+          {
+            "Type": "bind",
+            "Name": null,
+            "Source": "/mnt/disk1/appdata/postgresql14",
+            "Destination": "/var/lib/postgresql/data",
+            "RW": true
+          }
+        ]
+      },
+      {
+        "name": "postgresql14-14.10-rollback-20261015",
+        "status": "exited",
+        "image_ref": "postgres:14",
+        "mounts": [
+          {
+            "Type": "bind",
+            "Name": null,
+            "Source": "/mnt/disk1/appdata/postgresql14",
+            "Destination": "/var/lib/postgresql/data",
+            "RW": true
+          }
+        ]
+      }
+    ],
+    "production_stats_sample": [
+      {
+        "BlockIO": "0B / 0B",
+        "CPUPerc": "51.71%",
+        "Container": "e8976e5617cf",
+        "ID": "e8976e5617cf",
+        "MemPerc": "3.08%",
+        "MemUsage": "983.6MiB / 31.23GiB",
+        "Name": "postgresql14",
+        "NetIO": "1.33GB / 31.2GB",
+        "PIDs": "21"
+      },
+      {
+        "BlockIO": "0B / 0B",
+        "CPUPerc": "0.00%",
+        "Container": "b3b733fdd924",
+        "ID": "b3b733fdd924",
+        "MemPerc": "0.02%",
+        "MemUsage": "7.957MiB / 31.23GiB",
+        "Name": "market-watch-web-1",
+        "NetIO": "125kB / 6.14kB",
+        "PIDs": "7"
+      },
+      {
+        "BlockIO": "0B / 0B",
+        "CPUPerc": "0.39%",
+        "Container": "4e926d358646",
+        "ID": "4e926d358646",
+        "MemPerc": "0.36%",
+        "MemUsage": "114.6MiB / 31.23GiB",
+        "Name": "market-watch-native-history-worker-1",
+        "NetIO": "20.7MB / 19.6MB",
+        "PIDs": "6"
+      },
+      {
+        "BlockIO": "0B / 0B",
+        "CPUPerc": "0.79%",
+        "Container": "ae334d44fe75",
+        "ID": "ae334d44fe75",
+        "MemPerc": "0.35%",
+        "MemUsage": "111.9MiB / 31.23GiB",
+        "Name": "market-watch-chart-history-worker-1",
+        "NetIO": "24.6MB / 25.2MB",
+        "PIDs": "6"
+      },
+      {
+        "BlockIO": "0B / 0B",
+        "CPUPerc": "28.34%",
+        "Container": "aac6e687244e",
+        "ID": "aac6e687244e",
+        "MemPerc": "0.44%",
+        "MemUsage": "140.3MiB / 31.23GiB",
+        "Name": "market-watch-chart-aggregation-worker-1",
+        "NetIO": "23.7GB / 413MB",
+        "PIDs": "6"
+      },
+      {
+        "BlockIO": "0B / 0B",
+        "CPUPerc": "0.36%",
+        "Container": "eb6114fbca54",
+        "ID": "eb6114fbca54",
+        "MemPerc": "0.39%",
+        "MemUsage": "123.7MiB / 31.23GiB",
+        "Name": "market-watch-composite-aggregate-worker-1",
+        "NetIO": "3.29GB / 70.9MB",
+        "PIDs": "6"
+      },
+      {
+        "BlockIO": "0B / 0B",
+        "CPUPerc": "0.00%",
+        "Container": "bd0ba235bd4d",
+        "ID": "bd0ba235bd4d",
+        "MemPerc": "0.38%",
+        "MemUsage": "120.7MiB / 31.23GiB",
+        "Name": "market-watch-realtime-worker-1",
+        "NetIO": "450MB / 117MB",
+        "PIDs": "6"
+      },
+      {
+        "BlockIO": "0B / 0B",
+        "CPUPerc": "0.00%",
+        "Container": "ce053427d2bf",
+        "ID": "ce053427d2bf",
+        "MemPerc": "0.31%",
+        "MemUsage": "98.19MiB / 31.23GiB",
+        "Name": "market-watch-notify-worker-1",
+        "NetIO": "2.88MB / 3.58MB",
+        "PIDs": "6"
+      },
+      {
+        "BlockIO": "0B / 0B",
+        "CPUPerc": "6.23%",
+        "Container": "21402ff29a6c",
+        "ID": "21402ff29a6c",
+        "MemPerc": "0.41%",
+        "MemUsage": "131.7MiB / 31.23GiB",
+        "Name": "market-watch-pricing-worker-1",
+        "NetIO": "709MB / 260MB",
+        "PIDs": "10"
+      },
+      {
+        "BlockIO": "0B / 0B",
+        "CPUPerc": "0.00%",
+        "Container": "4a2f1c2a31a4",
+        "ID": "4a2f1c2a31a4",
+        "MemPerc": "0.32%",
+        "MemUsage": "102.2MiB / 31.23GiB",
+        "Name": "market-watch-history-worker-1",
+        "NetIO": "15.4MB / 10.2MB",
+        "PIDs": "6"
+      },
+      {
+        "BlockIO": "0B / 0B",
+        "CPUPerc": "1.58%",
+        "Container": "32eabcd95dcc",
+        "ID": "32eabcd95dcc",
+        "MemPerc": "0.33%",
+        "MemUsage": "107MiB / 31.23GiB",
+        "Name": "market-watch-market-stream-worker-1",
+        "NetIO": "94.9MB / 76.2MB",
+        "PIDs": "6"
+      },
+      {
+        "BlockIO": "0B / 0B",
+        "CPUPerc": "0.00%",
+        "Container": "7c20791570c8",
+        "ID": "7c20791570c8",
+        "MemPerc": "0.02%",
+        "MemUsage": "7.375MiB / 31.23GiB",
+        "Name": "market-watch-chart-origin-1",
+        "NetIO": "138kB / 336B",
+        "PIDs": "7"
+      },
+      {
+        "BlockIO": "0B / 0B",
+        "CPUPerc": "9.09%",
+        "Container": "eadaa293427d",
+        "ID": "eadaa293427d",
+        "MemPerc": "0.50%",
+        "MemUsage": "159.4MiB / 31.23GiB",
+        "Name": "market-watch-api-1",
+        "NetIO": "2.92GB / 320MB",
+        "PIDs": "21"
+      }
+    ],
+    "data_baseline": {
+      "baseline": {
+        "server_version": "14.24 (Debian 14.24-1.pgdg12+2)",
+        "server_version_num": "140024",
+        "database": "market_watch",
+        "database_bytes": 12410776923,
+        "schema": "au48_display_indicator_tasks",
+        "jit_admin_connection": "off",
+        "public_tables": 90,
+        "connections": 15
+      },
+      "largest_tables": [
+        {
+          "schemaname": "public",
+          "relname": "candles",
+          "estimated_live_rows": 21122288,
+          "total_bytes": 7928201216
+        },
+        {
+          "schemaname": "public",
+          "relname": "market_history_artifact_blocks",
+          "estimated_live_rows": 125173,
+          "total_bytes": 2320416768
+        },
+        {
+          "schemaname": "public",
+          "relname": "provider_bars",
+          "estimated_live_rows": 989527,
+          "total_bytes": 905887744
+        },
+        {
+          "schemaname": "public",
+          "relname": "audit_events",
+          "estimated_live_rows": 974169,
+          "total_bytes": 334938112
+        },
+        {
+          "schemaname": "public",
+          "relname": "market_source_blobs",
+          "estimated_live_rows": 3977,
+          "total_bytes": 284893184
+        },
+        {
+          "schemaname": "public",
+          "relname": "market_fixed_indicator_blocks",
+          "estimated_live_rows": 8764,
+          "total_bytes": 205824000
+        },
+        {
+          "schemaname": "public",
+          "relname": "market_composite_aggregate_bars",
+          "estimated_live_rows": 106878,
+          "total_bytes": 147546112
+        },
+        {
+          "schemaname": "public",
+          "relname": "market_data_coverage",
+          "estimated_live_rows": 177528,
+          "total_bytes": 72933376
+        },
+        {
+          "schemaname": "public",
+          "relname": "chart_published_bars",
+          "estimated_live_rows": 79959,
+          "total_bytes": 40017920
+        },
+        {
+          "schemaname": "public",
+          "relname": "chart_aggregation_jobs",
+          "estimated_live_rows": 57518,
+          "total_bytes": 28672000
+        },
+        {
+          "schemaname": "public",
+          "relname": "market_live_minutes",
+          "estimated_live_rows": 27642,
+          "total_bytes": 20643840
+        },
+        {
+          "schemaname": "public",
+          "relname": "market_history_artifacts",
+          "estimated_live_rows": 243,
+          "total_bytes": 16891904
+        }
+      ],
+      "jit_overrides": [
+        {
+          "datname": "market_watch",
+          "role_name": "market_watch_app",
+          "setting": "jit=off"
+        },
+        {
+          "datname": "market_watch",
+          "role_name": "*",
+          "setting": "jit=off"
+        }
+      ]
+    },
+    "database_parameters": {
+      "extensions": [
+        {
+          "name": "plpgsql",
+          "version": "1.0"
+        }
+      ],
+      "encoding": "UTF8",
+      "lc_collate": "en_US.utf8",
+      "lc_ctype": "en_US.utf8",
+      "timezone": "Asia/Shanghai",
+      "max_connections": "100",
+      "shared_buffers": "128MB",
+      "work_mem": "4MB"
+    },
+    "backups": {
+      "database_backup_type": "full_logical_dump",
+      "consistency_mechanism": "REPEATABLE READ plus pg_export_snapshot passed to pg_dump --snapshot",
+      "pg_dump_format": "custom",
+      "incremental": false,
+      "filesystem_snapshot": false,
+      "physical_base_backup_or_wal_archiving": false,
+      "manifest_fields": [
+        "created_at",
+        "sha256",
+        "bytes",
+        "table_counts"
+      ],
+      "archive_readability_check": "pg_restore --list; does not prove actual restore",
+      "implementation": "backend/alerts/backup.py",
+      "file_count": 248,
+      "file_bytes": 31297606413,
+      "dump_count": 60,
+      "dump_bytes": 24036528410,
+      "config_archive_count": 62,
+      "config_archive_bytes": 7260920725,
+      "latest_dumps": [
+        {
+          "name": "alerts-20261014T190003813046Z.dump",
+          "type": "f",
+          "bytes": 2784070534,
+          "mtime_epoch": 1792004734.4410985
+        },
+        {
+          "name": "alerts-20261014T153646075482Z.dump",
+          "type": "f",
+          "bytes": 2755261219,
+          "mtime_epoch": 1791992528.282462
+        },
+        {
+          "name": "alerts-20261014T004020976828Z.dump",
+          "type": "f",
+          "bytes": 2513986657,
+          "mtime_epoch": 1791938690.8268628
+        }
+      ],
+      "directory_names": [
+        "pg-upgrade-20261015T052401Z"
+      ]
+    },
+    "legacy_backup_path": {
+      "exit_code": 1,
+      "note": "path unavailable"
+    },
+    "backup_service": {
+      "image": "sha256:a623841914cba2b3dd04596cd1bc8f087886a28622cc34292105a717d5f8d009",
+      "volumes": [
+        {
+          "type": "bind",
+          "source": "/mnt/user/backup/market-watch",
+          "target": "/backups",
+          "bind": {
+            "create_host_path": true
+          }
+        }
+      ],
+      "profiles": [
+        "maintenance"
+      ],
+      "yahoo": null
+    },
+    "cron_entries": [
+      "0 3 * * * /mnt/user/appdata/market-watch/deploy/unraid-backup.sh >> /mnt/user/backup/market-watch/latest-run.log 2>&1"
+    ],
+    "cron_files": [
+      "market-watch.cron"
+    ],
+    "backend_yahoo_values": {
+      "api": "true",
+      "chart-aggregation-worker": "true",
+      "chart-history-worker": "true",
+      "composite-aggregate-worker": "true",
+      "history-worker": "true",
+      "market-stream-worker": "true",
+      "migrate": "true",
+      "native-history-worker": "true",
+      "notify-worker": "true",
+      "pricing-worker": "true",
+      "realtime-worker": "true"
+    },
+    "backup_yahoo_note": "The current v1.25.4 maintenance backup definition has no explicit Yahoo setting. All 11 non-backup backend definitions are true. New release templates require explicit true for backup as well.",
+    "release_directory_count": 24,
+    "no_zfs_snapshot_assumption": "Observed Unraid 6.11.5; production PG bind data is on XFS, Docker image store on Btrfs. No ZFS clone capability assumed."
+  },
+  "historical_release_v1_25_4": {
+    "source": "deploy/releases/v1.25.4-production.json",
+    "dump_bytes": 2755261219,
+    "restored_database_bytes": 9870765403,
+    "maintenance_seconds": 934,
+    "includes_final_backup_and_full_restore": true,
+    "schema": "au48_display_indicator_tasks"
+  },
+  "collection_methods": [
+    "docker info/ps/inspect/image inspect/volume inspect/network inspect/stats --no-stream/system df -v",
+    "df -PT -B1; /proc/meminfo; /proc/loadavg; bounded du of user-owned directories",
+    "docker buildx inspect without --bootstrap; existing user timers and monitoring/task records",
+    "SSH to Unraid, filtered compose config including maintenance profile; backup directory metadata and matching cron entries",
+    "SELECT-only PostgreSQL metadata queries under default_transaction_read_only=on, statement_timeout=5000, lock_timeout=1000"
+  ],
+  "limitations": [
+    "Point-in-time samples; not a peak-load or concurrency benchmark.",
+    "Docker reports overlapping image/cache/storage categories; do not sum them as physical disk usage.",
+    "Unraid backup directory totals cover only top-level regular files, excluding pg-upgrade subdirectory contents.",
+    "du permission gaps are preserved as lower bounds; no helper container or permission change used.",
+    "No private registry container observed on either host; remote registries or accounts were not exhaustively surveyed.",
+    "No user row payload, env secrets, credentials, private keys, licensed library, or raw full inspect/config committed."
+  ]
+}

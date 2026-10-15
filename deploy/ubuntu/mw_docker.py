@@ -7,6 +7,7 @@ import datetime as dt
 import fcntl
 import grp
 import hashlib
+import importlib.util
 import json
 import os
 import re
@@ -157,6 +158,9 @@ def labels_for(args):
         PREFIX + "built-at": built.isoformat(),
         PREFIX + "expires-at": expires if args.purpose in ("development", "acceptance") else "",
     }
+    for value in getattr(args, "build_arg", []):
+        if value.startswith("VITE_ADVANCED_CHART_ORIGIN="):
+            labels[PREFIX + "chart-origin"] = value.split("=", 1)[1]
     register(args.task, project, args.purpose)
     return labels
 
@@ -468,7 +472,11 @@ def validate_retirement_image(task, project, container, image, retained_images=(
             raise ValueError("PostgreSQL must be the reviewed, unowned official PG14 image")
         return
     service = (container["Config"].get("Labels") or {}).get("com.docker.compose.service")
-    if service == "tls" and container["Config"]["Image"] == "nginx:1.28-alpine":
+    if service == "tls" and container["Config"]["Image"] in (
+        "nginx:1.28-alpine",
+        "nginx:1.28-alpine@sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+        image["Id"],
+    ):
         trusted = "nginx@sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592"
         if any(key.startswith(PREFIX) for key in labels):
             raise ValueError("Shared TLS image must not have task/release ownership labels")
@@ -928,6 +936,15 @@ def monitor(docker, args):
     return 0
 
 
+def preview_module():
+    spec = importlib.util.spec_from_file_location(
+        "mw_preview", Path(__file__).with_name("mw_preview.py")
+    )
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def parser():
     p = argparse.ArgumentParser(description=__doc__)
     sub = p.add_subparsers(dest="command", required=True)
@@ -972,6 +989,18 @@ def parser():
     s = sub.add_parser("monitor")
     s.add_argument("--detail", action="store_true")
     s.add_argument("--threshold-gib", type=int, default=20)
+    s = sub.add_parser("preview", help="Task-owned lightweight Ubuntu preview; manual concurrency")
+    s.add_argument("action", choices=["prepare", "up", "status", "stop", "reset"])
+    s.add_argument("--task", required=True)
+    s.add_argument("--project", required=True)
+    s.add_argument("--repo", default=".")
+    s.add_argument("--api-image", help="Task-owned API image tag (prepare)")
+    s.add_argument("--web-image", help="Optional task-owned web image (prepare)")
+    s.add_argument("--chart-image", help="Optional task-owned licensed chart image (prepare)")
+    s.add_argument("--port", type=int, default=18443, help="API HTTP or UI HTTPS loopback port")
+    s.add_argument("--chart-port", type=int, help="Distinct chart HTTPS port for UI preview")
+    s.add_argument("--worker", action="append", default=[], choices=sorted(preview_module().WORKERS))
+    s.add_argument("--apply", action="store_true", help="Explicitly reset into a new DB; retain old DB")
     return p
 
 
@@ -999,6 +1028,8 @@ def main():
             cleanup(docker, args.task, args.apply, args.automatic)
         elif args.command == "retire":
             retire(docker, args)
+        elif args.command == "preview":
+            print(json.dumps(preview_module().run(docker, args, sys.modules[__name__]), indent=2))
         else:
             return monitor(docker, args)
     return 0
