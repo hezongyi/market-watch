@@ -85,8 +85,9 @@ def resolve(body):
         meta = metadata(query.instrument)
         identity["dataset_id"] = provider_identity(meta, query.timeframe if body.kind == "bars" else "M1")
         identity["metadata"] = meta
-        if body.kind == "bars":
-            ensure(meta, query.timeframe)
+        from .config import settings
+        if body.kind == "bars" or settings.oanda_acquisition_mode == "rest_batch":
+            ensure(meta, query.timeframe if body.kind == "bars" else "M1")
     elif query.series_kind in ("history", "composite"):
         from .series_access import composite_definition, metadata
 

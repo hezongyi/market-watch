@@ -55,8 +55,15 @@ def create(db, instrument, name, rule_dict, *, revision_id=None, seam_policy="re
         calculation_origin=None, timeframe=rule.timeframe, seam_policy=seam_policy))
     normalized = {**rule_dict, "version": rule.version, "indicator": rule.indicator,
                   "indicator_version": rule.indicator_version, "indicator_params": dict(rule.indicator_params)}
+    from .config import settings
+
+    # The observation contract is part of the saved watch identity.  REST
+    # candle mode has no Bid/Ask event and must never leave a stale
+    # ``sampled_bid_quote`` claim in the UI or signal evidence.
+    tick_mode = ("sampled_candle_close" if settings.oanda_acquisition_mode == "rest_batch"
+                 else "sampled_bid_quote")
     identity = {**identity, "contract": CONTRACT, "rule_version": rule.version, "fixed_rule": normalized,
-        "strategy_kind": rule.kind, "observation_mode": "sampled_bid_quote" if rule.timeframe == "tick" else "complete_close"}
+        "strategy_kind": rule.kind, "observation_mode": tick_mode if rule.timeframe == "tick" else "complete_close"}
     # Serialize creation with instrument/reference writers. first_use and bind
     # already validate the fixed historical baseline, mapping and account.
     db.scalar(select(Instrument.id).where(Instrument.id == identity["instrument_id"]).with_for_update())
@@ -432,8 +439,9 @@ def evaluate_tick(db, watch, binding, runtime, revision, value, live, now):
     price = sample["value"]
     rule = rule_from(watch.rule)
     runtime["epoch"] = live["connection_epoch"]
-    runtime["observation_basis"] = ("sampled_bid_quote" if mode == "stream_quote"
-                                     else "sampled_candle_close")
+    observation_basis = ("sampled_bid_quote" if mode == "stream_quote"
+                         else "sampled_candle_close")
+    runtime["observation_basis"] = observation_basis
     runtime["dependencies"] = [{"kind": sample["kind"], "observation_mode": mode,
                                  "source_start": sample["source_start"],
                                  "source_identity": sample.get("source_identity"),

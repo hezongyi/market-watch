@@ -358,6 +358,28 @@ def test_rest_batch_fences_complete_before_forming_and_reports_candle_readiness(
     assert view["candle_ready"] and not view["quote_ready"]
 
 
+def test_rest_forming_sample_during_recovery_does_not_advance_tick_baseline(running, monkeypatch):
+    factory, ownership, epoch, identities = running
+    identity = identities["EUR_USD"]
+    from alerts.oanda_rest_batch import CandleSpec, normalize_latest
+
+    calls = []
+    # Keep the source in recovery so the forming candle is display-only.
+    monkeypatch.setattr(live, "commit_confirmation", lambda *args, **kwargs: None)
+    monkeypatch.setattr("alerts.service.evaluate_close_sample", lambda *args, **kwargs: calls.append(args))
+    payload = {"latestCandles": [{"instrument": "EUR_USD", "granularity": "M1",
+        "candles": [{"time": "120", "complete": False, "volume": 3,
+                      "bid": {"o": "1.11", "h": "1.13", "l": "1.10", "c": "1.12"}}]}]}
+    batch = normalize_latest(payload, [CandleSpec.from_dataset(identity)], generation=epoch,
+                             sequence=1, demand_revision=live_demand_revision(
+                                 [CandleSpec.from_dataset(identity)]), requested_at=124900,
+                             received_at=125000)
+    assert live.publish_rest_batch(ownership, epoch, batch, {"EUR_USD": identity}, now=125000) == "accepted"
+    assert not calls
+    with factory.begin() as db:
+        assert not db.get(LiveState, identity.key).ready
+
+
 def test_rest_batch_demand_revision_fences_inflight_response_before_any_write(running):
     factory, ownership, epoch, identities = running
     identity = identities["EUR_USD"]

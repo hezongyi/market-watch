@@ -23,11 +23,11 @@ from .chart_calculation_history import calculation_rows
 from .chart_indicators import calculate, history_requirement
 from .config import settings
 from .market_resources import LANE, lane
+from .provider_acceptance import receipts as provider_receipts
 from .provider_capabilities import SOURCES, frames, fresh_seconds, page_capacity, versions
 from .provider_changes import ChangeSummary
-from .provider_acceptance import receipts as provider_receipts
 from .provider_history_policy import CapacityExceeded, capacity, optional_bars
-from .storage import ProviderBar, ProviderDataset, now_ms, transaction, uid
+from .storage import ProviderBar, ProviderDataset, ProviderInterest, now_ms, transaction, uid
 from .volume import metadata as volume_metadata
 
 _ACTIVE_LOCK = threading.Lock()
@@ -41,6 +41,18 @@ WORK_VALID = ContextVar("provider_history_work_valid", default=None)
 
 class HistoryPending(Exception):
     """Coverage needs additional committed pages; never a history boundary."""
+
+
+def rest_batch_owner_active(key):
+    """Whether an OANDA latest demand is owned by the account worker."""
+    if settings.oanda_acquisition_mode != "rest_batch":
+        return False
+    with budget_transaction() as db:
+        return db.scalar(select(ProviderInterest.id).where(
+            ProviderInterest.dataset_id == key,
+            ProviderInterest.subscribed.is_(True),
+            ProviderInterest.expires > now_ms(),
+        )) is not None
 
 log = logging.getLogger(__name__)
 
@@ -426,6 +438,8 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
 
 def fetch_page(key, meta, frame, before, count, deadline, *, kind="chart", latest=False,
                optional=0, revalidate=False):
+    if latest and meta["source"] == "oanda" and rest_batch_owner_active(key):
+        raise HistoryPending()
     progress = PAGE_PROGRESS.get()
     if READ_MODE.get() == "cache" or READ_MODE.get() == "step" and progress and progress["attempts"] >= 1:
         raise HistoryPending()
@@ -476,6 +490,23 @@ def fetch_page(key, meta, frame, before, count, deadline, *, kind="chart", lates
         if progress is not None:
             progress["pages"] += 1
         return page
+    finally:
+        release(key, lease)
+
+
+def commit_rest_latest(key, page, observed_at):
+    """Commit a REST candle snapshot without issuing a provider request.
+
+    The account-scoped OANDA worker has already performed the HTTP call and
+    owns its generation.  This helper only acquires the normal provider-cache
+    lease and reuses the immutable bar/revision writer, so native subscriptions
+    share the same cache contract without starting the legacy OANDA poller.
+    """
+    lease = claim(key)
+    if not lease:
+        raise TimeoutError("平台最新蜡烛缓存租约暂不可用")
+    try:
+        return commit_page(key, lease, page, observed_at, observed_at, latest=True)
     finally:
         release(key, lease)
 

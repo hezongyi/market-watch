@@ -124,6 +124,35 @@ class CandleSpec(BaseModel):
 
         return cls.from_source(collection_identity(identity))
 
+    @classmethod
+    def from_provider_metadata(cls, metadata, timeframe):
+        """Build a native-period request identity from provider cache metadata.
+
+        Provider datasets are keyed by their full native configuration (period,
+        side, smoothing and alignment).  Keeping this conversion next to the
+        REST wire contract prevents a native H1/D1 subscription from silently
+        falling back to the composite M1/BID identity.
+        """
+        from .native_series import OandaParameters
+        from .provider_chart import OANDA_FRAMES
+
+        if metadata.get("source") != "oanda" or timeframe not in OANDA_FRAMES:
+            raise ValueError("OANDA native provider metadata required")
+        native = OandaParameters.model_validate(metadata.get("native_parameters", {}))
+        scope = metadata.get("native_period_identity", {}).get("account_scope")
+        if not scope:
+            scope = metadata.get("account_scope")
+        if not isinstance(scope, str):
+            account = metadata.get("account_id")
+            if not isinstance(account, str):
+                from .history_catalog import account_scope
+
+                scope = account_scope()
+            else:
+                scope = "sha256:" + hashlib.sha256(account.encode()).hexdigest()
+        return cls(account_scope=scope, provider_symbol=metadata["symbol"],
+                   granularity=OANDA_FRAMES[timeframe], parameters=native, units="1")
+
 
 class RestCandle(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
@@ -380,6 +409,86 @@ class OandaRestBatch(OandaPractice):
             return LatestBatch(generation=generation, sequence=sequence, demand_revision=demand_revision,
                 requested_at=requested_at, received_at=received_at, result=result,
                 series=tuple(SeriesSnapshot(spec=spec, result=result) for spec in specs))
+
+    def page(self, identity, start, end, *, deadline=None, cancelled=None):
+        """Fetch a bounded complete-M1 confirmation window for the owner.
+
+        The latest endpoint is the normal cadence path. This endpoint proves
+        only the requested half-open interval and never turns an omitted
+        middle minute into coverage.
+        """
+        source = DatasetIdentity.model_validate(identity)
+        spec = CandleSpec.from_dataset(source)
+        if spec.granularity != "M1":
+            raise ValueError("REST confirmation requires an M1 dataset identity")
+        if not 0 <= start < end or end - start > 4000 * 60000 or start % 60000 or end % 60000:
+            raise ValueError("Use at most 4000 UTC M1 candles per request")
+        scope = "sha256:" + hashlib.sha256(self.account_id.encode()).hexdigest()
+        if source.account_scope != scope:
+            raise ValueError("OANDA account scope mismatch")
+        deadline = deadline if deadline is not None else time.monotonic() + 15
+        trace, response = TransportTrace(), None
+        try:
+            with request_slot("oanda", deadline=deadline, cancelled=cancelled):
+                if cancelled and cancelled():
+                    raise TimeoutError("Candle confirmation was superseded")
+                with request_deadline(deadline):
+                    response = self.rest_get(
+                        f"https://api-fxpractice.oanda.com/v3/accounts/{self.account_id}"
+                        f"/instruments/{spec.provider_symbol}/candles",
+                        headers=self.headers,
+                        params={
+                            "granularity": "M1",
+                            "price": spec.parameters.price,
+                            "smooth": str(spec.parameters.smooth).lower(),
+                            "from": str(Decimal(start) / 1000),
+                            "to": str(Decimal(end) / 1000),
+                        },
+                        extensions={"trace": trace},
+                    )
+            response.raise_for_status()
+            raw = response.json()
+            if raw.get("instrument", spec.provider_symbol) != spec.provider_symbol:
+                raise ValueError("OANDA response instrument mismatch")
+            if raw.get("granularity", "M1") != "M1" or not isinstance(raw.get("candles"), list):
+                raise ValueError("Invalid OANDA candle response")
+            observed = self.clock()
+            rows = []
+            side = SIDES[spec.parameters.price]
+            for candle in raw["candles"]:
+                if not isinstance(candle, dict) or type(candle.get("complete")) is not bool:
+                    raise ValueError("Invalid OANDA complete flag")
+                at = timestamp(candle["time"])
+                if not start <= at < end:
+                    raise ValueError("OANDA M1 outside requested half-open window")
+                if not candle["complete"] or at + 60000 > observed:
+                    continue
+                prices = candle.get(side)
+                if not isinstance(prices, dict):
+                    raise ValueError("OANDA candle price side missing")
+                volume = candle.get("volume")
+                if volume is not None and (type(volume) is not int or volume < 0):
+                    raise ValueError("Supplier volume must be an integer quote count")
+                rows.append(MinuteRow(timestamp=at, complete=True,
+                    **{name: prices[key] for name, key in (("open", "o"), ("high", "h"),
+                                                           ("low", "l"), ("close", "c"))},
+                    volume=str(volume) if volume is not None else None))
+            rows.sort(key=lambda row: row.timestamp)
+            return CandleBatch(identity=source, window_start=start, window_end=end,
+                observed_at=observed, rows=tuple(rows),
+                volume_kind="price_count", volume_unit="quotes",
+                result=RequestResult(status="data" if rows else "empty_success"),
+                checkpoint=end)
+        except (httpx.HTTPError, TimeoutError, ValueError, KeyError, TypeError, OverflowError) as error:
+            trace.rest_failed("candles", error, response)
+            observed = self.clock()
+            result = failed_request(error, observed_at=observed)
+            if result.status == "rate_limited":
+                cooldown("oanda", retry_seconds=max(1, (result.retry_at - observed) / 1000)
+                         if result.retry_at else None)
+            return CandleBatch(identity=source, window_start=start, window_end=end,
+                observed_at=observed, result=result,
+                volume_kind="price_count", volume_unit="quotes", checkpoint=start)
 
     def validate_candle_access(self, specs):
         """Account catalog plus real candles, without pricing or streaming."""

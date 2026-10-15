@@ -3,7 +3,7 @@
   "source_commit": "42b4864b0153ed4419c35d17f77241b163735ad4",
   "implementation_tag": "v1.25.6",
   "implementation_commit": "ee5b885626104577244f4fc40342d60b1a52c664",
-  "implementation_status": "partial_implementation_system_acceptance_pending",
+  "implementation_status": "r6_preview_and_regression_verified_production_switch_pending",
   "environment": "Ubuntu local Docker, dedicated project/network/PG14 volume/database, no HTTP listener; configured production OANDA proxy reused for read-only source requests",
   "direct_single": {
     "phase": "direct_fixed_1s",
@@ -598,5 +598,44 @@
     "Backend diagnostics use benchmark-only guard and scheduler, not a production implementation",
     "Raw response body sizes exclude outgoing requests, TCP/TLS overhead and potential wire compression"
   ],
-  "resource_state": "All benchmark containers stopped; PG volumes retained; database dump restored and all public table counts/content matched; managed retire preview rejected because reused release image is not a registered acceptance image"
+  "resource_state": "All benchmark containers stopped; PG volumes retained; database dump restored and all public table counts/content matched; managed retire preview rejected because reused release image is not a registered acceptance image",
+  "r6_preview": {
+    "task": "mw-oanda-rest-1s-20261015-r6",
+    "project": "mw-oanda-rest-1s-20261015-r6",
+    "commit": "2e47568f7a88aabb040491457589b8f1d3ff248d",
+    "dirty": true,
+    "api_url": "https://localhost:18483",
+    "chart_origin": "https://localhost:17454",
+    "health": [
+      "healthz",
+      "readyz"
+    ],
+    "ui_smoke": [
+      "main",
+      "chart_origin",
+      "login",
+      "session",
+      "charts_catalog",
+      "composite_center",
+      "composite_candidates"
+    ],
+    "real_supplier_connections": false,
+    "tests": [
+      {
+        "scope": "rest_batch_worker_composite_quotes",
+        "passed": 80,
+        "seconds": 53.1
+      },
+      {
+        "scope": "unified_sse_composite_chart_provider_cache",
+        "passed": 152,
+        "seconds": 179.59
+      }
+    ],
+    "limitations": [
+      "preview seed has no composite definition",
+      "no production switch",
+      "no browser long-run real-supplier chart acceptance"
+    ]
+  }
 }

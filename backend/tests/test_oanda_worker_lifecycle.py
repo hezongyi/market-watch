@@ -170,6 +170,83 @@ def test_rest_collect_fences_response_when_cancelled_during_http(monkeypatch):
     assert disconnected[0][1]["intentional"] is True
 
 
+def test_rest_collect_drains_checkpoint_pages_while_latest_cadence_runs(monkeypatch):
+    """Latest snapshots must not be the only recovery path after reconnect."""
+    stopped = threading.Event()
+    confirmation = threading.Event()
+    identity = SimpleNamespace(provider_symbol="EUR_USD", key="dataset")
+    identities = {"dataset": identity}
+    disconnected = []
+
+    monkeypatch.setattr(worker, "begin_connection", lambda *_: 7)
+    monkeypatch.setattr(worker, "renew", lambda *_: True)
+    monkeypatch.setattr(worker, "desired_for_mode", lambda *_: identities)
+    monkeypatch.setattr(worker, "closed_delay", lambda *_: None)
+    monkeypatch.setattr(worker, "disconnected", lambda *args, **kwargs: disconnected.append((args, kwargs)))
+    monkeypatch.setattr(worker, "CandleSpec", SimpleNamespace(from_dataset=lambda *_: SimpleNamespace(key="spec")))
+
+    def confirm(*args):
+        confirmation.set()
+        return None
+
+    monkeypatch.setattr(worker, "confirm_pages", confirm)
+
+    class Adapter:
+        account_id = "test-account"
+
+        def page(self, *_):
+            raise AssertionError("confirm_pages is the owned recovery entry point")
+
+        def latest(self, *_args, **_kwargs):
+            assert confirmation.wait(2), "latest loop started without the recovery thread"
+            stopped.set()
+            return SimpleNamespace(result=RequestResult(status="data"))
+
+    worker.collect_rest(Adapter(), ("account", "owner"), identities, stopped)
+    assert confirmation.is_set() and disconnected
+
+
+def test_rest_collect_batches_live_and_native_specs_by_request_group(monkeypatch):
+    stopped = threading.Event()
+    live_identity = SimpleNamespace(provider_symbol="EUR_USD", key="live")
+    live_spec = SimpleNamespace(key="live-spec", group_key="same-group")
+    native_spec = SimpleNamespace(key="native-h1", group_key="same-group")
+    identities = {"live": live_identity}
+    native = (("provider-h1", "H1", native_spec),)
+    calls, live_published, native_published = [], [], []
+
+    monkeypatch.setattr(settings, "oanda_acquisition_mode", "rest_batch")
+    monkeypatch.setattr(worker, "begin_connection", lambda *_: 7)
+    monkeypatch.setattr(worker, "renew", lambda *_: True)
+    monkeypatch.setattr(worker, "desired_for_mode", lambda *_: identities)
+    monkeypatch.setattr(worker, "native_specs", lambda *_: native)
+    monkeypatch.setattr(worker, "closed_delay", lambda *_: None)
+    monkeypatch.setattr(worker, "CandleSpec", SimpleNamespace(
+        from_dataset=lambda *_: live_spec,
+    ))
+    def publish_live(*args, **kwargs):
+        live_published.append((args, kwargs))
+        stopped.set()
+
+    monkeypatch.setattr(worker, "publish_rest_batch", publish_live)
+    monkeypatch.setattr(worker, "publish_native_rest_batch",
+                        lambda *args, **kwargs: native_published.append((args, kwargs)))
+    monkeypatch.setattr(worker, "disconnected", lambda *args, **kwargs: None)
+
+    class Adapter:
+        account_id = "test-account"
+
+        def latest(self, specs, **kwargs):
+            calls.append((specs, kwargs))
+            return SimpleNamespace(result=RequestResult(status="data"))
+
+    worker.collect_rest(Adapter(), ("account", "owner"), identities, stopped, native)
+    assert len(calls) == 1
+    assert {spec.key for spec in calls[0][0]} == {"live-spec", "native-h1"}
+    assert len(live_published) == len(native_published) == 1
+    assert live_published[0][1]["demand_revision"] == native_published[0][1]["demand_revision"]
+
+
 def test_rest_collect_preserves_terminal_auth_failure_for_disconnect(monkeypatch):
     stopped = threading.Event()
     identity = SimpleNamespace(provider_symbol="EUR_USD")

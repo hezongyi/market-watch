@@ -174,6 +174,31 @@ def test_one_batch_http_request_with_explicit_parameters_and_no_pricing():
     assert len(calls) == 1 and all(row.result.successful for row in result.series)
 
 
+def test_page_confirms_only_complete_m1_rows_and_preserves_requested_identity():
+    calls = []
+
+    def handle(request):
+        calls.append(request)
+        assert request.url.path == "/v3/accounts/test-account/instruments/EUR_USD/candles"
+        assert dict(request.url.params) == {
+            "granularity": "M1",
+            "price": "B",
+            "smooth": "false",
+            "from": "0",
+            "to": "120",
+        }
+        return httpx.Response(200, json={"instrument": "EUR_USD", "granularity": "M1",
+            "candles": [candle(0, complete=True), candle(60, complete=False)]})
+
+    with httpx.Client(transport=httpx.MockTransport(handle)) as client:
+        adapter = OandaRestBatch(token="secret", account_id="test-account",
+                                 rest_client=client, clock=lambda: 120000)
+        result = adapter.page(oanda_identity(), 0, 120000)
+    assert len(calls) == 1 and result.result.successful
+    assert [row.timestamp for row in result.rows] == [0]
+    assert result.checkpoint == 120000 and result.identity == oanda_identity()
+
+
 @pytest.mark.parametrize("status,expected", [(401, "unauthorized"), (403, "unauthorized"),
     (429, "rate_limited"), (503, "provider_maintenance")])
 def test_failures_preserve_status_and_shared_cooldown_without_secrets(monkeypatch, caplog, status, expected):

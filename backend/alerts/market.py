@@ -536,7 +536,8 @@ def queue_initial_history(db, *, end=None):
     return count
 
 
-def once(symbol=None, start=None, end=None, *, include_viewers=False, fetcher=None):
+def once(symbol=None, start=None, end=None, *, include_viewers=False, fetcher=None,
+         source_filter=None):
     fetch = fetcher or fetch_source
     with transaction() as db:
         clear_misrouted_composite_errors(db)
@@ -553,6 +554,7 @@ def once(symbol=None, start=None, end=None, *, include_viewers=False, fetcher=No
             (i.id, i.symbol, i.source)
             for i in db.scalars(ordinary_instruments().order_by(Instrument.enabled.desc(), Instrument.id))
             if (i.id == symbol if symbol else i.enabled or i.id in viewers)
+            and (source_filter is None or i.source in source_filter)
         ]
     for instrument_id, provider_symbol, source in instruments:
         with transaction() as db:
@@ -651,7 +653,7 @@ def once(symbol=None, start=None, end=None, *, include_viewers=False, fetcher=No
 
 
 def import_once(*, chart_only=False, fetcher=None, defer_aggregation=False,
-                realtime_only=False, history_only=False):
+                realtime_only=False, history_only=False, source_filter=None):
     """One daily slice per iteration. Durable cursor and lease permit safe restart."""
     with transaction() as db:
         from .storage import ChartAggregationJob
@@ -683,7 +685,8 @@ def import_once(*, chart_only=False, fetcher=None, defer_aggregation=False,
                 ImportJob.instrument_id.not_in(saturated_symbols) if defer_aggregation else True,
                 ImportJob.instrument_id.in_(
                     ordinary_instruments().with_only_columns(Instrument.id).where(
-                        Instrument.source.not_in(cooling_sources))
+                        Instrument.source.not_in(cooling_sources),
+                        (Instrument.source.in_(source_filter) if source_filter is not None else True))
                 ),
                 ImportJob.next_at <= now_ms(),
                 ImportJob.priority == 0 if realtime_only else True,

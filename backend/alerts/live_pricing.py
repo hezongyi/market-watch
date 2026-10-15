@@ -66,7 +66,7 @@ def ensure_catalog(items, account, *, ownership=None):
     return resident
 
 
-def desired_datasets(account):
+def _desired_dataset_identities(account):
     scope = "sha256:" + hashlib.sha256(account.encode()).hexdigest()
     residents = {symbol.strip() for symbol in settings.oanda_resident_symbols.split(",") if symbol.strip()}
     with transaction() as db:
@@ -74,7 +74,7 @@ def desired_datasets(account):
 
         wanted = wanted_instruments(db)
         targets = composite_targets(db, wanted)
-        result = {}
+        result = []
         for row in db.scalars(select(MarketDataset)):
             identity = DatasetIdentity.model_validate(row.identity)
             if (identity.source, identity.channel, identity.environment, identity.account_scope) != (
@@ -83,8 +83,45 @@ def desired_datasets(account):
             if identity.calendar_version != settings.oanda_calendar_version:
                 continue
             if identity.provider_symbol in residents or row.instrument_id in wanted or row.id in targets:
-                result[identity.provider_symbol] = identity
-        return result
+                result.append(identity)
+        return tuple(sorted(result, key=lambda identity: identity.key))
+
+
+def desired_dataset_identities(account):
+    """Return live datasets without compressing identity by provider symbol."""
+    return _desired_dataset_identities(account)
+
+
+def desired_datasets(account):
+    """Compatibility symbol map used by the existing stream lifecycle."""
+    return {identity.provider_symbol: identity for identity in _desired_dataset_identities(account)}
+
+
+def desired_native_provider_datasets(account):
+    """Active OANDA native-period provider datasets for shared REST polling.
+
+    Native chart interests live in ``ProviderInterest`` rather than
+    ``MarketDataset``.  Returning the dataset rows lets the account worker
+    batch H1/D1 (and non-default side/alignment) with the same full
+    ``CandleSpec`` identity instead of falling back to M1/BID by symbol.
+    """
+    scope = "sha256:" + hashlib.sha256(account.encode()).hexdigest()
+    from .storage import ProviderDataset, ProviderInterest
+
+    with transaction() as db:
+        rows = db.execute(select(ProviderDataset).join(
+            ProviderInterest, ProviderInterest.dataset_id == ProviderDataset.id
+        ).where(
+            ProviderDataset.source == "oanda",
+            ProviderInterest.subscribed.is_(True),
+            ProviderInterest.expires > now_ms(),
+        )).scalars().all()
+        result = []
+        for row in rows:
+            identity = (row.metadata_json or {}).get("native_period_identity")
+            if isinstance(identity, dict) and identity.get("account_scope") == scope:
+                result.append(row)
+        return tuple(sorted({row.id: row for row in result}.values(), key=lambda row: row.id))
 
 
 def claim(account, *, now=None, startup=False):
@@ -421,7 +458,7 @@ def publish_event(ownership, epoch, event, identities, *, now=None):
         return "accepted"
 
 
-def publish_rest_batch(ownership, epoch, batch, identities, *, now=None):
+def publish_rest_batch(ownership, epoch, batch, identities, *, now=None, demand_revision=None):
     """Fence and publish one shared ``candles/latest`` response.
 
     Confirmed candles are committed through the existing immutable input path
@@ -434,7 +471,7 @@ def publish_rest_batch(ownership, epoch, batch, identities, *, now=None):
     batch = LatestBatch.model_validate(batch)
     if batch.generation != epoch:
         raise TimeoutError("REST batch generation is obsolete")
-    expected_demand = live_demand_revision(
+    expected_demand = demand_revision or live_demand_revision(
         CandleSpec.from_dataset(identity) for identity in identities.values())
     if batch.demand_revision != expected_demand:
         raise TimeoutError("REST batch demand is obsolete")
@@ -495,10 +532,18 @@ def publish_rest_batch(ownership, epoch, batch, identities, *, now=None):
             state.received_at = sample.received_at
             state.heartbeat_at = sample.received_at
             state.revision += 1
-            evaluate_close_sample(db, inst, sample.received_at, sample.close,
-                                  received_at=sample.received_at, sequence=sample.sequence,
-                                  source_identity=sample.spec.identity.model_dump(mode='json'),
-                                  interval_ms=sample.interval_ms)
+            # A forming candle observed while the source is still recovering
+            # is display-only.  Advancing a tick rule here would create a new
+            # baseline from a potentially incomplete prefix and could emit a
+            # crossing before the confirmation gate has been rebuilt.  The
+            # next ready-generation sample will establish/evaluate it.
+            if sample.recovery == "ready" and state.ready:
+                evaluate_close_sample(
+                    db, inst, sample.received_at, sample.close,
+                    received_at=sample.received_at, sequence=sample.sequence,
+                    source_identity=sample.spec.identity.model_dump(mode='json'),
+                    interval_ms=sample.interval_ms,
+                )
     return 'accepted'
 
 

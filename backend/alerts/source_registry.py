@@ -33,6 +33,25 @@ class SourceIdentity(BaseModel):
 
 def collection_identity(identity):
     """Normalize only adapter parameters whose existing M1 semantics are known."""
+    # Native provider paths already carry a complete SourceIdentity.  Keep all
+    # OANDA request parameters in that identity instead of collapsing it to the
+    # legacy M1/BID collection key.  This is also the bridge used by the REST
+    # batch planner when a platform-native period is subscribed.
+    raw = identity.model_dump() if hasattr(identity, "model_dump") else dict(identity)
+    if "parameters" in raw:
+        source = SourceIdentity.model_validate(raw)
+        if (source.source, source.channel, source.environment) == ("oanda", "v20", "practice"):
+            from .native_series import BASES, OandaParameters
+
+            values = dict(source.parameters)
+            granularity = values.pop("granularity", "M1")
+            units = values.pop("units", "1")
+            native = OandaParameters.model_validate(values).model_dump()
+            return source.model_copy(update={
+                "basis": BASES[native["price"]],
+                "parameters": {"granularity": granularity, **native, "units": units},
+            })
+        return source
     old = DatasetIdentity.model_validate(identity)
     signature = (old.source, old.channel, old.environment, old.basis)
     if signature == ("dukascopy", "python", "historical", "bid"):

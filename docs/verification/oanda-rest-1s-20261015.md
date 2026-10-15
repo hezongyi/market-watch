@@ -110,7 +110,22 @@ docker compose -p mw-oanda-rest-1s-20261015 \
 `sha256:d1aba682529acc3038cd92703874084bd1a9c4b58424f745af833187cf3443de`。
 未改变生产实例、生产配置或生产数据库。
 
-- 相关定向测试：`105 passed`；Ruff 针对本次变更文件通过，compileall 和
+验收主机为 **Ubuntu 本机 Docker**。当前独立 Compose project 为
+`mw-oanda-rest-runtime-20261015`，实际入口为：API health
+`http://127.0.0.1:18463/healthz`，带 TLS 的主站
+`https://127.0.0.1:18472/`，独立 chart origin
+`https://127.0.0.1:17444/`。私有 Compose 文件不入仓库，启动和停止命令为：
+
+```bash
+docker compose -f /tmp/mw-oanda-rest-runtime-compose-20261015-ui.json up -d --no-build
+docker compose -f /tmp/mw-oanda-rest-runtime-compose-20261015-ui.json stop
+```
+
+该 project 使用独立 PG14 volume、网络、端口和只读行情配置；命令不会操作生产
+Compose。停止后现场保留，未执行全局 prune 或删除 volume。
+
+- 相关定向测试：变更核心套件 `105 passed`；组合/SSE/worker 回归套件
+  `188 passed, 1 skipped`。Ruff 针对本次变更文件通过，compileall 和
   `git diff --check` 通过。
 - `verify_oanda_rest_contract.py --seconds 120`：60/60 批次为 `data`，请求起始
   间隔中位数 2,000 ms，P95 2,000 ms，12 品种的 36 个已闭合 M1 与历史确认接口
@@ -129,3 +144,42 @@ docker compose -p mw-oanda-rest-1s-20261015 \
 - [r5 adapter contract](oanda-rest-1s-20261015-r5-contract.json)
 - [r5 runtime window](oanda-rest-1s-20261015-r5-runtime.json)
 - [r5 UI smoke](oanda-rest-1s-20261015-r5-ui.json)
+
+## 当前 r6 验证增补（2026-10-15）
+
+r6 使用当前工作树 commit `2e47568f7a88aabb040491457589b8f1d3ff248d` 构建，工作树带有未提交改动，镜像用途为 Ubuntu Docker acceptance；没有切换生产配置、生产数据库或生产采集模式。隔离 preview 已实际启动并通过健康检查：
+
+- task/project：`mw-oanda-rest-1s-20261015-r6`
+- API/主站：`https://localhost:18483`
+- chart origin：`https://localhost:17454`
+- API 镜像：`sha256:414ecc82f718ec61c67835ac50aa16ce2c693e2f9c17a32a31c1ecd7d33608cd`
+- Web 镜像：`sha256:0aec2a8b02214c53a9479a968436fc3cccb5bf20d6efdbde5ac6684c47da2f03`
+- chart 镜像：`sha256:ecc6414dbbf32dde81e8d14c70c839c3bd149a45a28acada9c21827275c14241`
+- PostgreSQL：14.24，JIT healthcheck 通过；preview seed 使用固定 D1 数据集
+
+实际 smoke 结果：`/healthz`、`/readyz`、主站、chart origin、登录、`/api/session`、`/api/charts/catalog`、组合中心列表和组合候选列表均返回成功。预置数据库没有组合定义，因此真实供应商组合长时图表需要使用带私有 OANDA 配置的隔离运行时另行验收；本 preview 不发起真实供应商连接。
+
+测试在 r6 API 容器内执行，避免使用主机安装环境：
+
+```bash
+docker exec mw-oanda-rest-1s-20261015-r6-api-1 \
+  sh -lc 'PYTHONPATH=/app/backend pytest -q /tmp/mwtests/test_oanda_rest_batch.py /tmp/mwtests/test_oanda_worker_lifecycle.py /tmp/mwtests/test_market_stream_worker.py /tmp/mwtests/test_composite_quotes.py'
+# 80 passed in 53.10s
+
+docker exec mw-oanda-rest-1s-20261015-r6-api-1 \
+  sh -lc 'PYTHONPATH=/app/backend:/tmp/mwtests pytest -q /tmp/mwtests/test_unified_sse_composite_fixture.py /tmp/mwtests/test_market_stream.py /tmp/mwtests/test_market_stream_api.py /tmp/mwtests/test_live_pricing.py /tmp/mwtests/test_composite_chart.py /tmp/mwtests/test_composite_series.py /tmp/mwtests/test_provider_cache.py /tmp/mwtests/test_provider_chart.py'
+# 152 passed in 179.59s
+```
+
+preview 的启动/停止命令如下；状态目录和凭据仍只保存在 Ubuntu 本机私有目录，不进入仓库：
+
+```bash
+python3 deploy/ubuntu/mw_docker.py preview up \
+  --task mw-oanda-rest-1s-20261015-r6 \
+  --project mw-oanda-rest-1s-20261015-r6
+python3 deploy/ubuntu/mw_docker.py preview stop \
+  --task mw-oanda-rest-1s-20261015-r6 \
+  --project mw-oanda-rest-1s-20261015-r6
+```
+
+这组证据证明当前 r6 镜像、共享 SSE、组合 fixture、REST candle 规范化和 worker 回归可运行；仍不证明生产切换、正式发布、浏览器级 15 分钟真实组合图表观察或长期供应商 SLA 已完成。

@@ -30,12 +30,20 @@ def main():
                 return fetch_source(source, symbol, start, end, mode=mode)
             return provider(symbol, start, end, mode=mode, client=clients.get(source))
 
+        # In REST-batch mode OANDA's account-scoped pricing worker owns every
+        # OANDA live M1 request.  Keep this legacy worker available for
+        # Binance/Dukascopy, but exclude OANDA from both its viewer cycle and
+        # its realtime import queue so it cannot issue duplicate pricing or
+        # single-instrument candle requests.
+        source_filter = None if settings.oanda_acquisition_mode == "stream" else (
+            "binance", "dukascopy")
+
         while True:
             started = time.monotonic()
             try:
                 with lane("realtime"):
-                    once(include_viewers=True, fetcher=fetch)
-                    import_once(realtime_only=True, fetcher=fetch)
+                    once(include_viewers=True, fetcher=fetch, source_filter=source_filter)
+                    import_once(realtime_only=True, fetcher=fetch, source_filter=source_filter)
                 logging.info("realtime_cycle seconds=%.3f", time.monotonic()-started)
             except Exception as error:
                 # Provider/DB details can contain account identifiers.

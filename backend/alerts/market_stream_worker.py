@@ -13,6 +13,7 @@ from . import market_stream as stream
 from .chart_api import DataQuery, data_sync
 from .chart_series import encode
 from .composite_realtime import CurrentBuckets
+from .config import settings
 from .storage import (
     Bar,
     CompositePreparation,
@@ -131,6 +132,20 @@ class Calculator:
             from .provider_capabilities import poll_seconds
             source = identity["metadata"]["source"]
             delay = poll_seconds(source) * 1000 if query.series_kind == "provider" else 500
+            if query.series_kind == "provider" and settings.oanda_acquisition_mode == "rest_batch":
+                # Provider quotes are also a finite native M1 demand. In
+                # REST-batch mode this interest is what lets the account
+                # owner refresh ProviderDataset instead of opening a direct
+                # quote/candle request from the consumer.
+                from .provider_service import interest_id, renew, subscribe
+                from .storage import ProviderInterest
+
+                worker_client, listener = "stream_" + work["id"][:32], "quote"
+                with transaction() as db:
+                    registered = db.get(ProviderInterest, interest_id(worker_client, listener)) is not None
+                if not registered:
+                    subscribe(worker_client, listener, query.instrument, "M1")
+                renew(worker_client)
             if query.series_kind != "provider":
                 with transaction() as db:
                     signal_value = stream.digest(self._signal(db, work, query))
