@@ -3,7 +3,7 @@
   "source_commit": "42b4864b0153ed4419c35d17f77241b163735ad4",
   "implementation_tag": "v1.25.6",
   "implementation_commit": "ee5b885626104577244f4fc40342d60b1a52c664",
-  "implementation_status": "r6_preview_and_regression_verified_production_switch_pending",
+  "implementation_status": "r7_preview_and_regression_verified_production_switch_pending",
   "environment": "Ubuntu local Docker, dedicated project/network/PG14 volume/database, no HTTP listener; configured production OANDA proxy reused for read-only source requests",
   "direct_single": {
     "phase": "direct_fixed_1s",
@@ -599,13 +599,13 @@
     "Raw response body sizes exclude outgoing requests, TCP/TLS overhead and potential wire compression"
   ],
   "resource_state": "All benchmark containers stopped; PG volumes retained; database dump restored and all public table counts/content matched; managed retire preview rejected because reused release image is not a registered acceptance image",
-  "r6_preview": {
-    "task": "mw-oanda-rest-1s-20261015-r6",
-    "project": "mw-oanda-rest-1s-20261015-r6",
-    "commit": "2e47568f7a88aabb040491457589b8f1d3ff248d",
-    "dirty": true,
-    "api_url": "https://localhost:18483",
-    "chart_origin": "https://localhost:17454",
+  "r7_preview": {
+    "task": "mw-oanda-rest-1s-20261015-r7",
+    "project": "mw-oanda-rest-1s-20261015-r7",
+    "commit": "a3088f53b90f870fc4ea99d4bf62aea3bba1aa36",
+    "dirty": false,
+    "api_url": "https://localhost:18493",
+    "chart_origin": "https://localhost:17464",
     "health": [
       "healthz",
       "readyz"
@@ -620,22 +620,43 @@
       "composite_candidates"
     ],
     "real_supplier_connections": false,
+    "workers": [
+      "market-stream"
+    ],
     "tests": [
       {
         "scope": "rest_batch_worker_composite_quotes",
         "passed": 80,
-        "seconds": 53.1
+        "seconds": 54.78
       },
       {
         "scope": "unified_sse_composite_chart_provider_cache",
         "passed": 152,
-        "seconds": 179.59
+        "seconds": 166.41
+      },
+      {
+        "scope": "composite_recheck",
+        "passed": 14,
+        "failed": 1,
+        "failure": "expected stale, observed coverage_pending"
+      },
+      {
+        "scope": "composite_recheck_postgres",
+        "skipped": 12,
+        "reason": "PostgreSQL targeted fixture disabled in preview API container"
+      },
+      {
+        "scope": "health",
+        "passed": 5,
+        "failed": 3,
+        "failure": "legacy import heartbeat and chart-history worker status contracts"
       }
     ],
     "limitations": [
       "preview seed has no composite definition",
       "no production switch",
-      "no browser long-run real-supplier chart acceptance"
+      "no browser long-run real-supplier chart acceptance",
+      "repository backend CI is not green: 31 failed, 2364 passed, 11 skipped; failures are classified in the verification report"
     ]
   }
 }

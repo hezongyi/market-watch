@@ -145,41 +145,55 @@ Compose。停止后现场保留，未执行全局 prune 或删除 volume。
 - [r5 runtime window](oanda-rest-1s-20261015-r5-runtime.json)
 - [r5 UI smoke](oanda-rest-1s-20261015-r5-ui.json)
 
-## 当前 r6 验证增补（2026-10-15）
+## 当前 r7 验证增补（2026-10-15）
 
-r6 使用当前工作树 commit `2e47568f7a88aabb040491457589b8f1d3ff248d` 构建，工作树带有未提交改动，镜像用途为 Ubuntu Docker acceptance；没有切换生产配置、生产数据库或生产采集模式。隔离 preview 已实际启动并通过健康检查：
+r7 使用 REST 实现 commit `a3088f53b90f870fc4ea99d4bf62aea3bba1aa36` 构建（后续仅补充验证文档），镜像用途为 Ubuntu Docker acceptance；没有切换生产配置、生产数据库或生产采集模式。隔离 preview 已实际启动并通过健康检查：
 
-- task/project：`mw-oanda-rest-1s-20261015-r6`
-- API/主站：`https://localhost:18483`
-- chart origin：`https://localhost:17454`
-- API 镜像：`sha256:414ecc82f718ec61c67835ac50aa16ce2c693e2f9c17a32a31c1ecd7d33608cd`
-- Web 镜像：`sha256:0aec2a8b02214c53a9479a968436fc3cccb5bf20d6efdbde5ac6684c47da2f03`
-- chart 镜像：`sha256:ecc6414dbbf32dde81e8d14c70c839c3bd149a45a28acada9c21827275c14241`
+- task/project：`mw-oanda-rest-1s-20261015-r7`
+- API/主站：`https://localhost:18493`
+- chart origin：`https://localhost:17464`
+- API 镜像：`sha256:ce8fbcd7bfba8ee64517be5af9d4538578a4a7b9eddb60b6013b43b7e93dcbbe`
+- Web 镜像：`sha256:7f625f8f2137ff89b9fc4a8637efb94d9df29a978e60bbf7c04cb8c46d304ac6`
+- chart 镜像：`sha256:ed3b3fe24b8f2f0671f499cba73fd669ad147bb2f0d4b7a7ebaf966e2dcb618d`
 - PostgreSQL：14.24，JIT healthcheck 通过；preview seed 使用固定 D1 数据集
 
 实际 smoke 结果：`/healthz`、`/readyz`、主站、chart origin、登录、`/api/session`、`/api/charts/catalog`、组合中心列表和组合候选列表均返回成功。预置数据库没有组合定义，因此真实供应商组合长时图表需要使用带私有 OANDA 配置的隔离运行时另行验收；本 preview 不发起真实供应商连接。
 
-测试在 r6 API 容器内执行，避免使用主机安装环境：
+测试在 r7 API 容器内执行，避免使用主机安装环境：
 
 ```bash
-docker exec mw-oanda-rest-1s-20261015-r6-api-1 \
+docker exec mw-oanda-rest-1s-20261015-r7-api-1 \
   sh -lc 'PYTHONPATH=/app/backend pytest -q /tmp/mwtests/test_oanda_rest_batch.py /tmp/mwtests/test_oanda_worker_lifecycle.py /tmp/mwtests/test_market_stream_worker.py /tmp/mwtests/test_composite_quotes.py'
-# 80 passed in 53.10s
+# 80 passed in 54.78s
 
-docker exec mw-oanda-rest-1s-20261015-r6-api-1 \
+docker exec mw-oanda-rest-1s-20261015-r7-api-1 \
   sh -lc 'PYTHONPATH=/app/backend:/tmp/mwtests pytest -q /tmp/mwtests/test_unified_sse_composite_fixture.py /tmp/mwtests/test_market_stream.py /tmp/mwtests/test_market_stream_api.py /tmp/mwtests/test_live_pricing.py /tmp/mwtests/test_composite_chart.py /tmp/mwtests/test_composite_series.py /tmp/mwtests/test_provider_cache.py /tmp/mwtests/test_provider_chart.py'
-# 152 passed in 179.59s
+# 152 passed in 166.41s
 ```
 
 preview 的启动/停止命令如下；状态目录和凭据仍只保存在 Ubuntu 本机私有目录，不进入仓库：
 
 ```bash
 python3 deploy/ubuntu/mw_docker.py preview up \
-  --task mw-oanda-rest-1s-20261015-r6 \
-  --project mw-oanda-rest-1s-20261015-r6
+  --task mw-oanda-rest-1s-20261015-r7 \
+  --project mw-oanda-rest-1s-20261015-r7
 python3 deploy/ubuntu/mw_docker.py preview stop \
-  --task mw-oanda-rest-1s-20261015-r6 \
-  --project mw-oanda-rest-1s-20261015-r6
+  --task mw-oanda-rest-1s-20261015-r7 \
+  --project mw-oanda-rest-1s-20261015-r7
 ```
 
-这组证据证明当前 r6 镜像、共享 SSE、组合 fixture、REST candle 规范化和 worker 回归可运行；仍不证明生产切换、正式发布、浏览器级 15 分钟真实组合图表观察或长期供应商 SLA 已完成。
+这组证据证明当前 r7 镜像、共享 SSE、组合 fixture、REST candle 规范化和 worker 回归可运行；仍不证明生产切换、正式发布、浏览器级 15 分钟真实组合图表观察或长期供应商 SLA 已完成。
+
+### r7 定向复核与 CI 失败分类
+
+在同一个 r7 API 容器中追加执行了组合恢复和健康检查：
+
+```text
+test_composite_recheck.py: 14 passed, 1 failed
+test_composite_recheck_postgres.py: 12 skipped（该容器未启用 PostgreSQL 定向 fixture）
+test_health.py: 5 passed, 3 failed
+```
+
+组合复核失败项仍将恢复状态报为 `coverage_pending`，测试契约期望 `stale`；失败发生在已有的告警恢复状态契约，当前 REST 批量采集改动没有修改该状态判定路径。健康检查的三项失败分别涉及旧 `import_heartbeat` 健康推断和 chart-history worker 的配置状态，当前变更没有修改 `worker_health` 判定实现。以上定向失败与 PR CI 的同类失败一起保留，不能宣称后端 CI 全绿。
+
+PR CI（31 failed, 2364 passed, 11 skipped）按范围分为：迁移 head 顺序、provider chart calculation contract、上述组合恢复和 health 契约、history replay 缺少 `history_artifacts.raw_chunk`，以及 market-demand PostgreSQL barrier。REST/组合/SSE 定向套件、Web、Compose、Ruff、compileall 和 `git diff --check` 已通过；这些结果只证明本次改动范围的候选验证，不替代生产切换前的完整兼容修复。
