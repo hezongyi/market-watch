@@ -10,6 +10,7 @@ from alerts.storage import (
     CompositeRevision,
     LiveState,
     MarketComposite,
+    MarketDataset,
     MarketDemand,
     PricingOwner,
     RealtimeMapping,
@@ -62,6 +63,35 @@ def test_live_quote_is_independent_of_recovery_and_exact_input_is_auditable(data
         assert row["provenance"]["connection_epoch"] == 3
         assert row["provenance"]["quote"]["source_time"] == stamp - 1000
         assert db.scalar(select(MarketDemand)) is None
+
+
+def test_rest_candle_sample_preserves_receive_clock_and_source_interval(database, monkeypatch):
+    composite_id, revision_id, seam = populated(database, monkeypatch)
+    stamp = 200010000
+    quote_state(database, revision_id, stamp)
+    with database.begin() as db:
+        revision = db.get(CompositeRevision, revision_id)
+        mapping = db.get(RealtimeMapping, revision.mapping_id)
+        state = db.get(LiveState, mapping.target_dataset_id)
+        target_identity = db.get(MarketDataset, mapping.target_dataset_id).identity
+        state.quote = {}
+        state.ready = True
+        state.forming = {
+            "start": seam + 600000, "end": seam + 660000,
+            "open": "1.10", "high": "1.12", "low": "1.09", "close": "1.115",
+            "volume": "3", "complete": False, "acquisition_mode": "rest_batch",
+            "connection_epoch": 3, "source_identity": {
+                "source": "oanda", "channel": "v20", "environment": "practice",
+                **target_identity,
+            },
+            "observation": {"received_at": stamp, "sequence": 4,
+                            "observation_mode": "candle_close_sample"},
+        }
+        row = snapshot(db, db.get(MarketComposite, composite_id), now=stamp)
+        assert row["price_type"] == "sampled_candle_close"
+        assert row["observed_at"] == stamp
+        assert row["provenance"]["candle"]["start"] == seam + 600000
+        assert row["provenance"]["candle"]["end"] == seam + 660000
 
 
 @pytest.mark.parametrize(

@@ -13,6 +13,7 @@ from . import market_stream as stream
 from .chart_api import DataQuery, data_sync
 from .chart_series import encode
 from .composite_realtime import CurrentBuckets
+from .config import settings
 from .storage import (
     Bar,
     CompositePreparation,
@@ -84,7 +85,9 @@ class Calculator:
                     db.get(Instrument, target.instrument_id).calendar_profile,
                     prep.input_revision, prep.status, prep.cutoff, prep.confirmed_end,
                     live["current_account"], live["owned"], live["connection"], live["quote_ready"],
-                    live["confirmed_tail_ready"], live["connection_epoch"], live["live_revision"],
+                    live.get("candle_ready", False), live.get("sample_ready", live["quote_ready"]),
+                    live.get("observation_mode", "stream_quote"), live["confirmed_tail_ready"],
+                    live["connection_epoch"], live["live_revision"],
                     stamp // 60000, self._indicators(db, revision_id=revision.id)]
         if kind == "history":
             version = db.get(HistoryVersion, ident)
@@ -129,6 +132,20 @@ class Calculator:
             from .provider_capabilities import poll_seconds
             source = identity["metadata"]["source"]
             delay = poll_seconds(source) * 1000 if query.series_kind == "provider" else 500
+            if query.series_kind == "provider" and settings.oanda_acquisition_mode == "rest_batch":
+                # Provider quotes are also a finite native M1 demand. In
+                # REST-batch mode this interest is what lets the account
+                # owner refresh ProviderDataset instead of opening a direct
+                # quote/candle request from the consumer.
+                from .provider_service import interest_id, renew, subscribe
+                from .storage import ProviderInterest
+
+                worker_client, listener = "stream_" + work["id"][:32], "quote"
+                with transaction() as db:
+                    registered = db.get(ProviderInterest, interest_id(worker_client, listener)) is not None
+                if not registered:
+                    subscribe(worker_client, listener, query.instrument, "M1")
+                renew(worker_client)
             if query.series_kind != "provider":
                 with transaction() as db:
                     signal_value = stream.digest(self._signal(db, work, query))
@@ -203,7 +220,8 @@ class Calculator:
                 revision = db.get(CompositeRevision, page["revision_id"])
                 state = live_snapshot(db, revision)
                 page["status"] = {key: state[key] for key in (
-                    "quote_ready", "confirmed_tail_ready", "owned", "connection", "current_account")}
+                    "quote_ready", "candle_ready", "sample_ready", "observation_mode",
+                    "confirmed_tail_ready", "owned", "connection", "current_account")}
         return {"type": "bars", **page}, 500
 
     def retire_memory(self):

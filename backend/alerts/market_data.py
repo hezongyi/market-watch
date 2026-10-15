@@ -1085,18 +1085,35 @@ def quote_snapshot(body: QuoteQuery):
                                 values["lp"] = float(facts["price"])
                                 if facts["price_type"] == "sampled_bid":
                                     values["bid"] = values["lp"]
-                            precise = facts["price_type"] == "sampled_bid"
+                            price_type = facts["price_type"]
+                            precise = price_type == "sampled_bid"
+                            candle_sample = price_type == "sampled_candle_close"
                             provenance = facts.get("provenance") or {}
+                            candle = provenance.get("candle") or {}
+                            # A candle close is observed at response receive
+                            # time, while its price belongs to the source
+                            # interval.  Preserve both clocks and the
+                            # acquisition contract; do not present it as a
+                            # precise Bid quote or as an old confirmed bar.
+                            sample_start = candle.get("start") if candle_sample else provenance.get("start")
+                            sample_end = candle.get("end") if candle_sample else provenance.get("end")
                             values.update(quote_time=facts["observed_at"] if precise else None,
-                                data_start=None if precise else provenance.get("start"),
-                                data_end=None if precise else provenance.get("end"),
-                                time_type="composite_snapshot", observation_type="provider_quote" if precise else "source_m1",
-                                price_type=facts["price_type"], quote_ready=facts["quote_ready"],
+                                observed_at=facts["observed_at"] if candle_sample else None,
+                                data_start=None if precise else sample_start,
+                                data_end=None if precise else sample_end,
+                                time_type="composite_snapshot",
+                                observation_type=("provider_quote" if precise else
+                                                  "candle_close_sample" if candle_sample else "source_m1"),
+                                observation_mode=("stream_quote" if precise else
+                                                  "candle_close_sample" if candle_sample else "stored_confirmed_m1"),
+                                price_type=price_type, quote_ready=facts["quote_ready"],
                                 confirmed_tail_ready=facts["confirmed_tail_ready"], quality=facts["quality"],
                                 **{key: facts.get(key) for key in ("market_session", "session_reason", "calendar_verified",
                                     "calendar_version", "read_at", "revision_id", "input_revision", "source_identity",
                                     "session_conflict", "session_conflict_reason", "fetch_status")})
-                            values["description"] += " · " + ("抽样Bid" if facts["price_type"] == "sampled_bid" else
+                            values["description"] += " · " + (
+                                "抽样Bid" if precise else
+                                "当前未闭合M1收盘采样" if candle_sample else
                                 "保存的确认M1收盘" if facts["price"] is not None else "等待报价")
 
                     # Watchlist metadata is pure, never a first-use command.

@@ -9,10 +9,10 @@ import hashlib
 import json
 import sys
 import threading
-from time import perf_counter
 from bisect import bisect_left
 from collections import OrderedDict
 from decimal import Decimal
+from time import perf_counter
 
 from sqlalchemy import select
 
@@ -20,8 +20,13 @@ from .calendar_profile import closures_from
 from .chart_data import FRAMES, bounds
 from .chart_series import is_gold
 from .domain import bucket_bounds, calendar_for, scheduled_open
-from .source_history_store import compressed_chunk
 from .market_datasets import price_rule, version_price_rows
+
+# ``raw_chunk`` remains a public test/diagnostic seam for older callers.  The
+# artifact worker intentionally uses the bounded compressed path below, but
+# retaining the import keeps compatibility probes from failing at collection.
+from .source_history_store import compressed_chunk
+from .source_history_store import raw_chunk as _raw_chunk
 from .storage import (
     HistoryArtifact,
     HistoryArtifactBlock,
@@ -38,6 +43,9 @@ from .storage import (
 )
 
 RULE_VERSION = "configured-phase-m1-v1"
+# Compatibility seam for older diagnostics/tests; the worker itself never
+# calls this unbounded decoder.
+raw_chunk = _raw_chunk
 _INPUT_LIMIT = 64 * 1024 * 1024
 _inputs = OrderedDict()
 _input_bytes = 0

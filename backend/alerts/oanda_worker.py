@@ -1,5 +1,6 @@
 """One leased multi-instrument stream plus an independent REST confirmation loop."""
 
+import hashlib
 import logging
 import re
 import signal
@@ -14,12 +15,16 @@ from .live_pricing import (
     claim_auth_probe,
     commit_confirmation,
     confirmation_window,
+    desired_dataset_identities,
     desired_datasets,
+    desired_native_provider_datasets,
     disconnected,
     ensure_catalog,
     finish_auth_probe,
+    lock_owner,
     park_closed,
     publish_event,
+    publish_rest_batch,
     recovery_requirements,
     renew,
     session_states,
@@ -28,8 +33,14 @@ from .live_pricing import (
 )
 from .market_contracts import RequestResult, failed_request
 from .market_resources import cooldown, lane
+from .oanda_rest_batch import (
+    MAX_SPECIFICATIONS,
+    CandleSpec,
+    OandaRestBatch,
+    live_demand_revision,
+)
 from .oanda_stream import OandaPractice
-from .storage import now_ms
+from .storage import now_ms, transaction
 
 log = logging.getLogger(__name__)
 
@@ -52,6 +63,48 @@ def subscription_change(identities, desired, idle_since, now):
     return idle_since, now - idle_since >= settings.oanda_idle_grace_seconds
 
 
+def desired_for_mode(account):
+    """Use complete identity keys for REST, symbol keys for stream legacy."""
+    if settings.oanda_acquisition_mode == "rest_batch":
+        return {identity.key: identity for identity in desired_dataset_identities(account)}
+    return desired_datasets(account)
+
+
+def native_specs(account):
+    """Resolve active provider interests to complete REST candle specs."""
+    return tuple(
+        (row.id, row.timeframe, CandleSpec.from_provider_metadata(row.metadata_json, row.timeframe))
+        for row in desired_native_provider_datasets(account)
+    )
+
+
+def demand_fingerprint(identities, native):
+    return (
+        tuple(sorted(getattr(identity, "key", key) for key, identity in identities.items())),
+        tuple(sorted(spec.key for *_, spec in native)),
+    )
+
+
+def request_groups(live_specs, native):
+    """Yield same-parameter REST batches within the supplier envelope."""
+    groups = {}
+    for key, spec in live_specs:
+        group_key = getattr(spec, "group_key", spec.key)
+        groups.setdefault(group_key, {"live": [], "native": []})["live"].append((key, spec))
+    for dataset_id, timeframe, spec in native:
+        groups.setdefault(spec.group_key, {"live": [], "native": []})["native"].append(
+            (dataset_id, timeframe, spec))
+    for original in groups.values():
+        entries = [("live", row) for row in original["live"]] + [
+            ("native", row) for row in original["native"]]
+        for offset in range(0, len(entries), MAX_SPECIFICATIONS):
+            chunk = entries[offset:offset + MAX_SPECIFICATIONS]
+            yield {
+                "live": [row for kind, row in chunk if kind == "live"],
+                "native": [row for kind, row in chunk if kind == "native"],
+            }
+
+
 def closed_delay(identities, *, now=None):
     stamp = now_ms() if now is None else now
     states = session_states(identities, now=stamp)
@@ -62,14 +115,22 @@ def closed_delay(identities, *, now=None):
 
 
 def probe_authentication(adapter, ownership):
-    identities = desired_datasets(adapter.account_id)
+    identities = desired_for_mode(adapter.account_id)
+    native = native_specs(adapter.account_id) if settings.oanda_acquisition_mode == "rest_batch" else ()
     delay = closed_delay(identities)
-    symbols = set(identities) | {
-        s.strip() for s in settings.oanda_resident_symbols.split(',') if s.strip()}
+    symbols = {identity.provider_symbol for identity in identities.values()} | {
+        s.strip() for s in settings.oanda_resident_symbols.split(',') if s.strip()} | {
+        spec.provider_symbol for _, _, spec in native}
     catalog = None
     try:
         with lane('realtime'):
-            catalog = adapter.validate_access(symbols)
+            if isinstance(adapter, OandaRestBatch):
+                scope = 'sha256:' + hashlib.sha256(adapter.account_id.encode()).hexdigest()
+                specs = [CandleSpec(
+                    account_scope=scope, provider_symbol=symbol) for symbol in sorted(symbols)]
+                catalog = adapter.validate_candle_access(specs)
+            else:
+                catalog = adapter.validate_access(symbols)
         ensure_catalog(catalog, adapter.account_id, ownership=ownership)
         result = RequestResult(status='data')
     except Exception as error:
@@ -79,6 +140,212 @@ def probe_authentication(adapter, ownership):
             cooldown('oanda', retry_seconds=max(1, (result.retry_at-now_ms())/1000) if result.retry_at else None)
     finish_auth_probe(ownership, result, retry_seconds=delay)
     return catalog
+
+
+def collect_rest(adapter, ownership, identities, stopped, native=()):
+    """Run one fenced fixed-cadence REST batch connection.
+
+    ``candles/latest`` is deliberately kept on the foreground cadence while
+    complete-minute recovery runs in a bounded maintenance thread.  A latest
+    response is not a coverage assertion: after a restart or a long outage we
+    must use the checkpointed ``page`` path before declaring the source ready.
+    """
+    epoch = begin_connection(ownership, identities)
+    native = tuple(native)
+    connection_stop = threading.Event()
+    intentional_stop = threading.Event()
+    closed_stop = threading.Event()
+    lost = threading.Event()
+    maintenance_error = []
+    sequence = 0
+    tick = time.monotonic()
+    terminal_result = RequestResult(status="unavailable")
+
+    def maintenance():
+        """Renew the lease and drain bounded complete-M1 recovery windows."""
+        refreshed = 0.0
+        while not stopped.is_set() and not connection_stop.is_set():
+            stage = "renew"
+            try:
+                if not renew(ownership):
+                    lost.set()
+                    return
+                if time.monotonic() - refreshed >= 10:
+                    stage = "subscription"
+                    desired = desired_for_mode(adapter.account_id)
+                    desired_native = (native_specs(adapter.account_id)
+                                      if native or settings.oanda_acquisition_mode == "rest_batch" else ())
+                    if demand_fingerprint(desired, desired_native) != demand_fingerprint(identities, native):
+                        intentional_stop.set()
+                        connection_stop.set()
+                        return
+                    delay = closed_delay(identities)
+                    if delay is not None:
+                        closed_stop.set()
+                        connection_stop.set()
+                        return
+                    refreshed = time.monotonic()
+                stage = "confirmation"
+                failure = confirm_pages(
+                    adapter, ownership, epoch, identities,
+                    lambda: stopped.is_set() or connection_stop.is_set() or lost.is_set(),
+                )
+                if failure:
+                    maintenance_error.append(failure)
+                    connection_stop.set()
+                    return
+            except TimeoutError:
+                lost.set()
+                return
+            except Exception as error:
+                # Keep the fixed-cadence latest loop alive for transient page
+                # failures; the page path records its own retry state.
+                log_failure("pricing_maintenance_failed", error, stage=stage, epoch=epoch)
+            connection_stop.wait(1)
+
+    # Test doubles and non-OANDA adapters may expose only ``latest``.  The
+    # production REST adapter inherits ``page`` and always gets recovery.
+    maintenance_thread = None
+    if hasattr(adapter, "page"):
+        maintenance_thread = threading.Thread(
+            target=maintenance, name="oanda-rest-confirmation", daemon=True
+        )
+        maintenance_thread.start()
+    try:
+        while not stopped.is_set() and not connection_stop.is_set():
+            if not renew(ownership):
+                raise TimeoutError('REST ownership expired')
+            if tick > time.monotonic():
+                connection_stop.wait(tick - time.monotonic())
+            if stopped.is_set() or connection_stop.is_set() or lost.is_set():
+                break
+            desired = desired_for_mode(adapter.account_id)
+            desired_native = (native_specs(adapter.account_id)
+                              if native or settings.oanda_acquisition_mode == "rest_batch" else ())
+            if demand_fingerprint(desired, desired_native) != demand_fingerprint(identities, native):
+                intentional_stop.set()
+                break
+            delay = closed_delay(identities)
+            if delay is not None:
+                closed_stop.set()
+                break
+            live_specs = [(getattr(identity, "key", key), CandleSpec.from_dataset(identity))
+                          for key, identity in identities.items()]
+            for group in request_groups(live_specs, native):
+                if stopped.is_set() or connection_stop.is_set() or lost.is_set():
+                    break
+                sequence += 1
+                specs = [spec for _, spec in group["live"]] + [spec for _, _, spec in group["native"]]
+                full_revision = live_demand_revision(specs)
+                with lane('realtime'):
+                    batch = adapter.latest(specs, generation=epoch, sequence=sequence,
+                        demand_revision=full_revision,
+                        deadline=time.monotonic() + max(7, settings.oanda_rest_interval_seconds * 2),
+                        cancelled=lambda: stopped.is_set() or connection_stop.is_set())
+                # A cancelled or superseded request may still return a successful
+                # HTTP response.  Once the connection is fenced, that response is
+                # no longer allowed to publish a snapshot or alert.
+                if stopped.is_set() or connection_stop.is_set() or lost.is_set():
+                    break
+                # Demand can change while the HTTP request is in flight. Fence the
+                # response before any confirmation or provisional/cache commit.
+                desired_after_request = desired_for_mode(adapter.account_id)
+                desired_native_after = (native_specs(adapter.account_id)
+                                        if native or settings.oanda_acquisition_mode == "rest_batch" else ())
+                if demand_fingerprint(desired_after_request, desired_native_after) != demand_fingerprint(identities, native):
+                    intentional_stop.set()
+                    connection_stop.set()
+                    break
+                if group["live"]:
+                    live = {key: identities[key] for key, _ in group["live"]}
+                    publish_rest_batch(ownership, epoch, batch, live, demand_revision=full_revision)
+                if group["native"]:
+                    publish_native_rest_batch(ownership, epoch, batch, group["native"], demand_revision=full_revision)
+                if batch.result.status in ('unauthorized', 'provider_maintenance'):
+                    terminal_result = batch.result
+                    connection_stop.set()
+                    break
+            if connection_stop.is_set():
+                break
+            tick += settings.oanda_rest_interval_seconds
+            now = time.monotonic()
+            if tick <= now:
+                skipped = int((now - tick) // settings.oanda_rest_interval_seconds) + 1
+                tick += skipped * settings.oanda_rest_interval_seconds
+    finally:
+        connection_stop.set()
+        if maintenance_thread is not None:
+            maintenance_thread.join(timeout=20)
+        if maintenance_error:
+            terminal_result = maintenance_error[-1]
+        if lost.is_set():
+            return
+        if closed_stop.is_set():
+            try:
+                park_closed(ownership, identities, closed_delay(identities) or 1)
+            except TimeoutError:
+                pass
+        else:
+            try:
+                disconnected(ownership, epoch, identities, terminal_result,
+                             intentional=intentional_stop.is_set() or stopped.is_set())
+            except TimeoutError:
+                pass
+
+
+def publish_native_rest_batch(ownership, epoch, batch, datasets, *, demand_revision=None):
+    """Publish native provider-period rows through the shared cache lease."""
+    from .oanda_rest_batch import LatestBatch
+    from .provider_cache import commit_rest_latest
+
+    batch = LatestBatch.model_validate(batch)
+    if batch.generation != epoch:
+        raise TimeoutError("REST native batch generation is obsolete")
+    if demand_revision is not None and batch.demand_revision != demand_revision:
+        raise TimeoutError("REST native batch demand is obsolete")
+    stamp = now_ms()
+    # The account owner is checked before every cache write.  Provider cache
+    # leases fence concurrent chart readers, while this check fences a stale
+    # pricing-worker epoch.
+    for dataset_id, frame, spec in datasets:
+        with transaction() as db:
+            lock_owner(db, ownership, epoch, now=stamp)
+        series = next((row for row in batch.series if row.spec == spec), None)
+        if series is None or not series.result.successful:
+            continue
+        from .native_series import chart_label
+
+        bars = []
+        coverage = []
+        for candle in series.candles:
+            end = candle.end
+            bar = {
+                "start": candle.start,
+                "end": end,
+                "chart_time": chart_label(candle.start, frame, spec.parameters.model_dump()),
+                "open": candle.open,
+                "high": candle.high,
+                "low": candle.low,
+                "close": candle.close,
+                "volume": candle.volume,
+                "volume_complete": bool(candle.complete and candle.volume is not None),
+                "complete": candle.complete,
+                "source_confirmed": candle.complete,
+                "coverage_complete": candle.complete,
+            }
+            bars.append(bar)
+            if candle.complete:
+                coverage.append([candle.start, end])
+        if not bars:
+            continue
+        try:
+            commit_rest_latest(dataset_id, {"bars": bars, "history_boundary": False,
+                "coverage": coverage}, stamp)
+        except TimeoutError:
+            # A foreground native read may briefly own the cache lease. The
+            # next cadence repeats the latest snapshot; account ownership
+            # itself was already fenced immediately before this attempt.
+            log.info("oanda_native_cache_busy dataset=%s", dataset_id)
 
 
 def confirm_pages(adapter, ownership, epoch, identities, cancelled):
@@ -251,12 +518,16 @@ def run(adapter, stopped):
                 with lane('realtime'):
                     catalog = adapter.catalog()
                 ensure_catalog(catalog, adapter.account_id, ownership=ownership)
-            identities = desired_datasets(adapter.account_id)
+            identities = desired_for_mode(adapter.account_id)
+            native = native_specs(adapter.account_id) if settings.oanda_acquisition_mode == "rest_batch" else ()
             delay = closed_delay(identities)
-            if delay is not None or not identities:
+            if delay is not None or (not identities and not native):
                 park_closed(ownership, identities, delay if delay is not None else 1)
                 continue
-            collect(adapter, ownership, identities, stopped)
+            if settings.oanda_acquisition_mode == 'rest_batch':
+                collect_rest(adapter, ownership, identities, stopped, native)
+            else:
+                collect(adapter, ownership, identities, stopped)
         except Exception as error:
             result = log_failure('pricing_start_failed', error, stage='startup')
             try:
@@ -267,14 +538,15 @@ def run(adapter, stopped):
 
 
 def main():
-    if not settings.oanda_stream_enabled:
-        raise SystemExit("Set ALERTS_OANDA_STREAM_ENABLED=true for this isolated worker")
+    if settings.oanda_acquisition_mode == 'stream' and not settings.oanda_stream_enabled:
+        raise SystemExit("Set ALERTS_OANDA_STREAM_ENABLED=true for stream acquisition")
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     logging.getLogger("httpx").setLevel(logging.WARNING)
     stopped = threading.Event()
     for sig in (signal.SIGTERM, signal.SIGINT):
         signal.signal(sig, lambda *_: stopped.set())
-    adapter = OandaPractice(token=settings.oanda_token, account_id=settings.oanda_account_id,
+    adapter_type = OandaRestBatch if settings.oanda_acquisition_mode == 'rest_batch' else OandaPractice
+    adapter = adapter_type(token=settings.oanda_token, account_id=settings.oanda_account_id,
                            proxy=settings.oanda_proxy or settings.market_proxy)
     try:
         while not stopped.is_set():

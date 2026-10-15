@@ -4,8 +4,8 @@ from sqlalchemy import func, or_, select
 
 from .composite_definitions import baseline
 from .history_catalog import account_scope
-from .market_usage import wanted_instruments
 from .market_names import code_search, display_code
+from .market_usage import wanted_instruments
 from .storage import (
     ChartAlert,
     ChartAlertVersion,
@@ -80,6 +80,8 @@ def detail(db, composite_id, *, permission_scope=SCOPE):
     connection = live["connection"]
     quote_age = live["quote_age_ms"]
     quote_ready = live["quote_ready"]
+    candle_ready = live.get("candle_ready", False)
+    sample_ready = live.get("sample_ready", quote_ready)
     confirmed_ready = live["confirmed_tail_ready"]
     from .composite_aggregates import report
     status = "account_changed" if not current_account else "attention" if prep.error else (
@@ -105,6 +107,8 @@ def detail(db, composite_id, *, permission_scope=SCOPE):
         "usage": {"charts": chart_count, "strategies": watch_count, "chart_alerts": alert_count,
                   "total": chart_count + watch_count + alert_count},
         "health": {"connection": connection, "quote_ready": quote_ready,
+            "candle_ready": candle_ready, "sample_ready": sample_ready,
+            "observation_mode": live.get("observation_mode", "stream_quote"),
             **{key: live[key] for key in ('market_session', 'next_session_at', 'calendar_verified',
                 'authentication_hold', 'connection_error', 'next_probe_at')},
             "confirmed_tail_ready": confirmed_ready, "quote_age_ms": quote_age,

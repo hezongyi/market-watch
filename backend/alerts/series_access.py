@@ -105,6 +105,7 @@ def chart_data(db, body, *, realtime=None):
     from .market_data import renew_demand
 
     meta = metadata(db, body.instrument, body.series_kind)
+    demand_renewed = False
     if body.series_kind == "composite":
         from .config import settings
         from .live_pricing import account_key
@@ -116,6 +117,14 @@ def chart_data(db, body, *, realtime=None):
             if not selected or selected.composite_id != composite.id:
                 raise ValueError("组合修订不属于当前组合")
             mapping = db.get(RealtimeMapping, selected.mapping_id)
+            # Register the browser lease before taking the live-state read lock
+            # or doing the bounded chart read.  Two first readers can then
+            # rendezvous at the atomic demand upsert instead of one holding
+            # the live-state lock while the other waits behind it.
+            if body.client:
+                renew_demand(db, body.client, db.get(Instrument, composite.instrument_id),
+                             composite_revision_id=selected.id)
+                demand_renewed = True
             # Strong references keep SQLAlchemy's weak identity map on this
             # source observation throughout the history/aggregation read.
             _live_observation = (db.get(LiveState, mapping.target_dataset_id),
@@ -165,7 +174,7 @@ def chart_data(db, body, *, realtime=None):
         meta["dataset_id"], meta["seam"] = parent.dataset_id, selected.seam
         target_inst = db.get(Instrument, db.get(MarketDataset, db.get(RealtimeMapping, selected.mapping_id).target_dataset_id).instrument_id)
         inst = SimpleNamespace(id=composite.instrument_id, calendar=meta["calendar"], calendar_profile=target_inst.calendar_profile)
-        if body.client:
+        if body.client and not demand_renewed:
             renew_demand(db, body.client, db.get(Instrument, composite.instrument_id),
                          composite_revision_id=selected.id)
     for bar in page["bars"]:

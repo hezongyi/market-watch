@@ -59,6 +59,10 @@ class Settings(BaseSettings):
     oanda_token: str = Field(default="", repr=False)
     oanda_account_id: str = Field(default="", repr=False)
     oanda_proxy: str = ""
+    # Explicit protocol selection prevents two collectors owning one account.
+    # REST remains opt-in until its end-to-end acceptance is complete.
+    oanda_acquisition_mode: Literal["stream", "rest_batch"] = "stream"
+    oanda_rest_interval_seconds: float = Field(default=2, ge=1, le=60)
     oanda_stream_enabled: bool = False
     oanda_resident_symbols: str = "EUR_USD,XAU_USD"
     oanda_calendar_version: str = "ny17-candidate-v1"

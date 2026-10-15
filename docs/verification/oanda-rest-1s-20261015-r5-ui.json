@@ -1,0 +1,29 @@
+{
+  "artifact": "runtime-ui-smoke",
+  "host": "Ubuntu local Docker",
+  "project": "mw-oanda-rest-runtime-20261015",
+  "endpoints": [
+    {
+      "name": "web",
+      "status_code": 200,
+      "ok": true
+    },
+    {
+      "name": "chart",
+      "status_code": 200,
+      "ok": true
+    },
+    {
+      "name": "chart_range_sync",
+      "status_code": 200,
+      "ok": true
+    },
+    {
+      "name": "api_health",
+      "status_code": 200,
+      "ok": true
+    }
+  ],
+  "chart_image": "market-watch-chart-origin:oanda-rest-batch-20261015-r5",
+  "web_image": "market-watch-web:oanda-rest-batch-20261015-r5"
+}

@@ -38,7 +38,9 @@ def run(fetch_page):
     from .worker_health import Pulse
 
     pulse = Pulse("chart_history")
-    refreshed = 0
+    # Force the first loop to refresh the provider catalog even when the
+    # process monotonic clock has not yet reached one day since boot.
+    refreshed = float("-inf")
     catalog_error = None
     while True:
         try:

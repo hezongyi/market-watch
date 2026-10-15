@@ -1,0 +1,1755 @@
+{
+  "contract_version": 1,
+  "host": "Ubuntu local Docker",
+  "production_changed": false,
+  "scope": "adapter contracts only; not end-to-end system acceptance",
+  "interval_seconds": 2,
+  "duration_seconds": 120,
+  "requests": 60,
+  "skipped_ticks": 0,
+  "statuses": {
+    "data": 60
+  },
+  "request_start_gap_ms": {
+    "count": 59,
+    "median": 2000,
+    "p95": 2000,
+    "max": 2004
+  },
+  "request_ms": {
+    "count": 60,
+    "median": 306.63750000000005,
+    "p95": 703.321,
+    "max": 1213.083
+  },
+  "first_confirmation_delay_ms": {
+    "count": 24,
+    "median": 1364.0,
+    "p95": 5138,
+    "max": 5308
+  },
+  "spec_identities": [
+    {
+      "source": "oanda",
+      "channel": "v20",
+      "environment": "practice",
+      "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+      "provider_symbol": "EUR_USD",
+      "basis": "bid",
+      "parameters": {
+        "granularity": "M1",
+        "price": "B",
+        "smooth": false,
+        "dailyAlignment": 17,
+        "alignmentTimezone": "America/New_York",
+        "weeklyAlignment": "Sunday",
+        "units": "1"
+      }
+    },
+    {
+      "source": "oanda",
+      "channel": "v20",
+      "environment": "practice",
+      "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+      "provider_symbol": "GBP_USD",
+      "basis": "bid",
+      "parameters": {
+        "granularity": "M1",
+        "price": "B",
+        "smooth": false,
+        "dailyAlignment": 17,
+        "alignmentTimezone": "America/New_York",
+        "weeklyAlignment": "Sunday",
+        "units": "1"
+      }
+    },
+    {
+      "source": "oanda",
+      "channel": "v20",
+      "environment": "practice",
+      "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+      "provider_symbol": "USD_JPY",
+      "basis": "bid",
+      "parameters": {
+        "granularity": "M1",
+        "price": "B",
+        "smooth": false,
+        "dailyAlignment": 17,
+        "alignmentTimezone": "America/New_York",
+        "weeklyAlignment": "Sunday",
+        "units": "1"
+      }
+    },
+    {
+      "source": "oanda",
+      "channel": "v20",
+      "environment": "practice",
+      "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+      "provider_symbol": "USD_CHF",
+      "basis": "bid",
+      "parameters": {
+        "granularity": "M1",
+        "price": "B",
+        "smooth": false,
+        "dailyAlignment": 17,
+        "alignmentTimezone": "America/New_York",
+        "weeklyAlignment": "Sunday",
+        "units": "1"
+      }
+    },
+    {
+      "source": "oanda",
+      "channel": "v20",
+      "environment": "practice",
+      "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+      "provider_symbol": "AUD_USD",
+      "basis": "bid",
+      "parameters": {
+        "granularity": "M1",
+        "price": "B",
+        "smooth": false,
+        "dailyAlignment": 17,
+        "alignmentTimezone": "America/New_York",
+        "weeklyAlignment": "Sunday",
+        "units": "1"
+      }
+    },
+    {
+      "source": "oanda",
+      "channel": "v20",
+      "environment": "practice",
+      "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+      "provider_symbol": "NZD_USD",
+      "basis": "bid",
+      "parameters": {
+        "granularity": "M1",
+        "price": "B",
+        "smooth": false,
+        "dailyAlignment": 17,
+        "alignmentTimezone": "America/New_York",
+        "weeklyAlignment": "Sunday",
+        "units": "1"
+      }
+    },
+    {
+      "source": "oanda",
+      "channel": "v20",
+      "environment": "practice",
+      "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+      "provider_symbol": "USD_CAD",
+      "basis": "bid",
+      "parameters": {
+        "granularity": "M1",
+        "price": "B",
+        "smooth": false,
+        "dailyAlignment": 17,
+        "alignmentTimezone": "America/New_York",
+        "weeklyAlignment": "Sunday",
+        "units": "1"
+      }
+    },
+    {
+      "source": "oanda",
+      "channel": "v20",
+      "environment": "practice",
+      "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+      "provider_symbol": "EUR_JPY",
+      "basis": "bid",
+      "parameters": {
+        "granularity": "M1",
+        "price": "B",
+        "smooth": false,
+        "dailyAlignment": 17,
+        "alignmentTimezone": "America/New_York",
+        "weeklyAlignment": "Sunday",
+        "units": "1"
+      }
+    },
+    {
+      "source": "oanda",
+      "channel": "v20",
+      "environment": "practice",
+      "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+      "provider_symbol": "GBP_JPY",
+      "basis": "bid",
+      "parameters": {
+        "granularity": "M1",
+        "price": "B",
+        "smooth": false,
+        "dailyAlignment": 17,
+        "alignmentTimezone": "America/New_York",
+        "weeklyAlignment": "Sunday",
+        "units": "1"
+      }
+    },
+    {
+      "source": "oanda",
+      "channel": "v20",
+      "environment": "practice",
+      "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+      "provider_symbol": "EUR_GBP",
+      "basis": "bid",
+      "parameters": {
+        "granularity": "M1",
+        "price": "B",
+        "smooth": false,
+        "dailyAlignment": 17,
+        "alignmentTimezone": "America/New_York",
+        "weeklyAlignment": "Sunday",
+        "units": "1"
+      }
+    },
+    {
+      "source": "oanda",
+      "channel": "v20",
+      "environment": "practice",
+      "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+      "provider_symbol": "AUD_JPY",
+      "basis": "bid",
+      "parameters": {
+        "granularity": "M1",
+        "price": "B",
+        "smooth": false,
+        "dailyAlignment": 17,
+        "alignmentTimezone": "America/New_York",
+        "weeklyAlignment": "Sunday",
+        "units": "1"
+      }
+    },
+    {
+      "source": "oanda",
+      "channel": "v20",
+      "environment": "practice",
+      "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+      "provider_symbol": "XAU_USD",
+      "basis": "bid",
+      "parameters": {
+        "granularity": "M1",
+        "price": "B",
+        "smooth": false,
+        "dailyAlignment": 17,
+        "alignmentTimezone": "America/New_York",
+        "weeklyAlignment": "Sunday",
+        "units": "1"
+      }
+    }
+  ],
+  "comparison_count": 36,
+  "comparisons": [
+    {
+      "symbol": "AUD_JPY",
+      "start": 1792085220000,
+      "end": 1792085280000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "AUD_JPY",
+      "start": 1792085280000,
+      "end": 1792085340000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "AUD_JPY",
+      "start": 1792085340000,
+      "end": 1792085400000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "AUD_USD",
+      "start": 1792085220000,
+      "end": 1792085280000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "AUD_USD",
+      "start": 1792085280000,
+      "end": 1792085340000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "AUD_USD",
+      "start": 1792085340000,
+      "end": 1792085400000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "EUR_GBP",
+      "start": 1792085220000,
+      "end": 1792085280000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "EUR_GBP",
+      "start": 1792085280000,
+      "end": 1792085340000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "EUR_GBP",
+      "start": 1792085340000,
+      "end": 1792085400000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "EUR_JPY",
+      "start": 1792085220000,
+      "end": 1792085280000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "EUR_JPY",
+      "start": 1792085280000,
+      "end": 1792085340000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "EUR_JPY",
+      "start": 1792085340000,
+      "end": 1792085400000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "EUR_USD",
+      "start": 1792085220000,
+      "end": 1792085280000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "EUR_USD",
+      "start": 1792085280000,
+      "end": 1792085340000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "EUR_USD",
+      "start": 1792085340000,
+      "end": 1792085400000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "GBP_JPY",
+      "start": 1792085220000,
+      "end": 1792085280000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "GBP_JPY",
+      "start": 1792085280000,
+      "end": 1792085340000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "GBP_JPY",
+      "start": 1792085340000,
+      "end": 1792085400000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "GBP_USD",
+      "start": 1792085220000,
+      "end": 1792085280000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "GBP_USD",
+      "start": 1792085280000,
+      "end": 1792085340000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "GBP_USD",
+      "start": 1792085340000,
+      "end": 1792085400000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "NZD_USD",
+      "start": 1792085220000,
+      "end": 1792085280000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "NZD_USD",
+      "start": 1792085280000,
+      "end": 1792085340000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "NZD_USD",
+      "start": 1792085340000,
+      "end": 1792085400000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "USD_CAD",
+      "start": 1792085220000,
+      "end": 1792085280000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "USD_CAD",
+      "start": 1792085280000,
+      "end": 1792085340000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "USD_CAD",
+      "start": 1792085340000,
+      "end": 1792085400000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "USD_CHF",
+      "start": 1792085220000,
+      "end": 1792085280000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "USD_CHF",
+      "start": 1792085280000,
+      "end": 1792085340000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "USD_CHF",
+      "start": 1792085340000,
+      "end": 1792085400000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "USD_JPY",
+      "start": 1792085220000,
+      "end": 1792085280000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "USD_JPY",
+      "start": 1792085280000,
+      "end": 1792085340000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "USD_JPY",
+      "start": 1792085340000,
+      "end": 1792085400000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "XAU_USD",
+      "start": 1792085220000,
+      "end": 1792085280000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "XAU_USD",
+      "start": 1792085280000,
+      "end": 1792085340000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    },
+    {
+      "symbol": "XAU_USD",
+      "start": 1792085340000,
+      "end": 1792085400000,
+      "result": "data",
+      "matched_decimal_ohlcv": true
+    }
+  ],
+  "samples": [
+    {
+      "requested_at": 1792085300871,
+      "received_at": 1792085301880,
+      "result": "data",
+      "elapsed_ms": 1213.083,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085302871,
+      "received_at": 1792085303196,
+      "result": "data",
+      "elapsed_ms": 328.55,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085304871,
+      "received_at": 1792085305146,
+      "result": "data",
+      "elapsed_ms": 279.074,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085306871,
+      "received_at": 1792085307268,
+      "result": "data",
+      "elapsed_ms": 400.182,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085308871,
+      "received_at": 1792085309162,
+      "result": "data",
+      "elapsed_ms": 294.188,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085310871,
+      "received_at": 1792085311238,
+      "result": "data",
+      "elapsed_ms": 370.563,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085312871,
+      "received_at": 1792085313566,
+      "result": "data",
+      "elapsed_ms": 699.547,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085314871,
+      "received_at": 1792085315155,
+      "result": "data",
+      "elapsed_ms": 287.126,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085316871,
+      "received_at": 1792085317170,
+      "result": "data",
+      "elapsed_ms": 302.712,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085318871,
+      "received_at": 1792085319228,
+      "result": "data",
+      "elapsed_ms": 360.884,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085320871,
+      "received_at": 1792085321571,
+      "result": "data",
+      "elapsed_ms": 703.321,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085322871,
+      "received_at": 1792085323196,
+      "result": "data",
+      "elapsed_ms": 328.161,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085324871,
+      "received_at": 1792085325170,
+      "result": "data",
+      "elapsed_ms": 302.977,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085326871,
+      "received_at": 1792085327145,
+      "result": "data",
+      "elapsed_ms": 277.817,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085328871,
+      "received_at": 1792085329300,
+      "result": "data",
+      "elapsed_ms": 432.673,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085330871,
+      "received_at": 1792085331148,
+      "result": "data",
+      "elapsed_ms": 280.636,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085332871,
+      "received_at": 1792085333163,
+      "result": "data",
+      "elapsed_ms": 295.238,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085334871,
+      "received_at": 1792085335215,
+      "result": "data",
+      "elapsed_ms": 354.96,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085336871,
+      "received_at": 1792085337338,
+      "result": "data",
+      "elapsed_ms": 470.629,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085338871,
+      "received_at": 1792085339154,
+      "result": "data",
+      "elapsed_ms": 286.249,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085340871,
+      "received_at": 1792085341152,
+      "result": "data",
+      "elapsed_ms": 284.301,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 8
+    },
+    {
+      "requested_at": 1792085342871,
+      "received_at": 1792085343160,
+      "result": "data",
+      "elapsed_ms": 292.449,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 11
+    },
+    {
+      "requested_at": 1792085344871,
+      "received_at": 1792085345138,
+      "result": "data",
+      "elapsed_ms": 270.843,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085346875,
+      "received_at": 1792085347913,
+      "result": "data",
+      "elapsed_ms": 1041.595,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085348871,
+      "received_at": 1792085349225,
+      "result": "data",
+      "elapsed_ms": 357.935,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085350871,
+      "received_at": 1792085351155,
+      "result": "data",
+      "elapsed_ms": 287.647,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085352871,
+      "received_at": 1792085353157,
+      "result": "data",
+      "elapsed_ms": 290.511,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085354871,
+      "received_at": 1792085355353,
+      "result": "data",
+      "elapsed_ms": 485.381,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085356871,
+      "received_at": 1792085357146,
+      "result": "data",
+      "elapsed_ms": 278.641,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085358871,
+      "received_at": 1792085359192,
+      "result": "data",
+      "elapsed_ms": 324.769,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085360871,
+      "received_at": 1792085361138,
+      "result": "data",
+      "elapsed_ms": 270.087,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085362871,
+      "received_at": 1792085363165,
+      "result": "data",
+      "elapsed_ms": 297.898,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085364871,
+      "received_at": 1792085365181,
+      "result": "data",
+      "elapsed_ms": 316.488,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085366871,
+      "received_at": 1792085367166,
+      "result": "data",
+      "elapsed_ms": 298.92,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085368871,
+      "received_at": 1792085369148,
+      "result": "data",
+      "elapsed_ms": 280.175,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085370871,
+      "received_at": 1792085371175,
+      "result": "data",
+      "elapsed_ms": 307.273,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085372871,
+      "received_at": 1792085373156,
+      "result": "data",
+      "elapsed_ms": 289.038,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085374871,
+      "received_at": 1792085375141,
+      "result": "data",
+      "elapsed_ms": 273.703,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085376871,
+      "received_at": 1792085377157,
+      "result": "data",
+      "elapsed_ms": 289.334,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085378871,
+      "received_at": 1792085379550,
+      "result": "data",
+      "elapsed_ms": 682.297,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085380871,
+      "received_at": 1792085381160,
+      "result": "data",
+      "elapsed_ms": 292.406,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085382871,
+      "received_at": 1792085383173,
+      "result": "data",
+      "elapsed_ms": 306.002,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085384871,
+      "received_at": 1792085385179,
+      "result": "data",
+      "elapsed_ms": 312.265,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085386871,
+      "received_at": 1792085387197,
+      "result": "data",
+      "elapsed_ms": 329.212,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085388871,
+      "received_at": 1792085389167,
+      "result": "data",
+      "elapsed_ms": 299.791,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085390871,
+      "received_at": 1792085391146,
+      "result": "data",
+      "elapsed_ms": 278.95,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085392871,
+      "received_at": 1792085393134,
+      "result": "data",
+      "elapsed_ms": 266.738,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085394871,
+      "received_at": 1792085395230,
+      "result": "data",
+      "elapsed_ms": 362.199,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085396871,
+      "received_at": 1792085397185,
+      "result": "data",
+      "elapsed_ms": 321.28,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085398871,
+      "received_at": 1792085399582,
+      "result": "data",
+      "elapsed_ms": 714.716,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085400871,
+      "received_at": 1792085401364,
+      "result": "data",
+      "elapsed_ms": 496.552,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 11
+    },
+    {
+      "requested_at": 1792085402871,
+      "received_at": 1792085403198,
+      "result": "data",
+      "elapsed_ms": 330.982,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 11
+    },
+    {
+      "requested_at": 1792085404871,
+      "received_at": 1792085405308,
+      "result": "data",
+      "elapsed_ms": 440.572,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085406871,
+      "received_at": 1792085407308,
+      "result": "data",
+      "elapsed_ms": 440.403,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085408871,
+      "received_at": 1792085409216,
+      "result": "data",
+      "elapsed_ms": 348.928,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085410871,
+      "received_at": 1792085411166,
+      "result": "data",
+      "elapsed_ms": 298.161,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085412871,
+      "received_at": 1792085413165,
+      "result": "data",
+      "elapsed_ms": 297.756,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085414873,
+      "received_at": 1792085415185,
+      "result": "data",
+      "elapsed_ms": 316.012,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085416871,
+      "received_at": 1792085417160,
+      "result": "data",
+      "elapsed_ms": 292.233,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    },
+    {
+      "requested_at": 1792085418871,
+      "received_at": 1792085419183,
+      "result": "data",
+      "elapsed_ms": 315.73,
+      "series": {
+        "XAU_USD": "data",
+        "NZD_USD": "data",
+        "AUD_USD": "data",
+        "USD_CAD": "data",
+        "GBP_USD": "data",
+        "EUR_USD": "data",
+        "USD_CHF": "data",
+        "EUR_JPY": "data",
+        "USD_JPY": "data",
+        "EUR_GBP": "data",
+        "GBP_JPY": "data",
+        "AUD_JPY": "data"
+      },
+      "current": 12
+    }
+  ],
+  "passed": true
+}

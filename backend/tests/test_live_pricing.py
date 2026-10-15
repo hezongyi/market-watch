@@ -4,6 +4,7 @@ import pytest
 from alerts import live_pricing as live
 from alerts.config import settings
 from alerts.market_contracts import CandleBatch, QuoteEvent, RequestResult
+from alerts.oanda_rest_batch import live_demand_revision
 from alerts.service import create_watch
 from alerts.storage import Audit, Bar, LiveState, PricingOwner, SignalRow, Watch
 from sqlalchemy import select
@@ -305,6 +306,126 @@ def test_invalid_spread_breaks_tick_judgment_continuity(running):
                        identities, now=128000)
     with factory.begin() as db:
         assert db.scalar(select(SignalRow)) is None
+
+
+def test_rest_close_samples_cross_only_between_observed_closes(running):
+    factory, _, _, identities = running
+    identity = identities["EUR_USD"]
+    from alerts.service import evaluate_close_sample
+    from alerts.storage import Instrument, MarketDataset
+
+    with factory.begin() as db:
+        dataset = db.get(MarketDataset, identity.key)
+        instrument = db.get(Instrument, dataset.instrument_id)
+        create_watch(db, instrument.id, "sampled close", {
+            "kind": "price", "timeframe": "tick", "direction": "buy", "level": "1.25"},
+            armed_at=0)
+        evaluate_close_sample(db, instrument, 125000, "1.10", received_at=125000,
+                              sequence=1, source_identity=identity.model_dump())
+        evaluate_close_sample(db, instrument, 127000, "1.30", received_at=127000,
+                              sequence=2, source_identity=identity.model_dump(), interval_ms=2000)
+    with factory.begin() as db:
+        signal = db.scalar(select(SignalRow))
+        assert signal and signal.evidence["observation_mode"] == "candle_close_sample"
+        assert signal.evidence["observation_gap_ms"] == 2000
+        assert signal.evidence["source_identity"]["provider_symbol"] == "EUR_USD"
+
+
+def test_rest_batch_fences_complete_before_forming_and_reports_candle_readiness(running):
+    factory, ownership, epoch, identities = running
+    identity = identities["EUR_USD"]
+    from alerts.oanda_rest_batch import CandleSpec, normalize_latest
+
+    payload = {"latestCandles": [{"instrument": "EUR_USD", "granularity": "M1",
+        "candles": [
+            {"time": "60", "complete": True, "volume": 9,
+             "bid": {"o": "1.10", "h": "1.12", "l": "1.09", "c": "1.11"}},
+            {"time": "120", "complete": False, "volume": 3,
+             "bid": {"o": "1.11", "h": "1.13", "l": "1.10", "c": "1.12"}},
+        ]}]}
+    batch = normalize_latest(payload, [CandleSpec.from_dataset(identity)], generation=epoch,
+                             sequence=1, demand_revision=live_demand_revision(
+                                 [CandleSpec.from_dataset(identity)]), requested_at=124900,
+                             received_at=125000)
+    assert live.publish_rest_batch(ownership, epoch, batch, {"EUR_USD": identity}, now=125000) == "accepted"
+    with factory.begin() as db:
+        state = db.get(LiveState, identity.key)
+        assert state.ready and state.forming["acquisition_mode"] == "rest_batch"
+        assert state.forming["close"] == "1.12"
+        assert db.scalar(select(Bar).where(Bar.start == 60000)).complete
+    view = next(row for row in live.snapshots(now=125000) if row["dataset_id"] == identity.key)
+    assert view["observation_mode"] == "candle_close_sample"
+    assert view["candle_ready"] and not view["quote_ready"]
+
+
+def test_rest_forming_sample_during_recovery_does_not_advance_tick_baseline(running, monkeypatch):
+    factory, ownership, epoch, identities = running
+    identity = identities["EUR_USD"]
+    from alerts.oanda_rest_batch import CandleSpec, normalize_latest
+
+    calls = []
+    # Keep the source in recovery so the forming candle is display-only.
+    monkeypatch.setattr(live, "commit_confirmation", lambda *args, **kwargs: None)
+    monkeypatch.setattr("alerts.service.evaluate_close_sample", lambda *args, **kwargs: calls.append(args))
+    payload = {"latestCandles": [{"instrument": "EUR_USD", "granularity": "M1",
+        "candles": [{"time": "120", "complete": False, "volume": 3,
+                      "bid": {"o": "1.11", "h": "1.13", "l": "1.10", "c": "1.12"}}]}]}
+    batch = normalize_latest(payload, [CandleSpec.from_dataset(identity)], generation=epoch,
+                             sequence=1, demand_revision=live_demand_revision(
+                                 [CandleSpec.from_dataset(identity)]), requested_at=124900,
+                             received_at=125000)
+    assert live.publish_rest_batch(ownership, epoch, batch, {"EUR_USD": identity}, now=125000) == "accepted"
+    assert not calls
+    with factory.begin() as db:
+        assert not db.get(LiveState, identity.key).ready
+
+
+def test_rest_batch_demand_revision_fences_inflight_response_before_any_write(running):
+    factory, ownership, epoch, identities = running
+    identity = identities["EUR_USD"]
+    from alerts.oanda_rest_batch import CandleSpec, normalize_latest
+
+    batch = normalize_latest({"latestCandles": [{"instrument": "EUR_USD", "granularity": "M1",
+        "candles": [{"time": "120", "complete": False, "volume": 3,
+                      "bid": {"o": "1.11", "h": "1.13", "l": "1.10", "c": "1.12"}}]}]},
+        [CandleSpec.from_dataset(identity)], generation=epoch, sequence=1,
+        demand_revision=live_demand_revision([CandleSpec.from_dataset(identity)]),
+        requested_at=124900, received_at=125000)
+    with pytest.raises(TimeoutError, match="demand"):
+        live.publish_rest_batch(ownership, epoch,
+            batch.model_copy(update={"demand_revision": "superseded-demand"}), identities, now=125000)
+    with factory.begin() as db:
+        state = db.get(LiveState, identity.key)
+        assert state.forming == {} and state.received_at == 0
+        assert db.scalar(select(Bar)) is None
+
+
+def test_rest_batch_repeated_complete_head_skips_confirmation_rewrite(running, monkeypatch):
+    factory, ownership, epoch, identities = running
+    identity = identities["EUR_USD"]
+    from alerts.oanda_rest_batch import CandleSpec, normalize_latest
+
+    def make(received, sequence):
+        return normalize_latest({"latestCandles": [{"instrument": "EUR_USD", "granularity": "M1",
+            "candles": [
+                {"time": "60", "complete": True, "volume": 9,
+                 "bid": {"o": "1.10", "h": "1.12", "l": "1.09", "c": "1.11"}},
+                {"time": "120", "complete": False, "volume": 3,
+                 "bid": {"o": "1.11", "h": "1.13", "l": "1.10", "c": "1.12"}},
+            ]}]}, [CandleSpec.from_dataset(identity)], generation=epoch, sequence=sequence,
+            demand_revision=live_demand_revision([CandleSpec.from_dataset(identity)]),
+            requested_at=received - 100, received_at=received)
+
+    first = make(125000, 1)
+    assert live.publish_rest_batch(ownership, epoch, first, {"EUR_USD": identity}, now=125000) == "accepted"
+    calls = []
+    monkeypatch.setattr(live, "commit_confirmation", lambda *args, **kwargs: calls.append(args))
+    second = make(127000, 2)
+    assert live.publish_rest_batch(ownership, epoch, second, {"EUR_USD": identity}, now=127000) == "accepted"
+    assert not calls
+    with factory.begin() as db:
+        state = db.get(LiveState, identity.key)
+        assert state.confirmed_end == 120000 and state.forming["sequence"] == 2
 
 
 def test_unauthorized_holds_configuration_fault_without_reconnect_storm(running):

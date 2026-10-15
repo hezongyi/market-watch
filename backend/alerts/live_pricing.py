@@ -66,7 +66,7 @@ def ensure_catalog(items, account, *, ownership=None):
     return resident
 
 
-def desired_datasets(account):
+def _desired_dataset_identities(account):
     scope = "sha256:" + hashlib.sha256(account.encode()).hexdigest()
     residents = {symbol.strip() for symbol in settings.oanda_resident_symbols.split(",") if symbol.strip()}
     with transaction() as db:
@@ -74,7 +74,7 @@ def desired_datasets(account):
 
         wanted = wanted_instruments(db)
         targets = composite_targets(db, wanted)
-        result = {}
+        result = []
         for row in db.scalars(select(MarketDataset)):
             identity = DatasetIdentity.model_validate(row.identity)
             if (identity.source, identity.channel, identity.environment, identity.account_scope) != (
@@ -83,8 +83,45 @@ def desired_datasets(account):
             if identity.calendar_version != settings.oanda_calendar_version:
                 continue
             if identity.provider_symbol in residents or row.instrument_id in wanted or row.id in targets:
-                result[identity.provider_symbol] = identity
-        return result
+                result.append(identity)
+        return tuple(sorted(result, key=lambda identity: identity.key))
+
+
+def desired_dataset_identities(account):
+    """Return live datasets without compressing identity by provider symbol."""
+    return _desired_dataset_identities(account)
+
+
+def desired_datasets(account):
+    """Compatibility symbol map used by the existing stream lifecycle."""
+    return {identity.provider_symbol: identity for identity in _desired_dataset_identities(account)}
+
+
+def desired_native_provider_datasets(account):
+    """Active OANDA native-period provider datasets for shared REST polling.
+
+    Native chart interests live in ``ProviderInterest`` rather than
+    ``MarketDataset``.  Returning the dataset rows lets the account worker
+    batch H1/D1 (and non-default side/alignment) with the same full
+    ``CandleSpec`` identity instead of falling back to M1/BID by symbol.
+    """
+    scope = "sha256:" + hashlib.sha256(account.encode()).hexdigest()
+    from .storage import ProviderDataset, ProviderInterest
+
+    with transaction() as db:
+        rows = db.execute(select(ProviderDataset).join(
+            ProviderInterest, ProviderInterest.dataset_id == ProviderDataset.id
+        ).where(
+            ProviderDataset.source == "oanda",
+            ProviderInterest.subscribed.is_(True),
+            ProviderInterest.expires > now_ms(),
+        )).scalars().all()
+        result = []
+        for row in rows:
+            identity = (row.metadata_json or {}).get("native_period_identity")
+            if isinstance(identity, dict) and identity.get("account_scope") == scope:
+                result.append(row)
+        return tuple(sorted({row.id: row for row in result}.values(), key=lambda row: row.id))
 
 
 def claim(account, *, now=None, startup=False):
@@ -421,6 +458,156 @@ def publish_event(ownership, epoch, event, identities, *, now=None):
         return "accepted"
 
 
+def publish_rest_batch(ownership, epoch, batch, identities, *, now=None, demand_revision=None):
+    """Fence and publish one shared ``candles/latest`` response.
+
+    Confirmed candles are committed through the existing immutable input path
+    before the forming candle is admitted to display and close-sample alerts.
+    A response can contain an old completed candle and a newer provisional
+    candle; each keeps its own source identity and acceptance boundary.
+    """
+    from .oanda_rest_batch import CandleSpec, LatestBatch, live_demand_revision
+
+    batch = LatestBatch.model_validate(batch)
+    if batch.generation != epoch:
+        raise TimeoutError("REST batch generation is obsolete")
+    expected_demand = demand_revision or live_demand_revision(
+        CandleSpec.from_dataset(identity) for identity in identities.values())
+    if batch.demand_revision != expected_demand:
+        raise TimeoutError("REST batch demand is obsolete")
+
+    # Complete rows must win over a provisional row for the same minute. Each
+    # row is a one-minute bounded CandleBatch, so a two-candle latest response
+    # never turns a missing interval into an implied coverage checkpoint. The
+    # latest endpoint repeats the previous complete candle on every poll; do
+    # not re-run ingestion, aggregation and watch evaluation when its immutable
+    # source content is unchanged. A later minute or a real revision remains a
+    # full confirmation so recovery and correction semantics stay intact.
+    confirmed = [confirmed for identity in identities.values()
+                 for confirmed in batch.confirmed_minutes(identity)]
+    for pending in _pending_rest_confirmations(ownership, epoch, confirmed, now=now):
+        commit_confirmation(ownership, epoch, pending, now=now)
+
+    stamp = now_ms() if now is None else now
+    with transaction() as db:
+        owner = lock_owner(db, ownership, epoch, now=stamp)
+        if owner.error == 'unauthorized':
+            raise TimeoutError('Account authentication hold')
+        if owner.error == 'provider_maintenance':
+            return 'rejected_provider_maintenance'
+        owner.expires = stamp + settings.oanda_stream_lease_seconds * 1000
+        from .display_observations import accept_rest
+        from .service import evaluate_close_sample
+
+        for identity in identities.values():
+            state = db.get(LiveState, identity.key)
+            dataset = db.get(MarketDataset, identity.key)
+            if not state or not dataset or state.epoch != epoch:
+                raise TimeoutError("REST dataset generation is obsolete")
+            series = next((row for row in batch.series if row.spec == CandleSpec.from_dataset(identity)), None)
+            if series is None:
+                continue
+            if not series.result.successful:
+                state.error = series.result.status
+                state.connection = 'recovering'
+                state.ready = False
+                state.revision += 1
+                continue
+            sample = batch.current_observation(
+                series.spec, committed_at=stamp,
+                recovery='ready' if state.ready else 'pending',
+                previous=None if not state.forming else _previous_rest_sample(state.forming),
+            )
+            if sample is None:
+                # A successful response containing only an old completed row
+                # must not refresh current-price freshness.
+                continue
+            inst = db.get(Instrument, dataset.instrument_id)
+            observation = accept_rest(db, state, sample, stamp=stamp,
+                                      profile=inst.calendar_profile)
+            if observation is None:
+                continue
+            state.connection = 'connected' if state.ready else 'recovering'
+            state.error = None
+            state.received_at = sample.received_at
+            state.heartbeat_at = sample.received_at
+            state.revision += 1
+            # A forming candle observed while the source is still recovering
+            # is display-only.  Advancing a tick rule here would create a new
+            # baseline from a potentially incomplete prefix and could emit a
+            # crossing before the confirmation gate has been rebuilt.  The
+            # next ready-generation sample will establish/evaluate it.
+            if sample.recovery == "ready" and state.ready:
+                evaluate_close_sample(
+                    db, inst, sample.received_at, sample.close,
+                    received_at=sample.received_at, sequence=sample.sequence,
+                    source_identity=sample.spec.identity.model_dump(mode='json'),
+                    interval_ms=sample.interval_ms,
+                )
+    return 'accepted'
+
+
+def _pending_rest_confirmations(ownership, epoch, batches, *, now=None):
+    """Filter repeated complete latest rows without weakening ownership fencing."""
+    if not batches:
+        return ()
+    stamp = now_ms() if now is None else now
+    from .source_registry import collection_identity
+    from .storage import SourceMinute, SourceMinuteRevision
+
+    def canonical(row):
+        data = row.model_dump()
+        for field in ("open", "high", "low", "close", "volume"):
+            if data[field] is not None:
+                data[field] = format(Decimal(data[field]).normalize(), "f")
+        data.update(volume_kind="price_count", volume_unit="quotes")
+        return data
+
+    with transaction() as db:
+        owner = lock_owner(db, ownership, epoch, now=stamp)
+        if owner.error == "unauthorized":
+            raise TimeoutError("Account authentication hold")
+        if owner.error == "provider_maintenance":
+            raise MarketRequestError(RequestResult(status="provider_maintenance"))
+        pending = []
+        for batch in batches:
+            state = db.get(LiveState, batch.identity.key)
+            if not state or state.epoch != epoch:
+                raise TimeoutError("Confirmation generation is obsolete")
+            source = collection_identity(batch.identity)
+            needs_commit = state.confirmed_end < max(row.timestamp + 60000 for row in batch.rows)
+            if not needs_commit:
+                for row in batch.rows:
+                    head = db.get(SourceMinute, (source.key, row.timestamp))
+                    revision = db.get(SourceMinuteRevision, head.revision_id) if head else None
+                    if not revision or revision.data != canonical(row):
+                        needs_commit = True
+                        break
+            if needs_commit:
+                pending.append(batch)
+        return tuple(pending)
+
+
+def _previous_rest_sample(forming):
+    """Return only the previous REST observation metadata needed for cadence."""
+    from .oanda_rest_batch import CandleSpec, CloseObservation, RestCandle
+
+    try:
+        return CloseObservation(
+            spec=CandleSpec.from_source(forming['source_identity']),
+            candle=RestCandle.model_validate({key: forming[key] for key in (
+                'start', 'end', 'open', 'high', 'low', 'close', 'volume', 'complete')}),
+            generation=forming['connection_epoch'], sequence=forming['sequence'],
+            demand_revision=forming['observation']['demand_revision'],
+            requested_at=forming['observation']['requested_at'],
+            received_at=forming['observation']['received_at'],
+            committed_at=forming['observation']['committed_at'],
+            recovery=forming['observation']['recovery'],
+            interval_ms=forming['observation'].get('interval_ms'))
+    except (KeyError, TypeError, ValueError):
+        return None
+
+
 def disconnected(ownership, epoch, identities, result, *, now=None, intentional=False):
     stamp = now_ms() if now is None else now
     with transaction() as db:
@@ -473,9 +660,10 @@ def confirmation_window(ownership, epoch, identity, *, now=None):
         start = min(start, cutoff - 2 * 60000)
         # A later confirmed minute is not proof that earlier observations were
         # confirmed. Keep shared backfill demand across connections/restarts.
+        from sqlalchemy import exists
+
         from .source_registry import collection_identity
         from .storage import ObservedMinute, SourceMinute
-        from sqlalchemy import exists
 
         pending = db.scalar(select(ObservedMinute.start).outerjoin(LiveMinute,
             (LiveMinute.dataset_id == ObservedMinute.dataset_id) & (LiveMinute.start == ObservedMinute.start)).where(
@@ -700,21 +888,27 @@ def snapshots(*, now=None):
             if scoped_owner and scoped_owner.error:
                 connection_error = (probe.value.get('error') if probe and authentication_hold else None) or scoped_owner.error
             quote = state.quote
+            forming = state.forming or {}
+            rest_sample = forming.get("acquisition_mode") == "rest_batch"
             age = stamp - quote["source_time"] if quote else None
+            candle_age = stamp - state.received_at if rest_sample and state.received_at else None
             connected = state.connection != "disconnected" and (
                 max(state.heartbeat_at, state.received_at) >= stamp - 15000)
             valid_quote = bool(quote and quote.get("bid") and quote.get("ask")
                 and Decimal(quote["ask"]) >= Decimal(quote["bid"]))
+            valid_candle = bool(rest_sample and forming.get("close") and forming.get("start") is not None
+                and candle_age is not None and 0 <= candle_age <= 15000)
             quality = ('provider_maintenance' if connection_error == 'provider_maintenance' else
                        'unauthorized' if authentication_hold else
                        'market_closed' if session_view['market_session'] == 'closed' else
                        "unavailable" if not connected else "recovering" if not state.ready else
                        "not_tradeable" if quote and not quote["tradeable"] else
-                       "stale" if age is None or age > 15000 or age < 0 else
-                       "degraded" if state.error or not valid_quote else "healthy")
+                       "stale" if ((not rest_sample and (age is None or age > 15000 or age < 0))
+                                   or (rest_sample and not valid_candle)) else
+                       "degraded" if state.error or (not rest_sample and not valid_quote) else "healthy")
             result.append({"dataset_id": dataset.id, "instrument_id": dataset.instrument_id,
                 "logical_symbol": dataset.logical_symbol, "identity": dataset.identity,
-                "revision": state.revision, "quote": quote, "forming": state.forming,
+                "revision": state.revision, "quote": quote, "forming": forming,
                 "quality": quality, "connection": state.connection, "connection_epoch": state.epoch,
                 "heartbeat_at": state.heartbeat_at, "last_confirmed_m1": state.confirmed_end,
                 "cooldown_until": source_cooldowns[source],
@@ -727,11 +921,14 @@ def snapshots(*, now=None):
                     "reviewed_start": session.reviewed_start.isoformat(), "reviewed_end": session.reviewed_end.isoformat()}
                     if session else None),
                 "fallback_ready": False, "selection_epoch": state.epoch,
-                "received_at": state.received_at, "quote_age_ms": age})
+                "received_at": state.received_at, "quote_age_ms": age,
+                "candle_age_ms": candle_age, "observation_mode":
+                "candle_close_sample" if rest_sample else "stream_quote"})
             available = not authentication_hold and connection_error != 'provider_maintenance' and session_view['market_session'] != 'closed'
-            result[-1]["quote_ready"] = bool(available and connected and valid_quote and quote["tradeable"]
+            result[-1]["quote_ready"] = bool(not rest_sample and available and connected and valid_quote and quote["tradeable"]
                 and age is not None and 0 <= age <= 15000)
-            result[-1]["candle_ready"] = bool(available and connected and state.ready and not state.error)
+            result[-1]["candle_ready"] = bool(available and connected and state.ready and not state.error
+                and (valid_candle if rest_sample else True))
             result[-1]["precision"] = inst.precision
             result[-1]["alert_readiness"] = [{"watch_id": watch.id, "reason": watch.paused_reason,
                 "status": watch.status} for watch in db.scalars(select(Watch).where(

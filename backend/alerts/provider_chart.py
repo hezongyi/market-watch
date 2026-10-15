@@ -16,7 +16,7 @@ from fastapi import HTTPException
 from .chart_data import FRAMES, bounds
 from .config import settings
 from .domain import Calendar, session_bounds
-from .provider_capabilities import SOURCES, versions
+from .provider_capabilities import SOURCES, fresh_seconds, versions
 from .provider_capabilities import frames as source_frames
 from .provider_deadline import request_deadline
 from .provider_transport import (
@@ -369,6 +369,41 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
 
 def cached_page(meta, frame, before, count, *, latest=False, quote=False, deadline=None, cache_seconds=None):
     deadline = deadline or time.monotonic() + 23
+    # In REST-batch mode an active native subscription is owned by the shared
+    # account worker. Do not let a foreground latest/quote read open a second
+    # single-instrument OANDA request while that owner is refreshing the
+    # ProviderDataset cache. Historical reads without an active subscription
+    # retain their bounded page path.
+    if meta["source"] == "oanda" and settings.oanda_acquisition_mode == "rest_batch" and latest:
+        from sqlalchemy import select
+
+        from .provider_cache import HistoryPending, snapshot_transaction
+        from .provider_cache import ensure as ensure_cache
+        from .storage import ProviderInterest, now_ms, transaction
+
+        dataset_id = ensure_cache(meta, frame)
+        with transaction() as db:
+            active = db.scalar(select(ProviderInterest.id).where(
+                ProviderInterest.dataset_id == dataset_id,
+                ProviderInterest.subscribed.is_(True),
+                ProviderInterest.expires > now_ms(),
+            )) is not None
+        if active:
+            with snapshot_transaction(dataset_id, before, count) as (_, cached):
+                fresh = now_ms() - cached["latest_at"] < fresh_seconds("oanda") * 1000
+                if cached["bars"] and fresh:
+                    return {
+                        **cached,
+                        "bars": cached["bars"][-count:],
+                        "series_kind": "provider",
+                        "basis": meta["basis"],
+                        "calendar": meta["calendar"],
+                        "precision": meta["precision"],
+                        "dataset_id": dataset_id,
+                        "cache_hit": True,
+                        "indicators": [],
+                    }
+            raise HistoryPending()
     from .market_calendar import observation_identity
 
     identity = observation_identity(meta["source"], meta["symbol"], meta)

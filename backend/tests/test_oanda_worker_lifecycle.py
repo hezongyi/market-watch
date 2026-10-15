@@ -1,6 +1,7 @@
 """Zero-demand idle and intentional subscription changes are healthy lifecycles."""
 
 import threading
+from contextlib import nullcontext
 from types import SimpleNamespace
 
 from alerts import live_pricing as live
@@ -137,3 +138,198 @@ def test_intentional_stop_releases_owner_without_fault_or_retry_delay(running):
             assert not db.get(Instrument, db.get(MarketDataset, ident.key).instrument_id).enabled
         assert db.scalar(select(Audit).where(Audit.kind == "pricing_idle"))
     assert live.claim("test-account", now=125001)
+
+
+def test_rest_collect_fences_response_when_cancelled_during_http(monkeypatch):
+    stopped = threading.Event()
+    identity = SimpleNamespace(provider_symbol="EUR_USD")
+    identities = {"EUR_USD": identity}
+    disconnected = []
+    published = []
+
+    monkeypatch.setattr(worker, "begin_connection", lambda *_: 7)
+    monkeypatch.setattr(worker, "renew", lambda *_: True)
+    monkeypatch.setattr(worker, "desired_datasets", lambda *_: identities)
+    monkeypatch.setattr(worker, "closed_delay", lambda *_: None)
+    monkeypatch.setattr(worker, "lane", lambda *_: nullcontext())
+    monkeypatch.setattr(worker.CandleSpec, "from_dataset", lambda *_: SimpleNamespace(key="EUR_USD"))
+    monkeypatch.setattr(worker.time, "monotonic", lambda: 100.0)
+    monkeypatch.setattr(worker, "publish_rest_batch", lambda *args, **kwargs: published.append(args))
+    monkeypatch.setattr(worker, "disconnected", lambda *args, **kwargs: disconnected.append((args, kwargs)))
+
+    class Adapter:
+        account_id = "test-account"
+
+        def latest(self, *args, **kwargs):
+            stopped.set()
+            return SimpleNamespace(result=RequestResult(status="data"))
+
+    worker.collect_rest(Adapter(), ("account", "owner"), identities, stopped)
+    assert not published
+    assert disconnected and disconnected[0][0][3].status == "unavailable"
+    assert disconnected[0][1]["intentional"] is True
+
+
+def test_rest_collect_drains_checkpoint_pages_while_latest_cadence_runs(monkeypatch):
+    """Latest snapshots must not be the only recovery path after reconnect."""
+    stopped = threading.Event()
+    confirmation = threading.Event()
+    identity = SimpleNamespace(provider_symbol="EUR_USD", key="dataset")
+    identities = {"dataset": identity}
+    disconnected = []
+
+    monkeypatch.setattr(worker, "begin_connection", lambda *_: 7)
+    monkeypatch.setattr(worker, "renew", lambda *_: True)
+    monkeypatch.setattr(worker, "desired_for_mode", lambda *_: identities)
+    monkeypatch.setattr(worker, "closed_delay", lambda *_: None)
+    monkeypatch.setattr(worker, "disconnected", lambda *args, **kwargs: disconnected.append((args, kwargs)))
+    monkeypatch.setattr(worker, "CandleSpec", SimpleNamespace(from_dataset=lambda *_: SimpleNamespace(key="spec")))
+
+    def confirm(*args):
+        confirmation.set()
+        return None
+
+    monkeypatch.setattr(worker, "confirm_pages", confirm)
+
+    class Adapter:
+        account_id = "test-account"
+
+        def page(self, *_):
+            raise AssertionError("confirm_pages is the owned recovery entry point")
+
+        def latest(self, *_args, **_kwargs):
+            assert confirmation.wait(2), "latest loop started without the recovery thread"
+            stopped.set()
+            return SimpleNamespace(result=RequestResult(status="data"))
+
+    worker.collect_rest(Adapter(), ("account", "owner"), identities, stopped)
+    assert confirmation.is_set() and disconnected
+
+
+def test_rest_collect_batches_live_and_native_specs_by_request_group(monkeypatch):
+    stopped = threading.Event()
+    live_identity = SimpleNamespace(provider_symbol="EUR_USD", key="live")
+    live_spec = SimpleNamespace(key="live-spec", group_key="same-group")
+    native_spec = SimpleNamespace(key="native-h1", group_key="same-group")
+    identities = {"live": live_identity}
+    native = (("provider-h1", "H1", native_spec),)
+    calls, live_published, native_published = [], [], []
+
+    monkeypatch.setattr(settings, "oanda_acquisition_mode", "rest_batch")
+    monkeypatch.setattr(worker, "begin_connection", lambda *_: 7)
+    monkeypatch.setattr(worker, "renew", lambda *_: True)
+    monkeypatch.setattr(worker, "desired_for_mode", lambda *_: identities)
+    monkeypatch.setattr(worker, "native_specs", lambda *_: native)
+    monkeypatch.setattr(worker, "closed_delay", lambda *_: None)
+    monkeypatch.setattr(worker, "CandleSpec", SimpleNamespace(
+        from_dataset=lambda *_: live_spec,
+    ))
+    def publish_live(*args, **kwargs):
+        live_published.append((args, kwargs))
+        stopped.set()
+
+    monkeypatch.setattr(worker, "publish_rest_batch", publish_live)
+    monkeypatch.setattr(worker, "publish_native_rest_batch",
+                        lambda *args, **kwargs: native_published.append((args, kwargs)))
+    monkeypatch.setattr(worker, "disconnected", lambda *args, **kwargs: None)
+
+    class Adapter:
+        account_id = "test-account"
+
+        def latest(self, specs, **kwargs):
+            calls.append((specs, kwargs))
+            return SimpleNamespace(result=RequestResult(status="data"))
+
+    worker.collect_rest(Adapter(), ("account", "owner"), identities, stopped, native)
+    assert len(calls) == 1
+    assert {spec.key for spec in calls[0][0]} == {"live-spec", "native-h1"}
+    assert len(live_published) == len(native_published) == 1
+    assert live_published[0][1]["demand_revision"] == native_published[0][1]["demand_revision"]
+
+
+def test_rest_collect_preserves_terminal_auth_failure_for_disconnect(monkeypatch):
+    stopped = threading.Event()
+    identity = SimpleNamespace(provider_symbol="EUR_USD")
+    identities = {"EUR_USD": identity}
+    disconnected = []
+    published = []
+
+    monkeypatch.setattr(worker, "begin_connection", lambda *_: 9)
+    monkeypatch.setattr(worker, "renew", lambda *_: True)
+    monkeypatch.setattr(worker, "desired_datasets", lambda *_: identities)
+    monkeypatch.setattr(worker, "closed_delay", lambda *_: None)
+    monkeypatch.setattr(worker, "lane", lambda *_: nullcontext())
+    monkeypatch.setattr(worker.CandleSpec, "from_dataset", lambda *_: SimpleNamespace(key="EUR_USD"))
+    monkeypatch.setattr(worker.time, "monotonic", lambda: 100.0)
+    monkeypatch.setattr(worker, "publish_rest_batch", lambda *args, **kwargs: published.append(args))
+    monkeypatch.setattr(worker, "disconnected", lambda *args, **kwargs: disconnected.append((args, kwargs)))
+
+    class Adapter:
+        account_id = "test-account"
+
+        def latest(self, *args, **kwargs):
+            return SimpleNamespace(result=RequestResult(status="unauthorized"))
+
+    worker.collect_rest(Adapter(), ("account", "owner"), identities, stopped)
+    assert published
+    assert disconnected and disconnected[0][0][3].status == "unauthorized"
+    assert disconnected[0][1]["intentional"] is False
+
+
+def test_rest_collect_uses_fixed_cadence_and_skips_after_slow_request(monkeypatch):
+    clock = [0.0]
+    starts = []
+    published = []
+
+    class Stop:
+        stopped = False
+
+        def is_set(self):
+            return self.stopped
+
+    stopped = Stop()
+
+    class FakeEvent:
+        def __init__(self):
+            self.value = False
+
+        def is_set(self):
+            return self.value
+
+        def set(self):
+            self.value = True
+
+        def wait(self, seconds=0):
+            clock[0] += seconds or 0
+            return self.value
+
+    identity = SimpleNamespace(provider_symbol="EUR_USD")
+    identities = {"EUR_USD": identity}
+    monkeypatch.setattr(worker.threading, "Event", FakeEvent)
+    monkeypatch.setattr(worker, "begin_connection", lambda *_: 7)
+    monkeypatch.setattr(worker, "renew", lambda *_: True)
+    monkeypatch.setattr(worker, "desired_datasets", lambda *_: identities)
+    monkeypatch.setattr(worker, "closed_delay", lambda *_: None)
+    monkeypatch.setattr(worker, "lane", lambda *_: nullcontext())
+    monkeypatch.setattr(worker.CandleSpec, "from_dataset", lambda *_: SimpleNamespace(key="EUR_USD"))
+    monkeypatch.setattr(worker.time, "monotonic", lambda: clock[0])
+    def publish(*args, **kwargs):
+        published.append(args)
+        if len(published) == 2:
+            stopped.stopped = True
+
+    monkeypatch.setattr(worker, "publish_rest_batch", publish)
+    monkeypatch.setattr(worker, "disconnected", lambda *args, **kwargs: None)
+
+    class Adapter:
+        account_id = "test-account"
+
+        def latest(self, *args, **kwargs):
+            starts.append(clock[0])
+            clock[0] += 3.0  # exceeds the configured two-second cadence
+            return SimpleNamespace(result=RequestResult(status="data"))
+
+    monkeypatch.setattr(settings, "oanda_rest_interval_seconds", 2)
+    worker.collect_rest(Adapter(), ("account", "owner"), identities, stopped)
+    assert starts == [0.0, 4.0]
+    assert len(published) == 2

@@ -19,7 +19,13 @@ YAHOO_INTERVALS = {
 
 
 def enabled_sources():
-    return tuple(s for s in SOURCES if s != "yahoo" or settings.yahoo_enabled)
+    # OANDA's account-scoped live path is owned by ``oanda_worker`` in REST
+    # batch mode.  Do not start the legacy provider-service poller alongside
+    # it; otherwise native/provider interests can issue pricing or single
+    # instrument candle requests outside the shared lease.
+    return tuple(s for s in SOURCES
+                 if (s != "oanda" or settings.oanda_acquisition_mode == "stream")
+                 and (s != "yahoo" or settings.yahoo_enabled))
 
 
 def frames(source):

@@ -1,0 +1,670 @@
+{
+  "source_tag": "v1.25.4",
+  "source_commit": "42b4864b0153ed4419c35d17f77241b163735ad4",
+  "implementation_tag": "v1.25.6",
+  "implementation_commit": "ee5b885626104577244f4fc40342d60b1a52c664",
+  "implementation_status": "r7_preview_and_regression_verified_production_switch_pending",
+  "environment": "Ubuntu local Docker, dedicated project/network/PG14 volume/database, no HTTP listener; configured production OANDA proxy reused for read-only source requests",
+  "direct_single": {
+    "phase": "direct_fixed_1s",
+    "started_ms": 1791999117209,
+    "duration_seconds": 300.004,
+    "polls": 299,
+    "http_requests": 299,
+    "skipped_ticks": 1,
+    "http_rps": 0.997,
+    "request_ms": {
+      "count": 299,
+      "min": 258.379,
+      "median": 301.958,
+      "p95": 456.722,
+      "max": 1114.334
+    },
+    "request_start_gap_ms": {
+      "count": 298,
+      "min": 994,
+      "median": 1000.0,
+      "p95": 1000,
+      "max": 2000
+    },
+    "poll_ms": {
+      "count": 299,
+      "min": 258.663,
+      "median": 302.238,
+      "p95": 457.007,
+      "max": 1114.641
+    },
+    "statuses": {
+      "200": 299
+    },
+    "poll_errors": {},
+    "body_bytes": 128509,
+    "response_header_bytes": 84617,
+    "process_cpu_seconds": 0.445,
+    "process_cpu_one_core_percent": 0.148,
+    "sql_statements": 0,
+    "max_rss_kib": 139840
+  },
+  "direct_single_confirmations": [
+    {
+      "minute_end_ms": 1791999120000,
+      "first_complete_after_boundary_ms": 1502.985,
+      "virtual_15s_after_boundary_ms": 12710.215
+    },
+    {
+      "minute_end_ms": 1791999180000,
+      "first_complete_after_boundary_ms": 2470.988,
+      "virtual_15s_after_boundary_ms": 12512.035
+    },
+    {
+      "minute_end_ms": 1791999240000,
+      "first_complete_after_boundary_ms": 2639.317,
+      "virtual_15s_after_boundary_ms": 12490.969
+    },
+    {
+      "minute_end_ms": 1791999300000,
+      "first_complete_after_boundary_ms": 1626.711,
+      "virtual_15s_after_boundary_ms": 12554.007
+    },
+    {
+      "minute_end_ms": 1791999360000,
+      "first_complete_after_boundary_ms": 1685.205,
+      "virtual_15s_after_boundary_ms": 12519.319
+    }
+  ],
+  "batch": {
+    "phases": [
+      {
+        "phase": "latest_batch_1",
+        "started_ms": 1791999694986,
+        "duration_seconds": 30.0,
+        "specifications": [
+          "EUR_USD"
+        ],
+        "requests": 29,
+        "rps": 0.967,
+        "skipped_ticks": 1,
+        "statuses": {
+          "200": 29
+        },
+        "errors": {},
+        "request_ms": {
+          "count": 29,
+          "median": 304.997,
+          "p95": 492.025,
+          "max": 1440.257
+        },
+        "request_start_gap_ms": {
+          "count": 28,
+          "median": 1000.0,
+          "p95": 1000,
+          "max": 2000
+        },
+        "mean_body_bytes": 325.483,
+        "cpu_seconds": 0.045,
+        "cpu_one_core_percent": 0.151,
+        "group_counts": {
+          "1": 29
+        },
+        "all_samples_cover_requested_instruments": true,
+        "all_groups_have_volume": true,
+        "samples_with_forming_for_every_group": 28,
+        "samples_with_complete_for_every_group": 29,
+        "minute_confirmations": [
+          {
+            "instrument": "EUR_USD",
+            "minute_end_ms": 1791999720000,
+            "first_complete_after_boundary_ms": 1282
+          }
+        ]
+      },
+      {
+        "phase": "latest_batch_12",
+        "started_ms": 1791999724987,
+        "duration_seconds": 120.0,
+        "specifications": [
+          "EUR_USD",
+          "GBP_USD",
+          "USD_JPY",
+          "USD_CHF",
+          "AUD_USD",
+          "NZD_USD",
+          "USD_CAD",
+          "EUR_JPY",
+          "GBP_JPY",
+          "EUR_GBP",
+          "AUD_JPY",
+          "XAU_USD"
+        ],
+        "requests": 120,
+        "rps": 1.0,
+        "skipped_ticks": 0,
+        "statuses": {
+          "200": 120
+        },
+        "errors": {},
+        "request_ms": {
+          "count": 120,
+          "median": 294.525,
+          "p95": 416.04,
+          "max": 768.308
+        },
+        "request_start_gap_ms": {
+          "count": 119,
+          "median": 1000,
+          "p95": 1000,
+          "max": 1000
+        },
+        "mean_body_bytes": 3694.217,
+        "cpu_seconds": 0.168,
+        "cpu_one_core_percent": 0.14,
+        "group_counts": {
+          "12": 120
+        },
+        "all_samples_cover_requested_instruments": true,
+        "all_groups_have_volume": true,
+        "samples_with_forming_for_every_group": 118,
+        "samples_with_complete_for_every_group": 120,
+        "minute_confirmations": [
+          {
+            "instrument": "AUD_JPY",
+            "minute_end_ms": 1791999780000,
+            "first_complete_after_boundary_ms": 1282
+          },
+          {
+            "instrument": "AUD_JPY",
+            "minute_end_ms": 1791999840000,
+            "first_complete_after_boundary_ms": 1263
+          },
+          {
+            "instrument": "AUD_USD",
+            "minute_end_ms": 1791999780000,
+            "first_complete_after_boundary_ms": 1282
+          },
+          {
+            "instrument": "AUD_USD",
+            "minute_end_ms": 1791999840000,
+            "first_complete_after_boundary_ms": 1263
+          },
+          {
+            "instrument": "EUR_GBP",
+            "minute_end_ms": 1791999780000,
+            "first_complete_after_boundary_ms": 1282
+          },
+          {
+            "instrument": "EUR_GBP",
+            "minute_end_ms": 1791999840000,
+            "first_complete_after_boundary_ms": 2322
+          },
+          {
+            "instrument": "EUR_JPY",
+            "minute_end_ms": 1791999780000,
+            "first_complete_after_boundary_ms": 1282
+          },
+          {
+            "instrument": "EUR_JPY",
+            "minute_end_ms": 1791999840000,
+            "first_complete_after_boundary_ms": 1263
+          },
+          {
+            "instrument": "EUR_USD",
+            "minute_end_ms": 1791999780000,
+            "first_complete_after_boundary_ms": 1282
+          },
+          {
+            "instrument": "EUR_USD",
+            "minute_end_ms": 1791999840000,
+            "first_complete_after_boundary_ms": 1263
+          },
+          {
+            "instrument": "GBP_JPY",
+            "minute_end_ms": 1791999780000,
+            "first_complete_after_boundary_ms": 1282
+          },
+          {
+            "instrument": "GBP_JPY",
+            "minute_end_ms": 1791999840000,
+            "first_complete_after_boundary_ms": 2322
+          },
+          {
+            "instrument": "GBP_USD",
+            "minute_end_ms": 1791999780000,
+            "first_complete_after_boundary_ms": 2283
+          },
+          {
+            "instrument": "GBP_USD",
+            "minute_end_ms": 1791999840000,
+            "first_complete_after_boundary_ms": 1263
+          },
+          {
+            "instrument": "NZD_USD",
+            "minute_end_ms": 1791999780000,
+            "first_complete_after_boundary_ms": 2283
+          },
+          {
+            "instrument": "NZD_USD",
+            "minute_end_ms": 1791999840000,
+            "first_complete_after_boundary_ms": 2322
+          },
+          {
+            "instrument": "USD_CAD",
+            "minute_end_ms": 1791999780000,
+            "first_complete_after_boundary_ms": 1282
+          },
+          {
+            "instrument": "USD_CAD",
+            "minute_end_ms": 1791999840000,
+            "first_complete_after_boundary_ms": 1263
+          },
+          {
+            "instrument": "USD_CHF",
+            "minute_end_ms": 1791999780000,
+            "first_complete_after_boundary_ms": 1282
+          },
+          {
+            "instrument": "USD_CHF",
+            "minute_end_ms": 1791999840000,
+            "first_complete_after_boundary_ms": 2322
+          },
+          {
+            "instrument": "USD_JPY",
+            "minute_end_ms": 1791999780000,
+            "first_complete_after_boundary_ms": 1282
+          },
+          {
+            "instrument": "USD_JPY",
+            "minute_end_ms": 1791999840000,
+            "first_complete_after_boundary_ms": 1263
+          },
+          {
+            "instrument": "XAU_USD",
+            "minute_end_ms": 1791999780000,
+            "first_complete_after_boundary_ms": 1282
+          },
+          {
+            "instrument": "XAU_USD",
+            "minute_end_ms": 1791999840000,
+            "first_complete_after_boundary_ms": 1263
+          }
+        ]
+      }
+    ]
+  },
+  "backend_unmodified_attempt": [
+    {
+      "phase": "backend_current_15s",
+      "started_ms": 1791999417254,
+      "duration_seconds": 60.748,
+      "polls": 58,
+      "http_requests": 4,
+      "skipped_ticks": 0,
+      "http_rps": 0.066,
+      "request_ms": {
+        "count": 4,
+        "min": 285.186,
+        "median": 388.023,
+        "p95": 984.922,
+        "max": 984.922
+      },
+      "request_start_gap_ms": {
+        "count": 3,
+        "min": 15154,
+        "median": 15445,
+        "p95": 15621,
+        "max": 15621
+      },
+      "poll_ms": {
+        "count": 58,
+        "min": 6.246,
+        "median": 7.203,
+        "p95": 355.421,
+        "max": 1107.143
+      },
+      "statuses": {
+        "200": 1,
+        "400": 3
+      },
+      "poll_errors": {},
+      "body_bytes": 652,
+      "response_header_bytes": 1032,
+      "process_cpu_seconds": 0.449,
+      "process_cpu_one_core_percent": 0.739,
+      "sql_statements": 446,
+      "max_rss_kib": 142748
+    },
+    {
+      "phase": "backend_config_only_1s",
+      "started_ms": 1791999478011,
+      "duration_seconds": 90.924,
+      "polls": 65,
+      "http_requests": 65,
+      "skipped_ticks": 0,
+      "http_rps": 0.715,
+      "request_ms": {
+        "count": 65,
+        "min": 275.95,
+        "median": 322.14,
+        "p95": 644.383,
+        "max": 799.504
+      },
+      "request_start_gap_ms": {
+        "count": 64,
+        "min": 1310,
+        "median": 1356.0,
+        "p95": 1687,
+        "max": 1844
+      },
+      "poll_ms": {
+        "count": 65,
+        "min": 309.204,
+        "median": 358.018,
+        "p95": 682.683,
+        "max": 839.983
+      },
+      "statuses": {
+        "400": 63,
+        "200": 2
+      },
+      "poll_errors": {},
+      "body_bytes": 5893,
+      "response_header_bytes": 16330,
+      "process_cpu_seconds": 1.581,
+      "process_cpu_one_core_percent": 1.739,
+      "sql_statements": 1842,
+      "max_rss_kib": 143012
+    }
+  ],
+  "backend_read_guard_diagnostic": {
+    "started_ms": 1791999984953,
+    "finished_ms": 1792000075131,
+    "phases": [
+      {
+        "phase": "backend_fixed_1s",
+        "started_ms": 1791999985113,
+        "duration_seconds": 90.002,
+        "polls": 89,
+        "http_requests": 47,
+        "skipped_ticks": 1,
+        "http_rps": 0.522,
+        "request_ms": {
+          "count": 47,
+          "min": 278.353,
+          "median": 326.684,
+          "p95": 845.792,
+          "max": 1049.922
+        },
+        "request_start_gap_ms": {
+          "count": 46,
+          "min": 882,
+          "median": 2000.0,
+          "p95": 2010,
+          "max": 2013
+        },
+        "poll_ms": {
+          "count": 89,
+          "min": 5.836,
+          "median": 317.999,
+          "p95": 560.648,
+          "max": 1657.895
+        },
+        "statuses": {
+          "200": 47
+        },
+        "poll_errors": {},
+        "body_bytes": 20733,
+        "response_header_bytes": 13268,
+        "process_cpu_seconds": 1.285,
+        "process_cpu_one_core_percent": 1.427,
+        "sql_statements": 1568,
+        "max_rss_kib": 141480
+      }
+    ],
+    "gates": {
+      "backend_fixed_1s_cadence": true,
+      "backend_fixed_one_request_per_poll": true,
+      "backend_fixed_all_requests_successful": true,
+      "backend_fixed_no_poll_errors": true
+    },
+    "benchmark_only_to_guard": true,
+    "benchmark_only_to_guard_scope": "read",
+    "minute_confirmations": [],
+    "pg_database_bytes": 12651867,
+    "pg_stats": {
+      "xact_commit": 8177,
+      "xact_rollback": 5,
+      "blks_read": 741,
+      "blks_hit": 151984,
+      "tup_inserted": 5375,
+      "tup_updated": 4420,
+      "tup_deleted": 1
+    },
+    "scope": "Ubuntu Docker, EUR_USD BID M1 count=3, configured proxy, no charts/studies; virtual 15s comparator samples the same 1s responses, not a separate concurrent client"
+  },
+  "backend_page_guard_diagnostic": {
+    "started_ms": 1791999695879,
+    "finished_ms": 1791999896001,
+    "phases": [
+      {
+        "phase": "backend_current_15s",
+        "started_ms": 1791999696050,
+        "duration_seconds": 45.624,
+        "polls": 43,
+        "http_requests": 3,
+        "skipped_ticks": 0,
+        "http_rps": 0.066,
+        "request_ms": {
+          "count": 3,
+          "min": 280.374,
+          "median": 339.801,
+          "p95": 1436.629,
+          "max": 1436.629
+        },
+        "request_start_gap_ms": {
+          "count": 2,
+          "min": 15493,
+          "median": 15560.5,
+          "p95": 15628,
+          "max": 15628
+        },
+        "poll_ms": {
+          "count": 43,
+          "min": 6.62,
+          "median": 7.648,
+          "p95": 332.861,
+          "max": 1554.638
+        },
+        "statuses": {
+          "200": 3
+        },
+        "poll_errors": {},
+        "body_bytes": 1661,
+        "response_header_bytes": 846,
+        "process_cpu_seconds": 0.363,
+        "process_cpu_one_core_percent": 0.796,
+        "sql_statements": 351,
+        "max_rss_kib": 141476
+      },
+      {
+        "phase": "backend_config_only_1s",
+        "started_ms": 1791999741678,
+        "duration_seconds": 63.236,
+        "polls": 21,
+        "http_requests": 92,
+        "skipped_ticks": 0,
+        "http_rps": 1.455,
+        "request_ms": {
+          "count": 92,
+          "min": 257.933,
+          "median": 281.985,
+          "p95": 417.95,
+          "max": 920.151
+        },
+        "request_start_gap_ms": {
+          "count": 91,
+          "min": 287,
+          "median": 675,
+          "p95": 1345,
+          "max": 1488
+        },
+        "poll_ms": {
+          "count": 21,
+          "min": 1547.214,
+          "median": 1805.095,
+          "p95": 2445.064,
+          "max": 2450.989
+        },
+        "statuses": {
+          "200": 92
+        },
+        "poll_errors": {},
+        "body_bytes": 40309,
+        "response_header_bytes": 25965,
+        "process_cpu_seconds": 2.113,
+        "process_cpu_one_core_percent": 3.342,
+        "sql_statements": 2559,
+        "max_rss_kib": 142000
+      },
+      {
+        "phase": "backend_fixed_1s",
+        "started_ms": 1791999804915,
+        "duration_seconds": 91.071,
+        "polls": 41,
+        "http_requests": 163,
+        "skipped_ticks": 51,
+        "http_rps": 1.79,
+        "request_ms": {
+          "count": 163,
+          "min": 257.359,
+          "median": 285.041,
+          "p95": 381.584,
+          "max": 475.52
+        },
+        "request_start_gap_ms": {
+          "count": 162,
+          "min": 284,
+          "median": 506.0,
+          "p95": 1200,
+          "max": 1360
+        },
+        "poll_ms": {
+          "count": 41,
+          "min": 1624.965,
+          "median": 1883.344,
+          "p95": 2067.351,
+          "max": 2115.149
+        },
+        "statuses": {
+          "200": 163
+        },
+        "poll_errors": {},
+        "body_bytes": 70867,
+        "response_header_bytes": 46013,
+        "process_cpu_seconds": 3.49,
+        "process_cpu_one_core_percent": 3.833,
+        "sql_statements": 4286,
+        "max_rss_kib": 143056
+      }
+    ],
+    "gates": {
+      "backend_fixed_1s_cadence": false,
+      "backend_fixed_all_requests_successful": true,
+      "backend_fixed_no_poll_errors": true,
+      "backend_fixed_one_request_per_poll": false
+    },
+    "benchmark_only_to_guard": true,
+    "minute_confirmations": [],
+    "pg_database_bytes": 13110619,
+    "pg_stats": {
+      "xact_commit": 7018,
+      "xact_rollback": 3,
+      "blks_read": 725,
+      "blks_hit": 138574,
+      "tup_inserted": 5372,
+      "tup_updated": 3791,
+      "tup_deleted": 1
+    },
+    "scope": "Ubuntu Docker, EUR_USD BID M1 count=3, configured proxy, no charts/studies; virtual 15s comparator samples the same 1s responses, not a separate concurrent client",
+    "benchmark_only_to_guard_scope": "page"
+  },
+  "restore_verification": {
+    "tables": 89,
+    "row_total": 22,
+    "all_tables_rows_and_content_match": true
+  },
+  "limitations": [
+    "Short isolated probes, not full charts/studies/alerts or 12-series database ingestion",
+    "Confirmation times use NTP-synchronized Ubuntu wall clock; they are first observations, not supplier publication times",
+    "Virtual 15s comparator samples the same 1s responses, not an independent live client",
+    "Backend diagnostics use benchmark-only guard and scheduler, not a production implementation",
+    "Raw response body sizes exclude outgoing requests, TCP/TLS overhead and potential wire compression"
+  ],
+  "resource_state": "All benchmark containers stopped; PG volumes retained; database dump restored and all public table counts/content matched; managed retire preview rejected because reused release image is not a registered acceptance image",
+  "r7_preview": {
+    "task": "mw-oanda-rest-1s-20261015-r7",
+    "project": "mw-oanda-rest-1s-20261015-r7",
+    "commit": "a3088f53b90f870fc4ea99d4bf62aea3bba1aa36",
+    "dirty": false,
+    "api_url": "https://localhost:18493",
+    "chart_origin": "https://localhost:17464",
+    "health": [
+      "healthz",
+      "readyz"
+    ],
+    "ui_smoke": [
+      "main",
+      "chart_origin",
+      "login",
+      "session",
+      "charts_catalog",
+      "composite_center",
+      "composite_candidates"
+    ],
+    "real_supplier_connections": false,
+    "workers": [
+      "market-stream"
+    ],
+    "tests": [
+      {
+        "scope": "rest_batch_worker_composite_quotes",
+        "passed": 80,
+        "seconds": 54.78
+      },
+      {
+        "scope": "unified_sse_composite_chart_provider_cache",
+        "passed": 152,
+        "seconds": 166.41
+      },
+      {
+        "scope": "composite_recheck",
+        "passed": 14,
+        "failed": 1,
+        "failure": "expected stale, observed coverage_pending"
+      },
+      {
+        "scope": "composite_recheck_postgres",
+        "skipped": 12,
+        "reason": "PostgreSQL targeted fixture disabled in preview API container"
+      },
+      {
+        "scope": "health",
+        "passed": 5,
+        "failed": 3,
+        "failure": "legacy import heartbeat and chart-history worker status contracts"
+      }
+    ],
+    "limitations": [
+      "preview seed has no composite definition",
+      "no production switch",
+      "no browser long-run real-supplier chart acceptance",
+      "repository backend CI is not green: 31 failed, 2364 passed, 11 skipped; failures are classified in the verification report"
+    ]
+  },
+  "ci_baseline_repair": {
+    "commit": "3b502eb8e159d51c8a05416c34c5ba8482987a15",
+    "github_run": "38819011830",
+    "status": "backend_green",
+    "previous_backend": "31 failed, 2364 passed, 11 skipped",
+    "targeted": "migration/provider_calculation/history_replay/composite_recovery/worker_health/market_demand barriers covered",
+    "result": "2395 passed, 11 skipped, 50 warnings"
+  }
+}
