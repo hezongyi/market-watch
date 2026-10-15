@@ -21,7 +21,7 @@ jobs:
       TEST_POSTGRES_URL: postgresql+psycopg://ci:ci@127.0.0.1:5432/ci
     services:
       postgres:
-        image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+        image: postgres:14.24-bookworm
         env:
           POSTGRES_DB: ci
           POSTGRES_USER: ci
@@ -51,6 +51,19 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.lock
           python -m pip install -e . --no-deps
+
+      - name: Verify PostgreSQL service version
+        run: |
+          python - <<'PY'
+          import os
+
+          import psycopg
+
+          with psycopg.connect(os.environ["TEST_POSTGRES_URL"]) as connection:
+              version = connection.execute("SHOW server_version_num").fetchone()[0]
+          if version != "140024":
+              raise SystemExit(f"expected PostgreSQL 14.24 (140024), got {version}")
+          print(f"PostgreSQL server_version_num={version}")
 
       - name: Ruff changed Python files
         env:
