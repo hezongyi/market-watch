@@ -952,13 +952,17 @@ def make_engine(url):
     if url.startswith("sqlite"):
         engine = create_engine(url, connect_args={"check_same_thread": False})
     else:
+        jit = "on" if settings.database_jit else "off"
         engine = create_engine(
             url,
             pool_size=settings.database_pool_size,
             max_overflow=settings.database_max_overflow,
             pool_timeout=settings.database_pool_timeout,
             pool_pre_ping=True,
-            connect_args={"application_name": settings.database_application_name},
+            connect_args={
+                "application_name": settings.database_application_name,
+                "options": f"-c jit={jit}",
+            },
         )
     if url.startswith("sqlite"):
 

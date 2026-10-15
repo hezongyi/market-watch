@@ -1,5 +1,5 @@
 ARG APP_IMAGE=trading-alerts-api:20260929-05eb433
-FROM postgres:14-bookworm AS pgclient
+FROM postgres@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872 AS pgclient
 FROM ${APP_IMAGE}
 USER root
 RUN apt-get update && apt-get install -y --no-install-recommends libpq5 libreadline8 liblz4-1 libzstd1 && rm -rf /var/lib/apt/lists/*

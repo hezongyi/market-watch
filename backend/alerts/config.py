@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     database_max_overflow: int = Field(default=0, ge=0, le=20)
     database_pool_timeout: int = Field(default=15, ge=1, le=120)
     database_application_name: str = "market-watch"
+    # PostgreSQL 14.10 has a JIT inlining leak (fixed in 14.11). Keep JIT
+    # disabled at connection time until all production servers are upgraded.
+    database_jit: bool = False
     mcp_enabled: bool = False
     mcp_allowed_hosts: list[str] = ["localhost", "localhost:*", "127.0.0.1", "127.0.0.1:*", "[::1]", "[::1]:*"]
     mcp_allowed_origins: list[str] = ["http://localhost", "http://localhost:*", "http://127.0.0.1", "http://127.0.0.1:*"]

@@ -13,10 +13,9 @@ def test_configured_pool_cannot_exceed_connection_budget(monkeypatch):
     def local_transport(url, **options):
         # Keep the production PostgreSQL pool settings, use local DB handles so
         # exhausting the acceptance pool cannot consume shared server slots.
-        assert (
-            options.pop("connect_args")["application_name"]
-            == storage.settings.database_application_name
-        )
+        connect_args = options.pop("connect_args")
+        assert connect_args["application_name"] == storage.settings.database_application_name
+        assert connect_args["options"] == "-c jit=off"
         return create_engine("sqlite://", poolclass=QueuePool, **options)
 
     monkeypatch.setattr(storage, "create_engine", local_transport)
