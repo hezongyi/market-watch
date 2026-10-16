@@ -884,7 +884,7 @@ const feed = {
   // Authenticated/network access stays in the trusted parent origin.
   getServerTime: (cb) => request({op: "serverTime"}, "market")
     .then(cb).catch(error => send({type: "error", error: "服务器时间获取失败：" + String(error)})),
-  getQuotes: (symbols, cb, err, isCurrent = () => true) => {
+  getQuotes: (symbols, cb, err, isCurrent = () => true, forceRefresh = false) => {
     if (!symbols.length) {
       queueMicrotask(() => cb([]));
       return;
@@ -893,6 +893,21 @@ const feed = {
     const initialRows = new Map(symbols.map(ticker => [ticker, quoteSnapshotRows.get(ticker)]));
     const resetTokens = new Map(symbols.map(ticker => [ticker, quoteResetTokens.get(ticker)]));
     const currentSymbols = () => symbols.filter(ticker => quoteResetTokens.get(ticker) === resetTokens.get(ticker));
+    // Native details asks for an initial snapshot before it subscribes. An
+    // already subscribed observation must not queue behind a slow mixed-source
+    // refresh on every row click. Subscription refreshes still use the network.
+    const subscribed = new Set([...quoteSubscriptions.values()].flatMap(sub => sub.symbols));
+    if (!forceRefresh && !marketPollingFallback && symbols.every(ticker =>
+      subscribed.has(ticker) && Number.isFinite(initialRows.get(ticker)?.v?.lp))) {
+      setTimeout(() => {
+        if (epoch !== workspaceEpoch || !isCurrent()) return;
+        const rows = symbols.map(ticker => quoteSnapshotRows.get(ticker));
+        if (currentSymbols().length === symbols.length && rows.every(row => Number.isFinite(row?.v?.lp)))
+          cb(rows.map(presentQuote));
+        else feed.getQuotes(symbols, cb, err, isCurrent, true);
+      }, 0);
+      return;
+    }
     // Quotes are independent of chart history. The request queue still keeps
     // a bounded quote lane, while cancellation and epoch checks fence stale
     // callbacks when a workspace or list changes.
@@ -954,7 +969,7 @@ const feed = {
         cb(rows);
       },
         error=>send({type:"feed-poll-state",key:"@quotes",error:String(error)}),
-        () => quoteSubscriptions.get(id) === quoteSub);
+        () => quoteSubscriptions.get(id) === quoteSub, true);
     }
   },
   unsubscribeQuotes: (id) => {

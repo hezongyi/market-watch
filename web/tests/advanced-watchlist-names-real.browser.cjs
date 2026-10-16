@@ -60,7 +60,15 @@ fs.mkdirSync(out,{recursive:true});
     console.log('Capture '+label);
     outer=await host();
     await outer.waitForFunction(()=>typeof ready!=='undefined'&&ready&&!loading&&widget.activeChart().dataReady(),null,{timeout:60000});
-    await page.waitForTimeout(6000);
+    // Real mixed-supplier snapshots may take longer than a fixed sleep. Start
+    // click acceptance only after native has subscribed and real prices exist.
+    await outer.waitForFunction(()=>{
+      const doc=document.querySelector('iframe')?.contentDocument;
+      const providers=[...doc?.querySelectorAll('[data-test-id-widget-type="watchlist"] [data-symbol-full]')||[]]
+        .map(r=>r.dataset.symbolFull).filter(t=>t.startsWith('MWP:'));
+      return providers.length&&quoteSubscriptions.size&&providers.every(ticker=>
+        [...quoteSnapshotRows].some(([key,row])=>key.toUpperCase()===ticker.toUpperCase()&&row.s==='ok'&&row.v?.lp>0));
+    },null,{timeout:90000});
     const frames=await Promise.all(page.frames().map(async f=>({url:f.url(),timeline:await f.evaluate(()=>window.__mwNameTimeline||[])})));
     const state=await outer.evaluate(()=>({ready,loading,symbol:widget.activeChart().symbol(),
       quotes:[...quoteSnapshotRows.entries()],subscriptions:[...quoteSubscriptions.values()].map(s=>s.symbols)}));
@@ -82,7 +90,12 @@ fs.mkdirSync(out,{recursive:true});
     await page.reload();await capture('02-reload');
     originalSymbol=await outer.evaluate(()=>widget.activeChart().symbol());
     await outer.evaluate(()=>{
-      window.__mwDetails=[];window.__mwQuoteCallbacks=[];
+      window.__mwDetails=[];window.__mwQuoteCallbacks=[];window.__mwQuoteRequests=[];
+      const getQuotes=feed.getQuotes;
+      feed.getQuotes=(symbols,callback,...args)=>{
+        const entry={time:performance.now(),symbols};__mwQuoteRequests.push(entry);
+        return getQuotes(symbols,rows=>{entry.delivered=performance.now();callback(rows)},...args);
+      };
       const subscribe=feed.subscribeQuotes;
       feed.subscribeQuotes=(symbols,fast,callback,id)=>subscribe(symbols,fast,rows=>{
         __mwQuoteCallbacks.push({time:performance.now(),id,rows:rows.map(r=>({n:r.n,s:r.s,
@@ -101,13 +114,13 @@ fs.mkdirSync(out,{recursive:true});
       const symbol=i%2?'XAUUSD':'EURUSD';
       console.log('Click details '+i+' '+symbol);
       await native.locator('[data-test-id-widget-type="watchlist"] [data-symbol-full="MWP:'+symbol+'"]').click();
-      await native.locator('[data-test-id-widget-type="detail"]').filter({hasText:symbol+' · 平台行情'}).waitFor({timeout:15000});
+      await native.locator('[data-test-id-widget-type="detail"]').filter({hasText:symbol+' · 平台行情'}).waitFor({timeout:60000});
       await page.waitForTimeout(1800);
       const price=await native.locator('[data-test-id-widget-type="detail"] [data-qa-id="details-element price"]').innerText();
       assert(/\d/.test(price),'real detail price missing for '+symbol);
       if(i<2)await page.screenshot({path:out+'/detail-'+symbol+'.png'});
     }
-    details.push(await outer.evaluate(()=>({timeline:__mwDetails,callbacks:__mwQuoteCallbacks})));
+    details.push(await outer.evaluate(()=>({timeline:__mwDetails,callbacks:__mwQuoteCallbacks,requests:__mwQuoteRequests})));
     assert(details[0].timeline.some(e=>e.text.includes('EURUSD · 平台行情')));
     assert(details[0].timeline.some(e=>e.text.includes('XAUUSD · 平台行情')));
     assert(!details[0].timeline.some(e=>e.text.includes('平台原生行情')),'details must never alternate provider wording');
@@ -162,7 +175,7 @@ fs.mkdirSync(out,{recursive:true});
   }finally{
     let restoreError;
     if(outer&&!details.length)details.push(await outer.evaluate(()=>({timeline:window.__mwDetails||[],
-      callbacks:window.__mwQuoteCallbacks||[]})).catch(()=>({timeline:[],callbacks:[]})));
+      callbacks:window.__mwQuoteCallbacks||[],requests:window.__mwQuoteRequests||[]})).catch(()=>({timeline:[],callbacks:[]})));
     if(tempId){
       outer=await host().catch(()=>null);
       if(outer)await outer.evaluate(async({id,active})=>{
@@ -173,8 +186,10 @@ fs.mkdirSync(out,{recursive:true});
       else {restoreError=Error('chart host unavailable during list restoration');errors.push(restoreError.message);}
       await page.waitForTimeout(1000);
     }
-    if(outer&&originalSymbol)await outer.evaluate(symbol=>widget.activeChart().setSymbol(symbol),originalSymbol)
-      .catch(e=>{restoreError=e;errors.push('restore symbol: '+e.message)});
+    if(outer&&originalSymbol)await (async()=>{
+      await outer.evaluate(symbol=>widget.activeChart().setSymbol(symbol),originalSymbol);
+      await outer.waitForFunction(symbol=>widget.activeChart().symbol()===symbol,originalSymbol,{timeout:15000});
+    })().catch(e=>{restoreError=e;errors.push('restore symbol: '+e.message)});
     await loadingCapture;
     fs.writeFileSync(out+'/result.json',JSON.stringify({samples,runs,details,flashes,errors},null,2));
     await context.close();await browser.close();
