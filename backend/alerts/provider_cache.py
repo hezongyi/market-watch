@@ -54,6 +54,20 @@ def rest_batch_owner_active(key):
             ProviderInterest.expires > now_ms(),
         )) is not None
 
+
+def rest_forming_tail(state, before):
+    """Read an adjacent forming candle without promoting it to query coverage."""
+    preceding = state["preceding"]
+    bars = state["bars"]
+    if not preceding or not bars:
+        return None
+    tail = bars[-1]
+    if (not tail["complete"] and preceding[1] == tail["start"]
+            and tail["start"] < before <= tail["end"]):
+        return preceding
+    return None
+
+
 log = logging.getLogger(__name__)
 
 
@@ -637,6 +651,7 @@ def _native_read(meta, body, before, count, prefix, latest, on_ready=None):
     from_time = body.from_time if body.from_time is not None and body.from_time < before else None
     deadline = DEADLINE.get() or time.monotonic() + settings.provider_request_seconds
     key = ensure(meta, body.timeframe)
+    shared_latest = latest and meta["source"] == "oanda" and rest_batch_owner_active(key)
     if READ_MODE.get() != "cache":
         revalidate_history(key, meta, body.timeframe, before, count+prefix, deadline)
     cap = page_capacity(meta["source"])
@@ -663,7 +678,8 @@ def _native_read(meta, body, before, count, prefix, latest, on_ready=None):
             connected = state["interval"]
             recent_tail = (latest and state["preceding"] and
                            before - state["preceding"][1] <= fresh_seconds(meta["source"]) * 1000)
-            readable = connected or (state["preceding"] if recent_tail else None)
+            observed_tail = rest_forming_tail(state, before) if shared_latest else None
+            readable = connected or observed_tail or (state["preceding"] if recent_tail else None)
             range_done = from_time is None or state["window_limit"] or bool(readable and readable[0] <= from_time)
             boundary = state["history_boundary"] or state["window_limit"]
             mandatory_done = bool(readable and range_done and
@@ -699,27 +715,33 @@ def _native_read(meta, body, before, count, prefix, latest, on_ready=None):
                 if on_ready:
                     on_ready(db, page)
                 return page
+        if shared_latest and mandatory_done:
+            # Only the account worker refreshes a complete live demand.
+            raise HistoryPending()
         observation_progress = (state["interval"], state["available_count"], state["latest_at"], state["cache_revision"])
         no_progress = no_progress + 1 if observation_progress == previous else 0
         previous = observation_progress
         if no_progress >= 3:
             raise TimeoutError("平台历史分页未推进，请重试")
-        tail = latest and bool(bars) and (not fresh or not connected)
+        tail = latest and not shared_latest and bool(bars) and (not fresh or not connected)
         if tail:
             elapsed = max(0, now_ms() - bars[-1]["start"])
             amount = min(cap, max(3, elapsed // upstream.FRAME_MS[body.timeframe] + 3))
             cursor = before
             attached = 0
         else:
-            cursor = connected[0] if connected else before
-            missing = max(1, demand + prefix - (state["available_count"] if connected else 0))
+            # Latest snapshots contain no proof of missing history. Fill that
+            # bounded historical demand even while shared latest polling owns
+            # the current candle; do not start a second latest poller.
+            cursor = readable[0] if readable else before
+            missing = max(1, demand + prefix - (state["available_count"] if readable else 0))
             # Unknown range length is discovered with mandatory pages. When
             # count still needs a page, spare HTTP capacity may include E; it
             # never controls the next page's stopping condition.
             amount = min(cap, missing if range_done or missing > 1 else cap)
             attached = min(optional, max(0, cap - amount), max(0, history_limit - demand - prefix))
         fetch_page(key, meta, body.timeframe, cursor, amount, deadline,
-                   kind=LANE.get() or "chart", latest=latest and cursor == before,
+                   kind=LANE.get() or "chart", latest=latest and not shared_latest and cursor == before,
                    optional=attached)
     raise TimeoutError("平台分页未完成，请重试")
 
