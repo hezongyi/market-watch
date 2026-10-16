@@ -56,8 +56,8 @@ function progress(mode,id){
    for(let i=0;i<5;i++)await p.host.evaluate(async i=>{const c=widget.chart(i),r=['60','5','1W','1D','240'][i];c.removeAllStudies();c.removeAllShapes();if(!MWSeries.same(c.symbol(),'MWC:85eb595180ed9491e1d5e3064aca750933a9ffd787b840d1357645fbbeca3b8a'))await c.setSymbol('MWC:85eb595180ed9491e1d5e3064aca750933a9ffd787b840d1357645fbbeca3b8a',{doNotActivateChart:true});if(c.resolution()!==r)await c.setResolution(r,{doNotActivateChart:true});},i);
    await p.host.waitForFunction(()=>Array.from({length:5},(_,i)=>widget.chart(i).dataReady()).every(Boolean),null,{timeout:90000});
    await capture(p,prefix+'-01-five-charts','F1/U6','Five real native panes: H1/M5/W1/D1/H4, current fixed composite revision.');
-   await series(p,composite,'60');await watch.click();await p.expect(p.ui.locator('[data-name="mw-quote-details-time"]')).toBeVisible();
-   await capture(p,prefix+'-02-symbol-details','U3/U4','Real quote observation time; no snapshot replay.');
+   await series(p,composite,'60');await watch.click();await p.expect(p.ui.locator('[data-test-id-widget-type="detail"]')).toBeVisible();await p.expect(p.ui.locator('[data-name="mw-quote-details-time"]')).toHaveCount(0);
+   await capture(p,prefix+'-02-symbol-details','U3/U4','Native TradingView quote details; no host-injected status/time extension.');
    await p.ui.getByRole('button',{name:'警报',exact:true}).click();await p.expect(p.ui.getByRole('tab',{name:'警报',exact:true})).toBeVisible();
    await p.ui.getByRole('tab',{name:'警报',exact:true}).click();
    await capture(p,prefix+'-03-alert-sidebar','F3/U2/U8');

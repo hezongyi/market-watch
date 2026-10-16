@@ -10,42 +10,29 @@ const assert=require('node:assert/strict'),fs=require('node:fs');
   await p.host.waitForFunction(()=>widget.activeChart().dataReady());
   const baseHeight=await p.host.locator('#chart').evaluate(n=>n.getBoundingClientRect().height);
   const details=p.ui.locator('[data-test-id-widget-type="detail"]');
-  const slot=details.locator('[data-name="mw-quote-details-time"]');
   for(const theme of ['Dark','Light']) {
     await p.host.evaluate(t=>widget.changeTheme(t),theme);
     const watch=p.ui.getByRole('button',{name:'观察清单和详情',exact:true});
     if(await watch.getAttribute('aria-pressed')!=='true')await watch.click();
-    await p.expect(slot).toContainText('来源行情观察时间');
+    await p.expect(details).toBeVisible();
+    await p.expect(details.locator('[data-name="mw-quote-details-time"]')).toHaveCount(0);
     const raw=await p.host.evaluate(()=>{const i=decode(widget.activeChart().symbol());return quoteSnapshotRows.get(MWSeries.encode(i.symbol,i.series_kind));});
     assert.ok(raw.v.data_start);assert.equal(raw.v.quote_time,null);
     for(const zone of ['Etc/UTC','Asia/Shanghai','America/New_York','exchange']) {
-      const expected=await p.host.evaluate(zone=>{widget.activeChart().getTimezoneApi().setTimezone(zone);const i=decode(widget.activeChart().symbol());const q=quoteSnapshotRows.get(MWSeries.encode(i.symbol,i.series_kind));return quoteTimeText(q.v.data_start,presentationFor(widget.activeChart().symbol()));},zone);
-      await p.expect(slot).toContainText(expected);
+      await p.host.evaluate(zone=>widget.activeChart().getTimezoneApi().setTimezone(zone),zone);
+      await p.expect(details).toBeVisible();
     }
     for(let i=0;i<4;i++) {
       const alert=p.ui.getByRole('button',{name:'警报',exact:true});await alert.click();
       const geometry=await alert.evaluate(n=>{const a=n.getBoundingClientRect(),b=n.querySelector('svg').getBoundingClientRect();return {button:[a.width,a.height],svg:[b.width,b.height],center:[b.x+b.width/2-a.x,b.y+b.height/2-a.y]};});
       assert.deepEqual(geometry.button,[44,44]);assert.deepEqual(geometry.svg,[44,44]);assert.deepEqual(geometry.center,[22,22]);
       await p.ui.getByRole('tab',{name:'日志',exact:true}).click();await p.ui.getByRole('tab',{name:'警报',exact:true}).click();
-      await watch.click();await p.expect(slot).toBeVisible();
+      await watch.click();await p.expect(details).toBeVisible();
       assert.equal(await p.host.locator('#chart').evaluate(n=>n.getBoundingClientRect().height),baseHeight);
       assert.equal(await p.host.getByRole('complementary',{name:'商品状态和行情时间'}).count(),0);
     }
     r.cases.push({name:'native details/timezones and sidebar geometry/height',theme,quoteTime:raw.v.data_start,height:baseHeight});
   }
-  // Pause quote callbacks in this browser alone, then replay rare states.
-  await p.host.evaluate(()=>{globalThis.presentationQuoteSaved=[...quoteSnapshotRows.values()];for(const id of [...quoteSubscriptions.keys()])feed.unsubscribeQuotes(id);});
-  for(const [name,values,phrase] of [
-    ['no record',{quote_time:null,data_start:null},'最后更新时间：暂无记录'],
-    ['closed failure',{market_session:'closed',fetch_status:'fetch_failed'},'休市 · 更新失败'],
-    ['unknown',{market_session:'unknown'},'时段未核实'],
-    ['precise quote',{quote_time:Date.UTC(2026,9,9,20,59,58)},'最后更新时间：'],
-    ['fixed history',{time_type:'fixed_history'},'历史数据时间：'],
-  ]) {
-    await p.host.evaluate(values=>{const i=decode(widget.activeChart().symbol()),key=MWSeries.encode(i.symbol,i.series_kind),old=presentationQuoteSaved.find(q=>MWSeries.same(q.n,key));quoteSnapshotRows.set(key,{...old,v:{...old.v,...values}});quoteDetails.refresh();},values);
-    await p.expect(slot).toContainText(phrase);r.cases.push({name:'controlled native snapshot '+name,text:await slot.innerText()});
-  }
-  await p.host.evaluate(()=>{for(const q of presentationQuoteSaved)quoteSnapshotRows.set(q.n,q);quoteDetails.refresh();});
   // Real calendar API and controls, plus native footer at two themes/widths.
   for(const theme of ['Dark','Light']) {
     await p.host.evaluate(t=>widget.changeTheme(t),theme);
