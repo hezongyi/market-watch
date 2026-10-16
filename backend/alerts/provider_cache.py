@@ -555,6 +555,7 @@ def _read(meta, frame, before, count, *, latest=False, deadline=None, on_ready=N
         raise ValueError("平台请求根数须在1至20000之间")
     deadline = deadline or DEADLINE.get() or time.monotonic() + settings.provider_request_seconds
     key = ensure(meta, frame)
+    shared_latest = meta["source"] == "oanda" and rest_batch_owner_active(key)
     revalidate_history(key, meta, frame, before, count, deadline)
     cap = page_capacity(meta["source"])
     fetched = False
@@ -572,7 +573,9 @@ def _read(meta, frame, before, count, *, latest=False, deadline=None, on_ready=N
                 and (len(cached["bars"]) >= count or cached["history_boundary"])
                 and before - cached["preceding"][1] <= fresh_seconds(meta["source"]) * 1000
             )
-            if (cached["satisfied"] or recent_tail) and fresh:
+            observed_range = readable_preceding_range(cached, before) if shared_latest else None
+            observed_tail = observed_range and (len(cached["bars"]) >= count or cached["history_boundary"])
+            if (cached["satisfied"] or recent_tail or observed_tail) and fresh:
                 page = {
                     **cached,
                     "series_kind": "provider",
@@ -596,8 +599,9 @@ def _read(meta, frame, before, count, *, latest=False, deadline=None, on_ready=N
                 amount = min(count, cap)
             cursor = before
         else:
-            cursor = cached["interval"][0] if cached["interval"] else before
-            missing = count - len(cached["bars"]) if cached["interval"] else count
+            readable = cached["interval"] or observed_range
+            cursor = readable[0] if readable else before
+            missing = count - len(cached["bars"]) if readable else count
             amount = min(cap, max(1, missing))
         fetch_page(key, meta, frame, cursor, amount, deadline,
                    kind=LANE.get() or "chart", latest=latest and cursor == before)

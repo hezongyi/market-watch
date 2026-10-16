@@ -117,3 +117,55 @@ def test_durable_load_waits_for_shared_refresh_and_keeps_its_deadline(database, 
         db.get(NativeHistoryLoad, expired).deadline = clock[0] - 1
     assert not loads.once()
     assert loads.status('owner', expired)['state'] == 'expired'
+
+
+@pytest.mark.parametrize("count_to_coverage", [False, True])
+def test_indicator_read_uses_adjacent_forming_without_repoll(database, monkeypatch, count_to_coverage):
+    key = own(database, monkeypatch)
+    if count_to_coverage:
+        with database.begin() as db:
+            db.get(ProviderDataset, key).coverage = [[0, 600001]]
+    monkeypatch.setattr(upstream, 'native_page', lambda *a, **kw: pytest.fail('indicator must use the shared observation'))
+    body = DataQuery(instrument=META['id'], series_kind='provider', timeframe='M1',
+                     before=600001, limit=5, firstDataRequest=False,
+                     indicators=[{'name':'SUPERTREND_PINE_V1',
+                                  'params':{'period':2, 'multiplier':3, 'source':'hl2', 'atr_method':'wilder'}}])
+    assert body.native_history is None
+    result = cache.data(body)
+    assert len(result['bars']) == 5
+    assert result['bars'][-1]['start'] == 600000
+    assert any(s['values'] for s in result['indicators'][0]['series'])
+    assert bool(cache.snapshot(key, 600001, 5)['interval']) == count_to_coverage
+
+
+def test_indicator_read_still_fetches_missing_prefix(database, monkeypatch):
+    key = own(database, monkeypatch, start=540000)
+    calls = []
+
+    def fetch(meta, frame, before, count, **kwargs):
+        calls.append((before, count))
+        return {'bars': bars(before-count*60000, before), 'history_boundary': False}
+
+    monkeypatch.setattr(upstream, 'native_page', fetch)
+    result = cache.data(DataQuery(instrument=META['id'], series_kind='provider', timeframe='M1',
+        before=600001, limit=5, firstDataRequest=False,
+        indicators=[{'name': 'SUPERTREND_PINE_V1', 'params': {'period': 2}}]))
+    assert calls == [(540000, 5)]
+    assert len(result['bars']) == 5
+    assert result['bars'][-1]['start'] == 600000
+    assert cache.snapshot(key, 600001, 5)['interval'] is None
+
+
+def test_ordinary_read_requires_real_coverage_across_a_gap(database, monkeypatch):
+    key = own(database, monkeypatch, gap=True)
+    monkeypatch.setattr(upstream, 'native_page', lambda *a, **kw: (_ for _ in ()).throw(TimeoutError('uncovered gap')))
+    with pytest.raises(TimeoutError, match='uncovered gap'):
+        cache.read(META, 'M1', 600001, 5)
+    assert cache.snapshot(key, 600001, 5)['interval'] is None
+
+
+def test_ordinary_latest_read_waits_for_shared_freshness(database, monkeypatch):
+    own(database, monkeypatch, stale=True)
+    monkeypatch.setattr(upstream, 'native_page', lambda *a, **kw: pytest.fail('latest must remain account-owned'))
+    with pytest.raises(cache.LatestObservationPending):
+        cache.read(META, 'M1', 600001, 5, latest=True)
