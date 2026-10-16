@@ -75,8 +75,12 @@ def freeze(db, page, body, maximum, *, evaluation_end=None):
         if evaluation_end is not None:
             ceiling = evaluation_end
     identity = (db.get_bind(), dataset.id, origin)
-    epoch = dataset.metadata_json.get("indicator_history_epoch")
     revision = dataset.revision
+    # A restored pre-patch dataset has no mutation epoch yet. Its exact
+    # revision is still immutable within this observation, so share that
+    # revision only; the next legacy write forces a complete reload.
+    epoch = dataset.metadata_json.get("indicator_history_epoch") or (
+        "legacy", revision, dataset.updated_at)
     entry = _entry(_INPUTS, identity, MAX_ROWS)
     # Hold no second connection while sharing a frozen prefix. The first
     # caller does only DB I/O/decoding here; numerical work follows checkin.

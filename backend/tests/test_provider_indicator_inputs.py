@@ -120,3 +120,61 @@ def test_cache_pressure_releases_oversized_entries(database, monkeypatch):
     cache.data(query())
     assert sum(entry.weight for entry in engine._INPUTS.values()) <= 10
     assert sum(entry.weight for entry in engine._RESULTS.values()) <= 10
+
+
+def test_restored_legacy_dataset_shares_exact_revision_without_epoch(database, monkeypatch):
+    monkeypatch.setattr(upstream, 'metadata', lambda _: META)
+    key = seed(META, 'M1', 1000000, page(1000, 1000000, boundary=True))
+    with database.begin() as db:
+        dataset = db.get(cache.ProviderDataset, key)
+        metadata = dict(dataset.metadata_json)
+        metadata.pop('indicator_history_epoch')
+        dataset.metadata_json = metadata
+    statements = []
+    pg = database.kw['bind']
+    def observe(conn, cursor, statement, params, context, many):
+        if ('provider_bars.payload' in statement and 'ORDER BY provider_bars.start' in statement
+                and 'DESC' not in statement):
+            statements.append(statement)
+    event.listen(pg, 'before_cursor_execute', observe)
+    try:
+        first, second = cache.data(query()), cache.data(query())
+        assert first['indicators'] == second['indicators']
+        assert len(statements) == 1, 'restored pre-patch data must share an unchanged input revision'
+    finally:
+        event.remove(pg, 'before_cursor_execute', observe)
+
+
+def test_cancelled_waiter_does_not_abort_a_shared_calculation(monkeypatch):
+    import threading
+    from concurrent.futures import ThreadPoolExecutor
+
+    from alerts import provider_indicator_inputs as engine
+
+    rows = page(0, 1000000)['bars']
+    frozen = engine.Inputs(rows, ('shared-cancel',), 'epoch', 1)
+    entered, release = threading.Event(), threading.Event()
+    original = engine.IndicatorState.step
+    def step(self, row, **kwargs):
+        if not entered.is_set():
+            entered.set()
+            assert release.wait(3)
+        return original(self, row, **kwargs)
+    monkeypatch.setattr(engine.IndicatorState, 'step', step)
+    def run():
+        return engine.compute(frozen, META, META['id'], SPEC, first=0, provisional=True)
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        active = pool.submit(run)
+        assert entered.wait(3)
+        cancelled = threading.Event()
+        cancelled.set()
+        token = cache.CANCELLED.set(cancelled)
+        try:
+            with pytest.raises(TimeoutError, match='取消'):
+                run()
+        finally:
+            cache.CANCELLED.reset(token)
+            release.set()
+        result = active.result(timeout=3)
+    assert any(v['value'] is not None for s in result['series'] for v in s['values'])
+    assert run()['series'] == result['series']
