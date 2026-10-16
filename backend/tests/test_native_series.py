@@ -159,3 +159,21 @@ def test_h4_dst_short_final_bucket_and_session_quote_boundary():
     assert native_series.session_start(stamp("2026-03-09T20:30:00+00:00"), DEFAULTS) == stamp("2026-03-08T21:00:00+00:00")
     assert chart_label(stamp("2026-09-30T00:00:00+00:00"), "D1",
         {**DEFAULTS, "dailyAlignment": 0, "alignmentTimezone": "UTC"}) == stamp("2026-09-30T00:00:00+00:00")
+
+
+@pytest.mark.parametrize('frame,observed,label,overrides', [
+    ('D1', '2026-03-08T21:30:00+00:00', '2026-03-09T00:00:00+00:00', {}),
+    ('W1', '2026-03-08T20:59:00+00:00', '2026-03-02T00:00:00+00:00', {}),
+    ('W1', '2026-03-08T21:00:00+00:00', '2026-03-09T00:00:00+00:00', {}),
+    ('MN', '2026-03-31T20:59:00+00:00', '2026-03-01T00:00:00+00:00', {}),
+    ('MN', '2026-03-31T21:00:00+00:00', '2026-04-01T00:00:00+00:00', {}),
+    ('D1', '2026-10-15T15:30:00+00:00', '2026-10-16T00:00:00+00:00',
+     {'alignmentTimezone': 'Asia/Tokyo', 'dailyAlignment': 0}),
+    ('W1', '2026-10-15T15:30:00+00:00', '2026-10-16T00:00:00+00:00',
+     {'alignmentTimezone': 'Asia/Tokyo', 'dailyAlignment': 0, 'weeklyAlignment': 'Friday'}),
+])
+def test_observation_chart_ceiling_tracks_dst_session_and_custom_calendar(frame, observed, label, overrides):
+    from alerts.native_series import chart_ceiling
+
+    assert chart_ceiling(stamp(observed), frame, {**DEFAULTS, **overrides}) == max(
+        stamp(observed) + 1, stamp(label) + 1)

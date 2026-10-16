@@ -1,5 +1,7 @@
 // Replay actual market MessageEvents against the coordinator with delayed reads.
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const provider=process.argv.includes('--provider');
+const credential=provider?'provider_snapshot_id':'display_snapshot_id';
 const bridge=fs.readFileSync('../advanced-host/bridge.js','utf8');
 const callbacks=[],batches=[],reads=[],held=[],reports=[];
 let token,scope={generation:1,name:'LWMA',resolution:'1',first:60000,last:60000,count:1},coordinator;
@@ -14,17 +16,17 @@ const context={MWNativeIndicatorResults:adapter,queueMicrotask,Date,setTimeout,c
  setInterval:()=>1,clearInterval(){},addEventListener:(type,handler)=>{if(type==='message')context.handle=handler;},
  send:()=>{},parent:{},parentOrigin:'https://parent.test',ready:false,loading:false,
  quoteSubscriptions:new Map(),subscriptions,marketHistoryState:state,indicatorBindings:bindings,
- indicatorKey:(s,r)=>s+'|'+r,decode:()=>({symbol:'test',series_kind:'composite'}),
- barsOf:event=>event.bars.map(bar=>({...bar,time:bar.start})),observeRangeBars(){},
- rememberIndicatorBinding:(s,r,event)=>{token=event.display_snapshot_id;bindings.set(s+'|'+r,{displaySnapshot:token});void coordinator.sync();}};
+ indicatorKey:(s,r)=>s+'|'+r,decode:()=>({symbol:'test',series_kind:provider?'provider':'composite'}),
+ stamp:bar=>bar.start,barsOf:event=>event.bars.map(bar=>({...bar,time:bar.start})),observeRangeBars(){},
+ rememberIndicatorBinding:(s,r,event)=>{token=event[credential];bindings.set(s+'|'+r,{displaySnapshot:token});void coordinator.sync();}};
 vm.runInNewContext(fs.readFileSync('../advanced-host/indicator-coordinator.js','utf8'),context);
 coordinator=context.chartIndicatorCoordinator({chartsCount:()=>1,chart:()=>chart},
  {LWMA:{params:{period:5},series:[{key:'value'}]}},{
  identity:{binding:()=>token?{revision:'composite',inputRevision:1,tailVersion:token,correctionVersion:0,
-  displaySnapshot:token,query:{display_snapshot_id:token}}:null,chartTime:bar=>bar.start},
- read:async(_,__,args)=>{reads.push(args.display_snapshot_id);await new Promise(resolve=>held.push(resolve));
+  ...(provider?{providerSnapshot:token}:{displaySnapshot:token}),query:{[credential]:token}}:null,chartTime:bar=>bar.start},
+ read:async(_,__,args)=>{reads.push(args[credential]);await new Promise(resolve=>held.push(resolve));
   const bars=Array.from({length:scope.count},(_,i)=>({start:60000*(i+1)}));
-  return {bars,input_revision:1,display_snapshot_id:args.display_snapshot_id,has_more:false,
+  return {bars,input_revision:1,[credential]:args[credential],has_more:false,
    indicators:[{name:'LWMA',params:{period:5},series:[{key:'value',values:bars.map(bar=>({time:bar.start,value:10}))}]}]};}
  });
 if(fs.existsSync('../advanced-host/composite-display-batches.js')){
@@ -42,7 +44,7 @@ vm.runInNewContext(bridge.slice(start,end),context);
 async function flush(){for(let i=0;i<40;i++)await Promise.resolve();}
 async function event(sequence,minute,close=sequence){await context.handle({source:context.parent,origin:context.parentOrigin,
  data:{channel:'mw-chart-v1',type:'market-event',event:{listener:'listener',generation:1,sequence,type:'bars',
- display_snapshot_id:'snapshot-'+sequence,initial_input_revision:1,bars:[{start:minute*60000,open:1,high:close,low:1,close}]}}});await flush();}
+ [credential]:'snapshot-'+sequence,initial_input_revision:1,bars:[{start:minute*60000,open:1,high:close,low:1,close}]}}});await flush();}
 (async()=>{
  try{
   await event(1,1);assert.deepEqual(reads,['snapshot-1']);
@@ -57,6 +59,6 @@ async function event(sequence,minute,close=sequence){await context.handle({sourc
   assert.equal(callbacks.at(-1).close,104);assert.deepEqual(reads,['snapshot-1','snapshot-103']);
   held.shift()();await flush();assert.equal(batches.length,2);assert.equal(batches[1].displaySnapshot,token);
   assert.equal(reports.filter(Boolean).length,0);
-  console.log('PASS actual bridge/coordinator: quote burst coalescing, slow-read progress and cross-minute retention');
+  console.log('PASS '+(provider?'provider':'composite')+' actual bridge/coordinator: quote burst coalescing, slow-read progress and cross-minute retention');
  }finally{context.compositeDisplayBatches?.dispose();coordinator.dispose();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

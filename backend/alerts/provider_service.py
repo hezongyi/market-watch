@@ -5,7 +5,6 @@ step issues at most one provider page; it never recursively activates interests.
 """
 
 import hashlib
-import json
 import logging
 import threading
 import time
@@ -15,8 +14,7 @@ from sqlalchemy import delete, func, select, text
 
 from . import provider_cache as cache
 from . import provider_chart as upstream
-from .chart_calculation_history import calculation_rows
-from .chart_indicators import calculate, history_requirement
+from .chart_indicators import history_requirement
 from .config import settings
 from .market_resources import lane
 from .provider_capabilities import enabled_sources, page_capacity, poll_seconds
@@ -240,7 +238,7 @@ def renew(client):
 def events(client, cursors):
     """Snapshot only: SSE never fetches upstream or holds DB during its wait."""
     result = []
-    swing_results = {}
+    maximum = cache.capacity()
     now = now_ms()
     with cache.budget_transaction(isolation_level="REPEATABLE READ") as db:
         rows = list(
@@ -312,71 +310,53 @@ def events(client, cursors):
                     or len(bars) > 2000 or (last and not connected)
                     else "bars"
                 )
-                indicators = []
+                frozen = []
                 if kind == "bars" and interest.indicators:
-                    prefix = list(
-                        db.scalars(
-                            select(ProviderBar)
-                            .where(
-                                ProviderBar.dataset_id == dataset.id,
-                                ProviderBar.chart_time <= new_last,
-                            )
-                            .order_by(ProviderBar.chart_time.desc())
-                        )
-                    )[::-1]
-                    prefix_connected = bool(prefix) and any(
-                        a <= prefix[0].chart_time and new_last < b
-                        for a, b in dataset.coverage
-                    )
-                    if not prefix_connected:
-                        kind = "reset"
-                    for spec in interest.indicators if prefix_connected else []:
-                        origin=spec.get("calculation_origin")
-                        inputs=[row.payload for row in prefix if origin is None or row.start>=origin]
-                        if inputs and origin is not None and inputs[0]["start"] != origin:
-                            kind="reset"
-                            indicators=[]
+                    from types import SimpleNamespace
+
+                    from .provider_indicator_inputs import freeze
+
+                    for spec in interest.indicators:
+                        body = SimpleNamespace(indicators=[spec], calculation_origin=spec.get("calculation_origin"))
+                        inputs = freeze(db, {"dataset_id": dataset.id,
+                            "bars": [r.payload for r in bars]}, body, maximum)
+                        connected = bool(inputs.rows) and any(
+                            a <= inputs.rows[0].get("chart_time", inputs.rows[0]["start"]) and new_last < b
+                            for a, b in dataset.coverage)
+                        if not connected:
+                            kind, frozen = "reset", []
                             break
-                        cache_key = (dataset.id, dataset.revision, origin,
-                                     json.dumps(spec.get("params", {}), sort_keys=True))
-                        calculated = swing_results.get(cache_key) if spec["name"] == "SWING_SR_V1" else None
-                        if calculated is None:
-                            calculated = calculate(calculation_rows(inputs, dataset.metadata_json,
-                                                                    dataset.metadata_json["id"]), spec, provisional=True)
-                            if "presentation" in calculated:
-                                calculated["presentation"] = calculated["presentation"] | {
-                                    "history_revision": str(dataset.revision), "history_complete": True}
-                            if spec["name"] == "SWING_SR_V1":
-                                swing_results[cache_key] = calculated
-                        indicators.append(
-                            {
-                                **calculated,
-                                "series": [
-                                    {
-                                        **series,
-                                        "values": [
-                                            v
-                                            for v in series["values"]
-                                            if v["time"] >= bars[0].start
-                                        ],
-                                    }
-                                    for series in calculated["series"]
-                                ],
-                            }
-                        )
+                        frozen.append((spec, inputs))
                 result.append(
                     {
                         "listener": interest.listener,
                         "type": kind,
                         "bars": [row.payload for row in bars] if kind == "bars" else [],
-                        "indicators": indicators,
+                        "indicators": [],
+                        "dataset_id": dataset.id,
+                        "_calculation": (frozen, dict(dataset.metadata_json)),
                         "revision": dataset.revision,
                         "cursor": new_last,
                         "as_of": dataset.updated_at,
                     }
                 )
+                if kind == "bars":
+                    from .provider_display_snapshots import capture
+                    capture(db, result[-1])
                 cursors[interest.listener] = (new_last, dataset.revision)
                 cursors[interest.listener + ":at"] = dataset.updated_at
+    from .provider_display_snapshots import publish
+    from .provider_indicator_inputs import compute
+    for event in result:
+        publish(event)
+        frozen, meta = event.pop("_calculation", ([], {}))
+        for spec, inputs in frozen:
+            calculated = compute(inputs, meta, meta["id"], spec,
+                first=event["bars"][0]["start"], provisional=True)
+            if "presentation" in calculated:
+                calculated["presentation"] = calculated["presentation"] | {
+                    "history_revision": str(event["revision"]), "history_complete": True}
+            event["indicators"].append(calculated)
     return result
 
 

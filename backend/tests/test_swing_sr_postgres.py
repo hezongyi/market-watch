@@ -17,6 +17,7 @@ pytestmark = pytest.mark.skipif(not os.getenv("TEST_POSTGRES_URL"),
 @pytest.mark.parametrize("contract", [
     provider.test_four_swing_listeners_share_calculation_and_revision,
     worker.test_provider_swing_worker_uses_bar_revision_and_ignores_future_rows,
+    worker.test_provider_swing_cutoff_uses_source_time_not_daily_display_label,
     swing.test_provider_page_keeps_full_statistics_and_source_chart_labels,
     swing.test_fixed_history_job_presentation_is_full_origin_when_paging,
     swing.test_fixed_composite_preview_is_page_independent_and_never_persisted,

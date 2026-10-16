@@ -1,0 +1,265 @@
+name: market-watch
+x-app:
+  image: sha256:84e794d3321543bf8a073e537cbdc5c614b2af1d518f402a0955585ccedb5cb4
+  env_file: .env
+  environment:
+    ALERTS_YAHOO_ENABLED: 'true'
+    ALERTS_OANDA_ACQUISITION_MODE: stream
+    ALERTS_OANDA_REST_INTERVAL_SECONDS: '2'
+    ALERTS_DATABASE_POOL_SIZE: '2'
+    ALERTS_DATABASE_MAX_OVERFLOW: '0'
+    ALERTS_DATABASE_JIT: 'off'
+  restart: unless-stopped
+services:
+  migrate:
+    image: sha256:84e794d3321543bf8a073e537cbdc5c614b2af1d518f402a0955585ccedb5cb4
+    env_file: .env
+    environment:
+      ALERTS_YAHOO_ENABLED: 'true'
+      ALERTS_OANDA_ACQUISITION_MODE: stream
+      ALERTS_OANDA_REST_INTERVAL_SECONDS: '2'
+      ALERTS_DATABASE_POOL_SIZE: '2'
+      ALERTS_DATABASE_MAX_OVERFLOW: '0'
+      ALERTS_DATABASE_JIT: 'off'
+    restart: 'no'
+    command:
+    - alembic
+    - upgrade
+    - head
+  api:
+    image: sha256:84e794d3321543bf8a073e537cbdc5c614b2af1d518f402a0955585ccedb5cb4
+    env_file: .env
+    environment:
+      ALERTS_YAHOO_ENABLED: 'true'
+      ALERTS_COOKIE_SECURE: 'true'
+      ALERTS_OANDA_ACQUISITION_MODE: stream
+      ALERTS_OANDA_REST_INTERVAL_SECONDS: '2'
+      ALERTS_OANDA_STREAM_ENABLED: 'true'
+      ALERTS_DATABASE_POOL_SIZE: '2'
+      ALERTS_DATABASE_MAX_OVERFLOW: '0'
+      ALERTS_DATABASE_JIT: 'off'
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-api
+      ALERTS_HISTORY_HEALTH_WORKERS: '["history_versions","chart_history","native_history"]'
+    restart: unless-stopped
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/readyz',
+        timeout=3)
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+  realtime-worker:
+    image: sha256:84e794d3321543bf8a073e537cbdc5c614b2af1d518f402a0955585ccedb5cb4
+    env_file: .env
+    environment:
+      ALERTS_YAHOO_ENABLED: 'true'
+      ALERTS_DELIVERY_ENABLED: 'false'
+      ALERTS_OANDA_ACQUISITION_MODE: stream
+      ALERTS_OANDA_REST_INTERVAL_SECONDS: '2'
+      ALERTS_DATABASE_POOL_SIZE: '2'
+      ALERTS_DATABASE_MAX_OVERFLOW: '0'
+      ALERTS_DATABASE_JIT: 'off'
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-realtime
+    restart: unless-stopped
+    command:
+    - python
+    - -m
+    - alerts.realtime_worker
+    depends_on:
+      api:
+        condition: service_healthy
+  chart-history-worker:
+    image: sha256:84e794d3321543bf8a073e537cbdc5c614b2af1d518f402a0955585ccedb5cb4
+    env_file: .env
+    environment:
+      ALERTS_YAHOO_ENABLED: 'true'
+      ALERTS_DELIVERY_ENABLED: 'false'
+      ALERTS_DATABASE_POOL_SIZE: '2'
+      ALERTS_DATABASE_MAX_OVERFLOW: '0'
+      ALERTS_DATABASE_JIT: 'off'
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-history
+      ALERTS_OANDA_ACQUISITION_MODE: stream
+      ALERTS_OANDA_REST_INTERVAL_SECONDS: '2'
+    restart: unless-stopped
+    command:
+    - python
+    - -m
+    - alerts.chart_history_worker
+    depends_on:
+      api:
+        condition: service_healthy
+  chart-aggregation-worker:
+    image: sha256:84e794d3321543bf8a073e537cbdc5c614b2af1d518f402a0955585ccedb5cb4
+    env_file: .env
+    environment:
+      ALERTS_YAHOO_ENABLED: 'true'
+      ALERTS_DELIVERY_ENABLED: 'false'
+      ALERTS_DATABASE_POOL_SIZE: '2'
+      ALERTS_DATABASE_MAX_OVERFLOW: '0'
+      ALERTS_DATABASE_JIT: 'off'
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-aggregation
+      ALERTS_OANDA_ACQUISITION_MODE: stream
+      ALERTS_OANDA_REST_INTERVAL_SECONDS: '2'
+    restart: unless-stopped
+    command:
+    - python
+    - -m
+    - alerts.chart_aggregation_worker
+    depends_on:
+      api:
+        condition: service_healthy
+  native-history-worker:
+    image: sha256:84e794d3321543bf8a073e537cbdc5c614b2af1d518f402a0955585ccedb5cb4
+    env_file: .env
+    environment:
+      ALERTS_YAHOO_ENABLED: 'true'
+      ALERTS_DELIVERY_ENABLED: 'false'
+      ALERTS_DATABASE_POOL_SIZE: '2'
+      ALERTS_DATABASE_MAX_OVERFLOW: '0'
+      ALERTS_DATABASE_JIT: 'off'
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-native-history
+      ALERTS_OANDA_STREAM_ENABLED: 'true'
+      ALERTS_OANDA_ACQUISITION_MODE: stream
+      ALERTS_OANDA_REST_INTERVAL_SECONDS: '2'
+    restart: unless-stopped
+    command:
+    - python
+    - -m
+    - alerts.native_history_loads
+    depends_on:
+      api:
+        condition: service_healthy
+  history-worker:
+    image: sha256:84e794d3321543bf8a073e537cbdc5c614b2af1d518f402a0955585ccedb5cb4
+    env_file: .env
+    environment:
+      ALERTS_YAHOO_ENABLED: 'true'
+      ALERTS_DELIVERY_ENABLED: 'false'
+      ALERTS_DATABASE_POOL_SIZE: '2'
+      ALERTS_DATABASE_MAX_OVERFLOW: '0'
+      ALERTS_DATABASE_JIT: 'off'
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-history-versions
+      ALERTS_OANDA_ACQUISITION_MODE: stream
+      ALERTS_OANDA_REST_INTERVAL_SECONDS: '2'
+    restart: unless-stopped
+    command:
+    - python
+    - -m
+    - alerts.history_versions
+    - --without-composite-aggregates
+    depends_on:
+      api:
+        condition: service_healthy
+  composite-aggregate-worker:
+    image: sha256:84e794d3321543bf8a073e537cbdc5c614b2af1d518f402a0955585ccedb5cb4
+    env_file: .env
+    environment:
+      ALERTS_YAHOO_ENABLED: 'true'
+      ALERTS_DELIVERY_ENABLED: 'false'
+      ALERTS_DATABASE_POOL_SIZE: '2'
+      ALERTS_DATABASE_MAX_OVERFLOW: '0'
+      ALERTS_DATABASE_JIT: 'off'
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-composite
+      ALERTS_OANDA_ACQUISITION_MODE: stream
+      ALERTS_OANDA_REST_INTERVAL_SECONDS: '2'
+    restart: unless-stopped
+    command:
+    - python
+    - -m
+    - alerts.composite_aggregate_worker
+    depends_on:
+      api:
+        condition: service_healthy
+  pricing-worker:
+    image: sha256:84e794d3321543bf8a073e537cbdc5c614b2af1d518f402a0955585ccedb5cb4
+    env_file: .env
+    environment:
+      ALERTS_YAHOO_ENABLED: 'true'
+      ALERTS_DELIVERY_ENABLED: 'false'
+      ALERTS_OANDA_ACQUISITION_MODE: stream
+      ALERTS_OANDA_REST_INTERVAL_SECONDS: '2'
+      ALERTS_OANDA_STREAM_ENABLED: 'true'
+      ALERTS_OANDA_RESIDENT_SYMBOLS: EUR_USD,XAU_USD
+      ALERTS_DATABASE_POOL_SIZE: '2'
+      ALERTS_DATABASE_MAX_OVERFLOW: '0'
+      ALERTS_DATABASE_JIT: 'off'
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-pricing
+    restart: unless-stopped
+    command:
+    - python
+    - -m
+    - alerts.oanda_worker
+    depends_on:
+      api:
+        condition: service_healthy
+  market-stream-worker:
+    image: sha256:84e794d3321543bf8a073e537cbdc5c614b2af1d518f402a0955585ccedb5cb4
+    env_file: .env
+    environment:
+      ALERTS_YAHOO_ENABLED: 'true'
+      ALERTS_DELIVERY_ENABLED: 'false'
+      ALERTS_DATABASE_POOL_SIZE: '2'
+      ALERTS_DATABASE_MAX_OVERFLOW: '0'
+      ALERTS_DATABASE_JIT: 'off'
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-stream
+      ALERTS_OANDA_ACQUISITION_MODE: stream
+      ALERTS_OANDA_REST_INTERVAL_SECONDS: '2'
+    restart: unless-stopped
+    command:
+    - python
+    - -m
+    - alerts.market_stream_worker
+    depends_on:
+      api:
+        condition: service_healthy
+  notify-worker:
+    image: sha256:84e794d3321543bf8a073e537cbdc5c614b2af1d518f402a0955585ccedb5cb4
+    env_file: .env
+    environment:
+      ALERTS_YAHOO_ENABLED: 'true'
+      ALERTS_OANDA_ACQUISITION_MODE: stream
+      ALERTS_OANDA_REST_INTERVAL_SECONDS: '2'
+      ALERTS_DATABASE_POOL_SIZE: '2'
+      ALERTS_DATABASE_MAX_OVERFLOW: '0'
+      ALERTS_DATABASE_JIT: 'off'
+    restart: unless-stopped
+    command:
+    - python
+    - -m
+    - alerts.notify
+    depends_on:
+      api:
+        condition: service_healthy
+  web:
+    image: sha256:3f736ef2dd1fe7b739628729d967fa9f6d13e607431fdaa93189b3786fcebabb
+    ports:
+    - 192.168.7.33:18080:80
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+  chart-origin:
+    image: sha256:4b28398bdd0fe989464f9f90a26d9c8b45ea2ced53bc7daaeb7ee867e83d0683
+    ports:
+    - 192.168.7.33:18083:80
+    restart: unless-stopped
+  backup:
+    image: sha256:e88bdd4377e1f30bbaf839fdb17964d88b4a6aaf7dd5ef0af635d4a77ba8ab35
+    env_file: .env
+    environment:
+      ALERTS_POSTGRES_BIN_DIR: /usr/local/bin
+      ALERTS_DELIVERY_ENABLED: 'false'
+      ALERTS_YAHOO_ENABLED: 'true'
+      ALERTS_DATABASE_JIT: 'off'
+    volumes:
+    - /mnt/user/backup/market-watch:/backups
+    profiles:
+    - maintenance
+    restart: 'no'

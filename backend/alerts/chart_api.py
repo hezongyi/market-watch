@@ -115,6 +115,7 @@ class DataQuery(BaseModel):
     composite_revision_id: str | None = Field(default=None, max_length=36)
     input_revision: int | None = Field(default=None, ge=0)
     display_snapshot_id: str | None = Field(default=None, min_length=64, max_length=64)
+    provider_snapshot_id: str | None = Field(default=None, min_length=64, max_length=64, pattern=r"^[a-f0-9]+$")
     display_retry: dict[str, str] | None = Field(default=None, max_length=12)
     native_history: NativeHistory | None = None
     history_observation: HistoryObservation | None = None
@@ -143,6 +144,8 @@ class DataQuery(BaseModel):
 
     @model_validator(mode="after")
     def validate_managed_limit(self):
+        if self.provider_snapshot_id is not None and (self.series_kind != "provider" or self.native_history is not None):
+            raise ValueError("平台展示快照只适用于普通平台指标读取")
         if self.native_reserve is not None:
             if (self.series_kind != "provider" or self.native_history is None or
                     self.indicators or self.history_observation is not None or self.before is None):

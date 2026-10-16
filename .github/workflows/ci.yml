@@ -150,6 +150,16 @@ jobs:
           npm ci
           npm run build
 
+      - name: Indicator runtime regressions
+        working-directory: web
+        run: |
+          node tests/indicator-high-rate.cjs
+          node tests/indicator-high-rate.cjs --provider
+          node tests/indicator-shared-read.cjs
+          node tests/composite-display-batches.cjs
+          node tests/indicator-display-snapshot.cjs
+          node tests/indicator-snapshot-recovery.cjs
+
   compose:
     name: compose
     runs-on: ubuntu-24.04

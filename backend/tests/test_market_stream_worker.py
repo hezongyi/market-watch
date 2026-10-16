@@ -458,3 +458,30 @@ def test_published_stream_signal_uses_publication_evidence_without_scanning_stag
     assert original != corrected, "publication corrections remain a change trigger"
     assert not any("FROM candles" in sql for sql in statements), \
         "published stream freshness must not rescan raw staging history on every check"
+
+
+def test_provider_swing_cutoff_uses_source_time_not_daily_display_label(database, monkeypatch):
+    from alerts import market_stream_worker as worker
+    from alerts import provider_chart as upstream
+    from test_provider_cache import META, page, seed
+
+    # A live source candle can carry tomorrow's daily display date. Cached rows
+    # beginning after the observation clock remain outside this evaluation.
+    payload = page(1000, 15000)
+    for bar in payload['bars']:
+        bar['chart_time'] = bar['start'] + 20000
+    seed(META, 'D1', 35000, payload)
+    monkeypatch.setattr(upstream, 'metadata', lambda *_a, **_k: META)
+    monkeypatch.setattr(worker, 'now_ms', lambda: 10000)
+    owner = session(database)
+    query = DataQuery(instrument=META['id'], series_kind='provider', timeframe='D1',
+                      indicators=[{'name': 'SWING_SR_V1'}])
+    identity, serialized = resolve(Subscription(client='page', listener='daily', generation=1,
+                                               kind='bars', query=query))
+    stream.register(owner, 'page', 'daily', 1, identity, serialized, {})
+    result, _ = Calculator().build(stream.claim())
+    assert result['bars'][-1]['start'] == 10000
+    assert result['bars'][-1]['chart_time'] == 30000
+    display = result['indicators'][0]['presentation']
+    assert display['as_of_bar_time'] == 10000
+    assert display['as_of_chart_time'] == 30000

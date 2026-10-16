@@ -1,0 +1,51 @@
+# REST 原生 M1 订阅无法加载
+
+v1.25.7 已部署生产，生产采集仍为 stream。Ubuntu 独立生产副本运行 rest_batch 时，平台 EURUSD M1 首次加载失败，界面显示 `HISTORY_NO_PROGRESS`，无法开始 15 分钟观察。组合 M1 已开始真实更新，平台 M5/M15/M30/H1/H4/D1/W1/MN 浏览器加载通过；不能据此宣布 REST 迁移收口。
+
+## 复现与原因
+
+共享 REST 最新批量写入确认蜡烛的真实覆盖范围，形成中蜡烛不提供确认覆盖。当当前分钟已过去超过 freshness 容差，原生读取不接受相邻形成中柱作为可读尾部，随后进入 latest 取数。此时账号共享采集的门禁返回 HistoryPending，历史加载任务不执行分页，最终以未推进失败。
+
+使用固定时钟、真实 ProviderDataset/ProviderInterest 和 native 数据读取入口，新增回归在修复前为 3 failed / 1 passed，第一轮修复后为 4 passed；Spec 复核进一步发现等待共享刷新会被计为分页停滞，增加 durable load 多轮等待、恢复和到期回归。用例覆盖当前柱可读但覆盖不扩大、冷历史继续分页、过期最新数据仍等待账号采集，以及中间缺口必须经过真实历史分页。
+
+## 修复与边界
+
+真实浏览器随后暴露普通指标请求的同类问题：`native_history=null`、`firstDataRequest=false`、`before=forming.start+1` 走普通读取入口，虽有足够缓存，仍因形成中柱不在确认覆盖内重复拉取约 2,000 根，耗尽预算返回 503。固定时钟回归仅改变是否有 count/to 覆盖，得到 1 failed / 1 passed；普通读取现复用相邻形成中观测，不扩大覆盖。缺失预热前缀或真实中间缺口仍独立补历史；完整但过期的最新需求才等待共享采集。新增 native/ordinary/indicator/durable 回归合计 11 项通过。
+
+原生读取可以在确认覆盖末端读取相邻形成中蜡烛，但不扩大覆盖、不提升 complete。缺失的必需历史通过有界原生历史分页补齐；正常最新刷新仍由账号共享 worker 执行。数据已满足但最新观察过期时返回独立的 latest pending，不启动第二个 latest 轮询；持久加载任务按一秒退让等待，不累计分页停滞，原到期和消费者取消仍有效。
+
+F1：修改共享采集与原生历史的后台衔接；不改 schema、固定历史、账户或告警配置。最小检查：新增回归、provider cache/native history/REST worker 专项、真实 PG14、两轴 review，以及 Ubuntu 真实原生 M1 和组合长观察。生产启用 REST 必须等这些证据通过；v1.25.7 标签保持不变。
+
+## 2026-10-16：完整前缀成本与持续更新饥饿
+
+固定历史窗口、0.8 CPU 和 2/0 数据库池下，四路普通 M1/Supertrend 请求两轮均有两次 503；去掉指标则四路全部成功。实际只显示 2,000 根，每次却重新读取并计算约 102,806 根。独立 bridge/coordinator 回放中，12 次价格更新产生 12 次读取，更新持续期间零次指标应用。快照中提前写 accessed_at 还会持有数据集行锁；共享 worker 的指标计算原本也在该事务中。
+
+本轮补丁继续按 F1，保留固定计算起点和覆盖门禁：
+
+- API、共享 worker 和兼容 SSE 先冻结普通输入值，再释放连接计算。accessed_at 改为独立、节流、skip-locked 的可选写入。
+- 有界进程缓存复用确认检查点与输出；正常追加重放尾部，较早历史改动、回补和删除轮换 indicator_history_epoch。形成中预览不会污染确认状态，缓存丢失时可从原数据重建。
+- 平台价格页和 worker 结果携带 provider_snapshot_id。服务端使用现有 preferences 保存最多 2,048 个、120 秒有效的价格凭据，复制形成中尾柱；同 epoch 可重建当时输入，历史改动或到期明确要求重新读取价格。无需 schema 迁移，旧镜像可忽略新元数据和带命名空间的偏好项。
+- provider 复用展示批次合并后续更新，同时保留指标的版本校验；切换与修订仍隔离在途结果。高周期指标分页使用实际 chart_time 边界。
+- 修复高频回放 fixture，并把 provider/composite 进展、共享取消、快照恢复回归接入 web CI。
+
+最小验收仍为定向红绿回归、所有内置增量指标与 batch 差分、真实 PG14 的锁/连接/跨进程快照检查、原资源下固定 HTTP 四并发、真实 REST M1/Supertrend 至少 15 分钟、组合及原生 D1/W1/MN 坐标核对、独立 Standards/Spec review 和当前提交 CI。候选构建与真实浏览器结果另行记录；本段不代表已完成验收或生产切换。
+
+## 2026-10-16：Swing 与高周期时钟边界复核
+
+保留评估快照的因果截止，按来源 start 排除未来行。Swing 右侧确认窗口必须已经进入同一快照；普通历史翻页保持固定统计起点和快照末端，回放才按游标截断。NY17 当前 D1/W1/MN 的显示日期可能晚于 UTC 当前时刻，不能据此删去合法来源柱。worker、首次 ordinary/native 价格入口及展示凭据均采用分离的来源时钟与显示边界。当前高周期请求让 OANDA 选择截止点，历史分页继续使用明确 to，避免供应商时钟差导致 400。
+
+最终代码 `27c9dde`，Ubuntu r9 候选使用原 0.8 CPU / 1 GiB、数据库池 2/0 和 8 秒预算。定向套件 173 项通过，新的首次价格边界另在真实 PG14 跑 12 项通过。进程冷缓存四并发与重启后的混合启动四并发均 4/4 HTTP 200；D1/W1/MN 的真实 OANDA/API、价格快照绑定及浏览器实际坐标核对通过。最终长观察和 CI 归档见[验收记录](../verification/oanda-rest-native-fix-20261016/README.md)。本段不代表生产切换。
+
+## 2026-10-16：当前 intraday 请求的供应商时钟恢复
+
+r9 的平台和组合 M1/Supertrend 各完成约 16 分钟连续观察，期间零重载、空价格/指标和空白画面；但平台启动的原生 M1 任务曾失败，不能把整轮启动视为无错误。任务与 worker 日志关联到 OANDA HTTP400；独立 M1/M5/H1 探针 9 次中 8 次报 `Invalid value specified for 'to'. Time is in the future`。此前只对 D1/W1/MN 省略本机当前 to，遗漏了 intraday。
+
+修正将当前 count/latest 请求规则用于所有 OANDA 原生周期。跨秒排队仍可能让旧 to 早于本机时钟、晚于供应商时钟，因此仅在带 to 请求收到上述精确 HTTP400 时，使用原 deadline 无 to 重试一次；其它错误和第二次错误仍上抛。成功请求决定 count_latest/count_to 证据，原来源观察和显示边界继续过滤，所有 OANDA 周期的覆盖上界均不超过实际观察或合法末柱标签。历史正常翻页保留明确的来源游标，不以虚构覆盖或延长预算消除失败。
+
+新增固定时钟回归扩展前为 12 failed / 12 passed，另补冷缓存普通/native 入口跨秒、cached_page 排队、单次回退、非目标错误和预算不重置用例。新候选需独立启动检查和连续观察，本段不替代它们。
+
+独立复核还覆盖整分钟 `count=1` 交接：latest 返回的唯一柱可能恰好等于原排他截止，过滤后不能当成历史结束或扩大 before。仅在实际 count_latest 且尚未尝试该恢复时，允许同一原游标明确请求一次历史；仍不推进则失败。原 deadline、来源截止、显示截止和总页数预算不变。普通/native 冷加载、cached_page 排队及多页独立探针均通过；最终定向套件 134 项通过，Standards/Spec 无剩余阻塞。r10 未包含此最后交接修正，不作为最终验收候选。
+
+## 最终 Ubuntu 验收
+
+`b2f57f0` / clean r11 候选通过：当前代码 CI backend 2,495 passed / 11 skipped，web/compose 成功；定向 134 passed，真实 PG14 边界 16 passed；独立 Standards/Spec 无剩余阻塞。冷四并发与混合冷启动各 4/4 HTTP200，当前供源探针 18/18，通过 D1/W1/MN API和真实浏览器坐标核对。平台/组合 M1+Supertrend 各约16分钟，从启动到结束零应用/page/HTTP错误、零重载/空价格/空指标/空白采样，原资源下零OOM/restart。详细镜像、时段、样本及全部历史失败见[最终验收记录](../verification/oanda-rest-native-fix-20261016/README.md)。生产本轮未访问或切换。

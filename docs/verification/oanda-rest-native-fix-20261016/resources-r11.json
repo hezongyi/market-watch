@@ -1,0 +1,154 @@
+{
+  "sample_count": 41,
+  "first_sample_utc": "2026-10-16T05:36:01.949875+00:00",
+  "last_sample_utc": "2026-10-16T05:54:22.790734+00:00",
+  "oom_seen": false,
+  "restart_seen": false,
+  "services": {
+    "mw-v1257-restore-api-1": {
+      "sampled_peak_memory_percent": 72.4,
+      "sampled_peak_cpu_percent": 85.06,
+      "sampled_peak_memory": "741.4MiB / 1GiB"
+    },
+    "mw-v1257-restore-chart-aggregation-worker-1": {
+      "sampled_peak_memory_percent": 26.89,
+      "sampled_peak_cpu_percent": 36.43,
+      "sampled_peak_memory": "137.7MiB / 512MiB"
+    },
+    "mw-v1257-restore-pricing-worker-1": {
+      "sampled_peak_memory_percent": 12.11,
+      "sampled_peak_cpu_percent": 21.86,
+      "sampled_peak_memory": "124MiB / 1GiB"
+    },
+    "mw-v1257-restore-composite-aggregate-worker-1": {
+      "sampled_peak_memory_percent": 23.63,
+      "sampled_peak_cpu_percent": 41.35,
+      "sampled_peak_memory": "121MiB / 512MiB"
+    },
+    "mw-v1257-restore-market-stream-worker-1": {
+      "sampled_peak_memory_percent": 21.76,
+      "sampled_peak_cpu_percent": 60.63,
+      "sampled_peak_memory": "222.8MiB / 1GiB"
+    },
+    "mw-v1257-restore-native-history-worker-1": {
+      "sampled_peak_memory_percent": 22.43,
+      "sampled_peak_cpu_percent": 7.04,
+      "sampled_peak_memory": "114.8MiB / 512MiB"
+    },
+    "mw-v1257-restore-chart-history-worker-1": {
+      "sampled_peak_memory_percent": 20.67,
+      "sampled_peak_cpu_percent": 1.1,
+      "sampled_peak_memory": "105.8MiB / 512MiB"
+    },
+    "mw-v1257-restore-web-1": {
+      "sampled_peak_memory_percent": 4.54,
+      "sampled_peak_cpu_percent": 1.26,
+      "sampled_peak_memory": "5.816MiB / 128MiB"
+    },
+    "mw-v1257-restore-chart-origin-1": {
+      "sampled_peak_memory_percent": 8.69,
+      "sampled_peak_cpu_percent": 0.01,
+      "sampled_peak_memory": "11.12MiB / 128MiB"
+    },
+    "mw-v1257-restore-tls-1": {
+      "sampled_peak_memory_percent": 6.57,
+      "sampled_peak_cpu_percent": 1.55,
+      "sampled_peak_memory": "8.41MiB / 128MiB"
+    },
+    "mw-v1257-restore-postgres-1": {
+      "sampled_peak_memory_percent": 39.24,
+      "sampled_peak_cpu_percent": 100.75,
+      "sampled_peak_memory": "803.7MiB / 2GiB"
+    }
+  },
+  "final_states": [
+    {
+      "name": "mw-v1257-restore-api-1",
+      "image_id": "sha256:1250338b88de45f9392d0a638eaca13ff047ed23d8c882e8570065861844a277",
+      "status": "running",
+      "health": "healthy",
+      "oom": false,
+      "restarts": 0
+    },
+    {
+      "name": "mw-v1257-restore-chart-aggregation-worker-1",
+      "image_id": "sha256:1250338b88de45f9392d0a638eaca13ff047ed23d8c882e8570065861844a277",
+      "status": "running",
+      "health": null,
+      "oom": false,
+      "restarts": 0
+    },
+    {
+      "name": "mw-v1257-restore-pricing-worker-1",
+      "image_id": "sha256:1250338b88de45f9392d0a638eaca13ff047ed23d8c882e8570065861844a277",
+      "status": "running",
+      "health": null,
+      "oom": false,
+      "restarts": 0
+    },
+    {
+      "name": "mw-v1257-restore-composite-aggregate-worker-1",
+      "image_id": "sha256:1250338b88de45f9392d0a638eaca13ff047ed23d8c882e8570065861844a277",
+      "status": "running",
+      "health": null,
+      "oom": false,
+      "restarts": 0
+    },
+    {
+      "name": "mw-v1257-restore-market-stream-worker-1",
+      "image_id": "sha256:1250338b88de45f9392d0a638eaca13ff047ed23d8c882e8570065861844a277",
+      "status": "running",
+      "health": null,
+      "oom": false,
+      "restarts": 0
+    },
+    {
+      "name": "mw-v1257-restore-native-history-worker-1",
+      "image_id": "sha256:1250338b88de45f9392d0a638eaca13ff047ed23d8c882e8570065861844a277",
+      "status": "running",
+      "health": null,
+      "oom": false,
+      "restarts": 0
+    },
+    {
+      "name": "mw-v1257-restore-chart-history-worker-1",
+      "image_id": "sha256:1250338b88de45f9392d0a638eaca13ff047ed23d8c882e8570065861844a277",
+      "status": "running",
+      "health": null,
+      "oom": false,
+      "restarts": 0
+    },
+    {
+      "name": "mw-v1257-restore-web-1",
+      "image_id": "sha256:5d862a1163f56c9e1f0b030f3eed8ffa4ce85c42d38477a9550594cacc675058",
+      "status": "running",
+      "health": null,
+      "oom": false,
+      "restarts": 0
+    },
+    {
+      "name": "mw-v1257-restore-chart-origin-1",
+      "image_id": "sha256:3c1f28242a3b56921f6ec6068ba01310a0fc6af245c702dd1ee0d2d0c7db5205",
+      "status": "running",
+      "health": null,
+      "oom": false,
+      "restarts": 0
+    },
+    {
+      "name": "mw-v1257-restore-tls-1",
+      "image_id": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "status": "running",
+      "health": null,
+      "oom": false,
+      "restarts": 0
+    },
+    {
+      "name": "mw-v1257-restore-postgres-1",
+      "image_id": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "status": "running",
+      "health": "healthy",
+      "oom": false,
+      "restarts": 0
+    }
+  ]
+}

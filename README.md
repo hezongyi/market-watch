@@ -1,8 +1,8 @@
 # 守望 · Market Watch
 
-个人外汇、黄金和比特币监控网站。当前源码版本 **v1.25.7**，支持继承或按服务显式控制 PostgreSQL JIT，保留连接参数，统一 Ubuntu 验收 PG14.24 固定镜像并核验实际版本。见 [实施与验收](docs/pg-jit-policy-implementation-20261015.md) 和 [PR 复核](docs/pg-jit-pr65-review-20261015.md)。
+个人外汇、黄金和比特币监控网站。当前源码版本 **v1.25.8**，支持继承或按服务显式控制 PostgreSQL JIT，保留连接参数，统一 Ubuntu 验收 PG14.24 固定镜像并核验实际版本。见 [实施与验收](docs/pg-jit-policy-implementation-20261015.md) 和 [PR 复核](docs/pg-jit-pr65-review-20261015.md)。
 
-当前生产版本为 **v1.25.4**。已在 Unraid 正式切换并登录网页验收，EURUSD M1＋Python Supertrend 实际观察约 15 分 40 秒，0 reset、0 数据清空；录屏分析与适用边界见 [生产交付](docs/main-sse-reset-v1.25.4-production-delivery.md)。固定镜像、完整备份恢复校验及回滚记录见同文。
+当前生产版本为 **v1.25.7**，采集仍为 **stream**。代码升级、最终全库备份实际恢复、账户及业务指纹、生产 M1／Supertrend 观察已完成；REST 迁移仍待原生 M1 补丁及真实长观察验收。见 [生产交付](docs/oanda-rest-v1.25.7-production-delivery.md) 和 [补丁记录](docs/issues/oanda-rest-native-history-20261015.md)。
 
 v1.14.1 保留固定自建历史、实时接续组合及可审计修订；部署前需迁移至 `aq44_aggregation_service_order`，按发布身份执行覆盖 `--until-complete --verify`。应用回退及重新升级步骤见 [发布说明](docs/verification/issue-13/release-pr.md)；本次为源码发布。
 

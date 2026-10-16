@@ -512,3 +512,48 @@ def test_small_native_demand_materializes_bounded_rows_in_large_pg_cache(provide
     assert len(result['bars']) < 4000
     assert statements and all('LIMIT' in sql for sql, _ in statements)
     assert all(p['param_1'] < 4000 for _, p in statements if 'param_1' in p)
+
+
+def test_frozen_snapshot_does_not_lock_source_and_compute_holds_no_connection(provider_pg, monkeypatch):
+    from alerts import provider_indicator_inputs as engine
+    from alerts.chart_api import DataQuery
+    from test_provider_cache import seed
+
+    factory, pg = provider_pg
+    key = seed(META, 'M1', 1000000, page(0, 1000000, boundary=True))
+    body = DataQuery(instrument=META['id'], series_kind='provider', timeframe='M1',
+                     before=1000000, limit=200, indicators=[{'name': 'EMA', 'params': {'period': 10}}])
+    with cache.snapshot_transaction(key, 1000000, 200) as (db, visible):
+        visible['dataset_id'] = key
+        frozen = engine.freeze(db, visible, body, 2000)
+        with factory.begin() as writer:
+            writer.scalar(select(ProviderDataset).where(ProviderDataset.id == key).with_for_update(nowait=True))
+    assert pg.pool.checkedout() == 0
+    original = engine.IndicatorState.step
+    def step(self, row, **kwargs):
+        assert pg.pool.checkedout() == 0, 'numerical calculation must run after connection checkin'
+        return original(self, row, **kwargs)
+    monkeypatch.setattr(engine.IndicatorState, 'step', step)
+    engine.compute(frozen, META, META['id'], body.indicators[0], first=0, provisional=True)
+    assert pg.pool.checkedout() == 0
+
+
+def test_provider_snapshot_survives_cross_process_tail_revision(provider_pg, monkeypatch):
+    from alerts import provider_indicator_inputs as engine
+    from alerts.chart_api import DataQuery
+    from test_provider_cache import seed
+
+    _, pg = provider_pg
+    monkeypatch.setattr(upstream, 'metadata', lambda _: META)
+    seed(META, 'M1', 1000000, page(0, 1000000, boundary=True))
+    body = DataQuery(instrument=META['id'], series_kind='provider', timeframe='M1',
+                     before=1000000, limit=200)
+    prices = cache.data(body)
+    seed(META, 'M1', 1001000, page(999000, 1001000, close='2.8'))
+    engine._INPUTS.clear()
+    engine._RESULTS.clear()
+    result = cache.data(body.model_copy(update={'indicators': [{'name': 'EMA', 'params': {}}],
+        'provider_snapshot_id': prices['provider_snapshot_id']}))
+    assert result['bars'] == prices['bars']
+    assert result['cache_revision'] == prices['cache_revision']
+    assert pg.pool.checkedout() == 0

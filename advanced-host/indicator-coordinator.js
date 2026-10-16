@@ -71,7 +71,7 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
     const ticker=chart.symbol();
     const binding=identity.binding(chart.symbol(),scope.resolution);
     if(!binding)return;
-    if(consumer.retrySnapshot!==binding.displaySnapshot){consumer.displayRetry=null;consumer.failedRetry=null;consumer.retrySnapshot=binding.displaySnapshot;}
+    if(consumer.retrySnapshot!==(binding.displaySnapshot ?? binding.providerSnapshot)){consumer.displayRetry=null;consumer.failedRetry=null;consumer.retrySnapshot=binding.displaySnapshot ?? binding.providerSnapshot;}
     const nextIdentity=scopeIdentity(chart,scope,params,meta.version,binding);
     // A genuine input revision change withdraws dependent values before recompute.
     // A reset may remove/recreate the coordinator consumer while the adapter
@@ -96,7 +96,7 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
     if(!chart.dataReady())return;
     scope=results.scope(chart,consumer.id);if(!scope)return;
     consumer.generation=scope.generation;
-    const signature=JSON.stringify([scope.generation,nextIdentity,binding.inputRevision,scope.first,scope.last,scope.count,binding.tailVersion,binding.correctionVersion,binding.displaySnapshot,
+    const signature=JSON.stringify([scope.generation,nextIdentity,binding.inputRevision,scope.first,scope.last,scope.count,binding.tailVersion,binding.correctionVersion,binding.displaySnapshot,binding.providerSnapshot,
       inputs.showsignals,inputs.highlighting]);
     consumer.requested=signature;
     if(consumer.failedSignature===signature && consumer.retryAt>Date.now())return;
@@ -119,12 +119,12 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
     const requestBefore=prepend ? previous.sourceFirst ?? previous.first : binding.before ?? scope.last+1;
     const unchangedBinding=()=>{
       const latest=identity.binding(chart.symbol(),scope.resolution);
-      return latest && ['revision','inputRevision','tailVersion','correctionVersion','before','displaySnapshot'].every(key=>latest[key]===binding[key]) &&
+      return latest && ['revision','inputRevision','tailVersion','correctionVersion','before','displaySnapshot','providerSnapshot'].every(key=>latest[key]===binding[key]) &&
         (!binding.calculationStart || latest.calculationStart===binding.calculationStart);
     };
     const current=()=>!disposed && chart.symbol()===ticker && chart.resolution()===scope.resolution && consumers.get(consumer.key)===consumer &&
       results.scope(chart,consumer.id)?.generation===scope.generation && consumer.pending===signature && unchangedBinding();
-    const key=JSON.stringify([nextIdentity,binding.inputRevision,scope.first,scope.last,scope.count,binding.tailVersion,binding.correctionVersion,binding.displaySnapshot,
+    const key=JSON.stringify([nextIdentity,binding.inputRevision,scope.first,scope.last,scope.count,binding.tailVersion,binding.correctionVersion,binding.displaySnapshot,binding.providerSnapshot,
       inputs.showsignals,inputs.highlighting,requestFirst,requestBefore,consumer.displayRetry]);consumer.cacheKey=key;
     let cached=shared.get(key);
     if(!cached){
@@ -138,8 +138,9 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
           const page=await read(chart.symbol(),scope.resolution,{before,limit:2000,
             indicators:[{name:scope.name,params}],...binding.query,
             ...(consumer.displayRetry ? {display_retry:consumer.displayRetry} : {})},sharedCurrent,
-            JSON.stringify([binding.revision,binding.calculationStart,binding.inputRevision,binding.tailVersion,binding.correctionVersion,binding.displaySnapshot]));
+            JSON.stringify([binding.revision,binding.calculationStart,binding.inputRevision,binding.tailVersion,binding.correctionVersion,binding.displaySnapshot,binding.providerSnapshot]));
           if(binding.displaySnapshot && page.display_snapshot_id!==binding.displaySnapshot)return null;
+          if(binding.providerSnapshot && page.provider_snapshot_id!==binding.providerSnapshot)return null;
           const result=page.indicators?.find(item=>item.name===scope.name && canonical(item.params)===canonical(params));
           if(!result)throw Error('Python 指标结果未返回');
           // Fixed-result progress is keyed by run_id/id, not name. Different
@@ -187,11 +188,11 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
         sourceFirst:tail ? previous.sourceFirst : batch.rows.find(row=>row.time>=scope.first)?.sourceTime,
         correctionVersion:binding.correctionVersion,inputRevision:binding.inputRevision,tailVersion:binding.tailVersion};
       const accepted=await results.applyBatch(consumer.handle,{identity:consumer.handle.identity,
-        current,displaySnapshot:binding.displaySnapshot,
+        current,displaySnapshot:binding.displaySnapshot ?? binding.providerSnapshot,
         generation:consumer.handle.generation,sequence:++consumer.sequence,inputRevision:revision,
         kind:prepend?'prepend':tail?'append':'snapshot',rows:batch.rows,offsets,coverage});
       if(accepted){consumer.acceptedScope={...coverage,generation:consumer.handle.generation};
-        consumer.accepted=JSON.stringify([consumer.handle.generation,nextIdentity,binding.inputRevision,scope.first,scope.last,scope.count,binding.tailVersion,binding.correctionVersion,binding.displaySnapshot,inputs.showsignals,inputs.highlighting]);
+        consumer.accepted=JSON.stringify([consumer.handle.generation,nextIdentity,binding.inputRevision,scope.first,scope.last,scope.count,binding.tailVersion,binding.correctionVersion,binding.displaySnapshot,binding.providerSnapshot,inputs.showsignals,inputs.highlighting]);
         consumer.requested=consumer.accepted;
         consumer.failures=0;consumer.retryAt=0;consumer.displayRetry=null;consumer.failedRetry=null;status(consumer,'ready');
         for(const {page} of batch.pages)presentation(chart.symbol(),scope.resolution,{...page,indicators:[{name:scope.name,params,presentation:page.presentation}]});}
@@ -202,7 +203,7 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
         // indicator by silently substituting a newer snapshot under old prices.
         consumer.retryAt=Infinity;
         try {
-          await recover(chart.symbol(),scope.resolution,binding.displaySnapshot);
+          await recover(chart.symbol(),scope.resolution,binding.displaySnapshot ?? binding.providerSnapshot);
           consumer.retryAt=0;
         } catch(recoveryError) {
           if(current()){status(consumer,'error',recoveryError);report(recoveryError,consumer);}
@@ -307,7 +308,7 @@ function chartIndicatorReadBatch(read) {
             const next=await read(ticker,resolution,{...query,indicators:specs.slice(offset,offset+12)},alive);
             if(!page)page=next;
             else {
-              const revision=item=>JSON.stringify([item.input_revision,item.cache_revision,item.revision,item.calculation_origin,item.origin,item.display_snapshot_id]);
+              const revision=item=>JSON.stringify([item.input_revision,item.cache_revision,item.revision,item.calculation_origin,item.origin,item.display_snapshot_id,item.provider_snapshot_id]);
               if(revision(page)!==revision(next))throw Error('批量指标输入在读取期间改变，请重试');
               page={...page,indicators:[...(page.indicators || []),...(next.indicators || [])],
                 indicator_progress:[...(page.indicator_progress || []),...(next.indicator_progress || [])]};

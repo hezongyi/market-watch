@@ -80,13 +80,14 @@ def test_four_swing_listeners_share_calculation_and_revision(database, monkeypat
                    state["as_of"], [spec | {"id": listener}])
     seed(META, "M5", 12000, page(9000, 12000, close="4"))
     calls = []
-    calculate = service.calculate
+    from alerts import provider_indicator_inputs as inputs
+    calculate = inputs.calculate
 
     def counted(rows, spec, **kwargs):
         calls.append(spec)
         return calculate(rows, spec, **kwargs)
 
-    monkeypatch.setattr(service, "calculate", counted)
+    monkeypatch.setattr(inputs, "calculate", counted)
     cursors = {}
     events = service.events("swing", cursors)
     assert len(events) == 4

@@ -183,29 +183,38 @@ class Calculator:
                 with transaction() as db:
                     page = chart_data(db, query, realtime=self.buckets)
         elif query.series_kind == "provider":
-            from .chart_calculation_history import calculation_rows
-            from .chart_indicators import calculate
             from .provider_cache import snapshot_transaction
+            from .provider_display_snapshots import capture, publish
+            from .provider_history_policy import capacity
+            from .provider_indicator_inputs import compute, freeze
             from .provider_service import interest_id
-            from .storage import ProviderBar, ProviderInterest
-            with snapshot_transaction(identity["dataset_id"], now_ms() + 1, 2000) as (db, page):
+            from .storage import ProviderInterest
+
+            maximum = capacity() if query.indicators else 0
+            frozen = []
+            with snapshot_transaction(identity["dataset_id"], 2**63 - 1, 2000,
+                                      source_before=now_ms() + 1) as (db, page):
+                page["dataset_id"] = identity["dataset_id"]
+                dataset = db.get(ProviderDataset, identity["dataset_id"])
+                meta = dict(dataset.metadata_json)
                 interest = db.get(ProviderInterest, interest_id("stream_" + work["id"][:32], "shared"))
                 page["status"] = {"state": "error" if interest and interest.error else "ready",
                                   "error": "平台行情暂不可用，后台重试中" if interest and interest.error else None}
-                if query.indicators and page["bars"]:
-                    dataset = db.get(ProviderDataset, identity["dataset_id"])
-                    inputs = list(db.scalars(select(ProviderBar).where(
-                        ProviderBar.dataset_id == dataset.id,
-                        ProviderBar.chart_time <= page["bars"][-1].get("chart_time", page["bars"][-1]["start"]),
-                    ).order_by(ProviderBar.chart_time)))
-                    page["indicators"] = [calculate(calculation_rows(
-                        [r.payload for r in inputs if spec.get("calculation_origin") is None or
-                         r.start >= spec["calculation_origin"]], dataset.metadata_json, query.instrument),
-                        spec, provisional=query.provisional) for spec in query.indicators]
-                    for result in page["indicators"]:
-                        if "presentation" in result:
-                            result["presentation"] = result["presentation"] | {
-                                "history_revision": str(dataset.revision), "history_complete": True}
+                capture(db, page, full_series=False)
+                if page["bars"]:
+                    for spec in query.indicators:
+                        body = query.model_copy(update={"indicators": [spec],
+                            "calculation_origin": spec.get("calculation_origin", query.calculation_origin)})
+                        frozen.append((spec, freeze(db, page, body, maximum, evaluation_end=page["bars"][-1]["start"])))
+            publish(page)
+            page["indicators"] = []
+            for spec, inputs in frozen:
+                result = compute(inputs, meta, query.instrument, spec,
+                    first=page["bars"][0]["start"], provisional=query.provisional)
+                if "presentation" in result:
+                    result["presentation"] = result["presentation"] | {
+                        "history_revision": str(page["cache_revision"]), "history_complete": True}
+                page["indicators"].append(result)
         else:
             page = data_sync(query)
         self.signals[work["id"]] = signal_value

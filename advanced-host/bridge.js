@@ -263,6 +263,8 @@ function rememberIndicatorBinding(ticker,res,page,{correction=false}={}) {
     revision:page.revision_id ?? old.revision,
     inputRevision:page.input_revision ?? page.initial_input_revision ?? old.inputRevision,
     displaySnapshot:hasTail ? page.display_snapshot_id ?? old.displaySnapshot : old.displaySnapshot ?? page.display_snapshot_id,
+    providerSnapshot:hasTail ? page.provider_snapshot_id ?? old.providerSnapshot : old.providerSnapshot ?? page.provider_snapshot_id,
+    lastChartTime:hasTail ? latest.chart_time ?? latest.start : old.lastChartTime,
     // A main provider page's start follows the viewport. Only a Python result
     // may establish the calculation origin; later price pagination preserves it.
     calculationStart:provider && !page.indicators?.length ? old.calculationStart :
@@ -287,9 +289,10 @@ function startIndicatorCoordinator(catalog) {
         return {...base,revision:base.revision || (id.series_kind==='history'?id.symbol:
           id.series_kind==='managed'?'published:'+String(session?.revision):'provider:'+id.symbol),
           calculationStart:base.calculationStart ?? session?.start ?? 0,
-          before:Number.isFinite(base.lastStart) ? base.lastStart+1 : undefined,
+          before:Number.isFinite(base.lastChartTime ?? base.lastStart) ? (base.lastChartTime ?? base.lastStart)+1 : undefined,
           query:{...(base.revision && id.series_kind==='composite'?{composite_revision_id:base.revision}:{}),
             ...(base.displaySnapshot && id.series_kind==='composite'?{display_snapshot_id:base.displaySnapshot}:{}),
+            ...(base.providerSnapshot && id.series_kind==='provider'?{provider_snapshot_id:base.providerSnapshot}:{}),
             ...(id.series_kind==='provider' && base.calculationStart?{calculation_origin:base.calculationStart}:{}),
             ...(['managed','history','composite'].includes(id.series_kind) && base.firstStart>0 ? {dependency_before:base.firstStart}:{}),
             provisional:true}};
@@ -2628,7 +2631,8 @@ addEventListener("message", async (e) => {
       await recoverMarketBar(sub);
     } else if(event.type==='bars' && !sub.historical && !sub.needsHistoryReload) {
       const identity=decode(sub.symbol);
-      if(identity.series_kind==='composite' && !identity.spec && event.display_snapshot_id){
+      if(!identity.spec && (identity.series_kind==='composite' && event.display_snapshot_id ||
+          identity.series_kind==='provider' && event.provider_snapshot_id)){
         const generation=sub.marketGeneration;
         compositeDisplayBatches.enqueue(indicatorKey(sub.symbol,sub.res),sub,event,
           ()=>[...subscriptions.values()].includes(sub) && sub.marketGeneration===generation &&
@@ -2648,6 +2652,7 @@ addEventListener("message", async (e) => {
       providerHistoryState.set(key,{revision:event.revision||0,observed_at:event.as_of||0,
         cursor:Math.max(old?.cursor||0,event.cursor||0)});
     if(event.type==='reset') {
+      compositeDisplayBatches.cancel(indicatorKey(sub.symbol,sub.res));
       rememberIndicatorBinding(sub.symbol,sub.res,{...event,cache_revision:event.revision},{correction:true});
       await reviewProviderReset(sub,event).catch(error=>{
         if(error.code!=='HISTORY_CANCELLED') send({type:'error',error:'历史检查未完成：'+String(error)});
@@ -2661,6 +2666,13 @@ addEventListener("message", async (e) => {
       const rows=barsOf({bars:event.bars,indicators:event.indicators||[]},sub.res,sub.symbol);
       if (historyOlder({cache_revision:event.revision,as_of:event.as_of},old)) return;
       const identity=decode(sub.symbol);
+      if(!identity.spec && event.provider_snapshot_id){
+        const generation=sub.marketGeneration;
+        compositeDisplayBatches.enqueue(indicatorKey(sub.symbol,sub.res),sub,event,
+          ()=>[...subscriptions.values()].includes(sub) && sub.marketGeneration===generation &&
+            !sub.needsHistoryReload && !sub.historical);
+        return;
+      }
       if(identity.spec?.name==='SWING_SR_V1') {
         swingStore().publish(MWSeries.encode(identity.symbol,identity.series_kind),sub.res,event,swingStore().ticket());
         swingDisplay?.refresh();

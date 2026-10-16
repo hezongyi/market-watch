@@ -1,0 +1,148 @@
+{
+  "since_utc": "2026-10-16T00:22:07Z",
+  "services": {
+    "pricing-worker": {
+      "running": true,
+      "restarts": 0,
+      "oom_killed": false,
+      "traceback_count": 0,
+      "cancelled_error_count": 0,
+      "error_lines": 0,
+      "warning_lines": 4,
+      "upstream_failure_types": {
+        "ReadTimeout": 4
+      },
+      "http_status_counts": {}
+    },
+    "history-worker": {
+      "running": true,
+      "restarts": 0,
+      "oom_killed": false,
+      "traceback_count": 0,
+      "cancelled_error_count": 0,
+      "error_lines": 0,
+      "warning_lines": 0,
+      "upstream_failure_types": {},
+      "http_status_counts": {}
+    },
+    "realtime-worker": {
+      "running": true,
+      "restarts": 0,
+      "oom_killed": false,
+      "traceback_count": 0,
+      "cancelled_error_count": 0,
+      "error_lines": 0,
+      "warning_lines": 0,
+      "upstream_failure_types": {},
+      "http_status_counts": {}
+    },
+    "web": {
+      "running": true,
+      "restarts": 0,
+      "oom_killed": false,
+      "traceback_count": 0,
+      "cancelled_error_count": 0,
+      "error_lines": 0,
+      "warning_lines": 0,
+      "upstream_failure_types": {},
+      "http_status_counts": {
+        "200": 544,
+        "401": 2,
+        "499": 78
+      }
+    },
+    "native-history-worker": {
+      "running": true,
+      "restarts": 0,
+      "oom_killed": false,
+      "traceback_count": 0,
+      "cancelled_error_count": 0,
+      "error_lines": 0,
+      "warning_lines": 0,
+      "upstream_failure_types": {},
+      "http_status_counts": {}
+    },
+    "market-stream-worker": {
+      "running": true,
+      "restarts": 0,
+      "oom_killed": false,
+      "traceback_count": 0,
+      "cancelled_error_count": 0,
+      "error_lines": 0,
+      "warning_lines": 0,
+      "upstream_failure_types": {},
+      "http_status_counts": {}
+    },
+    "composite-aggregate-worker": {
+      "running": true,
+      "restarts": 0,
+      "oom_killed": false,
+      "traceback_count": 0,
+      "cancelled_error_count": 0,
+      "error_lines": 0,
+      "warning_lines": 0,
+      "upstream_failure_types": {},
+      "http_status_counts": {}
+    },
+    "chart-history-worker": {
+      "running": true,
+      "restarts": 0,
+      "oom_killed": false,
+      "traceback_count": 0,
+      "cancelled_error_count": 0,
+      "error_lines": 0,
+      "warning_lines": 0,
+      "upstream_failure_types": {},
+      "http_status_counts": {}
+    },
+    "notify-worker": {
+      "running": true,
+      "restarts": 0,
+      "oom_killed": false,
+      "traceback_count": 0,
+      "cancelled_error_count": 0,
+      "error_lines": 0,
+      "warning_lines": 0,
+      "upstream_failure_types": {},
+      "http_status_counts": {}
+    },
+    "chart-aggregation-worker": {
+      "running": true,
+      "restarts": 0,
+      "oom_killed": false,
+      "traceback_count": 0,
+      "cancelled_error_count": 0,
+      "error_lines": 0,
+      "warning_lines": 0,
+      "upstream_failure_types": {},
+      "http_status_counts": {}
+    },
+    "api": {
+      "running": true,
+      "restarts": 0,
+      "oom_killed": false,
+      "traceback_count": 8,
+      "cancelled_error_count": 8,
+      "error_lines": 8,
+      "warning_lines": 0,
+      "upstream_failure_types": {},
+      "http_status_counts": {
+        "200": 564,
+        "401": 2
+      }
+    },
+    "chart-origin": {
+      "running": true,
+      "restarts": 0,
+      "oom_killed": false,
+      "traceback_count": 0,
+      "cancelled_error_count": 0,
+      "error_lines": 0,
+      "warning_lines": 0,
+      "upstream_failure_types": {},
+      "http_status_counts": {
+        "200": 336
+      }
+    }
+  }
+}

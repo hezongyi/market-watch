@@ -229,6 +229,28 @@ def _request(client, url, *, params, headers=None, deadline):
     raise RuntimeError("平台请求重试耗尽")
 
 
+def _oanda_candles(client, symbol, params, deadline):
+    url = f"https://api-fxpractice.oanda.com/v3/instruments/{symbol}/candles"
+    headers = {"Authorization": "Bearer " + settings.oanda_token, "Accept-Datetime-Format": "UNIX"}
+    try:
+        return _request(client, url, params=params, headers=headers, deadline=deadline), (
+            "count_to" if "to" in params else "count_latest")
+    except httpx.HTTPStatusError as exc:
+        if exc.response.status_code != 400 or "to" not in params:
+            raise
+        try:
+            body = exc.response.json()
+        except ValueError:
+            raise exc from None
+        if not isinstance(body, dict) or body.get("errorMessage") != "Invalid value specified for 'to'. Time is in the future":
+            raise
+    # A queued current cursor can become past locally while still being future
+    # to OANDA. Retry only this explicit rejection, within the original budget;
+    # native_page retains both original source and display cutoffs.
+    return _request(client, url, params={k: v for k, v in params.items() if k != "to"},
+                    headers=headers, deadline=deadline), "count_latest"
+
+
 def _end(start, frame, calendar):
     moment = instant(start)
     zone = ZoneInfo("America/New_York") if calendar == "ny17" else UTC
@@ -254,8 +276,15 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
     client = client or pooled_client(source)
     rows = []
     # Buffer only translates session timestamps to exclusive trading-date labels.
-    cursor = min(now_ms() + 1, before + (2 * 86400000 if frame in ("D1", "W1", "MN") else 0))
+    observed = now_ms()
+    if source == "oanda":
+        from .provider_cache import SOURCE_BEFORE
+        if SOURCE_BEFORE.get() is not None:
+            observed = min(observed, SOURCE_BEFORE.get() - 1)
+    high_period = frame in ("D1", "W1", "MN")
+    cursor = min(observed + 1, before + (2 * 86400000 if high_period else 0))
     boundary = False
+    force_cursor = False
     for _ in range(8):
         # Optional bars can fill this mandatory HTTP request, but never extend
         # the loop. High-period translation/filtering still stops at count.
@@ -268,22 +297,14 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
             native = parameters(meta)
             if not settings.oanda_token:
                 raise ValueError("OANDA认证未配置")
-            payload = _request(
-                client,
-                f"https://api-fxpractice.oanda.com/v3/instruments/{meta['symbol']}/candles",
-                params={
-                    "granularity": OANDA_FRAMES[frame],
-                    **native,
-                    "smooth": str(native["smooth"]).lower(),
-                    "count": batch_count,
-                    "to": str(Decimal(cursor) / 1000),
-                },
-                headers={
-                    "Authorization": "Bearer " + settings.oanda_token,
-                    "Accept-Datetime-Format": "UNIX",
-                },
-                deadline=deadline,
-            )
+            payload, request_mode = _oanda_candles(client, meta['symbol'], {
+                "granularity": OANDA_FRAMES[frame],
+                **native,
+                "smooth": str(native["smooth"]).lower(),
+                "count": batch_count,
+                # A current cutoff belongs to the supplier's clock.
+                **({} if cursor >= observed and not force_cursor else {"to": str(Decimal(cursor) / 1000)}),
+            }, deadline)
             candles = payload["candles"]
             batch = []
             for candle in candles:
@@ -329,13 +350,21 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
             ]
         boundary = len(batch) < batch_count
         rows = sorted(
-            {b["start"]: b for b in batch + rows if b["chart_time"] < before}.values(),
+            {b["start"]: b for b in batch + rows
+             if b["chart_time"] < before and (source != "oanda" or b["start"] <= observed)}.values(),
             key=lambda b: b["start"],
         )
         if boundary or len(rows) >= count:
             break
         next_cursor = min(b["start"] for b in batch)
         if next_cursor >= cursor:
+            if source == "oanda" and request_mode == "count_latest" and not force_cursor:
+                # Latest may cross a candle boundary while the request is in
+                # flight. Its first candle can equal the exclusive cursor and
+                # be filtered; the supplier has now reached that cursor, so
+                # try its original historical cutoff once, without moving it.
+                force_cursor = True
+                continue
             raise ValueError("平台分页未推进")
         cursor = next_cursor
     else:
@@ -343,14 +372,16 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
     visible = rows[-(count + optional):]
     exhausted = boundary and len(rows) <= count + optional
     proven_start = 0 if exhausted else visible[0]["chart_time"] if visible else before
+    proven_end = (min(before, max(observed + 1, visible[-1]["chart_time"] + 1 if visible else 0))
+                  if source == "oanda" else before)
     return {
         "bars": visible,
         "has_more": not boundary or len(rows) > count,
         "history_boundary": exhausted,
-        "coverage": [[proven_start, before]] if proven_start < before else [],
+        "coverage": [[proven_start, proven_end]] if proven_start < proven_end else [],
         "boundary_evidence": {
             "source": source,
-            "mode": "count_to",
+            "mode": request_mode if source == "oanda" else "count_to",
             "returned": len(batch),
             "requested": batch_count,
         }
