@@ -831,7 +831,9 @@ def data(body):
     now = (now_ms() // 1000 + 1) * 1000
     # Native to can include the chart's future right margin. It is exclusive;
     # never ask for/cache proof of future provider data.
-    before = min(body.before or now, now)
+    # A trusted price credential already bounds the admitted source inputs.
+    # Its D/W/M chart label can be later than the wall clock.
+    before = (body.before or now) if body.provider_snapshot_id else min(body.before or now, now)
     if body.native_reserve is not None:
         if body.timeframe not in upstream.FRAMES:
             raise ValueError("无效平台周期")

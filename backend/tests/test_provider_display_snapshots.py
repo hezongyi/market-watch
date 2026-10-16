@@ -56,3 +56,28 @@ def test_snapshot_expiry_and_capacity_are_bounded(database, monkeypatch):
             Preference.key.startswith(snapshots.PREFIX))) == 3
     with pytest.raises(DisplaySnapshotError):
         read(indicators=[SPEC], provider_snapshot_id=first)
+
+
+@pytest.mark.parametrize('frame', ['D1', 'W1', 'MN'])
+@pytest.mark.parametrize('spec', [{'name': 'EMA', 'params': {'period': 2}}, {'name': 'SWING_SR_V1'}])
+def test_snapshot_accepts_future_display_label_for_admitted_source_candle(database, monkeypatch, frame, spec):
+    from alerts import provider_display_snapshots as snapshots
+    payload = page(1000, 15000)
+    for bar in payload['bars']:
+        bar['chart_time'] = bar['start'] + 20000
+    key = seed(META, frame, 35000, payload)
+    monkeypatch.setattr(upstream, 'metadata', lambda _: META)
+    monkeypatch.setattr(cache, 'now_ms', lambda: 10000)
+    monkeypatch.setattr(snapshots, 'now_ms', lambda: 10000)
+    with cache.snapshot_transaction(key, 35000, 200, source_before=10001) as (db, price):
+        price['dataset_id'] = key
+        snapshots.capture(db, price, full_series=False)
+    snapshots.publish(price)
+    result = cache.data(DataQuery(instrument=META['id'], series_kind='provider', timeframe=frame,
+        before=30001, limit=200, indicators=[spec], provider_snapshot_id=price['provider_snapshot_id']))
+    assert result['bars'] == price['bars']
+    assert result['bars'][-1]['start'] == 10000
+    assert result['bars'][-1]['chart_time'] == 30000
+    assert all(series['values'][-1]['time'] == 10000 for series in result['indicators'][0]['series'])
+    if spec['name'] == 'SWING_SR_V1':
+        assert result['indicators'][0]['presentation']['as_of_bar_time'] == 10000
