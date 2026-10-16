@@ -646,3 +646,53 @@ def test_successful_quote_page_cache_uses_actual_observation_identity(monkeypatc
     first = provider_chart.cached_page({**meta, "source_identity": identity}, "M1", 100000, 1, quote=True)
     second = provider_chart.cached_page({**meta, "source_identity": {**identity, "account_scope": "account-b"}}, "M1", 100000, 1, quote=True)
     assert len(calls) == 2 and first["bars"] != second["bars"]
+
+
+@pytest.mark.parametrize('frame', ['D1', 'W1', 'MN'])
+def test_oanda_current_high_period_uses_supplier_clock_and_source_cutoff(monkeypatch, frame):
+    from decimal import Decimal
+
+    monkeypatch.setattr(settings, 'oanda_token', 'test-only')
+    observed = stamp('2026-10-16T03:00:00+00:00')
+    monkeypatch.setattr(provider, 'now_ms', lambda: observed)
+    starts = {
+        'D1': stamp('2026-10-15T21:00:00+00:00'),
+        'W1': stamp('2026-10-11T21:00:00+00:00'),
+        'MN': stamp('2026-09-30T21:00:00+00:00'),
+    }
+    calls = []
+
+    def handle(request):
+        params = request.url.params
+        calls.append(dict(params))
+        # The supplier clock is 500 ms behind this process. A local-now `to`
+        # is rejected even though requesting the latest candles is valid.
+        if 'to' in params and Decimal(params['to']) * 1000 > observed - 500:
+            return httpx.Response(400, json={'errorMessage': "Invalid value specified for 'to'. Time is in the future"})
+        return httpx.Response(200, json={'candles': [
+            {'time': str(Decimal(start) / 1000), 'complete': False,
+             'bid': {'o': '1', 'h': '2', 'l': '1', 'c': '1.5'}}
+            for start in [starts[frame], observed + 60000]
+        ]})
+
+    with httpx.Client(transport=httpx.MockTransport(handle)) as client:
+        page = provider.native_page(META, frame, observed, 5, client=client)
+    assert len(calls) == 1 and 'to' not in calls[0]
+    assert [bar['start'] for bar in page['bars']] == [starts[frame]]
+
+
+def test_oanda_historical_high_period_keeps_exclusive_source_cursor(monkeypatch):
+    from decimal import Decimal
+
+    monkeypatch.setattr(settings, 'oanda_token', 'test-only')
+    observed = stamp('2026-10-16T03:00:00+00:00')
+    before = stamp('2026-09-01T00:00:00+00:00')
+    monkeypatch.setattr(provider, 'now_ms', lambda: observed)
+
+    def handle(request):
+        assert Decimal(request.url.params['to']) * 1000 == before + 2 * 86400000
+        return httpx.Response(200, json={'candles': []})
+
+    with httpx.Client(transport=httpx.MockTransport(handle)) as client:
+        page = provider.native_page(META, 'MN', before, 5, client=client)
+    assert page['bars'] == []

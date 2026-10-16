@@ -254,7 +254,9 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
     client = client or pooled_client(source)
     rows = []
     # Buffer only translates session timestamps to exclusive trading-date labels.
-    cursor = min(now_ms() + 1, before + (2 * 86400000 if frame in ("D1", "W1", "MN") else 0))
+    observed = now_ms()
+    high_period = frame in ("D1", "W1", "MN")
+    cursor = min(observed + 1, before + (2 * 86400000 if high_period else 0))
     boundary = False
     for _ in range(8):
         # Optional bars can fill this mandatory HTTP request, but never extend
@@ -276,7 +278,10 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
                     **native,
                     "smooth": str(native["smooth"]).lower(),
                     "count": batch_count,
-                    "to": str(Decimal(cursor) / 1000),
+                    # Let OANDA choose its current cutoff. A local-now `to`
+                    # can be rejected when its clock is slightly behind ours.
+                    **({} if high_period and cursor >= observed else
+                       {"to": str(Decimal(cursor) / 1000)}),
                 },
                 headers={
                     "Authorization": "Bearer " + settings.oanda_token,
@@ -329,7 +334,8 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
             ]
         boundary = len(batch) < batch_count
         rows = sorted(
-            {b["start"]: b for b in batch + rows if b["chart_time"] < before}.values(),
+            {b["start"]: b for b in batch + rows
+             if b["chart_time"] < before and (source != "oanda" or b["start"] <= observed)}.values(),
             key=lambda b: b["start"],
         )
         if boundary or len(rows) >= count:
@@ -350,7 +356,7 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
         "coverage": [[proven_start, before]] if proven_start < before else [],
         "boundary_evidence": {
             "source": source,
-            "mode": "count_to",
+            "mode": "count_latest" if source == "oanda" and high_period and cursor >= observed else "count_to",
             "returned": len(batch),
             "requested": batch_count,
         }
