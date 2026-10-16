@@ -86,3 +86,35 @@ def test_missing_minutes_require_a_real_history_page(database, monkeypatch):
         cache.data(query())
     with database.begin() as db:
         assert db.get(ProviderDataset, key).coverage == [[0, 480000]]
+
+
+def test_durable_load_waits_for_shared_refresh_and_keeps_its_deadline(database, monkeypatch):
+    from alerts import native_history_loads as loads
+    from alerts.storage import NativeHistoryLoad
+    key = own(database, monkeypatch, stale=True)
+    clock = [NOW]
+    monkeypatch.setattr(cache, 'now_ms', lambda: clock[0])
+    monkeypatch.setattr(loads, 'now_ms', lambda: clock[0])
+    monkeypatch.setattr(upstream, 'native_page', lambda *a, **kw: pytest.fail('shared refresh must not fall back to polling'))
+    ident = loads.submit('owner', 'shared-refresh', query())['load']['id']
+    for _ in range(4):
+        assert loads.once()
+        state = loads.status('owner', ident)
+        assert state['state'] == 'waiting' and state['error'] is None
+        with database.begin() as db:
+            row = db.get(NativeHistoryLoad, ident)
+            assert row.stalls == 0
+            assert row.lease_until > clock[0], 'waiting must yield instead of tight polling'
+        clock[0] += 1000
+    with database.begin() as db:
+        db.get(ProviderDataset, key).latest_at = clock[0]
+    assert loads.once()
+    assert loads.status('owner', ident)['state'] == 'ready'
+    assert len(loads.result('owner', ident)['result']['bars']) >= 5
+    with database.begin() as db:
+        db.get(ProviderDataset, key).latest_at = clock[0] - 20000
+    expired = loads.submit('owner', 'expired-refresh', query())['load']['id']
+    with database.begin() as db:
+        db.get(NativeHistoryLoad, expired).deadline = clock[0] - 1
+    assert not loads.once()
+    assert loads.status('owner', expired)['state'] == 'expired'

@@ -194,11 +194,14 @@ def once():
                 NativeHistoryLoad.consumer_until > now_ms(), NativeHistoryLoad.deadline > now_ms())))
     progress = {"attempts": 0, "pages": 0, "advanced": False}
     state, failure = "waiting", None
+    waiting_latest = False
     try:
         if pages >= settings.native_history_task_pages:
             try:
                 read_cached(DataQuery.model_validate(query))
                 state = "ready"
+            except cache.LatestObservationPending:
+                raise
             except cache.HistoryPending:
                 raise CapacityExceeded("历史分页超过任务预算，请减小跨度") from None
         else:
@@ -207,6 +210,8 @@ def once():
             with read_context("step", time.monotonic()+settings.provider_request_seconds, progress, valid), lane("chart"):
                 cache.data(DataQuery.model_validate(query))
             state = "ready"
+    except cache.LatestObservationPending:
+        state, waiting_latest = "waiting", True
     except cache.HistoryPending:
         state = "waiting"
         if not progress["advanced"] and stalls >= 2:
@@ -223,8 +228,10 @@ def once():
         db.execute(update(NativeHistoryLoad).where(
             NativeHistoryLoad.id == ident, NativeHistoryLoad.generation == generation,
             NativeHistoryLoad.state == "filling", NativeHistoryLoad.lease_until > now_ms())
-            .values(state=state, error_json=failure, lease_until=0, pages=pages+progress["pages"],
-                    stalls=0 if progress["advanced"] else stalls+1))
+            .values(state=state, error_json=failure,
+                    lease_until=now_ms()+1000 if waiting_latest else 0,
+                    pages=pages+progress["pages"],
+                    stalls=0 if progress["advanced"] else stalls if waiting_latest else stalls+1))
     return True
 
 

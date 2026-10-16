@@ -43,6 +43,10 @@ class HistoryPending(Exception):
     """Coverage needs additional committed pages; never a history boundary."""
 
 
+class LatestObservationPending(HistoryPending):
+    """Wait for the account collector without declaring historical pagination stalled."""
+
+
 def rest_batch_owner_active(key):
     """Whether an OANDA latest demand is owned by the account worker."""
     if settings.oanda_acquisition_mode != "rest_batch":
@@ -55,7 +59,7 @@ def rest_batch_owner_active(key):
         )) is not None
 
 
-def rest_forming_tail(state, before):
+def readable_preceding_range(state, before):
     """Read an adjacent forming candle without promoting it to query coverage."""
     preceding = state["preceding"]
     bars = state["bars"]
@@ -453,7 +457,7 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
 def fetch_page(key, meta, frame, before, count, deadline, *, kind="chart", latest=False,
                optional=0, revalidate=False):
     if latest and meta["source"] == "oanda" and rest_batch_owner_active(key):
-        raise HistoryPending()
+        raise LatestObservationPending()
     progress = PAGE_PROGRESS.get()
     if READ_MODE.get() == "cache" or READ_MODE.get() == "step" and progress and progress["attempts"] >= 1:
         raise HistoryPending()
@@ -678,8 +682,8 @@ def _native_read(meta, body, before, count, prefix, latest, on_ready=None):
             connected = state["interval"]
             recent_tail = (latest and state["preceding"] and
                            before - state["preceding"][1] <= fresh_seconds(meta["source"]) * 1000)
-            observed_tail = rest_forming_tail(state, before) if shared_latest else None
-            readable = connected or observed_tail or (state["preceding"] if recent_tail else None)
+            observed_range = readable_preceding_range(state, before) if shared_latest else None
+            readable = connected or observed_range or (state["preceding"] if recent_tail else None)
             range_done = from_time is None or state["window_limit"] or bool(readable and readable[0] <= from_time)
             boundary = state["history_boundary"] or state["window_limit"]
             mandatory_done = bool(readable and range_done and
@@ -717,7 +721,7 @@ def _native_read(meta, body, before, count, prefix, latest, on_ready=None):
                 return page
         if shared_latest and mandatory_done:
             # Only the account worker refreshes a complete live demand.
-            raise HistoryPending()
+            raise LatestObservationPending()
         observation_progress = (state["interval"], state["available_count"], state["latest_at"], state["cache_revision"])
         no_progress = no_progress + 1 if observation_progress == previous else 0
         previous = observation_progress
