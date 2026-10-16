@@ -3,21 +3,21 @@
    before headerReady and on every list rebuild. Gate the name at first paint;
    the adapter releases human names in a mutation microtask. Never hide prices
    or rewrite React's text nodes/series identities. Applies to every source. */
-[data-test-id-widget-type="watchlist"] [data-symbol-full]:not([data-mw-name-ready="true"]) [class*="symbolNameText-"] {
+:root:not([data-mw-watchlist-fallback="true"]) [data-test-id-widget-type="watchlist"] [data-symbol-full]:not([data-mw-name-ready="true"]) [class*="symbolNameText-"] {
   position: relative;
   visibility: hidden;
 }
-[data-test-id-widget-type="watchlist"] [data-symbol-full]:not([data-mw-name-ready="true"]) [class*="symbolNameText-"]::after {
+:root:not([data-mw-watchlist-fallback="true"]) [data-test-id-widget-type="watchlist"] [data-symbol-full]:not([data-mw-name-ready="true"]) [class*="symbolNameText-"]::after {
   content: "加载中…";
   position: absolute;
   left: 0;
   visibility: visible;
 }
-[data-test-id-widget-type="watchlist"] [data-symbol-full][data-status="error"]:not([data-mw-name-ready="true"]) [class*="symbolNameText-"]::after {
+:root:not([data-mw-watchlist-fallback="true"]) [data-test-id-widget-type="watchlist"] [data-symbol-full][data-status="error"]:not([data-mw-name-ready="true"]) [class*="symbolNameText-"]::after {
   content: "不可用";
 }
 /* Use already resolved metadata immediately, even before a quote exists. */
-[data-test-id-widget-type="watchlist"] [data-symbol-full]:not([data-mw-name-ready="true"]) [class*="symbolNameText-"][data-mw-display-name]::after {
+:root:not([data-mw-watchlist-fallback="true"]) [data-test-id-widget-type="watchlist"] [data-symbol-full]:not([data-mw-name-ready="true"]) [class*="symbolNameText-"][data-mw-display-name]::after {
   content: attr(data-mw-display-name);
 }
 /* Reserve a header slot through the supported custom_css_url integration.
@@ -272,4 +272,23 @@ html.theme-dark [data-symbol-full][data-active="true"] > [class*="indicators-"]:
   .mw-setting-controls { gap:8px; flex-wrap:wrap; }
   .mw-native-select>[role="combobox"] { width:152px; }
   .mw-range-preview { margin-left:80px; }
+}
+
+/* Paint only the raised digit; native quote nodes and their full text stay
+   untouched for React updates, clipboard, sorting and accessibility. */
+[data-test-id-widget-type="watchlist"] [data-mw-price-digit] { position: relative; }
+[data-test-id-widget-type="watchlist"] [data-mw-price-digit]::after {
+  content: attr(data-mw-price-digit) / "";
+  position: absolute;
+  left: var(--mw-digit-left);
+  top: var(--mw-digit-top);
+  width: var(--mw-digit-width);
+  height: var(--mw-digit-height);
+  box-sizing: border-box;
+  background: var(--mw-digit-background);
+  color: var(--mw-digit-color);
+  font-size: var(--mw-digit-size);
+  line-height: 1;
+  text-align: center;
+  pointer-events: none;
 }

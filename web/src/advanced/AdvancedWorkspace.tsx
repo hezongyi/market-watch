@@ -730,25 +730,34 @@ export default function AdvancedWorkspace() {
           };
           const entries: [string, Record<string, unknown>][] = [];
           let cursor = 0;
+          // One budget for the whole optional prewarm, rather than four
+          // seconds for each successive batch of four stale identities.
+          const controller = new AbortController();
+          let timeout: number | undefined;
+          const deadline = new Promise<void>((resolve) => {
+            timeout = window.setTimeout(() => { controller.abort(); resolve(); }, 4000);
+          });
           const worker = async () => {
-            while (cursor < tickers.length) {
+            while (cursor < tickers.length && !controller.signal.aborted) {
               const ticker = tickers[cursor++];
-              let timeout: number | undefined;
               try {
-                const controller = new AbortController();
-                timeout = window.setTimeout(() => controller.abort(), 4000);
                 const metadata = await api<Record<string, unknown>>(
                   "/market-data/resolve",
                   { ...decodeWatchlistTicker(ticker), timeframe: "M1" },
                   controller.signal,
                 );
-                entries.push([ticker, metadata]);
+                if (!controller.signal.aborted) entries.push([ticker, metadata]);
               } catch (_) {
                 // A stale list entry must keep its native fallback behavior.
-              } finally { if (timeout !== undefined) window.clearTimeout(timeout); }
+              }
             }
           };
-          await Promise.all(Array.from({ length: Math.min(4, tickers.length) }, worker));
+          try {
+            await Promise.race([
+              Promise.all(Array.from({ length: Math.min(4, tickers.length) }, worker)),
+              deadline,
+            ]);
+          } finally { window.clearTimeout(timeout); }
           historyCapabilities.current = capabilities;
           reply({
             type: "init",

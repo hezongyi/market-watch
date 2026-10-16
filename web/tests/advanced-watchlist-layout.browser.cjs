@@ -17,7 +17,10 @@ const path = require('node:path');
       <div data-symbol-full="MWP:EURUSD"><span class="cell-test last-test"><span class="inner-test">1.12<span class="uptick-test">234</span></span></span></div>
       </div>
     </div>`);
+    await page.route('**/indicator-picker.css', route => route.fulfill({body:''}));
+    await page.addStyleTag({path:path.resolve(__dirname, '../../advanced-host/chart-menu.css')});
     await page.evaluate(() => {
+      window.nativeText = document.querySelector('.uptick-test').firstChild;
       const NativeObserver = MutationObserver;
       window.observerCalls = 0;
       window.MutationObserver = class extends NativeObserver {
@@ -49,19 +52,31 @@ const path = require('node:path');
     assert.ok(await page.evaluate(() => observerCalls <= 2),
       'numeric quotes must settle; the adapter must not observe its own changes forever');
     const read = () => page.locator('.last-test').evaluate(cell => ({
-      text:cell.textContent,raw:cell.dataset.mwRawPrice,sup:cell.querySelector('sup')?.textContent,
+      text:cell.textContent,raw:cell.dataset.mwRawPrice,digit:cell.dataset.mwPriceDigit,
       count:cell.querySelectorAll('sup').length,aria:cell.getAttribute('aria-label'),
     }));
-    assert.deepEqual(await read(), {text:'1.12234',raw:'1.12234',sup:'4',count:1,aria:'1.12234'});
+    assert.deepEqual(await read(), {text:'1.12234',raw:'1.12234',digit:'4',count:0,aria:'1.12234'});
     await page.evaluate(() => { layout.refresh(); layout.refresh(); });
     assert.equal((await read()).text, '1.12234', 'repeated refresh preserves every digit');
+    await page.evaluate(() => { nativeText.data = '250'; });
+    await page.waitForTimeout(50);
+    assert.equal(await page.evaluate(() => nativeText.isConnected),true,'original React Text remains connected');
+    assert.deepEqual(await read(), {text:'1.12250',raw:'1.12250',digit:'0',count:0,aria:'1.12250'});
     await page.evaluate(() => { document.querySelector('.last-test').innerHTML = '<span class="inner-test">1.12<span class="uptick-test">250</span></span>'; });
     await page.waitForTimeout(50);
-    assert.deepEqual(await read(), {text:'1.12250',raw:'1.12250',sup:'0',count:1,aria:'1.12250'});
-    // React can update a text node while the existing superscript remains.
+    assert.deepEqual(await read(), {text:'1.12250',raw:'1.12250',digit:'0',count:0,aria:'1.12250'});
+    // React can update the original Text node without retaining an old digit.
     await page.evaluate(() => { document.querySelector('.uptick-test').firstChild.data = '340'; });
     await page.waitForTimeout(50);
-    assert.deepEqual(await read(), {text:'1.123400',raw:'1.123400',sup:'0',count:1,aria:'1.123400'});
+    assert.deepEqual(await read(), {text:'1.12340',raw:'1.12340',digit:'0',count:0,aria:'1.12340'});
+    assert.equal(await page.locator('.last-test').evaluate(cell =>
+      getComputedStyle(cell, '::after').content), '"0" / ""');
+    assert(await page.locator('.last-test').evaluate(cell =>
+      parseFloat(getComputedStyle(cell,'::after').fontSize) < parseFloat(getComputedStyle(cell).fontSize)));
+    await page.evaluate(() => { document.querySelector('.uptick-test').firstChild.data = '—';
+      document.querySelector('.inner-test').firstChild.data = ''; });
+    await page.waitForTimeout(50);
+    assert.equal((await read()).digit,undefined,'missing quotes discard the glyph overlay');
     await page.locator('.columnsMenu-test').click({timeout:1500});
     assert.equal(await page.getByRole('menu').count(), 1,
       'visually moving the control must preserve its delegated native menu action');
