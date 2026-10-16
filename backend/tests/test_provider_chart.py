@@ -648,14 +648,16 @@ def test_successful_quote_page_cache_uses_actual_observation_identity(monkeypatc
     assert len(calls) == 2 and first["bars"] != second["bars"]
 
 
-@pytest.mark.parametrize('frame', ['D1', 'W1', 'MN'])
-def test_oanda_current_high_period_uses_supplier_clock_and_source_cutoff(monkeypatch, frame):
+@pytest.mark.parametrize('frame', ['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1', 'W1', 'MN'])
+@pytest.mark.parametrize('right_margin', [0, 60000])
+def test_oanda_current_request_uses_supplier_clock_and_source_cutoff(monkeypatch, frame, right_margin):
     from decimal import Decimal
 
     monkeypatch.setattr(settings, 'oanda_token', 'test-only')
-    observed = stamp('2026-10-16T03:00:00+00:00')
+    observed = stamp('2026-10-16T03:00:01+00:00')
     monkeypatch.setattr(provider, 'now_ms', lambda: observed)
-    starts = {
+    starts = {**{f: stamp('2026-10-16T03:00:00+00:00') for f in ['M1', 'M5', 'M15', 'M30', 'H1']},
+        'H4': stamp('2026-10-16T01:00:00+00:00'),
         'D1': stamp('2026-10-15T21:00:00+00:00'),
         'W1': stamp('2026-10-11T21:00:00+00:00'),
         'MN': stamp('2026-09-30T21:00:00+00:00'),
@@ -676,9 +678,11 @@ def test_oanda_current_high_period_uses_supplier_clock_and_source_cutoff(monkeyp
         ]})
 
     with httpx.Client(transport=httpx.MockTransport(handle)) as client:
-        page = provider.native_page(META, frame, observed, 5, client=client)
+        page = provider.native_page(META, frame, observed + right_margin, 5, client=client)
     assert len(calls) == 1 and 'to' not in calls[0]
     assert [bar['start'] for bar in page['bars']] == [starts[frame]]
+    assert page['boundary_evidence']['mode'] == 'count_latest'
+    assert all(end <= max(observed + 1, page['bars'][-1]['chart_time'] + 1) for _, end in page['coverage'])
 
 
 def test_oanda_historical_high_period_keeps_exclusive_source_cursor(monkeypatch):
@@ -696,3 +700,143 @@ def test_oanda_historical_high_period_keeps_exclusive_source_cursor(monkeypatch)
     with httpx.Client(transport=httpx.MockTransport(handle)) as client:
         page = provider.native_page(META, 'MN', before, 5, client=client)
     assert page['bars'] == []
+
+
+@pytest.mark.parametrize('frame', ['M1', 'M5', 'M15', 'M30', 'H1', 'H4'])
+def test_oanda_historical_intraday_keeps_exclusive_source_cursor(monkeypatch, frame):
+    from decimal import Decimal
+
+    monkeypatch.setattr(settings, 'oanda_token', 'test-only')
+    observed = stamp('2026-10-16T03:00:01+00:00')
+    before = observed - 86400000
+    monkeypatch.setattr(provider, 'now_ms', lambda: observed)
+
+    def handle(request):
+        assert Decimal(request.url.params['to']) * 1000 == before
+        return httpx.Response(200, json={'candles': [
+            {'time': str(Decimal(t) / 1000), 'complete': True,
+             'bid': {'o': '1', 'h': '2', 'l': '1', 'c': '1.5'}}
+            for t in [before - provider.FRAME_MS[frame], before]
+        ]})
+
+    with httpx.Client(transport=httpx.MockTransport(handle)) as client:
+        page = provider.native_page(META, frame, before, 5, client=client)
+    assert [b['start'] for b in page['bars']] == [before - provider.FRAME_MS[frame]]
+    assert page['boundary_evidence']['mode'] == 'count_to'
+
+
+@pytest.mark.parametrize('frame', ['M1', 'D1'])
+def test_oanda_queued_current_cursor_recovers_only_explicit_future_to(monkeypatch, frame):
+    from decimal import Decimal
+
+    monkeypatch.setattr(settings, 'oanda_token', 'test-only')
+    observed = stamp('2026-10-16T03:00:01.100+00:00')
+    before = observed - 100
+    opening = stamp('2026-10-16T03:00:00+00:00') if frame == 'M1' else stamp('2026-10-15T21:00:00+00:00')
+    monkeypatch.setattr(provider, 'now_ms', lambda: observed)
+    calls = []
+
+    def handle(request):
+        params = dict(request.url.params)
+        calls.append(params)
+        if 'to' in params:
+            assert Decimal(params['to']) * 1000 == before
+            return httpx.Response(400, json={'errorMessage': "Invalid value specified for 'to'. Time is in the future"})
+        return httpx.Response(200, json={'candles': [
+            {'time': str(Decimal(t) / 1000), 'complete': False,
+             'bid': {'o': '1', 'h': '2', 'l': '1', 'c': '1.5'}}
+            for t in [opening, observed + 1]
+        ]})
+
+    with httpx.Client(transport=httpx.MockTransport(handle)) as client:
+        page = provider.native_page(META, frame, before, 5, client=client)
+    # D1's calendar translation already selects count/latest; M1 needs fallback.
+    assert len(calls) == (2 if frame == 'M1' else 1)
+    assert 'to' not in calls[-1]
+    assert [b['start'] for b in page['bars']] == [opening]
+    assert all(end <= before for _, end in page['coverage'])
+    assert page['boundary_evidence']['mode'] == 'count_latest'
+
+
+@pytest.mark.parametrize('status,body,explicit,attempts', [
+    (400, {'errorMessage': 'Invalid price'}, True, 1),
+    (401, {'errorMessage': "Invalid value specified for 'to'. Time is in the future"}, True, 1),
+    (400, None, True, 1),
+    (400, {'errorMessage': "Invalid value specified for 'to'. Time is in the future"}, False, 1),
+    (400, {'errorMessage': "Invalid value specified for 'to'. Time is in the future"}, True, 2),
+])
+def test_oanda_future_to_fallback_is_single_and_does_not_mask_other_errors(
+        monkeypatch, status, body, explicit, attempts):
+    monkeypatch.setattr(settings, 'oanda_token', 'test-only')
+    observed = stamp('2026-10-16T03:00:01.100+00:00')
+    monkeypatch.setattr(provider, 'now_ms', lambda: observed)
+    calls = []
+
+    def handle(request):
+        calls.append(dict(request.url.params))
+        return httpx.Response(status, json=body) if body is not None else httpx.Response(status, content=b'not-json')
+
+    with httpx.Client(transport=httpx.MockTransport(handle)) as client:
+        with pytest.raises(httpx.HTTPStatusError):
+            provider.native_page(META, 'M1', observed - 100 if explicit else observed + 1, 5, client=client)
+    assert len(calls) == attempts
+    if attempts == 2:
+        assert 'to' in calls[0] and 'to' not in calls[1]
+
+
+def test_oanda_future_to_fallback_keeps_original_deadline(monkeypatch):
+    monkeypatch.setattr(settings, 'oanda_token', 'test-only')
+    observed = stamp('2026-10-16T03:00:01.100+00:00')
+    monkeypatch.setattr(provider, 'now_ms', lambda: observed)
+    clock = [provider.time.monotonic()]
+    monkeypatch.setattr(provider.time, 'monotonic', lambda: clock[0])
+    calls = []
+
+    def handle(request):
+        calls.append(dict(request.url.params))
+        clock[0] += 2
+        return httpx.Response(400, json={'errorMessage': "Invalid value specified for 'to'. Time is in the future"})
+
+    with httpx.Client(transport=httpx.MockTransport(handle)) as client:
+        with pytest.raises(TimeoutError):
+            provider.native_page(META, 'M1', observed - 100, 5, client=client, deadline=clock[0] + 1)
+    assert len(calls) == 1, 'the future-to fallback cannot reset the request budget'
+
+
+def test_oanda_cached_latest_recovers_cursor_after_slot_queue(database, monkeypatch):
+    from decimal import Decimal
+
+    monkeypatch.setattr(settings, 'oanda_token', 'test-only')
+    monkeypatch.setattr(settings, 'oanda_acquisition_mode', 'stream')
+    entry = stamp('2026-10-16T03:00:00.900+00:00')
+    opening = entry - 900
+    clock = [entry]
+    monkeypatch.setattr(provider, 'now_ms', lambda: clock[0])
+    provider._CACHE.clear()
+    calls = []
+
+    class QueuedSlot:
+        def acquire(self, timeout):
+            clock[0] += 200
+            return True
+
+        def release(self):
+            pass
+
+    monkeypatch.setitem(provider._LATEST_SLOTS, 'oanda', QueuedSlot())
+
+    def handle(request):
+        params = dict(request.url.params)
+        calls.append(params)
+        if 'to' in params:
+            return httpx.Response(400, json={'errorMessage': "Invalid value specified for 'to'. Time is in the future"})
+        return httpx.Response(200, json={'candles': [
+            {'time': str(Decimal(opening) / 1000), 'complete': False,
+             'bid': {'o': '1', 'h': '2', 'l': '1', 'c': '1.5'}}]})
+
+    with httpx.Client(transport=httpx.MockTransport(handle)) as client:
+        monkeypatch.setattr(provider, 'pooled_client', lambda _: client)
+        page = provider.cached_page(META, 'M1', opening + 1000, 1, latest=True)
+    assert len(calls) == 2 and 'to' in calls[0] and 'to' not in calls[1]
+    assert [b['start'] for b in page['bars']] == [opening]
+    provider._CACHE.clear()

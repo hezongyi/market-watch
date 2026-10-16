@@ -229,6 +229,28 @@ def _request(client, url, *, params, headers=None, deadline):
     raise RuntimeError("平台请求重试耗尽")
 
 
+def _oanda_candles(client, symbol, params, deadline):
+    url = f"https://api-fxpractice.oanda.com/v3/instruments/{symbol}/candles"
+    headers = {"Authorization": "Bearer " + settings.oanda_token, "Accept-Datetime-Format": "UNIX"}
+    try:
+        return _request(client, url, params=params, headers=headers, deadline=deadline), (
+            "count_to" if "to" in params else "count_latest")
+    except httpx.HTTPStatusError as exc:
+        if exc.response.status_code != 400 or "to" not in params:
+            raise
+        try:
+            body = exc.response.json()
+        except ValueError:
+            raise exc from None
+        if not isinstance(body, dict) or body.get("errorMessage") != "Invalid value specified for 'to'. Time is in the future":
+            raise
+    # A queued current cursor can become past locally while still being future
+    # to OANDA. Retry only this explicit rejection, within the original budget;
+    # native_page retains both original source and display cutoffs.
+    return _request(client, url, params={k: v for k, v in params.items() if k != "to"},
+                    headers=headers, deadline=deadline), "count_latest"
+
+
 def _end(start, frame, calendar):
     moment = instant(start)
     zone = ZoneInfo("America/New_York") if calendar == "ny17" else UTC
@@ -274,25 +296,14 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
             native = parameters(meta)
             if not settings.oanda_token:
                 raise ValueError("OANDA认证未配置")
-            payload = _request(
-                client,
-                f"https://api-fxpractice.oanda.com/v3/instruments/{meta['symbol']}/candles",
-                params={
-                    "granularity": OANDA_FRAMES[frame],
-                    **native,
-                    "smooth": str(native["smooth"]).lower(),
-                    "count": batch_count,
-                    # Let OANDA choose its current cutoff. A local-now `to`
-                    # can be rejected when its clock is slightly behind ours.
-                    **({} if high_period and cursor >= observed else
-                       {"to": str(Decimal(cursor) / 1000)}),
-                },
-                headers={
-                    "Authorization": "Bearer " + settings.oanda_token,
-                    "Accept-Datetime-Format": "UNIX",
-                },
-                deadline=deadline,
-            )
+            payload, request_mode = _oanda_candles(client, meta['symbol'], {
+                "granularity": OANDA_FRAMES[frame],
+                **native,
+                "smooth": str(native["smooth"]).lower(),
+                "count": batch_count,
+                # A current cutoff belongs to the supplier's clock.
+                **({} if cursor >= observed else {"to": str(Decimal(cursor) / 1000)}),
+            }, deadline)
             candles = payload["candles"]
             batch = []
             for candle in candles:
@@ -354,7 +365,7 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
     exhausted = boundary and len(rows) <= count + optional
     proven_start = 0 if exhausted else visible[0]["chart_time"] if visible else before
     proven_end = (min(before, max(observed + 1, visible[-1]["chart_time"] + 1 if visible else 0))
-                  if source == "oanda" and high_period else before)
+                  if source == "oanda" else before)
     return {
         "bars": visible,
         "has_more": not boundary or len(rows) > count,
@@ -362,7 +373,7 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
         "coverage": [[proven_start, proven_end]] if proven_start < proven_end else [],
         "boundary_evidence": {
             "source": source,
-            "mode": "count_latest" if source == "oanda" and high_period and cursor >= observed else "count_to",
+            "mode": request_mode if source == "oanda" else "count_to",
             "returned": len(batch),
             "requested": batch_count,
         }
