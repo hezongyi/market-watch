@@ -121,17 +121,20 @@ fs.mkdirSync(out,{recursive:true});
     assert.equal(errors.length,0,errors.join('\n'));
     console.log('PASS: four real suppliers, provider/history/composite/legacy managed; startup, reload, switch and add; no internal ticker frames.');
   }finally{
+    let restoreError;
     if(tempId){
       outer=await host().catch(()=>null);
       if(outer)await outer.evaluate(async({id,active})=>{
         const api=await widget.watchList();
         if(api.getActiveListId()===id)api.setActiveList(active);
         if(Object.values(api.getAllLists()).some(l=>l.id===id))api.deleteList(id);
-      },{id:tempId,active:originalActive}).catch(e=>errors.push('restore: '+e.message));
+      },{id:tempId,active:originalActive}).catch(e=>{restoreError=e;errors.push('restore: '+e.message)});
+      else {restoreError=Error('chart host unavailable during list restoration');errors.push(restoreError.message);}
       await page.waitForTimeout(1000);
     }
     await loadingCapture;
     fs.writeFileSync(out+'/result.json',JSON.stringify({samples,runs,flashes,errors},null,2));
     await context.close();await browser.close();
+    if(restoreError)throw restoreError;
   }
 })().catch(e=>{console.error(e.stack);process.exitCode=1});

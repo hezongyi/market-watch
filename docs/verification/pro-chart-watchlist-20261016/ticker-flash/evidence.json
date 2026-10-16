@@ -1,0 +1,4563 @@
+{
+  "classification": "F0: compatible UI/name presentation; no persisted identity/schema changes",
+  "host": "quant-server Ubuntu Docker",
+  "project": "mw-issue73-real-20261016",
+  "page": "https://192.168.7.232:18483/advanced-charts",
+  "chart_image": "market-watch-chart-origin:issue73-real-d14ec34",
+  "synthetic_market_data": false,
+  "before": {
+    "reloads_with_flash": 3,
+    "observations": [
+      {
+        "url": "https://192.168.7.232:17483/?parent=https%3A%2F%2F192.168.7.232%3A18483",
+        "time": 4146.199999988079,
+        "rows": [
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "text": "26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219"
+          },
+          {
+            "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+            "text": "DUKA:39bfb355d460ecebfa4cba28b8011eb2"
+          }
+        ]
+      },
+      {
+        "url": "https://192.168.7.232:17483/?parent=https%3A%2F%2F192.168.7.232%3A18483",
+        "time": 1525.5,
+        "rows": [
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "text": "26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219"
+          },
+          {
+            "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+            "text": "DUKA:39bfb355d460ecebfa4cba28b8011eb2"
+          }
+        ]
+      },
+      {
+        "url": "https://192.168.7.232:17483/?parent=https%3A%2F%2F192.168.7.232%3A18483",
+        "time": 1163.6000000238419,
+        "rows": [
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "text": "26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219"
+          },
+          {
+            "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+            "text": "DUKA:39bfb355d460ecebfa4cba28b8011eb2"
+          }
+        ]
+      },
+      {
+        "url": "https://192.168.7.232:17483/?parent=https%3A%2F%2F192.168.7.232%3A18483",
+        "time": 5478.300000011921,
+        "rows": [
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "text": "26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219\n1.12287\n0.00079\n0.07%"
+          },
+          {
+            "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+            "text": "DUKA:39bfb355d460ecebfa4cba28b8011eb2\n1.33154\n0.00447\n0.34%"
+          }
+        ]
+      }
+    ],
+    "history_switch_observations": [
+      {
+        "url": "https://192.168.7.232:17483/?parent=https%3A%2F%2F192.168.7.232%3A18483",
+        "time": 4365.5999999940395,
+        "rows": [
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "text": "26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219"
+          },
+          {
+            "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+            "text": "DUKA:39bfb355d460ecebfa4cba28b8011eb2"
+          }
+        ]
+      },
+      {
+        "url": "https://192.168.7.232:17483/?parent=https%3A%2F%2F192.168.7.232%3A18483",
+        "time": 10552.5,
+        "rows": [
+          {
+            "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+            "text": "24df99fe-2fb9-4d43-ac33-2c272bab9226"
+          }
+        ]
+      },
+      {
+        "url": "https://192.168.7.232:17483/?parent=https%3A%2F%2F192.168.7.232%3A18483",
+        "time": 15740,
+        "rows": [
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "text": "26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219"
+          },
+          {
+            "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+            "text": "DUKA:39bfb355d460ecebfa4cba28b8011eb2"
+          }
+        ]
+      }
+    ]
+  },
+  "after": {
+    "samples": [
+      {
+        "source": "oanda",
+        "kind": "provider",
+        "ticker": "MWP:EURUSD",
+        "name": "EURUSD"
+      },
+      {
+        "source": "oanda",
+        "kind": "provider",
+        "ticker": "MWP:OANDA:EUR_USD",
+        "name": "EURUSD"
+      },
+      {
+        "source": "dukascopy",
+        "kind": "provider",
+        "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+        "name": "GBPUSD"
+      },
+      {
+        "source": "binance",
+        "kind": "provider",
+        "ticker": "MWP:BTCUSDT",
+        "name": "BTCUSDT"
+      },
+      {
+        "source": "yahoo",
+        "kind": "provider",
+        "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+        "name": "AAPL"
+      },
+      {
+        "source": "oanda",
+        "kind": "history",
+        "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+        "name": "EURUSD"
+      },
+      {
+        "source": "composite",
+        "kind": "composite",
+        "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+        "name": "EURUSD"
+      },
+      {
+        "source": "oanda",
+        "kind": "managed",
+        "ticker": "EURUSD",
+        "name": "EURUSD"
+      },
+      {
+        "source": "binance",
+        "kind": "managed",
+        "ticker": "BTCUSDT",
+        "name": "BTCUSDT"
+      }
+    ],
+    "flashes": [],
+    "page_errors": [],
+    "runs": [
+      {
+        "label": "01-startup",
+        "ready": true,
+        "loading": false,
+        "rows": [
+          {
+            "ticker": "MWP:EURUSD",
+            "text": "EURUSD\n1.12292\n0.00087\n0.08%",
+            "name": "EURUSD",
+            "ready": "true",
+            "short": "EURUSD"
+          },
+          {
+            "ticker": "MWP:XAUUSD",
+            "text": "XAUUSD\n4,160.865\n−9.445\n−0.23%",
+            "name": "XAUUSD",
+            "ready": "true",
+            "short": "XAUUSD"
+          },
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "text": "EURUSD\n1.12292\n0.00084\n0.07%",
+            "name": "EURUSD",
+            "ready": "true",
+            "short": "26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219"
+          },
+          {
+            "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+            "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+            "name": "GBPUSD",
+            "ready": "true",
+            "short": "DUKA:39bfb355d460ecebfa4cba28b8011eb2"
+          }
+        ],
+        "paint_observations": 16,
+        "timeline": [
+          {
+            "time": 3502,
+            "rows": []
+          },
+          {
+            "time": 4094.300000011921,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "",
+                "loading": true
+              }
+            ]
+          },
+          {
+            "time": 5302.5,
+            "rows": []
+          },
+          {
+            "time": 5428.4000000059605,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "",
+                "loading": true
+              }
+            ]
+          },
+          {
+            "time": 6280.800000011921,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12290\n0.00085\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.745\n−9.565\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12290\n0.00082\n0.07%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 6394.0999999940395,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12290\n0.00085\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.745\n−9.565\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12290\n0.00082\n0.07%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156000\n0.00449000\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 7055.300000011921,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12290\n0.00085\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.745\n−9.565\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12294\n0.00086\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 7164.9000000059605,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12290\n0.00085\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.745\n−9.565\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12294\n0.00086\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156000\n0.00449000\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 7710.800000011921,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12290\n0.00085\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.745\n−9.565\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12293\n0.00085\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156000\n0.00449000\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 7821.5999999940395,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12290\n0.00085\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.745\n−9.565\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12293\n0.00085\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 7952.0999999940395,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12290\n0.00085\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.745\n−9.565\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12293\n0.00085\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156000\n0.00449000\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 8516.300000011921,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12290\n0.00085\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.745\n−9.565\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12293\n0.00085\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 8657.300000011921,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12290\n0.00085\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.745\n−9.565\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12293\n0.00085\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156000\n0.00449000\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 9241.5,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12290\n0.00085\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.745\n−9.565\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12292\n0.00084\n0.07%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 9331,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12290\n0.00085\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.865\n−9.445\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12292\n0.00084\n0.07%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 9364.800000011921,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12292\n0.00087\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.865\n−9.445\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12292\n0.00084\n0.07%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              }
+            ]
+          }
+        ],
+        "quotes": [
+          {
+            "ticker": "MWP:EURUSD",
+            "status": "ok",
+            "values": {
+              "short_name": "EURUSD",
+              "lp": 1.12292,
+              "ch": 0.00087,
+              "chp": 0.07753665166436434,
+              "prev_close_price": 1.12205,
+              "quote_time": null,
+              "data_start": 1792175100000,
+              "data_end": 1792175160000,
+              "time_type": "source_m1"
+            }
+          },
+          {
+            "ticker": "MWP:XAUUSD",
+            "status": "ok",
+            "values": {
+              "short_name": "XAUUSD",
+              "lp": 4160.865,
+              "ch": -9.445,
+              "chp": -0.2264819641705293,
+              "prev_close_price": 4170.31,
+              "quote_time": null,
+              "data_start": 1792175100000,
+              "data_end": 1792175160000,
+              "time_type": "source_m1"
+            }
+          },
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "status": "ok",
+            "values": {
+              "short_name": "EURUSD",
+              "lp": 1.12292,
+              "ch": 0.00084,
+              "chp": 0.0748609724796806,
+              "prev_close_price": 1.12208,
+              "quote_time": null,
+              "data_start": 1792175100000,
+              "data_end": 1792175160000,
+              "time_type": "composite_snapshot",
+              "price_type": "sampled_candle_close"
+            }
+          },
+          {
+            "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+            "status": "ok",
+            "values": {
+              "short_name": "GBPUSD",
+              "lp": 1.33156,
+              "ch": 0.00449,
+              "chp": 0.33833934909236135,
+              "prev_close_price": 1.32707,
+              "quote_time": null,
+              "data_start": 1792175040000,
+              "data_end": 1792175100000,
+              "time_type": "source_m1"
+            }
+          }
+        ]
+      },
+      {
+        "label": "02-reload",
+        "ready": true,
+        "loading": false,
+        "rows": [
+          {
+            "ticker": "MWP:EURUSD",
+            "text": "EURUSD\n1.12300\n0.00095\n0.08%",
+            "name": "EURUSD",
+            "ready": "true",
+            "short": "EURUSD"
+          },
+          {
+            "ticker": "MWP:XAUUSD",
+            "text": "XAUUSD\n4,160.615\n−9.695\n−0.23%",
+            "name": "XAUUSD",
+            "ready": "true",
+            "short": "XAUUSD"
+          },
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+            "name": "EURUSD",
+            "ready": "true",
+            "short": "26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219"
+          },
+          {
+            "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+            "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+            "name": "GBPUSD",
+            "ready": "true",
+            "short": "DUKA:39bfb355d460ecebfa4cba28b8011eb2"
+          }
+        ],
+        "paint_observations": 12,
+        "timeline": [
+          {
+            "time": 1603.4000000059605,
+            "rows": []
+          },
+          {
+            "time": 1751.5,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "",
+                "loading": true
+              }
+            ]
+          },
+          {
+            "time": 2107.300000011921,
+            "rows": []
+          },
+          {
+            "time": 2190,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "",
+                "loading": true
+              }
+            ]
+          },
+          {
+            "time": 3088.9000000059605,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12292\n0.00087\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.575\n−9.735\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12292\n0.00084\n0.07%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 3209.5999999940395,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12292\n0.00087\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.575\n−9.735\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12292\n0.00084\n0.07%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156000\n0.00449000\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 3728.800000011921,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12295\n0.00090\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.575\n−9.735\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12292\n0.00084\n0.07%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 3858.800000011921,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12295\n0.00090\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.575\n−9.735\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12292\n0.00084\n0.07%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156000\n0.00449000\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 4365.9000000059605,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12295\n0.00090\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.575\n−9.735\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12292\n0.00084\n0.07%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 4487.9000000059605,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12295\n0.00090\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.575\n−9.735\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12292\n0.00084\n0.07%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156000\n0.00449000\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 5224.199999988079,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12300\n0.00095\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.615\n−9.695\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12300\n0.00092\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 7275.699999988079,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12300\n0.00095\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.615\n−9.695\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              }
+            ]
+          }
+        ],
+        "quotes": [
+          {
+            "ticker": "MWP:EURUSD",
+            "status": "ok",
+            "values": {
+              "short_name": "EURUSD",
+              "lp": 1.123,
+              "ch": 0.00095,
+              "chp": 0.08466645871396106,
+              "prev_close_price": 1.12205,
+              "quote_time": null,
+              "data_start": 1792175160000,
+              "data_end": 1792175220000,
+              "time_type": "source_m1"
+            }
+          },
+          {
+            "ticker": "MWP:XAUUSD",
+            "status": "ok",
+            "values": {
+              "short_name": "XAUUSD",
+              "lp": 4160.615,
+              "ch": -9.695,
+              "chp": -0.23247672235397368,
+              "prev_close_price": 4170.31,
+              "quote_time": null,
+              "data_start": 1792175100000,
+              "data_end": 1792175160000,
+              "time_type": "source_m1"
+            }
+          },
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "status": "ok",
+            "values": {
+              "short_name": "EURUSD",
+              "lp": 1.12305,
+              "ch": 0.00097,
+              "chp": 0.08644659917296449,
+              "prev_close_price": 1.12208,
+              "quote_time": null,
+              "data_start": 1792175160000,
+              "data_end": 1792175220000,
+              "time_type": "composite_snapshot",
+              "price_type": "sampled_candle_close"
+            }
+          },
+          {
+            "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+            "status": "ok",
+            "values": {
+              "short_name": "GBPUSD",
+              "lp": 1.33156,
+              "ch": 0.00449,
+              "chp": 0.33833934909236135,
+              "prev_close_price": 1.32707,
+              "quote_time": null,
+              "data_start": 1792175040000,
+              "data_end": 1792175100000,
+              "time_type": "source_m1"
+            }
+          }
+        ]
+      },
+      {
+        "label": "03-switch-all",
+        "ready": true,
+        "loading": false,
+        "rows": [
+          {
+            "ticker": "MWP:EURUSD",
+            "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+            "name": "EURUSD",
+            "ready": "true",
+            "short": "EURUSD"
+          },
+          {
+            "ticker": "MWP:OANDA:EUR_USD",
+            "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+            "name": "EURUSD",
+            "ready": "true",
+            "short": "OANDA:EUR_USD"
+          },
+          {
+            "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+            "text": "GBPUSD\n1.33163\n0.00456\n0.34%",
+            "name": "GBPUSD",
+            "ready": "true",
+            "short": "DUKA:39bfb355d460ecebfa4cba28b8011eb2"
+          },
+          {
+            "ticker": "MWP:BTCUSDT",
+            "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+            "name": "BTCUSDT",
+            "ready": "true",
+            "short": "BTCUSDT"
+          },
+          {
+            "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+            "text": "AAPL\n341.90\n−0.10\n−0.03%",
+            "name": "AAPL",
+            "ready": "true",
+            "short": "YAHOO:1eb44d625271a4eb75016f276d137836"
+          },
+          {
+            "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+            "text": "EURUSD\n1.12248",
+            "name": "EURUSD",
+            "ready": "true",
+            "short": "24df99fe-2fb9-4d43-ac33-2c272bab9226"
+          },
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+            "name": "EURUSD",
+            "ready": "true",
+            "short": "26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219"
+          },
+          {
+            "ticker": "EURUSD",
+            "text": "EURUSD",
+            "name": "EURUSD",
+            "ready": "true",
+            "short": "EURUSD"
+          },
+          {
+            "ticker": "BTCUSDT",
+            "text": "BTCUSDT",
+            "name": "BTCUSDT",
+            "ready": "true",
+            "short": "BTCUSDT"
+          }
+        ],
+        "paint_observations": 22,
+        "timeline": [
+          {
+            "time": 1603.4000000059605,
+            "rows": []
+          },
+          {
+            "time": 1751.5,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "",
+                "loading": true
+              }
+            ]
+          },
+          {
+            "time": 2107.300000011921,
+            "rows": []
+          },
+          {
+            "time": 2190,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "",
+                "loading": true
+              }
+            ]
+          },
+          {
+            "time": 3088.9000000059605,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12292\n0.00087\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.575\n−9.735\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12292\n0.00084\n0.07%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 3209.5999999940395,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12292\n0.00087\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.575\n−9.735\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12292\n0.00084\n0.07%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156000\n0.00449000\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 3728.800000011921,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12295\n0.00090\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.575\n−9.735\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12292\n0.00084\n0.07%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 3858.800000011921,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12295\n0.00090\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.575\n−9.735\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12292\n0.00084\n0.07%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156000\n0.00449000\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 4365.9000000059605,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12295\n0.00090\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.575\n−9.735\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12292\n0.00084\n0.07%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 4487.9000000059605,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12295\n0.00090\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.575\n−9.735\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12292\n0.00084\n0.07%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156000\n0.00449000\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 5224.199999988079,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12300\n0.00095\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.615\n−9.695\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12300\n0.00092\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 7275.699999988079,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12300\n0.00095\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.615\n−9.695\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 9067.800000011921,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 9224.90000000596,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 10718.5,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.42\n−816.51\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 10811.300000011921,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156000\n0.00449000\n0.34%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.42\n−816.51\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90000000\n−0.10000000\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 11750.59999999404,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.42\n−816.51\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 11856.59999999404,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156000\n0.00449000\n0.34%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.42\n−816.51\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90000000\n−0.10000000\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 12621.40000000596,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.42\n−816.51\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90000000\n−0.10000000\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 13304.199999988079,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.42\n−816.51\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 14337.40000000596,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 15007,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33163\n0.00456\n0.34%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              }
+            ]
+          }
+        ],
+        "quotes": [
+          {
+            "ticker": "MWP:EURUSD",
+            "status": "ok",
+            "values": {
+              "short_name": "EURUSD",
+              "lp": 1.12305,
+              "ch": 0.001,
+              "chp": 0.089122588119959,
+              "prev_close_price": 1.12205,
+              "quote_time": null,
+              "data_start": 1792175160000,
+              "data_end": 1792175220000,
+              "time_type": "source_m1"
+            }
+          },
+          {
+            "ticker": "MWP:XAUUSD",
+            "status": "ok",
+            "values": {
+              "short_name": "XAUUSD",
+              "lp": 4160.615,
+              "ch": -9.695,
+              "chp": -0.23247672235397368,
+              "prev_close_price": 4170.31,
+              "quote_time": null,
+              "data_start": 1792175100000,
+              "data_end": 1792175160000,
+              "time_type": "source_m1"
+            }
+          },
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "status": "ok",
+            "values": {
+              "short_name": "EURUSD",
+              "lp": 1.12305,
+              "ch": 0.00097,
+              "chp": 0.08644659917296449,
+              "prev_close_price": 1.12208,
+              "quote_time": null,
+              "data_start": 1792175160000,
+              "data_end": 1792175220000,
+              "time_type": "composite_snapshot",
+              "price_type": "sampled_candle_close"
+            }
+          },
+          {
+            "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+            "status": "ok",
+            "values": {
+              "short_name": "GBPUSD",
+              "lp": 1.33163,
+              "ch": 0.00456,
+              "chp": 0.34361412736328906,
+              "prev_close_price": 1.32707,
+              "quote_time": null,
+              "data_start": 1792175100000,
+              "data_end": 1792175160000,
+              "time_type": "source_m1"
+            }
+          },
+          {
+            "ticker": "MWP:OANDA:EUR_USD",
+            "status": "ok",
+            "values": {
+              "short_name": "EURUSD",
+              "lp": 1.12305,
+              "ch": 0.001,
+              "chp": 0.089122588119959,
+              "prev_close_price": 1.12205,
+              "quote_time": null,
+              "data_start": 1792175160000,
+              "data_end": 1792175220000,
+              "time_type": "source_m1"
+            }
+          },
+          {
+            "ticker": "MWP:BTCUSDT",
+            "status": "ok",
+            "values": {
+              "short_name": "BTCUSDT",
+              "lp": 81429.43,
+              "ch": -816.5,
+              "chp": -0.9927542919145057,
+              "prev_close_price": 82245.93,
+              "quote_time": null,
+              "data_start": 1792175160000,
+              "data_end": 1792175220000,
+              "time_type": "source_m1"
+            }
+          },
+          {
+            "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+            "status": "ok",
+            "values": {
+              "short_name": "AAPL",
+              "lp": 341.9,
+              "ch": -0.1,
+              "chp": -0.029239766081871343,
+              "prev_close_price": 342,
+              "quote_time": 1792175119000,
+              "time_type": "provider_quote",
+              "delay_seconds": 900
+            }
+          },
+          {
+            "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+            "status": "ok",
+            "values": {
+              "short_name": "EURUSD",
+              "lp": 1.12248,
+              "quote_time": null,
+              "data_start": 1792172040000,
+              "data_end": 1792172100000,
+              "time_type": "fixed_history"
+            }
+          },
+          {
+            "ticker": "EURUSD",
+            "status": "ok",
+            "values": {
+              "short_name": "EURUSD",
+              "quote_time": null,
+              "data_start": null,
+              "time_type": null
+            }
+          },
+          {
+            "ticker": "BTCUSDT",
+            "status": "ok",
+            "values": {
+              "short_name": "BTCUSDT",
+              "quote_time": null,
+              "data_start": null,
+              "time_type": null
+            }
+          }
+        ]
+      },
+      {
+        "label": "04-add",
+        "ready": true,
+        "loading": false,
+        "rows": [
+          {
+            "ticker": "MWP:EURUSD",
+            "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+            "name": "EURUSD",
+            "ready": "true",
+            "short": "EURUSD"
+          },
+          {
+            "ticker": "MWP:OANDA:EUR_USD",
+            "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+            "name": "EURUSD",
+            "ready": "true",
+            "short": "OANDA:EUR_USD"
+          },
+          {
+            "ticker": "MWP:BTCUSDT",
+            "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+            "name": "BTCUSDT",
+            "ready": "true",
+            "short": "BTCUSDT"
+          },
+          {
+            "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+            "text": "AAPL\n341.90\n−0.10\n−0.03%",
+            "name": "AAPL",
+            "ready": "true",
+            "short": "YAHOO:1eb44d625271a4eb75016f276d137836"
+          },
+          {
+            "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+            "text": "EURUSD\n1.12248",
+            "name": "EURUSD",
+            "ready": "true",
+            "short": "24df99fe-2fb9-4d43-ac33-2c272bab9226"
+          },
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "text": "EURUSD\n1.12307\n0.00099\n0.09%",
+            "name": "EURUSD",
+            "ready": "true",
+            "short": "26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219"
+          },
+          {
+            "ticker": "EURUSD",
+            "text": "EURUSD",
+            "name": "EURUSD",
+            "ready": "true",
+            "short": "EURUSD"
+          },
+          {
+            "ticker": "BTCUSDT",
+            "text": "BTCUSDT",
+            "name": "BTCUSDT",
+            "ready": "true",
+            "short": "BTCUSDT"
+          },
+          {
+            "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+            "text": "GBPUSD\n1.33163\n0.00456\n0.34%",
+            "name": "GBPUSD",
+            "ready": "true",
+            "short": "DUKA:39bfb355d460ecebfa4cba28b8011eb2"
+          }
+        ],
+        "paint_observations": 36,
+        "timeline": [
+          {
+            "time": 1603.4000000059605,
+            "rows": []
+          },
+          {
+            "time": 1751.5,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "",
+                "loading": true
+              }
+            ]
+          },
+          {
+            "time": 2107.300000011921,
+            "rows": []
+          },
+          {
+            "time": 2190,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "",
+                "loading": true
+              }
+            ]
+          },
+          {
+            "time": 3088.9000000059605,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12292\n0.00087\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.575\n−9.735\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12292\n0.00084\n0.07%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 3209.5999999940395,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12292\n0.00087\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.575\n−9.735\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12292\n0.00084\n0.07%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156000\n0.00449000\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 3728.800000011921,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12295\n0.00090\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.575\n−9.735\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12292\n0.00084\n0.07%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 3858.800000011921,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12295\n0.00090\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.575\n−9.735\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12292\n0.00084\n0.07%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156000\n0.00449000\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 4365.9000000059605,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12295\n0.00090\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.575\n−9.735\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12292\n0.00084\n0.07%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 4487.9000000059605,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12295\n0.00090\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.575\n−9.735\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12292\n0.00084\n0.07%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156000\n0.00449000\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 5224.199999988079,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12300\n0.00095\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.615\n−9.695\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12300\n0.00092\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 7275.699999988079,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12300\n0.00095\n0.08%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:XAUUSD",
+                "text": "XAUUSD\n4,160.615\n−9.695\n−0.23%",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 9067.800000011921,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 9224.90000000596,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 10718.5,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.42\n−816.51\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 10811.300000011921,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156000\n0.00449000\n0.34%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.42\n−816.51\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90000000\n−0.10000000\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 11750.59999999404,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.42\n−816.51\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 11856.59999999404,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156000\n0.00449000\n0.34%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.42\n−816.51\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90000000\n−0.10000000\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 12621.40000000596,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.42\n−816.51\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90000000\n−0.10000000\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 13304.199999988079,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.42\n−816.51\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 14337.40000000596,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33156\n0.00449\n0.34%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 15007,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33163\n0.00456\n0.34%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 15319,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 15537.90000000596,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "",
+                "loading": true
+              }
+            ]
+          },
+          {
+            "time": 16220.800000011921,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 16338.199999988079,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90000000\n−0.10000000\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 16622.40000000596,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 17171.59999999404,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12305\n0.00097\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33163\n0.00456\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 19223.5,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12307\n0.00099\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33163\n0.00456\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 19404.90000000596,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90000000\n−0.10000000\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12307\n0.00099\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33163\n0.00456\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 19422.30000001192,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90000000\n−0.10000000\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12307\n0.00099\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33163000\n0.00456000\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 19839.5,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12307\n0.00099\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33163000\n0.00456000\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 20125.69999998808,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12307\n0.00099\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33163\n0.00456\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 20242.59999999404,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90000000\n−0.10000000\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12307\n0.00099\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33163000\n0.00456000\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 21343.90000000596,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12305\n0.00100\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12307\n0.00099\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33163\n0.00456\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 21471.80000001192,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12307\n0.00099\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33163\n0.00456\n0.34%",
+                "loading": false
+              }
+            ]
+          }
+        ],
+        "quotes": [
+          {
+            "ticker": "MWP:EURUSD",
+            "status": "ok",
+            "values": {
+              "short_name": "EURUSD",
+              "lp": 1.12307,
+              "ch": 0.00102,
+              "chp": 0.09090503988235818,
+              "prev_close_price": 1.12205,
+              "quote_time": null,
+              "data_start": 1792175160000,
+              "data_end": 1792175220000,
+              "time_type": "source_m1"
+            }
+          },
+          {
+            "ticker": "MWP:XAUUSD",
+            "status": "ok",
+            "values": {
+              "short_name": "XAUUSD",
+              "lp": 4160.615,
+              "ch": -9.695,
+              "chp": -0.23247672235397368,
+              "prev_close_price": 4170.31,
+              "quote_time": null,
+              "data_start": 1792175100000,
+              "data_end": 1792175160000,
+              "time_type": "source_m1"
+            }
+          },
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "status": "ok",
+            "values": {
+              "short_name": "EURUSD",
+              "lp": 1.12307,
+              "ch": 0.00099,
+              "chp": 0.08822900327962356,
+              "prev_close_price": 1.12208,
+              "quote_time": null,
+              "data_start": 1792175160000,
+              "data_end": 1792175220000,
+              "time_type": "composite_snapshot",
+              "price_type": "sampled_candle_close"
+            }
+          },
+          {
+            "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+            "status": "ok",
+            "values": {
+              "short_name": "GBPUSD",
+              "lp": 1.33163,
+              "ch": 0.00456,
+              "chp": 0.34361412736328906,
+              "prev_close_price": 1.32707,
+              "quote_time": null,
+              "data_start": 1792175100000,
+              "data_end": 1792175160000,
+              "time_type": "source_m1"
+            }
+          },
+          {
+            "ticker": "MWP:OANDA:EUR_USD",
+            "status": "ok",
+            "values": {
+              "short_name": "EURUSD",
+              "lp": 1.12307,
+              "ch": 0.00102,
+              "chp": 0.09090503988235818,
+              "prev_close_price": 1.12205,
+              "quote_time": null,
+              "data_start": 1792175160000,
+              "data_end": 1792175220000,
+              "time_type": "source_m1"
+            }
+          },
+          {
+            "ticker": "MWP:BTCUSDT",
+            "status": "ok",
+            "values": {
+              "short_name": "BTCUSDT",
+              "lp": 81429.43,
+              "ch": -816.5,
+              "chp": -0.9927542919145057,
+              "prev_close_price": 82245.93,
+              "quote_time": null,
+              "data_start": 1792175160000,
+              "data_end": 1792175220000,
+              "time_type": "source_m1"
+            }
+          },
+          {
+            "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+            "status": "ok",
+            "values": {
+              "short_name": "AAPL",
+              "lp": 341.9,
+              "ch": -0.1,
+              "chp": -0.029239766081871343,
+              "prev_close_price": 342,
+              "quote_time": 1792175119000,
+              "time_type": "provider_quote",
+              "delay_seconds": 900
+            }
+          },
+          {
+            "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+            "status": "ok",
+            "values": {
+              "short_name": "EURUSD",
+              "lp": 1.12248,
+              "quote_time": null,
+              "data_start": 1792172040000,
+              "data_end": 1792172100000,
+              "time_type": "fixed_history"
+            }
+          },
+          {
+            "ticker": "EURUSD",
+            "status": "ok",
+            "values": {
+              "short_name": "EURUSD",
+              "quote_time": null,
+              "data_start": null,
+              "time_type": null
+            }
+          },
+          {
+            "ticker": "BTCUSDT",
+            "status": "ok",
+            "values": {
+              "short_name": "BTCUSDT",
+              "quote_time": null,
+              "data_start": null,
+              "time_type": null
+            }
+          }
+        ]
+      },
+      {
+        "label": "05-mixed-reload",
+        "ready": true,
+        "loading": false,
+        "rows": [
+          {
+            "ticker": "MWP:EURUSD",
+            "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+            "name": "EURUSD",
+            "ready": "true",
+            "short": "EURUSD"
+          },
+          {
+            "ticker": "MWP:OANDA:EUR_USD",
+            "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+            "name": "EURUSD",
+            "ready": "true",
+            "short": "OANDA:EUR_USD"
+          },
+          {
+            "ticker": "MWP:BTCUSDT",
+            "text": "BTCUSDT\n81,418.88\n−827.05\n−1.01%",
+            "name": "BTCUSDT",
+            "ready": "true",
+            "short": "BTCUSDT"
+          },
+          {
+            "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+            "text": "AAPL\n341.39\n−0.61\n−0.18%",
+            "name": "AAPL",
+            "ready": "true",
+            "short": "YAHOO:1eb44d625271a4eb75016f276d137836"
+          },
+          {
+            "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+            "text": "EURUSD\n1.12248",
+            "name": "EURUSD",
+            "ready": "true",
+            "short": "24df99fe-2fb9-4d43-ac33-2c272bab9226"
+          },
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "text": "EURUSD\n1.12312\n0.00104\n0.09%",
+            "name": "EURUSD",
+            "ready": "true",
+            "short": "26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219"
+          },
+          {
+            "ticker": "EURUSD",
+            "text": "EURUSD",
+            "name": "EURUSD",
+            "ready": "true",
+            "short": "EURUSD"
+          },
+          {
+            "ticker": "BTCUSDT",
+            "text": "BTCUSDT",
+            "name": "BTCUSDT",
+            "ready": "true",
+            "short": "BTCUSDT"
+          },
+          {
+            "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+            "text": "GBPUSD\n1.33163\n0.00456\n0.34%",
+            "name": "GBPUSD",
+            "ready": "true",
+            "short": "DUKA:39bfb355d460ecebfa4cba28b8011eb2"
+          }
+        ],
+        "paint_observations": 16,
+        "timeline": [
+          {
+            "time": 999.0999999940395,
+            "rows": []
+          },
+          {
+            "time": 1218.7999999821186,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "",
+                "loading": true
+              }
+            ]
+          },
+          {
+            "time": 1738.199999988079,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12307\n0.00099\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33163\n0.00456\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 1858,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90000000\n−0.10000000\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12307\n0.00099\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33163000\n0.00456000\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 2873,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12307\n0.00099\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33163\n0.00456\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 3725.5,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90000000\n−0.10000000\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12307\n0.00099\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33163000\n0.00456000\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 4073.7999999821186,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12307\n0.00099\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33163000\n0.00456000\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 5095.699999988079,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12307\n0.00099\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33163\n0.00456\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 5128.5999999940395,
+            "rows": []
+          },
+          {
+            "time": 5219.799999982119,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "",
+                "loading": true
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "",
+                "loading": true
+              }
+            ]
+          },
+          {
+            "time": 5272.0999999940395,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.90\n−0.10\n−0.03%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12307\n0.00099\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33163\n0.00456\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 5453.699999988079,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "1.12307\n0.00102\n0.09%",
+                "loading": true
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "341.90\n−0.10\n−0.03%",
+                "loading": true
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "1.12248",
+                "loading": true
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "1.12307\n0.00099\n0.09%",
+                "loading": true
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "1.33163\n0.00456\n0.34%",
+                "loading": true
+              }
+            ]
+          },
+          {
+            "time": 9306.699999988079,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.39\n−0.61\n−0.18%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12312\n0.00104\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33163\n0.00456\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 9425.699999988079,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.39000000\n−0.61000000\n−0.18%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12312\n0.00104\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33163000\n0.00456000\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 9806.699999988079,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,429.43\n−816.50\n−0.99%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.39\n−0.61000000\n−0.18%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12312\n0.00104\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33163000\n0.00456000\n0.34%",
+                "loading": false
+              }
+            ]
+          },
+          {
+            "time": 10029.40000000596,
+            "rows": [
+              {
+                "ticker": "MWP:EURUSD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:OANDA:EUR_USD",
+                "text": "EURUSD\n1.12307\n0.00102\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:BTCUSDT",
+                "text": "BTCUSDT\n81,418.88\n−827.05\n−1.01%",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+                "text": "AAPL\n341.39\n−0.61\n−0.18%",
+                "loading": false
+              },
+              {
+                "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+                "text": "EURUSD\n1.12248",
+                "loading": false
+              },
+              {
+                "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+                "text": "EURUSD\n1.12312\n0.00104\n0.09%",
+                "loading": false
+              },
+              {
+                "ticker": "EURUSD",
+                "text": "EURUSD",
+                "loading": false
+              },
+              {
+                "ticker": "BTCUSDT",
+                "text": "BTCUSDT",
+                "loading": false
+              },
+              {
+                "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+                "text": "GBPUSD\n1.33163\n0.00456\n0.34%",
+                "loading": false
+              }
+            ]
+          }
+        ],
+        "quotes": [
+          {
+            "ticker": "MWP:EURUSD",
+            "status": "ok",
+            "values": {
+              "short_name": "EURUSD",
+              "lp": 1.12307,
+              "ch": 0.00102,
+              "chp": 0.09090503988235818,
+              "prev_close_price": 1.12205,
+              "quote_time": null,
+              "data_start": 1792175160000,
+              "data_end": 1792175220000,
+              "time_type": "source_m1"
+            }
+          },
+          {
+            "ticker": "MWP:OANDA:EUR_USD",
+            "status": "ok",
+            "values": {
+              "short_name": "EURUSD",
+              "lp": 1.12307,
+              "ch": 0.00102,
+              "chp": 0.09090503988235818,
+              "prev_close_price": 1.12205,
+              "quote_time": null,
+              "data_start": 1792175160000,
+              "data_end": 1792175220000,
+              "time_type": "source_m1"
+            }
+          },
+          {
+            "ticker": "MWP:BTCUSDT",
+            "status": "ok",
+            "values": {
+              "short_name": "BTCUSDT",
+              "lp": 81418.88,
+              "ch": -827.05,
+              "chp": -1.0055816743758628,
+              "prev_close_price": 82245.93,
+              "quote_time": null,
+              "data_start": 1792175160000,
+              "data_end": 1792175220000,
+              "time_type": "source_m1"
+            }
+          },
+          {
+            "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+            "status": "ok",
+            "values": {
+              "short_name": "AAPL",
+              "lp": 341.39,
+              "ch": -0.61,
+              "chp": -0.1783625730994152,
+              "prev_close_price": 342,
+              "quote_time": 1792175187000,
+              "time_type": "provider_quote",
+              "delay_seconds": 900
+            }
+          },
+          {
+            "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+            "status": "ok",
+            "values": {
+              "short_name": "EURUSD",
+              "lp": 1.12248,
+              "quote_time": null,
+              "data_start": 1792172040000,
+              "data_end": 1792172100000,
+              "time_type": "fixed_history"
+            }
+          },
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "status": "ok",
+            "values": {
+              "short_name": "EURUSD",
+              "lp": 1.12312,
+              "ch": 0.00104,
+              "chp": 0.0926850135462712,
+              "prev_close_price": 1.12208,
+              "quote_time": null,
+              "data_start": 1792175160000,
+              "data_end": 1792175220000,
+              "time_type": "composite_snapshot",
+              "price_type": "sampled_candle_close"
+            }
+          },
+          {
+            "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+            "status": "ok",
+            "values": {
+              "short_name": "GBPUSD",
+              "lp": 1.33163,
+              "ch": 0.00456,
+              "chp": 0.34361412736328906,
+              "prev_close_price": 1.32707,
+              "quote_time": null,
+              "data_start": 1792175100000,
+              "data_end": 1792175160000,
+              "time_type": "source_m1"
+            }
+          },
+          {
+            "ticker": "EURUSD",
+            "status": "ok",
+            "values": {
+              "short_name": "EURUSD",
+              "quote_time": null,
+              "data_start": null,
+              "time_type": null
+            }
+          },
+          {
+            "ticker": "BTCUSDT",
+            "status": "ok",
+            "values": {
+              "short_name": "BTCUSDT",
+              "quote_time": null,
+              "data_start": null,
+              "time_type": null
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "limits": [
+    "Real published history/composite samples are OANDA only; no Dukascopy/Binance history version is present.",
+    "Yahoo supports provider data only; history/composite search explicitly excludes Yahoo.",
+    "Legacy managed EURUSD/BTCUSDT have metadata but no published prices here; no price was fabricated.",
+    "No production, full catalog census, physical touch device or long-duration acceptance claim."
+  ],
+  "screenshots_sha256": {
+    "03-switch-all.png": "de5524c09289972a465d1c6e758df88a96358b715481290e5e5fa016bb252c8a",
+    "04-add.png": "27ef17051c7799e0fc3581d2db01c534459b1a8094418ba3789220ed45caf8df",
+    "05-mixed-reload.png": "196b716ec0b7b45ab9efe8f8013314512662e742f45e8962bae5fe01d01663d7",
+    "loading.png": "1fb2c8f84a35a6ef1d83aa5d11c353c2006509060eaeab021a5258bf8a806a9e",
+    "02-reload.png": "7713415cecd001a8e72a8f0e454d4733a11805c10dbcf28511ef5c022d03800b",
+    "before.png": "49abf7af48efc44074ddcb68dcee78b3024f972ff99bc6b7d4dba97426cac71d",
+    "01-startup.png": "04987480fbb6bfe6e4920d7cf2162cea107acdf5f1b5f28dbf2860bc85926d62"
+  },
+  "post_fix_smoke": {
+    "pass": true,
+    "page_errors": [],
+    "screenshots_sha256": {
+      "06-narrow-menu.png": "3efa9ceedf68496e0a2ac6360d4978655048be1587f29cfbb574f09b33c128e1",
+      "07-refreshed.png": "12e1e163db1e30e56be54d2be1563530df672ef5d8405336b65269fd2ea9bfac",
+      "05-composite-live.png": "7de33be099c09d15a8ebacced65e280a0a28bbec00956e2265b66b5eccfaee86",
+      "03-gold.png": "526f817ea697061a1e46cc7053d5b64508426d7102991b800351475869f347cd",
+      "04-composite.png": "6ce84d620b7e7af02f7d0c95ff0fac52ec44874342e55208a8250205a30b7256",
+      "02-menu.png": "12dd78879358b410c566c0a4d64a4bc5bfeecf73f9a98f33f6c0223d2b17b55d",
+      "01-desktop.png": "86f587e5b757d61a6215969ef7873b7ff90f6447a9fd64226dda103e1cc2a4bd"
+    },
+    "restored_watchlist": {
+      "active": "real-oanda-watchlist",
+      "list_count": 1,
+      "symbols": 4,
+      "dukascopy_retained": true
+    }
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "pass": true,
+  "checks": [
+    {
+      "check": "native-menu",
+      "pass": true,
+      "text": "Tradingview是交互式的，并且具有与屏幕阅读器一起使用的命令。以下是可用于在平台上交互的键盘命令列表\n\n开始使用键盘导航模式。按Alt + Z\n快速搜索。按Ctrl + K\n更改商品。开始输入商品名称\n更改时间周期。按数字或逗号\n指标、指标和策略。按斜线\n开放式布局。按下句号\nEURUSD\n4小时\n指标\n数据中心\n指标模板\n真实 OANDA 验收\n保存\nEURUSD · 平台行情 · bid · OANDA 报价量\n4小时\nOANDA\n开=\n1.12200\n高=\n1.12336\n低=\n1.12165\n收=\n1.12309\n+0.00109 (+0.10%)\n5年\n1年\n3个月\n1个月\n5天\n1天\n18:27:25 UTC\nlog\n自动\n真实 OANDA\n商品\n最新价\n涨跌\n涨跌%\nEURUSD\n1.12309\n0.00104\n0.09%\nXAUUSD\n4,160.225\n−10.085\n−0.24%\nEURUSD\n1.12309\n0.00101\n0.09%\nGBPUSD\n1.33173\n0.00466\n0.35%\nEURUSD\nEURUSD · 平台行情\nOANDA\n1.12309\n+0.00104\n+0.09%\n开市\n账户管理器\n最新价\n涨跌\n涨跌幅%\n成交量"
+    },
+    {
+      "check": "switch",
+      "symbol": "MWP:XAUUSD",
+      "ready": true,
+      "history": [
+        {
+          "key": "MWP:EURUSD|240|",
+          "first": 1780678800000,
+          "last": 1792170000000,
+          "empty": false
+        },
+        {
+          "key": "MWP:XAUUSD|240|",
+          "first": 1784667600000,
+          "last": 1792170000000,
+          "empty": false
+        }
+      ]
+    },
+    {
+      "check": "switch",
+      "symbol": "MWC:26197BDAEFAEE31CA32EEF9D743210591B0A10709FD286939B066CFE2B1B9219",
+      "ready": true,
+      "history": [
+        {
+          "key": "MWP:EURUSD|240|",
+          "first": 1780678800000,
+          "last": 1792170000000,
+          "empty": false
+        },
+        {
+          "key": "MWP:XAUUSD|240|",
+          "first": 1784667600000,
+          "last": 1792170000000,
+          "empty": false
+        },
+        {
+          "key": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219|240|",
+          "first": 1791910800000,
+          "last": 1792170000000,
+          "empty": false
+        }
+      ]
+    },
+    {
+      "check": "real-composite-quote",
+      "quote": {
+        "s": "ok",
+        "n": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+        "v": {
+          "short_name": "EURUSD",
+          "description": "EUR/USD · 组合行情 · 当前未闭合M1收盘采样 · 交易时段内 · 最后行情时间 2026-10-16 18:27:00 UTC",
+          "exchange": "COMPOSITE",
+          "lp": 1.12313,
+          "ch": 0.00105,
+          "chp": 0.09357621559960075,
+          "prev_close_price": 1.12208,
+          "quote_time": null,
+          "observed_at": 1792175271591,
+          "data_start": 1792175220000,
+          "data_end": 1792175280000,
+          "time_type": "composite_snapshot",
+          "observation_type": "candle_close_sample",
+          "observation_mode": "candle_close_sample",
+          "price_type": "sampled_candle_close",
+          "quote_ready": false,
+          "confirmed_tail_ready": true,
+          "quality": "sampled",
+          "market_session": "scheduled_open",
+          "session_reason": null,
+          "calendar_verified": true,
+          "calendar_version": "oanda-sg-live-hours-reviewed-2026-10-11",
+          "read_at": 1792175271736,
+          "revision_id": "24e6353d-243d-4086-a232-4a02e167ea2b",
+          "input_revision": 50,
+          "source_identity": {
+            "source": "oanda",
+            "channel": "v20",
+            "environment": "practice",
+            "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+            "provider_symbol": "EUR_USD",
+            "basis": "bid",
+            "calendar_version": "ny17-candidate-v1"
+          },
+          "session_conflict": null,
+          "session_conflict_reason": null,
+          "fetch_status": "ok",
+          "description_base": "EUR/USD · 组合行情 · 当前未闭合M1收盘采样"
+        }
+      },
+      "before": [
+        {
+          "ticker": "MWP:EURUSD",
+          "sequence": 97
+        },
+        {
+          "ticker": "MWP:XAUUSD",
+          "sequence": 96
+        },
+        {
+          "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+          "sequence": 748
+        },
+        {
+          "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+          "sequence": 61
+        },
+        {
+          "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+          "sequence": 748
+        }
+      ],
+      "after": [
+        {
+          "ticker": "MWP:EURUSD",
+          "sequence": 97
+        },
+        {
+          "ticker": "MWP:XAUUSD",
+          "sequence": 97
+        },
+        {
+          "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+          "sequence": 753
+        },
+        {
+          "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+          "sequence": 62
+        },
+        {
+          "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+          "sequence": 753
+        }
+      ]
+    },
+    {
+      "check": "narrow-menu",
+      "width": 780,
+      "pass": true
+    },
+    {
+      "check": "reload",
+      "pass": true,
+      "symbol": "MWP:EURUSD"
+    }
+  ],
+  "errors": [],
+  "bad": [
+    {
+      "path": "/api/session",
+      "status": 401,
+      "body": "{\"detail\":\"请先登录\"}"
+    }
+  ]
+}
