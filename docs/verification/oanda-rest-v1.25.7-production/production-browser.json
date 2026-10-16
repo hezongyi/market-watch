@@ -1,0 +1,44 @@
+{
+  "version": "1.25.7",
+  "checkedAt": "2026-10-16T00:23:10.032Z",
+  "errors": [],
+  "failedResponses": [],
+  "blockedWrites": [],
+  "overflow": false,
+  "secureCookie": true,
+  "httpOnlyCookie": true,
+  "chartOrigin": "https://charts.kookvv.com:8443",
+  "chartCanvasCount": 7,
+  "chartState": {
+    "ready": true,
+    "readonly": true,
+    "charts": [
+      {
+        "resolution": "60",
+        "studies": [
+          "守望 Python SUPERTREND_PINE_V1"
+        ],
+        "visibleRange": {
+          "from": 0,
+          "to": 0
+        },
+        "series_kind": "MWC"
+      }
+    ]
+  },
+  "successfulAPIPaths": {
+    "/api/login": 1,
+    "/api/session-range": 1,
+    "/api/session": 4,
+    "/api/advanced-charts/workspaces": 1,
+    "/api/advanced-charts/catalog": 1,
+    "/api/charts/history-capabilities": 1,
+    "/api/advanced-charts/preferences": 1,
+    "/api/market-data/resolve": 11,
+    "/api/charts/data": 10,
+    "/api/charts/stream/subscribe": 9,
+    "/api/charts/stream/unsubscribe": 5,
+    "/api/chart-alerts": 1,
+    "/api/chart-alerts/events": 1
+  }
+}

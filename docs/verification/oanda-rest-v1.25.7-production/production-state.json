@@ -1,0 +1,46 @@
+{
+  "version": "1.25.7",
+  "schema": "au48_display_indicator_tasks",
+  "static_business_tables_verified": [
+    "advanced_chart_workspaces",
+    "advanced_chart_preferences",
+    "chart_workspaces",
+    "watches",
+    "chart_alert_versions",
+    "chart_alert_actions",
+    "market_composites",
+    "market_composite_revisions",
+    "market_realtime_mappings"
+  ],
+  "alert_configuration_preserved": true,
+  "account_notifications_preserved": true,
+  "no_notification_test_or_password_change": true,
+  "heartbeats_before": {
+    "market_heartbeat": 1792109095134,
+    "notify_heartbeat": 1792109062487,
+    "market_stream_heartbeat": null
+  },
+  "heartbeats_after": {
+    "market_heartbeat": 1792111638355,
+    "notify_heartbeat": 1792111634161,
+    "market_stream_heartbeat": null
+  },
+  "counts_before": {
+    "candles": 21501563,
+    "provider_bars": 951178,
+    "chart_published_bars": 81164,
+    "chart_alerts": 2,
+    "advanced_chart_workspaces": 2
+  },
+  "counts_after": {
+    "candles": 21514218,
+    "provider_bars": 951324,
+    "chart_published_bars": 81207,
+    "chart_alerts": 2,
+    "advanced_chart_workspaces": 2
+  },
+  "new_table_counts": {},
+  "yahoo_enabled": true,
+  "proxy_configured": true,
+  "unknown_composite_errors_delta": 0
+}

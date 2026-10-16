@@ -2,9 +2,8 @@
 import time
 
 import pytest
-from sqlalchemy import select
-
-from alerts import provider_cache as cache, provider_chart as upstream
+from alerts import provider_cache as cache
+from alerts import provider_chart as upstream
 from alerts.chart_api import DataQuery
 from alerts.config import settings
 from alerts.native_history_loads import read_context

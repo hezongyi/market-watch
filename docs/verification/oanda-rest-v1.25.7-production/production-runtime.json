@@ -1,0 +1,151 @@
+{
+  "version": "1.25.7",
+  "services": {
+    "pricing-worker": {
+      "image": "sha256:84e794d3321543bf8a073e537cbdc5c614b2af1d518f402a0955585ccedb5cb4",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "history-worker": {
+      "image": "sha256:84e794d3321543bf8a073e537cbdc5c614b2af1d518f402a0955585ccedb5cb4",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "realtime-worker": {
+      "image": "sha256:84e794d3321543bf8a073e537cbdc5c614b2af1d518f402a0955585ccedb5cb4",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "web": {
+      "image": "sha256:3f736ef2dd1fe7b739628729d967fa9f6d13e607431fdaa93189b3786fcebabb",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "native-history-worker": {
+      "image": "sha256:84e794d3321543bf8a073e537cbdc5c614b2af1d518f402a0955585ccedb5cb4",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "market-stream-worker": {
+      "image": "sha256:84e794d3321543bf8a073e537cbdc5c614b2af1d518f402a0955585ccedb5cb4",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "composite-aggregate-worker": {
+      "image": "sha256:84e794d3321543bf8a073e537cbdc5c614b2af1d518f402a0955585ccedb5cb4",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "chart-history-worker": {
+      "image": "sha256:84e794d3321543bf8a073e537cbdc5c614b2af1d518f402a0955585ccedb5cb4",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "notify-worker": {
+      "image": "sha256:84e794d3321543bf8a073e537cbdc5c614b2af1d518f402a0955585ccedb5cb4",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "chart-aggregation-worker": {
+      "image": "sha256:84e794d3321543bf8a073e537cbdc5c614b2af1d518f402a0955585ccedb5cb4",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    },
+    "api": {
+      "image": "sha256:84e794d3321543bf8a073e537cbdc5c614b2af1d518f402a0955585ccedb5cb4",
+      "status": "running",
+      "restarts": 0,
+      "health": "healthy"
+    },
+    "chart-origin": {
+      "image": "sha256:4b28398bdd0fe989464f9f90a26d9c8b45ea2ced53bc7daaeb7ee867e83d0683",
+      "status": "running",
+      "restarts": 0,
+      "health": null
+    }
+  },
+  "yahoo": {
+    "pricing-worker": {
+      "enabled": true,
+      "proxy_configured": true,
+      "oanda_stream_enabled": true,
+      "acquisition_mode": "stream",
+      "database_jit": "off"
+    },
+    "history-worker": {
+      "enabled": true,
+      "proxy_configured": true,
+      "oanda_stream_enabled": false,
+      "acquisition_mode": "stream",
+      "database_jit": "off"
+    },
+    "realtime-worker": {
+      "enabled": true,
+      "proxy_configured": true,
+      "oanda_stream_enabled": false,
+      "acquisition_mode": "stream",
+      "database_jit": "off"
+    },
+    "native-history-worker": {
+      "enabled": true,
+      "proxy_configured": true,
+      "oanda_stream_enabled": true,
+      "acquisition_mode": "stream",
+      "database_jit": "off"
+    },
+    "market-stream-worker": {
+      "enabled": true,
+      "proxy_configured": true,
+      "oanda_stream_enabled": false,
+      "acquisition_mode": "stream",
+      "database_jit": "off"
+    },
+    "composite-aggregate-worker": {
+      "enabled": true,
+      "proxy_configured": true,
+      "oanda_stream_enabled": false,
+      "acquisition_mode": "stream",
+      "database_jit": "off"
+    },
+    "chart-history-worker": {
+      "enabled": true,
+      "proxy_configured": true,
+      "oanda_stream_enabled": false,
+      "acquisition_mode": "stream",
+      "database_jit": "off"
+    },
+    "notify-worker": {
+      "enabled": true,
+      "proxy_configured": true,
+      "oanda_stream_enabled": false,
+      "acquisition_mode": "stream",
+      "database_jit": "off"
+    },
+    "chart-aggregation-worker": {
+      "enabled": true,
+      "proxy_configured": true,
+      "oanda_stream_enabled": false,
+      "acquisition_mode": "stream",
+      "database_jit": "off"
+    },
+    "api": {
+      "enabled": true,
+      "proxy_configured": true,
+      "oanda_stream_enabled": true,
+      "acquisition_mode": "stream",
+      "database_jit": "off"
+    }
+  },
+  "source_hashes_verified": true,
+  "backend_modules": 370
+}
