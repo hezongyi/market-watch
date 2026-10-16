@@ -1,6 +1,6 @@
 # 专业图表自选列表首屏与报价体验计划
 
-状态：已获用户批准，**真实数据复验已通过；已撤销早期 fixture 验收结论，未执行生产部署**
+状态：**2026-10-16 用户明确确认人工验收通过；真实数据复验已通过；未合并或发布生产**
 日期：2026-10-16
 项目：market-watch
 基线工作树：`/home/quant/repos/market-watch-rest-native-fix-20261015`
@@ -264,7 +264,7 @@
 
 ## 当前状态
 
-- 计划：已批准。风险分类 F0：兼容的 UI/报价适配，无 schema 或持久格式变更；执行独立 Ubuntu R1 并追加真实 OANDA REST Batch 浏览器验收。
+- 最终风险分类：F1，与 Issue #73 保持一致。虽然没有 schema、持久格式或供应商采集策略变更，但组合 NY17 previous close 和 REST/stream 报价链路属于重要后台链路；不能只按 UI 补丁归类。按 R2 汇总已有独立 Ubuntu 集成、真实供应商/组合及浏览器证据，并补独立 Standards/Spec review；不涉及迁移，兼容性通过新增可选报价字段、原有价格/身份与 reset/取消路径回归验证。早期 R1 是实例规模与单轮 smoke 的记录，不代表最终风险降为 F0。
 - 真实数据验收：通过，见 [报告](verification/pro-chart-watchlist-20261016/real-acceptance.md) 和 [脱敏 JSON](verification/pro-chart-watchlist-20261016/real-acceptance.json)。
 - Ubuntu 主机：`quant-server`；独立 project `mw-issue73-real-20261016`；页面 `https://192.168.7.232:18483/advanced-charts`；图表来源 `https://192.168.7.232:17483`。
 - 真实来源：OANDA Practice；平台 EURUSD/XAUUSD 与真实 EURUSD 历史接续组合。没有生成或注入行情 fixture。
@@ -289,3 +289,10 @@
 - 真实网页复现并修正 OANDA 详情在两种文案间反复切换。六次 EURUSD/XAUUSD 实际点击通过，旧文案可见状态为 0；四源九条身份的加载/刷新/添加检查通过，37 个去重行状态中无内部 ticker，预热场景第一帧直接显示名称。
 - 证据与数据边界见 [专项报告](verification/pro-chart-watchlist-20261016/stable-names-details.md)。九张截图逐张检查；API 与 DB 已确认原活动列表和五条品种保留，临时列表删除，Dukascopy/USDCAD 保留。
 - 验收脚本补充了恢复动作间的异步间隔与持久结果轮询；未完成落库不再视为恢复成功。实例仍运行供人工验收，未合并或发布生产。
+
+### 人工验收与合并收口
+
+- 用户于 2026-10-16 明确确认“我已验收通过”。验收实例保留，等待合并检查点；不自动退役数据库或删除永久资源。
+- 本次候选只收口 Issue #73。完整品种显示模型贯穿搜索、首次添加与持久化，作为后续增强，不扩大本次已验收补丁。
+- 合并目标为 `main`，审查比较基线 `b53d2973cd70e8610154bc46a9d516e62ccdadd7`。创建 Draft PR、CI、自审及独立 review 可自动推进；合并和生产发布分别遵守 AGENTS.md 检查点。
+- Issue 模板改动不属于本次修复，已从最终差异移出；保留提交历史，不重写分支。

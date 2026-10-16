@@ -1,6 +1,6 @@
 # 已知名称直接显示与 OANDA 详情文字闪烁
 
-F0：兼容的 UI/报价呈现修复，不改变数据库 schema、行情标识或价格计算。复用 Ubuntu `quant-server` 的独立 R1 project `mw-issue73-real-20261016`。
+本轮补修本身是兼容的 UI/报价呈现修复，不改变数据库 schema、行情标识或价格计算。整个 Issue #73 按 F1 / R2 收口：此前还包含组合 NY17 previous close 与 REST/stream 报价链路变更。复用 Ubuntu `quant-server` 的独立 project `mw-issue73-real-20261016`，R1 为单轮实例规模记录。
 
 ## 原因及修正
 
@@ -36,3 +36,5 @@ F0：兼容的 UI/报价呈现修复，不改变数据库 schema、行情标识�
 docker compose -p mw-issue73-real-20261016 -f /tmp/mw-issue73-real/compose.json up -d --no-build
 docker compose -p mw-issue73-real-20261016 -f /tmp/mw-issue73-real/compose.json stop
 ```
+
+用户于 2026-10-16 明确确认人工验收通过。实例暂保留；合并、生产发布与永久资源删除仍分别执行仓库检查点。
