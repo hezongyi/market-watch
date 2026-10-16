@@ -90,7 +90,11 @@ def freeze(db, page, body, maximum, *, evaluation_end=None):
         previous = entry.value
         same = (previous is not None and previous.epoch == epoch and epoch is not None
                 and previous.revision <= revision)
-        if same and previous.revision == revision and (not previous.rows or
+        # With an unchanged mutation epoch, only the retained final row can
+        # have changed. A window ending strictly before it remains immutable
+        # even while the live writer advances the dataset revision.
+        prefix_unchanged = same and previous.rows and previous.rows[-1]["start"] > ceiling
+        if prefix_unchanged or same and previous.revision == revision and (not previous.rows or
                 previous.rows[-1]["start"] >= ceiling):
             rows = previous.rows
         else:
@@ -211,4 +215,3 @@ def compute(inputs, meta, instrument, spec, *, first, provisional):
     finally:
         entry.lock.release()
         _prune(_RESULTS, MAX_VALUES)
-

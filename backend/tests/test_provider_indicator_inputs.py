@@ -178,3 +178,38 @@ def test_cancelled_waiter_does_not_abort_a_shared_calculation(monkeypatch):
         result = active.result(timeout=3)
     assert any(v['value'] is not None for s in result['series'] for v in s['values'])
     assert run()['series'] == result['series']
+
+
+def test_historical_window_reuses_prefix_while_live_tail_advances(database, monkeypatch):
+    monkeypatch.setattr(upstream, 'metadata', lambda _: META)
+    key = seed(META, 'M1', 1000000, page(1000, 1000000, boundary=True))
+    cache.data(query())
+    statements = []
+    engine = database.kw['bind']
+
+    def observe(conn, cursor, statement, params, context, many):
+        if ('provider_bars.payload' in statement and 'ORDER BY provider_bars.start' in statement
+                and 'DESC' not in statement):
+            statements.append((statement, params))
+
+    event.listen(engine, 'before_cursor_execute', observe)
+    try:
+        for i in range(3):
+            # The live writer changes only a tail strictly after this older
+            # window. Its stable history epoch proves the retained prefix.
+            seed(META, 'M1', 1001000 + i * 1000,
+                 page(999000 + i * 1000, 1001000 + i * 1000))
+            result = cache.data(query(800000))
+            with database.begin() as db:
+                rows = list(db.scalars(cache.select(cache.ProviderBar.payload).where(
+                    cache.ProviderBar.dataset_id == key, cache.ProviderBar.start < 800000)
+                    .order_by(cache.ProviderBar.start)))
+            expected = calculate(calculation_rows(rows, META, META['id']), SPEC)
+            assert result['indicators'][0]['series'] == [
+                {**series, 'values': [v for v in series['values']
+                                     if v['time'] >= result['bars'][0]['start']]}
+                for series in expected['series']]
+        # Each independent batch reference above issues one prefix query.
+        assert len(statements) == 3, 'live append must not reload an unchanged historical prefix'
+    finally:
+        event.remove(engine, 'before_cursor_execute', observe)
