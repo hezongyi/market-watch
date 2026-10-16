@@ -1,6 +1,6 @@
 # 专业图表自选列表首屏与报价体验计划
 
-状态：已获用户批准，**计划阶段；尚未实现**
+状态：已获用户批准，**实现进行中；W1–W5 代码已完成，W0/W6 浏览器与隔离运行验收待完成**
 日期：2026-10-16
 项目：market-watch
 基线工作树：`/home/quant/repos/market-watch-rest-native-fix-20261015`
@@ -23,7 +23,7 @@
 - [AdvancedWorkspace.tsx](../web/src/advanced/AdvancedWorkspace.tsx) 的 `loaded` 处理会等待偏好迁移、指标 catalog、偏好和 history capabilities 后才发送 `init`。
 - [bridge.js](../advanced-host/bridge.js) 的 `getQuotes()` 当前等待 `initialHistoryGate`；该 gate 在首个 `getBars()` 收尾时才释放。
 - [bridge.js](../advanced-host/bridge.js) 的 `resolveSymbol()` 当前异步调用 `/market-data/resolve`，所以原生控件可能先显示内部 ticker，再换成 `display_symbol`。
-- [market_data.py](../backend/alerts/market_data.py) 的平台行情分支返回 `ch/chp/prev_close_price`，组合行情分支当前只返回 `lp` 等状态字段。
+- [market_data.py](../backend/alerts/market_data.py) 的平台与组合行情分支均返回一致的 `lp/ch/chp/prev_close_price` 字段；组合变化基于同 revision 的 NY17 前一根已确认 D1 收盘。
 - [market_stream_worker.py](../backend/alerts/market_stream_worker.py) 的 quote stream 复用 `quote_snapshot()`，因此组合报价字段应在后端统一修复。
 - [native-ui.js](../advanced-host/native-ui.js) 从提交 `3f14266` 起向原生详情框插入交易时段和观察时间扩展；用户已批准恢复原生详情框。
 - [chart-menu.js](../advanced-host/chart-menu.js) 当前只将 `商品代码` 改名为 `商品`，尚未移动三点控制。
@@ -77,6 +77,8 @@
 
 ### W1：组合行情报价字段
 
+状态：已完成（`8875731`）。
+
 **目标**：组合行情和平台行情在 watchlist 中具有一致的涨跌字段。
 
 **建议实现位置**：
@@ -100,6 +102,8 @@
 - stream worker 断言首次事件和后续变化事件均携带同样的报价字段。
 
 ### W2：watchlist 首屏并发与显示代码预热
+
+状态：已完成（`3064b02`）。
 
 **目标**：自选报价不再等待首个历史请求，原生列表直接显示最终代码。
 
@@ -129,6 +133,8 @@
 
 ### W3：原生详情框恢复
 
+状态：已完成（`3064b02`）。
+
 **建议实现位置**：
 
 - `advanced-host/native-ui.js`
@@ -148,6 +154,8 @@
 - 无遗留 `mw-quote-details-time` 节点和 observer。
 
 ### W4：三点按钮位置和方向
+
+状态：已完成（`3064b02`）。
 
 **建议实现位置**：
 
@@ -171,6 +179,8 @@
 - 版本 hash 不匹配时适配器不执行破坏性 DOM 操作。
 
 ### W5：最新价末位上标
+
+状态：已完成（`3064b02`）。
 
 **建议实现位置**：
 
@@ -255,7 +265,9 @@
 ## 当前状态
 
 - 计划：已批准。
-- 代码实现：未开始。
+- 代码实现：W1–W5 已提交（`8875731`, `3064b02`）。
+- W0 静态证据：`docs/verification/pro-chart-watchlist-20261016/w0-static-baseline.json`；主机 Chromium 启动仍缺 `libatk-1.0.so.0`，未伪造浏览器 DOM/时序证据。
+- 已验证：组合行情/API 与市场数据定向测试 66 passed；`npm run build` 通过；JS 语法与 ruff 检查通过。
 - 生产修改：未进行。
 - 生产部署：未授权、未进行。
-- 下一步：由后续代理先执行 W0 浏览器基线和 DOM 验证。
+- 下一步：在 Ubuntu 独立 Compose project 构建并运行 W6 smoke，补齐 Chromium 依赖后重跑 W0 浏览器时间线与 DOM 回归。
