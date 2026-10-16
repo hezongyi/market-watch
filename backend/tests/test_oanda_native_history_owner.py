@@ -250,15 +250,18 @@ def test_first_high_period_price_admits_source_before_future_date_label(
 
 
 @pytest.mark.parametrize('native', [False, True])
-def test_cold_latest_recovers_supplier_clock_rejection_after_queue(database, monkeypatch, native):
+@pytest.mark.parametrize('minute_handoff', [False, True])
+def test_cold_latest_recovers_supplier_clock_rejection_after_queue(database, monkeypatch, native, minute_handoff):
     from datetime import datetime
     from decimal import Decimal
 
     import httpx
 
-    entry = int(datetime.fromisoformat('2026-10-16T03:00:00.900+00:00').timestamp() * 1000)
+    entry = int(datetime.fromisoformat('2026-10-16T02:59:59.900+00:00' if minute_handoff else
+        '2026-10-16T03:00:00.900+00:00').timestamp() * 1000)
     observed = entry + 200
-    opening = entry - 900
+    opening = entry // 60000 * 60000
+    before = (entry // 1000 + 1) * 1000
     monkeypatch.setattr(cache, 'now_ms', lambda: entry)
     monkeypatch.setattr(upstream, 'now_ms', lambda: observed)
     monkeypatch.setattr(upstream, 'metadata', lambda _: META)
@@ -271,21 +274,24 @@ def test_cold_latest_recovers_supplier_clock_rejection_after_queue(database, mon
         params = dict(request.url.params)
         calls.append(params)
         if 'to' in params:
-            assert Decimal(params['to']) * 1000 == opening + 1000
-            assert Decimal(params['to']) * 1000 > observed - 500
-            return httpx.Response(400, json={'errorMessage': "Invalid value specified for 'to'. Time is in the future"})
+            assert Decimal(params['to']) * 1000 == before
+            if len(calls) == 1:
+                assert Decimal(params['to']) * 1000 > observed - 500
+                return httpx.Response(400, json={'errorMessage': "Invalid value specified for 'to'. Time is in the future"})
         return httpx.Response(200, json={'candles': [
             {'time': str(Decimal(t) / 1000), 'complete': False,
              'bid': {'o': '1', 'h': '2', 'l': '1', 'c': '1.5'}}
-            for t in [opening, observed + 60000]
+            for t in ([before] if minute_handoff and 'to' not in params else [opening])
         ]})
 
     with httpx.Client(transport=httpx.MockTransport(handle)) as client:
         monkeypatch.setattr(upstream, 'pooled_client', lambda _: client)
         result = cache.data(DataQuery(instrument=META['id'], series_kind='provider', timeframe='M1',
             limit=1, firstDataRequest=True, native_history={'chart_count': 1, 'focused': True} if native else None))
-    assert len(calls) == 2 and 'to' in calls[0] and 'to' not in calls[1]
+    assert len(calls) == (3 if minute_handoff else 2) and 'to' in calls[0] and 'to' not in calls[1]
+    if minute_handoff:
+        assert 'to' in calls[2]
     assert [b['start'] for b in result['bars']] == [opening]
     assert result['provider_snapshot_id']
     with database.begin() as db:
-        assert all(end <= opening + 1000 for _, end in db.get(ProviderDataset, result['dataset_id']).coverage)
+        assert all(end <= before for _, end in db.get(ProviderDataset, result['dataset_id']).coverage)

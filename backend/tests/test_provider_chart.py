@@ -840,3 +840,32 @@ def test_oanda_cached_latest_recovers_cursor_after_slot_queue(database, monkeypa
     assert len(calls) == 2 and 'to' in calls[0] and 'to' not in calls[1]
     assert [b['start'] for b in page['bars']] == [opening]
     provider._CACHE.clear()
+
+
+@pytest.mark.parametrize('advances', [True, False])
+def test_oanda_count_latest_at_exclusive_boundary_tries_one_historical_cursor(monkeypatch, advances):
+    from decimal import Decimal
+
+    monkeypatch.setattr(settings, 'oanda_token', 'test-only')
+    before = stamp('2026-10-16T03:00:00+00:00')
+    monkeypatch.setattr(provider, 'now_ms', lambda: before)
+    calls = []
+
+    def handle(request):
+        params = dict(request.url.params)
+        calls.append(params)
+        assert ('to' in params) == (len(calls) > 1)
+        opening = before - 60000 if 'to' in params and advances else before
+        return httpx.Response(200, json={'candles': [
+            {'time': str(Decimal(opening) / 1000), 'complete': False,
+             'bid': {'o': '1', 'h': '2', 'l': '1', 'c': '1.5'}}]})
+
+    with httpx.Client(transport=httpx.MockTransport(handle)) as client:
+        if advances:
+            page = provider.native_page(META, 'M1', before, 1, client=client)
+            assert [b['start'] for b in page['bars']] == [before - 60000]
+            assert page['coverage'] == [[before - 60000, before]]
+        else:
+            with pytest.raises(ValueError, match='分页未推进'):
+                provider.native_page(META, 'M1', before, 1, client=client)
+    assert len(calls) == 2

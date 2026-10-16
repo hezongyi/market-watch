@@ -284,6 +284,7 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
     high_period = frame in ("D1", "W1", "MN")
     cursor = min(observed + 1, before + (2 * 86400000 if high_period else 0))
     boundary = False
+    force_cursor = False
     for _ in range(8):
         # Optional bars can fill this mandatory HTTP request, but never extend
         # the loop. High-period translation/filtering still stops at count.
@@ -302,7 +303,7 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
                 "smooth": str(native["smooth"]).lower(),
                 "count": batch_count,
                 # A current cutoff belongs to the supplier's clock.
-                **({} if cursor >= observed else {"to": str(Decimal(cursor) / 1000)}),
+                **({} if cursor >= observed and not force_cursor else {"to": str(Decimal(cursor) / 1000)}),
             }, deadline)
             candles = payload["candles"]
             batch = []
@@ -357,6 +358,13 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
             break
         next_cursor = min(b["start"] for b in batch)
         if next_cursor >= cursor:
+            if source == "oanda" and request_mode == "count_latest" and not force_cursor:
+                # Latest may cross a candle boundary while the request is in
+                # flight. Its first candle can equal the exclusive cursor and
+                # be filtered; the supplier has now reached that cursor, so
+                # try its original historical cutoff once, without moving it.
+                force_cursor = True
+                continue
             raise ValueError("平台分页未推进")
         cursor = next_cursor
     else:
