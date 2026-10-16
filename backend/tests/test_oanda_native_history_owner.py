@@ -169,3 +169,18 @@ def test_ordinary_latest_read_waits_for_shared_freshness(database, monkeypatch):
     monkeypatch.setattr(upstream, 'native_page', lambda *a, **kw: pytest.fail('latest must remain account-owned'))
     with pytest.raises(cache.LatestObservationPending):
         cache.read(META, 'M1', 600001, 5, latest=True)
+
+
+def test_ordinary_latest_read_fetches_real_gap_beside_shared_owner(database, monkeypatch):
+    own(database, monkeypatch, gap=True)
+    calls = []
+
+    def fetch(meta, frame, before, count, **kwargs):
+        calls.append((before, count))
+        return {'bars': bars(360000, 600000) + bars(600000, 660000, complete=False),
+                'history_boundary': False, 'coverage': [[360000, before]]}
+
+    monkeypatch.setattr(upstream, 'native_page', fetch)
+    result = cache.read(META, 'M1', 600001, 5, latest=True)
+    assert calls == [(600001, 5)]
+    assert [b['start'] for b in result['bars']] == list(range(360000, 660000, 60000))

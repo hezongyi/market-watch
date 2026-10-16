@@ -589,7 +589,9 @@ def _read(meta, frame, before, count, *, latest=False, deadline=None, on_ready=N
                 if on_ready:
                     on_ready(db, page)
                 return page
-        if latest and (len(cached["bars"]) >= count or cached["history_boundary"]) and (not fresh or not cached["interval"]):
+        if shared_latest and (cached["satisfied"] or observed_tail):
+            raise LatestObservationPending()
+        if latest and not shared_latest and (len(cached["bars"]) >= count or cached["history_boundary"]) and (not fresh or not cached["interval"]):
             # Query only the missing tail since last observation, including an
             # overlapping bar for close/revision confirmation, never the whole window.
             if cached["bars"]:
@@ -604,7 +606,7 @@ def _read(meta, frame, before, count, *, latest=False, deadline=None, on_ready=N
             missing = count - len(cached["bars"]) if readable else count
             amount = min(cap, max(1, missing))
         fetch_page(key, meta, frame, cursor, amount, deadline,
-                   kind=LANE.get() or "chart", latest=latest and cursor == before)
+                   kind=LANE.get() or "chart", latest=latest and not shared_latest and cursor == before)
         fetched = True
     raise TimeoutError("平台分页未完成，请重试")
 

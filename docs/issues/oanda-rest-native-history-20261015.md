@@ -10,6 +10,8 @@ v1.25.7 已部署生产，生产采集仍为 stream。Ubuntu 独立生产副本�
 
 ## 修复与边界
 
+真实浏览器随后暴露普通指标请求的同类问题：`native_history=null`、`firstDataRequest=false`、`before=forming.start+1` 走普通读取入口，虽有足够缓存，仍因形成中柱不在确认覆盖内重复拉取约 2,000 根，耗尽预算返回 503。固定时钟回归仅改变是否有 count/to 覆盖，得到 1 failed / 1 passed；普通读取现复用相邻形成中观测，不扩大覆盖。缺失预热前缀或真实中间缺口仍独立补历史；完整但过期的最新需求才等待共享采集。新增 native/ordinary/indicator/durable 回归合计 11 项通过。
+
 原生读取可以在确认覆盖末端读取相邻形成中蜡烛，但不扩大覆盖、不提升 complete。缺失的必需历史通过有界原生历史分页补齐；正常最新刷新仍由账号共享 worker 执行。数据已满足但最新观察过期时返回独立的 latest pending，不启动第二个 latest 轮询；持久加载任务按一秒退让等待，不累计分页停滞，原到期和消费者取消仍有效。
 
 F1：修改共享采集与原生历史的后台衔接；不改 schema、固定历史、账户或告警配置。最小检查：新增回归、provider cache/native history/REST worker 专项、真实 PG14、两轴 review，以及 Ubuntu 真实原生 M1 和组合长观察。生产启用 REST 必须等这些证据通过；v1.25.7 标签保持不变。
