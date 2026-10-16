@@ -1,258 +1,325 @@
 # 平台、自建与组合行情 Python 指标交互性能方案
 
-状态：用户已确认目标，**方案阶段；暂不实现业务代码**  
-日期：2026-10-16  
-项目：market-watch  
-代码基线：`v1.25.8` / `b53d2973cd70e8610154bc46a9d516e62ccdadd7`  
-工作树：`/home/quant/repos/market-watch-rest-native-fix-20261015`  
-分支：`release/v1.25.8-20261016`  
-关联 Issue：[#73 专业图表自选列表与指标体验](https://github.com/hezongyi/market-watch/issues/73)
+状态：**评审后修订版；方案阶段，业务实现尚未开始**。日期：2026-10-16。项目：market-watch。
 
-本文是后续 agent 的交接方案。目标是让平台行情、自建行情和组合行情中的 Python 指标，在添加、首次加载、修改参数和恢复布局时，具有与 TradingView 内置指标一致的即时反馈节奏；计算结果仍须保持现有 Python 算法、交易日、缺口、临时 K 线和历史修订语义。
+业务参考基线：`v1.25.8` / `b53d2973cd70e8610154bc46a9d516e62ccdadd7`。原方案提交：`09c50059cab1ed1c20c776642de6c770be6e3963`。
+
+方案修订分支：`docs/issue74-plan-revision-20261016`。
+
+负责 Issue：[#74 Python 指标性能与交互一致性](https://github.com/hezongyi/market-watch/issues/74)。关联：[#73 自选表、组合报价与原生 UI](https://github.com/hezongyi/market-watch/issues/73)。[原方案评审记录](issues/issue-74-plan-review-20261016.md)。
+
+本文是后续实施的交接方案。目标是让 Python 指标在添加、首次加载、修改参数和恢复布局时提供接近 TradingView 内置指标的反馈，同时保持现有 Python 算法、交易日、缺口、临时 K 线和历史修订语义。评审已获用户认可；本次只修订方案和 Issue，不代表已完成 I0、性能验收或业务实现。
 
 ## 1. 范围和术语
 
-| 用户称呼 | 当前 `series_kind` | 本方案含义 |
+| 用户称呼 | `series_kind` | 范围 |
 | --- | --- | --- |
-| 平台行情 | `provider` | OANDA 等平台/供应商行情；上游历史可能需要 REST 或缓存补齐 |
+| 平台行情 | `provider` | OANDA 等供应商行情，历史可能需要 REST 或缓存补齐 |
 | 自建行情 | `managed` | 正在维护并持续发布的自建行情 |
-| 自建固定历史 | `history` | 已发布的固定自建历史；作为自建行情的一种，不得遗漏 |
-| 组合行情 | `composite` | 固定历史与实时来源按组合修订、接缝和展示快照拼接 |
+| 自建固定历史 | `history` | 已发布的固定自建历史，不得遗漏 |
+| 组合行情 | `composite` | 按组合修订、接缝和展示快照拼接固定历史与实时来源 |
 
-四类内部身份必须继续隔离。显示“像内置指标”描述的是用户可见的交互和等待行为，不表示把内部 ticker、组合修订或 Python 结果身份混在一起。
+四类内部身份继续隔离。动作包括添加指标、首次加载或切换品种/周期、修改计算参数或显示输入、恢复布局或重建多图，以及页面刷新后的冷恢复。
 
-四类动作均在范围内：
+术语区分：
 
-1. 从指标选择器添加 Python 指标；
-2. 图表首次加载或切换品种/周期后显示指标；
-3. 在设置框修改参数或显示输入；
-4. 恢复保存布局、重建多图或刷新页面后恢复指标。
+- **输入复用**：共享冻结的价格与语义证据，减少上游和数据库读取，不代表已复用计算状态。
+- **结果命中**：当前完整规格和输入证据已有可验证结果。
+- **checkpoint 命中**：目标规格已有相同算法、参数、计算起点和兼容输入前缀的状态。
+- **新规格冷计算**：目标规格未算过、checkpoint 不存在，需要合法初始化和回放。
+- **provisional**：保持现有形成中柱或未确认依赖的含义，不表示算法近似或历史初始化不足。
+- **覆盖区间**：结果已经计算的源时间范围；算法预热导致的合法 null 与尚未计算的缺失必须区分。
 
-## 2. 已测证据和当前瓶颈
+## 2. 已有证据与约束
 
-以下是生产只读 REST 测量，不是浏览器最终首屏承诺。真实 Chromium DOM 时序仍需在 Ubuntu 隔离环境完成 W0。
+以下性能数值来自原方案的生产只读 REST 测量，不是浏览器首屏或 p95 验收结果。真实 Chromium 基线仍须完成 I0。
 
-| 链路 | 观测 | 说明 |
+| 链路 | 已有观测 | 含义 |
 | --- | --- | --- |
-| 平台 `MWP:OANDA:USD_CAD` H1 | 无指标首次约 2623 ms；其中上游约 2495 ms。SMA20 约 195 ms，参数改为 SMA50 约 112 ms（后续命中缓存） | Python 计算本身不一定慢，首次行情历史/上游往返才是主要延迟 |
-| managed `EURUSD` H1 | 约 40–60 ms | 当前数据量和缓存较热；代码仍可能为每次带指标请求读取完整已发布历史 |
-| 固定历史 `MWH:*` H1 | 首次返回 `values=0`、`calculation.status=pending`；后台完成后才返回完整值 | `FixedIndicatorRun` 按约 2000 根一轮推进，页面可能长时间看到空值 |
-| 组合 `MWC:*` H1 | SMA20 首次约 274 ms 但状态仍 pending；SMA50 首次空值，约 6 秒后 complete | `FixedIndicatorRun` 之外，组合展示后缀还可能创建 `DisplayIndicatorTask`；后台有积压时可扩大到几十秒 |
-| 组合实时来源 | 生产部分数据集曾为 `recovering`，`quote_ready=false`，部分 quote 已过期 | 实时快照恢复会触发 reset/reload，导致价格和指标不同步；不能把恢复状态当成普通指标完成 |
+| 平台 `MWP:OANDA:USD_CAD` H1 | 无指标首次约 2623 ms，上游约 2495 ms；后续 SMA20 约 195 ms、SMA50 约 112 ms | 冷历史往返可能比算法更慢，热请求已有较低延迟 |
+| managed `EURUSD` H1 | 热请求约 40–60 ms | 不能代表长历史或新参数冷计算 |
+| 固定历史 `MWH:*` H1 | 首次空值且 calculation pending | 持久任务完成前尚无可见结果 |
+| 组合 `MWC:*` H1 | SMA20 首次约 274 ms 但 pending；SMA50 首次空值，约 6 秒后完成 | 固定任务、展示后缀和队列共同影响等待 |
+| 组合实时来源 | 部分数据集曾 recovering、quote_ready=false | 历史可用性与实时恢复须分别表达 |
 
-源码证据：
+源码已确认：
 
-- `advanced-host/indicators.js` 明确为“Python computes every value; JS only maps backend series”；原生指标直接使用浏览器已有 K 线，执行模型不同。
-- `advanced-host/indicator-coordinator.js` 每次最多读取 2000 根、最多 100 页，并有 30 秒总 deadline；参数变化可能重新读完整递归前缀。
-- `backend/alerts/provider_cache.py` 在带指标时需要冻结完整计算前缀，随后调用 `provider_indicator_inputs.compute()`。
-- `backend/alerts/managed_dataset.py` 的带指标路径会统计并读取完整发布历史，用户只看三百根也可能触发长历史计算。
-- `backend/alerts/fixed_indicators.py` 首次请求创建 `FixedIndicatorRun`，状态初始为 `pending`；`history_versions.worker_tick()` 每轮只推进一个任务。
-- `backend/alerts/display_indicator_jobs.py` 为组合展示后缀另起后台任务，且同样按有限页推进。
-- `advanced-host/bridge.js` 的请求、取消和展示快照恢复目前分散在多个路径，旧参数结果可能在新结果到达前被清空。
+- `advanced-host/indicators.js` 目前映射 Python 结果；`indicator-coordinator.js` 每页最多 2000 根、最多 100 页、30 秒预算。
+- `provider_indicator_inputs.freeze/compute` 已有进程内共享输入、参数隔离的结果缓存、增量状态和每 512 根 checkpoint。先测实际 miss、跨进程重复和快照不一致原因，不先复制一套缓存。
+- `managed_dataset.data()` 带指标时可能读取完整发布历史；输入读取成本和算法回放成本须分别计量。
+- `FixedIndicatorRun/Block` 按完整 spec 分组并保存 lineage；`DisplayIndicatorTask` 另有队列、容量和快照有效期。浏览器取消不会撤销已创建的持久 run。
+- `native-indicator-results.js` 只在输入完全相同时保留 rows；改参会走原生 clear，identity 改变也会清空 binding。无黑屏目标必须包含该 Adapter。
+- 历史更正时 coordinator 已先撤回受影响后缀。这是保留的正确性合同。
 
-## 3. 目标行为
+评审的直接数值复核：EMA500 输入为 1200 根价格 100，随后 800 根价格 200。仅用最后 800 根、其中 500 根 warmup 时，首个可见值为 `200`；完整历史结果为 `186.5205336828886`。同参数正确 checkpoint 恢复后的全部后缀与完整计算严格相等。EMA20 checkpoint 用于 EMA50 会被现有实现拒绝。现有 `test_indicator_state.py` 39 项通过。
 
-“像内置指标一样”拆成可测的用户时序：
+## 3. 目标与测量口径
 
-1. **已加载行情时添加指标**：用户操作后立即出现指标对象和状态；首个满足 warmup 的可见值目标 p95 `<300 ms`。
-2. **修改参数**：保留旧结果作为过渡，目标 p95 `<500 ms` 出现新参数的首个可见值；不因等待新结果而整段空白。
-3. **首次加载/冷启动**：行情和指标输入并行；有足够输入后先显示即时结果，后台继续补齐权威历史，不让用户等待几十秒才看到第一条线。
-4. **布局恢复**：按保存的 study identity 去重、复用已接受的 bars/checkpoint，目标 p95 `<500 ms` 重新出现首个可见值；旧布局结果不能串到新品种、周期或参数。
-5. **权威收敛**：普通缓存场景后端权威结果目标 `<2 s`；冷平台历史、长固定历史和实时恢复须显示明确的 `preparing/provisional/ready/error` 状态，不能无限空白或等待 30 秒后才报错。
-6. **实时更新**：新柱和形成中柱只追加/更新受影响后缀；同一计算身份不重复扫描整段历史。
+即时反馈包括立即出现 study 和准备状态；性能目标计量的是当前参数的有效可见值，不能把 study 对象、加载标识或旧参数曲线算成新结果。
 
-W0 取得真实浏览器基线后，可以调整目标数值，但任何调整必须按冷/热、三类行情、四类动作分别记录，不能用平均值掩盖组合或固定历史长尾。
+| 动作/结果 | 初始目标 | 计时和分组 |
+| --- | --- | --- |
+| 已加载行情后添加指标 | 首个新结果 p95 <300 ms | 用户操作开始计时，checkpoint/结果 miss 仍纳入对应分组 |
+| 修改参数 | 首个新参数结果 p95 <500 ms，等待期间保留仍有效的旧参数展示 | 包含从未使用过的新参数，不只测预热规格 |
+| 布局恢复 | 首个当前规格结果 p95 <500 ms | 同页热恢复与刷新/冷恢复分别报告；冷恢复不能假定旧内存缓存仍在 |
+| 普通缓存场景权威结果 | <2 s，报告 p50/p95 | 明确命中层级、输入版本和可见覆盖，不以历史任务完成代替可见结果 |
+| 首次冷加载、长历史、recovering | 立即有准备/恢复状态，精确结果就绪后显示 | 报告用户总等待与输入等待；I0 后给出各类冷场景预算及未达目标项 |
+| 实时更新 | 同一规格与兼容输入仅处理受影响后缀 | 记录扫描量、计算步数、订阅数和失效区间 |
 
-## 4. 推荐架构：即时结果和权威结果分层
+每个场景同时记录：
 
-### 4.1 即时显示层
+1. `T_op_first`：用户操作至当前参数首个有效可见值实际提交并经过渲染帧。
+2. `T_input_first`：所需价格、语义元数据和合法 seed 接受后至首值；此数值不能代替用户总等待。
+3. `T_visible_coverage`：当前可见区间全部可计算输出完成；多输出和合法 warmup null 分别说明。
+4. `T_visible_canonical`：当前可见结果与后端权威输入/算法收敛。
+5. `T_history_complete`：完整历史任务完成；与首屏分开报告。
 
-在浏览器端新增受控的 Python study display calculator（优先 Web Worker，避免阻塞 TradingView 主线程），输入是当前已接受的 K 线、必要 warmup 和指标规格。它只负责首屏和参数交互，不改变后端告警或历史认证。
+证据按四类内部行情、四类动作、冷/热、已用/全新参数、单/多指标、300 根/长历史和正常/recovering 分组，记录缓存命中层级、SQL 行数、计算步数及即时/权威结果差异。报告 p95 时每组至少 30 个独立样本，记录 n 和 nearest-rank 算法；不足样本只作探索分布，不宣称通过。超时/错误单列并计入该场景的失败，不能通过剔除慢样本达标。
 
-第一批覆盖现有标准目录：`SMA`、`EMA`、`LWMA`、`BBANDS`、`RSI`、`MACD`、`ATR`、`STOCH`。计算必须按 `backend/alerts/indicator_state.py` 的状态、预热、缺口和临时柱规则实现，并以 Python 结果 fixture 做逐点校验；不能只用一段简化的滚动平均替代真实语义。
+数学上不足 warmup 的区间应明确标记，不生成伪值。仅出现一个点不代表可见覆盖完成。I0 若证明某类冷恢复或全新参数达不到目标，必须保留测量、方案成本和未完成项，不能换计时起点或只保留热场景来宣称完成；需要改变目标或精度时另列取舍再确认。
 
-`SWING_SR_V1`、Supertrend 以及以后带复杂形态/绘图依赖的插件先走“后端预热 + 旧结果保留 + 明确状态”路径；在最终验收前必须为每个已发布 catalog 指标选择一种满足同一 SLO 的即时路径，不能永久留下“该指标例外”而不提示。
+## 4. 计算与结果协议
 
-即时结果必须带上：`series_kind`、instrument、timeframe、study spec、参数、算法版本、计算起点、输入 revision、是否 provisional。只接受仍匹配当前 chart generation 的结果。
+### 4.1 精确显示路径与 Worker 决策
 
-### 4.2 后端权威层
+默认仅展示与现有 oracle 语义一致的计算结果。浏览器 Worker 是可选的显示计算 Adapter，须在 I0、原生接入验证和已有缓存/队列优化后，根据剩余延迟决定覆盖范围；不预先要求把八项算法全部维护两份。
 
-后端继续负责完整历史起点、固定历史/组合修订、检查点、历史更正、组合接缝、最终 canonical result 和告警使用。即时结果到达后，后台结果按 identity 原子替换；如果输入 revision 或 display snapshot 不同，旧结果只能继续作为过渡画面，不能宣称已经同步。
+| 指标类型 | 合法快速路径 | 缺失状态时 |
+| --- | --- | --- |
+| SMA、LWMA、BBANDS、STOCH | 具备完整有限依赖窗口及缺口/覆盖证据，按现有算法计算 | 获取缺少的有限输入；不足 warmup 保留合法 null |
+| EMA、RSI、MACD、ATR | 从真实计算起点回放，或加载同规格、同算法、兼容前缀的 checkpoint 再推进 | 共享 frozen input，但进行目标规格的冷回放；准备状态不算数值 SLO 达标 |
+| SWING_SR_V1、SUPERTREND_PINE_V1 及后续插件 | 使用已验证的结果/checkpoint 或等价显示计算，完整保留形态、统计和多输出合同 | 单列全新规格精确路径；默认参数预热不能证明任意参数达标 |
 
-后端响应统一包含以下状态字段，前端和 stream 共用：
+所有候选浏览器实现按 `indicator_state.py` 和 Python oracle 对照，覆盖数值、null、缺口、NY17/DST、临时柱、接缝和绘图输出。现有数值合同使用的容差为 abs 1e-8、rel 1e-10；不得以展示四舍五入掩盖更大差异。
+
+默认不引入“仅从当前窗口初始化递归状态”的近似线。若后续确需近似展示，须先独立定义误差阈值、近似标识、收敛时限和失败行为，明确与 provisional 的区别，再确认该精度取舍；不由实现者默认为已获授权。
+
+I0/I1 交付每个已发布 catalog 指标的路径表：输入需求、seed 可用性、冷/热路径、原生提交方式、时序和精度证据。未验证的路径保持未完成，不以“复杂指标例外”或 pending 永久替代目标。
+
+### 4.2 已接受输入与 checkpoint 合同
+
+在 `barsOf` 转成原生 OHLCV 之前保留同一已接受快照的原始输入；不能从图表展示时间反推源时间、交易时段或缺口。输入合同至少声明：
+
+- `series_kind`、品种、周期、真实 `start/end`、后端 `chart_time`、OHLC 和 `complete`。
+- 后端核验的 `gap_before`、组合接缝，以及适用的 source_confirmed、coverage_complete、display_coverage_complete 等依赖证据。
+- 交易日/日历版本、历史起点、history epoch、修订和 provider/display snapshot 证据。字段不适用时显式说明，缺少必须字段时不执行猜测计算。
+
+checkpoint 包含算法及状态格式版本、完整规范化 spec、真实计算起点、输入前缀证据和状态所处的半开时间边界：状态只包含该边界以前的已确认输入，随后从边界开始回放。只有目标规格一致且前缀未受更正影响时才能复用。
+
+形成中柱用已确认状态的副本计算，不能污染后续 tick 或 checkpoint；组合展示依赖沿用现有 display_step 规则。若 checkpoint 之前发生更正，从受影响区间之前的合法状态回放；不能仅因 revision 数值较新就认定状态兼容。
+
+### 4.3 逻辑身份、执行证据与状态
+
+将逻辑请求、输入证据和消费者 generation 分开，避免把旧参数过渡值当作新参数结果，也避免每个 pane 的 generation 进入共享缓存键。
+
+```text
+logical_identity:
+  series_kind + canonical instrument/dataset + timeframe
+  + indicator name/catalog version + canonical params
+  + calculation_origin + provisional input policy + calendar semantics
+
+execution_identity:
+  logical_identity + algorithm/state-format version
+  + revision/input_revision + history epoch
+  + provider_snapshot/display_snapshot + dependency revision
+
+consumer:
+  chart/study identity + request_generation
+```
+
+输入、checkpoint 和结果各用适合的键：输入共享键不含单个指标参数；checkpoint/result 键必须包含完整目标规格与算法版本。窗口边界和 coverage 随结果声明，不能把窗口起点伪装成真实 calculation_origin。等价快照的跨版本复用必须有未变前缀证据，不能只比较时间戳。
+
+前后端统一结果协议，在兼容现有 run 和 display_status 的前提下补齐：
 
 ```text
 calculation: {
   status: pending | partial | complete | error,
-  run_id,
-  cursor,
-  target_end,
-  calculation_origin,
-  input_revision,
-  algorithm,
-  error
+  run_id, display_task_ids, cursor, target_end,
+  calculation_origin, input_revision, algorithm,
+  input_evidence, coverage, required_coverage,
+  producer: browser | backend,
+  accuracy: oracle_equivalent,
+  canonical_verified,
+  invalidation: {reason, affected_ranges},
+  error, retry_token
 }
 ```
 
-`partial` 只表示已经计算的区间，未完成区间必须是 null/明确缺失；不能把零值当作未完成结果。
+cursor/coverage 使用源时间及半开区间。partial 只表示已计算区间，未完成区间明确缺失；0、负值、合法 null 和未计算状态不得混淆。完整历史 pending 时可以交付已有可验证覆盖；不能把很早以前的 partial 前缀算作当前可见值。兼容既有错误码、重试凭据和 REST/stream 协议；破坏性格式变更单独评审。
 
-### 4.3 统一 identity、取消和去重
+浏览器与后端仅在逻辑身份、输入证据和所需覆盖均匹配时原子交接。canonical_verified 只描述该 execution identity 和 coverage 已获权威核对，浏览器不能自行把它设为 true。任务 status 描述声明目标的计算进度；UI 的可见就绪、权威核对和来源 recovering 分开表示，不能互相推断。provisional 仍是逐柱/依赖语义；不能共用一个 provisional 标记掩盖这些差别。
 
-请求和缓存键至少包含：
+### 4.4 取消、去重与失效
 
-```text
-series_kind + instrument + timeframe + revision/display_snapshot
-+ indicator name/version + canonical params + calculation_origin
-+ provisional mode + dependency revision
-```
-
-要求：
-
-- 添加、参数编辑、布局恢复使用同一 coordinator 协议；每个操作有 request generation 和 AbortController。
-- 新参数到达后取消尚未提交的旧请求，但保留旧参数的已接受结果直到新结果可替换。
-- 同一图表多 pane、多图或 stream 订阅共享一次输入读取和一次同规格计算；不同品种、周期、修订、参数不能串缓存。
-- 旧 generation 的 HTTP、worker、SSE、展示任务完成后不得提交。
-- 30 秒 deadline 只保护后端请求，不作为用户第一次反馈的等待时间；到 deadline 必须返回可重试的错误和已接受的旧/即时结果。
+- 添加、改参和布局恢复共用 coordinator；每个消费者有 generation 和取消句柄，多 pane 的同一输入/同规格计算共享，取消只解除本消费者。
+- 旧 generation 的 HTTP、Worker、SSE 和任务通知不得写入该消费者。共享的合法后台任务仍可按既有 fenced publication 保存权威结果，不因某个旧页面失效而禁止其他用户复用。
+- 同一输入的计算参数改变时，旧结果可作为带旧参数标签的过渡展示；显示输入改变时优先复用数值，不重新扫描历史。
+- 历史更正、组合修订切换等使旧值失效时，先撤回受影响区间；只保留有证据未受影响的前缀。普通新柱追加或尾柱更新不清空整段历史。
+- 快照过期按现有价格/指标共同恢复协议处理。旧修订指标不能叠到新版价格上；若保留整个旧画面，价格与指标必须一起保持同一旧证据并标记恢复。
+- 30 秒是后端请求保护预算，不是首次反馈预算。失败或超时只能保留仍可验证的结果，显示可重试状态，不恢复已知失效区间。
 
 ## 5. 分类型实施方案
 
-### 5.1 平台行情（`provider`）
+### 5.1 平台行情（provider）
 
-当前瓶颈主要是冷历史/上游 REST，而不是 SMA 等普通算法。实施顺序：
+1. 记录现有 freeze/compute 命中、进程、快照及上游请求数，确认重复读取发生在哪里。
+2. 指标绑定主图已接受的 provider snapshot；不同 study 共享一次输入冻结，避免重复触发上游。先复用现有进程内缓存，再用实测决定是否需要跨进程机制。
+3. 命中同规格状态时仅推进受影响后缀；首次新规格分别统计输入复用与冷回放，不承诺没有全前缀计算。
+4. 形成中柱使用副本；历史更正旋转 epoch，只有经验证安全的 checkpoint 可用于后缀回放。
+5. 冷历史仍需真实输入。即时层只使用 §4 允许的精确路径；上游失败不混用新旧 snapshot。
 
-1. 主图 `getBars` 建立 provider snapshot 后，指标请求直接复用同一 snapshot 和已接受 bars/warmup，不再为每个 study 重新触发上游历史读取。
-2. `provider_indicator_inputs.freeze/compute` 的输入和结果缓存提升为跨请求可观测的共享缓存；缓存键绑定 dataset revision、history epoch、calculation origin、规格和临时柱状态。
-3. 形成中柱只重算最后受影响状态；历史更正旋转 epoch，按 checkpoint 回放受影响后缀。
-4. 首次冷历史仍由后台补齐，但即时层使用已加载窗口先画；供应商失败显示状态，不把旧 snapshot 与新指标混合。
+验收：同一 snapshot 同时添加三项指标共享输入读取；分别报告冷/热、已有/全新参数、跨 API 进程的上游请求数、SQL 行数和计算步数。
 
-验收重点：同一 provider snapshot 下同时添加三项指标只有一次输入读取；冷/热首屏分别记录上游请求数、SQL/扫描量和首个可见值。
+### 5.2 自建 managed 行情（managed）
 
-### 5.2 自建 managed 行情（`managed`）
+1. 共享同发布数据集、周期和输入证据的 frozen input；结果/checkpoint 另按完整 spec、算法、起点和前缀证据隔离。
+2. 结果命中直接返回；同规格兼容 checkpoint 命中后回放后缀；全新规格按指标依赖进行有限窗口计算或从合法起点冷回放。输入缓存命中不等于免除算法回放。
+3. 数据更正从最早受影响区间之前恢复；可见结果与任务进度分开交付，不能把未计算值当 0。
+4. 多 pane 共享计算，展示映射独立；参数计算与显示开关分离。
 
-当前 `managed_dataset.data()` 带指标时可能读取完整已发布历史。建议：
+A4 的“不重复完整扫描”仅对输入/状态可复用场景成立；新规格 miss 必须单列成本。I0/I1 先验证已有结构和进程内缓存，新增持久化或跨进程机制须有测量理由及 F1 兼容/回滚设计。
 
-1. 按 `published revision + timeframe + calculation_origin + spec` 建立可复用的递归 checkpoint/result cache；优先复用现有发布修订和指标状态结构。
-2. 参数只改变指标规格时，从最近兼容 checkpoint 继续，不重新从 dataset 起点读取全部行；数据修订时从最早受影响的 checkpoint 回放后缀。
-3. 查询返回当前可见区间的即时/已缓存结果和完整 `calculation` 进度；前端不因完整历史未完成而清空当前窗口。
-4. 同周期多指标共享一份 frozen input；同一参数的多 pane 共享计算，展示映射保持独立。
+### 5.3 自建固定历史（history）
 
-在 W0/W1 证明现有进程内缓存不能跨 API 进程满足目标前，先不要新增数据库表。若确需持久化，新增缓存必须以 revision、算法版本和参数完整隔离，并走 F1 schema/回滚评审。
+1. 按有限的默认/最近布局规格预热，受 §7 预算约束；不阻塞 K 线交付。
+2. FixedIndicatorRun/Block lineage 只在相同规格、算法和安全输入前缀下继承。参数改变建立目标规格 run；其他规格的状态不能借用，原始输入可以共享。
+3. 首次响应交付实际已完成的 coverage/progress；partial 前缀未到当前窗口时仍是准备状态，不能据此撤掉可见旧参数曲线。
+4. 前台需求提升优先级，过期需求降级；保留维护公平性以及已有状态和不可变结果。
 
-### 5.3 自建固定历史（`history`）
+### 5.4 组合行情（composite）
 
-固定历史是不可变输入，最适合提前准备：
+1. 修订建立或切换时按预算预热；只复用同规格且未受接缝/历史变化影响的状态。
+2. FixedIndicatorRun 与 DisplayIndicatorTask 关联同一用户需求，统一展示进度但保留各自任务、错误和容量语义。
+3. recovering 时，从仍有效的同修订/历史快照交付已确认区间和相应指标；实时恢复状态另行表示，不能伪造 quote_ready 或跳过快照验证。
+4. 新 quote 只更新形成中柱及受影响后缀；不因每次 quote 建立完整历史 run。修订变化时撤回已失效区间并恢复一致价格/指标。
+5. REST 和 stream 使用同一输入证据；接缝、断线、快照过期和多图共享均须验证。
 
-1. 历史版本发布或用户首次打开周期时，按默认指标/最近布局指标预热 `FixedIndicatorRun`；预热任务不得阻塞 K 线交付。
-2. 复用 `FixedIndicatorBlock` 的 checkpoint lineage；参数变化只在新规格下建立 run，能够继承相同输入前缀时必须继承。
-3. API 首次响应可以返回已完成前缀和 `partial`，不能以 `values=0` 伪装成“已加载”；前端即时层先覆盖可见窗口。
-4. worker 任务按前台图表需求、可见周期和恢复布局优先级调度；普通后台维护仍保持公平，避免单个长历史饿死所有图表。
+## 6. 原生 Adapter 与交互合同
 
-### 5.4 组合行情（`composite`）
+I1 明确包含 `advanced-host/native-indicator-results.js`。保留 `indicators.js` 的输出/样式合同及许可库版本适配，不把 coordinator 的延后提交当作原生曲线已经保留的证据。
 
-组合同时受固定历史、接缝、实时来源和展示快照影响，是最高风险链路：
+Module 内部分开管理当前请求身份、仍有效的旧参数展示、待提交新结果；过渡展示不能注册成新 identity 的已接受结果。Worker 和后端通过同一结果 Interface 提交，bridge、study 和 stream 不各自决定失效规则。
 
-1. 组合修订建立或切换时预热常用指标；优先使用该修订已经存在的 fixed prefix 和 checkpoint。
-2. `FixedIndicatorRun` 与 `DisplayIndicatorTask` 合并同一用户需求的优先级/状态展示，避免前端只看到空值而不知道在等哪一个任务。
-3. 实时来源 `recovering` 时，先展示已确认的组合历史和即时指标；实时快照恢复单独显示，不阻塞历史指标首个可见值。
-4. 组合新 quote 只推进形成中柱和受影响后缀；不因每次 quote 创建完整历史 run。展示 snapshot 失效时按现有恢复协议重新取价格和指标，不接受异版结果。
-5. REST 初始结果和 stream 更新必须使用同一 `revision/input_revision/display_snapshot`；结果比较按 identity，而非只按时间戳。
+- 添加：立即创建 study 和 preparing 状态，选取合法快速路径并发起权威需求。
+- 改参：新 generation 开始；同一有效输入上的旧参数结果带“正在更新”保留。新参数的当前可见可计算区间及全部输出达到声明覆盖后一次替换，合法 warmup null 保持原样；不因收到一段不可见 partial 历史而清空曲线。
+- 修订/更正：按 §4.4 撤回失效区间，不能借旧参数保留机制把已知错误结果重新显示。
+- 删除或切换：解除本消费者，阻止迟到提交；不取消其他 pane 的共享需求。
+- 布局恢复：同页可复用仍有效的接受结果；页面刷新只能使用实际可恢复、已验证的持久结果/输入，不依赖已消失的旧内存对象。
+- 失败：仅保留仍有效的过渡结果，显示重试；没有合法结果时显示准备/失败状态。
 
-验收必须覆盖：来源正常、来源 recovering、组合修订切换、接缝附近参数修改、实时新柱、断线后恢复和多图共享。
+原生浏览器验证必须在后端响应被刻意延迟时进行，覆盖 A→B→A、连续改参、多输出、显示开关、删除/切换、期间发生历史更正和失败。要求提交/渲染事件与视频对应；仅 mock Adapter 的分支测试不构成无黑屏验收。
 
-## 6. 前端交互状态和参数修改规则
+## 7. 服务端需求生命周期与预算
 
-study UI 不再采用“删除旧 study → 等后台完成 → 重新创建”的黑屏流程。建议状态如下：
+服务端共享任务不能以浏览器 AbortController 是否触发来决定是否继续。复用现有任务、lease、fenced publication 和需求结构，新增结构须说明必要性。
 
-```text
-idle → preparing → provisional/partial → ready
-                         └────────────→ error（可重试）
-```
+1. 需求记录关联用户/页面消费者、目标 execution identity、所需可见区间、前台/预热用途及到期时间。取消仅解除对应消费者；连接异常后需求通过到期机制失效。
+2. 相同计算可被多个消费者共享。尚有有效消费者时不得取消共享计算；最后一个前台需求失效后撤销临时优先级，按预热预算降级或暂停领取新页，保留已完成输出/checkpoint。
+3. TTL 和预算必须能被实际 worker 进程观察；页面上的 generation 不作为持久队列优先级。需求有效期与 DisplaySnapshot 有效期分别核验，不能继续使用过期快照。
+4. I0/队列设计须定值并记录：需求有效期、单用户活跃需求上限、预热并发和待执行数量上限、输出容量、单步预算、前台份额和最低维护份额。先复用现有 MAX_TASKS/MAX_OUTPUT 等限制；未定值前不能放开无限预热。
+5. 预热只覆盖预算内的明确规格，不展开所有参数/周期/修订组合。队列满时采用既有可重试容量错误并说明等待原因，不不断创建重复任务。
+6. 过期需求不等于删除权威数据。结果回收按既有 retention、引用与 lineage 规则独立处理；不以浏览器离开为由删除共享结果。
 
-- 添加：先创建原生 study 和即时 worker 任务，再发后端权威请求。
-- 参数修改：立即生成新 identity，旧结果保持可见并标记“正在更新”；新结果第一次有效后原子替换。
-- 删除或切换图表：取消该 generation 的 worker/HTTP/stream 任务；不能取消其他 pane 共享的输入计算。
-- 恢复布局：按布局中的 study spec 去重预取；同一 identity 命中结果缓存时直接恢复，不重新创建后台 run。
-- 失败：保留最近一次可验证结果，显示可重试错误；没有任何可验证结果时显示明确的加载/失败面板，不能无限空白。
+验收同时施加多图、全新参数连续编辑、长固定历史、组合后缀和预热压力，记录有效/过期需求、每类队列长度/等待、CPU、内存、SQL 扫描、输出容量、维护进度和拒绝原因。上述是产品指标调度，不引入 agent/Ubuntu 验收并发准入或自动排队工具。
 
-## 7. 实施阶段和交付物
+## 8. 实施阶段与决策门槛
 
-### I0：浏览器真实基线（必须先做）
+保留 I0–I6 编号便于 Issue 跟踪，调整执行顺序为：**I0 → I1 → I3/I4/I5 中的最小可测优化 → G1 → 按缺口执行 I2 → I6**。各阶段小提交，按依赖推进；不因编号较小而先实现全部浏览器算法。
 
-- Ubuntu 隔离 Docker 补齐 Chromium 依赖并登录测试账户。
-- 采集三类行情 × 四类动作的事件：study click、study created、首次有效值、即时结果、`/api/charts/data`、后台 run、stream update、最终权威值和 layout ready。
-- 冷/热、单指标/多指标、300 根/长历史、正常/`recovering` 组合分别保存脱敏 JSON。
-- 交付请求瀑布、DOM/事件时序和当前 p50/p95；未完成前不得以总耗时猜测优化收益。
+### I0：真实浏览器基线与可行性证据（必须先做）
 
-### I1：统一指标请求协议
+- Ubuntu 隔离 Docker 中完成 Chromium、测试账户与脱敏 fixture；先核对资源及隔离归属。
+- 按 §3 采集请求、run、stream、原生提交/渲染、首值/覆盖/权威收敛时序和冷/热分组，区分 SQL 与计算成本。
+- 覆盖 EMA500 长参数、全新规格、复杂指标、冷页面恢复和 recovering；交付 catalog 路径表、性能 JSON、缓存 miss 原因与队列预算建议。
+- 测量可以先作探索采样；未达到样本要求不宣称 p95 通过，不启动未测收益的全量移植。
 
-- 统一 spec/identity、generation、取消、去重、状态和错误合同。
-- 让多个指标共享一次 bars/input 读取；参数编辑不清空旧结果。
-- 交付 coordinator 单元测试和过期响应/切换/布局恢复测试。
+### I1：统一协议与原生过渡展示
 
-### I2：即时显示层
+- 落实 §4 的输入/seed/identity、coverage、失效、取消与共享合同。
+- 明确修改原生 Adapter，在延迟响应下证明同输入改参的过渡曲线与多输出原子替换；验证更正后先撤回失效区间。
+- 交付协议/Adapter 定向测试和真实浏览器 A→B→A、迟到响应、布局及更正录像。先验证接入，不先移植八项算法。
 
-- Worker 先实现标准八项指标，逐点对照 Python oracle；覆盖 warmup、缺口、NY17、临时柱和多输出。
-- 将即时结果映射到现有 native study，不改变 `indicators.js` 的输出/样式合同。
-- 复杂指标先接“旧结果 + 后端预热 + 明确状态”，同时为最终即时路径建立测试夹具。
+### I3：平台既有缓存与 snapshot 优化
 
-### I3：平台 snapshot 和增量缓存
+- 依据 I0 定位实际 miss、重复输入读取和跨进程问题；优先复用 freeze/compute，不无依据新增缓存层。
+- 同规格复用 checkpoint，全新规格冷计算独立记录；形成中柱复制状态，历史更正安全回放。
+- 交付请求数、SQL 行数、计算步数、缓存层级和延迟对比。
 
-- 主图历史与指标共享 provider snapshot；避免重复上游读取。
-- 形成中柱只增量计算；历史更正按 epoch/checkpoint 回放。
-- 交付供应商请求数、输入扫描量和 p95 对比。
+### I4：managed/history 复用与调度
 
-### I4：managed/history checkpoint
+- 实现结果命中、兼容 checkpoint 命中、新规格 miss 三路；history 继承同规格 lineage，partial 按真实 coverage 返回。
+- 落实共享需求到期、前台/预热/维护预算；证明连续改参不保留无限前台优先级。
+- 按 F1 处理重要后台链路；若改 schema/持久格式，独立提交迁移、旧版本兼容及回滚证据。
 
-- managed 按发布 revision 建立可复用 checkpoint/result；history 复用现有 `FixedIndicatorRun/Block` lineage。
-- 参数变化从兼容 checkpoint 继续；任务按前台需求提升优先级并返回 partial。
-- 若需要 schema，单独提交迁移、回滚和 F1 评审，不与前端体验补丁混合。
+### I5：组合预热与恢复
 
-### I5：组合预热、实时接续和恢复
+- 关联固定与展示任务的需求、进度和预算；预热范围有界。
+- recovering 下交付合法确认历史；验证接缝、过期快照、修订/更正、实时接续、REST/stream 和多图共享。
+- 按 F1 验证后台语义、任务兼容与回滚，不以没有新表降为 F0。
 
-- 修订建立时预热；合并固定指标与展示后缀的用户可见状态。
-- `recovering` 时先展示确认历史，快照恢复单独处理。
-- 验证 REST/stream 同身份、接缝、断线、修订切换和多图。
+### G1：即时计算路径选择
+
+对 I0 和已完成最小优化重新测量，逐指标/场景列出是否仍有 SLO 缺口、原因、可用输入/seed、精度、计算位置、实现与维护成本。Worker、后端结果直达或其他精确路径均须先有原生接入和代表性 oracle/时序证据；满足目标的路径不为统一外形再实现一次。没有可行路径的项目保持未完成，需改变目标/范围/精度时单列取舍确认。
+
+### I2：按证据补充即时显示 Adapter
+
+- 对 G1 确认的缺口实现必要显示计算；标准八项均需有已验证路径，但不要求每项都增加浏览器实现。
+- 递归计算仅接受合法 seed/真实起点回放；输入不足时返回明确准备/覆盖状态。
+- 逐点对照 oracle，覆盖边界参数、缺口、NY17/DST、临时柱、多输出与 seed 边界；禁止用窗口近似填补未完成项。
 
 ### I6：综合验收
 
-- 三类用户行情（自建含 `managed`、`history`）× 添加/首次/改参/布局恢复 × 标准/复杂指标。
-- 后端、web、worker、Ubuntu R1/R2、浏览器视频和事件 JSON 均通过后，才形成候选清单。
-- 生产只读只验证请求、状态和版本，不改偏好、告警、配置或部署资源。
+- 四类内部行情 × 四类动作 × 标准/复杂指标，覆盖已有与全新规格及 §3 分组。
+- 完成 §9 的正确性、容量和性能证据后形成候选清单。兼容 UI/API 路径通常 F0+Ubuntu R1；重要后台链路 F1，验证兼容/回滚，按影响决定是否 R2，不无条件复制完整恢复流程。
+- 生产只读只核对请求、状态和版本；实现、合并和发布边界仍按 AGENTS.md。
 
-## 8. 验收矩阵
+## 9. 验收矩阵
 
-| ID | 可观察结果 | 证据 |
+| ID | 可观察结果 | 必需证据 |
 | --- | --- | --- |
-| A1 | 已加载 bars 时添加标准 Python 指标，首个有效值达到 `<300 ms` 目标 | 浏览器 performance timeline、study DOM/事件 JSON |
-| A2 | 修改参数时旧结果不黑屏，新结果首值达到 `<500 ms` 目标 | 参数前后 identity、取消/提交序列和视频 |
-| A3 | 平台冷/热请求不为每个指标重复上游读取 | provider snapshot、HTTP/SQL 计数和 p95 |
-| A4 | managed 参数变化从 checkpoint 继续，不扫描同一完整历史 | checkpoint 命中、扫描行数、revision 对照 |
-| A5 | 固定历史首次请求有 partial/progress，后台完成后原子替换 | `FixedIndicatorRun`、cursor、前后端结果对照 |
-| A6 | 组合在正常和 recovering 状态都先显示可验证历史指标 | live snapshot 状态、组合 run/display task、浏览器事件 |
-| A7 | 布局恢复复用 identity，切换/删除不会提交旧结果 | generation、AbortController、缓存命中和负向测试 |
-| A8 | Python 最终结果与现有 Python oracle 逐点一致 | 标准八项及复杂指标 fixture，含缺口/NY17/临时柱 |
-| A9 | stream 新柱只更新受影响后缀，无整段重算和重复订阅 | worker 计算计数、payload diff、长时回放 |
-| A10 | 超时/失败有明确状态和重试，不无限空白 | 断网、worker 错误、30 秒预算和恢复证据 |
+| A1 | 已加载行情添加指标达到首值目标；不足 warmup 不造值 | T_op_first/T_input_first、精度、coverage 与失败样本 |
+| A2 | 同输入改参保留标注旧参数的曲线，新结果按可见覆盖及多输出原子替换 | 延迟响应视频、A→B→A、身份与提交序列 |
+| A3 | 同一 provider snapshot 多指标共享输入，既有缓存收益可解释 | 上游请求数、SQL 行数、进程和命中层级 |
+| A4 | managed 可复用路径不重复完整读取；全新规格单列冷回放成本 | 结果/checkpoint hit、miss、SQL 行数与计算步数分别记录 |
+| A5 | 固定历史交付真实 partial/progress，尚未覆盖当前窗口不冒充首值 | run/cursor、coverage、可见区间及权威对照 |
+| A6 | 组合正常/recovering 均能显示合法确认历史，实时状态独立 | 快照有效性、修订、任务与浏览器时序 |
+| A7 | 热布局复用实际缓存；刷新冷恢复不假定旧内存存在 | 冷/热各自 T_op_first、重新取数与缓存证据 |
+| A8 | 所有已发布指标遵守 oracle 数值、null、绘图和依赖语义 | fixture，含 EMA500 反例、缺口/NY17/DST/临时柱/接缝 |
+| A9 | 新柱/尾柱只推进合法后缀，旧消费者不提交迟到结果 | 计算计数、payload、generation、订阅和长期回放 |
+| A10 | 超时/容量/失败明确且可重试，只保留仍有效结果 | 断网、worker/任务错误、30 秒保护预算与恢复 |
+| A11 | seed 绑定完整规格/版本/起点/时间边界和前缀证据 | JSON 状态恢复，错参数/算法/修订拒绝及临时状态不污染 |
+| A12 | 历史更正撤回受影响区间，普通追加不清空安全前缀 | 改参并发更正、修订切换、延迟 SSE/HTTP/Worker 负向测试 |
+| A13 | 从未用过的参数和复杂指标首次添加有真实精确路径 | 逐 catalog 路径表、冷 miss 的时序/覆盖/资源，不能以预热默认值代替 |
+| A14 | 原生 Adapter 在慢响应、失败和连续改参中维持正确过渡展示 | 实际 pinned Chromium/TradingView 渲染事件和视频 |
+| A15 | 过期需求降级，活跃共享任务不误取消，预热与维护均有预算 | 多图+连续新参数+长历史压力，队列、容量和维护进度 |
+| A16 | 首值、覆盖、权威收敛与全历史完成分别达成/记录 | 固定分组、n、p50/p95、误差、失败率与 G1 选择记录 |
 
-## 9. 风险、边界和回滚
+## 10. 风险、检查与回滚
 
-- **算法分叉风险**：即时层若与 TA-Lib/Python 不同会造成短暂错误显示。所有即时计算必须带 `provisional` 和 identity，并用 Python oracle 逐点测试；权威结果到达后替换。
-- **私有 TradingView 运行时**：只通过现有 study/bridge API 接入，不改许可库；浏览器版本和资源 hash 固定后再测。
-- **缓存污染**：任何缓存缺少 revision、origin、参数或 provisional 维度都视为缺陷；旧 generation 结果拒绝提交。
-- **组合恢复状态**：不能把 `quote_ready=false` 当成指标无数据；历史指标和实时恢复状态分开呈现。
-- **资源竞争**：解除串行等待后要设置 worker/API/供应商并发上限，监测 503、队列长度、CPU、内存和数据库扫描量。
-- **持久化变更**：默认先复用现有结构；新增表、迁移或改变固定结果格式属于 F1，必须独立回滚和恢复验收。
-- **生产边界**：本方案不授权生产部署、镜像切换、数据库迁移、工作区修改或供应商配置修改；生产仅允许明确的只读验证。
+- **数值与输入一致性**：浏览器来源不豁免 oracle 或初始化合同；合法 null、provisional 和未完成区间分开表示。近似精度取舍未确认前不引入近似线。
+- **缓存与失效**：输入键、结果键、consumer generation 分离；复用依赖完整规格、算法和前缀证据。更正先撤回受影响区间，不用“旧结果保留”放宽修订隔离。
+- **原生运行时**：通过现有 Adapter 接入，固定许可库版本/hash，不修改许可库。真实浏览器验证是改参无黑屏的证据。
+- **资源与持久状态**：预算先定值，监测队列、拒绝、CPU/内存、SQL 与输出容量。需求降级不删除权威数据或 lineage。
+- **变更分类**：本次文档修订为 P0，做文档检查、自审及适用 PR CI；兼容 UI/API 通常 F0；固定/展示任务调度和组合恢复等重要后台链路按 F1，即使不新增表。schema/持久格式变更独立说明兼容、迁移与回滚。
+- **生产边界**：本方案不授权业务实现、生产部署、正式 tag、镜像切换、数据库迁移或供应商/生产配置修改。后续实施按用户授权及 AGENTS.md 的检查点推进。
 
-回滚顺序：先关闭即时显示 feature flag，恢复纯后端 native 映射；再独立回退 provider snapshot/cache、worker 优先级和组合预热。旧的 Python 权威计算和固定结果表必须保持可读，不能用回滚清理历史结果。
+回滚：先关闭新增显示计算 Adapter，回到兼容的后端 native 映射；独立回退新增需求优先级/预热、snapshot/cache 优化。既有状态格式、固定结果和 retry token 必须保持可读；回滚不删除共享历史结果，不复活已知失效值。若涉及持久格式，单独提交旧版本读写兼容与恢复验证。
 
-## 10. 后续 agent 接手清单
+## 11. 接手与评审处理记录
 
-1. 阅读本文件、`docs/pro-chart-watchlist-plan-20261016.md` 和仓库 `AGENTS.md`；确认业务基线仍为 `b53d2973`，工作树干净。
-2. 先做 I0，补齐真实 Chromium 依赖和浏览器时序；不要先改业务代码。
-3. 按 I1 → I2 → I3 → I4 → I5 → I6 小提交实施，每阶段更新证据和未覆盖项。
-4. 复杂指标不能以“后台 pending”作为永久完成条件；要么接入即时计算，要么用实测权威预热达到同一首值 SLO，并在 UI 中明确状态。
-5. 不把生产凭据、完整浏览器状态、完整生产响应或私有许可资源提交仓库。
-6. 完成 I6 后只形成候选清单；合并、正式 tag、生产镜像、Unraid 切换和生产回滚仍等待单独授权。
+1. 阅读本方案、评审记录、Issue #74、相关 #73 与 AGENTS.md。以独立 worktree/branch 开始；记录实际业务 SHA，核对相对参考基线的变化，保留其他任务成果，不要求其他任务的分支回退到旧基线。
+2. 先做 I0。按 §8 的依赖顺序推进，逐阶段更新实测、路径选择与未覆盖项，不直接开始全量 Worker 算法移植。
+3. 每次结果提交核对逻辑身份、输入证据、coverage、generation；每次失效区分改参、普通追加、更正和修订切换。
+4. G1 不能用 preparing、旧参数结果、不可见 partial 或默认预热替代未达成的数值 SLO。
+5. 不提交凭据、完整生产响应、完整浏览器状态或私有许可资源；按最小风险分类选择隔离 Ubuntu 检查。
+6. 实现验收完成只形成候选；main 合并、正式 tag 和生产操作另按明确授权推进。
 
-当前状态：方案已形成；代码实现、生产部署和生产配置修改均未开始。
+| 评审项 | 本次方案处理 | 实现验证位置 |
+| --- | --- | --- |
+| P1 递归窗口初始化不等价 | §4.1–4.2 明确精确路径、seed 和默认不引入近似线 | I0/G1/I2、A8/A11/A13 |
+| P1 改参 checkpoint 不一定存在 | §1、§5 分离输入/结果/状态命中与全新规格冷计算，修订 A4 | I3/I4、A4/A13 |
+| P1 更正后仍保留失效结果 | §4.4、§6 限定过渡展示，保留受影响区间撤回 | I1/I5、A12 |
+| P2 原生 Adapter 交付范围遗漏 | §6 和 I1 明确 Adapter、延迟响应与原生渲染验证 | A2/A14 |
+| P2 需求过期与预热预算不足 | §7 定义共享需求到期、降级与预算，复杂冷规格单列 | I4/I5、A13/A15 |
+
+上述五项已落实为方案约束；业务实现和 I0–I6 验收仍未完成。
