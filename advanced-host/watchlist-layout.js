@@ -136,9 +136,16 @@
       return moreLabel.test(value) || button.querySelector('svg path[d*="M"]');
     });
     if (!menu || menu === plus) return false;
-    if (menu.parentElement === plus.parentElement && menu.nextElementSibling === plus) return true;
-    plus.parentElement?.insertBefore(menu, plus);
+    // The column header and list toolbar have separate native React roots.
+    // Reparenting this button breaks React's delegated menu handler. Keep the
+    // native tree intact and move only its visual box beside the + control.
+    const anchor = plus.getBoundingClientRect();
+    Object.assign(menu.style, {
+      position: "fixed", left: `${anchor.left - 32}px`, top: `${anchor.top}px`,
+      width: "28px", height: `${anchor.height}px`, margin: "0", zIndex: "10",
+    });
     menu.dataset.mwWatchlistMoved = "true";
+    if (!menu.getAttribute("aria-label")) menu.setAttribute("aria-label", "自选列表列设置");
     const svg = menu.querySelector("svg");
     if (svg) svg.style.transform = "rotate(90deg)";
     return true;
@@ -171,8 +178,16 @@
       queueMicrotask(() => { pending = false; refresh(); });
     });
     observer.observe(doc.body, {childList: true, subtree: true, characterData: true});
+    const resizeObserver = typeof ResizeObserver === "function" ? new ResizeObserver(refresh) : null;
+    resizeObserver?.observe(doc.documentElement);
+    const root = watchlistRoot(doc);
+    if (root) resizeObserver?.observe(root);
+    doc.defaultView?.addEventListener("resize", refresh);
     refresh();
-    return {refresh, dispose() {disposed = true; observer.disconnect();}};
+    return {refresh, dispose() {
+      disposed = true; observer.disconnect(); resizeObserver?.disconnect();
+      doc.defaultView?.removeEventListener("resize", refresh);
+    }};
   }
 
   globalThis.MWWatchlistLayout = {attach, wrapLastDigit};

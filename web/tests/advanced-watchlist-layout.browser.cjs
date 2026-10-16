@@ -11,7 +11,8 @@ const path = require('node:path');
   try {
     const page = await browser.newPage();
     await page.setContent(`<div data-test-id-widget-type="watchlist">
-      <button data-column-type="last_price">最新价</button>
+      <div id="native-columns"><button data-column-type="short_name">商品</button><button data-column-type="last_price">最新价</button><button class="columnsMenu-test">更多</button></div>
+      <div style="position:absolute;right:20px;top:20px"><button aria-label="添加商品代码" style="width:28px;height:28px">+</button></div>
       <div data-symbol-full="MWP:EURUSD"><span class="cell-test last-test"><span class="inner-test">1.12<span class="uptick-test">234</span></span></span></div>
     </div>`);
     await page.evaluate(() => {
@@ -28,6 +29,13 @@ const path = require('node:path');
         }
       };
       window.TradingView = {version: () => '6b804c486857f27920cf761aa7eb6e29d9bb6362'};
+      // Native controls rely on delegation through their original React root.
+      document.querySelector('#native-columns').addEventListener('click', event => {
+        if (event.target.closest('.columnsMenu-test')) {
+          const menu = document.createElement('div'); menu.setAttribute('role','menu');
+          menu.textContent = '成交量'; document.body.append(menu);
+        }
+      });
     });
     await page.addScriptTag({path:path.resolve(__dirname, '../../advanced-host/watchlist-layout.js')});
     await page.evaluate(() => {
@@ -52,6 +60,15 @@ const path = require('node:path');
     await page.evaluate(() => { document.querySelector('.uptick-test').firstChild.data = '340'; });
     await page.waitForTimeout(50);
     assert.deepEqual(await read(), {text:'1.123400',raw:'1.123400',sup:'0',count:1,aria:'1.123400'});
+    await page.locator('.columnsMenu-test').click();
+    assert.equal(await page.getByRole('menu').count(), 1,
+      'visually moving the control must preserve its delegated native menu action');
+    const bounds=await page.evaluate(()=>{
+      const menu=document.querySelector('.columnsMenu-test').getBoundingClientRect();
+      const plus=document.querySelector('[aria-label="添加商品代码"]').getBoundingClientRect();
+      return {gap:plus.left-menu.right,top:Math.abs(plus.top-menu.top)};
+    });
+    assert(bounds.gap>=0&&bounds.gap<=8&&bounds.top<=2,'menu appears immediately left of +');
     await page.evaluate(() => layout.dispose());
     console.log('Watchlist numeric updates settle and retain live values, trailing zero and accessibility.');
   } finally { await browser.close(); }
