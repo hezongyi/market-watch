@@ -81,15 +81,17 @@
   function wrapLastDigit(cell) {
     if (!cell) return false;
     const existing = cell.querySelector(':scope > [data-mw-price-sup="true"]');
-    if (existing) {
-      const raw = cell.dataset.mwRawPrice;
-      // Restore the complete native text before removing our wrapper. The
-      // wrapper's textContent still equals the raw value, so comparing first
-      // would drop the final digit on a second refresh.
-      if (raw != null) cell.textContent = raw;
-      existing.remove();
-    }
     const raw = cell.textContent || "";
+    if (existing) {
+      // Observer callbacks include our own DOM writes. Leave an unchanged
+      // quote untouched so those callbacks settle instead of rewriting the
+      // superscript forever and starving native rendering/subscriptions.
+      if (cell.dataset.mwRawPrice === raw) return true;
+      // A native text update may leave our wrapper in place. Preserve the
+      // current visible quote, including its last digit, rather than restoring
+      // the previous snapshot over the newly received price.
+      existing.replaceWith(cell.ownerDocument.createTextNode(existing.textContent || ""));
+    }
     let node, index = -1, lastNode;
     const walker = cell.ownerDocument.createTreeWalker(cell, NodeFilter.SHOW_TEXT);
     while ((node = walker.nextNode())) {
