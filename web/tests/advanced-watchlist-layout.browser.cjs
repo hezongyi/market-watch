@@ -11,9 +11,11 @@ const path = require('node:path');
   try {
     const page = await browser.newPage();
     await page.setContent(`<div data-test-id-widget-type="watchlist">
-      <div id="native-columns"><button data-column-type="short_name">商品</button><button data-column-type="last_price">最新价</button><button class="columnsMenu-test">更多</button></div>
       <div style="position:absolute;right:20px;top:20px"><button aria-label="添加商品代码" style="width:28px;height:28px">+</button></div>
+      <div class="widgetbar-widgetbody" style="position:absolute;left:300px;top:100px;width:400px;height:200px;contain:strict;overflow:hidden">
+      <div id="native-columns"><button data-column-type="short_name">商品</button><button data-column-type="last_price">最新价</button><button class="columnsMenu-test">更多</button></div>
       <div data-symbol-full="MWP:EURUSD"><span class="cell-test last-test"><span class="inner-test">1.12<span class="uptick-test">234</span></span></span></div>
+      </div>
     </div>`);
     await page.evaluate(() => {
       const NativeObserver = MutationObserver;
@@ -60,7 +62,7 @@ const path = require('node:path');
     await page.evaluate(() => { document.querySelector('.uptick-test').firstChild.data = '340'; });
     await page.waitForTimeout(50);
     assert.deepEqual(await read(), {text:'1.123400',raw:'1.123400',sup:'0',count:1,aria:'1.123400'});
-    await page.locator('.columnsMenu-test').click();
+    await page.locator('.columnsMenu-test').click({timeout:1500});
     assert.equal(await page.getByRole('menu').count(), 1,
       'visually moving the control must preserve its delegated native menu action');
     const bounds=await page.evaluate(()=>{

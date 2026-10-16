@@ -139,6 +139,15 @@
     // The column header and list toolbar have separate native React roots.
     // Reparenting this button breaks React's delegated menu handler. Keep the
     // native tree intact and move only its visual box beside the + control.
+    const body = menu.closest(".widgetbar-widgetbody");
+    if (body) {
+      // The native body uses strict containment, making fixed coordinates
+      // relative to the list and clipping anything above its column header.
+      // Retain size/style isolation while allowing this native control to
+      // paint in the widget toolbar.
+      body.style.contain = "size style";
+      body.style.overflow = "visible";
+    }
     const anchor = plus.getBoundingClientRect();
     Object.assign(menu.style, {
       position: "fixed", left: `${anchor.left - 32}px`, top: `${anchor.top}px`,
