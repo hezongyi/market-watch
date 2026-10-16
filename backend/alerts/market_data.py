@@ -1085,6 +1085,15 @@ def quote_snapshot(body: QuoteQuery):
                                 values["lp"] = float(facts["price"])
                                 if facts["price_type"] == "sampled_bid":
                                     values["bid"] = values["lp"]
+                                previous = facts.get("previous_close")
+                                if previous is not None and previous != 0:
+                                    delta = Decimal(str(facts["price"])) - Decimal(str(previous))
+                                    previous = Decimal(str(previous))
+                                    values.update(
+                                        ch=float(delta),
+                                        chp=float(delta / previous * 100),
+                                        prev_close_price=float(previous),
+                                    )
                             price_type = facts["price_type"]
                             precise = price_type == "sampled_bid"
                             candle_sample = price_type == "sampled_candle_close"

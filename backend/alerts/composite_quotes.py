@@ -3,6 +3,7 @@
 from decimal import Decimal, InvalidOperation
 
 from .composite_chart import chart_page
+from .composite_series import period
 from .config import settings
 from .history_catalog import account_scope
 from .live_pricing import account_key
@@ -19,6 +20,8 @@ from .storage import (
     RealtimeMapping,
     now_ms,
 )
+
+_previous_close_cache = {}
 
 
 def get_snapshot(db, composite_id):
@@ -159,6 +162,60 @@ def observation_evidence(sample):
     return json_safe(sample)
 
 
+def previous_close(db, composite, *, revision, input_revision, observed_at):
+    """Return the last confirmed NY17 daily close before ``observed_at``.
+
+    Composite quotes can be sampled from a live bid, a forming REST candle, or
+    a stored M1 tail.  Their observation clocks differ, but the change shown in
+    the watchlist must always compare against the same composite revision's
+    previous completed NY17 session.  The indexed D1 reader keeps this lookup
+    bounded and applies the same frozen input revision as the quote.
+    """
+    if not isinstance(observed_at, int):
+        return None
+    calendar = revision.rules["aggregation_calendar"]
+    session_start, _ = period(observed_at, "D1", calendar)
+    key = (id(db.get_bind()), composite.id, revision.id, input_revision, session_start)
+    if session_start < 0:
+        return None
+    if key in _previous_close_cache:
+        return _previous_close_cache[key]
+    page = chart_page(
+        db,
+        composite.id,
+        "D1",
+        before=session_start,
+        count=1,
+        revision_id=revision.id,
+        input_revision=input_revision,
+        provisional=False,
+        now=observed_at,
+    )
+    bars = [
+        row for row in page.get("bars", [])
+        if row.get("end", 0) <= session_start
+        and row.get("source_confirmed") is True
+        and row.get("time_closed", True) is True
+    ]
+    if not bars:
+        value = None
+        _previous_close_cache[key] = value
+        if len(_previous_close_cache) > 2048:
+            _previous_close_cache.pop(next(iter(_previous_close_cache)))
+        return value
+    value = bars[-1].get("close")
+    try:
+        value = Decimal(str(value))
+    except (InvalidOperation, TypeError, ValueError):
+        value = None
+    else:
+        value = value if value.is_finite() and value != 0 else None
+    _previous_close_cache[key] = value
+    if len(_previous_close_cache) > 2048:
+        _previous_close_cache.pop(next(iter(_previous_close_cache)))
+    return value
+
+
 def snapshot(db, composite, *, now=None, revision_id=None, input_revision=None):
     stamp = now_ms() if now is None else now
     revision = db.get(CompositeRevision, revision_id or composite.active_revision_id)
@@ -185,6 +242,7 @@ def snapshot(db, composite, *, now=None, revision_id=None, input_revision=None):
         "observation_mode": live.get("observation_mode", "stream_quote"),
         "confirmed_tail_ready": live["confirmed_tail_ready"],
         "connection": live["connection"], "price": None, "observed_at": None,
+        "previous_close": None,
         "quality": "pending", "price_type": None, "provenance": None,
         **session, "read_at": stamp, "source_identity": target.identity,
         "fetch_status": live["connection_error"] or "ok"}
@@ -207,6 +265,9 @@ def snapshot(db, composite, *, now=None, revision_id=None, input_revision=None):
                 "target_dataset_id": db.get(RealtimeMapping, revision.mapping_id).target_dataset_id,
                 "connection_epoch": live["connection_epoch"], "live_revision": live["live_revision"],
                 "received_at": live["received_at"], "quote": live["quote"]})
+        value = previous_close(db, composite, revision=revision,
+            input_revision=result["input_revision"], observed_at=result["observed_at"])
+        result["previous_close"] = str(value) if value is not None else None
         return presented()
     if input_revision is None and live.get("candle_ready"):
         forming = live.get("forming") or {}
@@ -217,6 +278,9 @@ def snapshot(db, composite, *, now=None, revision_id=None, input_revision=None):
                     "connection_epoch": live["connection_epoch"], "live_revision": live["live_revision"],
                     "received_at": live["received_at"], "candle": forming,
                     "observation_mode": "candle_close_sample"})
+            value = previous_close(db, composite, revision=revision,
+                input_revision=result["input_revision"], observed_at=forming.get("start"))
+            result["previous_close"] = str(value) if value is not None else None
             return presented()
     # Uses the same pinned M1 input as the chart; never raw target history that
     # has not been accepted by this composite revision. Historical side is <T.
@@ -231,4 +295,7 @@ def snapshot(db, composite, *, now=None, revision_id=None, input_revision=None):
                 "source_confirmed": bar["source_confirmed"], "start": bar["start"], "end": bar["end"]})
     if not live["current_account"]:
         result["quality"] = "account_changed"
+    value = previous_close(db, composite, revision=revision,
+        input_revision=result["input_revision"], observed_at=result["observed_at"])
+    result["previous_close"] = str(value) if value is not None else None
     return presented()

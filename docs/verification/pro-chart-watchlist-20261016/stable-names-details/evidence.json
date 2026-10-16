@@ -1,0 +1,4627 @@
+{
+  "source_commit": "abadf45728c0aeda657a7c3e12ab947c6182beb4",
+  "image": "market-watch-chart-origin:issue73-real-details-final",
+  "image_id": "sha256:4cea4cef3c3b686600dd094470c50c1ffe60c44a02295c13d2073ff77f2119b8",
+  "build_dirty_reason": "untracked follow-up verification documentation; implementation committed before build",
+  "host": "quant-server",
+  "project": "mw-issue73-real-20261016",
+  "base": "https://192.168.7.232:18483/advanced-charts",
+  "real_market_data": true,
+  "market_response_interception": false,
+  "samples": [
+    {
+      "source": "oanda",
+      "kind": "provider",
+      "ticker": "MWP:EURUSD",
+      "name": "EURUSD"
+    },
+    {
+      "source": "oanda",
+      "kind": "provider",
+      "ticker": "MWP:OANDA:EUR_USD",
+      "name": "EURUSD"
+    },
+    {
+      "source": "dukascopy",
+      "kind": "provider",
+      "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+      "name": "GBPUSD"
+    },
+    {
+      "source": "binance",
+      "kind": "provider",
+      "ticker": "MWP:BTCUSDT",
+      "name": "BTCUSDT"
+    },
+    {
+      "source": "yahoo",
+      "kind": "provider",
+      "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+      "name": "AAPL"
+    },
+    {
+      "source": "oanda",
+      "kind": "history",
+      "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+      "name": "EURUSD"
+    },
+    {
+      "source": "composite",
+      "kind": "composite",
+      "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+      "name": "EURUSD"
+    },
+    {
+      "source": "oanda",
+      "kind": "managed",
+      "ticker": "EURUSD",
+      "name": "EURUSD"
+    },
+    {
+      "source": "binance",
+      "kind": "managed",
+      "ticker": "BTCUSDT",
+      "name": "BTCUSDT"
+    }
+  ],
+  "unique_row_states": 37,
+  "internal_ticker_frames": 0,
+  "page_errors": [],
+  "oanda_clicks": 6,
+  "detail_old_wording_states": 0,
+  "native_cache_callbacks": 25,
+  "native_cache_max_ms": 130.30000001192093,
+  "details": [
+    {
+      "timeline": [
+        {
+          "time": 33567.90000000596,
+          "text": "EURUSD\nEURUSD · 平台行情\nOANDA\n1.12327\n+0.00122\n+0.11%\n开市"
+        },
+        {
+          "time": 33829.80000001192,
+          "text": "EURUSD\nEURUSD · 平台行情\nOANDA\n1.12330\n+0.00125\n+0.11%\n开市"
+        },
+        {
+          "time": 35882.09999999404,
+          "text": "XAUUSD"
+        },
+        {
+          "time": 36381.40000000596,
+          "text": "XAUUSD\nXAUUSD · 平台行情\nOANDA\n4,160.155\n−10.155\n−0.24%\n开市"
+        },
+        {
+          "time": 38862.80000001192,
+          "text": "EURUSD"
+        },
+        {
+          "time": 39345.20000001788,
+          "text": "EURUSD\nEURUSD · 平台行情\nOANDA\n1.12330\n+0.00125\n+0.11%\n开市"
+        },
+        {
+          "time": 41357.70000001788,
+          "text": "XAUUSD"
+        },
+        {
+          "time": 41845.5,
+          "text": "XAUUSD\nXAUUSD · 平台行情\nOANDA\n4,160.155\n−10.155\n−0.24%\n开市"
+        },
+        {
+          "time": 42832.90000000596,
+          "text": "XAUUSD\nXAUUSD · 平台行情\nOANDA\n4,160.795\n−9.515\n−0.23%\n开市"
+        },
+        {
+          "time": 44358.59999999404,
+          "text": "EURUSD"
+        },
+        {
+          "time": 44873.59999999404,
+          "text": "EURUSD\nEURUSD · 平台行情\nOANDA\n1.12330\n+0.00125\n+0.11%\n开市"
+        },
+        {
+          "time": 47043.09999999404,
+          "text": "XAUUSD"
+        },
+        {
+          "time": 47543.80000001192,
+          "text": "XAUUSD\nXAUUSD · 平台行情\nOANDA\n4,160.795\n−9.515\n−0.23%\n开市"
+        }
+      ],
+      "callbacks": [
+        {
+          "time": 35926.30000001192,
+          "id": "qs_multiplexer_full_tXPfoXWLt9Lr",
+          "rows": [
+            {
+              "n": "MWP:XAUUSD",
+              "s": "ok",
+              "description": "XAUUSD · 平台行情",
+              "lp": 4160.155,
+              "session": "scheduled_open",
+              "read_at": 1792177231584
+            },
+            {
+              "n": "MWP:EURUSD",
+              "s": "ok",
+              "description": "EURUSD · 平台行情",
+              "lp": 1.1233,
+              "session": "scheduled_open",
+              "read_at": 1792177235343
+            }
+          ]
+        },
+        {
+          "time": 36106.20000001788,
+          "id": "qs_multiplexer_full_tXPfoXWLt9Lr",
+          "rows": [
+            {
+              "n": "MWP:XAUUSD",
+              "s": "ok",
+              "description": "XAUUSD · 平台行情",
+              "lp": 4160.155,
+              "session": "scheduled_open",
+              "read_at": 1792177231584
+            }
+          ]
+        },
+        {
+          "time": 37125.09999999404,
+          "id": "qs_multiplexer_full_tXPfoXWLt9Lr",
+          "rows": [
+            {
+              "n": "MWP:XAUUSD",
+              "s": "ok",
+              "description": "XAUUSD · 平台行情",
+              "lp": 4160.155,
+              "session": "scheduled_open",
+              "read_at": 1792177231584
+            }
+          ]
+        },
+        {
+          "time": 39013.20000001788,
+          "id": "qs_multiplexer_full_tXPfoXWLt9Lr",
+          "rows": [
+            {
+              "n": "MWP:EURUSD",
+              "s": "ok",
+              "description": "EURUSD · 平台行情",
+              "lp": 1.1233,
+              "session": "scheduled_open",
+              "read_at": 1792177235343
+            },
+            {
+              "n": "MWP:XAUUSD",
+              "s": "ok",
+              "description": "XAUUSD · 平台行情",
+              "lp": 4160.155,
+              "session": "scheduled_open",
+              "read_at": 1792177231584
+            }
+          ]
+        },
+        {
+          "time": 39097.80000001192,
+          "id": "qs_multiplexer_full_tXPfoXWLt9Lr",
+          "rows": [
+            {
+              "n": "MWP:EURUSD",
+              "s": "ok",
+              "description": "EURUSD · 平台行情",
+              "lp": 1.1233,
+              "session": "scheduled_open",
+              "read_at": 1792177235343
+            }
+          ]
+        },
+        {
+          "time": 40162.20000001788,
+          "id": "qs_multiplexer_full_tXPfoXWLt9Lr",
+          "rows": [
+            {
+              "n": "MWP:EURUSD",
+              "s": "ok",
+              "description": "EURUSD · 平台行情",
+              "lp": 1.1233,
+              "session": "scheduled_open",
+              "read_at": 1792177235343
+            }
+          ]
+        },
+        {
+          "time": 41411.80000001192,
+          "id": "qs_multiplexer_full_tXPfoXWLt9Lr",
+          "rows": [
+            {
+              "n": "MWP:XAUUSD",
+              "s": "ok",
+              "description": "XAUUSD · 平台行情",
+              "lp": 4160.155,
+              "session": "scheduled_open",
+              "read_at": 1792177231584
+            },
+            {
+              "n": "MWP:EURUSD",
+              "s": "ok",
+              "description": "EURUSD · 平台行情",
+              "lp": 1.1233,
+              "session": "scheduled_open",
+              "read_at": 1792177235343
+            }
+          ]
+        },
+        {
+          "time": 41693.20000001788,
+          "id": "qs_multiplexer_full_tXPfoXWLt9Lr",
+          "rows": [
+            {
+              "n": "MWP:XAUUSD",
+              "s": "ok",
+              "description": "XAUUSD · 平台行情",
+              "lp": 4160.155,
+              "session": "scheduled_open",
+              "read_at": 1792177231584
+            }
+          ]
+        },
+        {
+          "time": 42816.59999999404,
+          "id": "qs_multiplexer_full_tXPfoXWLt9Lr",
+          "rows": [
+            {
+              "n": "MWP:XAUUSD",
+              "s": "ok",
+              "description": "XAUUSD · 平台行情",
+              "lp": 4160.795,
+              "session": "scheduled_open",
+              "read_at": 1792177246656
+            }
+          ]
+        },
+        {
+          "time": 44577.20000001788,
+          "id": "qs_multiplexer_full_tXPfoXWLt9Lr",
+          "rows": [
+            {
+              "n": "MWP:EURUSD",
+              "s": "ok",
+              "description": "EURUSD · 平台行情",
+              "lp": 1.1233,
+              "session": "scheduled_open",
+              "read_at": 1792177235343
+            },
+            {
+              "n": "MWP:XAUUSD",
+              "s": "ok",
+              "description": "XAUUSD · 平台行情",
+              "lp": 4160.795,
+              "session": "scheduled_open",
+              "read_at": 1792177246656
+            }
+          ]
+        },
+        {
+          "time": 44777.80000001192,
+          "id": "qs_multiplexer_full_tXPfoXWLt9Lr",
+          "rows": [
+            {
+              "n": "MWP:EURUSD",
+              "s": "ok",
+              "description": "EURUSD · 平台行情",
+              "lp": 1.1233,
+              "session": "scheduled_open",
+              "read_at": 1792177235343
+            }
+          ]
+        },
+        {
+          "time": 45827.80000001192,
+          "id": "qs_multiplexer_full_tXPfoXWLt9Lr",
+          "rows": [
+            {
+              "n": "MWP:EURUSD",
+              "s": "ok",
+              "description": "EURUSD · 平台行情",
+              "lp": 1.1233,
+              "session": "scheduled_open",
+              "read_at": 1792177235343
+            }
+          ]
+        },
+        {
+          "time": 47223.90000000596,
+          "id": "qs_multiplexer_full_tXPfoXWLt9Lr",
+          "rows": [
+            {
+              "n": "MWP:XAUUSD",
+              "s": "ok",
+              "description": "XAUUSD · 平台行情",
+              "lp": 4160.795,
+              "session": "scheduled_open",
+              "read_at": 1792177246656
+            },
+            {
+              "n": "MWP:EURUSD",
+              "s": "ok",
+              "description": "EURUSD · 平台行情",
+              "lp": 1.1233,
+              "session": "scheduled_open",
+              "read_at": 1792177235343
+            }
+          ]
+        },
+        {
+          "time": 47495.09999999404,
+          "id": "qs_multiplexer_full_tXPfoXWLt9Lr",
+          "rows": [
+            {
+              "n": "MWP:XAUUSD",
+              "s": "ok",
+              "description": "XAUUSD · 平台行情",
+              "lp": 4160.795,
+              "session": "scheduled_open",
+              "read_at": 1792177246656
+            }
+          ]
+        },
+        {
+          "time": 48336.80000001192,
+          "id": "qs_multiplexer_full_tXPfoXWLt9Lr",
+          "rows": [
+            {
+              "n": "MWP:XAUUSD",
+              "s": "ok",
+              "description": "XAUUSD · 平台行情",
+              "lp": 4160.795,
+              "session": "scheduled_open",
+              "read_at": 1792177246656
+            }
+          ]
+        }
+      ],
+      "requests": [
+        {
+          "time": 35875.59999999404,
+          "symbols": [
+            "MWP:EURUSD"
+          ],
+          "delivered": 35909.70000001788
+        },
+        {
+          "time": 35875.59999999404,
+          "symbols": [
+            "MWP:EURUSD",
+            "MWP:XAUUSD"
+          ],
+          "delivered": 35910.30000001192
+        },
+        {
+          "time": 35875.70000001788,
+          "symbols": [
+            "MWP:XAUUSD"
+          ],
+          "delivered": 35910.70000001788
+        },
+        {
+          "time": 35875.80000001192,
+          "symbols": [
+            "MWP:XAUUSD"
+          ],
+          "delivered": 35911.59999999404
+        },
+        {
+          "time": 35910.20000001788,
+          "symbols": [
+            "MWP:EURUSD"
+          ]
+        },
+        {
+          "time": 35910.59999999404,
+          "symbols": [
+            "MWP:EURUSD",
+            "MWP:XAUUSD"
+          ]
+        },
+        {
+          "time": 35911.30000001192,
+          "symbols": [
+            "MWP:XAUUSD",
+            "MWP:EURUSD"
+          ]
+        },
+        {
+          "time": 35912,
+          "symbols": [
+            "MWP:XAUUSD",
+            "MWP:EURUSD"
+          ]
+        },
+        {
+          "time": 36102.40000000596,
+          "symbols": [
+            "MWP:XAUUSD"
+          ],
+          "delivered": 36104
+        },
+        {
+          "time": 36104.30000001192,
+          "symbols": [
+            "MWP:XAUUSD"
+          ]
+        },
+        {
+          "time": 38856.5,
+          "symbols": [
+            "MWP:XAUUSD"
+          ],
+          "delivered": 38957.70000001788
+        },
+        {
+          "time": 38856.59999999404,
+          "symbols": [
+            "MWP:XAUUSD",
+            "MWP:EURUSD"
+          ],
+          "delivered": 38963.70000001788
+        },
+        {
+          "time": 38856.59999999404,
+          "symbols": [
+            "MWP:EURUSD"
+          ],
+          "delivered": 38964
+        },
+        {
+          "time": 38856.59999999404,
+          "symbols": [
+            "MWP:EURUSD"
+          ],
+          "delivered": 38964.20000001788
+        },
+        {
+          "time": 38963.59999999404,
+          "symbols": [
+            "MWP:XAUUSD"
+          ]
+        },
+        {
+          "time": 38964,
+          "symbols": [
+            "MWP:XAUUSD",
+            "MWP:EURUSD"
+          ]
+        },
+        {
+          "time": 38964.09999999404,
+          "symbols": [
+            "MWP:EURUSD",
+            "MWP:XAUUSD"
+          ]
+        },
+        {
+          "time": 38964.40000000596,
+          "symbols": [
+            "MWP:EURUSD",
+            "MWP:XAUUSD"
+          ]
+        },
+        {
+          "time": 39095.40000000596,
+          "symbols": [
+            "MWP:EURUSD"
+          ],
+          "delivered": 39095.80000001192
+        },
+        {
+          "time": 39096,
+          "symbols": [
+            "MWP:EURUSD"
+          ]
+        },
+        {
+          "time": 41351.90000000596,
+          "symbols": [
+            "MWP:EURUSD"
+          ],
+          "delivered": 41389.80000001192
+        },
+        {
+          "time": 41351.90000000596,
+          "symbols": [
+            "MWP:EURUSD",
+            "MWP:XAUUSD"
+          ],
+          "delivered": 41390.30000001192
+        },
+        {
+          "time": 41351.90000000596,
+          "symbols": [
+            "MWP:XAUUSD"
+          ],
+          "delivered": 41390.59999999404
+        },
+        {
+          "time": 41351.90000000596,
+          "symbols": [
+            "MWP:XAUUSD"
+          ],
+          "delivered": 41390.80000001192
+        },
+        {
+          "time": 41390.30000001192,
+          "symbols": [
+            "MWP:EURUSD"
+          ]
+        },
+        {
+          "time": 41390.59999999404,
+          "symbols": [
+            "MWP:EURUSD",
+            "MWP:XAUUSD"
+          ]
+        },
+        {
+          "time": 41390.80000001192,
+          "symbols": [
+            "MWP:XAUUSD",
+            "MWP:EURUSD"
+          ]
+        },
+        {
+          "time": 41391,
+          "symbols": [
+            "MWP:XAUUSD",
+            "MWP:EURUSD"
+          ]
+        },
+        {
+          "time": 41664.20000001788,
+          "symbols": [
+            "MWP:XAUUSD"
+          ],
+          "delivered": 41674.59999999404
+        },
+        {
+          "time": 41674.90000000596,
+          "symbols": [
+            "MWP:XAUUSD"
+          ]
+        },
+        {
+          "time": 44353.70000001788,
+          "symbols": [
+            "MWP:XAUUSD"
+          ],
+          "delivered": 44482.59999999404
+        },
+        {
+          "time": 44353.80000001192,
+          "symbols": [
+            "MWP:XAUUSD",
+            "MWP:EURUSD"
+          ],
+          "delivered": 44483
+        },
+        {
+          "time": 44353.90000000596,
+          "symbols": [
+            "MWP:EURUSD"
+          ],
+          "delivered": 44483.80000001192
+        },
+        {
+          "time": 44353.90000000596,
+          "symbols": [
+            "MWP:EURUSD"
+          ],
+          "delivered": 44484.20000001788
+        },
+        {
+          "time": 44482.80000001192,
+          "symbols": [
+            "MWP:XAUUSD"
+          ]
+        },
+        {
+          "time": 44483.70000001788,
+          "symbols": [
+            "MWP:XAUUSD",
+            "MWP:EURUSD"
+          ]
+        },
+        {
+          "time": 44484.20000001788,
+          "symbols": [
+            "MWP:EURUSD",
+            "MWP:XAUUSD"
+          ]
+        },
+        {
+          "time": 44484.40000000596,
+          "symbols": [
+            "MWP:EURUSD",
+            "MWP:XAUUSD"
+          ]
+        },
+        {
+          "time": 44708,
+          "symbols": [
+            "MWP:EURUSD"
+          ],
+          "delivered": 44756.5
+        },
+        {
+          "time": 44756.80000001192,
+          "symbols": [
+            "MWP:EURUSD"
+          ]
+        },
+        {
+          "time": 47039,
+          "symbols": [
+            "MWP:EURUSD"
+          ],
+          "delivered": 47126.80000001192
+        },
+        {
+          "time": 47039,
+          "symbols": [
+            "MWP:EURUSD",
+            "MWP:XAUUSD"
+          ],
+          "delivered": 47127.40000000596
+        },
+        {
+          "time": 47039.09999999404,
+          "symbols": [
+            "MWP:XAUUSD"
+          ],
+          "delivered": 47128.09999999404
+        },
+        {
+          "time": 47039.09999999404,
+          "symbols": [
+            "MWP:XAUUSD"
+          ],
+          "delivered": 47128.5
+        },
+        {
+          "time": 47127.30000001192,
+          "symbols": [
+            "MWP:EURUSD"
+          ]
+        },
+        {
+          "time": 47127.90000000596,
+          "symbols": [
+            "MWP:EURUSD",
+            "MWP:XAUUSD"
+          ]
+        },
+        {
+          "time": 47128.30000001192,
+          "symbols": [
+            "MWP:XAUUSD",
+            "MWP:EURUSD"
+          ]
+        },
+        {
+          "time": 47128.59999999404,
+          "symbols": [
+            "MWP:XAUUSD",
+            "MWP:EURUSD"
+          ]
+        },
+        {
+          "time": 47356.30000001192,
+          "symbols": [
+            "MWP:XAUUSD"
+          ],
+          "delivered": 47453.80000001192
+        },
+        {
+          "time": 47454.09999999404,
+          "symbols": [
+            "MWP:XAUUSD"
+          ]
+        }
+      ]
+    }
+  ],
+  "runs": [
+    {
+      "label": "01-startup",
+      "row_timeline": [
+        {
+          "time": 2919.300000011921,
+          "rows": []
+        },
+        {
+          "time": 3195.5,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:XAUUSD",
+              "text": "XAUUSD",
+              "display": "XAUUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:USD_CAD",
+              "text": "",
+              "display": "USDCAD",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 4671.5,
+          "rows": []
+        },
+        {
+          "time": 4800.800000011921,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:XAUUSD",
+              "text": "XAUUSD",
+              "display": "XAUUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:USD_CAD",
+              "text": "",
+              "display": "USDCAD",
+              "loading": false
+            }
+          ]
+        }
+      ],
+      "final_rows": [
+        {
+          "ticker": "MWP:EURUSD",
+          "text": "EURUSD\n1.12322\n0.00117\n0.10%",
+          "name": "EURUSD",
+          "ready": "true",
+          "short": "EURUSD"
+        },
+        {
+          "ticker": "MWP:XAUUSD",
+          "text": "XAUUSD\n4,159.585\n−10.725\n−0.26%",
+          "name": "XAUUSD",
+          "ready": "true",
+          "short": "XAUUSD"
+        },
+        {
+          "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+          "text": "EURUSD\n1.12322\n0.00114\n0.10%",
+          "name": "EURUSD",
+          "ready": "true",
+          "short": "26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219"
+        },
+        {
+          "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+          "text": "GBPUSD\n1.33185",
+          "name": "GBPUSD",
+          "ready": "true",
+          "short": "DUKA:39bfb355d460ecebfa4cba28b8011eb2"
+        },
+        {
+          "ticker": "MWP:OANDA:USD_CAD",
+          "text": "USDCAD\n1.41522\n−0.00314\n−0.22%",
+          "name": "USDCAD",
+          "ready": "true",
+          "short": "OANDA:USD_CAD"
+        }
+      ],
+      "quotes": [
+        {
+          "ticker": "MWP:EURUSD",
+          "status": "ok",
+          "values": {
+            "short_name": "EURUSD",
+            "description": "EURUSD · 平台行情 · 交易时段内 · 最后行情时间 2026-10-16 18:59:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 19:00:00 UTC，不含终点）",
+            "lp": 1.12322,
+            "ch": 0.00117,
+            "chp": 0.10427342810035203,
+            "fetch_status": "ok",
+            "time_type": "source_m1",
+            "read_at": 1792177187508,
+            "market_session": "scheduled_open",
+            "data_start": 1792177140000,
+            "data_end": 1792177200000
+          }
+        },
+        {
+          "ticker": "MWP:XAUUSD",
+          "status": "ok",
+          "values": {
+            "short_name": "XAUUSD",
+            "description": "XAUUSD · 平台行情 · 交易时段内 · 最后行情时间 2026-10-16 18:59:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 19:00:00 UTC，不含终点）",
+            "lp": 4159.585,
+            "ch": -10.725,
+            "chp": -0.2571751260697646,
+            "fetch_status": "ok",
+            "time_type": "source_m1",
+            "read_at": 1792177187508,
+            "market_session": "scheduled_open",
+            "data_start": 1792177140000,
+            "data_end": 1792177200000
+          }
+        },
+        {
+          "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+          "status": "ok",
+          "values": {
+            "short_name": "EURUSD",
+            "description": "EUR/USD · 组合行情 · 当前未闭合M1收盘采样 · 交易时段内 · 最后行情时间 2026-10-16 18:59:00 UTC",
+            "lp": 1.12322,
+            "ch": 0.00114,
+            "chp": 0.10159703407956652,
+            "fetch_status": "ok",
+            "time_type": "composite_snapshot",
+            "read_at": 1792177189486,
+            "market_session": "scheduled_open",
+            "price_type": "sampled_candle_close",
+            "data_start": 1792177140000,
+            "data_end": 1792177200000
+          }
+        },
+        {
+          "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+          "status": "ok",
+          "values": {
+            "short_name": "GBPUSD",
+            "description": "GBPUSD · 平台行情 · Bid · 来源原生UTC周期 · 时段未核实 · 更新失败，保留上次数据 · 最后行情时间 2026-10-16 18:40:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 18:41:00 UTC，不含终点）",
+            "lp": 1.33185,
+            "fetch_status": "fetch_failed",
+            "time_type": "source_m1",
+            "read_at": 1792177196693,
+            "market_session": "unknown",
+            "data_start": 1792176000000,
+            "data_end": 1792176060000
+          }
+        },
+        {
+          "ticker": "MWP:OANDA:USD_CAD",
+          "status": "ok",
+          "values": {
+            "short_name": "USDCAD",
+            "description": "USDCAD · 平台行情 · 时段未核实 · 最后行情时间 2026-10-16 19:00:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 19:01:00 UTC，不含终点）",
+            "lp": 1.41522,
+            "ch": -0.00314,
+            "chp": -0.22138244169322316,
+            "fetch_status": "ok",
+            "time_type": "source_m1",
+            "read_at": 1792177203565,
+            "market_session": "unknown",
+            "data_start": 1792177200000,
+            "data_end": 1792177260000
+          }
+        }
+      ]
+    },
+    {
+      "label": "02-reload",
+      "row_timeline": [
+        {
+          "time": 1977.2000000178814,
+          "rows": []
+        },
+        {
+          "time": 2279.5,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:XAUUSD",
+              "text": "XAUUSD",
+              "display": "XAUUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:USD_CAD",
+              "text": "",
+              "display": "USDCAD",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 4101.300000011921,
+          "rows": []
+        },
+        {
+          "time": 4205.0999999940395,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:XAUUSD",
+              "text": "XAUUSD",
+              "display": "XAUUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:USD_CAD",
+              "text": "",
+              "display": "USDCAD",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 32560,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12327\n0.00122\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:XAUUSD",
+              "text": "XAUUSD",
+              "display": "XAUUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:USD_CAD",
+              "text": "USDCAD",
+              "display": "USDCAD",
+              "loading": false
+            }
+          ]
+        }
+      ],
+      "final_rows": [
+        {
+          "ticker": "MWP:EURUSD",
+          "text": "EURUSD\n1.12330\n0.00125\n0.11%",
+          "name": "EURUSD",
+          "ready": "true",
+          "short": "EURUSD"
+        },
+        {
+          "ticker": "MWP:XAUUSD",
+          "text": "XAUUSD\n4,160.155\n−10.155\n−0.24%",
+          "name": "XAUUSD",
+          "ready": "true",
+          "short": "XAUUSD"
+        },
+        {
+          "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+          "text": "EURUSD\n1.12331\n0.00123\n0.11%",
+          "name": "EURUSD",
+          "ready": "true",
+          "short": "26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219"
+        },
+        {
+          "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+          "text": "GBPUSD\n1.33175",
+          "name": "GBPUSD",
+          "ready": "true",
+          "short": "DUKA:39bfb355d460ecebfa4cba28b8011eb2"
+        },
+        {
+          "ticker": "MWP:OANDA:USD_CAD",
+          "text": "USDCAD\n1.41521\n−0.00315\n−0.22%",
+          "name": "USDCAD",
+          "ready": "true",
+          "short": "OANDA:USD_CAD"
+        }
+      ],
+      "quotes": [
+        {
+          "ticker": "MWP:EURUSD",
+          "status": "ok",
+          "values": {
+            "short_name": "EURUSD",
+            "description": "EURUSD · 平台行情 · 交易时段内 · 最后行情时间 2026-10-16 19:00:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 19:01:00 UTC，不含终点）",
+            "lp": 1.1233,
+            "ch": 0.00125,
+            "chp": 0.11140323514994875,
+            "fetch_status": "ok",
+            "time_type": "source_m1",
+            "read_at": 1792177235343,
+            "market_session": "scheduled_open",
+            "data_start": 1792177200000,
+            "data_end": 1792177260000
+          }
+        },
+        {
+          "ticker": "MWP:XAUUSD",
+          "status": "ok",
+          "values": {
+            "short_name": "XAUUSD",
+            "description": "XAUUSD · 平台行情 · 交易时段内 · 最后行情时间 2026-10-16 19:00:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 19:01:00 UTC，不含终点）",
+            "lp": 4160.155,
+            "ch": -10.155,
+            "chp": -0.24350707741151137,
+            "fetch_status": "ok",
+            "time_type": "source_m1",
+            "read_at": 1792177231584,
+            "market_session": "scheduled_open",
+            "data_start": 1792177200000,
+            "data_end": 1792177260000
+          }
+        },
+        {
+          "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+          "status": "ok",
+          "values": {
+            "short_name": "EURUSD",
+            "description": "EUR/USD · 组合行情 · 当前未闭合M1收盘采样 · 交易时段内 · 最后行情时间 2026-10-16 19:00:00 UTC",
+            "lp": 1.12331,
+            "ch": 0.00123,
+            "chp": 0.1096178525595323,
+            "fetch_status": "ok",
+            "time_type": "composite_snapshot",
+            "read_at": 1792177237820,
+            "market_session": "scheduled_open",
+            "price_type": "sampled_candle_close",
+            "data_start": 1792177200000,
+            "data_end": 1792177260000
+          }
+        },
+        {
+          "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+          "status": "ok",
+          "values": {
+            "short_name": "GBPUSD",
+            "description": "GBPUSD · 平台行情 · Bid · 来源原生UTC周期 · 时段未核实 · 更新失败，保留上次数据 · 最后行情时间 2026-10-16 18:39:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 18:40:00 UTC，不含终点）",
+            "lp": 1.33175,
+            "fetch_status": "fetch_failed",
+            "time_type": "source_m1",
+            "read_at": 1792177228627,
+            "market_session": "unknown",
+            "data_start": 1792175940000,
+            "data_end": 1792176000000
+          }
+        },
+        {
+          "ticker": "MWP:OANDA:USD_CAD",
+          "status": "ok",
+          "values": {
+            "short_name": "USDCAD",
+            "description": "USDCAD · 平台行情 · 时段未核实 · 最后行情时间 2026-10-16 19:00:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 19:01:00 UTC，不含终点）",
+            "lp": 1.41521,
+            "ch": -0.00315,
+            "chp": -0.22208748131644998,
+            "fetch_status": "ok",
+            "time_type": "source_m1",
+            "read_at": 1792177225326,
+            "market_session": "unknown",
+            "data_start": 1792177200000,
+            "data_end": 1792177260000
+          }
+        }
+      ]
+    },
+    {
+      "label": "03-switch-all",
+      "row_timeline": [
+        {
+          "time": 1977.2000000178814,
+          "rows": []
+        },
+        {
+          "time": 2279.5,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:XAUUSD",
+              "text": "XAUUSD",
+              "display": "XAUUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:USD_CAD",
+              "text": "",
+              "display": "USDCAD",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 4101.300000011921,
+          "rows": []
+        },
+        {
+          "time": 4205.0999999940395,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:XAUUSD",
+              "text": "XAUUSD",
+              "display": "XAUUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:USD_CAD",
+              "text": "",
+              "display": "USDCAD",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 32560,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12327\n0.00122\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:XAUUSD",
+              "text": "XAUUSD",
+              "display": "XAUUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:USD_CAD",
+              "text": "USDCAD",
+              "display": "USDCAD",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 33373.70000001788,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12330\n0.00125\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:XAUUSD",
+              "text": "XAUUSD\n4,160.155\n−10.155\n−0.24%",
+              "display": "XAUUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12331\n0.00123\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:USD_CAD",
+              "text": "USDCAD\n1.41521\n−0.00315\n−0.22%",
+              "display": "USDCAD",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 37060.90000000596,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12330\n0.00125\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:XAUUSD",
+              "text": "XAUUSD\n4,160.155\n−10.155\n−0.24%",
+              "display": "XAUUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12331\n0.00123\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:USD_CAD",
+              "text": "USDCAD\n1.41520\n−0.00316\n−0.22%",
+              "display": "USDCAD",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 37665.30000001192,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12330\n0.00125\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:XAUUSD",
+              "text": "XAUUSD\n4,160.155\n−10.155\n−0.24%",
+              "display": "XAUUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12334\n0.00126\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:USD_CAD",
+              "text": "USDCAD\n1.41520\n−0.00316\n−0.22%",
+              "display": "USDCAD",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 39056.09999999404,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12330\n0.00125\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:XAUUSD",
+              "text": "XAUUSD\n4,160.155\n−10.155\n−0.24%",
+              "display": "XAUUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12326\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:USD_CAD",
+              "text": "USDCAD\n1.41520\n−0.00316\n−0.22%",
+              "display": "USDCAD",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 43522.70000001788,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12330\n0.00125\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:XAUUSD",
+              "text": "XAUUSD\n4,160.795\n−9.515\n−0.23%",
+              "display": "XAUUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12326\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:USD_CAD",
+              "text": "USDCAD\n1.41520\n−0.00316\n−0.22%",
+              "display": "USDCAD",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 47465,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12333\n0.00128\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:XAUUSD",
+              "text": "XAUUSD\n4,160.795\n−9.515\n−0.23%",
+              "display": "XAUUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12326\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:USD_CAD",
+              "text": "USDCAD\n1.41520\n−0.00316\n−0.22%",
+              "display": "USDCAD",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 51819,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "加载中…",
+              "loading": true
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "加载中…",
+              "loading": true
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "加载中…",
+              "loading": true
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 52120.59999999404,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12333\n0.00128\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "加载中…",
+              "loading": true
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "加载中…",
+              "loading": true
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "加载中…",
+              "loading": true
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12326\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 52710.20000001788,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12333\n0.00128\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "加载中…",
+              "loading": true
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "加载中…",
+              "loading": true
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12326\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 52996,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12333\n0.00128\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "加载中…",
+              "loading": true
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12326\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 53045.59999999404,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12333\n0.00128\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12326\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 58959.40000000596,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12333\n0.00128\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12329\n0.00121\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 62444,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12329\n0.00124\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12329\n0.00121\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 102279.40000000596,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12329\n0.00124\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12328\n0.00120\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 105845.09999999404,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12329\n0.00124\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12324\n0.00116\n0.10%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 107541.20000001788,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12324\n0.00119\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12324\n0.00116\n0.10%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 108093.80000001192,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12324\n0.00119\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12323\n0.00115\n0.10%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 113909.59999999404,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12324\n0.00119\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12324\n0.00116\n0.10%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 123108,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12323\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12324\n0.00116\n0.10%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 128298.09999999404,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12323\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12323\n0.00115\n0.10%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 129925.90000000596,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12323\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12328\n0.00120\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        }
+      ],
+      "final_rows": [
+        {
+          "ticker": "MWP:EURUSD",
+          "text": "EURUSD\n1.12323\n0.00118\n0.11%",
+          "name": "EURUSD",
+          "ready": "true",
+          "short": "EURUSD"
+        },
+        {
+          "ticker": "MWP:OANDA:EUR_USD",
+          "text": "EURUSD\n1.12323\n0.00118\n0.11%",
+          "name": "EURUSD",
+          "ready": "true",
+          "short": "OANDA:EUR_USD"
+        },
+        {
+          "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+          "text": "GBPUSD\n1.33175",
+          "name": "GBPUSD",
+          "ready": "true",
+          "short": "DUKA:39bfb355d460ecebfa4cba28b8011eb2"
+        },
+        {
+          "ticker": "MWP:BTCUSDT",
+          "text": "BTCUSDT\n81,094.19\n−1,151.74\n−1.40%",
+          "name": "BTCUSDT",
+          "ready": "true",
+          "short": "BTCUSDT"
+        },
+        {
+          "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+          "text": "AAPL\n342.01\n0.01\n0.00%",
+          "name": "AAPL",
+          "ready": "true",
+          "short": "YAHOO:1eb44d625271a4eb75016f276d137836"
+        },
+        {
+          "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+          "text": "EURUSD\n1.12248",
+          "name": "EURUSD",
+          "ready": "true",
+          "short": "24df99fe-2fb9-4d43-ac33-2c272bab9226"
+        },
+        {
+          "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+          "text": "EURUSD\n1.12328\n0.00120\n0.11%",
+          "name": "EURUSD",
+          "ready": "true",
+          "short": "26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219"
+        },
+        {
+          "ticker": "EURUSD",
+          "text": "EURUSD",
+          "name": "EURUSD",
+          "ready": "true",
+          "short": "EURUSD"
+        },
+        {
+          "ticker": "BTCUSDT",
+          "text": "BTCUSDT",
+          "name": "BTCUSDT",
+          "ready": "true",
+          "short": "BTCUSDT"
+        }
+      ],
+      "quotes": [
+        {
+          "ticker": "MWP:EURUSD",
+          "status": "ok",
+          "values": {
+            "short_name": "EURUSD",
+            "description": "EURUSD · 平台行情 · 交易时段内 · 最后行情时间 2026-10-16 19:01:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 19:02:00 UTC，不含终点）",
+            "lp": 1.12323,
+            "ch": 0.00118,
+            "chp": 0.10516465398155163,
+            "fetch_status": "ok",
+            "time_type": "source_m1",
+            "read_at": 1792177326367,
+            "market_session": "scheduled_open",
+            "data_start": 1792177260000,
+            "data_end": 1792177320000
+          }
+        },
+        {
+          "ticker": "MWP:XAUUSD",
+          "status": "ok",
+          "values": {
+            "short_name": "XAUUSD",
+            "description": "XAUUSD · 平台行情 · 交易时段内 · 最后行情时间 2026-10-16 19:01:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 19:02:00 UTC，不含终点）",
+            "lp": 4158.845,
+            "ch": -11.465,
+            "chp": -0.27491961029276,
+            "fetch_status": "ok",
+            "time_type": "source_m1",
+            "read_at": 1792177322104,
+            "market_session": "scheduled_open",
+            "data_start": 1792177260000,
+            "data_end": 1792177320000
+          }
+        },
+        {
+          "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+          "status": "ok",
+          "values": {
+            "short_name": "EURUSD",
+            "description": "EUR/USD · 组合行情 · 当前未闭合M1收盘采样 · 交易时段内 · 最后行情时间 2026-10-16 19:02:00 UTC",
+            "lp": 1.12328,
+            "ch": 0.0012,
+            "chp": 0.10694424639954371,
+            "fetch_status": "ok",
+            "time_type": "composite_snapshot",
+            "read_at": 1792177336361,
+            "market_session": "scheduled_open",
+            "price_type": "sampled_candle_close",
+            "data_start": 1792177320000,
+            "data_end": 1792177380000
+          }
+        },
+        {
+          "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+          "status": "ok",
+          "values": {
+            "short_name": "GBPUSD",
+            "description": "GBPUSD · 平台行情 · Bid · 来源原生UTC周期 · 时段未核实 · 更新失败，保留上次数据 · 最后行情时间 2026-10-16 18:39:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 18:40:00 UTC，不含终点）",
+            "lp": 1.33175,
+            "fetch_status": "fetch_failed",
+            "time_type": "source_m1",
+            "read_at": 1792177293754,
+            "market_session": "unknown",
+            "data_start": 1792175940000,
+            "data_end": 1792176000000
+          }
+        },
+        {
+          "ticker": "MWP:OANDA:USD_CAD",
+          "status": "ok",
+          "values": {
+            "short_name": "USDCAD",
+            "description": "USDCAD · 平台行情 · 时段未核实 · 最后行情时间 2026-10-16 19:02:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 19:03:00 UTC，不含终点）",
+            "lp": 1.41531,
+            "ch": -0.00305,
+            "chp": -0.21503708508418173,
+            "fetch_status": "ok",
+            "time_type": "source_m1",
+            "read_at": 1792177332119,
+            "market_session": "unknown",
+            "data_start": 1792177320000,
+            "data_end": 1792177380000
+          }
+        },
+        {
+          "ticker": "MWP:OANDA:EUR_USD",
+          "status": "ok",
+          "values": {
+            "short_name": "EURUSD",
+            "description": "EURUSD · 平台行情 · 交易时段内 · 最后行情时间 2026-10-16 19:01:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 19:02:00 UTC，不含终点）",
+            "lp": 1.12323,
+            "ch": 0.00118,
+            "chp": 0.10516465398155163,
+            "fetch_status": "ok",
+            "time_type": "source_m1",
+            "read_at": 1792177316254,
+            "market_session": "scheduled_open",
+            "data_start": 1792177260000,
+            "data_end": 1792177320000
+          }
+        },
+        {
+          "ticker": "MWP:BTCUSDT",
+          "status": "ok",
+          "values": {
+            "short_name": "BTCUSDT",
+            "description": "BTCUSDT · 平台行情 · 时段未核实 · 最后行情时间 2026-10-16 19:02:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 19:03:00 UTC，不含终点）",
+            "lp": 81094.19,
+            "ch": -1151.74,
+            "chp": -1.400361087776623,
+            "fetch_status": "ok",
+            "time_type": "source_m1",
+            "read_at": 1792177334531,
+            "market_session": "unknown",
+            "data_start": 1792177320000,
+            "data_end": 1792177380000
+          }
+        },
+        {
+          "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+          "status": "ok",
+          "values": {
+            "short_name": "AAPL",
+            "description": "苹果公司 · Yahoo 市场报价 · 延迟 15 分钟 · 时段未核实 · 最后更新于 2026-10-16 19:02:16 UTC",
+            "lp": 342.01,
+            "ch": 0.01,
+            "chp": 0.0029239766081871343,
+            "fetch_status": "ok",
+            "time_type": "provider_quote",
+            "read_at": 1792177338108,
+            "market_session": "unknown",
+            "delay_seconds": 900
+          }
+        },
+        {
+          "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+          "status": "ok",
+          "values": {
+            "short_name": "EURUSD",
+            "description": "EUR/USD · 固定历史 · 历史数据时间 2026-10-16 17:34:00 UTC",
+            "lp": 1.12248,
+            "time_type": "fixed_history",
+            "data_start": 1792172040000,
+            "data_end": 1792172100000
+          }
+        },
+        {
+          "ticker": "EURUSD",
+          "status": "ok",
+          "values": {
+            "short_name": "EURUSD",
+            "description": "EURUSD · 报价准备中 · 交易时段内 · 等待新行情 · 暂无行情更新时间",
+            "time_type": null,
+            "market_session": "scheduled_open",
+            "data_start": null
+          }
+        },
+        {
+          "ticker": "BTCUSDT",
+          "status": "ok",
+          "values": {
+            "short_name": "BTCUSDT",
+            "description": "BTCUSDT · 报价准备中 · 时段未核实 · 暂无行情更新时间",
+            "time_type": null,
+            "market_session": "unknown",
+            "data_start": null
+          }
+        }
+      ]
+    },
+    {
+      "label": "04-add",
+      "row_timeline": [
+        {
+          "time": 1977.2000000178814,
+          "rows": []
+        },
+        {
+          "time": 2279.5,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:XAUUSD",
+              "text": "XAUUSD",
+              "display": "XAUUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:USD_CAD",
+              "text": "",
+              "display": "USDCAD",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 4101.300000011921,
+          "rows": []
+        },
+        {
+          "time": 4205.0999999940395,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:XAUUSD",
+              "text": "XAUUSD",
+              "display": "XAUUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:USD_CAD",
+              "text": "",
+              "display": "USDCAD",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 32560,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12327\n0.00122\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:XAUUSD",
+              "text": "XAUUSD",
+              "display": "XAUUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:USD_CAD",
+              "text": "USDCAD",
+              "display": "USDCAD",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 33373.70000001788,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12330\n0.00125\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:XAUUSD",
+              "text": "XAUUSD\n4,160.155\n−10.155\n−0.24%",
+              "display": "XAUUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12331\n0.00123\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:USD_CAD",
+              "text": "USDCAD\n1.41521\n−0.00315\n−0.22%",
+              "display": "USDCAD",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 37060.90000000596,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12330\n0.00125\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:XAUUSD",
+              "text": "XAUUSD\n4,160.155\n−10.155\n−0.24%",
+              "display": "XAUUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12331\n0.00123\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:USD_CAD",
+              "text": "USDCAD\n1.41520\n−0.00316\n−0.22%",
+              "display": "USDCAD",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 37665.30000001192,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12330\n0.00125\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:XAUUSD",
+              "text": "XAUUSD\n4,160.155\n−10.155\n−0.24%",
+              "display": "XAUUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12334\n0.00126\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:USD_CAD",
+              "text": "USDCAD\n1.41520\n−0.00316\n−0.22%",
+              "display": "USDCAD",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 39056.09999999404,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12330\n0.00125\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:XAUUSD",
+              "text": "XAUUSD\n4,160.155\n−10.155\n−0.24%",
+              "display": "XAUUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12326\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:USD_CAD",
+              "text": "USDCAD\n1.41520\n−0.00316\n−0.22%",
+              "display": "USDCAD",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 43522.70000001788,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12330\n0.00125\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:XAUUSD",
+              "text": "XAUUSD\n4,160.795\n−9.515\n−0.23%",
+              "display": "XAUUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12326\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:USD_CAD",
+              "text": "USDCAD\n1.41520\n−0.00316\n−0.22%",
+              "display": "USDCAD",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 47465,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12333\n0.00128\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:XAUUSD",
+              "text": "XAUUSD\n4,160.795\n−9.515\n−0.23%",
+              "display": "XAUUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12326\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:USD_CAD",
+              "text": "USDCAD\n1.41520\n−0.00316\n−0.22%",
+              "display": "USDCAD",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 51819,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "加载中…",
+              "loading": true
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "加载中…",
+              "loading": true
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "加载中…",
+              "loading": true
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 52120.59999999404,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12333\n0.00128\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "加载中…",
+              "loading": true
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "加载中…",
+              "loading": true
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "加载中…",
+              "loading": true
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12326\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 52710.20000001788,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12333\n0.00128\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "加载中…",
+              "loading": true
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "加载中…",
+              "loading": true
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12326\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 52996,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12333\n0.00128\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "加载中…",
+              "loading": true
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12326\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 53045.59999999404,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12333\n0.00128\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12326\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 58959.40000000596,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12333\n0.00128\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12329\n0.00121\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 62444,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12329\n0.00124\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12329\n0.00121\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 102279.40000000596,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12329\n0.00124\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12328\n0.00120\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 105845.09999999404,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12329\n0.00124\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12324\n0.00116\n0.10%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 107541.20000001788,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12324\n0.00119\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12324\n0.00116\n0.10%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 108093.80000001192,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12324\n0.00119\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12323\n0.00115\n0.10%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 113909.59999999404,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12324\n0.00119\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12324\n0.00116\n0.10%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 123108,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12323\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12324\n0.00116\n0.10%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 128298.09999999404,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12323\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12323\n0.00115\n0.10%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 129925.90000000596,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12323\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12328\n0.00120\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 133509.80000001192,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12323\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "EURUSD\n1.12323\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "GBPUSD\n1.33175",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT\n81,094.19\n−1,151.74\n−1.40%",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "AAPL\n342.01\n0.01\n0.00%",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "EURUSD\n1.12248",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12328\n0.00120\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 133747,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12323\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "EURUSD\n1.12323\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT\n81,094.19\n−1,151.74\n−1.40%",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "AAPL\n342.01\n0.01\n0.00%",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "EURUSD\n1.12248",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12328\n0.00120\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 133979.59999999404,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD\n1.12323\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "EURUSD\n1.12323\n0.00118\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT\n81,094.19\n−1,151.74\n−1.40%",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "AAPL\n342.01\n0.01\n0.00%",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "EURUSD\n1.12248",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "EURUSD\n1.12328\n0.00120\n0.11%",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "",
+              "display": "GBPUSD",
+              "loading": false
+            }
+          ]
+        }
+      ],
+      "final_rows": [
+        {
+          "ticker": "MWP:EURUSD",
+          "text": "EURUSD\n1.12323\n0.00118\n0.11%",
+          "name": "EURUSD",
+          "ready": "true",
+          "short": "EURUSD"
+        },
+        {
+          "ticker": "MWP:OANDA:EUR_USD",
+          "text": "EURUSD\n1.12323\n0.00118\n0.11%",
+          "name": "EURUSD",
+          "ready": "true",
+          "short": "OANDA:EUR_USD"
+        },
+        {
+          "ticker": "MWP:BTCUSDT",
+          "text": "BTCUSDT\n81,094.19\n−1,151.74\n−1.40%",
+          "name": "BTCUSDT",
+          "ready": "true",
+          "short": "BTCUSDT"
+        },
+        {
+          "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+          "text": "AAPL\n342.01\n0.01\n0.00%",
+          "name": "AAPL",
+          "ready": "true",
+          "short": "YAHOO:1eb44d625271a4eb75016f276d137836"
+        },
+        {
+          "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+          "text": "EURUSD\n1.12248",
+          "name": "EURUSD",
+          "ready": "true",
+          "short": "24df99fe-2fb9-4d43-ac33-2c272bab9226"
+        },
+        {
+          "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+          "text": "EURUSD\n1.12328\n0.00120\n0.11%",
+          "name": "EURUSD",
+          "ready": "true",
+          "short": "26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219"
+        },
+        {
+          "ticker": "EURUSD",
+          "text": "EURUSD",
+          "name": "EURUSD",
+          "ready": "true",
+          "short": "EURUSD"
+        },
+        {
+          "ticker": "BTCUSDT",
+          "text": "BTCUSDT",
+          "name": "BTCUSDT",
+          "ready": "true",
+          "short": "BTCUSDT"
+        },
+        {
+          "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+          "text": "",
+          "name": "",
+          "short": "DUKA:39bfb355d460ecebfa4cba28b8011eb2"
+        }
+      ],
+      "quotes": [
+        {
+          "ticker": "MWP:EURUSD",
+          "status": "ok",
+          "values": {
+            "short_name": "EURUSD",
+            "description": "EURUSD · 平台行情 · 交易时段内 · 最后行情时间 2026-10-16 19:01:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 19:02:00 UTC，不含终点）",
+            "lp": 1.12323,
+            "ch": 0.00118,
+            "chp": 0.10516465398155163,
+            "fetch_status": "ok",
+            "time_type": "source_m1",
+            "read_at": 1792177326367,
+            "market_session": "scheduled_open",
+            "data_start": 1792177260000,
+            "data_end": 1792177320000
+          }
+        },
+        {
+          "ticker": "MWP:XAUUSD",
+          "status": "ok",
+          "values": {
+            "short_name": "XAUUSD",
+            "description": "XAUUSD · 平台行情 · 交易时段内 · 最后行情时间 2026-10-16 19:01:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 19:02:00 UTC，不含终点）",
+            "lp": 4158.845,
+            "ch": -11.465,
+            "chp": -0.27491961029276,
+            "fetch_status": "ok",
+            "time_type": "source_m1",
+            "read_at": 1792177322104,
+            "market_session": "scheduled_open",
+            "data_start": 1792177260000,
+            "data_end": 1792177320000
+          }
+        },
+        {
+          "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+          "status": "ok",
+          "values": {
+            "short_name": "EURUSD",
+            "description": "EUR/USD · 组合行情 · 当前未闭合M1收盘采样 · 交易时段内 · 最后行情时间 2026-10-16 19:02:00 UTC",
+            "lp": 1.12328,
+            "ch": 0.0012,
+            "chp": 0.10694424639954371,
+            "fetch_status": "ok",
+            "time_type": "composite_snapshot",
+            "read_at": 1792177336361,
+            "market_session": "scheduled_open",
+            "price_type": "sampled_candle_close",
+            "data_start": 1792177320000,
+            "data_end": 1792177380000
+          }
+        },
+        {
+          "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+          "status": "ok",
+          "values": {
+            "short_name": "GBPUSD",
+            "description": "GBPUSD · 平台行情 · Bid · 来源原生UTC周期 · 时段未核实 · 更新失败，保留上次数据 · 最后行情时间 2026-10-16 18:39:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 18:40:00 UTC，不含终点）",
+            "lp": 1.33175,
+            "fetch_status": "fetch_failed",
+            "time_type": "source_m1",
+            "read_at": 1792177293754,
+            "market_session": "unknown",
+            "data_start": 1792175940000,
+            "data_end": 1792176000000
+          }
+        },
+        {
+          "ticker": "MWP:OANDA:USD_CAD",
+          "status": "ok",
+          "values": {
+            "short_name": "USDCAD",
+            "description": "USDCAD · 平台行情 · 时段未核实 · 最后行情时间 2026-10-16 19:02:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 19:03:00 UTC，不含终点）",
+            "lp": 1.41531,
+            "ch": -0.00305,
+            "chp": -0.21503708508418173,
+            "fetch_status": "ok",
+            "time_type": "source_m1",
+            "read_at": 1792177332119,
+            "market_session": "unknown",
+            "data_start": 1792177320000,
+            "data_end": 1792177380000
+          }
+        },
+        {
+          "ticker": "MWP:OANDA:EUR_USD",
+          "status": "ok",
+          "values": {
+            "short_name": "EURUSD",
+            "description": "EURUSD · 平台行情 · 交易时段内 · 最后行情时间 2026-10-16 19:01:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 19:02:00 UTC，不含终点）",
+            "lp": 1.12323,
+            "ch": 0.00118,
+            "chp": 0.10516465398155163,
+            "fetch_status": "ok",
+            "time_type": "source_m1",
+            "read_at": 1792177316254,
+            "market_session": "scheduled_open",
+            "data_start": 1792177260000,
+            "data_end": 1792177320000
+          }
+        },
+        {
+          "ticker": "MWP:BTCUSDT",
+          "status": "ok",
+          "values": {
+            "short_name": "BTCUSDT",
+            "description": "BTCUSDT · 平台行情 · 时段未核实 · 最后行情时间 2026-10-16 19:02:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 19:03:00 UTC，不含终点）",
+            "lp": 81094.19,
+            "ch": -1151.74,
+            "chp": -1.400361087776623,
+            "fetch_status": "ok",
+            "time_type": "source_m1",
+            "read_at": 1792177334531,
+            "market_session": "unknown",
+            "data_start": 1792177320000,
+            "data_end": 1792177380000
+          }
+        },
+        {
+          "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+          "status": "ok",
+          "values": {
+            "short_name": "AAPL",
+            "description": "苹果公司 · Yahoo 市场报价 · 延迟 15 分钟 · 时段未核实 · 最后更新于 2026-10-16 19:02:16 UTC",
+            "lp": 342.01,
+            "ch": 0.01,
+            "chp": 0.0029239766081871343,
+            "fetch_status": "ok",
+            "time_type": "provider_quote",
+            "read_at": 1792177338108,
+            "market_session": "unknown",
+            "delay_seconds": 900
+          }
+        },
+        {
+          "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+          "status": "ok",
+          "values": {
+            "short_name": "EURUSD",
+            "description": "EUR/USD · 固定历史 · 历史数据时间 2026-10-16 17:34:00 UTC",
+            "lp": 1.12248,
+            "time_type": "fixed_history",
+            "data_start": 1792172040000,
+            "data_end": 1792172100000
+          }
+        },
+        {
+          "ticker": "EURUSD",
+          "status": "ok",
+          "values": {
+            "short_name": "EURUSD",
+            "description": "EURUSD · 报价准备中 · 交易时段内 · 等待新行情 · 暂无行情更新时间",
+            "time_type": null,
+            "market_session": "scheduled_open",
+            "data_start": null
+          }
+        },
+        {
+          "ticker": "BTCUSDT",
+          "status": "ok",
+          "values": {
+            "short_name": "BTCUSDT",
+            "description": "BTCUSDT · 报价准备中 · 时段未核实 · 暂无行情更新时间",
+            "time_type": null,
+            "market_session": "unknown",
+            "data_start": null
+          }
+        }
+      ]
+    },
+    {
+      "label": "05-mixed-reload",
+      "row_timeline": [
+        {
+          "time": 2158.600000023842,
+          "rows": []
+        },
+        {
+          "time": 2699.800000011921,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        },
+        {
+          "time": 4257.300000011921,
+          "rows": []
+        },
+        {
+          "time": 4368,
+          "rows": [
+            {
+              "ticker": "MWP:EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:OANDA:EUR_USD",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+              "text": "",
+              "display": "GBPUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            },
+            {
+              "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+              "text": "",
+              "display": "AAPL",
+              "loading": false
+            },
+            {
+              "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+              "text": "",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "EURUSD",
+              "text": "EURUSD",
+              "display": "EURUSD",
+              "loading": false
+            },
+            {
+              "ticker": "BTCUSDT",
+              "text": "BTCUSDT",
+              "display": "BTCUSDT",
+              "loading": false
+            }
+          ]
+        }
+      ],
+      "final_rows": [
+        {
+          "ticker": "MWP:EURUSD",
+          "text": "EURUSD\n1.12329\n0.00124\n0.11%",
+          "name": "EURUSD",
+          "ready": "true",
+          "short": "EURUSD"
+        },
+        {
+          "ticker": "MWP:OANDA:EUR_USD",
+          "text": "EURUSD\n1.12329\n0.00124\n0.11%",
+          "name": "EURUSD",
+          "ready": "true",
+          "short": "OANDA:EUR_USD"
+        },
+        {
+          "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+          "text": "GBPUSD\n1.33185",
+          "name": "GBPUSD",
+          "ready": "true",
+          "short": "DUKA:39bfb355d460ecebfa4cba28b8011eb2"
+        },
+        {
+          "ticker": "MWP:BTCUSDT",
+          "text": "BTCUSDT\n81,114.79\n−1,131.14\n−1.38%",
+          "name": "BTCUSDT",
+          "ready": "true",
+          "short": "BTCUSDT"
+        },
+        {
+          "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+          "text": "AAPL\n342.01\n0.01\n0.00%",
+          "name": "AAPL",
+          "ready": "true",
+          "short": "YAHOO:1eb44d625271a4eb75016f276d137836"
+        },
+        {
+          "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+          "text": "EURUSD\n1.12248",
+          "name": "EURUSD",
+          "ready": "true",
+          "short": "24df99fe-2fb9-4d43-ac33-2c272bab9226"
+        },
+        {
+          "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+          "text": "EURUSD\n1.12329\n0.00121\n0.11%",
+          "name": "EURUSD",
+          "ready": "true",
+          "short": "26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219"
+        },
+        {
+          "ticker": "EURUSD",
+          "text": "EURUSD",
+          "name": "EURUSD",
+          "ready": "true",
+          "short": "EURUSD"
+        },
+        {
+          "ticker": "BTCUSDT",
+          "text": "BTCUSDT",
+          "name": "BTCUSDT",
+          "ready": "true",
+          "short": "BTCUSDT"
+        }
+      ],
+      "quotes": [
+        {
+          "ticker": "MWP:EURUSD",
+          "status": "ok",
+          "values": {
+            "short_name": "EURUSD",
+            "description": "EURUSD · 平台行情 · 交易时段内 · 最后行情时间 2026-10-16 19:02:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 19:03:00 UTC，不含终点）",
+            "lp": 1.12329,
+            "ch": 0.00124,
+            "chp": 0.11051200926874917,
+            "fetch_status": "ok",
+            "time_type": "source_m1",
+            "read_at": 1792177342218,
+            "market_session": "scheduled_open",
+            "data_start": 1792177320000,
+            "data_end": 1792177380000
+          }
+        },
+        {
+          "ticker": "MWP:OANDA:EUR_USD",
+          "status": "ok",
+          "values": {
+            "short_name": "EURUSD",
+            "description": "EURUSD · 平台行情 · 交易时段内 · 最后行情时间 2026-10-16 19:02:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 19:03:00 UTC，不含终点）",
+            "lp": 1.12329,
+            "ch": 0.00124,
+            "chp": 0.11051200926874917,
+            "fetch_status": "ok",
+            "time_type": "source_m1",
+            "read_at": 1792177342218,
+            "market_session": "scheduled_open",
+            "data_start": 1792177320000,
+            "data_end": 1792177380000
+          }
+        },
+        {
+          "ticker": "MWP:DUKA:39bfb355d460ecebfa4cba28b8011eb2",
+          "status": "ok",
+          "values": {
+            "short_name": "GBPUSD",
+            "description": "GBPUSD · 平台行情 · Bid · 来源原生UTC周期 · 时段未核实 · 更新失败，保留上次数据 · 最后行情时间 2026-10-16 18:40:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 18:41:00 UTC，不含终点）",
+            "lp": 1.33185,
+            "fetch_status": "fetch_failed",
+            "time_type": "source_m1",
+            "read_at": 1792177354599,
+            "market_session": "unknown",
+            "data_start": 1792176000000,
+            "data_end": 1792176060000
+          }
+        },
+        {
+          "ticker": "MWP:BTCUSDT",
+          "status": "ok",
+          "values": {
+            "short_name": "BTCUSDT",
+            "description": "BTCUSDT · 平台行情 · 时段未核实 · 最后行情时间 2026-10-16 19:02:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 19:03:00 UTC，不含终点）",
+            "lp": 81114.79,
+            "ch": -1131.14,
+            "chp": -1.3753142556719828,
+            "fetch_status": "ok",
+            "time_type": "source_m1",
+            "read_at": 1792177367807,
+            "market_session": "unknown",
+            "data_start": 1792177320000,
+            "data_end": 1792177380000
+          }
+        },
+        {
+          "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+          "status": "ok",
+          "values": {
+            "short_name": "AAPL",
+            "description": "苹果公司 · Yahoo 市场报价 · 延迟 15 分钟 · 时段未核实 · 最后更新于 2026-10-16 19:02:16 UTC",
+            "lp": 342.01,
+            "ch": 0.01,
+            "chp": 0.0029239766081871343,
+            "fetch_status": "ok",
+            "time_type": "provider_quote",
+            "read_at": 1792177367813,
+            "market_session": "unknown",
+            "delay_seconds": 900
+          }
+        },
+        {
+          "ticker": "MWH:24df99fe-2fb9-4d43-ac33-2c272bab9226",
+          "status": "ok",
+          "values": {
+            "short_name": "EURUSD",
+            "description": "EUR/USD · 固定历史 · 历史数据时间 2026-10-16 17:34:00 UTC",
+            "lp": 1.12248,
+            "time_type": "fixed_history",
+            "data_start": 1792172040000,
+            "data_end": 1792172100000
+          }
+        },
+        {
+          "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+          "status": "ok",
+          "values": {
+            "short_name": "EURUSD",
+            "description": "EUR/USD · 组合行情 · 当前未闭合M1收盘采样 · 交易时段内 · 最后行情时间 2026-10-16 19:02:00 UTC",
+            "lp": 1.12329,
+            "ch": 0.00121,
+            "chp": 0.10783544845287324,
+            "fetch_status": "ok",
+            "time_type": "composite_snapshot",
+            "read_at": 1792177367877,
+            "market_session": "scheduled_open",
+            "price_type": "sampled_candle_close",
+            "data_start": 1792177320000,
+            "data_end": 1792177380000
+          }
+        },
+        {
+          "ticker": "EURUSD",
+          "status": "ok",
+          "values": {
+            "short_name": "EURUSD",
+            "description": "EURUSD · 报价准备中 · 交易时段内 · 等待新行情 · 暂无行情更新时间",
+            "time_type": null,
+            "market_session": "scheduled_open",
+            "data_start": null
+          }
+        },
+        {
+          "ticker": "BTCUSDT",
+          "status": "ok",
+          "values": {
+            "short_name": "BTCUSDT",
+            "description": "BTCUSDT · 报价准备中 · 时段未核实 · 暂无行情更新时间",
+            "time_type": null,
+            "market_session": "unknown",
+            "data_start": null
+          }
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "01-startup.png",
+      "sha256": "1872337d2a5b7576c8cdb5db8cb26385b90f296cb2af2e33445769bf8aca8a80"
+    },
+    {
+      "file": "02-reload.png",
+      "sha256": "ec34f79efbc535b8a1d9e34b1dc32bb2ca53310cd684f30d16df2302872c9ec2"
+    },
+    {
+      "file": "03-switch-all.png",
+      "sha256": "56a9f9bcd867566f6d0371c5aebccf2b76e4750c0b888949ba7505ccbcac7c6f"
+    },
+    {
+      "file": "04-add.png",
+      "sha256": "8c358d22c3993e62fe8d58c6d146415ed04902b8f6840e39284f7583e80fcb44"
+    },
+    {
+      "file": "05-mixed-reload.png",
+      "sha256": "a5bce0ea3c88cda6c4b15260ebeb7955774cc769bbc338dd83e49ce1dfa8c802"
+    },
+    {
+      "file": "detail-EURUSD.png",
+      "sha256": "f4d4a1633126c8d0fc14bf7c32b7a83262a5e25ab7f2b1b43fdbbe5fe86ad174"
+    },
+    {
+      "file": "detail-XAUUSD.png",
+      "sha256": "e9a25d8ed1fa0363661ec112999ecf4d07f8d0bb77b88446683beae0dfdae738"
+    },
+    {
+      "file": "loading.png",
+      "sha256": "ac5005e4664c3e5402bc4e30d928a2d6bdf0226a3b0eb7cb7105e996fbd26a5e"
+    },
+    {
+      "file": "06-restored.png",
+      "sha256": "38d329f35f50cf8686a6257c38a4b868c7537906ed750141ac83041a9bb05486"
+    }
+  ],
+  "cleanup": {
+    "initial_persistence_check": "required follow-up: original browser closed before pending preference write settled",
+    "final_status": "verified by preferences API, independent browser and read-only database query",
+    "original_active": "real-oanda-watchlist",
+    "list_count": 1,
+    "symbol_count": 5,
+    "dukascopy_preserved": true,
+    "usd_cad_preserved": true,
+    "native_original_list_real_prices_visible": true,
+    "native_original_detail_real_price_visible": true
+  }
+}

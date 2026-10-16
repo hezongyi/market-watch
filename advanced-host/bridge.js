@@ -54,7 +54,8 @@ let seq = 0,
   workspaceEpoch = 0,
   nativeReadonly = false;
 let barRangeMapping, syncCoordinator;
-let quoteDetails;
+let watchlistLayout;
+const watchlistMetadata = new Map();
 let rangeGuard, edgeGuard, demandReporter, progressivePages, progressivePoll, beforeInitialHistory, initialSymbol;
 let prewarming = false;
 let autoSave, editRevision = 0, manualSavePending = false;
@@ -161,7 +162,6 @@ function quoteTimeText(stamp, meta) {
   } catch (_) { return new Date(stamp).toISOString().replace("T", " ").replace(".000Z", " UTC"); }
 }
 function presentQuote(row) {
-  setTimeout(()=>quoteDetails?.refresh(),0);
   const meta = presentationFor(row.n);
   const result = chartQuotePresentation(row, meta);
   const value = result.v && typeof result.v === "object" ? {...result.v} : result.v;
@@ -181,7 +181,6 @@ function refreshQuotePresentation() {
     const rows = sub.symbols.map(ticker => quoteSnapshotRows.get(ticker)).filter(Boolean);
     if (rows.length) sub.cb(rows.map(presentQuote));
   }
-  quoteDetails?.refresh();
 }
 function bindTimezoneEvents() {
   if (!widget) return;
@@ -443,7 +442,8 @@ const symbolPresentations = new Map();
 const quoteSnapshotRows = new Map();
 const quoteResetTokens = new Map();
 function presentationFor(ticker) {
-  const exact = symbolPresentations.get(ticker);
+  const exact = symbolPresentations.get(ticker) ||
+    watchlistMetadata.get(ticker) || watchlistMetadata.get(ticker.toLowerCase());
   if (exact) return exact;
   try { return symbolPresentations.get(decode(ticker).symbol); } catch (_) { return undefined; }
 }
@@ -840,9 +840,12 @@ function seriesPresentationRows(symbols) {
     const identity = decode(ticker);
     const meta = presentationFor(ticker);
     const shown = meta?.display_symbol || meta?.symbol || MWSeries.display(identity.symbol);
-    const base = meta?.source === 'yahoo' ? meta.name + " · " + shown + " · Yahoo 市场报价" : shown + (
-        identity.series_kind === 'provider' ? " · 平台原生行情" :
-        identity.series_kind === 'history' ? " · 固定历史" : " · 组合行情");
+    const base = meta?.source === 'yahoo' ? (meta.name || shown) + " · Yahoo 市场报价" +
+      (meta.delay_seconds > 0 ? " · 延迟 " + Math.floor(meta.delay_seconds / 60) + " 分钟" :
+        meta.delay_seconds === 0 ? " · 实时" : " · 延迟未知") :
+      identity.series_kind === 'provider' ? shown + " · 平台行情" + (meta?.price_description ? " · " + meta.price_description : "") :
+      identity.series_kind === 'history' ? (meta?.name || shown) + " · 固定历史" :
+      identity.series_kind === 'composite' ? (meta?.name || shown) + " · 组合行情" : shown + " · 自建行情";
     return meta ? [{s:"ok",n:ticker,v:{short_name:shown,description:base,description_base:base,
       market_session:"unknown",time_type:identity.series_kind === "history" ? "fixed_history" : null,
       exchange:meta.exchange || meta.source?.toUpperCase()}}].map(presentQuote) : [];
@@ -881,7 +884,7 @@ const feed = {
   // Authenticated/network access stays in the trusted parent origin.
   getServerTime: (cb) => request({op: "serverTime"}, "market")
     .then(cb).catch(error => send({type: "error", error: "服务器时间获取失败：" + String(error)})),
-  getQuotes: (symbols, cb, err, isCurrent = () => true) => {
+  getQuotes: (symbols, cb, err, isCurrent = () => true, forceRefresh = false) => {
     if (!symbols.length) {
       queueMicrotask(() => cb([]));
       return;
@@ -890,11 +893,26 @@ const feed = {
     const initialRows = new Map(symbols.map(ticker => [ticker, quoteSnapshotRows.get(ticker)]));
     const resetTokens = new Map(symbols.map(ticker => [ticker, quoteResetTokens.get(ticker)]));
     const currentSymbols = () => symbols.filter(ticker => quoteResetTokens.get(ticker) === resetTokens.get(ticker));
-    // Details/watchlist quotes must not consume the bounded bridge/upstream
-    // slots ahead of the first visible candle page. Failure also opens the gate.
-    Promise.resolve(initialHistoryGate?.promise)
-      .then(() => request({ op: "quotes", args: { symbols } }, "market",
-        () => epoch === workspaceEpoch && isCurrent()))
+    // Native details asks for an initial snapshot before it subscribes. An
+    // already subscribed observation must not queue behind a slow mixed-source
+    // refresh on every row click. Subscription refreshes still use the network.
+    const subscribed = new Set([...quoteSubscriptions.values()].flatMap(sub => sub.symbols));
+    if (!forceRefresh && !marketPollingFallback && symbols.every(ticker =>
+      subscribed.has(ticker) && Number.isFinite(initialRows.get(ticker)?.v?.lp))) {
+      setTimeout(() => {
+        if (epoch !== workspaceEpoch || !isCurrent()) return;
+        const rows = symbols.map(ticker => quoteSnapshotRows.get(ticker));
+        if (currentSymbols().length === symbols.length && rows.every(row => Number.isFinite(row?.v?.lp)))
+          cb(rows.map(presentQuote));
+        else feed.getQuotes(symbols, cb, err, isCurrent, true);
+      }, 0);
+      return;
+    }
+    // Quotes are independent of chart history. The request queue still keeps
+    // a bounded quote lane, while cancellation and epoch checks fence stale
+    // callbacks when a workspace or list changes.
+    request({ op: "quotes", args: { symbols } }, "market",
+        () => epoch === workspaceEpoch && isCurrent())
       .then((rows) => {
         if (epoch !== workspaceEpoch || !isCurrent()) return;
         // A stream/reset received while this request was outstanding owns the
@@ -925,15 +943,24 @@ const feed = {
       send({type:'market-subscribe',args:{client:clientId,listener,generation,
         kind:'quotes',query:marketQuery(ticker,'1'),sequence:0}});
     }
-    const presented=all.filter(ticker=>{
-      const identity=decode(ticker);
-      return identity.symbol.startsWith("YAHOO:") || ['history','composite'].includes(identity.series_kind);
-    });
+    // The same name/quote path covers every supplier and series kind. Opaque
+    // DUKA/NATIVE/MD identities need their human names just as fixed histories
+    // and composites do; this must not depend on the active chart's resolve.
+    const presented=all;
     if(presented.length) {
       // Give native details its resolved human name while the real market
       // snapshot loads. No price, change or quote time is invented here.
-      const named=seriesPresentationRows(presented);
-      if(named.length) setTimeout(()=>{if(quoteSubscriptions.get(id) === quoteSub) cb(named)},0);
+      setTimeout(()=>{
+        if(quoteSubscriptions.get(id) !== quoteSub) return;
+        // Selecting another row rebuilds native subscriptions. Do not replace
+        // an existing price/session with name-only metadata. Read at delivery
+        // time so a stream arrival or revision reset before this task wins.
+        const rows=presented.flatMap(ticker=>{
+          const snapshot=quoteSnapshotRows.get(ticker);
+          return snapshot ? [presentQuote(snapshot)] : seriesPresentationRows([ticker]);
+        });
+        if(rows.length) cb(rows);
+      },0);
       feed.getQuotes(presented,rows=>{
         if(quoteSubscriptions.get(id) !== quoteSub) return;
         // Keep the first snapshot beside streaming/polling rows so a timezone
@@ -942,7 +969,7 @@ const feed = {
         cb(rows);
       },
         error=>send({type:"feed-poll-state",key:"@quotes",error:String(error)}),
-        () => quoteSubscriptions.get(id) === quoteSub);
+        () => quoteSubscriptions.get(id) === quoteSub, true);
     }
   },
   unsubscribeQuotes: (id) => {
@@ -979,8 +1006,9 @@ const feed = {
       const {symbol,series_kind} = decode(ticker);
       // One-time startup metadata rides with workspace configuration. Candle
       // demand and every subsequent symbol resolve still use the backend.
-      const supplied = initialSymbol?.ticker === ticker ? initialSymbol.metadata : undefined;
-      initialSymbol = undefined;
+      const supplied = initialSymbol?.ticker === ticker ? initialSymbol.metadata :
+        watchlistMetadata.get(ticker) || watchlistMetadata.get(ticker.toLowerCase());
+      if (initialSymbol?.ticker === ticker) initialSymbol = undefined;
       if (supplied) {
         // Native datafeed callbacks must leave the calling task, even when
         // their payload arrived with the workspace configuration.
@@ -998,6 +1026,7 @@ const feed = {
       symbolPresentations.set(ticker,meta);
       if (!symbolPresentations.has(symbol)) symbolPresentations.set(symbol,meta);
       while(symbolPresentations.size>250) symbolPresentations.delete(symbolPresentations.keys().next().value);
+      watchlistLayout?.refresh();
       cb({
         name: meta.display_symbol || meta.symbol || MWSeries.display(symbol),
         ticker,
@@ -1803,8 +1832,13 @@ function boot(
   preferences = [],
   workspace = null,
   symbolMetadata = null,
+  initialWatchlistMetadata = {},
 ) {
   initialSymbol = symbolMetadata;
+  watchlistMetadata.clear();
+  for (const [ticker, metadata] of Object.entries(initialWatchlistMetadata || {}))
+    if (typeof ticker === "string" && metadata && typeof metadata === "object")
+      watchlistMetadata.set(ticker.toLowerCase(), metadata);
   if(symbolMetadata?.metadata) {
     const ticker = symbolMetadata.ticker;
     const symbol = decode(ticker).symbol;
@@ -2197,9 +2231,6 @@ function boot(
     ],
     disabled_features: [
       "widget_logo",
-      // The native legend derives "open" from unverified symbol sessions.
-      // Host-owned quote status remains visible in the native details section.
-      "display_market_status",
       "use_localstorage_for_settings",
       "open_account_manager",
       "create_volume_indicator_by_default",
@@ -2220,16 +2251,12 @@ function boot(
   widget
     .headerReady()
     .then(async () => {
-      quoteDetails?.dispose();
-      quoteDetails=chartNativeQuoteDetails(widget,()=>{
-        const ticker=widget.activeChart().symbol();
-        const identity=decode(ticker);
-        // Native uppercases immutable UUID/hash tickers; snapshots retain the
-        // canonical backend identity. Both spellings refer to the same series.
-        const row=quoteSnapshotRows.get(ticker) ||
-          quoteSnapshotRows.get(MWSeries.encode(identity.symbol,identity.series_kind));
-        return {value:row?.v, time:stamp=>quoteTimeText(stamp,presentationFor(ticker))};
-      });
+      watchlistLayout?.dispose();
+      watchlistLayout = globalThis.MWWatchlistLayout?.attach(widget, error =>
+        send({type: "diagnostic", source: "watchlist-layout", error: String(error)}), ticker => {
+          const meta=presentationFor(ticker);
+          return meta?.display_symbol || meta?.symbol;
+        });
       if (!readonly) indicatorPicker = chartIndicatorPicker(widget, catalog, (e) =>
         send({type: "error", error: String(e)}), () => dataCenter?.nativeUi);
       // Public left-aligned buttons retain their creation order in the header.
@@ -2420,7 +2447,6 @@ function boot(
       rangeGuard = undefined;
       workspaceEpoch++;
       indicatorCoordinator?.dispose();indicatorCoordinator=undefined;indicatorBindings.clear();
-      quoteDetails?.refresh();
       send({type:'native-load-reset',epoch:workspaceEpoch});
       syncCoordinator.resetWorkspace(pendingSync);
       workspaceLoadPause = syncCoordinator.acquirePause("workspace-load",["date","time","barWidth"]);
@@ -2471,7 +2497,6 @@ function boot(
       bindViewports();
       bindTimezoneEvents();
       bindActiveChartEvent();
-      quoteDetails?.refresh();
       alertBridge.refresh();
       for(let index=0;index<widget.chartsCount();index++) MWNativeNavigation.recoverInitial(widget.chart(index));
       reportHistoryFailures();
@@ -2482,7 +2507,6 @@ function boot(
     bindViewports();
     bindTimezoneEvents();
     bindActiveChartEvent();
-    quoteDetails?.refresh();
     widget.subscribe("layout_changed", () => {
       synchronizeMarketVisibility();
       syncCoordinator.refreshCharts();
@@ -2723,7 +2747,7 @@ addEventListener("message", async (e) => {
     alertUIWorkspace = String(m.workspace?.id);
     MWNativeNavigation.setCapabilities(m.history_capabilities);
     globalThis.MW_HISTORY_CAPABILITIES=m.history_capabilities;
-    boot(m.document, m.readonly, m.catalog, m.preferences, m.workspace, m.initial_symbol);
+    boot(m.document, m.readonly, m.catalog, m.preferences, m.workspace, m.initial_symbol, m.watchlist_metadata);
   }
   else if (m.type === 'refresh-managed') await refreshManagedHistory(m.instrument);
   else if (m.type === "save") snapshot();
@@ -2741,7 +2765,7 @@ addEventListener("pagehide", () => {
   ordinaryNotices?.dispose();
   alertUI?.destroy();
   alertBridge?.destroy();
-  quoteDetails?.dispose();
+  watchlistLayout?.dispose();
   unbindActiveChartEvent();
   for (const [api, changed] of timezoneBindings) api.onTimezoneChanged().unsubscribe(null, changed);
   timezoneBindings.clear();

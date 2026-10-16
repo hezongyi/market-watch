@@ -710,6 +710,45 @@ export default function AdvancedWorkspace() {
             api("/advanced-charts/preferences"),
             api("/charts/history-capabilities"),
           ]);
+          const stored = (preferences as any[]).find(
+            (preference) => preference?.kind === "setting" && preference?.name === "mw.watchlists.v1",
+          )?.content?.value;
+          const active = Array.isArray(stored?.lists)
+            ? stored.lists.find((list: any) => list?.id === stored.active) || stored.lists[0]
+            : undefined;
+          const tickers: string[] = [...new Set<string>(
+            (Array.isArray(active?.symbols) ? active.symbols as unknown[] : [])
+              .filter((ticker: unknown): ticker is string => typeof ticker === "string")
+              .filter((ticker) => !ticker.startsWith("###"))
+              .slice(0, 32),
+          )];
+          const decodeWatchlistTicker = (ticker: string) => {
+            if (ticker.startsWith("MWH:")) return { instrument: ticker.slice(4), series_kind: "history" };
+            if (ticker.startsWith("MWC:")) return { instrument: ticker.slice(4), series_kind: "composite" };
+            if (ticker.startsWith("MWP:")) return { instrument: ticker.slice(4), series_kind: "provider" };
+            return { instrument: ticker, series_kind: "managed" };
+          };
+          const entries: [string, Record<string, unknown>][] = [];
+          let cursor = 0;
+          const worker = async () => {
+            while (cursor < tickers.length) {
+              const ticker = tickers[cursor++];
+              let timeout: number | undefined;
+              try {
+                const controller = new AbortController();
+                timeout = window.setTimeout(() => controller.abort(), 4000);
+                const metadata = await api<Record<string, unknown>>(
+                  "/market-data/resolve",
+                  { ...decodeWatchlistTicker(ticker), timeframe: "M1" },
+                  controller.signal,
+                );
+                entries.push([ticker, metadata]);
+              } catch (_) {
+                // A stale list entry must keep its native fallback behavior.
+              } finally { if (timeout !== undefined) window.clearTimeout(timeout); }
+            }
+          };
+          await Promise.all(Array.from({ length: Math.min(4, tickers.length) }, worker));
           historyCapabilities.current = capabilities;
           reply({
             type: "init",
@@ -721,6 +760,7 @@ export default function AdvancedWorkspace() {
             readonly: mobile,
             catalog,
             preferences,
+            watchlist_metadata: Object.fromEntries(entries),
             initial_symbol: current.current?.initial_symbol,
           });
         } catch (e) {

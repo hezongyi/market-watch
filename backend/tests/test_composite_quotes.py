@@ -1,5 +1,7 @@
 """Stored prices follow active composite input and owner fences, with no demand."""
 
+from decimal import Decimal
+
 import pytest
 from alerts import api, composite_quotes
 from alerts.chart_series import encode
@@ -196,7 +198,9 @@ def http_contract(factory, monkeypatch):
             assert quote["v"]["lp"] == float("1.123456789012345678")
             assert quote["v"]["price_type"] == "sampled_bid"
             assert quote["snapshot"]["price"] == "1.123456789012345678"
-            assert "ch" not in quote["v"] and "chp" not in quote["v"]
+            assert quote["v"]["prev_close_price"] == 1.11
+            assert quote["v"]["ch"] == float("0.013456789012345678")
+            assert quote["v"]["chp"] == float(Decimal("0.013456789012345678") / Decimal("1.11") * 100)
             assert "抽样Bid" in quote["v"]["description"]
             with factory() as db:
                 assert db.scalar(select(MarketDemand)) is None
@@ -207,3 +211,43 @@ def http_contract(factory, monkeypatch):
 
 def test_watchlist_http_uses_exact_snapshot_and_never_renews_demand(database, monkeypatch):
     http_contract(database, monkeypatch)
+
+
+def test_watchlist_http_presents_composite_change_fields_from_same_revision(database, monkeypatch):
+    composite_id, revision_id, _ = populated(database, monkeypatch)
+    stamp = 200010000
+    quote_state(database, revision_id, stamp)
+    monkeypatch.setattr(composite_quotes, "now_ms", lambda: stamp)
+    monkeypatch.setattr(composite_quotes, "previous_close", lambda *args, **kwargs: Decimal("1.000000000000000000"))
+    api.app.dependency_overrides[api.authenticated] = lambda: "test"
+    try:
+        with TestClient(api.app) as client:
+            quote = client.post(
+                "/api/market-data/quotes",
+                json={"symbols": [encode(composite_id, "composite")]},
+            ).json()[0]
+        assert quote["v"]["lp"] == float("1.123456789012345678")
+        assert quote["v"]["prev_close_price"] == 1
+        assert quote["v"]["ch"] == float("0.123456789012345678")
+        assert quote["v"]["chp"] == float("12.3456789012345678")
+    finally:
+        api.app.dependency_overrides.clear()
+
+
+def test_watchlist_http_keeps_latest_price_without_unverified_change(database, monkeypatch):
+    composite_id, revision_id, _ = populated(database, monkeypatch)
+    stamp = 200010000
+    quote_state(database, revision_id, stamp)
+    monkeypatch.setattr(composite_quotes, "now_ms", lambda: stamp)
+    monkeypatch.setattr(composite_quotes, "previous_close", lambda *args, **kwargs: None)
+    api.app.dependency_overrides[api.authenticated] = lambda: "test"
+    try:
+        with TestClient(api.app) as client:
+            quote = client.post(
+                "/api/market-data/quotes",
+                json={"symbols": [encode(composite_id, "composite")]},
+            ).json()[0]
+        assert quote["v"]["lp"] == float("1.123456789012345678")
+        assert all(key not in quote["v"] for key in ("ch", "chp", "prev_close_price"))
+    finally:
+        api.app.dependency_overrides.clear()

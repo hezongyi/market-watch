@@ -1,0 +1,22 @@
+{
+  "issue": 73,
+  "baseline": "v1.25.8",
+  "commit": "b53d2973cd70e8610154bc46a9d516e62ccdadd7",
+  "branch": "fix/pro-chart-watchlist-20261016",
+  "worktree": "/home/quant/repos/market-watch-issue73",
+  "captured_at": "2026-10-16",
+  "browser": {
+    "chromium_cache": "/home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",
+    "node_modules_present": false,
+    "authenticated_session": false,
+    "status": "static-only; authenticated cold/hot browser timing and private DOM snapshot pending isolated Ubuntu runtime"
+  },
+  "confirmed_code_paths": {
+    "quote_gate": "advanced-host/bridge.js:getQuotes waits for initialHistoryGate",
+    "gate_release": "advanced-host/bridge.js:getBars resolves initialHistoryGate after first data request",
+    "symbol_resolution": "advanced-host/bridge.js:resolveSymbol performs async market resolve",
+    "composite_quote": "backend/alerts/market_data.py:quote_snapshot delegates to composite_quotes.snapshot",
+    "custom_details": "advanced-host/native-ui.js:chartNativeQuoteDetails",
+    "menu_adapter": "advanced-host/chart-menu.js:chartThemeMenu"
+  }
+}

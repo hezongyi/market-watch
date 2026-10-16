@@ -1,0 +1,44 @@
+{
+  "task": "mw-issue73-20261016",
+  "project": "mw-issue73-20261016",
+  "host": "Ubuntu Docker",
+  "url": "https://localhost:18473",
+  "chart_origin": "https://localhost:17473",
+  "commit": "43caae2",
+  "browser": {
+    "engine": "Chromium 1243",
+    "tradingview_version": "TT v31.1.0",
+    "tradingview_internal_id": "6b804c486857f27920cf761aa7eb6e29d9bb6362",
+    "page_errors": []
+  },
+  "watchlist": {
+    "rows": [
+      "EURUSD",
+      "XAUUSD",
+      "BTCUSDT"
+    ],
+    "raw_prefix_visible": false,
+    "custom_quote_detail_nodes": 0,
+    "columns_menu": {
+      "present": true,
+      "same_parent_as_add_button": true,
+      "immediately_before_add_button": true,
+      "svg_transform": "rotate(90deg)"
+    }
+  },
+  "price_superscript_synthetic_native_cell": {
+    "input": "-123.450",
+    "text_content_after_first_apply": "-123.450",
+    "text_content_after_second_apply": "-123.450",
+    "raw_attribute": "-123.450",
+    "aria_label": "-123.450",
+    "superscript": "0",
+    "superscript_count": 1
+  },
+  "fixture_limitations": [
+    "D1 preview fixture leaves EURUSD/XAUUSD rows pending and BTCUSDT without a quote, so live numeric cells were empty during this run."
+  ],
+  "acceptance_status": "superseded-fixture-dom-only",
+  "superseded_by": "real-acceptance.json",
+  "real_data_acceptance_passed": false
+}
