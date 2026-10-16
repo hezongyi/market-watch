@@ -19,6 +19,12 @@ const path = require('node:path');
     </div>`);
     await page.route('**/indicator-picker.css', route => route.fulfill({body:''}));
     await page.addStyleTag({path:path.resolve(__dirname, '../../advanced-host/chart-menu.css')});
+    await page.addStyleTag({content:`
+      body { background: white; color: black; }
+      html.theme-dark body { background: rgb(20,20,20); color: white; }
+      [data-symbol-full]:hover { background: rgb(240,243,250); }
+      html.theme-dark [data-symbol-full]:hover { background: rgb(42,46,57); }
+    `});
     await page.evaluate(() => {
       window.nativeText = document.querySelector('.uptick-test').firstChild;
       const NativeObserver = MutationObserver;
@@ -65,6 +71,18 @@ const path = require('node:path');
     await page.evaluate(() => { document.querySelector('.last-test').innerHTML = '<span class="inner-test">1.12<span class="uptick-test">250</span></span>'; });
     await page.waitForTimeout(50);
     assert.deepEqual(await read(), {text:'1.12250',raw:'1.12250',digit:'0',count:0,aria:'1.12250'});
+    await page.evaluate(()=>document.documentElement.classList.add('theme-dark'));
+    await page.waitForTimeout(50);
+    const overlay=()=>page.locator('.last-test').evaluate(cell=>({
+      color:cell.style.getPropertyValue('--mw-digit-color'),
+      background:cell.style.getPropertyValue('--mw-digit-background')}));
+    assert.deepEqual(await overlay(),{color:'rgb(255, 255, 255)',background:'rgb(20,20,20)'},
+      'html theme change updates the decorative glyph');
+    await page.locator('[data-symbol-full]').hover();
+    await page.waitForTimeout(50);
+    assert.equal((await overlay()).background,'rgb(42,46,57)','CSS-only hover updates the glyph background');
+    await page.mouse.move(0,0);await page.waitForTimeout(50);
+    assert.equal((await overlay()).background,'rgb(20,20,20)','leaving hover restores native background');
     // React can update the original Text node without retaining an old digit.
     await page.evaluate(() => { document.querySelector('.uptick-test').firstChild.data = '340'; });
     await page.waitForTimeout(50);

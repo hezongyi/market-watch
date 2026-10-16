@@ -225,19 +225,24 @@
       pending = true;
       queueMicrotask(() => { pending = false; refresh(); });
     });
-    observer.observe(doc.body, {childList: true, subtree: true, characterData: true,
+    observer.observe(doc.documentElement, {childList: true, subtree: true, characterData: true,
       attributes: true, attributeFilter: ["data-symbol-full", "data-symbol-short", "data-active", "class"]});
     const resizeObserver = typeof ResizeObserver === "function" ? new ResizeObserver(refresh) : null;
     resizeObserver?.observe(doc.documentElement);
     const root = watchlistRoot(doc);
     if (root) resizeObserver?.observe(root);
     doc.defaultView?.addEventListener("resize", refresh);
+    // Native hover backgrounds change without a DOM mutation.
+    doc.addEventListener("pointerover", refresh, true);
+    doc.addEventListener("pointerout", refresh, true);
     refresh();
     return {refresh, dispose() {
       disposed = true; observer.disconnect(); resizeObserver?.disconnect();
       doc.documentElement.dataset.mwWatchlistFallback = "true";
       for (const cell of doc.querySelectorAll("[data-mw-price-digit]")) delete cell.dataset.mwPriceDigit;
       doc.defaultView?.removeEventListener("resize", refresh);
+      doc.removeEventListener("pointerover", refresh, true);
+      doc.removeEventListener("pointerout", refresh, true);
     }};
   }
 
