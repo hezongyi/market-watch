@@ -80,7 +80,8 @@
 
   function wrapLastDigit(cell) {
     if (!cell) return false;
-    const existing = cell.querySelector(':scope > [data-mw-price-sup="true"]');
+    // Native uptick/downtick markup nests the changing digits in spans.
+    const existing = cell.querySelector('[data-mw-price-sup="true"]');
     const raw = cell.textContent || "";
     if (existing) {
       // Observer callbacks include our own DOM writes. Leave an unchanged
