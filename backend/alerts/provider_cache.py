@@ -37,6 +37,7 @@ DEADLINE = ContextVar("provider_request_deadline", default=None)
 READ_MODE = ContextVar("provider_history_read_mode", default="normal")
 PAGE_PROGRESS = ContextVar("provider_history_page_progress", default=None)
 WORK_VALID = ContextVar("provider_history_work_valid", default=None)
+SOURCE_BEFORE = ContextVar("provider_source_before", default=None)
 
 
 class HistoryPending(Exception):
@@ -66,6 +67,7 @@ def readable_preceding_range(state, before):
     if not preceding or not bars:
         return None
     tail = bars[-1]
+    before = SOURCE_BEFORE.get() or before
     if (not tail["complete"] and preceding[1] == tail["start"]
             and tail["start"] < before <= tail["end"]):
         return preceding
@@ -198,6 +200,8 @@ def snapshot_transaction(key, before, count, *, observation=None, bounded_limit=
         metadata = db.scalar(select(ProviderDataset).where(ProviderDataset.id == key))
         if metadata is None:
             raise ValueError("平台缓存已清理，请重试")
+        if source_before is None and metadata.source == "oanda" and metadata.timeframe in ("D1", "W1", "MN"):
+            source_before = SOURCE_BEFORE.get() or now_ms() + 1
         if source_before is not None:
             # Intraday times and D/W/M display dates belong to different domains.
             # Choose the last admitted source candle, then page by its chart label.
@@ -601,7 +605,7 @@ def _read(meta, frame, before, count, *, latest=False, deadline=None, on_ready=N
                 latest
                 and cached["preceding"]
                 and (len(cached["bars"]) >= count or cached["history_boundary"])
-                and before - cached["preceding"][1] <= fresh_seconds(meta["source"]) * 1000
+                and (SOURCE_BEFORE.get() or before) - cached["preceding"][1] <= fresh_seconds(meta["source"]) * 1000
             )
             observed_range = readable_preceding_range(cached, before) if shared_latest else None
             observed_tail = observed_range and (len(cached["bars"]) >= count or cached["history_boundary"])
@@ -645,6 +649,7 @@ def _observed_read(meta, frame, count, operation):
     started = time.monotonic()
     timings = {}
     token = upstream.TIMINGS.set(timings)
+    source_token = SOURCE_BEFORE.set(now_ms() + 1 if meta["source"] == "oanda" and frame in ("D1", "W1", "MN") else None)
     with _ACTIVE_LOCK:
         _ACTIVE_READS[meta["source"]] += 1
     try:
@@ -667,6 +672,7 @@ def _observed_read(meta, frame, count, operation):
         raise
     finally:
         upstream.TIMINGS.reset(token)
+        SOURCE_BEFORE.reset(source_token)
         with _ACTIVE_LOCK:
             _ACTIVE_READS[meta["source"]] -= 1
 
@@ -717,7 +723,7 @@ def _native_read(meta, body, before, count, prefix, latest, on_ready=None):
                 raise CapacityExceeded("原生历史必需数量及计算前缀超过容量预算")
             connected = state["interval"]
             recent_tail = (latest and state["preceding"] and
-                           before - state["preceding"][1] <= fresh_seconds(meta["source"]) * 1000)
+                           (SOURCE_BEFORE.get() or before) - state["preceding"][1] <= fresh_seconds(meta["source"]) * 1000)
             observed_range = readable_preceding_range(state, before) if shared_latest else None
             readable = connected or observed_range or (state["preceding"] if recent_tail else None)
             range_done = from_time is None or state["window_limit"] or bool(readable and readable[0] <= from_time)
@@ -834,6 +840,10 @@ def data(body):
     # A trusted price credential already bounds the admitted source inputs.
     # Its D/W/M chart label can be later than the wall clock.
     before = (body.before or now) if body.provider_snapshot_id else min(body.before or now, now)
+    if not body.provider_snapshot_id and meta["source"] == "oanda" and body.timeframe in ("D1", "W1", "MN"):
+        from .native_series import chart_ceiling, parameters
+        ceiling = chart_ceiling(now_ms(), body.timeframe, parameters(meta))
+        before = min(body.before or ceiling, ceiling)
     if body.native_reserve is not None:
         if body.timeframe not in upstream.FRAMES:
             raise ValueError("无效平台周期")

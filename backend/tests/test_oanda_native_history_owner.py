@@ -184,3 +184,66 @@ def test_ordinary_latest_read_fetches_real_gap_beside_shared_owner(database, mon
     result = cache.read(META, 'M1', 600001, 5, latest=True)
     assert calls == [(600001, 5)]
     assert [b['start'] for b in result['bars']] == list(range(360000, 660000, 60000))
+
+
+@pytest.mark.parametrize('frame,opening,observed', [
+    ('D1', '2026-10-15T21:00:00+00:00', '2026-10-15T21:30:00+00:00'),
+    ('W1', '2026-10-11T21:00:00+00:00', '2026-10-11T21:30:00+00:00'),
+    ('MN', '2026-09-30T21:00:00+00:00', '2026-09-30T21:30:00+00:00'),
+])
+@pytest.mark.parametrize('native', [False, True])
+@pytest.mark.parametrize('explicit_margin', [False, True])
+def test_first_high_period_price_admits_source_before_future_date_label(
+        database, monkeypatch, frame, opening, observed, native, explicit_margin):
+    from datetime import datetime
+
+    from alerts import native_series
+    from alerts.storage import ProviderBar
+    from sqlalchemy import select
+
+    def stamp(value):
+        return int(datetime.fromisoformat(value).timestamp() * 1000)
+    clock, start = stamp(observed), stamp(opening)
+    monkeypatch.setattr(cache, 'now_ms', lambda: clock)
+    monkeypatch.setattr(settings, 'oanda_acquisition_mode', 'rest_batch')
+    monkeypatch.setattr(settings, 'provider_native_history_buffer', False)
+    monkeypatch.setattr(upstream, 'metadata', lambda _: META)
+    native_params = native_series.DEFAULTS
+    label = native_series.chart_label(start, frame, native_params)
+    assert start <= clock < label
+    end = native_series.interval_end(start, frame, native_params)
+    previous = start - (86400000 if frame == 'D1' else 7 * 86400000 if frame == 'W1' else 30 * 86400000)
+
+    def candle(at, finish, complete):
+        return {'start': at, 'end': finish,
+                'chart_time': native_series.chart_label(at, frame, native_params),
+                'open': '1.1', 'high': '1.2', 'low': '1.0', 'close': '1.15', 'complete': complete}
+
+    key = cache.ensure(META, frame)
+    lease = cache.claim(key)
+    cache.commit_page(key, lease, {'bars': [candle(previous, start, True), candle(start, end, False)],
+        'history_boundary': True, 'coverage': [[0, start]]}, clock, clock, latest=True)
+    cache.release(key, lease)
+    # A cached future source row must not enter either prices or credentials.
+    with database.begin() as db:
+        future = candle(end, native_series.interval_end(end, frame, native_params), False)
+        db.add(ProviderBar(dataset_id=key, start=end, chart_time=future['chart_time'],
+            complete=False, payload=future, observed_at=clock, changed_at=clock, revision=1))
+        db.add(ProviderInterest(id='date-label-owner', client='date-label-client', listener='chart',
+            dataset_id=key, accessed_at=clock, subscribed=True, expires=clock + 60000))
+    monkeypatch.setattr(upstream, 'native_page', lambda *a, **kw: pytest.fail('fresh covered source must be readable'))
+    body = DataQuery(instrument=META['id'], series_kind='provider', timeframe=frame, limit=1,
+        before=label + 2 * 86400000 if explicit_margin else None, firstDataRequest=True,
+        native_history={'chart_count': 1, 'focused': True} if native else None)
+    result = cache.data(body)
+    assert result['bars'][-1]['start'] == start
+    assert result['bars'][-1]['chart_time'] == label
+    assert all(bar['start'] <= clock for bar in result['bars'])
+    bound = cache.data(DataQuery(instrument=META['id'], series_kind='provider', timeframe=frame,
+        before=label+1, limit=1, provider_snapshot_id=result['provider_snapshot_id'],
+        indicators=[{'name': 'SWING_SR_V1'}]))
+    assert bound['bars'] == result['bars']
+    assert bound['indicators'][0]['presentation']['as_of_bar_time'] == start
+    with database.begin() as db:
+        assert db.get(ProviderDataset, key).coverage == [[0, start]]
+        assert len(list(db.scalars(select(ProviderBar).where(ProviderBar.dataset_id == key)))) == 3

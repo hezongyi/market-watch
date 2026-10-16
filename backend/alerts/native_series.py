@@ -126,6 +126,17 @@ def chart_label(start, frame, values):
     return ms(instant(0).replace(year=day.year, month=day.month, day=day.day))
 
 
+def chart_ceiling(observed, frame, values):
+    """Exclusive display ceiling for source candles already observable now."""
+    opening = session_start(observed, values)
+    if frame == "W1":
+        local = instant(opening).astimezone(ZoneInfo(values["alignmentTimezone"]))
+        weekday = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday").index(
+            values["weeklyAlignment"])
+        opening = ms(local - timedelta(days=(local.weekday() - weekday) % 7))
+    return max(observed + 1, chart_label(opening, frame, values) + 1)
+
+
 def interval_end(start, frame, values):
     from .provider_chart import FRAME_MS
 

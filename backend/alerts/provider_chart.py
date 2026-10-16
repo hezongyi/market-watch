@@ -255,6 +255,10 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
     rows = []
     # Buffer only translates session timestamps to exclusive trading-date labels.
     observed = now_ms()
+    if source == "oanda":
+        from .provider_cache import SOURCE_BEFORE
+        if SOURCE_BEFORE.get() is not None:
+            observed = min(observed, SOURCE_BEFORE.get() - 1)
     high_period = frame in ("D1", "W1", "MN")
     cursor = min(observed + 1, before + (2 * 86400000 if high_period else 0))
     boundary = False
@@ -349,11 +353,13 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
     visible = rows[-(count + optional):]
     exhausted = boundary and len(rows) <= count + optional
     proven_start = 0 if exhausted else visible[0]["chart_time"] if visible else before
+    proven_end = (min(before, max(observed + 1, visible[-1]["chart_time"] + 1 if visible else 0))
+                  if source == "oanda" and high_period else before)
     return {
         "bars": visible,
         "has_more": not boundary or len(rows) > count,
         "history_boundary": exhausted,
-        "coverage": [[proven_start, before]] if proven_start < before else [],
+        "coverage": [[proven_start, proven_end]] if proven_start < proven_end else [],
         "boundary_evidence": {
             "source": source,
             "mode": "count_latest" if source == "oanda" and high_period and cursor >= observed else "count_to",

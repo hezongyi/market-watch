@@ -24,6 +24,7 @@ def _calendar(meta):
 
 
 def capture(db, page, *, full_series=True):
+    from .provider_cache import SOURCE_BEFORE
     if not page['bars']:
         return
     dataset = db.get(ProviderDataset, page['dataset_id'])
@@ -33,7 +34,7 @@ def capture(db, page, *, full_series=True):
     last = dataset.metadata_json.get('indicator_tail_start')
     if full_series and (last is None or last > tail['start']):
         tail = db.scalar(select(ProviderBar.payload).where(ProviderBar.dataset_id == dataset.id,
-                         ProviderBar.start <= now_ms())
+                         ProviderBar.start < (SOURCE_BEFORE.get() or now_ms() + 1))
                          .order_by(ProviderBar.start.desc()).limit(1)) or tail
     content = {'dataset': dataset.id, 'revision': dataset.revision,
                'epoch': dataset.metadata_json.get('indicator_history_epoch'),
