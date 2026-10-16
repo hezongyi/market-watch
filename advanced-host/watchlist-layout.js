@@ -49,6 +49,28 @@
       const exact = [...row.querySelectorAll("[data-column-type]")]
         .find(node => node.dataset.columnType === type);
       if (exact) return exact;
+
+      // TradingView's current rows identify value columns with private,
+      // version-pinned class tokens rather than data attributes. Prefer the
+      // semantic token so the first indicator cell is never mistaken for the
+      // latest-price cell when the header and row structures differ.
+      const cells = [...row.querySelectorAll('[class*="cell"]')]
+        .filter(node => node.closest("[data-symbol-full]") === row);
+      const classFor = {
+        last_price: /(?:^|\s)last-[^\s]*(?:\s|$)/,
+        change: /(?:^|\s)change-[^\s]*(?:\s|$)/,
+        change_percent: /(?:^|\s)changeInPercent[^\s]*(?:\s|$)/,
+      }[type];
+      if (classFor) {
+        const semantic = cells.find(node => {
+          const classes = ` ${node.className || ""} `;
+          if (!classFor.test(classes)) return false;
+          if (type === "last_price" && /changeInPercent/.test(classes)) return false;
+          if (type === "change" && /changeInPercent/.test(classes)) return false;
+          return true;
+        });
+        if (semantic) return semantic;
+      }
     }
     const headers = header ? [...header.parentElement.querySelectorAll('button[data-column-type], [role="columnheader"]')] : [];
     const index = headers.indexOf(header);
@@ -104,7 +126,8 @@
     const header = root.querySelector('button[data-column-type="short_name"]');
     const headerRow = rowForHeader(header);
     const menu = [...(headerRow?.querySelectorAll("button") || []),
-      ...root.querySelectorAll('[data-name*="watchlist"][data-name*="menu"],button[aria-label*="更多"]')].find(button => {
+      ...root.querySelectorAll('button[class*="columnsMenu"],[data-name*="watchlist"][data-name*="menu"],button[aria-label*="更多"]')].find(button => {
+      if (button.matches('button[class*="columnsMenu"],button[data-name*="columns-menu"]')) return true;
       if (button === header || button === plus || button.disabled) return false;
       const value = text(button);
       return moreLabel.test(value) || button.querySelector('svg path[d*="M"]');
