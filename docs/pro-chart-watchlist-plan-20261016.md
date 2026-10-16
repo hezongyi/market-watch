@@ -1,6 +1,6 @@
 # 专业图表自选列表首屏与报价体验计划
 
-状态：已获用户批准，**实现进行中；W1–W5 代码已完成，W0/W6 浏览器与隔离运行验收待完成**
+状态：已获用户批准，**W1–W6 已完成；候选已推送，未执行生产部署**
 日期：2026-10-16
 项目：market-watch
 基线工作树：`/home/quant/repos/market-watch-rest-native-fix-20261015`
@@ -265,9 +265,11 @@
 ## 当前状态
 
 - 计划：已批准。
-- 代码实现：W1–W5 已提交（`8875731`, `3064b02`）。
-- W0 静态证据：`docs/verification/pro-chart-watchlist-20261016/w0-static-baseline.json`；主机 Chromium 启动仍缺 `libatk-1.0.so.0`，未伪造浏览器 DOM/时序证据。
-- 已验证：组合行情/API 与市场数据定向测试 66 passed；`npm run build` 通过；JS 语法与 ruff 检查通过。
+- 代码实现：W1–W5 已提交（`8875731`, `3064b02`）；当前适配器修复已提交并推送（`43caae2`）。
+- W0/W6 证据：`docs/verification/pro-chart-watchlist-20261016/w0-static-baseline.json`、`docs/verification/pro-chart-watchlist-20261016/w6-browser-dom.json`。
+- W6 Ubuntu project：`mw-issue73-20261016`，入口 `https://localhost:18473`，chart origin `https://localhost:17473`；PG 14.24、API、web、chart-origin、TLS 均 healthy。
+- 浏览器通过：三点位于 `+` 左侧且 SVG 为 `rotate(90deg)`；可见代码为 `EURUSD`/`XAUUSD`/`BTCUSDT`，无 `MWP:` 前缀；原生详情自定义节点数为 0；合成价格单元格上标与重复刷新幂等通过；pageErrors 为空。
+- 已验证：组合行情/API 与市场数据定向测试 66 passed；`npm run build`、JS 语法和 `git diff --check` 通过；`/readyz`、`/healthz` 和 charting library 静态资源通过。
+- 已知限制：D1 fixture 对 EURUSD/XAUUSD 保持 pending、BTCUSDT 无报价，因此本次真实 DOM 没有可填充的实时数字单元格；上标使用原生结构合成单元格验证。主机可用磁盘约 21.8 GiB，低于工具默认 23 GiB 轻量预览门槛，仅在临时工具副本中降至 21 GiB，仓库工具未修改。
 - 生产修改：未进行。
 - 生产部署：未授权、未进行。
-- 下一步：在 Ubuntu 独立 Compose project 构建并运行 W6 smoke，补齐 Chromium 依赖后重跑 W0 浏览器时间线与 DOM 回归。
