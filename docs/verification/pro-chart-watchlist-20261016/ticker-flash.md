@@ -1,5 +1,7 @@
 # 自选表加载时内部 ticker 闪现：四源复验
 
+后续：本报告记录 `d14ec34` 的历史验收；已知名称仍先显示“加载中…”的问题，以及 OANDA 详情文案反复切换的补修，见 [已知名称与详情稳定性复验](stable-names-details.md)。
+
 2026-10-16 18:14–18:26 UTC。F0：兼容的 UI 名称显示修复，不改变 ticker、价格、持久偏好格式或数据库 schema。沿用 Ubuntu 本机 `quant-server` 的独立 R1 project `mw-issue73-real-20261016`、数据库、volume、网络及端口。
 
 复现确认：旧实现连续三次刷新均在可绘制帧中显示组合哈希与 `DUKA:…`，切到只有一个真实固定历史版本的列表也显示版本 UUID。[修复前截图](ticker-flash/before.png)。此前稳定状态截图不能证明没有启动闪现。

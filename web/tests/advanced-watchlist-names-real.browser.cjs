@@ -181,10 +181,26 @@ fs.mkdirSync(out,{recursive:true});
       if(outer)await outer.evaluate(async({id,active})=>{
         const api=await widget.watchList();
         if(api.getActiveListId()===id)api.setActiveList(active);
+        await new Promise(resolve=>setTimeout(resolve,0));
         if(Object.values(api.getAllLists()).some(l=>l.id===id))api.deleteList(id);
+        await new Promise(resolve=>setTimeout(resolve,0));
       },{id:tempId,active:originalActive}).catch(e=>{restoreError=e;errors.push('restore: '+e.message)});
       else {restoreError=Error('chart host unavailable during list restoration');errors.push(restoreError.message);}
-      await page.waitForTimeout(1000);
+      if(!restoreError){
+        let restored=false;
+        try{
+          for(let i=0;i<60;i++){
+            const response=await page.request.get(base+'/api/advanced-charts/preferences');
+            if(response.ok()){
+              const preferences=await response.json();
+              const value=preferences.find(row=>row.kind==='setting'&&row.name==='mw.watchlists.v1')?.content?.value;
+              if(value?.active===originalActive&&!value.lists.some(list=>list.id===tempId)){restored=true;break;}
+            }
+            await page.waitForTimeout(1000);
+          }
+        }catch(e){restoreError=e;errors.push('restore verification: '+e.message);}
+        if(!restored&&!restoreError){restoreError=Error('watchlist restoration was not persisted');errors.push(restoreError.message);}
+      }
     }
     if(outer&&originalSymbol)await (async()=>{
       await outer.evaluate(symbol=>widget.activeChart().setSymbol(symbol),originalSymbol);
