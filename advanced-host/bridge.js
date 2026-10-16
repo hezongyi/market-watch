@@ -979,7 +979,7 @@ const feed = {
       // One-time startup metadata rides with workspace configuration. Candle
       // demand and every subsequent symbol resolve still use the backend.
       const supplied = initialSymbol?.ticker === ticker ? initialSymbol.metadata :
-        watchlistMetadata.get(ticker);
+        watchlistMetadata.get(ticker) || watchlistMetadata.get(ticker.toLowerCase());
       if (initialSymbol?.ticker === ticker) initialSymbol = undefined;
       if (supplied) {
         // Native datafeed callbacks must leave the calling task, even when
