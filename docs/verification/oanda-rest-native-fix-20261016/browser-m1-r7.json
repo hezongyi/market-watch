@@ -1,0 +1,74 @@
+{
+  "case": "browser-m1-r7",
+  "samples": 4414,
+  "sampled_seconds": 1000.76,
+  "resets": [],
+  "sampling_errors": 0,
+  "empty_price_samples": 0,
+  "not_ready_samples": 0,
+  "empty_study_samples": 0,
+  "price_tail_times": [
+    1792123980,
+    1792124040,
+    1792124100,
+    1792124160,
+    1792124220,
+    1792124280,
+    1792124340,
+    1792124400,
+    1792124460,
+    1792124520,
+    1792124580,
+    1792124640,
+    1792124700,
+    1792124760,
+    1792124820,
+    1792124880,
+    1792124940,
+    1792125000
+  ],
+  "study_value_variants": 178,
+  "visual_samples": 4439,
+  "blank_visual_samples": 0,
+  "no_colored_visual_samples": 0,
+  "visual_errors": 0,
+  "status": "completed",
+  "durationSeconds": 1007.269,
+  "remoteAddresses": [
+    "127.0.0.1"
+  ],
+  "errors": [],
+  "failedResponses": [],
+  "requests_by_path": {
+    "/api/charts/data": 403,
+    "/api/charts/reserve": 3
+  },
+  "provider_snapshot_requests": 391,
+  "event_types": {
+    "chart-indicator-state": 770,
+    "heartbeat": 1000,
+    "market-event": 2406,
+    "native-load-start": 4,
+    "native-load-end": 4,
+    "error": 2,
+    "ack": 294
+  },
+  "error_events": [
+    {
+      "at": 1792123990892,
+      "type": "error",
+      "error": "Error: ApiError: \u5e73\u53f0\u5386\u53f2\u6682\u4e0d\u53ef\u7528\uff0c\u8bf7\u91cd\u8bd5",
+      "message": null,
+      "code": null,
+      "reason": null
+    },
+    {
+      "at": 1792123990892,
+      "type": "error",
+      "error": "Error: ApiError: \u5e73\u53f0\u5386\u53f2\u6682\u4e0d\u53ef\u7528\uff0c\u8bf7\u91cd\u8bd5",
+      "message": null,
+      "code": null,
+      "reason": null
+    }
+  ]
+}

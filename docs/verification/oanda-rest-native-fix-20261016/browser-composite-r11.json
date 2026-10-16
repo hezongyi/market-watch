@@ -1,0 +1,51 @@
+{
+  "case": "browser-composite-r11",
+  "samples": 4443,
+  "sampled_seconds": 967.78,
+  "resets": [],
+  "sampling_errors": 0,
+  "empty_price_samples": 0,
+  "not_ready_samples": 0,
+  "empty_study_samples": 0,
+  "price_tail_times": [
+    1792128960,
+    1792129020,
+    1792129080,
+    1792129140,
+    1792129200,
+    1792129260,
+    1792129320,
+    1792129380,
+    1792129440,
+    1792129500,
+    1792129560,
+    1792129620,
+    1792129680,
+    1792129740,
+    1792129800,
+    1792129860,
+    1792129920
+  ],
+  "study_value_variants": 104,
+  "visual_samples": 4463,
+  "blank_visual_samples": 0,
+  "no_colored_visual_samples": 0,
+  "visual_errors": 0,
+  "status": "completed",
+  "durationSeconds": 975.152,
+  "remoteAddresses": [
+    "127.0.0.1"
+  ],
+  "errors": [],
+  "failedResponses": [],
+  "requests_by_path": {
+    "/api/charts/data": 183
+  },
+  "provider_snapshot_requests": 0,
+  "event_types": {
+    "chart-indicator-state": 334,
+    "heartbeat": 1205,
+    "market-event": 3032
+  },
+  "error_events": []
+}

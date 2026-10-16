@@ -1,0 +1,64 @@
+{
+  "status": "accepted",
+  "implementation_commit": "b2f57f0b065630ee5e6ff425b6e558804843b126",
+  "host": "Ubuntu local Docker",
+  "project": "mw-v1257-restore",
+  "task": "mw-v1257-native-fix-20261015",
+  "purpose": "acceptance",
+  "compose_private_path": "/tmp/market-watch-rest-analysis-20261016/runtime-r11.private.yaml",
+  "browser_route": "loopback DNS mapping; CDP remote-IP checks",
+  "database": "restored PostgreSQL 14.24, reused volume, host port 20407",
+  "acquisition_mode": "rest_batch",
+  "rest_interval_seconds": 2,
+  "api_cpu": 0.8,
+  "api_memory_mib": 1024,
+  "api_db_pool_size": 2,
+  "api_db_max_overflow": 0,
+  "provider_budget_seconds": 8,
+  "all_seven_backends_same_image": true,
+  "images": [
+    {
+      "service": "api",
+      "image_ref": "market-watch-api:oanda-native-history-fix-20261015-r11",
+      "image_id": "sha256:1250338b88de45f9392d0a638eaca13ff047ed23d8c882e8570065861844a277",
+      "source_labels": {
+        "io.market-watch.commit": "b2f57f0b065630ee5e6ff425b6e558804843b126",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.project": "mw-v1257-restore",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-v1257-native-fix-20261015"
+      }
+    },
+    {
+      "service": "web",
+      "image_ref": "market-watch-web:oanda-native-history-fix-20261015-r5",
+      "image_id": "sha256:5d862a1163f56c9e1f0b030f3eed8ffa4ce85c42d38477a9550594cacc675058",
+      "source_labels": {
+        "io.market-watch.commit": "b4e712a68e6b1a06e1907487aff5ca954917799a",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.project": "mw-v1257-restore",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-v1257-native-fix-20261015"
+      }
+    },
+    {
+      "service": "chart-origin",
+      "image_ref": "market-watch-chart-origin:oanda-native-history-fix-20261015-r5",
+      "image_id": "sha256:3c1f28242a3b56921f6ec6068ba01310a0fc6af245c702dd1ee0d2d0c7db5205",
+      "source_labels": {
+        "io.market-watch.commit": "b4e712a68e6b1a06e1907487aff5ca954917799a",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.project": "mw-v1257-restore",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-v1257-native-fix-20261015"
+      }
+    }
+  ],
+  "production_operations": false,
+  "frontend_code_unchanged_since_image_commit": true,
+  "web_origin": "https://trade.kookvv.com:8443",
+  "chart_origin": "https://charts.kookvv.com:8443",
+  "binding": "127.0.0.1:8443",
+  "accepted_at_utc": "2026-10-16T05:56:26.003097+00:00",
+  "code_ci_run": 38856331950
+}

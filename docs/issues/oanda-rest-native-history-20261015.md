@@ -45,3 +45,7 @@ r9 的平台和组合 M1/Supertrend 各完成约 16 分钟连续观察，期间�
 新增固定时钟回归扩展前为 12 failed / 12 passed，另补冷缓存普通/native 入口跨秒、cached_page 排队、单次回退、非目标错误和预算不重置用例。新候选需独立启动检查和连续观察，本段不替代它们。
 
 独立复核还覆盖整分钟 `count=1` 交接：latest 返回的唯一柱可能恰好等于原排他截止，过滤后不能当成历史结束或扩大 before。仅在实际 count_latest 且尚未尝试该恢复时，允许同一原游标明确请求一次历史；仍不推进则失败。原 deadline、来源截止、显示截止和总页数预算不变。普通/native 冷加载、cached_page 排队及多页独立探针均通过；最终定向套件 134 项通过，Standards/Spec 无剩余阻塞。r10 未包含此最后交接修正，不作为最终验收候选。
+
+## 最终 Ubuntu 验收
+
+`b2f57f0` / clean r11 候选通过：当前代码 CI backend 2,495 passed / 11 skipped，web/compose 成功；定向 134 passed，真实 PG14 边界 16 passed；独立 Standards/Spec 无剩余阻塞。冷四并发与混合冷启动各 4/4 HTTP200，当前供源探针 18/18，通过 D1/W1/MN API和真实浏览器坐标核对。平台/组合 M1+Supertrend 各约16分钟，从启动到结束零应用/page/HTTP错误、零重载/空价格/空指标/空白采样，原资源下零OOM/restart。详细镜像、时段、样本及全部历史失败见[最终验收记录](../verification/oanda-rest-native-fix-20261016/README.md)。生产本轮未访问或切换。
