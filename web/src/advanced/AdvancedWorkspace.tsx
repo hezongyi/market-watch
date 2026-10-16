@@ -1269,6 +1269,7 @@ export default function AdvancedWorkspace() {
                 limit: q.limit,
                 ...(q.series_kind === "provider"
                   ? {
+                      provider_snapshot_id: q.provider_snapshot_id,
                       countBack: q.countBack,
                       from: q.from,
                       firstDataRequest: q.firstDataRequest === true,

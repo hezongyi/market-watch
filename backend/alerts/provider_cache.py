@@ -79,6 +79,9 @@ def check_cancelled():
     event = CANCELLED.get()
     if event is not None and event.is_set():
         raise TimeoutError("平台读取已取消")
+    deadline = DEADLINE.get()
+    if deadline is not None and time.monotonic() >= deadline:
+        raise TimeoutError("平台读取超过时间预算")
 
 
 def database_budget(db):
@@ -182,7 +185,8 @@ def ensure(meta, frame):
 
 @contextmanager
 def snapshot_transaction(key, before, count, *, observation=None, bounded_limit=None,
-                         native_from=None, prefix=0, reserve=0, planning=False, history_limit=None):
+                         native_from=None, prefix=0, reserve=0, planning=False, history_limit=None,
+                         source_before=None):
     """One short repeatable-read observation; metadata is decoded exactly once.
 
     Planning counts indexed timestamps and reads just the tail while coverage is
@@ -194,6 +198,14 @@ def snapshot_transaction(key, before, count, *, observation=None, bounded_limit=
         metadata = db.scalar(select(ProviderDataset).where(ProviderDataset.id == key))
         if metadata is None:
             raise ValueError("平台缓存已清理，请重试")
+        if source_before is not None:
+            # Intraday times and D/W/M display dates belong to different domains.
+            # Choose the last admitted source candle, then page by its chart label.
+            last_label = db.scalar(select(ProviderBar.chart_time).where(
+                ProviderBar.dataset_id == key, ProviderBar.start < source_before)
+                .order_by(ProviderBar.start.desc()).limit(1))
+            if last_label is not None:
+                before = min(before, last_label + 1)
         ranges = metadata.coverage
         interval = next((r for r in ranges if r[0] < before <= r[1]), None)
         preceding = next((r for r in reversed(ranges) if r[1] < before), None)
@@ -203,6 +215,8 @@ def snapshot_transaction(key, before, count, *, observation=None, bounded_limit=
                             (before <= window.get("left", 0) or readable and readable[0] <= window.get("left", 0)))
         predicate = (ProviderBar.dataset_id == key, ProviderBar.chart_time < before,
                      ProviderBar.chart_time >= (readable[0] if readable else before))
+        if source_before is not None:
+            predicate = (*predicate, ProviderBar.start < source_before)
         available = in_range = 0
         demand = count
         limit = bounded_limit or count + 1
@@ -238,18 +252,6 @@ def snapshot_transaction(key, before, count, *, observation=None, bounded_limit=
                 ProviderBar.revision > 1,
                 ProviderBar.changed_at > observation.observed_at,
             )))) or metadata.metadata_json.get("invalidated_at", 0) > observation.observed_at)
-        # Optional access bookkeeping must not abort a published snapshot after
-        # a concurrent revision. A savepoint contains serialization conflicts.
-        try:
-            with db.begin_nested():
-                touched = select(ProviderDataset.id).where(ProviderDataset.id == key)
-                if db.get_bind().dialect.name == "postgresql":
-                    touched = touched.with_for_update(skip_locked=True)
-                db.execute(update(ProviderDataset).where(ProviderDataset.id.in_(touched))
-                           .values(accessed_at=now_ms()))
-        except DBAPIError as error:
-            if getattr(error.orig, "sqlstate", None) != "40001":
-                raise
         yield db, {
             **volume_metadata(metadata.source, metadata.symbol),
             **({k: metadata.metadata_json.get(k) for k in
@@ -266,6 +268,18 @@ def snapshot_transaction(key, before, count, *, observation=None, bounded_limit=
             "satisfied": bool(interval and (available >= count or boundary or window_limit) or window_limit and not rows),
             **({"history_revalidation": {"changed": changed}} if observation is not None else {}),
         }
+    # Do not retain an UPDATE lock while callers freeze recursive inputs.
+    # Bookkeeping is optional and uses a short, nonblocking observation.
+    if metadata.accessed_at < now_ms() - 30000:
+        try:
+            with budget_transaction() as db:
+                touched = select(ProviderDataset.id).where(ProviderDataset.id == key)
+                if db.get_bind().dialect.name == "postgresql":
+                    touched = touched.with_for_update(skip_locked=True)
+                db.execute(update(ProviderDataset).where(ProviderDataset.id.in_(touched))
+                           .values(accessed_at=now_ms()))
+        except (TimeoutError, DBAPIError):
+            log.debug("Provider optional access touch deferred")
 
 
 def snapshot(key, before, count, *, observation=None, bounded_limit=None):
@@ -338,6 +352,12 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
         )
         original_coverage = list(dataset.coverage)
         original_boundary = dataset.earliest
+        indicator_tail = dataset.metadata_json.get("indicator_tail_start")
+        if indicator_tail is None:
+            indicator_tail = db.scalar(select(func.max(ProviderBar.start)).where(
+                ProviderBar.dataset_id == key))
+        reset_indicators = not dataset.metadata_json.get("indicator_history_epoch")
+        removed_count = 0
         if (dataset.lease_token, dataset.generation) != lease or dataset.lease_until <= now_ms():
             raise TimeoutError("平台取数租约已失效，请重试")
         if page.get("revalidation") and page.get("coverage"):
@@ -357,6 +377,8 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
                 ProviderBar.chart_time < before,
                 ProviderBar.start.not_in([bar["start"] for bar in rows])))
             if removed.rowcount:
+                removed_count = removed.rowcount
+                reset_indicators = True
                 if observation:
                     observation.counts["deleted"] += removed.rowcount
                 dataset.metadata_json = {**dataset.metadata_json, "invalidated_at":observed_at}
@@ -394,6 +416,9 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
                 if old.payload != bar:
                     changed.append(bar["chart_time"])
             price_changed = not old or price_input(old.payload) != price_input(bar)
+            if (indicator_tail is not None and bar["start"] < indicator_tail
+                    and (not old or old.payload != bar)):
+                reset_indicators = True
             values.append(
                 dict(
                     dataset_id=key,
@@ -440,8 +465,13 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
         dataset.updated_at = max(dataset.updated_at, observed_at)
         if latest:
             dataset.latest_at = max(dataset.latest_at, observed_at)
-        if values:
+        if values or removed_count:
             dataset.revision += 1
+            dataset.metadata_json = {**dataset.metadata_json,
+                "indicator_tail_start": max([bar["start"] for bar in values] +
+                                             ([indicator_tail] if indicator_tail is not None else [0])),
+                "indicator_history_epoch": uid() if reset_indicators else
+                    dataset.metadata_json["indicator_history_epoch"]}
         report = observation.report(dataset.source, dataset.timeframe, dataset.revision, key) if observation else None
     # Only successful transactions enter the observation stream. This summary
     # counts one supplier commit, independently of how many charts consume it.
@@ -822,19 +852,13 @@ def data(body):
         # The visible page, metadata version and full recursive prefix must
         # describe one observation. ProviderBar is mutable: reading its prefix
         # after this transaction cannot recover the page's earlier revision.
+        if not body.provider_snapshot_id:
+            from .provider_display_snapshots import capture
+            capture(db, page)
         if body.indicators and page["bars"]:
-            swing = any(spec.get("name") == "SWING_SR_V1" for spec in body.indicators)
-            maximum = calculation_limit
-            prefix = list(db.scalars(select(ProviderBar.payload).where(
-                ProviderBar.dataset_id == page["dataset_id"],
-                ProviderBar.start <= (2**63 - 1 if swing else page["bars"][-1]["start"]),
-                ProviderBar.start >= (body.calculation_origin or 0),
-            ).order_by(ProviderBar.start).limit(maximum + 1)))
-            if len(prefix) > maximum:
-                raise CapacityExceeded(f"指标固定前缀超过历史容量 {maximum:,} 根，请调整容量后重试")
-            if prefix and body.calculation_origin is not None and prefix[0]["start"] != body.calculation_origin:
-                raise ValueError("指标固定历史起点缺失，请刷新并核对数据集")
-            page["_calculation_prefix"] = prefix
+            from .provider_indicator_inputs import freeze
+            endpoint = page.get("_provider_snapshot", {}).get("tail", {}).get("start")
+            page["_calculation_inputs"] = freeze(db, page, body, calculation_limit, evaluation_end=endpoint)
         if not body.client:
             return
         from .provider_service import activate
@@ -849,9 +873,20 @@ def data(body):
             log.warning("Provider optional activation failed source=%s frame=%s",
                         meta["source"], body.timeframe, exc_info=False)
 
-    callback = freeze_ready if body.client or body.indicators else None
-    page = (native_read(meta, body, before, count, extra, latest, on_ready=callback) if native else
-            read(meta, body.timeframe, before, count + extra, latest=latest, on_ready=callback))
+    if body.provider_snapshot_id:
+        from .provider_display_snapshots import read as snapshot_read
+        from .provider_display_snapshots import resolve
+        with budget_transaction(isolation_level="REPEATABLE READ") as db:
+            credential = resolve(db, body.provider_snapshot_id, identity(meta, body.timeframe))
+            page = snapshot_read(db, credential, before, count + extra, body.provider_snapshot_id)
+            page["_snapshot_tail"] = credential["tail"]
+            freeze_ready(db, page)
+            page.pop("_snapshot_tail", None)
+    else:
+        page = (native_read(meta, body, before, count, extra, latest, on_ready=freeze_ready) if native else
+                read(meta, body.timeframe, before, count + extra, latest=latest, on_ready=freeze_ready))
+        from .provider_display_snapshots import publish
+        publish(page)
     if meta["source"] == "oanda":
         from .native_series import parameters
         page["native_parameters"] = parameters(meta)
@@ -859,33 +894,23 @@ def data(body):
     output_count = page.get("mandatory_count", count)
     visible = page["bars"] if native and not body.indicators else page["bars"][-output_count:]
     first = visible[0]["start"] if visible else before
-    prefix = page.pop("_calculation_prefix", None)
-    if body.indicators and prefix is None and page["bars"]:
-        # ``read`` normally invokes ``freeze_ready`` while its repeatable-read
-        # snapshot is open.  Keep the data adapter correct for alternate read
-        # implementations (and lightweight test suppliers) that return a page
-        # without that callback: recursive studies must still use the complete
-        # persisted source prefix, independent of viewport page size.
-        swing = any(spec.get("name") == "SWING_SR_V1" for spec in body.indicators)
-        maximum = calculation_limit
+    frozen = page.pop("_calculation_inputs", None)
+    if body.indicators and frozen is None and page["bars"]:
+        # Alternate suppliers must still freeze a coherent fixed-origin prefix.
+        from .provider_indicator_inputs import freeze
         with budget_transaction(isolation_level="REPEATABLE READ") as db:
-            prefix = list(db.scalars(select(ProviderBar.payload).where(
-                ProviderBar.dataset_id == page["dataset_id"],
-                ProviderBar.start <= (2**63 - 1 if swing else page["bars"][-1]["start"]),
-                ProviderBar.start >= (body.calculation_origin or 0),
-            ).order_by(ProviderBar.start).limit(maximum + 1)))
-        if len(prefix) > maximum:
-            raise CapacityExceeded(f"指标固定前缀超过历史容量 {maximum:,} 根，请调整容量后重试")
-        if prefix and body.calculation_origin is not None and prefix[0]["start"] != body.calculation_origin:
-            raise ValueError("指标固定历史起点缺失，请刷新并核对数据集")
-    if prefix is None:
-        prefix = page["bars"]
-    if body.indicators and prefix:
-        # Compute outside the short database observation, using frozen inputs.
-        prefix = calculation_rows(prefix, meta, body.instrument)
+            frozen = freeze(db, page, body, calculation_limit)
+    prefix = frozen.rows if frozen is not None else page["bars"]
     indicators = []
     for spec in body.indicators:
-        result = calculate(prefix, spec, provisional=body.provisional)
+        check_cancelled()
+        if frozen is not None:
+            from .provider_indicator_inputs import compute
+            result = compute(frozen, meta, body.instrument, spec,
+                             first=first, provisional=body.provisional)
+        else:
+            result = calculate(calculation_rows(prefix, meta, body.instrument), spec,
+                               provisional=body.provisional)
         if "presentation" in result:
             result["presentation"] = result["presentation"] | {
                 "history_revision": str(page.get("cache_revision", page.get("revision", 0))),
