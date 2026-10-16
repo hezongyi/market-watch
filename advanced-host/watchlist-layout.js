@@ -43,6 +43,20 @@
     return [...root.querySelectorAll('[data-symbol-full]')];
   }
 
+  function releaseHumanName(row) {
+    const name = row.querySelector('[class*="symbolNameText-"]');
+    if (!name) return;
+    const value = (name.textContent || "").trim();
+    // Every source/type shares this guard. These are routing identities, never
+    // display codes, even after native marks a row "resolved" or shows a price.
+    const internal = /^(?:MW[CPH]:|(?:DUKA|YAHOO|NATIVE|MD|OANDA|BINANCE):)|^[a-f0-9]{32,64}$|^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i;
+    const ready = !!value && !internal.test(value);
+    if (ready !== (row.dataset.mwNameReady === "true")) {
+      if (ready) row.dataset.mwNameReady = "true";
+      else delete row.dataset.mwNameReady;
+    }
+  }
+
   function latestCell(row, header) {
     const type = header?.dataset.columnType;
     if (type) {
@@ -177,7 +191,10 @@
       try {
         moveMenu(root);
         const header = latestColumn(root);
-        for (const row of rowCells(root)) wrapLastDigit(latestCell(row, header));
+        for (const row of rowCells(root)) {
+          releaseHumanName(row);
+          wrapLastDigit(latestCell(row, header));
+        }
       } catch (error) { report(error); }
       finally { applying = false; }
     };
@@ -186,7 +203,8 @@
       pending = true;
       queueMicrotask(() => { pending = false; refresh(); });
     });
-    observer.observe(doc.body, {childList: true, subtree: true, characterData: true});
+    observer.observe(doc.body, {childList: true, subtree: true, characterData: true,
+      attributes: true, attributeFilter: ["data-symbol-full", "data-symbol-short"]});
     const resizeObserver = typeof ResizeObserver === "function" ? new ResizeObserver(refresh) : null;
     resizeObserver?.observe(doc.documentElement);
     const root = watchlistRoot(doc);

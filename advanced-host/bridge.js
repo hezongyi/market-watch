@@ -442,7 +442,8 @@ const symbolPresentations = new Map();
 const quoteSnapshotRows = new Map();
 const quoteResetTokens = new Map();
 function presentationFor(ticker) {
-  const exact = symbolPresentations.get(ticker);
+  const exact = symbolPresentations.get(ticker) ||
+    watchlistMetadata.get(ticker) || watchlistMetadata.get(ticker.toLowerCase());
   if (exact) return exact;
   try { return symbolPresentations.get(decode(ticker).symbol); } catch (_) { return undefined; }
 }
@@ -924,10 +925,10 @@ const feed = {
       send({type:'market-subscribe',args:{client:clientId,listener,generation,
         kind:'quotes',query:marketQuery(ticker,'1'),sequence:0}});
     }
-    const presented=all.filter(ticker=>{
-      const identity=decode(ticker);
-      return identity.symbol.startsWith("YAHOO:") || ['history','composite'].includes(identity.series_kind);
-    });
+    // The same name/quote path covers every supplier and series kind. Opaque
+    // DUKA/NATIVE/MD identities need their human names just as fixed histories
+    // and composites do; this must not depend on the active chart's resolve.
+    const presented=all;
     if(presented.length) {
       // Give native details its resolved human name while the real market
       // snapshot loads. No price, change or quote time is invented here.
@@ -1809,7 +1810,7 @@ function boot(
   watchlistMetadata.clear();
   for (const [ticker, metadata] of Object.entries(initialWatchlistMetadata || {}))
     if (typeof ticker === "string" && metadata && typeof metadata === "object")
-      watchlistMetadata.set(ticker, metadata);
+      watchlistMetadata.set(ticker.toLowerCase(), metadata);
   if(symbolMetadata?.metadata) {
     const ticker = symbolMetadata.ticker;
     const symbol = decode(ticker).symbol;

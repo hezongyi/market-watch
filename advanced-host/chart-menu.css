@@ -1,4 +1,21 @@
 @import url("/indicator-picker.css");
+/* Native rows paint their ticker before quote.short_name arrives, including
+   before headerReady and on every list rebuild. Gate the name at first paint;
+   the adapter releases human names in a mutation microtask. Never hide prices
+   or rewrite React's text nodes/series identities. Applies to every source. */
+[data-test-id-widget-type="watchlist"] [data-symbol-full]:not([data-mw-name-ready="true"]) [class*="symbolNameText-"] {
+  position: relative;
+  visibility: hidden;
+}
+[data-test-id-widget-type="watchlist"] [data-symbol-full]:not([data-mw-name-ready="true"]) [class*="symbolNameText-"]::after {
+  content: "加载中…";
+  position: absolute;
+  left: 0;
+  visibility: visible;
+}
+[data-test-id-widget-type="watchlist"] [data-symbol-full][data-status="error"]:not([data-mw-name-ready="true"]) [class*="symbolNameText-"]::after {
+  content: "不可用";
+}
 /* Reserve a header slot through the supported custom_css_url integration.
    The symbol-search id is public library markup; no vendor node is moved. */
 #header-toolbar-symbol-search { margin-left: 52px; }
