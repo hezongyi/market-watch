@@ -46,7 +46,8 @@
   function latestCell(row, header) {
     const type = header?.dataset.columnType;
     if (type) {
-      const exact = row.querySelector(`[data-column-type="${CSS.escape(type)}"]`);
+      const exact = [...row.querySelectorAll("[data-column-type]")]
+        .find(node => node.dataset.columnType === type);
       if (exact) return exact;
     }
     const headers = header ? [...header.parentElement.querySelectorAll('button[data-column-type], [role="columnheader"]')] : [];
@@ -60,7 +61,10 @@
     const existing = cell.querySelector(':scope > [data-mw-price-sup="true"]');
     if (existing) {
       const raw = cell.dataset.mwRawPrice;
-      if (raw != null && cell.textContent !== raw) cell.textContent = raw;
+      // Restore the complete native text before removing our wrapper. The
+      // wrapper's textContent still equals the raw value, so comparing first
+      // would drop the final digit on a second refresh.
+      if (raw != null) cell.textContent = raw;
       existing.remove();
     }
     const raw = cell.textContent || "";
