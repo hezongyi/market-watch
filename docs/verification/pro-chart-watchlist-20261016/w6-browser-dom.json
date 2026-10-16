@@ -12,7 +12,11 @@
     "page_errors": []
   },
   "watchlist": {
-    "rows": ["EURUSD", "XAUUSD", "BTCUSDT"],
+    "rows": [
+      "EURUSD",
+      "XAUUSD",
+      "BTCUSDT"
+    ],
     "raw_prefix_visible": false,
     "custom_quote_detail_nodes": 0,
     "columns_menu": {
@@ -33,5 +37,8 @@
   },
   "fixture_limitations": [
     "D1 preview fixture leaves EURUSD/XAUUSD rows pending and BTCUSDT without a quote, so live numeric cells were empty during this run."
-  ]
+  ],
+  "acceptance_status": "superseded-fixture-dom-only",
+  "superseded_by": "real-acceptance.json",
+  "real_data_acceptance_passed": false
 }

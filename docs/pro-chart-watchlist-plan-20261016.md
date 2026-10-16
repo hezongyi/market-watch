@@ -1,6 +1,6 @@
 # 专业图表自选列表首屏与报价体验计划
 
-状态：已获用户批准，**W1–W6 已完成；候选已推送，未执行生产部署**
+状态：已获用户批准，**真实数据复验已通过；已撤销早期 fixture 验收结论，未执行生产部署**
 日期：2026-10-16
 项目：market-watch
 基线工作树：`/home/quant/repos/market-watch-rest-native-fix-20261015`
@@ -264,12 +264,14 @@
 
 ## 当前状态
 
-- 计划：已批准。
-- 代码实现：W1–W5 已提交（`8875731`, `3064b02`）；当前适配器修复已提交并推送（`43caae2`）。
-- W0/W6 证据：`docs/verification/pro-chart-watchlist-20261016/w0-static-baseline.json`、`docs/verification/pro-chart-watchlist-20261016/w6-browser-dom.json`。
-- W6 Ubuntu project：`mw-issue73-20261016`，入口 `https://localhost:18473`，chart origin `https://localhost:17473`；PG 14.24、API、web、chart-origin、TLS 均 healthy。
-- 浏览器通过：三点位于 `+` 左侧且 SVG 为 `rotate(90deg)`；可见代码为 `EURUSD`/`XAUUSD`/`BTCUSDT`，无 `MWP:` 前缀；原生详情自定义节点数为 0；合成价格单元格上标与重复刷新幂等通过；pageErrors 为空。
-- 已验证：组合行情/API 与市场数据定向测试 66 passed；`npm run build`、JS 语法和 `git diff --check` 通过；`/readyz`、`/healthz` 和 charting library 静态资源通过。
-- 已知限制：D1 fixture 对 EURUSD/XAUUSD 保持 pending、BTCUSDT 无报价，因此本次真实 DOM 没有可填充的实时数字单元格；上标使用原生结构合成单元格验证。主机可用磁盘约 21.8 GiB，低于工具默认 23 GiB 轻量预览门槛，仅在临时工具副本中降至 21 GiB，仓库工具未修改。
-- 生产修改：未进行。
-- 生产部署：未授权、未进行。
+- 计划：已批准。风险分类 F0：兼容的 UI/报价适配，无 schema 或持久格式变更；执行独立 Ubuntu R1 并追加真实 OANDA REST Batch 浏览器验收。
+- 真实数据验收：通过，见 [报告](verification/pro-chart-watchlist-20261016/real-acceptance.md) 和 [脱敏 JSON](verification/pro-chart-watchlist-20261016/real-acceptance.json)。
+- Ubuntu 主机：`quant-server`；独立 project `mw-issue73-real-20261016`；页面 `https://192.168.7.232:18483/advanced-charts`；图表来源 `https://192.168.7.232:17483`。
+- 真实来源：OANDA Practice；平台 EURUSD/XAUUSD 与真实 EURUSD 历史接续组合。没有生成或注入行情 fixture。
+- 修复：上标自身 DOM 变更引发无限 MutationObserver 循环；原生涨跌闪烁 span 中的上标重复嵌套；三点按钮跨 React root 重挂后菜单事件丢失；原生严格包含导致工具栏按钮偏移/裁剪。业务修复止于 `d90e90d`。
+- 已通过：真实 K 线 `dataReady=true`；三行最新价/涨跌/涨跌幅；组合 previous close 数值校验；REST Batch 当前未闭合 M1 收盘采样通过 SSE 继续更新（10 秒内组合序号 28 → 33）；原生菜单实际展开；黄金/组合切换；780px 窄屏菜单；刷新后数据恢复；pageErrors 为空。
+- 已逐张人工打开查看 7 张真实页面截图。真实组合基线限近三天，故 H4 仅有有限根数；不把这解释为缺失平台历史或完整生产规模验收。
+- 永久回归：真实 Chromium DOM 测试覆盖自触发循环、嵌套涨跌 span、尾零/无障碍文本、原生事件委托、严格绘制包含和窗口缩放；startup metadata、market stream、watchlist restore 模块测试通过。
+- 撤销早期结论：旧 `mw-issue73-20261016` 的 D1 fixture 仅证明部分 DOM，实际 `dataReady=false`、持续 loading 和 resolve 422，不属于真实数据验收。旧证据已标记 superseded，不继续作为通过依据。
+- 未覆盖：物理触屏手机、生产全量数据、长期稳定性观察；当前报告不声称这些已通过。
+- 生产部署：未进行；验收实例保留供用户人工验收，凭据只保存在任务私有目录。

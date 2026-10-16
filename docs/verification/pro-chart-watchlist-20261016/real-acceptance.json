@@ -1,0 +1,160 @@
+{
+  "status": "passed-real-data",
+  "supersedes": "w6-browser-dom.json (fixture DOM only; not real-data acceptance)",
+  "host": "quant-server (Ubuntu local Docker)",
+  "project": "mw-issue73-real-20261016",
+  "app": "https://192.168.7.232:18483/advanced-charts",
+  "chart": "https://192.168.7.232:17483",
+  "data_source": "OANDA Practice real supplier responses; rest_batch; no synthetic candles or prices",
+  "chart_image": "market-watch-chart-origin:issue73-real-d90e90d",
+  "login_http": 200,
+  "ready": true,
+  "loading": false,
+  "dataReady": true,
+  "watchlist": [
+    {
+      "symbol": "MWP:EURUSD",
+      "short": "EURUSD",
+      "text": "EURUSD\n1.12265\n0.00060\n0.05%",
+      "prices": [
+        {
+          "raw": "1.12265",
+          "text": "1.12265",
+          "sup": "5",
+          "aria": "1.12265"
+        }
+      ]
+    },
+    {
+      "symbol": "MWP:XAUUSD",
+      "short": "XAUUSD",
+      "text": "XAUUSD\n4,163.130\n−7.180\n−0.17%",
+      "prices": [
+        {
+          "raw": "4,163.130",
+          "text": "4,163.130",
+          "sup": "0",
+          "aria": "4,163.130"
+        }
+      ]
+    },
+    {
+      "symbol": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+      "short": "26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+      "text": "EURUSD\n1.12263\n0.00055\n0.05%",
+      "prices": [
+        {
+          "raw": "1.12263",
+          "text": "1.12263",
+          "sup": "3",
+          "aria": "1.12263"
+        }
+      ]
+    }
+  ],
+  "native_menu_visual_position_pass": true,
+  "native_menu_rotation": "rotate(90deg)",
+  "custom_details_nodes": 0,
+  "platform_history": [
+    [
+      "MWP:EURUSD|240|",
+      {
+        "first": 1784120400000,
+        "last": 1792170000000,
+        "empty": false,
+        "accepted": true,
+        "barCount": 404
+      }
+    ]
+  ],
+  "composite_quote": {
+    "lp": 1.12263,
+    "ch": 0.00055,
+    "chp": 0.0490161129331242,
+    "prev_close_price": 1.12208,
+    "price_type": "sampled_candle_close",
+    "observation_mode": "candle_close_sample",
+    "observed_at": 1792173515112,
+    "data_start": 1792173480000,
+    "data_end": 1792173540000,
+    "revision_id": "24e6353d-243d-4086-a232-4a02e167ea2b",
+    "input_revision": 21
+  },
+  "quote_stream_before": [
+    {
+      "ticker": "MWP:EURUSD",
+      "sequence": 4
+    },
+    {
+      "ticker": "MWP:XAUUSD",
+      "sequence": 4
+    },
+    {
+      "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+      "sequence": 28
+    },
+    {
+      "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+      "sequence": 28
+    }
+  ],
+  "quote_stream_after": [
+    {
+      "ticker": "MWP:EURUSD",
+      "sequence": 4
+    },
+    {
+      "ticker": "MWP:XAUUSD",
+      "sequence": 4
+    },
+    {
+      "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+      "sequence": 33
+    },
+    {
+      "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+      "sequence": 33
+    }
+  ],
+  "functional_checks": [
+    {
+      "check": "native-menu",
+      "pass": true
+    },
+    {
+      "check": "switch",
+      "symbol": "MWP:XAUUSD",
+      "ready": true
+    },
+    {
+      "check": "switch",
+      "symbol": "MWC:26197BDAEFAEE31CA32EEF9D743210591B0A10709FD286939B066CFE2B1B9219",
+      "ready": true
+    },
+    {
+      "check": "real-composite-quote"
+    },
+    {
+      "check": "narrow-menu",
+      "width": 780,
+      "pass": true
+    },
+    {
+      "check": "reload",
+      "pass": true,
+      "symbol": "MWP:EURUSD"
+    }
+  ],
+  "page_errors": [],
+  "http_errors_after_login": [],
+  "screenshots": {
+    "01-desktop.png": "94a64472c055c7160f293b8ef1f91a7e7c4041d6b6514ae16e3a523b6e2a02e6",
+    "02-menu.png": "bcc26a1971262e01c88c474db776fe5028252cf5979af64657892c7bb3a30246",
+    "03-gold.png": "aceedbb0768d0ffe5b518921dc7b36730f18903622f0d60c01d1402498976337",
+    "04-composite.png": "0c1e1f7ed0dc6124bbf1248af5263356763684f5519753f8b6f047fd9cec314f",
+    "05-composite-live.png": "ac31a2d27a7bfaba4e8d5fcffe444b1f29bb96402c95d0f2bc1aacf71afcfc6c",
+    "06-narrow-menu.png": "ee89ce38de040e76b793d8500ae0b84f2be538aba1fd2c5dd0d66ed98facc364",
+    "07-refreshed.png": "eeb56f8ad7d57a5b0b281934b3962647727443cd8fb30b16081c7ee255475189"
+  },
+  "manual_image_review": "All 7 screenshots individually opened and reviewed. Composite history is limited to the 3-day real supplier import; platform chart has longer native history. 780px desktop viewport is covered; physical touch/mobile devices not covered."
+}

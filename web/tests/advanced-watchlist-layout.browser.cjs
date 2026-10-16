@@ -71,6 +71,14 @@ const path = require('node:path');
       return {gap:plus.left-menu.right,top:Math.abs(plus.top-menu.top)};
     });
     assert(bounds.gap>=0&&bounds.gap<=8&&bounds.top<=2,'menu appears immediately left of +');
+    await page.setViewportSize({width:780,height:950});
+    await page.waitForTimeout(50);
+    const narrow=await page.evaluate(()=>{
+      const menu=document.querySelector('.columnsMenu-test').getBoundingClientRect();
+      const plus=document.querySelector('[aria-label="添加商品代码"]').getBoundingClientRect();
+      return {gap:plus.left-menu.right,top:Math.abs(plus.top-menu.top)};
+    });
+    assert(narrow.gap>=0&&narrow.gap<=8&&narrow.top<=2,'menu follows the toolbar after resize');
     await page.evaluate(() => layout.dispose());
     console.log('Watchlist numeric updates settle and retain live values, trailing zero and accessibility.');
   } finally { await browser.close(); }
