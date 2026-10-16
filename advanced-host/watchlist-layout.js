@@ -7,6 +7,7 @@
   const number = /[0-9]/;
   const moreLabel = /(更多|菜单|列|more|menu|options)/i;
   const addLabel = /(添加|加入|add|plus|\+)/i;
+  const internalName = /^(?:MW[CPH]:|(?:DUKA|YAHOO|NATIVE|MD|OANDA|BINANCE):)|^[a-f0-9]{32,64}$|^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i;
 
   function versionSupported() {
     try {
@@ -43,14 +44,20 @@
     return [...root.querySelectorAll('[data-symbol-full]')];
   }
 
-  function releaseHumanName(row) {
+  function releaseHumanName(row, getName) {
     const name = row.querySelector('[class*="symbolNameText-"]');
     if (!name) return;
     const value = (name.textContent || "").trim();
     // Every source/type shares this guard. These are routing identities, never
     // display codes, even after native marks a row "resolved" or shows a price.
-    const internal = /^(?:MW[CPH]:|(?:DUKA|YAHOO|NATIVE|MD|OANDA|BINANCE):)|^[a-f0-9]{32,64}$|^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i;
-    const ready = !!value && !internal.test(value);
+    const ready = !!value && !internalName.test(value);
+    const known = String(getName(row.dataset.symbolFull) || "").trim();
+    // Metadata belongs to this exact routing identity, and is already present
+    // at startup. Paint its real name without waiting for the first quote or
+    // replacing native React text. Reused rows must discard the old overlay.
+    if (!ready && known && !internalName.test(known)) {
+      if (name.dataset.mwDisplayName !== known) name.dataset.mwDisplayName = known;
+    } else if (name.hasAttribute("data-mw-display-name")) delete name.dataset.mwDisplayName;
     if (ready !== (row.dataset.mwNameReady === "true")) {
       if (ready) row.dataset.mwNameReady = "true";
       else delete row.dataset.mwNameReady;
@@ -174,7 +181,7 @@
     return true;
   }
 
-  function attach(widget, report = () => {}) {
+  function attach(widget, report = () => {}, getName = () => undefined) {
     const probe = widget?.createButton?.({align: "left", useTradingViewStyle: false});
     const doc = probe?.ownerDocument;
     if (probe) widget.removeButton(probe);
@@ -192,7 +199,7 @@
         moveMenu(root);
         const header = latestColumn(root);
         for (const row of rowCells(root)) {
-          releaseHumanName(row);
+          releaseHumanName(row, getName);
           wrapLastDigit(latestCell(row, header));
         }
       } catch (error) { report(error); }

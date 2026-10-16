@@ -840,9 +840,12 @@ function seriesPresentationRows(symbols) {
     const identity = decode(ticker);
     const meta = presentationFor(ticker);
     const shown = meta?.display_symbol || meta?.symbol || MWSeries.display(identity.symbol);
-    const base = meta?.source === 'yahoo' ? meta.name + " · " + shown + " · Yahoo 市场报价" : shown + (
-        identity.series_kind === 'provider' ? " · 平台原生行情" :
-        identity.series_kind === 'history' ? " · 固定历史" : " · 组合行情");
+    const base = meta?.source === 'yahoo' ? (meta.name || shown) + " · Yahoo 市场报价" +
+      (meta.delay_seconds > 0 ? " · 延迟 " + Math.floor(meta.delay_seconds / 60) + " 分钟" :
+        meta.delay_seconds === 0 ? " · 实时" : " · 延迟未知") :
+      identity.series_kind === 'provider' ? shown + " · 平台行情" + (meta?.price_description ? " · " + meta.price_description : "") :
+      identity.series_kind === 'history' ? (meta?.name || shown) + " · 固定历史" :
+      identity.series_kind === 'composite' ? (meta?.name || shown) + " · 组合行情" : shown + " · 自建行情";
     return meta ? [{s:"ok",n:ticker,v:{short_name:shown,description:base,description_base:base,
       market_session:"unknown",time_type:identity.series_kind === "history" ? "fixed_history" : null,
       exchange:meta.exchange || meta.source?.toUpperCase()}}].map(presentQuote) : [];
@@ -932,8 +935,17 @@ const feed = {
     if(presented.length) {
       // Give native details its resolved human name while the real market
       // snapshot loads. No price, change or quote time is invented here.
-      const named=seriesPresentationRows(presented);
-      if(named.length) setTimeout(()=>{if(quoteSubscriptions.get(id) === quoteSub) cb(named)},0);
+      setTimeout(()=>{
+        if(quoteSubscriptions.get(id) !== quoteSub) return;
+        // Selecting another row rebuilds native subscriptions. Do not replace
+        // an existing price/session with name-only metadata. Read at delivery
+        // time so a stream arrival or revision reset before this task wins.
+        const rows=presented.flatMap(ticker=>{
+          const snapshot=quoteSnapshotRows.get(ticker);
+          return snapshot ? [presentQuote(snapshot)] : seriesPresentationRows([ticker]);
+        });
+        if(rows.length) cb(rows);
+      },0);
       feed.getQuotes(presented,rows=>{
         if(quoteSubscriptions.get(id) !== quoteSub) return;
         // Keep the first snapshot beside streaming/polling rows so a timezone
@@ -999,6 +1011,7 @@ const feed = {
       symbolPresentations.set(ticker,meta);
       if (!symbolPresentations.has(symbol)) symbolPresentations.set(symbol,meta);
       while(symbolPresentations.size>250) symbolPresentations.delete(symbolPresentations.keys().next().value);
+      watchlistLayout?.refresh();
       cb({
         name: meta.display_symbol || meta.symbol || MWSeries.display(symbol),
         ticker,
@@ -2225,7 +2238,10 @@ function boot(
     .then(async () => {
       watchlistLayout?.dispose();
       watchlistLayout = globalThis.MWWatchlistLayout?.attach(widget, error =>
-        send({type: "diagnostic", source: "watchlist-layout", error: String(error)}));
+        send({type: "diagnostic", source: "watchlist-layout", error: String(error)}), ticker => {
+          const meta=presentationFor(ticker);
+          return meta?.display_symbol || meta?.symbol;
+        });
       if (!readonly) indicatorPicker = chartIndicatorPicker(widget, catalog, (e) =>
         send({type: "error", error: String(e)}), () => dataCenter?.nativeUi);
       // Public left-aligned buttons retain their creation order in the header.

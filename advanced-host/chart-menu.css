@@ -16,6 +16,10 @@
 [data-test-id-widget-type="watchlist"] [data-symbol-full][data-status="error"]:not([data-mw-name-ready="true"]) [class*="symbolNameText-"]::after {
   content: "不可用";
 }
+/* Use already resolved metadata immediately, even before a quote exists. */
+[data-test-id-widget-type="watchlist"] [data-symbol-full]:not([data-mw-name-ready="true"]) [class*="symbolNameText-"][data-mw-display-name]::after {
+  content: attr(data-mw-display-name);
+}
 /* Reserve a header slot through the supported custom_css_url integration.
    The symbol-search id is public library markup; no vendor node is moved. */
 #header-toolbar-symbol-search { margin-left: 52px; }

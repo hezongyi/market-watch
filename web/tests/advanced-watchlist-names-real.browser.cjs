@@ -10,8 +10,8 @@ fs.mkdirSync(out,{recursive:true});
     executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE,args:['--no-sandbox','--disable-dev-shm-usage']});
   const context=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width:1600,height:950}});
   const page=await context.newPage();
-  const flashes=[],errors=[],runs=[],samples=[];
-  let originalActive,tempId,outer,loadingCapture;
+  const flashes=[],errors=[],runs=[],samples=[],details=[];
+  let originalActive,originalSymbol,tempId,outer,loadingCapture;
   await page.exposeBinding('mwNameFrame',async(_,event)=>{
     if(event.bad.length)flashes.push(event);
     if(event.loading&&!loadingCapture){
@@ -32,13 +32,15 @@ fs.mkdirSync(out,{recursive:true});
       if(root){
         const rows=[...root.querySelectorAll('[data-symbol-full]')].filter(r=>r.getClientRects().length).map(r=>{
           const name=r.querySelector('[class*="symbolNameText-"]');
-          return {ticker:r.dataset.symbolFull,text:r.innerText,
-            loading:!!name&&name.ownerDocument.defaultView.getComputedStyle(name).visibility==='hidden'};
+          const style=name&&name.ownerDocument.defaultView.getComputedStyle(name);
+          const overlay=name&&name.ownerDocument.defaultView.getComputedStyle(name,'::after').content;
+          const display=style?.visibility==='hidden' ? (overlay?.startsWith('"') ? JSON.parse(overlay) : '') : name?.innerText;
+          return {ticker:r.dataset.symbolFull,text:r.innerText,display,loading:display==='加载中…'};
         });
         const encoded=JSON.stringify(rows);
         if(encoded!==previous){
           previous=encoded;const event={time:performance.now(),rows};timeline.push(event);
-          const bad=rows.filter(r=>internal.test(r.text));
+          const bad=rows.filter(r=>internal.test(r.text)||internal.test(r.display));
           if(bad.length||rows.some(r=>r.loading))window.mwNameFrame({...event,bad,loading:rows.some(r=>r.loading)}).catch(()=>{});
         }
       }
@@ -55,6 +57,7 @@ fs.mkdirSync(out,{recursive:true});
     throw Error('chart host missing');
   };
   const capture=async(label)=>{
+    console.log('Capture '+label);
     outer=await host();
     await outer.waitForFunction(()=>typeof ready!=='undefined'&&ready&&!loading&&widget.activeChart().dataReady(),null,{timeout:60000});
     await page.waitForTimeout(6000);
@@ -77,6 +80,38 @@ fs.mkdirSync(out,{recursive:true});
     await page.goto(base+'/advanced-charts');
     await capture('01-startup');
     await page.reload();await capture('02-reload');
+    originalSymbol=await outer.evaluate(()=>widget.activeChart().symbol());
+    await outer.evaluate(()=>{
+      window.__mwDetails=[];window.__mwQuoteCallbacks=[];
+      const subscribe=feed.subscribeQuotes;
+      feed.subscribeQuotes=(symbols,fast,callback,id)=>subscribe(symbols,fast,rows=>{
+        __mwQuoteCallbacks.push({time:performance.now(),id,rows:rows.map(r=>({n:r.n,s:r.s,
+          description:r.v?.description,lp:r.v?.lp,session:r.v?.market_session,read_at:r.v?.read_at}))});
+        callback(rows);
+      },id);
+      let previous='';const tick=()=>{
+        const root=document.querySelector('iframe')?.contentDocument?.querySelector('[data-test-id-widget-type="detail"]');
+        const text=root?.innerText||'';
+        if(text!==previous){previous=text;__mwDetails.push({time:performance.now(),text});}
+        requestAnimationFrame(tick);
+      };requestAnimationFrame(tick);
+    });
+    const native=outer.childFrames()[0];
+    for(let i=0;i<6;i++){
+      const symbol=i%2?'XAUUSD':'EURUSD';
+      console.log('Click details '+i+' '+symbol);
+      await native.locator('[data-test-id-widget-type="watchlist"] [data-symbol-full="MWP:'+symbol+'"]').click();
+      await native.locator('[data-test-id-widget-type="detail"]').filter({hasText:symbol+' · 平台行情'}).waitFor({timeout:15000});
+      await page.waitForTimeout(1800);
+      const price=await native.locator('[data-test-id-widget-type="detail"] [data-qa-id="details-element price"]').innerText();
+      assert(/\d/.test(price),'real detail price missing for '+symbol);
+      if(i<2)await page.screenshot({path:out+'/detail-'+symbol+'.png'});
+    }
+    details.push(await outer.evaluate(()=>({timeline:__mwDetails,callbacks:__mwQuoteCallbacks})));
+    assert(details[0].timeline.some(e=>e.text.includes('EURUSD · 平台行情')));
+    assert(details[0].timeline.some(e=>e.text.includes('XAUUSD · 平台行情')));
+    assert(!details[0].timeline.some(e=>e.text.includes('平台原生行情')),'details must never alternate provider wording');
+    assert(!details[0].callbacks.some(e=>e.rows.some(r=>r.description?.includes('平台原生行情'))));
     for(const [source,query] of [['oanda','EURUSD'],['dukascopy','GBPUSD'],['binance','BTCUSDT'],['yahoo','AAPL']]){
       const response=await page.request.get(base+'/api/market-data/series/page',{params:{kind:'provider',source,query,page_size:5}});
       assert.equal(response.status(),200);const data=await response.json();
@@ -117,11 +152,17 @@ fs.mkdirSync(out,{recursive:true});
         'actual supplier quote missing: '+source);
     }
     assert(runs.every(r=>r.frames.some(f=>f.timeline.some(t=>t.rows.length))), 'every run must observe painted rows');
+    for(const run of runs.filter(r=>['01-startup','02-reload','05-mixed-reload'].includes(r.label))){
+      const first=run.frames.flatMap(f=>f.timeline).find(t=>t.rows.length);
+      assert(first.rows.every(r=>r.display&&!r.loading),'prewarmed names must display on the first painted frame: '+run.label);
+    }
     assert.equal(flashes.length,0,'visible internal identity in a painted frame');
     assert.equal(errors.length,0,errors.join('\n'));
-    console.log('PASS: four real suppliers, provider/history/composite/legacy managed; startup, reload, switch and add; no internal ticker frames.');
+    console.log('PASS: real suppliers and series names, direct prewarmed first paint, six OANDA detail clicks with stable wording.');
   }finally{
     let restoreError;
+    if(outer&&!details.length)details.push(await outer.evaluate(()=>({timeline:window.__mwDetails||[],
+      callbacks:window.__mwQuoteCallbacks||[]})).catch(()=>({timeline:[],callbacks:[]})));
     if(tempId){
       outer=await host().catch(()=>null);
       if(outer)await outer.evaluate(async({id,active})=>{
@@ -132,8 +173,10 @@ fs.mkdirSync(out,{recursive:true});
       else {restoreError=Error('chart host unavailable during list restoration');errors.push(restoreError.message);}
       await page.waitForTimeout(1000);
     }
+    if(outer&&originalSymbol)await outer.evaluate(symbol=>widget.activeChart().setSymbol(symbol),originalSymbol)
+      .catch(e=>{restoreError=e;errors.push('restore symbol: '+e.message)});
     await loadingCapture;
-    fs.writeFileSync(out+'/result.json',JSON.stringify({samples,runs,flashes,errors},null,2));
+    fs.writeFileSync(out+'/result.json',JSON.stringify({samples,runs,details,flashes,errors},null,2));
     await context.close();await browser.close();
     if(restoreError)throw restoreError;
   }

@@ -40,9 +40,16 @@ const path = require('node:path');
     });
     await page.addScriptTag({path:path.resolve(__dirname,'../../advanced-host/watchlist-layout.js')});
     await page.evaluate(() => {
-      window.layout=MWWatchlistLayout.attach({createButton:()=>document.createElement('button'),removeButton(){}},e=>{throw e});
+      window.knownNames=new Map();
+      const rows=[...document.querySelectorAll('[data-symbol-full]')];
+      window.knownNames.set(rows[0].dataset.symbolFull,'EURUSD');
+      window.knownNames.set(rows[1].dataset.symbolFull,'EURUSD');
+      window.knownNames.set(rows[2].dataset.symbolFull,'GBPUSD');
+      window.layout=MWWatchlistLayout.attach({createButton:()=>document.createElement('button'),removeButton(){}},e=>{throw e},ticker=>knownNames.get(ticker));
     });
     assert.equal((await names()).at(-1).visibility,'visible','readable platform code is released without a quote');
+    assert.deepEqual((await names()).slice(0,3).map(r=>r.placeholder),['"EURUSD"','"EURUSD"','"GBPUSD"'],
+      'already resolved names display immediately, independently of the first quote');
     const change = async (index, text) => page.evaluate(({index,text}) => {
       const row=document.querySelectorAll('[data-symbol-full]')[index];
       row.dataset.symbolShort=text; row.querySelector('.symbolNameText-test').textContent=text;
@@ -67,6 +74,12 @@ const path = require('node:path');
     });
     await page.waitForTimeout(30);
     assert.equal((await names())[2].visibility,'hidden');
+    assert.equal((await names())[2].placeholder,'"加载中…"','reused identities cannot retain an old metadata name');
+    await page.evaluate(() => {
+      const row=document.querySelectorAll('[data-symbol-full]')[2];
+      knownNames.set(row.dataset.symbolFull,'USDJPY');layout.refresh();
+    });
+    assert.equal((await names())[2].placeholder,'"USDJPY"','new metadata releases the actual name before any quote');
     assert.equal(await page.locator('.last-test').first().innerText(),'1.12250','name guard leaves quotes intact');
     await page.evaluate(() => layout.dispose());
     console.log('Watchlist names are safe before startup, after resolution and during list rebuilds.');

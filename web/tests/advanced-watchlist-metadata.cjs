@@ -26,6 +26,34 @@ for(const file of ['series.js','price-format.js','composite-display-batches.js',
   assert.deepEqual(Array.from(context.rows,r=>r.v.short_name),['EURUSD','BTCUSDT','GBPUSD','AAPL','GBPUSD','EURUSD','EURUSD']);
   assert(context.rows.every(r=>r.v.lp===undefined&&r.v.ch===undefined),'metadata never invents prices');
   assert.deepEqual(Array.from(context.rows,r=>r.n),Array.from(context.tickers),'routing identities are unchanged');
+  assert.equal(context.rows[0].v.description,'EURUSD · 平台行情',
+    'initial provider description agrees with the actual quote description');
+  assert.equal(context.rows[4].v.description,'GBPUSD · 自建行情',
+    'legacy managed metadata must not be mislabeled as a composite');
+  vm.runInContext(`
+    globalThis.cached=[];globalThis.arriving=[];globalThis.reset=[];globalThis.cancelled=[];
+    const cachedQuote={s:'ok',n:tickers[0],v:{short_name:'EURUSD',description:'EURUSD · 平台行情',
+      lp:1.12345,read_at:100,market_session:'open',fetch_status:'ok',time_type:'source_m1',
+      data_start:100,revision_id:'current'}};
+    rememberQuoteRows([cachedQuote]);
+    feed.subscribeQuotes([tickers[0]],[],batch=>cached.push(...batch),'cached');
+    feed.subscribeQuotes([tickers[1]],[],batch=>arriving.push(...batch),'arriving');
+    rememberQuoteRows([{...cachedQuote,n:tickers[1],v:{...cachedQuote.v,short_name:'BTCUSDT',lp:65000}}]);
+    feed.subscribeQuotes([tickers[2]],[],batch=>reset.push(...batch),'reset');
+    rememberQuoteRows([{...cachedQuote,n:tickers[2]}]);
+    // A revision reset removes the previous binding before the async callback.
+    quoteSnapshotRows.delete(tickers[2]);quoteResetTokens.set(tickers[2],{});
+    feed.subscribeQuotes([tickers[0]],[],batch=>cancelled.push(...batch),'cancelled');
+    feed.unsubscribeQuotes('cancelled');
+  `,context);
+  await new Promise(resolve=>setTimeout(resolve,15));
+  assert.equal(context.cached.length,1);
+  assert.equal(context.cached[0].v.lp,1.12345,'resubscription keeps the existing real price');
+  assert.equal(context.cached[0].v.market_session,'open','resubscription keeps the actual session');
+  assert.equal(context.cached[0].v.revision_id,'current','resubscription keeps the current binding');
+  assert.equal(context.arriving[0].v.lp,65000,'a stream arriving before the async callback wins over metadata');
+  assert.equal(context.reset[0].v.lp,undefined,'a reset cannot replay the removed price');
+  assert.equal(context.cancelled.length,0,'removed subscriptions receive no delayed presentation');
   console.log('All source/type metadata supplies human names without inventing quotes.');
 })().catch(e=>{console.error(e);process.exitCode=1}).finally(()=>{
   for(const entry of vm.runInContext('[...pending.values()]',context)){
