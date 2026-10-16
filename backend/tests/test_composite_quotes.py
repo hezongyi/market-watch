@@ -232,3 +232,22 @@ def test_watchlist_http_presents_composite_change_fields_from_same_revision(data
         assert quote["v"]["chp"] == float("12.3456789012345678")
     finally:
         api.app.dependency_overrides.clear()
+
+
+def test_watchlist_http_keeps_latest_price_without_unverified_change(database, monkeypatch):
+    composite_id, revision_id, _ = populated(database, monkeypatch)
+    stamp = 200010000
+    quote_state(database, revision_id, stamp)
+    monkeypatch.setattr(composite_quotes, "now_ms", lambda: stamp)
+    monkeypatch.setattr(composite_quotes, "previous_close", lambda *args, **kwargs: None)
+    api.app.dependency_overrides[api.authenticated] = lambda: "test"
+    try:
+        with TestClient(api.app) as client:
+            quote = client.post(
+                "/api/market-data/quotes",
+                json={"symbols": [encode(composite_id, "composite")]},
+            ).json()[0]
+        assert quote["v"]["lp"] == float("1.123456789012345678")
+        assert all(key not in quote["v"] for key in ("ch", "chp", "prev_close_price"))
+    finally:
+        api.app.dependency_overrides.clear()
