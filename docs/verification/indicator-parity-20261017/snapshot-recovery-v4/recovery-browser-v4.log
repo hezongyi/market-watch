@@ -1,0 +1,26 @@
+Console output:
+[log] {
+  held: {
+    token: '68bd8cc387d0be7a2911a60fd229989deb2c0eeb971f8edca941ede4442b2175',
+    revision: '4b9990c6-a496-4c86-9a58-5d4196833169',
+    instrument: '2bcbc81d8e0e33b2318774f24638e2327448c8d3ecae8d190915cb94b50f637b',
+    kind: 'composite',
+    timeframe: 'M1',
+    period: 131
+  },
+  before: {
+    key: 'MWC:2bcbc81d8e0e33b2318774f24638e2327448c8d3ecae8d190915cb94b50f637b|1',
+    token: '68bd8cc387d0be7a2911a60fd229989deb2c0eeb971f8edca941ede4442b2175',
+    revision: '4b9990c6-a496-4c86-9a58-5d4196833169',
+    previousToken: undefined,
+    previousState: undefined,
+    readyForSameToken: false,
+    at: 1792228613558
+  }
+}
+
+Traceback (most recent call last):
+  File "/tmp/mw-issue74-20261017/run-recovery-v4.py", line 26, in <module>
+    assert re.fullmatch('[a-f0-9]{64}',held['revision'])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

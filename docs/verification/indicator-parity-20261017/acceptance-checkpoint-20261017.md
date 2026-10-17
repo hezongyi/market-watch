@@ -1,13 +1,13 @@
 # Candidate acceptance checkpoint
 
-Status at 2026-10-17 08:50 UTC: **incomplete; Issue #74 is not accepted**.
+Status at 2026-10-17 09:22 UTC: **incomplete; Issue #74 is not accepted**.
 
 ## Candidate and environment
 
-- Code candidate `21c386e`, baseline `99124bb`, branch `feat/issue74-indicator-parity-20261017`.
-- Ubuntu local Docker project `mw-issue74-20261017`; no production services or other projects changed.
-- API/indicator worker: `market-watch-api:issue74-execution-v4`, product code `0216995`. Later commits contain acceptance/test changes only.
-- Chart origin: `market-watch-chart-origin:issue74-execution-v2`, code `340d634`; no subsequent chart product-code change.
+- Current code candidate `d56ffff`, baseline `99124bb`, branch `feat/issue74-indicator-parity-20261017`. The strict performance matrix below remains pinned to its original candidate `21c386e`; the later chart recovery changes have separate functional evidence only.
+- Ubuntu local host `quant-server`, Docker project `mw-issue74-20261017`; no production services or other projects changed.
+- API/indicator worker: `market-watch-api:issue74-execution-v4`, product code `0216995`.
+- Chart origin: `market-watch-chart-origin:issue74-recovery-v4`, code `d56ffff`; built through the required task-labelled Ubuntu entrypoint and replaced only this task's chart service.
 - App: `https://127.0.0.1:18474/advanced-charts`; chart origin `https://127.0.0.1:17475`.
 - Same task quotas: API 1 CPU/768 MiB, worker 1 CPU/512 MiB, PostgreSQL 0.5 CPU/384 MiB. Normal GC and worker retained; no diagnostic probes mounted.
 - Start: `docker compose -p mw-issue74-20261017 -f /tmp/mw-issue74-20261017/compose.json up -d`.
@@ -20,11 +20,11 @@ The host full-suite attempt was not clean: 1,893 passed, 551 skipped, 70 failed 
 
 The dependency-complete container attempt uses a separate task-owned logical database, `issue74_fullchecks_20261017`, with per-test schemas, never the app acceptance database. Additional read-only repository test scripts had to be copied into the API container because the production image does not package all test tooling. The broad run was interrupted for failure triage after **945 passed, 10 skipped, 4 failed** (636.59 seconds). Two failures lacked script files; two older-schema tests needed to account for the new demand foreign keys. Both script files were supplied, both migration fixtures corrected, and all four tests were included in the subsequent **64 passed** focused run (130.42 seconds). That run also covers real PostgreSQL demand cancellation/capacity and migration checks. This is not a claim that the entire suite passed.
 
-Independent Standards/Spec review through `21c386e` found no confirmed new product runtime regression or hard repository-rule violation. The earlier reusable-hit input-cardinality finding is fixed. A defensive gap treating durable HTTP work of zero as proof of a short worker suffix now has a reproducing negative check and a fail-closed fix (`212c0ce`). The final incremental reviewers reported no additional findings; static review does not replace acceptance.
+Independent Standards/Spec review through `21c386e` found no confirmed new product runtime regression or hard repository-rule violation. The earlier reusable-hit input-cardinality finding is fixed. A defensive gap treating durable HTTP work of zero as proof of a short worker suffix now has a reproducing negative check and a fail-closed fix (`212c0ce`). The subsequent recovery review found a P2 cross-generation stale-error gap; `d56ffff` fixes it with a red/green lifecycle regression. Both reviewers confirmed that fix without new findings. The completion audit's overnamed boolean is explicitly limited to a pre-commit marker, not proof of publication. Static review does not replace acceptance.
 
 ## Latest real Playwriter exploration
 
-Playwriter session 3, actual Chromium 153, after real app reload against the current isolated candidate. No tests/build/seed process ran during these operations. All use `execution-evidence-v2`, exact series identity, actual submitted calculation evidence and native rendering after two animation frames.
+Playwriter session 3, actual Chromium 153, after real app reload against the original performance candidate `21c386e` (chart `340d634`). No tests/build/seed process ran during these operations. All use `execution-evidence-v2`, exact series identity, actual submitted calculation evidence and native rendering after two animation frames.
 
 | Predeclared scenario | n | Operation failures | First / coverage / canonical ms | Interpretation |
 | --- | --- | --- | --- | --- |
@@ -64,4 +64,6 @@ The harness records 64 failed samples: 60 input-cardinality evidence rejections,
 
 ## Snapshot recovery follow-up
 
-The exact retained composite request currently returns HTTP 422 `DISPLAY_SNAPSHOT_EXPIRED`. A separate lifecycle regression then reproduced a concrete recovery defect: unchanged prices may renew the same content-addressed token; after its next expiry, the previous completed recovery Promise suppressed another price refresh. The real bridge-function regression failed with four reload attempts where five were required. The candidate fix allows a new recovery when that token is still bound, while continuing to ignore delayed errors for a token replaced by newer prices. The regression and the adjacent coordinator/batch checks pass. A candidate chart build and real Playwriter expired-token recovery still need verification; this is not yet claimed as the explanation or fix for every original timeout.
+The retained composite request returned HTTP 422 `DISPLAY_SNAPSHOT_EXPIRED`. The lifecycle regression reproduced two concrete defects: a completed recovery suppressed a later expiry of the same renewed content-addressed token (four attempts instead of five), and an error for A could reset current prices C after a recovery for B (seven attempts instead of six). Both now pass, alongside the adjacent coordinator/batch checks. CI includes the lifecycle regression.
+
+After a required Ubuntu chart build and real app reload, [three Playwriter functional cycles](snapshot-recovery-v4/README.md) each observed an actual server 422, parent-price reread and finite current-parameter native coverage matching backend execution authority. The third explicitly expired the same already-ready token again. A separate real bridge HTTP request using obsolete A with previous recovery B and active C confirmed no new recovery entry, subscription-generation change, native-result change or parent-price reload. Its request is intentionally obsolete rather than a physically delayed in-flight response. Earlier harness failures remain archived. These checks neither replace the original failures nor establish that all original timeouts have the same cause; full latency and A1–A16 acceptance remain incomplete.
