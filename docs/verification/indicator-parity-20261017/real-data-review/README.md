@@ -1,5 +1,7 @@
 # 真实 Dukascopy 数据 Playwriter 复验
 
+**后续归因更正：** 用户人工验收确认数据返回后的 Supertrend 绘制和改参体验可接受，窗口加载 bar 的慢点不在本轮处理范围。核对同一样本发现，首次切黄金10.7秒中，窗口history-load结果到约9.9秒才返回，Supertrend在接受计算输入后约110毫秒提交。下文秒级总耗时和EMA500现象保留，但撤下将它们直接作为指标性能/同输入计算一致性阻塞的优先级结论；详见[范围与时间线复核](../scope-attribution-20261017.md)。原始数据、旧标准下失败和CI状态均未改判。
+
 2026-10-17，Ubuntu `quant-server`、独立 Docker project `mw-issue74-20261017`，实际应用 `https://127.0.0.1:18474/advanced-charts`，chart origin `https://127.0.0.1:17475`，Playwriter session 3。API/indicator worker 产品源码 `0216995`，图表源码 `d56ffff`，仓库取证基线 `df0d9eb`。**Issue #74 仍未整体验收通过。**
 
 本轮通过真实 UI 搜索并选择 Dukascopy EUR/USD、添加 EMA；其余 study、改参、周期及品种切换使用实际页面的原生公开 SDK，由 Playwriter 执行。布局复制、命名和保存通过原生 UI，随后真实页面 reload。真实品种是 `DUKA:9105c84af42600ccfa4f03132cc2472b`（EUR/USD）和 `DUKA:c2893271b856e9d2550cadc243bdf793`（XAU/USD）。这些 ID 未由合成 provider writer 写入。本任务的旧 BTCUSDT M1/H1 fixture writer 仍保留，旧自建/组合数据也仍是 fixture；它们不属于此次真实数据证据。
