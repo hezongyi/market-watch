@@ -1,5 +1,7 @@
 # 真实 Dukascopy 数据 Playwriter 复验
 
+**最新核实结论：** [同快照专项对照](../provider-origin-verification/README.md)进一步确认，旧起点使已经可用的更早历史不参与计算，535根相同可见价格下仍只算218根、EMA500全空；移除旧起点约束后读取既有7,806根并得到535个有限结果。该依赖更新/重新初始化行为需要修复，仍属指标功能；不是相同输入算法错值，也不要求优化窗口bar获取速度。
+
 **后续归因更正：** 用户人工验收确认数据返回后的 Supertrend 绘制和改参体验可接受，窗口加载 bar 的慢点不在本轮处理范围。核对同一样本发现，首次切黄金10.7秒中，窗口history-load结果到约9.9秒才返回，Supertrend在接受计算输入后约110毫秒提交。下文秒级总耗时和EMA500现象保留，但撤下将它们直接作为指标性能/同输入计算一致性阻塞的优先级结论；详见[范围与时间线复核](../scope-attribution-20261017.md)。原始数据、旧标准下失败和CI状态均未改判。
 
 2026-10-17，Ubuntu `quant-server`、独立 Docker project `mw-issue74-20261017`，实际应用 `https://127.0.0.1:18474/advanced-charts`，chart origin `https://127.0.0.1:17475`，Playwriter session 3。API/indicator worker 产品源码 `0216995`，图表源码 `d56ffff`，仓库取证基线 `df0d9eb`。**Issue #74 仍未整体验收通过。**
