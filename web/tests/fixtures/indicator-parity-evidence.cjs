@@ -8,6 +8,19 @@ const itemsFor=(responses,study)=>responses.flatMap(response=>(response.indicato
   .filter(item=>item.name===study.name && stable(item.params)===stable(study.params))
   .map(item=>({response,item})));
 
+function capturePage(query,page,status,at,http){
+  return {at,status,http,timings:page.timings_ms,bars:page.bars?.length,
+    query:Object.fromEntries(['instrument','series_kind','timeframe','indicators','before','limit',
+      'provider_snapshot_id','display_snapshot_id'].map(key=>[key,query[key]])),
+    page:Object.fromEntries(['series_kind','timeframe','origin','calculation_origin','revision_id',
+      'input_revision','cache_revision','revision','history_revision','provider_snapshot_id',
+      'display_snapshot_id','dependency_revision'].map(key=>[key,page[key]])),
+    sourceRows:page.bars?.map(bar=>({start:bar.start,end:bar.end,chart_time:bar.chart_time})),
+    indicators:page.indicators?.map(item=>({name:item.name,params:item.params,calculation:item.calculation,
+      plots:item.series?.map(plot=>({key:plot.key,count:plot.values.length,
+        finite:plot.values.filter(point=>Number.isFinite(point.value)).length}))}))};
+}
+
 function matchAuthority(commit,responses,study,kind){
   const identity=commit?.identity;
   if(!identity || identity.algorithmVersion!==study.name+':1' || !commit.executionEvidence?.length ||
@@ -79,4 +92,4 @@ function validatePreparation(config,responses,study,retainedCommit){
   return {valid:true,observedPrefixRows:rows};
 }
 
-module.exports={matchAuthority,validatePreparation};
+module.exports={capturePage,matchAuthority,validatePreparation};

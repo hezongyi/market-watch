@@ -126,6 +126,13 @@ def test_long_prefix_keeps_real_pending_progress_without_approximation(database,
     fallback = data_sync(query(version, {"name": "EMA", "params": {"period": 500}}))
     assert not fallback["indicators"][0]["calculation"]["visible_complete"]
     assert fallback["indicators"][0]["series"][0]["values"] == []
+    progress = fallback['indicators'][0]['calculation']
+    assert progress['execution'] == {'path': 'durable-fixed', 'input_rows': 301,
+                                    'result_cache': 'miss', 'calculation_steps': 0}
+    drain(progress['run_id'])
+    completed = data_sync(query(version, {"name": "EMA", "params": {"period": 500}}))
+    execution = completed['indicators'][0]['calculation']['execution']
+    assert execution['input_rows'] == 301 and execution['result_cache'] == 'hit'
 
 
 def test_math_runs_after_database_transaction_closes(database, monkeypatch):

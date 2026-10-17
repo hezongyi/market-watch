@@ -4,7 +4,7 @@
 const fs=require('node:fs'),assert=require('assert').strict;
 const evidenceModule={exports:{}};
 new Function('module',fs.readFileSync('web/tests/fixtures/indicator-parity-evidence.cjs','utf8'))(evidenceModule);
-const {matchAuthority}=evidenceModule.exports;
+const {capturePage,matchAuthority}=evidenceModule.exports;
 const budgets=JSON.parse(fs.readFileSync('web/tests/fixtures/indicator-parity-budgets.json','utf8'));
 const config=state.layout,budget=budgets.scenarios[config?.scenario];
 assert.ok(config && budget && ['warm-layout','cold-local','cold-provider'].includes(config.scenario));
@@ -52,10 +52,7 @@ const capture=response=>{
   const task=(async()=>{
     try{
       const page=await response.json();
-      responses.push({at:Date.now(),status:response.status(),query:{instrument:query.instrument,series_kind:query.series_kind,timeframe:query.timeframe,indicators:query.indicators},
-        page:Object.fromEntries(['series_kind','timeframe','origin','calculation_origin','revision_id','input_revision','cache_revision','revision','history_revision','provider_snapshot_id','display_snapshot_id','dependency_revision'].map(key=>[key,page[key]])),
-        sourceRows:page.bars?.map(bar=>({start:bar.start,end:bar.end,chart_time:bar.chart_time})),http:response.request().timing(),bars:page.bars?.length,
-        indicators:page.indicators?.map(item=>({name:item.name,params:item.params,calculation:item.calculation}))});
+      responses.push(capturePage(query,page,response.status(),Date.now(),response.request().timing()));
     }catch(error){responses.push({at:Date.now(),status:response.status(),error:String(error)});}
   })();
   pending.add(task);task.finally(()=>pending.delete(task));

@@ -20,7 +20,7 @@ from .provider_indicator_inputs import (
     _entry,
     _prune,
 )
-from .storage import DisplaySnapshot, FixedIndicatorRun
+from .storage import DisplaySnapshot, FixedIndicatorRun, now_ms
 
 MAX_FOREGROUND_ROWS = 6000
 
@@ -81,6 +81,7 @@ def prepare(db, page, body):
 
 def complete(page, prepared):
     """Called after checkin: current-spec values plus separate durable progress."""
+    input_accepted_at = now_ms()
     for item, run, frozen, phase, profiles, seam, hit in prepared:
         key = ("fixed-display-result", frozen.identity, run.algorithm, json.dumps(run.spec, sort_keys=True))
         entry = _entry(_RESULTS, key, MAX_VALUES)
@@ -107,5 +108,6 @@ def complete(page, prepared):
             execution={"path": "bounded-fixed-replay", "input_cache": "hit" if hit else "miss",
                        "result_cache": "hit" if result_hit else "miss",
                        "input_rows": len(frozen.rows), "calculation_steps": 0 if result_hit else len(frozen.rows),
+                       "input_accepted_at_ms": input_accepted_at,
                        "calculation_ms": round((perf_counter()-started)*1000, 2)})
     return page

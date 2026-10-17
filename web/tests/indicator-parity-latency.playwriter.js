@@ -5,7 +5,7 @@ const assert = require('assert').strict;
 const budgets = JSON.parse(fs.readFileSync('web/tests/fixtures/indicator-parity-budgets.json','utf8'));
 const evidenceModule={exports:{}};
 new Function('module',fs.readFileSync('web/tests/fixtures/indicator-parity-evidence.cjs','utf8'))(evidenceModule);
-const {matchAuthority,validatePreparation}=evidenceModule.exports;
+const {capturePage,matchAuthority,validatePreparation}=evidenceModule.exports;
 const config = state.latency;
 assert.ok(config, 'declare state.latency before measuring');
 const budget = budgets.scenarios[config.scenario];
@@ -35,13 +35,7 @@ const capture = response => {
   const task=(async()=>{
     try {
       const page=await response.json();
-      responses.push({at:Date.now(),status:response.status(),query:{instrument:query.instrument,series_kind:query.series_kind,
-        timeframe:query.timeframe,indicators:query.indicators,before:query.before,limit:query.limit,provider_snapshot_id:query.provider_snapshot_id,display_snapshot_id:query.display_snapshot_id},
-        page:Object.fromEntries(['series_kind','timeframe','origin','calculation_origin','revision_id','input_revision','cache_revision','revision','history_revision','provider_snapshot_id','display_snapshot_id','dependency_revision'].map(key=>[key,page[key]])),
-        sourceRows:page.bars?.map(bar=>({start:bar.start,end:bar.end,chart_time:bar.chart_time})),
-        http:response.request().timing(),timings:page.timings_ms,bars:page.bars?.length,
-        indicators:page.indicators?.map(item=>({name:item.name,params:item.params,calculation:item.calculation,
-          plots:item.series?.map(plot=>({key:plot.key,count:plot.values.length,finite:plot.values.filter(point=>Number.isFinite(point.value)).length}))}))});
+      responses.push(capturePage(query,page,response.status(),Date.now(),response.request().timing()));
     }catch(error){responses.push({at:Date.now(),status:response.status(),error:String(error)});}
   })();
   pending.add(task);task.finally(()=>pending.delete(task));
@@ -140,9 +134,13 @@ try {
       const preparation=browserReuse ? validatePreparation(config,warmupRequests,study,result.covered) :
         validatePreparation(config,measured,study);
       assert.ok(preparation.valid,preparation.reason);
+      const acceptedTimes=authority.executions.map(execution=>execution.calculation.execution?.input_accepted_at_ms);
+      const inputAcceptedAt=acceptedTimes.every(Number.isFinite) ? Math.max(...acceptedTimes) : null;
       samples.push({index:index+1,params:spec.params,...result,authority,preparation,
         canonicalMs:authority.canonicalAt-environment.timeOrigin-operation.at,
-        T_input_first:null,inputTimingReason:'full prefix acceptance not instrumented; user total retained',
+        T_input_first:inputAcceptedAt!==null && result.first ? result.first.epochAt-inputAcceptedAt : null,
+        inputAcceptedAt,inputTimingReason:inputAcceptedAt===null ? 'durable paged input acceptance not instrumented' :
+          'backend frozen prefix and legal seed admitted before computation; browser and API use the same Ubuntu host clock; retained reuse includes time since original acceptance',
         noFiniteOutput:result.ms===null,requests:measured,warmupRequests});
     }catch(cause){error=String(cause);samples.push({index:index+1,params:spec.params,ms:null,coverageMs:null,canonicalMs:null,error,
       requests:responses.slice(warmupStart)});}

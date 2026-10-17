@@ -327,6 +327,12 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='di
     results, progress, display_errors, restarted = [], [], [], {}
     if not page["bars"]:
         return results, progress
+    artifact_rows = None
+    if not page.get('revision_id'):
+        from .history_artifacts import published_artifact
+
+        artifact_rows = published_artifact(db, page.get('history_version_id', page.get('version_id')),
+                                           page['timeframe']).count
     for spec in specs:
         run = request(db, page, spec, stamp=stamp)
         start, end = page["bars"][0]["start"], page["bars"][-1]["end"]
@@ -338,6 +344,11 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='di
             "cursor": run.cursor, "target_end": run.target_end, "input_revision": run.input_revision,
             "algorithm": run.algorithm, "error": run.error, "next_at": run.next_at,
             "parent_run_id": run.parent_id, "reused_prefix_end": run.prefix_end}
+        if artifact_rows is not None:
+            status['execution'] = {'path': 'durable-fixed', 'input_rows': artifact_rows,
+                'result_cache': 'hit' if run.status == 'complete' else
+                    'checkpoint' if run.cursor > page['origin'] or run.parent_id else 'miss',
+                'calculation_steps': 0}
         display = None
         if run.spec["name"] == "SWING_SR_V1":
             from .swing_sr import SwingState
