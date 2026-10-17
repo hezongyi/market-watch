@@ -52,4 +52,8 @@ Object.assign(hit.indicators[0].calculation.execution,{calculation_steps:0,check
 assert.equal(validatePreparation(reusable,[hit],study).valid,true);
 const suffix=clone(hit);Object.assign(suffix.indicators[0].calculation.execution,{result_cache:'checkpoint',calculation_steps:513});
 assert.equal(validatePreparation(reusable,[suffix],study).valid,false);
+const durable=clone(hit);
+durable.indicators[0].calculation.execution={path:'durable-fixed',input_rows:100,result_cache:'checkpoint',calculation_steps:0};
+assert.equal(validatePreparation(reusable,[durable],study).valid,false,
+  'HTTP work of zero cannot prove a bounded durable-worker suffix');
 console.log('PASS parity evidence: execution/snapshot/revision/origin/coverage and cache preparation fences');

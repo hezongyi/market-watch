@@ -83,7 +83,8 @@ function validatePreparation(config,responses,study,retainedCommit){
     if(retainedCommit && matchAuthority(retainedCommit,responses,study,config.kind).complete)
       return {valid:true,cache:'browser-shared-result',verifiedWarmupExecution:true,observedPrefixRows:rows};
     if(executions.some(execution=>execution.result_cache!=='hit' &&
-      !(execution.result_cache==='checkpoint' && execution.calculation_steps<=512)))
+      !(execution.result_cache==='checkpoint' && execution.path!=='durable-fixed' &&
+        Number.isInteger(execution.calculation_steps) && execution.calculation_steps>=0 && execution.calculation_steps<=512)))
       return {valid:false,reason:'reusable result/checkpoint was not observed'};
   }else if(executions[0]?.result_cache!=='miss' || executions[0]?.checkpoint_index>0){
     // Retries within this operation may reuse work that its first miss created.
