@@ -2,6 +2,8 @@
 
 Status: in progress. No implementation or SLO completion is claimed.
 
+Latest running-candidate status and test/browser limits: [2026-10-17 acceptance checkpoint](acceptance-checkpoint-20261017.md). This supersedes older deployment/status statements below; historical measurements remain unchanged.
+
 ## Authority and boundaries
 
 - User: implement all of #74 on the latest baseline; ignore unrelated baseline blockers; use Playwriter for browser acceptance.

@@ -1,0 +1,16 @@
+# Strict execution-evidence matrix
+
+These immutable records come from the actual Ubuntu app through Playwriter, Chromium 153, native study rendering after two animation frames, and exact backend execution/snapshot/revision/coverage matching. Candidate `21c386e`; API product code `0216995`; chart product code `340d634`. Later fixes need their own named evidence. Data is synthetic; provider inputs are written to a local cache, not acquired from an upstream provider.
+
+`manifest.json` pins both the original bytes and the stored files. Fifty latency JSON records are gzip-compressed without modifying their content: 39 loaded/long groups, eight layout groups, three n=1 explorations. Plans, summaries, runners, a read-only completion audit and the expired-snapshot replay are retained beside them. Decompress with `gzip -dc FILE.json.gz`.
+
+## Results and limits
+
+- Loaded/long: 39 groups x30 operations, 30 passing three-latency verdicts and nine nonpassing groups. All 64 rejected samples remain: three HTTP 422/timeouts, 60 composite durable-cache preparation-evidence failures, one declared new SMA spec that was actually cached. Four other groups exceed first-value latency; one managed Swing group has legal complete-null output and no finite first value. See [checkpoint](../../acceptance-checkpoint-20261017.md) for the individual classifications.
+- Exact long-origin EMA: 20,160 rows, 30 misses, zero errors, first/coverage/canonical p95 3,268.4 ms. Exact long Supertrend: same prefix size, 30 misses, zero errors, p95 2,442 ms. The foreground ceiling remains 6,000 rows.
+- Layouts: four kinds x warm/cold-local x30. No complete layout group passes all targets. History/managed/provider warm first p95 1,095/749/1,189 ms. Managed cold first p95 2,425 ms. Six cold failures came from the harness asserting before the iframe's first navigation; composite warm has three distinct 5-second waits with no captured indicator request. These records are preserved; neither category is silently dropped.
+- Replaying the retained composite request with the real app session/CSRF credential established HTTP 422 `DISPLAY_SNAPSHOT_EXPIRED`. The replay artifact contains the query and error, never login/session credentials. Its later expiry proves this failure condition, not that every original timeout has the same recovery cause.
+- The history audit observes 636 referenced runs complete. `updated_at` records the worker completion marker before its transaction commit; retained complete HTTP receipts or the read-only PostgreSQL observation bound publication above. These intervals are separate from visible rendering. Failed samples without an operation-start timestamp remain unmeasured; no durable input-acceptance timestamp is inferred.
+- Missing durable/layout input timing, completed-run composite input cardinality, composite recovery/pressure evidence and remaining A1-A16 coverage prevent overall acceptance. A `passed:true` here applies only to that group's three measured latency budgets and required harness predicates, not to the whole Issue.
+
+The original matrix-v1 diagnostic files and all earlier failures remain unchanged. There is no performance rerun chosen for a faster result in this matrix.
