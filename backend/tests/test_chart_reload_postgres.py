@@ -161,7 +161,7 @@ def test_additive_display_migrations_roundtrip_and_preserve_observations(provide
     from alembic.operations import Operations
     from sqlalchemy import inspect
     modules = []
-    for name in ['at47_display_observations', 'au48_display_indicator_tasks']:
+    for name in ['at47_display_observations', 'au48_display_indicator_tasks', 'av49_indicator_demands']:
         path = Path(__file__).resolve().parents[2] / ('migrations/versions/' + name + '.py')
         spec = importlib.util.spec_from_file_location(name, path)
         module = importlib.util.module_from_spec(spec)
@@ -178,6 +178,7 @@ def test_additive_display_migrations_roundtrip_and_preserve_observations(provide
         assert inspect(conn).has_table('market_observed_minutes')
         assert inspect(conn).has_table('market_display_snapshots')
         assert inspect(conn).has_table('market_display_indicator_tasks')
+        assert inspect(conn).has_table('market_indicator_demands')
     retained(provider_pg[0], monkeypatch, 'minute_rollover', False)
     with provider_pg[1].begin() as conn:
         modules[0].op = Operations(MigrationContext.configure(conn))
