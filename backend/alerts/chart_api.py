@@ -91,6 +91,35 @@ class NativeReserve(BaseModel):
     warmup_bars: int = Field(default=0, ge=0, le=2000)
 
 
+class IndicatorConsumerReference(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    id: str = Field(min_length=1,max_length=100)
+    generation: int = Field(ge=0,le=9007199254740991)
+
+
+class IndicatorConsumer(IndicatorConsumerReference):
+    spec: dict
+    purpose: str = Field(default='foreground',pattern='^(foreground|warmup)$')
+
+
+class ReleaseIndicatorConsumers(BaseModel):
+    client: str = Field(min_length=1,max_length=64)
+    consumers: list[IndicatorConsumerReference] = Field(max_length=64)
+
+
+class IndicatorLease(BaseModel):
+    run_id: str = Field(pattern='^[a-f0-9]{64}$')
+    snapshot_id: str | None = Field(default=None,pattern='^[a-f0-9]{64}$')
+    start: int = Field(ge=0)
+    end: int = Field(ge=0)
+    consumer: IndicatorConsumer
+
+
+class UpdateIndicatorLeases(BaseModel):
+    client: str = Field(min_length=1,max_length=64)
+    leases: list[IndicatorLease] = Field(max_length=64)
+
+
 class DataQuery(BaseModel):
     # v1.3.2 compatibility: optional fields from newer bridges remain ignorable.
     model_config = ConfigDict(extra="ignore")
@@ -103,6 +132,7 @@ class DataQuery(BaseModel):
     count_back: int | None = Field(default=None, alias="countBack", ge=1, le=1000000)
     first_data_request: bool = Field(default=False, alias="firstDataRequest")
     client: str | None = Field(default=None, max_length=64)
+    indicator_consumers: list[IndicatorConsumer] = Field(default_factory=list,max_length=64)
     indicators: list[dict] = Field(default_factory=list, max_length=12)
     track_history: bool = False
     revision_before: int | None = Field(default=None, gt=0)
@@ -384,6 +414,31 @@ _RESULT_CACHE = OrderedDict()
 
 def router(authenticated):
     r = APIRouter(prefix="/api/charts", dependencies=[Depends(authenticated)])
+
+    @r.post('/indicator-demands/release')
+    def release_indicator_consumers(body: ReleaseIndicatorConsumers):
+        from .indicator_demands import release
+        with transaction() as db:
+            release(db,body.client,[consumer.model_dump() for consumer in body.consumers],stamp=now_ms())
+        return {'released':True}
+
+    @r.post('/indicator-demands/update')
+    def update_indicator_leases(body: UpdateIndicatorLeases):
+        from .indicator_demands import renew
+        from .storage import DisplaySnapshot, FixedIndicatorRun
+        with transaction() as db:
+            stamp=now_ms()
+            for lease in body.leases:
+                run=db.get(FixedIndicatorRun,lease.run_id)
+                if not run:
+                    continue
+                if lease.snapshot_id:
+                    snapshot=db.get(DisplaySnapshot,lease.snapshot_id)
+                    if not snapshot or snapshot.expires_at<=stamp or snapshot.revision_id!=run.revision_id or snapshot.timeframe!=run.timeframe:
+                        continue
+                renew(db,body.client,[lease.consumer.model_dump()],run,snapshot_id=lease.snapshot_id,
+                    start=lease.start,end=lease.end,stamp=stamp)
+        return {'renewed':True}
 
     @r.post("/provider/configure")
     def native_configuration(body: NativeConfiguration):

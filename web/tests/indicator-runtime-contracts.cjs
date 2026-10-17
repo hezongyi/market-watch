@@ -46,7 +46,7 @@ function page(specs,pendingPeriod=null,value=10){
  const queryContext={decode:()=>({symbol:'TEST',series_kind:'managed'}),frames:{'1':'M1'},
   managedSessions:new Map(),cache:new Map(),workspaceEpoch:1,Date:class extends Date {static now(){return 1000;}},
   hasHistoryViewer:()=>true,MWSeries:{encode:s=>s},request:async()=>({value:++requests}),
-  alertCalculationOrigins:new Map(),alertCompositeRevisions:new Map()};
+  alertCalculationOrigins:new Map(),alertCompositeRevisions:new Map(),clientId:'test-page'};
  vm.runInNewContext(querySource,queryContext);
  const args={before:3001,indicators:[{name:'EMA',params:{period:5}}]};
  assert.equal((await queryContext.query('TEST','1',args)).value,1);

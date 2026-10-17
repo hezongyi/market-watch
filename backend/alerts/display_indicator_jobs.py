@@ -7,7 +7,14 @@ from sqlalchemy import delete, func, select, text
 
 from .indicator_state import IndicatorState
 from .source_history_store import _insert
-from .storage import DisplayIndicatorTask, DisplaySnapshot, FixedIndicatorRun, now_ms, transaction, uid
+from .storage import (
+    DisplayIndicatorTask,
+    DisplaySnapshot,
+    FixedIndicatorRun,
+    now_ms,
+    transaction,
+    uid,
+)
 
 PAGE_SIZE = 2000
 MAX_OUTPUT_ROWS = 10000
@@ -103,10 +110,13 @@ def tick():
 
     stamp = now_ms()
     with transaction() as db:
+        from .indicator_demands import priority, warmup_capacity
+        order=priority(db,DisplayIndicatorTask.run_id,stamp,kind='display',snapshot_id=DisplayIndicatorTask.snapshot_id)
         task = db.scalar(select(DisplayIndicatorTask).join(DisplaySnapshot).where(
             DisplayIndicatorTask.status == 'pending', DisplayIndicatorTask.next_at <= stamp,
             DisplayIndicatorTask.lease_until <= stamp, DisplaySnapshot.expires_at > stamp)
-            .order_by(DisplaySnapshot.expires_at.desc(), DisplayIndicatorTask.id)
+            .where(warmup_capacity(DisplayIndicatorTask,DisplayIndicatorTask.run_id,stamp))
+            .order_by(order,DisplaySnapshot.expires_at.desc(), DisplayIndicatorTask.id)
             .with_for_update(of=DisplayIndicatorTask, skip_locked=True).limit(1))
         if not task:
             return False

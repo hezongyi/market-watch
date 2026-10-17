@@ -5,6 +5,7 @@ const MWNativeIndicatorResultsAdapter = (() => {
   const sessions=new WeakMap();
   const handles=new WeakMap();
   const studyBindings=new WeakMap();
+  const listeners=new Set();
   let catalog={},enabled=false,generation=0,cells=0;
   const fingerprint=value=>JSON.stringify(value);
   const numericRevision=value=>/^\d+$/.test(String(value)) ? BigInt(value) : null;
@@ -26,12 +27,14 @@ const MWNativeIndicatorResultsAdapter = (() => {
     if(!records){records=new Map();sessions.set(engine,records);}
     const previous=entry(engine,session,source);
     // Native history extension may restart the same study. Keep only results
-    // with identical source, parent, resolution and calculation inputs; a new
-    // generation still fences every old handle/queued batch.
+    // with identical source, parent and resolution. Parameter changes retain
+    // the old display identity, never accept it as a new calculation result.
+    // A new generation still fences every old handle/queued batch.
     const retained=previous && previous.alive && previous.parent===parent && previous.resolution===resolution &&
-      previous.name===match[1] && fingerprint(previous.symbol)===fingerprint(symbol) && fingerprint(previous.inputs)===fingerprint(inputs)
+      previous.name===match[1] && fingerprint(previous.symbol)===fingerprint(symbol)
       ? {rows:new Map(previous.rows),identity:previous.identity,study:previous.study,chart:previous.chart,revision:previous.revision,
-          offsets:previous.offsets,cells:previous.cells || 0,coverage:previous.coverage} : null;
+          offsets:previous.offsets,cells:previous.cells || 0,coverage:previous.coverage,
+          transition:previous.transition,displayIdentity:previous.displayIdentity || previous.identity} : null;
     if(previous)detach(previous);
     const binding={engine,session,source,parent,turnaround,symbol,resolution,name:match[1],inputs:{...inputs},
       generation:++generation,alive:true,sequence:0,revision:null,rows:new Map(),queue:Promise.resolve()};
@@ -59,6 +62,9 @@ const MWNativeIndicatorResultsAdapter = (() => {
       });
       binding.queue=binding.queue.catch(()=>{});
     }
+    // Native readiness can follow the public study event. Wake consumers at
+    // this actual seam instead of waiting for their safety poll.
+    queueMicrotask(()=>{for(const listener of listeners)listener();});
     return true;
   }
   function attach(chart,id,identity){
@@ -72,8 +78,20 @@ const MWNativeIndicatorResultsAdapter = (() => {
     if(binding.identity && fingerprint(binding.identity)!==fingerprint(identity)){
       // A new calculation origin/identity fences all queued handles. The engine
       // itself is already in external mode, so no second writer is introduced.
-      binding.generation=++generation;binding.sequence=0;binding.revision=null;
-      cells-=binding.cells || 0;binding.cells=0;binding.rows.clear();binding.mapping=null;
+      const old=binding.displayIdentity || binding.identity;
+      const sameInput=['main','fixedRevision','algorithmVersion','calculationStart','period'].every(key=>old[key]===identity[key]);
+      binding.generation=++generation;binding.sequence=0;
+      if(sameInput && binding.rows.size){
+        binding.transition={identity:old,params:JSON.parse(old.paramsFingerprint)};
+      }else{
+        // A revision/origin switch cannot leave old indicators over new prices.
+        cells-=binding.cells || 0;binding.cells=0;binding.rows.clear();binding.mapping=null;
+        binding.revision=null;binding.transition=null;binding.displayIdentity=null;
+        binding.queue=binding.queue.then(async()=>{
+          await study._ongoingDataUpdate;
+          if(current(binding)){commit(binding,new Map());await study._ongoingDataUpdate;}
+        }).catch(()=>{});
+      }
       binding.coverage=null;
     }
     binding.identity=Object.freeze({...identity});binding.study=study;
@@ -83,10 +101,8 @@ const MWNativeIndicatorResultsAdapter = (() => {
       if(typeof clear!=='function')throw Error('原生指标清理契约不兼容');
       study.clearData=function(...args){
         const owner=studyBindings.get(this);
-        const apiInputs=owner?.chart?.getStudyById(id)?.getInputValues();
-        const inputs=apiInputs && Object.fromEntries(apiInputs.map(item=>[item.id,item.value]));
         const same=owner?.alive && owner.chart && owner.rows.size && owner.identity?.main===owner.chart.symbol() &&
-          owner.resolution===owner.chart.resolution() && Object.entries(owner.inputs).every(([key,value])=>inputs?.[key]===value);
+          owner.resolution===owner.chart.resolution();
         if(same)return;
         return clear.apply(this,args);
       };
@@ -127,7 +143,8 @@ const MWNativeIndicatorResultsAdapter = (() => {
     }
     return {generation:binding.generation,name:binding.name,resolution:binding.resolution,
       first:Math.round(rows[0].value[0]*1000),last:Math.round(rows.at(-1).value[0]*1000),count:rows.length,
-      coverage:binding.coverage ? {...binding.coverage,generation:binding.generation} : null};
+      coverage:binding.coverage ? {...binding.coverage,generation:binding.generation} : null,
+      transition:binding.transition || null};
   }
   function validate(handle,batch){
     const binding=handles.get(handle);
@@ -205,6 +222,10 @@ const MWNativeIndicatorResultsAdapter = (() => {
       commit(binding,rows,batch.offsets);
       cells+=count-(binding.cells || 0);binding.cells=count;
       binding.rows=rows;binding.sequence=batch.sequence;binding.revision=batch.inputRevision;
+      if(batch.kind==='snapshot'){
+        binding.transition=null;binding.displayIdentity=binding.identity;
+      }
+      if(!rows.size){binding.transition=null;binding.displayIdentity=null;}
       binding.coverage=batch.coverage ? {...batch.coverage} : null;
       binding.offsets=batch.offsets || {};
       await binding.study._ongoingDataUpdate;
@@ -232,6 +253,8 @@ const MWNativeIndicatorResultsAdapter = (() => {
     const records=sessions.get(binding.engine);
     if(records?.get(binding.session+'|'+binding.source)===binding)records.delete(binding.session+'|'+binding.source);
   }
-  return {configure,start,attach,scope,applyBatch,invalidate,detach,enabled:name=>enabled && !!catalog[name]};
+  return {configure,start,attach,scope,applyBatch,invalidate,detach,
+    subscribe(listener){listeners.add(listener);return ()=>listeners.delete(listener);},
+    enabled:name=>enabled && !!catalog[name]};
 })();
 globalThis.MWNativeIndicatorResults=MWNativeIndicatorResultsAdapter;

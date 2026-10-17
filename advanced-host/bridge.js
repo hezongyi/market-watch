@@ -303,9 +303,12 @@ function startIndicatorCoordinator(catalog) {
           dependencyRevision:page.dependency_revision ?? old.dependencyRevision});},
     },
     status:(consumer,state,error)=>send({type:'chart-indicator-state',epoch:workspaceEpoch,index:consumer.index,
-      id:consumer.id,name:consumer.meta.label || consumer.id,state,error:error?.message || ''}),
+      id:consumer.id,name:consumer.meta.label || consumer.id,state,error:error?.message || '',
+      previousParams:MWNativeIndicatorResults.scope(consumer.chart,consumer.id)?.transition?.params || null}),
     report:error=>{if(error.code!=='HISTORY_CANCELLED')send({type:'error',error:'指标读取失败：'+String(error)});},
     presentation:(ticker,res,page)=>{swingStore().publish(ticker,res,page,swingStore().ticket());swingDisplay?.refresh();},
+    leases:leases=>{if(leases.length)void request({client:clientId,leases},'indicator-demand-update').catch(error=>send({type:'error',error:String(error)}));},
+    release:consumers=>{void request({client:clientId,consumers},'indicator-demand-release').catch(()=>{});},
     demand:rows=>{
       const next=new Map(rows.map(row=>[indicatorKey(row.ticker,row.resolution),row.origin]));
       const changed=new Set([...indicatorDependencyOrigins.keys(),...next.keys()].filter(key=>indicatorDependencyOrigins.get(key)!==next.get(key)));
@@ -767,7 +770,7 @@ function query(ticker, res, args, expires = Infinity, current = () => true) {
   const q = {
     instrument: symbol,
     series_kind,
-    ...(series_kind === 'composite' ? {client:clientId} : {}),
+    ...(['composite','history'].includes(series_kind) || args.indicators?.length ? {client:clientId} : {}),
     timeframe: frames[res],
     ...(spec && series_kind === 'provider' && alertCalculationOrigins.has(MWSeries.encode(symbol,series_kind)+'|'+res)
       ? {calculation_origin:alertCalculationOrigins.get(MWSeries.encode(symbol,series_kind)+'|'+res)} : {}),

@@ -50,6 +50,23 @@ def drain(ident):
     raise AssertionError("indicator job failed to finish")
 
 
+def test_completed_visible_coverage_is_readable_before_full_history_finishes(database,monkeypatch):
+    version=history(database,monkeypatch,count=4500)
+    query=DataQuery(instrument=version,series_kind='history',timeframe='M1',limit=7,
+        before=1000*60000,indicators=[SPEC])
+    first=data_sync(query)
+    run_id=first['indicator_progress'][0]['run_id']
+    assert first['indicator_progress'][0]['visible_complete'] is False
+    jobs.indicator_tick(run_id)
+    partial=data_sync(query)
+    progress=partial['indicator_progress'][0]
+    assert progress['status']=='partial' and progress['cursor']<progress['target_end']
+    assert progress['visible_complete'] is True
+    assert progress['coverage']==progress['required_coverage']
+    assert len(partial['indicators'][0]['series'][0]['values'])==7
+    assert all(v['value'] is not None for v in partial['indicators'][0]['series'][0]['values'])
+
+
 def test_historical_page_reads_full_origin_and_persisted_outputs_without_m1(database, monkeypatch):
     version = history(database, monkeypatch)
     query = DataQuery(instrument=version, series_kind="history", timeframe="M1", limit=7, indicators=[SPEC])

@@ -1,0 +1,707 @@
+{
+  "phase": "baseline",
+  "synthetic": true,
+  "source": "actual app / Playwriter / native renderer",
+  "kind": "managed",
+  "operation": "add",
+  "indicator": "LWMA",
+  "parameters": "30 previously unused periods",
+  "n": 30,
+  "failures": 0,
+  "quantile": "nearest-rank, failures included as infinity",
+  "p50": 451.5,
+  "p95": 609.2000000178814,
+  "target": 300,
+  "samples": [
+    {
+      "period": 31,
+      "ms": 506.80000001192093,
+      "commit": {
+        "at": 1182259.800000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":31}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        127.22599564516831
+      ]
+    },
+    {
+      "period": 32,
+      "ms": 451.5,
+      "commit": {
+        "at": 1182759.1000000238,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":32}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        127.17476374999023
+      ]
+    },
+    {
+      "period": 33,
+      "ms": 572.2000000178814,
+      "commit": {
+        "at": 1183383.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":33}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        127.11687094474586
+      ]
+    },
+    {
+      "period": 34,
+      "ms": 358.7999999821186,
+      "commit": {
+        "at": 1183762,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":34}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        127.05328905883836
+      ]
+    },
+    {
+      "period": 35,
+      "ms": 448.90000000596046,
+      "commit": {
+        "at": 1184258.900000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":35}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.98499285712714
+      ]
+    },
+    {
+      "period": 36,
+      "ms": 573.5,
+      "commit": {
+        "at": 1184877.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":36}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.91294914413095
+      ]
+    },
+    {
+      "period": 37,
+      "ms": 392.2999999821186,
+      "commit": {
+        "at": 1185301.5,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":37}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.83810631579138
+      ]
+    },
+    {
+      "period": 38,
+      "ms": 440.90000000596046,
+      "commit": {
+        "at": 1185758.900000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":38}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.7613845074424
+      ]
+    },
+    {
+      "period": 39,
+      "ms": 491.90000000596046,
+      "commit": {
+        "at": 1186275.800000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":39}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.6836664102704
+      ]
+    },
+    {
+      "period": 40,
+      "ms": 547.1999999880791,
+      "commit": {
+        "at": 1186850.300000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":40}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.60578885365946
+      ]
+    },
+    {
+      "period": 41,
+      "ms": 408.40000000596046,
+      "commit": {
+        "at": 1187309.7000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":41}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.52853528454304
+      ]
+    },
+    {
+      "period": 42,
+      "ms": 439.40000000596046,
+      "commit": {
+        "at": 1187775.900000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":42}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.45262918051428
+      ]
+    },
+    {
+      "period": 43,
+      "ms": 469.19999998807907,
+      "commit": {
+        "at": 1188276,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":43}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.37872844608425
+      ]
+    },
+    {
+      "period": 44,
+      "ms": 577.3000000119209,
+      "commit": {
+        "at": 1188880.7000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":44}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.30742084848205
+      ]
+    },
+    {
+      "period": 45,
+      "ms": 333.30000001192093,
+      "commit": {
+        "at": 1189244.1000000238,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":45}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.23922053140714
+      ]
+    },
+    {
+      "period": 46,
+      "ms": 581.2000000178814,
+      "commit": {
+        "at": 1189848.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":46}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.17456560591243
+      ]
+    },
+    {
+      "period": 47,
+      "ms": 416.19999998807907,
+      "commit": {
+        "at": 1190314.300000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":47}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.1138168173803
+      ]
+    },
+    {
+      "period": 48,
+      "ms": 503.19999998807907,
+      "commit": {
+        "at": 1190859.900000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":48}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.05725727890857
+      ]
+    },
+    {
+      "period": 49,
+      "ms": 377.69999998807907,
+      "commit": {
+        "at": 1191275.5,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":49}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.00509320816603
+      ]
+    },
+    {
+      "period": 50,
+      "ms": 407.69999998807907,
+      "commit": {
+        "at": 1191743.400000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":50}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        125.957455662747
+      ]
+    },
+    {
+      "period": 51,
+      "ms": 490.19999998807907,
+      "commit": {
+        "at": 1192260.300000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":51}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        125.91440319004934
+      ]
+    },
+    {
+      "period": 52,
+      "ms": 609.2000000178814,
+      "commit": {
+        "at": 1192894.6000000238,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":52}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        125.87592534832564
+      ]
+    },
+    {
+      "period": 53,
+      "ms": 286.10000002384186,
+      "commit": {
+        "at": 1193258.6000000238,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":53}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        125.8419469811323
+      ]
+    },
+    {
+      "period": 54,
+      "ms": 517.9000000059605,
+      "commit": {
+        "at": 1193830.400000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":54}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        125.81233318519104
+      ]
+    },
+    {
+      "period": 55,
+      "ms": 369.5,
+      "commit": {
+        "at": 1194302.1000000238,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":55}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        125.78689486363639
+      ]
+    },
+    {
+      "period": 56,
+      "ms": 516,
+      "commit": {
+        "at": 1194858.800000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":56}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        125.76539478697019
+      ]
+    },
+    {
+      "period": 57,
+      "ms": 387.5,
+      "commit": {
+        "at": 1195292.6000000238,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":57}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        125.74755402298807
+      ]
+    },
+    {
+      "period": 58,
+      "ms": 440.5,
+      "commit": {
+        "at": 1195758.6000000238,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":58}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        125.73305864991244
+      ]
+    },
+    {
+      "period": 59,
+      "ms": 509.39999997615814,
+      "commit": {
+        "at": 1196312.5,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":59}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        125.72156664971766
+      ]
+    },
+    {
+      "period": 60,
+      "ms": 628.5,
+      "commit": {
+        "at": 1196977.300000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":60}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "kind": "snapshot",
+        "rows": 145,
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        125.71271485792343
+      ]
+    }
+  ]
+}

@@ -129,11 +129,13 @@ def freeze(db, page, body, maximum, *, evaluation_end=None):
         _prune(_INPUTS, MAX_ROWS)
 
 
-def compute(inputs, meta, instrument, spec, *, first, provisional):
+def compute(inputs, meta, instrument, spec, *, first, provisional, telemetry=None):
     """Share one immutable input calculation, including its confirmed checkpoints."""
     from .provider_cache import check_cancelled
 
     name, params = validate(spec)
+    stats = telemetry if telemetry is not None else {}
+    stats.update(result_cache='miss', calculation_steps=0, checkpoint_index=0)
     rows = inputs.rows
     key = (inputs.identity, name, json.dumps(params, sort_keys=True),
            json.dumps(meta.get("calendar_profile"), sort_keys=True), meta["calendar"], instrument)
@@ -149,6 +151,9 @@ def compute(inputs, meta, instrument, spec, *, first, provisional):
                 result = calculate(calculation_rows(rows, meta, instrument), spec, provisional=provisional)
                 check_cancelled()
                 entry.value, entry.weight = result, len(rows) * max(6, len(CATALOG[name]["series"]))
+                stats['calculation_steps'] = len(rows)
+            else:
+                stats['result_cache'] = 'hit'
             result = entry.value
             return {**result, "series": [{**s, "values": [v for v in s["values"] if v["time"] >= first]}
                                          for s in result["series"]]}
@@ -164,12 +169,14 @@ def compute(inputs, meta, instrument, spec, *, first, provisional):
                     and previous[0].epoch == inputs.epoch)
         if reusable and previous[0].rows is rows:
             values, checkpoints = previous[1:]
+            stats['result_cache'] = 'hit'
         else:
             # Checkpoints precede the mutable tail. Historical corrections and
             # backfills use a different epoch and replay from the fixed origin.
             common = min(len(previous[0].rows), len(rows)) - 1 if reusable else 0
             checkpoints = previous[2] if reusable else {}
             index = max((i for i in checkpoints if i <= common), default=0)
+            stats.update(result_cache='checkpoint' if index else 'miss', checkpoint_index=index)
             state = IndicatorState(spec, checkpoints.get(index))
             values = list(previous[1][:index]) if reusable else []
             checkpoints = {i: value for i, value in checkpoints.items() if i <= index}
@@ -177,6 +184,7 @@ def compute(inputs, meta, instrument, spec, *, first, provisional):
             if index:
                 prepared = prepared[1:]
             for offset, row in enumerate(prepared, index):
+                stats['calculation_steps'] += 1
                 if offset % 512 == 0:
                     check_cancelled()
                     checkpoints[offset] = state.checkpoint()

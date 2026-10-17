@@ -652,9 +652,9 @@ def published_history_check(db, inst, pub, visible, body):
 
 
 def data(body):
-    from .chart_calculation_history import calculation_rows
     from .chart_data import future_grid
-    from .chart_indicators import calculate
+    from .managed_indicator_inputs import freeze
+    from .provider_indicator_inputs import compute
 
     with transaction() as db:
         # Published inputs and their prefix credential must describe one snapshot.
@@ -671,23 +671,13 @@ def data(body):
         before = body.before or now_ms() + 1
         # Recursive algorithms use only the selected published dataset prefix;
         # backfill never extends the user's approved start as an indicator side effect.
-        count = (
-            db.scalar(
-                select(func.count())
-                .select_from(ChartPublishedBar)
-                .where(
-                    ChartPublishedBar.instrument_id == inst.id,
-                    ChartPublishedBar.timeframe == body.timeframe,
-                )
-            )
-            if body.indicators
-            else body.limit + 1
-        )
         swing = any(spec.get("name") == "SWING_SR_V1" for spec in body.indicators)
-        rows = read_rows(
-            db, inst, body.timeframe, now_ms() + 1 if swing else before, max(1, count),
-            dataset_start=body.dataset_start
-        )
+        frozen, input_stats = None, {}
+        if body.indicators and pub:
+            frozen, input_stats = freeze(db, inst, pub, body, ceiling=now_ms() if swing else before-1)
+            rows = frozen.rows
+        else:
+            rows = read_rows(db, inst, body.timeframe, before, body.limit+1, dataset_start=body.dataset_start)
         eligible = [row for row in rows if row["start"] < before]
         visible = eligible[-body.limit :]
         has_more = len(eligible) > body.limit
@@ -702,10 +692,22 @@ def data(body):
             body.model_copy(update={"track_history": True, "revision_before": body.dependency_before,
                 "revision_after": None})) if body.dependency_before else None
         calculation_meta = {"calendar": inst.calendar, "calendar_profile": inst.calendar_profile}
-    rows = calculation_rows(rows, calculation_meta, body.instrument)
     indicators = []
     for spec in body.indicators:
-        result = calculate(rows, spec, provisional=body.provisional)
+        from .indicator_state import IndicatorState
+        from .provider_indicator_inputs import Inputs
+
+        execution = dict(input_stats)
+        start = visible[0]["start"] if visible else before
+        result = compute(frozen or Inputs([], ('empty-managed',body.instrument),None,0),
+                         calculation_meta, body.instrument, spec, first=start,
+                         provisional=body.provisional, telemetry=execution)
+        result['calculation'] = dict(status='complete', calculation_origin=left,
+            input_revision=revision, algorithm=IndicatorState(spec).algorithm,
+            producer='backend', accuracy='oracle_equivalent', canonical_verified=True,
+            input_evidence={'publication_revision':revision}, execution=execution,
+            coverage=[{'start':start,'end':visible[-1]['end']}] if visible else [],
+            required_coverage=[{'start':start,'end':visible[-1]['end']}] if visible else [])
         if "presentation" in result:
             result["presentation"] = result["presentation"] | {
                 "history_revision": str(revision), "history_complete": True}

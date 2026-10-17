@@ -430,6 +430,28 @@ class FixedIndicatorRun(Base):
     updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
 
 
+class IndicatorDemand(Base):
+    """Expiring consumer priority, independently of immutable shared outputs."""
+    __tablename__ = 'market_indicator_demands'
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    client: Mapped[str] = mapped_column(String(64), index=True)
+    consumer: Mapped[str] = mapped_column(String(100))
+    run_id: Mapped[str | None] = mapped_column(ForeignKey('market_fixed_indicator_runs.id', ondelete='CASCADE'), index=True)
+    snapshot_id: Mapped[str | None] = mapped_column(ForeignKey('market_display_snapshots.id', ondelete='CASCADE'))
+    start: Mapped[int] = mapped_column(BigInteger)
+    end: Mapped[int] = mapped_column(BigInteger)
+    purpose: Mapped[str] = mapped_column(String(12))
+    generation: Mapped[int] = mapped_column(BigInteger)
+    released: Mapped[bool] = mapped_column(Boolean,default=False)
+    expires: Mapped[int] = mapped_column(BigInteger, index=True)
+
+
+class IndicatorSchedule(Base):
+    __tablename__ = 'market_indicator_schedule'
+    kind: Mapped[str] = mapped_column(String(12), primary_key=True)
+    turn: Mapped[int] = mapped_column(BigInteger, default=0)
+
+
 class FixedIndicatorBlock(Base):
     __tablename__ = "market_fixed_indicator_blocks"
     run_id: Mapped[str] = mapped_column(ForeignKey("market_fixed_indicator_runs.id"), primary_key=True)

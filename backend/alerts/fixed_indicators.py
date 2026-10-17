@@ -39,6 +39,17 @@ from .storage import (
 PAGE_SIZE = 2000
 
 
+def coverage(rows):
+    """Source-time half-open intervals; unknown rows never become null values."""
+    ranges = []
+    for row in sorted(rows, key=lambda row: row['start']):
+        if ranges and ranges[-1]['end'] == row['start']:
+            ranges[-1]['end'] = row['end']
+        else:
+            ranges.append({'start':row['start'], 'end':row['end']})
+    return ranges
+
+
 def digest(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
 
@@ -87,6 +98,10 @@ def request(db, page, spec, *, stamp=None):
     existing = db.get(FixedIndicatorRun, ident)
     if existing:
         return existing
+    from .indicator_demands import MAX_PENDING_RUNS, DemandCapacity, guard
+    guard(db)
+    if db.scalar(select(func.count()).select_from(FixedIndicatorRun).where(FixedIndicatorRun.status=='pending'))>=MAX_PENDING_RUNS:
+        raise DemandCapacity()
     # Match the artifact reader's shared lock: upgrading two concurrent readers
     # to exclusive locks would deadlock. Immutable inputs plus unique run IDs
     # make concurrent selection safe; reclamation takes the exclusive lock.
@@ -171,7 +186,10 @@ def claim(run_id=None):
             FixedIndicatorRun.lease_until <= stamp, FixedIndicatorRun.next_at <= stamp)
         if run_id:
             query = query.where(FixedIndicatorRun.id == run_id)
-        run = db.scalar(query.order_by(FixedIndicatorRun.updated_at, FixedIndicatorRun.id)
+        from .indicator_demands import priority, warmup_capacity
+        order=priority(db,FixedIndicatorRun.id,stamp,kind='fixed')
+        query=query.where(warmup_capacity(FixedIndicatorRun,FixedIndicatorRun.id,stamp))
+        run = db.scalar(query.order_by(order, FixedIndicatorRun.updated_at, FixedIndicatorRun.id)
             .with_for_update(skip_locked=True).limit(1))
         if not run:
             return None
@@ -267,13 +285,16 @@ def outputs(db, run, start, end):
     return sorted(rows, key=lambda row: row["start"])
 
 
-def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='display', display_retry=None):
+def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='display', display_retry=None, client=None, consumers=()):
     results, progress, display_errors, restarted = [], [], [], {}
     if not page["bars"]:
         return results, progress
     for spec in specs:
         run = request(db, page, spec, stamp=stamp)
         start, end = page["bars"][0]["start"], page["bars"][-1]["end"]
+        from .indicator_demands import renew
+        renew(db,client,consumers,run,snapshot_id=page.get('display_snapshot_id'),
+            start=start,end=end,stamp=stamp or now_ms())
         rows = outputs(db, run, start, min(end, run.cursor))
         status = {"id": spec.get("id", spec["name"]), "run_id": run.id, "status": run.status,
             "cursor": run.cursor, "target_end": run.target_end, "input_revision": run.input_revision,
@@ -347,6 +368,16 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='di
                         "initialized": trial.initialized(values)})
                 break
         result = presentation(spec, rows, display)
+        available = {row['start'] for row in rows}
+        visible_complete = all(bar['start'] in available for bar in page['bars'])
+        bar_ends = {bar['start']:bar['end'] for bar in page['bars']}
+        status.update(status=run.status if run.status=='complete' or run.cursor<=page['origin'] else 'partial',
+            calculation_origin=page['origin'], producer='backend', accuracy='oracle_equivalent',
+            canonical_verified=True, coverage=coverage([{**row,'end':bar_ends[row['start']]} for row in rows if row['start'] in bar_ends]), required_coverage=coverage(page['bars']),
+            visible_complete=visible_complete,
+            input_evidence={'revision_id':run.revision_id,'input_revision':run.input_revision,
+                'history_version_id':run.history_version_id,'display_snapshot_id':page.get('display_snapshot_id')},
+            display_task_ids=[repaired['task_id']] if provisional and purpose=='display' and run.revision_id and repaired and repaired.get('task_id') else [])
         results.append({**result, "id": status["id"], "calculation": status,
                         "dependencies": [{key: row.get(key) for key in
                             ("start", "dependency_origin", "seam_dependency", "initialized", "provisional")} for row in rows]})

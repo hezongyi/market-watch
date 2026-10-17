@@ -1,0 +1,917 @@
+{
+  "phase": "managed-cache",
+  "synthetic": true,
+  "source": "actual app / Playwriter / native renderer",
+  "kind": "managed",
+  "operation": "add",
+  "indicator": "LWMA",
+  "parameters": "30 previously unused periods",
+  "n": 30,
+  "failures": 0,
+  "quantile": "nearest-rank, failures included as infinity",
+  "p50": 188.40000000596046,
+  "p95": 277,
+  "target": 300,
+  "samples": [
+    {
+      "period": 31,
+      "ms": 263.09999999403954,
+      "commit": {
+        "at": 484924.7999999821,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":31}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":31}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        127.22599564516128
+      ]
+    },
+    {
+      "period": 32,
+      "ms": 162.19999998807907,
+      "commit": {
+        "at": 485176.39999997616,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":32}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":32}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        127.17476375000001
+      ]
+    },
+    {
+      "period": 33,
+      "ms": 205.30000001192093,
+      "commit": {
+        "at": 485426.1999999881,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":33}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":33}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        127.11687094474155
+      ]
+    },
+    {
+      "period": 34,
+      "ms": 223.5,
+      "commit": {
+        "at": 485712.2999999821,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":34}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":34}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        127.05328905882351
+      ]
+    },
+    {
+      "period": 35,
+      "ms": 263.69999998807907,
+      "commit": {
+        "at": 486024.6999999881,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":35}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":35}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.98499285714284
+      ]
+    },
+    {
+      "period": 36,
+      "ms": 190.19999998807907,
+      "commit": {
+        "at": 486243.39999997616,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":36}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":36}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.91294914414414
+      ]
+    },
+    {
+      "period": 37,
+      "ms": 184.19999998807907,
+      "commit": {
+        "at": 486458.2999999821,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":37}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":37}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.83810631578943
+      ]
+    },
+    {
+      "period": 38,
+      "ms": 172.2999999821186,
+      "commit": {
+        "at": 486659.89999997616,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":38}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":38}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.76138450742239
+      ]
+    },
+    {
+      "period": 39,
+      "ms": 178.2999999821186,
+      "commit": {
+        "at": 486863.7999999821,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":39}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":39}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.68366641025641
+      ]
+    },
+    {
+      "period": 40,
+      "ms": 157.59999999403954,
+      "commit": {
+        "at": 487043.6999999881,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":40}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":40}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.60578885365854
+      ]
+    },
+    {
+      "period": 41,
+      "ms": 188.40000000596046,
+      "commit": {
+        "at": 487295.5,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":41}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":41}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.52853528455287
+      ]
+    },
+    {
+      "period": 42,
+      "ms": 178.80000001192093,
+      "commit": {
+        "at": 487497.5,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":42}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":42}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.45262918050946
+      ]
+    },
+    {
+      "period": 43,
+      "ms": 216.30000001192093,
+      "commit": {
+        "at": 487743.59999999404,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":43}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":43}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.37872844608877
+      ]
+    },
+    {
+      "period": 44,
+      "ms": 201.89999997615814,
+      "commit": {
+        "at": 487991.39999997616,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":44}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":44}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.30742084848484
+      ]
+    },
+    {
+      "period": 45,
+      "ms": 174.19999998807907,
+      "commit": {
+        "at": 488191.39999997616,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":45}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":45}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.23922053140096
+      ]
+    },
+    {
+      "period": 46,
+      "ms": 230.40000000596046,
+      "commit": {
+        "at": 488447.7999999821,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":46}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":46}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.17456560592045
+      ]
+    },
+    {
+      "period": 47,
+      "ms": 289.59999999403954,
+      "commit": {
+        "at": 488776.7999999821,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":47}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":47}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.11381681737589
+      ]
+    },
+    {
+      "period": 48,
+      "ms": 277,
+      "commit": {
+        "at": 489102.2999999821,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":48}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":48}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.05725727891155
+      ]
+    },
+    {
+      "period": 49,
+      "ms": 184.10000002384186,
+      "commit": {
+        "at": 489308,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":49}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":49}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        126.00509320816327
+      ]
+    },
+    {
+      "period": 50,
+      "ms": 172.30000001192093,
+      "commit": {
+        "at": 489508,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":50}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":50}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        125.95745566274512
+      ]
+    },
+    {
+      "period": 51,
+      "ms": 219.59999999403954,
+      "commit": {
+        "at": 489758.09999999404,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":51}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":51}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        125.91440319004528
+      ]
+    },
+    {
+      "period": 52,
+      "ms": 188.40000000596046,
+      "commit": {
+        "at": 489974.7999999821,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":52}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":52}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        125.87592534833098
+      ]
+    },
+    {
+      "period": 53,
+      "ms": 159,
+      "commit": {
+        "at": 490158,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":53}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":53}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        125.84194698113208
+      ]
+    },
+    {
+      "period": 54,
+      "ms": 157.7999999821186,
+      "commit": {
+        "at": 490341.2999999821,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":54}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":54}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        125.8123331851852
+      ]
+    },
+    {
+      "period": 55,
+      "ms": 159.19999998807907,
+      "commit": {
+        "at": 490528.7999999821,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":55}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":55}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        125.78689486363633
+      ]
+    },
+    {
+      "period": 56,
+      "ms": 198.39999997615814,
+      "commit": {
+        "at": 490775.89999997616,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":56}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":56}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        125.76539478696742
+      ]
+    },
+    {
+      "period": 57,
+      "ms": 186.59999999403954,
+      "commit": {
+        "at": 490991.2999999821,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":57}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":57}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        125.74755402298851
+      ]
+    },
+    {
+      "period": 58,
+      "ms": 208.5,
+      "commit": {
+        "at": 491224.6999999881,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":58}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":58}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        125.73305864991235
+      ]
+    },
+    {
+      "period": 59,
+      "ms": 191.09999999403954,
+      "commit": {
+        "at": 491441.1999999881,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":59}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":59}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        125.72156664971754
+      ]
+    },
+    {
+      "period": 60,
+      "ms": 233.40000000596046,
+      "commit": {
+        "at": 491701,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":60}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792193220000,
+          "last": 1792201860000,
+          "count": 145,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":60}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792193220000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 145
+      },
+      "nativeRows": 145,
+      "nativeLast": [
+        1792201860,
+        125.71271485792352
+      ]
+    }
+  ]
+}
