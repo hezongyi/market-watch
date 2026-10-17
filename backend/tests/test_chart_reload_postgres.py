@@ -1,17 +1,31 @@
 """Same public display contracts on task-isolated Ubuntu PostgreSQL."""
 import os
+
 import pytest
-from test_provider_postgres import provider_pg as provider_pg
 from test_chart_reload_diagnosis import (
-    test_observed_m1_does_not_vanish_before_rest_confirmation as retained,
-    test_exact_price_snapshot_survives_later_tick_and_confirmation as exact,
-    test_older_observed_confirmation_resets_only_for_price_change as confirmed,
-    test_snapshot_expiry_and_capacity_return_recoverable_codes as capacity,
-    test_legacy_quote_handover_never_copies_uncertified_forming as legacy,
     test_display_replay_budget_uses_shared_background_job as background,
 )
+from test_chart_reload_diagnosis import (
+    test_exact_price_snapshot_survives_later_tick_and_confirmation as exact,
+)
+from test_chart_reload_diagnosis import (
+    test_legacy_quote_handover_never_copies_uncertified_forming as legacy,
+)
+from test_chart_reload_diagnosis import (
+    test_observed_m1_does_not_vanish_before_rest_confirmation as retained,
+)
+from test_chart_reload_diagnosis import (
+    test_older_observed_confirmation_resets_only_for_price_change as confirmed,
+)
+from test_chart_reload_diagnosis import (
+    test_snapshot_expiry_and_capacity_return_recoverable_codes as capacity,
+)
+from test_chart_reload_matrix import (
+    test_pending_gap_pages_confirmation_and_recursive_values as matrix,
+)
 from test_fixed_indicators import test_observed_suffix_replays_all_recursive_dependencies as suffix
-from test_chart_reload_matrix import test_pending_gap_pages_confirmation_and_recursive_values as matrix
+from test_provider_postgres import provider_pg as provider_pg
+
 pytestmark = pytest.mark.skipif(not os.getenv('TEST_POSTGRES_URL'), reason='Requires isolated Ubuntu PostgreSQL')
 
 @pytest.mark.parametrize('transition', ['minute_rollover', 'quote_age_16s', 'reconnect'])
@@ -57,13 +71,14 @@ def test_recursive(provider_pg, monkeypatch, name, later_confirmed):
 def test_capture_fences_concurrent_confirmation_and_preserves_exact_old_snapshot(provider_pg, monkeypatch):
     from concurrent.futures import ThreadPoolExecutor
     from threading import Event
+
     from alerts import live_pricing as live
     from alerts.composite_chart import chart_page
+    from alerts.display_snapshots import resolve
     from alerts.market_contracts import DatasetIdentity, QuoteEvent
-    from alerts.storage import CompositeRevision, MarketDataset, RealtimeMapping, LiveState
+    from alerts.storage import CompositeRevision, MarketDataset, RealtimeMapping
     from test_composite_chart import populated
     from test_market_contracts import batch, minute
-    from alerts.display_snapshots import resolve
 
     factory = provider_pg[0]
     composite, revision_id, seam = populated(factory, monkeypatch)
@@ -114,12 +129,14 @@ def test_capture_fences_concurrent_confirmation_and_preserves_exact_old_snapshot
 def test_concurrent_first_display_read_adopts_legacy_without_lock_upgrade(provider_pg, monkeypatch):
     from concurrent.futures import ThreadPoolExecutor
     from threading import Barrier, local
-    from alerts import live_pricing as live, display_observations, series_access
+
+    from alerts import display_observations, series_access
+    from alerts import live_pricing as live
     from alerts.chart_api import DataQuery
     from alerts.market_contracts import DatasetIdentity, QuoteEvent
     from alerts.storage import CompositeRevision, MarketDataset, RealtimeMapping
-    from test_composite_chart import populated
     from sqlalchemy import text
+    from test_composite_chart import populated
 
     factory = provider_pg[0]
     composite, revision_id, seam = populated(factory, monkeypatch)
@@ -157,6 +174,7 @@ def test_concurrent_first_display_read_adopts_legacy_without_lock_upgrade(provid
 def test_additive_display_migrations_roundtrip_and_preserve_observations(provider_pg, monkeypatch):
     import importlib.util
     from pathlib import Path
+
     from alembic.migration import MigrationContext
     from alembic.operations import Operations
     from sqlalchemy import inspect
@@ -199,6 +217,7 @@ def test_batched_terminal_task_retry(provider_pg, monkeypatch):
 
 def test_concurrent_terminal_retry_is_idempotent(provider_pg, monkeypatch):
     from concurrent.futures import ThreadPoolExecutor
+
     from alerts import display_indicator_jobs as jobs
     from alerts.storage import DisplayIndicatorTask, DisplaySnapshot, FixedIndicatorRun
     from test_chart_reload_diagnosis import test_display_replay_budget_uses_shared_background_job
@@ -222,5 +241,7 @@ def test_concurrent_terminal_retry_is_idempotent(provider_pg, monkeypatch):
 
 
 def test_mixed_stale_retry_rollback(provider_pg, monkeypatch):
-    from test_chart_reload_diagnosis import test_mixed_stale_display_retry_survives_transaction_rollback
+    from test_chart_reload_diagnosis import (
+        test_mixed_stale_display_retry_survives_transaction_rollback,
+    )
     test_mixed_stale_display_retry_survives_transaction_rollback(provider_pg[0], monkeypatch)
