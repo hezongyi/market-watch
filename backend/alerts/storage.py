@@ -1043,6 +1043,8 @@ def bootstrap(db_engine=engine):
         with sessionmaker(bind=connection).begin() as db:
             if not db.get(Preference, "auth.admin"):
                 db.add(Preference(key="auth.admin", value={}))
+            if not db.get(NotificationStream, 1):
+                db.add(NotificationStream(id=1, epoch=uid(), seq=0))
             for name, label, calendar, precision in [
                 ("EURUSD", "欧元 / 美元", "ny17", 5),
                 ("XAUUSD", "黄金 / 美元", "ny17", 2),
@@ -1528,3 +1530,114 @@ class AgentOperation(Base):
     intent_hash: Mapped[str] = mapped_column(String(64))
     result: Mapped[dict] = mapped_column(JSON)
     created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+# --- Unified notification center (Issue #75) ---------------------------------
+# Additive projection tables. Legacy notifications/outbox/receipts keep their
+# original semantics and are never rewritten by the projection worker.
+
+class NotificationStream(Base):
+    """Single row: (epoch, seq). Publishing locks this row before allocating."""
+    __tablename__ = "notification_stream"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    epoch: Mapped[str] = mapped_column(String(36), default=uid)
+    seq: Mapped[int] = mapped_column(BigInteger, default=0)
+    updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class NotificationIncident(Base):
+    __tablename__ = "notification_incidents"
+    __table_args__ = (UniqueConstraint("subject", "dedupe_key", name="uq_notification_incident"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    subject: Mapped[str] = mapped_column(String(64), index=True)
+    dedupe_key: Mapped[str] = mapped_column(String(200))
+    status: Mapped[str] = mapped_column(String(16), default="open")
+    severity: Mapped[str] = mapped_column(String(16), default="warning")
+    count: Mapped[int] = mapped_column(default=1)
+    first_at: Mapped[int] = mapped_column(BigInteger)
+    last_at: Mapped[int] = mapped_column(BigInteger)
+    resolved_at: Mapped[int | None] = mapped_column(BigInteger)
+    attention_version: Mapped[int] = mapped_column(default=1)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class NotificationEvent(Base):
+    __tablename__ = "notification_events"
+    __table_args__ = (
+        UniqueConstraint("subject", "source_kind", "source_id", "source_version",
+                         name="uq_notification_source"),
+        Index("ix_notification_events_subject_occurred", "subject", "occurred_at"),
+        Index("ix_notification_events_first_seq", "first_seq"),
+        Index("ix_notification_events_incident", "incident_id"),
+    )
+    id: Mapped[str] = mapped_column(String(80), primary_key=True)
+    subject: Mapped[str] = mapped_column(String(64), index=True)
+    schema_version: Mapped[int] = mapped_column(default=1)
+    source_kind: Mapped[str] = mapped_column(String(32))
+    source_id: Mapped[str] = mapped_column(String(120))
+    source_version: Mapped[str] = mapped_column(String(64))
+    kind: Mapped[str] = mapped_column(String(24), index=True)
+    severity: Mapped[str] = mapped_column(String(16), index=True)
+    title: Mapped[str] = mapped_column(String(300))
+    summary: Mapped[str] = mapped_column(String(2000), default="")
+    context: Mapped[dict] = mapped_column(JSON, default=dict)
+    links: Mapped[dict] = mapped_column(JSON, default=dict)
+    actions: Mapped[dict] = mapped_column(JSON, default=dict)
+    evidence: Mapped[dict] = mapped_column(JSON, default=dict)
+    payload_hash: Mapped[str] = mapped_column(String(64), default="")
+    dedupe_key: Mapped[str] = mapped_column(String(200), index=True)
+    instrument: Mapped[str | None] = mapped_column(String(40), index=True)
+    workspace: Mapped[str | None] = mapped_column(String(80), index=True)
+    incident_id: Mapped[str | None] = mapped_column(String(36), index=True)
+    notification_id: Mapped[str | None] = mapped_column(String(36), index=True)
+    notify_web: Mapped[bool] = mapped_column(default=True)
+    occurred_at: Mapped[int] = mapped_column(BigInteger)
+    recorded_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    first_seq: Mapped[int] = mapped_column(BigInteger, default=0)
+    version: Mapped[int] = mapped_column(default=1)
+    deleted_at: Mapped[int | None] = mapped_column(BigInteger)
+
+
+class NotificationChange(Base):
+    __tablename__ = "notification_changes"
+    __table_args__ = (Index("ix_notification_changes_at", "at"),)
+    seq: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    epoch: Mapped[str] = mapped_column(String(36))
+    kind: Mapped[str] = mapped_column(String(16))
+    event_id: Mapped[str | None] = mapped_column(String(80), index=True)
+    incident_id: Mapped[str | None] = mapped_column(String(36))
+    version: Mapped[int] = mapped_column(default=1)
+    at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    payload: Mapped[dict] = mapped_column(JSON, default=dict)
+
+
+class NotificationObservation(Base):
+    __tablename__ = "notification_observations"
+    __table_args__ = (
+        UniqueConstraint("subject", "event_id", "kind", "profile_id", "dedupe",
+                         name="uq_notification_observation"),
+        Index("ix_notification_observations_event", "event_id", "kind"),
+    )
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    subject: Mapped[str] = mapped_column(String(64), index=True)
+    event_id: Mapped[str] = mapped_column(String(80), index=True)
+    profile_id: Mapped[str] = mapped_column(String(80), default="")
+    kind: Mapped[str] = mapped_column(String(24))
+    result: Mapped[str] = mapped_column(String(32), default="recorded")
+    dedupe: Mapped[str] = mapped_column(String(120), default="")
+    client_at: Mapped[int | None] = mapped_column(BigInteger)
+    server_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    meta: Mapped[dict] = mapped_column(JSON, default=dict)
+
+
+class NotificationSourceClaim(Base):
+    __tablename__ = "notification_source_claims"
+    __table_args__ = (UniqueConstraint("source_kind", "source_id", "source_version",
+                                       name="uq_notification_claim"),)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    source_kind: Mapped[str] = mapped_column(String(32))
+    source_id: Mapped[str] = mapped_column(String(120))
+    source_version: Mapped[str] = mapped_column(String(64))
+    change_seq: Mapped[int] = mapped_column(BigInteger, default=0)
+    claimed_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
