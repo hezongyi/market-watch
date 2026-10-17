@@ -13,8 +13,39 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  backend:
-    name: backend
+  changes:
+    name: Classify changes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      docs_only: ${{ steps.changes.outputs.docs_only }}
+      backend_changed: ${{ steps.changes.outputs.backend_changed }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Verify change classification
+        run: python -m unittest discover -s tests/ops -p test_ci_changes.py
+
+      - name: Classify changed inputs
+        id: changes
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: python .github/scripts/ci_changes.py --base "$BASE_SHA" --head "$HEAD_SHA" --event "$EVENT_NAME"
+
+  backend_checks:
+    name: Backend checks
+    needs: changes
+    if: needs.changes.outputs.docs_only != 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
@@ -54,30 +85,8 @@ jobs:
 
       - name: Ubuntu tooling checks
         run: |
-          python -m ruff check deploy/ubuntu/mw_docker.py deploy/ubuntu/mw_preview.py deploy/ubuntu/d1_seed.py tests/ops/test_preview.py
+          python -m ruff check deploy/ubuntu/mw_docker.py deploy/ubuntu/mw_preview.py deploy/ubuntu/d1_seed.py tests/ops/test_preview.py .github/scripts/ci_changes.py tests/ops/test_ci_changes.py
           python -m pytest -q tests/ops
-
-      - name: Detect backend test changes
-        id: backend_changes
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-        run: |
-          set -euo pipefail
-
-          if [[ "$BASE_SHA" =~ ^0+$ ]]; then
-            changed_files="$(git diff-tree --root --no-commit-id --name-only -r "$HEAD_SHA")"
-          else
-            changed_files="$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")"
-          fi
-
-          if printf '%s\n' "$changed_files" | grep -Eq '^(backend/|migrations/|pyproject\.toml$|requirements\.lock$|alembic\.ini$|Dockerfile$)'; then
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "Backend test inputs changed; full backend checks will run."
-          else
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "No backend test inputs changed; full backend checks will be skipped."
-          fi
 
       - name: Verify PostgreSQL service version
         run: |
@@ -94,7 +103,7 @@ jobs:
           print(f"PostgreSQL server_version_num={version}")
 
       - name: Ruff changed Python files
-        if: steps.backend_changes.outputs.changed == 'true'
+        if: needs.changes.outputs.backend_changed == 'true'
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -108,7 +117,7 @@ jobs:
             )
           else
             mapfile -t python_files < <(
-              git diff --name-only "$BASE_SHA" "$HEAD_SHA" |
+              git diff --name-only --diff-filter=ACMRT "$BASE_SHA" "$HEAD_SHA" |
                 awk '/^backend\/.*\.py$/ { print }'
             )
           fi
@@ -122,15 +131,17 @@ jobs:
           python -m ruff check "${python_files[@]}"
 
       - name: Python tests
-        if: steps.backend_changes.outputs.changed == 'true'
+        if: needs.changes.outputs.backend_changed == 'true'
         run: python -m pytest -q
 
       - name: Backend checks skipped
-        if: steps.backend_changes.outputs.changed != 'true'
-        run: echo "Backend checks are not needed for this change set."
+        if: needs.changes.outputs.backend_changed != 'true'
+        run: echo "No backend runtime or dependency changes; full backend tests skipped."
 
-  web:
-    name: web
+  web_checks:
+    name: Web checks
+    needs: changes
+    if: needs.changes.outputs.docs_only != 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -176,8 +187,10 @@ jobs:
           node tests/advanced-watchlist-layout.browser.cjs
           node tests/advanced-watchlist-names.browser.cjs
 
-  compose:
-    name: compose
+  compose_checks:
+    name: Compose checks
+    needs: changes
+    if: needs.changes.outputs.docs_only != 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
@@ -215,3 +228,26 @@ jobs:
           MW_ACCEPTANCE_ENV="$acceptance_dir/api.env" \
           MW_ACCEPTANCE_DIR="$acceptance_dir" \
             docker compose -f compose.acceptance.yaml config --quiet
+
+  required:
+    # Keep the protected contexts, including when heavy jobs are skipped.
+    # always() also reports failure if classification failed or a job was cancelled.
+    name: ${{ matrix.check }}
+    needs: [changes, backend_checks, web_checks, compose_checks]
+    if: ${{ always() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        check: [backend, web, compose]
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Report required check
+        env:
+          CLASSIFICATION_RESULT: ${{ needs.changes.result }}
+          DOCS_ONLY: ${{ needs.changes.outputs.docs_only }}
+          CHECK_RESULT: ${{ needs[format('{0}_checks', matrix.check)].result }}
+        run: bash .github/scripts/ci_required.sh
