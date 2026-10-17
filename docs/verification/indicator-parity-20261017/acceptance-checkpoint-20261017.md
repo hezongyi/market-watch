@@ -1,5 +1,7 @@
 # Candidate acceptance checkpoint
 
+Latest closure decision (2026-10-17): the user accepted indicator loading/parameter interaction and authorized CI fixes, review, merge and source tagging. Calculation/origin policy remains unchanged; the original matrix verdicts below remain historical evidence. Current scope and release gates are in the [v1.26.0 closure record](../../indicator-parity-v1.26.0-source-delivery.md).
+
 Status at 2026-10-17 09:22 UTC: **incomplete; Issue #74 is not accepted**.
 
 Newest EMA500 verification: [same-price-snapshot control](provider-origin-verification/README.md) reproduces null→finite→null by varying only the requested calculation origin, using535identical visible bars, the same provider snapshot and revision19. Earlier cached history already exists (7,806rows); the current binding keeps a218-row origin. This requires an indicator dependency/origin reinitialization fix, separately from out-of-scope window-bar loading speed. No product fix has been applied.

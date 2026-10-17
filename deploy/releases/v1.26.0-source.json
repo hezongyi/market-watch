@@ -1,0 +1,44 @@
+{
+  "version": "1.26.0",
+  "release_tag": "v1.26.0",
+  "previous_source_tag": "v1.25.9",
+  "pull_requests": [
+    "https://github.com/hezongyi/market-watch/pull/84"
+  ],
+  "issues": [
+    "https://github.com/hezongyi/market-watch/issues/74"
+  ],
+  "last_runtime_change_commit": "e93a80e76322971b8c30fc61c811f5fa4ac1a853",
+  "last_chart_runtime_change_commit": "0eb0ef137154e40d35d4c3f45e4a07105d712c81",
+  "source_commit_resolution": "Resolve annotated v1.26.0^{commit}; create only at the final checked PR #84 main merge commit, preserving all existing tags.",
+  "source_delivery_record": "docs/indicator-parity-v1.26.0-source-delivery.md",
+  "risk_class": "F1",
+  "verification": {
+    "required_checks": [
+      "backend",
+      "web",
+      "compose"
+    ],
+    "ci_resolution": "PR #84 final head and merged main commit check runs; all required checks must succeed before the source tag is pushed.",
+    "ci_regression_cases_passed": 11,
+    "read_committed_negative_control_failures": 2,
+    "user_indicator_loading_accepted": true,
+    "playwriter_oanda_switch_frames": 2704,
+    "playwriter_dukascopy_control_frames": 687,
+    "original_strict_performance_matrix_all_passed": false,
+    "full_A1_A16_matrix_completed": false,
+    "open_session_new_bar_handoff_verified": false,
+    "ema500_origin_policy_changed": false
+  },
+  "new_migrations": [
+    "av49_indicator_demands"
+  ],
+  "application_dependencies_changed": false,
+  "existing_result_checkpoint_format_changed": false,
+  "provider_cache_identity_changed": true,
+  "provider_cache_version": "oanda-account-candles-units1-v2",
+  "rollback": "Old application can retain additive tables; stop new demand writers before downgrade to au48_display_indicator_tasks; preserve old provider caches and immutable results/checkpoints.",
+  "acceptance_instance": "Ubuntu quant-server / mw-issue74-20261017 retained for review; API account-v6, chart credential-v5 retain their original image identities.",
+  "production_images": "No production release images built, retagged or transferred by this source publication.",
+  "production_deployment": "Not authorized or performed; source merge/tag authorization does not authorize production deployment or permanent data deletion."
+}

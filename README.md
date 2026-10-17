@@ -1,8 +1,8 @@
 # 守望 · Market Watch
 
-个人外汇、黄金和比特币监控网站。当前源码版本 **v1.25.9**，修复自选表首屏报价、统一行情名称和详情、原生末位上标及组合 D1 涨跌基准。无新增依赖或数据库迁移；来源、真实验收与生产前门槛见 [源码交付](docs/watchlist-v1.25.9-source-delivery.md)。
+个人外汇、黄金和比特币监控网站。当前源码版本 **v1.26.0**，改进 Python 指标结果复用、参数切换与布局恢复，统一 OANDA 平台历史和实时 candle 的账户价格口径。新增可回退迁移 `av49_indicator_demands`，无新增依赖；验收范围、已知边界与生产前检查见 [源码交付](docs/indicator-parity-v1.26.0-source-delivery.md)。
 
-本次为源码发布，尚未部署生产。历史生产交付见 [v1.25.7 记录](docs/oanda-rest-v1.25.7-production-delivery.md)；实际生产版本和 OANDA 采集模式须在下一次部署前只读核实，不能从源码版本或历史记录推断。最近 Ubuntu 真实补验中，休市重启后的 OANDA 平台报价暂不可用，仍需查清并补验。
+本次为源码发布。Ubuntu 真实行情及组合行情已复验，用户认可指标加载体验并决定收口；严格性能矩阵原始未达标记录保留。正式生产迁移、开盘新柱接续及休市重启后的报价恢复仍须按发布清单验证。历史生产交付见 [v1.25.7 记录](docs/oanda-rest-v1.25.7-production-delivery.md)，实际生产版本须在部署前只读核实。
 
 v1.14.1 保留固定自建历史、实时接续组合及可审计修订；部署前需迁移至 `aq44_aggregation_service_order`，按发布身份执行覆盖 `--until-complete --verify`。应用回退及重新升级步骤见 [发布说明](docs/verification/issue-13/release-pr.md)；本次为源码发布。
 
