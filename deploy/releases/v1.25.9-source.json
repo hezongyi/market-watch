@@ -1,0 +1,39 @@
+{
+  "version": "1.25.9",
+  "release_tag": "v1.25.9",
+  "previous_source_tag": "v1.25.8",
+  "pull_requests": [
+    "https://github.com/hezongyi/market-watch/pull/78",
+    "https://github.com/hezongyi/market-watch/pull/79"
+  ],
+  "tested_application_commit": "eab74f71bbcccb3e3f4127f85ec306208025f704",
+  "tested_head_commit": "0d545ed27b50eed4b27a151030f83272c4f47a11",
+  "application_main_merge_commit": "6c156c6cfb214e6f270da6fb6d5e1c9b2336a0e2",
+  "source_commit_resolution": "Resolve annotated v1.25.9^{commit} after version packaging merges into main; preserve all existing tags.",
+  "verification_record": "docs/verification/pro-chart-watchlist-20261016/review-followup.md",
+  "source_delivery_record": "docs/watchlist-v1.25.9-source-delivery.md",
+  "verification": {
+    "application_ci": "https://github.com/hezongyi/market-watch/actions/runs/38985845780",
+    "application_ci_head": "0d545ed27b50eed4b27a151030f83272c4f47a11",
+    "application_ci_checks": ["backend", "web", "compose"],
+    "packaging_ci": "Require latest version-packaging PR head checks; previous application CI is not packaging CI.",
+    "targeted_backend_passed": 27,
+    "standards_remaining_blockers": 0,
+    "spec_remaining_blockers": 0,
+    "real_binance_price_update_verified": true,
+    "native_text_superscript_theme_hover_verified": true,
+    "real_composite_price_verified": true,
+    "composite_complete_d1_baseline_available": false,
+    "latest_oanda_quote_acceptance_passed": false,
+    "screenshots_manually_reviewed": 7,
+    "all_providers_accepted": false
+  },
+  "production_gate": "Investigate closed-session/cold-start OANDA quote unavailability and complete real-data acceptance before production. Application fixes require a new immutable version; do not move v1.25.9.",
+  "new_migrations": [],
+  "application_dependencies_changed": false,
+  "persistent_format_changed": false,
+  "acquisition_policy_changed": false,
+  "acceptance_instance": "Ubuntu quant-server / mw-issue73-real-20261016 retained for user review; images built from clean eab74f7, not relabeled as v1.25.9.",
+  "production_images": "Not built, retagged or transferred by this source publication.",
+  "production_deployment": "Not authorized or performed; Git tag authorization does not authorize production operations."
+}
