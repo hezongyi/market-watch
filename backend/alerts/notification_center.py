@@ -20,8 +20,6 @@ from sqlalchemy.exc import IntegrityError
 from .config import settings
 from .storage import (
     Audit,
-    DeliveryAttempt,
-    DeviceReceipt,
     Instrument,
     Notification,
     NotificationChange,
@@ -31,8 +29,8 @@ from .storage import (
     NotificationSourceClaim,
     NotificationStream,
     SignalRow,
-    transaction,
     now_ms,
+    transaction,
     uid,
 )
 

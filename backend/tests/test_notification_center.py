@@ -8,7 +8,6 @@ from alerts.storage import (
     Notification,
     NotificationChange,
     NotificationEvent,
-    NotificationObservation,
     Outbox,
     SignalRow,
     now_ms,
@@ -156,8 +155,6 @@ def test_phone_stop_keeps_legacy_ack_semantics(database, monkeypatch):
     with database.begin() as db:
         signal, note = add_signal(db, 1)
     center.project_pending(50)
-    with database.begin() as db:
-        event_id = db.scalar(select(NotificationEvent.id))
     with TestClient(api_module.app) as client:
         login(client, monkeypatch)
         old = client.post(f"/api/notifications/{note.id}/ack")

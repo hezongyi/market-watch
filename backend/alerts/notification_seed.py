@@ -26,7 +26,6 @@ from .storage import (
     bootstrap,
     now_ms,
     transaction,
-    uid,
 )
 
 

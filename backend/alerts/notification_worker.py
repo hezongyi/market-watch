@@ -12,7 +12,7 @@ import signal
 import sys
 import time
 
-from .notification_center import prune, project_pending
+from .notification_center import project_pending, prune
 from .storage import bootstrap, now_ms
 
 PRUNE_INTERVAL_MS = 60 * 60 * 1000

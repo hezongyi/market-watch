@@ -1026,7 +1026,7 @@ from .chart_api import router as chart_router  # noqa: E402
 
 app.include_router(chart_router(authenticated))
 
-from .market_stream_api import router as market_stream_router
+from .market_stream_api import router as market_stream_router  # noqa: E402
 
 app.include_router(market_stream_router(authenticated))
 
