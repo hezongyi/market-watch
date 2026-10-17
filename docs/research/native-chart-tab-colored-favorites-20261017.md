@@ -18,7 +18,7 @@
 
 ## 浏览器标签：由顶层应用更新
 
-实现任务已独立登记为 [Issue #82](https://github.com/hezongyi/market-watch/issues/82)。
+本节与入口、导航、登录和七色收藏统一纳入完整方案的 [Issue #82](https://github.com/hezongyi/market-watch/issues/82)。
 
 用户已确定：浏览器标签左侧使用**当前守望 Logo** 作为 favicon，复用[已确认登录页](../design/login-approved-20261017/README.md)的品牌图形，全站保持一致。
 
