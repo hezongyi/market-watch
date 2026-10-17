@@ -1,0 +1,365 @@
+{
+  "phase": "history-queue-baseline",
+  "synthetic": true,
+  "source": "actual app / Playwriter / native renderer",
+  "kind": "history",
+  "operation": "add",
+  "indicator": "LWMA",
+  "parameters": "30 previously unused periods",
+  "n": 30,
+  "failures": 23,
+  "quantile": "nearest-rank, failures included as infinity",
+  "p50": null,
+  "p95": null,
+  "target": 300,
+  "samples": [
+    {
+      "period": 31,
+      "ms": 1913.699999988079,
+      "commit": {
+        "at": 150455.09999999404,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":31}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479100000,
+          "last": 1791503940000,
+          "count": 415,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":31}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479100000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 415
+      },
+      "nativeRows": 415,
+      "nativeLast": [
+        1791503940,
+        1.10226
+      ]
+    },
+    {
+      "period": 32,
+      "ms": null,
+      "nativeRows": 0,
+      "error": "TimeoutError: frame.waitForFunction: Timeout 5000ms exceeded."
+    },
+    {
+      "period": 33,
+      "ms": null,
+      "nativeRows": 0,
+      "error": "TimeoutError: frame.waitForFunction: Timeout 5000ms exceeded."
+    },
+    {
+      "period": 34,
+      "ms": null,
+      "nativeRows": 0,
+      "error": "TimeoutError: frame.waitForFunction: Timeout 5000ms exceeded."
+    },
+    {
+      "period": 35,
+      "ms": null,
+      "nativeRows": 0,
+      "error": "TimeoutError: frame.waitForFunction: Timeout 5000ms exceeded."
+    },
+    {
+      "period": 36,
+      "ms": 2132.2000000178814,
+      "commit": {
+        "at": 172996.20000001788,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":36}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479100000,
+          "last": 1791503940000,
+          "count": 415,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":36}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479100000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 415
+      },
+      "nativeRows": 415,
+      "nativeLast": [
+        1791503940,
+        1.1022433333333335
+      ]
+    },
+    {
+      "period": 37,
+      "ms": null,
+      "nativeRows": 0,
+      "error": "TimeoutError: frame.waitForFunction: Timeout 5000ms exceeded."
+    },
+    {
+      "period": 38,
+      "ms": null,
+      "nativeRows": 0,
+      "error": "TimeoutError: frame.waitForFunction: Timeout 5000ms exceeded."
+    },
+    {
+      "period": 39,
+      "ms": null,
+      "nativeRows": 0,
+      "error": "TimeoutError: frame.waitForFunction: Timeout 5000ms exceeded."
+    },
+    {
+      "period": 40,
+      "ms": null,
+      "nativeRows": 0,
+      "error": "TimeoutError: frame.waitForFunction: Timeout 5000ms exceeded."
+    },
+    {
+      "period": 41,
+      "ms": 2249.7999999821186,
+      "commit": {
+        "at": 195466.09999999404,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":41}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479100000,
+          "last": 1791503940000,
+          "count": 415,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":41}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479100000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 415
+      },
+      "nativeRows": 415,
+      "nativeLast": [
+        1791503940,
+        1.1022266666666671
+      ]
+    },
+    {
+      "period": 42,
+      "ms": null,
+      "nativeRows": 0,
+      "error": "TimeoutError: frame.waitForFunction: Timeout 5000ms exceeded."
+    },
+    {
+      "period": 43,
+      "ms": null,
+      "nativeRows": 0,
+      "error": "TimeoutError: frame.waitForFunction: Timeout 5000ms exceeded."
+    },
+    {
+      "period": 44,
+      "ms": null,
+      "nativeRows": 0,
+      "error": "TimeoutError: frame.waitForFunction: Timeout 5000ms exceeded."
+    },
+    {
+      "period": 45,
+      "ms": 2321.199999988079,
+      "commit": {
+        "at": 212977,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":45}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479100000,
+          "last": 1791503940000,
+          "count": 415,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":45}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479100000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 415
+      },
+      "nativeRows": 415,
+      "nativeLast": [
+        1791503940,
+        1.1022133333333333
+      ]
+    },
+    {
+      "period": 46,
+      "ms": null,
+      "nativeRows": 0,
+      "error": "TimeoutError: frame.waitForFunction: Timeout 5000ms exceeded."
+    },
+    {
+      "period": 47,
+      "ms": null,
+      "nativeRows": 0,
+      "error": "TimeoutError: frame.waitForFunction: Timeout 5000ms exceeded."
+    },
+    {
+      "period": 48,
+      "ms": null,
+      "nativeRows": 0,
+      "error": "TimeoutError: frame.waitForFunction: Timeout 5000ms exceeded."
+    },
+    {
+      "period": 49,
+      "ms": 2347.7000000178814,
+      "commit": {
+        "at": 230599.30000001192,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":49}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479100000,
+          "last": 1791503940000,
+          "count": 415,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":49}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479100000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 415
+      },
+      "nativeRows": 415,
+      "nativeLast": [
+        1791503940,
+        1.1022000000000003
+      ]
+    },
+    {
+      "period": 50,
+      "ms": null,
+      "nativeRows": 0,
+      "error": "TimeoutError: frame.waitForFunction: Timeout 5000ms exceeded."
+    },
+    {
+      "period": 51,
+      "ms": null,
+      "nativeRows": 0,
+      "error": "TimeoutError: frame.waitForFunction: Timeout 5000ms exceeded."
+    },
+    {
+      "period": 52,
+      "ms": null,
+      "nativeRows": 0,
+      "error": "TimeoutError: frame.waitForFunction: Timeout 5000ms exceeded."
+    },
+    {
+      "period": 53,
+      "ms": 2091.7999999821186,
+      "commit": {
+        "at": 247975.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":53}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479100000,
+          "last": 1791503940000,
+          "count": 415,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":53}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479100000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 415
+      },
+      "nativeRows": 415,
+      "nativeLast": [
+        1791503940,
+        1.1021866666666666
+      ]
+    },
+    {
+      "period": 54,
+      "ms": null,
+      "nativeRows": 0,
+      "error": "TimeoutError: frame.waitForFunction: Timeout 5000ms exceeded."
+    },
+    {
+      "period": 55,
+      "ms": null,
+      "nativeRows": 0,
+      "error": "TimeoutError: frame.waitForFunction: Timeout 5000ms exceeded."
+    },
+    {
+      "period": 56,
+      "ms": null,
+      "nativeRows": 0,
+      "error": "TimeoutError: frame.waitForFunction: Timeout 5000ms exceeded."
+    },
+    {
+      "period": 57,
+      "ms": null,
+      "nativeRows": 0,
+      "error": "TimeoutError: frame.waitForFunction: Timeout 5000ms exceeded."
+    },
+    {
+      "period": 58,
+      "ms": 2178.4000000059605,
+      "commit": {
+        "at": 270486.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":58}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479100000,
+          "last": 1791503940000,
+          "count": 415,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":58}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479100000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 415
+      },
+      "nativeRows": 415,
+      "nativeLast": [
+        1791503940,
+        1.1021700000000003
+      ]
+    },
+    {
+      "period": 59,
+      "ms": null,
+      "nativeRows": 0,
+      "error": "TimeoutError: frame.waitForFunction: Timeout 5000ms exceeded."
+    },
+    {
+      "period": 60,
+      "ms": null,
+      "nativeRows": 0,
+      "error": "TimeoutError: frame.waitForFunction: Timeout 5000ms exceeded."
+    }
+  ]
+}

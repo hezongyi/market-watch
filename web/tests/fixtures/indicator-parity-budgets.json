@@ -1,0 +1,15 @@
+{
+  "revision": "2026-10-17-scenarios-v1",
+  "quantile": "nearest-rank",
+  "minimumSamples": 30,
+  "scenarios": {
+    "loaded-reusable": {"firstMs": 300, "coverageMs": 500, "canonicalMs": 2000, "timeoutMs": 5000},
+    "loaded-new-spec": {"firstMs": 500, "coverageMs": 1000, "canonicalMs": 2000, "timeoutMs": 5000},
+    "loaded-complex-spec": {"firstMs": 1000, "coverageMs": 2000, "canonicalMs": 3000, "timeoutMs": 6000},
+    "warm-layout": {"firstMs": 500, "coverageMs": 1500, "canonicalMs": 2000, "timeoutMs": 5000},
+    "cold-local": {"firstMs": 2000, "coverageMs": 4000, "canonicalMs": 4000, "timeoutMs": 8000},
+    "cold-provider": {"firstMs": 5000, "coverageMs": 8000, "canonicalMs": 8000, "timeoutMs": 12000},
+    "long-origin": {"firstMs": 5000, "coverageMs": 10000, "canonicalMs": 10000, "timeoutMs": 15000},
+    "long-complex-origin": {"firstMs": 10000, "coverageMs": 15000, "canonicalMs": 15000, "timeoutMs": 20000}
+  }
+}

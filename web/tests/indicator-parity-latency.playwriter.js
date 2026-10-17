@@ -1,57 +1,158 @@
-// Run with Playwriter -s SESSION -f FILE. Uses the task's authenticated app tab.
+// Run at repo root with Playwriter -s SESSION -f FILE and an authenticated app.
+// state.latency declares the group BEFORE sampling. See plan §3; no reclassification.
 const fs = require('node:fs');
 const assert = require('assert').strict;
+const budgets = JSON.parse(fs.readFileSync('web/tests/fixtures/indicator-parity-budgets.json','utf8'));
+const config = state.latency;
+assert.ok(config, 'declare state.latency before measuring');
+const budget = budgets.scenarios[config.scenario];
+assert.ok(budget, 'unknown budget scenario');
+assert.ok(['add','edit'].includes(config.operation), 'this harness measures loaded add/edit only; use a layout harness for page setup');
+assert.ok(config.scenario.startsWith('loaded-') || config.scenario.startsWith('long-'));
+assert.ok(config.phase && /^[a-z0-9-]+$/.test(config.phase));
+assert.ok(config.kind && config.indicator && config.specs?.length);
+assert.ok(config.prefixRows > 0 && config.prefixRows <= (config.scenario.startsWith('long-') ? 50000 : 6000));
+if(config.scenario.startsWith('long-')) assert.ok(config.prefixRows > 6000);
+const complex = ['SWING_SR_V1','SUPERTREND_PINE_V1'].includes(config.indicator);
+if(config.scenario !== 'loaded-reusable') {
+  assert.equal(config.scenario.includes('complex'),complex,'declare complex catalog separately');
+  assert.equal(config.knownUnused,true,'new-spec group requires previously unused specifications');
+} else assert.equal(config.prewarm,true,'prepare reusable result before each measured operation');
+const canonical = value => JSON.stringify(Object.fromEntries(Object.entries(value).sort(([a],[b]) => a.localeCompare(b))));
+assert.equal(new Set(config.specs.map(spec=>canonical(spec.params))).size,config.specs.length,'specs must be distinct within the group');
+const output = '/tmp/mw-issue74-20261017/latency-'+config.phase+'.json';
+assert.equal(fs.existsSync(output),false,'never overwrite a recorded group');
 assert.ok(state.chart && state.app, 'open the isolated app first');
-console.log(await snapshot({page:state.app}));
-await state.chart.evaluate(() => {
-  widget.activeChart().getAllStudies().forEach(study => widget.activeChart().removeEntity(study.id));
-  window.parityCommits = [];
-  if (!window.parityOriginalApply) {
-    window.parityOriginalApply = MWNativeIndicatorResults.applyBatch;
-    MWNativeIndicatorResults.applyBatch = async (handle,batch) => {
-      const accepted = await parityOriginalApply(handle,batch);
-      if (accepted) {
-        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-        parityCommits.push({at:performance.now(),identity:handle.identity,coverage:batch.coverage,
-          finite:batch.rows.filter(row => row.valid.some(Boolean)).length});
+const environment = await state.chart.evaluate(() => ({symbol:widget.activeChart().symbol(),range:widget.activeChart().getVisibleRange(),timeOrigin:performance.timeOrigin}));
+const responses = [], pending = new Set();
+const capture = response => {
+  if(!response.url().endsWith('/api/charts/data') || response.request().method() !== 'POST') return;
+  const query=response.request().postDataJSON();
+  if(!query.indicators?.some(item=>item.name===config.indicator)) return;
+  const task=(async()=>{
+    try {
+      const page=await response.json();
+      responses.push({at:Date.now(),status:response.status(),query:{instrument:query.instrument,series_kind:query.series_kind,
+        indicators:query.indicators,before:query.before,limit:query.limit,provider_snapshot_id:query.provider_snapshot_id,display_snapshot_id:query.display_snapshot_id},
+        http:response.request().timing(),timings:page.timings_ms,bars:page.bars?.length,
+        indicators:page.indicators?.map(item=>({name:item.name,params:item.params,calculation:item.calculation,
+          plots:item.series?.map(plot=>({key:plot.key,count:plot.values.length,finite:plot.values.filter(point=>Number.isFinite(point.value)).length}))}))});
+    }catch(error){responses.push({at:Date.now(),status:response.status(),error:String(error)});}
+  })();
+  pending.add(task);task.finally(()=>pending.delete(task));
+};
+state.app.on('response',capture);
+const samples=[];
+try {
+  await state.chart.evaluate(() => {
+    widget.activeChart().getAllStudies().forEach(study=>widget.activeChart().removeEntity(study.id));
+    // Replace any previous diagnostic wrapper instead of nesting observers.
+    const original=window.parityOriginalApply || MWNativeIndicatorResults.applyBatch.__parityOriginal || MWNativeIndicatorResults.applyBatch;
+    window.parityOriginalApply=original;
+    window.parityCommits=[];
+    MWNativeIndicatorResults.applyBatch=async(handle,batch)=>{
+      const accepted=await original(handle,batch);
+      if(accepted){
+        await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+        const coverage=batch.coverage;
+        const visible=batch.rows.filter(row=>coverage && coverage.first<=row.time && row.time<=coverage.last);
+        parityCommits.push({at:performance.now(),identity:handle.identity,coverage,
+          finite:visible.filter(row=>row.valid.some(Boolean)).length,
+          visibleRows:new Set(visible.map(row=>row.time)).size,
+          plots:batch.rows[0]?.values.length,kind:batch.kind});
       }
       return accepted;
     };
+  });
+  for(const [index,spec] of config.specs.entries()) {
+    const inputs=spec.inputs || spec.params;
+    let id,operation,error;
+    const warmupStart=responses.length;
+    const create=()=>state.chart.evaluate(async({name,inputs})=>{
+      const at=performance.now();
+      const id=await widget.activeChart().createStudy('守望 Python '+name,false,false,inputs);
+      return {id,at};
+    },{name:config.indicator,inputs});
+    const wait=()=>state.chart.waitForFunction(({params,name,at})=>{
+      const fingerprint=value=>JSON.stringify(Object.fromEntries(Object.entries(value).sort(([a],[b])=>a.localeCompare(b))));
+      return parityCommits.some(commit=>commit.at>=at && commit.finite && commit.coverage &&
+        commit.visibleRows>=commit.coverage.count && commit.identity.algorithmVersion===name+':1' &&
+        fingerprint(JSON.parse(commit.identity.paramsFingerprint))===fingerprint(params));
+    },{params:spec.params,name:config.indicator,at:operation.at},{timeout:budget.timeoutMs});
+    try {
+      if(config.prewarm || config.operation==='edit') {
+        const initial=config.operation==='edit' ? config.initial : spec;
+        assert.ok(initial?.params, 'edit needs an initial current-spec curve');
+        operation=await state.chart.evaluate(async({name,initial})=>{
+          const at=performance.now();
+          return {at,id:await widget.activeChart().createStudy('守望 Python '+name,false,false,initial.inputs || initial.params)};
+        },{name:config.indicator,initial});
+        id=operation.id;
+        await state.chart.waitForFunction(id=>MWNativeIndicatorResults.scope(widget.activeChart(),id)?.coverage,id,{timeout:budget.timeoutMs});
+        await Promise.allSettled([...pending]);
+        if(config.operation==='add') {
+          await state.chart.evaluate(id=>widget.activeChart().removeEntity(id),id);
+          id=undefined;
+        }
+      }
+      const responseStart=responses.length;
+      operation=config.operation==='add' ? await create() : await state.chart.evaluate(({id,inputs})=>{
+        const at=performance.now();
+        widget.activeChart().getStudyById(id).setInputValues(Object.entries(inputs).map(([id,value])=>({id,value})));
+        return {id,at};
+      },{id,inputs});
+      id=operation.id;
+      await wait();
+      await Promise.allSettled([...pending]);
+      const result=await state.chart.evaluate(({id,at,params,name})=>{
+        const fingerprint=value=>JSON.stringify(Object.fromEntries(Object.entries(value).sort(([a],[b])=>a.localeCompare(b))));
+        const matching=parityCommits.filter(commit=>commit.at>=at && commit.finite && commit.identity.algorithmVersion===name+':1' &&
+          fingerprint(JSON.parse(commit.identity.paramsFingerprint))===fingerprint(params));
+        const first=matching[0],covered=matching.find(commit=>commit.visibleRows>=commit.coverage?.count);
+        const native=widget.activeChart()._chartWidget.model().model().dataSourceForId(id);
+        return {ms:first ? first.at-at : null,coverageMs:covered ? covered.at-at : null,first,covered,
+          nativeRows:native?.data().size(),nativeLast:native?.data().last()?.value};
+      },{id,at:operation.at,params:spec.params,name:config.indicator});
+      const measured=responses.slice(responseStart);
+      const provenance=responses.slice(warmupStart).flatMap(response=>response.indicators || []).filter(item=>
+        item.name===config.indicator && canonical(item.params)===canonical(spec.params));
+      const authoritative=provenance.some(item=>item.calculation?.canonical_verified &&
+        (item.calculation.visible_complete || item.calculation.status==='complete'));
+      const wronglyCached=config.knownUnused && measured.some(response=>response.indicators?.some(item=>
+        canonical(item.params)===canonical(spec.params) && item.calculation?.execution?.result_cache==='hit'));
+      assert.ok(result.nativeRows && result.coverageMs!==null,'current result has no complete native coverage');
+      assert.ok(authoritative,'missing canonical backend provenance');
+      assert.equal(Boolean(wronglyCached),false,'new-spec preparation was invalid; preserve the failed group');
+      samples.push({index:index+1,params:spec.params,...result,
+        canonicalMs:result.coverageMs,T_input_first:null,inputTimingReason:'full prefix acceptance not instrumented; user total retained',
+        requests:measured,warmupRequests:responses.slice(warmupStart,responseStart)});
+    }catch(cause){error=String(cause);samples.push({index:index+1,params:spec.params,ms:null,coverageMs:null,canonicalMs:null,error,
+      requests:responses.slice(warmupStart)});}
+    finally{if(id)await state.chart.evaluate(id=>widget.activeChart().removeEntity(id),id).catch(()=>{});}
+    console.log({sample:index+1,ms:samples.at(-1).ms,coverageMs:samples.at(-1).coverageMs,error});
   }
-});
-console.log(await getLatestLogs({page:state.app,sinceLastCall:true}));
-const samples = [];
-for(let sample = 0; sample < 30; sample++) {
-  const period = 31 + sample;
-  const operation = await state.chart.evaluate(async period => {
-    window.parityCommits = [];
-    const at = performance.now();
-    const id = await widget.activeChart().createStudy('守望 Python LWMA',false,false,{period});
-    return {id,at};
-  },period);
-  let error;
-  try {
-    await state.chart.waitForFunction(period => parityCommits.some(commit =>
-      commit.finite && JSON.parse(commit.identity.paramsFingerprint).period === period),period,{timeout:5000});
-  } catch(cause) {error = String(cause);}
-  const result = await state.chart.evaluate(({period,operation}) => {
-    const commit = parityCommits.find(commit => commit.finite && JSON.parse(commit.identity.paramsFingerprint).period === period);
-    const native = widget.activeChart()._chartWidget.model().model().dataSourceForId(operation.id);
-    return {period,ms:commit ? commit.at - operation.at : null,commit,
-      nativeRows:native?.data().size(),nativeLast:native?.data().last()?.value};
-  },{period,operation});
-  samples.push({...result,error});
-  await state.chart.evaluate(id => widget.activeChart().removeEntity(id),operation.id);
-  console.log(await getLatestLogs({page:state.app,sinceLastCall:true}));
-  console.log({sample:sample+1,ms:result.ms,error});
+}finally{
+  await Promise.allSettled([...pending]);
+  state.app.off('response',capture);
+  await state.chart.evaluate(()=>{
+    if(window.parityOriginalApply) MWNativeIndicatorResults.applyBatch=window.parityOriginalApply;
+  });
 }
-const values = samples.map(sample => sample.ms ?? Infinity).sort((a,b) => a-b);
-const evidence = {phase:state.phase || 'baseline',synthetic:true,source:'actual app / Playwriter / native renderer',
-  kind:'managed',operation:'add',indicator:'LWMA',parameters:'30 previously unused periods',
-  n:samples.length,failures:samples.filter(sample => sample.error || !sample.nativeRows).length,
-  quantile:'nearest-rank, failures included as infinity',p50:values[Math.ceil(values.length*.5)-1],
-  p95:values[Math.ceil(values.length*.95)-1],target:300,samples};
-fs.writeFileSync('/tmp/mw-issue74-20261017/latency-'+evidence.phase+'.json',JSON.stringify(evidence,null,2));
-console.log(JSON.stringify(evidence));
-assert.equal(evidence.failures,0,'first current-parameter value did not render');
-assert.ok(evidence.p95 < evidence.target,'add current-parameter first visible value exceeds 300 ms p95');
+const quantile=(key,q)=>{
+  const values=samples.map(sample=>sample.error || sample[key]===null ? Infinity : sample[key]).sort((a,b)=>a-b);
+  const value=values[Math.ceil(values.length*q)-1];
+  return Number.isFinite(value) ? value : null;
+};
+const metrics=Object.fromEntries(['ms','coverageMs','canonicalMs'].map(key=>[key,{p50:quantile(key,.5),p95:quantile(key,.95)}]));
+const failures=samples.filter(sample=>sample.error).length;
+const passed=samples.length>=budgets.minimumSamples && !failures && metrics.ms.p95<budget.firstMs &&
+  metrics.coverageMs.p95<budget.coverageMs && metrics.canonicalMs.p95<budget.canonicalMs;
+const evidence={recordedAt:new Date().toISOString(),budgetRevision:budgets.revision,scenario:config.scenario,budget,
+  source:'actual app / Playwriter / native renderer after two RAFs',synthetic:true,config,environment,
+  n:samples.length,failures,quantile:'nearest-rank; failures as infinity (JSON null)',
+  ...metrics,passed,samples};
+fs.writeFileSync(output,JSON.stringify(evidence,null,2),{flag:'wx'});
+console.log(JSON.stringify({...evidence,samples:undefined}));
+assert.equal(failures,0,'one or more operations failed; all samples retained');
+assert.ok(samples.length>=budgets.minimumSamples,'exploration only; at least 30 independent operations per p95 group');
+assert.ok(passed,'declared scenario exceeds its first/coverage/canonical budget');

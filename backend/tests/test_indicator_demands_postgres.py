@@ -8,6 +8,7 @@ import pytest
 from alerts import fixed_indicators as jobs
 from alerts import indicator_demands as demands
 from alerts.chart_api import DataQuery, data_sync
+from alerts.publication_wakeup import PublicationWakeup
 from alerts.storage import FixedIndicatorRun
 from sqlalchemy import func, select
 from test_fixed_indicators import history
@@ -56,3 +57,22 @@ def test_same_spec_waiter_reuses_last_pending_slot(provider_pg, monkeypatch):
 def test_postgres_cancellation_budgets(provider_pg, monkeypatch, check):
     factory, _ = provider_pg
     check(factory, monkeypatch)
+
+
+def test_new_run_wakes_worker_only_after_committed_enqueue(provider_pg, monkeypatch):
+    factory, engine = provider_pg
+    version = history(factory, monkeypatch, count=100)
+    page = data_sync(DataQuery(instrument=version, series_kind="history", timeframe="M1", limit=7))
+    with PublicationWakeup(engine) as wake:
+        with factory.begin() as db:
+            jobs.request(db, page, {"name": "EMA", "params": {"period": 23}})
+            assert wake.wait(.05) == "timer"
+        assert wake.wait(2) == "notification"
+        wake.prepare()
+        with factory.begin() as db:
+            jobs.request(db, page, {"name": "EMA", "params": {"period": 23}})
+        assert wake.wait(.05) == "timer", "polling an existing run must not flood notifications"
+        with factory() as db:
+            jobs.request(db, page, {"name": "EMA", "params": {"period": 24}})
+            db.rollback()
+        assert wake.wait(.05) == "timer"

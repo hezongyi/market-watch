@@ -1,0 +1,88 @@
+{
+  "source": "actual app / Playwriter / real delayed HTTP",
+  "synthetic": true,
+  "before": {
+    "rows": 145,
+    "last": [
+      1792201860,
+      124.53059466666667
+    ],
+    "scope": {
+      "generation": 61,
+      "name": "LWMA",
+      "resolution": "1",
+      "first": 1792193220000,
+      "last": 1792201860000,
+      "count": 145,
+      "coverage": {
+        "first": 1792193220000,
+        "last": 1792201860000,
+        "count": 145,
+        "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":5}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+        "sourceFirst": 1792193220000,
+        "correctionVersion": 0,
+        "tailVersion": 1,
+        "generation": 61
+      },
+      "transition": null
+    }
+  },
+  "delayed": {
+    "rows": 145,
+    "last": [
+      1792201860,
+      124.53059466666667
+    ],
+    "scope": {
+      "generation": 63,
+      "name": "LWMA",
+      "resolution": "1",
+      "first": 1792193220000,
+      "last": 1792201860000,
+      "count": 145,
+      "coverage": null,
+      "transition": {
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":5}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "params": {
+          "period": 5
+        }
+      }
+    }
+  },
+  "after": {
+    "rows": 145,
+    "last": [
+      1792201860,
+      126.20329120879123
+    ],
+    "scope": {
+      "generation": 63,
+      "name": "LWMA",
+      "resolution": "1",
+      "first": 1792193220000,
+      "last": 1792201860000,
+      "count": 145,
+      "coverage": {
+        "first": 1792193220000,
+        "last": 1792201860000,
+        "count": 145,
+        "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":13}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+        "sourceFirst": 1792193220000,
+        "correctionVersion": 0,
+        "tailVersion": 1,
+        "generation": 63
+      },
+      "transition": null
+    }
+  },
+  "heldRequests": 1,
+  "label": "暂显旧参数：period=5",
+  "passed": true
+}

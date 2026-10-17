@@ -364,7 +364,9 @@ def test_native_python_uses_identical_real_demand_and_prefix_with_e_on_off(
     monkeypatch.setattr(settings, 'provider_native_history_buffer', True)
     on = cache.data(body)
     assert len(off['bars']) == len(on['bars']) == demand
-    assert off['bars'] == on['bars'] and off['indicators'] == on['indicators']
+    from test_provider_indicator_inputs import stable_indicators
+
+    assert off['bars'] == on['bars'] and stable_indicators(off) == stable_indicators(on)
     assert on['optional_count'] == 0
 
 

@@ -1194,6 +1194,15 @@ export default function AdvancedWorkspace() {
         if (
           !q ||
           !validIndicatorRead(q.indicators) ||
+          (q.client !== undefined && (typeof q.client !== "string" || q.client.length < 1 || q.client.length > 64)) ||
+          (q.indicator_consumers !== undefined && (
+            !Array.isArray(q.indicator_consumers) || q.indicator_consumers.length > 64 ||
+            q.indicator_consumers.some((consumer: any) => !consumer ||
+              typeof consumer.id !== "string" || consumer.id.length < 1 || consumer.id.length > 100 ||
+              !Number.isSafeInteger(consumer.generation) || consumer.generation < 0 ||
+              !validIndicatorRead([consumer.spec]) ||
+              (consumer.purpose !== undefined && !["foreground", "warmup"].includes(consumer.purpose)))
+          )) ||
           typeof q.instrument !== "string" ||
           q.instrument.length > 80 ||
           (q.series_kind !== undefined &&
@@ -1310,9 +1319,10 @@ export default function AdvancedWorkspace() {
                 instrument: q.instrument,
                 series_kind: q.series_kind || "managed",
                 published: q.series_kind !== "provider",
+                ...(q.client !== undefined ? { client: q.client } : {}),
+                ...(q.indicator_consumers !== undefined ? { indicator_consumers: q.indicator_consumers } : {}),
                 ...(q.series_kind === "composite"
                   ? {
-                      client: q.client,
                       composite_revision_id: q.composite_revision_id,
                       input_revision: q.input_revision,
                       display_snapshot_id: q.display_snapshot_id,
@@ -1336,7 +1346,6 @@ export default function AdvancedWorkspace() {
                       countBack: q.countBack,
                       from: q.from,
                       firstDataRequest: q.firstDataRequest === true,
-                      client: q.client,
                       ...(q.native_history !== undefined
                         ? {
                             native_history: q.native_history,

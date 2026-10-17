@@ -59,10 +59,12 @@ def _entry(cache, key, maximum):
         return entry
 
 
-def freeze(db, page, body, maximum, *, evaluation_end=None):
+def freeze(db, page, body, maximum, *, evaluation_end=None, telemetry=None):
     """Called inside the visible page's repeatable-read transaction, never computes."""
     from .provider_cache import check_cancelled
 
+    stats = telemetry if telemetry is not None else {}
+    stats.update(input_cache='miss', sql_payload_rows=0)
     dataset = db.get(ProviderDataset, page["dataset_id"])
     origin = body.calculation_origin or 0
     swing = any(s["name"] == "SWING_SR_V1" for s in body.indicators)
@@ -97,6 +99,7 @@ def freeze(db, page, body, maximum, *, evaluation_end=None):
         if prefix_unchanged or same and previous.revision == revision and (not previous.rows or
                 previous.rows[-1]["start"] >= ceiling):
             rows = previous.rows
+            stats['input_cache'] = 'hit'
         else:
             # Every commit changing an earlier row rotates the history epoch.
             # Re-read the last retained row, which can still be forming.
@@ -105,6 +108,7 @@ def freeze(db, page, body, maximum, *, evaluation_end=None):
             loaded = list(db.scalars(select(ProviderBar.payload).where(
                 ProviderBar.dataset_id == dataset.id, ProviderBar.start >= left,
                 ProviderBar.start <= ceiling).order_by(ProviderBar.start).limit(maximum + 1)))
+            stats.update(input_cache='append' if incremental else 'miss', sql_payload_rows=len(loaded))
             check_cancelled()
             rows = [*previous.rows[:-1], *loaded] if incremental else loaded
             if len(rows) > maximum:

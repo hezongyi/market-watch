@@ -111,3 +111,35 @@ def test_boundary_parameters_still_follow_whole_origin_talib(spec):
     for output in calculate(rows, spec)["series"]:
         assert [row[output["key"]] for row in actual] == pytest.approx(
             [row["value"] for row in output["values"]], abs=1e-8)
+
+
+def test_swing_replay_owns_confirmed_state_but_isolates_preview_and_checkpoints(monkeypatch):
+    from alerts import swing_sr
+
+    spec = {"name": "SWING_SR_V1", "params": {"high_strength": 32, "low_strength": 33}}
+    rows = prices(700)
+    original = swing_sr.deepcopy
+    state_copies = []
+
+    def counted(value):
+        if isinstance(value, dict) and "window" in value and "statistics" in value:
+            state_copies.append(value["n"])
+        return original(value)
+
+    monkeypatch.setattr(swing_sr, "deepcopy", counted)
+    engine = IndicatorState(spec)
+    for row in rows[:600]:
+        engine.step(row)
+    assert state_copies == [], "confirmed replay must not clone the growing window on every bar"
+    checkpoint = engine.checkpoint()
+    engine.step(rows[600], provisional=True)
+    assert len(state_copies) == 1, "preview must clone the confirmed state exactly once"
+    assert engine.checkpoint() == checkpoint
+    restored = IndicatorState(spec, checkpoint)
+    expected = engine.step(rows[600])
+    assert checkpoint["state"]["n"] == 600
+    assert restored.step(rows[600]) == expected
+    assert restored.checkpoint() == engine.checkpoint()
+    restored.step(rows[601])
+    assert restored.state["n"] == engine.state["n"] + 1
+    assert checkpoint["state"]["n"] == 600

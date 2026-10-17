@@ -853,10 +853,15 @@ def data_sync(body: DataQuery):
         for spec in body.indicators:
             validate(spec)
         if body.series_kind in ("history", "composite"):
+            from .fixed_indicator_display import complete, prepare
             from .series_access import chart_data
 
+            started = time.perf_counter()
             with transaction() as db:
-                return chart_data(db, body)
+                page = chart_data(db, body)
+                prepared = prepare(db, page, body)
+            page['timings_ms'] = {**page.get('timings_ms', {}), 'fixed_read_freeze':round((time.perf_counter()-started)*1000,2)}
+            return complete(page, prepared)
         if body.series_kind == "provider":
             import httpx
 

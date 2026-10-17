@@ -137,6 +137,9 @@ def request(db, page, spec, *, stamp=None):
         parent_id=parent, prefix_end=prefix, cursor=prefix, state=state, status="pending",
         lease_until=0, next_at=0, attempts=0, updated_at=stamp)
         .on_conflict_do_nothing(index_elements=["id"]))
+    from .publication_wakeup import notify
+
+    notify(db)
     return db.get(FixedIndicatorRun, ident)
 
 
@@ -209,30 +212,60 @@ def build(ownership):
         if inputs is None:
             return None
         rows, phase, profiles = inputs
-        engine = IndicatorState(run.spec, run.state)
         seam = db.get(CompositeRevision, run.revision_id).seam if run.revision_id else None
-        output = []
-        for source in rows:
-            row = dict(source)
-            if run.spec["name"] == "SWING_SR_V1":
-                from .series_access import fixed_label
-
-                row["chart_time"] = fixed_label(row, run.timeframe, phase)
-            row["gap_before"] = gap_before(engine.state.get("last_end"), row["start"], phase, profiles)
-            previous_end = engine.state.get("last_end")
-            if (seam is not None and not row["gap_before"] and previous_end is not None
-                    and previous_end <= seam <= row["start"]):
-                # The seam can lie in an evidenced closure with no candle at T.
-                # A dependency still spans sources even without seam_at_start.
-                row["seam_at_start"] = True
-            values = engine.step(row)
-            output.append({"start": row["start"], "end": row["end"], "values": values,
-                **({"break_before": True} if row["gap_before"] else {}),
-                "dependency_origin": engine.state.get("origin"), "seam_dependency": engine.state.get("seam", False),
-                "initialized": engine.initialized(values)})
+        calculated = calculate_inputs(run, rows, phase, profiles, seam=seam)
         cursor = rows[-1]["end"] if rows else run.target_end
         done = len(rows) < PAGE_SIZE or cursor >= run.target_end
-        return {"rows": output, "state": engine.checkpoint(), "cursor": run.target_end if done else cursor, "done": done}
+        return {**calculated, "cursor": run.target_end if done else cursor, "done": done}
+
+
+def calculate_inputs(run, rows, phase, profiles, *, seam=None, initial_state=None, batch=False):
+    """One exact numerical path for worker pages and bounded foreground replay."""
+    if batch and run.spec["name"] in ("SMA", "EMA", "LWMA", "BBANDS", "RSI", "ATR", "MACD", "STOCH"):
+        from .chart_indicators import calculate
+        from .indicator_state import advance_dependencies
+
+        if initial_state and initial_state.get('state'):
+            raise ValueError('Batch oracle requires a full origin replay, not a checkpoint suffix')
+        engine = IndicatorState(run.spec)
+        prepared, output = [], []
+        for source in rows:
+            previous_end = engine.state.get("last_end")
+            row = {**source, "gap_before": gap_before(previous_end, source["start"], phase, profiles)}
+            if seam is not None and not row["gap_before"] and previous_end is not None and previous_end <= seam <= row["start"]:
+                row["seam_at_start"] = True
+            advance_dependencies(engine.state, engine.name, engine.params, row)
+            prepared.append(row)
+            output.append({"start": row["start"], "end": row["end"],
+                **({"break_before": True} if row["gap_before"] else {}),
+                "dependency_origin": engine.state.get("origin"), "seam_dependency": engine.state.get("seam", False)})
+        oracle = calculate(prepared, run.spec)
+        for index, row in enumerate(output):
+            row["values"] = {series["key"]: series["values"][index]["value"] for series in oracle["series"]}
+            row["initialized"] = all(value is not None for value in row["values"].values())
+        # No checkpoint is invented from a batch result. Durable worker replay
+        # still owns its existing, versioned state format and page publication.
+        return {"rows": output, "state": None, "display": None}
+    engine = IndicatorState(run.spec, run.state if initial_state is None else initial_state)
+    output = []
+    for source in rows:
+        row = dict(source)
+        if run.spec["name"] == "SWING_SR_V1":
+            from .series_access import fixed_label
+
+            row["chart_time"] = fixed_label(row, run.timeframe, phase)
+        row["gap_before"] = gap_before(engine.state.get("last_end"), row["start"], phase, profiles)
+        previous_end = engine.state.get("last_end")
+        if (seam is not None and not row["gap_before"] and previous_end is not None
+                and previous_end <= seam <= row["start"]):
+            # The seam may lie in an evidenced closure without a candle at T.
+            row["seam_at_start"] = True
+        values = engine.step(row)
+        output.append({"start": row["start"], "end": row["end"], "values": values,
+            **({"break_before": True} if row["gap_before"] else {}),
+            "dependency_origin": engine.state.get("origin"), "seam_dependency": engine.state.get("seam", False),
+            "initialized": engine.initialized(values)})
+    return {"rows": output, "state": engine.checkpoint(), "display": getattr(engine, "last_presentation", None)}
 
 
 def _lock(db, ownership):

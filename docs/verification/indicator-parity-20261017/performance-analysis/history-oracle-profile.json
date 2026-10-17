@@ -1,0 +1,1892 @@
+[
+  {
+    "period": 151,
+    "http": {
+      "startTime": 1792210526643.7212,
+      "domainLookupStart": 6.92,
+      "domainLookupEnd": 6.923,
+      "connectStart": 6.923,
+      "secureConnectionStart": 7.223,
+      "connectEnd": 17.065,
+      "requestStart": 17.224,
+      "responseStart": 400.59,
+      "responseEnd": 402.264
+    },
+    "timings": {
+      "fixed_read_freeze": 232.1
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "a266879fe9fc97ed964b8583c3ad3919e05aa36bce70503a65b06c849dab135b",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "miss",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 77.14
+      }
+    }
+  },
+  {
+    "period": 152,
+    "http": {
+      "startTime": 1792210527177.795,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.268,
+      "responseStart": 179.165,
+      "responseEnd": 185.45
+    },
+    "timings": {
+      "fixed_read_freeze": 64.32
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "04b4376dbcb649b6a68b26317d1f26bcbea5db613a84cda5f70c2793097d2974",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 67.87
+      }
+    }
+  },
+  {
+    "period": 153,
+    "http": {
+      "startTime": 1792210527563.686,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.259,
+      "responseStart": 213.806,
+      "responseEnd": 224.656
+    },
+    "timings": {
+      "fixed_read_freeze": 73.74
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "5506a3174ad9a5b733beaa8fa0791d18e7bf3cd522095d0d96a03086998b4eb2",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 76.58
+      }
+    }
+  },
+  {
+    "period": 154,
+    "http": {
+      "startTime": 1792210527962.1301,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.24,
+      "responseStart": 231.667,
+      "responseEnd": 246.206
+    },
+    "timings": {
+      "fixed_read_freeze": 79.83
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "b77ae9a7bcc6051e8203c8e46940373843532ab55297d21bb732fde638b0a8c8",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 83.68
+      }
+    }
+  },
+  {
+    "period": 155,
+    "http": {
+      "startTime": 1792210528342.925,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 17.749,
+      "responseStart": 225.743,
+      "responseEnd": 228.205
+    },
+    "timings": {
+      "fixed_read_freeze": 71.82
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "21498f65043789c1b9f186e4cd8ae5db5b785e32c8f787f99c8d5bd8de328a06",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 80.2
+      }
+    }
+  },
+  {
+    "period": 156,
+    "http": {
+      "startTime": 1792210528799.106,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.247,
+      "responseStart": 446.166,
+      "responseEnd": 460.395
+    },
+    "timings": {
+      "fixed_read_freeze": 170.69
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "32b088f3afd2533d8f3bc6fe35494c1345151c234b34147416cc2f3da22efbf6",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 94.96
+      }
+    }
+  },
+  {
+    "period": 157,
+    "http": {
+      "startTime": 1792210529358.965,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.222,
+      "responseStart": 205.922,
+      "responseEnd": 210.912
+    },
+    "timings": {
+      "fixed_read_freeze": 58.18
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "b3d0ecdc7d12146ef59f5745d072427b28b9e6d94e15f722830a673298d41e15",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 86.15
+      }
+    }
+  },
+  {
+    "period": 158,
+    "http": {
+      "startTime": 1792210529700.9648,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 14.728,
+      "responseStart": 235.368,
+      "responseEnd": 240.33
+    },
+    "timings": {
+      "fixed_read_freeze": 69.61
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "a8fe1a8ee88983a6fd5dd98b847f1daefae2fd21e1107f918de4f5d971be05f2",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 91.29
+      }
+    }
+  },
+  {
+    "period": 159,
+    "http": {
+      "startTime": 1792210530140.771,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.248,
+      "responseStart": 260.11,
+      "responseEnd": 264.314
+    },
+    "timings": {
+      "fixed_read_freeze": 58.32
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "8ab815d2bd1b18902b7420ad53987e99b60907a3896c0ad7aa6b130966fa8854",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 108.56
+      }
+    }
+  },
+  {
+    "period": 160,
+    "http": {
+      "startTime": 1792210530548.5461,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.224,
+      "responseStart": 222.501,
+      "responseEnd": 223.995
+    },
+    "timings": {
+      "fixed_read_freeze": 74.09
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "e08b763dfc8f473d8c27cfc8694dc929325e353363fcc5d8e3c655353638b716",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 92.42
+      }
+    }
+  },
+  {
+    "period": 161,
+    "http": {
+      "startTime": 1792210530914.1282,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.237,
+      "responseStart": 212.292,
+      "responseEnd": 222.655
+    },
+    "timings": {
+      "fixed_read_freeze": 88.73
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "184f269e625e9161270b00d9d39c2e53d4edce398a7704b4fc22073777cdcf1b",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 63.23
+      }
+    }
+  },
+  {
+    "period": 162,
+    "http": {
+      "startTime": 1792210531245.152,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.243,
+      "responseStart": 183.513,
+      "responseEnd": 195.204
+    },
+    "timings": {
+      "fixed_read_freeze": 70.46
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "62537f264730c97b320e26b11a7c58e5a56c3a84618b7dc43e5f578177bf0527",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 62.56
+      }
+    }
+  },
+  {
+    "period": 163,
+    "http": {
+      "startTime": 1792210531555.089,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.257,
+      "responseStart": 241.426,
+      "responseEnd": 255.431
+    },
+    "timings": {
+      "fixed_read_freeze": 67.43
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "f8ed89673f4ae7675c4c520a90bcef729a2405eb89cd85cf7300a7dc5299eb38",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 72.73
+      }
+    }
+  },
+  {
+    "period": 164,
+    "http": {
+      "startTime": 1792210531938.038,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.23,
+      "responseStart": 276.917,
+      "responseEnd": 281.854
+    },
+    "timings": {
+      "fixed_read_freeze": 84.78
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "14e96bed0e235c6b91dc684c6db44b3504cd8bfc5b4bfabdc0457b2622840069",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 80.92
+      }
+    }
+  },
+  {
+    "period": 165,
+    "http": {
+      "startTime": 1792210532437.352,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.351,
+      "responseStart": 190.669,
+      "responseEnd": 193.073
+    },
+    "timings": {
+      "fixed_read_freeze": 60.08
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "768b1bc9e2410568b1b8991fe524da361158506ab8701a8a24067c6c19c61748",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 79.29
+      }
+    }
+  },
+  {
+    "period": 166,
+    "http": {
+      "startTime": 1792210532745.072,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.235,
+      "responseStart": 382.176,
+      "responseEnd": 394.327
+    },
+    "timings": {
+      "fixed_read_freeze": 62.61
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "9a9597cf68dd6392736b999ffc424a71520dea1dee3fd9918fda4e417900f662",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 62.12
+      }
+    }
+  },
+  {
+    "period": 167,
+    "http": {
+      "startTime": 1792210533304.728,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.427,
+      "responseStart": 219.956,
+      "responseEnd": 230.39
+    },
+    "timings": {
+      "fixed_read_freeze": 57.99
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "8c2866970b792bfbeab703fd91d05b8511db56a7f58a21ce0e0d5b5dfe8a2c81",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 73.87
+      }
+    }
+  },
+  {
+    "period": 168,
+    "http": {
+      "startTime": 1792210533651.297,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.24,
+      "responseStart": 246.899,
+      "responseEnd": 250.308
+    },
+    "timings": {
+      "fixed_read_freeze": 91.81
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "372ed7b3660529c704c5a537f71b879249efd4d90ca5982aaa34b46a19b8936d",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 87.43
+      }
+    }
+  },
+  {
+    "period": 169,
+    "http": {
+      "startTime": 1792210533995.064,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.245,
+      "responseStart": 265.892,
+      "responseEnd": 283.897
+    },
+    "timings": {
+      "fixed_read_freeze": 51.11
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "c89779a0f16e13c876d7e0572fa66911e561bb5b35c5211cffeeb13f5b34f3cc",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 133.86
+      }
+    }
+  },
+  {
+    "period": 170,
+    "http": {
+      "startTime": 1792210534395.53,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.228,
+      "responseStart": 202.686,
+      "responseEnd": 217.314
+    },
+    "timings": {
+      "fixed_read_freeze": 53.9
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "31d57efca77fd073905100a4dac8f03d581486d8f271d5dc3e53adc4dbb3f862",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 88.23
+      }
+    }
+  },
+  {
+    "period": 171,
+    "http": {
+      "startTime": 1792210534721.961,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.287,
+      "responseStart": 326.572,
+      "responseEnd": 337.109
+    },
+    "timings": {
+      "fixed_read_freeze": 175.6
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "656e7dff2d1614633953d25cb4e5db85ba205db2ee5c5fb5a1af481973caa861",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 64.63
+      }
+    }
+  },
+  {
+    "period": 172,
+    "http": {
+      "startTime": 1792210535152.517,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.263,
+      "responseStart": 320.67,
+      "responseEnd": 332.117
+    },
+    "timings": {
+      "fixed_read_freeze": 77.97
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "47ef638891b0d2df456d7581ac94ea7b17217a41603b97123528963fd32239a2",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 165.54
+      }
+    }
+  },
+  {
+    "period": 173,
+    "http": {
+      "startTime": 1792210535637.267,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.238,
+      "responseStart": 225.33,
+      "responseEnd": 235.549
+    },
+    "timings": {
+      "fixed_read_freeze": 54.5
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "058dca98bb21e868e70f9dbc73e2a38834774fcc16f5be7f493e8c2a99be830c",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 78.22
+      }
+    }
+  },
+  {
+    "period": 174,
+    "http": {
+      "startTime": 1792210536004.527,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.616,
+      "responseStart": 175.807,
+      "responseEnd": 184.892
+    },
+    "timings": {
+      "fixed_read_freeze": 64.57
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "ff53708a7fdca6a71196b530a6c2576dbfbe45a7de1bd9c297f1180301529d28",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 58.28
+      }
+    }
+  },
+  {
+    "period": 175,
+    "http": {
+      "startTime": 1792210536358.647,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.235,
+      "responseStart": 233.242,
+      "responseEnd": 251.194
+    },
+    "timings": {
+      "fixed_read_freeze": 60.61
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "bacd93fcc955025b1d048af8e87af3084849e50fd8cb90b966ff3c52ab2194ae",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 88.95
+      }
+    }
+  },
+  {
+    "period": 176,
+    "http": {
+      "startTime": 1792210536740.716,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.248,
+      "responseStart": 184.103,
+      "responseEnd": 187.693
+    },
+    "timings": {
+      "fixed_read_freeze": 60.58
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "5659befc9ee004d24ef62fbe60c8ebedf837e32b3a56e499bf51ef157e24308c",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 71.07
+      }
+    }
+  },
+  {
+    "period": 177,
+    "http": {
+      "startTime": 1792210537017.667,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.241,
+      "responseStart": 213.497,
+      "responseEnd": 223.57
+    },
+    "timings": {
+      "fixed_read_freeze": 53.11
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "eef2dc37befbb108eeae1784ffd6f44a94d63e173d23f6f5d0a4835e529c796e",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 84.74
+      }
+    }
+  },
+  {
+    "period": 178,
+    "http": {
+      "startTime": 1792210537342.77,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.291,
+      "responseStart": 369.954,
+      "responseEnd": 378.584
+    },
+    "timings": {
+      "fixed_read_freeze": 70.05
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "2851b1149b3c62944e31cc7ae9e1b0cb6ffabdb7b92cfaa48740525de068bed3",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 91.42
+      }
+    }
+  },
+  {
+    "period": 179,
+    "http": {
+      "startTime": 1792210537839.695,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 6.303,
+      "responseStart": 168.649,
+      "responseEnd": 177.379
+    },
+    "timings": {
+      "fixed_read_freeze": 53.3
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "4974b34977ecd11f87ea1eae4fe0d2818624021e541be4fd8126e83572fda9e4",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 63.3
+      }
+    }
+  },
+  {
+    "period": 180,
+    "http": {
+      "startTime": 1792210538124.101,
+      "domainLookupStart": -1,
+      "domainLookupEnd": -1,
+      "connectStart": -1,
+      "secureConnectionStart": -1,
+      "connectEnd": -1,
+      "requestStart": 0.303,
+      "responseStart": 200.23,
+      "responseEnd": 213.055
+    },
+    "timings": {
+      "fixed_read_freeze": 55.14
+    },
+    "progress": {
+      "id": "LWMA",
+      "run_id": "5fabce18932f62b6104a24e1df6c225417db715c12e923d8c1952700a0897a2e",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791470940000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 75.47
+      }
+    }
+  }
+]

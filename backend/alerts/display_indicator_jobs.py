@@ -78,6 +78,9 @@ def request(db, run, snapshot, affected, cursor, end, checkpoint, *, retry=None)
             state=initial_state, dependent=False,
             output=pack([]), status='pending', lease_until=0, next_at=0)
             .on_conflict_do_nothing(index_elements=['id']))
+        from .publication_wakeup import notify
+
+        notify(db)
         task = db.get(DisplayIndicatorTask, ident)
     restarted = None
     if retry and ident in retry:
@@ -91,6 +94,9 @@ def request(db, run, snapshot, affected, cursor, end, checkpoint, *, retry=None)
             restarted = {ident: retry[ident]}
             task.status, task.error, task.next_at = 'pending', None, 0
             task.lease_token, task.lease_until = None, 0
+            from .publication_wakeup import notify
+
+            notify(db)
     if task.status != 'complete':
         if task.status == 'error':
             error = (DisplayOutputLimit() if task.error == 'DisplayOutputLimit' else

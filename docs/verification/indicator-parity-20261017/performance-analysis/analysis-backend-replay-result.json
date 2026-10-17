@@ -1,0 +1,2742 @@
+[
+  {
+    "period": 481,
+    "cprofile_enabled": false,
+    "data_sync_ms": 333.73,
+    "jsonable_encoder_ms": 20.413,
+    "json_render_ms": 3.337,
+    "response_bytes": 264039,
+    "bars": 409,
+    "progress": {
+      "id": "LWMA",
+      "run_id": "79db1dc211c5653437a503da723aa87e16a5554952b104b9ec8b468f11f110f3",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791479460000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791479460000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "miss",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 27.6
+      }
+    },
+    "spans": {
+      "series_access.metadata": {
+        "calls": 1,
+        "total_ms": 98.484,
+        "max_ms": 98.484
+      },
+      "history_artifacts.published_artifact": {
+        "calls": 4,
+        "total_ms": 14.435,
+        "max_ms": 5.115
+      },
+      "history_artifacts.read_artifact": {
+        "calls": 1,
+        "total_ms": 11.965,
+        "max_ms": 11.965
+      },
+      "history_artifacts.chart_page": {
+        "calls": 1,
+        "total_ms": 11.977,
+        "max_ms": 11.977
+      },
+      "indicator_demands.guard": {
+        "calls": 2,
+        "total_ms": 1.18,
+        "max_ms": 0.633
+      },
+      "fixed_indicators.request": {
+        "calls": 1,
+        "total_ms": 15.556,
+        "max_ms": 15.556
+      },
+      "indicator_demands.renew": {
+        "calls": 1,
+        "total_ms": 11.395,
+        "max_ms": 11.395
+      },
+      "fixed_indicators.outputs": {
+        "calls": 1,
+        "total_ms": 0.005,
+        "max_ms": 0.005
+      },
+      "fixed_indicators.presentation": {
+        "calls": 1,
+        "total_ms": 0.021,
+        "max_ms": 0.021
+      },
+      "series_access.history_check": {
+        "calls": 2,
+        "total_ms": 0.039,
+        "max_ms": 0.035
+      },
+      "series_access.future_grid": {
+        "calls": 1,
+        "total_ms": 0.922,
+        "max_ms": 0.922
+      },
+      "series_access.chart_data": {
+        "calls": 1,
+        "total_ms": 175.077,
+        "max_ms": 175.077
+      },
+      "fixed_indicators._context": {
+        "calls": 4,
+        "total_ms": 7.747,
+        "max_ms": 2.27
+      },
+      "fixed_indicators.read_artifact": {
+        "calls": 3,
+        "total_ms": 117.808,
+        "max_ms": 46.67
+      },
+      "fixed_indicators.input_rows": {
+        "calls": 3,
+        "total_ms": 124.087,
+        "max_ms": 48.97
+      },
+      "fixed_indicator_display.prepare": {
+        "calls": 1,
+        "total_ms": 128.642,
+        "max_ms": 128.642
+      },
+      "transaction.body": {
+        "calls": 1,
+        "total_ms": 303.728,
+        "max_ms": 303.728
+      },
+      "transaction.commit_exit": {
+        "calls": 1,
+        "total_ms": 2.081,
+        "max_ms": 2.081
+      },
+      "transaction.total": {
+        "calls": 1,
+        "total_ms": 305.988,
+        "max_ms": 305.988
+      },
+      "chart_indicators.calculate": {
+        "calls": 1,
+        "total_ms": 9.648,
+        "max_ms": 9.648
+      },
+      "fixed_indicators.calculate_inputs": {
+        "calls": 1,
+        "total_ms": 26.708,
+        "max_ms": 26.708
+      },
+      "fixed_indicator_display.presentation": {
+        "calls": 1,
+        "total_ms": 0.14,
+        "max_ms": 0.14
+      },
+      "fixed_indicator_display.complete": {
+        "calls": 1,
+        "total_ms": 27.666,
+        "max_ms": 27.666
+      }
+    },
+    "sql": [
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_versions"
+        ],
+        "advisory": false,
+        "ms": 3.17,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_reclamations"
+        ],
+        "advisory": false,
+        "ms": 0.871,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.957,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "instruments"
+        ],
+        "advisory": false,
+        "ms": 1.19,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_artifacts"
+        ],
+        "advisory": false,
+        "ms": 0.834,
+        "rowcount": 9
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_versions"
+        ],
+        "advisory": false,
+        "ms": 0.567,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.544,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_reclamations"
+        ],
+        "advisory": false,
+        "ms": 0.395,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_artifacts"
+        ],
+        "advisory": false,
+        "ms": 0.456,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_artifact_blocks"
+        ],
+        "advisory": false,
+        "ms": 1.102,
+        "rowcount": -1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.422,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "instruments"
+        ],
+        "advisory": false,
+        "ms": 0.291,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.328,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.904,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [],
+        "advisory": true,
+        "ms": 0.336,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.456,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.848,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.349,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_reclamations"
+        ],
+        "advisory": false,
+        "ms": 0.254,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.644,
+        "rowcount": 0
+      },
+      {
+        "kind": "INSERT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 1.076,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [],
+        "advisory": false,
+        "ms": 0.391,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.535,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [],
+        "advisory": true,
+        "ms": 0.371,
+        "rowcount": 1
+      },
+      {
+        "kind": "DELETE",
+        "tables": [
+          "market_indicator_demands"
+        ],
+        "advisory": false,
+        "ms": 0.737,
+        "rowcount": 30
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_indicator_demands"
+        ],
+        "advisory": false,
+        "ms": 0.618,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_indicator_schedule"
+        ],
+        "advisory": false,
+        "ms": 0.658,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_indicator_demands"
+        ],
+        "advisory": false,
+        "ms": 0.401,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_indicator_demands"
+        ],
+        "advisory": false,
+        "ms": 0.38,
+        "rowcount": 1
+      },
+      {
+        "kind": "INSERT",
+        "tables": [
+          "SET",
+          "market_indicator_demands"
+        ],
+        "advisory": false,
+        "ms": 0.891,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.508,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_versions"
+        ],
+        "advisory": false,
+        "ms": 0.36,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.3,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "instruments"
+        ],
+        "advisory": false,
+        "ms": 0.32,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.35,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "instruments"
+        ],
+        "advisory": false,
+        "ms": 0.45,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.314,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_reclamations"
+        ],
+        "advisory": false,
+        "ms": 0.309,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_artifacts"
+        ],
+        "advisory": false,
+        "ms": 0.407,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_artifact_blocks"
+        ],
+        "advisory": false,
+        "ms": 0.692,
+        "rowcount": -1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.687,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "instruments"
+        ],
+        "advisory": false,
+        "ms": 0.518,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.768,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_reclamations"
+        ],
+        "advisory": false,
+        "ms": 0.721,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_artifacts"
+        ],
+        "advisory": false,
+        "ms": 0.814,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_artifact_blocks"
+        ],
+        "advisory": false,
+        "ms": 0.615,
+        "rowcount": -1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.501,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "instruments"
+        ],
+        "advisory": false,
+        "ms": 0.586,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.457,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_reclamations"
+        ],
+        "advisory": false,
+        "ms": 0.581,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_artifacts"
+        ],
+        "advisory": false,
+        "ms": 0.42,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_artifact_blocks"
+        ],
+        "advisory": false,
+        "ms": 0.58,
+        "rowcount": -1
+      }
+    ]
+  },
+  {
+    "period": 482,
+    "cprofile_enabled": false,
+    "data_sync_ms": 52.811,
+    "jsonable_encoder_ms": 21.17,
+    "json_render_ms": 3.297,
+    "response_bytes": 264014,
+    "bars": 409,
+    "progress": {
+      "id": "LWMA",
+      "run_id": "9c13b11e22dea91c9267bce24ee2888f3178e193c76ae5602f7cfa00588f2933",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791479460000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791479460000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 26.01
+      }
+    },
+    "spans": {
+      "series_access.metadata": {
+        "calls": 1,
+        "total_ms": 3.545,
+        "max_ms": 3.545
+      },
+      "history_artifacts.published_artifact": {
+        "calls": 1,
+        "total_ms": 1.685,
+        "max_ms": 1.685
+      },
+      "history_artifacts.read_artifact": {
+        "calls": 1,
+        "total_ms": 6.552,
+        "max_ms": 6.552
+      },
+      "history_artifacts.chart_page": {
+        "calls": 1,
+        "total_ms": 6.563,
+        "max_ms": 6.563
+      },
+      "indicator_demands.guard": {
+        "calls": 2,
+        "total_ms": 0.617,
+        "max_ms": 0.324
+      },
+      "fixed_indicators.request": {
+        "calls": 1,
+        "total_ms": 7.214,
+        "max_ms": 7.214
+      },
+      "indicator_demands.renew": {
+        "calls": 1,
+        "total_ms": 2.957,
+        "max_ms": 2.957
+      },
+      "fixed_indicators.outputs": {
+        "calls": 1,
+        "total_ms": 0.005,
+        "max_ms": 0.005
+      },
+      "fixed_indicators.presentation": {
+        "calls": 1,
+        "total_ms": 0.016,
+        "max_ms": 0.016
+      },
+      "series_access.history_check": {
+        "calls": 2,
+        "total_ms": 0.037,
+        "max_ms": 0.032
+      },
+      "series_access.future_grid": {
+        "calls": 1,
+        "total_ms": 0.027,
+        "max_ms": 0.027
+      },
+      "series_access.chart_data": {
+        "calls": 1,
+        "total_ms": 22.853,
+        "max_ms": 22.853
+      },
+      "fixed_indicators._context": {
+        "calls": 1,
+        "total_ms": 1.632,
+        "max_ms": 1.632
+      },
+      "fixed_indicator_display.prepare": {
+        "calls": 1,
+        "total_ms": 2.425,
+        "max_ms": 2.425
+      },
+      "transaction.body": {
+        "calls": 1,
+        "total_ms": 25.284,
+        "max_ms": 25.284
+      },
+      "transaction.commit_exit": {
+        "calls": 1,
+        "total_ms": 1.136,
+        "max_ms": 1.136
+      },
+      "transaction.total": {
+        "calls": 1,
+        "total_ms": 26.54,
+        "max_ms": 26.54
+      },
+      "chart_indicators.calculate": {
+        "calls": 1,
+        "total_ms": 9.217,
+        "max_ms": 9.217
+      },
+      "fixed_indicators.calculate_inputs": {
+        "calls": 1,
+        "total_ms": 25.101,
+        "max_ms": 25.101
+      },
+      "fixed_indicator_display.presentation": {
+        "calls": 1,
+        "total_ms": 0.131,
+        "max_ms": 0.131
+      },
+      "fixed_indicator_display.complete": {
+        "calls": 1,
+        "total_ms": 26.064,
+        "max_ms": 26.064
+      }
+    },
+    "sql": [
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_versions"
+        ],
+        "advisory": false,
+        "ms": 0.524,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_reclamations"
+        ],
+        "advisory": false,
+        "ms": 0.211,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.206,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "instruments"
+        ],
+        "advisory": false,
+        "ms": 0.209,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_artifacts"
+        ],
+        "advisory": false,
+        "ms": 0.275,
+        "rowcount": 9
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_versions"
+        ],
+        "advisory": false,
+        "ms": 0.356,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.304,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_reclamations"
+        ],
+        "advisory": false,
+        "ms": 0.182,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_artifacts"
+        ],
+        "advisory": false,
+        "ms": 0.297,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_artifact_blocks"
+        ],
+        "advisory": false,
+        "ms": 0.447,
+        "rowcount": -1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.361,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "instruments"
+        ],
+        "advisory": false,
+        "ms": 0.26,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.273,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.353,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [],
+        "advisory": true,
+        "ms": 0.179,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.342,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.325,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.188,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_reclamations"
+        ],
+        "advisory": false,
+        "ms": 0.177,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.582,
+        "rowcount": 0
+      },
+      {
+        "kind": "INSERT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.537,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [],
+        "advisory": false,
+        "ms": 0.191,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.28,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [],
+        "advisory": true,
+        "ms": 0.163,
+        "rowcount": 1
+      },
+      {
+        "kind": "DELETE",
+        "tables": [
+          "market_indicator_demands"
+        ],
+        "advisory": false,
+        "ms": 0.256,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_indicator_demands"
+        ],
+        "advisory": false,
+        "ms": 0.345,
+        "rowcount": 1
+      },
+      {
+        "kind": "INSERT",
+        "tables": [
+          "SET",
+          "market_indicator_demands"
+        ],
+        "advisory": false,
+        "ms": 0.533,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.311,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_versions"
+        ],
+        "advisory": false,
+        "ms": 0.365,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.198,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "instruments"
+        ],
+        "advisory": false,
+        "ms": 0.25,
+        "rowcount": 1
+      }
+    ]
+  },
+  {
+    "period": 483,
+    "cprofile_enabled": true,
+    "data_sync_ms": 211.43,
+    "jsonable_encoder_ms": 83.64,
+    "json_render_ms": 3.293,
+    "response_bytes": 263995,
+    "bars": 409,
+    "progress": {
+      "id": "LWMA",
+      "run_id": "b006f4dd08a444d55dc3d0ec7cc354bd083471a3a5465d40c7e43f3cce98b997",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791479460000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791479460000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 156.19
+      }
+    },
+    "spans": {
+      "series_access.metadata": {
+        "calls": 1,
+        "total_ms": 7.463,
+        "max_ms": 7.463
+      },
+      "history_artifacts.published_artifact": {
+        "calls": 1,
+        "total_ms": 7.426,
+        "max_ms": 7.426
+      },
+      "history_artifacts.read_artifact": {
+        "calls": 1,
+        "total_ms": 12.986,
+        "max_ms": 12.986
+      },
+      "history_artifacts.chart_page": {
+        "calls": 1,
+        "total_ms": 13.003,
+        "max_ms": 13.003
+      },
+      "indicator_demands.guard": {
+        "calls": 2,
+        "total_ms": 1.199,
+        "max_ms": 0.692
+      },
+      "fixed_indicators.request": {
+        "calls": 1,
+        "total_ms": 17.64,
+        "max_ms": 17.64
+      },
+      "indicator_demands.renew": {
+        "calls": 1,
+        "total_ms": 4.584,
+        "max_ms": 4.584
+      },
+      "fixed_indicators.outputs": {
+        "calls": 1,
+        "total_ms": 0.013,
+        "max_ms": 0.013
+      },
+      "fixed_indicators.presentation": {
+        "calls": 1,
+        "total_ms": 0.029,
+        "max_ms": 0.029
+      },
+      "series_access.history_check": {
+        "calls": 2,
+        "total_ms": 0.061,
+        "max_ms": 0.052
+      },
+      "series_access.future_grid": {
+        "calls": 1,
+        "total_ms": 0.06,
+        "max_ms": 0.06
+      },
+      "series_access.chart_data": {
+        "calls": 1,
+        "total_ms": 49.25,
+        "max_ms": 49.25
+      },
+      "fixed_indicators._context": {
+        "calls": 1,
+        "total_ms": 2.421,
+        "max_ms": 2.421
+      },
+      "fixed_indicator_display.prepare": {
+        "calls": 1,
+        "total_ms": 3.87,
+        "max_ms": 3.87
+      },
+      "transaction.body": {
+        "calls": 1,
+        "total_ms": 53.138,
+        "max_ms": 53.138
+      },
+      "transaction.commit_exit": {
+        "calls": 1,
+        "total_ms": 1.565,
+        "max_ms": 1.565
+      },
+      "transaction.total": {
+        "calls": 1,
+        "total_ms": 54.84,
+        "max_ms": 54.84
+      },
+      "chart_indicators.calculate": {
+        "calls": 1,
+        "total_ms": 25.962,
+        "max_ms": 25.962
+      },
+      "fixed_indicators.calculate_inputs": {
+        "calls": 1,
+        "total_ms": 154.326,
+        "max_ms": 154.326
+      },
+      "fixed_indicator_display.presentation": {
+        "calls": 1,
+        "total_ms": 0.319,
+        "max_ms": 0.319
+      },
+      "fixed_indicator_display.complete": {
+        "calls": 1,
+        "total_ms": 156.282,
+        "max_ms": 156.282
+      }
+    },
+    "sql": [
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_versions"
+        ],
+        "advisory": false,
+        "ms": 1.42,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_reclamations"
+        ],
+        "advisory": false,
+        "ms": 0.336,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.239,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "instruments"
+        ],
+        "advisory": false,
+        "ms": 0.303,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_artifacts"
+        ],
+        "advisory": false,
+        "ms": 0.379,
+        "rowcount": 9
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_versions"
+        ],
+        "advisory": false,
+        "ms": 0.32,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.299,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_reclamations"
+        ],
+        "advisory": false,
+        "ms": 0.296,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_artifacts"
+        ],
+        "advisory": false,
+        "ms": 4.709,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_artifact_blocks"
+        ],
+        "advisory": false,
+        "ms": 0.673,
+        "rowcount": -1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 2.86,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "instruments"
+        ],
+        "advisory": false,
+        "ms": 0.321,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.274,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.362,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [],
+        "advisory": true,
+        "ms": 0.225,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.319,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 1.234,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 1.053,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_reclamations"
+        ],
+        "advisory": false,
+        "ms": 0.914,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.691,
+        "rowcount": 0
+      },
+      {
+        "kind": "INSERT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.767,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [],
+        "advisory": false,
+        "ms": 0.342,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.732,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [],
+        "advisory": true,
+        "ms": 0.382,
+        "rowcount": 1
+      },
+      {
+        "kind": "DELETE",
+        "tables": [
+          "market_indicator_demands"
+        ],
+        "advisory": false,
+        "ms": 0.348,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_indicator_demands"
+        ],
+        "advisory": false,
+        "ms": 0.358,
+        "rowcount": 1
+      },
+      {
+        "kind": "INSERT",
+        "tables": [
+          "SET",
+          "market_indicator_demands"
+        ],
+        "advisory": false,
+        "ms": 0.6,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.406,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_versions"
+        ],
+        "advisory": false,
+        "ms": 0.422,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.227,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "instruments"
+        ],
+        "advisory": false,
+        "ms": 0.235,
+        "rowcount": 1
+      }
+    ]
+  },
+  {
+    "period": 484,
+    "cprofile_enabled": false,
+    "data_sync_ms": 59.415,
+    "jsonable_encoder_ms": 20.37,
+    "json_render_ms": 3.815,
+    "response_bytes": 264018,
+    "bars": 409,
+    "progress": {
+      "id": "LWMA",
+      "run_id": "5dfd927ac2165ad0bf684d92f5be66f5d643051c1efe9af43c16b7582a2b70f7",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791479460000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791479460000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 29.44
+      }
+    },
+    "spans": {
+      "series_access.metadata": {
+        "calls": 1,
+        "total_ms": 3.687,
+        "max_ms": 3.687
+      },
+      "history_artifacts.published_artifact": {
+        "calls": 1,
+        "total_ms": 1.74,
+        "max_ms": 1.74
+      },
+      "history_artifacts.read_artifact": {
+        "calls": 1,
+        "total_ms": 7.134,
+        "max_ms": 7.134
+      },
+      "history_artifacts.chart_page": {
+        "calls": 1,
+        "total_ms": 7.145,
+        "max_ms": 7.145
+      },
+      "indicator_demands.guard": {
+        "calls": 2,
+        "total_ms": 0.866,
+        "max_ms": 0.462
+      },
+      "fixed_indicators.request": {
+        "calls": 1,
+        "total_ms": 8.571,
+        "max_ms": 8.571
+      },
+      "indicator_demands.renew": {
+        "calls": 1,
+        "total_ms": 3.358,
+        "max_ms": 3.358
+      },
+      "fixed_indicators.outputs": {
+        "calls": 1,
+        "total_ms": 0.005,
+        "max_ms": 0.005
+      },
+      "fixed_indicators.presentation": {
+        "calls": 1,
+        "total_ms": 0.018,
+        "max_ms": 0.018
+      },
+      "series_access.history_check": {
+        "calls": 2,
+        "total_ms": 0.043,
+        "max_ms": 0.038
+      },
+      "series_access.future_grid": {
+        "calls": 1,
+        "total_ms": 0.027,
+        "max_ms": 0.027
+      },
+      "series_access.chart_data": {
+        "calls": 1,
+        "total_ms": 25.174,
+        "max_ms": 25.174
+      },
+      "fixed_indicators._context": {
+        "calls": 1,
+        "total_ms": 1.82,
+        "max_ms": 1.82
+      },
+      "fixed_indicator_display.prepare": {
+        "calls": 1,
+        "total_ms": 2.762,
+        "max_ms": 2.762
+      },
+      "transaction.body": {
+        "calls": 1,
+        "total_ms": 27.943,
+        "max_ms": 27.943
+      },
+      "transaction.commit_exit": {
+        "calls": 1,
+        "total_ms": 1.615,
+        "max_ms": 1.615
+      },
+      "transaction.total": {
+        "calls": 1,
+        "total_ms": 29.637,
+        "max_ms": 29.637
+      },
+      "chart_indicators.calculate": {
+        "calls": 1,
+        "total_ms": 9.999,
+        "max_ms": 9.999
+      },
+      "fixed_indicators.calculate_inputs": {
+        "calls": 1,
+        "total_ms": 28.534,
+        "max_ms": 28.534
+      },
+      "fixed_indicator_display.presentation": {
+        "calls": 1,
+        "total_ms": 0.128,
+        "max_ms": 0.128
+      },
+      "fixed_indicator_display.complete": {
+        "calls": 1,
+        "total_ms": 29.51,
+        "max_ms": 29.51
+      }
+    },
+    "sql": [
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_versions"
+        ],
+        "advisory": false,
+        "ms": 0.551,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_reclamations"
+        ],
+        "advisory": false,
+        "ms": 0.155,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.221,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "instruments"
+        ],
+        "advisory": false,
+        "ms": 0.266,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_artifacts"
+        ],
+        "advisory": false,
+        "ms": 0.372,
+        "rowcount": 9
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_versions"
+        ],
+        "advisory": false,
+        "ms": 0.305,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.293,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_reclamations"
+        ],
+        "advisory": false,
+        "ms": 0.202,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_artifacts"
+        ],
+        "advisory": false,
+        "ms": 0.292,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_artifact_blocks"
+        ],
+        "advisory": false,
+        "ms": 0.598,
+        "rowcount": -1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.267,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "instruments"
+        ],
+        "advisory": false,
+        "ms": 0.201,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.319,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.381,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [],
+        "advisory": true,
+        "ms": 0.226,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.21,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.4,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.263,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_reclamations"
+        ],
+        "advisory": false,
+        "ms": 0.223,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.526,
+        "rowcount": 0
+      },
+      {
+        "kind": "INSERT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.633,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [],
+        "advisory": false,
+        "ms": 0.451,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.699,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [],
+        "advisory": true,
+        "ms": 0.268,
+        "rowcount": 1
+      },
+      {
+        "kind": "DELETE",
+        "tables": [
+          "market_indicator_demands"
+        ],
+        "advisory": false,
+        "ms": 0.424,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_indicator_demands"
+        ],
+        "advisory": false,
+        "ms": 0.386,
+        "rowcount": 1
+      },
+      {
+        "kind": "INSERT",
+        "tables": [
+          "SET",
+          "market_indicator_demands"
+        ],
+        "advisory": false,
+        "ms": 0.534,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.342,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_versions"
+        ],
+        "advisory": false,
+        "ms": 0.292,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.216,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "instruments"
+        ],
+        "advisory": false,
+        "ms": 0.271,
+        "rowcount": 1
+      }
+    ]
+  },
+  {
+    "period": 485,
+    "cprofile_enabled": false,
+    "data_sync_ms": 50.802,
+    "jsonable_encoder_ms": 22.695,
+    "json_render_ms": 4.049,
+    "response_bytes": 264001,
+    "bars": 409,
+    "progress": {
+      "id": "LWMA",
+      "run_id": "7076acdcd378bf7cff761bab800b142c12f37ff502dd7466d96d17b285634f9f",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791479460000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791479460000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "miss",
+        "input_rows": 5760,
+        "calculation_steps": 5760,
+        "calculation_ms": 24.05
+      }
+    },
+    "spans": {
+      "series_access.metadata": {
+        "calls": 1,
+        "total_ms": 3.569,
+        "max_ms": 3.569
+      },
+      "history_artifacts.published_artifact": {
+        "calls": 1,
+        "total_ms": 1.476,
+        "max_ms": 1.476
+      },
+      "history_artifacts.read_artifact": {
+        "calls": 1,
+        "total_ms": 7.088,
+        "max_ms": 7.088
+      },
+      "history_artifacts.chart_page": {
+        "calls": 1,
+        "total_ms": 7.098,
+        "max_ms": 7.098
+      },
+      "indicator_demands.guard": {
+        "calls": 2,
+        "total_ms": 0.644,
+        "max_ms": 0.348
+      },
+      "fixed_indicators.request": {
+        "calls": 1,
+        "total_ms": 6.409,
+        "max_ms": 6.409
+      },
+      "indicator_demands.renew": {
+        "calls": 1,
+        "total_ms": 3.537,
+        "max_ms": 3.537
+      },
+      "fixed_indicators.outputs": {
+        "calls": 1,
+        "total_ms": 0.005,
+        "max_ms": 0.005
+      },
+      "fixed_indicators.presentation": {
+        "calls": 1,
+        "total_ms": 0.013,
+        "max_ms": 0.013
+      },
+      "series_access.history_check": {
+        "calls": 2,
+        "total_ms": 0.033,
+        "max_ms": 0.028
+      },
+      "series_access.future_grid": {
+        "calls": 1,
+        "total_ms": 0.025,
+        "max_ms": 0.025
+      },
+      "series_access.chart_data": {
+        "calls": 1,
+        "total_ms": 22.848,
+        "max_ms": 22.848
+      },
+      "fixed_indicators._context": {
+        "calls": 1,
+        "total_ms": 1.461,
+        "max_ms": 1.461
+      },
+      "fixed_indicator_display.prepare": {
+        "calls": 1,
+        "total_ms": 2.191,
+        "max_ms": 2.191
+      },
+      "transaction.body": {
+        "calls": 1,
+        "total_ms": 25.044,
+        "max_ms": 25.044
+      },
+      "transaction.commit_exit": {
+        "calls": 1,
+        "total_ms": 1.365,
+        "max_ms": 1.365
+      },
+      "transaction.total": {
+        "calls": 1,
+        "total_ms": 26.49,
+        "max_ms": 26.49
+      },
+      "chart_indicators.calculate": {
+        "calls": 1,
+        "total_ms": 8.735,
+        "max_ms": 8.735
+      },
+      "fixed_indicators.calculate_inputs": {
+        "calls": 1,
+        "total_ms": 23.164,
+        "max_ms": 23.164
+      },
+      "fixed_indicator_display.presentation": {
+        "calls": 1,
+        "total_ms": 0.125,
+        "max_ms": 0.125
+      },
+      "fixed_indicator_display.complete": {
+        "calls": 1,
+        "total_ms": 24.1,
+        "max_ms": 24.1
+      }
+    },
+    "sql": [
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_versions"
+        ],
+        "advisory": false,
+        "ms": 0.51,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_reclamations"
+        ],
+        "advisory": false,
+        "ms": 0.219,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.257,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "instruments"
+        ],
+        "advisory": false,
+        "ms": 0.174,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_artifacts"
+        ],
+        "advisory": false,
+        "ms": 0.338,
+        "rowcount": 9
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_versions"
+        ],
+        "advisory": false,
+        "ms": 0.225,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.212,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_reclamations"
+        ],
+        "advisory": false,
+        "ms": 0.188,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_artifacts"
+        ],
+        "advisory": false,
+        "ms": 0.303,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_artifact_blocks"
+        ],
+        "advisory": false,
+        "ms": 0.548,
+        "rowcount": -1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.36,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "instruments"
+        ],
+        "advisory": false,
+        "ms": 0.238,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.231,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.263,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [],
+        "advisory": true,
+        "ms": 0.17,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.227,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.399,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.211,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_reclamations"
+        ],
+        "advisory": false,
+        "ms": 0.19,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.484,
+        "rowcount": 0
+      },
+      {
+        "kind": "INSERT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.495,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [],
+        "advisory": false,
+        "ms": 0.262,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.296,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [],
+        "advisory": true,
+        "ms": 0.22,
+        "rowcount": 1
+      },
+      {
+        "kind": "DELETE",
+        "tables": [
+          "market_indicator_demands"
+        ],
+        "advisory": false,
+        "ms": 1.114,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_indicator_demands"
+        ],
+        "advisory": false,
+        "ms": 0.298,
+        "rowcount": 1
+      },
+      {
+        "kind": "INSERT",
+        "tables": [
+          "SET",
+          "market_indicator_demands"
+        ],
+        "advisory": false,
+        "ms": 0.464,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.319,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_versions"
+        ],
+        "advisory": false,
+        "ms": 0.265,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.176,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "instruments"
+        ],
+        "advisory": false,
+        "ms": 0.242,
+        "rowcount": 1
+      }
+    ]
+  },
+  {
+    "period": 485,
+    "cprofile_enabled": false,
+    "data_sync_ms": 30.441,
+    "jsonable_encoder_ms": 26.326,
+    "json_render_ms": 3.939,
+    "response_bytes": 263992,
+    "bars": 409,
+    "progress": {
+      "id": "LWMA",
+      "run_id": "7076acdcd378bf7cff761bab800b142c12f37ff502dd7466d96d17b285634f9f",
+      "status": "pending",
+      "cursor": 1791158400000,
+      "target_end": 1791504000000,
+      "input_revision": 0,
+      "algorithm": "fixed-indicator-state-v3",
+      "error": null,
+      "next_at": 0,
+      "parent_run_id": null,
+      "reused_prefix_end": 1791158400000,
+      "calculation_origin": 1791158400000,
+      "producer": "backend",
+      "accuracy": "oracle_equivalent",
+      "canonical_verified": true,
+      "coverage": [
+        {
+          "start": 1791479460000,
+          "end": 1791504000000
+        }
+      ],
+      "required_coverage": [
+        {
+          "start": 1791479460000,
+          "end": 1791504000000
+        }
+      ],
+      "visible_complete": true,
+      "input_evidence": {
+        "revision_id": null,
+        "input_revision": 0,
+        "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+        "display_snapshot_id": null
+      },
+      "display_task_ids": [],
+      "display_status": "complete",
+      "execution": {
+        "path": "bounded-fixed-replay",
+        "input_cache": "hit",
+        "result_cache": "hit",
+        "input_rows": 5760,
+        "calculation_steps": 0,
+        "calculation_ms": 0.88
+      }
+    },
+    "spans": {
+      "series_access.metadata": {
+        "calls": 1,
+        "total_ms": 4.069,
+        "max_ms": 4.069
+      },
+      "history_artifacts.published_artifact": {
+        "calls": 1,
+        "total_ms": 1.616,
+        "max_ms": 1.616
+      },
+      "history_artifacts.read_artifact": {
+        "calls": 1,
+        "total_ms": 11.961,
+        "max_ms": 11.961
+      },
+      "history_artifacts.chart_page": {
+        "calls": 1,
+        "total_ms": 11.973,
+        "max_ms": 11.973
+      },
+      "fixed_indicators.request": {
+        "calls": 1,
+        "total_ms": 1.493,
+        "max_ms": 1.493
+      },
+      "indicator_demands.guard": {
+        "calls": 1,
+        "total_ms": 0.388,
+        "max_ms": 0.388
+      },
+      "indicator_demands.renew": {
+        "calls": 1,
+        "total_ms": 4.626,
+        "max_ms": 4.626
+      },
+      "fixed_indicators.outputs": {
+        "calls": 1,
+        "total_ms": 0.006,
+        "max_ms": 0.006
+      },
+      "fixed_indicators.presentation": {
+        "calls": 1,
+        "total_ms": 0.017,
+        "max_ms": 0.017
+      },
+      "series_access.history_check": {
+        "calls": 2,
+        "total_ms": 0.038,
+        "max_ms": 0.032
+      },
+      "series_access.future_grid": {
+        "calls": 1,
+        "total_ms": 0.03,
+        "max_ms": 0.03
+      },
+      "series_access.chart_data": {
+        "calls": 1,
+        "total_ms": 25.32,
+        "max_ms": 25.32
+      },
+      "fixed_indicators._context": {
+        "calls": 1,
+        "total_ms": 1.605,
+        "max_ms": 1.605
+      },
+      "fixed_indicator_display.prepare": {
+        "calls": 1,
+        "total_ms": 2.535,
+        "max_ms": 2.535
+      },
+      "transaction.body": {
+        "calls": 1,
+        "total_ms": 27.859,
+        "max_ms": 27.859
+      },
+      "transaction.commit_exit": {
+        "calls": 1,
+        "total_ms": 1.372,
+        "max_ms": 1.372
+      },
+      "transaction.total": {
+        "calls": 1,
+        "total_ms": 29.307,
+        "max_ms": 29.307
+      },
+      "fixed_indicator_display.presentation": {
+        "calls": 1,
+        "total_ms": 0.132,
+        "max_ms": 0.132
+      },
+      "fixed_indicator_display.complete": {
+        "calls": 1,
+        "total_ms": 0.928,
+        "max_ms": 0.928
+      }
+    },
+    "sql": [
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_versions"
+        ],
+        "advisory": false,
+        "ms": 0.341,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_reclamations"
+        ],
+        "advisory": false,
+        "ms": 0.43,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.201,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "instruments"
+        ],
+        "advisory": false,
+        "ms": 0.199,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_artifacts"
+        ],
+        "advisory": false,
+        "ms": 0.485,
+        "rowcount": 9
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_versions"
+        ],
+        "advisory": false,
+        "ms": 0.231,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.201,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_reclamations"
+        ],
+        "advisory": false,
+        "ms": 0.176,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_artifacts"
+        ],
+        "advisory": false,
+        "ms": 0.274,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_artifact_blocks"
+        ],
+        "advisory": false,
+        "ms": 1.86,
+        "rowcount": -1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.596,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "instruments"
+        ],
+        "advisory": false,
+        "ms": 0.395,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.267,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.326,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [],
+        "advisory": true,
+        "ms": 0.204,
+        "rowcount": 1
+      },
+      {
+        "kind": "DELETE",
+        "tables": [
+          "market_indicator_demands"
+        ],
+        "advisory": false,
+        "ms": 0.687,
+        "rowcount": 0
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_indicator_demands"
+        ],
+        "advisory": false,
+        "ms": 0.533,
+        "rowcount": 1
+      },
+      {
+        "kind": "INSERT",
+        "tables": [
+          "SET",
+          "market_indicator_demands"
+        ],
+        "advisory": false,
+        "ms": 0.774,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_fixed_indicator_runs"
+        ],
+        "advisory": false,
+        "ms": 0.35,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_history_versions"
+        ],
+        "advisory": false,
+        "ms": 0.255,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "market_datasets"
+        ],
+        "advisory": false,
+        "ms": 0.214,
+        "rowcount": 1
+      },
+      {
+        "kind": "SELECT",
+        "tables": [
+          "instruments"
+        ],
+        "advisory": false,
+        "ms": 0.288,
+        "rowcount": 1
+      }
+    ]
+  }
+]
