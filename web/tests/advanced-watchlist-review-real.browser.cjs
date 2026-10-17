@@ -82,6 +82,8 @@ const out=process.env.MW_OUTPUT;fs.mkdirSync(out,{recursive:true});
   await page.mouse.move(0,0);await page.waitForTimeout(300);
   await capture('05-theme-rest');
  }finally{
+  let cleanupError;
+  try {
   if(outer&&tempId){
    await outer.evaluate(async({id,active})=>{const lists=await widget.watchList();lists.setActiveList(active);
     await new Promise(resolve=>setTimeout(resolve,0));lists.deleteList(id);
@@ -101,11 +103,13 @@ const out=process.env.MW_OUTPUT;fs.mkdirSync(out,{recursive:true});
    if(await row.count())await row.click();
    await page.waitForTimeout(2000);await capture('06-restored');
   }
+  } catch(error) { cleanupError=error; errors.push('restore: '+error.message); }
   const files=fs.readdirSync(out).filter(file=>file.endsWith('.png')).map(file=>({file,
    sha256:crypto.createHash('sha256').update(fs.readFileSync(out+'/'+file)).digest('hex')}));
   fs.writeFileSync(out+'/evidence.json',JSON.stringify({at:new Date().toISOString(),base,chart,originalTheme,
    originalSymbol,runs,errors,files,market:'Weekend: actual stored supplier observations, no fabricated prices or tick-progress claims'},null,2));
   await browser.close();
+  if(cleanupError)throw cleanupError;
  }
  assert.deepEqual(errors,[]);assert.equal(runs.length,7);console.log('PASS real prices, native text, details, theme, hover and restoration');
 })().catch(error=>{console.error(error);process.exitCode=1});
