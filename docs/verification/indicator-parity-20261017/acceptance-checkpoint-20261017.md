@@ -73,3 +73,12 @@ The harness records 64 failed samples: 60 input-cardinality evidence rejections,
 The retained composite request returned HTTP 422 `DISPLAY_SNAPSHOT_EXPIRED`. The lifecycle regression reproduced two concrete defects: a completed recovery suppressed a later expiry of the same renewed content-addressed token (four attempts instead of five), and an error for A could reset current prices C after a recovery for B (seven attempts instead of six). Both now pass, alongside the adjacent coordinator/batch checks. CI includes the lifecycle regression.
 
 After a required Ubuntu chart build and real app reload, [three Playwriter functional cycles](snapshot-recovery-v4/README.md) each observed an actual server 422, parent-price reread and finite current-parameter native coverage matching backend execution authority. The third explicitly expired the same already-ready token again. A separate real bridge HTTP request using obsolete A with previous recovery B and active C confirmed no new recovery entry, subscription-generation change, native-result change or parent-price reload. Its request is intentionally obsolete rather than a physically delayed in-flight response. Earlier harness failures remain archived. These checks neither replace the original failures nor establish that all original timeouts have the same cause; full latency and A1–A16 acceptance remain incomplete.
+# 最新增量：真实组合准备与平台凭据过期闪空（2026-10-17）
+
+已为人工测试准备真实 Dukascopy XAU/USD Bid 两个月历史（2026-08-17 至 2026-10-17 UTC，61,828 根 M1）、明确来源会话的新日历身份与 OANDA Practice 接续组合。九周期产物已发布；Playwriter 验证 H1/M15/H4 Supertrend 绘图、H4 period 10→14→10、独立布局保存和刷新。周末接续查询成功但无观测，不宣称开盘实时接续已通过。
+
+定位并修复一条“添加指标→快照过期→整图 reset→K 线闪空”的路径：同版本且所有已加载时间/OHLC/量不变时仅校验后续期展示凭据；真实版本/价格变化仍完整恢复。前台画布红色复现 34 个零像素帧（首尾 552 ms），v5 两次真实 422 对照中主图 reset=0、无空白且指标覆盖成功（371/426 帧）。Node 红/绿与现有相关回归通过，已部署本任务 chart v5。
+
+最新完整 CI `39026587111`（本增量前 `e287be4`）仍为 Backend 10 failed / 2560 passed / 11 skipped，Web/Compose 通过。EMA500 旧起点重新初始化、其他品种切换闪空、开盘接续和原有整体验收余项未清零。窗口历史获取性能仍在本轮范围外。
+
+人工布局、来源/缺口、复现限制、镜像与启停命令见 [真实组合与闪空 v5 证据](real-composite-and-flash-v5/README.md)。**Issue #74 整体验收仍未通过。**

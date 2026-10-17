@@ -171,6 +171,7 @@ jobs:
           node tests/indicator-display-snapshot.cjs
           node tests/indicator-snapshot-recovery.cjs
           node tests/display-recovery-lifecycle.cjs
+          node tests/provider-credential-recovery.cjs
 
       - name: Watchlist bridge regressions
         working-directory: web
