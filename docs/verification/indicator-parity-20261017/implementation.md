@@ -48,7 +48,15 @@ An exploratory prior LWMA5 add measured 565.6 ms vs API responseEnd 175.8 ms (20
 ## Defined scheduling budget
 
 - Foreground TTL 30 s; active browser leases renewed every 10 s; cancellation tombstones 60 s to fence late HTTP.
-- 64 consumers per page/client, 256 demands globally (the application has one authenticated workspace), 256 pending fixed runs. Replacement parameters reuse the consumer slot.
+- 64 active consumers per page/client, 256 active demands globally (the application has one authenticated workspace), 256 pending fixed runs. Replacement parameters reuse the consumer slot. Cancellation fences have a separate 256-record budget; if it fills, eviction establishes a persistent 60-second admission fence for unknown consumers. Existing active consumers continue to renew/edit/release. A late request cannot resurrect an evicted cancellation; new admission gets the retryable capacity error until the fence expires.
 - Default warming: exactly SMA20 and EMA20 per visited series/period; eight warm demands globally, one concurrent warm claim per fixed/display role. Prices do not fail if the warm budget is full.
 - Every four claims: two foreground-preferred, one warming-preferred, one maintenance-preferred. Unused shares fall through; no demand expiration deletes immutable outputs.
 - Existing display limits remain 256 tasks, 10,000 output rows per task, 64 MiB total compressed output, 8 MiB state, 2,000 rows per worker page. Fixed pages remain 2,000 rows; exact input caches are bounded at 250,000 rows and result caches at 1.5 million weighted values. Capacity, expiry, concurrent claims, fairness and PostgreSQL pressure still require comprehensive acceptance.
+
+## Independent checkpoint review and migration validation
+
+- Standards: no confirmed documented-standard violations; two P2 correctness findings (lost cancellation at capacity, shared-run waiter incorrectly rejected at final capacity slot).
+- Spec: two P2 findings (cancellation records charged as active consumers, lost cancellation at capacity). Full specification acceptance remains pending independently of these defects.
+- Fixes: reclaim expired cancellation records before release, separate active/fence budgets, retain an overflow admission fence, check active capacity when reactivating a canceled consumer, and recheck the shared run after acquiring its capacity lock.
+- Regression: 25 demand/fixed tests passed on SQLite; four real PostgreSQL tests passed, including two simultaneous requests sharing the final pending slot and the three cancellation-capacity cases. The tests use disposable unique schemas inside this task's PostgreSQL. The first-response origin-discovery coordinator regression also passed.
+- [Actual restored-database migration/rollback](demand-migration-rollback.json): upgrade, downgrade to au48, re-upgrade. All 12,412 published bars, one fixed run, three result/checkpoint blocks and one history version preserved, including the stored state/block digest. Old candidate API/worker remained healthy on the migrated live acceptance DB before replacement. This is partial F1 evidence; old-binary numerical reads and the broader pressure matrix remain pending.

@@ -1,0 +1,33 @@
+{
+  "host": "Ubuntu local Docker",
+  "database": "indicator_parity_restore",
+  "baseline": {
+    "counts": {
+      "chart_published_bars": 12412,
+      "market_fixed_indicator_runs": 1,
+      "market_fixed_indicator_blocks": 3,
+      "market_history_versions": 1
+    },
+    "immutable_digest": "139428718803abe35c7fc582a48958f347250b37c572a24116e0e310ae3bea2f"
+  },
+  "steps": [
+    {
+      "action": "upgrade",
+      "revision": "head",
+      "preserved": true,
+      "demand_tables": true
+    },
+    {
+      "action": "downgrade",
+      "revision": "au48_display_indicator_tasks",
+      "preserved": true,
+      "demand_tables": false
+    },
+    {
+      "action": "upgrade",
+      "revision": "head",
+      "preserved": true,
+      "demand_tables": true
+    }
+  ]
+}

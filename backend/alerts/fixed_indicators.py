@@ -100,6 +100,11 @@ def request(db, page, spec, *, stamp=None):
         return existing
     from .indicator_demands import MAX_PENDING_RUNS, DemandCapacity, guard
     guard(db)
+    # Another reader may have created this shared run while we waited for the
+    # capacity lock. Reuse it even when that insert consumed the final slot.
+    existing = db.get(FixedIndicatorRun, ident)
+    if existing:
+        return existing
     if db.scalar(select(func.count()).select_from(FixedIndicatorRun).where(FixedIndicatorRun.status=='pending'))>=MAX_PENDING_RUNS:
         raise DemandCapacity()
     # Match the artifact reader's shared lock: upgrading two concurrent readers
