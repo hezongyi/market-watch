@@ -20,6 +20,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       report: (input: Parameters<NotificationStore["report"]>[0]) => store.report(input),
       observe: (eventId: string, kind: string, extra?: Record<string, unknown>) =>
         store.observeForDebug(eventId, kind, extra),
+      soundAttempt: (eventId: string) => store.soundAttemptForDebug(eventId),
       open: () => window.dispatchEvent(new CustomEvent("mw-notification-open")),
     };
     (window as any).MWNotificationCenter = debug;

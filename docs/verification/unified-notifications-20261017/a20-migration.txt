@@ -1,0 +1,17 @@
+== fresh migration_check database ==
+created
+== upgrade head ==
+notification_changes,notification_events,notification_incidents,notification_observations,notification_source_claims,notification_stream,notifications
+== seed pre-existing legacy evidence ==
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+legacy_notifications=1 legacy_outbox=1
+== downgrade -1 ==
+tables_after_downgrade=notifications
+legacy_notifications=1 legacy_outbox=1
+== upgrade head again ==
+tables_after_reupgrade=7
+legacy_notifications=1 legacy_outbox=1
+== live acceptance database ==
+legacy_notifications=627 legacy_outbox=627 delivery_attempts=0 device_receipts=0 projected_events=709 changes=981 claims=637

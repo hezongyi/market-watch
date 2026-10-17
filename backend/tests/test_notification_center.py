@@ -227,3 +227,24 @@ def test_retention_writes_tombstone_then_resets_old_cursors(database, monkeypatc
     with database.begin() as db:
         page = center.list_events(db)
         assert page["items"] == []
+
+
+def test_late_committed_lower_audit_id_is_still_projectable(database):
+    """A source transaction that commits late must not be skipped by max(id)."""
+    with database.begin() as db:
+        signal, note = add_signal(db, 1)
+        first = db.scalar(select(Audit.id).order_by(Audit.id))
+    center.project_pending(10)
+    with database.begin() as db:
+        late = Audit(id=1, kind="chart_alert_signal",
+                     details={"signal_id": signal.id})
+        # Move the first audit out of the way so the new source owns a lower id.
+        existing = db.get(Audit, first)
+        existing.id = 99
+        db.add(late)
+        db.flush()
+    assert center.project_pending(10) == 1
+    with database.begin() as db:
+        assert len(list(db.scalars(select(NotificationEvent)))) == 1
+        claims = list(db.scalars(select(center.NotificationSourceClaim.source_id)))
+    assert set(claims) == {"1", "99"}

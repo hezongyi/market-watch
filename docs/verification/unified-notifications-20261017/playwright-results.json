@@ -1,119 +1,147 @@
 {
   "base": "http://127.0.0.1:18176",
-  "at": "2026-10-17T16:05:34.294Z",
-  "passed": 16,
+  "at": "2026-10-17T16:22:38.366Z",
+  "passed": 20,
   "failed": 0,
   "results": [
     {
       "id": "A1.entry",
       "title": "父页面顶部有唯一通知入口与未读角标",
       "ok": true,
-      "ms": 118,
+      "ms": 101,
       "detail": "entry=1 unread=0"
     },
     {
       "id": "A1.single-bubble",
       "title": "一次发生只出现一个锚定气泡，不四角堆叠",
       "ok": true,
-      "ms": 199,
+      "ms": 154,
       "detail": "bubble=1"
     },
     {
       "id": "A2.api-pagination",
       "title": "稳定分页可连续读取超过 500 条",
       "ok": true,
-      "ms": 1147,
-      "detail": "668 events / 7 pages"
+      "ms": 882,
+      "detail": "693 events / 7 pages"
     },
     {
       "id": "A2.filters",
       "title": "类型/级别筛选与关键词过滤生效",
       "ok": true,
-      "ms": 1215,
+      "ms": 814,
       "detail": "alerts=100"
     },
     {
       "id": "A2.window-pagination",
       "title": "中心列表在内存预算内翻页而不无限增长",
       "ok": true,
-      "ms": 502,
+      "ms": 427,
       "detail": "items 100→200"
     },
     {
       "id": "A3.detail-timeline",
       "title": "详情显示稳定 ID、来源、本地/UTC 时间与观察时间线",
       "ok": true,
-      "ms": 1050,
-      "detail": "event=web:953c694c-b432-4da5-bc09-e4886b11a882"
+      "ms": 640,
+      "detail": "event=web:76f518e5-b110-487d-8c0e-0f737a88ab6a"
     },
     {
       "id": "A4.alert-evidence",
       "title": "告警详情保留实际值/阈值/规则版本/图表代次",
       "ok": true,
-      "ms": 694,
+      "ms": 1214,
       "detail": "evidence fields present"
     },
     {
       "id": "A5.channels",
       "title": "网页、手机接受与设备回执分别记录",
       "ok": true,
-      "ms": 54,
+      "ms": 224,
       "detail": "channels=ntfy,device"
     },
     {
       "id": "A6.incident-grouping",
       "title": "同一事故保留逐次发生并显示计数",
       "ok": true,
-      "ms": 37,
-      "detail": "grouped=3"
+      "ms": 42,
+      "detail": "grouped=58"
     },
     {
       "id": "A7.success-short",
       "title": "普通成功短提示且可回查",
       "ok": true,
-      "ms": 270,
+      "ms": 271,
       "detail": "success retained"
     },
     {
       "id": "A10.offline-intake",
       "title": "离线通知立即展示、本机待同步，恢复后幂等补传",
       "ok": true,
-      "ms": 7601,
+      "ms": 7016,
       "detail": "pending drained after reconnect"
     },
     {
       "id": "A14.read-vs-phone",
       "title": "网页已读不停止手机；显式停止才写旧确认",
       "ok": true,
-      "ms": 1206,
-      "detail": "event=srv:551313db-2510-4137-8ab6-25590f5d124f"
+      "ms": 366,
+      "detail": "event=srv:a3e92527-be44-494c-a058-0edb9e745eda"
     },
     {
       "id": "A15.chart-fallback",
       "title": "图表宿主不可用时父页面入口仍可查看记录",
       "ok": true,
-      "ms": 1743,
+      "ms": 2077,
       "detail": "fallback entry usable"
     },
     {
       "id": "A16.shared-sound",
       "title": "双标签页共享声音预留，自动尝试至多一次",
       "ok": true,
-      "ms": 7701,
+      "ms": 6872,
       "detail": "sound_reserved=1"
+    },
+    {
+      "id": "A13.reconnect-poll",
+      "title": "断线重连后仅靠补拉也能收敛到新事件",
+      "ok": true,
+      "ms": 4221,
+      "detail": "writer pending drained, stable tab online"
+    },
+    {
+      "id": "A17.sound-blocked",
+      "title": "声音未解锁时记录 blocked 而不是假装已响",
+      "ok": true,
+      "ms": 322,
+      "detail": "sound_blocked recorded"
+    },
+    {
+      "id": "A17.sound-expired",
+      "title": "超过 30 秒的事件不再补响，记录 expired",
+      "ok": true,
+      "ms": 31073,
+      "detail": "expired"
+    },
+    {
+      "id": "A18.cross-instrument",
+      "title": "跨品种同名故障不混为同一事故",
+      "ok": true,
+      "ms": 32,
+      "detail": "2 instruments / 2 incidents"
     },
     {
       "id": "A19.storm",
       "title": "突发故障不阻塞中心打开，内存有界",
       "ok": true,
-      "ms": 572,
-      "detail": "40 reports in 279ms, items=142"
+      "ms": 497,
+      "detail": "40 reports in 185ms, items=145"
     },
     {
       "id": "A20.keyboard",
       "title": "Escape 关闭面板且焦点回到入口",
       "ok": true,
-      "ms": 134,
+      "ms": 429,
       "detail": "escape closes and focus returns"
     }
   ],

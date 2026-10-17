@@ -53,8 +53,15 @@ async function login(page) {
 }
 
 async function openCenter(page) {
-  await page.getByTestId("notification-entry").click();
-  await expect(page.getByTestId("notification-panel")).toBeVisible();
+  const panel = page.getByTestId("notification-panel");
+  if (await panel.count()) return;
+  await page.getByTestId("notification-entry").click({ force: true });
+  await expect(panel).toBeVisible({ timeout: 10000 });
+}
+
+async function dismissBubbles(page) {
+  const close = page.getByRole("button", { name: "关闭提示" });
+  while (await close.count()) await close.first().click();
 }
 
 async function closeCenter(page) {
@@ -202,6 +209,8 @@ async function main() {
     await check("A4.alert-evidence", "告警详情保留实际值/阈值/规则版本/图表代次", async () => {
       await page.getByRole("button", { name: "返回通知列表" }).click();
       await page.getByLabel("按类型筛选").selectOption("alert");
+      await expect.poll(async () => (await state(page)).items[0]?.kind, { timeout: 15000 })
+        .toBe("alert");
       await page.getByTestId("notification-item").first().click();
       const detail = page.getByTestId("notification-detail");
       await expect(detail).toContainText("实际值");
@@ -252,6 +261,7 @@ async function main() {
     });
 
     await check("A7.success-short", "普通成功短提示且可回查", async () => {
+      await dismissBubbles(page);
       const title = `保存成功 ${Date.now()}`;
       await report(page, { kind: "success", severity: "info", title,
         summary: "普通成功只做短提示", dedupe_key: "acceptance:success" });
@@ -357,6 +367,84 @@ async function main() {
       }, { timeout: 20000 }).toBe(1);
       await shared.close();
       return "sound_reserved=1";
+    });
+
+    await check("A13.reconnect-poll", "断线重连后仅靠补拉也能收敛到新事件", async () => {
+      const pair = await browser.newContext({ viewport: { width: 1200, height: 900 } });
+      const stable = await pair.newPage();
+      const writer = await pair.newPage();
+      [stable, writer].forEach((tab) =>
+        tab.on("pageerror", (error) => pageErrors.push(String(error))));
+      await login(stable);
+      await login(writer);
+      await pair.setOffline(true);
+      // The stable tab loses SSE; the writer stays local but cannot upload.
+      const title = `重连收敛 ${Date.now()}`;
+      await writer.evaluate((body) => window.MWNotificationCenter.report(body), {
+        kind: "failure", severity: "warning", title, dedupe_key: "acceptance:reconnect",
+      });
+      await pair.setOffline(false);
+      await expect.poll(async () => (await state(stable)).connection, { timeout: 30000 })
+        .not.toBe("offline");
+      await expect.poll(async () => {
+        const current = await state(writer);
+        return current.pending === 0 && current.items.some((item) => item.title === title);
+      }, { timeout: 30000 }).toBe(true);
+      await pair.close();
+      return "writer pending drained, stable tab online";
+    });
+
+    await check("A17.sound-blocked", "声音未解锁时记录 blocked 而不是假装已响", async () => {
+      const title = `静音故障 ${Date.now()}`;
+      await page.evaluate(async (body) => {
+        await window.MWNotificationCenter.report(body);
+      }, { kind: "failure", severity: "critical", title, dedupe_key: "acceptance:blocked" });
+      await waitForEvent(page, title);
+      await expect.poll(async () => {
+        const kinds = await page.evaluate(async (target) => {
+          const list = await fetch("/api/notification-center/events?limit=100",
+            { credentials: "same-origin" }).then((row) => row.json());
+          const event = list.items.find((item) => item.title === target);
+          if (!event) return [];
+          const detail = await fetch(`/api/notification-center/events/${encodeURIComponent(event.id)}`,
+            { credentials: "same-origin" }).then((row) => row.json());
+          return detail.observations.map((row) => row.kind);
+        }, title);
+        return kinds.includes("sound_blocked");
+      }, { timeout: 15000 }).toBe(true);
+      return "sound_blocked recorded";
+    });
+
+    await check("A17.sound-expired", "超过 30 秒的事件不再补响，记录 expired", async () => {
+      const title = `过期声音 ${Date.now()}`;
+      await page.evaluate((body) => window.MWNotificationCenter.report(body),
+        { kind: "failure", severity: "critical", title, dedupe_key: "acceptance:expired" });
+      await waitForEvent(page, title);
+      await page.waitForTimeout(31_000);
+      const outcome = await page.evaluate(async (target) => {
+        const current = window.MWNotificationCenter.getState();
+        const event = current.items.find((item) => item.title === target);
+        return window.MWNotificationCenter.soundAttempt(event.id);
+      }, title);
+      expect(outcome).toBe("expired");
+      return outcome;
+    });
+
+    await check("A18.cross-instrument", "跨品种同名故障不混为同一事故", async () => {
+      const groups = await page.evaluate(async () => {
+        const body = await fetch("/api/notification-center/events?limit=100&q="
+          + encodeURIComponent("验收规则 acc-cross"), { credentials: "same-origin" })
+          .then((row) => row.json());
+        return body.items.map((item) => ({
+          instrument: item.context?.instrument,
+          incident: item.incident_id,
+        }));
+      });
+      const instruments = new Set(groups.map((row) => row.instrument));
+      const incidents = new Set(groups.map((row) => row.incident));
+      expect(instruments.size).toBeGreaterThanOrEqual(2);
+      expect(incidents.size).toBeGreaterThanOrEqual(2);
+      return `${instruments.size} instruments / ${incidents.size} incidents`;
     });
 
     await check("A19.storm", "突发故障不阻塞中心打开，内存有界", async () => {

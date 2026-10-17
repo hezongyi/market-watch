@@ -338,24 +338,24 @@ def _project_event(db, payload: dict, recorded_at: int | None = None) -> tuple[N
     return event, incident, True
 
 
-def _project_signal(db, audit: Audit) -> bool:
+def _project_signal(db, audit: Audit) -> int | None:
     details = audit.details or {}
     signal = db.get(SignalRow, details.get("signal_id")) if details.get("signal_id") else None
     if signal is None:
-        return False
+        return None
     notification = db.scalar(select(Notification).where(Notification.signal_id == signal.id))
     payload = _signal_payload(signal, notification)
     event, incident, created = _project_event(db, payload, audit.at)
     if not created:
-        return True
+        return 0  # already projected; keep the claim so replays stay idempotent
     event.first_seq = 0
     seq = _publish(db, "created", event=event, incident=incident)
     event.first_seq = seq
     db.flush()
-    return True
+    return seq
 
 
-def _delivery_fact(db, audit: Audit) -> bool:
+def _delivery_fact(db, audit: Audit) -> int | None:
     details = audit.details or {}
     notification_id = details.get("notification_id")
     if not notification_id:
@@ -363,7 +363,7 @@ def _delivery_fact(db, audit: Audit) -> bool:
     event = db.scalar(select(NotificationEvent).where(
         NotificationEvent.notification_id == notification_id))
     if event is None:
-        return False  # Signal projection has not committed yet; retry later.
+        return None  # Signal projection has not committed yet; retry later.
     channels = list((event.context or {}).get("channels") or [])
     if details.get("kind") == "receipt":
         fact = {"channel": "device", "status": "received",
@@ -380,8 +380,7 @@ def _delivery_fact(db, audit: Audit) -> bool:
     event.context = {**event.context, "channels": channels[-20:]}
     event.version += 1
     db.flush()
-    _publish(db, "updated", event=event)
-    return True
+    return _publish(db, "updated", event=event)
 
 
 def project_pending(limit: int = 100) -> int:
@@ -398,12 +397,12 @@ def project_pending(limit: int = 100) -> int:
                 if audit is None:
                     continue
                 if audit.kind in ("signal", "chart_alert_signal"):
-                    done = _project_signal(db, audit)
+                    seq = _project_signal(db, audit)
                 else:
-                    done = _delivery_fact(db, audit)
-                if not done:
+                    seq = _delivery_fact(db, audit)
+                if seq is None:
                     continue
-                _claim(db, audit_id)
+                _claim(db, audit_id, seq)
                 projected += 1
         except IntegrityError:
             # Another projector won the claim; its transaction is authoritative.

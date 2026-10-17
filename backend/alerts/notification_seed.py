@@ -16,6 +16,9 @@ from sqlalchemy import func, select
 
 from .storage import (
     Audit,
+    DeliveryAttempt,
+    Device,
+    DeviceReceipt,
     Instrument,
     Notification,
     Outbox,
@@ -84,6 +87,10 @@ def latest_notifications(limit: int) -> list[Notification]:
 
 def add_delivery(notification_id: str, accepted: bool, attempt: int) -> None:
     with transaction() as db:
+        db.add(DeliveryAttempt(
+            notification_id=notification_id,
+            status="accepted" if accepted else "failed_or_unknown",
+            details={"acceptance_fixture": True, "attempt": attempt}))
         db.add(Audit(kind="notification_delivery", details={
             "kind": "delivery", "notification_id": notification_id,
             "attempt_id": attempt * 1000 + int(notification_id[:2], 16),
@@ -94,6 +101,17 @@ def add_delivery(notification_id: str, accepted: bool, attempt: int) -> None:
 
 def add_receipt(notification_id: str, device_id: str) -> None:
     with transaction() as db:
+        device = db.get(Device, device_id)
+        if device is None:
+            device = Device(id=device_id, name="acceptance",
+                            token_hash=f"acceptance-{device_id}")
+            db.add(device)
+            db.flush()
+        existing = db.scalar(select(DeviceReceipt).where(
+            DeviceReceipt.device_id == device_id,
+            DeviceReceipt.notification_id == notification_id))
+        if existing is None:
+            db.add(DeviceReceipt(device_id=device_id, notification_id=notification_id))
         db.add(Audit(kind="notification_receipt", details={
             "kind": "receipt", "notification_id": notification_id,
             "device_id": device_id, "received_at": now_ms()}))

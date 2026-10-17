@@ -107,6 +107,8 @@ export class NotificationStore {
   private queue: CenterEvent[] = [];
   private bubbled = new Set<string>();
   private observedReceipts = new Set<string>();
+  private pendingIds = new Set<string>();
+  private deferredObservations: { id: string; kind: string; extra: Record<string, unknown> }[] = [];
   private started = false;
   private refreshing = false;
   private flushing = false;
@@ -305,6 +307,9 @@ export class NotificationStore {
   }
 
   private async tick() {
+    // Never replay the change log before the baseline cursor exists: an early
+    // online/visibility tick must not turn historical events into new bubbles.
+    if (!this.state.ready) return;
     if (navigator.onLine === false) {
       this.update({ connection: "offline" });
       return;
@@ -477,6 +482,12 @@ export class NotificationStore {
 
   private async observe(id: string, kind: string, extra: Record<string, unknown> = {}) {
     if (!id) return null;
+    if (this.pendingIds.has(id)) {
+      // The event itself has not reached the server yet; replay this observation
+      // after the idempotent upload completes instead of losing it to a 404.
+      this.deferredObservations.push({ id, kind, extra });
+      return null;
+    }
     try {
       const response = await api<{ observation: any; created: boolean }>(
         "/notification-center/observations",
@@ -535,6 +546,9 @@ export class NotificationStore {
       first_seq: 0, version: 1, deleted_at: null, read: false, incident: null,
     };
     this.update({ items: sortItems([optimistic, ...this.state.items]) });
+    // Register first: the local sound/bubble path may emit an observation before
+    // the upload completes, and that observation must wait for the server id.
+    this.pendingIds.add(id);
     this.announce(optimistic);
     const stored = await this.local.put("pending", id, { payload, attempts: 0, nextAt: 0 });
     if (!stored) {
@@ -561,6 +575,7 @@ export class NotificationStore {
       }>("pending");
       let bytes = 0;
       for (const row of rows) {
+        this.pendingIds.add(row.payload.id);
         bytes += JSON.stringify(row.payload).length;
         if (bytes > PENDING_BYTES) {
           this.notice("本机待同步超过 10 MiB，较早的通知不会补传。");
@@ -570,8 +585,11 @@ export class NotificationStore {
         try {
           await api("/notification-center/events", row.payload);
           await this.local.delete("pending", row.payload.id);
+          this.pendingIds.delete(row.payload.id);
+          await this.replayDeferred(row.payload.id);
         } catch (error) {
           if (error instanceof ApiError && error.status === 409) {
+            this.pendingIds.delete(row.payload.id);
             await this.local.delete("pending", row.payload.id);
             this.notice("一条本机通知与服务端记录冲突，已保留服务端版本。");
           } else if (error instanceof ApiError && error.status === 429) {
@@ -599,6 +617,21 @@ export class NotificationStore {
         }, 5000);
       }
     }
+  }
+
+  private async replayDeferred(eventId: string) {
+    const queued = this.deferredObservations.filter((row) => row.id === eventId);
+    if (queued.length === 0) return;
+    this.deferredObservations = this.deferredObservations.filter((row) => row.id !== eventId);
+    for (const row of queued) await this.observe(row.id, row.kind, row.extra);
+  }
+
+  /** Debug/acceptance hook: run the real sound consumer for one event. */
+  async soundAttemptForDebug(id: string): Promise<string> {
+    if (!this.sound) return "unavailable";
+    const event = this.state.items.find((row) => row.id === id)
+      ?? (await api<Detail>(`/notification-center/events/${encodeURIComponent(id)}`)).event;
+    return this.sound.attempt(event);
   }
 
   /** Debug/acceptance hook: same CSRF-aware observation path as the UI. */
