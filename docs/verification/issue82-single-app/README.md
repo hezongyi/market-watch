@@ -25,7 +25,7 @@
 | 9. 七色收藏 | 七色/清除、键盘焦点、同名不同源、刷新/重新登录、跨列表/工作区、503 重试、真实 409 后逐品种合并、移除成员不清色；虚拟行复用/dispose 独立 DOM 回归 |
 | 10. 协议与边界 | API/device/action/MCP/health/SSE 维持协议；Nginx 与 Python fallback；旧偏好兼容、未知版本拒绝、SDK/凭据未提交 |
 
-最终全量 Playwright **20 组全部通过，未捕获异常 0**；401 后还实际复制恢复为独立工作区，核对原工作区文档不变并移除已恢复草稿。机器结果见 `browser/results.json`，浏览器输出见 `browser.log`，后端 21 项见 `backend.log`，纯逻辑及 DOM 回归见 `frontend.log`，Python fallback 见 `python-fallback.log`。`browser/` 截图仅含合成数据，不包含真实密码、cookie 或完整浏览器状态。
+最终全量 Playwright **20 组全部通过，未捕获异常 0**；401 后还实际复制恢复为独立工作区，核对原工作区文档不变并移除已恢复草稿。机器结果见 `browser/results.json`，浏览器输出见 `browser.log`，后端 21 项见 `backend.log`，纯逻辑及 DOM 回归见 `frontend.log`，Python fallback 见 `python-fallback.log`，运维测试见 `ops.log`。`browser/` 截图仅含合成数据，不包含真实密码、cookie 或完整浏览器状态。
 
 ## SDK 与兼容/恢复
 
@@ -40,6 +40,7 @@ SDK 能力核对与实施依据见 Issue 引用的[标签/收藏分析](https://
 - Standards：初审发现布局捕获作用域、会话过期残留离页对话框、收藏 dispose 后异步回调问题；已修复，复审无剩余实质性发现。
 - Spec：初审及复审覆盖入口、协议、通知、标题、旧功能和完整范围；最后发现手机 platform 会创建工作区，已改为只读匹配，并为桌面入口创建去重。最终复核无剩余确定缺陷。
 - 审查均为只读源代码审查；浏览器和 Docker 验收由主执行者完成。
+- 远端 CI 的通用 Compose 运维测试曾使用相对占位目录，暴露 TLS 短格式挂载被解析为命名卷的问题；已明确为 `type: bind`，本地运维测试全通过，实际私有目录展开配置保持一致。
 - 完整浏览器验收新增真实 Compare 后，发现原生 `chart.priceFormatter()` 会跟随百分比刻度，导致标题报价带 `%`。现复用既有价格精度规则格式化原始 `lp`，独立于图表刻度；纯测试与真实比较线场景均覆盖该问题，Spec 再审通过。
 
 ## Ubuntu 实例与复现
