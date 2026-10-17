@@ -195,14 +195,14 @@ def previous_close(db, composite, *, revision, input_revision, observed_at):
         row for row in page.get("bars", [])
         if row.get("end", 0) <= session_start
         and row.get("source_confirmed") is True
-        and row.get("time_closed", True) is True
+        and row.get("time_closed") is True
+        and row.get("complete") is True
+        and row.get("coverage_complete") is True
     ]
     if not bars:
-        value = None
-        _previous_close_cache[key] = value
-        if len(_previous_close_cache) > 2048:
-            _previous_close_cache.pop(next(iter(_previous_close_cache)))
-        return value
+        # An artifact can publish later without changing the pinned minute
+        # input revision. Never retain a missing/unverified baseline.
+        return None
     value = bars[-1].get("close")
     try:
         value = Decimal(str(value))
@@ -210,6 +210,8 @@ def previous_close(db, composite, *, revision, input_revision, observed_at):
         value = None
     else:
         value = value if value.is_finite() and value != 0 else None
+    if value is None:
+        return None
     _previous_close_cache[key] = value
     if len(_previous_close_cache) > 2048:
         _previous_close_cache.pop(next(iter(_previous_close_cache)))

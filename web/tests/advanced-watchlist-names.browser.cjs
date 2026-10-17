@@ -81,6 +81,21 @@ const path = require('node:path');
     });
     assert.equal((await names())[2].placeholder,'"USDJPY"','new metadata releases the actual name before any quote');
     assert.equal(await page.locator('.last-test').first().innerText(),'1.12250','name guard leaves quotes intact');
+    await page.evaluate(() => {
+      layout.dispose();
+      TradingView.version=()=> 'unsupported-library-version';
+      window.fallbackReports=[];
+      window.fallback=MWWatchlistLayout.attach({createButton:()=>document.createElement('button'),removeButton(){}},
+        error=>fallbackReports.push(error.message));
+    });
+    assert((await names()).every(r=>r.visibility==='visible'),'unsupported versions release native names');
+    assert.equal(await page.evaluate(()=>fallbackReports.length),1);
+    await page.evaluate(()=>{
+      TradingView.version=()=> '6b804c486857f27920cf761aa7eb6e29d9bb6362';
+      window.layout=MWWatchlistLayout.attach({createButton:()=>document.createElement('button'),removeButton(){}},
+        error=>{throw error},ticker=>knownNames.get(ticker));
+    });
+    assert.equal((await names())[0].visibility,'hidden','supported reattach restores first-frame protection');
     await page.evaluate(() => layout.dispose());
     console.log('Watchlist names are safe before startup, after resolution and during list rebuilds.');
   } finally {await browser.close();}

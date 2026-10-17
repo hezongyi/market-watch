@@ -160,6 +160,22 @@ jobs:
           node tests/indicator-display-snapshot.cjs
           node tests/indicator-snapshot-recovery.cjs
 
+      - name: Watchlist bridge regressions
+        working-directory: web
+        run: |
+          node tests/advanced-watchlist-prewarm.cjs
+          node tests/advanced-watchlist-metadata.cjs
+          node tests/advanced-startup-metadata.cjs
+          node tests/advanced-market-stream.cjs
+          node tests/advanced-watchlists.cjs
+
+      - name: Watchlist native DOM regressions
+        working-directory: web
+        run: |
+          npx playwright install --with-deps chromium
+          node tests/advanced-watchlist-layout.browser.cjs
+          node tests/advanced-watchlist-names.browser.cjs
+
   compose:
     name: compose
     runs-on: ubuntu-24.04

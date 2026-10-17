@@ -1,0 +1,528 @@
+{
+  "at": "2026-10-17T00:12:16.758Z",
+  "base": "https://192.168.7.232:18483",
+  "chart": "https://192.168.7.232:17483",
+  "originalTheme": "Dark",
+  "originalSymbol": "MWP:EURUSD",
+  "runs": [
+    {
+      "label": "01-current",
+      "state": {
+        "symbol": "MWP:EURUSD",
+        "quotes": [
+          {
+            "ticker": "MWP:XAUUSD",
+            "description": "平台报价暂不可用，请重试 · 休市 · 每日暂停 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "price": 1.12384,
+            "description": "EUR/USD · 组合行情 · 保存的确认M1收盘 · 休市 · 每日暂停 · 最后行情时间 2026-10-16 20:58:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 20:59:00 UTC，不含终点）",
+            "priceType": "confirmed_m1_close"
+          },
+          {
+            "ticker": "MWP:OANDA:USD_CAD",
+            "description": "平台报价暂不可用，请重试 · 时段未核实 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWP:OANDA:USD_JPY",
+            "description": "平台报价暂不可用，请重试 · 时段未核实 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWP:EURUSD",
+            "description": "平台报价暂不可用，请重试 · 休市 · 每日暂停 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          }
+        ]
+      },
+      "ui": {
+        "dark": true,
+        "detail": "EURUSD",
+        "rows": [
+          {
+            "ticker": "MWP:EURUSD",
+            "text": "EURUSD",
+            "name": "EURUSD",
+            "overlay": null
+          },
+          {
+            "ticker": "MWP:XAUUSD",
+            "text": "XAUUSD",
+            "name": "XAUUSD",
+            "overlay": null
+          },
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "text": "EURUSD\n1.12384",
+            "name": "EURUSD",
+            "raw": "1.12384",
+            "textPrice": "1.12384",
+            "digit": "4",
+            "aria": "1.12384",
+            "nodeCount": 0,
+            "overlay": "\"4\" / \"\"",
+            "overlayBackground": "rgb(15,15,15)"
+          },
+          {
+            "ticker": "MWP:OANDA:USD_CAD",
+            "text": "USDCAD",
+            "name": "USDCAD",
+            "overlay": null
+          },
+          {
+            "ticker": "MWP:OANDA:USD_JPY",
+            "text": "USDJPY",
+            "name": "USDJPY",
+            "overlay": null
+          }
+        ]
+      }
+    },
+    {
+      "label": "02-eurusd",
+      "state": {
+        "symbol": "MWP:EURUSD",
+        "quotes": [
+          {
+            "ticker": "MWP:XAUUSD",
+            "description": "平台报价暂不可用，请重试 · 休市 · 每日暂停 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "price": 1.12384,
+            "description": "EUR/USD · 组合行情 · 保存的确认M1收盘 · 休市 · 每日暂停 · 最后行情时间 2026-10-16 20:58:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 20:59:00 UTC，不含终点）",
+            "priceType": "confirmed_m1_close"
+          },
+          {
+            "ticker": "MWP:OANDA:USD_CAD",
+            "description": "平台报价暂不可用，请重试 · 时段未核实 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWP:OANDA:USD_JPY",
+            "description": "平台报价暂不可用，请重试 · 时段未核实 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWP:EURUSD",
+            "description": "平台报价暂不可用，请重试 · 休市 · 每日暂停 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          }
+        ]
+      },
+      "ui": {
+        "dark": true,
+        "detail": "EURUSD\n平台报价暂不可用，请重试\nOANDA\n休市",
+        "rows": [
+          {
+            "ticker": "MWP:EURUSD",
+            "text": "EURUSD",
+            "name": "EURUSD",
+            "overlay": null
+          },
+          {
+            "ticker": "MWP:XAUUSD",
+            "text": "XAUUSD",
+            "name": "XAUUSD",
+            "overlay": null
+          },
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "text": "EURUSD\n1.12384",
+            "name": "EURUSD",
+            "raw": "1.12384",
+            "textPrice": "1.12384",
+            "digit": "4",
+            "aria": "1.12384",
+            "nodeCount": 0,
+            "overlay": "\"4\" / \"\"",
+            "overlayBackground": "rgb(15,15,15)"
+          },
+          {
+            "ticker": "MWP:OANDA:USD_CAD",
+            "text": "USDCAD",
+            "name": "USDCAD",
+            "overlay": null
+          },
+          {
+            "ticker": "MWP:OANDA:USD_JPY",
+            "text": "USDJPY",
+            "name": "USDJPY",
+            "overlay": null
+          }
+        ]
+      }
+    },
+    {
+      "label": "03-gold",
+      "state": {
+        "symbol": "MWP:XAUUSD",
+        "quotes": [
+          {
+            "ticker": "MWP:XAUUSD",
+            "description": "平台报价暂不可用，请重试 · 休市 · 每日暂停 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "price": 1.12384,
+            "description": "EUR/USD · 组合行情 · 保存的确认M1收盘 · 休市 · 每日暂停 · 最后行情时间 2026-10-16 20:58:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 20:59:00 UTC，不含终点）",
+            "priceType": "confirmed_m1_close"
+          },
+          {
+            "ticker": "MWP:OANDA:USD_CAD",
+            "description": "平台报价暂不可用，请重试 · 时段未核实 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWP:OANDA:USD_JPY",
+            "description": "平台报价暂不可用，请重试 · 时段未核实 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWP:EURUSD",
+            "description": "平台报价暂不可用，请重试 · 休市 · 每日暂停 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          }
+        ]
+      },
+      "ui": {
+        "dark": true,
+        "detail": "XAUUSD\n平台报价暂不可用，请重试\nOANDA\n休市",
+        "rows": [
+          {
+            "ticker": "MWP:EURUSD",
+            "text": "EURUSD",
+            "name": "EURUSD",
+            "overlay": null
+          },
+          {
+            "ticker": "MWP:XAUUSD",
+            "text": "XAUUSD",
+            "name": "XAUUSD",
+            "overlay": null
+          },
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "text": "EURUSD\n1.12384",
+            "name": "EURUSD",
+            "raw": "1.12384",
+            "textPrice": "1.12384",
+            "digit": "4",
+            "aria": "1.12384",
+            "nodeCount": 0,
+            "overlay": "\"4\" / \"\"",
+            "overlayBackground": "rgb(15,15,15)"
+          },
+          {
+            "ticker": "MWP:OANDA:USD_CAD",
+            "text": "USDCAD",
+            "name": "USDCAD",
+            "overlay": null
+          },
+          {
+            "ticker": "MWP:OANDA:USD_JPY",
+            "text": "USDJPY",
+            "name": "USDJPY",
+            "overlay": null
+          }
+        ]
+      }
+    },
+    {
+      "label": "07-live-crypto",
+      "state": {
+        "symbol": "MWP:XAUUSD",
+        "quotes": [
+          {
+            "ticker": "MWP:XAUUSD",
+            "description": "平台报价暂不可用，请重试 · 休市 · 每日暂停 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "price": 1.12384,
+            "description": "EUR/USD · 组合行情 · 保存的确认M1收盘 · 休市 · 每日暂停 · 最后行情时间 2026-10-16 20:58:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 20:59:00 UTC，不含终点）",
+            "priceType": "confirmed_m1_close"
+          },
+          {
+            "ticker": "MWP:OANDA:USD_CAD",
+            "description": "平台报价暂不可用，请重试 · 时段未核实 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWP:OANDA:USD_JPY",
+            "description": "平台报价暂不可用，请重试 · 时段未核实 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWP:EURUSD",
+            "description": "平台报价暂不可用，请重试 · 休市 · 每日暂停 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWP:BTCUSDT",
+            "price": 81572.66,
+            "previous": 81615.64,
+            "change": -42.98,
+            "percent": -0.05266147517804186,
+            "description": "BTCUSDT · 平台行情 · 时段未核实 · 最后行情时间 2026-10-17 00:12:00 UTC · 来源 M1 分钟数据（区间至 2026-10-17 00:13:00 UTC，不含终点）"
+          }
+        ]
+      },
+      "ui": {
+        "dark": true,
+        "detail": "XAUUSD\n平台报价暂不可用，请重试\nOANDA\n休市",
+        "rows": [
+          {
+            "ticker": "MWP:BTCUSDT",
+            "text": "BTCUSDT\n81,572.66\n−42.98\n−0.05%",
+            "name": "BTCUSDT",
+            "raw": "81,572.66",
+            "textPrice": "81,572.66",
+            "digit": "6",
+            "aria": "81,572.66",
+            "nodeCount": 0,
+            "overlay": "\"6\" / \"\"",
+            "overlayBackground": "rgb(15,15,15)"
+          }
+        ]
+      }
+    },
+    {
+      "label": "04-theme-hover",
+      "state": {
+        "symbol": "MWP:XAUUSD",
+        "quotes": [
+          {
+            "ticker": "MWP:XAUUSD",
+            "description": "平台报价暂不可用，请重试 · 休市 · 每日暂停 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "price": 1.12384,
+            "description": "EUR/USD · 组合行情 · 保存的确认M1收盘 · 休市 · 每日暂停 · 最后行情时间 2026-10-16 20:58:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 20:59:00 UTC，不含终点）",
+            "priceType": "confirmed_m1_close"
+          },
+          {
+            "ticker": "MWP:OANDA:USD_CAD",
+            "description": "平台报价暂不可用，请重试 · 时段未核实 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWP:OANDA:USD_JPY",
+            "description": "平台报价暂不可用，请重试 · 时段未核实 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWP:EURUSD",
+            "description": "平台报价暂不可用，请重试 · 休市 · 每日暂停 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWP:BTCUSDT",
+            "price": 81572.66,
+            "previous": 81615.64,
+            "change": -42.98,
+            "percent": -0.05266147517804186,
+            "description": "BTCUSDT · 平台行情 · 时段未核实 · 最后行情时间 2026-10-17 00:12:00 UTC · 来源 M1 分钟数据（区间至 2026-10-17 00:13:00 UTC，不含终点）"
+          }
+        ]
+      },
+      "ui": {
+        "dark": false,
+        "detail": "XAUUSD\n平台报价暂不可用，请重试\nOANDA\n休市",
+        "rows": [
+          {
+            "ticker": "MWP:BTCUSDT",
+            "text": "BTCUSDT\n81,572.66\n−42.98\n−0.05%",
+            "name": "BTCUSDT",
+            "raw": "81,572.66",
+            "textPrice": "81,572.66",
+            "digit": "6",
+            "aria": "81,572.66",
+            "nodeCount": 0,
+            "overlay": "\"6\" / \"\"",
+            "overlayBackground": "rgb(242,242,242)"
+          }
+        ]
+      }
+    },
+    {
+      "label": "05-theme-rest",
+      "state": {
+        "symbol": "MWP:XAUUSD",
+        "quotes": [
+          {
+            "ticker": "MWP:XAUUSD",
+            "description": "平台报价暂不可用，请重试 · 休市 · 每日暂停 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "price": 1.12384,
+            "description": "EUR/USD · 组合行情 · 保存的确认M1收盘 · 休市 · 每日暂停 · 最后行情时间 2026-10-16 20:58:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 20:59:00 UTC，不含终点）",
+            "priceType": "confirmed_m1_close"
+          },
+          {
+            "ticker": "MWP:OANDA:USD_CAD",
+            "description": "平台报价暂不可用，请重试 · 时段未核实 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWP:OANDA:USD_JPY",
+            "description": "平台报价暂不可用，请重试 · 时段未核实 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWP:EURUSD",
+            "description": "平台报价暂不可用，请重试 · 休市 · 每日暂停 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWP:BTCUSDT",
+            "price": 81572.67,
+            "previous": 81615.64,
+            "change": -42.97,
+            "percent": -0.05264922262448717,
+            "description": "BTCUSDT · 平台行情 · 时段未核实 · 最后行情时间 2026-10-17 00:12:00 UTC · 来源 M1 分钟数据（区间至 2026-10-17 00:13:00 UTC，不含终点）"
+          }
+        ]
+      },
+      "ui": {
+        "dark": false,
+        "detail": "XAUUSD\n平台报价暂不可用，请重试\nOANDA\n休市",
+        "rows": [
+          {
+            "ticker": "MWP:BTCUSDT",
+            "text": "BTCUSDT\n81,572.67\n−42.97\n−0.05%",
+            "name": "BTCUSDT",
+            "raw": "81,572.67",
+            "textPrice": "81,572.67",
+            "digit": "7",
+            "aria": "81,572.67",
+            "nodeCount": 0,
+            "overlay": "\"7\" / \"\"",
+            "overlayBackground": "rgb(255,255,255)"
+          }
+        ]
+      }
+    },
+    {
+      "label": "06-restored",
+      "state": {
+        "symbol": "MWP:EURUSD",
+        "quotes": [
+          {
+            "ticker": "MWP:XAUUSD",
+            "description": "平台报价暂不可用，请重试 · 休市 · 每日暂停 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "price": 1.12384,
+            "description": "EUR/USD · 组合行情 · 保存的确认M1收盘 · 休市 · 每日暂停 · 最后行情时间 2026-10-16 20:58:00 UTC · 来源 M1 分钟数据（区间至 2026-10-16 20:59:00 UTC，不含终点）",
+            "priceType": "confirmed_m1_close"
+          },
+          {
+            "ticker": "MWP:OANDA:USD_CAD",
+            "description": "平台报价暂不可用，请重试 · 时段未核实 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWP:OANDA:USD_JPY",
+            "description": "平台报价暂不可用，请重试 · 时段未核实 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWP:EURUSD",
+            "description": "平台报价暂不可用，请重试 · 休市 · 每日暂停 · 更新失败，暂无成功行情 · 暂无行情更新时间"
+          },
+          {
+            "ticker": "MWP:BTCUSDT",
+            "price": 81572.67,
+            "previous": 81615.64,
+            "change": -42.97,
+            "percent": -0.05264922262448717,
+            "description": "BTCUSDT · 平台行情 · 时段未核实 · 最后行情时间 2026-10-17 00:12:00 UTC · 来源 M1 分钟数据（区间至 2026-10-17 00:13:00 UTC，不含终点）"
+          }
+        ]
+      },
+      "ui": {
+        "dark": true,
+        "detail": "EURUSD\n休市",
+        "rows": [
+          {
+            "ticker": "MWP:EURUSD",
+            "text": "EURUSD",
+            "name": "EURUSD",
+            "overlay": null
+          },
+          {
+            "ticker": "MWP:XAUUSD",
+            "text": "XAUUSD",
+            "name": "XAUUSD",
+            "overlay": null
+          },
+          {
+            "ticker": "MWC:26197bdaefaee31ca32eef9d743210591b0a10709fd286939b066cfe2b1b9219",
+            "text": "EURUSD\n1.12384",
+            "name": "EURUSD",
+            "raw": "1.12384",
+            "textPrice": "1.12384",
+            "digit": "4",
+            "aria": "1.12384",
+            "nodeCount": 0,
+            "overlay": "\"4\" / \"\"",
+            "overlayBackground": "rgb(15,15,15)"
+          },
+          {
+            "ticker": "MWP:OANDA:USD_CAD",
+            "text": "USDCAD",
+            "name": "USDCAD",
+            "overlay": null
+          },
+          {
+            "ticker": "MWP:OANDA:USD_JPY",
+            "text": "USDJPY",
+            "name": "USDJPY",
+            "overlay": null
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "files": [
+    {
+      "file": "01-current.png",
+      "sha256": "43f0f7ddd02b764d2c57edbb9fb4b1b8f3b9f1357bd9a6470efd0ca451b064c8"
+    },
+    {
+      "file": "02-eurusd.png",
+      "sha256": "3480befb6d81fc647f7f4abebb0bb4d9655b5d55c563e3dca16b2aad9d32f974"
+    },
+    {
+      "file": "03-gold.png",
+      "sha256": "17948fcc678549cd1666a9669b9ab09a412d03cd1441f198328775e1071c25fb"
+    },
+    {
+      "file": "04-theme-hover.png",
+      "sha256": "d1c84cedf6377b68cefe521dade652aae0564aa18e2da96cc5338625f7bff0c0"
+    },
+    {
+      "file": "05-theme-rest.png",
+      "sha256": "4e83ab63416cda4a081b618f9ca874d6f73435560800bfa7d6e835def7da2484"
+    },
+    {
+      "file": "06-restored.png",
+      "sha256": "f1ce7cfd71003e0ff7b32bc425df262088d22a47808717faf2db760cf8bfa9cc"
+    },
+    {
+      "file": "07-live-crypto.png",
+      "sha256": "b5916cdf229bf4c3792f4fbd278887cba7e6442fdfe4b21ace1cab926fd238aa"
+    }
+  ],
+  "market": "2026-10-17 weekend: OANDA platform quotes unavailable; composite uses a real stored confirmed M1 close; Binance actual current prices changed from 81572.66 to 81572.67. No price/candle interception or injection.",
+  "cleanup": {
+    "temporary_list_deleted_and_persisted": true,
+    "active_list": "real-oanda-watchlist",
+    "final_row_count": 5,
+    "theme_restored": "Dark",
+    "symbol_restored": "MWP:EURUSD"
+  },
+  "images": {
+    "api": {
+      "tag": "market-watch-api:issue73-review-eab74f7",
+      "id": "sha256:c1172b6652417cb2e98df45c3021068900179b5e0122ce95221907afdeadcaac"
+    },
+    "web": {
+      "tag": "market-watch-web:issue73-review-eab74f7",
+      "id": "sha256:037989544c46e5ac4555a801cbdba4182b9806b5ec515d96d90312956dcc0a2d"
+    },
+    "chart": {
+      "tag": "market-watch-chart-origin:issue73-review-eab74f7",
+      "id": "sha256:a669058b7182ba0bc982846886f8a951e8481c4fb1c6cc7bf4108b513f2a1628"
+    },
+    "commit": "eab74f71bbcccb3e3f4127f85ec306208025f704",
+    "dirty": false
+  }
+}

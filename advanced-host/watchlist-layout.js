@@ -4,7 +4,6 @@
  */
 (() => {
   const versionHash = "6b804c486857f27920cf761aa7eb6e29d9bb6362";
-  const number = /[0-9]/;
   const moreLabel = /(更多|菜单|列|more|menu|options)/i;
   const addLabel = /(添加|加入|add|plus|\+)/i;
   const internalName = /^(?:MW[CPH]:|(?:DUKA|YAHOO|NATIVE|MD|OANDA|BINANCE):)|^[a-f0-9]{32,64}$|^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i;
@@ -101,43 +100,55 @@
 
   function wrapLastDigit(cell) {
     if (!cell) return false;
-    // Native uptick/downtick markup nests the changing digits in spans.
-    const existing = cell.querySelector('[data-mw-price-sup="true"]');
+    // Keep every native Text node intact: React may retain and update it.
+    // A CSS glyph overlay raises the last digit without splitting/replacing
+    // native text or adding duplicated characters to copy/sort/reader text.
     const raw = cell.textContent || "";
-    if (existing) {
-      // Observer callbacks include our own DOM writes. Leave an unchanged
-      // quote untouched so those callbacks settle instead of rewriting the
-      // superscript forever and starving native rendering/subscriptions.
-      if (cell.dataset.mwRawPrice === raw) return true;
-      // A native text update may leave our wrapper in place. Preserve the
-      // current visible quote, including its last digit, rather than restoring
-      // the previous snapshot over the newly received price.
-      existing.replaceWith(cell.ownerDocument.createTextNode(existing.textContent || ""));
-    }
     let node, index = -1, lastNode;
     const walker = cell.ownerDocument.createTreeWalker(cell, NodeFilter.SHOW_TEXT);
     while ((node = walker.nextNode())) {
-      const match = [...node.data].reduce((found, char, i) => number.test(char) ? i : found, -1);
-      if (match >= 0) { index = match; lastNode = node; }
+      const matches = [...node.data.matchAll(/[0-9]/g)];
+      if (matches.length) { index = matches.at(-1).index; lastNode = node; }
     }
-    // The row is native markup; only wrap a known numeric tail. A missing or
-    // malformed quote remains ordinary text and never blocks the watchlist.
-    if (index < 0) return false;
-    const target = lastNode;
-    const digit = target.data[index];
-    const before = target.data.slice(0, index);
-    const after = target.data.slice(index + 1);
-    const sup = cell.ownerDocument.createElement("sup");
-    sup.dataset.mwPriceSup = "true";
-    sup.setAttribute("aria-hidden", "true");
-    sup.textContent = digit;
-    target.replaceWith(...[
-      before && cell.ownerDocument.createTextNode(before),
-      sup,
-      after && cell.ownerDocument.createTextNode(after),
-    ].filter(Boolean));
-    cell.dataset.mwRawPrice = raw;
-    cell.setAttribute("aria-label", raw);
+    if (index < 0) {
+      if (cell.hasAttribute("data-mw-price-digit")) {
+        delete cell.dataset.mwPriceDigit;
+        delete cell.dataset.mwRawPrice;
+        cell.removeAttribute("aria-label");
+      }
+      return false;
+    }
+    const range = cell.ownerDocument.createRange();
+    range.setStart(lastNode, index); range.setEnd(lastNode, index + 1);
+    const glyph = range.getBoundingClientRect(), bounds = cell.getBoundingClientRect();
+    if (!glyph.width || !glyph.height) return false;
+    const view = cell.ownerDocument.defaultView;
+    const style = view.getComputedStyle(lastNode.parentElement);
+    // Composite translucent native row/flash backgrounds over their ancestors
+    // so the overlay fully covers the baseline glyph, including selected rows.
+    let alpha = 0, rgb = [0, 0, 0];
+    for (let at = lastNode.parentElement; at && alpha < 1; at = at.parentElement) {
+      const color = view.getComputedStyle(at).backgroundColor.match(/[\d.]+/g)?.map(Number);
+      if (!color || color.length < 3) continue;
+      const layer = (1 - alpha) * (color[3] ?? 1);
+      rgb = rgb.map((value, i) => value + color[i] * layer);
+      alpha += layer;
+    }
+    rgb = rgb.map(value => Math.round(value + 255 * (1 - alpha)));
+    const values = {
+      "--mw-digit-left": `${glyph.left - bounds.left - cell.clientLeft}px`,
+      "--mw-digit-top": `${glyph.top - bounds.top - cell.clientTop}px`,
+      "--mw-digit-width": `${glyph.width}px`,
+      "--mw-digit-height": `${glyph.height}px`,
+      "--mw-digit-color": style.color,
+      "--mw-digit-background": `rgb(${rgb.join(",")})`,
+      "--mw-digit-size": `${parseFloat(style.fontSize) * 0.7}px`,
+    };
+    for (const [key, value] of Object.entries(values))
+      if (cell.style.getPropertyValue(key) !== value) cell.style.setProperty(key, value);
+    if (cell.dataset.mwPriceDigit !== lastNode.data[index]) cell.dataset.mwPriceDigit = lastNode.data[index];
+    if (cell.dataset.mwRawPrice !== raw) cell.dataset.mwRawPrice = raw;
+    if (cell.getAttribute("aria-label") !== raw) cell.setAttribute("aria-label", raw);
     return true;
   }
 
@@ -186,9 +197,13 @@
     const doc = probe?.ownerDocument;
     if (probe) widget.removeButton(probe);
     if (!doc || !versionSupported()) {
+      // The startup CSS gate applies before attach. Release it explicitly on
+      // an unsupported library rather than leaving genuine names loading.
+      if (doc) doc.documentElement.dataset.mwWatchlistFallback = "true";
       report(Error("watchlist DOM 版本未适配，已安全回退"));
       return {refresh() {}, dispose() {}};
     }
+    delete doc.documentElement.dataset.mwWatchlistFallback;
     let disposed = false, applying = false, pending = false;
     const refresh = () => {
       if (disposed || applying) return;
@@ -210,17 +225,24 @@
       pending = true;
       queueMicrotask(() => { pending = false; refresh(); });
     });
-    observer.observe(doc.body, {childList: true, subtree: true, characterData: true,
-      attributes: true, attributeFilter: ["data-symbol-full", "data-symbol-short"]});
+    observer.observe(doc.documentElement, {childList: true, subtree: true, characterData: true,
+      attributes: true, attributeFilter: ["data-symbol-full", "data-symbol-short", "data-active", "class"]});
     const resizeObserver = typeof ResizeObserver === "function" ? new ResizeObserver(refresh) : null;
     resizeObserver?.observe(doc.documentElement);
     const root = watchlistRoot(doc);
     if (root) resizeObserver?.observe(root);
     doc.defaultView?.addEventListener("resize", refresh);
+    // Native hover backgrounds change without a DOM mutation.
+    doc.addEventListener("pointerover", refresh, true);
+    doc.addEventListener("pointerout", refresh, true);
     refresh();
     return {refresh, dispose() {
       disposed = true; observer.disconnect(); resizeObserver?.disconnect();
+      doc.documentElement.dataset.mwWatchlistFallback = "true";
+      for (const cell of doc.querySelectorAll("[data-mw-price-digit]")) delete cell.dataset.mwPriceDigit;
       doc.defaultView?.removeEventListener("resize", refresh);
+      doc.removeEventListener("pointerover", refresh, true);
+      doc.removeEventListener("pointerout", refresh, true);
     }};
   }
 
