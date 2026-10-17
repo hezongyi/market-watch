@@ -90,6 +90,7 @@ def test_every_catalog_item_matches_full_origin_and_shares_repeated_inputs(datab
     assert execution["sql_payload_rows"] == 0
     assert execution["result_cache"] == "hit"
     assert execution["calculation_steps"] == 0
+    assert execution["input_rows"] == 2400, "A result hit still declares its complete fixed prefix size"
     expected = calculate(
         calculation_rows(rows, {"calendar": "utc0"}, "BTCUSDT"), request.indicators[0]
     )

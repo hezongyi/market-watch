@@ -48,6 +48,7 @@ assert.equal(validatePreparation(config,[oversize],study).valid,false);
 const reusable={...config,scenario:'loaded-reusable',prewarm:true};
 assert.equal(validatePreparation(reusable,[response],study).valid,false,'input hit alone cannot prove reusable result');
 const hit=clone(response);hit.indicators[0].calculation.execution.result_cache='hit';
+Object.assign(hit.indicators[0].calculation.execution,{calculation_steps:0,checkpoint_index:0});
 assert.equal(validatePreparation(reusable,[hit],study).valid,true);
 const suffix=clone(hit);Object.assign(suffix.indicators[0].calculation.execution,{result_cache:'checkpoint',calculation_steps:513});
 assert.equal(validatePreparation(reusable,[suffix],study).valid,false);

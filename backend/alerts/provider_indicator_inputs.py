@@ -139,8 +139,8 @@ def compute(inputs, meta, instrument, spec, *, first, provisional, telemetry=Non
 
     name, params = validate(spec)
     stats = telemetry if telemetry is not None else {}
-    stats.update(result_cache='miss', calculation_steps=0, checkpoint_index=0)
     rows = inputs.rows
+    stats.update(result_cache='miss', input_rows=len(rows), calculation_steps=0, checkpoint_index=0)
     key = (inputs.identity, name, json.dumps(params, sort_keys=True),
            json.dumps(meta.get("calendar_profile"), sort_keys=True), meta["calendar"], instrument)
     if name == "SWING_SR_V1" or name not in SUPPORTED:

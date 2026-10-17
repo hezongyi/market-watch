@@ -42,6 +42,7 @@ def test_repeated_and_appended_indicator_reads_do_not_reload_whole_prefix(databa
         assert first['indicators'][0]['calculation']['execution']['input_cache'] == 'miss'
         assert repeated['indicators'][0]['calculation']['execution']['input_cache'] == 'hit'
         assert repeated['indicators'][0]['calculation']['execution']['calculation_steps'] == 0
+        assert repeated['indicators'][0]['calculation']['execution']['input_rows'] == 999
         assert len(statements) == 1, "same input revision must reuse its frozen prefix"
         seed(META, "M1", 1001000, page(999000, 1001000))
         appended = cache.data(query(1001000))
