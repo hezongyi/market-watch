@@ -2,6 +2,8 @@
 
 Status at 2026-10-17 09:22 UTC: **incomplete; Issue #74 is not accepted**.
 
+Later actual-provider follow-up: [真实 Dukascopy Playwriter 复验](real-data-review/README.md) records a missing task-local history worker (fixed), long-period warmup/refresh origin inconsistency (open), seconds-long real interactions, and the corrected case-sensitive provider evidence predicate. Saved real XAU/USD EMA500 was null before reload and finite after reload because its calculation origin changed. PR #84 CI run `39021184862` also failed Backend (10 failed, 2560 passed, 11 skipped); Web/Compose/classification passed. These findings keep overall acceptance incomplete; the original synthetic matrices below remain unchanged.
+
 ## Candidate and environment
 
 - Current code candidate `d56ffff`, baseline `99124bb`, branch `feat/issue74-indicator-parity-20261017`. The strict performance matrix below remains pinned to its original candidate `21c386e`; the later chart recovery changes have separate functional evidence only.

@@ -46,7 +46,7 @@ function matchAuthority(commit,responses,study,kind){
       same(ticker,identity.fixedRevision) && same(calculation.input_revision,0) && !snapshot;
     if(kind==='managed')return identity.fixedRevision==='published:'+evidence.publication_revision &&
       same(calculation.input_revision,evidence.publication_revision) && !snapshot;
-    if(kind==='provider')return identity.fixedRevision==='provider:'+ticker &&
+    if(kind==='provider')return same(identity.fixedRevision,'provider:'+ticker) &&
       same(commit.inputRevision,page.cache_revision ?? page.revision) &&
       same(calculation.input_revision,page.cache_revision ?? page.revision) &&
       same(evidence.input_revision,calculation.input_revision) && evidence.provider_snapshot_id===snapshot && !!snapshot;

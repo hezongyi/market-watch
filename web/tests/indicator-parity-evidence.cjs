@@ -37,6 +37,20 @@ for(const mutate of [
 }
 const delayed=clone(response);delayed.at=1190;
 assert.equal(matchAuthority(commit,[delayed],study,'composite').canonicalAt,1190,'authority receipt can follow render');
+const providerCommit=clone(commit),providerResponse=clone(response);
+Object.assign(providerCommit.identity,{main:'MWP:DUKA:9105C84AF42600CCFA4F03132CC2472B',
+  fixedRevision:'provider:DUKA:9105c84af42600ccfa4f03132cc2472b'});
+Object.assign(providerResponse.query,{instrument:'DUKA:9105c84af42600ccfa4f03132cc2472b',series_kind:'provider'});
+Object.assign(providerResponse.page,{series_kind:'provider',cache_revision:2,provider_snapshot_id:'snapshot1'});
+providerResponse.indicators[0].calculation.input_evidence={input_revision:2,provider_snapshot_id:'snapshot1'};
+providerCommit.executionEvidence=[clone(providerResponse.indicators[0].calculation)];
+assert.equal(matchAuthority(providerCommit,[providerResponse],study,'provider').complete,true,
+  'native uppercase Dukascopy ticker must match its normalized provider revision');
+for(const mutate of [c=>c.identity.fixedRevision='provider:DUKA:other',c=>c.identity.main='MWP:DUKA:other']){
+  const wrong=clone(providerCommit);mutate(wrong);
+  assert.equal(matchAuthority(wrong,[providerResponse],study,'provider').complete,false,
+    'different provider identities must still be rejected');
+}
 const config={scenario:'loaded-new-spec',kind:'composite',prefixRows:100,knownUnused:true};
 assert.equal(validatePreparation(config,[response],study).valid,true);
 for(const cache of ['hit','checkpoint']){
