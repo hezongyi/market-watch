@@ -46,6 +46,11 @@ def test_chart_route_serializes_native_json_catalog_payload_without_recursive_re
     from fastapi.testclient import TestClient
 
     version = history(database, monkeypatch, count=300)
+    specs = [{"name": name} for name in CATALOG]
+    pending = data_sync(DataQuery(instrument=version, series_kind="history", timeframe="M1",
+        limit=25, indicators=specs))
+    for progress in pending["indicator_progress"]:
+        drain(progress["run_id"])
     original = routing.jsonable_encoder
 
     def encode(value, *args, **kwargs):
@@ -59,12 +64,13 @@ def test_chart_route_serializes_native_json_catalog_payload_without_recursive_re
         with TestClient(api.app) as client:
             result = client.post("/api/charts/data", json={"instrument": version,
                 "series_kind": "history", "timeframe": "M1", "limit": 25,
-                "indicators": [{"name": name} for name in CATALOG]})
+                "indicators": specs})
             assert result.status_code == 200, result.text
             assert result.headers["content-type"] == "application/json"
             page = result.json()
             assert len(page["bars"]) == 25
             assert {item["name"] for item in page["indicators"]} == set(CATALOG)
+            assert all(len(series["values"]) == 25 for item in page["indicators"] for series in item["series"])
     finally:
         api.app.dependency_overrides.clear()
 
