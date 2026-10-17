@@ -1,6 +1,6 @@
 {
   "base": "http://127.0.0.1:18176",
-  "at": "2026-10-17T16:43:07.910Z",
+  "at": "2026-10-17T16:51:52.885Z",
   "passed": 20,
   "failed": 0,
   "results": [
@@ -8,140 +8,140 @@
       "id": "A1.entry",
       "title": "父页面顶部有唯一通知入口与未读角标",
       "ok": true,
-      "ms": 110,
+      "ms": 75,
       "detail": "entry=1 unread=0"
     },
     {
       "id": "A1.single-bubble",
       "title": "一次发生只出现一个锚定气泡，不四角堆叠",
       "ok": true,
-      "ms": 167,
+      "ms": 155,
       "detail": "bubble=1"
     },
     {
       "id": "A2.api-pagination",
       "title": "稳定分页可连续读取超过 500 条",
       "ok": true,
-      "ms": 1339,
-      "detail": "640 events / 7 pages"
+      "ms": 1523,
+      "detail": "654 events / 7 pages"
     },
     {
       "id": "A2.filters",
       "title": "类型/级别筛选与关键词过滤生效",
       "ok": true,
-      "ms": 995,
+      "ms": 751,
       "detail": "alerts=100"
     },
     {
       "id": "A2.window-pagination",
       "title": "中心列表在内存预算内翻页而不无限增长",
       "ok": true,
-      "ms": 435,
+      "ms": 480,
       "detail": "items 100→200"
     },
     {
       "id": "A3.detail-timeline",
       "title": "详情显示稳定 ID、来源、本地/UTC 时间与观察时间线",
       "ok": true,
-      "ms": 609,
-      "detail": "event=web:99434626-86a0-47bf-8da0-71cf9630ac41"
+      "ms": 581,
+      "detail": "event=web:7a097961-0ec9-4742-8a78-77776cb2a50a"
     },
     {
       "id": "A4.alert-evidence",
       "title": "告警详情保留实际值/阈值/规则版本/图表代次",
       "ok": true,
-      "ms": 1152,
+      "ms": 1674,
       "detail": "evidence fields present"
     },
     {
       "id": "A5.channels",
       "title": "网页、手机接受与设备回执分别记录",
       "ok": true,
-      "ms": 52,
+      "ms": 47,
       "detail": "channels=ntfy,device"
     },
     {
       "id": "A6.incident-grouping",
       "title": "同一事故保留逐次发生并显示计数",
       "ok": true,
-      "ms": 2643,
-      "detail": "grouped=6, no bubble after reload"
+      "ms": 2614,
+      "detail": "grouped=13, no bubble after reload"
     },
     {
       "id": "A7.success-short",
       "title": "普通成功短提示且可回查",
       "ok": true,
-      "ms": 329,
+      "ms": 335,
       "detail": "success retained"
     },
     {
       "id": "A10.offline-intake",
       "title": "离线通知立即展示、本机待同步，恢复后幂等补传",
       "ok": true,
-      "ms": 7092,
+      "ms": 7010,
       "detail": "pending drained after reconnect"
     },
     {
       "id": "A14.read-vs-phone",
       "title": "网页已读不停止手机；显式停止才写旧确认",
       "ok": true,
-      "ms": 657,
-      "detail": "event=srv:5becd5d4-a534-4d6e-a67d-c8eb9fe7c36f"
+      "ms": 847,
+      "detail": "event=srv:b756bbc7-cec7-49e2-8315-65a9fe64c3c8"
     },
     {
       "id": "A15.chart-fallback",
       "title": "图表宿主不可用时父页面入口仍可查看记录",
       "ok": true,
-      "ms": 1759,
+      "ms": 1397,
       "detail": "fallback entry usable"
     },
     {
       "id": "A16.shared-sound",
       "title": "双标签页共享声音预留，自动尝试至多一次",
       "ok": true,
-      "ms": 7853,
+      "ms": 5316,
       "detail": "sound_reserved=1"
     },
     {
       "id": "A13.reconnect-poll",
       "title": "断线重连后仅靠补拉也能收敛到新事件",
       "ok": true,
-      "ms": 5199,
+      "ms": 9131,
       "detail": "writer pending drained, stable tab online"
     },
     {
       "id": "A17.sound-blocked",
       "title": "声音未解锁时记录 blocked 而不是假装已响",
       "ok": true,
-      "ms": 279,
+      "ms": 164,
       "detail": "sound_blocked recorded"
     },
     {
       "id": "A17.sound-expired",
       "title": "超过 30 秒的事件不再补响，记录 expired",
       "ok": true,
-      "ms": 31018,
+      "ms": 31077,
       "detail": "expired"
     },
     {
       "id": "A18.cross-instrument",
       "title": "跨品种同名故障不混为同一事故",
       "ok": true,
-      "ms": 3855,
+      "ms": 1826,
       "detail": "2 instruments / 2 incidents + recurrence"
     },
     {
       "id": "A19.storm",
       "title": "突发故障不阻塞中心打开，内存有界",
       "ok": true,
-      "ms": 549,
-      "detail": "40 reports in 160ms, items=49"
+      "ms": 749,
+      "detail": "40 reports in 222ms, items=147"
     },
     {
       "id": "A20.keyboard",
       "title": "Escape 关闭面板且焦点回到入口",
       "ok": true,
-      "ms": 149,
+      "ms": 482,
       "detail": "escape closes and focus returns"
     }
   ],

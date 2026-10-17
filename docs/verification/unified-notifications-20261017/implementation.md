@@ -66,6 +66,10 @@
 | P2 | A12 测试无法区分 claim 与 max(id) | 改为两个新信号 + 显式低 `Audit.id`，断言两个事件/两条凭据 |
 | P2 | 证据断言不足 | A6 增加刷新不弹泡、A13 增加对端收敛、A15 增加布局宽高断言 |
 | P2 | 行锁只在 SQLite 验证 | 新增 `TEST_POSTGRES_URL` 双线程投影测试（CI 的 PG 14 服务上运行，20 事件/20 凭据） |
+| P1 | refresh 关 SSE 后失败不重连 | 刷新失败置 `polling/offline` 并按可用游标重连；`online` 时未 ready 先重建基线 |
+| P1 | 本机事件双气泡（incident 版本导致键变化） | 气泡键改为 `subject/profile/event_id/严重级别`，get+put 在 Web Lock 内原子判定 |
+| P2 | 观察重试无定时器 | 新增 5 秒定时重试（页面可见时），不再依赖 pending 队列 |
+| P2 | 投影 worker 无心跳 | worker 每轮写 `notification.projector.heartbeat`；`--check` 作为 compose healthcheck；`/summary` 返回 `projector_age_ms/projector_ok` |
 
 ## 4. 迁移与回退
 

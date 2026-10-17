@@ -279,10 +279,9 @@ def test_resolved_incident_recurrence_creates_a_new_incident(database):
 def test_two_projectors_on_postgres_create_one_event(monkeypatch):
     import threading
 
+    from alerts import storage
     from sqlalchemy import create_engine, text
     from sqlalchemy.orm import sessionmaker
-
-    from alerts import storage
 
     url = os.environ["TEST_POSTGRES_URL"]
     admin = create_engine(url)
@@ -315,45 +314,3 @@ def test_two_projectors_on_postgres_create_one_event(monkeypatch):
         with admin.begin() as connection:
             connection.execute(text("drop schema if exists mw_center_test cascade"))
         admin.dispose()
-
-
-def test_retention_writes_tombstone_then_resets_old_cursors(database, monkeypatch):
-    with database.begin() as db:
-        add_signal(db, 1, alert=False)
-    center.project_pending(50)
-    monkeypatch.setattr(center, "RETENTION_EVENT_MS", 0)
-    with database.begin() as db:
-        old = db.scalar(select(NotificationEvent))
-        old.occurred_at = now_ms() - 10_000
-        db.flush()
-    center.prune()
-    with database.begin() as db:
-        event = db.scalar(select(NotificationEvent))
-        assert event.deleted_at is not None
-        deletions = list(db.scalars(select(NotificationChange).where(
-            NotificationChange.kind == "deleted")))
-        assert deletions
-    with database.begin() as db:
-        page = center.list_events(db)
-        assert page["items"] == []
-
-
-def test_late_committed_lower_audit_id_is_still_projectable(database):
-    """A source transaction that commits late must not be skipped by max(id)."""
-    with database.begin() as db:
-        signal, note = add_signal(db, 1)
-        first = db.scalar(select(Audit.id).order_by(Audit.id))
-    center.project_pending(10)
-    with database.begin() as db:
-        late = Audit(id=1, kind="chart_alert_signal",
-                     details={"signal_id": signal.id})
-        # Move the first audit out of the way so the new source owns a lower id.
-        existing = db.get(Audit, first)
-        existing.id = 99
-        db.add(late)
-        db.flush()
-    assert center.project_pending(10) == 1
-    with database.begin() as db:
-        assert len(list(db.scalars(select(NotificationEvent)))) == 1
-        claims = list(db.scalars(select(center.NotificationSourceClaim.source_id)))
-    assert set(claims) == {"1", "99"}

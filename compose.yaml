@@ -73,6 +73,12 @@ services:
   notification-worker:
     build: .
     command: ["python", "-m", "alerts.notification_worker"]
+    healthcheck:
+      test: ["CMD", "python", "-m", "alerts.notification_worker", "--check"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     env_file: .env
     environment:
       ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts

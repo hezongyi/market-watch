@@ -55,6 +55,12 @@ services:
     image: ${MW_API_IMAGE:?Build the task-owned API image}
     restart: "no"
     command: [python, -m, alerts.notification_worker]
+    healthcheck:
+      test: ["CMD", "python", "-m", "alerts.notification_worker", "--check"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     environment: *backend-env
     depends_on:
       api: {condition: service_healthy}

@@ -100,6 +100,7 @@ export class NotificationStore {
   private profile = "";
   private sound: SoundCoordinator | null = null;
   private serverOffset = 0;
+  private retryTimer: number | undefined;
   private source: EventSource | null = null;
   private pollTimer: number | undefined;
   private flushTimer: number | undefined;
@@ -112,6 +113,7 @@ export class NotificationStore {
   private deferredObservations: { id: string; kind: string; extra: Record<string, unknown> }[] = [];
   private started = false;
   private refreshing = false;
+  private refreshAgain = false;
   private flushing = false;
   private cursorSavedAt = 0;
 
@@ -156,6 +158,9 @@ export class NotificationStore {
     this.pollTimer = window.setInterval(() => {
       if (document.visibilityState === "visible") void this.tick();
     }, 20_000);
+    this.retryTimer = window.setInterval(() => {
+      if (document.visibilityState === "visible") void this.retryObservations();
+    }, 5_000);
     void this.flush();
   }
 
@@ -164,6 +169,7 @@ export class NotificationStore {
     this.source?.close();
     this.source = null;
     if (this.pollTimer) window.clearInterval(this.pollTimer);
+    if (this.retryTimer) window.clearInterval(this.retryTimer);
     if (this.flushTimer) window.clearTimeout(this.flushTimer);
     if (this.bubbleTimer) window.clearTimeout(this.bubbleTimer);
     window.removeEventListener("online", this.onOnline);
@@ -174,7 +180,8 @@ export class NotificationStore {
   private onOnline = () => {
     this.update({ connection: "connecting" });
     void this.flush();
-    void this.tick();
+    if (!this.state.ready) void this.refresh(true);
+    else void this.tick();
   };
 
   private onOffline = () => this.update({ connection: "offline" });
@@ -205,29 +212,38 @@ export class NotificationStore {
         const server = Date.parse(header);
         if (Number.isFinite(server)) this.serverOffset = server - Date.now();
       }
+      const body = await response.json().catch(() => null);
+      if (body && body.projector_ok === false) {
+        this.notice("通知投影暂未运行，告警事件可能暂缺；请检查 notification-worker。");
+      }
     } catch {
       /* clock estimate is optional; the 30 s window stays conservative */
     }
   }
 
   async refresh(reset = false): Promise<void> {
-    if (this.refreshing) return;
+    if (this.refreshing) { this.refreshAgain = true; return; }
     this.refreshing = true;
+    const wasLive = this.state.connection === "live";
     this.source?.close();
     this.source = null;
+    if (wasLive) this.update({ connection: "polling" });
     try {
       const page = await api<Page>(`/notification-center/events?${query(this.state.filters)}`);
       this.applyPage(page, reset);
       this.connect();
     } catch (error) {
-      if (error instanceof TypeError) {
-        this.update({ connection: "offline" });
-        this.notice("暂时无法连接通知服务，已保留本机记录。");
-      } else {
-        this.notice(`通知中心读取失败：${String(error)}`);
-      }
+      const offline = error instanceof TypeError || navigator.onLine === false;
+      this.update({ connection: offline ? "offline" : "polling" });
+      this.notice(offline
+        ? "暂时无法连接通知服务，已保留本机记录。"
+        : `通知中心读取失败：${String(error)}`);
+      // A failed baseline must not leave the UI "live but deaf": fall back to
+      // polling/SSE from the last durable cursor and refresh again when online.
+      if (this.state.ready) this.connect();
     } finally {
       this.refreshing = false;
+      if (this.refreshAgain) { this.refreshAgain = false; void this.refresh(true); }
     }
   }
 
@@ -312,7 +328,7 @@ export class NotificationStore {
   private async tick() {
     // Never replay the change log before the baseline cursor exists: an early
     // online/visibility tick must not turn historical events into new bubbles.
-    if (!this.state.ready) return;
+    if (!this.state.ready) { void this.refresh(true); return; }
     if (navigator.onLine === false) {
       this.update({ connection: "offline" });
       return;
@@ -396,24 +412,43 @@ export class NotificationStore {
 
   private announce(event: CenterEvent) {
     if (!event.notify_web) return;
-    const key = `${this.profile}|${event.id}|${event.incident?.attention_version ?? 0}`;
+    // One bubble per occurrence; a severity upgrade may alert again, channel
+    // updates and incident counters never do.
+    const rank = SEVERITY_RANK[event.severity] ?? 1;
+    const key = `${this.profile}|${event.id}|${rank}`;
     if (this.bubbled.has(key)) return;
     this.bubbled.add(key);
     void this.announcePersisted(event, key);
   }
 
   private async announcePersisted(event: CenterEvent, key: string) {
-    // The contract requires notification de-duplication across tabs and reloads,
-    // not just within this tab's memory.
-    if (await this.local.get("bubbles", key)) return;
-    const stored = await this.local.put("bubbles", key, Date.now());
-    if (!stored) {
-      this.notice("本机存储不可用，重复提示抑制只在当前页面有效。");
-    }
+    // The contract requires de-duplication across tabs and reloads, not just
+    // within this tab's memory; the get+put claim runs under a Web Lock so two
+    // tabs cannot both decide they are first.
+    const claimed = await this.claimBubble(key);
+    if (!claimed) return;
     if (event.kind !== "success" && SEVERITY_RANK[event.severity] >= 2) {
       void this.sound?.attempt(event);
     }
     this.enqueueBubble(event);
+  }
+
+  private async claimBubble(key: string): Promise<boolean> {
+    const claim = async () => {
+      if (await this.local.get("bubbles", key)) return false;
+      const stored = await this.local.put("bubbles", key, Date.now());
+      if (!stored) this.notice("本机存储不可用，重复提示抑制只在当前页面有效。");
+      // Storage failure must not suppress the bubble itself.
+      return true;
+    };
+    try {
+      if (navigator.locks?.request) {
+        return await navigator.locks.request("mw-notification-bubble", claim);
+      }
+      return await claim();
+    } catch {
+      return await claim();
+    }
   }
 
   private enqueueBubble(event: CenterEvent) {

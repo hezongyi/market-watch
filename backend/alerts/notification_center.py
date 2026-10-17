@@ -28,6 +28,7 @@ from .storage import (
     NotificationObservation,
     NotificationSourceClaim,
     NotificationStream,
+    Preference,
     SignalRow,
     now_ms,
     transaction,
@@ -696,6 +697,13 @@ def changes_since(db, after_seq: int, *, epoch: str | None = None, limit: int = 
         "next_seq": rows[-1].seq if rows else after_seq,
         "more": bool(rows) and rows[-1].seq < stream.seq,
     }
+
+
+def projector_age(db) -> int | None:
+    row = db.get(Preference, "notification.projector.heartbeat")
+    if not row or not isinstance(row.value, dict):
+        return None
+    return now_ms() - int(row.value.get("at") or 0)
 
 
 def resolve_incident(db, incident_id: str) -> dict:

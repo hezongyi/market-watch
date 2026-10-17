@@ -52,7 +52,7 @@
 ## 5. 展示与降级
 
 - 父页面持有入口与状态：`parent_starting → native_ready | parent_fallback`；切换不复制事件、未读和声音状态。
-- 最多一个锚定气泡；按 `subject/profile/event_id/attention_version` 去重；普通成功 3 秒、故障 8 秒，悬停/焦点暂停。
+- 最多一个锚定气泡；按 `subject/profile/event_id/严重级别` 持久去重（级别升级可重新提示，渠道更新/计数不重弹）；普通成功 3 秒、故障 8 秒，悬停/焦点暂停。
 - 首次快照、reset、历史翻页、回填、渠道状态更新不弹泡、不响铃。
 - 目标宿主不可用时，父页面入口仍可打开中心并查看原因。
 

@@ -8,7 +8,6 @@ import json
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
-
 from sqlalchemy.exc import IntegrityError
 
 from . import notification_center as center
@@ -144,7 +143,10 @@ def router(authenticated):
         with transaction() as db:
             window = center.change_window(db)
             page = center.list_events(db, limit=1)
-            return {**window, "unread": page["unread"]}
+            age = center.projector_age(db)
+            return {**window, "unread": page["unread"],
+                    "projector_age_ms": age,
+                    "projector_ok": age is not None and age <= 120_000}
 
     @api.get("/stream")
     async def stream(request: Request, after_seq: int = Query(default=0, ge=0),
