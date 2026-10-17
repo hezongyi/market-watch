@@ -1,0 +1,85 @@
+# Issue #82 only. Credentials and TLS material live outside the repository.
+name: mw-issue82-20261017
+x-limits: &logs
+  driver: json-file
+  options: {max-size: 10m, max-file: '3'}
+services:
+  postgres:
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+    mem_limit: 512m
+    cpus: 0.5
+    logging: *logs
+    environment:
+      POSTGRES_DB: single_app
+      POSTGRES_USER: single_app
+      POSTGRES_PASSWORD: ${MW_ACCEPTANCE_DB_PASSWORD:?private env required}
+    volumes: [postgres-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U single_app -d single_app && test \"$$(PGOPTIONS='-c jit=on' psql -U single_app -d single_app -Atqc \"SELECT current_setting('server_version_num') = '140024' AND pg_jit_available()\")\" = t"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  migrate:
+    image: ${MW_API_IMAGE:?task-owned API image required}
+    mem_limit: 1g
+    cpus: 0.9
+    logging: *logs
+    command: [alembic, upgrade, head]
+    environment: &backend
+      ALERTS_DATABASE_URL: postgresql+psycopg://single_app:${MW_ACCEPTANCE_DB_PASSWORD}@postgres/single_app
+      ALERTS_DATABASE_EXPECTED_VERSION: '140024'
+      ALERTS_DATABASE_APPLICATION_NAME: mw-issue82-20261017
+      ALERTS_ADMIN_PASSWORD_HASH: ${MW_ADMIN_PASSWORD_HASH:?private hash required}
+      ALERTS_COOKIE_SECURE: 'true'
+      ALERTS_PUBLIC_URL: https://192.168.7.232:18282
+      ALERTS_DELIVERY_ENABLED: 'false'
+      ALERTS_MCP_ENABLED: 'false'
+      ALERTS_YAHOO_ENABLED: 'false'
+      ALERTS_OANDA_STREAM_ENABLED: 'false'
+      ALERTS_INITIAL_HISTORY_DAYS: '0'
+      ALERTS_DATABASE_POOL_SIZE: '2'
+      ALERTS_DATABASE_MAX_OVERFLOW: '0'
+    depends_on:
+      postgres: {condition: service_healthy}
+  api:
+    image: ${MW_API_IMAGE:?task-owned API image required}
+    mem_limit: 1g
+    cpus: 0.9
+    logging: *logs
+    environment:
+      <<: *backend
+      PYTHONPATH: /fixtures:/app/backend
+    volumes: ['./single-app-fixture.py:/fixtures/single_app_fixture.py:ro']
+    command: [uvicorn, 'single_app_fixture:app', --host, 0.0.0.0, --port, '8000']
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8000/readyz', timeout=3)"]
+      interval: 3s
+      timeout: 4s
+      retries: 30
+  web:
+    image: ${MW_WEB_IMAGE:?task-owned web image required}
+    mem_limit: 64m
+    cpus: 0.15
+    logging: *logs
+    depends_on:
+      api: {condition: service_healthy}
+  chart:
+    image: ${MW_CHART_IMAGE:?task-owned licensed chart image required}
+    mem_limit: 128m
+    cpus: 0.25
+    logging: *logs
+    depends_on: [web]
+  tls:
+    image: nginx:1.28-alpine
+    mem_limit: 64m
+    cpus: 0.1
+    logging: *logs
+    ports: ['18282:443', '18283:444']
+    volumes:
+      - './single-app-tls.conf:/etc/nginx/conf.d/default.conf:ro'
+      - '${MW_ACCEPTANCE_PRIVATE:?private directory required}/tls:/tls:ro'
+    depends_on: [web, chart]
+volumes:
+  postgres-data:

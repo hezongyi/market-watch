@@ -252,8 +252,14 @@ def cancel_watch(watch_id: str):
 
 
 @app.get("/api/signals", dependencies=[Depends(authenticated)])
-def signals():
-    return business.signals()
+def signals(signal: str | None = None):
+    return business.signals(signal)
+
+
+@app.get("/api/signals/pending-count", dependencies=[Depends(authenticated)])
+def pending_signals():
+    with transaction() as db:
+        return {"count": db.scalar(select(func.count(Notification.id)).where(Notification.ack_at.is_(None)))}
 
 
 @app.post("/api/notifications/{notification_id}/retry", dependencies=[Depends(authenticated)])
@@ -1022,7 +1028,7 @@ from .chart_api import router as chart_router  # noqa: E402
 
 app.include_router(chart_router(authenticated))
 
-from .market_stream_api import router as market_stream_router
+from .market_stream_api import router as market_stream_router  # noqa: E402
 
 app.include_router(market_stream_router(authenticated))
 

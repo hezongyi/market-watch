@@ -1,0 +1,16 @@
+/ 200 SPA
+/login 200 SPA
+/signals?signal=old 200 SPA
+/advanced-charts/issue82-a 200 SPA
+/settings/account 200 SPA
+/replay/run 200 SPA
+/legacy/monitoring 200 SPA
+/chart-workspaces/issue82-legacy 200 SPA
+/missing 200 SPA
+/api 404 protocol
+/api/unknown 404 protocol
+/mcp 404 protocol
+/mcp/unknown 404 protocol
+/api/device/sync 401 protocol
+/healthz/missing 404 protocol
+Python fallback and favicon passed inside Ubuntu task API container

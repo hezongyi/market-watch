@@ -38,6 +38,8 @@ async function observedFetch(path: string, init: RequestInit, attempt: number, r
   try {
     const response = await fetch(`/api${path}`, init);
     status = response.status;
+    if (status === 401 && csrf && !["/session", "/login", "/logout"].includes(path))
+      dispatchEvent(new Event("mw-session-expired"));
     // Fetch resolves at headers. Keep the abort budget and diagnostic active
     // through body delivery; Safari can report Load failed during that phase.
     const body = readBody ? await response.arrayBuffer() : undefined;

@@ -413,6 +413,7 @@ async function nativeAlertShell(widget, { mount, unmount, report }) {
     });
   }
   return {
+    isOpen: () => !disposed && bar.layout.getActivePage()?.name === "alerts" && !bar.layout.minimized,
     open: () => {
       if (!disposed) bar.setPage("alerts");
     },

@@ -108,7 +108,7 @@ function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, s
       target = { id: crypto.randomUUID(), workspace: workspace().id, epoch: epoch(), index: widget.activeChartIndex(), chart: widget.activeChart(),
         symbol: widget.activeChart().symbol(), resolution: widget.activeChart().resolution(), layout: widget.layout() };
       pendingLocation = location; dialog.open = true;
-      send({ type: "data-center-state", open: true, session });
+      send({ type: "data-center-state", open: true, session, location: location || remembered || "/market-data" });
       const R=ui.react, mount=doc.createElement("div");
       const hosted = {
         ui, context: {workspace:target.workspace,target:target.id,theme:widget.getTheme().toLowerCase(), timezone:timezone(),
@@ -140,7 +140,7 @@ function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, s
         target={id:crypto.randomUUID(),workspace:workspace().id,epoch:epoch(),index:widget.activeChartIndex(),chart:widget.activeChart(),
           symbol:widget.activeChart().symbol(),resolution:widget.activeChart().resolution(),layout:widget.layout()};
         pendingLocation=location;dialog.open=true;opening=false;childReady=false;
-        send({type:"data-center-state",open:true,session});
+        send({type:"data-center-state",open:true,session,location:location || remembered || "/market-data"});
         fallback=doc.createElement("dialog");fallback.setAttribute("aria-label","数据中心兼容窗口");
         fallback.style.cssText="position:fixed;inset:0;margin:auto;padding:0;border:1px solid #777;border-radius:6px;width:min(1120px,calc(100vw - 32px));height:min(720px,calc(100dvh - 32px));max-width:none;max-height:none";
         fallbackFrame=doc.createElement("iframe");fallbackFrame.title="数据中心";
@@ -245,7 +245,9 @@ function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, s
   function handleMessage(m) {
     if (m.type === "ready") {childReady=true;context();}
     else if(m.type==="close") close();
-    else if(m.type==="location" && typeof m.location==="string" && m.location.length<=4000 && m.location.startsWith("/market-data")) remembered=m.location;
+    else if(m.type==="location" && typeof m.location==="string" && m.location.length<=4000 && m.location.startsWith("/market-data")) {
+      remembered=m.location; send({type:"data-center-state",open:true,session,location:remembered});
+    }
     else if(m.type==="apply" && typeof m.id==="string" && m.id.length<=40 && typeof m.ticker==="string" && m.ticker.length<=90) void apply(m);
     else if(m.type==="replay" && /^\/replay(?:\?dataset_version=[a-f0-9-]{36})?$/.test(m.path)){send({type:"data-center-replay",path:m.path,session});close();}
   }

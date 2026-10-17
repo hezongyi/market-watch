@@ -6,6 +6,7 @@ function nativeWorkspaces(initial, rpc, readonly, onLoaded, onSaved) {
   let writes = Promise.resolve();
   let unsaved = false;
   return {
+    discardChanges: () => { unsaved = false; },
     getAllCharts: async () => {
       const rows = (await rpc("list", {})).filter(
         (row) => !deleted.has(String(row.id)),

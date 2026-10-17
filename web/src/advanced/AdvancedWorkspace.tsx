@@ -4,6 +4,9 @@ import {
   type HistoryCapabilities,
 } from "./nativeHistoryLoads";
 import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate, useParams, NavLink } from "react-router-dom";
+import { useApp } from "../app/context";
+import { defaultChart } from "../app/navigation";
 import { centerLocation } from "../market-data/location";
 import { api, apiErrorDetails } from "../api";
 import "./advanced.css";
@@ -42,6 +45,19 @@ const frames = new Set([
 ]);
 
 export default function AdvancedWorkspace() {
+  const appLocation = useLocation(), navigate = useNavigate(), { workspaceId } = useParams();
+  const app = useApp(), appRef = useRef(app); appRef.current = app;
+  const urlRef = useRef(appLocation); urlRef.current = appLocation;
+  const capturing = useRef<{resolve: () => void; reject: (error: Error) => void} | null>(null);
+  const titleTimer = useRef<ReturnType<typeof setTimeout> | null>(null), titleText = useRef(""), titleLast = useRef(0), titleIdentity = useRef("");
+  const remember = (id: string, replace = false) => {
+    localStorage.setItem("mw.last-workspace.v1", id);
+    const query = new URLSearchParams(urlRef.current.search); query.delete("platform");
+    const next = `/advanced-charts/${id}` + (query.size ? "?"+query : "") + urlRef.current.hash;
+    sessionStorage.setItem("mw.chart-return.v1", next);
+    if (urlRef.current.pathname !== `/advanced-charts/${id}`) navigate(next, { replace });
+  };
+
   const [, setRows] = useState<Workspace[]>([]),
     [active, setActive] = useState<Workspace | null>(null);
   const [historyPlansOpen, setHistoryPlansOpen] = useState(false);
@@ -82,6 +98,19 @@ export default function AdvancedWorkspace() {
   const unsaved = useRef(false);
   const centerSession = useRef<string | null>(null);
   const deepCenter = useRef(new URLSearchParams(location.search).get("data_center"));
+  const requestedPlatform = new URLSearchParams(appLocation.search).get("platform");
+  // StrictMode replays opening effects. Reuse each creation until navigation
+  // resolves it, so one compatibility entry cannot create two workspaces.
+  const entryCreations = useRef(new Map<string, Promise<Workspace>>());
+  const createEntry = (key: string, body: { name: string; symbol?: string }) => {
+    let pending = entryCreations.current.get(key);
+    if (!pending) {
+      pending = api<Workspace>("/advanced-charts/workspaces", body);
+      entryCreations.current.set(key, pending);
+      pending.catch(() => entryCreations.current.delete(key));
+    }
+    return pending;
+  };
   const flushWaiters = useRef<
     { resolve: () => void; reject: (e: Error) => void }[]
   >([]);
@@ -139,6 +168,7 @@ export default function AdvancedWorkspace() {
         : "",
     );
     setStatus("正在加载图表");
+    remember(row.id, !workspaceId);
   };
   const noticeMessages = [
     ...(blocked.current
@@ -205,32 +235,50 @@ export default function AdvancedWorkspace() {
     return () => removeEventListener("keydown", save);
   }, [mobile]);
   useEffect(() => {
+    return app.registerGuard({
+      dirty: () => !mobile && unsaved.current,
+      shouldBlock: pathname => pathname !== `/advanced-charts/${current.current?.id}`,
+      save: flush,
+      discard: () => {
+        if (current.current) localStorage.removeItem("mw-tv-draft:" + current.current.id);
+        unsaved.current = false; blocked.current = false; post({ type: "discard-changes" });
+      },
+      preserve: () => {
+        if (mobile || !unsaved.current) return Promise.resolve();
+        return new Promise<void>((resolve, reject) => {
+          capturing.current = {resolve, reject}; post({ type: "capture-draft" });
+          setTimeout(() => { if (capturing.current?.resolve === resolve) { capturing.current = null; reject(Error("图表草稿尚未捕获")); } }, 10000);
+        });
+      },
+    });
+  }, [app.registerGuard, origin, mobile]);
+  useEffect(() => {
+    if (current.current && current.current.id === workspaceId) return;
     let cancelled = false;
-    const platform = new URLSearchParams(location.search).get("platform");
-    const opening = platform
-      ? api<Workspace>("/advanced-charts/workspaces", {
-          name: "平台行情",
-          symbol: platform,
-        }).then((row) => {
-          history.replaceState(null, "", location.pathname);
-          return [row];
-        })
-      : refresh(1).then(async list => {
-          if (!list.length && deepCenter.current) return [await api<Workspace>("/advanced-charts/workspaces", {name: "图表工作区"})];
+    const opening = workspaceId
+      ? api<Workspace>("/advanced-charts/workspaces/" + encodeURIComponent(workspaceId)).then(row => [row])
+      : requestedPlatform
+        ? mobile
+          ? refresh().then(list => list.filter(row => row.document.symbol === requestedPlatform))
+          : createEntry("platform:" + requestedPlatform, {name:"平台行情",symbol:requestedPlatform}).then(row => [row])
+      : refresh().then(async list => {
+          const last = localStorage.getItem("mw.last-workspace.v1");
+          if (last) { const found = list.find(row => row.id === last); if (found) return [found]; }
+          if (!list.length && deepCenter.current && !mobile) return [await createEntry("data-center", {name:"图表工作区"})];
           return list;
         });
-    opening
-      .then((list) => {
-        if (!cancelled) {
-          if (list[0]) select(list[0]);
-          else setStatus("新建工作区开始使用");
-        }
-      })
-      .catch((e) => setError(String(e)));
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    opening.then(list => {
+      if (cancelled) return;
+      if (list[0]) { setError(""); select(list[0]); }
+      else { current.current = null; setActive(null); setStatus(mobile ? "请在桌面浏览器创建工作区" : "新建工作区开始使用"); }
+    }).catch(e => { if (!cancelled) { setActive(null); current.current = null; setError(workspaceId ? "工作区不可用：" + String(e) : String(e)); } });
+    return () => { cancelled = true; };
+  }, [workspaceId, requestedPlatform, mobile]);
+  useEffect(() => {
+    if (active) sessionStorage.setItem("mw.chart-return.v1", appLocation.pathname + appLocation.search + appLocation.hash);
+  }, [active?.id, appLocation]);
+  useEffect(() => { if (nativeReady) post({ type: "app-state", pending: app.pending }); }, [nativeReady, app.pending]);
+  useEffect(() => () => { if (titleTimer.current) clearTimeout(titleTimer.current); }, []);
   useEffect(() => {
     const marketRequests = new Map<Window, Map<number, AbortController>>();
     const provider = providerSubscriptions(
@@ -262,13 +310,47 @@ export default function AdvancedWorkspace() {
         source = e.source as Window;
       const reply = (value: object) =>
         source.postMessage({ channel, ...value }, origin);
+      if (m.type === "draft-captured") {
+        const waiter = capturing.current; capturing.current = null;
+        if (!waiter) return;
+        try {
+          if (m.workspace_id !== current.current?.id || m.document?.engine !== "tv31" || m.document?.schemaVersion !== 1 || JSON.stringify(m.document).length > 4_000_000) throw Error("草稿响应无效");
+          localStorage.setItem("mw-tv-draft:" + m.workspace_id, JSON.stringify(m.document)); waiter.resolve();
+        } catch (e) { waiter.reject(new Error(String(e))); }
+        return;
+      }
+      if (m.type === "confirm-leave") {
+        const allowed = await appRef.current.confirmLeave();
+        reply({ type:"result", id:m.id, result:allowed }); return;
+      }
+      if (m.type === "active-quote") {
+        if (m.workspace_id !== current.current?.id || typeof m.ticker !== "string" || m.ticker.length > 150 || typeof m.label !== "string" || m.label.length > 150 || !Number.isSafeInteger(m.generation)) return;
+        // Source, channel and workspace are checked before title data is used.
+        const identity = `${m.workspace_id}:${m.generation}:${m.ticker}`;
+        const price = Number.isFinite(m.price) && typeof m.formatted === "string" ? " " + m.formatted.slice(0, 60) : "";
+        const percent = price && Number.isFinite(m.change) ? ` ${m.change > 0 ? "▲ +" : m.change < 0 ? "▼ −" : ""}${Math.abs(m.change).toFixed(2)}%` : "";
+        titleText.current = m.label + price + percent + (m.historical ? " · 历史" : m.delayed ? " · 迟延" : "");
+        const write = () => { titleTimer.current = null; if (document.title !== titleText.current) document.title = titleText.current; titleLast.current = performance.now(); };
+        if (identity !== titleIdentity.current) { if (titleTimer.current) clearTimeout(titleTimer.current); titleIdentity.current = identity; write(); }
+        else if (!titleTimer.current) titleTimer.current = setTimeout(write, Math.max(0, 1000 - (performance.now() - titleLast.current)));
+        return;
+      }
+      if (m.type === "alerts-panel-state" && m.workspace_id === current.current?.id && typeof m.open === "boolean") {
+        const url = new URL(location.href);
+        if (m.open) url.searchParams.set("panel", "alerts"); else url.searchParams.delete("panel");
+        navigate(url.pathname + url.search + url.hash, {replace:true}); return;
+      }
       if (m.type === "data-center-state" && typeof m.session === "string" && /^[a-f0-9-]{36}$/.test(m.session)) {
         centerSession.current = m.open === true ? m.session : null;
+        const url = new URL(location.href);
+        if (m.open) url.searchParams.set("data_center", centerLocation(typeof m.location === "string" ? m.location : "/market-data"));
+        else url.searchParams.delete("data_center");
+        navigate(url.pathname + url.search + url.hash, {replace:true});
         if (m.open) { setCapacityDialog(null); setExportSelection(null); }
         return;
       }
       if (m.type === "data-center-replay" && m.session === centerSession.current && /^\/replay(?:\?dataset_version=[a-f0-9-]{36})?$/.test(m.path)) {
-        location.assign(m.path); return;
+        navigate(m.path); return;
       }
       if (m.type === "data-center-api") {
         const q = m.query;
@@ -771,7 +853,10 @@ export default function AdvancedWorkspace() {
             workspace: current.current,
             readonly: mobile,
             catalog,
-            preferences,
+            preferences: localStorage.getItem("mw.app-theme") ? [
+              ...preferences.filter((p:any)=>!(p.kind === "setting" && p.name === "mw.theme")),
+              {...preferences.find((p:any)=>p.kind === "setting" && p.name === "mw.theme"),kind:"setting",name:"mw.theme",tool:"",content:{value:appRef.current.theme}},
+            ] : preferences,
             watchlist_metadata: Object.fromEntries(entries),
             initial_symbol: current.current?.initial_symbol,
           });
@@ -791,28 +876,24 @@ export default function AdvancedWorkspace() {
         )
           setExportSelection(value);
       } else if (m.type === "workspace-action") {
-        if (m.action === "home") location.assign("/");
-
+        const paths: Record<string,string> = {home: location.pathname, charts: location.pathname, signals:"/signals", replay:"/replay", settings:"/settings", legacy:"/legacy/monitoring"};
+        if (paths[m.action]) navigate(paths[m.action]);
         else if (m.action === "logout") {
-          try {
-            if (!mobile && unsaved.current) await flush();
-            await api("/logout", {});
-            location.assign("/");
-          } catch (e) {
-            setError(String(e));
-          }
+          try { await appRef.current.logout(); } catch(e) { setError(String(e)); }
         } else if (!mobile && m.action === "create") await create();
         else if (!mobile && m.action === "recover") await copy();
       } else if (m.type === "theme-changed") {
         if (typeof m.theme === "string" && /^(dark|light)$/i.test(m.theme))
-          setChartTheme(m.theme.toLowerCase());
+          { setChartTheme(m.theme.toLowerCase()); appRef.current.setTheme(m.theme.toLowerCase() as "dark" | "light"); }
       } else if (m.type === "ready") {
         setNativeReady(true);
         if (deepCenter.current) {
           reply({type: "data-center-open", location: centerLocation(deepCenter.current)});
           deepCenter.current = null;
-          const url = new URL(location.href); url.searchParams.delete("data_center"); history.replaceState(null, "", url.pathname + url.search);
+
         }
+        if (new URLSearchParams(location.search).get("panel") === "alerts") reply({type:"open-alerts"});
+        reply({ type:"app-state", pending:appRef.current.pending });
         setStatus("已加载 · 行情按需更新");
       } else if (m.type === "viewport-notice") {
         if (typeof m.key !== "string" || m.key.length > 200) return;
@@ -831,8 +912,10 @@ export default function AdvancedWorkspace() {
           else delete next[m.key];
           return next;
         });
-      } else if (m.type === "error")
+      } else if (m.type === "error") {
         setFeedError(String(m.error).slice(0, 500));
+        flushWaiters.current.splice(0).forEach(w => w.reject(Error(String(m.error))));
+      }
       else if (m.type === "workspace-dirty") {
         if (!mobile) unsaved.current = true;
         setStatus("布局有未保存更改");
@@ -940,6 +1023,7 @@ export default function AdvancedWorkspace() {
             // Native loads happen inside the existing widget. Reflect their
             // identity without recreating the iframe or discarding chart state.
             setActive(current.current);
+            remember(result.id);
             if (previousWorkspace !== result.id || q.op === "load") {
               alertUiSession.current = crypto.randomUUID();
               reply({
@@ -1024,6 +1108,20 @@ export default function AdvancedWorkspace() {
             ? { type: "result", id: m.id, error: "模板名称不能超过128字" }
             : { type: "result", id: m.id, result: value },
         );
+      } else if (m.type === "symbol-flags") {
+        const q = m.query;
+        try {
+          if (!q || !["read","save"].includes(q.op) || JSON.stringify(q).length > 1_100_000) throw Error("收藏请求不允许");
+          let result;
+          if (q.op === "read") {
+            const rows = await api<any[]>("/advanced-charts/preferences");
+            result = rows.find(row=>row.kind==="setting" && row.name==="mw.symbol-flags.v1" && !row.tool) || null;
+          } else {
+            if (mobile || q.args?.kind !== "setting" || q.args?.name !== "mw.symbol-flags.v1" || q.args?.tool) throw Error("收藏保存请求不允许");
+            result = await api("/advanced-charts/preferences/save", q.args);
+          }
+          reply({type:"result",id:m.id,result});
+        } catch(e) { reply({type:"result",id:m.id,error:String(e),errorDetails:apiErrorDetails(e)}); }
       } else if (m.type === "preferences") {
         const q = m.query;
         if (
@@ -1465,7 +1563,7 @@ export default function AdvancedWorkspace() {
     const name = prompt("工作区名称", "我的图表");
     if (!name?.trim()) return;
     try {
-      await flush();
+      if (!await appRef.current.confirmLeave()) return;
       const row = await api<Workspace>("/advanced-charts/workspaces", {
         name: name.trim(),
       });
@@ -1585,9 +1683,9 @@ export default function AdvancedWorkspace() {
         />
       ) : (
         <section>
-          <a href="/">返回守望</a>
-          <h1>专业图表夹</h1>
-          <p>独立工作区，沿用守望行情。</p>
+          <h1>{error && workspaceId ? "工作区不可用" : "图表工作区"}</h1>
+          <p>{mobile ? "手机只读看盘，请在桌面浏览器创建工作区。" : "选择已有工作区，或新建工作区开始使用。"}</p>
+          <NavLink to="/advanced-charts">选择默认工作区</NavLink> · <NavLink to="/signals">通知</NavLink> · <NavLink to="/settings">设置</NavLink>
           <button disabled={mobile} onClick={create}>
             新建工作区
           </button>

@@ -261,11 +261,12 @@ def cancel_watch_in(db, watch_id):
     return watch_dict(w)
 
 
-def signals():
+def signals(signal_id: str | None = None):
     with transaction() as db:
         rows = db.execute(
             select(SignalRow, Notification)
             .join(Notification, Notification.signal_id == SignalRow.id)
+            .where(SignalRow.id == signal_id if signal_id else True)
             .order_by(SignalRow.created_at.desc())
             .limit(500)
         ).all()
