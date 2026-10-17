@@ -74,6 +74,9 @@ try{
         await state.app.reload({waitUntil:'domcontentloaded',timeout:budget.timeoutMs});
         await state.app.locator('iframe[title="专业图表工作区"]').waitFor({timeout:budget.timeoutMs});
         state.chart=state.app.frames().find(frame=>frame.url().startsWith('https://127.0.0.1:17475/'));
+        if(!state.chart) state.chart=await state.app.waitForEvent('framenavigated',{
+          predicate:frame=>frame.url().startsWith('https://127.0.0.1:17475/'),
+          timeout:Math.max(1,budget.timeoutMs-(Date.now()-at))});
         assert.ok(state.chart,'real app chart frame did not restore');
       }
       await state.chart.waitForFunction(({studies,at})=>{
