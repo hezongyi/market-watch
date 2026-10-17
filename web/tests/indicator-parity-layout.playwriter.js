@@ -99,6 +99,7 @@ try{
           coverageMs:Math.max(...commits.map(commit=>commit.covered.at))-at,
           symbol:chart.symbol(),commits,native};
       },{studies:config.studies,at});
+      assert.equal(result.symbol.toUpperCase(),config.symbol?.toUpperCase(),'restored a different saved series');
       assert.equal(result.native.length,config.studies.length,'saved layout lost or duplicated a study');
       assert.ok(result.native.every(study=>study.rows>0),'restored study has no native data');
       const measured=responses.slice(responseStart);

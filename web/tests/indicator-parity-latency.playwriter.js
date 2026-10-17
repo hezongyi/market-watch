@@ -27,6 +27,7 @@ const output = '/tmp/mw-issue74-20261017/latency-'+config.phase+'.json';
 assert.equal(fs.existsSync(output),false,'never overwrite a recorded group');
 assert.ok(state.chart && state.app, 'open the isolated app first');
 const environment = await state.chart.evaluate(() => ({symbol:widget.activeChart().symbol(),range:widget.activeChart().getVisibleRange(),timeOrigin:performance.timeOrigin}));
+assert.equal(environment.symbol.toUpperCase(),config.symbol?.toUpperCase(),'declare the exact series before sampling');
 const responses = [], pending = new Set();
 const capture = response => {
   if(!response.url().endsWith('/api/charts/data') || response.request().method() !== 'POST') return;
