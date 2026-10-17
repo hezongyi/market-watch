@@ -1,0 +1,12 @@
+https://github.com/hezongyi/market-watch/actions/runs/39034631301
+2026-10-17T13:14:14.4838120Z FAILED backend/tests/test_market_stream_postgres.py::test_published_indicator_prefix_proof_matches_inputs_during_concurrent_repair - assert [] == [True]
+2026-10-17T13:14:14.4839435Z FAILED backend/tests/test_native_mcp.py::test_mcp_provider_fixed_origin_matches_browser_after_earlier_backfill - AssertionError: assert [{'name': 'EM...8.0}]}], ...}] == [{'name': 'EM... 'main', ...}]
+2026-10-17T13:14:14.4854598Z FAILED backend/tests/test_native_update_diagnosis.py::test_provider_study_page_uses_the_same_frozen_prices_during_repair[False-SUPERTREND_PINE_V1-False] - AssertionError: old price token cannot describe new recursive input
+2026-10-17T13:14:14.4887653Z FAILED backend/tests/test_native_update_diagnosis.py::test_provider_study_page_uses_the_same_frozen_prices_during_repair[False-SUPERTREND_PINE_V1-True] - AssertionError: old price token cannot describe new recursive input
+2026-10-17T13:14:14.4920520Z FAILED backend/tests/test_native_update_diagnosis.py::test_provider_study_page_uses_the_same_frozen_prices_during_repair[False-SWING_SR_V1-False] - AssertionError: old price token cannot describe new recursive input
+2026-10-17T13:14:14.4952347Z FAILED backend/tests/test_native_update_diagnosis.py::test_provider_study_page_uses_the_same_frozen_prices_during_repair[False-SWING_SR_V1-True] - AssertionError: old price token cannot describe new recursive input
+2026-10-17T13:14:14.4984454Z FAILED backend/tests/test_native_update_diagnosis.py::test_provider_study_page_uses_the_same_frozen_prices_during_repair[True-SUPERTREND_PINE_V1-False] - AssertionError: old price token cannot describe new recursive input
+2026-10-17T13:14:14.5017108Z FAILED backend/tests/test_native_update_diagnosis.py::test_provider_study_page_uses_the_same_frozen_prices_during_repair[True-SUPERTREND_PINE_V1-True] - AssertionError: old price token cannot describe new recursive input
+2026-10-17T13:14:14.5049966Z FAILED backend/tests/test_native_update_diagnosis.py::test_provider_study_page_uses_the_same_frozen_prices_during_repair[True-SWING_SR_V1-False] - AssertionError: old price token cannot describe new recursive input
+2026-10-17T13:14:14.5091818Z FAILED backend/tests/test_native_update_diagnosis.py::test_provider_study_page_uses_the_same_frozen_prices_during_repair[True-SWING_SR_V1-True] - AssertionError: old price token cannot describe new recursive input
+2026-10-17T13:14:16.5663066Z 10 failed, 2573 passed, 11 skipped, 50 warnings in 899.69s (0:14:59)

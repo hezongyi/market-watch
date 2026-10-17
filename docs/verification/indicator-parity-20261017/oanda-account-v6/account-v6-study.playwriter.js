@@ -1,0 +1,3 @@
+state.accountStudy=await state.accountChart.evaluate(()=>widget.activeChart().createStudy('守望 Python SUPERTREND_PINE_V1',false,false,{period:11,source:'hl2',multiplier:3,changeATR:true,showsignals:true,highlighting:true}));
+await state.accountChart.waitForFunction(id=>{const c=widget.activeChart();const last=c._chartWidget.model().model().dataSourceForId(id)?.data().last()?.value;return Number.isFinite(last?.[1])||Number.isFinite(last?.[2]);},state.accountStudy,{timeout:18000});
+console.log(await state.accountChart.evaluate(id=>({id,study:widget.activeChart().getAllStudies(),last:widget.activeChart()._chartWidget.model().model().dataSourceForId(id).data().last()?.value}),state.accountStudy));

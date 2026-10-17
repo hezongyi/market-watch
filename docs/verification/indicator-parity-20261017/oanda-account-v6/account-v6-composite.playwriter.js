@@ -1,0 +1,12 @@
+const fs=require('node:fs');
+await state.compositePage.bringToFront();
+await state.compositePage.reload();await state.compositePage.waitForTimeout(1300);
+state.compositeChart=state.compositePage.frames().find(f=>f.url().startsWith('https://127.0.0.1:17475/'));
+await state.compositeChart.waitForFunction(()=>typeof widget!=='undefined'&&ready&&!loading&&widget.activeChart().dataReady(),{},{timeout:15000});
+state.compositeSupertrend=await state.compositeChart.evaluate(()=>widget.activeChart().getAllStudies().find(x=>x.name==='守望 Python SUPERTREND_PINE_V1')?.id);
+await state.compositeChart.waitForFunction(id=>{const c=widget.activeChart(),s=MWNativeIndicatorResults.scope(c,id),last=c._chartWidget.model().model().dataSourceForId(id)?.data().last()?.value;return s?.coverage&&!s.transition&&(Number.isFinite(last?.[1])||Number.isFinite(last?.[2]));},state.compositeSupertrend,{timeout:15000});
+const r=await state.compositeChart.evaluate(id=>{const c=widget.activeChart();return {symbol:c.symbol(),res:c.resolution(),bars:c._chartWidget.model().model().mainSeries().data().size(),scope:MWNativeIndicatorResults.scope(c,id),last:c._chartWidget.model().model().dataSourceForId(id).data().last()?.value};},state.compositeSupertrend);
+fs.writeFileSync('/tmp/mw-issue74-20261017/account-v6-composite.json',JSON.stringify(r,null,2));
+await state.compositePage.screenshot({path:'/tmp/mw-issue74-20261017/account-v6-composite.png',scale:'css'});
+console.log(r);
+if(!r.symbol.startsWith('MWC:')||r.bars<100)throw Error('Real saved composite not ready');
