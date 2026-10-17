@@ -42,6 +42,7 @@ import AdvancedWorkspacePage from "./advanced/AdvancedWorkspace";
 import DataCenterWindow from "./market-data/Window";
 import { centerLocation } from "./market-data/location";
 import SeriesPicker, { type QualifiedSeries } from "./market-data/SeriesPicker";
+import { NotificationEntry, NotificationProvider, useCenterState, useNotificationStore } from "./notification-center/NotificationCenter";
 import { instrumentName, instrumentIdentity, instrumentIcon } from "./instrumentPresentation";
 import InstrumentDetails from "./InstrumentDetails";
 import ReplayJobs from "./ReplayJobs";
@@ -148,7 +149,13 @@ function App() {
   if (appLocation.pathname === "/chart-data-center") return <DataCenterWindow />;
   if (appLocation.pathname.startsWith("/market-data")) return <Navigate replace to={`/advanced-charts?data_center=${encodeURIComponent(centerLocation(appLocation.pathname + appLocation.search + appLocation.hash))}`} />;
   if (appLocation.pathname === "/advanced-charts")
-    return <Suspense fallback={<div className="loading">正在加载专业图表…</div>}><AdvancedWorkspacePage /></Suspense>;
+    return (
+      <NotificationProvider>
+        <Suspense fallback={<div className="loading">正在加载专业图表…</div>}>
+          <AdvancedWorkspacePage />
+        </Suspense>
+      </NotificationProvider>
+    );
   if (appLocation.pathname.startsWith("/chart-workspaces"))
     return (
       <Suspense fallback={<div className="loading">正在加载图表工作区…</div>}>
@@ -158,12 +165,14 @@ function App() {
       </Suspense>
     );
   return (
-    <Shell
-      logout={async () => {
-        await api("/logout", {});
-        setLogged(false);
-      }}
-    />
+    <NotificationProvider>
+      <Shell
+        logout={async () => {
+          await api("/logout", {});
+          setLogged(false);
+        }}
+      />
+    </NotificationProvider>
   );
 }
 
@@ -183,10 +192,10 @@ function Shell({ logout }: { logout: () => void }) {
     [watches, setWatches] = useState<Watch[]>([]),
     [signals, setSignals] = useState<Signal[]>([]),
     [error, setError] = useState("");
-  const [health, setHealth] = useState<any>({}),
-    [sound, setSound] = useState(false);
-  const audio = useRef<AudioContext | null>(null),
-    known = useRef<Set<string> | null>(null);
+  const [health, setHealth] = useState<any>({});
+  const center = useNotificationStore(),
+    centerState = useCenterState();
+  const audio = useRef<AudioContext | null>(null);
   const refreshRunning = useRef(false);
   const refreshAgain = useRef(false);
   const refresh = useCallback(async () => {
@@ -221,19 +230,6 @@ function Shell({ logout }: { logout: () => void }) {
       events.close();
     };
   }, [refresh]);
-  useEffect(() => {
-    const ids = new Set(signals.map((s) => s.id));
-    if (
-      sound &&
-      known.current &&
-      signals.some((s) => !known.current!.has(s.id) &&
-        (!s.evidence?.chart_alert || s.evidence.config.notify_web)) &&
-      audio.current
-    ) {
-      playAlertTone(audio.current);
-    }
-    known.current = ids;
-  }, [signals, sound]);
   const location = useLocation();
   useEffect(() => {
     document
@@ -305,18 +301,21 @@ function Shell({ logout }: { logout: () => void }) {
             </strong>
           </span>
           <div>
+            <NotificationEntry />
             <button
-              className={`sound-toggle ${sound ? "enabled" : ""}`}
+              className={`sound-toggle ${centerState.soundEnabled ? "enabled" : ""}`}
+              aria-pressed={centerState.soundEnabled}
               onClick={async () => {
-                if (!sound) {
+                const next = !centerState.soundEnabled;
+                const ok = await center.setSoundEnabled(next);
+                if (next && !ok) {
                   audio.current ??= new AudioContext();
                   await audio.current.resume();
                 }
-                setSound(!sound);
               }}
             >
               <Bell size={16} />
-              {sound ? "网页声音已开" : "开启网页声音"}
+              {centerState.soundEnabled ? "网页声音已开" : "开启网页声音"}
             </button>
             <span className="avatar">我</span>
           </div>

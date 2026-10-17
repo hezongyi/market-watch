@@ -17,6 +17,7 @@ from datetime import UTC, datetime
 from sqlalchemy import String, and_, cast, exists, func, or_, select
 from sqlalchemy.exc import IntegrityError
 
+from .config import settings
 from .storage import (
     Audit,
     DeliveryAttempt,
@@ -429,19 +430,23 @@ def _payload_hash(payload: dict) -> str:
 
 def _rate_ok(db) -> int | None:
     now = now_ms()
+    minute_limit = settings.notification_rate_minute
+    burst_limit = settings.notification_rate_burst
+    if minute_limit <= 0:
+        return None
     minute = db.scalar(select(func.count()).select_from(NotificationEvent).where(
         NotificationEvent.subject == SUBJECT,
         NotificationEvent.source_kind == "browser",
         NotificationEvent.recorded_at > now - 60_000,
     )) or 0
-    if minute >= RATE_PER_MINUTE:
+    if minute >= minute_limit:
         return 60
     burst = db.scalar(select(func.count()).select_from(NotificationEvent).where(
         NotificationEvent.subject == SUBJECT,
         NotificationEvent.source_kind == "browser",
         NotificationEvent.recorded_at > now - 120_000,
     )) or 0
-    if burst >= RATE_BURST:
+    if burst_limit > 0 and burst >= burst_limit:
         return 60
     return None
 

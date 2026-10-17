@@ -13,6 +13,7 @@ import { ExportDialog, type ExportSelection } from "./ExportDialog";
 import { providerSubscriptions } from "./providerSubscriptions";
 import { validAlertContext } from "./chartAlerts";
 import { chartAlertUiRequest } from "./chartAlertUiApi";
+import { NotificationEntry, useNotificationStore } from "../notification-center/NotificationCenter";
 import { HistoryCapacityDialog } from "./HistoryCapacityDialog";
 import {
   HistoryLoadingNotice,
@@ -173,6 +174,48 @@ export default function AdvancedWorkspace() {
         draftBlocked: blocked.current,
       });
   }, [nativeReady, notificationState]);
+  // Parent-owned rule: these ordinary faults are parent facts. They are also
+  // recorded as durable browser events so they survive refresh and can be
+  // reviewed later instead of disappearing with the in-chart toast.
+  const center = useNotificationStore();
+  const reportedNotices = useRef(new Set<string>());
+  useEffect(() => {
+    const workspace = active?.id ?? "none";
+    for (const notice of noticeMessages) {
+      if (notice.recover) continue;
+      const text = notice.text.replace(/^(?:Error:\s*)+/, "").trim();
+      if (!text) continue;
+      const key = `${workspace}:${notice.id}:${text}`;
+      if (reportedNotices.current.has(key)) continue;
+      reportedNotices.current.add(key);
+      void center.report({
+        kind: "failure",
+        severity: "warning",
+        title: text.length > 120 ? `${text.slice(0, 120)}…` : text,
+        summary: text,
+        dedupe_key: `workspace:${workspace}:${notice.id}`,
+        context: { workspace },
+        evidence: { notice_id: notice.id },
+      });
+    }
+  }, [notificationState, active?.id]);
+  useEffect(() => {
+    for (const [key, notice] of Object.entries(capacityNotices)) {
+      if (notice.phase !== "failed") continue;
+      const dedupe = `capacity:${key}:${notice.id ?? ""}`;
+      if (reportedNotices.current.has(dedupe)) continue;
+      reportedNotices.current.add(dedupe);
+      void center.report({
+        kind: "failure",
+        severity: "warning",
+        title: `${notice.instrument}${notice.timeframe ? ` · ${notice.timeframe}` : ""} 历史加载失败`,
+        summary: notice.message,
+        dedupe_key: `capacity:${key}`,
+        context: { workspace: active?.id, instrument: notice.instrument, timeframe: notice.timeframe },
+        evidence: { notice_id: String(notice.id ?? ""), requested: notice.requested, actual: notice.actual, limit: notice.limit },
+      });
+    }
+  }, [capacityNotices, active?.id]);
   async function refresh(limit?: number) {
     const list = await api<Workspace[]>(
       "/advanced-charts/workspaces" + (limit ? "?limit=" + limit : ""),
@@ -1498,6 +1541,7 @@ export default function AdvancedWorkspace() {
   }
   return (
     <main className="advanced-workspace" data-theme={chartTheme}>
+      <div className="mw-center-fixed"><NotificationEntry /></div>
       {mobile && <p className="advanced-readonly-note" role="note">手机只读看盘。编辑图表、绘图和告警请使用桌面浏览器；桌面工作区布局仍保留。</p>}
       {Object.keys(indicatorStates).length>0 && <aside className="advanced-history-failures" aria-label="图格指标状态">{Object.entries(indicatorStates).map(([key,item])=><p key={key} role="status">图格 {item.index+1} · {item.name}：{item.state==='error' ? item.error : '正在计算'}{item.previousParams && <>（暂显旧参数：{item.previousParams}）</>}{item.state==='error' && <button onClick={()=>post({type:'retry-chart-indicators',index:item.index,epoch:item.epoch})}>重试指标</button>}</p>)}</aside>}
       {chartFailures.length>0 && <aside className="advanced-history-failures" aria-label="图格历史加载失败">{chartFailures.map(item=><p key={item.index} role="status">图格 {item.index+1} · {item.label} · {item.resolution}：{item.error}<button onClick={()=>post({type:'retry-chart-history',...item})}>重试此图格</button></p>)}</aside>}

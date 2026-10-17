@@ -1,0 +1,74 @@
+# Ubuntu-only isolated acceptance for Issue #75. Build both images with mw-docker first.
+name: mw-issue75-20261017
+services:
+  postgres:
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+    restart: "no"
+    environment:
+      POSTGRES_DB: notifications
+      POSTGRES_USER: notifications
+      POSTGRES_PASSWORD: ${MW_ACCEPTANCE_DB_PASSWORD:?Set a development-only password}
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\" && test \"$$(PGOPTIONS='-c jit=on' psql -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\" -Atqc \"SELECT current_setting('server_version_num') = '140024' AND pg_jit_available()\")\" = t"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  migrate:
+    image: ${MW_API_IMAGE:?Build the task-owned API image}
+    restart: "no"
+    command: [alembic, upgrade, head]
+    environment: &backend-env
+      ALERTS_DATABASE_URL: postgresql+psycopg://notifications:${MW_ACCEPTANCE_DB_PASSWORD}@postgres/notifications
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
+      ALERTS_COOKIE_SECURE: "false"
+      ALERTS_PUBLIC_URL: http://127.0.0.1:18176
+      ALERTS_DELIVERY_ENABLED: "false"
+      ALERTS_MCP_ENABLED: "false"
+      ALERTS_YAHOO_ENABLED: "false"
+      ALERTS_INITIAL_HISTORY_DAYS: "0"
+      ALERTS_DATABASE_POOL_SIZE: "1"
+      ALERTS_DATABASE_MAX_OVERFLOW: "0"
+      ALERTS_ACCEPTANCE_SEED: "1"
+      # D1 storm/pagination checks need to create more than the production
+      # 60/min browser intake budget; production keeps the reviewed default.
+      ALERTS_NOTIFICATION_RATE_MINUTE: "100000"
+      ALERTS_NOTIFICATION_RATE_BURST: "100000"
+      ALERTS_ADMIN_PASSWORD_HASH: ${MW_ADMIN_PASSWORD_HASH:?Set the acceptance login hash}
+    depends_on:
+      postgres: {condition: service_healthy}
+  api:
+    image: ${MW_API_IMAGE:?Build the task-owned API image}
+    restart: "no"
+    environment: *backend-env
+    ports: ["127.0.0.1:18175:8000"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8000/readyz', timeout=3)"]
+      interval: 3s
+      timeout: 4s
+      retries: 20
+  notification-worker:
+    image: ${MW_API_IMAGE:?Build the task-owned API image}
+    restart: "no"
+    command: [python, -m, alerts.notification_worker]
+    environment: *backend-env
+    depends_on:
+      api: {condition: service_healthy}
+  web:
+    image: ${MW_WEB_IMAGE:?Build the task-owned web image}
+    restart: "no"
+    ports: ["127.0.0.1:18176:80"]
+    depends_on:
+      api: {condition: service_healthy}
+  chart:
+    image: ${MW_CHART_IMAGE:?Build the task-owned chart image}
+    restart: "no"
+    ports: ["127.0.0.1:18177:80"]
+    depends_on:
+      web: {condition: service_started}
+volumes:
+  postgres-data:
