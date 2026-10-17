@@ -324,10 +324,11 @@ const displayRecoveries=new Map();
 async function recoverDisplaySnapshot(ticker,res,token,retry=false){
   const key=indicatorKey(ticker,res),previous=displayRecoveries.get(key);
   const binding=indicatorBindings.get(key);
+  const boundToken=binding?.displaySnapshot ?? binding?.providerSnapshot;
+  if(boundToken!=null && boundToken!==token)return;
   // Reading unchanged prices can renew the same content-addressed token. A
   // later expiry needs a new recovery; delayed errors for replaced tokens do not.
-  const expiredAgain=previous?.state==='ready' &&
-    (binding?.displaySnapshot ?? binding?.providerSnapshot ?? token)===token;
+  const expiredAgain=previous?.state==='ready';
   if(previous?.token===token && !expiredAgain && (!retry || previous.state!=='error'))return previous.promise;
   const epoch=workspaceEpoch;
   const charts=ready ? Array.from({length:widget.chartsCount()},(_,index)=>({index,chart:widget.chart(index)}))

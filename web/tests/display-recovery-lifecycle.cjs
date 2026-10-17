@@ -20,10 +20,19 @@ vm.runInNewContext(bridge.slice(start,end)+'\nglobalThis.recover=recoverDisplayS
  // A delayed error for an old token must still leave newer prices alone.
  ctx.indicatorBindings.get('MWC:test|1').displaySnapshot='fresh';
  await ctx.recover('MWC:test','1','expired');assert.equal(attempts,5);assert.equal(registered,2);
+ // With a recovery record for B and active prices C, a delayed error for A
+ // must not cancel batches, reset subscriptions, or replace that record.
+ await ctx.recover('MWC:test','1','fresh');assert.equal(attempts,6);assert.equal(registered,3);
+ ctx.indicatorBindings.get('MWC:test|1').displaySnapshot='latest';
+ const generation=sub.marketGeneration;
+ await ctx.recover('MWC:test','1','expired');
+ assert.equal(attempts,6,'an error two tokens behind cannot reload current prices');
+ assert.equal(registered,3);assert.equal(sub.marketGeneration,generation);
+ ctx.indicatorBindings.get('MWC:test|1').displaySnapshot='navigation';
  busy=true;await assert.rejects(ctx.recover('MWC:test','1','navigation'));
  ticker='MWC:other';ctx.prune();assert.equal(reports.filter(x=>x.state).at(-1).state,'removed','settled error removed after symbol switch');
- ticker='MWC:test';busy=false;
+ ticker='MWC:test';busy=false;ctx.indicatorBindings.get('MWC:test|1').displaySnapshot='new';
  onReload=()=>{ctx.workspaceEpoch++;};await ctx.recover('MWC:test','1','new');
- assert.equal(registered,2,'old workspace cannot re-register a subscription');
+ assert.equal(registered,3,'old workspace cannot re-register a subscription');
  console.log('PASS price-only retry, recovery deduplication, workspace cancellation');
 })().catch(e=>{console.error(e);process.exitCode=1;});
