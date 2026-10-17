@@ -2,11 +2,15 @@
 from types import SimpleNamespace
 
 import pytest
-from alerts import market_stream as stream, provider_cache as cache
+from alerts import market_stream as stream
+from alerts import provider_cache as cache
 from alerts.chart_api import DataQuery
 from alerts.provider_acceptance import receipts
+from indicator_assertions import stable_indicators
 from test_provider_cache import META, seed
-from test_provider_postgres import provider_pg
+from test_provider_postgres import provider_pg as _provider_pg
+
+provider_pg = _provider_pg
 
 
 @pytest.mark.parametrize("change, should_reset", [
@@ -119,8 +123,10 @@ def test_provider_study_page_uses_the_same_frozen_prices_during_repair(provider_
     assert repairs
     assert accepted["bars"] == original["bars"]
     assert accepted["cache_revision"] == original["cache_revision"] < current["cache_revision"]
-    assert accepted["indicators"] == original["indicators"], "old price token cannot describe new recursive input"
-    assert current["indicators"] != original["indicators"]
+    assert stable_indicators(accepted) == stable_indicators(original), \
+        "old price token cannot describe new recursive input"
+    assert stable_indicators(current) != stable_indicators(original)
+    assert current["indicators"][0]["calculation"]["input_revision"] == current["cache_revision"]
 
 
 def test_study_prefix_budget_rejects_without_truncating_the_origin(provider_pg, monkeypatch):
@@ -146,6 +152,7 @@ def test_study_prefix_budget_rejects_without_truncating_the_origin(provider_pg, 
 def test_diagnostics_record_only_successfully_committed_changes(provider_pg, monkeypatch, caplog):
     import json
     import logging
+
     from alerts.storage import ProviderBar
 
     clock = [10000000]

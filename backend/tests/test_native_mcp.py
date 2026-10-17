@@ -14,6 +14,7 @@ from alerts.capabilities.models import Empty, StatusResult
 from alerts.capabilities.registry import Capability, Registry
 from alerts.mcp.auth import digest, issue, revoke
 from fastapi.testclient import TestClient
+from indicator_assertions import stable_indicators
 from sqlalchemy import create_engine, func, select
 from sqlalchemy.orm import sessionmaker
 
@@ -922,5 +923,5 @@ def test_mcp_provider_fixed_origin_matches_browser_after_earlier_backfill(mcp, m
     assert not result.get('isError'),result
     page=result['structuredContent']['page']
     assert page['calculation_origin']==600000
-    assert page['indicators']==web['indicators']
+    assert stable_indicators(page)==stable_indicators(web)
     assert page['bars']==web['bars']

@@ -6,16 +6,11 @@ from alerts import provider_chart as upstream
 from alerts.chart_api import DataQuery
 from alerts.chart_calculation_history import calculation_rows
 from alerts.chart_indicators import calculate
+from indicator_assertions import stable_indicators
 from sqlalchemy import event
 from test_provider_cache import META, page, seed
 
 SPEC = {"name": "SUPERTREND_PINE_V1", "params": {"period": 10}}
-
-
-def stable_indicators(page):
-    """Execution counters vary with cache hits; numerical/input evidence must not."""
-    return [{**item, "calculation": {key: value for key, value in item["calculation"].items()
-                                    if key != "execution"}} for item in page["indicators"]]
 
 
 def query(before=1000000, **kwargs):
