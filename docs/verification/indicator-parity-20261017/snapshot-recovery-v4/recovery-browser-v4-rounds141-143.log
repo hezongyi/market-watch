@@ -1,0 +1,129 @@
+Console output:
+[log] {
+  held: {
+    token: 'ba1ffed0082781a9f8847b6bfe428ddec51072b1c2f71863e860ade0effbd21d',
+    revision: '4b9990c6-a496-4c86-9a58-5d4196833169',
+    instrument: '2bcbc81d8e0e33b2318774f24638e2327448c8d3ecae8d190915cb94b50f637b',
+    kind: 'composite',
+    timeframe: 'M1',
+    period: 141
+  },
+  before: {
+    key: 'MWC:2bcbc81d8e0e33b2318774f24638e2327448c8d3ecae8d190915cb94b50f637b|1',
+    token: 'ba1ffed0082781a9f8847b6bfe428ddec51072b1c2f71863e860ade0effbd21d',
+    revision: '4b9990c6-a496-4c86-9a58-5d4196833169',
+    previousToken: '68bd8cc387d0be7a2911a60fd229989deb2c0eeb971f8edca941ede4442b2175',
+    previousState: 'ready',
+    readyForSameToken: false,
+    at: 1792228710126
+  }
+}
+
+{"expiredRows": 1, "period": 141}
+Console output:
+[log] {
+  period: 141,
+  passed: true,
+  readyForSameToken: false,
+  sameToken: false,
+  nativeRows: 162,
+  requests: [
+    {
+      status: 422,
+      detail: {
+        code: 'DISPLAY_SNAPSHOT_EXPIRED',
+        message: '展示快照已过期或身份不匹配，请读取新的价格快照'
+      }
+    },
+    { status: 200, detail: undefined },
+    { status: 200, detail: undefined },
+    { status: 200, detail: undefined }
+  ]
+}
+
+Console output:
+[log] {
+  held: {
+    token: 'c1b9424a1cc3813f4ed93ca3f51580db31bd8fadc3669b13a29ecb61c394dfca',
+    revision: '4b9990c6-a496-4c86-9a58-5d4196833169',
+    instrument: '2bcbc81d8e0e33b2318774f24638e2327448c8d3ecae8d190915cb94b50f637b',
+    kind: 'composite',
+    timeframe: 'M1',
+    period: 142
+  },
+  before: {
+    key: 'MWC:2bcbc81d8e0e33b2318774f24638e2327448c8d3ecae8d190915cb94b50f637b|1',
+    token: 'c1b9424a1cc3813f4ed93ca3f51580db31bd8fadc3669b13a29ecb61c394dfca',
+    revision: '4b9990c6-a496-4c86-9a58-5d4196833169',
+    previousToken: 'ba1ffed0082781a9f8847b6bfe428ddec51072b1c2f71863e860ade0effbd21d',
+    previousState: 'ready',
+    readyForSameToken: false,
+    at: 1792228712860
+  }
+}
+
+{"expiredRows": 1, "period": 142}
+Console output:
+[log] {
+  period: 142,
+  passed: true,
+  readyForSameToken: false,
+  sameToken: true,
+  nativeRows: 162,
+  requests: [
+    {
+      status: 422,
+      detail: {
+        code: 'DISPLAY_SNAPSHOT_EXPIRED',
+        message: '展示快照已过期或身份不匹配，请读取新的价格快照'
+      }
+    },
+    { status: 200, detail: undefined },
+    { status: 200, detail: undefined },
+    { status: 200, detail: undefined }
+  ]
+}
+
+Console output:
+[log] {
+  held: {
+    token: 'c1b9424a1cc3813f4ed93ca3f51580db31bd8fadc3669b13a29ecb61c394dfca',
+    revision: '4b9990c6-a496-4c86-9a58-5d4196833169',
+    instrument: '2bcbc81d8e0e33b2318774f24638e2327448c8d3ecae8d190915cb94b50f637b',
+    kind: 'composite',
+    timeframe: 'M1',
+    period: 143
+  },
+  before: {
+    key: 'MWC:2bcbc81d8e0e33b2318774f24638e2327448c8d3ecae8d190915cb94b50f637b|1',
+    token: 'c1b9424a1cc3813f4ed93ca3f51580db31bd8fadc3669b13a29ecb61c394dfca',
+    revision: '4b9990c6-a496-4c86-9a58-5d4196833169',
+    previousToken: 'c1b9424a1cc3813f4ed93ca3f51580db31bd8fadc3669b13a29ecb61c394dfca',
+    previousState: 'ready',
+    readyForSameToken: true,
+    at: 1792228714994
+  }
+}
+
+{"expiredRows": 1, "period": 143}
+Console output:
+[log] {
+  period: 143,
+  passed: true,
+  readyForSameToken: true,
+  sameToken: true,
+  nativeRows: 325,
+  requests: [
+    {
+      status: 422,
+      detail: {
+        code: 'DISPLAY_SNAPSHOT_EXPIRED',
+        message: '展示快照已过期或身份不匹配，请读取新的价格快照'
+      }
+    },
+    { status: 200, detail: undefined },
+    { status: 200, detail: undefined },
+    { status: 200, detail: undefined }
+  ]
+}
+

@@ -1,0 +1,6110 @@
+{
+  "recordedAt": "2026-10-17T07:14:28.684Z",
+  "budgetRevision": "2026-10-17-scenarios-v1",
+  "scenario": "loaded-complex-spec",
+  "budget": {
+    "firstMs": 1000,
+    "coverageMs": 2000,
+    "canonicalMs": 3000,
+    "timeoutMs": 6000
+  },
+  "source": "actual app / Playwriter / native renderer after two RAFs",
+  "synthetic": true,
+  "config": {
+    "phase": "budget-managed-supertrend-pine-v1-add-complex-spec-8",
+    "scenario": "loaded-complex-spec",
+    "operation": "add",
+    "kind": "managed",
+    "indicator": "SUPERTREND_PINE_V1",
+    "prefixRows": 3000,
+    "specs": [
+      {
+        "params": {
+          "period": 41,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 41,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 42,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 42,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 43,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 43,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 44,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 44,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 45,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 45,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 46,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 46,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 47,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 47,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 48,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 48,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 49,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 49,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 50,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 50,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 51,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 51,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 52,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 52,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 53,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 53,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 54,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 54,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 55,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 55,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 56,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 56,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 57,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 57,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 58,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 58,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 59,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 59,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 60,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 60,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 61,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 61,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 62,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 62,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 63,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 63,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 64,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 64,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 65,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 65,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 66,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 66,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 67,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 67,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 68,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 68,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 69,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 69,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      },
+      {
+        "params": {
+          "period": 70,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 70,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      }
+    ],
+    "knownUnused": true
+  },
+  "environment": {
+    "symbol": "PARITY",
+    "range": {
+      "from": 1792189920,
+      "to": 1792202460
+    },
+    "timeOrigin": 1792219995443.6
+  },
+  "n": 30,
+  "failures": 0,
+  "quantile": "nearest-rank; failures as infinity (JSON null)",
+  "ms": {
+    "p50": 127.59999999403954,
+    "p95": 184.30000001192093
+  },
+  "coverageMs": {
+    "p50": 127.59999999403954,
+    "p95": 184.30000001192093
+  },
+  "canonicalMs": {
+    "p50": 127.59999999403954,
+    "p95": 184.30000001192093
+  },
+  "passed": true,
+  "samples": [
+    {
+      "index": 1,
+      "params": {
+        "period": 41,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 154.59999999403954,
+      "coverageMs": 154.59999999403954,
+      "first": {
+        "at": 1267752.599999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":41,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":41,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1267752.599999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":41,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":41,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 154.59999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221263185,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 41,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221263070.977,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.245,
+            "responseStart": 85.405,
+            "responseEnd": 89.384
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 41,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 2,
+      "params": {
+        "period": 42,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 174.69999998807907,
+      "coverageMs": 174.69999998807907,
+      "first": {
+        "at": 1267968.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":42,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":42,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1267968.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":42,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":42,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 174.69999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221263378,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 42,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221263274.8909,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.317,
+            "responseStart": 78.316,
+            "responseEnd": 80.274
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 42,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 3,
+      "params": {
+        "period": 43,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 173.09999999403954,
+      "coverageMs": 173.09999999403954,
+      "first": {
+        "at": 1268173.900000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":43,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":43,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1268173.900000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":43,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":43,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 173.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221263579,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 43,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221263476.9731,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.259,
+            "responseStart": 87.345,
+            "responseEnd": 92.574
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 43,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 4,
+      "params": {
+        "period": 44,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 161.5,
+      "coverageMs": 161.5,
+      "first": {
+        "at": 1268433.599999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":44,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":44,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1268433.599999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":44,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":44,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 161.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221263840,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 44,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221263749.9941,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.248,
+            "responseStart": 75.737,
+            "responseEnd": 80.249
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 44,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 5,
+      "params": {
+        "period": 45,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 136.69999998807907,
+      "coverageMs": 136.69999998807907,
+      "first": {
+        "at": 1268616.400000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":45,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":45,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1268616.400000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":45,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":45,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 136.69999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221264065,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 45,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221263948.397,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.67,
+            "responseStart": 85.302,
+            "responseEnd": 88.491
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 45,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 6,
+      "params": {
+        "period": 46,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 213,
+      "coverageMs": 213,
+      "first": {
+        "at": 1268931,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":46,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":46,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1268931,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":46,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":46,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 213,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221264351,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 46,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221264235.09,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.239,
+            "responseStart": 93.774,
+            "responseEnd": 94.81
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 46,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 7,
+      "params": {
+        "period": 47,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 127.89999997615814,
+      "coverageMs": 127.89999997615814,
+      "first": {
+        "at": 1269130.599999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":47,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":47,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1269130.599999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":47,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":47,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 127.89999997615814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221264558,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 47,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221264486.2512,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.266,
+            "responseStart": 59.826,
+            "responseEnd": 61.384
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 47,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 8,
+      "params": {
+        "period": 48,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 120.5,
+      "coverageMs": 120.5,
+      "first": {
+        "at": 1269296.400000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":48,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":48,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1269296.400000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":48,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":48,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 120.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221264719,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 48,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221264642.6802,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.321,
+            "responseStart": 60.805,
+            "responseEnd": 65.732
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 48,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 9,
+      "params": {
+        "period": 49,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 113.2999999821186,
+      "coverageMs": 113.2999999821186,
+      "first": {
+        "at": 1269479.5,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":49,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":49,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1269479.5,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":49,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":49,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 113.2999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221264912,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 49,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221264835.0662,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.273,
+            "responseStart": 62.857,
+            "responseEnd": 66.51
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 49,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 10,
+      "params": {
+        "period": 50,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 123.10000002384186,
+      "coverageMs": 123.10000002384186,
+      "first": {
+        "at": 1269646.7000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":50,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":50,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1269646.7000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":50,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":50,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 123.10000002384186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221265078,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 50,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221264997.8672,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.25,
+            "responseStart": 62.395,
+            "responseEnd": 64.251
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 50,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 11,
+      "params": {
+        "period": 51,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 120.09999999403954,
+      "coverageMs": 120.09999999403954,
+      "first": {
+        "at": 1269798.5,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":51,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":51,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1269798.5,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":51,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":51,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 120.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221265232,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 51,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221265145.9949,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.235,
+            "responseStart": 73.721,
+            "responseEnd": 75.577
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 51,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 12,
+      "params": {
+        "period": 52,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 151.5,
+      "coverageMs": 151.5,
+      "first": {
+        "at": 1269997.400000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":52,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":52,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1269997.400000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":52,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":52,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 151.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221265426,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 52,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221265309.6208,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.333,
+            "responseStart": 103.302,
+            "responseEnd": 106.139
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 52,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 13,
+      "params": {
+        "period": 53,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 118.09999999403954,
+      "coverageMs": 118.09999999403954,
+      "first": {
+        "at": 1270146.900000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":53,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":53,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1270146.900000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":53,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":53,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 118.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221265593,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 53,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221265493.094,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.263,
+            "responseStart": 66.104,
+            "responseEnd": 67.538
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 53,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 14,
+      "params": {
+        "period": 54,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 119.7000000178814,
+      "coverageMs": 119.7000000178814,
+      "first": {
+        "at": 1270296.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":54,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":54,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1270296.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":54,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":54,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 119.7000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221265724,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 54,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221265639.388,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.245,
+            "responseStart": 72.601,
+            "responseEnd": 73.688
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 54,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 15,
+      "params": {
+        "period": 55,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 137.2999999821186,
+      "coverageMs": 137.2999999821186,
+      "first": {
+        "at": 1270481.5,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":55,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":55,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1270481.5,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":55,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":55,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 137.2999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221265916,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 55,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221265810.563,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.25,
+            "responseStart": 88.522,
+            "responseEnd": 90.297
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 55,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 16,
+      "params": {
+        "period": 56,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 127.59999999403954,
+      "coverageMs": 127.59999999403954,
+      "first": {
+        "at": 1270663,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":56,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":56,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1270663,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":56,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":56,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 127.59999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221266088,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 56,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221266011.503,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.353,
+            "responseStart": 60.051,
+            "responseEnd": 62.547
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 56,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 17,
+      "params": {
+        "period": 57,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 138.80000001192093,
+      "coverageMs": 138.80000001192093,
+      "first": {
+        "at": 1270846.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":57,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":57,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1270846.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":57,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":57,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 138.80000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221266282,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 57,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221266175.7698,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.449,
+            "responseStart": 77.609,
+            "responseEnd": 84.176
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 57,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 18,
+      "params": {
+        "period": 58,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 108,
+      "coverageMs": 108,
+      "first": {
+        "at": 1270997.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":58,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":58,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1270997.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":58,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":58,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 108,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221266426,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 58,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221266339.5579,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.253,
+            "responseStart": 74.627,
+            "responseEnd": 79.49
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 58,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 19,
+      "params": {
+        "period": 59,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 120,
+      "coverageMs": 120,
+      "first": {
+        "at": 1271148.400000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":59,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":59,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1271148.400000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":59,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":59,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 120,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221266590,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 59,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221266491.137,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.262,
+            "responseStart": 64.877,
+            "responseEnd": 68.217
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 59,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 20,
+      "params": {
+        "period": 60,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 158.10000002384186,
+      "coverageMs": 158.10000002384186,
+      "first": {
+        "at": 1271416.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":60,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":60,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1271416.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":60,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":60,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 158.10000002384186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221266875,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 60,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221266742.064,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.259,
+            "responseStart": 93.104,
+            "responseEnd": 94.619
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 60,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 21,
+      "params": {
+        "period": 61,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 133,
+      "coverageMs": 133,
+      "first": {
+        "at": 1271612.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":61,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":61,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1271612.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":61,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":61,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 133,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221267024,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 61,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221266942.46,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.327,
+            "responseStart": 60.728,
+            "responseEnd": 63.293
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 61,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 22,
+      "params": {
+        "period": 62,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 123.09999999403954,
+      "coverageMs": 123.09999999403954,
+      "first": {
+        "at": 1271782.800000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":62,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":62,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1271782.800000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":62,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":62,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 123.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221267212,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 62,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221267128.213,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.278,
+            "responseStart": 60.102,
+            "responseEnd": 61.739
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 62,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 23,
+      "params": {
+        "period": 63,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 117.10000002384186,
+      "coverageMs": 117.10000002384186,
+      "first": {
+        "at": 1271946.7000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":63,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":63,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1271946.7000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":63,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":63,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 117.10000002384186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221267381,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 63,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221267299.813,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.279,
+            "responseStart": 61.439,
+            "responseEnd": 64.222
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 63,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 24,
+      "params": {
+        "period": 64,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 95.30000001192093,
+      "coverageMs": 95.30000001192093,
+      "first": {
+        "at": 1272104.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":64,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":64,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1272104.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":64,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":64,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 95.30000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221267533,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 64,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221267459.9,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.209,
+            "responseStart": 57.752,
+            "responseEnd": 59.372
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 64,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 25,
+      "params": {
+        "period": 65,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 109.2000000178814,
+      "coverageMs": 109.2000000178814,
+      "first": {
+        "at": 1272267.7000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":65,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":65,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1272267.7000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":65,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":65,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 109.2000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221267689,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 65,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221267608.0598,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.296,
+            "responseStart": 57.628,
+            "responseEnd": 58.763
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 65,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 26,
+      "params": {
+        "period": 66,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 145.09999999403954,
+      "coverageMs": 145.09999999403954,
+      "first": {
+        "at": 1272436,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":66,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":66,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1272436,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":66,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":66,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 145.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221267864,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 66,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221267740.5222,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.269,
+            "responseStart": 100.44,
+            "responseEnd": 102.37
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 66,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 27,
+      "params": {
+        "period": 67,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 184.30000001192093,
+      "coverageMs": 184.30000001192093,
+      "first": {
+        "at": 1272682.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":67,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":67,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1272682.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":67,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":67,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 184.30000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221268114,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 67,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221267966.5042,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.257,
+            "responseStart": 122.552,
+            "responseEnd": 128.057
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 67,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 28,
+      "params": {
+        "period": 68,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 133.59999999403954,
+      "coverageMs": 133.59999999403954,
+      "first": {
+        "at": 1272880.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":68,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":68,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1272880.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":68,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":68,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 133.59999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221268308,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 68,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221268211.01,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.247,
+            "responseStart": 78.725,
+            "responseEnd": 79.965
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 68,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 29,
+      "params": {
+        "period": 69,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 116.7999999821186,
+      "coverageMs": 116.7999999821186,
+      "first": {
+        "at": 1273029.599999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":69,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":69,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1273029.599999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":69,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":69,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 116.7999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221268466,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 69,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221268381.4822,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.261,
+            "responseStart": 69.526,
+            "responseEnd": 72.176
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 69,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 30,
+      "params": {
+        "period": 70,
+        "source": "hl2",
+        "multiplier": 3,
+        "atr_method": "wilder"
+      },
+      "ms": 120.09999999403954,
+      "coverageMs": 120.09999999403954,
+      "first": {
+        "at": 1273199.400000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":70,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":70,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1273199.400000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":70,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":70,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 9,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        116.85991999999999,
+        null,
+        122.85492,
+        116.85991999999999,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "canonicalMs": 120.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221268629,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "SUPERTREND_PINE_V1",
+                "params": {
+                  "period": 70,
+                  "source": "hl2",
+                  "multiplier": 3,
+                  "atr_method": "wilder"
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221268541.874,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.281,
+            "responseStart": 73.348,
+            "responseEnd": 75.362
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "SUPERTREND_PINE_V1",
+              "params": {
+                "period": 70,
+                "source": "hl2",
+                "multiplier": 3,
+                "atr_method": "wilder"
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "supertrend-pine-state-v1",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "up",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "down",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "buy_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "sell_price",
+                  "count": 205,
+                  "finite": 0
+                },
+                {
+                  "key": "fill_reference",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "direction",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    }
+  ]
+}

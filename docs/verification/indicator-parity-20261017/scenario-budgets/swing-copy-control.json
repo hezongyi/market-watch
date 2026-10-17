@@ -1,0 +1,39 @@
+{
+  "synthetic": true,
+  "rows": 5760,
+  "spec": {
+    "name": "SWING_SR_V1",
+    "params": {
+      "high_strength": 32,
+      "low_strength": 33
+    }
+  },
+  "samples_per_arm": 3,
+  "browser_slo": false,
+  "results": {
+    "legacy-copy-per-bar": {
+      "replay_ms": [
+        1657.79,
+        1635.81,
+        1622.69
+      ],
+      "output_and_state_sha256": [
+        "ba4b190112ca9786e26cd81a4ee483031b5392e32e2cf5697fc978495e0a8c98",
+        "ba4b190112ca9786e26cd81a4ee483031b5392e32e2cf5697fc978495e0a8c98",
+        "ba4b190112ca9786e26cd81a4ee483031b5392e32e2cf5697fc978495e0a8c98"
+      ]
+    },
+    "owned-confirmed-state": {
+      "replay_ms": [
+        160.96,
+        153.6,
+        155.56
+      ],
+      "output_and_state_sha256": [
+        "ba4b190112ca9786e26cd81a4ee483031b5392e32e2cf5697fc978495e0a8c98",
+        "ba4b190112ca9786e26cd81a4ee483031b5392e32e2cf5697fc978495e0a8c98",
+        "ba4b190112ca9786e26cd81a4ee483031b5392e32e2cf5697fc978495e0a8c98"
+      ]
+    }
+  }
+}

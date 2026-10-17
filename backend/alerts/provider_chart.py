@@ -230,7 +230,8 @@ def _request(client, url, *, params, headers=None, deadline):
 
 
 def _oanda_candles(client, symbol, params, deadline):
-    url = f"https://api-fxpractice.oanda.com/v3/instruments/{symbol}/candles"
+    url = (f"https://api-fxpractice.oanda.com/v3/accounts/{settings.oanda_account_id}"
+           f"/instruments/{symbol}/candles")
     headers = {"Authorization": "Bearer " + settings.oanda_token, "Accept-Datetime-Format": "UNIX"}
     try:
         return _request(client, url, params=params, headers=headers, deadline=deadline), (
@@ -295,12 +296,13 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
         if source == "oanda":
             from .native_series import chart_label, interval_end, parameters
             native = parameters(meta)
-            if not settings.oanda_token:
-                raise ValueError("OANDA认证未配置")
+            if not settings.oanda_token or not settings.oanda_account_id:
+                raise ValueError("OANDA认证或账户未配置")
             payload, request_mode = _oanda_candles(client, meta['symbol'], {
                 "granularity": OANDA_FRAMES[frame],
                 **native,
                 "smooth": str(native["smooth"]).lower(),
+                "units": "1",
                 "count": batch_count,
                 # A current cutoff belongs to the supplier's clock.
                 **({} if cursor >= observed and not force_cursor else {"to": str(Decimal(cursor) / 1000)}),

@@ -7,7 +7,14 @@ from sqlalchemy import delete, func, select, text
 
 from .indicator_state import IndicatorState
 from .source_history_store import _insert
-from .storage import DisplayIndicatorTask, DisplaySnapshot, FixedIndicatorRun, now_ms, transaction, uid
+from .storage import (
+    DisplayIndicatorTask,
+    DisplaySnapshot,
+    FixedIndicatorRun,
+    now_ms,
+    transaction,
+    uid,
+)
 
 PAGE_SIZE = 2000
 MAX_OUTPUT_ROWS = 10000
@@ -71,6 +78,9 @@ def request(db, run, snapshot, affected, cursor, end, checkpoint, *, retry=None)
             state=initial_state, dependent=False,
             output=pack([]), status='pending', lease_until=0, next_at=0)
             .on_conflict_do_nothing(index_elements=['id']))
+        from .publication_wakeup import notify
+
+        notify(db)
         task = db.get(DisplayIndicatorTask, ident)
     restarted = None
     if retry and ident in retry:
@@ -84,6 +94,9 @@ def request(db, run, snapshot, affected, cursor, end, checkpoint, *, retry=None)
             restarted = {ident: retry[ident]}
             task.status, task.error, task.next_at = 'pending', None, 0
             task.lease_token, task.lease_until = None, 0
+            from .publication_wakeup import notify
+
+            notify(db)
     if task.status != 'complete':
         if task.status == 'error':
             error = (DisplayOutputLimit() if task.error == 'DisplayOutputLimit' else
@@ -103,10 +116,13 @@ def tick():
 
     stamp = now_ms()
     with transaction() as db:
+        from .indicator_demands import priority, warmup_capacity
+        order=priority(db,DisplayIndicatorTask.run_id,stamp,kind='display',snapshot_id=DisplayIndicatorTask.snapshot_id)
         task = db.scalar(select(DisplayIndicatorTask).join(DisplaySnapshot).where(
             DisplayIndicatorTask.status == 'pending', DisplayIndicatorTask.next_at <= stamp,
             DisplayIndicatorTask.lease_until <= stamp, DisplaySnapshot.expires_at > stamp)
-            .order_by(DisplaySnapshot.expires_at.desc(), DisplayIndicatorTask.id)
+            .where(warmup_capacity(DisplayIndicatorTask,DisplayIndicatorTask.run_id,stamp))
+            .order_by(order,DisplaySnapshot.expires_at.desc(), DisplayIndicatorTask.id)
             .with_for_update(of=DisplayIndicatorTask, skip_locked=True).limit(1))
         if not task:
             return False

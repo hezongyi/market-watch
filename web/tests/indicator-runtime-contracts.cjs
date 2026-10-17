@@ -11,7 +11,7 @@ function harness({binding={revision:'fixed-1',inputRevision:7,calculationStart:1
   attach:(chart,id,identity)=>({generation:1,identity,id}),detach:handle=>coverage.delete(handle.id),invalidate:async(handle,range,revision)=>Number(revision)>=Number(revisions.get(handle.id) || 0),
   applyBatch:async(handle,batch)=>{revisions.set(handle.id,batch.inputRevision);batches.push({id:handle.id,...batch});coverage.set(handle.id,{...batch.coverage,generation:1});return true;}};
  class Clock extends Date{static now(){return clock;}}
- const context={MWNativeIndicatorResults:adapter,queueMicrotask,Date:Clock,setInterval:()=>1,clearInterval(){},
+ const context={MWNativeIndicatorResults:adapter,queueMicrotask,Date:Clock,setTimeout,clearTimeout,setInterval:()=>1,clearInterval(){},
   indicatorKey:(ticker,res)=>ticker+'|'+res,indicatorBindings:new Map(),indicatorCoordinator:undefined,decode:()=>({series_kind:'composite'})};
  const bridge=fs.readFileSync(root+'/advanced-host/bridge.js','utf8');
  const bindingSource=bridge.slice(bridge.indexOf('function rememberIndicatorBinding('),bridge.indexOf('function startIndicatorCoordinator('));
@@ -46,7 +46,7 @@ function page(specs,pendingPeriod=null,value=10){
  const queryContext={decode:()=>({symbol:'TEST',series_kind:'managed'}),frames:{'1':'M1'},
   managedSessions:new Map(),cache:new Map(),workspaceEpoch:1,Date:class extends Date {static now(){return 1000;}},
   hasHistoryViewer:()=>true,MWSeries:{encode:s=>s},request:async()=>({value:++requests}),
-  alertCalculationOrigins:new Map(),alertCompositeRevisions:new Map()};
+  alertCalculationOrigins:new Map(),alertCompositeRevisions:new Map(),clientId:'test-page'};
  vm.runInNewContext(querySource,queryContext);
  const args={before:3001,indicators:[{name:'EMA',params:{period:5}}]};
  assert.equal((await queryContext.query('TEST','1',args)).value,1);

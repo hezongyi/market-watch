@@ -148,6 +148,8 @@ def client_for(*, summary_id="test-account", pricing_code=200, pricing_payload=N
     def respond(request):
         calls.append(request.url.path)
         assert request.headers["Authorization"] == "Bearer test"
+        if request.url.path == '/v3/accounts':
+            return httpx.Response(200, json={"accounts": [{"id": "test-account"}]})
         if request.url.path.endswith('/summary'):
             return httpx.Response(200, json={"account": {"id": summary_id}})
         if request.url.path.endswith('/instruments'):
@@ -191,7 +193,8 @@ def test_pricing_failure_keeps_hold_even_with_successful_account_endpoints(runni
     result = failed_request(failure.value, observed_at=due)
     assert result.status == status
     live.finish_auth_probe(probe, result, now=due + 1)
-    assert len(calls) == 3 and all('/accounts/test-account/' in path for path in calls)
+    assert len(calls) == 4 and calls[1] == '/v3/accounts'
+    assert all('/accounts/test-account/' in path for path in (calls[0], *calls[2:]))
     assert live.claim('test-account', now=due + 2) is None
     assert live.claim_auth_probe('test-account', now=due + 2) is None
     with factory.begin() as db:

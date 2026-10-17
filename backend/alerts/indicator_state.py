@@ -19,6 +19,30 @@ SUPPORTED = frozenset(("SMA", "EMA", "LWMA", "BBANDS", "RSI", "MACD", "ATR", "ST
 ALGORITHMS = (ALGORITHM, SUPERTREND_ALGORITHM)
 
 
+def advance_dependencies(state, name, params, row):
+    """Dependency evidence shared by state replay and the batch oracle path."""
+    if row.get("gap_before") or not row["complete"]:
+        state.clear()
+    if not row["complete"]:
+        return
+    continued = bool(state)
+    if not state:
+        state.update(n=0, origin=row["start"], seam=False)
+    touches_seam = bool(row.get("seam_crossing") or row.get("seam_at_start") and continued)
+    state["seam"] |= touches_seam
+    state["n"] += 1
+    if name in ("SMA", "LWMA", "BBANDS", "STOCH"):
+        length = (params["k"] + params["smooth"] + params["d"] - 2) if name == "STOCH" else params["period"]
+        dependencies = state.setdefault("dependencies", [])
+        dependencies.append([row["start"], touches_seam])
+        if len(dependencies) > length:
+            removed = dependencies.pop(0)
+            if removed[1]:
+                state["seam"] = any(item[1] for item in dependencies)
+        state["origin"] = dependencies[0][0]
+    state["last_end"] = row["end"]
+
+
 class IndicatorState:
     def __init__(self, spec, checkpoint=None):
         self.name, self.params = validate(spec)
@@ -51,7 +75,7 @@ class IndicatorState:
         if self.name == 'SWING_SR_V1':
             from .swing_sr import SwingState
 
-            engine = SwingState(self.params, self.state or None)
+            engine = SwingState(self.params, self.state or None, copy_state=False)
             admitted = row.get('display_coverage_complete', not row.get('source_confirmed', row['complete']) or row['complete'])
             values, _ = engine.step({**row, 'complete': row['complete'] if admitted else False,
                 'gap_before': row.get('gap_before') or not admitted},
@@ -67,7 +91,10 @@ class IndicatorState:
         if self.name == "SWING_SR_V1":
             from .swing_sr import SwingState
 
-            engine = SwingState(self.params, self.state or None)
+            # Confirmed state is owned by this IndicatorState. Only preview
+            # needs isolation; cloning its rolling window per bar is quadratic
+            # in the configured strength and adds no correctness boundary.
+            engine = SwingState(self.params, self.state or None, copy_state=provisional)
             values, _ = engine.step(row, provisional=provisional)
             self.last_presentation = engine.presentation()
             if not provisional:
@@ -93,21 +120,8 @@ class IndicatorState:
             if not math.isfinite(open_):
                 raise ValueError(f"{self.name}: open 必须是有限数值")
         s, p = self.state, self.params
-        continued = bool(s)
-        if not s:
-            s.update(n=0, origin=row["start"], seam=False)
-        touches_seam = bool(row.get("seam_crossing") or row.get("seam_at_start") and continued)
-        s["seam"] |= touches_seam
-        s["n"] += 1
+        advance_dependencies(s, self.name, p, row)
         n = s["n"]
-        if self.name in ("SMA", "LWMA", "BBANDS", "STOCH"):
-            length = (p["k"] + p["smooth"] + p["d"] - 2) if self.name == "STOCH" else p["period"]
-            dependencies = s.setdefault("dependencies", [])
-            dependencies.append([row["start"], touches_seam])
-            if len(dependencies) > length:
-                dependencies.pop(0)
-            s["origin"] = dependencies[0][0]
-            s["seam"] = any(item[1] for item in dependencies)
         if self.name == SUPERTREND_NAME:
             result = supertrend_step(s, open_, high, low, close, p)
         elif self.name in ("SMA", "LWMA", "BBANDS", "EMA"):

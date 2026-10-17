@@ -102,7 +102,7 @@ def test_worker_startup401_maintenance_then_pricing_access_recovers_without_manu
         adapter = OandaPractice(token='test', account_id='test-account', rest_client=client, clock=lambda: clock[0])
         oanda_worker.run(adapter, stopped)
     assert len(collections) == 1
-    assert len(calls) == 7  # Startup catalog, failed 3-endpoint probe, successful 3-endpoint probe.
+    assert len(calls) == 9  # Startup 401, failed 4-endpoint probe, successful 4-endpoint probe.
     assert {at for at, _ in calls} == {125000, 125000 + interval, 125000 + 2*interval}
     with factory.begin() as db:
         owner = db.get(PricingOwner, live.account_key('test-account'))
@@ -132,7 +132,7 @@ def test_worker_verified_closure_has_no_stream_or_rest_poll_storm(provider_pg, m
     with client, httpx.Client(transport=httpx.MockTransport(respond)) as rest:
         adapter = OandaPractice(token='test', account_id='test-account', rest_client=rest)
         oanda_worker.run(adapter, ControlledStop(clock, stamp + 2*settings.oanda_closed_probe_seconds*1000 + 1000))
-    assert len(calls) == 1 and calls[0].endswith('/instruments')
+    assert len(calls) == 2 and calls[0] == '/v3/accounts' and calls[1].endswith('/instruments')
     rows = live.snapshots(now=stamp)
     assert rows and all(row['quality'] == 'market_closed' for row in rows)
     assert all(not row['quote_ready'] and not row['candle_ready'] for row in rows)

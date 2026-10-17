@@ -1,11 +1,11 @@
 /* Main-chart ranges drive Python demand. One read includes all plots; shared
  * results stay time-keyed until the native adapter maps them to current indexes. */
-function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=()=>{},status=()=>{},presentation=()=>{},demand=()=>{}}) {
+function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=()=>{},status=()=>{},presentation=()=>{},demand=()=>{},leases=()=>{},release=()=>{}}) {
   const results=globalThis.MWNativeIndicatorResults;
   read=chartIndicatorReadBatch(read);
   const consumers=new Map(),shared=new Map(),charts=new WeakMap(),rangeEvents=new Map(),operations=new Set();
   let chartSequence=0;
-  let disposed=false,timer,syncQueued=false,demandSignature;
+  let disposed=false,timer,syncQueued=false,demandSignature,leaseSignature,leaseRenewed=0;
   function publishDemand(){
     const origins=new Map();
     for(const consumer of consumers.values()){
@@ -19,6 +19,12 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
     const rows=[...origins.values()].sort((a,b)=>(a.ticker+'|'+a.resolution).localeCompare(b.ticker+'|'+b.resolution));
     const signature=JSON.stringify(rows);
     if(signature!==demandSignature){demandSignature=signature;demand(rows);}
+    const active=[...consumers.values()].filter(c=>c.lease).map(c=>({...c.lease,
+      consumer:{id:c.key,generation:c.generation,spec:{name:c.meta.id || c.lease.name,params:c.params}}}));
+    const next=JSON.stringify(active);
+    if(next!==leaseSignature || active.length && Date.now()-leaseRenewed>=10000){
+      leaseSignature=next;leaseRenewed=Date.now();leases(active);
+    }
   }
   function scheduleSync(){
     if(disposed || syncQueued)return;
@@ -37,7 +43,7 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
       shared.delete(key);total-=record.rows.length;values-=record.values || 0;
     }
   }
-  function detach(consumer){status(consumer,'removed');if(consumer.handle)results.detach(consumer.handle);consumers.delete(consumer.key);}
+  function detach(consumer){if(consumer.retryTimer)clearTimeout(consumer.retryTimer);status(consumer,'removed');release([{id:consumer.key,generation:consumer.generation || 0}]);if(consumer.handle)results.detach(consumer.handle);consumers.delete(consumer.key);}
   function rowsFor(result,page,meta,params,inputs,resolution,ticker){
     const source=new Map(result.series.map(series=>[series.key,new Map(series.values.map(point=>[point.time,point]))]));
     const supertrend=meta.render_profile==='supertrend_pine_v1';
@@ -129,14 +135,15 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
     let cached=shared.get(key);
     if(!cached){
       const promise=(async()=>{
-        const pages=[],rows=[];let before=requestBefore,covered=false;const deadline=Date.now()+30000;
+        const pages=[],rows=[];let before=requestBefore,covered=false,lease;const deadline=Date.now()+30000;
         for(let partition=0;partition<100;partition++){
           const sharedCurrent=()=>!disposed && [...consumers.values()].some(other=>other.cacheKey===key &&
             results.scope(other.chart,other.id)?.generation===other.generation);
           if(!sharedCurrent())return null;
           if(Date.now()>deadline)throw Error('指标范围读取超时');
-          const page=await read(chart.symbol(),scope.resolution,{before,limit:2000,
+          const page=await read(chart.symbol(),scope.resolution,{before,limit:Math.min(2000,scope.count+1),
             indicators:[{name:scope.name,params}],...binding.query,
+            _indicatorConsumer:{id:consumer.key,generation:scope.generation,spec:{name:scope.name,params}},
             ...(consumer.displayRetry ? {display_retry:consumer.displayRetry} : {})},sharedCurrent,
             JSON.stringify([binding.revision,binding.calculationStart,binding.inputRevision,binding.tailVersion,binding.correctionVersion,binding.displaySnapshot,binding.providerSnapshot]));
           if(binding.displaySnapshot && page.display_snapshot_id!==binding.displaySnapshot)return null;
@@ -147,13 +154,18 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
           // parameters of one algorithm can have independent pending runs.
           const progress=result.calculation ||
             (page.indicators.length===1 ? page.indicator_progress?.find(item=>item.id===(result.id || scope.name)) : undefined);
-          if(progress && (progress.display_status ?? progress.status)!=='complete')return {pending:true};
+          if(progress?.run_id)lease={name:scope.name,run_id:progress.run_id,
+            snapshot_id:binding.displaySnapshot || null,start:page.bars[0]?.start ?? 0,end:page.bars.at(-1)?.end ?? 0};
+          const legacyCovered=progress?.visible_complete===undefined && progress?.display_status==='complete' &&
+            result.series.every(series=>{const times=new Set(series.values.map(point=>point.time));return page.bars.every(bar=>times.has(bar.start));});
+          if(progress && (progress.display_status && progress.display_status!=='complete' ||
+            progress.status!=='complete' && !progress.visible_complete && !legacyCovered))return {pending:true,lease};
           if(page.input_revision!==undefined && binding.inputRevision!==undefined && page.input_revision!==binding.inputRevision)return null;
           rows.push(...rowsFor(result,page,meta,params,inputs,scope.resolution,chart.symbol()).rows);
           // Keep only result identity/revision/presentation in the shared cache.
           // Raw bars and plot payloads would duplicate the normalized rows.
           const {bars,indicators,...metadata}=page;
-          pages.push({page:{...metadata,presentation:result.presentation,
+          pages.push({calculation:progress,page:{...metadata,presentation:result.presentation,
             ...(result.presentation ? {bars:bars.map(bar=>({start:bar.start,chart_time:bar.chart_time}))} : {})}});
           if(!page.bars.length || (page.bars[0].chart_time ?? identity.chartTime(page.bars[0],scope.resolution,chart.symbol()))<=requestFirst || page.has_more===false){covered=true;break;}
           if(!((page.next_before ?? page.bars[0]?.start)<before))throw Error('指标范围分页未推进');
@@ -162,7 +174,7 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
         if(!covered)throw Error('指标范围超出读取容量');
         const unique=[...new Map(rows.filter(row=>row.time>=requestFirst).map(row=>[row.time,row])).values()].sort((a,b)=>a.time-b.time);
         if(unique.length>200000)throw Error('指标范围超出缓存容量');
-        return {rows:unique,pages};
+        return {rows:unique,pages,lease};
       })();
       cached={promise,rows:[]};shared.set(key,cached);
       promise.then(value=>{cached.settled=true;if(value && !value.pending){cached.rows=value.rows;cached.values=value.rows.reduce((n,row)=>n+row.values.length,0);}else shared.delete(key);},()=>{cached.settled=true;shared.delete(key);});
@@ -171,7 +183,18 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
     try {
       const batch=await cached.promise;
       if(!current() || !batch)return;
-      if(batch.pending){consumer.failedSignature=signature;consumer.retryAt=Date.now()+1500;return;}
+      consumer.lease=batch.lease;
+      if(batch.pending){
+        if(consumer.waitSignature!==signature){consumer.waitSignature=signature;consumer.waitStarted=Date.now();consumer.waitAttempts=0;}
+        if(Date.now()-consumer.waitStarted>=30000){const error=Error('指标计算等待超过30秒，请重试');error.code='INDICATOR_TIMEOUT';throw error;}
+        // A committed job wakes the server worker immediately. Observe its
+        // bounded pages promptly, then back off for genuinely long replays.
+        const delay=Math.min(1000,50*2**Math.min(5,consumer.waitAttempts++));
+        consumer.failedSignature=signature;consumer.retryAt=Date.now()+delay;
+        if(consumer.retryTimer)clearTimeout(consumer.retryTimer);
+        consumer.retryTimer=setTimeout(()=>{consumer.retryTimer=null;scheduleSync();},delay);
+        return;
+      }
       const page=batch.pages[0]?.page;
       const revisionOf=item=>String(item?.input_revision ?? item?.cache_revision ?? item?.revision ?? item?.history_revision ?? '');
       if(batch.pages.some(({page:item})=>revisionOf(item)!==revisionOf(page))){shared.delete(key);return;}
@@ -182,6 +205,9 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
       const origin=page?.calculation_origin ?? page?.origin ?? binding.calculationStart;
       if(Number.isFinite(origin) && nextIdentity.calculationStart!==origin){
         nextIdentity.calculationStart=origin;consumer.handle=results.attach(chart,consumer.id,nextIdentity);consumer.sequence=0;consumer.generation=consumer.handle.generation;
+        // The accepted first read established the real origin. This handle is
+        // the same consumer/input observation, now fenced by its new generation.
+        scope={...scope,generation:consumer.handle.generation};
       }
       const offsets=meta.render_profile==='swing_sr_v1'?{plot1:-params.high_strength,plot3:-params.low_strength}:{};
       const coverage={first:scope.first,last:scope.last,count:scope.count,identity:JSON.stringify(nextIdentity),
@@ -189,12 +215,13 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
         correctionVersion:binding.correctionVersion,inputRevision:binding.inputRevision,tailVersion:binding.tailVersion};
       const accepted=await results.applyBatch(consumer.handle,{identity:consumer.handle.identity,
         current,displaySnapshot:binding.displaySnapshot ?? binding.providerSnapshot,
+        executionEvidence:batch.pages.map(item=>item.calculation).filter(Boolean),
         generation:consumer.handle.generation,sequence:++consumer.sequence,inputRevision:revision,
         kind:prepend?'prepend':tail?'append':'snapshot',rows:batch.rows,offsets,coverage});
       if(accepted){consumer.acceptedScope={...coverage,generation:consumer.handle.generation};
         consumer.accepted=JSON.stringify([consumer.handle.generation,nextIdentity,binding.inputRevision,scope.first,scope.last,scope.count,binding.tailVersion,binding.correctionVersion,binding.displaySnapshot,binding.providerSnapshot,inputs.showsignals,inputs.highlighting]);
         consumer.requested=consumer.accepted;
-        consumer.failures=0;consumer.retryAt=0;consumer.displayRetry=null;consumer.failedRetry=null;status(consumer,'ready');
+        consumer.failures=0;consumer.retryAt=0;consumer.waitSignature=null;consumer.displayRetry=null;consumer.failedRetry=null;status(consumer,'ready');
         for(const {page} of batch.pages)presentation(chart.symbol(),scope.resolution,{...page,indicators:[{name:scope.name,params,presentation:page.presentation}]});}
     }catch(error){if(current()){
       consumer.failedSignature=signature;
@@ -212,7 +239,7 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
       }
       consumer.failedRetry=error.display_retry;
       consumer.failures=(consumer.failures || 0)+1;
-      consumer.retryAt=['DISPLAY_SUFFIX_CAPACITY_EXCEEDED','DISPLAY_REPLAY_FAILED'].includes(error.code) || consumer.failures>=3 ?
+      consumer.retryAt=['DISPLAY_SUFFIX_CAPACITY_EXCEEDED','DISPLAY_REPLAY_FAILED','INDICATOR_TIMEOUT'].includes(error.code) || consumer.failures>=3 ?
         Infinity:Date.now()+1000*2**consumer.failures;
       status(consumer,'error',error);report(error,consumer);
     }}
@@ -272,8 +299,11 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
       await new Promise(resolve=>setTimeout(resolve,100));
     }
   }
+  const stopNativeEvents=results.subscribe?.(scheduleSync);
+  const studyEvents=['study_event','study_properties_changed','chart_loaded'];
+  for(const event of studyEvents)widget.subscribe?.(event,scheduleSync);
   timer=setInterval(()=>void sync(),500);
-  return {sync,settle,retry(index){for(const c of consumers.values())if(c.index===index){c.retryAt=0;c.failures=0;c.accepted=null;shared.delete(c.cacheKey);c.displayRetry=c.failedRetry;}return sync();},dispose(){disposed=true;clearInterval(timer);for(const unsubscribe of rangeEvents.values())unsubscribe();rangeEvents.clear();for(const consumer of consumers.values())detach(consumer);shared.clear();publishDemand();},
+  return {sync,settle,retry(index){for(const c of consumers.values())if(c.index===index){c.retryAt=0;c.failures=0;c.waitSignature=null;c.accepted=null;shared.delete(c.cacheKey);c.displayRetry=c.failedRetry;}return sync();},dispose(){disposed=true;clearInterval(timer);stopNativeEvents?.();for(const event of studyEvents)widget.unsubscribe?.(event,scheduleSync);for(const unsubscribe of rangeEvents.values())unsubscribe();rangeEvents.clear();for(const consumer of consumers.values())detach(consumer);shared.clear();publishDemand();},
     diagnostics:()=>({consumers:consumers.size,shared:shared.size,rows:[...shared.values()].reduce((n,r)=>n+r.rows.length,0)})};
 }
 
@@ -282,7 +312,7 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
 function chartIndicatorReadBatch(read) {
   const queued=new Map(),inFlight=new Map();
   return (ticker,resolution,args,current,inputVersion=null)=>new Promise((resolve,reject)=>{
-    const {indicators,...query}=args,key=JSON.stringify([ticker,resolution,query,inputVersion]);
+    const {indicators,_indicatorConsumer,...query}=args,key=JSON.stringify([ticker,resolution,query,inputVersion]);
     let group=queued.get(key);
     // Native pagination can restart a study before its accepted source page
     // returns. A replacement needing the same dispatched specs joins that
@@ -305,7 +335,9 @@ function chartIndicatorReadBatch(read) {
           let page;
           for(let offset=0;offset<specs.length;offset+=12){
             if(!alive())throw Object.assign(Error('指标读取已取消'),{code:'HISTORY_CANCELLED'});
-            const next=await read(ticker,resolution,{...query,indicators:specs.slice(offset,offset+12)},alive);
+            const demands=group.consumers.filter(c=>c.current() && c.demand).map(c=>c.demand);
+            const next=await read(ticker,resolution,{...query,indicators:specs.slice(offset,offset+12),
+              ...(demands.length ? {indicator_consumers:demands} : {})},alive);
             if(!page)page=next;
             else {
               const revision=item=>JSON.stringify([item.input_revision,item.cache_revision,item.revision,item.calculation_origin,item.origin,item.display_snapshot_id,item.provider_snapshot_id]);
@@ -320,6 +352,6 @@ function chartIndicatorReadBatch(read) {
         finally{running.delete(group);if(!running.size)inFlight.delete(key);}
       });
     }
-    group.consumers.push({indicators,current,resolve,reject});
+    group.consumers.push({indicators,current,resolve,reject,demand:_indicatorConsumer});
   });
 }

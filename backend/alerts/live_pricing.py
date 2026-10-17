@@ -106,6 +106,7 @@ def desired_native_provider_datasets(account):
     ``CandleSpec`` identity instead of falling back to M1/BID by symbol.
     """
     scope = "sha256:" + hashlib.sha256(account.encode()).hexdigest()
+    from .provider_cache import identity as provider_identity
     from .storage import ProviderDataset, ProviderInterest
 
     with transaction() as db:
@@ -119,7 +120,8 @@ def desired_native_provider_datasets(account):
         result = []
         for row in rows:
             identity = (row.metadata_json or {}).get("native_period_identity")
-            if isinstance(identity, dict) and identity.get("account_scope") == scope:
+            if (isinstance(identity, dict) and identity.get("account_scope") == scope
+                    and row.id == provider_identity(row.metadata_json, row.timeframe)):
                 result.append(row)
         return tuple(sorted({row.id: row for row in result}.values(), key=lambda row: row.id))
 

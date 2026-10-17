@@ -1,0 +1,10 @@
+{"expiredRows": 1, "period": 131}
+
+
+Error executing code: AssertionError [ERR_ASSERTION]: missing current native execution evidence
+    at /home/quant/repos/market-watch-issue74-20261017/.playwriter-eval.js:21:10
+    at async file:///tmp/mw-issue74-npm-cache/_npx/945f35517ce0271a/node_modules/playwriter/dist/executor.js:1498:28
+    at async PlaywrightExecutor.executeInternal (file:///tmp/mw-issue74-npm-cache/_npx/945f35517ce0271a/node_modules/playwriter/dist/executor.js:1496:28)
+
+[HINT: If this is an internal Playwright error, page/browser closed, or connection issue, call reset to reconnect.]
+

@@ -1,0 +1,7 @@
+# Scenario budget evidence
+
+All original files are immutable diagnostic records. The initial groups and [fixed matrix](matrix-v1-diagnostic/README.md) used the pre-review harness from `c046121`; its canonical join and new-spec preparation checks were insufficient. Historical `passed:true` is not current acceptance. Exact Swing copy-control parity remains independent of that browser harness limitation.
+
+The follow-up harness `execution-evidence-v2` requires the native batch to carry the actual backend calculation evidence; joins canonical receipts by instrument, period, origin, revision, snapshot, algorithm, run and complete source-row coverage; and derives canonical timing from both receipt and rendered submission. New-spec groups must begin with an observed result/checkpoint miss. A retry may reuse work created within that operation. Reusable edits warm the target before creating the initial curve; browser cache reuse requires matching warmup execution evidence. Observed prefix counts must fit the predeclared bound. Complete-null shapes preserve coverage and report the absence of a finite first value.
+
+The [strict matrix-v2 execution records](matrix-v2-execution/README.md) retain 39 loaded/long groups (30 passing latency verdicts, nine nonpassing), eight layout groups, the input/preparation failures and the expired-snapshot replay. Long-origin EMA/Supertrend meet their measured latency budgets; several loaded and all complete layout verdicts do not. Full A1–A16 acceptance remains pending.

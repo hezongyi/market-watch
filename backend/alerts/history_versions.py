@@ -3,7 +3,6 @@
 import argparse
 import hashlib
 import json
-import time
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -16,11 +15,15 @@ from .history_request_evidence import snapshot as read_snapshot
 from .history_request_evidence import start as start_read
 from .history_sources import HistoryConfigurationError, HistorySources, history_identity, page_end
 from .market_contracts import DatasetIdentity, failed_request
-from .market_datasets import PRICE_RULE_VERSION, PricePrecisionError, version_price_rows, register_dataset
+from .market_datasets import (
+    PRICE_RULE_VERSION,
+    PricePrecisionError,
+    register_dataset,
+    version_price_rows,
+)
 from .market_resources import cooldown, lane
 from .source_history_store import AcquisitionBusy, raw_chunk, shared_page, store_blob
 from .source_registry import collection_identity
-from .transaction_retry import is_conflict, retry_conflicts
 from .storage import (
     HistoryChunk,
     HistoryReadAttempt,
@@ -34,6 +37,7 @@ from .storage import (
     transaction,
     uid,
 )
+from .transaction_retry import is_conflict, retry_conflicts
 
 
 def month_end(stamp):
@@ -321,12 +325,12 @@ def version_report(db, ident):
     run = db.get(HistoryRun, version.id)
     from sqlalchemy import func
 
+    from .history_artifacts import derivation_progress
     from .history_maintenance import task_status
 
     # Times come from persisted events. Legacy mutation timestamps remain
     # unknown; poll time and lease deadlines are not task update timestamps.
     from .storage import HistoryArtifact, HistoryReadAttempt
-    from .history_artifacts import derivation_progress
 
     started_at = db.scalar(select(func.min(HistoryReadAttempt.started_at)).where(
         HistoryReadAttempt.version_id == version.id))
@@ -401,8 +405,8 @@ def worker_tick(adapter, *, version_id=None, without_composite_aggregates=False,
         from .composite_aggregates import aggregate_tick
         from .composite_preparation import preparation_tick
         from .composite_revisions import preparation_tick as revision_tick
-        from .fixed_indicators import indicator_tick
         from .display_indicator_jobs import tick as display_indicator_tick
+        from .fixed_indicators import indicator_tick
         from .history_maintenance import schedule_tick
 
         phase("schedule", schedule_tick)
@@ -463,18 +467,22 @@ def main():
             print(json.dumps(version_report(db, version_id)))
         return
     adapter = HistorySources()
+    from .publication_wakeup import PublicationWakeup
     from .worker_health import Pulse
 
     pulse = Pulse("history_versions")
     try:
-        while True:
-            worked = worker_tick(adapter, version_id=version_id,
-                without_composite_aggregates=args.without_composite_aggregates, pulse=pulse)
-            if args.once:
-                return
-            # Every round services all roles with bounded page transactions.
-            # Yield briefly under load; there is no one-second per-page floor.
-            time.sleep(0.01 if worked else 5)
+        with PublicationWakeup() as wake:
+            while True:
+                # Register before scanning so a committed foreground request
+                # arriving between the scan and idle wait cannot lose its wake.
+                wake.prepare()
+                worked = worker_tick(adapter, version_id=version_id,
+                    without_composite_aggregates=args.without_composite_aggregates, pulse=pulse)
+                if args.once:
+                    return
+                # Keep existing bounded/fair role service and polling fallback.
+                wake.wait(0.01 if worked else 5)
     finally:
         adapter.close()
 

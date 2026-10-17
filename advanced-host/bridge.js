@@ -303,9 +303,12 @@ function startIndicatorCoordinator(catalog) {
           dependencyRevision:page.dependency_revision ?? old.dependencyRevision});},
     },
     status:(consumer,state,error)=>send({type:'chart-indicator-state',epoch:workspaceEpoch,index:consumer.index,
-      id:consumer.id,name:consumer.meta.label || consumer.id,state,error:error?.message || ''}),
+      id:consumer.id,name:consumer.meta.label || consumer.id,state,error:error?.message || '',
+      previousParams:MWNativeIndicatorResults.scope(consumer.chart,consumer.id)?.transition?.params || null}),
     report:error=>{if(error.code!=='HISTORY_CANCELLED')send({type:'error',error:'指标读取失败：'+String(error)});},
     presentation:(ticker,res,page)=>{swingStore().publish(ticker,res,page,swingStore().ticket());swingDisplay?.refresh();},
+    leases:leases=>{if(leases.length)void request({client:clientId,leases},'indicator-demand-update').catch(error=>send({type:'error',error:String(error)}));},
+    release:consumers=>{void request({client:clientId,consumers},'indicator-demand-release').catch(()=>{});},
     demand:rows=>{
       const next=new Map(rows.map(row=>[indicatorKey(row.ticker,row.resolution),row.origin]));
       const changed=new Set([...indicatorDependencyOrigins.keys(),...next.keys()].filter(key=>indicatorDependencyOrigins.get(key)!==next.get(key)));
@@ -317,10 +320,54 @@ function startIndicatorCoordinator(catalog) {
     },
   });
 }
+function providerRecoveryRows(chart) {
+  if(!chart.dataReady())return null;
+  const data=chart._chartWidget.model().model().mainSeries().data(),rows=[];
+  if(data.size()<1 || data.size()>20000)return null;
+  // Native stops iteration when the callback returns a truthy value.
+  data.each((_,row)=>{rows.push(row.slice(0,6));});
+  return rows.length===data.size() ? rows : null;
+}
+async function refreshProviderDisplayCredential(ticker,res,token,charts,current) {
+  const key=indicatorKey(ticker,res),binding=indicatorBindings.get(key);
+  if(!binding || binding.providerSnapshot!==token)return false;
+  const accepted=charts.map(({chart})=>({chart,rows:providerRecoveryRows(chart)}));
+  if(accepted.some(item=>!item.rows))return false;
+  let refreshed;
+  for(const {rows} of accepted) {
+    const page=await query(ticker,res,{before:rows.at(-1)[0]*1000+1,
+      limit:rows.length,indicators:[]},Date.now()+10000,current);
+    if(!current())return false;
+    // A stream update can already have replaced the rejected credential.
+    if(indicatorBindings.get(key)?.providerSnapshot!==token)return true;
+    if(!page.provider_snapshot_id || !Number.isSafeInteger(page.cache_revision) ||
+      page.cache_revision!==binding.tailVersion)return false;
+    const prices=barsOf(page,res,ticker);
+    if(prices.length!==rows.length || prices.some((bar,index)=>{
+      const row=rows[index];
+      return bar.time!==row[0]*1000 || ['open','high','low','close'].some((name,i)=>bar[name]!==row[i+1]) ||
+        (bar.volume ?? 0)!==(row[5] ?? 0);
+    }))return false;
+    if(!refreshed || prices.at(-1).time>=barsOf(refreshed,res,ticker).at(-1).time)refreshed=page;
+  }
+  if(!current())return false;
+  if(indicatorBindings.get(key)?.providerSnapshot!==token)return true;
+  // Pagination, navigation or a native restart during the read invalidates the
+  // comparison. No credential may be rebound under a different accepted page.
+  if(accepted.some(({chart,rows})=>JSON.stringify(providerRecoveryRows(chart))!==JSON.stringify(rows)))return false;
+  rememberIndicatorBinding(ticker,res,refreshed);
+  return true;
+}
 const displayRecoveries=new Map();
 async function recoverDisplaySnapshot(ticker,res,token,retry=false){
   const key=indicatorKey(ticker,res),previous=displayRecoveries.get(key);
-  if(previous?.token===token && (!retry || previous.state!=='error'))return previous.promise;
+  const binding=indicatorBindings.get(key);
+  const boundToken=binding?.displaySnapshot ?? binding?.providerSnapshot;
+  if(boundToken!=null && boundToken!==token)return;
+  // Reading unchanged prices can renew the same content-addressed token. A
+  // later expiry needs a new recovery; delayed errors for replaced tokens do not.
+  const expiredAgain=previous?.state==='ready';
+  if(previous?.token===token && !expiredAgain && (!retry || previous.state!=='error'))return previous.promise;
   const epoch=workspaceEpoch;
   const charts=ready ? Array.from({length:widget.chartsCount()},(_,index)=>({index,chart:widget.chart(index)}))
     .filter(({chart})=>chartUsesSymbol(chart,ticker,res)) : [];
@@ -345,6 +392,21 @@ async function recoverDisplaySnapshot(ticker,res,token,retry=false){
   entry.promise=(async()=>{
     if(!current())return;
     notify('preparing');
+    if(ticker.startsWith('MWP:')) {
+      try {
+        if(await refreshProviderDisplayCredential(ticker,res,token,charts,current)) {
+          if(current()) {
+            entry.state='ready';notify('ready');send({type:'feed-poll-state',key:'display:'+key,error:''});
+          }
+          return;
+        }
+      } catch(error) {
+        if(!current())return;
+        // A failed comparison read cannot certify unchanged prices. Retain
+        // the existing bounded full recovery and its visible retry state.
+      }
+    }
+    if(!current())return;
     compositeDisplayBatches.cancel(key);
     for(const sub of subscriptions.values())if(indicatorKey(sub.symbol,sub.res)===key){
       sub.needsHistoryReload=true;
@@ -767,7 +829,7 @@ function query(ticker, res, args, expires = Infinity, current = () => true) {
   const q = {
     instrument: symbol,
     series_kind,
-    ...(series_kind === 'composite' ? {client:clientId} : {}),
+    ...(['composite','history'].includes(series_kind) || args.indicators?.length ? {client:clientId} : {}),
     timeframe: frames[res],
     ...(spec && series_kind === 'provider' && alertCalculationOrigins.has(MWSeries.encode(symbol,series_kind)+'|'+res)
       ? {calculation_origin:alertCalculationOrigins.get(MWSeries.encode(symbol,series_kind)+'|'+res)} : {}),

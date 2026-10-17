@@ -1,0 +1,5510 @@
+{
+  "recordedAt": "2026-10-17T07:12:57.458Z",
+  "budgetRevision": "2026-10-17-scenarios-v1",
+  "scenario": "loaded-new-spec",
+  "budget": {
+    "firstMs": 500,
+    "coverageMs": 1000,
+    "canonicalMs": 2000,
+    "timeoutMs": 5000
+  },
+  "source": "actual app / Playwriter / native renderer after two RAFs",
+  "synthetic": true,
+  "config": {
+    "phase": "budget-history-bbands-add-new-spec-1",
+    "scenario": "loaded-new-spec",
+    "operation": "add",
+    "kind": "history",
+    "indicator": "BBANDS",
+    "prefixRows": 5760,
+    "specs": [
+      {
+        "params": {
+          "period": 41,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 42,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 43,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 44,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 45,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 46,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 47,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 48,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 49,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 50,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 51,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 52,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 53,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 54,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 55,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 56,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 57,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 58,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 59,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 60,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 61,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 62,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 63,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 64,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 65,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 66,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 67,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 68,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 69,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 70,
+          "deviation": 2.3
+        }
+      }
+    ],
+    "knownUnused": true
+  },
+  "environment": {
+    "symbol": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+    "range": {
+      "from": 1791491880,
+      "to": 1791504540
+    },
+    "timeOrigin": 1792219995443.6
+  },
+  "n": 30,
+  "failures": 0,
+  "quantile": "nearest-rank; failures as infinity (JSON null)",
+  "ms": {
+    "p50": 311.30000001192093,
+    "p95": 497.90000000596046
+  },
+  "coverageMs": {
+    "p50": 311.30000001192093,
+    "p95": 497.90000000596046
+  },
+  "canonicalMs": {
+    "p50": 311.30000001192093,
+    "p95": 497.90000000596046
+  },
+  "passed": true,
+  "samples": [
+    {
+      "index": 1,
+      "params": {
+        "period": 41,
+        "deviation": 2.3
+      },
+      "ms": 282.09999999403954,
+      "coverageMs": 282.09999999403954,
+      "first": {
+        "at": 1170468.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":41}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":41}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1170468.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":41}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":41}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.10243213962949,
+        1.1021600000000038,
+        1.1018878603705176
+      ],
+      "canonicalMs": 282.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221165901,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 41,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221165664.349,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.267,
+            "responseStart": 155.646,
+            "responseEnd": 161.508
+          },
+          "timings": {
+            "fixed_read_freeze": 51.17
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 41,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "71f52fcbcdb384e7c1655d8f413ede3f018fe7f359c9e9b1ffe1ac0fe655c8ff",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 42.22
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 2,
+      "params": {
+        "period": 42,
+        "deviation": 2.3
+      },
+      "ms": 379.80000001192093,
+      "coverageMs": 379.80000001192093,
+      "first": {
+        "at": 1171008.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":42}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":42}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1171008.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":42}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":42}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.1024337811278122,
+        1.1021550000000002,
+        1.1018762188721882
+      ],
+      "canonicalMs": 379.80000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221166452,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 42,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221166116.892,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.237,
+            "responseStart": 275.316,
+            "responseEnd": 286.668
+          },
+          "timings": {
+            "fixed_read_freeze": 126.46
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 42,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "036b214ea595e028c9c10c063c3cac0babe81956d16ef4c762930d36a6310d56",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 43.66
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 3,
+      "params": {
+        "period": 43,
+        "deviation": 2.3
+      },
+      "ms": 330.7999999821186,
+      "coverageMs": 330.7999999821186,
+      "first": {
+        "at": 1171382.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":43}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":43}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1171382.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":43}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":43}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.1024354223163666,
+        1.1021500000000073,
+        1.101864577683648
+      ],
+      "canonicalMs": 330.7999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221166842,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 43,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221166527.952,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.253,
+            "responseStart": 214.325,
+            "responseEnd": 222.646
+          },
+          "timings": {
+            "fixed_read_freeze": 70.64
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 43,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "571929f57e541c3b6a7c45272dbfbe0e6ee09b8c31b3419c3b2ee8c306ea090a",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 38.02
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 4,
+      "params": {
+        "period": 44,
+        "deviation": 2.3
+      },
+      "ms": 311.30000001192093,
+      "coverageMs": 311.30000001192093,
+      "first": {
+        "at": 1171803.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":44}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":44}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1171803.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":44}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":44}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.1024370637471392,
+        1.1021450000000035,
+        1.1018529362528677
+      ],
+      "canonicalMs": 311.30000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221167258,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 44,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221166957.971,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.23,
+            "responseStart": 226.064,
+            "responseEnd": 239.759
+          },
+          "timings": {
+            "fixed_read_freeze": 100
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 44,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "97423a070f8fa074a40b466f874bfaa5284c9ed240f2a8825c6cb2aa03d4f5c9",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 46.68
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 5,
+      "params": {
+        "period": 45,
+        "deviation": 2.3
+      },
+      "ms": 307.80000001192093,
+      "coverageMs": 307.80000001192093,
+      "first": {
+        "at": 1172197.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":45}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":45}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1172197.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":45}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":45}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.1024387048475621,
+        1.102140000000007,
+        1.1018412951524519
+      ],
+      "canonicalMs": 307.80000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221167645,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 45,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221167368.242,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.246,
+            "responseStart": 212.867,
+            "responseEnd": 219.851
+          },
+          "timings": {
+            "fixed_read_freeze": 72.01
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 45,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "3fa674af850aa758bd677980f79f3c6a807a450a0fb46823267df810eccdd987",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 56.15
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 6,
+      "params": {
+        "period": 46,
+        "deviation": 2.3
+      },
+      "ms": 306.30000001192093,
+      "coverageMs": 306.30000001192093,
+      "first": {
+        "at": 1172563.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":46}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":46}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1172563.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":46}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":46}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.1024403460219367,
+        1.1021350000000034,
+        1.10182965397807
+      ],
+      "canonicalMs": 306.30000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221168019,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 46,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221167706.087,
+            "domainLookupStart": 0.161,
+            "domainLookupEnd": 0.172,
+            "connectStart": 0.172,
+            "secureConnectionStart": 0.365,
+            "connectEnd": 6.613,
+            "requestStart": 6.719,
+            "responseStart": 236.277,
+            "responseEnd": 242.151
+          },
+          "timings": {
+            "fixed_read_freeze": 62.03
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 46,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "e361c310f4519c08fe1b102225d30cf125a08a96ee7b83a6929411479e54da00",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 42.17
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 7,
+      "params": {
+        "period": 47,
+        "deviation": 2.3
+      },
+      "ms": 289.09999999403954,
+      "coverageMs": 289.09999999403954,
+      "first": {
+        "at": 1172888.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":47}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":47}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1172888.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":47}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":47}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.102441987092366,
+        1.1021300000000065,
+        1.101818012907647
+      ],
+      "canonicalMs": 289.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221168363,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 47,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221168084.3862,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.248,
+            "responseStart": 185.05,
+            "responseEnd": 206.086
+          },
+          "timings": {
+            "fixed_read_freeze": 65.97
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 47,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "e68d1779bf7c2042926901f49ec5c61d0200c5c82ff13d504fce8812eb6a14a4",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 40.02
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 8,
+      "params": {
+        "period": 48,
+        "deviation": 2.3
+      },
+      "ms": 265.5,
+      "coverageMs": 265.5,
+      "first": {
+        "at": 1173219.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":48}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":48}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1173219.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":48}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":48}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.102443628214636,
+        1.1021249999999998,
+        1.1018063717853637
+      ],
+      "canonicalMs": 265.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221168662,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 48,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221168423.677,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.255,
+            "responseStart": 183.335,
+            "responseEnd": 188.705
+          },
+          "timings": {
+            "fixed_read_freeze": 57.33
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 48,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "b793d32986ca8ffd8885496009775a5b3c1071d32626f28a5e97625a3d536028",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 50.35
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 9,
+      "params": {
+        "period": 49,
+        "deviation": 2.3
+      },
+      "ms": 347.09999999403954,
+      "coverageMs": 347.09999999403954,
+      "first": {
+        "at": 1173612.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":49}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":49}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1173612.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":49}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":49}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.1024452690678004,
+        1.10212,
+        1.1017947309321996
+      ],
+      "canonicalMs": 347.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221169040,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 49,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221168747.612,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.243,
+            "responseStart": 189.818,
+            "responseEnd": 198.415
+          },
+          "timings": {
+            "fixed_read_freeze": 65.07
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 49,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "18350c966db5e6aba4f089982db43477bd5cc7445d7ca8ca9060e570e4e8ae48",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 42.25
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 10,
+      "params": {
+        "period": 50,
+        "deviation": 2.3
+      },
+      "ms": 361.40000000596046,
+      "coverageMs": 361.40000000596046,
+      "first": {
+        "at": 1174033.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":50}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":50}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1174033.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":50}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":50}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.1024469098998109,
+        1.102115000000003,
+        1.1017830901001953
+      ],
+      "canonicalMs": 361.40000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221169478,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 50,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221169147.6982,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.316,
+            "responseStart": 257.354,
+            "responseEnd": 276.515
+          },
+          "timings": {
+            "fixed_read_freeze": 72.95
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 50,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "74b2297a2f15a2b8b32afd2b01c634c3d2440cdd65ff599ea9eedf2dba884532",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 84.41
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 11,
+      "params": {
+        "period": 51,
+        "deviation": 2.3
+      },
+      "ms": 278.40000000596046,
+      "coverageMs": 278.40000000596046,
+      "first": {
+        "at": 1174363.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":51}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":51}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1174363.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":51}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":51}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.10244855075701,
+        1.102110000000003,
+        1.101771449242996
+      ],
+      "canonicalMs": 278.40000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221169854,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 51,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221169549.518,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.308,
+            "responseStart": 169.392,
+            "responseEnd": 176.027
+          },
+          "timings": {
+            "fixed_read_freeze": 62.8
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 51,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "03363ca6088da17a43c2e3e2e0d3c45595a279ba3b2c735b7f0d8b2762463b00",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 38.28
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 12,
+      "params": {
+        "period": 52,
+        "deviation": 2.3
+      },
+      "ms": 478.60000002384186,
+      "coverageMs": 478.60000002384186,
+      "first": {
+        "at": 1174924.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":52}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":52}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1174924.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":52}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":52}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.1024501916906877,
+        1.102105,
+        1.101759808309312
+      ],
+      "canonicalMs": 478.60000002384186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221170370,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 52,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221169918.442,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.244,
+            "responseStart": 380.884,
+            "responseEnd": 393.004
+          },
+          "timings": {
+            "fixed_read_freeze": 87.5
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 52,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "320cd79f3e02320988c87c57e558c101058e571e83c805886c5586bfc663b9ad",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 63.65
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 13,
+      "params": {
+        "period": 53,
+        "deviation": 2.3
+      },
+      "ms": 264.10000002384186,
+      "coverageMs": 264.10000002384186,
+      "first": {
+        "at": 1175226.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":53}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":53}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1175226.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":53}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":53}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.1024518323509773,
+        1.1020999999999999,
+        1.1017481676490224
+      ],
+      "canonicalMs": 264.10000002384186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221170702,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 53,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221170427.9539,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.279,
+            "responseStart": 171.197,
+            "responseEnd": 180.293
+          },
+          "timings": {
+            "fixed_read_freeze": 41.51
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 53,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "80dd007ed276c8e90f4370554115ab465d8bec990d004b2153ee6974bd19dd10",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 46.13
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 14,
+      "params": {
+        "period": 54,
+        "deviation": 2.3
+      },
+      "ms": 391,
+      "coverageMs": 391,
+      "first": {
+        "at": 1175677.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":54}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":54}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1175677.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":54}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":54}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.1024534729922708,
+        1.102095,
+        1.1017365270077293
+      ],
+      "canonicalMs": 391,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221171132,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 54,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221170753.228,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.331,
+            "responseStart": 308.325,
+            "responseEnd": 311.894
+          },
+          "timings": {
+            "fixed_read_freeze": 131.2
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 54,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "2f1f7bd469634d6b455dcfbbaa60a298078e213058a389fba197e6eb6d432e70",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 85.12
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 15,
+      "params": {
+        "period": 55,
+        "deviation": 2.3
+      },
+      "ms": 272.09999999403954,
+      "coverageMs": 272.09999999403954,
+      "first": {
+        "at": 1175989,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":55}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":55}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1175989,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":55}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":55}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.1024551136365153,
+        1.1020900000000002,
+        1.1017248863634852
+      ],
+      "canonicalMs": 272.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221171434,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 55,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221171189.252,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.234,
+            "responseStart": 175.431,
+            "responseEnd": 184.924
+          },
+          "timings": {
+            "fixed_read_freeze": 39.56
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 55,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "8e1df68d8cd78c7049686e34a0dcd1058d5968eecbaac3744ddfcfaff84936ef",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 42.81
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 16,
+      "params": {
+        "period": 56,
+        "deviation": 2.3
+      },
+      "ms": 316.19999998807907,
+      "coverageMs": 316.19999998807907,
+      "first": {
+        "at": 1176353,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":56}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":56}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1176353,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":56}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":56}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.102456754248796,
+        1.102085,
+        1.101713245751204
+      ],
+      "canonicalMs": 316.19999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221171801,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 56,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221171499.707,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.262,
+            "responseStart": 205.927,
+            "responseEnd": 215.089
+          },
+          "timings": {
+            "fixed_read_freeze": 60.32
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 56,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "038043bc741e091b04fc8f283605865a5c55406c01e75c8b29e8307abbf58e92",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 39
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 17,
+      "params": {
+        "period": 57,
+        "deviation": 2.3
+      },
+      "ms": 282.40000000596046,
+      "coverageMs": 282.40000000596046,
+      "first": {
+        "at": 1176718,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":57}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":57}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1176718,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":57}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":57}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.1024583949906546,
+        1.1020799999999913,
+        1.101701605009328
+      ],
+      "canonicalMs": 282.40000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221172167,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 57,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221171913.1091,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.245,
+            "responseStart": 166.603,
+            "responseEnd": 175.882
+          },
+          "timings": {
+            "fixed_read_freeze": 55.27
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 57,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "e5b2d937ec015096adf81983412f8d0764a5e8fa884472e760c757ba45017c5b",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 43.73
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 18,
+      "params": {
+        "period": 58,
+        "deviation": 2.3
+      },
+      "ms": 362.7000000178814,
+      "coverageMs": 362.7000000178814,
+      "first": {
+        "at": 1177128.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":58}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":58}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1177128.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":58}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":58}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.1024600359133423,
+        1.1020749999999677,
+        1.1016899640865931
+      ],
+      "canonicalMs": 362.7000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221172551,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 58,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221172227.5632,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.239,
+            "responseStart": 262.914,
+            "responseEnd": 274.258
+          },
+          "timings": {
+            "fixed_read_freeze": 148.41
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 58,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "76c44275b88b30af882b063df386d7329ff367d3766daf593ef50c1682215276",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 48.14
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 19,
+      "params": {
+        "period": 59,
+        "deviation": 2.3
+      },
+      "ms": 352.5,
+      "coverageMs": 352.5,
+      "first": {
+        "at": 1177525.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":59}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":59}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1177525.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":59}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":59}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.1024616737720008,
+        1.1020700000001395,
+        1.1016783262282783
+      ],
+      "canonicalMs": 352.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221172966,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 59,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221172635.692,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.245,
+            "responseStart": 232.626,
+            "responseEnd": 236.908
+          },
+          "timings": {
+            "fixed_read_freeze": 97.88
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 59,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "ee724c1bb0f249aa280eb51c3c7f252bde36b7f838d52f9b001a15c5196ac9f4",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 48.16
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 20,
+      "params": {
+        "period": 60,
+        "deviation": 2.3
+      },
+      "ms": 326.09999999403954,
+      "coverageMs": 326.09999999403954,
+      "first": {
+        "at": 1177918,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":60}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":60}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1177918,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":60}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":60}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.1024633163498074,
+        1.102065,
+        1.1016666836501927
+      ],
+      "canonicalMs": 326.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221173372,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 60,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221173090.687,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.246,
+            "responseStart": 209.262,
+            "responseEnd": 214.42
+          },
+          "timings": {
+            "fixed_read_freeze": 85.13
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 60,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "9d84f0420fc37165315acf76075ccab8b8c19c944e2966009df63b6fd5a31649",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 56.25
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 21,
+      "params": {
+        "period": 61,
+        "deviation": 2.3
+      },
+      "ms": 302.09999999403954,
+      "coverageMs": 302.09999999403954,
+      "first": {
+        "at": 1178273.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":61}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":61}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1178273.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":61}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":61}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.102464956674055,
+        1.1020600000000105,
+        1.101655043325966
+      ],
+      "canonicalMs": 302.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221173717,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 61,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221173436.5781,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.248,
+            "responseStart": 217.684,
+            "responseEnd": 220.874
+          },
+          "timings": {
+            "fixed_read_freeze": 73.1
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 61,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "aa15e46f573315db31c589fc1cf976a4095531f56236df1ee8d1152c7f33eb13",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 52.86
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 22,
+      "params": {
+        "period": 62,
+        "deviation": 2.3
+      },
+      "ms": 302.30000001192093,
+      "coverageMs": 302.30000001192093,
+      "first": {
+        "at": 1178619.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":62}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":62}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1178619.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":62}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":62}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.1024665971267087,
+        1.102055,
+        1.1016434028732913
+      ],
+      "canonicalMs": 302.30000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221174080,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 62,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221173809.371,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.255,
+            "responseStart": 173.868,
+            "responseEnd": 185.702
+          },
+          "timings": {
+            "fixed_read_freeze": 49.32
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 62,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "d71e20bfde4753692975bb324ad144aa0ef694b0696a28d01aa90b7873963b96",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 59.37
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 23,
+      "params": {
+        "period": 63,
+        "deviation": 2.3
+      },
+      "ms": 497.90000000596046,
+      "coverageMs": 497.90000000596046,
+      "first": {
+        "at": 1179191.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":63}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":63}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1179191.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":63}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":63}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.1024682374615673,
+        1.1020500000000102,
+        1.101631762538453
+      ],
+      "canonicalMs": 497.90000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221174641,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 63,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221174158.519,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.261,
+            "responseStart": 393.351,
+            "responseEnd": 395.487
+          },
+          "timings": {
+            "fixed_read_freeze": 92.19
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 63,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "9359de819afa43bbb1afd3b7e033c10fe49a795643bcc53d56b2a3e2f11307eb",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 141.3
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 24,
+      "params": {
+        "period": 64,
+        "deviation": 2.3
+      },
+      "ms": 410.30000001192093,
+      "coverageMs": 410.30000001192093,
+      "first": {
+        "at": 1179664.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":64}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":64}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1179664.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":64}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":64}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.1024698779785436,
+        1.1020450000000004,
+        1.1016201220214572
+      ],
+      "canonicalMs": 410.30000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221175111,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 64,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221174761.865,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.33,
+            "responseStart": 270.395,
+            "responseEnd": 273.183
+          },
+          "timings": {
+            "fixed_read_freeze": 106.52
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 64,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "7a4c6339b6691131cc4a91e19403cd76654a4ce967a1ec6b3bd69a9c5db6862b",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 45.66
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 25,
+      "params": {
+        "period": 65,
+        "deviation": 2.3
+      },
+      "ms": 507.7999999821186,
+      "coverageMs": 507.7999999821186,
+      "first": {
+        "at": 1180213.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":65}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":65}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1180213.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":65}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":65}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.102471518085388,
+        1.10204000000001,
+        1.101608481914632
+      ],
+      "canonicalMs": 507.7999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221175651,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 65,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221175178.2852,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.249,
+            "responseStart": 412.329,
+            "responseEnd": 418.9
+          },
+          "timings": {
+            "fixed_read_freeze": 213.73
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 65,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "4c6df3b17b6fc5d4693af38facec3c15ca327a3f1e1dd9c14263c35475d718c4",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 78.59
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 26,
+      "params": {
+        "period": 66,
+        "deviation": 2.3
+      },
+      "ms": 299.40000000596046,
+      "coverageMs": 299.40000000596046,
+      "first": {
+        "at": 1180608.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":66}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":66}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1180608.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":66}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":66}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.1024731585164835,
+        1.1020350000000003,
+        1.101596841483517
+      ],
+      "canonicalMs": 299.40000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221176061,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 66,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221175785.11,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.341,
+            "responseStart": 204.607,
+            "responseEnd": 214.765
+          },
+          "timings": {
+            "fixed_read_freeze": 69.83
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 66,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "50464d30b9423e25537bd2dc95e785422316b163f58b86dde8c7c285f52a8734",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 49.72
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 27,
+      "params": {
+        "period": 67,
+        "deviation": 2.3
+      },
+      "ms": 321,
+      "coverageMs": 321,
+      "first": {
+        "at": 1180974.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":67}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":67}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1180974.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":67}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":67}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.1024747986763737,
+        1.1020300000000096,
+        1.1015852013236456
+      ],
+      "canonicalMs": 321,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221176430,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 67,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221176120.16,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.262,
+            "responseStart": 228.409,
+            "responseEnd": 243.954
+          },
+          "timings": {
+            "fixed_read_freeze": 63.25
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 67,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "a8a7137221927dbc3f81e5227aa454f27dbe95dfff879e3144aa0dd833abf63e",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 48.69
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 28,
+      "params": {
+        "period": 68,
+        "deviation": 2.3
+      },
+      "ms": 337.30000001192093,
+      "coverageMs": 337.30000001192093,
+      "first": {
+        "at": 1181352.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":68}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":68}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1181352.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":68}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":68}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.1024764390570465,
+        1.1020250000000003,
+        1.101573560942954
+      ],
+      "canonicalMs": 337.30000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221176788,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 68,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221176485.3289,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.261,
+            "responseStart": 227.09,
+            "responseEnd": 239.888
+          },
+          "timings": {
+            "fixed_read_freeze": 75.1
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 68,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "f431ac231fbb9aee6c3c842eb8407334397cb15c2f343808bf12e456d1505375",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 51.43
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 29,
+      "params": {
+        "period": 69,
+        "deviation": 2.3
+      },
+      "ms": 279.30000001192093,
+      "coverageMs": 279.30000001192093,
+      "first": {
+        "at": 1181673.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":69}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":69}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1181673.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":69}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":69}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.1024780791463504,
+        1.1020200000000095,
+        1.1015619208536687
+      ],
+      "canonicalMs": 279.30000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221177129,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 69,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221176844.739,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.273,
+            "responseStart": 220.483,
+            "responseEnd": 225.017
+          },
+          "timings": {
+            "fixed_read_freeze": 59.61
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 69,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "3cfe4bdfa205a8dc7e07e7ae9d17cdd59258e7cce4f44aad54559d7df763ae1e",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 62.19
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 30,
+      "params": {
+        "period": 70,
+        "deviation": 2.3
+      },
+      "ms": 257.5,
+      "coverageMs": 257.5,
+      "first": {
+        "at": 1181971.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":70}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":70}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1181971.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":70}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":70}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        1.102479719534291,
+        1.1020150000000004,
+        1.1015502804657098
+      ],
+      "canonicalMs": 257.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221177422,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 70,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221177184.329,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.24,
+            "responseStart": 171.609,
+            "responseEnd": 177.167
+          },
+          "timings": {
+            "fixed_read_freeze": 34.58
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 70,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "id": "BBANDS",
+                "run_id": "728b1a5bd3da7e717cd0f7172fa406026158df5e6040ab9fce96f022f1f0c943",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 48.08
+                }
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "middle",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "lower",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    }
+  ]
+}

@@ -1,0 +1,1938 @@
+{
+  "synthetic": true,
+  "evidence": [
+    {
+      "label": "LWMA initial",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          101.73566150169137
+        ],
+        "scope": {
+          "generation": 1,
+          "name": "LWMA",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": {
+            "first": 1764720000000,
+            "last": 1790553600000,
+            "count": 300,
+            "identity": "{\"main\":\"TEST\",\"fixedRevision\":\"parity-fixture-1\",\"paramsFingerprint\":\"{\\\"period\\\":5}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1704240000000,\"period\":\"1D\"}",
+            "sourceFirst": 1764720000000,
+            "correctionVersion": 0,
+            "inputRevision": 1,
+            "generation": 1
+          },
+          "transition": null
+        },
+        "inputs": [
+          {
+            "id": "period",
+            "value": 5
+          }
+        ],
+        "at": 1255.7000000178814
+      }
+    },
+    {
+      "label": "LWMA delayed edit",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          101.73566150169137
+        ],
+        "scope": {
+          "generation": 3,
+          "name": "LWMA",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": null,
+          "transition": {
+            "identity": {
+              "main": "TEST",
+              "fixedRevision": "parity-fixture-1",
+              "paramsFingerprint": "{\"period\":5}",
+              "algorithmVersion": "LWMA:1",
+              "calculationStart": 1704240000000,
+              "period": "1D"
+            },
+            "params": {
+              "period": 5
+            }
+          }
+        },
+        "inputs": [
+          {
+            "id": "period",
+            "value": 6
+          }
+        ],
+        "at": 1323
+      }
+    },
+    {
+      "label": "LWMA A to B to A",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          101.73566150169137
+        ],
+        "scope": {
+          "generation": 5,
+          "name": "LWMA",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": {
+            "first": 1764720000000,
+            "last": 1790553600000,
+            "count": 300,
+            "identity": "{\"main\":\"TEST\",\"fixedRevision\":\"parity-fixture-1\",\"paramsFingerprint\":\"{\\\"period\\\":5}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1704240000000,\"period\":\"1D\"}",
+            "sourceFirst": 1764720000000,
+            "correctionVersion": 0,
+            "inputRevision": 1,
+            "generation": 5
+          },
+          "transition": null
+        },
+        "inputs": [
+          {
+            "id": "period",
+            "value": 5
+          }
+        ],
+        "at": 1402.5
+      }
+    },
+    {
+      "label": "LWMA late B rejected",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          101.73566150169137
+        ],
+        "scope": {
+          "generation": 5,
+          "name": "LWMA",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": {
+            "first": 1764720000000,
+            "last": 1790553600000,
+            "count": 300,
+            "identity": "{\"main\":\"TEST\",\"fixedRevision\":\"parity-fixture-1\",\"paramsFingerprint\":\"{\\\"period\\\":5}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1704240000000,\"period\":\"1D\"}",
+            "sourceFirst": 1764720000000,
+            "correctionVersion": 0,
+            "inputRevision": 1,
+            "generation": 5
+          },
+          "transition": null
+        },
+        "inputs": [
+          {
+            "id": "period",
+            "value": 5
+          }
+        ],
+        "at": 1447.1000000238419
+      }
+    },
+    {
+      "label": "LWMA failure keeps valid old display",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          101.73566150169137
+        ],
+        "scope": {
+          "generation": 7,
+          "name": "LWMA",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": null,
+          "transition": {
+            "identity": {
+              "main": "TEST",
+              "fixedRevision": "parity-fixture-1",
+              "paramsFingerprint": "{\"period\":5}",
+              "algorithmVersion": "LWMA:1",
+              "calculationStart": 1704240000000,
+              "period": "1D"
+            },
+            "params": {
+              "period": 5
+            }
+          }
+        },
+        "inputs": [
+          {
+            "id": "period",
+            "value": 6
+          }
+        ],
+        "at": 1529.300000011921
+      }
+    },
+    {
+      "label": "LWMA retry atomic replacement",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          101.51340161755252
+        ],
+        "scope": {
+          "generation": 7,
+          "name": "LWMA",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": {
+            "first": 1764720000000,
+            "last": 1790553600000,
+            "count": 300,
+            "identity": "{\"main\":\"TEST\",\"fixedRevision\":\"parity-fixture-1\",\"paramsFingerprint\":\"{\\\"period\\\":6}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1704240000000,\"period\":\"1D\"}",
+            "sourceFirst": 1764720000000,
+            "correctionVersion": 0,
+            "inputRevision": 1,
+            "generation": 7
+          },
+          "transition": null
+        },
+        "inputs": [
+          {
+            "id": "period",
+            "value": 6
+          }
+        ],
+        "at": 1560
+      }
+    },
+    {
+      "label": "LWMA concurrent correction withdrawn",
+      "sample": {
+        "size": 0,
+        "scope": {
+          "generation": 9,
+          "name": "LWMA",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": null,
+          "transition": null
+        },
+        "inputs": [
+          {
+            "id": "period",
+            "value": 5
+          }
+        ],
+        "at": 1675.6000000238419
+      }
+    },
+    {
+      "label": "LWMA current revision restored",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          101.73566150169137
+        ],
+        "scope": {
+          "generation": 9,
+          "name": "LWMA",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": {
+            "first": 1764720000000,
+            "last": 1790553600000,
+            "count": 300,
+            "identity": "{\"main\":\"TEST\",\"fixedRevision\":\"parity-fixture-1\",\"paramsFingerprint\":\"{\\\"period\\\":5}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1704240000000,\"period\":\"1D\"}",
+            "sourceFirst": 1764720000000,
+            "correctionVersion": 1,
+            "inputRevision": 2,
+            "generation": 9
+          },
+          "transition": null
+        },
+        "inputs": [
+          {
+            "id": "period",
+            "value": 5
+          }
+        ],
+        "at": 1777
+      }
+    },
+    {
+      "label": "BBANDS initial",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          103.97700127221331,
+          101.10412140644782,
+          98.23124154068232
+        ],
+        "scope": {
+          "generation": 1,
+          "name": "BBANDS",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": {
+            "first": 1764720000000,
+            "last": 1790553600000,
+            "count": 300,
+            "identity": "{\"main\":\"TEST\",\"fixedRevision\":\"parity-fixture-1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2,\\\"period\\\":20}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1704240000000,\"period\":\"1D\"}",
+            "sourceFirst": 1764720000000,
+            "correctionVersion": 0,
+            "inputRevision": 1,
+            "generation": 1
+          },
+          "transition": null
+        },
+        "inputs": [
+          {
+            "id": "period",
+            "value": 20
+          },
+          {
+            "id": "deviation",
+            "value": 2
+          }
+        ],
+        "at": 1181.8999999761581
+      }
+    },
+    {
+      "label": "BBANDS delayed edit",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          103.97700127221331,
+          101.10412140644782,
+          98.23124154068232
+        ],
+        "scope": {
+          "generation": 3,
+          "name": "BBANDS",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": null,
+          "transition": {
+            "identity": {
+              "main": "TEST",
+              "fixedRevision": "parity-fixture-1",
+              "paramsFingerprint": "{\"deviation\":2,\"period\":20}",
+              "algorithmVersion": "BBANDS:1",
+              "calculationStart": 1704240000000,
+              "period": "1D"
+            },
+            "params": {
+              "deviation": 2,
+              "period": 20
+            }
+          }
+        },
+        "inputs": [
+          {
+            "id": "period",
+            "value": 21
+          },
+          {
+            "id": "deviation",
+            "value": 2
+          }
+        ],
+        "at": 1282.7999999821186
+      }
+    },
+    {
+      "label": "BBANDS A to B to A",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          103.97700127221331,
+          101.10412140644782,
+          98.23124154068232
+        ],
+        "scope": {
+          "generation": 5,
+          "name": "BBANDS",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": {
+            "first": 1764720000000,
+            "last": 1790553600000,
+            "count": 300,
+            "identity": "{\"main\":\"TEST\",\"fixedRevision\":\"parity-fixture-1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2,\\\"period\\\":20}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1704240000000,\"period\":\"1D\"}",
+            "sourceFirst": 1764720000000,
+            "correctionVersion": 0,
+            "inputRevision": 1,
+            "generation": 5
+          },
+          "transition": null
+        },
+        "inputs": [
+          {
+            "id": "period",
+            "value": 20
+          },
+          {
+            "id": "deviation",
+            "value": 2
+          }
+        ],
+        "at": 1355.5
+      }
+    },
+    {
+      "label": "BBANDS late B rejected",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          103.97700127221331,
+          101.10412140644782,
+          98.23124154068232
+        ],
+        "scope": {
+          "generation": 5,
+          "name": "BBANDS",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": {
+            "first": 1764720000000,
+            "last": 1790553600000,
+            "count": 300,
+            "identity": "{\"main\":\"TEST\",\"fixedRevision\":\"parity-fixture-1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2,\\\"period\\\":20}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1704240000000,\"period\":\"1D\"}",
+            "sourceFirst": 1764720000000,
+            "correctionVersion": 0,
+            "inputRevision": 1,
+            "generation": 5
+          },
+          "transition": null
+        },
+        "inputs": [
+          {
+            "id": "period",
+            "value": 20
+          },
+          {
+            "id": "deviation",
+            "value": 2
+          }
+        ],
+        "at": 1417.3999999761581
+      }
+    },
+    {
+      "label": "BBANDS failure keeps valid old display",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          103.97700127221331,
+          101.10412140644782,
+          98.23124154068232
+        ],
+        "scope": {
+          "generation": 7,
+          "name": "BBANDS",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": null,
+          "transition": {
+            "identity": {
+              "main": "TEST",
+              "fixedRevision": "parity-fixture-1",
+              "paramsFingerprint": "{\"deviation\":2,\"period\":20}",
+              "algorithmVersion": "BBANDS:1",
+              "calculationStart": 1704240000000,
+              "period": "1D"
+            },
+            "params": {
+              "deviation": 2,
+              "period": 20
+            }
+          }
+        },
+        "inputs": [
+          {
+            "id": "period",
+            "value": 21
+          },
+          {
+            "id": "deviation",
+            "value": 2
+          }
+        ],
+        "at": 1471.3999999761581
+      }
+    },
+    {
+      "label": "BBANDS retry atomic replacement",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          104.04654327559207,
+          101.17402632434691,
+          98.30150937310175
+        ],
+        "scope": {
+          "generation": 7,
+          "name": "BBANDS",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": {
+            "first": 1764720000000,
+            "last": 1790553600000,
+            "count": 300,
+            "identity": "{\"main\":\"TEST\",\"fixedRevision\":\"parity-fixture-1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2,\\\"period\\\":21}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1704240000000,\"period\":\"1D\"}",
+            "sourceFirst": 1764720000000,
+            "correctionVersion": 0,
+            "inputRevision": 1,
+            "generation": 7
+          },
+          "transition": null
+        },
+        "inputs": [
+          {
+            "id": "period",
+            "value": 21
+          },
+          {
+            "id": "deviation",
+            "value": 2
+          }
+        ],
+        "at": 1511.0999999940395
+      }
+    },
+    {
+      "label": "BBANDS concurrent correction withdrawn",
+      "sample": {
+        "size": 0,
+        "scope": {
+          "generation": 9,
+          "name": "BBANDS",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": null,
+          "transition": null
+        },
+        "inputs": [
+          {
+            "id": "period",
+            "value": 20
+          },
+          {
+            "id": "deviation",
+            "value": 2
+          }
+        ],
+        "at": 1608.3999999761581
+      }
+    },
+    {
+      "label": "BBANDS current revision restored",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          103.97700127221331,
+          101.10412140644782,
+          98.23124154068232
+        ],
+        "scope": {
+          "generation": 9,
+          "name": "BBANDS",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": {
+            "first": 1764720000000,
+            "last": 1790553600000,
+            "count": 300,
+            "identity": "{\"main\":\"TEST\",\"fixedRevision\":\"parity-fixture-1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2,\\\"period\\\":20}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1704240000000,\"period\":\"1D\"}",
+            "sourceFirst": 1764720000000,
+            "correctionVersion": 1,
+            "inputRevision": 2,
+            "generation": 9
+          },
+          "transition": null
+        },
+        "inputs": [
+          {
+            "id": "period",
+            "value": 20
+          },
+          {
+            "id": "deviation",
+            "value": 2
+          }
+        ],
+        "at": 1622.199999988079
+      }
+    },
+    {
+      "label": "MACD initial",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          0.17242721695178886,
+          0.013805667480908359,
+          0.1586215494708805
+        ],
+        "scope": {
+          "generation": 1,
+          "name": "MACD",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": {
+            "first": 1764720000000,
+            "last": 1790553600000,
+            "count": 300,
+            "identity": "{\"main\":\"TEST\",\"fixedRevision\":\"parity-fixture-1\",\"paramsFingerprint\":\"{\\\"fast\\\":12,\\\"signal\\\":9,\\\"slow\\\":26}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1704240000000,\"period\":\"1D\"}",
+            "sourceFirst": 1764720000000,
+            "correctionVersion": 0,
+            "inputRevision": 1,
+            "generation": 1
+          },
+          "transition": null
+        },
+        "inputs": [
+          {
+            "id": "fast",
+            "value": 12
+          },
+          {
+            "id": "slow",
+            "value": 26
+          },
+          {
+            "id": "signal",
+            "value": 9
+          }
+        ],
+        "at": 1519
+      }
+    },
+    {
+      "label": "MACD delayed edit",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          0.17242721695178886,
+          0.013805667480908359,
+          0.1586215494708805
+        ],
+        "scope": {
+          "generation": 3,
+          "name": "MACD",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": null,
+          "transition": {
+            "identity": {
+              "main": "TEST",
+              "fixedRevision": "parity-fixture-1",
+              "paramsFingerprint": "{\"fast\":12,\"signal\":9,\"slow\":26}",
+              "algorithmVersion": "MACD:1",
+              "calculationStart": 1704240000000,
+              "period": "1D"
+            },
+            "params": {
+              "fast": 12,
+              "signal": 9,
+              "slow": 26
+            }
+          }
+        },
+        "inputs": [
+          {
+            "id": "fast",
+            "value": 13
+          },
+          {
+            "id": "slow",
+            "value": 26
+          },
+          {
+            "id": "signal",
+            "value": 9
+          }
+        ],
+        "at": 1617.6000000238419
+      }
+    },
+    {
+      "label": "MACD A to B to A",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          0.17242721695178886,
+          0.013805667480908359,
+          0.1586215494708805
+        ],
+        "scope": {
+          "generation": 5,
+          "name": "MACD",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": {
+            "first": 1764720000000,
+            "last": 1790553600000,
+            "count": 300,
+            "identity": "{\"main\":\"TEST\",\"fixedRevision\":\"parity-fixture-1\",\"paramsFingerprint\":\"{\\\"fast\\\":12,\\\"signal\\\":9,\\\"slow\\\":26}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1704240000000,\"period\":\"1D\"}",
+            "sourceFirst": 1764720000000,
+            "correctionVersion": 0,
+            "inputRevision": 1,
+            "generation": 5
+          },
+          "transition": null
+        },
+        "inputs": [
+          {
+            "id": "fast",
+            "value": 12
+          },
+          {
+            "id": "slow",
+            "value": 26
+          },
+          {
+            "id": "signal",
+            "value": 9
+          }
+        ],
+        "at": 1671.7000000178814
+      }
+    },
+    {
+      "label": "MACD late B rejected",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          0.17242721695178886,
+          0.013805667480908359,
+          0.1586215494708805
+        ],
+        "scope": {
+          "generation": 5,
+          "name": "MACD",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": {
+            "first": 1764720000000,
+            "last": 1790553600000,
+            "count": 300,
+            "identity": "{\"main\":\"TEST\",\"fixedRevision\":\"parity-fixture-1\",\"paramsFingerprint\":\"{\\\"fast\\\":12,\\\"signal\\\":9,\\\"slow\\\":26}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1704240000000,\"period\":\"1D\"}",
+            "sourceFirst": 1764720000000,
+            "correctionVersion": 0,
+            "inputRevision": 1,
+            "generation": 5
+          },
+          "transition": null
+        },
+        "inputs": [
+          {
+            "id": "fast",
+            "value": 12
+          },
+          {
+            "id": "slow",
+            "value": 26
+          },
+          {
+            "id": "signal",
+            "value": 9
+          }
+        ],
+        "at": 1693.300000011921
+      }
+    },
+    {
+      "label": "MACD failure keeps valid old display",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          0.17242721695178886,
+          0.013805667480908359,
+          0.1586215494708805
+        ],
+        "scope": {
+          "generation": 7,
+          "name": "MACD",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": null,
+          "transition": {
+            "identity": {
+              "main": "TEST",
+              "fixedRevision": "parity-fixture-1",
+              "paramsFingerprint": "{\"fast\":12,\"signal\":9,\"slow\":26}",
+              "algorithmVersion": "MACD:1",
+              "calculationStart": 1704240000000,
+              "period": "1D"
+            },
+            "params": {
+              "fast": 12,
+              "signal": 9,
+              "slow": 26
+            }
+          }
+        },
+        "inputs": [
+          {
+            "id": "fast",
+            "value": 13
+          },
+          {
+            "id": "slow",
+            "value": 26
+          },
+          {
+            "id": "signal",
+            "value": 9
+          }
+        ],
+        "at": 1749.2000000178814
+      }
+    },
+    {
+      "label": "MACD retry atomic replacement",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          0.1473842569566557,
+          0.011462217435134932,
+          0.13592203952152077
+        ],
+        "scope": {
+          "generation": 7,
+          "name": "MACD",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": {
+            "first": 1764720000000,
+            "last": 1790553600000,
+            "count": 300,
+            "identity": "{\"main\":\"TEST\",\"fixedRevision\":\"parity-fixture-1\",\"paramsFingerprint\":\"{\\\"fast\\\":13,\\\"signal\\\":9,\\\"slow\\\":26}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1704240000000,\"period\":\"1D\"}",
+            "sourceFirst": 1764720000000,
+            "correctionVersion": 0,
+            "inputRevision": 1,
+            "generation": 7
+          },
+          "transition": null
+        },
+        "inputs": [
+          {
+            "id": "fast",
+            "value": 13
+          },
+          {
+            "id": "slow",
+            "value": 26
+          },
+          {
+            "id": "signal",
+            "value": 9
+          }
+        ],
+        "at": 1817.7000000178814
+      }
+    },
+    {
+      "label": "MACD concurrent correction withdrawn",
+      "sample": {
+        "size": 0,
+        "scope": {
+          "generation": 9,
+          "name": "MACD",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": null,
+          "transition": null
+        },
+        "inputs": [
+          {
+            "id": "fast",
+            "value": 12
+          },
+          {
+            "id": "slow",
+            "value": 26
+          },
+          {
+            "id": "signal",
+            "value": 9
+          }
+        ],
+        "at": 1955.7000000178814
+      }
+    },
+    {
+      "label": "MACD current revision restored",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          0.17242721695178886,
+          0.013805667480908359,
+          0.1586215494708805
+        ],
+        "scope": {
+          "generation": 9,
+          "name": "MACD",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": {
+            "first": 1764720000000,
+            "last": 1790553600000,
+            "count": 300,
+            "identity": "{\"main\":\"TEST\",\"fixedRevision\":\"parity-fixture-1\",\"paramsFingerprint\":\"{\\\"fast\\\":12,\\\"signal\\\":9,\\\"slow\\\":26}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1704240000000,\"period\":\"1D\"}",
+            "sourceFirst": 1764720000000,
+            "correctionVersion": 1,
+            "inputRevision": 2,
+            "generation": 9
+          },
+          "transition": null
+        },
+        "inputs": [
+          {
+            "id": "fast",
+            "value": 12
+          },
+          {
+            "id": "slow",
+            "value": 26
+          },
+          {
+            "id": "signal",
+            "value": 9
+          }
+        ],
+        "at": 1989
+      }
+    },
+    {
+      "label": "SUPERTREND_PINE_V1 initial",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          89.50822351156827,
+          null,
+          102.02022503437277,
+          89.50822351156827,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "scope": {
+          "generation": 1,
+          "name": "SUPERTREND_PINE_V1",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": {
+            "first": 1764720000000,
+            "last": 1790553600000,
+            "count": 300,
+            "identity": "{\"main\":\"TEST\",\"fixedRevision\":\"parity-fixture-1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1704240000000,\"period\":\"1D\"}",
+            "sourceFirst": 1764720000000,
+            "correctionVersion": 0,
+            "inputRevision": 1,
+            "generation": 1
+          },
+          "transition": null
+        },
+        "inputs": [
+          {
+            "id": "period",
+            "value": 10
+          },
+          {
+            "id": "source",
+            "value": "hl2"
+          },
+          {
+            "id": "multiplier",
+            "value": 3
+          },
+          {
+            "id": "changeATR",
+            "value": true
+          },
+          {
+            "id": "showsignals",
+            "value": true
+          },
+          {
+            "id": "highlighting",
+            "value": true
+          }
+        ],
+        "at": 770.5999999940395
+      }
+    },
+    {
+      "label": "SUPERTREND_PINE_V1 delayed edit",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          89.50822351156827,
+          null,
+          102.02022503437277,
+          89.50822351156827,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "scope": {
+          "generation": 3,
+          "name": "SUPERTREND_PINE_V1",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": null,
+          "transition": {
+            "identity": {
+              "main": "TEST",
+              "fixedRevision": "parity-fixture-1",
+              "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+              "algorithmVersion": "SUPERTREND_PINE_V1:1",
+              "calculationStart": 1704240000000,
+              "period": "1D"
+            },
+            "params": {
+              "atr_method": "wilder",
+              "multiplier": 3,
+              "period": 10,
+              "source": "hl2"
+            }
+          }
+        },
+        "inputs": [
+          {
+            "id": "period",
+            "value": 11
+          },
+          {
+            "id": "source",
+            "value": "hl2"
+          },
+          {
+            "id": "multiplier",
+            "value": 3
+          },
+          {
+            "id": "changeATR",
+            "value": true
+          },
+          {
+            "id": "showsignals",
+            "value": true
+          },
+          {
+            "id": "highlighting",
+            "value": true
+          }
+        ],
+        "at": 909.5
+      }
+    },
+    {
+      "label": "SUPERTREND_PINE_V1 A to B to A",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          89.50822351156827,
+          null,
+          102.02022503437277,
+          89.50822351156827,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "scope": {
+          "generation": 5,
+          "name": "SUPERTREND_PINE_V1",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": {
+            "first": 1764720000000,
+            "last": 1790553600000,
+            "count": 300,
+            "identity": "{\"main\":\"TEST\",\"fixedRevision\":\"parity-fixture-1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1704240000000,\"period\":\"1D\"}",
+            "sourceFirst": 1764720000000,
+            "correctionVersion": 0,
+            "inputRevision": 1,
+            "generation": 5
+          },
+          "transition": null
+        },
+        "inputs": [
+          {
+            "id": "period",
+            "value": 10
+          },
+          {
+            "id": "source",
+            "value": "hl2"
+          },
+          {
+            "id": "multiplier",
+            "value": 3
+          },
+          {
+            "id": "changeATR",
+            "value": true
+          },
+          {
+            "id": "showsignals",
+            "value": true
+          },
+          {
+            "id": "highlighting",
+            "value": true
+          }
+        ],
+        "at": 974.5
+      }
+    },
+    {
+      "label": "SUPERTREND_PINE_V1 late B rejected",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          89.50822351156827,
+          null,
+          102.02022503437277,
+          89.50822351156827,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "scope": {
+          "generation": 5,
+          "name": "SUPERTREND_PINE_V1",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": {
+            "first": 1764720000000,
+            "last": 1790553600000,
+            "count": 300,
+            "identity": "{\"main\":\"TEST\",\"fixedRevision\":\"parity-fixture-1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1704240000000,\"period\":\"1D\"}",
+            "sourceFirst": 1764720000000,
+            "correctionVersion": 0,
+            "inputRevision": 1,
+            "generation": 5
+          },
+          "transition": null
+        },
+        "inputs": [
+          {
+            "id": "period",
+            "value": 10
+          },
+          {
+            "id": "source",
+            "value": "hl2"
+          },
+          {
+            "id": "multiplier",
+            "value": 3
+          },
+          {
+            "id": "changeATR",
+            "value": true
+          },
+          {
+            "id": "showsignals",
+            "value": true
+          },
+          {
+            "id": "highlighting",
+            "value": true
+          }
+        ],
+        "at": 993.5999999940395
+      }
+    },
+    {
+      "label": "SUPERTREND_PINE_V1 failure keeps valid old display",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          89.50822351156827,
+          null,
+          102.02022503437277,
+          89.50822351156827,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "scope": {
+          "generation": 7,
+          "name": "SUPERTREND_PINE_V1",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": null,
+          "transition": {
+            "identity": {
+              "main": "TEST",
+              "fixedRevision": "parity-fixture-1",
+              "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+              "algorithmVersion": "SUPERTREND_PINE_V1:1",
+              "calculationStart": 1704240000000,
+              "period": "1D"
+            },
+            "params": {
+              "atr_method": "wilder",
+              "multiplier": 3,
+              "period": 10,
+              "source": "hl2"
+            }
+          }
+        },
+        "inputs": [
+          {
+            "id": "period",
+            "value": 11
+          },
+          {
+            "id": "source",
+            "value": "hl2"
+          },
+          {
+            "id": "multiplier",
+            "value": 3
+          },
+          {
+            "id": "changeATR",
+            "value": true
+          },
+          {
+            "id": "showsignals",
+            "value": true
+          },
+          {
+            "id": "highlighting",
+            "value": true
+          }
+        ],
+        "at": 1090.5999999940395
+      }
+    },
+    {
+      "label": "SUPERTREND_PINE_V1 retry atomic replacement",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          89.49828967822101,
+          null,
+          102.02022503437277,
+          89.49828967822101,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "scope": {
+          "generation": 7,
+          "name": "SUPERTREND_PINE_V1",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": {
+            "first": 1764720000000,
+            "last": 1790553600000,
+            "count": 300,
+            "identity": "{\"main\":\"TEST\",\"fixedRevision\":\"parity-fixture-1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":11,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1704240000000,\"period\":\"1D\"}",
+            "sourceFirst": 1764720000000,
+            "correctionVersion": 0,
+            "inputRevision": 1,
+            "generation": 7
+          },
+          "transition": null
+        },
+        "inputs": [
+          {
+            "id": "period",
+            "value": 11
+          },
+          {
+            "id": "source",
+            "value": "hl2"
+          },
+          {
+            "id": "multiplier",
+            "value": 3
+          },
+          {
+            "id": "changeATR",
+            "value": true
+          },
+          {
+            "id": "showsignals",
+            "value": true
+          },
+          {
+            "id": "highlighting",
+            "value": true
+          }
+        ],
+        "at": 1165.699999988079
+      }
+    },
+    {
+      "label": "SUPERTREND_PINE_V1 concurrent correction withdrawn",
+      "sample": {
+        "size": 0,
+        "scope": {
+          "generation": 9,
+          "name": "SUPERTREND_PINE_V1",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": null,
+          "transition": null
+        },
+        "inputs": [
+          {
+            "id": "period",
+            "value": 10
+          },
+          {
+            "id": "source",
+            "value": "hl2"
+          },
+          {
+            "id": "multiplier",
+            "value": 3
+          },
+          {
+            "id": "changeATR",
+            "value": true
+          },
+          {
+            "id": "showsignals",
+            "value": true
+          },
+          {
+            "id": "highlighting",
+            "value": true
+          }
+        ],
+        "at": 1222
+      }
+    },
+    {
+      "label": "SUPERTREND_PINE_V1 current revision restored",
+      "sample": {
+        "size": 300,
+        "last": [
+          1790553600,
+          89.50822351156827,
+          null,
+          102.02022503437277,
+          89.50822351156827,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "scope": {
+          "generation": 9,
+          "name": "SUPERTREND_PINE_V1",
+          "resolution": "1D",
+          "first": 1764720000000,
+          "last": 1790553600000,
+          "count": 300,
+          "coverage": {
+            "first": 1764720000000,
+            "last": 1790553600000,
+            "count": 300,
+            "identity": "{\"main\":\"TEST\",\"fixedRevision\":\"parity-fixture-1\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1704240000000,\"period\":\"1D\"}",
+            "sourceFirst": 1764720000000,
+            "correctionVersion": 1,
+            "inputRevision": 2,
+            "generation": 9
+          },
+          "transition": null
+        },
+        "inputs": [
+          {
+            "id": "period",
+            "value": 10
+          },
+          {
+            "id": "source",
+            "value": "hl2"
+          },
+          {
+            "id": "multiplier",
+            "value": 3
+          },
+          {
+            "id": "changeATR",
+            "value": true
+          },
+          {
+            "id": "showsignals",
+            "value": true
+          },
+          {
+            "id": "highlighting",
+            "value": true
+          }
+        ],
+        "at": 1263
+      }
+    }
+  ],
+  "timeline": [
+    {
+      "type": "frame",
+      "frame": 0,
+      "at": 1792205048.048465
+    },
+    {
+      "type": "frame",
+      "frame": 1,
+      "at": 1792205048.244535
+    },
+    {
+      "type": "frame",
+      "frame": 2,
+      "at": 1792205048.334238
+    },
+    {
+      "type": "frame",
+      "frame": 3,
+      "at": 1792205048.430651
+    },
+    {
+      "type": "frame",
+      "frame": 4,
+      "at": 1792205048.766617
+    },
+    {
+      "type": "frame",
+      "frame": 5,
+      "at": 1792205048.928194
+    },
+    {
+      "type": "frame",
+      "frame": 6,
+      "at": 1792205049.027695
+    },
+    {
+      "type": "frame",
+      "frame": 7,
+      "at": 1792205049.15145
+    },
+    {
+      "type": "frame",
+      "frame": 8,
+      "at": 1792205049.2389
+    },
+    {
+      "type": "action",
+      "label": "LWMA initial",
+      "at": 1792205049.278
+    },
+    {
+      "type": "frame",
+      "frame": 9,
+      "at": 1792205049.321501
+    },
+    {
+      "type": "action",
+      "label": "LWMA delayed edit",
+      "at": 1792205049.345
+    },
+    {
+      "type": "action",
+      "label": "LWMA A to B to A",
+      "at": 1792205049.424
+    },
+    {
+      "type": "frame",
+      "frame": 10,
+      "at": 1792205049.432219
+    },
+    {
+      "type": "action",
+      "label": "LWMA late B rejected",
+      "at": 1792205049.469
+    },
+    {
+      "type": "frame",
+      "frame": 11,
+      "at": 1792205049.512584
+    },
+    {
+      "type": "action",
+      "label": "LWMA failure keeps valid old display",
+      "at": 1792205049.55
+    },
+    {
+      "type": "action",
+      "label": "LWMA retry atomic replacement",
+      "at": 1792205049.584
+    },
+    {
+      "type": "frame",
+      "frame": 12,
+      "at": 1792205049.626681
+    },
+    {
+      "type": "action",
+      "label": "LWMA concurrent correction withdrawn",
+      "at": 1792205049.708
+    },
+    {
+      "type": "frame",
+      "frame": 13,
+      "at": 1792205049.708762
+    },
+    {
+      "type": "action",
+      "label": "LWMA current revision restored",
+      "at": 1792205049.799
+    },
+    {
+      "type": "frame",
+      "frame": 14,
+      "at": 1792205049.803297
+    },
+    {
+      "type": "frame",
+      "frame": 15,
+      "at": 1792205049.907958
+    },
+    {
+      "type": "frame",
+      "frame": 16,
+      "at": 1792205050.046077
+    },
+    {
+      "type": "frame",
+      "frame": 17,
+      "at": 1792205050.391073
+    },
+    {
+      "type": "frame",
+      "frame": 18,
+      "at": 1792205050.543371
+    },
+    {
+      "type": "frame",
+      "frame": 19,
+      "at": 1792205050.630101
+    },
+    {
+      "type": "frame",
+      "frame": 20,
+      "at": 1792205050.740121
+    },
+    {
+      "type": "frame",
+      "frame": 21,
+      "at": 1792205050.826685
+    },
+    {
+      "type": "frame",
+      "frame": 22,
+      "at": 1792205050.908258
+    },
+    {
+      "type": "action",
+      "label": "BBANDS initial",
+      "at": 1792205051
+    },
+    {
+      "type": "frame",
+      "frame": 23,
+      "at": 1792205051.01775
+    },
+    {
+      "type": "action",
+      "label": "BBANDS delayed edit",
+      "at": 1792205051.104
+    },
+    {
+      "type": "frame",
+      "frame": 24,
+      "at": 1792205051.119848
+    },
+    {
+      "type": "action",
+      "label": "BBANDS A to B to A",
+      "at": 1792205051.185
+    },
+    {
+      "type": "frame",
+      "frame": 25,
+      "at": 1792205051.202643
+    },
+    {
+      "type": "action",
+      "label": "BBANDS late B rejected",
+      "at": 1792205051.229
+    },
+    {
+      "type": "action",
+      "label": "BBANDS failure keeps valid old display",
+      "at": 1792205051.283
+    },
+    {
+      "type": "frame",
+      "frame": 26,
+      "at": 1792205051.286791
+    },
+    {
+      "type": "action",
+      "label": "BBANDS retry atomic replacement",
+      "at": 1792205051.323
+    },
+    {
+      "type": "action",
+      "label": "BBANDS concurrent correction withdrawn",
+      "at": 1792205051.42
+    },
+    {
+      "type": "action",
+      "label": "BBANDS current revision restored",
+      "at": 1792205051.434
+    },
+    {
+      "type": "frame",
+      "frame": 27,
+      "at": 1792205051.396972
+    },
+    {
+      "type": "frame",
+      "frame": 28,
+      "at": 1792205051.484329
+    },
+    {
+      "type": "frame",
+      "frame": 29,
+      "at": 1792205051.572409
+    },
+    {
+      "type": "frame",
+      "frame": 30,
+      "at": 1792205051.685089
+    },
+    {
+      "type": "frame",
+      "frame": 31,
+      "at": 1792205051.768268
+    },
+    {
+      "type": "frame",
+      "frame": 32,
+      "at": 1792205051.861015
+    },
+    {
+      "type": "frame",
+      "frame": 33,
+      "at": 1792205051.951013
+    },
+    {
+      "type": "frame",
+      "frame": 34,
+      "at": 1792205052.060219
+    },
+    {
+      "type": "frame",
+      "frame": 35,
+      "at": 1792205052.152917
+    },
+    {
+      "type": "frame",
+      "frame": 36,
+      "at": 1792205052.239527
+    },
+    {
+      "type": "frame",
+      "frame": 37,
+      "at": 1792205052.441964
+    },
+    {
+      "type": "frame",
+      "frame": 38,
+      "at": 1792205052.539124
+    },
+    {
+      "type": "frame",
+      "frame": 39,
+      "at": 1792205052.652304
+    },
+    {
+      "type": "frame",
+      "frame": 40,
+      "at": 1792205052.74404
+    },
+    {
+      "type": "frame",
+      "frame": 41,
+      "at": 1792205052.853786
+    },
+    {
+      "type": "frame",
+      "frame": 42,
+      "at": 1792205052.959236
+    },
+    {
+      "type": "action",
+      "label": "MACD initial",
+      "at": 1792205053.087
+    },
+    {
+      "type": "frame",
+      "frame": 43,
+      "at": 1792205053.076024
+    },
+    {
+      "type": "frame",
+      "frame": 44,
+      "at": 1792205053.162092
+    },
+    {
+      "type": "action",
+      "label": "MACD delayed edit",
+      "at": 1792205053.177
+    },
+    {
+      "type": "action",
+      "label": "MACD A to B to A",
+      "at": 1792205053.229
+    },
+    {
+      "type": "action",
+      "label": "MACD late B rejected",
+      "at": 1792205053.252
+    },
+    {
+      "type": "frame",
+      "frame": 45,
+      "at": 1792205053.24365
+    },
+    {
+      "type": "action",
+      "label": "MACD failure keeps valid old display",
+      "at": 1792205053.307
+    },
+    {
+      "type": "frame",
+      "frame": 46,
+      "at": 1792205053.334593
+    },
+    {
+      "type": "action",
+      "label": "MACD retry atomic replacement",
+      "at": 1792205053.403
+    },
+    {
+      "type": "frame",
+      "frame": 47,
+      "at": 1792205053.429494
+    },
+    {
+      "type": "action",
+      "label": "MACD concurrent correction withdrawn",
+      "at": 1792205053.515
+    },
+    {
+      "type": "frame",
+      "frame": 48,
+      "at": 1792205053.52055
+    },
+    {
+      "type": "action",
+      "label": "MACD current revision restored",
+      "at": 1792205053.546
+    },
+    {
+      "type": "frame",
+      "frame": 49,
+      "at": 1792205053.663736
+    },
+    {
+      "type": "frame",
+      "frame": 50,
+      "at": 1792205053.992735
+    },
+    {
+      "type": "frame",
+      "frame": 51,
+      "at": 1792205054.114448
+    },
+    {
+      "type": "frame",
+      "frame": 52,
+      "at": 1792205054.225932
+    },
+    {
+      "type": "action",
+      "label": "SUPERTREND_PINE_V1 initial",
+      "at": 1792205054.339
+    },
+    {
+      "type": "frame",
+      "frame": 53,
+      "at": 1792205054.346954
+    },
+    {
+      "type": "frame",
+      "frame": 54,
+      "at": 1792205054.431452
+    },
+    {
+      "type": "action",
+      "label": "SUPERTREND_PINE_V1 delayed edit",
+      "at": 1792205054.487
+    },
+    {
+      "type": "frame",
+      "frame": 55,
+      "at": 1792205054.524213
+    },
+    {
+      "type": "action",
+      "label": "SUPERTREND_PINE_V1 A to B to A",
+      "at": 1792205054.543
+    },
+    {
+      "type": "action",
+      "label": "SUPERTREND_PINE_V1 late B rejected",
+      "at": 1792205054.563
+    },
+    {
+      "type": "frame",
+      "frame": 56,
+      "at": 1792205054.645482
+    },
+    {
+      "type": "action",
+      "label": "SUPERTREND_PINE_V1 failure keeps valid old display",
+      "at": 1792205054.659
+    },
+    {
+      "type": "action",
+      "label": "SUPERTREND_PINE_V1 retry atomic replacement",
+      "at": 1792205054.736
+    },
+    {
+      "type": "frame",
+      "frame": 57,
+      "at": 1792205054.736381
+    },
+    {
+      "type": "action",
+      "label": "SUPERTREND_PINE_V1 concurrent correction withdrawn",
+      "at": 1792205054.79
+    },
+    {
+      "type": "action",
+      "label": "SUPERTREND_PINE_V1 current revision restored",
+      "at": 1792205054.831
+    },
+    {
+      "type": "frame",
+      "frame": 58,
+      "at": 1792205054.834855
+    }
+  ]
+}

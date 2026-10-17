@@ -233,6 +233,8 @@ def test_candle_auth_probe_uses_catalog_and_latest_without_quote_calls():
 
     def handle(request):
         calls.append(request.url.path)
+        if request.url.path == "/v3/accounts":
+            return httpx.Response(200, json={"accounts": [{"id": "test-account"}]})
         if request.url.path.endswith("/summary"):
             return httpx.Response(200, json={"account": {"id": "test-account"}})
         if request.url.path.endswith("/instruments"):
@@ -243,12 +245,13 @@ def test_candle_auth_probe_uses_catalog_and_latest_without_quote_calls():
     with httpx.Client(transport=httpx.MockTransport(handle)) as client:
         adapter = OandaRestBatch(token="secret", account_id="test-account", rest_client=client, clock=lambda: 61200)
         assert adapter.validate_candle_access([spec()]) == [{"name": "EUR_USD"}]
-    assert len(calls) == 3 and not any("pricing" in url for url in calls)
+    assert len(calls) == 4 and not any("pricing" in url for url in calls)
 
 
 def test_candle_auth_does_not_clear_hold_for_invalid_partial_payload():
     with httpx.Client(transport=httpx.MockTransport(lambda request: httpx.Response(200, json=(
         {"account": {"id": "test-account"}} if request.url.path.endswith("/summary") else
+        {"accounts": [{"id": "test-account"}]} if request.url.path == "/v3/accounts" else
         {"instruments": [{"name": "EUR_USD"}]} if request.url.path.endswith("/instruments") else
         {"latestCandles": []})))) as client:
         adapter = OandaRestBatch(token="secret", account_id="test-account", rest_client=client, clock=lambda: 61200)

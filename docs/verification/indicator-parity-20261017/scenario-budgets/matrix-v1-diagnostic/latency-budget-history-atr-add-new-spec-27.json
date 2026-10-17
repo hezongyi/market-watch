@@ -1,0 +1,5030 @@
+{
+  "recordedAt": "2026-10-17T07:20:07.678Z",
+  "budgetRevision": "2026-10-17-scenarios-v1",
+  "scenario": "loaded-new-spec",
+  "budget": {
+    "firstMs": 500,
+    "coverageMs": 1000,
+    "canonicalMs": 2000,
+    "timeoutMs": 5000
+  },
+  "source": "actual app / Playwriter / native renderer after two RAFs",
+  "synthetic": true,
+  "config": {
+    "phase": "budget-history-atr-add-new-spec-27",
+    "scenario": "loaded-new-spec",
+    "operation": "add",
+    "kind": "history",
+    "indicator": "ATR",
+    "prefixRows": 5760,
+    "specs": [
+      {
+        "params": {
+          "period": 121
+        }
+      },
+      {
+        "params": {
+          "period": 122
+        }
+      },
+      {
+        "params": {
+          "period": 123
+        }
+      },
+      {
+        "params": {
+          "period": 124
+        }
+      },
+      {
+        "params": {
+          "period": 125
+        }
+      },
+      {
+        "params": {
+          "period": 126
+        }
+      },
+      {
+        "params": {
+          "period": 127
+        }
+      },
+      {
+        "params": {
+          "period": 128
+        }
+      },
+      {
+        "params": {
+          "period": 129
+        }
+      },
+      {
+        "params": {
+          "period": 130
+        }
+      },
+      {
+        "params": {
+          "period": 131
+        }
+      },
+      {
+        "params": {
+          "period": 132
+        }
+      },
+      {
+        "params": {
+          "period": 133
+        }
+      },
+      {
+        "params": {
+          "period": 134
+        }
+      },
+      {
+        "params": {
+          "period": 135
+        }
+      },
+      {
+        "params": {
+          "period": 136
+        }
+      },
+      {
+        "params": {
+          "period": 137
+        }
+      },
+      {
+        "params": {
+          "period": 138
+        }
+      },
+      {
+        "params": {
+          "period": 139
+        }
+      },
+      {
+        "params": {
+          "period": 140
+        }
+      },
+      {
+        "params": {
+          "period": 141
+        }
+      },
+      {
+        "params": {
+          "period": 142
+        }
+      },
+      {
+        "params": {
+          "period": 143
+        }
+      },
+      {
+        "params": {
+          "period": 144
+        }
+      },
+      {
+        "params": {
+          "period": 145
+        }
+      },
+      {
+        "params": {
+          "period": 146
+        }
+      },
+      {
+        "params": {
+          "period": 147
+        }
+      },
+      {
+        "params": {
+          "period": 148
+        }
+      },
+      {
+        "params": {
+          "period": 149
+        }
+      },
+      {
+        "params": {
+          "period": 150
+        }
+      }
+    ],
+    "knownUnused": true
+  },
+  "environment": {
+    "symbol": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+    "range": {
+      "from": 1791491880,
+      "to": 1791504540
+    },
+    "timeOrigin": 1792219995443.6
+  },
+  "n": 30,
+  "failures": 0,
+  "quantile": "nearest-rank; failures as infinity (JSON null)",
+  "ms": {
+    "p50": 344.69999998807907,
+    "p95": 529.7000000178814
+  },
+  "coverageMs": {
+    "p50": 344.69999998807907,
+    "p95": 529.7000000178814
+  },
+  "canonicalMs": {
+    "p50": 344.69999998807907,
+    "p95": 529.7000000178814
+  },
+  "passed": false,
+  "samples": [
+    {
+      "index": 1,
+      "params": {
+        "period": 121
+      },
+      "ms": 295.5,
+      "coverageMs": 295.5,
+      "first": {
+        "at": 1598328.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":121}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":121}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1598328.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":121}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":121}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.00040632967829182655
+      ],
+      "canonicalMs": 295.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221593752,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 121
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221593538.7468,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.216,
+            "responseStart": 147.548,
+            "responseEnd": 164.657
+          },
+          "timings": {
+            "fixed_read_freeze": 48.38
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 121
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "7740b6efc88d5df05ce01f0dbf9f79961d59ff6a9948ecd7960f11ac03300946",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 31.71
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 2,
+      "params": {
+        "period": 122
+      },
+      "ms": 528.5999999940395,
+      "coverageMs": 528.5999999940395,
+      "first": {
+        "at": 1598970.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":122}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":122}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1598970.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":122}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":122}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.00040637893972075346
+      ],
+      "canonicalMs": 528.5999999940395,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221594397,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 122
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221593940.502,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.245,
+            "responseStart": 386.483,
+            "responseEnd": 395.115
+          },
+          "timings": {
+            "fixed_read_freeze": 128.43
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 122
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "63c2de0dcc7174ba973c5d7f4c2168bf48775857d9d4dfd02d97a8947d62281a",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 82.2
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 3,
+      "params": {
+        "period": 123
+      },
+      "ms": 291,
+      "coverageMs": 291,
+      "first": {
+        "at": 1599366.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":123}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":123}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1599366.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":123}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":123}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.0004064274607371842
+      ],
+      "canonicalMs": 291,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221594807,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 123
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221594567.8152,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.245,
+            "responseStart": 191.183,
+            "responseEnd": 196.561
+          },
+          "timings": {
+            "fixed_read_freeze": 57.53
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 123
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "ecf400bf6592034d17b16d79313e9d1336eb1cd25ccc3f6cb10d0add66ea97ca",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 59.95
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 4,
+      "params": {
+        "period": 124
+      },
+      "ms": 344.69999998807907,
+      "coverageMs": 344.69999998807907,
+      "first": {
+        "at": 1599789,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":124}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":124}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1599789,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":124}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":124}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.0004064752509645829
+      ],
+      "canonicalMs": 344.69999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221595229,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 124
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221594944.679,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.512,
+            "responseStart": 207.896,
+            "responseEnd": 216.328
+          },
+          "timings": {
+            "fixed_read_freeze": 80.77
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 124
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "ebdf6c361bde3fba1d70694440e3ee8972bbb2c58375e57a4e0418765a3029a5",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 29.59
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 5,
+      "params": {
+        "period": 125
+      },
+      "ms": 330.30000001192093,
+      "coverageMs": 330.30000001192093,
+      "first": {
+        "at": 1600249.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":125}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":125}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1600249.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":125}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":125}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.0004065223200661279
+      ],
+      "canonicalMs": 330.30000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221595694,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 125
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221595447.552,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.269,
+            "responseStart": 189.013,
+            "responseEnd": 196.526
+          },
+          "timings": {
+            "fixed_read_freeze": 69.03
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 125
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "6cf492c163178d1ecee90a4e89276119d98ecd23872318b0057f210884073f57",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 58.14
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 6,
+      "params": {
+        "period": 126
+      },
+      "ms": 484,
+      "coverageMs": 484,
+      "first": {
+        "at": 1600805.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":126}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":126}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1600805.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":126}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":126}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.00040656867773108057
+      ],
+      "canonicalMs": 484,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221596214,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 126
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221595822.0918,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.33,
+            "responseStart": 296.587,
+            "responseEnd": 317.077
+          },
+          "timings": {
+            "fixed_read_freeze": 85.95
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 126
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "111bac26caf4d7f9ae35a0cd13c52e783bed670475e756e374c5f4d133cc121b",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 37.53
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 7,
+      "params": {
+        "period": 127
+      },
+      "ms": 370.7000000178814,
+      "coverageMs": 370.7000000178814,
+      "first": {
+        "at": 1601307.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":127}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":127}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1601307.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":127}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":127}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.0004066143336621347
+      ],
+      "canonicalMs": 370.7000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221596754,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 127
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221596469.1038,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.241,
+            "responseStart": 236.475,
+            "responseEnd": 239.408
+          },
+          "timings": {
+            "fixed_read_freeze": 71.03
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 127
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "74b4730d13111b3ff961818c6ce9bbcdd14c1632c9e187b2a3a66c15925e7c32",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 98.83
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 8,
+      "params": {
+        "period": 128
+      },
+      "ms": 370.2000000178814,
+      "coverageMs": 370.2000000178814,
+      "first": {
+        "at": 1601779.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":128}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":128}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1601779.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":128}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":128}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.00040665929756368184
+      ],
+      "canonicalMs": 370.2000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221597210,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 128
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221596919.616,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.287,
+            "responseStart": 224.701,
+            "responseEnd": 232.642
+          },
+          "timings": {
+            "fixed_read_freeze": 44.85
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 128
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "eadf71a2c5ad8f22160d0c1d7b1d5eeedb874060f1adaadeff930cd202ad4304",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 76.16
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 9,
+      "params": {
+        "period": 129
+      },
+      "ms": 486.90000000596046,
+      "coverageMs": 486.90000000596046,
+      "first": {
+        "at": 1602389,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":129}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":129}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1602389,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":129}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":129}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.0004067035791309476
+      ],
+      "canonicalMs": 486.90000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221597834,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 129
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221597465.7422,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.559,
+            "responseStart": 289.757,
+            "responseEnd": 311.066
+          },
+          "timings": {
+            "fixed_read_freeze": 161.51
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 129
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "aa5424290ed96d85873bb96058ee5caa6f04bc82f22070bd960f280df25ae2bd",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 55.89
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 10,
+      "params": {
+        "period": 130
+      },
+      "ms": 1071.7999999821186,
+      "coverageMs": 1071.7999999821186,
+      "first": {
+        "at": 1603536.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":130}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":130}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1603536.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":130}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":130}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.00040674718803994093
+      ],
+      "canonicalMs": 1071.7999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221598724,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 130
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221598086.9,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.432,
+            "responseStart": 443.2,
+            "responseEnd": 449.993
+          },
+          "timings": {
+            "fixed_read_freeze": 104.32
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 130
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "57c27a7132eb3eac82939ce2e589620ff097e2f24641e7e1d3f1d22e362397f3",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 134.71
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 11,
+      "params": {
+        "period": 131
+      },
+      "ms": 388.90000000596046,
+      "coverageMs": 388.90000000596046,
+      "first": {
+        "at": 1604181,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":131}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":131}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1604181,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":131}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":131}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.0004067901339381742
+      ],
+      "canonicalMs": 388.90000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221599622,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 131
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221599332.421,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.253,
+            "responseStart": 187.956,
+            "responseEnd": 203.28
+          },
+          "timings": {
+            "fixed_read_freeze": 80.93
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 131
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "468080bfafdffed564b078efd3e2b38c2762f5a8b9b428cfd47de8a70994a8aa",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 49.92
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 12,
+      "params": {
+        "period": 132
+      },
+      "ms": 346.09999999403954,
+      "coverageMs": 346.09999999403954,
+      "first": {
+        "at": 1604619,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":132}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":132}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1604619,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":132}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":132}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.00040683242643610695
+      ],
+      "canonicalMs": 346.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221600059,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 132
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221599790.229,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.269,
+            "responseStart": 189.716,
+            "responseEnd": 199.987
+          },
+          "timings": {
+            "fixed_read_freeze": 67.81
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 132
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "ab833443f2499bd701396c87f91495dad300b447fb4a1dc2250721ab15bd0305",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 43.69
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 13,
+      "params": {
+        "period": 133
+      },
+      "ms": 404.30000001192093,
+      "coverageMs": 404.30000001192093,
+      "first": {
+        "at": 1605136.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":133}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":133}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1605136.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":133}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":133}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.00040687407509926876
+      ],
+      "canonicalMs": 404.30000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221600577,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 133
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221600278.86,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.236,
+            "responseStart": 253.463,
+            "responseEnd": 256.431
+          },
+          "timings": {
+            "fixed_read_freeze": 119.15
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 133
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "935223ab2c114ca3aaca86a6d0db2d20dfa7a8634c2cd6f4a99b39a789113048",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 42.28
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 14,
+      "params": {
+        "period": 134
+      },
+      "ms": 405.2999999821186,
+      "coverageMs": 405.2999999821186,
+      "first": {
+        "at": 1605627.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":134}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":134}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1605627.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":134}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":134}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.0004069150894410261
+      ],
+      "canonicalMs": 405.2999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221601075,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 134
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221600761.7148,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.296,
+            "responseStart": 250.971,
+            "responseEnd": 260.878
+          },
+          "timings": {
+            "fixed_read_freeze": 75.48
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 134
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "b67b8f6c64862cfcc8824df63877e7071db681f77a4971442ece1a60ceaa4db1",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 113.5
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 15,
+      "params": {
+        "period": 135
+      },
+      "ms": 337.5,
+      "coverageMs": 337.5,
+      "first": {
+        "at": 1606076,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":135}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":135}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1606076,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":135}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":135}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.0004069554789159467
+      ],
+      "canonicalMs": 337.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221601521,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 135
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221601248.133,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.386,
+            "responseStart": 207.707,
+            "responseEnd": 213.14
+          },
+          "timings": {
+            "fixed_read_freeze": 69.24
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 135
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "de31bd7fedb2beee9335176081a779c59f50051eb9e54c09eed798ae9a61e64b",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 40.94
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 16,
+      "params": {
+        "period": 136
+      },
+      "ms": 260.09999999403954,
+      "coverageMs": 260.09999999403954,
+      "first": {
+        "at": 1606437.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":136}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":136}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1606437.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":136}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":136}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.0004069952529137294
+      ],
+      "canonicalMs": 260.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221601884,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 136
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221601678.314,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.242,
+            "responseStart": 148.363,
+            "responseEnd": 155.184
+          },
+          "timings": {
+            "fixed_read_freeze": 38.22
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 136
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "f565f73d8c66ec214f9d3b7f1545f80f34b775fed2bad66f04ffeb54f3eb5390",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 36.42
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 17,
+      "params": {
+        "period": 137
+      },
+      "ms": 367.40000000596046,
+      "coverageMs": 367.40000000596046,
+      "first": {
+        "at": 1607000.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":137}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":137}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1607000.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":137}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":137}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.00040703442075366706
+      ],
+      "canonicalMs": 367.40000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221602427,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 137
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221602198.6748,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.246,
+            "responseStart": 164.41,
+            "responseEnd": 172.097
+          },
+          "timings": {
+            "fixed_read_freeze": 40.49
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 137
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "92861082fa9bb01a7e8c49ee411dd23fe12be748a363c2f41ac1a400f45670de",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 57.4
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 18,
+      "params": {
+        "period": 138
+      },
+      "ms": 331.59999999403954,
+      "coverageMs": 331.59999999403954,
+      "first": {
+        "at": 1607433.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":138}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":138}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1607433.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":138}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":138}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.0004070729916796028
+      ],
+      "canonicalMs": 331.59999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221602872,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 138
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221602606.8298,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.241,
+            "responseStart": 215.401,
+            "responseEnd": 218.775
+          },
+          "timings": {
+            "fixed_read_freeze": 85.26
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 138
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "249c5fba446ea01b514e576d77fbce4512a46fbe31538f1728ee204a683e4301",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 28.22
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 19,
+      "params": {
+        "period": 139
+      },
+      "ms": 248.7000000178814,
+      "coverageMs": 248.7000000178814,
+      "first": {
+        "at": 1607727.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":139}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":139}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1607727.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":139}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":139}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.00040711097485535754
+      ],
+      "canonicalMs": 248.7000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221603161,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 139
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221602928.352,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.246,
+            "responseStart": 180.17,
+            "responseEnd": 186.182
+          },
+          "timings": {
+            "fixed_read_freeze": 43.42
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 139
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "8f6c7e7667681926b09be810cca63d460f0ced0a800408cb5a761260a58d23c6",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 44.08
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 20,
+      "params": {
+        "period": 140
+      },
+      "ms": 349.69999998807907,
+      "coverageMs": 349.69999998807907,
+      "first": {
+        "at": 1608149,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":140}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":140}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1608149,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":140}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":140}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.00040714837936058973
+      ],
+      "canonicalMs": 349.69999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221603585,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 140
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221603313.662,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.295,
+            "responseStart": 206.443,
+            "responseEnd": 213.981
+          },
+          "timings": {
+            "fixed_read_freeze": 39.27
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 140
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "c08700a1295219cabf83dddd8c7018934f2a8e11e7d5230ad570f5293413d22d",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 92.71
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 21,
+      "params": {
+        "period": 141
+      },
+      "ms": 319.2000000178814,
+      "coverageMs": 319.2000000178814,
+      "first": {
+        "at": 1608501.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":141}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":141}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1608501.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":141}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":141}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.000407185214187068
+      ],
+      "canonicalMs": 319.2000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221603948,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 141
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221603645.614,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.237,
+            "responseStart": 246.067,
+            "responseEnd": 253.092
+          },
+          "timings": {
+            "fixed_read_freeze": 64.04
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 141
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "6fea18272b7bd57f64b6a0b6bee15659c8878ce729e4958fe26f0e4f982883e1",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 99.93
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 22,
+      "params": {
+        "period": 142
+      },
+      "ms": 411.90000000596046,
+      "coverageMs": 411.90000000596046,
+      "first": {
+        "at": 1608993,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":142}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":142}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1608993,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":142}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":142}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.0004072214882353271
+      ],
+      "canonicalMs": 411.90000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221604446,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 142
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221604079.6812,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.239,
+            "responseStart": 297.362,
+            "responseEnd": 302.385
+          },
+          "timings": {
+            "fixed_read_freeze": 162.1
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 142
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "b3270233992b4494e3b9c890daba31c2ce5feef7b8be1bf918fb9bbadf500f2a",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 51.04
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 23,
+      "params": {
+        "period": 143
+      },
+      "ms": 248.2999999821186,
+      "coverageMs": 248.2999999821186,
+      "first": {
+        "at": 1609287.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":143}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":143}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1609287.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":143}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":143}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.0004072572103116799
+      ],
+      "canonicalMs": 248.2999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221604734,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 143
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221604507.276,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.26,
+            "responseStart": 161.212,
+            "responseEnd": 168.184
+          },
+          "timings": {
+            "fixed_read_freeze": 62
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 143
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "2e3a2ab68903fd48db9097effd6d29a3a0a33c14aaba1c463cdfba083963811f",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 37.35
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 24,
+      "params": {
+        "period": 144
+      },
+      "ms": 529.7000000178814,
+      "coverageMs": 529.7000000178814,
+      "first": {
+        "at": 1609934.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":144}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":144}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1609934.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":144}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":144}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.00040729238912556745
+      ],
+      "canonicalMs": 529.7000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221605386,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 144
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221604893.666,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.246,
+            "responseStart": 435.991,
+            "responseEnd": 441.875
+          },
+          "timings": {
+            "fixed_read_freeze": 274.71
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 144
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "37d1942e5109cbd97bde0c938ec55e52b891a6a7bb6681cf86b1d4e3bae5bbd6",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 81.25
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 25,
+      "params": {
+        "period": 145
+      },
+      "ms": 312.5,
+      "coverageMs": 312.5,
+      "first": {
+        "at": 1610316.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":145}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":145}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1610316.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":145}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":145}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.00040732703328722044
+      ],
+      "canonicalMs": 312.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221605757,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 145
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221605506.2292,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.316,
+            "responseStart": 192.374,
+            "responseEnd": 201.347
+          },
+          "timings": {
+            "fixed_read_freeze": 72.52
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 145
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "e33fbe45a3c8c0b6c5719268364dff2d9a2b60cd9ee13b2ca6a6700a3081f423",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 57.31
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 26,
+      "params": {
+        "period": 146
+      },
+      "ms": 336,
+      "coverageMs": 336,
+      "first": {
+        "at": 1610702.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":146}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":146}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1610702.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":146}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":146}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.00040736115130561427
+      ],
+      "canonicalMs": 336,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221606141,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 146
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221605834.168,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.267,
+            "responseStart": 221.566,
+            "responseEnd": 236.585
+          },
+          "timings": {
+            "fixed_read_freeze": 88.35
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 146
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "46bfa247700570bd7485b1737b70989db87eb24456a00c11ba0d51c95232b56d",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 71.67
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 27,
+      "params": {
+        "period": 147
+      },
+      "ms": 317.40000000596046,
+      "coverageMs": 317.40000000596046,
+      "first": {
+        "at": 1611083.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":147}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":147}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1611083.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":147}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":147}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.00040739475158669744
+      ],
+      "canonicalMs": 317.40000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221606515,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 147
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221606241.2039,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.291,
+            "responseStart": 205.409,
+            "responseEnd": 215.103
+          },
+          "timings": {
+            "fixed_read_freeze": 49.73
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 147
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "3e4053e205f45e7832965669f7e2773ae23b04d34bd4eec9efb5fd3fa16bdecd",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 39.29
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 28,
+      "params": {
+        "period": 148
+      },
+      "ms": 277.69999998807907,
+      "coverageMs": 277.69999998807907,
+      "first": {
+        "at": 1611440.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":148}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":148}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1611440.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":148}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":148}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.0004074278424318706
+      ],
+      "canonicalMs": 277.69999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221606889,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 148
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221606662.876,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.285,
+            "responseStart": 166.322,
+            "responseEnd": 173.785
+          },
+          "timings": {
+            "fixed_read_freeze": 59.13
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 148
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "09eea2513ce39e57c683a54825df1987bb702890572362de24cc9295a779bfa4",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 38.36
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 29,
+      "params": {
+        "period": 149
+      },
+      "ms": 250.89999997615814,
+      "coverageMs": 250.89999997615814,
+      "first": {
+        "at": 1611743.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":149}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":149}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1611743.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":149}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":149}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.0004074604320367095
+      ],
+      "canonicalMs": 250.89999997615814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221607166,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 149
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221606942.025,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.243,
+            "responseStart": 171.3,
+            "responseEnd": 180.274
+          },
+          "timings": {
+            "fixed_read_freeze": 60.58
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 149
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "5de1db63241a214b8ca7055c7150c45166d49cc0a6f18bea0ebc7c38d36889da",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 36.56
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 30,
+      "params": {
+        "period": 150
+      },
+      "ms": 385.40000000596046,
+      "coverageMs": 385.40000000596046,
+      "first": {
+        "at": 1612183.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":150}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":150}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1612183.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":150}",
+          "algorithmVersion": "ATR:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":150}\",\"algorithmVersion\":\"ATR:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        0.00040749252848990247
+      ],
+      "canonicalMs": 385.40000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221607627,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "ATR",
+                "params": {
+                  "period": 150
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221607280.2588,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.304,
+            "responseStart": 283.212,
+            "responseEnd": 297.175
+          },
+          "timings": {
+            "fixed_read_freeze": 88.28
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "ATR",
+              "params": {
+                "period": 150
+              },
+              "calculation": {
+                "id": "ATR",
+                "run_id": "3908bf78262ddc51c430820d8a4fd42759363b5615a39bdd19e90dcb98fd3966",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 80.65
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    }
+  ]
+}

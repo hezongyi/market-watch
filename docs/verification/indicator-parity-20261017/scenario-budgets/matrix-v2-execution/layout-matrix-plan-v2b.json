@@ -1,0 +1,378 @@
+[
+  {
+    "phase": "execution-v2b-layout-history-warm-layout",
+    "scenario": "warm-layout",
+    "kind": "history",
+    "symbol": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+    "studies": [
+      {
+        "name": "EMA",
+        "params": {
+          "period": 500
+        }
+      },
+      {
+        "name": "BBANDS",
+        "params": {
+          "period": 20,
+          "deviation": 2
+        }
+      },
+      {
+        "name": "MACD",
+        "params": {
+          "fast": 12,
+          "slow": 26,
+          "signal": 9
+        }
+      },
+      {
+        "name": "SUPERTREND_PINE_V1",
+        "params": {
+          "period": 10,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 10,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      }
+    ],
+    "count": 30
+  },
+  {
+    "phase": "execution-v2b-layout-history-cold-local",
+    "scenario": "cold-local",
+    "kind": "history",
+    "symbol": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+    "studies": [
+      {
+        "name": "EMA",
+        "params": {
+          "period": 500
+        }
+      },
+      {
+        "name": "BBANDS",
+        "params": {
+          "period": 20,
+          "deviation": 2
+        }
+      },
+      {
+        "name": "MACD",
+        "params": {
+          "fast": 12,
+          "slow": 26,
+          "signal": 9
+        }
+      },
+      {
+        "name": "SUPERTREND_PINE_V1",
+        "params": {
+          "period": 10,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 10,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      }
+    ],
+    "count": 30
+  },
+  {
+    "phase": "execution-v2b-layout-managed-warm-layout",
+    "scenario": "warm-layout",
+    "kind": "managed",
+    "symbol": "PARITY",
+    "studies": [
+      {
+        "name": "EMA",
+        "params": {
+          "period": 500
+        }
+      },
+      {
+        "name": "BBANDS",
+        "params": {
+          "period": 20,
+          "deviation": 2
+        }
+      },
+      {
+        "name": "MACD",
+        "params": {
+          "fast": 12,
+          "slow": 26,
+          "signal": 9
+        }
+      },
+      {
+        "name": "SUPERTREND_PINE_V1",
+        "params": {
+          "period": 10,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 10,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      }
+    ],
+    "count": 30
+  },
+  {
+    "phase": "execution-v2b-layout-managed-cold-local",
+    "scenario": "cold-local",
+    "kind": "managed",
+    "symbol": "PARITY",
+    "studies": [
+      {
+        "name": "EMA",
+        "params": {
+          "period": 500
+        }
+      },
+      {
+        "name": "BBANDS",
+        "params": {
+          "period": 20,
+          "deviation": 2
+        }
+      },
+      {
+        "name": "MACD",
+        "params": {
+          "fast": 12,
+          "slow": 26,
+          "signal": 9
+        }
+      },
+      {
+        "name": "SUPERTREND_PINE_V1",
+        "params": {
+          "period": 10,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 10,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      }
+    ],
+    "count": 30
+  },
+  {
+    "phase": "execution-v2b-layout-provider-warm-layout",
+    "scenario": "warm-layout",
+    "kind": "provider",
+    "symbol": "MWP:BTCUSDT",
+    "studies": [
+      {
+        "name": "EMA",
+        "params": {
+          "period": 500
+        }
+      },
+      {
+        "name": "BBANDS",
+        "params": {
+          "period": 20,
+          "deviation": 2
+        }
+      },
+      {
+        "name": "MACD",
+        "params": {
+          "fast": 12,
+          "slow": 26,
+          "signal": 9
+        }
+      },
+      {
+        "name": "SUPERTREND_PINE_V1",
+        "params": {
+          "period": 10,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 10,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      }
+    ],
+    "count": 30
+  },
+  {
+    "phase": "execution-v2b-layout-provider-cold-local",
+    "scenario": "cold-local",
+    "kind": "provider",
+    "symbol": "MWP:BTCUSDT",
+    "studies": [
+      {
+        "name": "EMA",
+        "params": {
+          "period": 500
+        }
+      },
+      {
+        "name": "BBANDS",
+        "params": {
+          "period": 20,
+          "deviation": 2
+        }
+      },
+      {
+        "name": "MACD",
+        "params": {
+          "fast": 12,
+          "slow": 26,
+          "signal": 9
+        }
+      },
+      {
+        "name": "SUPERTREND_PINE_V1",
+        "params": {
+          "period": 10,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 10,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      }
+    ],
+    "count": 30
+  },
+  {
+    "phase": "execution-v2b-layout-composite-warm-layout",
+    "scenario": "warm-layout",
+    "kind": "composite",
+    "symbol": "MWC:2bcbc81d8e0e33b2318774f24638e2327448c8d3ecae8d190915cb94b50f637b",
+    "studies": [
+      {
+        "name": "EMA",
+        "params": {
+          "period": 500
+        }
+      },
+      {
+        "name": "BBANDS",
+        "params": {
+          "period": 20,
+          "deviation": 2
+        }
+      },
+      {
+        "name": "MACD",
+        "params": {
+          "fast": 12,
+          "slow": 26,
+          "signal": 9
+        }
+      },
+      {
+        "name": "SUPERTREND_PINE_V1",
+        "params": {
+          "period": 10,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 10,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      }
+    ],
+    "count": 30
+  },
+  {
+    "phase": "execution-v2b-layout-composite-cold-local",
+    "scenario": "cold-local",
+    "kind": "composite",
+    "symbol": "MWC:2bcbc81d8e0e33b2318774f24638e2327448c8d3ecae8d190915cb94b50f637b",
+    "studies": [
+      {
+        "name": "EMA",
+        "params": {
+          "period": 500
+        }
+      },
+      {
+        "name": "BBANDS",
+        "params": {
+          "period": 20,
+          "deviation": 2
+        }
+      },
+      {
+        "name": "MACD",
+        "params": {
+          "fast": 12,
+          "slow": 26,
+          "signal": 9
+        }
+      },
+      {
+        "name": "SUPERTREND_PINE_V1",
+        "params": {
+          "period": 10,
+          "source": "hl2",
+          "multiplier": 3,
+          "atr_method": "wilder"
+        },
+        "inputs": {
+          "period": 10,
+          "source": "hl2",
+          "multiplier": 3,
+          "changeATR": true,
+          "showsignals": true,
+          "highlighting": true
+        }
+      }
+    ],
+    "count": 30
+  }
+]

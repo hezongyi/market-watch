@@ -1,0 +1,198 @@
+[
+  {
+    "run": "plain-1",
+    "symbol": "MWP:OANDA:GBP_JPY",
+    "res": "5",
+    "bars": 223,
+    "frames": 681,
+    "dropFrames": 0,
+    "blankRuns": [],
+    "resets": [],
+    "marketEvents": [
+      {
+        "ms": 3307,
+        "type": "bars",
+        "bars": 1
+      },
+      {
+        "ms": 6049,
+        "type": "bars",
+        "bars": 1
+      },
+      {
+        "ms": 7116,
+        "type": "quotes"
+      },
+      {
+        "ms": 8141,
+        "type": "bars",
+        "bars": 0
+      },
+      {
+        "ms": 10286,
+        "type": "bars",
+        "bars": 0
+      }
+    ],
+    "studies": []
+  },
+  {
+    "run": "plain-2",
+    "symbol": "MWP:OANDA:GBP_JPY",
+    "res": "5",
+    "bars": 223,
+    "frames": 672,
+    "dropFrames": 0,
+    "blankRuns": [],
+    "resets": [],
+    "marketEvents": [
+      {
+        "ms": 2116,
+        "type": "bars",
+        "bars": 1
+      },
+      {
+        "ms": 2634,
+        "type": "bars",
+        "bars": 1
+      },
+      {
+        "ms": 4795,
+        "type": "bars",
+        "bars": 1
+      },
+      {
+        "ms": 6932,
+        "type": "bars",
+        "bars": 0
+      },
+      {
+        "ms": 9021,
+        "type": "bars",
+        "bars": 0
+      },
+      {
+        "ms": 10812,
+        "type": "bars",
+        "bars": 0
+      }
+    ],
+    "studies": []
+  },
+  {
+    "run": "supertrend-1",
+    "symbol": "MWP:OANDA:GBP_JPY",
+    "res": "5",
+    "bars": 212,
+    "frames": 676,
+    "dropFrames": 0,
+    "blankRuns": [],
+    "resets": [],
+    "marketEvents": [
+      {
+        "ms": 1376,
+        "type": "quotes"
+      },
+      {
+        "ms": 2482,
+        "type": "bars",
+        "bars": 1
+      },
+      {
+        "ms": 4034,
+        "type": "bars",
+        "bars": 1
+      },
+      {
+        "ms": 6110,
+        "type": "bars",
+        "bars": 0
+      },
+      {
+        "ms": 8229,
+        "type": "bars",
+        "bars": 0
+      },
+      {
+        "ms": 10305,
+        "type": "bars",
+        "bars": 0
+      }
+    ],
+    "studies": [
+      {
+        "id": "cH3onI",
+        "name": "\u5b88\u671b Python SUPERTREND_PINE_V1"
+      }
+    ]
+  },
+  {
+    "run": "supertrend-2",
+    "symbol": "MWP:OANDA:GBP_JPY",
+    "res": "5",
+    "bars": 212,
+    "frames": 675,
+    "dropFrames": 0,
+    "blankRuns": [],
+    "resets": [],
+    "marketEvents": [
+      {
+        "ms": 1140,
+        "type": "quotes"
+      },
+      {
+        "ms": 3331,
+        "type": "bars",
+        "bars": 1
+      },
+      {
+        "ms": 4878,
+        "type": "bars",
+        "bars": 1
+      },
+      {
+        "ms": 6937,
+        "type": "bars",
+        "bars": 0
+      },
+      {
+        "ms": 8526,
+        "type": "bars",
+        "bars": 0
+      },
+      {
+        "ms": 11136,
+        "type": "bars",
+        "bars": 0
+      }
+    ],
+    "studies": [
+      {
+        "id": "cH3onI",
+        "name": "\u5b88\u671b Python SUPERTREND_PINE_V1"
+      }
+    ]
+  },
+  {
+    "run": "dukascopy",
+    "symbol": "MWP:DUKA:055C2FBF27268A4C6D76ADC491E51CD3",
+    "res": "5",
+    "bars": 436,
+    "frames": 687,
+    "dropFrames": 0,
+    "blankRuns": [],
+    "resets": [],
+    "marketEvents": [
+      {
+        "ms": 526,
+        "type": "quotes"
+      },
+      {
+        "ms": 6657,
+        "type": "bars",
+        "bars": 1
+      }
+    ],
+    "studies": []
+  }
+]

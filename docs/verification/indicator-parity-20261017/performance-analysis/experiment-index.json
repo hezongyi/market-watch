@@ -1,0 +1,69 @@
+{
+  "recorded_at": "2026-10-17T05:13:31.730419+00:00",
+  "scope": "synthetic history M1; 5760-row full origin; actual app via Playwriter; 30 independent unused parameter additions per group",
+  "authoritative_threshold_ms": 300,
+  "threshold_changed": false,
+  "all_slo_groups_failed": true,
+  "phases": {
+    "history-oracle": {
+      "instrumented": false,
+      "note": "handoff; different viewport from current groups"
+    },
+    "analysis-oracle-181": {
+      "instrumented": false,
+      "worker": "running",
+      "image": "issue74-oracle"
+    },
+    "analysis-dependencies-211": {
+      "instrumented": false,
+      "worker": "running",
+      "image": "issue74-dependencies"
+    },
+    "analysis-active-241": {
+      "instrumented": false,
+      "worker": "running",
+      "cpu_sampling": true
+    },
+    "analysis-gc-enabled-271": {
+      "instrumented": true,
+      "worker": "running",
+      "gc_enabled": true,
+      "final_acceptance_evidence": false
+    },
+    "analysis-gc-disabled-301": {
+      "instrumented": true,
+      "worker": "running",
+      "gc_enabled": false,
+      "final_acceptance_evidence": false,
+      "note": "short diagnostic only; not a production solution"
+    },
+    "analysis-gc-restored-421": {
+      "instrumented": true,
+      "worker": "running",
+      "gc_enabled": true,
+      "final_acceptance_evidence": false,
+      "note": "includes accumulated GC debt after re-enable; all samples retained"
+    },
+    "analysis-worker-paused-451": {
+      "instrumented": true,
+      "worker": "transitioning to stopped",
+      "gc_enabled": true,
+      "valid_stable_worker_control": false,
+      "note": "first operation 05:01:35.302 UTC; worker FinishedAt 05:01:43.473 UTC; entire group retained but not used as stable control"
+    },
+    "analysis-worker-stopped-mixed": {
+      "instrumented": true,
+      "worker": "confirmed stopped before first operation",
+      "gc_enabled": true,
+      "final_acceptance_evidence": false
+    }
+  },
+  "restored_state": {
+    "api_and_worker_image": "market-watch-api:issue74-dependencies",
+    "original_commands_and_mounts": true,
+    "worker_running": true,
+    "api_and_pg_healthy": true,
+    "temporary_probes_removed": true,
+    "native_smoke_rows": 408
+  }
+}

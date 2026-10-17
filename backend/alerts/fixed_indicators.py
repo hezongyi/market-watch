@@ -39,6 +39,17 @@ from .storage import (
 PAGE_SIZE = 2000
 
 
+def coverage(rows):
+    """Source-time half-open intervals; unknown rows never become null values."""
+    ranges = []
+    for row in sorted(rows, key=lambda row: row['start']):
+        if ranges and ranges[-1]['end'] == row['start']:
+            ranges[-1]['end'] = row['end']
+        else:
+            ranges.append({'start':row['start'], 'end':row['end']})
+    return ranges
+
+
 def digest(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
 
@@ -87,6 +98,15 @@ def request(db, page, spec, *, stamp=None):
     existing = db.get(FixedIndicatorRun, ident)
     if existing:
         return existing
+    from .indicator_demands import MAX_PENDING_RUNS, DemandCapacity, guard
+    guard(db)
+    # Another reader may have created this shared run while we waited for the
+    # capacity lock. Reuse it even when that insert consumed the final slot.
+    existing = db.get(FixedIndicatorRun, ident)
+    if existing:
+        return existing
+    if db.scalar(select(func.count()).select_from(FixedIndicatorRun).where(FixedIndicatorRun.status=='pending'))>=MAX_PENDING_RUNS:
+        raise DemandCapacity()
     # Match the artifact reader's shared lock: upgrading two concurrent readers
     # to exclusive locks would deadlock. Immutable inputs plus unique run IDs
     # make concurrent selection safe; reclamation takes the exclusive lock.
@@ -117,6 +137,9 @@ def request(db, page, spec, *, stamp=None):
         parent_id=parent, prefix_end=prefix, cursor=prefix, state=state, status="pending",
         lease_until=0, next_at=0, attempts=0, updated_at=stamp)
         .on_conflict_do_nothing(index_elements=["id"]))
+    from .publication_wakeup import notify
+
+    notify(db)
     return db.get(FixedIndicatorRun, ident)
 
 
@@ -171,7 +194,10 @@ def claim(run_id=None):
             FixedIndicatorRun.lease_until <= stamp, FixedIndicatorRun.next_at <= stamp)
         if run_id:
             query = query.where(FixedIndicatorRun.id == run_id)
-        run = db.scalar(query.order_by(FixedIndicatorRun.updated_at, FixedIndicatorRun.id)
+        from .indicator_demands import priority, warmup_capacity
+        order=priority(db,FixedIndicatorRun.id,stamp,kind='fixed')
+        query=query.where(warmup_capacity(FixedIndicatorRun,FixedIndicatorRun.id,stamp))
+        run = db.scalar(query.order_by(order, FixedIndicatorRun.updated_at, FixedIndicatorRun.id)
             .with_for_update(skip_locked=True).limit(1))
         if not run:
             return None
@@ -186,30 +212,60 @@ def build(ownership):
         if inputs is None:
             return None
         rows, phase, profiles = inputs
-        engine = IndicatorState(run.spec, run.state)
         seam = db.get(CompositeRevision, run.revision_id).seam if run.revision_id else None
-        output = []
-        for source in rows:
-            row = dict(source)
-            if run.spec["name"] == "SWING_SR_V1":
-                from .series_access import fixed_label
-
-                row["chart_time"] = fixed_label(row, run.timeframe, phase)
-            row["gap_before"] = gap_before(engine.state.get("last_end"), row["start"], phase, profiles)
-            previous_end = engine.state.get("last_end")
-            if (seam is not None and not row["gap_before"] and previous_end is not None
-                    and previous_end <= seam <= row["start"]):
-                # The seam can lie in an evidenced closure with no candle at T.
-                # A dependency still spans sources even without seam_at_start.
-                row["seam_at_start"] = True
-            values = engine.step(row)
-            output.append({"start": row["start"], "end": row["end"], "values": values,
-                **({"break_before": True} if row["gap_before"] else {}),
-                "dependency_origin": engine.state.get("origin"), "seam_dependency": engine.state.get("seam", False),
-                "initialized": engine.initialized(values)})
+        calculated = calculate_inputs(run, rows, phase, profiles, seam=seam)
         cursor = rows[-1]["end"] if rows else run.target_end
         done = len(rows) < PAGE_SIZE or cursor >= run.target_end
-        return {"rows": output, "state": engine.checkpoint(), "cursor": run.target_end if done else cursor, "done": done}
+        return {**calculated, "cursor": run.target_end if done else cursor, "done": done}
+
+
+def calculate_inputs(run, rows, phase, profiles, *, seam=None, initial_state=None, batch=False):
+    """One exact numerical path for worker pages and bounded foreground replay."""
+    if batch and run.spec["name"] in ("SMA", "EMA", "LWMA", "BBANDS", "RSI", "ATR", "MACD", "STOCH"):
+        from .chart_indicators import calculate
+        from .indicator_state import advance_dependencies
+
+        if initial_state and initial_state.get('state'):
+            raise ValueError('Batch oracle requires a full origin replay, not a checkpoint suffix')
+        engine = IndicatorState(run.spec)
+        prepared, output = [], []
+        for source in rows:
+            previous_end = engine.state.get("last_end")
+            row = {**source, "gap_before": gap_before(previous_end, source["start"], phase, profiles)}
+            if seam is not None and not row["gap_before"] and previous_end is not None and previous_end <= seam <= row["start"]:
+                row["seam_at_start"] = True
+            advance_dependencies(engine.state, engine.name, engine.params, row)
+            prepared.append(row)
+            output.append({"start": row["start"], "end": row["end"],
+                **({"break_before": True} if row["gap_before"] else {}),
+                "dependency_origin": engine.state.get("origin"), "seam_dependency": engine.state.get("seam", False)})
+        oracle = calculate(prepared, run.spec)
+        for index, row in enumerate(output):
+            row["values"] = {series["key"]: series["values"][index]["value"] for series in oracle["series"]}
+            row["initialized"] = all(value is not None for value in row["values"].values())
+        # No checkpoint is invented from a batch result. Durable worker replay
+        # still owns its existing, versioned state format and page publication.
+        return {"rows": output, "state": None, "display": None}
+    engine = IndicatorState(run.spec, run.state if initial_state is None else initial_state)
+    output = []
+    for source in rows:
+        row = dict(source)
+        if run.spec["name"] == "SWING_SR_V1":
+            from .series_access import fixed_label
+
+            row["chart_time"] = fixed_label(row, run.timeframe, phase)
+        row["gap_before"] = gap_before(engine.state.get("last_end"), row["start"], phase, profiles)
+        previous_end = engine.state.get("last_end")
+        if (seam is not None and not row["gap_before"] and previous_end is not None
+                and previous_end <= seam <= row["start"]):
+            # The seam may lie in an evidenced closure without a candle at T.
+            row["seam_at_start"] = True
+        values = engine.step(row)
+        output.append({"start": row["start"], "end": row["end"], "values": values,
+            **({"break_before": True} if row["gap_before"] else {}),
+            "dependency_origin": engine.state.get("origin"), "seam_dependency": engine.state.get("seam", False),
+            "initialized": engine.initialized(values)})
+    return {"rows": output, "state": engine.checkpoint(), "display": getattr(engine, "last_presentation", None)}
 
 
 def _lock(db, ownership):
@@ -267,18 +323,32 @@ def outputs(db, run, start, end):
     return sorted(rows, key=lambda row: row["start"])
 
 
-def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='display', display_retry=None):
+def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='display', display_retry=None, client=None, consumers=(), foreground=False):
     results, progress, display_errors, restarted = [], [], [], {}
     if not page["bars"]:
         return results, progress
+    artifact_rows = None
+    if not page.get('revision_id'):
+        from .history_artifacts import published_artifact
+
+        artifact_rows = published_artifact(db, page.get('history_version_id', page.get('version_id')),
+                                           page['timeframe']).count
     for spec in specs:
         run = request(db, page, spec, stamp=stamp)
         start, end = page["bars"][0]["start"], page["bars"][-1]["end"]
+        from .indicator_demands import renew
+        renew(db,client,consumers,run,snapshot_id=page.get('display_snapshot_id'),
+            start=start,end=end,stamp=stamp or now_ms())
         rows = outputs(db, run, start, min(end, run.cursor))
         status = {"id": spec.get("id", spec["name"]), "run_id": run.id, "status": run.status,
             "cursor": run.cursor, "target_end": run.target_end, "input_revision": run.input_revision,
             "algorithm": run.algorithm, "error": run.error, "next_at": run.next_at,
             "parent_run_id": run.parent_id, "reused_prefix_end": run.prefix_end}
+        if artifact_rows is not None:
+            status['execution'] = {'path': 'durable-fixed', 'input_rows': artifact_rows,
+                'result_cache': 'hit' if run.status == 'complete' else
+                    'checkpoint' if run.cursor > page['origin'] or run.parent_id else 'miss',
+                'calculation_steps': 0}
         display = None
         if run.spec["name"] == "SWING_SR_V1":
             from .swing_sr import SwingState
@@ -299,7 +369,15 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='di
                                     page['display_snapshot_id']) if page.get('display_snapshot_id') else None))
             if latest["input_revision"] == run.input_revision:
                 tail = latest["bars"]
-        if provisional and purpose == 'display' and run.revision_id:
+        from .fixed_indicator_display import confirmed_page
+
+        # The request's post-transaction foreground replay already owns this
+        # confirmed prefix. Do not first rescan it or create a redundant display
+        # task; over-budget prefixes continue through the durable fixed worker.
+        confirmed_foreground = (foreground and tail is page['bars'] and end <= run.target_end
+                                and confirmed_page(db, page))
+        repaired = None
+        if provisional and purpose == 'display' and run.revision_id and not confirmed_foreground:
             from .display_indicators import suffix
 
             display_page = page if tail is page['bars'] else {**page, 'bars': sorted(
@@ -347,6 +425,16 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='di
                         "initialized": trial.initialized(values)})
                 break
         result = presentation(spec, rows, display)
+        available = {row['start'] for row in rows}
+        visible_complete = all(bar['start'] in available for bar in page['bars'])
+        bar_ends = {bar['start']:bar['end'] for bar in page['bars']}
+        status.update(status=run.status if run.status=='complete' or run.cursor<=page['origin'] else 'partial',
+            calculation_origin=page['origin'], producer='backend', accuracy='oracle_equivalent',
+            canonical_verified=True, coverage=coverage([{**row,'end':bar_ends[row['start']]} for row in rows if row['start'] in bar_ends]), required_coverage=coverage(page['bars']),
+            visible_complete=visible_complete,
+            input_evidence={'revision_id':run.revision_id,'input_revision':run.input_revision,
+                'history_version_id':run.history_version_id,'display_snapshot_id':page.get('display_snapshot_id')},
+            display_task_ids=[repaired['task_id']] if provisional and purpose=='display' and run.revision_id and repaired and repaired.get('task_id') else [])
         results.append({**result, "id": status["id"], "calculation": status,
                         "dependencies": [{key: row.get(key) for key in
                             ("start", "dependency_origin", "seam_dependency", "initialized", "provisional")} for row in rows]})

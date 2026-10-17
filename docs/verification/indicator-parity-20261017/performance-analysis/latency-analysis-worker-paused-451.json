@@ -1,0 +1,917 @@
+{
+  "phase": "analysis-worker-paused-451",
+  "synthetic": true,
+  "source": "actual app / Playwriter / native renderer",
+  "kind": "history",
+  "operation": "add",
+  "indicator": "LWMA",
+  "parameters": "30 previously unused periods",
+  "n": 30,
+  "failures": 0,
+  "quantile": "nearest-rank, failures included as infinity",
+  "p50": 256.5,
+  "p95": 478.09999999403954,
+  "target": 300,
+  "samples": [
+    {
+      "period": 451,
+      "ms": 212.10000002384186,
+      "commit": {
+        "at": 5813654.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":451}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":451}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021036081078408
+      ]
+    },
+    {
+      "period": 452,
+      "ms": 398.40000000596046,
+      "commit": {
+        "at": 5814083.199999988,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":452}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":452}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021058388520948
+      ]
+    },
+    {
+      "period": 453,
+      "ms": 371.7000000178814,
+      "commit": {
+        "at": 5814490.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":453}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":453}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021080573951387
+      ]
+    },
+    {
+      "period": 454,
+      "ms": 292.19999998807907,
+      "commit": {
+        "at": 5814849.399999976,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":454}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":454}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021102637362594
+      ]
+    },
+    {
+      "period": 455,
+      "ms": 268.7000000178814,
+      "commit": {
+        "at": 5815156.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":455}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":455}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021124578754615
+      ]
+    },
+    {
+      "period": 456,
+      "ms": 273.7999999821186,
+      "commit": {
+        "at": 5815471.899999976,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":456}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":456}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021146398134263
+      ]
+    },
+    {
+      "period": 457,
+      "ms": 257.19999998807907,
+      "commit": {
+        "at": 5815787.899999976,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":457}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":457}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021168095515606
+      ]
+    },
+    {
+      "period": 458,
+      "ms": 256.5,
+      "commit": {
+        "at": 5816085.299999982,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":458}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":458}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021189670919236
+      ]
+    },
+    {
+      "period": 459,
+      "ms": 253.80000001192093,
+      "commit": {
+        "at": 5816366.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":459}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":459}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021211124372405
+      ]
+    },
+    {
+      "period": 460,
+      "ms": 236.80000001192093,
+      "commit": {
+        "at": 5816635.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":460}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":460}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021232455908192
+      ]
+    },
+    {
+      "period": 461,
+      "ms": 255.19999998807907,
+      "commit": {
+        "at": 5816936.299999982,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":461}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":461}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021253665567963
+      ]
+    },
+    {
+      "period": 462,
+      "ms": 174.40000000596046,
+      "commit": {
+        "at": 5817149.799999982,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":462}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":462}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021274753396246
+      ]
+    },
+    {
+      "period": 463,
+      "ms": 478.09999999403954,
+      "commit": {
+        "at": 5817696.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":463}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":463}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021295719445872
+      ]
+    },
+    {
+      "period": 464,
+      "ms": 270.39999997615814,
+      "commit": {
+        "at": 5818000.399999976,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":464}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":464}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.10213165637671
+      ]
+    },
+    {
+      "period": 465,
+      "ms": 230.40000000596046,
+      "commit": {
+        "at": 5818275,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":465}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":465}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.102133728644591
+      ]
+    },
+    {
+      "period": 466,
+      "ms": 249,
+      "commit": {
+        "at": 5818565.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":466}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":466}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021357887529677
+      ]
+    },
+    {
+      "period": 467,
+      "ms": 307.2000000178814,
+      "commit": {
+        "at": 5818901.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":467}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":467}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021378367100512
+      ]
+    },
+    {
+      "period": 468,
+      "ms": 211.80000001192093,
+      "commit": {
+        "at": 5819165.199999988,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":468}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":468}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.102139872523806
+      ]
+    },
+    {
+      "period": 469,
+      "ms": 235.5,
+      "commit": {
+        "at": 5819450.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":469}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":469}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021418962028575
+      ]
+    },
+    {
+      "period": 470,
+      "ms": 448,
+      "commit": {
+        "at": 5819931.699999988,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":470}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":470}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021439077562378
+      ]
+    },
+    {
+      "period": 471,
+      "ms": 304.69999998807907,
+      "commit": {
+        "at": 5820271.199999988,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":471}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":471}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021459071934836
+      ]
+    },
+    {
+      "period": 472,
+      "ms": 190.19999998807907,
+      "commit": {
+        "at": 5820498.299999982,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":472}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":472}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021478945246552
+      ]
+    },
+    {
+      "period": 473,
+      "ms": 226.40000000596046,
+      "commit": {
+        "at": 5820767,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":473}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":473}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021498697602816
+      ]
+    },
+    {
+      "period": 474,
+      "ms": 399.7000000178814,
+      "commit": {
+        "at": 5821215.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":474}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":474}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021518329113769
+      ]
+    },
+    {
+      "period": 475,
+      "ms": 236.40000000596046,
+      "commit": {
+        "at": 5821483,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":475}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":475}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021537839893776
+      ]
+    },
+    {
+      "period": 476,
+      "ms": 352,
+      "commit": {
+        "at": 5821889.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":476}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":476}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021557230061678
+      ]
+    },
+    {
+      "period": 477,
+      "ms": 480.69999998807907,
+      "commit": {
+        "at": 5822407.799999982,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":477}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":477}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021576499741161
+      ]
+    },
+    {
+      "period": 478,
+      "ms": 184.69999998807907,
+      "commit": {
+        "at": 5822631.699999988,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":478}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":478}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021595649059486
+      ]
+    },
+    {
+      "period": 479,
+      "ms": 272.7999999821186,
+      "commit": {
+        "at": 5822932.899999976,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":479}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":479}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021614678148817
+      ]
+    },
+    {
+      "period": 480,
+      "ms": 207.7000000178814,
+      "commit": {
+        "at": 5823181.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":480}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791479520000,
+          "last": 1791503940000,
+          "count": 408,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":480}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791479520000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 408
+      },
+      "nativeRows": 408,
+      "nativeLast": [
+        1791503940,
+        1.1021633587144777
+      ]
+    }
+  ]
+}

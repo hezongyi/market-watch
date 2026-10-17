@@ -1,0 +1,356 @@
+{
+  "dataset_id": "876dea0322a7af95954ef967ccf66fc05b26dd1cc8026499d7f60dab3a90cf65",
+  "source": {
+    "source": "dukascopy",
+    "channel": "python",
+    "environment": "historical",
+    "account_scope": "public",
+    "provider_symbol": "XAU/USD",
+    "basis": "bid",
+    "calendar_version": "issue74-real-xau-duka-session-20260817-20261017-v2"
+  },
+  "label": "Issue74 XAUUSD \u8fd1\u4e24\u4e2a\u6708\uff08\u771f\u5b9e\u7ec4\u5408\u9a8c\u6536\uff09",
+  "calendar": "ny17",
+  "calendar_profile": {
+    "revision": "issue74-real-xau-duka-session-20260817-20261017-v2",
+    "closures": [],
+    "source_session": {
+      "source": "dukascopy",
+      "channel": "python",
+      "environment": "historical",
+      "provider_symbol": "XAU/USD",
+      "account_scope": "public",
+      "timezone": "America/New_York",
+      "reviewed_start": "2026-08-17T00:00:00Z",
+      "reviewed_end": "2026-10-18T00:00:00Z",
+      "evidence_url": "https://www.dukascopy.com/swiss/english/forex/forex-trading-accounts/link/",
+      "applicability": "Dukascopy published regular XAU/USD trading schedule, finite Aug17-Oct17 2026 BID M1 test dataset. Regular closures cross-checked against all immutable source observations; no holiday completeness or public JSON3 feed SLA claimed. US national holiday exceptions remain unknown.",
+      "weekly_closures": [
+        {
+          "start": 1020,
+          "end": 1080
+        },
+        {
+          "start": 2460,
+          "end": 2520
+        },
+        {
+          "start": 3900,
+          "end": 3960
+        },
+        {
+          "start": 5340,
+          "end": 5400
+        },
+        {
+          "start": 6780,
+          "end": 9720
+        }
+      ]
+    }
+  },
+  "version_id": "e58c153b-1a3a-4aaa-a8c1-eddbbf1576fd",
+  "manifest": {
+    "dataset_version": "e58c153b-1a3a-4aaa-a8c1-eddbbf1576fd",
+    "identity": {
+      "source": "dukascopy",
+      "channel": "python",
+      "environment": "historical",
+      "account_scope": "public",
+      "provider_symbol": "XAU/USD",
+      "basis": "bid",
+      "calendar_version": "issue74-real-xau-duka-session-20260817-20261017-v2"
+    },
+    "start": 1786924800000,
+    "end": 1792195200000,
+    "volume_kind": "quantity",
+    "volume_unit": "source_quantity",
+    "asset_class": "metal",
+    "aggregation_calendar": "ny17",
+    "calendar_profile": {
+      "revision": "issue74-real-xau-duka-session-20260817-20261017-v2",
+      "closures": [],
+      "source_session": {
+        "source": "dukascopy",
+        "channel": "python",
+        "environment": "historical",
+        "provider_symbol": "XAU/USD",
+        "account_scope": "public",
+        "timezone": "America/New_York",
+        "reviewed_start": "2026-08-17T00:00:00Z",
+        "reviewed_end": "2026-10-18T00:00:00Z",
+        "evidence_url": "https://www.dukascopy.com/swiss/english/forex/forex-trading-accounts/link/",
+        "applicability": "Dukascopy published regular XAU/USD trading schedule, finite Aug17-Oct17 2026 BID M1 test dataset. Regular closures cross-checked against all immutable source observations; no holiday completeness or public JSON3 feed SLA claimed. US national holiday exceptions remain unknown.",
+        "weekly_closures": [
+          {
+            "start": 1020,
+            "end": 1080
+          },
+          {
+            "start": 2460,
+            "end": 2520
+          },
+          {
+            "start": 3900,
+            "end": 3960
+          },
+          {
+            "start": 5340,
+            "end": 5400
+          },
+          {
+            "start": 6780,
+            "end": 9720
+          }
+        ]
+      }
+    },
+    "rows": 61828,
+    "unknown_minutes": 26012,
+    "coverage": "observed_only; unobserved intervals remain unknown",
+    "checksum": "5fdbfb6380ffc97a6d8c1689d27970ffd1c86c81565d65123fa333ca3fcb1864",
+    "chunks": [
+      {
+        "id": "130eaa61-6e96-411e-b5c1-d3deab32e4b8",
+        "start": 1786924800000,
+        "end": 1787235600000,
+        "count": 5000,
+        "checksum": "49861b75dc44cb1aa2b63f520b61b8d1c8d113d5ff8e5e0b82a2755244736738"
+      },
+      {
+        "id": "36f6e77b-180b-4adf-95f9-9b146c63e9d1",
+        "start": 1787235600000,
+        "end": 1787722800000,
+        "count": 5000,
+        "checksum": "811f03df0c8421daf0fb4842fff4af96b91167ac5c0053e789762d7ca5883290"
+      },
+      {
+        "id": "400d4f33-fc06-4f72-90f2-923e74a2d1e8",
+        "start": 1787722800000,
+        "end": 1788206400000,
+        "count": 5000,
+        "checksum": "3fb26e45e1ff026a4715bcfa08f95279a6816de2a59a9686a29749fa9fd351b5"
+      },
+      {
+        "id": "78f88e39-6df7-4db2-9e32-4dea7df281d5",
+        "start": 1788206400000,
+        "end": 1788220800000,
+        "count": 180,
+        "checksum": "e2bda83d388a463e56de31b739ce1318f129c2a7208beef043a1e9bf4b2194dd"
+      },
+      {
+        "id": "12e4887b-851d-4a06-86d1-1f21114a98e2",
+        "start": 1788220800000,
+        "end": 1788531600000,
+        "count": 5000,
+        "checksum": "96f206206fa87dba1f924f49ce04f2e838d51bbf4fbd5797416b8949a13e48cd"
+      },
+      {
+        "id": "3958b553-59b7-4a39-98a3-5279dcfdafab",
+        "start": 1788531600000,
+        "end": 1789027860000,
+        "count": 5000,
+        "checksum": "e5f49419267f0c021198665f4e0823eb15f39c5d7d9a6560cd61144a52645bd0"
+      },
+      {
+        "id": "7e2d2630-7762-4fca-b292-88c9316d0cfe",
+        "start": 1789027860000,
+        "end": 1789515060000,
+        "count": 5000,
+        "checksum": "4d70ade035e7aaced1c98be7d6b37d341d3577c728f84f504ba09ccd5c274da2"
+      },
+      {
+        "id": "9e4f432b-0107-409c-96a6-1e2675cd3a47",
+        "start": 1789515060000,
+        "end": 1789998660000,
+        "count": 5000,
+        "checksum": "e7137950ee7fef3290b0f2b3750bfba71c13fdadef6ad0754d711a958241759d"
+      },
+      {
+        "id": "3aff287d-c1b3-409b-9113-41dcb2a41005",
+        "start": 1789998660000,
+        "end": 1790313060000,
+        "count": 5000,
+        "checksum": "5bde60efd312c83e278d19dde1b0707edef03e07d1f1cd792c8d23c3b76e322f"
+      },
+      {
+        "id": "f7b9c9b7-3a15-4f49-b5ba-49914da65a64",
+        "start": 1790313060000,
+        "end": 1790796660000,
+        "count": 5000,
+        "checksum": "0900fd9f805be8ae433985434ccb2bc4a81f1e5d1160b72312fd94e8c1bb53a6"
+      },
+      {
+        "id": "372773aa-80cd-4f7f-9439-3ea6b6093b8d",
+        "start": 1790796660000,
+        "end": 1790812800000,
+        "count": 208,
+        "checksum": "0ddf2d62766c9c90343ac50307c865e575565d377979c6a81d456fc4f168c5db"
+      },
+      {
+        "id": "e84a98d3-7d13-422e-8d41-949a5ca77e42",
+        "start": 1790812800000,
+        "end": 1791296400000,
+        "count": 5000,
+        "checksum": "34ef108991430386ffd78589f9d3d4c1c527551a59203d7123a2af8a3bf58a48"
+      },
+      {
+        "id": "bba15ac9-95bf-40e0-a651-bad8bfecd921",
+        "start": 1791296400000,
+        "end": 1791783600000,
+        "count": 5000,
+        "checksum": "9e28cd11752ce49c33699cf8c82d06495a06d6cbb0a3c936e15123064fadcde5"
+      },
+      {
+        "id": "d32ce0bc-c46f-4cc1-912f-21446c1f043c",
+        "start": 1791783600000,
+        "end": 1792094400000,
+        "count": 5000,
+        "checksum": "f6deb59acfe9ac3813e36966839b37e496e3ddd864408e915d4a2c0ce4401297"
+      },
+      {
+        "id": "7b9b7bab-f427-4d3a-b04f-7467c841fd19",
+        "start": 1792094400000,
+        "end": 1792195200000,
+        "count": 1440,
+        "checksum": "d668ba5b210d7369bfc83fb06e9fa20980ae4c9d8f6152ac1132aa65a5f3895e"
+      }
+    ],
+    "request_evidence": {
+      "schema": "bounded-m1-read-v1",
+      "count": 0,
+      "failed": 0,
+      "ids": [],
+      "checksum": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "scope": "version read attempts; supplier requests, shared cache and parent reuse distinguished"
+    },
+    "price_precision": 3,
+    "price_rule_version": "dataset-precision-half-up-v1",
+    "provenance": {
+      "derived_from_version": "25833014-18de-4420-8332-ab21277bc17d",
+      "original_identity": {
+        "source": "dukascopy",
+        "channel": "python",
+        "environment": "historical",
+        "account_scope": "public",
+        "provider_symbol": "XAU/USD",
+        "basis": "bid",
+        "calendar_version": "issue74-real-xau-ny17-phase-v1"
+      },
+      "original_cursor": 1792195200000,
+      "copied_minutes": 61828,
+      "copied_chunks": 15,
+      "original_prefix_checksum": "5fdbfb6380ffc97a6d8c1689d27970ffd1c86c81565d65123fa333ca3fcb1864",
+      "method": "verified immutable original chunks; target version price rule; no source substitution"
+    }
+  },
+  "artifacts": [
+    {
+      "frame": "M1",
+      "status": "published",
+      "rows": 61828,
+      "complete_rows": 61828,
+      "checksum": "0aceaf66910223076bedfe127026c08ff453cb6c78eac789e2d3ee886e564476"
+    },
+    {
+      "frame": "M15",
+      "status": "published",
+      "rows": 4122,
+      "complete_rows": 4120,
+      "checksum": "a95aa978a53c95438f4be08fd4c27e6394864aa5f27c6cf8f4688673f9042071"
+    },
+    {
+      "frame": "D1",
+      "status": "published",
+      "rows": 45,
+      "complete_rows": 42,
+      "checksum": "196cd3fb2c74bbb1adc1b5b1555ce3e4d37dbae2f137e7b519728fd41d516608"
+    },
+    {
+      "frame": "H1",
+      "status": "published",
+      "rows": 1031,
+      "complete_rows": 1029,
+      "checksum": "88b16d3dabb7d94ffa32624fefb880150f2e1ac800e65b59bcf96ec3343cd937"
+    },
+    {
+      "frame": "MN",
+      "status": "published",
+      "rows": 3,
+      "complete_rows": 0,
+      "checksum": "887b7bc936305fb77302f68c9c78c93a331c632a8215e3d1a09dc68e2dc7ba34"
+    },
+    {
+      "frame": "M30",
+      "status": "published",
+      "rows": 2061,
+      "complete_rows": 2059,
+      "checksum": "21bfcdf2d1e52a85d044b4210cdca21da8ed490932920249de0280f8048d4d1b"
+    },
+    {
+      "frame": "M5",
+      "status": "published",
+      "rows": 12366,
+      "complete_rows": 12364,
+      "checksum": "44609df4822640d803950642600bdde28720efcc2c72d50a76d0331a6953137a"
+    },
+    {
+      "frame": "H4",
+      "status": "published",
+      "rows": 270,
+      "complete_rows": 267,
+      "checksum": "2a2dd326c6f6dcd144a1393e8838c79e0a891dc35c59ea5a2620035ac1fb2941"
+    },
+    {
+      "frame": "W1",
+      "status": "published",
+      "rows": 9,
+      "complete_rows": 5,
+      "checksum": "8a62f9c52f095fdfb02eff23a2b10fc8336422819968e907b4d6c58f863d4cc7"
+    }
+  ],
+  "composite_id": "f6b3e47945a87094bb0ad5c1ee442c4f9d52cd55a2b0961e041b5945b2051c74",
+  "revision_id": "4c75713d-ed9e-4bfe-800f-cedf25975347",
+  "seam": 1792184400000,
+  "preparation": {
+    "status": "queried",
+    "cutoff": 1792235880000,
+    "cursor": 1792235880000,
+    "input_revision": 0,
+    "error": null,
+    "confirmed_end": 0,
+    "attempts": [
+      {
+        "start": 1792184400000,
+        "end": 1792235880000,
+        "result": "empty_success",
+        "observations": 0,
+        "accepted": true,
+        "read_kind": "supplier_request"
+      }
+    ]
+  },
+  "maintenance": {
+    "frequency": "daily",
+    "target_start": 1786924800000,
+    "timeframes": [
+      "M1",
+      "M5",
+      "M15",
+      "M30",
+      "H1",
+      "H4",
+      "D1",
+      "W1",
+      "MN"
+    ],
+    "overlap_minutes": 2880,
+    "paused": false,
+    "next_at": 1792283400000
+  },
+  "limitations": [
+    "Real-time reopening and cross-broker seam not observed during Saturday closure.",
+    "Regular source closures reviewed for finite interval only; holiday exceptions and remaining missing minutes stay unknown.",
+    "Dukascopy historical quotes and OANDA Practice CFD quotes are distinct broker/product price series."
+  ]
+}

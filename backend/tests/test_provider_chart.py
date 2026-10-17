@@ -11,6 +11,11 @@ from fastapi.testclient import TestClient
 from sqlalchemy import func, select
 
 
+@pytest.fixture(autouse=True)
+def oanda_account(monkeypatch):
+    monkeypatch.setattr(settings, "oanda_account_id", "chart-test-account")
+
+
 def stamp(value):
     return int(datetime.fromisoformat(value).timestamp() * 1000)
 

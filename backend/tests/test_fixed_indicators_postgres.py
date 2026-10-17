@@ -67,15 +67,17 @@ def test_additive_migration_and_downgrade_snapshot_protection(provider_pg, monke
     migration = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(migration)
     with engine.begin() as conn:
-        from alerts.storage import DisplayIndicatorTask
+        from alerts.storage import DisplayIndicatorTask, IndicatorDemand
 
         # Reconstruct the older migration's schema before testing its upgrade.
+        IndicatorDemand.__table__.drop(conn)
         DisplayIndicatorTask.__table__.drop(conn)
         FixedIndicatorBlock.__table__.drop(conn)
         FixedIndicatorRun.__table__.drop(conn)
         migration.op = Operations(MigrationContext.configure(conn))
         migration.upgrade()
         assert "market_fixed_indicator_blocks" in inspect(conn).get_table_names()
+        IndicatorDemand.__table__.create(conn)
     version = contracts.history(factory, monkeypatch, count=70)
     data_sync(DataQuery(instrument=version, series_kind="history", timeframe="M1", limit=2, indicators=[contracts.SPEC]))
     with engine.begin() as conn:

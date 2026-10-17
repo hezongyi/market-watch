@@ -6,7 +6,7 @@ from alerts import provider_chart as upstream
 from alerts.chart_api import DataQuery
 from alerts.display_snapshots import DisplaySnapshotError
 from test_provider_cache import META, page, seed
-from test_provider_indicator_inputs import SPEC
+from test_provider_indicator_inputs import SPEC, stable_indicators
 
 
 def read(**kwargs):
@@ -24,7 +24,7 @@ def test_price_snapshot_restores_original_forming_tail(database, monkeypatch):
     # A new minute and a revised forming close must not alter old accepted prices.
     old = read(indicators=[SPEC], provider_snapshot_id=price['provider_snapshot_id'])
     assert old['bars'] == price['bars']
-    assert old['indicators'] == original['indicators']
+    assert stable_indicators(old) == stable_indicators(original)
     assert old['cache_revision'] == price['cache_revision']
     assert old['provider_snapshot_id'] == price['provider_snapshot_id']
     assert read()['bars'] != old['bars']

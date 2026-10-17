@@ -1,0 +1,5360 @@
+{
+  "recordedAt": "2026-10-17T07:15:32.571Z",
+  "budgetRevision": "2026-10-17-scenarios-v1",
+  "scenario": "loaded-complex-spec",
+  "budget": {
+    "firstMs": 1000,
+    "coverageMs": 2000,
+    "canonicalMs": 3000,
+    "timeoutMs": 6000
+  },
+  "source": "actual app / Playwriter / native renderer after two RAFs",
+  "synthetic": true,
+  "config": {
+    "phase": "budget-provider-swing-sr-v1-add-complex-spec-14",
+    "scenario": "loaded-complex-spec",
+    "operation": "add",
+    "kind": "provider",
+    "indicator": "SWING_SR_V1",
+    "prefixRows": 3000,
+    "specs": [
+      {
+        "params": {
+          "high_strength": 16,
+          "low_strength": 18
+        }
+      },
+      {
+        "params": {
+          "high_strength": 17,
+          "low_strength": 19
+        }
+      },
+      {
+        "params": {
+          "high_strength": 18,
+          "low_strength": 20
+        }
+      },
+      {
+        "params": {
+          "high_strength": 19,
+          "low_strength": 21
+        }
+      },
+      {
+        "params": {
+          "high_strength": 20,
+          "low_strength": 22
+        }
+      },
+      {
+        "params": {
+          "high_strength": 21,
+          "low_strength": 23
+        }
+      },
+      {
+        "params": {
+          "high_strength": 22,
+          "low_strength": 24
+        }
+      },
+      {
+        "params": {
+          "high_strength": 23,
+          "low_strength": 25
+        }
+      },
+      {
+        "params": {
+          "high_strength": 24,
+          "low_strength": 26
+        }
+      },
+      {
+        "params": {
+          "high_strength": 25,
+          "low_strength": 27
+        }
+      },
+      {
+        "params": {
+          "high_strength": 26,
+          "low_strength": 28
+        }
+      },
+      {
+        "params": {
+          "high_strength": 27,
+          "low_strength": 29
+        }
+      },
+      {
+        "params": {
+          "high_strength": 28,
+          "low_strength": 30
+        }
+      },
+      {
+        "params": {
+          "high_strength": 29,
+          "low_strength": 31
+        }
+      },
+      {
+        "params": {
+          "high_strength": 30,
+          "low_strength": 32
+        }
+      },
+      {
+        "params": {
+          "high_strength": 31,
+          "low_strength": 33
+        }
+      },
+      {
+        "params": {
+          "high_strength": 32,
+          "low_strength": 34
+        }
+      },
+      {
+        "params": {
+          "high_strength": 33,
+          "low_strength": 35
+        }
+      },
+      {
+        "params": {
+          "high_strength": 34,
+          "low_strength": 36
+        }
+      },
+      {
+        "params": {
+          "high_strength": 35,
+          "low_strength": 37
+        }
+      },
+      {
+        "params": {
+          "high_strength": 36,
+          "low_strength": 38
+        }
+      },
+      {
+        "params": {
+          "high_strength": 37,
+          "low_strength": 39
+        }
+      },
+      {
+        "params": {
+          "high_strength": 38,
+          "low_strength": 40
+        }
+      },
+      {
+        "params": {
+          "high_strength": 39,
+          "low_strength": 41
+        }
+      },
+      {
+        "params": {
+          "high_strength": 40,
+          "low_strength": 42
+        }
+      },
+      {
+        "params": {
+          "high_strength": 41,
+          "low_strength": 43
+        }
+      },
+      {
+        "params": {
+          "high_strength": 42,
+          "low_strength": 44
+        }
+      },
+      {
+        "params": {
+          "high_strength": 43,
+          "low_strength": 45
+        }
+      },
+      {
+        "params": {
+          "high_strength": 44,
+          "low_strength": 46
+        }
+      },
+      {
+        "params": {
+          "high_strength": 45,
+          "low_strength": 47
+        }
+      }
+    ],
+    "knownUnused": true
+  },
+  "environment": {
+    "symbol": "MWP:BTCUSDT",
+    "range": {
+      "from": 1792209240,
+      "to": 1792221840
+    },
+    "timeOrigin": 1792219995443.6
+  },
+  "n": 30,
+  "failures": 0,
+  "quantile": "nearest-rank; failures as infinity (JSON null)",
+  "ms": {
+    "p50": 258.09999999403954,
+    "p95": 334.10000002384186
+  },
+  "coverageMs": {
+    "p50": 258.09999999403954,
+    "p95": 334.10000002384186
+  },
+  "canonicalMs": {
+    "p50": 258.09999999403954,
+    "p95": 334.10000002384186
+  },
+  "passed": true,
+  "samples": [
+    {
+      "index": 1,
+      "params": {
+        "high_strength": 16,
+        "low_strength": 18
+      },
+      "ms": 254.2999999821186,
+      "coverageMs": 254.2999999821186,
+      "first": {
+        "at": 1325913.099999994,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":16,\"low_strength\":18}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":16,\\\"low_strength\\\":18}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1325913.099999994,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":16,\"low_strength\":18}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":16,\\\"low_strength\\\":18}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81628.18,
+        81628.18,
+        81416,
+        81416
+      ],
+      "canonicalMs": 254.2999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221321341,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 16,
+                  "low_strength": 18
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221321152.8098,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.251,
+            "responseStart": 138.878,
+            "responseEnd": 145.51
+          },
+          "timings": {
+            "metadata": 3.7
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 16,
+                "low_strength": 18
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "append",
+                  "sql_payload_rows": 1,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 2,
+      "params": {
+        "high_strength": 17,
+        "low_strength": 19
+      },
+      "ms": 217.09999999403954,
+      "coverageMs": 217.09999999403954,
+      "first": {
+        "at": 1326211.800000012,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":17,\"low_strength\":19}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":17,\\\"low_strength\\\":19}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1326211.800000012,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":17,\"low_strength\":19}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":17,\\\"low_strength\\\":19}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81628.18,
+        81628.18,
+        81416,
+        81416
+      ],
+      "canonicalMs": 217.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221321630,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 17,
+                  "low_strength": 19
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221321475.8032,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.256,
+            "responseStart": 132.522,
+            "responseEnd": 136.65
+          },
+          "timings": {
+            "metadata": 4.16
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 17,
+                "low_strength": 19
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 3,
+      "params": {
+        "high_strength": 18,
+        "low_strength": 20
+      },
+      "ms": 334.10000002384186,
+      "coverageMs": 334.10000002384186,
+      "first": {
+        "at": 1326667.7000000179,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":18,\"low_strength\":20}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":18,\\\"low_strength\\\":20}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1326667.7000000179,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":18,\"low_strength\":20}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":18,\\\"low_strength\\\":20}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81628.18,
+        81628.18,
+        81416,
+        81416
+      ],
+      "canonicalMs": 334.10000002384186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221322089,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 18,
+                  "low_strength": 20
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221321809.6108,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.243,
+            "responseStart": 250.45,
+            "responseEnd": 253.874
+          },
+          "timings": {
+            "metadata": 2.79
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 18,
+                "low_strength": 20
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 4,
+      "params": {
+        "high_strength": 19,
+        "low_strength": 21
+      },
+      "ms": 241.80000001192093,
+      "coverageMs": 241.80000001192093,
+      "first": {
+        "at": 1327011.900000006,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":19,\"low_strength\":21}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":19,\\\"low_strength\\\":21}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1327011.900000006,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":19,\"low_strength\":21}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":19,\\\"low_strength\\\":21}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81628.18,
+        81628.18,
+        81416,
+        81416
+      ],
+      "canonicalMs": 241.80000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221322434,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 19,
+                  "low_strength": 21
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221322246.999,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.208,
+            "responseStart": 161.391,
+            "responseEnd": 166.62
+          },
+          "timings": {
+            "metadata": 3.17
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 19,
+                "low_strength": 21
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "append",
+                  "sql_payload_rows": 1,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 5,
+      "params": {
+        "high_strength": 20,
+        "low_strength": 22
+      },
+      "ms": 247,
+      "coverageMs": 247,
+      "first": {
+        "at": 1327354.400000006,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":20,\"low_strength\":22}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":20,\\\"low_strength\\\":22}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1327354.400000006,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":20,\"low_strength\":22}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":20,\\\"low_strength\\\":22}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81628.18,
+        81628.18,
+        81416,
+        81416
+      ],
+      "canonicalMs": 247,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221322756,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 20,
+                  "low_strength": 22
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221322579.325,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.279,
+            "responseStart": 142.438,
+            "responseEnd": 153.53
+          },
+          "timings": {
+            "metadata": 12.25
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 20,
+                "low_strength": 22
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 6,
+      "params": {
+        "high_strength": 21,
+        "low_strength": 23
+      },
+      "ms": 323.90000000596046,
+      "coverageMs": 323.90000000596046,
+      "first": {
+        "at": 1327793.300000012,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":21,\"low_strength\":23}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":21,\\\"low_strength\\\":23}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1327793.300000012,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":21,\"low_strength\":23}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":21,\\\"low_strength\\\":23}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81628.18,
+        81628.18,
+        81416,
+        81416
+      ],
+      "canonicalMs": 323.90000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221323207,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 21,
+                  "low_strength": 23
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221322942.138,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.245,
+            "responseStart": 234.794,
+            "responseEnd": 242.809
+          },
+          "timings": {
+            "metadata": 6.9
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 21,
+                "low_strength": 23
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 7,
+      "params": {
+        "high_strength": 22,
+        "low_strength": 24
+      },
+      "ms": 230.59999999403954,
+      "coverageMs": 230.59999999403954,
+      "first": {
+        "at": 1328110,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":22,\"low_strength\":24}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":22,\\\"low_strength\\\":24}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1328110,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":22,\"low_strength\":24}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":22,\\\"low_strength\\\":24}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81628.18,
+        81628.18,
+        81416,
+        81416
+      ],
+      "canonicalMs": 230.59999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221323530,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 22,
+                  "low_strength": 24
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221323352.876,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.239,
+            "responseStart": 152.489,
+            "responseEnd": 157.056
+          },
+          "timings": {
+            "metadata": 3.83
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 22,
+                "low_strength": 24
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 8,
+      "params": {
+        "high_strength": 23,
+        "low_strength": 25
+      },
+      "ms": 241.69999998807907,
+      "coverageMs": 241.69999998807907,
+      "first": {
+        "at": 1328453.599999994,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":23,\"low_strength\":25}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":23,\\\"low_strength\\\":25}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1328453.599999994,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":23,\"low_strength\":25}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":23,\\\"low_strength\\\":25}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81628.18,
+        81628.18,
+        81416,
+        81416
+      ],
+      "canonicalMs": 241.69999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221323871,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 23,
+                  "low_strength": 25
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221323687.096,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.24,
+            "responseStart": 142.009,
+            "responseEnd": 150.702
+          },
+          "timings": {
+            "metadata": 4.3
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 23,
+                "low_strength": 25
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 9,
+      "params": {
+        "high_strength": 24,
+        "low_strength": 26
+      },
+      "ms": 264.09999999403954,
+      "coverageMs": 264.09999999403954,
+      "first": {
+        "at": 1328826.099999994,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":24,\"low_strength\":26}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":24,\\\"low_strength\\\":26}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1328826.099999994,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":24,\"low_strength\":26}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":24,\\\"low_strength\\\":26}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81628.18,
+        81628.18,
+        81416,
+        81416
+      ],
+      "canonicalMs": 264.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221324245,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 24,
+                  "low_strength": 26
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221324042.634,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.254,
+            "responseStart": 168.971,
+            "responseEnd": 176.972
+          },
+          "timings": {
+            "metadata": 3.84
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 24,
+                "low_strength": 26
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 10,
+      "params": {
+        "high_strength": 25,
+        "low_strength": 27
+      },
+      "ms": 205.80000001192093,
+      "coverageMs": 205.80000001192093,
+      "first": {
+        "at": 1329130.800000012,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":25,\"low_strength\":27}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":25,\\\"low_strength\\\":27}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1329130.800000012,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":25,\"low_strength\":27}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":25,\\\"low_strength\\\":27}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81628.18,
+        81628.18,
+        81416,
+        81416
+      ],
+      "canonicalMs": 205.80000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221324555,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 25,
+                  "low_strength": 27
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221324396.486,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.251,
+            "responseStart": 125.278,
+            "responseEnd": 131.729
+          },
+          "timings": {
+            "metadata": 2.28
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 25,
+                "low_strength": 27
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "append",
+                  "sql_payload_rows": 1,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 11,
+      "params": {
+        "high_strength": 26,
+        "low_strength": 28
+      },
+      "ms": 436.09999999403954,
+      "coverageMs": 436.09999999403954,
+      "first": {
+        "at": 1329658.099999994,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":26,\"low_strength\":28}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":26,\\\"low_strength\\\":28}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1329658.099999994,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":26,\"low_strength\":28}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":26,\\\"low_strength\\\":28}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81628.18,
+        81628.18,
+        81416,
+        81416
+      ],
+      "canonicalMs": 436.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221325058,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 26,
+                  "low_strength": 28
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221324703.904,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.225,
+            "responseStart": 298.206,
+            "responseEnd": 300.234
+          },
+          "timings": {
+            "metadata": 3.57
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 26,
+                "low_strength": 28
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 12,
+      "params": {
+        "high_strength": 27,
+        "low_strength": 29
+      },
+      "ms": 258.09999999403954,
+      "coverageMs": 258.09999999403954,
+      "first": {
+        "at": 1330192.400000006,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":27,\"low_strength\":29}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":27,\\\"low_strength\\\":29}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1330192.400000006,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":27,\"low_strength\":29}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":27,\\\"low_strength\\\":29}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81628.18,
+        81628.18,
+        81416,
+        81416
+      ],
+      "canonicalMs": 258.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221325605,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 27,
+                  "low_strength": 29
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221325410.022,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.241,
+            "responseStart": 161.95,
+            "responseEnd": 166.449
+          },
+          "timings": {
+            "metadata": 2.32
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 27,
+                "low_strength": 29
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 13,
+      "params": {
+        "high_strength": 28,
+        "low_strength": 30
+      },
+      "ms": 259.80000001192093,
+      "coverageMs": 259.80000001192093,
+      "first": {
+        "at": 1330528.900000006,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":28,\"low_strength\":30}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":28,\\\"low_strength\\\":30}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1330528.900000006,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":28,\"low_strength\":30}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":28,\\\"low_strength\\\":30}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81628.18,
+        81628.18,
+        81416,
+        81416
+      ],
+      "canonicalMs": 259.80000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221325947,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 28,
+                  "low_strength": 30
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221325747.8962,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.23,
+            "responseStart": 170.392,
+            "responseEnd": 174.099
+          },
+          "timings": {
+            "metadata": 2.53
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 28,
+                "low_strength": 30
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 14,
+      "params": {
+        "high_strength": 29,
+        "low_strength": 31
+      },
+      "ms": 268.2999999821186,
+      "coverageMs": 268.2999999821186,
+      "first": {
+        "at": 1330931.099999994,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":29,\"low_strength\":31}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":29,\\\"low_strength\\\":31}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1330931.099999994,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":29,\"low_strength\":31}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":29,\\\"low_strength\\\":31}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81646.54,
+        81646.54,
+        81416,
+        81416
+      ],
+      "canonicalMs": 268.2999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221326346,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 29,
+                  "low_strength": 31
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221326144.977,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.242,
+            "responseStart": 168.605,
+            "responseEnd": 179.132
+          },
+          "timings": {
+            "metadata": 8.89
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 29,
+                "low_strength": 31
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 15,
+      "params": {
+        "high_strength": 30,
+        "low_strength": 32
+      },
+      "ms": 246.7000000178814,
+      "coverageMs": 246.7000000178814,
+      "first": {
+        "at": 1331267.7000000179,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":30,\"low_strength\":32}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":30,\\\"low_strength\\\":32}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1331267.7000000179,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":30,\"low_strength\":32}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":30,\\\"low_strength\\\":32}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81646.54,
+        81646.54,
+        81416,
+        81416
+      ],
+      "canonicalMs": 246.7000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221326725,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 30,
+                  "low_strength": 32
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221326492.101,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 1.53,
+            "responseStart": 166.816,
+            "responseEnd": 171.833
+          },
+          "timings": {
+            "metadata": 5.4
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 30,
+                "low_strength": 32
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "append",
+                  "sql_payload_rows": 1,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 16,
+      "params": {
+        "high_strength": 31,
+        "low_strength": 33
+      },
+      "ms": 267.7000000178814,
+      "coverageMs": 267.7000000178814,
+      "first": {
+        "at": 1331671.800000012,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":31,\"low_strength\":33}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":31,\\\"low_strength\\\":33}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1331671.800000012,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":31,\"low_strength\":33}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":31,\\\"low_strength\\\":33}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81646.54,
+        81646.54,
+        81416,
+        81416
+      ],
+      "canonicalMs": 267.7000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221327079,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 31,
+                  "low_strength": 33
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221326885.923,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.243,
+            "responseStart": 146.988,
+            "responseEnd": 156.168
+          },
+          "timings": {
+            "metadata": 2.74
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 31,
+                "low_strength": 33
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 17,
+      "params": {
+        "high_strength": 32,
+        "low_strength": 34
+      },
+      "ms": 252.90000000596046,
+      "coverageMs": 252.90000000596046,
+      "first": {
+        "at": 1332052.800000012,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":32,\"low_strength\":34}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":32,\\\"low_strength\\\":34}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1332052.800000012,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":32,\"low_strength\":34}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":32,\\\"low_strength\\\":34}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81646.54,
+        81646.54,
+        81416,
+        81416
+      ],
+      "canonicalMs": 252.90000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221327448,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 32,
+                  "low_strength": 34
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221327270.347,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.276,
+            "responseStart": 151.15,
+            "responseEnd": 157.468
+          },
+          "timings": {
+            "metadata": 7.93
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 32,
+                "low_strength": 34
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 18,
+      "params": {
+        "high_strength": 33,
+        "low_strength": 35
+      },
+      "ms": 263.59999999403954,
+      "coverageMs": 263.59999999403954,
+      "first": {
+        "at": 1332414.900000006,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":33,\"low_strength\":35}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":33,\\\"low_strength\\\":35}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1332414.900000006,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":33,\"low_strength\":35}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":33,\\\"low_strength\\\":35}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81646.54,
+        81646.54,
+        81416,
+        81416
+      ],
+      "canonicalMs": 263.59999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221327818,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 33,
+                  "low_strength": 35
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221327630.502,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.237,
+            "responseStart": 153.978,
+            "responseEnd": 159.588
+          },
+          "timings": {
+            "metadata": 4.55
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 33,
+                "low_strength": 35
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 19,
+      "params": {
+        "high_strength": 34,
+        "low_strength": 36
+      },
+      "ms": 266.90000000596046,
+      "coverageMs": 266.90000000596046,
+      "first": {
+        "at": 1332809,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":34,\"low_strength\":36}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":34,\\\"low_strength\\\":36}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1332809,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":34,\"low_strength\":36}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":34,\\\"low_strength\\\":36}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81646.54,
+        81646.54,
+        81416,
+        81416
+      ],
+      "canonicalMs": 266.90000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221328214,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 34,
+                  "low_strength": 36
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221328031.025,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.353,
+            "responseStart": 151.954,
+            "responseEnd": 153.553
+          },
+          "timings": {
+            "metadata": 3.96
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 34,
+                "low_strength": 36
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 20,
+      "params": {
+        "high_strength": 35,
+        "low_strength": 37
+      },
+      "ms": 250.60000002384186,
+      "coverageMs": 250.60000002384186,
+      "first": {
+        "at": 1333177.2000000179,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":35,\"low_strength\":37}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":35,\\\"low_strength\\\":37}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1333177.2000000179,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":35,\"low_strength\":37}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":35,\\\"low_strength\\\":37}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81646.54,
+        81646.54,
+        81416,
+        81416
+      ],
+      "canonicalMs": 250.60000002384186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221328607,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 35,
+                  "low_strength": 37
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221328408.56,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.247,
+            "responseStart": 162.813,
+            "responseEnd": 167.537
+          },
+          "timings": {
+            "metadata": 6.67
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 35,
+                "low_strength": 37
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "append",
+                  "sql_payload_rows": 1,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 21,
+      "params": {
+        "high_strength": 36,
+        "low_strength": 38
+      },
+      "ms": 249.7999999821186,
+      "coverageMs": 249.7999999821186,
+      "first": {
+        "at": 1333518,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":36,\"low_strength\":38}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":36,\\\"low_strength\\\":38}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1333518,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":36,\"low_strength\":38}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":36,\\\"low_strength\\\":38}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81646.54,
+        81646.54,
+        81416,
+        81416
+      ],
+      "canonicalMs": 249.7999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221328985,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 36,
+                  "low_strength": 38
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221328746.596,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.615,
+            "responseStart": 165.91,
+            "responseEnd": 170.578
+          },
+          "timings": {
+            "metadata": 2.57
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 36,
+                "low_strength": 38
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 22,
+      "params": {
+        "high_strength": 37,
+        "low_strength": 39
+      },
+      "ms": 300.5,
+      "coverageMs": 300.5,
+      "first": {
+        "at": 1333946.7000000179,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":37,\"low_strength\":39}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":37,\\\"low_strength\\\":39}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1333946.7000000179,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":37,\"low_strength\":39}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":37,\\\"low_strength\\\":39}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81646.54,
+        81646.54,
+        81416,
+        81416
+      ],
+      "canonicalMs": 300.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221329359,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 37,
+                  "low_strength": 39
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221329121.8972,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.234,
+            "responseStart": 208.435,
+            "responseEnd": 213.476
+          },
+          "timings": {
+            "metadata": 9.29
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 37,
+                "low_strength": 39
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 23,
+      "params": {
+        "high_strength": 38,
+        "low_strength": 40
+      },
+      "ms": 266.80000001192093,
+      "coverageMs": 266.80000001192093,
+      "first": {
+        "at": 1334293.7000000179,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":38,\"low_strength\":40}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":38,\\\"low_strength\\\":40}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1334293.7000000179,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":38,\"low_strength\":40}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":38,\\\"low_strength\\\":40}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81646.54,
+        81646.54,
+        81416,
+        81416
+      ],
+      "canonicalMs": 266.80000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221329700,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 38,
+                  "low_strength": 40
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221329499.736,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.246,
+            "responseStart": 167.021,
+            "responseEnd": 178.667
+          },
+          "timings": {
+            "metadata": 2.62
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 38,
+                "low_strength": 40
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 24,
+      "params": {
+        "high_strength": 39,
+        "low_strength": 41
+      },
+      "ms": 287.40000000596046,
+      "coverageMs": 287.40000000596046,
+      "first": {
+        "at": 1334724.2000000179,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":39,\"low_strength\":41}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":39,\\\"low_strength\\\":41}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1334724.2000000179,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":39,\"low_strength\":41}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":39,\\\"low_strength\\\":41}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81646.54,
+        81646.54,
+        81416,
+        81416
+      ],
+      "canonicalMs": 287.40000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221330132,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 39,
+                  "low_strength": 41
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221329937.799,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.235,
+            "responseStart": 166.642,
+            "responseEnd": 175.057
+          },
+          "timings": {
+            "metadata": 5.14
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 39,
+                "low_strength": 41
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 25,
+      "params": {
+        "high_strength": 40,
+        "low_strength": 42
+      },
+      "ms": 323.59999999403954,
+      "coverageMs": 323.59999999403954,
+      "first": {
+        "at": 1335160.900000006,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":40,\"low_strength\":42}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":40,\\\"low_strength\\\":42}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1335160.900000006,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":40,\"low_strength\":42}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":40,\\\"low_strength\\\":42}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81646.54,
+        81646.54,
+        81416,
+        81416
+      ],
+      "canonicalMs": 323.59999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221330568,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 40,
+                  "low_strength": 42
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221330310.052,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.248,
+            "responseStart": 231.422,
+            "responseEnd": 234.201
+          },
+          "timings": {
+            "metadata": 5.1
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 40,
+                "low_strength": 42
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 26,
+      "params": {
+        "high_strength": 41,
+        "low_strength": 43
+      },
+      "ms": 214.40000000596046,
+      "coverageMs": 214.40000000596046,
+      "first": {
+        "at": 1335467.2000000179,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":41,\"low_strength\":43}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":41,\\\"low_strength\\\":43}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1335467.2000000179,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":41,\"low_strength\":43}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":41,\\\"low_strength\\\":43}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81646.54,
+        81646.54,
+        81416,
+        81416
+      ],
+      "canonicalMs": 214.40000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221330879,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 41,
+                  "low_strength": 43
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221330725.218,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.243,
+            "responseStart": 119.789,
+            "responseEnd": 125.213
+          },
+          "timings": {
+            "metadata": 3.06
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 41,
+                "low_strength": 43
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "append",
+                  "sql_payload_rows": 1,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 27,
+      "params": {
+        "high_strength": 42,
+        "low_strength": 44
+      },
+      "ms": 303,
+      "coverageMs": 303,
+      "first": {
+        "at": 1335874.400000006,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":42,\"low_strength\":44}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":42,\\\"low_strength\\\":44}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1335874.400000006,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":42,\"low_strength\":44}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":42,\\\"low_strength\\\":44}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81646.54,
+        81646.54,
+        81416,
+        81416
+      ],
+      "canonicalMs": 303,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221331284,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 42,
+                  "low_strength": 44
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221331060.271,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.235,
+            "responseStart": 178.827,
+            "responseEnd": 182.135
+          },
+          "timings": {
+            "metadata": 2.36
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 42,
+                "low_strength": 44
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 28,
+      "params": {
+        "high_strength": 43,
+        "low_strength": 45
+      },
+      "ms": 273.59999999403954,
+      "coverageMs": 273.59999999403954,
+      "first": {
+        "at": 1336285.099999994,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":43,\"low_strength\":45}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":43,\\\"low_strength\\\":45}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1336285.099999994,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":43,\"low_strength\":45}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":43,\\\"low_strength\\\":45}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81646.54,
+        81646.54,
+        81416,
+        81416
+      ],
+      "canonicalMs": 273.59999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221331699,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 43,
+                  "low_strength": 45
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221331489.592,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.253,
+            "responseStart": 180.515,
+            "responseEnd": 187.658
+          },
+          "timings": {
+            "metadata": 9.16
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 43,
+                "low_strength": 45
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 29,
+      "params": {
+        "high_strength": 44,
+        "low_strength": 46
+      },
+      "ms": 242.89999997615814,
+      "coverageMs": 242.89999997615814,
+      "first": {
+        "at": 1336648.099999994,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":44,\"low_strength\":46}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":44,\\\"low_strength\\\":46}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1336648.099999994,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":44,\"low_strength\":46}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":44,\\\"low_strength\\\":46}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81646.54,
+        81646.54,
+        81416,
+        81416
+      ],
+      "canonicalMs": 242.89999997615814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221332098,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 44,
+                  "low_strength": 46
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221331886.252,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.231,
+            "responseStart": 131.235,
+            "responseEnd": 133.387
+          },
+          "timings": {
+            "metadata": 2.23
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 44,
+                "low_strength": 46
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 30,
+      "params": {
+        "high_strength": 45,
+        "low_strength": 47
+      },
+      "ms": 244.7999999821186,
+      "coverageMs": 244.7999999821186,
+      "first": {
+        "at": 1336986.5,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":45,\"low_strength\":47}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":45,\\\"low_strength\\\":47}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1336986.5,
+        "identity": {
+          "main": "MWP:BTCUSDT",
+          "fixedRevision": "provider:BTCUSDT",
+          "paramsFingerprint": "{\"high_strength\":45,\"low_strength\":47}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792183320000,
+          "last": 1792221240000,
+          "count": 633,
+          "identity": "{\"main\":\"MWP:BTCUSDT\",\"fixedRevision\":\"provider:BTCUSDT\",\"paramsFingerprint\":\"{\\\"high_strength\\\":45,\\\"low_strength\\\":47}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792183320000,
+          "correctionVersion": 0,
+          "tailVersion": 6758
+        },
+        "finite": 633,
+        "visibleRows": 633,
+        "plots": 4,
+        "kind": "snapshot"
+      },
+      "nativeRows": 633,
+      "nativeLast": [
+        1792221240,
+        81646.54,
+        81646.54,
+        81416,
+        81416
+      ],
+      "canonicalMs": 244.7999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221332409,
+          "status": 200,
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "indicators": [
+              {
+                "name": "SWING_SR_V1",
+                "params": {
+                  "high_strength": 45,
+                  "low_strength": 47
+                }
+              }
+            ],
+            "before": 1792221240001,
+            "limit": 634,
+            "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70"
+          },
+          "http": {
+            "startTime": 1792221332217.467,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.258,
+            "responseStart": 150.285,
+            "responseEnd": 159.272
+          },
+          "timings": {
+            "metadata": 2.98
+          },
+          "bars": 634,
+          "indicators": [
+            {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 45,
+                "low_strength": 47
+              },
+              "calculation": {
+                "status": "complete",
+                "visible_complete": true,
+                "calculation_origin": 1792057920000,
+                "input_revision": 6758,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "dataset_id": "110b32ffa5f563fde3a3c6a46a3f7f5db7ee34ef8f2de3fd6f9fe147618d8b8d",
+                  "provider_snapshot_id": "d47b9b16b5782db7897a7ae3444b774543a36b110912b8b50030daef173b5b70",
+                  "input_revision": 6758
+                },
+                "coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792183260000,
+                    "end": 1792221300000
+                  }
+                ],
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2723,
+                  "checkpoint_index": 0
+                }
+              },
+              "plots": [
+                {
+                  "key": "high",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "high_left",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low",
+                  "count": 634,
+                  "finite": 634
+                },
+                {
+                  "key": "low_left",
+                  "count": 634,
+                  "finite": 634
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    }
+  ]
+}

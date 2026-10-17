@@ -69,7 +69,7 @@ export default function AdvancedWorkspace() {
   const [nativeLoads, setNativeLoads] = useState<Record<string, NativeLoad>>(
     {},
   );
-  const [indicatorStates,setIndicatorStates]=useState<Record<string,{index:number;name:string;state:string;error:string;epoch:number}>>({});
+  const [indicatorStates,setIndicatorStates]=useState<Record<string,{index:number;name:string;state:string;error:string;epoch:number;previousParams:string}>>({});
   const [chartFailures,setChartFailures]=useState<{index:number;symbol:string;resolution:string;label:string;error:string;epoch:number}[]>([]);
   const [capacityDialog, setCapacityDialog] = useState<{
     capabilities: HistoryCapabilities;
@@ -526,7 +526,10 @@ export default function AdvancedWorkspace() {
         typeof m.name==='string' && typeof m.error==='string' && ['preparing','ready','error','removed'].includes(m.state)) {
         setIndicatorStates(old=>{const next={...old},key=m.index+'|'+m.id;
           if(m.state==='ready' || m.state==='removed')delete next[key];
-          else next[key]={index:m.index,name:m.name,state:m.state,error:m.error,epoch:m.epoch};
+          else next[key]={index:m.index,name:m.name,state:m.state,error:m.error,epoch:m.epoch,
+            previousParams:m.previousParams && typeof m.previousParams==='object' && !Array.isArray(m.previousParams)
+              ? Object.entries(m.previousParams).filter(([key,value])=>key.length<80 && ['string','number','boolean'].includes(typeof value))
+                .map(([key,value])=>key+'='+String(value).slice(0,100)).join(', ') : ''};
           return next;});return;
       }
       if (m.type === 'chart-history-failures' && m.epoch===nativeLoadEpoch.current && Array.isArray(m.failures)) {
@@ -1175,11 +1178,31 @@ export default function AdvancedWorkspace() {
       } else if (m.type === "status") {
         setStatus(String(m.text).slice(0, 200));
         if (m.text === "行情已加载") setFeedError("");
+      } else if (m.type === 'indicator-demand-update' || m.type === 'indicator-demand-release') {
+        const q=m.query;
+        if(!q || typeof q.client!=='string' || q.client.length>64 ||
+          (m.type==='indicator-demand-update' ? !Array.isArray(q.leases) || q.leases.length>64 :
+            !Array.isArray(q.consumers) || q.consumers.length>64)) {
+          reply({type:'result',id:m.id,error:'指标需求格式无效'});return;
+        }
+        try {
+          const result=await api('/charts/indicator-demands/'+(m.type==='indicator-demand-update'?'update':'release'),q);
+          reply({type:'result',id:m.id,result});
+        }catch(error){reply({type:'result',id:m.id,error:String(error)});}
       } else if (m.type === "data") {
         const q = m.query;
         if (
           !q ||
           !validIndicatorRead(q.indicators) ||
+          (q.client !== undefined && (typeof q.client !== "string" || q.client.length < 1 || q.client.length > 64)) ||
+          (q.indicator_consumers !== undefined && (
+            !Array.isArray(q.indicator_consumers) || q.indicator_consumers.length > 64 ||
+            q.indicator_consumers.some((consumer: any) => !consumer ||
+              typeof consumer.id !== "string" || consumer.id.length < 1 || consumer.id.length > 100 ||
+              !Number.isSafeInteger(consumer.generation) || consumer.generation < 0 ||
+              !validIndicatorRead([consumer.spec]) ||
+              (consumer.purpose !== undefined && !["foreground", "warmup"].includes(consumer.purpose)))
+          )) ||
           typeof q.instrument !== "string" ||
           q.instrument.length > 80 ||
           (q.series_kind !== undefined &&
@@ -1296,9 +1319,10 @@ export default function AdvancedWorkspace() {
                 instrument: q.instrument,
                 series_kind: q.series_kind || "managed",
                 published: q.series_kind !== "provider",
+                ...(q.client !== undefined ? { client: q.client } : {}),
+                ...(q.indicator_consumers !== undefined ? { indicator_consumers: q.indicator_consumers } : {}),
                 ...(q.series_kind === "composite"
                   ? {
-                      client: q.client,
                       composite_revision_id: q.composite_revision_id,
                       input_revision: q.input_revision,
                       display_snapshot_id: q.display_snapshot_id,
@@ -1322,7 +1346,6 @@ export default function AdvancedWorkspace() {
                       countBack: q.countBack,
                       from: q.from,
                       firstDataRequest: q.firstDataRequest === true,
-                      client: q.client,
                       ...(q.native_history !== undefined
                         ? {
                             native_history: q.native_history,
@@ -1476,7 +1499,7 @@ export default function AdvancedWorkspace() {
   return (
     <main className="advanced-workspace" data-theme={chartTheme}>
       {mobile && <p className="advanced-readonly-note" role="note">手机只读看盘。编辑图表、绘图和告警请使用桌面浏览器；桌面工作区布局仍保留。</p>}
-      {Object.values(indicatorStates).some(item=>item.state==='error') && <aside className="advanced-history-failures" aria-label="图格指标状态">{Object.entries(indicatorStates).filter(([,item])=>item.state==='error').map(([key,item])=><p key={key} role="status">图格 {item.index+1} · {item.name}：{item.error}<button onClick={()=>post({type:'retry-chart-indicators',index:item.index,epoch:item.epoch})}>重试指标</button></p>)}</aside>}
+      {Object.keys(indicatorStates).length>0 && <aside className="advanced-history-failures" aria-label="图格指标状态">{Object.entries(indicatorStates).map(([key,item])=><p key={key} role="status">图格 {item.index+1} · {item.name}：{item.state==='error' ? item.error : '正在计算'}{item.previousParams && <>（暂显旧参数：{item.previousParams}）</>}{item.state==='error' && <button onClick={()=>post({type:'retry-chart-indicators',index:item.index,epoch:item.epoch})}>重试指标</button>}</p>)}</aside>}
       {chartFailures.length>0 && <aside className="advanced-history-failures" aria-label="图格历史加载失败">{chartFailures.map(item=><p key={item.index} role="status">图格 {item.index+1} · {item.label} · {item.resolution}：{item.error}<button onClick={()=>post({type:'retry-chart-history',...item})}>重试此图格</button></p>)}</aside>}
       {(Object.keys(nativeLoads).length > 0 ||
         Object.keys(capacityNotices).length > 0) && (

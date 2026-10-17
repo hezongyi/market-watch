@@ -11,10 +11,10 @@ from alerts.storage import HistoryVersion, Instrument
 from sqlalchemy import create_engine, inspect, text
 
 ROOT = Path(__file__).resolve().parents[2]
-# The display-observation and bounded-indicator-task migrations are part of the
+# The display-observation, indicator-task and demand migrations are part of the
 # current single line of deployed schema.  Keep the upgrade-path contract tied
 # to the actual Alembic head so new branches cannot silently regress it.
-HEAD = "au48_display_indicator_tasks"
+HEAD = "av49_indicator_demands"
 
 
 def configuration():
@@ -58,6 +58,7 @@ def verify_upgrade_paths(engine, monkeypatch, initial):
         assert {"chart_alerts", "chart_alert_versions", "agent_credentials", "agent_operations",
                 "market_datasets", "market_history_versions", "market_live_states",
                 "market_stream_tasks", "market_stream_clients", "market_stream_subscriptions"} <= set(tables)
+        assert {"market_indicator_demands", "market_indicator_schedule"} <= set(tables)
         assert {"event_key", "chart_alert_id"} <= {c["name"] for c in inspect(connection).get_columns("signals")}
         if initial == "s20_agent_capabilities":
             assert connection.execute(text("SELECT agent_id, quota_count FROM agent_credentials WHERE token_hash='kept-hash'")).one() == ("migration-fixture", 3)

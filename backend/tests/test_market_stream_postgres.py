@@ -2,6 +2,7 @@
 
 import multiprocessing
 import os
+from collections import OrderedDict
 from concurrent.futures import ThreadPoolExecutor
 
 import pytest
@@ -12,6 +13,7 @@ import test_market_stream_quotes as quote_contracts
 import test_market_stream_worker as worker_contracts
 from alerts import market_stream as stream
 from alerts.storage import MarketStreamTask
+from indicator_assertions import stable_indicators
 from sqlalchemy import func, select
 from test_provider_postgres import provider_pg as _provider_pg
 
@@ -48,9 +50,13 @@ def test_durable_contract(provider_pg, contract):
     contract(provider_pg[0])
 
 
-def test_published_indicator_prefix_proof_matches_inputs_during_concurrent_repair(provider_pg, monkeypatch):
+@pytest.mark.parametrize("cached_inputs", [False, True])
+def test_published_indicator_prefix_proof_matches_inputs_during_concurrent_repair(
+    provider_pg, monkeypatch, cached_inputs
+):
     from types import SimpleNamespace
-    from alerts import managed_dataset
+
+    from alerts import managed_dataset, managed_indicator_inputs
     from alerts.chart_api import DataQuery
     from alerts.storage import ChartPublication, ChartPublishedBar, Instrument
 
@@ -70,11 +76,14 @@ def test_published_indicator_prefix_proof_matches_inputs_during_concurrent_repai
         dataset_start=60000, before=360000, limit=2, dependency_before=240000,
         indicators=[{"name": "EMA", "params": {"period": 2}}])
     before = managed_dataset.data(query)
-    read_rows = managed_dataset.read_rows
+    freeze = managed_indicator_inputs.freeze
+    if not cached_inputs:
+        monkeypatch.setattr(managed_indicator_inputs, "_INPUTS", OrderedDict())
     repairs = []
 
     def repair_after_input_read(*args, **kwargs):
-        rows = read_rows(*args, **kwargs)
+        frozen, execution = freeze(*args, **kwargs)
+        assert execution["input_cache"] == ("hit" if cached_inputs else "miss")
         if not repairs:
             # Commit on a second PostgreSQL connection after the reader accepts
             # its inputs, before it reads the dependency fingerprint.
@@ -84,18 +93,19 @@ def test_published_indicator_prefix_proof_matches_inputs_during_concurrent_repai
                 row.revision += 1
                 db.get(ChartPublication, ("PREFIX_TEST", "M1")).revision += 1
             repairs.append(True)
-        return rows
+        return frozen, execution
 
-    monkeypatch.setattr(managed_dataset, "read_rows", repair_after_input_read)
+    monkeypatch.setattr(managed_indicator_inputs, "freeze", repair_after_input_read)
     accepted = managed_dataset.data(query)
-    monkeypatch.setattr(managed_dataset, "read_rows", read_rows)
+    monkeypatch.setattr(managed_indicator_inputs, "freeze", freeze)
     current = managed_dataset.data(query)
     assert repairs == [True]
-    assert accepted["indicators"] == before["indicators"], "accepted values retain their old input snapshot"
+    assert stable_indicators(accepted) == stable_indicators(before), \
+        "accepted values retain their old input snapshot"
     assert accepted["dependency_revision"] == before["dependency_revision"], \
         "the prefix proof must describe those same inputs, not the concurrent repair"
     assert current["dependency_revision"] != accepted["dependency_revision"]
-    assert current["indicators"] != accepted["indicators"]
+    assert current["indicators"][0]["series"] != accepted["indicators"][0]["series"]
     state = dict(history_accepted=True, historical=True, loaded_before=300000, loaded_after=240000,
         dependency_origin=60000, dependency_before=240000, dependency_revision=accepted["dependency_revision"],
         cursor=300000)

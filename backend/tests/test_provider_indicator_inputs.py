@@ -6,6 +6,7 @@ from alerts import provider_chart as upstream
 from alerts.chart_api import DataQuery
 from alerts.chart_calculation_history import calculation_rows
 from alerts.chart_indicators import calculate
+from indicator_assertions import stable_indicators
 from sqlalchemy import event
 from test_provider_cache import META, page, seed
 
@@ -32,7 +33,11 @@ def test_repeated_and_appended_indicator_reads_do_not_reload_whole_prefix(databa
         first = cache.data(query())
         repeated = cache.data(query())
         assert first["bars"] == repeated["bars"]
-        assert first["indicators"] == repeated["indicators"]
+        assert stable_indicators(first) == stable_indicators(repeated)
+        assert first['indicators'][0]['calculation']['execution']['input_cache'] == 'miss'
+        assert repeated['indicators'][0]['calculation']['execution']['input_cache'] == 'hit'
+        assert repeated['indicators'][0]['calculation']['execution']['calculation_steps'] == 0
+        assert repeated['indicators'][0]['calculation']['execution']['input_rows'] == 999
         assert len(statements) == 1, "same input revision must reuse its frozen prefix"
         seed(META, "M1", 1001000, page(999000, 1001000))
         appended = cache.data(query(1001000))
@@ -139,7 +144,7 @@ def test_restored_legacy_dataset_shares_exact_revision_without_epoch(database, m
     event.listen(pg, 'before_cursor_execute', observe)
     try:
         first, second = cache.data(query()), cache.data(query())
-        assert first['indicators'] == second['indicators']
+        assert stable_indicators(first) == stable_indicators(second)
         assert len(statements) == 1, 'restored pre-patch data must share an unchanged input revision'
     finally:
         event.remove(pg, 'before_cursor_execute', observe)

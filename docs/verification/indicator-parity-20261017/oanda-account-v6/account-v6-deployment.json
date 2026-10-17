@@ -1,0 +1,32 @@
+{
+  "host": "quant-server",
+  "image_id": "sha256:0590abde7ed9c65c10cca0d8c1b49933a98c2bfd85b9dc7d1554255e7ca2841b",
+  "labels": {
+    "io.market-watch.built-at": "2026-10-17T13:11:25.471648+00:00",
+    "io.market-watch.commit": "e93a80e76322971b8c30fc61c811f5fa4ac1a853",
+    "io.market-watch.dirty": "false",
+    "io.market-watch.expires-at": "2026-10-24T13:11:25.471648+00:00",
+    "io.market-watch.managed": "true",
+    "io.market-watch.project": "mw-issue74-20261017",
+    "io.market-watch.purpose": "acceptance",
+    "io.market-watch.task": "mw-issue74-20261017"
+  },
+  "services": {
+    "pg": "postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+    "api": "market-watch-api:issue74-account-v6",
+    "indicator-worker": "market-watch-api:issue74-account-v6",
+    "web": "market-watch-web:issue74-wakeup",
+    "chart-origin": "market-watch-chart-origin:issue74-credential-v5",
+    "tls": "nginx:1.28-alpine",
+    "native-probe": "nginx:1.28-alpine",
+    "provider-fixture": "market-watch-api:issue74-wakeup",
+    "native-history-worker": "market-watch-api:issue74-account-v6",
+    "history-worker": "market-watch-api:issue74-account-v6",
+    "composite-aggregate-worker": "market-watch-api:issue74-account-v6",
+    "chart-history-worker": "market-watch-api:issue74-account-v6",
+    "market-stream-worker": "market-watch-api:issue74-account-v6",
+    "pricing-worker": "market-watch-api:issue74-account-v6"
+  },
+  "app": "https://127.0.0.1:18474/advanced-charts",
+  "chart": "https://127.0.0.1:17475"
+}

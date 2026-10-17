@@ -1,0 +1,5030 @@
+{
+  "recordedAt": "2026-10-17T07:20:31.491Z",
+  "budgetRevision": "2026-10-17-scenarios-v1",
+  "scenario": "loaded-new-spec",
+  "budget": {
+    "firstMs": 500,
+    "coverageMs": 1000,
+    "canonicalMs": 2000,
+    "timeoutMs": 5000
+  },
+  "source": "actual app / Playwriter / native renderer after two RAFs",
+  "synthetic": true,
+  "config": {
+    "phase": "budget-history-lwma-add-new-spec-29",
+    "scenario": "loaded-new-spec",
+    "operation": "add",
+    "kind": "history",
+    "indicator": "LWMA",
+    "prefixRows": 96,
+    "specs": [
+      {
+        "params": {
+          "period": 31
+        }
+      },
+      {
+        "params": {
+          "period": 32
+        }
+      },
+      {
+        "params": {
+          "period": 33
+        }
+      },
+      {
+        "params": {
+          "period": 34
+        }
+      },
+      {
+        "params": {
+          "period": 35
+        }
+      },
+      {
+        "params": {
+          "period": 36
+        }
+      },
+      {
+        "params": {
+          "period": 37
+        }
+      },
+      {
+        "params": {
+          "period": 38
+        }
+      },
+      {
+        "params": {
+          "period": 39
+        }
+      },
+      {
+        "params": {
+          "period": 40
+        }
+      },
+      {
+        "params": {
+          "period": 41
+        }
+      },
+      {
+        "params": {
+          "period": 42
+        }
+      },
+      {
+        "params": {
+          "period": 43
+        }
+      },
+      {
+        "params": {
+          "period": 44
+        }
+      },
+      {
+        "params": {
+          "period": 45
+        }
+      },
+      {
+        "params": {
+          "period": 46
+        }
+      },
+      {
+        "params": {
+          "period": 47
+        }
+      },
+      {
+        "params": {
+          "period": 48
+        }
+      },
+      {
+        "params": {
+          "period": 49
+        }
+      },
+      {
+        "params": {
+          "period": 50
+        }
+      },
+      {
+        "params": {
+          "period": 51
+        }
+      },
+      {
+        "params": {
+          "period": 52
+        }
+      },
+      {
+        "params": {
+          "period": 53
+        }
+      },
+      {
+        "params": {
+          "period": 54
+        }
+      },
+      {
+        "params": {
+          "period": 55
+        }
+      },
+      {
+        "params": {
+          "period": 56
+        }
+      },
+      {
+        "params": {
+          "period": 57
+        }
+      },
+      {
+        "params": {
+          "period": 58
+        }
+      },
+      {
+        "params": {
+          "period": 59
+        }
+      },
+      {
+        "params": {
+          "period": 60
+        }
+      }
+    ],
+    "knownUnused": true
+  },
+  "environment": {
+    "symbol": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+    "range": {
+      "from": 1791158400,
+      "to": 1791536400
+    },
+    "timeOrigin": 1792219995443.6
+  },
+  "n": 30,
+  "failures": 0,
+  "quantile": "nearest-rank; failures as infinity (JSON null)",
+  "ms": {
+    "p50": 148.7000000178814,
+    "p95": 189.10000002384186
+  },
+  "coverageMs": {
+    "p50": 148.7000000178814,
+    "p95": 189.10000002384186
+  },
+  "canonicalMs": {
+    "p50": 148.7000000178814,
+    "p95": 189.10000002384186
+  },
+  "passed": true,
+  "samples": [
+    {
+      "index": 1,
+      "params": {
+        "period": 31
+      },
+      "ms": 117.19999998807907,
+      "coverageMs": 117.19999998807907,
+      "first": {
+        "at": 1630184.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":31}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":31}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 66,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1630184.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":31}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":31}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 66,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.102515665322581
+      ],
+      "canonicalMs": 117.19999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221625610,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 31
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221625520.821,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.263,
+            "responseStart": 77.461,
+            "responseEnd": 79.786
+          },
+          "timings": {
+            "fixed_read_freeze": 56.71
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 31
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "8e48a82d15be8e11cfc84da36dcfd17b08d7bbc13be8670715fe7417a6c050c1",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "miss",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 2.29
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 66
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 2,
+      "params": {
+        "period": 32
+      },
+      "ms": 108.90000000596046,
+      "coverageMs": 108.90000000596046,
+      "first": {
+        "at": 1630350.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":32}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":32}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 65,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1630350.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":32}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":32}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 65,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.1025237121212126
+      ],
+      "canonicalMs": 108.90000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221625775,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 32
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221625693.5562,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.261,
+            "responseStart": 68.507,
+            "responseEnd": 69.634
+          },
+          "timings": {
+            "fixed_read_freeze": 47.55
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 32
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "3942f3e1a8e8d8cdd6c9b530f34c1f9bccf5815c245c5b79390e3242bb31ef4c",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.82
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 65
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 3,
+      "params": {
+        "period": 33
+      },
+      "ms": 146.90000000596046,
+      "coverageMs": 146.90000000596046,
+      "first": {
+        "at": 1630531.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":33}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":33}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 64,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1630531.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":33}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":33}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 64,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.1025321746880565
+      ],
+      "canonicalMs": 146.90000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221625958,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 33
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221625847.469,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 13.996,
+            "responseStart": 97.597,
+            "responseEnd": 101.173
+          },
+          "timings": {
+            "fixed_read_freeze": 49.1
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 33
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "5993f31122db82582f3d4851bb6d1e572cf84588793851876be97d8acc240ebc",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.84
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 64
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 4,
+      "params": {
+        "period": 34
+      },
+      "ms": 146.2999999821186,
+      "coverageMs": 146.2999999821186,
+      "first": {
+        "at": 1630715,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":34}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":34}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 63,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1630715,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":34}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":34}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 63,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.1025399327731098
+      ],
+      "canonicalMs": 146.2999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221626134,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 34
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221626029.98,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.264,
+            "responseStart": 89.904,
+            "responseEnd": 93.852
+          },
+          "timings": {
+            "fixed_read_freeze": 59.6
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 34
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "4354bc4c1f35d7c324c8c2a4f2536d8c0af313bdad401f122aedd210b10a472c",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.97
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 63
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 5,
+      "params": {
+        "period": 35
+      },
+      "ms": 170.19999998807907,
+      "coverageMs": 170.19999998807907,
+      "first": {
+        "at": 1630933.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":35}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":35}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 62,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1630933.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":35}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":35}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 62,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.1025461111111126
+      ],
+      "canonicalMs": 170.19999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221626362,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 35
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221626250.5,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.254,
+            "responseStart": 99.403,
+            "responseEnd": 108.03
+          },
+          "timings": {
+            "fixed_read_freeze": 79.04
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 35
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "b38b3dc0dc4f8b458b4b98bcfb2d0d3650660abda146295f549a592ab0761ffa",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.9
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 62
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 6,
+      "params": {
+        "period": 36
+      },
+      "ms": 137.5,
+      "coverageMs": 137.5,
+      "first": {
+        "at": 1631115,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":36}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":36}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 61,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1631115,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":36}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":36}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 61,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.10255003003003
+      ],
+      "canonicalMs": 137.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221626534,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 36
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221626427.017,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.248,
+            "responseStart": 95.717,
+            "responseEnd": 99.18
+          },
+          "timings": {
+            "fixed_read_freeze": 63.5
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 36
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "7962a474f6e6ca7bb66295c1c2024c5805e3344a0a9079b401987d9e9089119a",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.81
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 61
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 7,
+      "params": {
+        "period": 37
+      },
+      "ms": 153.60000002384186,
+      "coverageMs": 153.60000002384186,
+      "first": {
+        "at": 1631316.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":37}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":37}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 60,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1631316.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":37}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":37}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 60,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.1025511664295902
+      ],
+      "canonicalMs": 153.60000002384186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221626746,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 37
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221626628.797,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.242,
+            "responseStart": 104.892,
+            "responseEnd": 106.354
+          },
+          "timings": {
+            "fixed_read_freeze": 81.11
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 37
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "66c88d67bf92f2bd53e5af4fa1af3b90d6d0ee5725c0f08a0bb79430211c7dcb",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.96
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 60
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 8,
+      "params": {
+        "period": 38
+      },
+      "ms": 155.90000000596046,
+      "coverageMs": 155.90000000596046,
+      "first": {
+        "at": 1631531.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":38}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":38}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 59,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1631531.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":38}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":38}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 59,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.1025491228070181
+      ],
+      "canonicalMs": 155.90000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221626948,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 38
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221626828.3499,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.277,
+            "responseStart": 109.408,
+            "responseEnd": 110.56
+          },
+          "timings": {
+            "fixed_read_freeze": 62.72
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 38
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "7f3637a0e6552391187a087845543e61173db4dec0c67e315b1f58258fc9657e",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.85
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 59
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 9,
+      "params": {
+        "period": 39
+      },
+      "ms": 147.69999998807907,
+      "coverageMs": 147.69999998807907,
+      "first": {
+        "at": 1631714.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":39}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":39}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 58,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1631714.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":39}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":39}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 58,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.1025500512820512
+      ],
+      "canonicalMs": 147.69999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221627146,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 39
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221627030.817,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.231,
+            "responseStart": 102.508,
+            "responseEnd": 106.273
+          },
+          "timings": {
+            "fixed_read_freeze": 64.5
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 39
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "8bbad090eb021e65edc6e8d72e9065a21e913133c62e8441e3578dc6f40c3b21",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.84
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 58
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 10,
+      "params": {
+        "period": 40
+      },
+      "ms": 220.90000000596046,
+      "coverageMs": 220.90000000596046,
+      "first": {
+        "at": 1631981.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":40}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":40}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 57,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1631981.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":40}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":40}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 57,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.1025527926829268
+      ],
+      "canonicalMs": 220.90000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221627411,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 40
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221627210.361,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.285,
+            "responseStart": 183.91,
+            "responseEnd": 185.155
+          },
+          "timings": {
+            "fixed_read_freeze": 93.95
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 40
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "55433a0e462c9518550326198cff842e2019122751797c673191093d7ca33c82",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.99
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 57
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 11,
+      "params": {
+        "period": 41
+      },
+      "ms": 134.40000000596046,
+      "coverageMs": 134.40000000596046,
+      "first": {
+        "at": 1632148.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":41}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":41}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 56,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1632148.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":41}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":41}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 56,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.1025563879210227
+      ],
+      "canonicalMs": 134.40000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221627576,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 41
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221627481.0232,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.236,
+            "responseStart": 82.02,
+            "responseEnd": 83.614
+          },
+          "timings": {
+            "fixed_read_freeze": 53.71
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 41
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "1d6aadd744d79ca1e45981ad5e2ac0ed6d2c197546c92ada1922b832c991c418",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.79
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 56
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 12,
+      "params": {
+        "period": 42
+      },
+      "ms": 135.90000000596046,
+      "coverageMs": 135.90000000596046,
+      "first": {
+        "at": 1632315,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":42}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":42}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 55,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1632315,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":42}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":42}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 55,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.102560044296789
+      ],
+      "canonicalMs": 135.90000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221627748,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 42
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221627637.581,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.263,
+            "responseStart": 95.735,
+            "responseEnd": 97.07
+          },
+          "timings": {
+            "fixed_read_freeze": 67.24
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 42
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "36ec3ddb1acf35164677d9569f23b86c8c9d5785e335c21e0ea327b3f1e9ae14",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.82
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 55
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 13,
+      "params": {
+        "period": 43
+      },
+      "ms": 148.7000000178814,
+      "coverageMs": 148.7000000178814,
+      "first": {
+        "at": 1632538.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":43}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":43}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 54,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1632538.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":43}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":43}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 54,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.1025631078224103
+      ],
+      "canonicalMs": 148.7000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221627951,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 43
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221627848.336,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.252,
+            "responseStart": 89.446,
+            "responseEnd": 92.292
+          },
+          "timings": {
+            "fixed_read_freeze": 65.13
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 43
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "fc93ae9b00c1d10cb00e93686469d2fd4ae28a4fcd3431cb889d0ff9affabb06",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.93
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 54
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 14,
+      "params": {
+        "period": 44
+      },
+      "ms": 154.90000000596046,
+      "coverageMs": 154.90000000596046,
+      "first": {
+        "at": 1632716.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":44}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":44}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 53,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1632716.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":44}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":44}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 53,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.1025650404040417
+      ],
+      "canonicalMs": 154.90000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221628159,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 44
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221628012.908,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.253,
+            "responseStart": 122.237,
+            "responseEnd": 124.418
+          },
+          "timings": {
+            "fixed_read_freeze": 86.02
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 44
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "e55bc320e2a44e87888eec090a5f16429091544dda349ff596c28c4ad4eb81f0",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.85
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 53
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 15,
+      "params": {
+        "period": 45
+      },
+      "ms": 159,
+      "coverageMs": 159,
+      "first": {
+        "at": 1632922.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":45}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":45}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 52,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1632922.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":45}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":45}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 52,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.1025654009661838
+      ],
+      "canonicalMs": 159,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221628359,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 45
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221628233.861,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.276,
+            "responseStart": 103.461,
+            "responseEnd": 105.139
+          },
+          "timings": {
+            "fixed_read_freeze": 72.07
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 45
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "0f6adb7c5a4774c8fbb4fc2fa43126bdda78a13a7f4adb3a0be995c5ceebd039",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 1.53
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 52
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 16,
+      "params": {
+        "period": 46
+      },
+      "ms": 136.5,
+      "coverageMs": 136.5,
+      "first": {
+        "at": 1633115,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":46}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":46}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 51,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1633115,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":46}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":46}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 51,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.1025638297872333
+      ],
+      "canonicalMs": 136.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221628540,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 46
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221628431.0652,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.241,
+            "responseStart": 99.369,
+            "responseEnd": 100.716
+          },
+          "timings": {
+            "fixed_read_freeze": 64.77
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 46
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "042eb87941641d54b6bff9966d4276a484d2d0b2db0ece56fc4ada63386836e3",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.9
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 51
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 17,
+      "params": {
+        "period": 47
+      },
+      "ms": 136.59999999403954,
+      "coverageMs": 136.59999999403954,
+      "first": {
+        "at": 1633281.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":47}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":47}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 50,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1633281.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":47}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":47}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 50,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.1025644946808513
+      ],
+      "canonicalMs": 136.59999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221628713,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 47
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221628592.833,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.249,
+            "responseStart": 107.625,
+            "responseEnd": 109.358
+          },
+          "timings": {
+            "fixed_read_freeze": 72.8
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 47
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "e1d9f9ab30a51e0aac1920b88af57a276906559b3d68f36854490967f526f321",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.9
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 50
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 18,
+      "params": {
+        "period": 48
+      },
+      "ms": 172,
+      "coverageMs": 172,
+      "first": {
+        "at": 1633498.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":48}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":48}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 49,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1633498.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":48}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":48}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 49,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.1025666156462588
+      ],
+      "canonicalMs": 172,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221628913,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 48
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221628774.7131,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.257,
+            "responseStart": 125.647,
+            "responseEnd": 128.927
+          },
+          "timings": {
+            "fixed_read_freeze": 97.07
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 48
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "c2c4bb29db6015a25eca0a66230dde2ffcd2847fbf5e0afe69e2c65cd00993d6",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.87
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 49
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 19,
+      "params": {
+        "period": 49
+      },
+      "ms": 160.10000002384186,
+      "coverageMs": 160.10000002384186,
+      "first": {
+        "at": 1633698.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":49}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":49}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 48,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1633698.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":49}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":49}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 48,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.1025695265306128
+      ],
+      "canonicalMs": 160.10000002384186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221629130,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 49
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221629018.0571,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.227,
+            "responseStart": 98.624,
+            "responseEnd": 102.964
+          },
+          "timings": {
+            "fixed_read_freeze": 76.15
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 49
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "892e264615be3627a1d4a4ab437edea02ebaf92e209db2712294ec6e60b37d41",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 1.53
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 48
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 20,
+      "params": {
+        "period": 50
+      },
+      "ms": 148.30000001192093,
+      "coverageMs": 148.30000001192093,
+      "first": {
+        "at": 1633903.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":50}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":50}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 47,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1633903.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":50}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":50}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 47,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.10257265882353
+      ],
+      "canonicalMs": 148.30000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221629349,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 50
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221629234.038,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.246,
+            "responseStart": 86.268,
+            "responseEnd": 88.071
+          },
+          "timings": {
+            "fixed_read_freeze": 70.92
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 50
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "10cbdc99d05665e72d835c5d69bd1d889f700e22e4b45919b288b57c28db936b",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.78
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 47
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 21,
+      "params": {
+        "period": 51
+      },
+      "ms": 141.7999999821186,
+      "coverageMs": 141.7999999821186,
+      "first": {
+        "at": 1634115,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":51}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":51}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 46,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1634115,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":51}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":51}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 46,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.1025755279034692
+      ],
+      "canonicalMs": 141.7999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221629558,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 51
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221629431.864,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.232,
+            "responseStart": 104.742,
+            "responseEnd": 107.441
+          },
+          "timings": {
+            "fixed_read_freeze": 54.67
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 51
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "05c22cf066b1719857dd9e4ae6386a50246d42a1dbe6c001563a6c36259c9e79",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.8
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 46
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 22,
+      "params": {
+        "period": 52
+      },
+      "ms": 168.30000001192093,
+      "coverageMs": 168.30000001192093,
+      "first": {
+        "at": 1634331.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":52}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":52}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 45,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1634331.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":52}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":52}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 45,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.1025777213352685
+      ],
+      "canonicalMs": 168.30000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221629755,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 52
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221629626.2,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.511,
+            "responseStart": 119.048,
+            "responseEnd": 120.171
+          },
+          "timings": {
+            "fixed_read_freeze": 72.72
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 52
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "82dd81f0ce824bfaf8f107d838bf6a227b22df32097c1a01b8a48d50f84eaa77",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 4.22
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 45
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 23,
+      "params": {
+        "period": 53
+      },
+      "ms": 189.10000002384186,
+      "coverageMs": 189.10000002384186,
+      "first": {
+        "at": 1634566.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":53}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":53}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 44,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1634566.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":53}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":53}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 44,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.1025788888888888
+      ],
+      "canonicalMs": 189.10000002384186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221630001,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 53
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221629827.507,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.251,
+            "responseStart": 158.749,
+            "responseEnd": 164.074
+          },
+          "timings": {
+            "fixed_read_freeze": 85.85
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 53
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "b4d0ec17b217cc04408fe619c335365438bf0be185159b0bbbef175c9c13c5ea",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.79
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 44
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 24,
+      "params": {
+        "period": 54
+      },
+      "ms": 177.5,
+      "coverageMs": 177.5,
+      "first": {
+        "at": 1634785,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":54}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":54}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 43,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1634785,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":54}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":54}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 43,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.1025787340067343
+      ],
+      "canonicalMs": 177.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221630229,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 54
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221630056.43,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.268,
+            "responseStart": 143.453,
+            "responseEnd": 149.471
+          },
+          "timings": {
+            "fixed_read_freeze": 74.6
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 54
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "10e23bb83926c2e6e524b021d0e1539abf3bddd0b11f9a4eecf14aa1fe887add",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.75
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 43
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 25,
+      "params": {
+        "period": 55
+      },
+      "ms": 161,
+      "coverageMs": 161,
+      "first": {
+        "at": 1634998.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":55}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":55}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 42,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1634998.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":55}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":55}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 42,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.1025770064935072
+      ],
+      "canonicalMs": 161,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221630423,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 55
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221630304.7861,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.236,
+            "responseStart": 103.115,
+            "responseEnd": 105.298
+          },
+          "timings": {
+            "fixed_read_freeze": 81.99
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 55
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "2edb65f0a4dc3b1562e955e9a2550ad22377466a0892a27f3ea51b80b6cbad20",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.88
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 42
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 26,
+      "params": {
+        "period": 56
+      },
+      "ms": 163.30000001192093,
+      "coverageMs": 163.30000001192093,
+      "first": {
+        "at": 1635214.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":56}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":56}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 41,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1635214.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":56}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":56}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 41,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.1025766478696752
+      ],
+      "canonicalMs": 163.30000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221630626,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 56
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221630519.6042,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.253,
+            "responseStart": 93.963,
+            "responseEnd": 96.817
+          },
+          "timings": {
+            "fixed_read_freeze": 63.72
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 56
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "321f70a4d0434f9dd41e00fe67884a244fb0863cc848bc4f6e9a50e2a299a2ea",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 1
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 41
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 27,
+      "params": {
+        "period": 57
+      },
+      "ms": 137.2999999821186,
+      "coverageMs": 137.2999999821186,
+      "first": {
+        "at": 1635399,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":57}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":57}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 40,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1635399,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":57}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":57}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 40,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.102577156684816
+      ],
+      "canonicalMs": 137.2999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221630846,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 57
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221630721.4531,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.346,
+            "responseStart": 94.091,
+            "responseEnd": 96.491
+          },
+          "timings": {
+            "fixed_read_freeze": 66.31
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 57
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "7b5032a293988aabdb050c69a819506208d21cca92380858826927329dec48fa",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.86
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 40
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 28,
+      "params": {
+        "period": 58
+      },
+      "ms": 135.90000000596046,
+      "coverageMs": 135.90000000596046,
+      "first": {
+        "at": 1635581.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":58}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":58}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 39,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1635581.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":58}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":58}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 39,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.1025780946814723
+      ],
+      "canonicalMs": 135.90000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221631006,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 58
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221630910.165,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.258,
+            "responseStart": 81.026,
+            "responseEnd": 85.239
+          },
+          "timings": {
+            "fixed_read_freeze": 43.36
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 58
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "c9bdce5465efa7ab300c2a8117e89c221c073c1f5d183069266a0316b61cb6bc",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.93
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 39
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 29,
+      "params": {
+        "period": 59
+      },
+      "ms": 164.5,
+      "coverageMs": 164.5,
+      "first": {
+        "at": 1635798.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":59}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":59}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 38,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1635798.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":59}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":59}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 38,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.1025790790960457
+      ],
+      "canonicalMs": 164.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221631245,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 59
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221631105.0461,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.271,
+            "responseStart": 118.463,
+            "responseEnd": 120.472
+          },
+          "timings": {
+            "fixed_read_freeze": 57.91
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 59
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "09cadc8706f54b4e86c01b81856dad6c6175a022e3c552735767f0b68f8de2e2",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.82
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 38
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 30,
+      "params": {
+        "period": 60
+      },
+      "ms": 151.10000002384186,
+      "coverageMs": 151.10000002384186,
+      "first": {
+        "at": 1635999.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":60}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":60}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 37,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1635999.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":60}",
+          "algorithmVersion": "LWMA:1",
+          "calculationStart": 1791158400000,
+          "period": "60"
+        },
+        "coverage": {
+          "first": 1791158400000,
+          "last": 1791500400000,
+          "count": 96,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":60}\",\"algorithmVersion\":\"LWMA:1\",\"calculationStart\":1791158400000,\"period\":\"60\"}",
+          "sourceFirst": 1791158400000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 37,
+        "visibleRows": 96,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 96,
+      "nativeLast": [
+        1791500400,
+        1.102579775956285
+      ],
+      "canonicalMs": 151.10000002384186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221631420,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "LWMA",
+                "params": {
+                  "period": 60
+                }
+              }
+            ],
+            "before": 1791500400001,
+            "limit": 97
+          },
+          "http": {
+            "startTime": 1792221631311.7422,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.233,
+            "responseStart": 87.492,
+            "responseEnd": 90.649
+          },
+          "timings": {
+            "fixed_read_freeze": 54.85
+          },
+          "bars": 96,
+          "indicators": [
+            {
+              "name": "LWMA",
+              "params": {
+                "period": 60
+              },
+              "calculation": {
+                "id": "LWMA",
+                "run_id": "d97766a38068f6752dab814c09078723cd54eaecfa9d238c2887d17a0603c1de",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791158400000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 96,
+                  "calculation_steps": 96,
+                  "calculation_ms": 0.87
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 96,
+                  "finite": 37
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    }
+  ]
+}

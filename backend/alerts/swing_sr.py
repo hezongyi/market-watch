@@ -38,10 +38,11 @@ def statistics(values):
 
 
 class SwingState:
-    def __init__(self, params, state=None):
+    def __init__(self, params, state=None, *, copy_state=True):
+        # Disabling the copy is only for callers advancing their own state.
         self.params = dict(params)
         self.state = (
-            deepcopy(state)
+            (deepcopy(state) if copy_state else state)
             if state
             else {
                 "n": 0,

@@ -1,0 +1,24 @@
+{
+  "at": 1792227387080,
+  "query": {
+    "instrument": "2bcbc81d8e0e33b2318774f24638e2327448c8d3ecae8d190915cb94b50f637b",
+    "series_kind": "composite",
+    "timeframe": "M1",
+    "indicators": [
+      {
+        "name": "EMA",
+        "params": {
+          "period": 391
+        }
+      }
+    ],
+    "before": 1791493140001,
+    "limit": 485,
+    "display_snapshot_id": "13842f580e60987c12569935ef7d2be3fc90ebaf019c9e3a5df7c1122919da93"
+  },
+  "status": 422,
+  "detail": {
+    "code": "DISPLAY_SNAPSHOT_EXPIRED",
+    "message": "展示快照已过期或身份不匹配，请读取新的价格快照"
+  }
+}
