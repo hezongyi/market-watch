@@ -36,6 +36,10 @@ class Settings(BaseSettings):
     mcp_calls_per_minute: int = Field(default=60, ge=1, le=600)
     mcp_concurrency: int = Field(default=4, ge=1, le=16)
     public_url: str = "http://localhost:8000"
+    # Browser-source notification intake budget (Issue #75). Acceptance may
+    # raise it explicitly; production keeps the reviewed default.
+    notification_rate_minute: int = Field(default=60, ge=0, le=100000)
+    notification_rate_burst: int = Field(default=120, ge=0, le=100000)
     admin_password_hash: str = Field(default="", repr=False)
     cookie_secure: bool = True
     ntfy_url: str = "https://ntfy.sh"

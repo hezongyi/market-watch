@@ -147,13 +147,21 @@ def deliver_once(client=None):
         # Same lock order as acknowledge: notification before its outbox row.
         note = db.scalar(select(Notification).where(Notification.id == note_id).with_for_update())
         row = db.scalar(select(Outbox).where(Outbox.id == task_id).with_for_update())
-        db.add(
-            DeliveryAttempt(
-                notification_id=note_id,
-                status="accepted" if accepted else "failed_or_unknown",
-                details=detail,
-            )
+        attempt_row = DeliveryAttempt(
+            notification_id=note_id,
+            status="accepted" if accepted else "failed_or_unknown",
+            details=detail,
         )
+        db.add(attempt_row)
+        db.flush()
+        # Reliable source fact for the unified notification timeline. Projection
+        # runs asynchronously and never blocks delivery.
+        db.add(Audit(kind="notification_delivery", details={
+            "kind": "delivery", "notification_id": note_id,
+            "attempt_id": attempt_row.id,
+            "status": "accepted" if accepted else "failed_or_unknown",
+            "at": now_ms(), "error": detail.get("error"),
+            "provider_id": detail.get("provider_id")}))
         if row.attempts != attempt:
             # Record the HTTP outcome, but a newer lease owns task state.
             return True

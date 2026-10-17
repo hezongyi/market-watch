@@ -1,0 +1,172 @@
+{
+  "event": {
+    "id": "srv:d81f8b1c-dc11-43cb-b005-c228ffa086b0",
+    "first_seq": 626,
+    "version": 8,
+    "occurred_at": "2026-10-17T16:18:04.822000+00:00",
+    "recorded_at": "2026-10-17T16:18:04.830000+00:00",
+    "incident_id": "30f63ef3-78ec-4073-9dc1-c95304d7968c",
+    "channels": [
+      {
+        "channel": "ntfy",
+        "status": "accepted",
+        "at": 1792254665102,
+        "attempt_id": 1223,
+        "error": null
+      },
+      {
+        "channel": "device",
+        "status": "received",
+        "at": 1792254665120,
+        "device": "acc-device"
+      }
+    ]
+  },
+  "source": {
+    "kind": "chart_alert_signal",
+    "audit_id": 626,
+    "audit_at": "2026-10-17T16:18:04.830000+00:00",
+    "signal_id": "d81f8b1c-dc11-43cb-b005-c228ffa086b0",
+    "signal_occurred_at": "2026-10-17T16:18:04.822000+00:00"
+  },
+  "claim": {
+    "source_id": "626",
+    "change_seq": 0,
+    "claimed_at": "2026-10-17T16:18:10.011000+00:00"
+  },
+  "changes": [
+    {
+      "seq": 626,
+      "type": "created",
+      "version": 1
+    },
+    {
+      "seq": 628,
+      "type": "updated",
+      "version": 2
+    },
+    {
+      "seq": 633,
+      "type": "updated",
+      "version": 3
+    },
+    {
+      "seq": 641,
+      "type": "observation",
+      "version": 3
+    },
+    {
+      "seq": 678,
+      "type": "observation",
+      "version": 3
+    },
+    {
+      "seq": 679,
+      "type": "observation",
+      "version": 3
+    },
+    {
+      "seq": 680,
+      "type": "updated",
+      "version": 4
+    },
+    {
+      "seq": 681,
+      "type": "observation",
+      "version": 4
+    },
+    {
+      "seq": 684,
+      "type": "observation",
+      "version": 4
+    },
+    {
+      "seq": 798,
+      "type": "observation",
+      "version": 4
+    },
+    {
+      "seq": 817,
+      "type": "observation",
+      "version": 4
+    },
+    {
+      "seq": 896,
+      "type": "observation",
+      "version": 4
+    },
+    {
+      "seq": 916,
+      "type": "observation",
+      "version": 4
+    },
+    {
+      "seq": 982,
+      "type": "updated",
+      "version": 5
+    },
+    {
+      "seq": 987,
+      "type": "updated",
+      "version": 6
+    },
+    {
+      "seq": 992,
+      "type": "updated",
+      "version": 7
+    },
+    {
+      "seq": 995,
+      "type": "updated",
+      "version": 8
+    }
+  ],
+  "observations": [
+    {
+      "kind": "received",
+      "server_at": "2026-10-17T16:18:17.220000+00:00",
+      "client_at": "2026-10-17T16:18:17.186000+00:00"
+    },
+    {
+      "kind": "received",
+      "server_at": "2026-10-17T16:18:39.154000+00:00",
+      "client_at": "2026-10-17T16:18:38.814000+00:00"
+    },
+    {
+      "kind": "viewed",
+      "server_at": "2026-10-17T16:18:39.212000+00:00",
+      "client_at": "2026-10-17T16:18:39.206000+00:00"
+    },
+    {
+      "kind": "phone_stop",
+      "server_at": "2026-10-17T16:18:39.249000+00:00",
+      "client_at": "2026-10-17T16:18:39.233000+00:00"
+    },
+    {
+      "kind": "received",
+      "server_at": "2026-10-17T16:18:40.941000+00:00",
+      "client_at": "2026-10-17T16:18:40.510000+00:00"
+    },
+    {
+      "kind": "received",
+      "server_at": "2026-10-17T16:19:49.306000+00:00",
+      "client_at": "2026-10-17T16:19:48.975000+00:00"
+    },
+    {
+      "kind": "rendered",
+      "server_at": "2026-10-17T16:19:49.997000+00:00",
+      "client_at": "2026-10-17T16:19:49.807000+00:00"
+    },
+    {
+      "kind": "received",
+      "server_at": "2026-10-17T16:21:43.781000+00:00",
+      "client_at": "2026-10-17T16:21:43.768000+00:00"
+    },
+    {
+      "kind": "rendered",
+      "server_at": "2026-10-17T16:21:44.917000+00:00",
+      "client_at": "2026-10-17T16:21:44.536000+00:00"
+    }
+  ],
+  "high_watermark": 997
+}

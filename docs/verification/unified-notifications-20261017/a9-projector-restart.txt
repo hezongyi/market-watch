@@ -1,0 +1,13 @@
+== stop projector ==
+ Container mw-issue75-20261017-notification-worker-1  Stopped
+== seed 4 sources while projector down ==
+signals=4 alert=acc-crash same_alert=False
+== projected before restart ==
+signals=667 projected_events=672
+== restart projector ==
+ Container mw-issue75-20261017-notification-worker-1  Started
+== projected after restart ==
+signals=667 projected_events=676
+== restart again (idempotency) ==
+ Container mw-issue75-20261017-notification-worker-1  Started
+signals=667 projected_events=676

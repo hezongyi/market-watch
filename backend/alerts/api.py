@@ -682,6 +682,10 @@ def device_received(notification_id: str, device_id=Depends(device_auth)):
         )
         if not existing:
             db.add(DeviceReceipt(device_id=device_id, notification_id=notification_id))
+            # Source fact for the unified timeline; projection is asynchronous.
+            db.add(Audit(kind="notification_receipt", details={
+                "kind": "receipt", "notification_id": notification_id,
+                "device_id": device_id, "received_at": now_ms()}))
         return {"received": True}
 
 
@@ -1022,7 +1026,7 @@ from .chart_api import router as chart_router  # noqa: E402
 
 app.include_router(chart_router(authenticated))
 
-from .market_stream_api import router as market_stream_router
+from .market_stream_api import router as market_stream_router  # noqa: E402
 
 app.include_router(market_stream_router(authenticated))
 
@@ -1049,3 +1053,8 @@ app.include_router(live_router(authenticated))
 from .chart_alert_api import router as chart_alert_router  # noqa: E402
 
 app.include_router(chart_alert_router(authenticated))
+
+
+from .notification_api import router as notification_router  # noqa: E402
+
+app.include_router(notification_router(authenticated))
