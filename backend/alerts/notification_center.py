@@ -208,6 +208,7 @@ def _incident_for(db, dedupe_key: str, severity: str, occurred_at: int) -> tuple
     incident = db.scalar(select(NotificationIncident).where(
         NotificationIncident.subject == SUBJECT,
         NotificationIncident.dedupe_key == dedupe_key,
+        NotificationIncident.status == "open",
     ))
     if incident is None:
         incident = NotificationIncident(
@@ -466,6 +467,9 @@ def record_browser_event(payload: dict) -> dict:
     occurred = min(max(occurred, now - 3600_000), now + 60_000)
     dedupe = str(payload.get("dedupe_key") or f"browser:{digest[:16]}")[:200]
     with transaction() as db:
+        # Serialize intake so two browsers with the same dedupe key cannot race
+        # the incident upsert into a unique violation (PostgreSQL row lock).
+        stream_row(db, lock=True)
         existing = db.get(NotificationEvent, event_id)
         if existing is not None:
             if existing.subject != SUBJECT or existing.payload_hash != digest:
@@ -692,6 +696,19 @@ def changes_since(db, after_seq: int, *, epoch: str | None = None, limit: int = 
         "next_seq": rows[-1].seq if rows else after_seq,
         "more": bool(rows) and rows[-1].seq < stream.seq,
     }
+
+
+def resolve_incident(db, incident_id: str) -> dict:
+    incident = db.get(NotificationIncident, incident_id)
+    if incident is None or incident.subject != SUBJECT:
+        raise KeyError("事故不存在")
+    if incident.status != "resolved":
+        incident.status = "resolved"
+        incident.resolved_at = now_ms()
+        incident.updated_at = incident.resolved_at
+        db.flush()
+        _publish(db, "incident", incident=incident)
+    return incident_dict(incident)
 
 
 def prune(now: int | None = None) -> dict:

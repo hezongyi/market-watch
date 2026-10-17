@@ -108,6 +108,7 @@ export class NotificationStore {
   private bubbled = new Set<string>();
   private observedReceipts = new Set<string>();
   private pendingIds = new Set<string>();
+  private observationRetries: { id: string; kind: string; extra: Record<string, unknown>; attempts: number }[] = [];
   private deferredObservations: { id: string; kind: string; extra: Record<string, unknown> }[] = [];
   private started = false;
   private refreshing = false;
@@ -212,10 +213,12 @@ export class NotificationStore {
   async refresh(reset = false): Promise<void> {
     if (this.refreshing) return;
     this.refreshing = true;
+    this.source?.close();
+    this.source = null;
     try {
       const page = await api<Page>(`/notification-center/events?${query(this.state.filters)}`);
       this.applyPage(page, reset);
-      if (reset) this.connect();
+      this.connect();
     } catch (error) {
       if (error instanceof TypeError) {
         this.update({ connection: "offline" });
@@ -233,7 +236,7 @@ export class NotificationStore {
     this.update({
       ready: true,
       epoch: page.epoch,
-      cursor: Math.max(reset ? 0 : this.state.cursor, page.high_watermark),
+      cursor: Math.max(this.state.cursor, page.high_watermark),
       highWatermark: page.high_watermark,
       items: reset ? items : sortItems([...items, ...this.state.items]).filter(
         (row, index, all) => all.findIndex((other) => other.id === row.id) === index),
@@ -338,7 +341,17 @@ export class NotificationStore {
     let unread = this.state.unread;
     if (change.type === "created" && change.event) {
       const event = { ...change.event, read: false, incident: change.incident ?? null };
-      if (index === -1) items.unshift(event);
+      if (index === -1) {
+        items.unshift(event);
+      } else {
+        // Optimistic local event: adopt the durable server row (incident id,
+        // first_seq, version) without losing local read/attention state.
+        items[index] = {
+          ...items[index], ...change.event,
+          read: items[index].read,
+          incident: change.incident ?? items[index].incident,
+        };
+      }
       if (live) this.announce(event);
     } else if (change.type === "updated" && change.event && index >= 0) {
       items[index] = { ...items[index], ...change.event, read: items[index].read };
@@ -383,8 +396,20 @@ export class NotificationStore {
 
   private announce(event: CenterEvent) {
     if (!event.notify_web) return;
-    if (this.bubbled.has(event.id)) return;
-    this.bubbled.add(event.id);
+    const key = `${this.profile}|${event.id}|${event.incident?.attention_version ?? 0}`;
+    if (this.bubbled.has(key)) return;
+    this.bubbled.add(key);
+    void this.announcePersisted(event, key);
+  }
+
+  private async announcePersisted(event: CenterEvent, key: string) {
+    // The contract requires notification de-duplication across tabs and reloads,
+    // not just within this tab's memory.
+    if (await this.local.get("bubbles", key)) return;
+    const stored = await this.local.put("bubbles", key, Date.now());
+    if (!stored) {
+      this.notice("本机存储不可用，重复提示抑制只在当前页面有效。");
+    }
     if (event.kind !== "success" && SEVERITY_RANK[event.severity] >= 2) {
       void this.sound?.attempt(event);
     }
@@ -467,6 +492,24 @@ export class NotificationStore {
     }
   }
 
+  async resolveIncident(incidentId: string): Promise<boolean> {
+    try {
+      await api(`/notification-center/incidents/${encodeURIComponent(incidentId)}/resolve`, {});
+      const items = this.state.items.map((row) => row.incident_id === incidentId && row.incident
+        ? { ...row, incident: { ...row.incident, status: "resolved" as const } } : row);
+      this.update({
+        items,
+        detail: this.state.detail?.incident?.id === incidentId
+          ? { ...this.state.detail, incident: { ...this.state.detail.incident, status: "resolved" as const } }
+          : this.state.detail,
+      });
+      return true;
+    } catch (error) {
+      this.notice(`标记恢复失败：${String(error)}`);
+      return false;
+    }
+  }
+
   async stopPhone(id: string): Promise<boolean> {
     const observation = await this.observe(id, "phone_stop");
     return observation !== null;
@@ -494,8 +537,41 @@ export class NotificationStore {
         { event_id: id, kind, profile_id: this.profile, client_at: Date.now(), ...extra });
       return response.observation;
     } catch {
-      return null; // observation is evidence, never a reason to break the UI
+      // Observation is evidence, never a reason to break the UI; replay it a
+      // bounded number of times so a transient failure does not silently lose
+      // the read/sound fact.
+      const already = this.observationRetries.find((row) => row.id === id && row.kind === kind);
+      if (!already && this.observationRetries.length < 100) {
+        this.observationRetries.push({ id, kind, extra, attempts: 0 });
+      }
+      return null;
     }
+  }
+
+  private async retryObservations() {
+    if (this.observationRetries.length === 0) return;
+    const queued = this.observationRetries.slice();
+    for (const row of queued) {
+      row.attempts += 1;
+      const ok = await this.observeNow(row.id, row.kind, row.extra);
+      if (ok || row.attempts >= 5) {
+        this.observationRetries = this.observationRetries.filter((item) => item !== row);
+      }
+    }
+  }
+
+  private async observeNow(id: string, kind: string, extra: Record<string, unknown>) {
+    try {
+      await api("/notification-center/observations",
+        { event_id: id, kind, profile_id: this.profile, client_at: Date.now(), ...extra });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  isSoundUnlocked(): boolean {
+    return this.sound?.unlocked ?? false;
   }
 
   async setSoundEnabled(enabled: boolean): Promise<boolean> {
@@ -567,6 +643,7 @@ export class NotificationStore {
   async flush(): Promise<void> {
     if (this.flushing) return;
     this.flushing = true;
+    void this.retryObservations();
     let pending = 0;
     try {
       const rows = await this.local.all<{
@@ -602,13 +679,19 @@ export class NotificationStore {
             await this.local.put("pending", row.payload.id, row);
             pending += 1;
           } else {
-            await this.local.delete("pending", row.payload.id);
-            this.notice(`一条本机通知被服务端拒绝：${String(error)}`);
+            row.attempts += 1;
+            row.nextAt = Date.now() + Math.min(60_000, 1000 * 2 ** Math.min(row.attempts, 6));
+            await this.local.put("pending", row.payload.id, row);
+            pending += 1;
+            if (row.attempts === 5) {
+              this.notice(`一条本机通知暂未同步（已重试 ${row.attempts} 次），将继续保留。`);
+            }
           }
         }
       }
     } finally {
       this.flushing = false;
+      void this.retryObservations();
       this.update({ pending, storage: this.local.state });
       if (pending > 0 && !this.flushTimer) {
         this.flushTimer = window.setTimeout(() => {

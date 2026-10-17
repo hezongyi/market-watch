@@ -99,7 +99,10 @@ async function waitForEvent(page, title) {
 async function main() {
   if (!PASSWORD) throw new Error("MW_ACCEPTANCE_PASSWORD is required");
   fs.mkdirSync(EVIDENCE, { recursive: true });
-  const browser = await chromium.launch({ executablePath: CHROME, args: ["--no-sandbox"] });
+  const browser = await chromium.launch({
+    executablePath: CHROME,
+    args: ["--no-sandbox", "--autoplay-policy=no-user-gesture-required"],
+  });
   try {
     const context = await browser.newContext({ viewport: { width: 1600, height: 1000 } });
     const page = await context.newPage();
@@ -257,7 +260,11 @@ async function main() {
         return body.items.filter((item) => item.incident && item.incident.count >= 3).length;
       });
       expect(outcome).toBeGreaterThan(0);
-      return `grouped=${outcome}`;
+      await page.reload();
+      await expect(page.getByTestId("notification-entry")).toBeVisible();
+      await page.waitForTimeout(2500);
+      expect(await page.getByTestId("notification-bubble").count()).toBe(0);
+      return `grouped=${outcome}, no bubble after reload`;
     });
 
     await check("A7.success-short", "普通成功短提示且可回查", async () => {
@@ -331,9 +338,13 @@ async function main() {
       await login(tab);
       await tab.goto(`${BASE}/advanced-charts`);
       await expect(tab.getByTestId("notification-entry")).toBeVisible();
+      const before = await tab.locator("main.advanced-workspace").boundingBox();
       await openCenter(tab);
       await expect(tab.getByTestId("notification-panel")).toBeVisible();
       await expect(tab.getByTestId("notification-item").first()).toBeVisible();
+      const after = await tab.locator("main.advanced-workspace").boundingBox();
+      expect(after.height).toBe(before.height);
+      expect(after.width).toBe(before.width);
       await shot(tab, "a15-fallback");
       await closeCenter(tab);
       await blocked.close();
@@ -349,6 +360,11 @@ async function main() {
         tab.on("pageerror", (error) => pageErrors.push(String(error))));
       await login(first);
       await login(second);
+      for (const tab of [first, second]) {
+        await tab.locator(".sound-toggle").click();
+        await expect.poll(() => tab.evaluate(() =>
+          window.MWNotificationCenter.soundUnlocked()), { timeout: 10000 }).toBe(true);
+      }
       const title = `共享声音 ${Date.now()}`;
       await report(first, { kind: "failure", severity: "critical", title,
         summary: "两个标签页共享一次自动尝试", dedupe_key: "acceptance:sound" });
@@ -389,6 +405,10 @@ async function main() {
       await expect.poll(async () => {
         const current = await state(writer);
         return current.pending === 0 && current.items.some((item) => item.title === title);
+      }, { timeout: 30000 }).toBe(true);
+      await expect.poll(async () => {
+        const current = await state(stable);
+        return current.items.some((item) => item.title === title);
       }, { timeout: 30000 }).toBe(true);
       await pair.close();
       return "writer pending drained, stable tab online";
@@ -444,7 +464,34 @@ async function main() {
       const incidents = new Set(groups.map((row) => row.incident));
       expect(instruments.size).toBeGreaterThanOrEqual(2);
       expect(incidents.size).toBeGreaterThanOrEqual(2);
-      return `${instruments.size} instruments / ${incidents.size} incidents`;
+      const dedupe = `acceptance:recur:${Date.now()}`;
+      const firstTitle = `复发前 ${Date.now()}`;
+      await report(page, { kind: "failure", severity: "warning", title: firstTitle,
+        dedupe_key: dedupe });
+      await waitForEvent(page, firstTitle);
+      await expect.poll(async () => {
+        const current = await state(page);
+        return current.items.find((item) => item.title === firstTitle)?.incident_id;
+      }).not.toBeNull();
+      const incidentId = await page.evaluate((target) => {
+        const current = window.MWNotificationCenter.getState();
+        return current.items.find((item) => item.title === target)?.incident_id;
+      }, firstTitle);
+      expect(incidentId).toBeTruthy();
+      expect(await page.evaluate((id) => window.MWNotificationCenter.resolve(id), incidentId))
+        .toBe(true);
+      const secondTitle = `复发后 ${Date.now()}`;
+      await report(page, { kind: "failure", severity: "warning", title: secondTitle,
+        dedupe_key: dedupe });
+      await waitForEvent(page, secondTitle);
+      await expect.poll(async () => {
+        const current = await state(page);
+        const row = current.items.find((item) => item.title === secondTitle);
+        const previous = current.items.find((item) => item.title === firstTitle);
+        return Boolean(row?.incident_id && row.incident_id !== previous?.incident_id
+          && previous?.incident?.status === "resolved");
+      }, { timeout: 15000 }).toBe(true);
+      return `${instruments.size} instruments / ${incidents.size} incidents + recurrence`;
     });
 
     await check("A19.storm", "突发故障不阻塞中心打开，内存有界", async () => {

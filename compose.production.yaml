@@ -148,6 +148,16 @@ services:
       ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-stream
     depends_on:
       api: {condition: service_healthy}
+  notification-worker:
+    <<: *app
+    command: ["python", "-m", "alerts.notification_worker"]
+    environment:
+      <<: *app-environment
+      ALERTS_DATABASE_JIT: ${MW_NOTIFICATION_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-notifications
+    depends_on:
+      api: {condition: service_healthy}
+    restart: unless-stopped
   notify-worker:
     <<: *app
     command: ["python", "-m", "alerts.notify"]

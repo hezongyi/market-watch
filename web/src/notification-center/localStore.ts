@@ -2,7 +2,7 @@
 export type LocalState = "ok" | "unavailable" | "limited";
 
 const DB_NAME = "mw-notification-center";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 function open(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -16,6 +16,7 @@ function open(): Promise<IDBDatabase> {
       if (!db.objectStoreNames.contains("state")) db.createObjectStore("state");
       if (!db.objectStoreNames.contains("pending")) db.createObjectStore("pending");
       if (!db.objectStoreNames.contains("sounds")) db.createObjectStore("sounds");
+      if (!db.objectStoreNames.contains("bubbles")) db.createObjectStore("bubbles");
     };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error || new Error("IndexedDB open failed"));
@@ -40,7 +41,7 @@ export class LocalStore {
     }
   }
 
-  async get<T>(store: "state" | "pending" | "sounds", key: string): Promise<T | undefined> {
+  async get<T>(store: "state" | "pending" | "sounds" | "bubbles", key: string): Promise<T | undefined> {
     try {
       const db = await this.handle();
       return await new Promise<T | undefined>((resolve, reject) => {
@@ -66,7 +67,7 @@ export class LocalStore {
     }
   }
 
-  async put(store: "state" | "pending" | "sounds", key: string, value: unknown): Promise<boolean> {
+  async put(store: "state" | "pending" | "sounds" | "bubbles", key: string, value: unknown): Promise<boolean> {
     try {
       const db = await this.handle();
       await new Promise<void>((resolve, reject) => {
@@ -83,7 +84,7 @@ export class LocalStore {
     }
   }
 
-  async delete(store: "state" | "pending" | "sounds", key: string): Promise<void> {
+  async delete(store: "state" | "pending" | "sounds" | "bubbles", key: string): Promise<void> {
     try {
       const db = await this.handle();
       await new Promise<void>((resolve, reject) => {

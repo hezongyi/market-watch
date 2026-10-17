@@ -21,6 +21,8 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       observe: (eventId: string, kind: string, extra?: Record<string, unknown>) =>
         store.observeForDebug(eventId, kind, extra),
       soundAttempt: (eventId: string) => store.soundAttemptForDebug(eventId),
+      soundUnlocked: () => store.isSoundUnlocked(),
+      resolve: (incidentId: string) => store.resolveIncident(incidentId),
       open: () => window.dispatchEvent(new CustomEvent("mw-notification-open")),
     };
     (window as any).MWNotificationCenter = debug;
@@ -187,6 +189,11 @@ function DetailView({ detail, onBack }: { detail: Detail; onBack: () => void }) 
         <button type="button" onClick={() => store.markHandled(event.id)}>
           <CheckCheck size={14} /> 标为已处理
         </button>
+        {detail.incident?.status === "open" && (
+          <button type="button" onClick={() => { void store.resolveIncident(detail.incident!.id); }}>
+            <Check size={14} /> 标记事故已恢复
+          </button>
+        )}
         {event.actions?.phone_stop && !context.phone_stopped_at && (
           confirmStop ? (
             <button type="button" className="danger" onClick={async () => {
@@ -285,10 +292,13 @@ function Panel({ onClose }: { onClose: () => void }) {
             type="button"
             aria-pressed={state.soundEnabled}
             data-testid="notification-sound"
-            onClick={() => { void store.setSoundEnabled(!state.soundEnabled); }}
+            onClick={() => {
+              void store.setSoundEnabled(!store.isSoundUnlocked());
+            }}
           >
-            {state.soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
-            {state.soundEnabled ? "声音已开" : "开启声音"}
+            {!state.soundEnabled ? <VolumeX size={15} /> : <Volume2 size={15} />}
+            {!state.soundEnabled ? "开启声音"
+              : store.isSoundUnlocked() ? "声音已开" : "声音待解锁"}
           </button>
           <button type="button" aria-label="刷新通知" onClick={() => { void store.refresh(true); }}>
             <RefreshCw size={15} />

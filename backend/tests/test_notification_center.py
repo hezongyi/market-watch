@@ -1,3 +1,4 @@
+import os
 from decimal import Decimal
 
 import pytest
@@ -14,7 +15,7 @@ from alerts.storage import (
 )
 from argon2 import PasswordHasher
 from fastapi.testclient import TestClient
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 
 def login(client, monkeypatch):
@@ -26,11 +27,12 @@ def login(client, monkeypatch):
     client.headers["x-csrf-token"] = logged.json()["csrf"]
 
 
-def add_signal(db, index=1, *, alert=True, notify_web=True, notify_ntfy=True):
+def add_signal(db, index=1, *, alert=True, notify_web=True, notify_ntfy=True,
+               alert_id=None):
     evidence = {}
     if alert:
         evidence = {
-            "chart_alert": True, "alert_id": f"alert-{index}", "rule_version": 1,
+            "chart_alert": True, "alert_id": alert_id or f"alert-{index}", "rule_version": 1,
             "config": {"timeframe": "M5", "notify_web": notify_web, "notify_ntfy": notify_ntfy},
             "market_identity": {"symbol": "EURUSD", "source": "dukascopy"},
             "run": 3, "ordinal": 1, "detected_at": now_ms(),
@@ -46,7 +48,8 @@ def add_signal(db, index=1, *, alert=True, notify_web=True, notify_ntfy=True):
     db.flush()
     db.add(Outbox(notification_id=note.id))
     db.add(Audit(kind="chart_alert_signal" if alert else "signal",
-                 details={"signal_id": signal.id, "alert_id": f"alert-{index}"}))
+                 details={"signal_id": signal.id,
+                          "alert_id": alert_id or f"alert-{index}"}))
     db.flush()
     return signal, note
 
@@ -203,6 +206,115 @@ def test_delivery_and_receipt_update_the_same_event(database):
     center.project_pending(50)  # re-projection must not duplicate channel facts
     with database.begin() as db:
         assert len(db.scalar(select(NotificationEvent)).context["channels"]) == 2
+
+
+def test_retention_writes_tombstone_then_resets_old_cursors(database, monkeypatch):
+    with database.begin() as db:
+        add_signal(db, 1, alert=False)
+    center.project_pending(50)
+    monkeypatch.setattr(center, "RETENTION_EVENT_MS", 0)
+    with database.begin() as db:
+        old = db.scalar(select(NotificationEvent))
+        old.occurred_at = now_ms() - 10_000
+        db.flush()
+    center.prune()
+    with database.begin() as db:
+        event = db.scalar(select(NotificationEvent))
+        assert event.deleted_at is not None
+        deletions = list(db.scalars(select(NotificationChange).where(
+            NotificationChange.kind == "deleted")))
+        assert deletions
+    with database.begin() as db:
+        page = center.list_events(db)
+        assert page["items"] == []
+
+
+def test_late_committed_lower_audit_id_is_still_projectable(database):
+    """A source transaction that commits late must not be skipped by max(id)."""
+    with database.begin() as db:
+        first, _ = add_signal(db, 1, alert_id="late-one")
+        second, _ = add_signal(db, 2, alert_id="late-two")
+        db.query(Audit).delete()
+        db.add(Audit(id=10, kind="chart_alert_signal",
+                     details={"signal_id": first.id}))
+    assert center.project_pending(10) == 1
+    with database.begin() as db:
+        db.add(Audit(id=5, kind="chart_alert_signal",
+                     details={"signal_id": second.id}))
+    assert center.project_pending(10) == 1
+    with database.begin() as db:
+        events = list(db.scalars(select(NotificationEvent)))
+        assert len(events) == 2
+        assert {event.source_id for event in events} == {first.id, second.id}
+        assert len({event.first_seq for event in events}) == 2
+        assert {claim.source_id for claim in db.scalars(
+            select(center.NotificationSourceClaim))} == {"5", "10"}
+
+
+def test_resolved_incident_recurrence_creates_a_new_incident(database):
+    with database.begin() as db:
+        add_signal(db, 1, alert_id="recurring")
+    center.project_pending(10)
+    with database.begin() as db:
+        incident = db.scalar(select(center.NotificationIncident))
+        original = incident.id
+        resolved = center.resolve_incident(db, original)
+        assert resolved["status"] == "resolved" and resolved["resolved_at"]
+    with database.begin() as db:
+        add_signal(db, 2, alert_id="recurring")
+    center.project_pending(10)
+    with database.begin() as db:
+        incidents = list(db.scalars(select(center.NotificationIncident)))
+        assert len(incidents) == 2
+        assert {row.status for row in incidents} == {"open", "resolved"}
+        reopened = next(row for row in incidents if row.status == "open")
+        assert reopened.id != original and reopened.count == 1
+        events = list(db.scalars(select(NotificationEvent)))
+        assert len(events) == 2
+        assert {event.incident_id for event in events} == {original, reopened.id}
+
+
+@pytest.mark.skipif(not os.environ.get("TEST_POSTGRES_URL"),
+                    reason="TEST_POSTGRES_URL not configured")
+def test_two_projectors_on_postgres_create_one_event(monkeypatch):
+    import threading
+
+    from sqlalchemy import create_engine, text
+    from sqlalchemy.orm import sessionmaker
+
+    from alerts import storage
+
+    url = os.environ["TEST_POSTGRES_URL"]
+    admin = create_engine(url)
+    with admin.begin() as connection:
+        connection.execute(text("drop schema if exists mw_center_test cascade"))
+        connection.execute(text("create schema mw_center_test"))
+    engine = create_engine(url, connect_args={"options": "-csearch_path=mw_center_test"})
+    storage.Base.metadata.create_all(engine)
+    factory = sessionmaker(engine, expire_on_commit=False)
+    monkeypatch.setattr(storage, "Session", factory)
+    try:
+        with factory.begin() as db:
+            for index in range(20):
+                add_signal(db, index, alert_id=f"pg-{index}")
+        results = []
+
+        def worker():
+            results.append(center.project_pending(50))
+
+        threads = [threading.Thread(target=worker) for _ in range(2)]
+        [thread.start() for thread in threads]
+        [thread.join() for thread in threads]
+        with factory.begin() as db:
+            events = db.scalar(select(func.count()).select_from(NotificationEvent))
+            claims = db.scalar(select(func.count()).select_from(
+                center.NotificationSourceClaim))
+        assert events == 20 and claims == 20
+    finally:
+        engine.dispose()
+        with admin.begin() as connection:
+            connection.execute(text("drop schema if exists mw_center_test cascade"))
+        admin.dispose()
 
 
 def test_retention_writes_tombstone_then_resets_old_cursors(database, monkeypatch):

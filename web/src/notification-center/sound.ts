@@ -55,6 +55,10 @@ export class SoundCoordinator {
     }
   }
 
+  get unlocked(): boolean {
+    return this.enabled && this.context?.state === "running";
+  }
+
   /** Must be called from a user gesture to unlock audio. */
   async enable(): Promise<boolean> {
     try {
@@ -92,6 +96,13 @@ export class SoundCoordinator {
       return "expired";
     }
     if (!this.enabled) {
+      this.observe("sound_blocked", { event_id: event.id, reason: "gesture_required" });
+      return "blocked";
+    }
+    // A reload keeps the preference but not the unlocked AudioContext. Never
+    // reserve (and therefore never burn) an automatic attempt before the next
+    // gesture recreates a running context.
+    if (!this.context || this.context.state !== "running") {
       this.observe("sound_blocked", { event_id: event.id, reason: "gesture_required" });
       return "blocked";
     }

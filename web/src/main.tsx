@@ -306,9 +306,8 @@ function Shell({ logout }: { logout: () => void }) {
               className={`sound-toggle ${centerState.soundEnabled ? "enabled" : ""}`}
               aria-pressed={centerState.soundEnabled}
               onClick={async () => {
-                const next = !centerState.soundEnabled;
-                const ok = await center.setSoundEnabled(next);
-                if (next && !ok) {
+                const ok = await center.setSoundEnabled(!center.isSoundUnlocked());
+                if (!ok && !centerState.soundEnabled) {
                   audio.current ??= new AudioContext();
                   await audio.current.resume();
                 }

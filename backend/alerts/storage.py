@@ -1547,7 +1547,13 @@ class NotificationStream(Base):
 
 class NotificationIncident(Base):
     __tablename__ = "notification_incidents"
-    __table_args__ = (UniqueConstraint("subject", "dedupe_key", name="uq_notification_incident"),)
+    # One open incident per stable key; a resolved incident keeps its row and a
+    # recurrence creates a new incident (partial index allows both).
+    __table_args__ = (Index(
+        "uq_notification_incident_open", "subject", "dedupe_key", unique=True,
+        postgresql_where=text("status = 'open'"),
+        sqlite_where=text("status = 'open'"),
+    ),)
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
     subject: Mapped[str] = mapped_column(String(64), index=True)
     dedupe_key: Mapped[str] = mapped_column(String(200))

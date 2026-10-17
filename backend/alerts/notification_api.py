@@ -9,6 +9,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
+from sqlalchemy.exc import IntegrityError
+
 from . import notification_center as center
 from .storage import transaction
 
@@ -46,6 +48,8 @@ def _http_error(exc: Exception):
         return HTTPException(409, {"code": "CONFLICT", "message": str(exc)})
     if isinstance(exc, PermissionError):
         return HTTPException(429, {"code": "RATE_LIMITED", "message": str(exc)})
+    if isinstance(exc, IntegrityError):
+        return HTTPException(503, {"code": "RETRY", "message": "通知暂不可写入，请稍后重试"})
     return HTTPException(422, str(exc))
 
 
@@ -92,11 +96,17 @@ def router(authenticated):
 
     @api.post("/events")
     def report(body: BrowserEventBody):
+        payload = body.model_dump()
         try:
-            event, created = center.record_browser_event(body.model_dump())
+            try:
+                event, created = center.record_browser_event(payload)
+            except IntegrityError:
+                # A concurrent insert won the id/dedupe race; the retry observes
+                # the committed row and stays idempotent instead of losing input.
+                event, created = center.record_browser_event(payload)
+            return {"event": event, "created": created}
         except Exception as exc:  # noqa: BLE001 - mapped to explicit HTTP codes
             raise _http_error(exc) from exc
-        return {"event": event, "created": created}
 
     @api.post("/observations")
     def observe(body: ObservationBody):
@@ -118,6 +128,16 @@ def router(authenticated):
     ):
         with transaction() as db:
             return center.changes_since(db, after_seq, epoch=epoch, limit=limit)
+
+    @api.post("/incidents/{incident_id}/resolve")
+    def resolve(incident_id: str):
+        if len(incident_id) > 36:
+            raise HTTPException(422, "事故 ID 过长")
+        try:
+            with transaction() as db:
+                return center.resolve_incident(db, incident_id)
+        except Exception as exc:  # noqa: BLE001
+            raise _http_error(exc) from exc
 
     @api.get("/summary")
     def summary():
