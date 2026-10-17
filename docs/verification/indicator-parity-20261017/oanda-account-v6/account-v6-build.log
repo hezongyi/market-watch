@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/home/quant/.local/bin/mw-docker", line 1102, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/quant/.local/bin/mw-docker", line 1078, in main
+    with (STATE / lock_name).open("a") as lock:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/quant/miniforge3/envs/planck/lib/python3.11/pathlib.py", line 1044, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [Errno 30] Read-only file system: '/home/quant/.local/share/market-watch-docker/ops.lock'

@@ -504,6 +504,8 @@ def warm_step(source, after=None):
             rows = sorted(rows, key=lambda pair: (pair[0].id <= after, pair[0].id))
         candidate = None
         for interest, dataset in rows:
+            if cache.identity(dataset.metadata_json, dataset.timeframe) != dataset.id:
+                continue
             pending = next(
                 (
                     i

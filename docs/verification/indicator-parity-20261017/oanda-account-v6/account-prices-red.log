@@ -1,0 +1,156 @@
+FF.FFFFFFFFFF                                                            [100%]
+=================================== FAILURES ===================================
+_ test_native_history_then_account_latest_does_not_reset_but_real_repair_does __
+backend/tests/test_oanda_provider_account_prices.py:78: in test_native_history_then_account_latest_does_not_reset_but_real_repair_does
+    assert result["type"] == ("reset" if repair else "bars"), result
+E   AssertionError: {'type': 'reset', 'reason': 'history_changed'}
+E   assert 'reset' == 'bars'
+E
+E     - bars
+E     + reset
+_____________ test_history_sends_same_units_and_calendar_as_latest _____________
+backend/tests/test_oanda_provider_account_prices.py:94: in test_history_sends_same_units_and_calendar_as_latest
+    assert provider_chart.native_page(META, "M5", 1000000, 3, client=client)["bars"] == []
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/tmp/mw-issue74-20261017/account-red-package/alerts/provider_chart.py:300: in native_page
+    payload, request_mode = _oanda_candles(client, meta['symbol'], {
+/tmp/mw-issue74-20261017/account-red-package/alerts/provider_chart.py:236: in _oanda_candles
+    return _request(client, url, params=params, headers=headers, deadline=deadline), (
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/tmp/mw-issue74-20261017/account-red-package/alerts/provider_chart.py:195: in _request
+    response = client.get(
+.venv/lib/python3.11/site-packages/httpx/_client.py:1053: in get
+    return self.request(
+.venv/lib/python3.11/site-packages/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+.venv/lib/python3.11/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+.venv/lib/python3.11/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/httpx/_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/httpx/_transports/mock.py:24: in handle_request
+    response = self.handler(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+backend/tests/test_oanda_provider_account_prices.py:87: in respond
+    assert request.url.path == "/v3/accounts/selected-account/instruments/GBP_JPY/candles"
+E   AssertionError: assert '/v3/instrume...P_JPY/candles' == '/v3/accounts...P_JPY/candles'
+E
+E     - /v3/accounts/selected-account/instruments/GBP_JPY/candles
+E     + /v3/instruments/GBP_JPY/candles
+___ test_history_rejects_missing_credentials_without_http[oanda_account_id] ____
+backend/tests/test_oanda_provider_account_prices.py:102: in test_history_rejects_missing_credentials_without_http
+    provider_chart.native_page(META, "M5", 1000000, 3, client=client)
+/tmp/mw-issue74-20261017/account-red-package/alerts/provider_chart.py:300: in native_page
+    payload, request_mode = _oanda_candles(client, meta['symbol'], {
+/tmp/mw-issue74-20261017/account-red-package/alerts/provider_chart.py:236: in _oanda_candles
+    return _request(client, url, params=params, headers=headers, deadline=deadline), (
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/tmp/mw-issue74-20261017/account-red-package/alerts/provider_chart.py:195: in _request
+    response = client.get(
+.venv/lib/python3.11/site-packages/httpx/_client.py:1053: in get
+    return self.request(
+.venv/lib/python3.11/site-packages/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+.venv/lib/python3.11/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+.venv/lib/python3.11/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/httpx/_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.11/site-packages/httpx/_transports/mock.py:24: in handle_request
+    response = self.handler(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+backend/tests/test_oanda_provider_account_prices.py:100: in <lambda>
+    with httpx.Client(transport=httpx.MockTransport(lambda _: pytest.fail("must validate before HTTP"))) as client:
+                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: must validate before HTTP
+_ test_new_cache_isolates_legacy_rows_and_preserves_account_scope[parameters0] _
+backend/tests/test_oanda_provider_account_prices.py:123: in test_new_cache_isolates_legacy_rows_and_preserves_account_scope
+    assert new_key != old_key
+E   AssertionError: assert 'e15468eca6cd81a0cc1b5259a7827588faa66abe5001e8711d23728cc4aca881' != 'e15468eca6cd81a0cc1b5259a7827588faa66abe5001e8711d23728cc4aca881'
+_ test_new_cache_isolates_legacy_rows_and_preserves_account_scope[parameters1] _
+backend/tests/test_oanda_provider_account_prices.py:123: in test_new_cache_isolates_legacy_rows_and_preserves_account_scope
+    assert new_key != old_key
+E   AssertionError: assert '3ee63a3169677ab9f55508b110df69811d2e1cbc04af0f03ac7e30ffed6821a3' != '3ee63a3169677ab9f55508b110df69811d2e1cbc04af0f03ac7e30ffed6821a3'
+_ test_new_cache_isolates_legacy_rows_and_preserves_account_scope[parameters2] _
+backend/tests/test_oanda_provider_account_prices.py:123: in test_new_cache_isolates_legacy_rows_and_preserves_account_scope
+    assert new_key != old_key
+E   AssertionError: assert '48813f7a140cd4221c577a0eb4a4b89213502f2cfe1803e9abc29bb0b926aeba' != '48813f7a140cd4221c577a0eb4a4b89213502f2cfe1803e9abc29bb0b926aeba'
+_________ test_catalog_validates_explicit_account_even_when_not_first __________
+backend/tests/test_oanda_provider_account_prices.py:147: in test_catalog_validates_explicit_account_even_when_not_first
+    assert paths == ["/v3/accounts", "/v3/accounts/selected-account/instruments"]
+E   AssertionError: assert ['/v3/account.../instruments'] == ['/v3/account.../instruments']
+E
+E     At index 0 diff: '/v3/accounts/selected-account/instruments' != '/v3/accounts'
+E     Right contains one more item: '/v3/accounts/selected-account/instruments'
+E     Use -v to get more diff
+_ test_invalid_account_fails_before_catalog_and_logs_no_credentials[payload0-200-MarketRequestError] _
+backend/tests/test_oanda_provider_account_prices.py:165: in test_invalid_account_fails_before_catalog_and_logs_no_credentials
+    adapter.catalog()
+/tmp/mw-issue74-20261017/account-red-package/alerts/oanda_stream.py:180: in catalog
+    items = response.json()["instruments"]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'instruments'
+------------------------------ Captured log call -------------------------------
+WARNING  alerts.oanda_stream:oanda_stream.py:66 oanda_rest_failed operation=catalog phase=payload route=upstream type=KeyError http_status=200 body_kind=json elapsed_ms=0
+_ test_invalid_account_fails_before_catalog_and_logs_no_credentials[payload1-200-MarketRequestError] _
+backend/tests/test_oanda_provider_account_prices.py:165: in test_invalid_account_fails_before_catalog_and_logs_no_credentials
+    adapter.catalog()
+/tmp/mw-issue74-20261017/account-red-package/alerts/oanda_stream.py:180: in catalog
+    items = response.json()["instruments"]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'instruments'
+------------------------------ Captured log call -------------------------------
+WARNING  alerts.oanda_stream:oanda_stream.py:66 oanda_rest_failed operation=catalog phase=payload route=upstream type=KeyError http_status=200 body_kind=json elapsed_ms=0
+_ test_invalid_account_fails_before_catalog_and_logs_no_credentials[payload2-200-ValueError] _
+backend/tests/test_oanda_provider_account_prices.py:165: in test_invalid_account_fails_before_catalog_and_logs_no_credentials
+    adapter.catalog()
+/tmp/mw-issue74-20261017/account-red-package/alerts/oanda_stream.py:180: in catalog
+    items = response.json()["instruments"]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'instruments'
+------------------------------ Captured log call -------------------------------
+WARNING  alerts.oanda_stream:oanda_stream.py:66 oanda_rest_failed operation=catalog phase=payload route=upstream type=KeyError http_status=200 body_kind=json elapsed_ms=1
+_ test_invalid_account_fails_before_catalog_and_logs_no_credentials[payload3-200-ValueError] _
+backend/tests/test_oanda_provider_account_prices.py:165: in test_invalid_account_fails_before_catalog_and_logs_no_credentials
+    adapter.catalog()
+/tmp/mw-issue74-20261017/account-red-package/alerts/oanda_stream.py:180: in catalog
+    items = response.json()["instruments"]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'instruments'
+------------------------------ Captured log call -------------------------------
+WARNING  alerts.oanda_stream:oanda_stream.py:66 oanda_rest_failed operation=catalog phase=payload route=upstream type=KeyError http_status=200 body_kind=json elapsed_ms=0
+_ test_invalid_account_fails_before_catalog_and_logs_no_credentials[payload4-401-HTTPStatusError] _
+backend/tests/test_oanda_provider_account_prices.py:168: in test_invalid_account_fails_before_catalog_and_logs_no_credentials
+    assert paths == ["/v3/accounts"]
+E   AssertionError: assert ['/v3/account.../instruments'] == ['/v3/accounts']
+E
+E     At index 0 diff: '/v3/accounts/selected-account/instruments' != '/v3/accounts'
+E     Use -v to get more diff
+------------------------------ Captured log call -------------------------------
+WARNING  alerts.oanda_stream:oanda_stream.py:66 oanda_rest_failed operation=catalog phase=http_status route=upstream type=HTTPStatusError http_status=401 body_kind=json elapsed_ms=0
+=========================== short test summary info ============================
+FAILED backend/tests/test_oanda_provider_account_prices.py::test_native_history_then_account_latest_does_not_reset_but_real_repair_does
+FAILED backend/tests/test_oanda_provider_account_prices.py::test_history_sends_same_units_and_calendar_as_latest
+FAILED backend/tests/test_oanda_provider_account_prices.py::test_history_rejects_missing_credentials_without_http[oanda_account_id]
+FAILED backend/tests/test_oanda_provider_account_prices.py::test_new_cache_isolates_legacy_rows_and_preserves_account_scope[parameters0]
+FAILED backend/tests/test_oanda_provider_account_prices.py::test_new_cache_isolates_legacy_rows_and_preserves_account_scope[parameters1]
+FAILED backend/tests/test_oanda_provider_account_prices.py::test_new_cache_isolates_legacy_rows_and_preserves_account_scope[parameters2]
+FAILED backend/tests/test_oanda_provider_account_prices.py::test_catalog_validates_explicit_account_even_when_not_first
+FAILED backend/tests/test_oanda_provider_account_prices.py::test_invalid_account_fails_before_catalog_and_logs_no_credentials[payload0-200-MarketRequestError]
+FAILED backend/tests/test_oanda_provider_account_prices.py::test_invalid_account_fails_before_catalog_and_logs_no_credentials[payload1-200-MarketRequestError]
+FAILED backend/tests/test_oanda_provider_account_prices.py::test_invalid_account_fails_before_catalog_and_logs_no_credentials[payload2-200-ValueError]
+FAILED backend/tests/test_oanda_provider_account_prices.py::test_invalid_account_fails_before_catalog_and_logs_no_credentials[payload3-200-ValueError]
+FAILED backend/tests/test_oanda_provider_account_prices.py::test_invalid_account_fails_before_catalog_and_logs_no_credentials[payload4-401-HTTPStatusError]
+12 failed, 1 passed in 1.44s

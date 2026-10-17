@@ -78,6 +78,7 @@ def test_authenticated_registration_is_immutable_idempotent_and_demand_free(nati
     {"dailyAlignment": 0}, {"alignmentTimezone": "UTC"}, {"weeklyAlignment": "Monday"}])
 def test_parameter_isolation_and_original_native_ohlc(native_catalog, monkeypatch, delta):
     monkeypatch.setattr(settings, "oanda_token", "test-only")
+    monkeypatch.setattr(settings, "oanda_account_id", "native-test-account")
     meta = provider_chart.metadata("OANDA:EUR_USD")
     before = stamp("2026-10-02T00:00:00+00:00")
     configured = native_series.register(meta, {**DEFAULTS, **delta})

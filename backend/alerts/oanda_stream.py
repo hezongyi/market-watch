@@ -9,7 +9,14 @@ from decimal import Decimal, InvalidOperation
 
 import httpx
 
-from .market_contracts import CandleBatch, MinuteRow, QuoteEvent, RequestResult, failed_request
+from .market_contracts import (
+    CandleBatch,
+    MarketRequestError,
+    MinuteRow,
+    QuoteEvent,
+    RequestResult,
+    failed_request,
+)
 from .market_resources import cooldown, request_slot
 from .provider_transport import (
     activity,
@@ -171,6 +178,21 @@ class OandaPractice:
     def catalog(self):
         trace, response = TransportTrace(), None
         try:
+            # A token can authorize several accounts. Validate the explicitly
+            # configured account; never select the first account implicitly.
+            with request_slot("oanda"):
+                trace.phase, trace.route = "request", "upstream"
+                response = self.rest_get("https://api-fxpractice.oanda.com/v3/accounts",
+                    headers=self.headers, extensions={"trace": trace})
+            response.raise_for_status()
+            payload = response.json()
+            accounts = payload.get("accounts") if isinstance(payload, dict) else None
+            if not isinstance(accounts, list) or any(
+                    not isinstance(row, dict) or not isinstance(row.get("id"), str) or not row["id"]
+                    for row in accounts):
+                raise ValueError("Invalid OANDA account list")
+            if self.account_id not in {row["id"] for row in accounts}:
+                raise MarketRequestError(RequestResult(status="unauthorized"))
             with request_slot("oanda"):
                 trace.phase, trace.route = "request", "upstream"
                 response = self.rest_get(
@@ -181,7 +203,7 @@ class OandaPractice:
             if not isinstance(items, list):
                 raise ValueError("Invalid OANDA account catalog")
             return items
-        except (httpx.HTTPError, TimeoutError, ValueError, KeyError, TypeError) as error:
+        except (httpx.HTTPError, TimeoutError, ValueError, KeyError, TypeError, MarketRequestError) as error:
             trace.rest_failed("catalog", error, response)
             raise
 

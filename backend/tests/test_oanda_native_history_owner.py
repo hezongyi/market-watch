@@ -14,6 +14,11 @@ META = {'id': 'OANDA:EUR_USD', 'symbol': 'EUR_USD', 'source': 'oanda',
 NOW = 630000
 
 
+@pytest.fixture(autouse=True)
+def oanda_account(monkeypatch):
+    monkeypatch.setattr(settings, "oanda_account_id", "native-history-account")
+
+
 def bars(start, end, *, complete=True):
     return [{'start': t, 'end': t + 60000, 'chart_time': t,
              'open': '1.1', 'high': '1.2', 'low': '1.0', 'close': '1.1',

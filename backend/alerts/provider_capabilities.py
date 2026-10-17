@@ -48,11 +48,12 @@ def poll_seconds(source):
 
 def versions(meta):
     if meta["source"] == "oanda":
-        from .native_series import DEFAULTS, parameters
+        from .native_series import parameters
         native = parameters(meta)
-        if native != DEFAULTS:
-            rules = hashlib.sha256(json.dumps(native, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
-            return ("oanda-native-parameters-v1:" + rules, "volume-v1")
+        rules = hashlib.sha256(json.dumps(native, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+        # Both history and latest now use this configured account with units=1.
+        # Preserve legacy caches; their instrument-only prices are not reusable.
+        return ("oanda-account-candles-units1-v2:" + rules, "volume-v1")
     if meta["source"] == "dukascopy":
         return ("dukascopy-json3-bid-utc-splits-stocks-v1", "dukascopy-native-quantity-v1")
     if meta["source"] == "yahoo":
