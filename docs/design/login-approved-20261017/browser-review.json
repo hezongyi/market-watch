@@ -1,0 +1,206 @@
+{
+  "host": "quant-server / Ubuntu 22.04.5 LTS",
+  "url": "http://127.0.0.1:18717/login?variant=A&background=glow",
+  "baselineCommit": "9063547",
+  "layouts": [
+    {
+      "theme": "dark",
+      "width": 320,
+      "height": 740,
+      "scrollWidth": 320,
+      "cardInWidth": true,
+      "headerFits": true,
+      "toolbarBelowSubmit": true,
+      "animatedDots": 10,
+      "backgroundDecorative": true,
+      "matchesOriginalAGeometry": true
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "cardInWidth": true,
+      "headerFits": true,
+      "toolbarBelowSubmit": true,
+      "animatedDots": 14,
+      "backgroundDecorative": true,
+      "matchesOriginalAGeometry": true
+    },
+    {
+      "theme": "dark",
+      "width": 768,
+      "height": 1024,
+      "scrollWidth": 768,
+      "cardInWidth": true,
+      "headerFits": true,
+      "toolbarBelowSubmit": true,
+      "animatedDots": 33,
+      "backgroundDecorative": true
+    },
+    {
+      "theme": "dark",
+      "width": 1024,
+      "height": 768,
+      "scrollWidth": 1024,
+      "cardInWidth": true,
+      "headerFits": true,
+      "toolbarBelowSubmit": true,
+      "animatedDots": 33,
+      "backgroundDecorative": true
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "height": 900,
+      "scrollWidth": 1440,
+      "cardInWidth": true,
+      "headerFits": true,
+      "toolbarBelowSubmit": true,
+      "animatedDots": 54,
+      "backgroundDecorative": true,
+      "matchesOriginalAGeometry": true
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "height": 740,
+      "scrollWidth": 320,
+      "cardInWidth": true,
+      "headerFits": true,
+      "toolbarBelowSubmit": true,
+      "animatedDots": 10,
+      "backgroundDecorative": true,
+      "matchesOriginalAGeometry": true
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "cardInWidth": true,
+      "headerFits": true,
+      "toolbarBelowSubmit": true,
+      "animatedDots": 14,
+      "backgroundDecorative": true,
+      "matchesOriginalAGeometry": true
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "height": 1024,
+      "scrollWidth": 768,
+      "cardInWidth": true,
+      "headerFits": true,
+      "toolbarBelowSubmit": true,
+      "animatedDots": 33,
+      "backgroundDecorative": true
+    },
+    {
+      "theme": "light",
+      "width": 1024,
+      "height": 768,
+      "scrollWidth": 1024,
+      "cardInWidth": true,
+      "headerFits": true,
+      "toolbarBelowSubmit": true,
+      "animatedDots": 33,
+      "backgroundDecorative": true
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "height": 900,
+      "scrollWidth": 1440,
+      "cardInWidth": true,
+      "headerFits": true,
+      "toolbarBelowSubmit": true,
+      "animatedDots": 54,
+      "backgroundDecorative": true,
+      "matchesOriginalAGeometry": true
+    }
+  ],
+  "checks": [
+    "10 A layouts: dark/light × 320/390/768/1024/1440; no overflow, header overlap, or submit obstruction; original card/input/button geometry preserved",
+    "CSS breathing animations advance without pointer interaction",
+    "Input/show-password focus pauses animation; DOM identity, password and caret survive; leaving the form resumes",
+    "Manual switch works on first pointer click and by keyboard, preserves form, and restores pause from URL on reload",
+    "Visibility-change handler pauses/resumes (hidden property simulated in headless browser)",
+    "Theme preserves password; error correction, notification/session context and simulated submit work; background pauses while submitting",
+    "Plain A comparison and historical B/C URLs remain available; only A mounts dots",
+    "Resize rebuilds only decorative dots and preserves manual pause",
+    "Reduced motion shows a static dot grid and disables the switch; live preference changes work without navigation"
+  ],
+  "errors": [],
+  "failedResponses": [],
+  "externalRequests": [],
+  "geometryBefore": [
+    {
+      "width": 1440,
+      "height": 900,
+      "card": {
+        "x": 510,
+        "y": 203.109375,
+        "width": 420,
+        "height": 477.78125
+      },
+      "input": {
+        "x": 547,
+        "y": 410.890625,
+        "width": 346,
+        "height": 50
+      },
+      "button": {
+        "x": 547,
+        "y": 488.890625,
+        "width": 346,
+        "height": 48
+      }
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "card": {
+        "x": 20,
+        "y": 156.109375,
+        "width": 350,
+        "height": 465.78125
+      },
+      "input": {
+        "x": 47,
+        "y": 357.890625,
+        "width": 296,
+        "height": 50
+      },
+      "button": {
+        "x": 47,
+        "y": 435.890625,
+        "width": 296,
+        "height": 48
+      }
+    },
+    {
+      "width": 320,
+      "height": 740,
+      "card": {
+        "x": 20,
+        "y": 106,
+        "width": 280,
+        "height": 465.78125
+      },
+      "input": {
+        "x": 43,
+        "y": 307.78125,
+        "width": 234,
+        "height": 50
+      },
+      "button": {
+        "x": 43,
+        "y": 385.78125,
+        "width": 234,
+        "height": 48
+      }
+    }
+  ],
+  "result": "passed"
+}

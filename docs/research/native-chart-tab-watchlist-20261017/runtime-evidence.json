@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-17",
+  "host": "quant-server / Ubuntu 22.04.5 LTS",
+  "method": "Headless Chromium with in-memory request routing; installed licensed SDK read only; deterministic synthetic bars and quotes; no deployed service, application backend, credentials or persisted browser state.",
+  "version": "TT v31.1.0 (internal id 6b804c486857f27920cf761aa7eb6e29d9bb6362 @ 2026-04-08T18:21:25.992Z)",
+  "archive_sha256": "e4eabc20e156000b2a8fda7747044fd82b95c714526c7ab7f34bcfe62abaf9ee",
+  "loadedFiles": [
+    {
+      "path": "charting_library.js",
+      "sha256": "2b49390b118321b574f11119d3d9b9e1b8dad7af22aa8d674425ad75f0c7ab41",
+      "matchesManifest": true
+    },
+    {
+      "path": "bundles/runtime.d6871abde1090b0329fe.js",
+      "sha256": "42857375d9295366c17e6e60241f09d13be67e622466db8666d9c457e1265431",
+      "matchesManifest": true
+    },
+    {
+      "path": "bundles/library.e2f8b3a016c9e1a0b7a5.js",
+      "sha256": "114428b8dde6eb137fd7ef3bc20ef35882189186c4bd092bb743b64d11682be1",
+      "matchesManifest": true
+    },
+    {
+      "path": "bundles/watchlist-widget.f2884e5a3090b7d69890.js",
+      "sha256": "52539ef6f4600319d8e803255a4b43498b2d21d5d532b2deb6095c5cc51add2d",
+      "matchesManifest": true
+    }
+  ],
+  "config": {
+    "locale": "zh",
+    "watchlist": true,
+    "readonly": false,
+    "enabled_features": [
+      "support_multicharts",
+      "items_favoriting"
+    ],
+    "disabled_features": [
+      "use_localstorage_for_settings",
+      "widget_logo",
+      "open_account_manager"
+    ],
+    "settings_adapter": "memory only"
+  },
+  "watchlistReady": true,
+  "displayedSymbols": [
+    "EURUSD",
+    "XAUUSD",
+    "BTCUSDT"
+  ],
+  "apiMethods": [
+    "constructor",
+    "defaultList",
+    "getList",
+    "getActiveListId",
+    "setActiveList",
+    "getAllLists",
+    "setList",
+    "updateList",
+    "renameList",
+    "createList",
+    "saveList",
+    "deleteList",
+    "onListChanged",
+    "onActiveListChanged",
+    "onListAdded",
+    "onListRemoved",
+    "onListRenamed"
+  ],
+  "nativeFlagNodes": 0,
+  "nativePaletteNodes": 0,
+  "contextMenuVisibleLabels": [
+    "添加商品代码",
+    "添加EURUSD进行比较"
+  ],
+  "contextMenuTextTail": "EURUSD\nAudit•开市\n\t\n添加商品代码\n\n\n\n\t\n添加EURUSD进行比较",
+  "afterAltEnter": {
+    "nativeFlagNodes": 0,
+    "nativePaletteNodes": 0
+  },
+  "pageErrors": [],
+  "blockedRequests": [],
+  "consoleWarnings": [],
+  "scope": "Direct installed-SDK component audit, not an end-to-end application or backend regression. No inference about other SDK versions or private customer extensions."
+}
