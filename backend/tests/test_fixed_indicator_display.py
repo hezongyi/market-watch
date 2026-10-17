@@ -13,6 +13,62 @@ from test_fixed_indicators import drain, history
 from test_indicator_state import SPECS, prices
 
 
+def test_confirmed_composite_foreground_skips_redundant_display_suffix(database, monkeypatch):
+    from test_composite_aggregates import drain as aggregates
+    from test_composite_chart import populated
+
+    composite, revision, seam = populated(database, monkeypatch)
+    aggregates(revision, "M1")
+    spec = {"name": "EMA", "params": {"period": 2}}
+    body = DataQuery(instrument=composite, series_kind="composite", timeframe="M1", before=seam,
+        limit=2, provisional=True, indicators=[spec], client="confirmed-display-test",
+        indicator_consumers=[{"id": "study", "generation": 1, "spec": spec}])
+
+    def redundant(*args, **kwargs):
+        raise AssertionError("Confirmed foreground inputs must not scan or enqueue a display suffix")
+
+    monkeypatch.setattr("alerts.display_indicators.suffix", redundant)
+    result = data_sync(body)
+    actual = result["indicators"][0]
+    assert actual["calculation"]["visible_complete"]
+    assert not actual["calculation"]["display_task_ids"]
+    assert actual["calculation"]["execution"]["result_cache"] == "miss"
+    drain(actual["calculation"]["run_id"])
+    canonical = data_sync(body.model_copy(update={"client": None, "indicator_consumers": [],
+        "provisional": False}))["indicators"][0]
+    assert actual["series"] == canonical["series"]
+    assert actual["dependencies"] == canonical["dependencies"]
+
+
+def test_chart_route_serializes_native_json_catalog_payload_without_recursive_reencoding(database, monkeypatch):
+    from alerts import api
+    from fastapi import routing
+    from fastapi.testclient import TestClient
+
+    version = history(database, monkeypatch, count=300)
+    original = routing.jsonable_encoder
+
+    def encode(value, *args, **kwargs):
+        assert not (isinstance(value, dict) and "bars" in value and "indicators" in value), (
+            "Chart payloads already use JSON types; avoid a second recursive walk")
+        return original(value, *args, **kwargs)
+
+    monkeypatch.setattr(routing, "jsonable_encoder", encode)
+    api.app.dependency_overrides[api.authenticated] = lambda: "test"
+    try:
+        with TestClient(api.app) as client:
+            result = client.post("/api/charts/data", json={"instrument": version,
+                "series_kind": "history", "timeframe": "M1", "limit": 25,
+                "indicators": [{"name": name} for name in CATALOG]})
+            assert result.status_code == 200, result.text
+            assert result.headers["content-type"] == "application/json"
+            page = result.json()
+            assert len(page["bars"]) == 25
+            assert {item["name"] for item in page["indicators"]} == set(CATALOG)
+    finally:
+        api.app.dependency_overrides.clear()
+
+
 def query(version, spec, generation=1):
     return DataQuery(instrument=version, series_kind="history", timeframe="M1", limit=25,
         indicators=[spec], client="display-test", indicator_consumers=[

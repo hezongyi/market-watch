@@ -838,7 +838,9 @@ def router(authenticated):
 
     @r.post("/data")
     async def data(body: DataQuery, request: Request):
-        return await query_chart(body, request.is_disconnected)
+        # Readers already return JSON primitives. A response avoids FastAPI's
+        # second recursive conversion of every candle, segment and plot point.
+        return JSONResponse(await query_chart(body, request.is_disconnected))
 
     return r
 

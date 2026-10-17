@@ -1,0 +1,4681 @@
+{
+  "recordedAt": "2026-10-17T07:14:34.942Z",
+  "budgetRevision": "2026-10-17-scenarios-v1",
+  "scenario": "loaded-new-spec",
+  "budget": {
+    "firstMs": 500,
+    "coverageMs": 1000,
+    "canonicalMs": 2000,
+    "timeoutMs": 5000
+  },
+  "source": "actual app / Playwriter / native renderer after two RAFs",
+  "synthetic": true,
+  "config": {
+    "phase": "budget-managed-ema-edit-new-spec-9",
+    "scenario": "loaded-new-spec",
+    "operation": "edit",
+    "kind": "managed",
+    "indicator": "EMA",
+    "prefixRows": 3000,
+    "specs": [
+      {
+        "params": {
+          "period": 331
+        }
+      },
+      {
+        "params": {
+          "period": 332
+        }
+      },
+      {
+        "params": {
+          "period": 333
+        }
+      },
+      {
+        "params": {
+          "period": 334
+        }
+      },
+      {
+        "params": {
+          "period": 335
+        }
+      },
+      {
+        "params": {
+          "period": 336
+        }
+      },
+      {
+        "params": {
+          "period": 337
+        }
+      },
+      {
+        "params": {
+          "period": 338
+        }
+      },
+      {
+        "params": {
+          "period": 339
+        }
+      },
+      {
+        "params": {
+          "period": 340
+        }
+      },
+      {
+        "params": {
+          "period": 341
+        }
+      },
+      {
+        "params": {
+          "period": 342
+        }
+      },
+      {
+        "params": {
+          "period": 343
+        }
+      },
+      {
+        "params": {
+          "period": 344
+        }
+      },
+      {
+        "params": {
+          "period": 345
+        }
+      },
+      {
+        "params": {
+          "period": 346
+        }
+      },
+      {
+        "params": {
+          "period": 347
+        }
+      },
+      {
+        "params": {
+          "period": 348
+        }
+      },
+      {
+        "params": {
+          "period": 349
+        }
+      },
+      {
+        "params": {
+          "period": 350
+        }
+      },
+      {
+        "params": {
+          "period": 351
+        }
+      },
+      {
+        "params": {
+          "period": 352
+        }
+      },
+      {
+        "params": {
+          "period": 353
+        }
+      },
+      {
+        "params": {
+          "period": 354
+        }
+      },
+      {
+        "params": {
+          "period": 355
+        }
+      },
+      {
+        "params": {
+          "period": 356
+        }
+      },
+      {
+        "params": {
+          "period": 357
+        }
+      },
+      {
+        "params": {
+          "period": 358
+        }
+      },
+      {
+        "params": {
+          "period": 359
+        }
+      },
+      {
+        "params": {
+          "period": 360
+        }
+      }
+    ],
+    "knownUnused": true,
+    "initial": {
+      "params": {
+        "period": 21
+      }
+    }
+  },
+  "environment": {
+    "symbol": "PARITY",
+    "range": {
+      "from": 1792189920,
+      "to": 1792202460
+    },
+    "timeOrigin": 1792219995443.6
+  },
+  "n": 30,
+  "failures": 0,
+  "quantile": "nearest-rank; failures as infinity (JSON null)",
+  "ms": {
+    "p50": 89,
+    "p95": 116.59999999403954
+  },
+  "coverageMs": {
+    "p50": 89,
+    "p95": 116.59999999403954
+  },
+  "canonicalMs": {
+    "p50": 89,
+    "p95": 116.59999999403954
+  },
+  "passed": true,
+  "samples": [
+    {
+      "index": 1,
+      "params": {
+        "period": 331
+      },
+      "ms": 94.90000000596046,
+      "coverageMs": 94.90000000596046,
+      "first": {
+        "at": 1274179.7000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":331}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":331}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1274179.7000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":331}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":331}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.5352432356682
+      ],
+      "canonicalMs": 94.90000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221269602,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 331
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221269546.509,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.25,
+            "responseStart": 44.521,
+            "responseEnd": 45.479
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 331
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": [
+        {
+          "at": 1792221269513,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 21
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221269437.645,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.278,
+            "responseStart": 55.495,
+            "responseEnd": 56.605
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 21
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "params": {
+        "period": 332
+      },
+      "ms": 79.19999998807907,
+      "coverageMs": 79.19999998807907,
+      "first": {
+        "at": 1274332.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":332}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":332}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1274332.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":332}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":332}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.52966649085339
+      ],
+      "canonicalMs": 79.19999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221269758,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 332
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221269699.878,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.322,
+            "responseStart": 46.939,
+            "responseEnd": 49.111
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 332
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 3,
+      "params": {
+        "period": 333
+      },
+      "ms": 78.39999997615814,
+      "coverageMs": 78.39999997615814,
+      "first": {
+        "at": 1274497.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":333}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":333}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1274497.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":333}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":333}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.52409314570046
+      ],
+      "canonicalMs": 78.39999997615814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221269929,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 333
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221269866.4941,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.264,
+            "responseStart": 51.708,
+            "responseEnd": 52.865
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 333
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 4,
+      "params": {
+        "period": 334
+      },
+      "ms": 81.30000001192093,
+      "coverageMs": 81.30000001192093,
+      "first": {
+        "at": 1274696.900000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":334}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":334}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1274696.900000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":334}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":334}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.51852317105762
+      ],
+      "canonicalMs": 81.30000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221270121,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 334
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221270070.435,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.234,
+            "responseStart": 42.321,
+            "responseEnd": 43.69
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 334
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 5,
+      "params": {
+        "period": 335
+      },
+      "ms": 100.59999999403954,
+      "coverageMs": 100.59999999403954,
+      "first": {
+        "at": 1274896,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":335}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":335}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1274896,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":335}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":335}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.51295653794054
+      ],
+      "canonicalMs": 100.59999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221270324,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 335
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221270252.352,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.252,
+            "responseStart": 54.686,
+            "responseEnd": 55.726
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 335
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 6,
+      "params": {
+        "period": 336
+      },
+      "ms": 75.69999998807907,
+      "coverageMs": 75.69999998807907,
+      "first": {
+        "at": 1275063.400000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":336}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":336}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1275063.400000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":336}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":336}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.50739321750399
+      ],
+      "canonicalMs": 75.69999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221270500,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 336
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221270437.162,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.294,
+            "responseStart": 49.844,
+            "responseEnd": 50.809
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 336
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 7,
+      "params": {
+        "period": 337
+      },
+      "ms": 112.7000000178814,
+      "coverageMs": 112.7000000178814,
+      "first": {
+        "at": 1275263.7000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":337}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":337}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1275263.7000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":337}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":337}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.50183318101567
+      ],
+      "canonicalMs": 112.7000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221270724,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 337
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221270598.532,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.253,
+            "responseStart": 79.325,
+            "responseEnd": 80.342
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 337
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 8,
+      "params": {
+        "period": 338
+      },
+      "ms": 97.7000000178814,
+      "coverageMs": 97.7000000178814,
+      "first": {
+        "at": 1275449.800000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":338}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":338}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1275449.800000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":338}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":338}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.49627639983504
+      ],
+      "canonicalMs": 97.7000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221270852,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 338
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221270799.726,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.251,
+            "responseStart": 43.755,
+            "responseEnd": 45.935
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 338
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 9,
+      "params": {
+        "period": 339
+      },
+      "ms": 92.39999997615814,
+      "coverageMs": 92.39999997615814,
+      "first": {
+        "at": 1275631.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":339}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":339}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1275631.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":339}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":339}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.49072284539565
+      ],
+      "canonicalMs": 92.39999997615814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221271052,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 339
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221271000.5833,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.242,
+            "responseStart": 41.167,
+            "responseEnd": 48.337
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 339
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 10,
+      "params": {
+        "period": 340
+      },
+      "ms": 96.40000000596046,
+      "coverageMs": 96.40000000596046,
+      "first": {
+        "at": 1275848.800000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":340}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":340}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1275848.800000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":340}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":340}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.48517248919465
+      ],
+      "canonicalMs": 96.40000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221271295,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 340
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221271199.34,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.247,
+            "responseStart": 62.665,
+            "responseEnd": 63.598
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 340
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 11,
+      "params": {
+        "period": 341
+      },
+      "ms": 86.7999999821186,
+      "coverageMs": 86.7999999821186,
+      "first": {
+        "at": 1275996,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":341}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":341}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1275996,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":341}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":341}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.47962530278544
+      ],
+      "canonicalMs": 86.7999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221271426,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 341
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221271355.4648,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.244,
+            "responseStart": 61.964,
+            "responseEnd": 62.933
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 341
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 12,
+      "params": {
+        "period": 342
+      },
+      "ms": 69.19999998807907,
+      "coverageMs": 69.19999998807907,
+      "first": {
+        "at": 1276162.5,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":342}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":342}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1276162.5,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":342}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":342}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.47408125777909
+      ],
+      "canonicalMs": 69.19999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221271607,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 342
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221271540.314,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.659,
+            "responseStart": 41.956,
+            "responseEnd": 43.024
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 342
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 13,
+      "params": {
+        "period": 343
+      },
+      "ms": 98,
+      "coverageMs": 98,
+      "first": {
+        "at": 1276329.300000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":343}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":343}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1276329.300000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":343}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":343}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.46854032585144
+      ],
+      "canonicalMs": 98,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221271752,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 343
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221271692.811,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.285,
+            "responseStart": 49.971,
+            "responseEnd": 52.123
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 343
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 14,
+      "params": {
+        "period": 344
+      },
+      "ms": 76.40000000596046,
+      "coverageMs": 76.40000000596046,
+      "first": {
+        "at": 1276496.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":344}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":344}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1276496.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":344}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":344}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.46300247875747
+      ],
+      "canonicalMs": 76.40000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221271940,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 344
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221271868.3337,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.254,
+            "responseStart": 49.945,
+            "responseEnd": 51.015
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 344
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 15,
+      "params": {
+        "period": 345
+      },
+      "ms": 90.2000000178814,
+      "coverageMs": 90.2000000178814,
+      "first": {
+        "at": 1276730.300000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":345}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":345}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1276730.300000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":345}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":345}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.45746768835177
+      ],
+      "canonicalMs": 90.2000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221272159,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 345
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221272092.3728,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.249,
+            "responseStart": 53.808,
+            "responseEnd": 59.901
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 345
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 16,
+      "params": {
+        "period": 346
+      },
+      "ms": 89,
+      "coverageMs": 89,
+      "first": {
+        "at": 1276898.900000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":346}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":346}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1276898.900000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":346}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":346}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.45193592661649
+      ],
+      "canonicalMs": 89,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221272321,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 346
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221272257.031,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.256,
+            "responseStart": 52.301,
+            "responseEnd": 53.66
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 346
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 17,
+      "params": {
+        "period": 347
+      },
+      "ms": 66,
+      "coverageMs": 66,
+      "first": {
+        "at": 1277062.800000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":347}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":347}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1277062.800000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":347}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":347}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.44640716569624
+      ],
+      "canonicalMs": 66,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221272505,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 347
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221272444.5312,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.243,
+            "responseStart": 36.561,
+            "responseEnd": 39.905
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 347
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 18,
+      "params": {
+        "period": 348
+      },
+      "ms": 74.7999999821186,
+      "coverageMs": 74.7999999821186,
+      "first": {
+        "at": 1277212.599999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":348}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":348}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1277212.599999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":348}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":348}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.44088137793777
+      ],
+      "canonicalMs": 74.7999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221272644,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 348
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221272584.687,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.255,
+            "responseStart": 50.198,
+            "responseEnd": 51.528
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 348
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 19,
+      "params": {
+        "period": 349
+      },
+      "ms": 116.59999999403954,
+      "coverageMs": 116.59999999403954,
+      "first": {
+        "at": 1277396.800000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":349}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":349}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1277396.800000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":349}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":349}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.43535853593659
+      ],
+      "canonicalMs": 116.59999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221272821,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 349
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221272737.367,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.238,
+            "responseStart": 72.392,
+            "responseEnd": 74.827
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 349
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 20,
+      "params": {
+        "period": 350
+      },
+      "ms": 78.40000000596046,
+      "coverageMs": 78.40000000596046,
+      "first": {
+        "at": 1277579.300000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":350}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":350}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1277579.300000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":350}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":350}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.42983861258617
+      ],
+      "canonicalMs": 78.40000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221273008,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 350
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221272947.346,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.249,
+            "responseStart": 49.321,
+            "responseEnd": 50.398
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 350
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 21,
+      "params": {
+        "period": 351
+      },
+      "ms": 86.40000000596046,
+      "coverageMs": 86.40000000596046,
+      "first": {
+        "at": 1277746.300000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":351}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":351}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1277746.300000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":351}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":351}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.4243215811328
+      ],
+      "canonicalMs": 86.40000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221273161,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 351
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221273107.848,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.256,
+            "responseStart": 42.127,
+            "responseEnd": 45.954
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 351
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 22,
+      "params": {
+        "period": 352
+      },
+      "ms": 103.09999999403954,
+      "coverageMs": 103.09999999403954,
+      "first": {
+        "at": 1277912.800000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":352}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":352}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1277912.800000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":352}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":352}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.41880741523137
+      ],
+      "canonicalMs": 103.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221273333,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 352
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221273258.754,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.274,
+            "responseStart": 64.519,
+            "responseEnd": 65.652
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 352
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 23,
+      "params": {
+        "period": 353
+      },
+      "ms": 112.60000002384186,
+      "coverageMs": 112.60000002384186,
+      "first": {
+        "at": 1278129.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":353}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":353}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1278129.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":353}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":353}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.41329608900266
+      ],
+      "canonicalMs": 112.60000002384186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221273553,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 353
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221273462.9478,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.253,
+            "responseStart": 77.872,
+            "responseEnd": 78.841
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 353
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 24,
+      "params": {
+        "period": 354
+      },
+      "ms": 91.7999999821186,
+      "coverageMs": 91.7999999821186,
+      "first": {
+        "at": 1278312.599999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":354}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":354}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1278312.599999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":354}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":354}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.40778757709019
+      ],
+      "canonicalMs": 91.7999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221273745,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 354
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221273668.8052,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.272,
+            "responseStart": 59.025,
+            "responseEnd": 64.325
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 354
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 25,
+      "params": {
+        "period": 355
+      },
+      "ms": 71.2999999821186,
+      "coverageMs": 71.2999999821186,
+      "first": {
+        "at": 1278546,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":355}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":355}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1278546,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":355}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":355}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.40228185471476
+      ],
+      "canonicalMs": 71.2999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221273986,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 355
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221273921.098,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.259,
+            "responseStart": 41.341,
+            "responseEnd": 43.284
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 355
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": [
+        {
+          "at": 1792221273905,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 21
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221273823.332,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.24,
+            "responseStart": 68.997,
+            "responseEnd": 72.647
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 21
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "index": 26,
+      "params": {
+        "period": 356
+      },
+      "ms": 92.59999999403954,
+      "coverageMs": 92.59999999403954,
+      "first": {
+        "at": 1278712.599999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":356}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":356}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1278712.599999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":356}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":356}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.39677889772743
+      ],
+      "canonicalMs": 92.59999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221274139,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 356
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221274066.9912,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.255,
+            "responseStart": 59.276,
+            "responseEnd": 60.261
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 356
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 27,
+      "params": {
+        "period": 357
+      },
+      "ms": 85.7000000178814,
+      "coverageMs": 85.7000000178814,
+      "first": {
+        "at": 1278879.300000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":357}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":357}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1278879.300000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":357}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":357}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.39127868265487
+      ],
+      "canonicalMs": 85.7000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221274301,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 357
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221274245.2068,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.247,
+            "responseStart": 45.482,
+            "responseEnd": 46.834
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 357
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 28,
+      "params": {
+        "period": 358
+      },
+      "ms": 86.40000000596046,
+      "coverageMs": 86.40000000596046,
+      "first": {
+        "at": 1279045.900000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":358}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":358}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1279045.900000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":358}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":358}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.38578118673978
+      ],
+      "canonicalMs": 86.40000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221274470,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 358
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221274405.781,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.252,
+            "responseStart": 57.519,
+            "responseEnd": 58.465
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 358
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 29,
+      "params": {
+        "period": 359
+      },
+      "ms": 102.59999999403954,
+      "coverageMs": 102.59999999403954,
+      "first": {
+        "at": 1279230.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":359}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":359}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1279230.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":359}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":359}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.38028638797338
+      ],
+      "canonicalMs": 102.59999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221274661,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 359
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221274575.1018,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.251,
+            "responseStart": 75.736,
+            "responseEnd": 79.037
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 359
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 30,
+      "params": {
+        "period": 360
+      },
+      "ms": 139.39999997615814,
+      "coverageMs": 139.39999997615814,
+      "first": {
+        "at": 1279441.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":360}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":360}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1279441.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"period\":360}",
+          "algorithmVersion": "EMA:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"period\\\":360}\",\"algorithmVersion\":\"EMA:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        123.3747942651173
+      ],
+      "canonicalMs": 139.39999997615814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221274851,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "EMA",
+                "params": {
+                  "period": 360
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221274748.459,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.323,
+            "responseStart": 90.283,
+            "responseEnd": 95.636
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "EMA",
+              "params": {
+                "period": 360
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    }
+  ]
+}

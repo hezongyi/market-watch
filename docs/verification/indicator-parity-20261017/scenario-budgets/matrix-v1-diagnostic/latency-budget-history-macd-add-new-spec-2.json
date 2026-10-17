@@ -1,0 +1,5630 @@
+{
+  "recordedAt": "2026-10-17T07:13:13.755Z",
+  "budgetRevision": "2026-10-17-scenarios-v1",
+  "scenario": "loaded-new-spec",
+  "budget": {
+    "firstMs": 500,
+    "coverageMs": 1000,
+    "canonicalMs": 2000,
+    "timeoutMs": 5000
+  },
+  "source": "actual app / Playwriter / native renderer after two RAFs",
+  "synthetic": true,
+  "config": {
+    "phase": "budget-history-macd-add-new-spec-2",
+    "scenario": "loaded-new-spec",
+    "operation": "add",
+    "kind": "history",
+    "indicator": "MACD",
+    "prefixRows": 5760,
+    "specs": [
+      {
+        "params": {
+          "fast": 13,
+          "slow": 91,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 14,
+          "slow": 92,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 15,
+          "slow": 93,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 16,
+          "slow": 94,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 17,
+          "slow": 95,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 18,
+          "slow": 96,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 19,
+          "slow": 97,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 20,
+          "slow": 98,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 21,
+          "slow": 99,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 22,
+          "slow": 100,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 23,
+          "slow": 101,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 24,
+          "slow": 102,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 25,
+          "slow": 103,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 26,
+          "slow": 104,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 27,
+          "slow": 105,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 28,
+          "slow": 106,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 29,
+          "slow": 107,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 30,
+          "slow": 108,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 31,
+          "slow": 109,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 32,
+          "slow": 110,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 33,
+          "slow": 111,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 34,
+          "slow": 112,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 35,
+          "slow": 113,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 36,
+          "slow": 114,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 37,
+          "slow": 115,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 38,
+          "slow": 116,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 39,
+          "slow": 117,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 40,
+          "slow": 118,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 41,
+          "slow": 119,
+          "signal": 11
+        }
+      },
+      {
+        "params": {
+          "fast": 42,
+          "slow": 120,
+          "signal": 11
+        }
+      }
+    ],
+    "knownUnused": true
+  },
+  "environment": {
+    "symbol": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+    "range": {
+      "from": 1791491880,
+      "to": 1791504540
+    },
+    "timeOrigin": 1792219995443.6
+  },
+  "n": 30,
+  "failures": 0,
+  "quantile": "nearest-rank; failures as infinity (JSON null)",
+  "ms": {
+    "p50": 374,
+    "p95": 525
+  },
+  "coverageMs": {
+    "p50": 374,
+    "p95": 525
+  },
+  "canonicalMs": {
+    "p50": 374,
+    "p95": 525
+  },
+  "passed": false,
+  "samples": [
+    {
+      "index": 1,
+      "params": {
+        "fast": 13,
+        "slow": 91,
+        "signal": 11
+      },
+      "ms": 508.40000000596046,
+      "coverageMs": 508.40000000596046,
+      "first": {
+        "at": 1183414.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":13,\"signal\":11,\"slow\":91}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":13,\\\"signal\\\":11,\\\"slow\\\":91}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1183414.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":13,\"signal\":11,\"slow\":91}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":13,\\\"signal\\\":11,\\\"slow\\\":91}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.0003557399744114065,
+        0.00035145747121274364,
+        0.000004282503198662843
+      ],
+      "canonicalMs": 508.40000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221178938,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 13,
+                  "slow": 91,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221178468.7102,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.224,
+            "responseStart": 189.283,
+            "responseEnd": 197.595
+          },
+          "timings": {
+            "fixed_read_freeze": 52.42
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 13,
+                "slow": 91,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "e5b36d820b0bf6cdbdf12bd6a760f8ab7304f4ae135ae8e5485f35bc1b358f64",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 39.31
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 2,
+      "params": {
+        "fast": 14,
+        "slow": 92,
+        "signal": 11
+      },
+      "ms": 346.5,
+      "coverageMs": 346.5,
+      "first": {
+        "at": 1183993.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":14,\"signal\":11,\"slow\":92}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":14,\\\"signal\\\":11,\\\"slow\\\":92}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1183993.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":14,\"signal\":11,\"slow\":92}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":14,\\\"signal\\\":11,\\\"slow\\\":92}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.00035383050383042125,
+        0.0003493651339330926,
+        0.0000044653698973286336
+      ],
+      "canonicalMs": 346.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221179420,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 14,
+                  "slow": 92,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221179184.9312,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.262,
+            "responseStart": 154.206,
+            "responseEnd": 161.412
+          },
+          "timings": {
+            "fixed_read_freeze": 44.06
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 14,
+                "slow": 92,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "7e8233f5f282a5939367746c129cdab636bf9f6254ba4271883b799458bd3c02",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 42.52
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 3,
+      "params": {
+        "fast": 15,
+        "slow": 93,
+        "signal": 11
+      },
+      "ms": 444,
+      "coverageMs": 444,
+      "first": {
+        "at": 1184512.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":15,\"signal\":11,\"slow\":93}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":15,\\\"signal\\\":11,\\\"slow\\\":93}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1184512.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":15,\"signal\":11,\"slow\":93}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":15,\\\"signal\\\":11,\\\"slow\\\":93}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.0003518591181499442,
+        0.0003472077910957218,
+        0.000004651327054222402
+      ],
+      "canonicalMs": 444,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221179938,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 15,
+                  "slow": 93,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221179578.3071,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.262,
+            "responseStart": 288.262,
+            "responseEnd": 292.258
+          },
+          "timings": {
+            "fixed_read_freeze": 139.49
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 15,
+                "slow": 93,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "1f845b132943522214b3acc27068d71cb50ae953a77268d8f057788fb3e165eb",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 49.04
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 4,
+      "params": {
+        "fast": 16,
+        "slow": 94,
+        "signal": 11
+      },
+      "ms": 332.69999998807907,
+      "coverageMs": 332.69999998807907,
+      "first": {
+        "at": 1184956.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":16,\"signal\":11,\"slow\":94}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":16,\\\"signal\\\":11,\\\"slow\\\":94}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1184956.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":16,\"signal\":11,\"slow\":94}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":16,\\\"signal\\\":11,\\\"slow\\\":94}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.00034982566721830644,
+        0.00034498538616454367,
+        0.00000484028105376277
+      ],
+      "canonicalMs": 332.69999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221180374,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 16,
+                  "slow": 94,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221180139.878,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.249,
+            "responseStart": 178.529,
+            "responseEnd": 181.477
+          },
+          "timings": {
+            "fixed_read_freeze": 48.06
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 16,
+                "slow": 94,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "19d12974c9ec5c364a00116d818620cee9b5d9daa70620032c117ff4cc71e762",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 53.83
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 5,
+      "params": {
+        "fast": 17,
+        "slow": 95,
+        "signal": 11
+      },
+      "ms": 433.5,
+      "coverageMs": 433.5,
+      "first": {
+        "at": 1185490.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":17,\"signal\":11,\"slow\":95}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":17,\\\"signal\\\":11,\\\"slow\\\":95}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1185490.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":17,\"signal\":11,\"slow\":95}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":17,\\\"signal\\\":11,\\\"slow\\\":95}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.0003477300452101595,
+        0.0003426979077540634,
+        0.000005032137456096068
+      ],
+      "canonicalMs": 433.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221180890,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 17,
+                  "slow": 95,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221180566.514,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.305,
+            "responseStart": 238.275,
+            "responseEnd": 244.693
+          },
+          "timings": {
+            "fixed_read_freeze": 63.46
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 17,
+                "slow": 95,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "5646a9d8e735bd06cc319131bb8f02c473eef3fc56d28154244388f3e3ae29d1",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 80.47
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 6,
+      "params": {
+        "fast": 18,
+        "slow": 96,
+        "signal": 11
+      },
+      "ms": 382.69999998807907,
+      "coverageMs": 382.69999998807907,
+      "first": {
+        "at": 1185959.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":18,\"signal\":11,\"slow\":96}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":18,\\\"signal\\\":11,\\\"slow\\\":96}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1185959.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":18,\"signal\":11,\"slow\":96}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":18,\\\"signal\\\":11,\\\"slow\\\":96}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.00034557218928488176,
+        0.0003403453880958442,
+        0.000005226801189037579
+      ],
+      "canonicalMs": 382.69999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221181377,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 18,
+                  "slow": 96,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221181166.931,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.286,
+            "responseStart": 149.077,
+            "responseEnd": 154.634
+          },
+          "timings": {
+            "fixed_read_freeze": 36.9
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 18,
+                "slow": 96,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "b089d3a36cab9c1b33ea54693d41595ae2f2780d5a105716d479a9f3f7d74b6d",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 42.1
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 7,
+      "params": {
+        "fast": 19,
+        "slow": 97,
+        "signal": 11
+      },
+      "ms": 576.9000000059605,
+      "coverageMs": 576.9000000059605,
+      "first": {
+        "at": 1186641.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":19,\"signal\":11,\"slow\":97}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":19,\\\"signal\\\":11,\\\"slow\\\":97}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1186641.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":19,\"signal\":11,\"slow\":97}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":19,\\\"signal\\\":11,\\\"slow\\\":97}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.0003433520782538668,
+        0.0003379279015404988,
+        0.000005424176713368027
+      ],
+      "canonicalMs": 576.9000000059605,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221182068,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 19,
+                  "slow": 97,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221181561.518,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.276,
+            "responseStart": 411.364,
+            "responseEnd": 417.367
+          },
+          "timings": {
+            "fixed_read_freeze": 83.41
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 19,
+                "slow": 97,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "cc8b2952dd1e4e2cbc5af32098ed4020b0c1924c3360daac5dcac04f70db1e0f",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 73.72
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 8,
+      "params": {
+        "fast": 20,
+        "slow": 98,
+        "signal": 11
+      },
+      "ms": 294.10000002384186,
+      "coverageMs": 294.10000002384186,
+      "first": {
+        "at": 1186993.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":20,\"signal\":11,\"slow\":98}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":20,\\\"signal\\\":11,\\\"slow\\\":98}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1186993.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":20,\"signal\":11,\"slow\":98}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":20,\\\"signal\\\":11,\\\"slow\\\":98}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.00034106973126735163,
+        0.0003354455631285313,
+        0.00000562416813882033
+      ],
+      "canonicalMs": 294.10000002384186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221182391,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 20,
+                  "slow": 98,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221182190.947,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.292,
+            "responseStart": 142.155,
+            "responseEnd": 149.183
+          },
+          "timings": {
+            "fixed_read_freeze": 30.85
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 20,
+                "slow": 98,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "07f0a43f3466927e7cb95898b4b37bbea4ac1d1e93cd594a7ecfb22ed33cf294",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 42.39
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 9,
+      "params": {
+        "fast": 21,
+        "slow": 99,
+        "signal": 11
+      },
+      "ms": 472.09999999403954,
+      "coverageMs": 472.09999999403954,
+      "first": {
+        "at": 1187580.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":21,\"signal\":11,\"slow\":99}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":21,\\\"signal\\\":11,\\\"slow\\\":99}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1187580.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":21,\"signal\":11,\"slow\":99}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":21,\\\"signal\\\":11,\\\"slow\\\":99}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.00033872520659450345,
+        0.0003328985273164754,
+        0.00000582667927802804
+      ],
+      "canonicalMs": 472.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221183001,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 21,
+                  "slow": 99,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221182613.322,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.291,
+            "responseStart": 288.372,
+            "responseEnd": 300.657
+          },
+          "timings": {
+            "fixed_read_freeze": 53.82
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 21,
+                "slow": 99,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "4376c6272359b5cb21641cb10b025cc619398ab9cc83434cc2485dabd9fab5c6",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 131.54
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 10,
+      "params": {
+        "fast": 22,
+        "slow": 100,
+        "signal": 11
+      },
+      "ms": 332.80000001192093,
+      "coverageMs": 332.80000001192093,
+      "first": {
+        "at": 1188035.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":22,\"signal\":11,\"slow\":100}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":22,\\\"signal\\\":11,\\\"slow\\\":100}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1188035.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":22,\"signal\":11,\"slow\":100}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":22,\\\"signal\\\":11,\\\"slow\\\":100}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.0003363186005509444,
+        0.0003302869869447701,
+        0.000006031613606174318
+      ],
+      "canonicalMs": 332.80000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221183454,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 22,
+                  "slow": 100,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221183210.688,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.238,
+            "responseStart": 175.134,
+            "responseEnd": 185.786
+          },
+          "timings": {
+            "fixed_read_freeze": 48.69
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 22,
+                "slow": 100,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "9349f9a784d84df33ef9fc7440f7f7cf753c9901d1df881d899343715cc84b96",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 50.49
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 11,
+      "params": {
+        "fast": 23,
+        "slow": 101,
+        "signal": 11
+      },
+      "ms": 350.90000000596046,
+      "coverageMs": 350.90000000596046,
+      "first": {
+        "at": 1188486.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":23,\"signal\":11,\"slow\":101}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":23,\\\"signal\\\":11,\\\"slow\\\":101}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1188486.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":23,\"signal\":11,\"slow\":101}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":23,\\\"signal\\\":11,\\\"slow\\\":101}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.00033385004667585427,
+        0.0003276111725723172,
+        0.000006238874103537046
+      ],
+      "canonicalMs": 350.90000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221183906,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 23,
+                  "slow": 101,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221183635.076,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.322,
+            "responseStart": 198.167,
+            "responseEnd": 211.279
+          },
+          "timings": {
+            "fixed_read_freeze": 33.84
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 23,
+                "slow": 101,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "b9947724b19fe96624f104bc10ffde36beb1e817e9b8612172c7bf4633f7c2c9",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 65.35
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 12,
+      "params": {
+        "fast": 24,
+        "slow": 102,
+        "signal": 11
+      },
+      "ms": 363,
+      "coverageMs": 363,
+      "first": {
+        "at": 1188970.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":24,\"signal\":11,\"slow\":102}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":24,\\\"signal\\\":11,\\\"slow\\\":102}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1188970.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":24,\"signal\":11,\"slow\":102}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":24,\\\"signal\\\":11,\\\"slow\\\":102}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.0003313197152587932,
+        0.0003248713522963093,
+        0.000006448362962483897
+      ],
+      "canonicalMs": 363,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221184373,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 24,
+                  "slow": 102,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221184125.6208,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.242,
+            "responseStart": 190.71,
+            "responseEnd": 197.232
+          },
+          "timings": {
+            "fixed_read_freeze": 53.14
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 24,
+                "slow": 102,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "a5f99ac8ff099a7f3192f68ec758ae3c2aeef97f5f59976c3265700536bba50d",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 60.91
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 13,
+      "params": {
+        "fast": 25,
+        "slow": 103,
+        "signal": 11
+      },
+      "ms": 326.7999999821186,
+      "coverageMs": 326.7999999821186,
+      "first": {
+        "at": 1189393.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":25,\"signal\":11,\"slow\":103}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":25,\\\"signal\\\":11,\\\"slow\\\":103}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1189393.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":25,\"signal\":11,\"slow\":103}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":25,\\\"signal\\\":11,\\\"slow\\\":103}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.00032872781333836976,
+        0.0003220678322007063,
+        0.000006659981137663469
+      ],
+      "canonicalMs": 326.7999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221184831,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 25,
+                  "slow": 103,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221184562.237,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.266,
+            "responseStart": 179.501,
+            "responseEnd": 184.244
+          },
+          "timings": {
+            "fixed_read_freeze": 39.25
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 25,
+                "slow": 103,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "ca208c2bdaca2807c558a2adcddfeeca0305c4e57066dbf9c96458238a6d335d",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 49.33
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 14,
+      "params": {
+        "fast": 26,
+        "slow": 104,
+        "signal": 11
+      },
+      "ms": 374,
+      "coverageMs": 374,
+      "first": {
+        "at": 1189862.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":26,\"signal\":11,\"slow\":104}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":26,\\\"signal\\\":11,\\\"slow\\\":104}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1189862.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":26,\"signal\":11,\"slow\":104}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":26,\\\"signal\\\":11,\\\"slow\\\":104}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.00032607458527289523,
+        0.00031920095752510516,
+        0.00000687362774779007
+      ],
+      "canonicalMs": 374,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221185281,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 26,
+                  "slow": 104,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221184990.854,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.256,
+            "responseStart": 214.663,
+            "responseEnd": 217.279
+          },
+          "timings": {
+            "fixed_read_freeze": 39.46
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 26,
+                "slow": 104,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "75037f815596a32e11fecce721312d30682adbf74a633dac46d3eee5ffe5b7fd",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 59.13
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 15,
+      "params": {
+        "fast": 27,
+        "slow": 105,
+        "signal": 11
+      },
+      "ms": 459.59999999403954,
+      "coverageMs": 459.59999999403954,
+      "first": {
+        "at": 1190431.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":27,\"signal\":11,\"slow\":105}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":27,\\\"signal\\\":11,\\\"slow\\\":105}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1190431.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":27,\"signal\":11,\"slow\":105}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":27,\\\"signal\\\":11,\\\"slow\\\":105}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.0003233603139594088,
+        0.00031627111462812537,
+        0.000007089199331283412
+      ],
+      "canonicalMs": 459.59999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221185699,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 27,
+                  "slow": 105,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221185471.3672,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.246,
+            "responseStart": 159.166,
+            "responseEnd": 166.227
+          },
+          "timings": {
+            "fixed_read_freeze": 31.52
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 27,
+                "slow": 105,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "1b25a1ed05cb530ce5c206662ecac88d7b0541a017e0e349f171c7ea21820210",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 48.83
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 16,
+      "params": {
+        "fast": 28,
+        "slow": 106,
+        "signal": 11
+      },
+      "ms": 463.5,
+      "coverageMs": 463.5,
+      "first": {
+        "at": 1191283.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":28,\"signal\":11,\"slow\":106}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":28,\\\"signal\\\":11,\\\"slow\\\":106}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1191283.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":28,\"signal\":11,\"slow\":106}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":28,\\\"signal\\\":11,\\\"slow\\\":106}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.000320585322783451,
+        0.00031327873379410166,
+        0.000007306588989349318
+      ],
+      "canonicalMs": 463.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221186707,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 28,
+                  "slow": 106,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221186359.5957,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.241,
+            "responseStart": 232.951,
+            "responseEnd": 238.652
+          },
+          "timings": {
+            "fixed_read_freeze": 56.15
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 28,
+                "slow": 106,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "b461d3b9c68adc7a360f749a5ee900d828853ea85df8172e3184c9af0da91f33",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 77.89
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 17,
+      "params": {
+        "fast": 29,
+        "slow": 107,
+        "signal": 11
+      },
+      "ms": 391.69999998807907,
+      "coverageMs": 391.69999998807907,
+      "first": {
+        "at": 1191785.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":29,\"signal\":11,\"slow\":107}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":29,\\\"signal\\\":11,\\\"slow\\\":107}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1191785.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":29,\"signal\":11,\"slow\":107}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":29,\\\"signal\\\":11,\\\"slow\\\":107}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.0003177499782702764,
+        0.00031022429282185444,
+        0.00000752568544842196
+      ],
+      "canonicalMs": 391.69999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221187187,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 29,
+                  "slow": 107,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221186918.7441,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.249,
+            "responseStart": 203.278,
+            "responseEnd": 212.33
+          },
+          "timings": {
+            "fixed_read_freeze": 52.48
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 29,
+                "slow": 107,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "027ec0448e20a42037748ae7ad25f91ebaea32a85e96a5f2a13a34dac489234c",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 57.6
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 18,
+      "params": {
+        "fast": 30,
+        "slow": 108,
+        "signal": 11
+      },
+      "ms": 437.40000000596046,
+      "coverageMs": 437.40000000596046,
+      "first": {
+        "at": 1192368.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":30,\"signal\":11,\"slow\":108}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":30,\\\"signal\\\":11,\\\"slow\\\":108}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1192368.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":30,\"signal\":11,\"slow\":108}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":30,\\\"signal\\\":11,\\\"slow\\\":108}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.0003148546934390595,
+        0.00030710832135110995,
+        0.000007746372087949526
+      ],
+      "canonicalMs": 437.40000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221187753,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 30,
+                  "slow": 108,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221187452.0312,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.337,
+            "responseStart": 232.416,
+            "responseEnd": 248.326
+          },
+          "timings": {
+            "fixed_read_freeze": 71.7
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 30,
+                "slow": 108,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "dd9a86f92988cc54fd2c00a90308ce3c21b6ce730530d5779a6ec8e176d3d935",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 52.3
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 19,
+      "params": {
+        "fast": 31,
+        "slow": 109,
+        "signal": 11
+      },
+      "ms": 358.90000000596046,
+      "coverageMs": 358.90000000596046,
+      "first": {
+        "at": 1192882.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":31,\"signal\":11,\"slow\":109}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":31,\\\"signal\\\":11,\\\"slow\\\":109}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1192882.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":31,\"signal\":11,\"slow\":109}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":31,\\\"signal\\\":11,\\\"slow\\\":109}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.0003118999317672788,
+        0.0003039314057824505,
+        0.0000079685259848283
+      ],
+      "canonicalMs": 358.90000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221188287,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 31,
+                  "slow": 109,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221188046.195,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.343,
+            "responseStart": 184.839,
+            "responseEnd": 188.412
+          },
+          "timings": {
+            "fixed_read_freeze": 51.13
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 31,
+                "slow": 109,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "92cbb327c134fe21605183b5721bbc30bf5d43766aa29514e2fa53764a39b888",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 54.96
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 20,
+      "params": {
+        "fast": 32,
+        "slow": 110,
+        "signal": 11
+      },
+      "ms": 490.40000000596046,
+      "coverageMs": 490.40000000596046,
+      "first": {
+        "at": 1193463.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":32,\"signal\":11,\"slow\":110}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":32,\\\"signal\\\":11,\\\"slow\\\":110}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1193463.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":32,\"signal\":11,\"slow\":110}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":32,\\\"signal\\\":11,\\\"slow\\\":110}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.0003088862116522595,
+        0.0003006941946337706,
+        0.000008192017018488905
+      ],
+      "canonicalMs": 490.40000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221188871,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 32,
+                  "slow": 110,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221188461.498,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.241,
+            "responseStart": 342.272,
+            "responseEnd": 344.238
+          },
+          "timings": {
+            "fixed_read_freeze": 72.55
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 32,
+                "slow": 110,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "5f4e0f2c62cdd5a9e2cb535173f6fc3cae618379bd6718a4fa13795d2b944df8",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 185.42
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 21,
+      "params": {
+        "fast": 33,
+        "slow": 111,
+        "signal": 11
+      },
+      "ms": 334.59999999403954,
+      "coverageMs": 334.59999999403954,
+      "first": {
+        "at": 1193916.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":33,\"signal\":11,\"slow\":111}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":33,\\\"signal\\\":11,\\\"slow\\\":111}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1193916.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":33,\"signal\":11,\"slow\":111}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":33,\\\"signal\\\":11,\\\"slow\\\":111}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.00030581411122110325,
+        0.0002973974041318592,
+        0.000008416707089244058
+      ],
+      "canonicalMs": 334.59999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221189330,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 33,
+                  "slow": 111,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221189079.6243,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.346,
+            "responseStart": 184.63,
+            "responseEnd": 201.266
+          },
+          "timings": {
+            "fixed_read_freeze": 61.77
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 33,
+                "slow": 111,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "17d7fd2e7c86cec0a12a496007e1ca51dbdbcd2c6af2b608f4eba2aa03cebc83",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 52.33
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 22,
+      "params": {
+        "fast": 34,
+        "slow": 112,
+        "signal": 11
+      },
+      "ms": 297.7000000178814,
+      "coverageMs": 297.7000000178814,
+      "first": {
+        "at": 1194342.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":34,\"signal\":11,\"slow\":112}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":34,\\\"signal\\\":11,\\\"slow\\\":112}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1194342.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":34,\"signal\":11,\"slow\":112}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":34,\\\"signal\\\":11,\\\"slow\\\":112}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.0003026842733175883,
+        0.0002940418238344038,
+        0.000008642449483184508
+      ],
+      "canonicalMs": 297.7000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221189785,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 34,
+                  "slow": 112,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221189553.803,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.248,
+            "responseStart": 149.766,
+            "responseEnd": 157.844
+          },
+          "timings": {
+            "fixed_read_freeze": 45.11
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 34,
+                "slow": 112,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "c23134a9eefaa72717fe70f622529d47221ba51a0193da780addfba4dc70d0b6",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 38.7
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 23,
+      "params": {
+        "fast": 35,
+        "slow": 113,
+        "signal": 11
+      },
+      "ms": 375.90000000596046,
+      "coverageMs": 375.90000000596046,
+      "first": {
+        "at": 1194797.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":35,\"signal\":11,\"slow\":113}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":35,\\\"signal\\\":11,\\\"slow\\\":113}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1194797.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":35,\"signal\":11,\"slow\":113}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":35,\\\"signal\\\":11,\\\"slow\\\":113}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.00029949741049395406,
+        0.00029062832207806026,
+        0.0000088690884158938
+      ],
+      "canonicalMs": 375.90000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221190223,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 35,
+                  "slow": 113,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221189942.0828,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.24,
+            "responseStart": 197.578,
+            "responseEnd": 207.923
+          },
+          "timings": {
+            "fixed_read_freeze": 39.16
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 35,
+                "slow": 113,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "90769a5533f244e137c2814143ede922a923c15c0dd2e453291dbcfc3f15a16e",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 74.73
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 24,
+      "params": {
+        "fast": 36,
+        "slow": 114,
+        "signal": 11
+      },
+      "ms": 376.89999997615814,
+      "coverageMs": 376.89999997615814,
+      "first": {
+        "at": 1195295.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":36,\"signal\":11,\"slow\":114}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":36,\\\"signal\\\":11,\\\"slow\\\":114}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1195295.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":36,\"signal\":11,\"slow\":114}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":36,\\\"signal\\\":11,\\\"slow\\\":114}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.00029625430981528034,
+        0.00028715785103702125,
+        0.000009096458778259085
+      ],
+      "canonicalMs": 376.89999997615814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221190704,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 36,
+                  "slow": 114,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221190418.719,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.225,
+            "responseStart": 216.33,
+            "responseEnd": 227.536
+          },
+          "timings": {
+            "fixed_read_freeze": 90.65
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 36,
+                "slow": 114,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "1eac233444db0bbb741521d826547333cd897c589000da0a65db8cac6de3cc35",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 51.3
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 25,
+      "params": {
+        "fast": 37,
+        "slow": 115,
+        "signal": 11
+      },
+      "ms": 480.60000002384186,
+      "coverageMs": 480.60000002384186,
+      "first": {
+        "at": 1195844.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":37,\"signal\":11,\"slow\":115}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":37,\\\"signal\\\":11,\\\"slow\\\":115}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1195844.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":37,\"signal\":11,\"slow\":115}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":37,\\\"signal\\\":11,\\\"slow\\\":115}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.00029295583731392405,
+        0.0002836314512203233,
+        0.000009324386093600729
+      ],
+      "canonicalMs": 480.60000002384186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221191328,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 37,
+                  "slow": 115,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221190866.2478,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.252,
+            "responseStart": 268.745,
+            "responseEnd": 275.48
+          },
+          "timings": {
+            "fixed_read_freeze": 94.47
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 37,
+                "slow": 115,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "2f7df9a9515b154c80a46d9dffb620828b755b44b6d4655b8b82108e21355702",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 79.7
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 26,
+      "params": {
+        "fast": 38,
+        "slow": 116,
+        "signal": 11
+      },
+      "ms": 345.7000000178814,
+      "coverageMs": 345.7000000178814,
+      "first": {
+        "at": 1196327.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":38,\"signal\":11,\"slow\":116}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":38,\\\"signal\\\":11,\\\"slow\\\":116}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1196327.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":38,\"signal\":11,\"slow\":116}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":38,\\\"signal\\\":11,\\\"slow\\\":116}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.00028960294193325353,
+        0.00028005025524703803,
+        0.000009552686686215505
+      ],
+      "canonicalMs": 345.7000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221191752,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 38,
+                  "slow": 116,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221191486.84,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.252,
+            "responseStart": 194.866,
+            "responseEnd": 212.514
+          },
+          "timings": {
+            "fixed_read_freeze": 71.38
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 38,
+                "slow": 116,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "2bbc99872ba52e3fabb5c2d1c631d1a60e6a4c22e220e4e2a7cfea7aa6942fe6",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 43.76
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 27,
+      "params": {
+        "fast": 39,
+        "slow": 117,
+        "signal": 11
+      },
+      "ms": 362,
+      "coverageMs": 362,
+      "first": {
+        "at": 1196742.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":39,\"signal\":11,\"slow\":117}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":39,\\\"signal\\\":11,\\\"slow\\\":117}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1196742.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":39,\"signal\":11,\"slow\":117}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":39,\\\"signal\\\":11,\\\"slow\\\":117}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.0002861966588316722,
+        0.00027641549077278766,
+        0.000009781168058884565
+      ],
+      "canonicalMs": 362,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221192141,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 39,
+                  "slow": 117,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221191830.933,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.239,
+            "responseStart": 226.289,
+            "responseEnd": 234.769
+          },
+          "timings": {
+            "fixed_read_freeze": 77
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 39,
+                "slow": 117,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "dbb55a8c0e35dd40ef4847d9f8efb0446e4f4ae20c136cad4c252a5772c9a78e",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 51.21
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 28,
+      "params": {
+        "fast": 40,
+        "slow": 118,
+        "signal": 11
+      },
+      "ms": 318.69999998807907,
+      "coverageMs": 318.69999998807907,
+      "first": {
+        "at": 1197154,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":40,\"signal\":11,\"slow\":118}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":40,\\\"signal\\\":11,\\\"slow\\\":118}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1197154,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":40,\"signal\":11,\"slow\":118}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":40,\\\"signal\\\":11,\\\"slow\\\":118}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.000282738111933023,
+        0.0002727284824700522,
+        0.000010009629462970793
+      ],
+      "canonicalMs": 318.69999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221192579,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 40,
+                  "slow": 118,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221192330.3452,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.307,
+            "responseStart": 181.357,
+            "responseEnd": 189.87
+          },
+          "timings": {
+            "fixed_read_freeze": 45.07
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 40,
+                "slow": 118,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "e6dcd493e1e0bf579c378551d78fb208bc4e11812562d88fca582952b4234d84",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 56.18
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 29,
+      "params": {
+        "fast": 41,
+        "slow": 119,
+        "signal": 11
+      },
+      "ms": 525,
+      "coverageMs": 525,
+      "first": {
+        "at": 1197773.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":41,\"signal\":11,\"slow\":119}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":41,\\\"signal\\\":11,\\\"slow\\\":119}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1197773.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":41,\"signal\":11,\"slow\":119}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":41,\\\"signal\\\":11,\\\"slow\\\":119}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.00027922851565076456,
+        0.00026899065300866747,
+        0.000010237862642097095
+      ],
+      "canonicalMs": 525,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221193121,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 41,
+                  "slow": 119,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221192758.1392,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.244,
+            "responseStart": 298.188,
+            "responseEnd": 303.614
+          },
+          "timings": {
+            "fixed_read_freeze": 124.06
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 41,
+                "slow": 119,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "9001fd2767ece1456b734b9b3d62695dc804d7dcb932a794229964e8e2536472",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 63.83
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 30,
+      "params": {
+        "fast": 42,
+        "slow": 120,
+        "signal": 11
+      },
+      "ms": 316.7000000178814,
+      "coverageMs": 316.7000000178814,
+      "first": {
+        "at": 1198198.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":42,\"signal\":11,\"slow\":120}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":42,\\\"signal\\\":11,\\\"slow\\\":120}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1198198.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"fast\":42,\"signal\":11,\"slow\":120}",
+          "algorithmVersion": "MACD:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791466320000,
+          "last": 1791503940000,
+          "count": 628,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"fast\\\":42,\\\"signal\\\":11,\\\"slow\\\":120}\",\"algorithmVersion\":\"MACD:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791466320000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 628,
+        "visibleRows": 628,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 628,
+      "nativeLast": [
+        1791503940,
+        0.0002756691757332952,
+        0.00026520352300871103,
+        0.000010465652724584156
+      ],
+      "canonicalMs": 316.7000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221193617,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "MACD",
+                "params": {
+                  "fast": 42,
+                  "slow": 120,
+                  "signal": 11
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 629
+          },
+          "http": {
+            "startTime": 1792221193385.7861,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.302,
+            "responseStart": 170.065,
+            "responseEnd": 177.025
+          },
+          "timings": {
+            "fixed_read_freeze": 45.28
+          },
+          "bars": 629,
+          "indicators": [
+            {
+              "name": "MACD",
+              "params": {
+                "fast": 42,
+                "slow": 120,
+                "signal": 11
+              },
+              "calculation": {
+                "id": "MACD",
+                "run_id": "837a8633e069424d82dc664009318939553c04c267e323ac47a73342cb64127e",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791466260000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 61.41
+                }
+              },
+              "plots": [
+                {
+                  "key": "macd",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "signal",
+                  "count": 629,
+                  "finite": 629
+                },
+                {
+                  "key": "histogram",
+                  "count": 629,
+                  "finite": 629
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    }
+  ]
+}

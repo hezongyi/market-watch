@@ -25,15 +25,20 @@ from .storage import DisplaySnapshot, FixedIndicatorRun
 MAX_FOREGROUND_ROWS = 6000
 
 
+def confirmed_page(db, page):
+    """A display page with no speculative dependency can use fixed replay."""
+    if not page.get("bars"):
+        return False
+    if any(not bar.get("complete") or not bar.get("source_confirmed", True) for bar in page["bars"]):
+        return False
+    snapshot = db.get(DisplaySnapshot, page["display_snapshot_id"]) if page.get("display_snapshot_id") else None
+    return not snapshot or not snapshot.content["observations"]
+
+
 def prepare(db, page, body):
     """Freeze a complete, confirmed prefix or leave the bounded queue response."""
-    if not body.client or not body.indicator_consumers or not page.get("bars"):
+    if not body.client or not body.indicator_consumers or not confirmed_page(db, page):
         return []
-    if any(not bar.get("complete") or not bar.get("source_confirmed", True) for bar in page["bars"]):
-        return []
-    snapshot = db.get(DisplaySnapshot, page["display_snapshot_id"]) if page.get("display_snapshot_id") else None
-    if snapshot and snapshot.content["observations"]:
-        return []  # Accepted provisional chains retain the existing suffix path.
     pending = [item for item in page.get("indicators", []) if not item["calculation"].get("visible_complete")]
     if not pending:
         return []

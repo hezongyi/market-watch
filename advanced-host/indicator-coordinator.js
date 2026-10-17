@@ -165,7 +165,7 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
           // Keep only result identity/revision/presentation in the shared cache.
           // Raw bars and plot payloads would duplicate the normalized rows.
           const {bars,indicators,...metadata}=page;
-          pages.push({page:{...metadata,presentation:result.presentation,
+          pages.push({calculation:progress,page:{...metadata,presentation:result.presentation,
             ...(result.presentation ? {bars:bars.map(bar=>({start:bar.start,chart_time:bar.chart_time}))} : {})}});
           if(!page.bars.length || (page.bars[0].chart_time ?? identity.chartTime(page.bars[0],scope.resolution,chart.symbol()))<=requestFirst || page.has_more===false){covered=true;break;}
           if(!((page.next_before ?? page.bars[0]?.start)<before))throw Error('指标范围分页未推进');
@@ -215,6 +215,7 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
         correctionVersion:binding.correctionVersion,inputRevision:binding.inputRevision,tailVersion:binding.tailVersion};
       const accepted=await results.applyBatch(consumer.handle,{identity:consumer.handle.identity,
         current,displaySnapshot:binding.displaySnapshot ?? binding.providerSnapshot,
+        executionEvidence:batch.pages.map(item=>item.calculation).filter(Boolean),
         generation:consumer.handle.generation,sequence:++consumer.sequence,inputRevision:revision,
         kind:prepend?'prepend':tail?'append':'snapshot',rows:batch.rows,offsets,coverage});
       if(accepted){consumer.acceptedScope={...coverage,generation:consumer.handle.generation};

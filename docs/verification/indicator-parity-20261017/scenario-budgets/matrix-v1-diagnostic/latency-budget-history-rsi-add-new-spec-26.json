@@ -1,0 +1,5030 @@
+{
+  "recordedAt": "2026-10-17T07:19:52.424Z",
+  "budgetRevision": "2026-10-17-scenarios-v1",
+  "scenario": "loaded-new-spec",
+  "budget": {
+    "firstMs": 500,
+    "coverageMs": 1000,
+    "canonicalMs": 2000,
+    "timeoutMs": 5000
+  },
+  "source": "actual app / Playwriter / native renderer after two RAFs",
+  "synthetic": true,
+  "config": {
+    "phase": "budget-history-rsi-add-new-spec-26",
+    "scenario": "loaded-new-spec",
+    "operation": "add",
+    "kind": "history",
+    "indicator": "RSI",
+    "prefixRows": 5760,
+    "specs": [
+      {
+        "params": {
+          "period": 121
+        }
+      },
+      {
+        "params": {
+          "period": 122
+        }
+      },
+      {
+        "params": {
+          "period": 123
+        }
+      },
+      {
+        "params": {
+          "period": 124
+        }
+      },
+      {
+        "params": {
+          "period": 125
+        }
+      },
+      {
+        "params": {
+          "period": 126
+        }
+      },
+      {
+        "params": {
+          "period": 127
+        }
+      },
+      {
+        "params": {
+          "period": 128
+        }
+      },
+      {
+        "params": {
+          "period": 129
+        }
+      },
+      {
+        "params": {
+          "period": 130
+        }
+      },
+      {
+        "params": {
+          "period": 131
+        }
+      },
+      {
+        "params": {
+          "period": 132
+        }
+      },
+      {
+        "params": {
+          "period": 133
+        }
+      },
+      {
+        "params": {
+          "period": 134
+        }
+      },
+      {
+        "params": {
+          "period": 135
+        }
+      },
+      {
+        "params": {
+          "period": 136
+        }
+      },
+      {
+        "params": {
+          "period": 137
+        }
+      },
+      {
+        "params": {
+          "period": 138
+        }
+      },
+      {
+        "params": {
+          "period": 139
+        }
+      },
+      {
+        "params": {
+          "period": 140
+        }
+      },
+      {
+        "params": {
+          "period": 141
+        }
+      },
+      {
+        "params": {
+          "period": 142
+        }
+      },
+      {
+        "params": {
+          "period": 143
+        }
+      },
+      {
+        "params": {
+          "period": 144
+        }
+      },
+      {
+        "params": {
+          "period": 145
+        }
+      },
+      {
+        "params": {
+          "period": 146
+        }
+      },
+      {
+        "params": {
+          "period": 147
+        }
+      },
+      {
+        "params": {
+          "period": 148
+        }
+      },
+      {
+        "params": {
+          "period": 149
+        }
+      },
+      {
+        "params": {
+          "period": 150
+        }
+      }
+    ],
+    "knownUnused": true
+  },
+  "environment": {
+    "symbol": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+    "range": {
+      "from": 1791491880,
+      "to": 1791504540
+    },
+    "timeOrigin": 1792219995443.6
+  },
+  "n": 30,
+  "failures": 0,
+  "quantile": "nearest-rank; failures as infinity (JSON null)",
+  "ms": {
+    "p50": 326.80000001192093,
+    "p95": 599.5
+  },
+  "coverageMs": {
+    "p50": 326.80000001192093,
+    "p95": 599.5
+  },
+  "canonicalMs": {
+    "p50": 326.80000001192093,
+    "p95": 599.5
+  },
+  "passed": false,
+  "samples": [
+    {
+      "index": 1,
+      "params": {
+        "period": 121
+      },
+      "ms": 326.80000001192093,
+      "coverageMs": 326.80000001192093,
+      "first": {
+        "at": 1583419.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":121}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":121}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1583419.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":121}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":121}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        60.72880727699926
+      ],
+      "canonicalMs": 326.80000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221578855,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 121
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221578626.896,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.294,
+            "responseStart": 175.504,
+            "responseEnd": 185.638
+          },
+          "timings": {
+            "fixed_read_freeze": 52.36
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 121
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "4af71414600759b18c108cf8854b4168584703f3f537fe48cc7a3b80297f4a98",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 34.8
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 2,
+      "params": {
+        "period": 122
+      },
+      "ms": 330.60000002384186,
+      "coverageMs": 330.60000002384186,
+      "first": {
+        "at": 1583839.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":122}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":122}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1583839.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":122}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":122}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        60.54352639270761
+      ],
+      "canonicalMs": 330.60000002384186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221579283,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 122
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221579027.2031,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.231,
+            "responseStart": 190.349,
+            "responseEnd": 198.98
+          },
+          "timings": {
+            "fixed_read_freeze": 73.77
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 122
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "97bb9ebf19634c7165c12a97ef14c45a5b105b3aaaed034157d14790ef54fd2d",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 42.96
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 3,
+      "params": {
+        "period": 123
+      },
+      "ms": 365.5,
+      "coverageMs": 365.5,
+      "first": {
+        "at": 1584385.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":123}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":123}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1584385.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":123}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":123}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        60.36212862555506
+      ],
+      "canonicalMs": 365.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221579808,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 123
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221579543.526,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.261,
+            "responseStart": 197.996,
+            "responseEnd": 205.658
+          },
+          "timings": {
+            "fixed_read_freeze": 52.18
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 123
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "375f195ea8f5b72f69f43fb3d59c598959329bf5ac56d8752c03e6654569bf80",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 67.47
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 4,
+      "params": {
+        "period": 124
+      },
+      "ms": 315.40000000596046,
+      "coverageMs": 315.40000000596046,
+      "first": {
+        "at": 1584791.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":124}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":124}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1584791.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":124}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":124}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        60.18451890262012
+      ],
+      "canonicalMs": 315.40000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221580217,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 124
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221579979.728,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.24,
+            "responseStart": 174.209,
+            "responseEnd": 189.379
+          },
+          "timings": {
+            "fixed_read_freeze": 35.22
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 124
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "8354e84e617318c660ee6d227635c3a2ef155e3c9a5ef8ca9b7f4902c21d409b",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 59.72
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 5,
+      "params": {
+        "period": 125
+      },
+      "ms": 273,
+      "coverageMs": 273,
+      "first": {
+        "at": 1585144.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":125}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":125}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1585144.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":125}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":125}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        60.01060456449524
+      ],
+      "canonicalMs": 273,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221580583,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 125
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221580350.591,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.248,
+            "responseStart": 165.64,
+            "responseEnd": 169.194
+          },
+          "timings": {
+            "fixed_read_freeze": 69.82
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 125
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "1eb71a5b5e9b9c804f6fc3574b3fd9b05b4c9238ac8da3b708fc467b1a026133",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 40.46
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 6,
+      "params": {
+        "period": 126
+      },
+      "ms": 793.3000000119209,
+      "coverageMs": 793.3000000119209,
+      "first": {
+        "at": 1586188.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":126}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":126}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1586188.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":126}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":126}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        59.84029531906382
+      ],
+      "canonicalMs": 793.3000000119209,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221581608,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 126
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221581280.497,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.272,
+            "responseStart": 239.139,
+            "responseEnd": 247.159
+          },
+          "timings": {
+            "fixed_read_freeze": 58.67
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 126
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "b8d91d315233931ab9345750fa36285af374a4535e603e74832a0a8a4d6b8660",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 71.91
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 7,
+      "params": {
+        "period": 127
+      },
+      "ms": 334.2000000178814,
+      "coverageMs": 334.2000000178814,
+      "first": {
+        "at": 1586696.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":127}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":127}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1586696.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":127}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":127}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        59.67350319419551
+      ],
+      "canonicalMs": 334.2000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221582124,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 127
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221581863.35,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.298,
+            "responseStart": 195.47,
+            "responseEnd": 201.229
+          },
+          "timings": {
+            "fixed_read_freeze": 75.27
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 127
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "026dccbf79dcb370f03fa560a980288ca7590473c749d96c9bd57de57f67d147",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 51.25
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 8,
+      "params": {
+        "period": 128
+      },
+      "ms": 346.80000001192093,
+      "coverageMs": 346.80000001192093,
+      "first": {
+        "at": 1587144.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":128}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":128}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1587144.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":128}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":128}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        59.51014248962802
+      ],
+      "canonicalMs": 346.80000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221582603,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 128
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221582322.602,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 1.239,
+            "responseStart": 198.261,
+            "responseEnd": 203.701
+          },
+          "timings": {
+            "fixed_read_freeze": 54.38
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 128
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "ee48267993130ea2078967151ce268697db0f3e96ff92fb8d58ef1874c1fd90a",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 54.63
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 9,
+      "params": {
+        "period": 129
+      },
+      "ms": 370.2999999821186,
+      "coverageMs": 370.2999999821186,
+      "first": {
+        "at": 1587615,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":129}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":129}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1587615,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":129}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":129}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        59.350129728272485
+      ],
+      "canonicalMs": 370.2999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221583067,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 129
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221582749.92,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.283,
+            "responseStart": 263.606,
+            "responseEnd": 273.313
+          },
+          "timings": {
+            "fixed_read_freeze": 140.01
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 129
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "448d2f9b4663c5ab1532a4de19aa79394739d600aaf3fec71c488e86cddea379",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 42.98
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 10,
+      "params": {
+        "period": 130
+      },
+      "ms": 326.7999999821186,
+      "coverageMs": 326.7999999821186,
+      "first": {
+        "at": 1588074.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":130}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":130}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1588074.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":130}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":130}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        59.193383607151326
+      ],
+      "canonicalMs": 326.7999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221583553,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 130
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221583281.6812,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.242,
+            "responseStart": 178.768,
+            "responseEnd": 185.885
+          },
+          "timings": {
+            "fixed_read_freeze": 64.27
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 130
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "5e954c6b2e668bade4d9418c5d298090cb5951c955ad29f6cd33c397dacbb568",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 48.2
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 11,
+      "params": {
+        "period": 131
+      },
+      "ms": 505.69999998807907,
+      "coverageMs": 505.69999998807907,
+      "first": {
+        "at": 1588693.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":131}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":131}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1588693.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":131}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":131}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        59.03982494815637
+      ],
+      "canonicalMs": 505.69999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221584158,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 131
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221583699.7578,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.234,
+            "responseStart": 371.496,
+            "responseEnd": 382.878
+          },
+          "timings": {
+            "fixed_read_freeze": 36.62
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 131
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "73bb8236b2e9a51c2874bf05506b1df997ebaa47b8e5af24bd2ce9a9b297b0fe",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 238.54
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 12,
+      "params": {
+        "period": 132
+      },
+      "ms": 418.90000000596046,
+      "coverageMs": 418.90000000596046,
+      "first": {
+        "at": 1589268.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":132}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":132}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1589268.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":132}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":132}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        58.88937664879085
+      ],
+      "canonicalMs": 418.90000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221584707,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 132
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221584373.137,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.254,
+            "responseStart": 282.753,
+            "responseEnd": 286.191
+          },
+          "timings": {
+            "fixed_read_freeze": 145.23
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 132
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "57205cfdc9acfc02f9c4025691cd1db5d08c9769408ed9c7ffbcfec264e3e100",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 48.11
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 13,
+      "params": {
+        "period": 133
+      },
+      "ms": 250.40000000596046,
+      "coverageMs": 250.40000000596046,
+      "first": {
+        "at": 1589595.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":133}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":133}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1589595.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":133}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":133}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        58.741963633041884
+      ],
+      "canonicalMs": 250.40000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221585050,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 133
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221584845.977,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.266,
+            "responseStart": 138.868,
+            "responseEnd": 148.635
+          },
+          "timings": {
+            "fixed_read_freeze": 35.38
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 133
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "361d107459f4c023a13958bb342302e59cb2f74a5843ea04ea43b72d4a618171",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 42.83
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 14,
+      "params": {
+        "period": 134
+      },
+      "ms": 296.2999999821186,
+      "coverageMs": 296.2999999821186,
+      "first": {
+        "at": 1589989.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":134}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":134}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1589989.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":134}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":134}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        58.59751280250806
+      ],
+      "canonicalMs": 296.2999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221585462,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 134
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221585205.941,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.348,
+            "responseStart": 155.12,
+            "responseEnd": 157.73
+          },
+          "timings": {
+            "fixed_read_freeze": 40.35
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 134
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "72da8e46c89a16effff4ebc5bd1f67c16bc9c4431118b9571cf4981c8c6dca60",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 46.88
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 15,
+      "params": {
+        "period": 135
+      },
+      "ms": 311.19999998807907,
+      "coverageMs": 311.19999998807907,
+      "first": {
+        "at": 1590363.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":135}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":135}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1590363.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":135}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":135}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        58.45595298789603
+      ],
+      "canonicalMs": 311.19999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221585810,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 135
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221585530.951,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.316,
+            "responseStart": 215.539,
+            "responseEnd": 220.308
+          },
+          "timings": {
+            "fixed_read_freeze": 51.64
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 135
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "540a53d70859ece7b9ae4cb098cdb763d02170c20d64b330f2ce4487d62caf19",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 61.44
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 16,
+      "params": {
+        "period": 136
+      },
+      "ms": 355.19999998807907,
+      "coverageMs": 355.19999998807907,
+      "first": {
+        "at": 1590807.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":136}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":136}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1590807.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":136}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":136}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        58.31721490098205
+      ],
+      "canonicalMs": 355.19999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221586245,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 136
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221585955.0771,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.265,
+            "responseStart": 233.066,
+            "responseEnd": 237.139
+          },
+          "timings": {
+            "fixed_read_freeze": 52.53
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 136
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "38ad38f972fccb4f73541e93047f212bb8b947502b17524b9c59f33afd5d0fd8",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 87.18
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 17,
+      "params": {
+        "period": 137
+      },
+      "ms": 303.09999999403954,
+      "coverageMs": 303.09999999403954,
+      "first": {
+        "at": 1591188,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":137}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":137}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1591188,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":137}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":137}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        58.18123108712094
+      ],
+      "canonicalMs": 303.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221586636,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 137
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221586400.489,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.252,
+            "responseStart": 177.772,
+            "responseEnd": 184.836
+          },
+          "timings": {
+            "fixed_read_freeze": 48.62
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 137
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "2594d1cf66d3b5ed602410ed1c35bf018f27b5bcd57e69af1c593ebd4eea06fc",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 44.85
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 18,
+      "params": {
+        "period": 138
+      },
+      "ms": 254.90000000596046,
+      "coverageMs": 254.90000000596046,
+      "first": {
+        "at": 1591497.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":138}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":138}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1591497.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":138}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":138}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        58.04793587837719
+      ],
+      "canonicalMs": 254.90000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221586942,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 138
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221586695.106,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.27,
+            "responseStart": 188.767,
+            "responseEnd": 195.678
+          },
+          "timings": {
+            "fixed_read_freeze": 56.34
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 138
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "dad9ea9fbe1a1c7f56e4c3a54eadaef8e9303456bcef6172410e2e6fe442c5d6",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 52.98
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 19,
+      "params": {
+        "period": 139
+      },
+      "ms": 346.2999999821186,
+      "coverageMs": 346.2999999821186,
+      "first": {
+        "at": 1591934.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":139}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":139}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1591934.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":139}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":139}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        57.91726534733753
+      ],
+      "canonicalMs": 346.2999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221587372,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 139
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221587099.812,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.267,
+            "responseStart": 202.956,
+            "responseEnd": 206.472
+          },
+          "timings": {
+            "fixed_read_freeze": 57.01
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 139
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "93ab277a147bcd79fb71d7fa2f1bb7fbe4ec6bd7431cdd7f5655c91c1d0be5fa",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 49.94
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 20,
+      "params": {
+        "period": 140
+      },
+      "ms": 429.7000000178814,
+      "coverageMs": 429.7000000178814,
+      "first": {
+        "at": 1592489.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":140}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":140}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1592489.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":140}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":140}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        57.78915726165869
+      ],
+      "canonicalMs": 429.7000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221587936,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 140
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221587606.426,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.236,
+            "responseStart": 274.503,
+            "responseEnd": 279.8
+          },
+          "timings": {
+            "fixed_read_freeze": 145.03
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 140
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "c84d43bc567c5d0a421a029bff79f3d55bf40a3d53ba7e3b309bed3dd61d8349",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 52.73
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 21,
+      "params": {
+        "period": 141
+      },
+      "ms": 363.10000002384186,
+      "coverageMs": 363.10000002384186,
+      "first": {
+        "at": 1592896.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":141}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":141}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1592896.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":141}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":141}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        57.66355103939296
+      ],
+      "canonicalMs": 363.10000002384186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221588334,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 141
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221588004.6921,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.246,
+            "responseStart": 281.965,
+            "responseEnd": 283.562
+          },
+          "timings": {
+            "fixed_read_freeze": 110.94
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 141
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "a259ccfc3f066ff6d9312377a45f72057bf45a8b8ea3e5db8303ab162475de21",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 89.5
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 22,
+      "params": {
+        "period": 142
+      },
+      "ms": 276.5,
+      "coverageMs": 276.5,
+      "first": {
+        "at": 1593200.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":142}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":142}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1593200.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":142}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":142}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        57.54038770512865
+      ],
+      "canonicalMs": 276.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221588635,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 142
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221588375.0889,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 27.859,
+            "responseStart": 207.323,
+            "responseEnd": 217.544
+          },
+          "timings": {
+            "fixed_read_freeze": 58.72
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 142
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "218d780ca0954928284e1114b9e07051e27699b64e72dc6ec7979855ac2da066",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 41
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 23,
+      "params": {
+        "period": 143
+      },
+      "ms": 253.7000000178814,
+      "coverageMs": 253.7000000178814,
+      "first": {
+        "at": 1593488.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":143}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":143}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1593488.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":143}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":143}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        57.41960984697424
+      ],
+      "canonicalMs": 253.7000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221588926,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 143
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221588709.914,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.253,
+            "responseStart": 161.827,
+            "responseEnd": 169.312
+          },
+          "timings": {
+            "fixed_read_freeze": 65.9
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 143
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "5203aaafb0a7230cba0bff8a29977b86fa75a64b5fd301cf66e279d5c081aa0e",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 32.06
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 24,
+      "params": {
+        "period": 144
+      },
+      "ms": 432.90000000596046,
+      "coverageMs": 432.90000000596046,
+      "first": {
+        "at": 1594008.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":144}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":144}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1594008.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":144}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":144}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        57.30116157440962
+      ],
+      "canonicalMs": 432.90000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221589432,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 144
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221589100.209,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.243,
+            "responseStart": 232.916,
+            "responseEnd": 234.543
+          },
+          "timings": {
+            "fixed_read_freeze": 67.08
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 144
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "5b44de7ca7621fd00efb326fa9c5c64fd04f0238e000ef4567ab763f7ff10719",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 50.97
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 25,
+      "params": {
+        "period": 145
+      },
+      "ms": 594,
+      "coverageMs": 594,
+      "first": {
+        "at": 1594788.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":145}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":145}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1594788.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":145}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":145}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        57.18498847702216
+      ],
+      "canonicalMs": 594,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221590244,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 145
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221589724.9128,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.244,
+            "responseStart": 426.001,
+            "responseEnd": 430.933
+          },
+          "timings": {
+            "fixed_read_freeze": 78.66
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 145
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "ec88bb6d432e766c119e2e1aab7d994a0a1ba5bcfa0ded9099d57c670f30448b",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 73.09
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 26,
+      "params": {
+        "period": 146
+      },
+      "ms": 253.5,
+      "coverageMs": 253.5,
+      "first": {
+        "at": 1595099.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":146}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":146}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1595099.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":146}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":146}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        57.07103758414146
+      ],
+      "canonicalMs": 253.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221590542,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 146
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221590322.5188,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.24,
+            "responseStart": 159.829,
+            "responseEnd": 169.03
+          },
+          "timings": {
+            "fixed_read_freeze": 47.75
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 146
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "6d62cdac39a99adf37ce9d203af6a50ff0c62e6ebd5bf393ee763e48ab4dc2a6",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 47.95
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 27,
+      "params": {
+        "period": 147
+      },
+      "ms": 599.5,
+      "coverageMs": 599.5,
+      "first": {
+        "at": 1595809.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":147}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":147}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1595809.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":147}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":147}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        56.959257325380676
+      ],
+      "canonicalMs": 599.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221591299,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 147
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221590818.39,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 7.783,
+            "responseStart": 362.329,
+            "responseEnd": 369.004
+          },
+          "timings": {
+            "fixed_read_freeze": 71.82
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 147
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "08329647630c153f55c844aa3c3159153de4cb09a14a0b8403723b34d2d2d223",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 57.52
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 28,
+      "params": {
+        "period": 148
+      },
+      "ms": 281.69999998807907,
+      "coverageMs": 281.69999998807907,
+      "first": {
+        "at": 1596161.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":148}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":148}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1596161.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":148}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":148}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        56.84959749208966
+      ],
+      "canonicalMs": 281.69999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221591614,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 148
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221591383.848,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.248,
+            "responseStart": 156.28,
+            "responseEnd": 164.407
+          },
+          "timings": {
+            "fixed_read_freeze": 49.73
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 148
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "3185ba63b047ce9f6dd4f43497e81710329c9580e352adae94bcd49203574bf8",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 39.07
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 29,
+      "params": {
+        "period": 149
+      },
+      "ms": 299,
+      "coverageMs": 299,
+      "first": {
+        "at": 1596534.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":149}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":149}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1596534.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":149}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":149}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        56.742009199722666
+      ],
+      "canonicalMs": 299,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221591979,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 149
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221591743.662,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.244,
+            "responseStart": 172.623,
+            "responseEnd": 178.056
+          },
+          "timings": {
+            "fixed_read_freeze": 57.37
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 149
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "dfe3fb94cd7f6dd184b5a35e939b570f98381fbea392fe9fa55b3a128379fe44",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 38.76
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 30,
+      "params": {
+        "period": 150
+      },
+      "ms": 295.5,
+      "coverageMs": 295.5,
+      "first": {
+        "at": 1596873.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":150}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":150}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1596873.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"period\":150}",
+          "algorithmVersion": "RSI:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"period\\\":150}\",\"algorithmVersion\":\"RSI:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 1,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        56.63644485111759
+      ],
+      "canonicalMs": 295.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221592327,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "RSI",
+                "params": {
+                  "period": 150
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221592033.109,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.684,
+            "responseStart": 226.433,
+            "responseEnd": 233.11
+          },
+          "timings": {
+            "fixed_read_freeze": 94.99
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "RSI",
+              "params": {
+                "period": 150
+              },
+              "calculation": {
+                "id": "RSI",
+                "run_id": "85c56df945304538970e86032d134c53575a9249768ee2a5a5f9a9416275b9d8",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 50.89
+                }
+              },
+              "plots": [
+                {
+                  "key": "value",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    }
+  ]
+}

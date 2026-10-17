@@ -3,6 +3,9 @@
 const fs = require('node:fs');
 const assert = require('assert').strict;
 const budgets = JSON.parse(fs.readFileSync('web/tests/fixtures/indicator-parity-budgets.json','utf8'));
+const evidenceModule={exports:{}};
+new Function('module',fs.readFileSync('web/tests/fixtures/indicator-parity-evidence.cjs','utf8'))(evidenceModule);
+const {matchAuthority,validatePreparation}=evidenceModule.exports;
 const config = state.latency;
 assert.ok(config, 'declare state.latency before measuring');
 const budget = budgets.scenarios[config.scenario];
@@ -33,7 +36,9 @@ const capture = response => {
     try {
       const page=await response.json();
       responses.push({at:Date.now(),status:response.status(),query:{instrument:query.instrument,series_kind:query.series_kind,
-        indicators:query.indicators,before:query.before,limit:query.limit,provider_snapshot_id:query.provider_snapshot_id,display_snapshot_id:query.display_snapshot_id},
+        timeframe:query.timeframe,indicators:query.indicators,before:query.before,limit:query.limit,provider_snapshot_id:query.provider_snapshot_id,display_snapshot_id:query.display_snapshot_id},
+        page:Object.fromEntries(['series_kind','timeframe','origin','calculation_origin','revision_id','input_revision','cache_revision','revision','history_revision','provider_snapshot_id','display_snapshot_id','dependency_revision'].map(key=>[key,page[key]])),
+        sourceRows:page.bars?.map(bar=>({start:bar.start,end:bar.end,chart_time:bar.chart_time})),
         http:response.request().timing(),timings:page.timings_ms,bars:page.bars?.length,
         indicators:page.indicators?.map(item=>({name:item.name,params:item.params,calculation:item.calculation,
           plots:item.series?.map(plot=>({key:plot.key,count:plot.values.length,finite:plot.values.filter(point=>Number.isFinite(point.value)).length}))}))});
@@ -56,7 +61,11 @@ try {
         await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
         const coverage=batch.coverage;
         const visible=batch.rows.filter(row=>coverage && coverage.first<=row.time && row.time<=coverage.last);
-        parityCommits.push({at:performance.now(),identity:handle.identity,coverage,
+        const at=performance.now();
+        parityCommits.push({at,epochAt:performance.timeOrigin+at,identity:handle.identity,coverage,
+          executionEvidence:batch.executionEvidence,
+          inputRevision:batch.inputRevision,displaySnapshot:batch.displaySnapshot,generation:batch.generation,
+          sourceRows:visible.map(row=>({time:row.time,sourceTime:row.sourceTime})),
           finite:visible.filter(row=>row.valid.some(Boolean)).length,
           visibleRows:new Set(visible.map(row=>row.time)).size,
           plots:batch.rows[0]?.values.length,kind:batch.kind});
@@ -75,11 +84,17 @@ try {
     },{name:config.indicator,inputs});
     const wait=()=>state.chart.waitForFunction(({params,name,at})=>{
       const fingerprint=value=>JSON.stringify(Object.fromEntries(Object.entries(value).sort(([a],[b])=>a.localeCompare(b))));
-      return parityCommits.some(commit=>commit.at>=at && commit.finite && commit.coverage &&
+      return parityCommits.some(commit=>commit.at>=at && commit.coverage &&
         commit.visibleRows>=commit.coverage.count && commit.identity.algorithmVersion===name+':1' &&
         fingerprint(JSON.parse(commit.identity.paramsFingerprint))===fingerprint(params));
     },{params:spec.params,name:config.indicator,at:operation.at},{timeout:budget.timeoutMs});
     try {
+      if(config.prewarm && config.operation==='edit') {
+        operation=await create();id=operation.id;
+        await wait();
+        await Promise.allSettled([...pending]);
+        await state.chart.evaluate(id=>widget.activeChart().removeEntity(id),id);id=undefined;
+      }
       if(config.prewarm || config.operation==='edit') {
         const initial=config.operation==='edit' ? config.initial : spec;
         assert.ok(initial?.params, 'edit needs an initial current-spec curve');
@@ -106,26 +121,29 @@ try {
       await Promise.allSettled([...pending]);
       const result=await state.chart.evaluate(({id,at,params,name})=>{
         const fingerprint=value=>JSON.stringify(Object.fromEntries(Object.entries(value).sort(([a],[b])=>a.localeCompare(b))));
-        const matching=parityCommits.filter(commit=>commit.at>=at && commit.finite && commit.identity.algorithmVersion===name+':1' &&
+        const matching=parityCommits.filter(commit=>commit.at>=at && commit.identity.algorithmVersion===name+':1' &&
           fingerprint(JSON.parse(commit.identity.paramsFingerprint))===fingerprint(params));
-        const first=matching[0],covered=matching.find(commit=>commit.visibleRows>=commit.coverage?.count);
+        const first=matching.find(commit=>commit.finite),covered=matching.find(commit=>commit.visibleRows>=commit.coverage?.count);
         const native=widget.activeChart()._chartWidget.model().model().dataSourceForId(id);
         return {ms:first ? first.at-at : null,coverageMs:covered ? covered.at-at : null,first,covered,
           nativeRows:native?.data().size(),nativeLast:native?.data().last()?.value};
       },{id,at:operation.at,params:spec.params,name:config.indicator});
       const measured=responses.slice(responseStart);
-      const provenance=responses.slice(warmupStart).flatMap(response=>response.indicators || []).filter(item=>
-        item.name===config.indicator && canonical(item.params)===canonical(spec.params));
-      const authoritative=provenance.some(item=>item.calculation?.canonical_verified &&
-        (item.calculation.visible_complete || item.calculation.status==='complete'));
-      const wronglyCached=config.knownUnused && measured.some(response=>response.indicators?.some(item=>
-        canonical(item.params)===canonical(spec.params) && item.calculation?.execution?.result_cache==='hit'));
+      const study={name:config.indicator,params:spec.params};
+      const authority=matchAuthority(result.covered,responses.slice(warmupStart),study,config.kind);
       assert.ok(result.nativeRows && result.coverageMs!==null,'current result has no complete native coverage');
-      assert.ok(authoritative,'missing canonical backend provenance');
-      assert.equal(Boolean(wronglyCached),false,'new-spec preparation was invalid; preserve the failed group');
-      samples.push({index:index+1,params:spec.params,...result,
-        canonicalMs:result.coverageMs,T_input_first:null,inputTimingReason:'full prefix acceptance not instrumented; user total retained',
-        requests:measured,warmupRequests:responses.slice(warmupStart,responseStart)});
+      assert.ok(authority.complete,authority.reason);
+      const warmupRequests=responses.slice(warmupStart,responseStart);
+      const browserReuse=config.scenario==='loaded-reusable' && !measured.some(response=>
+        response.indicators?.some(item=>item.name===study.name && canonical(item.params)===canonical(study.params))) &&
+        matchAuthority(result.covered,warmupRequests,study,config.kind).complete;
+      const preparation=browserReuse ? validatePreparation(config,warmupRequests,study,result.covered) :
+        validatePreparation(config,measured,study);
+      assert.ok(preparation.valid,preparation.reason);
+      samples.push({index:index+1,params:spec.params,...result,authority,preparation,
+        canonicalMs:authority.canonicalAt-environment.timeOrigin-operation.at,
+        T_input_first:null,inputTimingReason:'full prefix acceptance not instrumented; user total retained',
+        noFiniteOutput:result.ms===null,requests:measured,warmupRequests});
     }catch(cause){error=String(cause);samples.push({index:index+1,params:spec.params,ms:null,coverageMs:null,canonicalMs:null,error,
       requests:responses.slice(warmupStart)});}
     finally{if(id)await state.chart.evaluate(id=>widget.activeChart().removeEntity(id),id).catch(()=>{});}
@@ -145,9 +163,9 @@ const quantile=(key,q)=>{
 };
 const metrics=Object.fromEntries(['ms','coverageMs','canonicalMs'].map(key=>[key,{p50:quantile(key,.5),p95:quantile(key,.95)}]));
 const failures=samples.filter(sample=>sample.error).length;
-const passed=samples.length>=budgets.minimumSamples && !failures && metrics.ms.p95<budget.firstMs &&
+const passed=samples.length>=budgets.minimumSamples && !failures && Object.values(metrics).every(metric=>Number.isFinite(metric.p95)) && metrics.ms.p95<budget.firstMs &&
   metrics.coverageMs.p95<budget.coverageMs && metrics.canonicalMs.p95<budget.canonicalMs;
-const evidence={recordedAt:new Date().toISOString(),budgetRevision:budgets.revision,scenario:config.scenario,budget,
+const evidence={recordedAt:new Date().toISOString(),harnessRevision:'execution-evidence-v2',budgetRevision:budgets.revision,scenario:config.scenario,budget,
   source:'actual app / Playwriter / native renderer after two RAFs',synthetic:true,config,environment,
   n:samples.length,failures,quantile:'nearest-rank; failures as infinity (JSON null)',
   ...metrics,passed,samples};

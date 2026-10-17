@@ -1,0 +1,5450 @@
+{
+  "recordedAt": "2026-10-17T07:20:24.386Z",
+  "budgetRevision": "2026-10-17-scenarios-v1",
+  "scenario": "loaded-new-spec",
+  "budget": {
+    "firstMs": 500,
+    "coverageMs": 1000,
+    "canonicalMs": 2000,
+    "timeoutMs": 5000
+  },
+  "source": "actual app / Playwriter / native renderer after two RAFs",
+  "synthetic": true,
+  "config": {
+    "phase": "budget-history-stoch-add-new-spec-28",
+    "scenario": "loaded-new-spec",
+    "operation": "add",
+    "kind": "history",
+    "indicator": "STOCH",
+    "prefixRows": 5760,
+    "specs": [
+      {
+        "params": {
+          "k": 81,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 82,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 83,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 84,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 85,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 86,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 87,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 88,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 89,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 90,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 91,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 92,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 93,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 94,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 95,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 96,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 97,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 98,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 99,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 100,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 101,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 102,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 103,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 104,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 105,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 106,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 107,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 108,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 109,
+          "smooth": 5,
+          "d": 7
+        }
+      },
+      {
+        "params": {
+          "k": 110,
+          "smooth": 5,
+          "d": 7
+        }
+      }
+    ],
+    "knownUnused": true
+  },
+  "environment": {
+    "symbol": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+    "range": {
+      "from": 1791491880,
+      "to": 1791504540
+    },
+    "timeOrigin": 1792219995443.6
+  },
+  "n": 30,
+  "failures": 0,
+  "quantile": "nearest-rank; failures as infinity (JSON null)",
+  "ms": {
+    "p50": 388.59999999403954,
+    "p95": 575.0999999940395
+  },
+  "coverageMs": {
+    "p50": 388.59999999403954,
+    "p95": 575.0999999940395
+  },
+  "canonicalMs": {
+    "p50": 388.59999999403954,
+    "p95": 575.0999999940395
+  },
+  "passed": false,
+  "samples": [
+    {
+      "index": 1,
+      "params": {
+        "k": 81,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 396.59999999403954,
+      "coverageMs": 396.59999999403954,
+      "first": {
+        "at": 1613511.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":81,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":81,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1613511.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":81,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":81,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        91.66666666666761,
+        91.66666666666777
+      ],
+      "canonicalMs": 396.59999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221608932,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 81,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221608654.511,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.336,
+            "responseStart": 185.667,
+            "responseEnd": 191.767
+          },
+          "timings": {
+            "fixed_read_freeze": 67.01
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 81,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "760937f49f828e355ac02ad36190970872eda941e0a6d4176494653720c55d92",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 46.77
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 2,
+      "params": {
+        "k": 82,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 428.89999997615814,
+      "coverageMs": 428.89999997615814,
+      "first": {
+        "at": 1614035.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":82,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":82,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1614035.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":82,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":82,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        91.73553719008314,
+        91.73553719008417
+      ],
+      "canonicalMs": 428.89999997615814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221609427,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 82,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221609109.9683,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.257,
+            "responseStart": 222.475,
+            "responseEnd": 236.006
+          },
+          "timings": {
+            "fixed_read_freeze": 48.69
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 82,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "bbdc80fb318a443c083c98c87e5e92f4f754e2724abd0d2276853f7658e9e132",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 59
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 3,
+      "params": {
+        "k": 83,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 354.09999999403954,
+      "coverageMs": 354.09999999403954,
+      "first": {
+        "at": 1614533.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":83,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":83,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1614533.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":83,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":83,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        91.80327868852537,
+        91.80327868852554
+      ],
+      "canonicalMs": 354.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221609957,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 83,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221609696.861,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.311,
+            "responseStart": 199.117,
+            "responseEnd": 215.872
+          },
+          "timings": {
+            "fixed_read_freeze": 58.82
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 83,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "705f05180bb9be2342715dc90967a6a60e18e0bb896293df3996f74181dd0a1a",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 55.14
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 4,
+      "params": {
+        "k": 84,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 344.7000000178814,
+      "coverageMs": 344.7000000178814,
+      "first": {
+        "at": 1615000.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":84,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":84,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1615000.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":84,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":84,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        91.869918699188,
+        91.86991869918825
+      ],
+      "canonicalMs": 344.7000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221610410,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 84,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221610158.2139,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.263,
+            "responseStart": 188.287,
+            "responseEnd": 192.637
+          },
+          "timings": {
+            "fixed_read_freeze": 81.64
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 84,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "ff6686ce0a32cd2a4ac99949c5dcbd737696a4474ab384ca7fb681df98702db1",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 43.41
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 5,
+      "params": {
+        "k": 85,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 423.2999999821186,
+      "coverageMs": 423.2999999821186,
+      "first": {
+        "at": 1615569.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":85,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":85,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1615569.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":85,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":85,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        91.93548387096862,
+        91.9354838709688
+      ],
+      "canonicalMs": 423.2999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221610975,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 85,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221610668.277,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.256,
+            "responseStart": 251.65,
+            "responseEnd": 260.827
+          },
+          "timings": {
+            "fixed_read_freeze": 72.81
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 85,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "914f8f6b9857ac43d11e4b4cfb251a04c580092bbc98ea6909d3fc587706daf5",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 81.01
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 6,
+      "params": {
+        "k": 86,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 346.89999997615814,
+      "coverageMs": 346.89999997615814,
+      "first": {
+        "at": 1615994.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":86,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":86,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1615994.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":86,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":86,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        92.000000000001,
+        92.00000000000082
+      ],
+      "canonicalMs": 346.89999997615814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221611420,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 86,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221611096.072,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.262,
+            "responseStart": 228.403,
+            "responseEnd": 242.946
+          },
+          "timings": {
+            "fixed_read_freeze": 81
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 86,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "848e5d493cdea04f138ff07629e3aac494797479e18d20e7578f4f4b23503dbd",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 64.47
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 7,
+      "params": {
+        "k": 87,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 526.2000000178814,
+      "coverageMs": 526.2000000178814,
+      "first": {
+        "at": 1616575.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":87,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":87,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1616575.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":87,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":87,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        92.06349206349331,
+        92.06349206349189
+      ],
+      "canonicalMs": 526.2000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221612002,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 87,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221611554.981,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.227,
+            "responseStart": 379.976,
+            "responseEnd": 389.974
+          },
+          "timings": {
+            "fixed_read_freeze": 70.74
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 87,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "22eea51ff11c8a29987c34326a1b6d2356e00024b0604f877615d9cc24f06cb9",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 49.49
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 8,
+      "params": {
+        "k": 88,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 369.19999998807907,
+      "coverageMs": 369.19999998807907,
+      "first": {
+        "at": 1617071.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":88,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":88,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1617071.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":88,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":88,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        92.12598425196947,
+        92.12598425196963
+      ],
+      "canonicalMs": 369.19999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221612474,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 88,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221612212.742,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.251,
+            "responseStart": 181.278,
+            "responseEnd": 189.054
+          },
+          "timings": {
+            "fixed_read_freeze": 39.68
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 88,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "75ea2ad9180bd2be34bf177d6da32ff86494949bf5ec1d3b527261ae9dd5c01c",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 65.99
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 9,
+      "params": {
+        "k": 89,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 349.7999999821186,
+      "coverageMs": 349.7999999821186,
+      "first": {
+        "at": 1617626.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":89,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":89,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1617626.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":89,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":89,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        92.18750000000057,
+        92.18750000000077
+      ],
+      "canonicalMs": 349.7999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221613047,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 89,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221612735.4888,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.27,
+            "responseStart": 258.907,
+            "responseEnd": 267.393
+          },
+          "timings": {
+            "fixed_read_freeze": 89.36
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 89,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "b8a2ebaf48926a2633e9520348b1b705e238a200866faf94604272783a0163a6",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 84.75
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 10,
+      "params": {
+        "k": 90,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 421.09999999403954,
+      "coverageMs": 421.09999999403954,
+      "first": {
+        "at": 1618150.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":90,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":90,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1618150.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":90,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":90,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        92.24806201550479,
+        92.24806201550496
+      ],
+      "canonicalMs": 421.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221613551,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 90,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221613255.3809,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.262,
+            "responseStart": 223.984,
+            "responseEnd": 229.084
+          },
+          "timings": {
+            "fixed_read_freeze": 62.38
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 90,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "0223423dc46160d138b9d94dd1ec3b104622aa258943cebf0c5cb8c0406c157b",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 96.54
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 11,
+      "params": {
+        "k": 91,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 454,
+      "coverageMs": 454,
+      "first": {
+        "at": 1618716.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":91,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":91,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1618716.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":91,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":91,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        92.3076923076931,
+        92.30769230769306
+      ],
+      "canonicalMs": 454,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221614124,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 91,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221613790.936,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.334,
+            "responseStart": 254.739,
+            "responseEnd": 261.19
+          },
+          "timings": {
+            "fixed_read_freeze": 84.13
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 91,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "d188d105717f6d7c2a9a972cd078a3d79177ef85a471245e573e85c468f8ecb5",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 91.76
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 12,
+      "params": {
+        "k": 92,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 389.69999998807907,
+      "coverageMs": 389.69999998807907,
+      "first": {
+        "at": 1619247.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":92,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":92,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1619247.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":92,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":92,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        92.36641221374097,
+        92.3664122137413
+      ],
+      "canonicalMs": 389.69999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221614656,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 92,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221614411.396,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.274,
+            "responseStart": 169.498,
+            "responseEnd": 193.836
+          },
+          "timings": {
+            "fixed_read_freeze": 45.12
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 92,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "90f4f833f8cc2bbee8e7917adfd8270326cfd758ab62888dd91b324084f1c5f4",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 57.02
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 13,
+      "params": {
+        "k": 93,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 805.3999999761581,
+      "coverageMs": 805.3999999761581,
+      "first": {
+        "at": 1620149.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":93,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":93,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1620149.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":93,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":93,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        92.42424242424343,
+        92.42424242424349
+      ],
+      "canonicalMs": 805.3999999761581,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221615264,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 93,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221614842.696,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.235,
+            "responseStart": 232.401,
+            "responseEnd": 238.62
+          },
+          "timings": {
+            "fixed_read_freeze": 43.55
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 93,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "cd3f7487f5245dbe4256445e9e73c1440f4dc324ae8f78336b98f7c1ee9e9070",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 104.79
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 14,
+      "params": {
+        "k": 94,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 298.7999999821186,
+      "coverageMs": 298.7999999821186,
+      "first": {
+        "at": 1620653.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":94,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":94,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1620653.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":94,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":94,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        92.48120300751967,
+        92.48120300751955
+      ],
+      "canonicalMs": 298.7999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221616039,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 94,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221615817.53,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.307,
+            "responseStart": 155.345,
+            "responseEnd": 172.216
+          },
+          "timings": {
+            "fixed_read_freeze": 31.52
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 94,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "dc578e767b903568c51721c40865dd04ee7828f7c67cb2e38d1ee42a1939da70",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 48.2
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 15,
+      "params": {
+        "k": 95,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 451.40000000596046,
+      "coverageMs": 451.40000000596046,
+      "first": {
+        "at": 1621233.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":95,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":95,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1621233.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":95,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":95,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        92.53731343283657,
+        92.53731343283691
+      ],
+      "canonicalMs": 451.40000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221616621,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 95,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221616310.297,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.265,
+            "responseStart": 235.004,
+            "responseEnd": 247.942
+          },
+          "timings": {
+            "fixed_read_freeze": 68.82
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 95,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "ca990655d5770da3ce0ad88efd78def8b01d1d9144577a427f441a2e09bc7333",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 72.97
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 16,
+      "params": {
+        "k": 96,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 323.10000002384186,
+      "coverageMs": 323.10000002384186,
+      "first": {
+        "at": 1621680.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":96,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":96,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1621680.2000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":96,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":96,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        92.5925925925932,
+        92.59259259259318
+      ],
+      "canonicalMs": 323.10000002384186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221617129,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 96,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221616855.4128,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.27,
+            "responseStart": 189.7,
+            "responseEnd": 196.473
+          },
+          "timings": {
+            "fixed_read_freeze": 82.62
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 96,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "d7491fcde6c220482f04524d96fd58866660880a3b96a1517010f8776de889ab",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 43.4
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 17,
+      "params": {
+        "k": 97,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 365.80000001192093,
+      "coverageMs": 365.80000001192093,
+      "first": {
+        "at": 1622169.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":97,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":97,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1622169.7000000179,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":97,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":97,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        92.64705882353023,
+        92.64705882353026
+      ],
+      "canonicalMs": 365.80000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221617556,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 97,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221617323.5093,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.227,
+            "responseStart": 168.823,
+            "responseEnd": 175.056
+          },
+          "timings": {
+            "fixed_read_freeze": 37.08
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 97,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "cdfa28b96258282f41237d3cab50c8b37541d26428847605ce441f4aed8cbb1e",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 63.04
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 18,
+      "params": {
+        "k": 98,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 491.2000000178814,
+      "coverageMs": 491.2000000178814,
+      "first": {
+        "at": 1622792.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":98,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":98,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1622792.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":98,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":98,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        92.70072992700786,
+        92.70072992700791
+      ],
+      "canonicalMs": 491.2000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221618176,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 98,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221617914.479,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.306,
+            "responseStart": 201.561,
+            "responseEnd": 208.486
+          },
+          "timings": {
+            "fixed_read_freeze": 47.49
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 98,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "5d737b16b3c74da330aa1c5bcdd72b5753af85cee8dd71f3606292146d11faa8",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 51.65
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 19,
+      "params": {
+        "k": 99,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 400.19999998807907,
+      "coverageMs": 400.19999998807907,
+      "first": {
+        "at": 1623357.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":99,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":99,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1623357.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":99,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":99,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        92.75362318840625,
+        92.75362318840648
+      ],
+      "canonicalMs": 400.19999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221618778,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 99,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221618502.294,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.265,
+            "responseStart": 215.981,
+            "responseEnd": 222.974
+          },
+          "timings": {
+            "fixed_read_freeze": 55.92
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 99,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "5d73c2cb3f5c8bc4560f72cfe51fd0e23e5a76563616f3aa8927e5020079aa69",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 52.62
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 20,
+      "params": {
+        "k": 100,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 340,
+      "coverageMs": 340,
+      "first": {
+        "at": 1623769.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":100,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":100,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1623769.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":100,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":100,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        92.80575539568402,
+        92.80575539568407
+      ],
+      "canonicalMs": 340,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221619181,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 100,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221618957.541,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.233,
+            "responseStart": 162.394,
+            "responseEnd": 165.72
+          },
+          "timings": {
+            "fixed_read_freeze": 36.24
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 100,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "5deb2828f69cf146cfa7964e07a51a766632983b22038022439f314487c11065",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 48.92
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 21,
+      "params": {
+        "k": 101,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 575.0999999940395,
+      "coverageMs": 575.0999999940395,
+      "first": {
+        "at": 1624469.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":101,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":101,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1624469.900000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":101,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":101,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        92.85714285714354,
+        92.85714285714334
+      ],
+      "canonicalMs": 575.0999999940395,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221619889,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 101,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221619429.872,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.263,
+            "responseStart": 399.706,
+            "responseEnd": 406.275
+          },
+          "timings": {
+            "fixed_read_freeze": 54.74
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 101,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "48b5c1e741de1b770b92254039de3c0ff230960a0a643412cd2d0e87551df5b0",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 71.46
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 22,
+      "params": {
+        "k": 102,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 388.59999999403954,
+      "coverageMs": 388.59999999403954,
+      "first": {
+        "at": 1624943.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":102,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":102,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1624943.5,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":102,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":102,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        92.90780141844027,
+        92.90780141844073
+      ],
+      "canonicalMs": 388.59999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221620344,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 102,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221620058.9211,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.237,
+            "responseStart": 192.726,
+            "responseEnd": 196.984
+          },
+          "timings": {
+            "fixed_read_freeze": 60.03
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 102,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "a1ba7becab4c288158bcbc966b11c7149e7e351481ac1758a363fa495f54d117",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 54.35
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 23,
+      "params": {
+        "k": 103,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 392.59999999403954,
+      "coverageMs": 392.59999999403954,
+      "first": {
+        "at": 1625455.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":103,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":103,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1625455.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":103,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":103,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        92.95774647887364,
+        92.95774647887399
+      ],
+      "canonicalMs": 392.59999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221620866,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 103,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221620565.1992,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.26,
+            "responseStart": 244.587,
+            "responseEnd": 255.535
+          },
+          "timings": {
+            "fixed_read_freeze": 89.02
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 103,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "11d4b29e1e66bf7e2bd034f83fd1382633b9f6133da39bdf7b8ae84102902a8e",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 54.85
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 24,
+      "params": {
+        "k": 104,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 364.69999998807907,
+      "coverageMs": 364.69999998807907,
+      "first": {
+        "at": 1625942.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":104,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":104,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1625942.099999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":104,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":104,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        93.00699300699351,
+        93.00699300699412
+      ],
+      "canonicalMs": 364.69999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221621344,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 104,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221621080.3762,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.257,
+            "responseStart": 197.782,
+            "responseEnd": 208.629
+          },
+          "timings": {
+            "fixed_read_freeze": 45.89
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 104,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "2c7ffb0ca7b4a6425d07889b96a6f5f72e854fa8262c1e652a6675a75111426d",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 60.19
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 25,
+      "params": {
+        "k": 105,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 328,
+      "coverageMs": 328,
+      "first": {
+        "at": 1626335.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":105,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":105,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1626335.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":105,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":105,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        93.0555555555562,
+        93.05555555555624
+      ],
+      "canonicalMs": 328,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221621752,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 105,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221621456.465,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.258,
+            "responseStart": 237.247,
+            "responseEnd": 247.893
+          },
+          "timings": {
+            "fixed_read_freeze": 63.82
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 105,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "956fe91a37820b58cbaffe1ca9dfd327883e543fac821fe47da5514fe91ef3e3",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 54.56
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 26,
+      "params": {
+        "k": 106,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 335.59999999403954,
+      "coverageMs": 335.59999999403954,
+      "first": {
+        "at": 1626770.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":106,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":106,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1626770.800000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":106,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":106,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        93.10344827586282,
+        93.10344827586859
+      ],
+      "canonicalMs": 335.59999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221622174,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 106,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221621934.9517,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.264,
+            "responseStart": 153.843,
+            "responseEnd": 172.284
+          },
+          "timings": {
+            "fixed_read_freeze": 36.5
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 106,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "6da0be321823c7311b052b28a0b715f540c235f0282950da972bd180f5060c2a",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 50.48
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 27,
+      "params": {
+        "k": 107,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 370.80000001192093,
+      "coverageMs": 370.80000001192093,
+      "first": {
+        "at": 1627249.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":107,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":107,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1627249.300000012,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":107,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":107,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        93.15068493150767,
+        93.15068493151264
+      ],
+      "canonicalMs": 370.80000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221622650,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 107,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221622391.584,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.246,
+            "responseStart": 210.812,
+            "responseEnd": 212.678
+          },
+          "timings": {
+            "fixed_read_freeze": 97.29
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 107,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "74e92912ce785a15e6ce5ab24536ebb2269f0a091a25c475c5e9f8ddff89dc93",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 48.97
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 28,
+      "params": {
+        "k": 108,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 409.39999997615814,
+      "coverageMs": 409.39999997615814,
+      "first": {
+        "at": 1627772.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":108,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":108,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1627772.599999994,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":108,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":108,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        93.19727891156523,
+        93.19727891156501
+      ],
+      "canonicalMs": 409.39999997615814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221623168,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 108,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221622946.908,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.246,
+            "responseStart": 167.878,
+            "responseEnd": 171.847
+          },
+          "timings": {
+            "fixed_read_freeze": 50.42
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 108,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "09bbefc23fa717567f10dc29cb74a9b7cb439a63d0cbc5976dbb35ff3260647e",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 40.14
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 29,
+      "params": {
+        "k": 109,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 382.5,
+      "coverageMs": 382.5,
+      "first": {
+        "at": 1628279.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":109,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":109,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1628279.400000006,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":109,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":109,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        93.24324324324382,
+        93.2432432432439
+      ],
+      "canonicalMs": 382.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221623674,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 109,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221623406.658,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.236,
+            "responseStart": 203.393,
+            "responseEnd": 207.877
+          },
+          "timings": {
+            "fixed_read_freeze": 78.82
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 109,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "d2bae2edfc4e3fee0494eed17397a22562438172378eb501efcbaa64efb525db",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 47.05
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 30,
+      "params": {
+        "k": 110,
+        "smooth": 5,
+        "d": 7
+      },
+      "ms": 405.59999999403954,
+      "coverageMs": 405.59999999403954,
+      "first": {
+        "at": 1628813,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":110,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":110,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1628813,
+        "identity": {
+          "main": "MWH:03064D76-2C86-46B3-B206-3DD35E156DFC",
+          "fixedRevision": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+          "paramsFingerprint": "{\"d\":7,\"k\":110,\"smooth\":5}",
+          "algorithmVersion": "STOCH:1",
+          "calculationStart": 1791158400000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1791465780000,
+          "last": 1791503940000,
+          "count": 637,
+          "identity": "{\"main\":\"MWH:03064D76-2C86-46B3-B206-3DD35E156DFC\",\"fixedRevision\":\"03064d76-2c86-46b3-b206-3dd35e156dfc\",\"paramsFingerprint\":\"{\\\"d\\\":7,\\\"k\\\":110,\\\"smooth\\\":5}\",\"algorithmVersion\":\"STOCH:1\",\"calculationStart\":1791158400000,\"period\":\"1\"}",
+          "sourceFirst": 1791465780000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 637,
+        "visibleRows": 637,
+        "plots": 2,
+        "kind": "snapshot"
+      },
+      "nativeRows": 637,
+      "nativeLast": [
+        1791503940,
+        93.28859060402729,
+        93.28859060402753
+      ],
+      "canonicalMs": 405.59999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221624206,
+          "status": 200,
+          "query": {
+            "instrument": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+            "series_kind": "history",
+            "indicators": [
+              {
+                "name": "STOCH",
+                "params": {
+                  "k": 110,
+                  "smooth": 5,
+                  "d": 7
+                }
+              }
+            ],
+            "before": 1791503940001,
+            "limit": 638
+          },
+          "http": {
+            "startTime": 1792221623907.443,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.259,
+            "responseStart": 227.524,
+            "responseEnd": 238.601
+          },
+          "timings": {
+            "fixed_read_freeze": 52.85
+          },
+          "bars": 638,
+          "indicators": [
+            {
+              "name": "STOCH",
+              "params": {
+                "k": 110,
+                "smooth": 5,
+                "d": 7
+              },
+              "calculation": {
+                "id": "STOCH",
+                "run_id": "c1f42a400352a6895c022804ff7ed951fe02898fc06f5ad3c3bd9e38422f429d",
+                "status": "pending",
+                "cursor": 1791158400000,
+                "target_end": 1791504000000,
+                "input_revision": 0,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 1791158400000,
+                "calculation_origin": 1791158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1791465720000,
+                    "end": 1791504000000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": null,
+                  "input_revision": 0,
+                  "history_version_id": "03064d76-2c86-46b3-b206-3dd35e156dfc",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": [],
+                "display_status": "complete",
+                "execution": {
+                  "path": "bounded-fixed-replay",
+                  "input_cache": "hit",
+                  "result_cache": "miss",
+                  "input_rows": 5760,
+                  "calculation_steps": 5760,
+                  "calculation_ms": 81.12
+                }
+              },
+              "plots": [
+                {
+                  "key": "k",
+                  "count": 638,
+                  "finite": 638
+                },
+                {
+                  "key": "d",
+                  "count": 638,
+                  "finite": 638
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    }
+  ]
+}

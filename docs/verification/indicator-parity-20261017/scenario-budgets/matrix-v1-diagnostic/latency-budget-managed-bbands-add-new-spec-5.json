@@ -1,0 +1,5000 @@
+{
+  "recordedAt": "2026-10-17T07:13:42.028Z",
+  "budgetRevision": "2026-10-17-scenarios-v1",
+  "scenario": "loaded-new-spec",
+  "budget": {
+    "firstMs": 500,
+    "coverageMs": 1000,
+    "canonicalMs": 2000,
+    "timeoutMs": 5000
+  },
+  "source": "actual app / Playwriter / native renderer after two RAFs",
+  "synthetic": true,
+  "config": {
+    "phase": "budget-managed-bbands-add-new-spec-5",
+    "scenario": "loaded-new-spec",
+    "operation": "add",
+    "kind": "managed",
+    "indicator": "BBANDS",
+    "prefixRows": 3000,
+    "specs": [
+      {
+        "params": {
+          "period": 41,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 42,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 43,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 44,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 45,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 46,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 47,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 48,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 49,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 50,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 51,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 52,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 53,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 54,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 55,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 56,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 57,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 58,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 59,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 60,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 61,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 62,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 63,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 64,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 65,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 66,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 67,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 68,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 69,
+          "deviation": 2.3
+        }
+      },
+      {
+        "params": {
+          "period": 70,
+          "deviation": 2.3
+        }
+      }
+    ],
+    "knownUnused": true
+  },
+  "environment": {
+    "symbol": "PARITY",
+    "range": {
+      "from": 1792189920,
+      "to": 1792202460
+    },
+    "timeOrigin": 1792219995443.6
+  },
+  "n": 30,
+  "failures": 0,
+  "quantile": "nearest-rank; failures as infinity (JSON null)",
+  "ms": {
+    "p50": 128.5,
+    "p95": 195.69999998807907
+  },
+  "coverageMs": {
+    "p50": 128.5,
+    "p95": 195.69999998807907
+  },
+  "canonicalMs": {
+    "p50": 128.5,
+    "p95": 195.69999998807907
+  },
+  "passed": true,
+  "samples": [
+    {
+      "index": 1,
+      "params": {
+        "period": 41,
+        "deviation": 2.3
+      },
+      "ms": 118.69999998807907,
+      "coverageMs": 118.69999998807907,
+      "first": {
+        "at": 1221114.900000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":41}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":41}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1221114.900000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":41}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":41}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        133.4263356241054,
+        124.98346390243893,
+        116.54059218077245
+      ],
+      "canonicalMs": 118.69999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221216541,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 41,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221216462.1082,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.228,
+            "responseStart": 66.424,
+            "responseEnd": 68.465
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 41,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 2,
+      "params": {
+        "period": 42,
+        "deviation": 2.3
+      },
+      "ms": 116,
+      "coverageMs": 116,
+      "first": {
+        "at": 1221282.400000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":42}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":42}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1221282.400000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":42}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":42}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        133.3359338029386,
+        124.89655404761899,
+        116.45717429229938
+      ],
+      "canonicalMs": 116,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221216706,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 42,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221216636.6548,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.371,
+            "responseStart": 60.315,
+            "responseEnd": 66.335
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 42,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 3,
+      "params": {
+        "period": 43,
+        "deviation": 2.3
+      },
+      "ms": 117.59999999403954,
+      "coverageMs": 117.59999999403954,
+      "first": {
+        "at": 1221449.400000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":43}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":43}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1221449.400000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":43}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":43}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        133.2320149953167,
+        124.82681302325571,
+        116.42161105119472
+      ],
+      "canonicalMs": 117.59999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221216881,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 43,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221216798.1301,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.245,
+            "responseStart": 62.185,
+            "responseEnd": 64.539
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 43,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 4,
+      "params": {
+        "period": 44,
+        "deviation": 2.3
+      },
+      "ms": 134.09999999403954,
+      "coverageMs": 134.09999999403954,
+      "first": {
+        "at": 1221637.400000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":44}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":44}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1221637.400000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":44}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":44}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        133.12109688985785,
+        124.77430749999998,
+        116.4275181101421
+      ],
+      "canonicalMs": 134.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221217050,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 44,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221216981.489,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.235,
+            "responseStart": 55.958,
+            "responseEnd": 57.448
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 44,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 5,
+      "params": {
+        "period": 45,
+        "deviation": 2.3
+      },
+      "ms": 132,
+      "coverageMs": 132,
+      "first": {
+        "at": 1221794.300000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":45}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":45}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1221794.300000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":45}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":45}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        133.0100849946044,
+        124.73881355555554,
+        116.46754211650668
+      ],
+      "canonicalMs": 132,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221217242,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 45,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221217125.773,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.277,
+            "responseStart": 64.424,
+            "responseEnd": 72.547
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 45,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 6,
+      "params": {
+        "period": 46,
+        "deviation": 2.3
+      },
+      "ms": 118,
+      "coverageMs": 118,
+      "first": {
+        "at": 1221964.800000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":46}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":46}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1221964.800000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":46}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":46}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        132.9059437061295,
+        124.71982978260849,
+        116.53371585908745
+      ],
+      "canonicalMs": 118,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221217401,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 46,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221217318.518,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.242,
+            "responseStart": 61.781,
+            "responseEnd": 62.875
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 46,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 7,
+      "params": {
+        "period": 47,
+        "deviation": 2.3
+      },
+      "ms": 117.39999997615814,
+      "coverageMs": 117.39999997615814,
+      "first": {
+        "at": 1222115.599999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":47}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":47}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1222115.599999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":47}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":47}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        132.81531130081336,
+        124.71659468085105,
+        116.61787806088874
+      ],
+      "canonicalMs": 117.39999997615814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221217543,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 47,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221217464.8608,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.307,
+            "responseStart": 62.854,
+            "responseEnd": 69.736
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 47,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 8,
+      "params": {
+        "period": 48,
+        "deviation": 2.3
+      },
+      "ms": 166.60000002384186,
+      "coverageMs": 166.60000002384186,
+      "first": {
+        "at": 1222315.7000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":48}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":48}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1222315.7000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":48}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":48}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        132.74407514337037,
+        124.72810812499989,
+        116.71214110662942
+      ],
+      "canonicalMs": 166.60000002384186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221217739,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 48,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221217618.552,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.317,
+            "responseStart": 104.883,
+            "responseEnd": 109.402
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 48,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 9,
+      "params": {
+        "period": 49,
+        "deviation": 2.3
+      },
+      "ms": 210.30000001192093,
+      "coverageMs": 210.30000001192093,
+      "first": {
+        "at": 1222625.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":49}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":49}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1222625.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":49}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":49}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        132.69693849062892,
+        124.75315551020402,
+        116.80937252977911
+      ],
+      "canonicalMs": 210.30000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221218068,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 49,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221217955.085,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.245,
+            "responseStart": 81.857,
+            "responseEnd": 82.869
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 49,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 10,
+      "params": {
+        "period": 50,
+        "deviation": 2.3
+      },
+      "ms": 156.59999999403954,
+      "coverageMs": 156.59999999403954,
+      "first": {
+        "at": 1222898.599999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":50}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":50}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1222898.599999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":50}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":50}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        132.67702962128902,
+        124.79033579999988,
+        116.90364197871074
+      ],
+      "canonicalMs": 156.59999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221218338,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 50,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221218210.519,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.255,
+            "responseStart": 69.869,
+            "responseEnd": 74.64
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 50,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 11,
+      "params": {
+        "period": 51,
+        "deviation": 2.3
+      },
+      "ms": 118.7999999821186,
+      "coverageMs": 118.7999999821186,
+      "first": {
+        "at": 1223098.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":51}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":51}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1223098.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":51}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":51}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        132.6856100935131,
+        124.838091372549,
+        116.9905726515849
+      ],
+      "canonicalMs": 118.7999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221218528,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 51,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221218448.287,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.246,
+            "responseStart": 67.025,
+            "responseEnd": 70.623
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 51,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 12,
+      "params": {
+        "period": 52,
+        "deviation": 2.3
+      },
+      "ms": 103.7999999821186,
+      "coverageMs": 103.7999999821186,
+      "first": {
+        "at": 1223248.599999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":52}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":52}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1223248.599999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":52}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":52}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        132.72193892407648,
+        124.89474038461532,
+        117.06754184515417
+      ],
+      "canonicalMs": 103.7999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221218675,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 52,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221218606.688,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.229,
+            "responseStart": 58.728,
+            "responseEnd": 59.788
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 52,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 13,
+      "params": {
+        "period": 53,
+        "deviation": 2.3
+      },
+      "ms": 195.69999998807907,
+      "coverageMs": 195.69999998807907,
+      "first": {
+        "at": 1223480,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":53}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":53}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1223480,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":53}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":53}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        132.78332274844072,
+        124.9585094339623,
+        117.13369611948389
+      ],
+      "canonicalMs": 195.69999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221218928,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 53,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221218750.999,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.241,
+            "responseStart": 132.989,
+            "responseEnd": 139.263
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 53,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 14,
+      "params": {
+        "period": 54,
+        "deviation": 2.3
+      },
+      "ms": 178.40000000596046,
+      "coverageMs": 178.40000000596046,
+      "first": {
+        "at": 1223730.5,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":54}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":54}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1223730.5,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":54}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":54}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        132.86535744589904,
+        125.02756759259252,
+        117.189777739286
+      ],
+      "canonicalMs": 178.40000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221219177,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 54,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221219071.499,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.271,
+            "responseStart": 63.634,
+            "responseEnd": 65.256
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 54,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 15,
+      "params": {
+        "period": 55,
+        "deviation": 2.3
+      },
+      "ms": 146.69999998807907,
+      "coverageMs": 146.69999998807907,
+      "first": {
+        "at": 1223949.5,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":55}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":55}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1223949.5,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":55}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":55}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        132.9623255586827,
+        125.10006018181804,
+        117.23779480495338
+      ],
+      "canonicalMs": 146.69999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221219372,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 55,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221219289.9822,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.243,
+            "responseStart": 69.549,
+            "responseEnd": 71.485
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 55,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 16,
+      "params": {
+        "period": 56,
+        "deviation": 2.3
+      },
+      "ms": 103.2000000178814,
+      "coverageMs": 103.2000000178814,
+      "first": {
+        "at": 1224098.7000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":56}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":56}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1224098.7000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":56}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":56}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        133.06769512584404,
+        125.17414267857136,
+        117.28059023129867
+      ],
+      "canonicalMs": 103.2000000178814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221219523,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 56,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221219457.292,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.627,
+            "responseStart": 53.631,
+            "responseEnd": 55.361
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 56,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 17,
+      "params": {
+        "period": 57,
+        "deviation": 2.3
+      },
+      "ms": 109.09999999403954,
+      "coverageMs": 109.09999999403954,
+      "first": {
+        "at": 1224250.800000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":57}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":57}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1224250.800000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":57}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":57}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        133.17464861265145,
+        125.24801263157879,
+        117.32137665050614
+      ],
+      "canonicalMs": 109.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221219676,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 57,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221219593.0261,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.252,
+            "responseStart": 67.613,
+            "responseEnd": 73.884
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 57,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 18,
+      "params": {
+        "period": 58,
+        "deviation": 2.3
+      },
+      "ms": 120.10000002384186,
+      "coverageMs": 120.10000002384186,
+      "first": {
+        "at": 1224398.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":58}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":58}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1224398.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":58}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":58}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        133.2765891278723,
+        125.31994051724133,
+        117.36329190661034
+      ],
+      "canonicalMs": 120.10000002384186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221219830,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 58,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221219726.49,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.36,
+            "responseStart": 78.074,
+            "responseEnd": 83.58
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 58,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 19,
+      "params": {
+        "period": 59,
+        "deviation": 2.3
+      },
+      "ms": 134.89999997615814,
+      "coverageMs": 134.89999997615814,
+      "first": {
+        "at": 1224585.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":59}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":59}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1224585.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":59}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":59}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        133.36758148035554,
+        125.38829864406776,
+        117.40901580777997
+      ],
+      "canonicalMs": 134.89999997615814,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221220025,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 59,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221219926.0093,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.274,
+            "responseStart": 70.353,
+            "responseEnd": 71.633
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 59,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 20,
+      "params": {
+        "period": 60,
+        "deviation": 2.3
+      },
+      "ms": 137.80000001192093,
+      "coverageMs": 137.80000001192093,
+      "first": {
+        "at": 1224776.800000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":60}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":60}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1224776.800000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":60}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":60}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        133.4427030500311,
+        125.451587,
+        117.46047094996892
+      ],
+      "canonicalMs": 137.80000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221220223,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 60,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221220109.969,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.23,
+            "responseStart": 70.478,
+            "responseEnd": 73.43
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 60,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 21,
+      "params": {
+        "period": 61,
+        "deviation": 2.3
+      },
+      "ms": 135.30000001192093,
+      "coverageMs": 135.30000001192093,
+      "first": {
+        "at": 1224948.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":61}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":61}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1224948.2000000179,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":61}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":61}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        133.49830026277994,
+        125.508456557377,
+        117.51861285197408
+      ],
+      "canonicalMs": 135.30000001192093,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221220376,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 61,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221220282.0452,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.269,
+            "responseStart": 65.372,
+            "responseEnd": 68.247
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 61,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 22,
+      "params": {
+        "period": 62,
+        "deviation": 2.3
+      },
+      "ms": 119.09999999403954,
+      "coverageMs": 119.09999999403954,
+      "first": {
+        "at": 1225099.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":62}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":62}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1225099.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":62}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":62}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        133.53215005691698,
+        125.55772919354838,
+        117.58330833017978
+      ],
+      "canonicalMs": 119.09999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221220521,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 62,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221220443.0618,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.254,
+            "responseStart": 69.227,
+            "responseEnd": 71.506
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 62,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 23,
+      "params": {
+        "period": 63,
+        "deviation": 2.3
+      },
+      "ms": 128.5,
+      "coverageMs": 128.5,
+      "first": {
+        "at": 1225271.5,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":63}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":63}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1225271.5,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":63}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":63}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        133.54353092289952,
+        125.59841380952366,
+        117.6532966961478
+      ],
+      "canonicalMs": 128.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221220684,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 63,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221220592.2617,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.26,
+            "responseStart": 80.456,
+            "responseEnd": 81.623
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 63,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 24,
+      "params": {
+        "period": 64,
+        "deviation": 2.3
+      },
+      "ms": 119.5,
+      "coverageMs": 119.5,
+      "first": {
+        "at": 1225417.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":64}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":64}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1225417.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":64}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":64}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        133.53320973174942,
+        125.62971890624986,
+        117.7262280807503
+      ],
+      "canonicalMs": 119.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221220843,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 64,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221220763.73,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.475,
+            "responseStart": 63.585,
+            "responseEnd": 65.598
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 64,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 25,
+      "params": {
+        "period": 65,
+        "deviation": 2.3
+      },
+      "ms": 125.59999999403954,
+      "coverageMs": 125.59999999403954,
+      "first": {
+        "at": 1225574.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":65}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":65}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1225574.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":65}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":65}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        133.50334605627728,
+        125.65106123076912,
+        117.79877640526095
+      ],
+      "canonicalMs": 125.59999999403954,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221221004,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 65,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221220919.482,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.234,
+            "responseStart": 63.573,
+            "responseEnd": 64.677
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 65,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 26,
+      "params": {
+        "period": 66,
+        "deviation": 2.3
+      },
+      "ms": 149.90000000596046,
+      "coverageMs": 149.90000000596046,
+      "first": {
+        "at": 1225766.900000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":66}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":66}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1225766.900000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":66}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":66}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        133.45731460035205,
+        125.66207030303025,
+        117.86682600570845
+      ],
+      "canonicalMs": 149.90000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221221193,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 66,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221221111.3071,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.275,
+            "responseStart": 58.556,
+            "responseEnd": 61.467
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 66,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 27,
+      "params": {
+        "period": 67,
+        "deviation": 2.3
+      },
+      "ms": 170.5,
+      "coverageMs": 170.5,
+      "first": {
+        "at": 1225967.300000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":67}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":67}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1225967.300000012,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":67}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":67}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        133.39944746237825,
+        125.66258925373124,
+        117.92573104508423
+      ],
+      "canonicalMs": 170.5,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221221390,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 67,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221221288.39,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.254,
+            "responseStart": 82.699,
+            "responseEnd": 83.892
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 67,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 28,
+      "params": {
+        "period": 68,
+        "deviation": 2.3
+      },
+      "ms": 133.7999999821186,
+      "coverageMs": 133.7999999821186,
+      "first": {
+        "at": 1226133.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":68}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":68}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1226133.099999994,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":68}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":68}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        133.3346996705521,
+        125.65267132352959,
+        117.97064297650708
+      ],
+      "canonicalMs": 133.7999999821186,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221221564,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 68,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221221472.3252,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.285,
+            "responseStart": 73.324,
+            "responseEnd": 75.195
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 68,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 29,
+      "params": {
+        "period": 69,
+        "deviation": 2.3
+      },
+      "ms": 129.90000000596046,
+      "coverageMs": 129.90000000596046,
+      "first": {
+        "at": 1226298,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":69}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":69}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1226298,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":69}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":69}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        133.2682521981125,
+        125.63257304347823,
+        117.99689388884399
+      ],
+      "canonicalMs": 129.90000000596046,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221221717,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 69,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221221630.814,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.26,
+            "responseStart": 71.281,
+            "responseEnd": 77.95
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 69,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    },
+    {
+      "index": 30,
+      "params": {
+        "period": 70,
+        "deviation": 2.3
+      },
+      "ms": 125.19999998807907,
+      "coverageMs": 125.19999998807907,
+      "first": {
+        "at": 1226498.400000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":70}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":70}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "covered": {
+        "at": 1226498.400000006,
+        "identity": {
+          "main": "PARITY",
+          "fixedRevision": "published:1",
+          "paramsFingerprint": "{\"deviation\":2.3,\"period\":70}",
+          "algorithmVersion": "BBANDS:1",
+          "calculationStart": 1792057920000,
+          "period": "1"
+        },
+        "coverage": {
+          "first": 1792189680000,
+          "last": 1792201860000,
+          "count": 204,
+          "identity": "{\"main\":\"PARITY\",\"fixedRevision\":\"published:1\",\"paramsFingerprint\":\"{\\\"deviation\\\":2.3,\\\"period\\\":70}\",\"algorithmVersion\":\"BBANDS:1\",\"calculationStart\":1792057920000,\"period\":\"1\"}",
+          "sourceFirst": 1792189680000,
+          "correctionVersion": 0,
+          "tailVersion": 1
+        },
+        "finite": 204,
+        "visibleRows": 204,
+        "plots": 3,
+        "kind": "snapshot"
+      },
+      "nativeRows": 204,
+      "nativeLast": [
+        1792201860,
+        133.20507693599302,
+        125.60274357142859,
+        118.00041020686416
+      ],
+      "canonicalMs": 125.19999998807907,
+      "T_input_first": null,
+      "inputTimingReason": "full prefix acceptance not instrumented; user total retained",
+      "requests": [
+        {
+          "at": 1792221221919,
+          "status": 200,
+          "query": {
+            "instrument": "PARITY",
+            "series_kind": "managed",
+            "indicators": [
+              {
+                "name": "BBANDS",
+                "params": {
+                  "period": 70,
+                  "deviation": 2.3
+                }
+              }
+            ],
+            "before": 1792201860001,
+            "limit": 205
+          },
+          "http": {
+            "startTime": 1792221221838.591,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.24,
+            "responseStart": 65.753,
+            "responseEnd": 66.831
+          },
+          "bars": 205,
+          "indicators": [
+            {
+              "name": "BBANDS",
+              "params": {
+                "period": 70,
+                "deviation": 2.3
+              },
+              "calculation": {
+                "status": "complete",
+                "calculation_origin": 1792057920000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "input_evidence": {
+                  "publication_revision": 1
+                },
+                "execution": {
+                  "input_cache": "hit",
+                  "sql_payload_rows": 0,
+                  "prefix_credential_queries": 0,
+                  "result_cache": "miss",
+                  "calculation_steps": 2400,
+                  "checkpoint_index": 0
+                },
+                "coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 1792189620000,
+                    "end": 1792201920000
+                  }
+                ]
+              },
+              "plots": [
+                {
+                  "key": "upper",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "middle",
+                  "count": 205,
+                  "finite": 205
+                },
+                {
+                  "key": "lower",
+                  "count": 205,
+                  "finite": 205
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "warmupRequests": []
+    }
+  ]
+}

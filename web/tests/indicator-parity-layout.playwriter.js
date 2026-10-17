@@ -2,6 +2,9 @@
 // and state.layout={phase,scenario,kind,studies:[{name,params}],count:30}.
 // Cold groups reload the real app for EVERY operation; server warmth is recorded.
 const fs=require('node:fs'),assert=require('assert').strict;
+const evidenceModule={exports:{}};
+new Function('module',fs.readFileSync('web/tests/fixtures/indicator-parity-evidence.cjs','utf8'))(evidenceModule);
+const {matchAuthority}=evidenceModule.exports;
 const budgets=JSON.parse(fs.readFileSync('web/tests/fixtures/indicator-parity-budgets.json','utf8'));
 const config=state.layout,budget=budgets.scenarios[config?.scenario];
 assert.ok(config && budget && ['warm-layout','cold-local','cold-provider'].includes(config.scenario));
@@ -20,7 +23,10 @@ function installProbe(){
       if(accepted){
         await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
         const coverage=batch.coverage,visible=batch.rows.filter(row=>coverage && coverage.first<=row.time && row.time<=coverage.last);
-        (window.parityLayoutCommits ||= []).push({at:Date.now(),identity:handle.identity,coverage,
+        (window.parityLayoutCommits ||= []).push({at:Date.now(),epochAt:Date.now(),identity:handle.identity,coverage,
+          executionEvidence:batch.executionEvidence,
+          inputRevision:batch.inputRevision,displaySnapshot:batch.displaySnapshot,generation:batch.generation,
+          sourceRows:visible.map(row=>({time:row.time,sourceTime:row.sourceTime})),
           finite:visible.filter(row=>row.valid.some(Boolean)).length,visibleRows:new Set(visible.map(row=>row.time)).size,
           plots:batch.rows[0]?.values.length});
       }
@@ -46,8 +52,9 @@ const capture=response=>{
   const task=(async()=>{
     try{
       const page=await response.json();
-      responses.push({at:Date.now(),status:response.status(),instrument:query.instrument,seriesKind:query.series_kind,
-        query:query.indicators,http:response.request().timing(),bars:page.bars?.length,
+      responses.push({at:Date.now(),status:response.status(),query:{instrument:query.instrument,series_kind:query.series_kind,timeframe:query.timeframe,indicators:query.indicators},
+        page:Object.fromEntries(['series_kind','timeframe','origin','calculation_origin','revision_id','input_revision','cache_revision','revision','history_revision','provider_snapshot_id','display_snapshot_id','dependency_revision'].map(key=>[key,page[key]])),
+        sourceRows:page.bars?.map(bar=>({start:bar.start,end:bar.end,chart_time:bar.chart_time})),http:response.request().timing(),bars:page.bars?.length,
         indicators:page.indicators?.map(item=>({name:item.name,params:item.params,calculation:item.calculation}))});
     }catch(error){responses.push({at:Date.now(),status:response.status(),error:String(error)});}
   })();
@@ -98,11 +105,11 @@ try{
       assert.equal(result.native.length,config.studies.length,'saved layout lost or duplicated a study');
       assert.ok(result.native.every(study=>study.rows>0),'restored study has no native data');
       const measured=responses.slice(responseStart);
-      const provenance=config.scenario==='warm-layout' ? [...(state.layoutProvenance || []),...measured] : measured;
-      for(const study of config.studies) assert.ok(provenance.some(response=>response.indicators?.some(item=>
-        item.name===study.name && stable(item.params)===stable(study.params) && item.calculation?.canonical_verified &&
-        (item.calculation.visible_complete || item.calculation.status==='complete'))),'missing current-spec canonical provenance');
-      samples.push({index:index+1,at,...result,canonicalMs:result.coverageMs,requests:measured});
+      const provenance=config.scenario==='warm-layout' ? [...(state.layoutProvenance || []),...responses] : measured;
+      const authorities=result.commits.map(commit=>matchAuthority(commit.covered,provenance,commit.study,config.kind));
+      assert.ok(authorities.every(authority=>authority.complete),'missing matching execution/snapshot/revision/coverage authority');
+      samples.push({index:index+1,at,...result,authorities,
+        canonicalMs:Math.max(...authorities.map(authority=>authority.canonicalAt))-at,requests:measured});
     }catch(cause){error=String(cause);samples.push({index:index+1,at,firstMs:null,coverageMs:null,canonicalMs:null,error,requests:responses.slice(responseStart)});}
     console.log({sample:index+1,firstMs:samples.at(-1).firstMs,coverageMs:samples.at(-1).coverageMs,error});
   }
@@ -115,9 +122,9 @@ const quantile=(key,q)=>{
 };
 const metrics=Object.fromEntries(['firstMs','coverageMs','canonicalMs'].map(key=>[key,{p50:quantile(key,.5),p95:quantile(key,.95)}]));
 const failures=samples.filter(sample=>sample.error).length;
-const passed=samples.length>=budgets.minimumSamples && !failures && metrics.firstMs.p95<budget.firstMs &&
+const passed=samples.length>=budgets.minimumSamples && !failures && Object.values(metrics).every(metric=>Number.isFinite(metric.p95)) && metrics.firstMs.p95<budget.firstMs &&
   metrics.coverageMs.p95<budget.coverageMs && metrics.canonicalMs.p95<budget.canonicalMs;
-const evidence={recordedAt:new Date().toISOString(),budgetRevision:budgets.revision,config,budget,
+const evidence={recordedAt:new Date().toISOString(),harnessRevision:'execution-evidence-v2',budgetRevision:budgets.revision,config,budget,
   source:'actual app / Playwriter / persisted layout / native after two RAFs',synthetic:true,
   preparation:config.scenario==='warm-layout'?'same-page widget.load':'real app reload each sample; API process stays running',
   n:samples.length,failures,quantile:'nearest-rank; failures as infinity (JSON null)',...metrics,passed,samples};

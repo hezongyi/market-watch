@@ -323,7 +323,7 @@ def outputs(db, run, start, end):
     return sorted(rows, key=lambda row: row["start"])
 
 
-def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='display', display_retry=None, client=None, consumers=()):
+def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='display', display_retry=None, client=None, consumers=(), foreground=False):
     results, progress, display_errors, restarted = [], [], [], {}
     if not page["bars"]:
         return results, progress
@@ -358,7 +358,15 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='di
                                     page['display_snapshot_id']) if page.get('display_snapshot_id') else None))
             if latest["input_revision"] == run.input_revision:
                 tail = latest["bars"]
-        if provisional and purpose == 'display' and run.revision_id:
+        from .fixed_indicator_display import confirmed_page
+
+        # The request's post-transaction foreground replay already owns this
+        # confirmed prefix. Do not first rescan it or create a redundant display
+        # task; over-budget prefixes continue through the durable fixed worker.
+        confirmed_foreground = (foreground and tail is page['bars'] and end <= run.target_end
+                                and confirmed_page(db, page))
+        repaired = None
+        if provisional and purpose == 'display' and run.revision_id and not confirmed_foreground:
             from .display_indicators import suffix
 
             display_page = page if tail is page['bars'] else {**page, 'bars': sorted(
