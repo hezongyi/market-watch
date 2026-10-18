@@ -5,6 +5,8 @@
   --nc-muted: #9fa6b5;
   --nc-border: #363c4e;
   --nc-accent: #6aa5ff;
+  --nc-danger-text: #ff9c99;
+  --nc-warning-text: #d9ac60;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -28,6 +30,8 @@
   --nc-muted: #565e70;
   --nc-border: #d8dbe3;
   --nc-accent: #165dcc;
+  --nc-danger-text: #b42318;
+  --nc-warning-text: #82580e;
   color-scheme: light;
 }
 .nc-panel * {
@@ -184,11 +188,11 @@
 }
 .nc-error.nc-severity,
 .nc-critical {
-  color: #ff9c99;
+  color: var(--nc-danger-text);
   background: none;
 }
 .nc-warning {
-  color: #d9ac60;
+  color: var(--nc-warning-text);
 }
 .nc-panel .nc-pending {
   border-left: 3px solid #b89658;
