@@ -12,7 +12,7 @@ import secrets
 import uuid
 
 from fastapi import HTTPException
-from sqlalchemy import String, and_, cast, delete, exists, func, or_, select
+from sqlalchemy import BigInteger, String, and_, cast, delete, exists, func, or_, select
 
 from .notification_sources import safe_text
 from .storage import (
@@ -218,22 +218,28 @@ def _server_source(db, state, audit):
         row = _signal(db, state, facts['signal_id'], audit.at)
         return row.id if row else None
     if kind.startswith('phone_'):
+        signal = db.get(SignalRow, facts['signal_id'])
+        if (signal and signal.created_at < now_ms() - 30 * 86400_000
+                and not db.get(NoticeEvent, signal_event_id(signal.id))):
+            return None  # A late phone fact cannot recreate an expired event.
         row = _signal(db, state, facts['signal_id'], audit.at)
         if not row:
             return None
-        observation_id = 'source:' + str(audit.id)
+        observation_id = ('phone-attempt:' + source['source_id'] if kind == 'phone_attempt' else
+            'phone-received:' + source['source_id'] if kind == 'phone_received' else 'source:' + str(audit.id))
         if not db.get(NoticeObservation, observation_id):
             db.add(NoticeObservation(id=observation_id, event_id=row.id, subject=state.subject,
-                profile='server', kind=kind, at=audit.at, reported_at=None,
+                profile='server', kind=kind, at=facts.get('at', facts.get('received_at', audit.at)), reported_at=None,
                 details=clean(facts), intent_hash=intent_hash(facts)))
         body = {**row.body}
         channels, versions = dict(body.get('channels', {})), dict(body.get('channel_versions', {}))
         # Each Notification update holds its source row lock before its Audit insert.
         # Its audit ID is a per-source version, never a global consumption cursor.
         version_key = kind + ':' + (str(facts.get('device_id')) if kind == 'phone_received' else '')
-        if audit.id > versions.get(version_key, 0):
+        version = int(source['source_id']) if kind in ('phone_attempt', 'phone_received') else audit.id
+        if version > versions.get(version_key, 0):
             channels[version_key] = clean(facts)
-            versions[version_key] = audit.id
+            versions[version_key] = version
         body.update(channels=channels, channel_versions=versions)
         row.body, row.version = body, state.seq + 1
         db.flush()
@@ -241,15 +247,15 @@ def _server_source(db, state, audit):
         return row.id
     if kind == 'task_failure':
         ident = 't:' + str(uuid.uuid5(uuid.NAMESPACE_URL, canonical([
-            source['source_id'], facts['attempt'], facts['code']])))
-        row = _new_event(db, state, ident=ident, source_kind='data_center',
+            source['source_id'], audit.id, facts['attempt'], facts['code']])))
+        row = _new_event(db, state, ident=ident, source_kind=facts.get('source_kind', 'data_center'),
             source_id=source['source_id'], occurred_at=audit.at, source_version=audit.id,
             dedupe=facts['dedupe_key'], backfill=audit.at < state.started_at,
             body={'title': facts['title'], 'message': facts['code'], 'notify_web': True,
                   'context': facts.get('context', {}), 'evidence': facts.get('evidence', {})})
         return row.id
     if kind == 'recovery':
-        dedupe = intent_hash([state.subject, 'data_center', facts['dedupe_key']])
+        dedupe = intent_hash([state.subject, facts.get('source_kind', 'data_center'), facts['dedupe_key']])
         group = db.scalar(select(NoticeIncident).where(NoticeIncident.subject == state.subject,
             NoticeIncident.dedupe_key == dedupe, NoticeIncident.closed_at.is_(None)))
         if group and audit.id > group.source_version:
@@ -275,7 +281,8 @@ def project(db, *, limit=100, fail_after=None):
     intakes = list(db.scalars(select(NoticeIntake).where(NoticeIntake.subject == state.subject,
         ~exists(select(NoticeSourceReceipt.source_key).where(
             NoticeSourceReceipt.source_key == 'browser:' + NoticeIntake.id)))
-        .order_by(NoticeIntake.at, NoticeIntake.id).limit(limit - count)))
+        .order_by(func.coalesce(cast(NoticeIntake.body['_accepted_order'].as_string(), BigInteger),
+            NoticeIntake.at * 1000), NoticeIntake.id).limit(limit - count)))
     for intake in intakes:
         value = intake.body
         event_id = intake.id
@@ -334,6 +341,17 @@ def accept_browser(db, subject, value):
     if budget.tokens < 1:
         raise HTTPException(429, '通知接收限流，本机待同步记录仍需保留', headers={'Retry-After': '1'})
     budget.tokens -= 1
+    # The existing subject budget lock also orders durable acceptance. A
+    # timestamp alone cannot order same-millisecond failure/recovery/recurrence.
+    # Keep the logical order separate from the actual recorded/report times.
+    order_key = 'notice_intake_order:' + subject
+    previous_order = db.get(Preference, order_key, populate_existing=True)
+    order = max(at * 1000 + 1, (previous_order.value['last'] if previous_order else 0) + 1)
+    raw['_accepted_order'] = order
+    if previous_order:
+        previous_order.value = {'last': order}
+    else:
+        db.add(Preference(key=order_key, value={'last': order}))
     db.add(NoticeIntake(id=value.event_id, subject=subject, profile=value.profile, at=at,
                        intent_hash=signature, body=raw))
     return {'id': value.event_id, 'status': 'accepted', 'recorded_at': at}
@@ -507,7 +525,9 @@ def rebuild(db):
     state.seq = 0
     state.floor = 0
     db.execute(delete(NoticeChange).where(NoticeChange.subject == state.subject))
-    db.execute(delete(NoticeSourceReceipt))
+    # Keep receipts for expired events: replay must not undo retention tombstones.
+    db.execute(delete(NoticeSourceReceipt).where(exists(select(NoticeEvent.id).where(
+        NoticeEvent.id == NoticeSourceReceipt.event_id))))
     for row in db.scalars(select(NoticeEvent).where(NoticeEvent.subject == state.subject)):
         row.attention = False
         row.backfill = True
@@ -519,7 +539,14 @@ def rebuild(db):
 
 def health(db):
     pref = db.get(Preference, 'notice_projector_health')
-    return pref.value if pref else {'state': 'unknown', 'message': '尚未观察到通知投影 worker'}
+    audits = select(Audit.at).where(Audit.kind == 'notice_source', ~exists(
+        select(NoticeSourceReceipt.source_key).where(NoticeSourceReceipt.source_key == 'audit:' + cast(Audit.id, String))))
+    intakes = select(NoticeIntake.at).where(NoticeIntake.subject == SUBJECT, ~exists(
+        select(NoticeSourceReceipt.source_key).where(NoticeSourceReceipt.source_key == 'browser:' + NoticeIntake.id)))
+    backlog = audits.union_all(intakes).subquery()
+    count, oldest = db.execute(select(func.count(), func.min(backlog.c.at))).one()
+    return {**(pref.value if pref else {'state': 'unknown', 'message': '尚未观察到通知投影 worker'}),
+        'pending_sources': count, 'oldest_pending_at': oldest}
 
 
 def resolve_signal(db, ident):
@@ -538,10 +565,13 @@ def resolve_signal(db, ident):
 
 
 def backfill(db, *, limit=100):
-    """Import retained pre-installation chart facts once, without invented observations."""
+    """Import chart facts without a reliable source, including application rollback writes."""
     state = stream(db, lock=True)
     rows = list(db.scalars(select(SignalRow).where(SignalRow.chart_alert_id.is_not(None),
-        SignalRow.created_at >= now_ms() - 30 * 86400_000, SignalRow.created_at < state.started_at,
+        SignalRow.created_at >= now_ms() - 30 * 86400_000,
+        ~exists(select(Audit.id).where(Audit.kind == 'notice_source',
+            Audit.details['kind'].as_string() == 'signal',
+            Audit.details['facts']['signal_id'].as_string() == SignalRow.id)),
         ~exists(select(NoticeEvent.id).where(NoticeEvent.source_id == SignalRow.id, NoticeEvent.source_kind == 'chart_alert')),
         ~exists(select(NoticeSourceReceipt.source_key).where(NoticeSourceReceipt.source_key == 'backfill:' + SignalRow.id)))
         .order_by(SignalRow.occurred_at, SignalRow.id).limit(limit)))
@@ -560,13 +590,13 @@ def backfill(db, *, limit=100):
             channels = {'phone_state:': {'notification_id': note.id, 'status': note.status, 'stopped_at': note.ack_at}}
             row.body = {**row.body, 'channels': channels, 'historical_observations': '未存储的网页与声音事实均未知'}
             for attempt in db.scalars(select(DeliveryAttempt).where(DeliveryAttempt.notification_id == note.id)):
-                key = 'backfill:attempt:' + str(attempt.id)
+                key = 'phone-attempt:' + str(attempt.id)
                 if not db.get(NoticeObservation, key):
                     facts = clean({'at': attempt.at, 'status': attempt.status, 'details': attempt.details})
                     db.add(NoticeObservation(id=key, event_id=row.id, subject=state.subject, profile='server',
                         kind='phone_attempt', at=attempt.at, details=facts, intent_hash=intent_hash(facts)))
             for receipt in db.scalars(select(DeviceReceipt).where(DeviceReceipt.notification_id == note.id)):
-                key = 'backfill:receipt:' + str(receipt.id)
+                key = 'phone-received:' + str(receipt.id)
                 if not db.get(NoticeObservation, key):
                     facts = {'received_at': receipt.received_at, 'device_id': receipt.device_id}
                     db.add(NoticeObservation(id=key, event_id=row.id, subject=state.subject, profile='server',
@@ -575,4 +605,48 @@ def backfill(db, *, limit=100):
         db.flush()
         publish(db, state, 'updated', row.id, summary(db, row))
         count += 1
+    return count
+
+
+def reconcile_channels(db, *, limit=100):
+    """Catch up original phone records written while an older binary had no hooks."""
+    from .config import settings
+    if not settings.notification_center_sources_enabled:
+        return 0
+    stream(db, lock=True)
+    count = 0
+    for model, kind, prefix in ((DeliveryAttempt, 'phone_attempt', 'phone-attempt:'),
+                                 (DeviceReceipt, 'phone_received', 'phone-received:')):
+        rows = db.execute(select(model, Notification).join(Notification,
+            model.notification_id == Notification.id).join(NoticeEvent,
+            and_(NoticeEvent.source_id == Notification.signal_id, NoticeEvent.source_kind == 'chart_alert'))
+            .where(~exists(select(NoticeObservation.id).where(
+                NoticeObservation.id == prefix + cast(model.id, String))))
+            .order_by(model.id).limit(max(0, limit-count))).all()
+        for item, note in rows:
+            facts = {'signal_id': note.signal_id, 'notification_id': note.id}
+            if kind == 'phone_attempt':
+                facts.update(attempt_id=item.id, at=item.at, status=item.status,
+                    details={key: safe_text(item.details[key]) for key in
+                        ('provider_id', 'status_code', 'error') if key in item.details})
+            else:
+                facts.update(device_id=item.device_id, received_at=item.received_at)
+            db.add(Audit(kind='notice_source', details={'schema_version': 1, 'kind': kind,
+                'source_id': str(item.id), 'facts': facts, 'reconciled': True}))
+            count += 1
+    channel = NoticeEvent.body['channels']['phone_state:']
+    notes = db.scalars(select(Notification).join(NoticeEvent,
+        and_(NoticeEvent.source_id == Notification.signal_id, NoticeEvent.source_kind == 'chart_alert'))
+        .where(or_(channel['status'].as_string().is_distinct_from(Notification.status),
+                   cast(channel['stopped_at'].as_string(), BigInteger).is_distinct_from(Notification.ack_at)))
+        .order_by(Notification.id).limit(max(0, limit-count))
+        .with_for_update(of=Notification).execution_options(populate_existing=True))
+    for note in notes:
+        db.add(Audit(kind='notice_source', details={'schema_version': 1, 'kind': 'phone_state',
+            'source_id': note.id, 'reconciled': True, 'facts': {'signal_id': note.signal_id,
+                'notification_id': note.id, 'status': note.status, 'stopped_at': note.ack_at}}))
+        count += 1
+    # Allocate source versions while holding each phone row lock, so a later
+    # real update always obtains a later Audit ID than this snapshot.
+    db.flush()
     return count

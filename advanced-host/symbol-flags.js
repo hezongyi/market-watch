@@ -33,7 +33,8 @@ const MWSymbolFlags = (() => {
     }
     return result;
   }
-  function store(initial, rpc) {
+  function store(initial, rpc, terminal = () => {}) {
+    const notify = (...args) => { try { terminal(...args); } catch { /* Reporting cannot change a saved preference. */ } };
     let row = initial,
       flags = parse(row?.content?.value),
       queue = Promise.resolve();
@@ -50,6 +51,7 @@ const MWSymbolFlags = (() => {
         if (color !== null && !Object.hasOwn(colors, color))
           return Promise.reject(Error("未知收藏颜色"));
         const task = queue.then(async () => {
+          const attemptId = crypto.randomUUID();
           for (let attempt = 0; ; attempt++) {
             const merged = { ...flags };
             if (color === null) delete merged[ticker];
@@ -63,11 +65,15 @@ const MWSymbolFlags = (() => {
                 content: { value: { version: 1, flags: merged } },
               });
               flags = parse(row.content.value);
+              notify(null, attemptId);
               return flags;
             } catch (error) {
-              if (error.status !== 409 || attempt >= 2) throw error;
+              if (error.status !== 409 || attempt >= 2) {
+                notify(error, attemptId);
+                throw error;
+              }
               // Rebase only this explicit symbol edit; preserve other windows' flags.
-              await reload();
+              try { await reload(); } catch (failure) { notify(failure, attemptId); throw failure; }
             }
           }
         });
@@ -76,12 +82,12 @@ const MWSymbolFlags = (() => {
       },
     };
   }
-  function attach(widget, initial, readonly, rpc, report) {
+  function attach(widget, initial, readonly, rpc, report, terminal) {
     if (!String(globalThis.TradingView?.version?.()).includes(version)) {
       report(Error("当前图表库版本不支持行内收藏增强，原生自选表仍可使用"));
       return { dispose() {} };
     }
-    const state = store(initial, rpc),
+    const state = store(initial, rpc, terminal),
       slot = widget.createButton({ align: "left", useTradingViewStyle: false }),
       doc = slot.ownerDocument;
     widget.removeButton(slot);

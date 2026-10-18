@@ -27,6 +27,7 @@ export async function loadNativeHistory(
   signal: AbortSignal,
   capabilities: HistoryCapabilities,
   progress: (state: HistoryProgress) => void,
+  noticeContext: Record<string, string> = {},
 ) {
   let handle: string | undefined;
   const deadline = Date.now() + capabilities.task_seconds * 1000;
@@ -37,7 +38,7 @@ export async function loadNativeHistory(
     progress({ phase: "checking", estimatedPages: estimate });
     let reply = await api(
       "/charts/history-loads",
-      { request_id: crypto.randomUUID(), query },
+      { request_id: crypto.randomUUID(), query, notice_context: noticeContext },
       signal,
     );
     if (reply.result) {
@@ -66,7 +67,7 @@ export async function loadNativeHistory(
           error?.message || "历史加载已结束",
           error?.status || 503,
           error?.code || "HISTORY_UNAVAILABLE",
-        ), state.state==='failed'?{notice_source_id:'native_history:'+handle}:{});
+        ), state.state==='failed'?{notice_source_id:state.notice_source_id || 'native_history:'+handle}:{});
       }
       progress({
         phase:

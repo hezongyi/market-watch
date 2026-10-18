@@ -33,6 +33,9 @@
 .nc-panel * {
   box-sizing: border-box;
 }
+.nc-panel > * {
+  flex-shrink: 0;
+}
 .nc-panel h2,
 .nc-panel h3,
 .nc-panel p {
@@ -145,7 +148,7 @@
   margin-top: 8px;
 }
 .nc-list {
-  flex: 1;
+  flex: 1 0 auto;
   min-height: 120px;
 }
 .nc-panel .nc-row {

@@ -12,7 +12,7 @@ const chart={symbol:()=>sub.symbol,resolution:()=>sub.res,dataReady:()=>true,get
  getStudyById:()=>({isVisible:()=>true,getInputValues:()=>[{id:'period',value:5}]}),onDataLoaded:()=>({subscribe(){},unsubscribe(){}})};
 const adapter={scope:()=>({...scope}),attach:(_,__,identity)=>({generation:1,identity}),detach(){},invalidate:async()=>true,
  applyBatch:async(_,batch)=>{if(!batch.current())return false;batches.push(batch);return true;}};
-const context={MWNativeIndicatorResults:adapter,queueMicrotask,Date,setTimeout,clearTimeout,
+const context={crypto:require('node:crypto').webcrypto,MWNativeIndicatorResults:adapter,queueMicrotask,Date,setTimeout,clearTimeout,
  setInterval:()=>1,clearInterval(){},addEventListener:(type,handler)=>{if(type==='message')context.handle=handler;},
  send:()=>{},parent:{},parentOrigin:'https://parent.test',ready:false,loading:false,
  quoteSubscriptions:new Map(),subscriptions,marketHistoryState:state,indicatorBindings:bindings,

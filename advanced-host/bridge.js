@@ -282,6 +282,20 @@ function rememberIndicatorBinding(ticker,res,page,{correction=false}={}) {
 function emitNotice(fault,recovered=false){
   send({type:'notice-source',workspace_id:alertUIWorkspace,session:alertUISession,epoch:workspaceEpoch,fault,recovered});
 }
+// Each live request owner carries at most one outage per instrument/period.
+// Callers fence cancellation/generation before recording a transition.
+function marketRequestNotice(owner,ticker,res,error){
+  if(error?.code==='HISTORY_CANCELLED' || error?.name==='AbortError')return;
+  const key=ticker+'|'+res;
+  const outages=owner.noticeOutages || (owner.noticeOutages=new Map());
+  let attempt=outages.get(key);
+  if(error && !attempt){attempt=crypto.randomUUID();outages.set(key,attempt);}
+  else if(error || !attempt)return;
+  if(!error)outages.delete(key);
+  emitNotice({source_kind:'market',attempt_id:attempt,code:'MARKET_REQUEST_FAILED',title:'图表行情请求失败',
+    message:error ? String(error) : '当前有效行情请求已成功',
+    context:{instrument:ticker,timeframe:res,consumer:'request',source_id:owner.noticeSourceId || (owner.noticeSourceId=crypto.randomUUID())}},!error);
+}
 function indicatorFault(consumer,error,attempt_id){
   const binding=indicatorBindings.get(indicatorKey(consumer.chart.symbol(),consumer.chart.resolution()))||{};
   const scope=MWNativeIndicatorResults.scope(consumer.chart,consumer.id);
@@ -494,9 +508,12 @@ async function recoverMarketBar(sub) {
     if(![...subscriptions.values()].includes(sub)) return;
     if(restored) {
       sub.needsHistoryReload=false;
+      marketRequestNotice(sub,sub.symbol,sub.res,null);
       registerMarketBar(sub);
     } else sub.marketRetry=setTimeout(()=>recoverMarketBar(sub),500);
   } catch(error) {
+    if(![...subscriptions.values()].includes(sub))return;
+    marketRequestNotice(sub,sub.symbol,sub.res,error);
     send({type:'feed-poll-state',key:sub.symbol+'|'+sub.res,error:String(error)});
     if([...subscriptions.values()].includes(sub)) sub.marketRetry=setTimeout(()=>recoverMarketBar(sub),1000);
   } finally {sub.marketRecovering=false;}
@@ -1054,9 +1071,10 @@ const feed = {
         // Keep the first snapshot beside streaming/polling rows so a timezone
         // or active-chart change can reformat the same stored epoch without
         // issuing another provider request.
+        for(const row of rows)marketRequestNotice(quoteSub,row.n,'quotes',row.s==='error' || (row.v?.fetch_status && row.v.fetch_status!=='ok') ? Error('报价抓取失败') : null);
         cb(rows);
       },
-        error=>send({type:"feed-poll-state",key:"@quotes",error:String(error)}),
+        error=>{if(quoteSubscriptions.get(id)!==quoteSub)return;for(const ticker of presented)marketRequestNotice(quoteSub,ticker,'quotes',error);send({type:"feed-poll-state",key:"@quotes",error:String(error)});},
         () => quoteSubscriptions.get(id) === quoteSub, true);
     }
   },
@@ -1204,7 +1222,7 @@ const feed = {
         // Native requirements pass unchanged; the backend owns cache policy
         // and provider pagination, including demands larger than one page.
         const epoch = workspaceEpoch, reserveStarted = globalThis.performance?.now() || 0;
-        const args={limit:p.countBack,history_progress_id:loadId,history_progress_epoch:loadEpoch,
+        const args={limit:p.countBack,history_progress_id:loadId,history_progress_epoch:loadEpoch,notice_chart_index:s.mw_window || '',
           history_page_bars:s.mw_historyPageBars || 4000,
           countBack:p.countBack, from:p.from*1000, before:p.to*1000,
           firstDataRequest:p.firstDataRequest, client:clientId,
@@ -1712,6 +1730,7 @@ async function tick() {
           if (!current(binding)) continue;
           const {sub} = binding;
           const symbols = sub.symbols.filter(ticker => active.has(ticker));
+          for(const row of rows.filter(row=>symbols.includes(row.n)))marketRequestNotice(sub,row.n,'quotes',row.s==='error' || (row.v?.fetch_status && row.v.fetch_status!=='ok') ? Error('报价抓取失败') : null);
           if (symbols.length) sub.cb(symbols.map(ticker => quoteSnapshotRows.get(ticker)).filter(Boolean).map(presentQuote));
         }
         send({ type: "feed-poll-state", key: "@quotes", error: "" });
@@ -1719,6 +1738,7 @@ async function tick() {
         const rows = quoteFailureRows(currentSymbols(), initialQuotes);
         for (const binding of quoteBindings) {
           if (!current(binding)) continue;
+          for(const ticker of binding.sub.symbols.filter(ticker=>currentSymbols().includes(ticker)))marketRequestNotice(binding.sub,ticker,'quotes',e);
           const selected = rows.filter(row => binding.sub.symbols.includes(row.n));
           if (selected.length) binding.sub.cb(selected);
         }
@@ -1849,9 +1869,11 @@ async function tick() {
         }
         if (needsReload && await reloadHistory(symbol, first.res))
           for (const sub of group) sub.needsHistoryReload = false;
+        if(epoch===workspaceEpoch)for(const sub of group)if([...subscriptions.values()].includes(sub))marketRequestNotice(sub,sub.symbol,sub.res,null);
         send({ type: "feed-poll-state", key: first.symbol + "|" + first.res, error: "" });
         if (result.pending?.length) send({type:'status',text:result.pending.join('；')});
       } catch (e) {
+        if(epoch===workspaceEpoch)for(const sub of group)if([...subscriptions.values()].includes(sub))marketRequestNotice(sub,sub.symbol,sub.res,e);
         send({ type: "feed-poll-state", key: first.symbol + "|" + first.res, error: String(e) });
       }
     }
@@ -2499,7 +2521,8 @@ function boot(
     symbolFlags?.dispose();
     try {
       symbolFlags = MWSymbolFlags.attach(widget, preferences.find(p=>p.kind==="setting" && p.name===MWSymbolFlags.name), readonly,
-        (op,args)=>request({op,args},"symbol-flags"), error=>send({type:"error",error:"收藏保存失败："+String(error)}));
+        (op,args)=>request({op,args},"symbol-flags"), error=>send({type:"error",error:"收藏保存失败："+String(error)}),
+        (error,attempt_id)=>emitNotice({source_kind:'preferences',attempt_id,code:'PREFERENCE_SAVE_FAILED',title:'收藏偏好保存失败',message:String(error||'收藏偏好已保存'),context:{source_id:'setting:mw.symbol-flags.v1',endpoint:'/advanced-charts/preferences/save'}},!error));
     } catch(error) {send({type:"error",error:"收藏增强不可用："+String(error)});}
     nativeWatchlists(
       widget,

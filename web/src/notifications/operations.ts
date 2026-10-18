@@ -29,7 +29,7 @@ export function operationFault(
     title = "图表偏好保存失败";
   } else if (
     body !== undefined &&
-    /^\/(market-data|charts\/history-capabilities)/.test(route) &&
+    /^\/(market-data|charts\/(history-capabilities|history-capacity|provider\/configure))/.test(route) &&
     !/\/(quotes|resolve|cache|search|page|snapshot)(?:\/|$)/.test(route)
   ) {
     kind = "data_center";

@@ -14,7 +14,7 @@ function harness(change=()=>{}){
   _chartWidget:{model:()=>({model:()=>({mainSeries:()=>({data:()=>data})})})}};
  const key='MWP:DUKA:test|1',binding={providerSnapshot:'expired',tailVersion:7,lastChartTime:2000,
   lastStart:2000,firstStart:1000,calculationStart:500,correctionVersion:0};
- const ctx={ready:true,widget:{chartsCount:()=>1,chart:()=>chart},workspaceEpoch:1,
+ const ctx={alertUIWorkspace:'test-workspace',alertUISession:'test-session',crypto:require('node:crypto').webcrypto,ready:true,widget:{chartsCount:()=>1,chart:()=>chart},workspaceEpoch:1,
   indicatorKey:(s,r)=>s+'|'+r,indicatorBindings:new Map([[key,binding]]),
   decode:()=>({series_kind:'provider'}),indicatorCoordinator:{sync(){}},
   chartUsesSymbol:(c,s,r)=>c.symbol()===s&&c.resolution()===r,

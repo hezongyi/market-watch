@@ -1,5 +1,11 @@
 /** Same-origin, subject-scoped durability. All claims are atomic IDB transactions. */
-type Item = { key: string; subject: string; at: number; value: any };
+type Item = {
+  key: string;
+  subject: string;
+  at: number;
+  order?: number;
+  value: any;
+};
 export class NoticeStore {
   private db: IDBDatabase | null = null;
   private opening: Promise<void> | null = null;
@@ -69,8 +75,44 @@ export class NoticeStore {
       request.onsuccess = () => {
         previous = request.result?.value;
         const value = create(previous);
-        if (value !== undefined)
-          store.put({ key, subject, at: Date.now(), value });
+        if (value !== undefined) {
+          const write = () =>
+            store.put({
+              key,
+              subject,
+              ...(request.result?.order === undefined
+                ? {}
+                : { order: request.result.order }),
+              at:
+                name === "pending" || (name === "observations" && value.pending)
+                  ? (request.result?.at ?? Date.now())
+                  : Date.now(),
+              value,
+            });
+          if (
+            previous === undefined &&
+            ["claims", "observations", "meta"].includes(name)
+          ) {
+            const budget =
+              name === "claims" ? 10000 : name === "observations" ? 2000 : 1100;
+            const rows = store.index("subject").getAll(subject);
+            rows.onsuccess = () => {
+              const bytes = rows.result.reduce(
+                (total, row) =>
+                  total +
+                  new TextEncoder().encode(JSON.stringify(row.value)).length,
+                0,
+              );
+              if (
+                rows.result.length >= budget ||
+                bytes + new TextEncoder().encode(JSON.stringify(value)).length >
+                  2 * 1024 * 1024
+              )
+                tx.abort();
+              else write();
+            };
+          } else write();
+        }
       };
       tx.oncomplete = () => resolve(previous);
       tx.onerror = () => reject(tx.error);
@@ -96,6 +138,11 @@ export class NoticeStore {
         if (rows.some((r) => r.key === subject + ":" + value.event_id)) return;
         if (
           size > 16384 ||
+          [value.context, value.evidence].some(
+            (part) =>
+              new TextEncoder().encode(JSON.stringify(part || {})).length >
+              12288,
+          ) ||
           rows.length >= 1000 ||
           rows.reduce((n, r) => n + JSON.stringify(r.value).length * 2, 0) +
             size >
@@ -108,6 +155,12 @@ export class NoticeStore {
           key: subject + ":" + value.event_id,
           subject,
           at: Date.now(),
+          // This transaction serializes tabs; wall-clock ties cannot reorder a
+          // failure, its recovery and a subsequent recurrence in the uploader.
+          order: Math.max(
+            Date.now(),
+            ...rows.map((row) => (row.order ?? row.at) + 1),
+          ),
           value: { event: value, status: "pending" },
         });
       };
@@ -123,6 +176,7 @@ export class NoticeStore {
     epoch: string,
     events: any[],
     unread: number,
+    projectedIds: string[] = events.map((event) => event.id),
   ) {
     return new Promise<void>((resolve, reject) => {
       const tx = this.db!.transaction(
@@ -141,8 +195,16 @@ export class NoticeStore {
         at: Date.now(),
         value: { after, epoch, unread },
       });
-      for (const event of events)
-        tx.objectStore("pending").delete(subject + ":" + event.id);
+      const pending = tx.objectStore("pending");
+      for (const id of projectedIds) {
+        const key = subject + ":" + id;
+        const request = pending.get(key);
+        request.onsuccess = () => {
+          // A conflicting local payload remains reviewable even if the original
+          // server event with the same ID is projected successfully.
+          if (request.result?.value.status !== "rejected") pending.delete(key);
+        };
+      }
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(tx.error);
       tx.onabort = () => reject(tx.error);
@@ -157,11 +219,15 @@ export class NoticeStore {
       const rows = await this.all(name, subject);
       for (const row of rows)
         if (
-          row.at < Date.now() - 31 * 86400000 &&
+          row.at <
+            Date.now() -
+              (name === "observations" && !row.value.pending ? 1 : 31) *
+                86400000 &&
           (name !== "meta" || row.key.includes(":fault:"))
         )
           await this.remove(name, row.key);
     }
-    return { lost: expired.length, from: expired[0]?.at || null };
+    const lost = expired.filter((row) => row.value.status !== "accepted");
+    return { lost: lost.length, from: lost[0]?.at || null };
   }
 }

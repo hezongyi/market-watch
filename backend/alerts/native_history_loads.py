@@ -68,7 +68,9 @@ def read_cached(body):
 
 
 def public(row):
+    from .notification_sources import native_key
     return {"id": row.id, "state": row.state, "pages": row.pages,
+            "notice_source_id": native_key(row.query_json),
             "deadline": row.deadline, "error": row.error_json}
 
 
@@ -88,9 +90,11 @@ def refresh(row):
         row.consumer_until = min(row.deadline, now_ms() + 45000)
 
 
-def submit(owner, request_id, body):
+def submit(owner, request_id, body, notice_context=None):
     admit(body)
     query = body.model_dump(by_alias=True, mode="json")
+    if notice_context:
+        query['_notice_context'] = notice_context
     with transaction() as db:
         old = db.scalar(select(NativeHistoryLoad).where(
             NativeHistoryLoad.owner == owner, NativeHistoryLoad.request_id == request_id))
@@ -100,7 +104,11 @@ def submit(owner, request_id, body):
             refresh(old)
             return {"load": public(old)}
     try:
-        return {"result": read_cached(body)}
+        result = read_cached(body)
+        from .notification_sources import native_recovery
+        with transaction() as db:
+            native_recovery(db.connection(), request_id, query)
+        return {"result": result}
     except cache.HistoryPending:
         pass
     with transaction() as db:

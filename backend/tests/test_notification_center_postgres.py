@@ -118,3 +118,68 @@ def test_av49_to_aw50_is_additive_repeatable_and_retains_demands(postgres_alerts
     with factory.begin() as db:
         assert center.project(db) == 1
         assert center.list_events(db, center.SUBJECT, {})['events'][0]['title'] == '任务失败'
+
+
+def test_channel_reconciliation_orders_snapshot_before_concurrent_ack(postgres_alerts, monkeypatch):
+    from alerts.config import settings
+    from alerts.service import acknowledge
+    from alerts.storage import Notification
+    from sqlalchemy import event, update
+    from test_notification_center import drain, trigger
+
+    monkeypatch.setattr(settings, 'fx_source', 'dukascopy')
+    factory = sessions(postgres_alerts)
+    signal_id = trigger(factory)
+    drain(factory)
+    with factory.begin() as db:
+        note_id = db.scalar(select(Notification.id).where(Notification.signal_id == signal_id))
+        # Simulate the older binary, which writes phone state without source hooks.
+        db.execute(update(Notification).where(Notification.id == note_id).values(status='sent'))
+    captured, release, ack_started, ack_finished = (threading.Event() for _ in range(4))
+
+    def reconcile():
+        with factory.begin() as db:
+            def before_flush(session, context, instances):
+                if any(isinstance(row, Audit) and row.details.get('reconciled')
+                       and row.details.get('kind') == 'phone_state' for row in session.new):
+                    captured.set()
+                    assert release.wait(5)
+            event.listen(db, 'before_flush', before_flush)
+            return center.reconcile_channels(db)
+
+    def ack():
+        ack_started.set()
+        with factory.begin() as db:
+            acknowledge(db, note_id)
+        ack_finished.set()
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        snapshot = pool.submit(reconcile)
+        assert captured.wait(5)
+        stopped = pool.submit(ack)
+        try:
+            assert ack_started.wait(3)
+            assert not ack_finished.wait(.2), 'ack must wait until the snapshot source version is allocated'
+        finally:
+            release.set()
+        assert snapshot.result(timeout=5) == 1
+        stopped.result(timeout=5)
+    with factory() as db:
+        facts = [row for row in db.scalars(select(Audit).order_by(Audit.id))
+                 if row.kind == 'notice_source' and row.details['kind'] == 'phone_state']
+        assert facts[-2].details['facts']['status'] == 'sent'
+        assert facts[-1].details['facts']['status'] == 'acknowledged'
+        assert facts[-2].id < facts[-1].id
+    drain(factory)
+    with factory() as db:
+        detail = center.detail(db, center.SUBJECT, center.signal_event_id(signal_id))
+        assert detail['channels']['phone_state:']['status'] == 'acknowledged'
+        assert detail['channels']['phone_state:']['stopped_at']
+        assert center.reconcile_channels(db) == 0
+
+
+def test_same_millisecond_browser_recovery_order_on_postgres(postgres_alerts, monkeypatch):
+    from test_notification_center import (
+        test_same_millisecond_failure_recovery_recurrence_keep_acceptance_order,
+    )
+    test_same_millisecond_failure_recovery_recurrence_keep_acceptance_order(sessions(postgres_alerts), monkeypatch)

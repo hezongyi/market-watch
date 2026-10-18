@@ -180,6 +180,7 @@ jobs:
           node tests/advanced-watchlist-metadata.cjs
           node tests/advanced-startup-metadata.cjs
           node tests/advanced-market-stream.cjs
+          node tests/advanced-provider-subscriptions.cjs
           node tests/advanced-watchlists.cjs
 
       - name: Single application regressions
@@ -188,6 +189,7 @@ jobs:
           node tests/single-app-routing.cjs
           node tests/chart-tab.cjs
           node tests/symbol-flags.cjs
+          node tests/notifications-runtime.cjs
 
       - name: Watchlist native DOM regressions
         working-directory: web

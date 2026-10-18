@@ -15,12 +15,28 @@ export function providerSubscriptions(
   receive: (event: any) => void,
   failure: (error: unknown) => void,
   paths = {subscribe: '/charts/provider/subscribe', unsubscribe: '/charts/provider/unsubscribe'},
+  observe: (args: Subscription, kind: 'market' | 'connection', error: unknown | null, attempt: string) => void = () => {},
 ) {
   let disposed = false;
   const desired = new Map<string, Subscription>();
   const queues = new Map<string, Promise<void>>();
   const streams = new Map<string, Stream>();
   const retries = new Map<string, ReturnType<typeof setTimeout>>();
+  const outages = new Map<string, string>();
+  let attempt = 0;
+  function status(args: Subscription, kind: 'market' | 'connection', error: unknown | null) {
+    if (disposed || desired.get(keyOf(args)) !== args) return;
+    const key = keyOf(args) + '|' + String(args.generation ?? '') + '|' + kind;
+    const previous = outages.get(key);
+    if (error != null && !previous) {
+      const id = String(++attempt);
+      outages.set(key, id);
+      observe(args, kind, error, id);
+    } else if (error == null && previous) {
+      outages.delete(key);
+      observe(args, kind, null, previous);
+    }
+  }
   const keyOf = (args: Subscription) => args.client + "|" + args.listener;
   function closeUnused(client: string) {
     if ([...desired.values()].some(args => args.client === client)) return;
@@ -32,7 +48,10 @@ export function providerSubscriptions(
   function enqueue(args: Subscription, action: () => Promise<void>) {
     const key = keyOf(args);
     const next = (queues.get(key) || Promise.resolve()).then(action).catch(error => {
-      if (!disposed) failure(error);
+      if (!disposed && desired.get(keyOf(args)) === args) {
+        status(args, 'connection', error);
+        failure(error);
+      }
     });
     queues.set(key, next);
     void next.then(() => { if (queues.get(key) === next) queues.delete(key); });
@@ -43,6 +62,7 @@ export function providerSubscriptions(
     if (current?.generation != null && args.generation != null &&
         Number(args.generation) < Number(current.generation)) return Promise.resolve();
     desired.delete(keyOf(args));
+    for (const key of outages.keys()) if (key.startsWith(keyOf(args) + '|')) outages.delete(key);
     closeUnused(args.client);
     return enqueue(args, async () => {
       await request(paths.unsubscribe, {client: args.client, listener: args.listener,
@@ -54,7 +74,8 @@ export function providerSubscriptions(
     const stream = connect(client);
     streams.set(client, stream);
     stream.onopen = () => {
-      if (streams.get(client) !== stream) return;
+      if (disposed || streams.get(client) !== stream) return;
+      for (const current of desired.values()) if (current.client === client) status(current, 'connection', null);
       for (const current of desired.values()) if (current.client === client)
         void enqueue(current, async () => {
           if (!disposed && desired.get(keyOf(current)) === current)
@@ -64,7 +85,9 @@ export function providerSubscriptions(
     stream.onerror = () => {
       // Native EventSource retries CONNECTING itself. An HTTP error may leave
       // it CLOSED permanently, so recreate only that terminal transport.
-      if (disposed || streams.get(client) !== stream || stream.readyState !== 2) return;
+      if (disposed || streams.get(client) !== stream) return;
+      for (const current of desired.values()) if (current.client === client) status(current, 'connection', Error('行情事件连接中断，正在重连'));
+      if (stream.readyState !== 2) return;
       stream.close();
       streams.delete(client);
       retries.set(client, setTimeout(() => {
@@ -83,6 +106,10 @@ export function providerSubscriptions(
             (epochChanged || current.sequence == null || value.sequence > Number(current.sequence))) {
           if (epochChanged) current.sequence = 0;
           if (value.result_epoch != null) current.result_epoch = value.result_epoch;
+          const quoteError = value.type === 'quotes' && value.quotes?.some((row: any) => row.s === 'error' || (row.v?.fetch_status && row.v.fetch_status !== 'ok'));
+          if (quoteError || value.status?.connection_error || value.status?.error || value.type === 'error' || (value.type === 'status' && (value.error || value.status === 'error')))
+            status(current, 'market', Error(value.error || value.status?.error || value.status?.connection_error || '行情读取失败'));
+          else if ((value.type === 'bars' && (!value.status || value.status.state === 'ready' || (value.status.connection === 'connected' && value.status.owned === true && value.status.current_account === true && (value.status.sample_ready === true || value.status.confirmed_tail_ready === true)))) || (value.type === 'quotes' && value.quotes?.length)) status(current, 'market', null);
           receive(value);
           if(value.type === 'bars') {
             if(value.cursor != null) current.cursor=value.cursor;
@@ -122,10 +149,12 @@ export function providerSubscriptions(
     },
     subscribe(args: Subscription) {
       if (disposed) return Promise.resolve();
+      for (const key of outages.keys()) if (key.startsWith(keyOf(args) + '|')) outages.delete(key);
       desired.set(keyOf(args), args);
       return enqueue(args, async () => {
         if (disposed || desired.get(keyOf(args)) !== args) return;
         await request(paths.subscribe, args);
+        status(args, 'connection', null);
         if (disposed || desired.get(keyOf(args)) !== args) return;
         if (!retries.has(args.client)) open(args.client);
       });

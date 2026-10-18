@@ -41,7 +41,7 @@ export function NoticePanel({
   active?: boolean;
   eventId?: string;
   onClose: () => void;
-  onLocate?: (notice: Notice) => void;
+  onLocate?: (notice: Notice) => void | Promise<void>;
 }) {
   const [page, setPage] = useState<HistoryPage | null>(null),
     [filters, setFilters] = useState<Record<string, string>>({});
@@ -70,6 +70,12 @@ export function NoticePanel({
   }, [eventId]);
   const filterKey = JSON.stringify(filters);
   useEffect(() => {
+    setBefore(null);
+    setPrevious([]);
+    setTimelineBefore(null);
+    setPage(null);
+  }, [state.epoch]);
+  useEffect(() => {
     const current = ++revision.current;
     setError("");
     setBusy(true);
@@ -78,13 +84,22 @@ export function NoticePanel({
         if (mounted.current && revision.current === current) setPage(result);
       })
       .catch((error) => {
-        if (mounted.current && revision.current === current)
+        if (mounted.current && revision.current === current) {
+          if (
+            error?.code === "NOTICE_RESET" ||
+            String(error).includes("NOTICE_RESET")
+          ) {
+            setBefore(null);
+            setPrevious([]);
+            setPage(null);
+          }
           setError(String(error));
+        }
       })
       .finally(() => {
         if (mounted.current && revision.current === current) setBusy(false);
       });
-  }, [request, filterKey, before, state.revision, active]);
+  }, [request, filterKey, before, state.revision, state.epoch, active]);
   useEffect(() => {
     if (!selection || !active) {
       setDetail(null);
@@ -114,7 +129,7 @@ export function NoticePanel({
     return () => {
       alive = false;
     };
-  }, [request, selection, state.revision, active]);
+  }, [request, selection, state.revision, state.epoch, active]);
   useEffect(() => {
     if (selection && active)
       void request({
@@ -283,8 +298,19 @@ export function NoticePanel({
               {detail.handled_at ? "已处理" : "标为已处理"}
             </button>
             {onLocate && detail.workspace && (
-              <button type="button" onClick={() => onLocate(detail)}>
-                定位图表
+              <button
+                type="button"
+                onClick={() => {
+                  void Promise.resolve()
+                    .then(() => onLocate(detail))
+                    .catch((error) => setError(String(error)));
+                }}
+              >
+                {detail.source_kind === "chart_alert" ? "定位图表"
+                  : ['workspace','preferences','chart_shell'].includes(detail.source_kind) ? "返回专业图表"
+                  : detail.source_kind === 'capacity' ? "打开历史容量设置"
+                  : detail.source_kind === 'data_center' || detail.context.consumer === 'quotes' || detail.context.timeframe === 'quotes' ? "打开数据中心"
+                  : "返回来源图格"}
               </button>
             )}
             {detail.notification_id && (
@@ -486,7 +512,9 @@ export function NoticePanel({
                   <small>
                     {row.local_status === "accepted"
                       ? "服务端已接收，等待投影"
-                      : "仅本机待同步"}{" "}
+                      : row.local_status === "rejected"
+                        ? "服务端拒绝，未保存；本机证据保留"
+                        : "仅本机待同步"}{" "}
                     · {time(row.occurred_at)}
                   </small>
                 </article>

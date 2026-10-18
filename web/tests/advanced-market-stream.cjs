@@ -16,6 +16,20 @@ const evaluate = source => vm.runInContext(source, context);
 const deliver = event => handlers.message({source:parent,origin:'http://localhost',
   data:{channel:'mw-chart-v1',type:'market-event',event}});
 (async()=>{
+  evaluate(`{
+    const first={},second={};
+    marketRequestNotice(first,'MWP:EURUSD','60',Error('request503'));
+    marketRequestNotice(first,'MWP:EURUSD','60',Error('request503 repeated'));
+    marketRequestNotice(second,'MWP:EURUSD','60',Error('request503'));
+    marketRequestNotice(first,'MWP:EURUSD','60',null);
+  }`);
+  const requestFacts=sent.filter(row=>row.type==='notice-source');
+  assert.equal(requestFacts.length,3,'continuous request failure emits once per active owner');
+  assert.notEqual(requestFacts[0].fault.context.source_id,requestFacts[1].fault.context.source_id,
+    'different request owners cannot close each other’s incidents');
+  assert.equal(requestFacts[0].fault.context.source_id,requestFacts[2].fault.context.source_id);
+  assert.equal(requestFacts[2].recovered,true);
+
   evaluate(`globalThis.received=[]; globalThis.quotes=[];
     globalThis.symbol=MWSeries.encode('a'.repeat(64),'composite');
     lastHistory.set(symbol+'|1',60000);

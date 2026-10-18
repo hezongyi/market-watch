@@ -1,0 +1,69 @@
+{
+  "since": 1792338370369,
+  "injection": [
+    {
+      "listener": "23cbbbb5-6524-4bb9-891a-2eb0621d976c",
+      "generation": 4,
+      "sequence": 1,
+      "type": "status",
+      "error": "MW75_FINAL_MARKET_FAILURE"
+    },
+    {
+      "listener": "23cbbbb5-6524-4bb9-891a-2eb0621d976c",
+      "generation": 4,
+      "sequence": 2,
+      "type": "bars",
+      "bars": [],
+      "status": {
+        "state": "ready"
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "b:938b3d4b-ddab-0d93-a33c-c235f936f282",
+      "source_domain": "pro_chart",
+      "source_kind": "market",
+      "source_id": "23cbbbb5-6524-4bb9-891a-2eb0621d976c:4:1",
+      "incident_id": "2d7ea8a7-0c27-4487-829a-ca50767ebaad",
+      "occurred_at": 1792338377979,
+      "recorded_at": 1792338379864,
+      "version": 2098,
+      "first_seq": 2089,
+      "severity": "error",
+      "kind": "failure",
+      "workspace": "mw75-b",
+      "instrument": "17ee3194-f959-4fcd-bfb1-1464862c5ef3",
+      "viewed_at": null,
+      "handled_at": null,
+      "attention": true,
+      "backfill": false,
+      "title": "图表行情读取失败",
+      "message": "Error: MW75_FINAL_MARKET_FAILURE",
+      "context": {
+        "workspace_id": "mw75-b",
+        "epoch": 0,
+        "source_id": "23cbbbb5-6524-4bb9-891a-2eb0621d976c",
+        "generation": 4,
+        "instrument": "17ee3194-f959-4fcd-bfb1-1464862c5ef3",
+        "timeframe": "H1",
+        "consumer": "bars"
+      },
+      "evidence": {},
+      "notify_web": true,
+      "client_reported_time": true,
+      "profile": "145693fe-28f9-4b3b-9902-8117c46720f0",
+      "code": "MARKET_READ_FAILED",
+      "accepted_at": 1792338379083,
+      "incident": {
+        "id": "2d7ea8a7-0c27-4487-829a-ca50767ebaad",
+        "first_at": 1792338377979,
+        "last_at": 1792338377979,
+        "closed_at": 1792338379175,
+        "count": 1,
+        "count_scope": "当前事故已接受发生数",
+        "severity_rank": 2
+      }
+    }
+  ]
+}

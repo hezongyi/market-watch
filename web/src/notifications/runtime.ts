@@ -11,6 +11,7 @@ import type {
 
 const base = "/notification-center";
 const initial: NoticeState = {
+  epoch: "",
   revision: 0,
   events: [],
   pending: [],
@@ -81,6 +82,7 @@ export class NoticeRuntime {
   private listeners = new Set<() => void>();
   private store = new NoticeStore();
   private startup: Promise<void> | null = null;
+  private faultIngress: Promise<void> = Promise.resolve();
   private subject = "";
   private generation = 0;
   private profile = "";
@@ -92,7 +94,10 @@ export class NoticeRuntime {
   private after = "";
   private epoch = "";
   private errorCount = 0;
+  private uploadErrors = 0;
+  private nextUpload = 0;
   private nextHealth = 0;
+  private nextPrune = 0;
   private serverAnchor = 0;
   private monoAnchor = 0;
   private soundAllowed = false;
@@ -148,6 +153,8 @@ export class NoticeRuntime {
     this.candidates.clear();
     this.after = "";
     this.epoch = "";
+    this.nextUpload = 0;
+    this.uploadErrors = 0;
     this.presentation = false;
     void this.audio?.suspend().catch(() => {});
     this.patch({ ...initial });
@@ -197,6 +204,7 @@ export class NoticeRuntime {
         );
       }
       const pruned = await this.store.prune(subject);
+      this.nextPrune = performance.now() + 60000;
       if (!this.current(generation)) return;
       if (pruned.lost) {
         const gap = `${pruned.lost} 条本机待同步记录超过七天，未能保存到服务器（最早 ${new Date(pruned.from!).toLocaleString()}）`;
@@ -208,6 +216,7 @@ export class NoticeRuntime {
       this.after = progress?.after || "";
       this.epoch = progress?.epoch || "";
       this.patch({
+        epoch: this.epoch,
         events: cached || [],
         unread: progress?.unread || 0,
         enabled: !!enabled,
@@ -304,7 +313,20 @@ export class NoticeRuntime {
       client_reported_time: true,
     };
   }
-  async report(fault: BrowserFault): Promise<string | null> {
+  private ingest<T>(run: () => Promise<T>, cancelled: T): Promise<T> {
+    const generation = this.generation;
+    const next = this.faultIngress.then(() =>
+      this.current(generation) ? run() : cancelled,
+    );
+    // Producer callbacks may report failure and recovery without awaiting each
+    // other. Serialize before hashes/IDB reads, not merely during upload.
+    this.faultIngress = next.then(() => {}, () => {});
+    return next;
+  }
+  report(fault: BrowserFault): Promise<string | null> {
+    return this.ingest(() => this.recordFault(fault), null);
+  }
+  private async recordFault(fault: BrowserFault): Promise<string | null> {
     const generation = this.generation,
       subject = this.subject;
     if (!this.ready && subject && this.startup) await this.startup;
@@ -436,7 +458,10 @@ export class NoticeRuntime {
         this.patch({ gap: "恢复事实尚未保存：" + String(error) });
     }
   }
-  async resolve(fault: BrowserFault) {
+  resolve(fault: BrowserFault): Promise<void> {
+    return this.ingest(() => this.resolveFault(fault), undefined);
+  }
+  private async resolveFault(fault: BrowserFault) {
     if (!this.ready) return;
     const generation = this.generation,
       subject = this.subject;
@@ -455,16 +480,22 @@ export class NoticeRuntime {
       ].map((k) => context[k] ?? ""),
     ]);
     const key = subject + ":fault:" + (await stableId(grouping));
-    const group = await this.store.get("meta", key);
-    if (this.current(generation) && group?.open)
-      await this.recovered({ ...fault, context }, group.latest);
+    try {
+      const group = await this.store.get("meta", key);
+      if (this.current(generation) && group?.open)
+        await this.recovered({ ...fault, context }, group.latest);
+    } catch (error) {
+      if (this.current(generation))
+        this.patch({
+          gap: "操作已成功，通知恢复事实尚未保存：" + String(error),
+        });
+    }
   }
   async operation<T>(fault: BrowserFault, run: () => Promise<T>): Promise<T> {
     const generation = this.generation;
+    let result: T;
     try {
-      const result = await run();
-      if (this.current(generation)) await this.resolve(fault);
-      return result;
+      result = await run();
     } catch (error) {
       if (
         this.current(generation) &&
@@ -474,6 +505,16 @@ export class NoticeRuntime {
         await this.report({ ...fault, message: String(error) });
       throw error;
     }
+    // A committed business operation stays successful even if telemetry fails.
+    try {
+      if (this.current(generation)) await this.resolve(fault);
+    } catch (error) {
+      if (this.current(generation))
+        this.patch({
+          gap: "操作已成功，通知恢复事实尚未保存：" + String(error),
+        });
+    }
+    return result;
   }
   private enqueue(event: Notice) {
     if (
@@ -591,16 +632,6 @@ export class NoticeRuntime {
     this.working = true;
     const subject = this.subject;
     try {
-      const pending = await this.store.all("pending", subject);
-      for (const item of pending
-        .filter((r) => r.value.status === "pending")
-        .sort((a, b) => a.at - b.at)
-        .slice(0, 100)) {
-        if (!this.current(generation)) return;
-        await api(base + "/events", item.value.event);
-        if (!this.current(generation)) return;
-        await this.store.remove("pending", item.key);
-      }
       if (!this.after) {
         const requestStarted = performance.now();
         const page = await api<HistoryPage>(base + "/events");
@@ -616,7 +647,11 @@ export class NoticeRuntime {
         if (!this.current(generation)) return;
         this.after = page.after;
         this.epoch = page.epoch;
-        this.patch({ events: page.events, unread: page.unread });
+        this.patch({
+          events: page.events,
+          unread: page.unread,
+          epoch: page.epoch,
+        });
       }
       let more = false;
       for (let batch = 0; batch < 10; batch++) {
@@ -664,11 +699,20 @@ export class NoticeRuntime {
           result.epoch,
           events,
           unread,
+          result.changes
+            .filter(
+              (change: any) =>
+                change.kind === "created" ||
+                change.kind === "updated" ||
+                change.kind === "deleted",
+            )
+            .map((change: any) => change.event_id),
         );
         if (!this.current(generation)) return;
         this.after = result.after;
         this.epoch = result.epoch;
         this.patch({
+          epoch: result.epoch,
           events,
           unread,
           revision: this.state.revision + (result.changes.length ? 1 : 0),
@@ -690,16 +734,124 @@ export class NoticeRuntime {
         more = result.more;
         if (!more) break;
       }
-      const observations = await this.store.all("observations", subject);
-      for (const item of observations
-        .filter((r) => r.value.pending)
-        .slice(0, 100)) {
+      if (this.nextHealth > 0) void this.playCandidates();
+      // Projection acknowledgement is independent of the 200-summary window.
+      for (const item of (await this.store.all("pending", subject))
+        .filter(
+          (row) =>
+            row.value.status === "accepted" &&
+            (row.value.nextCheck || 0) <= Date.now(),
+        )
+        .slice(0, 10)) {
         if (!this.current(generation)) return;
         try {
-          await api(base + "/observations", item.value.value);
+          await api(
+            base + "/events/" + encodeURIComponent(item.value.event.event_id),
+            undefined,
+            AbortSignal.timeout(2000),
+          );
+          if (!this.current(generation)) return;
+          await this.store.remove("pending", item.key);
         } catch (error) {
-          if (error instanceof ApiError && error.status === 404) continue;
-          throw error;
+          if (!this.current(generation)) return;
+          if (error instanceof ApiError && error.status === 401) throw error;
+          await this.store.update("pending", item.key, subject, (old) =>
+            old ? { ...old, nextCheck: Date.now() + 30000 } : undefined,
+          );
+          if (!(error instanceof ApiError && error.status === 404)) break;
+        }
+      }
+      // Live consumption has priority. A poison intake must never block it.
+      const pending = await this.store.all("pending", subject);
+      for (const item of pending
+        .filter(
+          (r) =>
+            r.value.status === "pending" &&
+            performance.now() >= this.nextUpload,
+        )
+        .sort((a, b) => (a.order ?? a.at) - (b.order ?? b.at))
+        .slice(0, 10)) {
+        if (!this.current(generation)) return;
+        try {
+          await api(
+            base + "/events",
+            item.value.event,
+            AbortSignal.timeout(2000),
+          );
+          if (!this.current(generation)) return;
+          if (item.value.event.recovery_of) {
+            // Recovery intake closes its incident without creating an event
+            // under the recovery ID. Durable acceptance completes this upload.
+            await this.store.remove("pending", item.key);
+          } else {
+            await this.store.update("pending", item.key, subject, (old) =>
+              old ? { ...old, status: "accepted" } : undefined,
+            );
+          }
+          this.uploadErrors = 0;
+        } catch (error) {
+          if (!this.current(generation)) return;
+          if (error instanceof ApiError && error.status === 401) throw error;
+          if (
+            error instanceof ApiError &&
+            [400, 409, 413, 422].includes(error.status)
+          ) {
+            await this.store.update("pending", item.key, subject, (old) =>
+              old
+                ? { ...old, status: "rejected", rejection: String(error) }
+                : undefined,
+            );
+            this.patch({
+              gap: "有本机通知被服务端拒绝，未保存到服务器；证据仍保留在本机",
+            });
+            continue;
+          }
+          this.patch({ status: "本机记录待同步，服务端通知继续接收" });
+          this.nextUpload =
+            performance.now() +
+            Math.min(60000, 1000 * 2 ** Math.min(6, ++this.uploadErrors)) *
+              (0.8 + Math.random() * 0.4);
+          break;
+        }
+      }
+      const observations = await this.store.all("observations", subject);
+      for (const item of observations
+        .filter(
+          (r) => r.value.pending && (r.value.nextCheck || 0) <= Date.now(),
+        )
+        .slice(0, 10)) {
+        if (!this.current(generation)) return;
+        try {
+          await api(
+            base + "/observations",
+            item.value.value,
+            AbortSignal.timeout(2000),
+          );
+        } catch (error) {
+          if (error instanceof ApiError && error.status === 404) {
+            await this.store.update("observations", item.key, subject, (old) =>
+              old ? { ...old, nextCheck: Date.now() + 30000 } : undefined,
+            );
+            continue;
+          }
+          if (error instanceof ApiError && error.status === 401) throw error;
+          if (
+            error instanceof ApiError &&
+            [400, 409, 413, 422].includes(error.status)
+          ) {
+            await this.store.update(
+              "observations",
+              item.key,
+              subject,
+              (old) => ({ ...old, pending: false, rejected: true }),
+            );
+            this.patch({
+              gap: "有网页观察被服务端拒绝；未据此确认已读或声音状态",
+            });
+            continue;
+          }
+          this.patch({ status: "网页观察待同步，服务端通知继续接收" });
+          break;
         }
         if (!this.current(generation)) return;
         await this.store.update("observations", item.key, subject, (old) => ({
@@ -729,6 +881,15 @@ export class NoticeRuntime {
         });
       }
       this.errorCount = 0;
+      if (performance.now() >= this.nextPrune) {
+        const pruned = await this.store.prune(subject);
+        this.nextPrune = performance.now() + 60000;
+        if (pruned.lost) {
+          const gap = `${pruned.lost} 条本机记录超过七天，未能保存到服务器（最早 ${new Date(pruned.from!).toLocaleString()}）`;
+          await this.store.update("meta", subject + ":gap", subject, () => gap);
+          if (this.current(generation)) this.patch({ gap });
+        }
+      }
       await this.loadPending(generation);
       void this.playCandidates();
       this.schedule(generation, more ? 20 : 2000);
@@ -744,6 +905,7 @@ export class NoticeRuntime {
         this.queue = [];
         this.candidates.clear();
         this.patch({
+          epoch: "",
           events: [],
           bubble: null,
           gap: "通知日志范围已变化，正在重建；历史不会重新提示或响铃",
@@ -815,6 +977,18 @@ export class NoticeRuntime {
     this.tone();
   }
   private async playCandidates() {
+    const generation = this.generation;
+    try {
+      await this.playCandidatesWithClaims();
+    } catch (error) {
+      if (this.current(generation))
+        this.patch({
+          soundLimited: true,
+          gap: "声音协调记录无法持久保存，自动声音已受限：" + String(error),
+        });
+    }
+  }
+  private async playCandidatesWithClaims() {
     const generation = this.generation,
       subject = this.subject;
     if (!this.ready || !subject) return;

@@ -4,7 +4,7 @@ import logging
 import time
 
 from .config import settings
-from .notification_center import backfill, project, rebuild, retain
+from .notification_center import backfill, project, rebuild, reconcile_channels, retain
 from .storage import Preference, now_ms, transaction
 
 log = logging.getLogger(__name__)
@@ -17,6 +17,8 @@ def once():
         count = project(db)
         if count < 100:
             count += backfill(db, limit=100-count)
+        if count == 0:
+            count += reconcile_channels(db)
         return count
 
 

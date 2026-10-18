@@ -55,10 +55,10 @@ export default function AdvancedWorkspace() {
     const fault=operationFault(path,body,current.current?.id||workspaceId);
     return fault?notices.operation(fault,()=>requestAPI<T>(path,body,signal)):requestAPI<T>(path,body,signal);
   }
-  const notificationReadyRef=useRef(notificationReady);notificationReadyRef.current=notificationReady;
   const noticeStateRef=useRef(noticeState);noticeStateRef.current=noticeState;
   const noticeRequest=useCallback((q:NoticeAction)=>notices.action(q),[notices]);
   const [notificationReady,setNotificationReady]=useState(false);
+  const notificationReadyRef=useRef(notificationReady);notificationReadyRef.current=notificationReady;
   const noticeOpen=new URLSearchParams(appLocation.search).get('panel')==='notifications';
   const noticeEvent=new URLSearchParams(appLocation.search).get('event') || undefined;
   const closeNotices=()=>{const url=new URL(location.href);url.searchParams.delete('panel');url.searchParams.delete('event');navigate(url.pathname+url.search+url.hash,{replace:true});};
@@ -334,6 +334,18 @@ export default function AdvancedWorkspace() {
   useEffect(() => () => { if (titleTimer.current) clearTimeout(titleTimer.current); }, []);
   useEffect(() => {
     const marketRequests = new Map<Window, Map<number, AbortController>>();
+    const subscriptionScopes = new WeakMap<object, {workspace: string; session: string; epoch: number}>();
+    const observeSubscription = (args: any, kind: 'market' | 'connection', error: unknown | null, attempt: string) => {
+      const scope = subscriptionScopes.get(args);
+      if (!scope || scope.workspace !== current.current?.id || scope.session !== alertUiSession.current || scope.epoch !== nativeLoadEpoch.current) return;
+      const query = args.query || args;
+      const fault = {source_kind: kind, attempt_id: args.listener + ':' + String(args.generation ?? '') + ':' + attempt,
+        code: kind === 'connection' ? 'MARKET_CONNECTION_FAILED' : 'MARKET_READ_FAILED',
+        title: kind === 'connection' ? '图表行情连接中断' : '图表行情读取失败', message: error == null ? '当前订阅已明确恢复' : String(error),
+        context: {workspace_id: scope.workspace, epoch: scope.epoch, source_id: args.listener,
+          generation: args.generation ?? 0, instrument: query.instrument || '', timeframe: query.timeframe || '', consumer: args.kind || 'bars'}};
+      if (error == null) void notices.resolve(fault); else void notices.report(fault);
+    };
     const provider = providerSubscriptions(
       api,
       (client) =>
@@ -347,11 +359,12 @@ export default function AdvancedWorkspace() {
         ),
       (error) => setError(String(error)),
       {subscribe: '/charts/stream/subscribe', unsubscribe: '/charts/stream/unsubscribe'},
+      observeSubscription,
     );
     const legacyProvider = providerSubscriptions(api,
       client => new EventSource('/api/charts/provider/events?client=' + encodeURIComponent(client)),
       event => frame.current?.contentWindow?.postMessage({channel, type:'provider-event', event}, origin),
-      error => setError(String(error)));
+      error => setError(String(error)), undefined, observeSubscription);
     const listener = async (e: MessageEvent) => {
       if (
         e.source !== frame.current?.contentWindow ||
@@ -365,7 +378,7 @@ export default function AdvancedWorkspace() {
         source.postMessage({ channel, ...value }, origin);
       if(m.type==='notice-source'){
         if(m.session!==alertUiSession.current||m.workspace_id!==current.current?.id||m.epoch!==nativeLoadEpoch.current||
-          !m.fault||JSON.stringify(m.fault).length>16000||!['indicator','history','capacity','market','chart_shell','data_center'].includes(m.fault.source_kind))return;
+          !m.fault||JSON.stringify(m.fault).length>16000||!['indicator','history','capacity','market','connection','chart_shell','data_center','preferences'].includes(m.fault.source_kind))return;
         const fault={...m.fault,context:{...m.fault.context,workspace_id:current.current?.id,epoch:m.epoch}};
         if(m.recovered===true)void notices.resolve(fault);else void notices.report(fault);
         return;
@@ -377,7 +390,7 @@ export default function AdvancedWorkspace() {
         try{const result=await notices.action(q);
           if(source===frame.current?.contentWindow && session===alertUiSession.current && scope===current.current?.id)
             reply({type:'result',id:m.id,result});
-        }catch(error){reply({type:'result',id:m.id,error:String(error)});}return;
+        }catch(error){reply({type:'result',id:m.id,error:String(error),errorDetails:apiErrorDetails(error)});}return;
       }
       if(m.type==='notice-center-ready' && m.session===alertUiSession.current && m.workspace_id===current.current?.id){setNotificationReady(true);return;}
       if(m.type==='notice-center-unavailable' && m.session===alertUiSession.current){setNotificationReady(false);void notices.report({source_kind:'chart_shell',attempt_id:m.session+':notice-shell',code:'CHART_SHELL_UNAVAILABLE',title:'原生通知侧栏暂不可用',message:String(m.error||'接入失败'),context:{workspace_id:current.current?.id}});return;}
@@ -388,7 +401,15 @@ export default function AdvancedWorkspace() {
       if(m.type==='notice-center-locate' && m.session===alertUiSession.current && typeof m.event_id==='string'){
         const row=await notices.action({action:'detail',event_id:m.event_id});
         const workspace=row.workspace;if(typeof workspace!=='string'||!workspace) return;
-        if(workspace!==current.current?.id){navigate('/advanced-charts/'+encodeURIComponent(workspace)+'?panel=notifications&event='+encodeURIComponent(row.id));return;}
+        if(workspace!==current.current?.id){
+          const session=alertUiSession.current,from=current.current?.id;
+          if(!await appRef.current.confirmLeave() || session!==alertUiSession.current || from!==current.current?.id)return;
+          navigate('/advanced-charts/'+encodeURIComponent(workspace)+'?panel=notifications&event='+encodeURIComponent(row.id));return;
+        }
+        if(row.source_kind==='data_center' || row.context?.consumer==='quotes' || row.context?.timeframe==='quotes') {
+          reply({type:'data-center-open',location:'/market-data'});return;
+        }
+        if(row.source_kind==='capacity') {reply({type:'history-capacity-open'});return;}
         if(row.source_kind==='chart_alert'){
           const rows=await api('/chart-alerts');const alert=rows.find((a:any)=>a.id===row.original_evidence?.alert_id);
           if(alert && source===frame.current?.contentWindow)reply({type:'chart-alert-locate',row:alert,event:row.original_evidence});
@@ -619,6 +640,7 @@ export default function AdvancedWorkspace() {
           if (m.type === 'market-accept') {
             await provider.accept(args);
           } else if (m.type.endsWith('-subscribe')) {
+            subscriptionScopes.set(args, {workspace:current.current?.id || '',session:alertUiSession.current,epoch:nativeLoadEpoch.current});
             await transport.subscribe(args);
           } else {
             await transport.unsubscribe(args);
@@ -1204,7 +1226,8 @@ export default function AdvancedWorkspace() {
             result = rows.find(row=>row.kind==="setting" && row.name==="mw.symbol-flags.v1" && !row.tool) || null;
           } else {
             if (mobile || q.args?.kind !== "setting" || q.args?.name !== "mw.symbol-flags.v1" || q.args?.tool) throw Error("收藏保存请求不允许");
-            result = await api("/advanced-charts/preferences/save", q.args);
+            // The native producer owns the bounded 409 rebase/retry loop.
+            result = await requestAPI("/advanced-charts/preferences/save", q.args);
           }
           reply({type:"result",id:m.id,result});
         } catch(e) { reply({type:"result",id:m.id,error:String(e),errorDetails:apiErrorDetails(e)}); }
@@ -1491,6 +1514,7 @@ export default function AdvancedWorkspace() {
                             [key]: { ...previous[key], ...progress },
                           };
                         }),
+                      {workspace_id:current.current?.id || "",chart_index:String(q.notice_chart_index ?? "")},
                     )
                 : (body: unknown, signal: AbortSignal) =>
                     api(
@@ -1707,6 +1731,7 @@ export default function AdvancedWorkspace() {
       )}
       {capacityDialog && (
         <HistoryCapacityDialog
+          request={api}
           {...capacityDialog}
           theme={chartTheme}
           onClose={() => setCapacityDialog(null)}
@@ -1718,6 +1743,7 @@ export default function AdvancedWorkspace() {
       )}
       {historyPlansOpen && (
         <HistoryPlansDialog
+          request={api}
           onClose={() => setHistoryPlansOpen(false)}
           readonly={mobile}
           onRefresh={() => post({ type: "refresh-managed" })}
@@ -1726,6 +1752,7 @@ export default function AdvancedWorkspace() {
       )}
       {maintenanceInstrument && (
         <MaintenanceDialog
+          request={api}
           instrument={maintenanceInstrument}
           onClose={() => setMaintenanceInstrument(null)}
           onSubmitted={() => {
@@ -1737,6 +1764,7 @@ export default function AdvancedWorkspace() {
       {exportSelection && (
         <ExportDialog
           selection={exportSelection}
+          workspace={active?.id}
           onClose={() => setExportSelection(null)}
         />
       )}

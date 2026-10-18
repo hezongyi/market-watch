@@ -320,3 +320,222 @@ def test_backfill_only_pre_install_chart_sources_and_is_repeatable(database):
         row = db.get(NoticeEvent, center.signal_event_id(ident))
         assert row.backfill and not row.attention
         assert row.body['historical_observations'].startswith('未存储')
+
+
+def test_native_history_only_matching_range_success_closes_incident(database):
+    from alerts.notification_sources import native_result
+    from alerts.storage import NativeHistoryLoad
+
+    query = {'instrument': 'OANDA:EUR_USD', 'timeframe': 'H1', 'series_kind': 'provider',
+             '_notice_context': {'workspace_id': 'workspace-a', 'chart_index': 'window-a'}}
+    with database.begin() as db:
+        center.stream(db)
+        failed = NativeHistoryLoad(id='native-failed', owner='owner', request_id='attempt-a',
+            query_json={**query, 'before': 10}, state='failed', deadline=100, consumer_until=100,
+            generation=2, error_json={'code': 'HISTORY_UNAVAILABLE'})
+        db.add(failed)
+        db.flush()
+        native_result(db, failed.id)
+    drain(database)
+    with database() as db:
+        row = db.scalar(select(NoticeEvent))
+        ident, group = row.id, row.incident_id
+        assert row.source_kind == 'history' and row.workspace == 'workspace-a'
+        assert not db.get(NoticeIncident, group).closed_at
+    with database.begin() as db:
+        success = NativeHistoryLoad(id='native-success', owner='owner', request_id='attempt-b',
+            query_json={**query, 'before': 20}, state='ready', deadline=100, consumer_until=100)
+        db.add(success)
+        db.flush()
+        native_result(db, success.id)
+    drain(database)
+    with database() as db:
+        assert not db.get(NoticeIncident, group).closed_at
+    with database.begin() as db:
+        matching = NativeHistoryLoad(id='native-matching', owner='owner', request_id='attempt-c',
+            query_json={**query, 'before': 10}, state='ready', deadline=100, consumer_until=100)
+        db.add(matching)
+        db.flush()
+        native_result(db, matching.id)
+    drain(database)
+    with database() as db:
+        assert db.get(NoticeIncident, group).closed_at
+        assert db.get(NoticeEvent, ident)
+        assert db.scalar(select(func.count()).select_from(NoticeEvent)) == 1
+
+
+def test_unprocessed_old_sources_are_not_discarded_by_retention_age(database):
+    old = now_ms() - 40 * 86400_000
+    ident = trigger(database)
+    value = browser()
+    with database.begin() as db:
+        db.get(SignalRow, ident).created_at = old
+        for source in db.scalars(select(Audit).where(Audit.kind == 'notice_source')):
+            source.at = old
+        center.accept_browser(db, center.SUBJECT, value)
+        db.flush()
+        db.get(NoticeIntake, value.event_id).at = old
+    drain(database)
+    with database() as db:
+        assert db.get(NoticeEvent, center.signal_event_id(ident))
+        assert db.get(NoticeEvent, value.event_id)
+
+
+def test_rollforward_reconciles_phone_attempt_receipt_and_stop(database, monkeypatch):
+    from alerts.config import settings
+    from alerts.storage import Device, DeviceReceipt
+    signal_id = trigger(database)
+    drain(database)
+    monkeypatch.setattr(settings, 'notification_center_sources_enabled', False)
+    with database.begin() as db:
+        note = db.scalar(select(Notification).where(Notification.signal_id == signal_id))
+        db.add(Device(id='rollback-device', name='fixture', token_hash='fixture-only'))
+        db.flush()
+        db.add(DeliveryAttempt(notification_id=note.id, status='failed_or_unknown', details={'error': 'offline'}))
+        db.add(DeviceReceipt(notification_id=note.id, device_id='rollback-device'))
+        acknowledge(db, note.id)
+    monkeypatch.setattr(settings, 'notification_center_sources_enabled', True)
+    with database.begin() as db:
+        assert center.reconcile_channels(db) == 3
+    drain(database)
+    with database.begin() as db:
+        assert center.reconcile_channels(db) == 0
+        row = center.detail(db, center.SUBJECT, center.signal_event_id(signal_id))
+        assert row['channels']['phone_state:']['stopped_at']
+        assert row['incident']['count'] == 1
+        kinds = [item['kind'] for item in center.timeline(db, center.SUBJECT, row['id'])['observations']]
+        assert kinds.count('phone_attempt') == 1 and kinds.count('phone_received') == 1
+
+
+def test_rebuild_does_not_resurrect_expired_events(database):
+    signal_id = trigger(database)
+    drain(database)
+    with database.begin() as db:
+        db.get(NoticeEvent, center.signal_event_id(signal_id)).recorded_at = now_ms() - 31 * 86400_000
+    with database.begin() as db:
+        center.retain(db)
+    with database.begin() as db:
+        center.rebuild(db)
+    drain(database)
+    with database() as db:
+        assert not db.get(NoticeEvent, center.signal_event_id(signal_id))
+
+
+def test_same_millisecond_failure_recovery_recurrence_keep_acceptance_order(database, monkeypatch):
+    fixed = now_ms()
+    monkeypatch.setattr(center, 'now_ms', lambda: fixed)
+    first = browser(event_id='b:' + str(uuid.UUID(int=2**128-1)), occurred_at=fixed)
+    recovery = browser(event_id='b:' + str(uuid.UUID(int=2)), recovery_of=first.event_id, occurred_at=fixed)
+    recurrence = browser(event_id='b:' + str(uuid.UUID(int=1)), occurred_at=fixed)
+    for value in (first, recovery, recurrence):
+        with database.begin() as db:
+            center.accept_browser(db, center.SUBJECT, value)
+            # Lost responses/retransmission must not allocate another position.
+            center.accept_browser(db, center.SUBJECT, value)
+    with pytest.raises(RuntimeError, match='Injected'):
+        with database.begin() as db:
+            center.project(db, limit=1, fail_after=1)
+    for _ in range(3):
+        with database.begin() as db:
+            assert center.project(db, limit=1) == 1
+    with database.begin() as db:
+        assert center.project(db, limit=1) == 0
+        a, b = db.get(NoticeEvent, first.event_id), db.get(NoticeEvent, recurrence.event_id)
+        assert a.incident_id != b.incident_id
+        assert db.get(NoticeIncident, a.incident_id).closed_at == fixed
+        assert not db.get(NoticeIncident, b.incident_id).closed_at
+        assert db.get(NoticeIncident, a.incident_id).count == 1
+        assert db.get(NoticeIncident, b.incident_id).count == 1
+        rows = [db.get(NoticeIntake, value.event_id) for value in (first, recovery, recurrence)]
+        assert len({row.at for row in rows}) == 1
+        assert [row.body['_accepted_order'] for row in rows] == sorted(row.body['_accepted_order'] for row in rows)
+        assert db.scalar(select(func.count()).select_from(NoticeSourceReceipt)) == 3
+
+
+def test_chart_plan_terminal_source_is_atomic_excludes_legacy_and_allows_same_attempt_recurrence(database):
+    from alerts.storage import ImportJob
+    with database.begin() as db:
+        center.stream(db)
+        chart = ImportJob(instrument_id='EURUSD', start=0, end=60000, cursor=0, chart_plan=True)
+        legacy = ImportJob(instrument_id='EURUSD', start=0, end=60000, cursor=0)
+        db.add_all([chart, legacy])
+        db.flush()
+        chart_id, legacy_id = chart.id, legacy.id
+    with pytest.raises(RuntimeError):
+        with database.begin() as db:
+            db.get(ImportJob, chart_id).status = 'failed'
+            db.flush()
+            raise RuntimeError('source rollback')
+    with database() as db:
+        assert not db.scalar(select(Audit).where(Audit.kind == 'notice_source'))
+    with database.begin() as db:
+        for ident in (chart_id, legacy_id):
+            task = db.get(ImportJob, ident)
+            task.status, task.attempts, task.error = 'failed', 5, 'provider timeout'
+    drain(database)
+    with database() as db:
+        rows = list(db.scalars(select(NoticeEvent)))
+        assert len(rows) == 1 and rows[0].source_id == chart_id
+        first_id, first_group = rows[0].id, rows[0].incident_id
+    with database.begin() as db:
+        db.get(ImportJob, chart_id).status = 'complete'
+    drain(database)
+    with database() as db:
+        assert db.get(NoticeIncident, first_group).closed_at
+    with database.begin() as db:
+        db.get(ImportJob, chart_id).status = 'pending'
+    with database.begin() as db:
+        db.get(ImportJob, chart_id).status = 'failed'
+    drain(database)
+    with database() as db:
+        rows = list(db.scalars(select(NoticeEvent)))
+        assert len(rows) == 2 and len({row.id for row in rows}) == 2
+        recurrence = next(row for row in rows if row.id != first_id)
+        assert recurrence.incident_id != first_group and recurrence.attention
+
+
+def test_export_background_job_is_owned_after_window_closes(database):
+    from alerts.notification_sources import chart_import_scope
+    from alerts.storage import ImportJob
+    with database.begin() as db:
+        center.stream(db)
+        job = ImportJob(instrument_id='EURUSD', start=0, end=60000, cursor=0)
+        db.add(job)
+        db.flush()
+        ident = job.id
+        chart_import_scope(db, [job], {'workspace_id': 'export-workspace', 'timeframe': 'H1', 'endpoint': '/charts/export'})
+        chart_import_scope(db, [job], {'workspace_id': 'export-workspace', 'timeframe': 'H1', 'endpoint': '/charts/export'})
+    with database.begin() as db:
+        task = db.get(ImportJob, ident)
+        task.status, task.attempts = 'failed', 5
+    drain(database)
+    with database() as db:
+        row = db.scalar(select(NoticeEvent))
+        assert row.source_id == ident and row.body['context']['workspace_id'] == 'export-workspace'
+        assert row.body['context']['endpoint'] == '/charts/export'
+        assert row.body['context']['timeframe'] == 'H1'
+        assert db.scalar(select(func.count()).select_from(NoticeEvent)) == 1
+
+
+def test_export_attaches_to_existing_failed_job_once(database):
+    from alerts.notification_sources import chart_import_scope
+    from alerts.storage import ImportJob
+    with database.begin() as db:
+        center.stream(db)
+        job = ImportJob(instrument_id='EURUSD', start=0, end=60000, cursor=0, status='failed', attempts=5)
+        db.add(job)
+        db.flush()
+        chart_import_scope(db, [job], {'endpoint': '/charts/export'})
+        chart_import_scope(db, [job], {'endpoint': '/charts/export'})
+    drain(database)
+    with database() as db:
+        assert db.scalar(select(func.count()).select_from(NoticeEvent)) == 1
+
+
+def test_native_recovery_requires_matching_request_range():
+    from alerts.notification_sources import native_key
+    query = {'instrument': 'EURUSD', 'timeframe': 'H1', 'before': 1000000, 'countBack': 4000,
+             '_notice_context': {'workspace_id': 'a', 'chart_index': '0'}}
+    assert native_key(query) == native_key(dict(query))
+    assert native_key(query) != native_key({**query, 'before': 2000000})
+    assert native_key(query) != native_key({**query, 'countBack': 100})

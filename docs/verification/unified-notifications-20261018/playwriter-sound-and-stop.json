@@ -1,0 +1,115 @@
+{
+  "event_id": "s:351d90e0-9488-59b6-b416-ddb2c9dd8804",
+  "sound_reserved": 1,
+  "sound_started": 1,
+  "viewed_at": 1792309972296,
+  "handled_at": 1792310006089,
+  "phone": {
+    "signal_id": "5a27fd9f-9928-4ecc-b387-fab7a2316c4b",
+    "notification_id": "c822c6fb-1e2e-4ae9-90ea-24650e85f336",
+    "status": "acknowledged",
+    "stopped_at": 1792310137818
+  },
+  "observations": [
+    {
+      "id": "source:1013",
+      "kind": "phone_state",
+      "profile": "server",
+      "reported_at": null,
+      "received_at": 1792310137841,
+      "details": {
+        "signal_id": "5a27fd9f-9928-4ecc-b387-fab7a2316c4b",
+        "notification_id": "c822c6fb-1e2e-4ae9-90ea-24650e85f336",
+        "status": "acknowledged",
+        "stopped_at": 1792310137818
+      }
+    },
+    {
+      "id": "bdb73897-b3aa-4a42-942f-bd94c3edf1a1",
+      "kind": "handled",
+      "profile": "145693fe-28f9-4b3b-9902-8117c46720f0",
+      "reported_at": 1792310005803,
+      "received_at": 1792310006090,
+      "details": {}
+    },
+    {
+      "id": "51cb38e6-6862-41db-b344-b918b02cdf9a",
+      "kind": "viewed",
+      "profile": "145693fe-28f9-4b3b-9902-8117c46720f0",
+      "reported_at": 1792309971998,
+      "received_at": 1792309972299,
+      "details": {}
+    },
+    {
+      "id": "b8489224-daba-3ef8-8cdd-571c03c632aa",
+      "kind": "sound_expired",
+      "profile": "145693fe-28f9-4b3b-9902-8117c46720f0",
+      "reported_at": 1792309406520,
+      "received_at": 1792309406543,
+      "details": {
+        "reason": "超过30秒实时窗口"
+      }
+    },
+    {
+      "id": "0ea43093-2e5a-3ab3-8ff6-284c96ee9b1a",
+      "kind": "sound_blocked",
+      "profile": "145693fe-28f9-4b3b-9902-8117c46720f0",
+      "reported_at": 1792309379990,
+      "received_at": 1792309380110,
+      "details": {
+        "reason": "页面隐藏或尚未手势解锁"
+      }
+    },
+    {
+      "id": "dc65aa86-88ec-7c66-b622-dc258718da7d",
+      "kind": "rendered",
+      "profile": "145693fe-28f9-4b3b-9902-8117c46720f0",
+      "reported_at": 1792309377770,
+      "received_at": 1792309378885,
+      "details": {
+        "visibility": "页面与展示元素可见；不代表人已看见"
+      }
+    },
+    {
+      "id": "5b4ec7d6-6968-34f6-189c-d7ae77b81d7b",
+      "kind": "sound_reserved",
+      "profile": "145693fe-28f9-4b3b-9902-8117c46720f0",
+      "reported_at": 1792309377970,
+      "received_at": 1792309378715,
+      "details": {
+        "reason": "自动播放已持久预留，不自动重试"
+      }
+    },
+    {
+      "id": "0f4b1b37-71d0-6dc3-f3c8-052a06aa852e",
+      "kind": "sound_started",
+      "profile": "145693fe-28f9-4b3b-9902-8117c46720f0",
+      "reported_at": 1792309378165,
+      "received_at": 1792309378584,
+      "details": {
+        "reason": "AudioContext 已开始；不代表用户听见"
+      }
+    },
+    {
+      "id": "c4f7250c-b989-0f86-3884-bda558cfa6c4",
+      "kind": "received",
+      "profile": "145693fe-28f9-4b3b-9902-8117c46720f0",
+      "reported_at": 1792309377488,
+      "received_at": 1792309377807,
+      "details": {}
+    },
+    {
+      "id": "source:5",
+      "kind": "phone_state",
+      "profile": "server",
+      "reported_at": null,
+      "received_at": 1792309375523,
+      "details": {
+        "signal_id": "5a27fd9f-9928-4ecc-b387-fab7a2316c4b",
+        "notification_id": "c822c6fb-1e2e-4ae9-90ea-24650e85f336",
+        "status": "pending",
+        "stopped_at": null
+      }
+    }
+  ]
+}

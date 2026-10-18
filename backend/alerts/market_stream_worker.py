@@ -230,7 +230,7 @@ class Calculator:
                 state = live_snapshot(db, revision)
                 page["status"] = {key: state[key] for key in (
                     "quote_ready", "candle_ready", "sample_ready", "observation_mode",
-                    "confirmed_tail_ready", "owned", "connection", "current_account")}
+                    "confirmed_tail_ready", "owned", "connection", "connection_error", "current_account")}
         return {"type": "bars", **page}, 500
 
     def retire_memory(self):

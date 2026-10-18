@@ -8,6 +8,7 @@ vm.runInNewContext(source,{exports:moduleExports,Map,Promise,JSON,
  setTimeout:cb=>{const id=++timerId;timers.set(id,cb);return id},clearTimeout:id=>timers.delete(id)});
 const factory=moduleExports.providerSubscriptions;
 const flush=()=>new Promise(resolve=>setImmediate(resolve));
+const watchdog=setTimeout(()=>{console.error('Provider subscription test timed out');process.exit(1)},10000);
 (async()=>{
   const calls=[],streams=[],received=[],errors=[];
   let release;
@@ -110,5 +111,54 @@ const flush=()=>new Promise(resolve=>setImmediate(resolve));
   await flush();const disposed=closing.dispose();finish();await opened;await disposed;
   assert.deepEqual(finalCalls,['/charts/provider/subscribe','/charts/provider/unsubscribe']);
   assert.equal(finalStreams.length,0,'unmount drains pending registrations before releasing them');
+  const facts=[],outageStreams=[];let requestFailure=true,releaseOld;
+  const outages=factory(async()=>{if(requestFailure)throw Error('subscribe503')},()=>{
+    const stream={readyState:0,onmessage:null,close(){}};outageStreams.push(stream);return stream;
+  },()=>{},()=>{},undefined,(args,kind,error,attempt)=>facts.push({listener:args.listener,kind,error:!!error,attempt}));
+  const args={client:'outage',listener:'active',generation:1,sequence:0};
+  await outages.subscribe(args);
+  assert.equal(facts.length,1,'actual registration failure produces a connection occurrence');
+  requestFailure=false;await outages.subscribe(args);
+  // The explicit new subscribe replaces a failed registration owner. Its first
+  // successful data path has no invented recovery for the abandoned owner.
+  const stream=outageStreams[0];
+  stream.onerror({});stream.onerror({});
+  assert.equal(facts.filter(f=>f.error).length,2,'continuous EventSource outage emits once');
+  stream.onopen({});await flush();
+  assert.equal(facts.at(-1).error,false,'EventSource open explicitly recovers the current outage');
+  stream.onmessage({data:JSON.stringify({listener:'active',generation:1,sequence:1,type:'status',error:'provider503'})});
+  stream.onmessage({data:JSON.stringify({listener:'active',generation:1,sequence:2,type:'status',error:'provider503'})});
+  assert.equal(facts.filter(f=>f.kind==='market'&&f.error).length,1);
+  stream.onmessage({data:JSON.stringify({listener:'active',generation:2,sequence:3,type:'bars',bars:[]})});
+  assert.equal(facts.at(-1).error,true,'old or different generation cannot resolve the outage');
+  stream.onmessage({data:JSON.stringify({listener:'active',generation:1,sequence:3,type:'bars',bars:[]})});
+  const recovered=facts.at(-1);assert.equal(recovered.error,false);
+  stream.onmessage({data:JSON.stringify({listener:'active',generation:1,sequence:4,type:'status',error:'provider503'})});
+  assert.notEqual(facts.at(-1).attempt,recovered.attempt,'recurrence gets a distinct failure attempt');
+  stream.onmessage({data:JSON.stringify({listener:'active',generation:1,sequence:5,type:'quotes',quotes:[{s:'ok',v:{lp:1,fetch_status:'fetch_failed'}}]})});
+  assert.equal(facts.at(-1).error,true,'cached price with failed fetch cannot resolve an outage');
+  stream.onmessage({data:JSON.stringify({listener:'active',generation:1,sequence:6,type:'quotes',quotes:[{s:'error',v:{}}]})});
+  assert.equal(facts.at(-1).error,true,'error quote is a persistent failure');
+  stream.onmessage({data:JSON.stringify({listener:'active',generation:1,sequence:7,type:'quotes',quotes:[{s:'ok',v:{lp:2,fetch_status:'ok'}}]})});
+  assert.equal(facts.at(-1).error,false,'successful quote explicitly recovers');
+  stream.onmessage({data:JSON.stringify({listener:'active',generation:1,sequence:8,type:'bars',status:{state:'error',error:'backfill503'},bars:[]})});
+  assert.equal(facts.at(-1).error,true,'bar payload can carry a genuine failure despite successful SSE');
+  stream.onmessage({data:JSON.stringify({listener:'active',generation:1,sequence:9,type:'bars',status:{state:'pending'},bars:[]})});
+  assert.equal(facts.at(-1).error,true,'pending bar state cannot count as recovery');
+  stream.onmessage({data:JSON.stringify({listener:'active',generation:1,sequence:10,type:'bars',status:{state:'ready'},bars:[]})});
+  assert.equal(facts.at(-1).error,false);
+  stream.onmessage({data:JSON.stringify({listener:'active',generation:1,sequence:11,type:'quotes',quotes:[{s:'ok',v:{lp:2,fetch_status:'provider_maintenance'}}]})});
+  assert.equal(facts.at(-1).error,true,'composite maintenance is a real failure despite cached price');
+  stream.onmessage({data:JSON.stringify({listener:'active',generation:1,sequence:12,type:'bars',status:{connection:'connected',owned:true,current_account:true,confirmed_tail_ready:true},bars:[]})});
+  assert.equal(facts.at(-1).error,false,'healthy owned composite bars explicitly recover');
+  stream.onmessage({data:JSON.stringify({listener:'active',generation:1,sequence:13,type:'bars',status:{connection:'recovering',connection_error:'unauthorized',owned:true,current_account:true,confirmed_tail_ready:false},bars:[]})});
+  assert.equal(facts.at(-1).error,true,'composite bars retain their explicit connection failure');
+  await outages.clear();const count=facts.length;stream.onerror({});stream.onopen({});
+  assert.equal(facts.length,count,'cancelled subscriptions produce neither failure nor recovery');
+  const late=factory(async(path)=>{if(path.endsWith('/subscribe'))await new Promise((resolve,reject)=>{releaseOld=()=>reject(Error('late503'))})},()=>({close(){},onmessage:null}),()=>{},()=>{},undefined,
+    ()=>facts.push('stale'));
+  const pendingOld=late.subscribe({client:'late',listener:'old',generation:1});await flush();
+  const clearOld=late.clear();releaseOld();await pendingOld;await clearOld;
+  assert.equal(facts.length,count,'late registration errors after release cannot produce facts');
   console.log('Provider subscription transport: ordered cancellation, shared stream, stale events and unmount passed');
-})().catch(error=>{console.error(error);process.exitCode=1});
+})().catch(error=>{console.error(error);process.exitCode=1}).finally(()=>clearTimeout(watchdog));

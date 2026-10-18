@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
-const context={queueMicrotask,Date,setTimeout,setInterval:()=>1,clearInterval(){}};
+const context={crypto:require('node:crypto').webcrypto,queueMicrotask,Date,setTimeout,setInterval:()=>1,clearInterval(){}};
 const errors=[],recovered=[],batches=[];let token='expired',fail=true;
 const scope={generation:1,name:'LWMA',resolution:'1',first:1000,last:2000,count:2};
 const chart={symbol:()=> 'MWC:test',resolution:()=> '1',dataReady:()=>true,getAllStudies:()=>[{id:'study'}],

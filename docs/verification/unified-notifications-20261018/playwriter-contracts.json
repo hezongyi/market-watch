@@ -1,0 +1,40 @@
+{
+  "unauthenticated": 401,
+  "no_csrf": 403,
+  "forged_signal": 422,
+  "forged_phone": 422,
+  "pagination": {
+    "events": 1000,
+    "pages": 10,
+    "unique": 1000,
+    "latency_ms": [
+      75,
+      106,
+      133,
+      191,
+      111,
+      149,
+      140,
+      115,
+      105,
+      97
+    ]
+  },
+  "sse_json_parity": {
+    "changes": 1,
+    "matching_cursor": true,
+    "epoch": "742d92d0-fbdc-45fc-99b3-49e63f3b6bd1"
+  },
+  "web_mobile_independence": {
+    "viewed": true,
+    "handled": true,
+    "phone_status": "pending",
+    "phone_stopped": false
+  },
+  "baseline_rollforward": {
+    "backfill": true,
+    "phone_stopped": true,
+    "attempt_and_receipt": true,
+    "incident_count": 1
+  }
+}

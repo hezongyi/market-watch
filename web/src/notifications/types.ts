@@ -64,6 +64,7 @@ export type Intake = BrowserFault & {
   recovery_of?: string;
 };
 export type NoticeState = {
+  epoch: string;
   revision: number;
   events: Notice[];
   pending: Notice[];

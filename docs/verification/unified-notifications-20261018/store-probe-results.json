@@ -1,0 +1,32 @@
+{
+  "testedAt": "2026-10-18T15:58:39.738Z",
+  "repo": "/home/quant/repos/market-watch-issue75-implementation-20261018",
+  "engine": "fake-indexeddb 6.2.4",
+  "checks": [
+    {
+      "name": "Repeated nextCheck preserves original pending/observation TTL and pending order; seven-day/31-day expiry works",
+      "outcome": "PASS"
+    },
+    {
+      "name": "Completed observation starts one-day retention at completion",
+      "outcome": "PASS"
+    },
+    {
+      "name": "saveProgress removes projected pending IDs while preserving rejected same-ID evidence",
+      "outcome": "PASS"
+    },
+    {
+      "name": "Aborted saveProgress atomically preserves pending evidence and prior cursor",
+      "outcome": "PASS"
+    },
+    {
+      "name": "Same-millisecond reverse-lexical failure/recovery/recurrence stages in causal order without rewriting at; update preserves order",
+      "outcome": "PASS"
+    },
+    {
+      "name": "Separate Store connections serialize concurrent same-millisecond stage orders",
+      "outcome": "PASS"
+    }
+  ],
+  "outcome": "PASS"
+}

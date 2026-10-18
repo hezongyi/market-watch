@@ -3,7 +3,7 @@ const bridge=fs.readFileSync('../advanced-host/bridge.js','utf8');
 const start=bridge.indexOf('const displayRecoveries=new Map();'),end=bridge.indexOf('function acceptMarketHistory',start);
 let busy=true,attempts=0,registered=0,onReload,ticker='MWC:test';
 const reports=[],chart={symbol:()=> ticker,resolution:()=> '1'},sub={symbol:'MWC:test',res:'1'};
-const ctx={ready:true,widget:{chartsCount:()=>1,chart:()=>chart},chartUsesSymbol:(c,s,r)=>c.symbol()===s&&c.resolution()===r,
+const ctx={emitNotice:()=>{},crypto:require('node:crypto').webcrypto,ready:true,widget:{chartsCount:()=>1,chart:()=>chart},chartUsesSymbol:(c,s,r)=>c.symbol()===s&&c.resolution()===r,
  indicatorKey:(s,r)=>s+'|'+r,indicatorBindings:new Map([['MWC:test|1',{displaySnapshot:'expired'}]]),workspaceEpoch:1,compositeDisplayBatches:{cancel(){}},subscriptions:new Map([['sub',sub]]),marketGeneration:1,cache:new Map(),
  reloadHistory:async()=>{attempts++;onReload?.();return !busy;},registerMarketBar(){registered++;},send:x=>reports.push(x),setTimeout:fn=>{queueMicrotask(fn);return 1;}};
 vm.runInNewContext(bridge.slice(start,end)+'\nglobalThis.recover=recoverDisplaySnapshot;globalThis.prune=()=>{for(const entry of displayRecoveries.values())entry.prune();};',ctx);

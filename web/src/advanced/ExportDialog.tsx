@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import {useNotices} from "../notifications/context";
 import { apiResponse } from "../api";
 
 export type ExportSelection = {
@@ -10,12 +11,15 @@ export type ExportSelection = {
 };
 const inputDate = (time: number) => new Date(time).toISOString().slice(0, 16);
 export function ExportDialog({
+  workspace,
   selection,
   onClose,
 }: {
+  workspace?: string;
   selection: ExportSelection;
   onClose: () => void;
 }) {
+  const notices=useNotices();
   const dialog = useRef<HTMLDialogElement>(null);
   const abort = useRef<AbortController | null>(null);
   const [start, setStart] = useState(inputDate(Date.now() - 86400000));
@@ -44,11 +48,16 @@ export function ExportDialog({
     setStatus("正在检查历史行情");
     const body = {
       ...selection,
+      notice_workspace: workspace || "",
       published: selection.series_kind === 'managed' || !selection.series_kind,
       start: left,
       end: right,
       indicators: include ? selection.indicators : [],
     };
+    const fault={source_kind:'data_center' as const,attempt_id:crypto.randomUUID(),code:'CHART_EXPORT_FAILED',title:'图表行情导出失败',message:'',
+      context:{workspace_id:workspace || '',endpoint:'/charts/export',instrument:selection.instrument,timeframe:selection.timeframe},
+      evidence:{start:left,end:right,include_indicators:include}};
+    let reliableTaskFailure=false;
     try {
       if (retryFailed) {
         for (const id of failedTasks) {
@@ -84,6 +93,7 @@ export function ExportDialog({
         }
         if (!response.ok) {
           const result = await response.json();
+          reliableTaskFailure=Array.isArray(result.failed_task_ids) && result.failed_task_ids.length>0;
           setFailedTasks(
             Array.isArray(result.failed_task_ids)
               ? result.failed_task_ids.filter(
@@ -113,12 +123,14 @@ export function ExportDialog({
         link.click();
         setTimeout(() => URL.revokeObjectURL(url), 60000);
         setStatus("CSV 已生成并交给浏览器下载");
+        void notices.resolve(fault);
         break;
       }
     } catch (e) {
       if (!controller.signal.aborted) {
         setStatus("");
         setError(String(e));
+        if(!reliableTaskFailure)void notices.report({...fault,message:String(e)});
       }
     } finally {
       if (!controller.signal.aborted) setBusy(false);
