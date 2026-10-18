@@ -120,3 +120,7 @@
 
 .volume-job { padding:16px 0; border-top:1px solid #78849a55; overflow-wrap:anywhere; }
 .volume-job button { min-height:44px; margin:4px; }
+
+/* Local actionable load status shares one strip; ordinary incidents live in the native center. */
+.advanced-workspace .advanced-history-failures,.advanced-workspace .advanced-loading-notice{position:relative;inset:auto;flex-shrink:0;width:auto;max-width:none;max-height:140px;margin:0;border-radius:0;padding:6px 12px;font-size:12px;overflow:auto}
+.nc-parent-unlock{display:flex;gap:12px;align-items:center;padding:4px 12px;font-size:12px;flex-shrink:0}.nc-parent-unlock button{font:inherit;padding:4px 8px}

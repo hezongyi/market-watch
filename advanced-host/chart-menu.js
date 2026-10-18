@@ -336,7 +336,7 @@ function chartThemeMenu(chartWidget, report, grid, actions, createWorkspace, aut
   return {
     setPending(count) {
       const entry = panel.querySelector('[data-app-action="signals"] .label-jFqVJoPk');
-      if (entry) entry.textContent = "通知" + (Number.isSafeInteger(count) && count > 0 ? `（${count} 待确认）` : "");
+      if (entry) entry.textContent = "通知" + (Number.isSafeInteger(count) && count > 0 ? `（${count} 未读）` : "");
     },
     changePassword: () => chartPasswordDialog(chartWidget, doc, changePassword, report),
     setDraftBlocked(blocked) {

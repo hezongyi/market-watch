@@ -1,14 +1,18 @@
+import {useNotices,useNoticeState} from "../notifications/context";
+import {NoticePanel,NoticeBubble} from "../notifications/Panel";
+import {operationFault} from "../notifications/operations";
+import type {NoticeAction} from "../notifications/types";
 import { validIndicatorRead } from "./indicatorRequests";
 import {
   loadNativeHistory,
   type HistoryCapabilities,
 } from "./nativeHistoryLoads";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams, NavLink } from "react-router-dom";
 import { useApp } from "../app/context";
 import { defaultChart, pageName } from "../app/navigation";
 import { centerLocation } from "../market-data/location";
-import { api, apiErrorDetails } from "../api";
+import { api as requestAPI, apiErrorDetails } from "../api";
 import "./advanced.css";
 import { HistoryPlansDialog, type DatasetViews } from "./HistoryPlansDialog";
 import { MaintenanceDialog } from "./MaintenanceDialog";
@@ -46,6 +50,19 @@ const frames = new Set([
 
 export default function AdvancedWorkspace() {
   const appLocation = useLocation(), navigate = useNavigate(), { workspaceId } = useParams();
+  const notices=useNotices(), noticeState=useNoticeState();
+  function api<T=any>(path:string,body?:unknown,signal?:AbortSignal):Promise<T>{
+    const fault=operationFault(path,body,current.current?.id||workspaceId);
+    return fault?notices.operation(fault,()=>requestAPI<T>(path,body,signal)):requestAPI<T>(path,body,signal);
+  }
+  const notificationReadyRef=useRef(notificationReady);notificationReadyRef.current=notificationReady;
+  const noticeStateRef=useRef(noticeState);noticeStateRef.current=noticeState;
+  const noticeRequest=useCallback((q:NoticeAction)=>notices.action(q),[notices]);
+  const [notificationReady,setNotificationReady]=useState(false);
+  const noticeOpen=new URLSearchParams(appLocation.search).get('panel')==='notifications';
+  const noticeEvent=new URLSearchParams(appLocation.search).get('event') || undefined;
+  const closeNotices=()=>{const url=new URL(location.href);url.searchParams.delete('panel');url.searchParams.delete('event');navigate(url.pathname+url.search+url.hash,{replace:true});};
+  const openNotices=(event?:string)=>{const url=new URL(location.href);url.searchParams.set('panel','notifications');if(event)url.searchParams.set('event',event);else url.searchParams.delete('event');navigate(url.pathname+url.search+url.hash,{replace:true});};
   const app = useApp(), appRef = useRef(app); appRef.current = app;
   const urlRef = useRef(appLocation); urlRef.current = appLocation;
   const capturing = useRef<{resolve: () => void; reject: (error: Error) => void} | null>(null);
@@ -166,7 +183,7 @@ export default function AdvancedWorkspace() {
       }, 15000);
     });
   const select = (row: Workspace) => {
-    setNativeReady(false);
+    setNativeReady(false);setNotificationReady(false);
     setPollErrors({});
     setHistoryProgress({});
     setNativeLoads({});
@@ -217,7 +234,7 @@ export default function AdvancedWorkspace() {
       text,
     })),
   ];
-  const notificationState = JSON.stringify(noticeMessages);
+  const notificationState = JSON.stringify(noticeMessages.filter(row=>row.recover));
   useEffect(() => {
     if (nativeReady)
       post({
@@ -301,7 +318,19 @@ export default function AdvancedWorkspace() {
     if (active) sessionStorage.setItem("mw.chart-return.v1", appLocation.pathname + appLocation.search + appLocation.hash);
   }, [active?.id, appLocation]);
   useEffect(() => { updateTitle(true); }, [active?.id, active?.name]);
-  useEffect(() => { if (nativeReady) post({ type: "app-state", pending: app.pending }); }, [nativeReady, app.pending]);
+  useEffect(()=>{
+    if(!active?.id)return;
+    const context={workspace_id:active.id};
+    const attempt=crypto.randomUUID();
+    const timer=setTimeout(()=>{if(!notificationReadyRef.current)void notices.report({source_kind:'chart_shell',attempt_id:attempt,code:'CHART_SHELL_UNAVAILABLE',title:'图表通知接入尚未完成',message:'图表启动或原生侧栏接入超时，可在主页面查记录并重新加载图表',context});},25000);
+    return()=>clearTimeout(timer);
+  },[active?.id,frameKey,notices]);
+  useEffect(()=>{if(notificationReady&&active?.id)void notices.resolve({source_kind:'chart_shell',attempt_id:alertUiSession.current,code:'CHART_SHELL_UNAVAILABLE',title:'图表通知接入已恢复',message:'当前工作区原生通知已接入',context:{workspace_id:active.id}});},[notificationReady,active?.id,notices]);
+  useEffect(()=>{notices.setPresentation(true);return()=>notices.setPresentation(false);},[notices]);
+  useEffect(()=>{if(nativeReady)post({type:'app-state',pending:noticeState.unread});
+    if(notificationReady)post({type:'notice-center-state',session:alertUiSession.current,workspace_id:current.current?.id,state:noticeState});
+  },[nativeReady,notificationReady,noticeState]);
+  useEffect(()=>{if(notificationReady && noticeOpen)post({type:'notice-center-open',event_id:noticeEvent});},[notificationReady,noticeOpen,noticeEvent]);
   useEffect(() => () => { if (titleTimer.current) clearTimeout(titleTimer.current); }, []);
   useEffect(() => {
     const marketRequests = new Map<Window, Map<number, AbortController>>();
@@ -334,6 +363,37 @@ export default function AdvancedWorkspace() {
         source = e.source as Window;
       const reply = (value: object) =>
         source.postMessage({ channel, ...value }, origin);
+      if(m.type==='notice-source'){
+        if(m.session!==alertUiSession.current||m.workspace_id!==current.current?.id||m.epoch!==nativeLoadEpoch.current||
+          !m.fault||JSON.stringify(m.fault).length>16000||!['indicator','history','capacity','market','chart_shell','data_center'].includes(m.fault.source_kind))return;
+        const fault={...m.fault,context:{...m.fault.context,workspace_id:current.current?.id,epoch:m.epoch}};
+        if(m.recovered===true)void notices.resolve(fault);else void notices.report(fault);
+        return;
+      }
+      if(m.type==='notice-center-rpc'){
+        const q=m.query,scope=current.current?.id,session=alertUiSession.current;
+        if(!q || q.workspace_id!==scope || q.session!==session ||
+          !Number.isSafeInteger(m.id) || JSON.stringify(q).length>6000){reply({type:'result',id:m.id,error:'通知上下文已失效'});return;}
+        try{const result=await notices.action(q);
+          if(source===frame.current?.contentWindow && session===alertUiSession.current && scope===current.current?.id)
+            reply({type:'result',id:m.id,result});
+        }catch(error){reply({type:'result',id:m.id,error:String(error)});}return;
+      }
+      if(m.type==='notice-center-ready' && m.session===alertUiSession.current && m.workspace_id===current.current?.id){setNotificationReady(true);return;}
+      if(m.type==='notice-center-unavailable' && m.session===alertUiSession.current){setNotificationReady(false);void notices.report({source_kind:'chart_shell',attempt_id:m.session+':notice-shell',code:'CHART_SHELL_UNAVAILABLE',title:'原生通知侧栏暂不可用',message:String(m.error||'接入失败'),context:{workspace_id:current.current?.id}});return;}
+      if(m.type==='notice-center-panel' && m.session===alertUiSession.current && m.workspace_id===current.current?.id){
+        if(m.open)openNotices(typeof m.event==='string'?m.event:undefined);
+        else if(new URLSearchParams(location.search).get('panel')==='notifications')closeNotices();return;
+      }
+      if(m.type==='notice-center-locate' && m.session===alertUiSession.current && typeof m.event_id==='string'){
+        const row=await notices.action({action:'detail',event_id:m.event_id});
+        const workspace=row.workspace;if(typeof workspace!=='string'||!workspace) return;
+        if(workspace!==current.current?.id){navigate('/advanced-charts/'+encodeURIComponent(workspace)+'?panel=notifications&event='+encodeURIComponent(row.id));return;}
+        if(row.source_kind==='chart_alert'){
+          const rows=await api('/chart-alerts');const alert=rows.find((a:any)=>a.id===row.original_evidence?.alert_id);
+          if(alert && source===frame.current?.contentWindow)reply({type:'chart-alert-locate',row:alert,event:row.original_evidence});
+        }return;
+      }
       if (m.type === "draft-captured") {
         const waiter = capturing.current; capturing.current = null;
         if (!waiter) return;
@@ -360,7 +420,7 @@ export default function AdvancedWorkspace() {
       }
       if (m.type === "alerts-panel-state" && m.workspace_id === current.current?.id && typeof m.open === "boolean") {
         const url = new URL(location.href);
-        if (m.open) url.searchParams.set("panel", "alerts"); else url.searchParams.delete("panel");
+        if (m.open) url.searchParams.set("panel", "alerts"); else if(url.searchParams.get("panel")==="alerts") url.searchParams.delete("panel");
         navigate(url.pathname + url.search + url.hash, {replace:true}); return;
       }
       if (m.type === "data-center-state" && typeof m.session === "string" && /^[a-f0-9-]{36}$/.test(m.session)) {
@@ -870,6 +930,7 @@ export default function AdvancedWorkspace() {
           reply({
             type: "init",
             alert_ui_session: alertUiSession.current,
+            notice_state: noticeStateRef.current,
             alert_ui_draft: readAlertDraft(current.current?.id),
             history_capabilities: capabilities,
             document: current.current?.document || {},
@@ -899,8 +960,9 @@ export default function AdvancedWorkspace() {
         )
           setExportSelection(value);
       } else if (m.type === "workspace-action") {
-        const paths: Record<string,string> = {home: location.pathname, charts: location.pathname, signals:"/signals", replay:"/replay", settings:"/settings", legacy:"/legacy/monitoring"};
-        if (paths[m.action]) navigate(paths[m.action]);
+        const paths: Record<string,string> = {home: location.pathname, charts: location.pathname, signals:location.pathname+"?panel=notifications", replay:"/replay", settings:"/settings", legacy:"/legacy/monitoring"};
+        if(m.action==='signals')openNotices();
+        else if (paths[m.action]) navigate(paths[m.action]);
         else if (m.action === "logout") {
           try { await appRef.current.logout(); } catch(e) { setError(String(e)); }
         } else if (!mobile && m.action === "create") await create();
@@ -916,7 +978,7 @@ export default function AdvancedWorkspace() {
 
         }
         if (new URLSearchParams(location.search).get("panel") === "alerts") reply({type:"open-alerts"});
-        reply({ type:"app-state", pending:appRef.current.pending });
+        reply({ type:"app-state", pending:noticeStateRef.current.unread });
         setStatus("已加载 · 行情按需更新");
       } else if (m.type === "viewport-notice") {
         if (typeof m.key !== "string" || m.key.length > 200) return;
@@ -992,6 +1054,7 @@ export default function AdvancedWorkspace() {
               localStorage.setItem("mw-tv-draft:" + draftId, draft);
             } catch {
               setError("本地草稿空间不足，请勿关闭页面，等待服务器保存完成");
+              void notices.report({source_kind:'workspace',attempt_id:crypto.randomUUID(),code:'LOCAL_DRAFT_FAILED',title:'图表草稿未能保存到本机',message:'本机存储写入失败，请勿关闭页面',context:{workspace_id:draftId}});
             }
           }
           let result;
@@ -1534,6 +1597,7 @@ export default function AdvancedWorkspace() {
           localStorage.setItem("mw-tv-draft:" + id, JSON.stringify(document));
         } catch (e) {
           setError("本地草稿空间不足，将继续尝试服务器保存");
+          void notices.report({source_kind:'workspace',attempt_id:crypto.randomUUID(),code:'LOCAL_DRAFT_FAILED',title:'图表草稿未能保存到本机',message:String(e),context:{workspace_id:id},evidence:{server_save:'继续尝试；请勿关闭页面'}});
         }
         setStatus("正在保存");
         queue.current = queue.current.then(async () => {
@@ -1619,6 +1683,7 @@ export default function AdvancedWorkspace() {
   }
   return (
     <main className="advanced-workspace" data-theme={chartTheme}>
+      {noticeState.enabled&&!noticeState.unlocked&&<div className="nc-parent-unlock" role="status"><span>{noticeState.soundStatus}</span><button type="button" onClick={()=>void notices.unlock()}>在主页面解锁声音</button></div>}
       {mobile && <p className="advanced-readonly-note" role="note">手机只读看盘。编辑图表、绘图和告警请使用桌面浏览器；桌面工作区布局仍保留。</p>}
       {Object.keys(indicatorStates).length>0 && <aside className="advanced-history-failures" aria-label="图格指标状态">{Object.entries(indicatorStates).map(([key,item])=><p key={key} role="status">图格 {item.index+1} · {item.name}：{item.state==='error' ? item.error : '正在计算'}{item.previousParams && <>（暂显旧参数：{item.previousParams}）</>}{item.state==='error' && <button onClick={()=>post({type:'retry-chart-indicators',index:item.index,epoch:item.epoch})}>重试指标</button>}</p>)}</aside>}
       {chartFailures.length>0 && <aside className="advanced-history-failures" aria-label="图格历史加载失败">{chartFailures.map(item=><p key={item.index} role="status">图格 {item.index+1} · {item.label} · {item.resolution}：{item.error}<button onClick={()=>post({type:'retry-chart-history',...item})}>重试此图格</button></p>)}</aside>}
@@ -1683,16 +1748,12 @@ export default function AdvancedWorkspace() {
       >
         {status}
       </div>
-      {!nativeReady && noticeMessages.length > 0 && (
-        <div className="advanced-loading-notice" role="alert">
-          {noticeMessages
-            .map((notice) => notice.text.replace(/^(?:Error:\s*)+/, ""))
-            .join("；")}
-          {blocked.current && !mobile && (
-            <button onClick={copy}>复制恢复草稿</button>
-          )}
-        </div>
-      )}
+      {!notificationReady&&<div className="nc-fallback-entry"><button type="button" onClick={()=>openNotices()}>图表通知（{noticeState.unread} 未读）</button>
+        <button type="button" onClick={()=>void appRef.current.confirmLeave().then(ok=>{if(ok){setNativeReady(false);setNotificationReady(false);setFrameKey(key=>key+1);}})}>重新加载图表</button><p>{nativeReady?'原生通知暂不可用':error?'图表加载失败，可查看排查记录':'图表正在启动'}{noticeState.gap?' · '+noticeState.gap:''}</p>
+        {blocked.current&&!mobile&&<button onClick={copy}>复制恢复草稿</button>}
+        {noticeState.bubble&&<NoticeBubble notice={noticeState.bubble} request={noticeRequest} onOpen={()=>openNotices(noticeState.bubble!.id)}/>}
+      </div>}
+      {!notificationReady&&noticeOpen&&<div className="nc-fallback"><NoticePanel state={noticeState} request={noticeRequest} eventId={noticeEvent} onClose={closeNotices}/></div>}
       {active ? (
         <iframe
           key={frameKey}
@@ -1708,7 +1769,7 @@ export default function AdvancedWorkspace() {
         <section>
           <h1>{error && workspaceId ? "工作区不可用" : "图表工作区"}</h1>
           <p>{mobile ? "手机只读看盘，请在桌面浏览器创建工作区。" : "选择已有工作区，或新建工作区开始使用。"}</p>
-          <NavLink to="/advanced-charts">选择默认工作区</NavLink> · <NavLink to="/signals">通知</NavLink> · <NavLink to="/settings">设置</NavLink>
+          <NavLink to="/advanced-charts">选择默认工作区</NavLink> · <button onClick={()=>openNotices()}>图表通知</button> · <NavLink to="/settings">设置</NavLink>
           <button disabled={mobile} onClick={create}>
             新建工作区
           </button>

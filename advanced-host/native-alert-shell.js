@@ -1,7 +1,8 @@
 /* Fixed v31.1.0 adapter. All private widgetbar/notice DOM access lives here.
  * Vendor bytes are untouched. Business state outlives native page recreation. */
 const nativeAlertRuntimes = new WeakMap();
-async function nativeAlertShell(widget, { mount, unmount, report }) {
+const nativePageRegistries = new WeakMap();
+async function nativeAlertShell(widget, { mount, unmount, report, page = "alerts", title = "警报", icon }) {
   const version = globalThis.TradingView?.version?.();
   if (
     !version ||
@@ -76,8 +77,29 @@ async function nativeAlertShell(widget, { mount, unmount, report }) {
     ].every(Boolean)
   )
     throw Error("v31.1.0 原生告警控件契约不匹配");
-  const originalState = bar.getLayoutState,
-    originalConfig = bar.widgetConfig.alerts;
+  let registry = nativePageRegistries.get(bar);
+  if (!registry) {
+    registry = {originalState: bar.getLayoutState, entries: new Map()};
+    nativePageRegistries.set(bar, registry);
+    bar.getLayoutState = function () {
+      const state = registry.originalState.call(this);
+      for (const [name, entry] of registry.entries) {
+        if (!state.pages.some(item => item.name === name))
+          state.pages.splice(1, 0, {name, title: entry.title, icon: entry.icon, widgets: [{type:name}]});
+      }
+      return state;
+    };
+  }
+  if (registry.entries.has(page)) throw Error("原生侧栏页面重复接入：" + page);
+  const originalConfig = bar.widgetConfig[page];
+  const releasePage = () => {
+    registry.entries.delete(page);
+    if (originalConfig) bar.widgetConfig[page] = originalConfig; else delete bar.widgetConfig[page];
+    if (!registry.entries.size) {
+      bar.getLayoutState = registry.originalState;
+      nativePageRegistries.delete(bar);
+    }
+  };
   let disposed = false,
     dialog = null,
     cancelOpening = null;
@@ -98,29 +120,18 @@ async function nativeAlertShell(widget, { mount, unmount, report }) {
       this.node.remove();
     }
   }
-  bar.widgetConfig.alerts = {
-    ...originalConfig,
+  bar.widgetConfig[page] = {
+    ...bar.widgetConfig.alerts,
     noHeader: true,
     ctor: AlertContent,
   };
-  bar.getLayoutState = function () {
-    const state = originalState.call(this);
-    if (!state.pages.some((page) => page.name === "alerts"))
-      state.pages.splice(1, 0, {
-        name: "alerts",
-        title: "警报",
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.5"><g transform="translate(8 8)"><circle cx="14" cy="15" r="8"/><path d="M14 10v5h4M5 6l3-3M20 3l3 3M9 23l-2 2M19 23l2 2"/></g></svg>',
-        widgets: [{ type: "alerts" }],
-      });
-    return state;
-  };
+  registry.entries.set(page, {title, icon: icon || '<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.5"><g transform="translate(8 8)"><circle cx="14" cy="15" r="8"/><path d="M14 10v5h4M5 6l3-3M20 3l3 3M9 23l-2 2M19 23l2 2"/></g></svg>'});
   // Rebuild only once. Native refreshes use the wrapped state factory thereafter.
   try {
     bar.refreshFromTVSettings();
   } catch (error) {
     disposed = true;
-    bar.getLayoutState = originalState;
-    bar.widgetConfig.alerts = originalConfig;
+    releasePage();
     for (const node of nodes) {
       unmount(node);
       node.remove();
@@ -413,14 +424,14 @@ async function nativeAlertShell(widget, { mount, unmount, report }) {
     });
   }
   return {
-    isOpen: () => !disposed && bar.layout.getActivePage()?.name === "alerts" && !bar.layout.minimized,
+    isOpen: () => !disposed && bar.layout.getActivePage()?.name === page && !bar.layout.minimized,
     open: () => {
-      if (!disposed) bar.setPage("alerts");
+      if (!disposed) bar.setPage(page);
     },
     close: () => {
       if (
         !disposed &&
-        bar.layout.getActivePage()?.name === "alerts" &&
+        bar.layout.getActivePage()?.name === page &&
         !bar.layout.minimized
       )
         bar.layout.onTabClick(bar.layout.getActivePage());
@@ -450,8 +461,7 @@ async function nativeAlertShell(widget, { mount, unmount, report }) {
       }
       nodes.clear();
       style.remove();
-      bar.getLayoutState = originalState;
-      bar.widgetConfig.alerts = originalConfig;
+      releasePage();
       try {
         bar.refreshFromTVSettings();
       } catch (error) {

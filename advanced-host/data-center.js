@@ -1,5 +1,5 @@
 /* Native dialog host. Authenticated operations remain in the trusted app. */
-function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, suspendIndicators, managementRequest, searchSymbols, timezone = () => widget.activeChart().getTimezoneApi().getTimezone().id }) {
+function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, suspendIndicators, managementRequest, searchSymbols, occurrence=()=>{}, timezone = () => widget.activeChart().getTimezoneApi().getTimezone().id }) {
   const probe = widget.createButton({ align: "left", useTradingViewStyle: false });
   const doc = probe.ownerDocument;
   widget.removeButton(probe);
@@ -196,6 +196,7 @@ function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, s
         }
         clearOperation();
       };
+      work.attempt_id=crypto.randomUUID();
       work.timer = setTimeout(() => {
         if (owned(work) && (unchanged(work) || MWSeries.same(captured.chart.symbol(), m.ticker)))
           showLoad(work, "行情仍在加载，可继续操作图表或重试。", true);
@@ -223,9 +224,11 @@ function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, s
         if (!captured.chart.dataReady())
           await timeout(new Promise(done => captured.chart.dataReady(done)), 30000);
       }
+      if(owned(work))occurrence({source_kind:'data_center',attempt_id:work.attempt_id,code:'OPEN_SERIES_FAILED',title:'图表行情已打开',message:'有效目标图格已成功加载',context:{chart_index:captured.index,instrument:m.ticker,timeframe:m.frame}},true);
       completed();
     } catch (e) {
       clearTimeout(work.timer);
+      if(owned(work))occurrence({source_kind:'data_center',attempt_id:work.attempt_id||crypto.randomUUID(),code:'OPEN_SERIES_FAILED',title:'图表行情打开失败',message:String(e),context:{chart_index:captured.index,instrument:m.ticker,timeframe:m.frame}});
       if (owned(work) && (unchanged(work) || MWSeries.same(captured.chart.symbol(), m.ticker)))
         showLoad(work, `打开行情失败：${String(e?.message || e).replace(/^(?:[A-Za-z]*Error:\s*)+/, "")}`, true);
       else if (operation === work) clearOperation();

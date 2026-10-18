@@ -1,3 +1,4 @@
+import {NoticeProvider,useNotices,useNoticeState} from "./notifications/context";
 import React, { useCallback, useEffect, useRef, useState, lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -48,7 +49,7 @@ import {
 import "./style.css";
 import Login from "./app/Login";
 import { AppContext, useApp, type LeaveGuard } from "./app/context";
-import { safeNext, defaultChart, pageName, chartReturn } from "./app/navigation";
+import { safeNext, defaultChart, pageName, chartReturn, notificationReturn } from "./app/navigation";
 import "./app/app.css";
 import AdvancedWorkspacePage from "./advanced/AdvancedWorkspace";
 import DataCenterWindow from "./market-data/Window";
@@ -75,6 +76,7 @@ const frames = ["M1", "M5", "M15", "H1", "H4", "D1"];
 
 function App() {
   const appLocation = useLocation(), navigate = useNavigate();
+  const [subject,setSubject]=useState("");
   const [ready, setReady] = useState(false), [logged, setLogged] = useState(false), [connectionError, setConnectionError] = useState("");
   const [theme, setThemeState] = useState<"dark" | "light">(localStorage.getItem("mw.app-theme") === "light" ? "light" : "dark");
   const [pending, setPending] = useState(0);
@@ -104,7 +106,7 @@ function App() {
   function finishLeave(ok: boolean) { dialog.current?.close(); leave?.resolve(ok); setLeave(null); }
   const checkSession = useCallback(async () => {
     setConnectionError("");
-    try { const r = await api("/session"); setCsrf(r.csrf); setLogged(true); }
+    try { const r = await api("/session"); setCsrf(r.csrf); setSubject(r.subject); setLogged(true); }
     catch (e) { if (e instanceof ApiError && e.status === 401) { setCsrf(""); setLogged(false); } else setConnectionError(String(e)); }
     finally { setReady(true); }
   }, []);
@@ -142,7 +144,7 @@ function App() {
   const next = safeNext(new URLSearchParams(appLocation.search).get("next"));
   let content;
   if (!ready) content = <div className="loading" role="status">正在连接守望…</div>;
-  else if (appLocation.pathname === "/login") content = logged ? <Navigate replace to={next} /> : <Login next={next} connectionError={connectionError} retry={checkSession} login={async password => { const r = await api("/login", { password }); setCsrf(r.csrf); setLogged(true); navigate(next, { replace: true }); }} />;
+  else if (appLocation.pathname === "/login") content = logged ? <Navigate replace to={next} /> : <Login next={next} connectionError={connectionError} retry={checkSession} login={async password => { const r = await api("/login", { password }); setCsrf(r.csrf); setSubject(r.subject); setLogged(true); navigate(next, { replace: true }); }} />;
   else if (connectionError && !logged) content = <div className="loading" role="alert">连接出现问题：{connectionError}<button onClick={checkSession}>重新连接</button></div>;
   else if (!logged) content = <Navigate replace to={"/login?next=" + encodeURIComponent(safeNext(appLocation.pathname + appLocation.search + appLocation.hash))} />;
   else if (appLocation.pathname === "/") content = <Navigate replace to={defaultChart} />;
@@ -155,7 +157,7 @@ function App() {
     <Route path="*" element={<Shell logout={logout} />} />
   </Routes></Suspense>;
   return <AppContext.Provider value={{ registerGuard, confirmLeave, logout, theme, setTheme, pending }}>
-    {content}
+    <NoticeProvider active={logged} subject={subject}>{content}</NoticeProvider>
     {logged && connectionError && <div className="advanced-loading-notice" role="alert">{connectionError}<button onClick={() => { setConnectionError(""); dispatchEvent(new Event("mw-session-expired")); }}>重新登录并保留草稿</button></div>}
     {leave && <dialog ref={dialog} className="leave-dialog" data-app-theme={theme} aria-labelledby="leave-title" onCancel={e => { e.preventDefault(); if (!leaveBusy) finishLeave(false); }}>
       <h2 id="leave-title">有未保存的更改</h2><p>保存后继续，或放弃本次更改。取消可留在当前页面。</p>
@@ -168,6 +170,7 @@ function App() {
 
 function AppHeader({ logout, sound, toggleSound }: { logout: () => void; sound: boolean; toggleSound: () => void }) {
   const { theme, setTheme, pending } = useApp(), location = useLocation();
+  const noticeRuntime=useNotices(),noticeState=useNoticeState();
   const [open, setOpen] = useState(false);
   const menu = useRef<HTMLDivElement>(null), button = useRef<HTMLButtonElement>(null);
   useEffect(() => { setOpen(false); }, [location.pathname, location.search]);
@@ -186,20 +189,9 @@ function AppHeader({ logout, sound, toggleSound }: { logout: () => void; sound: 
     document.addEventListener("pointerdown", close); document.addEventListener("keydown", keys);
     return () => { document.removeEventListener("pointerdown", close); document.removeEventListener("keydown", keys); };
   }, [open]);
-  return <header className="app-header"><button ref={button} type="button" aria-label="应用菜单" aria-expanded={open} aria-controls="app-menu" onClick={() => setOpen(!open)}><Menu size={20} aria-hidden="true" /></button><Waves size={23} aria-hidden="true" /><strong>{pageName(location.pathname)}</strong><NavLink to={chartReturn()}>返回图表</NavLink><button onClick={toggleSound} aria-pressed={sound}>{sound ? "网页声音已开" : "开启网页声音"}</button><button aria-label={theme === "dark" ? "切换浅色主题" : "切换暗色主题"} onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>{theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}</button>
-    {open && <nav id="app-menu" className="app-menu" ref={menu} aria-label="应用导航" onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget as Node) && e.relatedTarget !== button.current) setOpen(false); }}><NavLink to={chartReturn()}>图表</NavLink><NavLink to="/signals">通知 {pending > 0 && <span aria-label={`${pending} 条待确认通知`}>{pending}</span>}</NavLink><NavLink to="/replay">历史演练</NavLink><NavLink to="/settings">设置</NavLink><small>兼容功能</small><NavLink to="/legacy/monitoring">旧版监控</NavLink><hr /><button onClick={logout}>退出登录</button></nav>}
+  return <header className="app-header"><button ref={button} type="button" aria-label="应用菜单" aria-expanded={open} aria-controls="app-menu" onClick={() => setOpen(!open)}><Menu size={20} aria-hidden="true" /></button><Waves size={23} aria-hidden="true" /><strong>{pageName(location.pathname)}</strong><NavLink to={chartReturn()}>返回图表</NavLink><button onClick={toggleSound} aria-pressed={sound}>{sound ? "网页声音已开" : "开启网页声音"}</button><span role="status">{sound&&!noticeState.unlocked&&<button onClick={()=>void noticeRuntime.unlock()}>解锁网页声音</button>}</span><button aria-label={theme === "dark" ? "切换浅色主题" : "切换暗色主题"} onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>{theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}</button>
+    {open && <nav id="app-menu" className="app-menu" ref={menu} aria-label="应用导航" onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget as Node) && e.relatedTarget !== button.current) setOpen(false); }}><NavLink to={chartReturn()}>图表</NavLink><NavLink to={notificationReturn()}>图表通知</NavLink><NavLink to="/signals">兼容历史{pending>0?`（${pending} 待手机确认）`:""}</NavLink><NavLink to="/replay">历史演练</NavLink><NavLink to="/settings">设置</NavLink><small>兼容功能</small><NavLink to="/legacy/monitoring">旧版监控</NavLink><hr /><button onClick={logout}>退出登录</button></nav>}
   </header>;
-}
-
-function playAlertTone(context: AudioContext) {
-  const osc = context.createOscillator(), gain = context.createGain();
-  osc.connect(gain);
-  gain.connect(context.destination);
-  gain.gain.value = 0.12;
-  osc.frequency.value = 660;
-  osc.onended = () => { osc.disconnect(); gain.disconnect(); };
-  osc.start();
-  osc.stop(context.currentTime + 0.5);
 }
 
 function Shell({ logout }: { logout: () => void }) {
@@ -207,11 +199,9 @@ function Shell({ logout }: { logout: () => void }) {
     [watches, setWatches] = useState<Watch[]>([]),
     [signals, setSignals] = useState<Signal[]>([]),
     [error, setError] = useState("");
-  const [health, setHealth] = useState<any>({}),
-    [sound, setSound] = useState(localStorage.getItem("mw.web-sound") === "on");
+  const [health, setHealth] = useState<any>({});
+  const notices=useNotices(), noticeState=useNoticeState();
   const { theme } = useApp();
-  const audio = useRef<AudioContext | null>(null),
-    known = useRef<Set<string> | null>(null);
   const refreshRunning = useRef(false);
   const refreshAgain = useRef(false);
   const refresh = useCallback(async () => {
@@ -246,19 +236,6 @@ function Shell({ logout }: { logout: () => void }) {
       events.close();
     };
   }, [refresh]);
-  useEffect(() => {
-    const ids = new Set(signals.map((s) => s.id));
-    if (
-      sound &&
-      known.current &&
-      signals.some((s) => !known.current!.has(s.id) &&
-        (!s.evidence?.chart_alert || s.evidence.config.notify_web)) &&
-      audio.current
-    ) {
-      playAlertTone(audio.current);
-    }
-    known.current = ids;
-  }, [signals, sound]);
   const location = useLocation();
   useEffect(() => {
     document
@@ -271,10 +248,7 @@ function Shell({ logout }: { logout: () => void }) {
         跳至主要内容
       </a>
       <div className="main-shell">
-        <AppHeader logout={logout} sound={sound} toggleSound={async () => {
-          if (!sound) { audio.current ??= new AudioContext(); await audio.current.resume(); }
-          setSound(!sound); localStorage.setItem("mw.web-sound", !sound ? "on" : "off");
-        }} />
+        <AppHeader logout={logout} sound={noticeState.enabled} toggleSound={() => {void notices.setEnabled(!noticeState.enabled);}} />
         <main id="main-content" tabIndex={-1}>
           {matchMedia("(pointer:coarse)").matches && <p className="muted" role="note">专业图表在手机上只读看盘；编辑功能请使用桌面浏览器。</p>}
           {error && (
@@ -305,12 +279,7 @@ function Shell({ logout }: { logout: () => void }) {
             />
             <Route
               path="/settings/:section"
-              element={<SettingsPage health={health} instruments={instruments} previewSound={async () => {
-                audio.current ??= new AudioContext();
-                await audio.current.resume();
-                if (audio.current.state !== "running") throw new Error("浏览器未允许播放声音，请检查站点声音权限。");
-                playAlertTone(audio.current);
-              }} />}
+              element={<SettingsPage health={health} instruments={instruments} previewSound={async () => { await notices.preview(); }} />}
             />
             <Route
               path="*"
@@ -804,13 +773,15 @@ function Signals({
   refresh: () => Promise<void>;
 }) {
   const [error, setError] = useState("");
-  const location = useLocation(), target = new URLSearchParams(location.search).get("signal");
+  const location = useLocation(), navigate=useNavigate(), target = new URLSearchParams(location.search).get("signal");
   const [located, setLocated] = useState<Signal | null>(null), [locating, setLocating] = useState(false);
   const focusedTarget = useRef<string | null>(null);
   useEffect(() => { setLocated(null); focusedTarget.current = null; }, [target]);
   useEffect(() => {
     if (!target) return;
     const controller = new AbortController(); setLocating(true);
+    api('/notification-center/resolve?signal='+encodeURIComponent(target),undefined,controller.signal)
+      .then(result=>{if(!controller.signal.aborted&&result.domain==='pro_chart'&&result.destination)navigate(result.destination,{replace:true});}).catch(()=>{});
     api<Signal[]>("/signals?signal=" + encodeURIComponent(target), undefined, controller.signal).then(rows => {
       if (!controller.signal.aborted) { setLocated(rows[0] || null); setError(rows.length ? "" : "该通知不存在或已不可用，仍可查看其他通知。"); }
     }).catch(e => { if (!controller.signal.aborted) setError(String(e)); }).finally(() => { if (!controller.signal.aborted) setLocating(false); });
@@ -831,8 +802,8 @@ function Signals({
       <div className="page-heading">
         <div>
           <span className="eyebrow">SIGNAL JOURNAL</span>
-          <h1>通知</h1>
-          <p>核对触发价格与时间，确认你已经看到这次机会。</p>
+          <h1>兼容提醒历史</h1>
+          <p>旧版记录仅作查询。专业图表的即时通知请从图表通知中心查看；下面的停止动作仅影响此事件后续手机提醒。</p>
         </div>
       </div>
       {error && (
@@ -847,7 +818,7 @@ function Signals({
             <article className="signal-card" key={s.id} id={"signal-" + s.id} tabIndex={-1} data-target={s.id === target}>
               <div className="signal-top">
                 <span className={`status ${s.ack_at ? "cancelled" : "active"}`}>
-                  {s.ack_at ? "已确认" : "待确认"}
+                  {s.ack_at ? "手机提醒已停止" : "待手机确认"}
                 </span>
                 <time>{date(s.occurred_at)}</time>
               </div>
@@ -910,7 +881,7 @@ function Signals({
                     onClick={() => ack(s.notification_id)}
                   >
                     <Check size={16} />
-                    确认已看到
+                    停止此事件后续手机提醒
                   </button>
                 )}
               </div>
@@ -1429,7 +1400,7 @@ function SettingsPage({ health, instruments, previewSound }: { health: any; inst
         </section>}
         {section === "sound" && <section className="panel settings-card">
           <h2>网页声音</h2>
-          <p>试听会在当前浏览器播放半秒提示音。接收新信号的声音提醒，请在页面顶部开启网页声音。</p>
+          <p>试听会在当前浏览器播放半秒提示音。专业图表业务告警的自动声音由通知中心统一管理；请开启声音并在当前浏览器解锁。</p>
           <button type="button" className="secondary" disabled={audioBusy} onClick={async () => {
             setAudioBusy(true); setAudioMessage("");
             try { await previewSound(); setAudioMessage("试听已播放；若未听到，请检查设备音量和站点声音权限。"); }

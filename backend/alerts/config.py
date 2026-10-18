@@ -28,6 +28,11 @@ class Settings(BaseSettings):
                     't': 'on', 'f': 'off'}.get(value, value)
         return value
 
+    notification_center_sources_enabled: bool = True
+    notification_center_enabled: bool = True
+    notification_center_projection_enabled: bool = True
+    notification_center_sound_enabled: bool = True
+
     mcp_enabled: bool = False
     mcp_allowed_hosts: list[str] = ["localhost", "localhost:*", "127.0.0.1", "127.0.0.1:*", "[::1]", "[::1]:*"]
     mcp_allowed_origins: list[str] = ["http://localhost", "http://localhost:*", "http://127.0.0.1", "http://127.0.0.1:*"]

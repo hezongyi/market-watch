@@ -148,6 +148,11 @@ services:
       ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-stream
     depends_on:
       api: {condition: service_healthy}
+  notification-projector:
+    <<: *app
+    command: ["python", "-m", "alerts.notification_center_worker"]
+    depends_on:
+      api: {condition: service_healthy}
   notify-worker:
     <<: *app
     command: ["python", "-m", "alerts.notify"]

@@ -452,6 +452,7 @@ const MWNativeNavigation = (() => {
         const cache = thread._cache,
           sourceGeneration = thread.mw_sourceGeneration;
         let settled = false;
+        const noticeAttempt=crypto.randomUUID();
         const valid = () =>
           !settled &&
           !thread._destroyed &&
@@ -477,6 +478,11 @@ const MWNativeNavigation = (() => {
           }
           if(error?.code === "NATIVE_HISTORY_CAPACITY_EXCEEDED") thread.mw_capacityRequest = request;
           thread.mw_failedCursor = thread.mw_requestCursor;
+          if(error?.code!=='HISTORY_CANCELLED'&&!error?.notice_source_id)
+            globalThis.dispatchEvent(new CustomEvent('mw-history-occurrence',{detail:{attempt_id:noticeAttempt,
+              source_kind:error?.code==='NATIVE_HISTORY_CAPACITY_EXCEEDED'?'capacity':'history',
+              instrument:info.ticker,timeframe:resolution,code:'HISTORY_READ_FAILED',message:String(error),
+              evidence:{reason_code:error?.code||'HISTORY_UNAVAILABLE',count:request.countBack,from:request.from,to:request.to,first_data_request:request.firstDataRequest}}}));
           complete(failure, error);
           globalThis.dispatchEvent(new CustomEvent("mw-history-state", {detail:{key:thread.mw_key}}));
         };
@@ -504,6 +510,10 @@ const MWNativeNavigation = (() => {
                 0,
               );
               admit(thread, extra, undefined, true);
+              if(thread.mw_lastFailure)globalThis.dispatchEvent(new CustomEvent('mw-history-occurrence',{detail:{
+                attempt_id:noticeAttempt,source_kind:thread.mw_lastFailure.error?.code==='NATIVE_HISTORY_CAPACITY_EXCEEDED'?'capacity':'history',
+                instrument:info.ticker,timeframe:resolution,code:'HISTORY_READ_FAILED',recovered:true,
+                message:'当前有效图格已成功接收历史',evidence:{received:bars.length}}}));
               thread.mw_lastFailure = null;
               thread.mw_initialRecoveryAttempted = false;
               globalThis.dispatchEvent(new CustomEvent("mw-history-state", {detail:{key:thread.mw_key}}));

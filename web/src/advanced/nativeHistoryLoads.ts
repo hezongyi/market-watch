@@ -62,11 +62,11 @@ export async function loadNativeHistory(
       const state = reply.load;
       if (["failed", "cancelled", "expired"].includes(state?.state)) {
         const error = state.error;
-        throw new ApiError(
+        throw Object.assign(new ApiError(
           error?.message || "历史加载已结束",
           error?.status || 503,
           error?.code || "HISTORY_UNAVAILABLE",
-        );
+        ), state.state==='failed'?{notice_source_id:'native_history:'+handle}:{});
       }
       progress({
         phase:

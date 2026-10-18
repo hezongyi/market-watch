@@ -1,3 +1,4 @@
+import "../notifications/native";
 import { createRoot } from "react-dom/client";
 import { useState } from "react";
 import { ChartAlertsPanel, type AlertDraft } from "./ChartAlertsPanel";
@@ -38,6 +39,7 @@ declare global {
       mount: (node: HTMLElement) => void;
       unmount: (node: HTMLElement) => void;
       report: (error: unknown) => void;
+      page?: string; title?: string; icon?: string;
     },
   ) => Promise<Shell>;
   var MWNativeAlerts: { attach: typeof attach };

@@ -45,3 +45,10 @@ export function chartReturn() {
   const path = safeNext(sessionStorage.getItem("mw.chart-return.v1"));
   return path.startsWith("/advanced-charts") ? path : defaultChart;
 }
+
+export function notificationReturn(eventId?: string) {
+  const url = new URL(chartReturn(), 'https://app.invalid');
+  url.searchParams.set('panel','notifications');
+  if(eventId)url.searchParams.set('event',eventId);else url.searchParams.delete('event');
+  return url.pathname+url.search+url.hash;
+}

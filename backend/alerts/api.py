@@ -143,12 +143,12 @@ def login(body: Credentials, response: Response, request: Request):
         samesite="strict",
         max_age=settings.session_hours * 3600,
     )
-    return {"csrf": csrf}
+    return {"csrf": csrf, "subject": "admin"}
 
 
 @app.get("/api/session")
 def session(csrf=Depends(authenticated)):
-    return {"csrf": csrf}
+    return {"csrf": csrf, "subject": "admin"}
 
 
 @app.post("/api/logout", dependencies=[Depends(authenticated)])
@@ -1055,3 +1055,8 @@ app.include_router(live_router(authenticated))
 from .chart_alert_api import router as chart_alert_router  # noqa: E402
 
 app.include_router(chart_alert_router(authenticated))
+
+
+from .notification_center_api import router as notification_center_router  # noqa: E402
+
+app.include_router(notification_center_router(authenticated))

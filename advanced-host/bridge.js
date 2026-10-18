@@ -14,6 +14,7 @@ const pending = new Map();
 // Only draft recovery requires a native confirmation.
 const acknowledgedNotices = new Set();
 let ordinaryNotices;
+let noticeUI, noticeState, noticeOpenEvent;
 let activeNotices = [], noticeDialogOpen = false, chartMenu, indicatorPicker, alertBridge, alertUI, alertUISession, alertUIDraft, alertUIWorkspace, alertUIAttach, dataCenter;
 let invalidateAlertUI = () => {};
 // Lazy loading keeps ordinary datafeed consumers independent of the renderer.
@@ -277,6 +278,20 @@ function rememberIndicatorBinding(ticker,res,page,{correction=false}={}) {
   });
   void indicatorCoordinator?.sync();
 }
+// Facts originate at actual terminal attempts, never from React snapshots or error text.
+function emitNotice(fault,recovered=false){
+  send({type:'notice-source',workspace_id:alertUIWorkspace,session:alertUISession,epoch:workspaceEpoch,fault,recovered});
+}
+function indicatorFault(consumer,error,attempt_id){
+  const binding=indicatorBindings.get(indicatorKey(consumer.chart.symbol(),consumer.chart.resolution()))||{};
+  const scope=MWNativeIndicatorResults.scope(consumer.chart,consumer.id);
+  return {source_kind:'indicator',attempt_id:attempt_id||crypto.randomUUID(),code:'INDICATOR_TERMINAL_FAILED',
+    title:'图格指标计算失败',message:String(error?.message||'当前可见范围已成功计算'),
+    context:{chart_index:consumer.index,consumer:consumer.id,instrument:consumer.chart.symbol(),timeframe:consumer.chart.resolution()},
+    evidence:{reason_code:error?.code||'INDICATOR_FAILED',params:consumer.params,algorithm_version:consumer.meta.version,
+      input_revision:binding.inputRevision,visible_from:scope?.first,visible_to:scope?.last,
+      calculation_origin:binding.calculationStart,accepted_scope:consumer.acceptedScope||null}};
+}
 function startIndicatorCoordinator(catalog) {
   indicatorCoordinator=chartIndicatorCoordinator(widget,catalog,{
     read:(symbol,res,args,current)=>query(symbol,res,args,Date.now()+30000,current),
@@ -306,6 +321,8 @@ function startIndicatorCoordinator(catalog) {
     status:(consumer,state,error)=>send({type:'chart-indicator-state',epoch:workspaceEpoch,index:consumer.index,
       id:consumer.id,name:consumer.meta.label || consumer.id,state,error:error?.message || '',
       previousParams:MWNativeIndicatorResults.scope(consumer.chart,consumer.id)?.transition?.params || null}),
+    occurrence:(error,consumer,attempt)=>{if(!['HISTORY_CANCELLED','DISPLAY_SNAPSHOT_EXPIRED'].includes(error.code))emitNotice(indicatorFault(consumer,error,attempt));},
+    recovered:consumer=>emitNotice(indicatorFault(consumer),true),
     report:error=>{if(error.code!=='HISTORY_CANCELLED')send({type:'error',error:'指标读取失败：'+String(error)});},
     presentation:(ticker,res,page)=>{swingStore().publish(ticker,res,page,swingStore().ticket());swingDisplay?.refresh();},
     leases:leases=>{if(leases.length)void request({client:clientId,leases},'indicator-demand-update').catch(error=>send({type:'error',error:String(error)}));},
@@ -372,7 +389,7 @@ async function recoverDisplaySnapshot(ticker,res,token,retry=false){
   const epoch=workspaceEpoch;
   const charts=ready ? Array.from({length:widget.chartsCount()},(_,index)=>({index,chart:widget.chart(index)}))
     .filter(({chart})=>chartUsesSymbol(chart,ticker,res)) : [];
-  const entry={token,state:'preparing',prune(){
+  const entry={token,attempt_id:crypto.randomUUID(),state:'preparing',prune(){
     for(let offset=charts.length-1;offset>=0;offset--){
       const {index,chart}=charts[offset];
       if(epoch===workspaceEpoch && index<widget.chartsCount() &&
@@ -397,7 +414,7 @@ async function recoverDisplaySnapshot(ticker,res,token,retry=false){
       try {
         if(await refreshProviderDisplayCredential(ticker,res,token,charts,current)) {
           if(current()) {
-            entry.state='ready';notify('ready');send({type:'feed-poll-state',key:'display:'+key,error:''});
+            entry.state='ready';notify('ready');emitNotice({source_kind:'indicator',attempt_id:entry.attempt_id,code:'SNAPSHOT_RECOVERY_FAILED',title:'图表快照已恢复',message:'当前有效图格已成功恢复',context:{instrument:ticker,timeframe:res,consumer:'snapshot'}},true);send({type:'feed-poll-state',key:'display:'+key,error:''});
           }
           return;
         }
@@ -422,7 +439,7 @@ async function recoverDisplaySnapshot(ticker,res,token,retry=false){
           for(const sub of subscriptions.values())if(indicatorKey(sub.symbol,sub.res)===key){
             sub.needsHistoryReload=false;registerMarketBar(sub);
           }
-          entry.state='ready';notify('ready');send({type:'feed-poll-state',key:'display:'+key,error:''});
+          entry.state='ready';notify('ready');emitNotice({source_kind:'indicator',attempt_id:entry.attempt_id,code:'SNAPSHOT_RECOVERY_FAILED',title:'图表快照已恢复',message:'当前有效图格已成功恢复',context:{instrument:ticker,timeframe:res,consumer:'snapshot'}},true);send({type:'feed-poll-state',key:'display:'+key,error:''});
           return;
         }
       }catch(error){
@@ -438,6 +455,7 @@ async function recoverDisplaySnapshot(ticker,res,token,retry=false){
   }};
   entry.promise.then(cancel,error=>{if(current()){
     entry.state='error';notify('error',String(error));
+    emitNotice({source_kind:'indicator',attempt_id:entry.attempt_id,code:'SNAPSHOT_RECOVERY_FAILED',title:'图表快照恢复失败',message:String(error),context:{instrument:ticker,timeframe:res,consumer:'snapshot'},evidence:{input_revision:binding?.inputRevision,calculation_origin:binding?.calculationStart}});
     send({type:'feed-poll-state',key:'display:'+key,error:String(error)});
   }else cancel();});
   if(displayRecoveries.size>64)displayRecoveries.delete(displayRecoveries.keys().next().value);
@@ -806,6 +824,13 @@ globalThis.MWNativeReserve?.configure(async ({symbol, resolution, before, screen
 }, nativeReserveWarmup);
 globalThis.MWNativeNavigation?.configure(nativeReserveWarmup);
 
+globalThis.addEventListener('mw-history-occurrence',({detail})=>{
+  if(!ready||loading)return;
+  const charts=Array.from({length:widget.chartsCount()},(_,index)=>({index,chart:widget.chart(index)}));
+  for(const {index,chart}of charts)if(chartUsesSymbol(chart,detail.instrument,detail.timeframe))emitNotice({
+    source_kind:detail.source_kind,attempt_id:detail.attempt_id+':'+index,code:detail.code,title:detail.source_kind==='capacity'?'图格历史容量受限':'图格历史读取失败',
+    message:detail.message,context:{chart_index:index,instrument:detail.instrument,timeframe:detail.timeframe},evidence:detail.evidence},detail.recovered===true);
+});
 globalThis.addEventListener('mw-navigation-error', event => {
   if (event.detail?.code === 'NATIVE_HISTORY_CAPACITY_EXCEEDED')
     send({type:'capacity-notice',epoch:workspaceEpoch,key:'operation',phase:'failed',message:String(event.detail)});
@@ -2019,6 +2044,7 @@ function boot(
   let attachingAlerts = 0, alertAttachQueue = Promise.resolve(), alertUIStopped = false;
   invalidateAlertUI = () => {
     attachingAlerts++;
+    noticeUI?.destroy(); noticeUI = undefined;
     alertUI?.destroy(); alertUI = undefined;
   };
   // Serialize private widgetbar mutations. A cancelled attach must finish and
@@ -2028,6 +2054,7 @@ function boot(
     const attempt = ++attachingAlerts, session = alertUISession, workspaceId = alertUIWorkspace;
     alertAttachQueue = alertAttachQueue.then(async () => {
     if (attempt !== attachingAlerts || alertUIStopped) return;
+    noticeUI?.destroy(); noticeUI = undefined;
     alertUI?.destroy(); alertUI = undefined;
     try {
       const instance = await MWNativeAlerts.attach({widget, scope: {workspace_id: workspaceId, session}, readonly,
@@ -2039,6 +2066,18 @@ function boot(
       if (attempt !== attachingAlerts || session !== alertUISession || alertUIStopped) {instance.destroy();return;}
       alertUI = instance; instance.theme(widget.getTheme());
       if (restoreAlertsPanel) instance.open();
+      try {
+        const scope={workspace_id:workspaceId,session,epoch:workspaceEpoch};
+        const notification=await MWNativeNotifications.attach({widget,scope,state:noticeState,
+          request:query=>request({...scope,...query},'notice-center-rpc',()=>attempt===attachingAlerts && session===alertUISession),
+          panelChanged:(open,event)=>send({type:'notice-center-panel',...scope,open,event}),
+          locate:row=>send({type:'notice-center-locate',...scope,event_id:row.id}),
+          report:error=>send({type:'error',error:String(error)})});
+        if(attempt!==attachingAlerts || session!==alertUISession || alertUIStopped){notification.destroy();return;}
+        noticeUI=notification;send({type:'notice-center-ready',...scope});
+        if(noticeOpenEvent!==undefined){notification.open(noticeOpenEvent || undefined);noticeOpenEvent=undefined;}
+      } catch(error) {send({type:'notice-center-unavailable',workspace_id:workspaceId,session,error:String(error)});}
+
     } catch (error) {if (attempt === attachingAlerts && !alertUIStopped) send({type:'error', error:'原生告警接入失败：' + String(error)});}
     });
     return alertAttachQueue;
@@ -2331,7 +2370,7 @@ function boot(
       if (!readonly) indicatorPicker = chartIndicatorPicker(widget, catalog, (e) =>
         send({type: "error", error: String(e)}), () => dataCenter?.nativeUi);
       // Public left-aligned buttons retain their creation order in the header.
-      if (!readonly) dataCenter = chartDataCenter({widget, appOrigin: parentOrigin,
+      if (!readonly) dataCenter = chartDataCenter({occurrence:emitNotice,widget, appOrigin: parentOrigin,
         workspace: () => currentNativeWorkspace, epoch: () => workspaceEpoch, send, searchSymbols: searchNativeSymbols,
         timezone: () => {const chart=widget.activeChart(),zone=chart.getTimezoneApi().getTimezone().id;
           return zone === "exchange" ? presentationFor(chart.symbol())?.timezone || "UTC" : zone;},
@@ -2362,9 +2401,8 @@ function boot(
       widget.symbolSync().setValue(false);
       if (workspace && !readonly) {
         try {
-          await new Promise((resolve) =>
-            widget.activeChart().dataReady(resolve),
-          );
+          await Promise.race([new Promise(resolve=>widget.activeChart().dataReady(resolve)),
+            new Promise((_,reject)=>setTimeout(()=>reject(Error('首次图格历史未能就绪；请在通知中心查看并重试')),15000))]);
           // Leave the initial ready dispatch before binding the server identity.
           await new Promise((resolve) => setTimeout(resolve, 0));
           initialNativeSave = true;
@@ -2628,6 +2666,8 @@ addEventListener("message", async (e) => {
   )
     return;
   const m = e.data;
+  if(m.type==='notice-center-state' && m.session===alertUISession && m.workspace_id===alertUIWorkspace){noticeState=m.state;noticeUI?.update(m.state);return;}
+  if(m.type==='notice-center-open'){noticeOpenEvent=typeof m.event_id==='string'?m.event_id:'';if(noticeUI){noticeUI.open(noticeOpenEvent || undefined);noticeOpenEvent=undefined;}return;}
   if (m.type === "data-center-open" && ready && !loading && typeof m.location === "string" && m.location.length <= 4000) { dataCenter?.open(m.location); return; }
   if (m.type === 'chart-alert-ui-scope') {
     if (typeof m.session !== 'string' || typeof m.workspace_id !== 'string') return;
@@ -2652,11 +2692,6 @@ addEventListener("message", async (e) => {
         text: entry.text.replace(/^(?:Error:\s*)+/, ""), recover: entry.recover === true && !nativeReadonly}));
     const live = new Set(activeNotices.map(entry => entry.key));
     for (const key of acknowledgedNotices) if (!live.has(key)) acknowledgedNotices.delete(key);
-    if (activeNotices.some(entry => !entry.recover) || ordinaryNotices) {
-      ordinaryNotices ||= chartNotices(document);
-      ordinaryNotices.theme(widget?.getTheme?.() || "Dark");
-      ordinaryNotices.update(activeNotices.map(entry => ({...entry,id:entry.key})));
-    }
     chartMenu?.setDraftBlocked(m.draftBlocked === true);
     showNextNotice();
     return;
@@ -2817,6 +2852,7 @@ addEventListener("message", async (e) => {
     if(chart.symbol()===m.symbol && chart.resolution()===m.resolution) MWNativeNavigation.recoverInitial(chart,true);
   } else if (m.type === "init" && !widget) {
     alertUISession = m.alert_ui_session;
+    noticeState = m.notice_state;
     alertUIDraft = m.alert_ui_draft;
     alertUIWorkspace = String(m.workspace?.id);
     MWNativeNavigation.setCapabilities(m.history_capabilities);
@@ -2846,6 +2882,7 @@ addEventListener("pagehide", () => {
   compositeDisplayBatches.dispose();
   indicatorCoordinator?.dispose();
   ordinaryNotices?.dispose();
+  noticeUI?.destroy();
   alertUI?.destroy();
   alertBridge?.destroy();
   watchlistLayout?.dispose();
