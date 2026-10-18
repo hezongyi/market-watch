@@ -295,6 +295,26 @@ const assert = require("node:assert/strict"),
   assert.equal(staged[2].event_id,secondId);
   const group = [...durable].find(([key])=>key.startsWith('meta:admin:fault:'))[1];
   assert.equal(group.open,true);assert.equal(group.latest,secondId);
+  const resetCase = fixture();
+  const regularAPI = sandbox.testAPI;
+  let resetOnce = true;
+  resetCase.runtime.state.gap = "已有本机记录未能保存";
+  sandbox.testAPI = async (path, ...args) => {
+    if (path === "/notification-center/health")
+      return {at: Date.now(), display_enabled: true, state: "ok"};
+    if (resetOnce && path.startsWith("/notification-center/changes")) {
+      resetOnce = false;
+      throw new sandbox.TestApiError("epoch changed", 409, "NOTICE_RESET");
+    }
+    return regularAPI(path, ...args);
+  };
+  await resetCase.runtime.cycle(0);
+  assert.match(resetCase.runtime.state.status, /日志已换代/);
+  assert.equal(resetCase.runtime.state.gap, "已有本机记录未能保存");
+  await resetCase.runtime.cycle(0);
+  assert.equal(resetCase.runtime.state.status, "已同步");
+  assert.equal(resetCase.runtime.state.gap, "已有本机记录未能保存",
+    "successful reset clears transient progress without hiding persistent storage loss");
   console.log(
     "PASS notification intake isolation, permanent rejection, accepted projection gap and business outcome",
   );

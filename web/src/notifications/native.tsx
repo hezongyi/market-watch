@@ -252,7 +252,9 @@ async function attach({
     [...doc.querySelectorAll<HTMLElement>('button,[role="button"]')].find(
       (node) =>
         node.textContent?.trim() === entryText() &&
-        node.getClientRects().length > 0,
+        node.getClientRects().length > 0 &&
+        doc.defaultView!.getComputedStyle(node).visibility === "visible" &&
+        !node.closest('[aria-hidden="true"],[inert]'),
     );
   const sync = (state: NoticeState) => {
     current = state;

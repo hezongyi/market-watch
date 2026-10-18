@@ -902,13 +902,14 @@ export class NoticeRuntime {
       ) {
         this.after = "";
         this.epoch = "";
+        this.nextHealth = 0;
         this.queue = [];
         this.candidates.clear();
         this.patch({
           epoch: "",
           events: [],
           bubble: null,
-          gap: "通知日志范围已变化，正在重建；历史不会重新提示或响铃",
+          status: "通知日志已换代，正在恢复；历史不会重新提示或响铃",
         });
         this.schedule(generation, 0);
       } else if (error instanceof ApiError && error.status === 401) {

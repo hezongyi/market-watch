@@ -120,7 +120,7 @@
 .nc-filters {
   padding: 10px 14px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 8px;
   border-bottom: 1px solid var(--nc-border);
 }
@@ -134,6 +134,9 @@
 }
 .nc-filters input,
 .nc-filters select {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
   width: 100%;
   color: var(--nc-text);
 }
