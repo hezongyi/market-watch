@@ -13,7 +13,7 @@ const path = require('node:path');
     await page.setContent(`<div data-test-id-widget-type="watchlist">
       <div style="position:absolute;right:20px;top:20px"><button aria-label="添加商品代码" style="width:28px;height:28px">+</button></div>
       <div class="widgetbar-widgetbody" style="position:absolute;left:300px;top:100px;width:400px;height:200px;contain:strict;overflow:hidden">
-      <div id="native-columns"><button data-column-type="short_name">商品</button><button data-column-type="last_price">最新价</button><button class="columnsMenu-test">更多</button></div>
+      <div id="native-columns" style="display:flex;flex-direction:row-reverse"><button data-column-type="short_name">商品</button><button data-column-type="last_price">最新价</button><button class="columnsMenu-test">更多</button></div>
       <div data-symbol-full="MWP:EURUSD"><span class="cell-test last-test"><span class="inner-test">1.12<span class="uptick-test">234</span></span></span></div>
       </div>
     </div>`);
@@ -40,6 +40,8 @@ const path = require('node:path');
         }
       };
       window.TradingView = {version: () => '6b804c486857f27920cf761aa7eb6e29d9bb6362'};
+      window.sortUpdates = 0;
+      window.watchlistSymbols = ['###分区甲','MWP:ZETA','MWP:BETA','MWP:ALPHA','###分区乙','MWP:DELTA','MWP:CHARLIE'];
       // Native controls rely on delegation through their original React root.
       document.querySelector('#native-columns').addEventListener('click', event => {
         if (event.target.closest('.columnsMenu-test')) {
@@ -52,11 +54,42 @@ const path = require('node:path');
     await page.evaluate(() => {
       window.layout = MWWatchlistLayout.attach({
         createButton: () => document.createElement('button'), removeButton() {},
-      }, error => { throw error; });
+        watchList: async () => ({
+          getActiveListId: () => 'test-list',
+          getList: () => window.watchlistSymbols,
+          updateList: (_id, symbols) => { window.sortUpdates++; window.watchlistSymbols = symbols; },
+        }),
+      }, error => { throw error; }, name => name, ticker => ({
+        'MWP:ZETA':'blue','MWP:BETA':'red','MWP:ALPHA':'red',
+        'MWP:DELTA':'blue','MWP:CHARLIE':'red',
+      }[ticker]));
     });
     await page.waitForTimeout(50);
     assert.ok(await page.evaluate(() => observerCalls <= 2),
       'numeric quotes must settle; the adapter must not observe its own changes forever');
+    const sortButton=page.getByRole('button',{name:'按旗标排序'});
+    assert(await sortButton.isVisible(),'the flag sort control stays beside the product header');
+    assert.equal(await sortButton.evaluate(button=>button.style.position),'absolute',
+      'the control overlays the header without taking a flex column slot');
+    assert.equal(await sortButton.evaluate(button=>button.getBoundingClientRect().width),16,
+      'the control matches the row flag width');
+    assert.equal(await sortButton.evaluate(button=>button.getBoundingClientRect().height),24,
+      'the control matches the row flag height');
+    assert(await sortButton.evaluate(button=>button.getBoundingClientRect().right <=
+      button.parentElement.querySelector('[data-column-type="short_name"]').getBoundingClientRect().left),
+      'the flag is visually before the product label');
+    assert.equal(await page.evaluate(()=>sortUpdates),0,'sorting is not applied until requested');
+    await sortButton.evaluate(button => button.dispatchEvent(new PointerEvent('pointerenter')));
+    assert.equal(await sortButton.evaluate(button=>button.style.color),'rgb(174, 177, 186)',
+      'the gray flag brightens slightly on hover');
+    await sortButton.evaluate(button => button.click());
+    await page.waitForFunction(()=>sortUpdates===1);
+    assert.deepEqual(await page.evaluate(()=>watchlistSymbols),[
+      '###分区甲','MWP:ALPHA','MWP:BETA','MWP:ZETA',
+      '###分区乙','MWP:CHARLIE','MWP:DELTA',
+    ],'red then blue symbols sort alphabetically inside each section');
+    await page.waitForTimeout(40);
+    assert.equal(await page.evaluate(()=>sortUpdates),1,'a completed click does not keep re-sorting');
     const read = () => page.locator('.last-test').evaluate(cell => ({
       text:cell.textContent,raw:cell.dataset.mwRawPrice,digit:cell.dataset.mwPriceDigit,
       count:cell.querySelectorAll('sup').length,aria:cell.getAttribute('aria-label'),

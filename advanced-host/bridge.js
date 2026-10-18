@@ -2327,7 +2327,7 @@ function boot(
         send({type: "diagnostic", source: "watchlist-layout", error: String(error)}), ticker => {
           const meta=presentationFor(ticker);
           return meta?.display_symbol || meta?.symbol;
-        });
+        }, ticker => symbolFlags?.colorFor?.(ticker));
       if (!readonly) indicatorPicker = chartIndicatorPicker(widget, catalog, (e) =>
         send({type: "error", error: String(e)}), () => dataCenter?.nativeUi);
       // Public left-aligned buttons retain their creation order in the header.
@@ -2390,7 +2390,7 @@ function boot(
         chartMenu = chartThemeMenu(widget, (e) =>
           send({ type: "error", error: String(e) }),
           grid, [
-            ...[["图表","charts"],["通知","signals"],["历史演练","replay"],["设置","settings"],["兼容功能 · 旧版监控","legacy"]].map(([label,action]) => ({label, action, run:() => send({type:"workspace-action",action})})),
+            ...[["通知","signals"],["历史演练","replay"],["设置","settings"],["兼容功能 · 旧版监控","legacy"]].map(([label,action]) => ({label, action, run:() => send({type:"workspace-action",action})})),
             {label: "历史数据容量", run: () => send({type:"history-capacity-open",usage:MWNativeNavigation.diagnostics().resident})},
             ...(!readonly ? [{label: "保存样式", title: "保存图表样式模板", run: async () => {
               try {
@@ -2414,10 +2414,6 @@ function boot(
                 send({ type: "error", error: String(error) });
               }
             }}] : []),
-            {label: "刷新历史", title: "载入新发布历史，保留柱宽与查看位置", run: async () => {
-              await refreshProviderHistoryCorrections();
-              await refreshManagedHistory();
-            }},
             {label: "修改密码", run: () => chartMenu.changePassword()},
             {label: "退出登录", action:"logout", run: () => send({type: "workspace-action", action: "logout"})},
             ...(!readonly ? [{label: "复制恢复草稿", recovery: true,

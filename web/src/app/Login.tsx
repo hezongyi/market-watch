@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useMemo,
   useRef,
   useState,
   type FormEvent,
@@ -24,6 +25,7 @@ import "./app.css";
 // Adapted from Magic UI Dot Pattern (MIT); see MAGIC_UI_LICENSE.md.
 function DotBackground({ paused }: { paused: boolean }) {
   const host = useRef<HTMLDivElement>(null);
+  const pulseRefs = useRef<Array<SVGGElement | null>>([]);
   const [size, setSize] = useState({ width: 0, height: 0 });
   useEffect(() => {
     const observer = new ResizeObserver(([entry]) =>
@@ -35,14 +37,58 @@ function DotBackground({ paused }: { paused: boolean }) {
     if (host.current) observer.observe(host.current);
     return () => observer.disconnect();
   }, []);
-  const spacing = size.width <= 760 ? 28 : 32;
+  const spacing = size.width <= 760 ? 26 : 30;
   const cols = Math.ceil(size.width / spacing),
     rows = Math.ceil(size.height / spacing);
-  const count = Math.min(64, Math.floor((size.width * size.height) / 24000));
-  const dots = Array.from({ length: count }, (_, i) => ({
-    x: ((i * 37 + 11) % Math.max(cols, 1)) * spacing + spacing / 2,
-    y: ((i * 23 + 7) % Math.max(rows, 1)) * spacing + spacing / 2,
-  }));
+  const count = Math.min(112, Math.floor((size.width * size.height) / 18000));
+  const dots = useMemo(
+    () =>
+      Array.from({ length: count }, (_, i) => ({
+        x: ((i * 37 + 11) % Math.max(cols, 1)) * spacing + spacing / 2,
+        y: ((i * 23 + 7) % Math.max(rows, 1)) * spacing + spacing / 2,
+      })),
+    [cols, count, rows, spacing],
+  );
+  useEffect(() => {
+    let frame = 0;
+    const reset = () => {
+      pulseRefs.current.forEach((node) => {
+        node?.style.setProperty("--pointer-scale", "1");
+        node?.style.setProperty("--pointer-alpha", "1");
+      });
+    };
+    const move = (event: PointerEvent) => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        const rect = host.current?.getBoundingClientRect();
+        if (!rect) return;
+        const x = event.clientX - rect.left,
+          y = event.clientY - rect.top;
+        dots.forEach((dot, i) => {
+          const distance = Math.hypot(dot.x - x, dot.y - y),
+            influence = Math.max(0, 1 - distance / 150),
+            node = pulseRefs.current[i];
+          node?.style.setProperty(
+            "--pointer-scale",
+            (1 + influence * 0.72).toFixed(3),
+          );
+          node?.style.setProperty(
+            "--pointer-alpha",
+            (1 + influence * 0.35).toFixed(3),
+          );
+        });
+      });
+    };
+    window.addEventListener("pointermove", move, { passive: true });
+    document.addEventListener("mouseleave", reset);
+    return () => {
+      window.removeEventListener("pointermove", move);
+      document.removeEventListener("mouseleave", reset);
+      if (frame) cancelAnimationFrame(frame);
+      reset();
+    };
+  }, [dots]);
   return (
     <div
       ref={host}
@@ -74,11 +120,14 @@ function DotBackground({ paused }: { paused: boolean }) {
         {dots.map((p, i) => (
           <g key={i} transform={`translate(${p.x} ${p.y})`}>
             <g
+              ref={(node) => {
+                pulseRefs.current[i] = node;
+              }}
               className="dot-pulse"
               style={
                 {
-                  "--breath-duration": `${7 + (i % 6)}s`,
-                  "--breath-delay": `${-i * 0.71}s`,
+                  "--breath-duration": `${4.8 + (i % 5) * 0.55}s`,
+                  "--breath-delay": `${-i * 0.19}s`,
                 } as CSSProperties
               }
             >

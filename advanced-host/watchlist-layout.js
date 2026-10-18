@@ -162,6 +162,7 @@
     const headerRow = rowForHeader(header);
     const menu = [...(headerRow?.querySelectorAll("button") || []),
       ...root.querySelectorAll('button[class*="columnsMenu"],[data-name*="watchlist"][data-name*="menu"],button[aria-label*="更多"]')].find(button => {
+      if (button.matches(".mw-watchlist-sort, .mw-symbol-flag")) return false;
       if (button.matches('button[class*="columnsMenu"],button[data-name*="columns-menu"]')) return true;
       if (button === header || button === plus || button.disabled) return false;
       const value = text(button);
@@ -192,7 +193,81 @@
     return true;
   }
 
-  function attach(widget, report = () => {}, getName = () => undefined) {
+  function sortSymbols(symbols, colorFor, getName) {
+    const priority = color => color === "red" ? 0 : color === "blue" ? 1 : color ? 2 : 3;
+    const compare = (a, b) => {
+      const nameA = String(getName(a) || a), nameB = String(getName(b) || b);
+      return nameA.localeCompare(nameB, undefined, {sensitivity: "base", numeric: true}) || a.localeCompare(b);
+    };
+    const result = [];
+    let group = [];
+    const flush = () => {
+      group.sort((a, b) => priority(colorFor(a)) - priority(colorFor(b)) || compare(a, b));
+      result.push(...group);
+      group = [];
+    };
+    for (const symbol of symbols) {
+      if (typeof symbol === "string" && symbol.startsWith("###")) {
+        flush();
+        result.push(symbol);
+      } else group.push(symbol);
+    }
+    flush();
+    return result;
+  }
+
+  function sortControl(root, widget, colorFor, getName, report, positionedHeaders) {
+    const header = root.querySelector('button[data-column-type="short_name"]');
+    if (!header?.parentElement) return;
+    const parent = header.parentElement;
+    const host = parent.parentElement || parent;
+    let button = root.querySelector(".mw-watchlist-sort");
+    if (!button) {
+      button = root.ownerDocument.createElement("button");
+      button.type = "button";
+      button.className = "mw-watchlist-sort";
+      button.setAttribute("aria-label", "按旗标排序");
+      button.title = "按旗标排序";
+      button.innerHTML = '<svg viewBox="0 0 16 24" aria-hidden="true"><path d="M2.5 17.5v-11h11l-3.67 5.5 3.67 5.5z"/></svg>';
+      Object.assign(button.style, {
+        position: "absolute", zIndex: "5", display: "grid", placeItems: "center",
+        width: "16px", minWidth: "16px", height: "24px", margin: "0", padding: "0",
+        border: "0", borderRadius: "2px", background: "transparent", color: "#787b86",
+        cursor: "pointer", opacity: "0.82", transform: "translateY(-50%)",
+      });
+      const svg = button.querySelector("svg");
+      Object.assign(svg.style, {width: "16px", height: "24px", fill: "currentColor", pointerEvents: "none"});
+      button.addEventListener("pointerenter", () => { button.style.opacity = "1"; button.style.color = "#aeb1ba"; });
+      button.addEventListener("pointerleave", () => { button.style.opacity = "0.82"; button.style.color = "#787b86"; });
+      button.addEventListener("click", async event => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (button.disabled) return;
+        button.disabled = true;
+        try {
+          const api = await widget.watchList();
+          const id = api.getActiveListId();
+          const current = api.getList(id);
+          if (!id || !Array.isArray(current)) throw Error("无法读取当前自选表");
+          const sorted = sortSymbols(current, colorFor, getName);
+          if (sorted.some((symbol, index) => symbol !== current[index])) api.updateList(id, sorted);
+        } catch (error) { report(error); }
+        finally { button.disabled = false; }
+      });
+    }
+    if (button.parentElement !== host) host.append(button);
+    if (root.ownerDocument.defaultView.getComputedStyle(host).position === "static") {
+      if (!positionedHeaders.has(host)) positionedHeaders.set(host, host.style.position);
+      host.style.position = "relative";
+    }
+    const rowFlag = rowCells(root).map(row => row.querySelector(".mw-symbol-flag")).find(Boolean);
+    const parentBounds = host.getBoundingClientRect();
+    const anchorX = rowFlag?.getBoundingClientRect().left ?? root.getBoundingClientRect().left;
+    button.style.left = `${anchorX - parentBounds.left}px`;
+    button.style.top = "50%";
+  }
+
+  function attach(widget, report = () => {}, getName = () => undefined, colorFor = () => undefined) {
     const probe = widget?.createButton?.({align: "left", useTradingViewStyle: false});
     const doc = probe?.ownerDocument;
     if (probe) widget.removeButton(probe);
@@ -205,6 +280,7 @@
     }
     delete doc.documentElement.dataset.mwWatchlistFallback;
     let disposed = false, applying = false, pending = false;
+    const positionedHeaders = new Map();
     const refresh = () => {
       if (disposed || applying) return;
       const root = watchlistRoot(doc);
@@ -212,6 +288,7 @@
       applying = true;
       try {
         moveMenu(root);
+        sortControl(root, widget, colorFor, getName, report, positionedHeaders);
         const header = latestColumn(root);
         for (const row of rowCells(root)) {
           releaseHumanName(row, getName);
@@ -239,6 +316,10 @@
     return {refresh, dispose() {
       disposed = true; observer.disconnect(); resizeObserver?.disconnect();
       doc.documentElement.dataset.mwWatchlistFallback = "true";
+      doc.querySelectorAll(".mw-watchlist-sort").forEach(button => button.remove());
+      for (const [parent, position] of positionedHeaders)
+        if (parent.isConnected && parent.style.position === "relative") parent.style.position = position;
+      positionedHeaders.clear();
       for (const cell of doc.querySelectorAll("[data-mw-price-digit]")) delete cell.dataset.mwPriceDigit;
       doc.defaultView?.removeEventListener("resize", refresh);
       doc.removeEventListener("pointerover", refresh, true);
@@ -246,5 +327,5 @@
     }};
   }
 
-  globalThis.MWWatchlistLayout = {attach, wrapLastDigit};
+  globalThis.MWWatchlistLayout = {attach, wrapLastDigit, sortSymbols};
 })();

@@ -13,7 +13,7 @@ const assert = require("node:assert/strict"),
     errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.setContent(
-    '<div data-symbol-full="MWP:EURUSD"><span class="symbolName-v31">EURUSD</span></div>',
+    '<div data-symbol-full="MWP:EURUSD"><span class="symbolName-v31">EURUSD</span></div><div data-symbol-full="MWP:GBPUSD"><span class="symbolName-v31">GBPUSD</span></div>',
   );
   await page.addScriptTag({
     content:
@@ -45,8 +45,18 @@ const assert = require("node:assert/strict"),
       () => {},
     );
   });
-  const button = page.locator(".mw-symbol-flag");
+  const button = page.locator(".mw-symbol-flag").first();
+  const emptyButton = page.locator('.mw-symbol-flag[data-ticker="MWP:GBPUSD"]');
   await expect(button).toHaveAttribute("title", "红色收藏");
+  await page.locator('[data-symbol-full="MWP:GBPUSD"]').hover();
+  await expect(emptyButton).toHaveCSS("opacity", "1");
+  assert.equal(
+    await emptyButton.evaluate((n) => getComputedStyle(n).color),
+    "rgb(120, 123, 134)",
+  );
+  await page.mouse.move(300, 300);
+  await expect(button).toHaveCSS("opacity", "1");
+  await expect(emptyButton).toHaveCSS("opacity", "0");
   await page.evaluate(
     () =>
       (document.querySelector("[data-symbol-full]").dataset.symbolFull =

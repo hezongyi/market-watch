@@ -6,7 +6,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams, NavLink } from "react-router-dom";
 import { useApp } from "../app/context";
-import { defaultChart } from "../app/navigation";
+import { defaultChart, pageName } from "../app/navigation";
 import { centerLocation } from "../market-data/location";
 import { api, apiErrorDetails } from "../api";
 import "./advanced.css";
@@ -49,7 +49,27 @@ export default function AdvancedWorkspace() {
   const app = useApp(), appRef = useRef(app); appRef.current = app;
   const urlRef = useRef(appLocation); urlRef.current = appLocation;
   const capturing = useRef<{resolve: () => void; reject: (error: Error) => void} | null>(null);
-  const titleTimer = useRef<ReturnType<typeof setTimeout> | null>(null), titleText = useRef(""), titleLast = useRef(0), titleIdentity = useRef("");
+  const titleTimer = useRef<ReturnType<typeof setTimeout> | null>(null), titleText = useRef(""), titleQuote = useRef(""), titleLast = useRef(0), titleIdentity = useRef("");
+  const updateTitle = (immediate = false) => {
+    const layout = current.current?.name?.trim();
+    titleText.current = [titleQuote.current || pageName(appLocation.pathname), layout]
+      .filter(Boolean)
+      .join(" ");
+    const write = () => {
+      titleTimer.current = null;
+      if (document.title !== titleText.current) document.title = titleText.current;
+      titleLast.current = performance.now();
+    };
+    if (immediate) {
+      if (titleTimer.current) clearTimeout(titleTimer.current);
+      write();
+    } else if (!titleTimer.current) {
+      titleTimer.current = setTimeout(
+        write,
+        Math.max(0, 1000 - (performance.now() - titleLast.current)),
+      );
+    }
+  };
   const remember = (id: string, replace = false) => {
     localStorage.setItem("mw.last-workspace.v1", id);
     const query = new URLSearchParams(urlRef.current.search); query.delete("platform");
@@ -157,6 +177,9 @@ export default function AdvancedWorkspace() {
     setSyncNotices({});
     unsaved.current = false;
     current.current = row;
+    titleQuote.current = "";
+    titleIdentity.current = "";
+    updateTitle(true);
     alertUiSession.current = "";
     blocked.current =
       !mobile && !!localStorage.getItem("mw-tv-draft:" + row.id);
@@ -277,6 +300,7 @@ export default function AdvancedWorkspace() {
   useEffect(() => {
     if (active) sessionStorage.setItem("mw.chart-return.v1", appLocation.pathname + appLocation.search + appLocation.hash);
   }, [active?.id, appLocation]);
+  useEffect(() => { updateTitle(true); }, [active?.id, active?.name]);
   useEffect(() => { if (nativeReady) post({ type: "app-state", pending: app.pending }); }, [nativeReady, app.pending]);
   useEffect(() => () => { if (titleTimer.current) clearTimeout(titleTimer.current); }, []);
   useEffect(() => {
@@ -329,10 +353,9 @@ export default function AdvancedWorkspace() {
         const identity = `${m.workspace_id}:${m.generation}:${m.ticker}`;
         const price = Number.isFinite(m.price) && typeof m.formatted === "string" ? " " + m.formatted.slice(0, 60) : "";
         const percent = price && Number.isFinite(m.change) ? ` ${m.change > 0 ? "▲ +" : m.change < 0 ? "▼ −" : ""}${Math.abs(m.change).toFixed(2)}%` : "";
-        titleText.current = m.label + price + percent + (m.historical ? " · 历史" : m.delayed ? " · 迟延" : "");
-        const write = () => { titleTimer.current = null; if (document.title !== titleText.current) document.title = titleText.current; titleLast.current = performance.now(); };
-        if (identity !== titleIdentity.current) { if (titleTimer.current) clearTimeout(titleTimer.current); titleIdentity.current = identity; write(); }
-        else if (!titleTimer.current) titleTimer.current = setTimeout(write, Math.max(0, 1000 - (performance.now() - titleLast.current)));
+        titleQuote.current = m.label + price + percent + (m.historical ? " · 历史" : m.delayed ? " · 迟延" : "");
+        updateTitle(identity !== titleIdentity.current);
+        titleIdentity.current = identity;
         return;
       }
       if (m.type === "alerts-panel-state" && m.workspace_id === current.current?.id && typeof m.open === "boolean") {

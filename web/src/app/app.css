@@ -267,29 +267,30 @@
   user-select: none;
   mask-image: radial-gradient(
     ellipse at 50% 44%,
-    transparent 10%,
-    #000b 48%,
-    #000 90%
+    transparent 6%,
+    #000c 42%,
+    #000 82%
   );
 }
 .dot-base {
-  fill: #4b5a70;
-  opacity: 0.48;
+  fill: #637895;
+  opacity: 0.64;
 }
 .dot-core {
-  fill: #88a8d8;
+  fill: #a8c5f2;
 }
 .dot-halo {
-  stop-color: #618bd0;
+  stop-color: #78a9f1;
 }
 .auth-screen[data-theme="light"] .dot-base {
-  fill: #97a6bc;
+  fill: #7f94b2;
 }
 .auth-screen[data-theme="light"] .dot-core {
-  fill: #4871b2;
+  fill: #3c6bb3;
 }
 .dot-pulse {
-  opacity: 0.3;
+  --pointer-scale: 1;
+  --pointer-alpha: 1;
   transform-origin: 0 0;
   animation: dot-breathe var(--breath-duration) ease-in-out var(--breath-delay)
     infinite;
@@ -300,12 +301,12 @@
 @keyframes dot-breathe {
   0%,
   100% {
-    opacity: 0.14;
-    transform: scale(1);
+    opacity: calc(var(--pointer-alpha, 1) * 0.2);
+    transform: scale(var(--pointer-scale, 1));
   }
   50% {
-    opacity: 0.8;
-    transform: scale(1.45);
+    opacity: calc(var(--pointer-alpha, 1) * 0.95);
+    transform: scale(calc(var(--pointer-scale, 1) * 1.5));
   }
 }
 @media (prefers-reduced-motion: reduce) {
