@@ -1,0 +1,78 @@
+{
+  "database": "preview_mw75_final",
+  "synthetic_load_only": true,
+  "stages": [
+    {
+      "all_backfill": false,
+      "all_incidents_once": true,
+      "automatic_sound_observations": 0,
+      "database": "preview_mw75_final",
+      "database_bytes": 27250011,
+      "epoch": "8a1f8d41-6a39-493b-aecc-e32a9aed5642",
+      "health": {
+        "at": 1792340797183,
+        "batch_count": 0,
+        "error_type": null,
+        "oldest_pending_at": null,
+        "pending_sources": 0,
+        "state": "ok"
+      },
+      "incident_count_sum": 1000,
+      "incident_counts_sha256": "5929e7e6f5ffd57a54fad0d5a8c30f13c4756efe5f9f6ef917e55b6a809cb0aa",
+      "outbox_count": 0,
+      "stage": "before",
+      "stream_seq": 1000,
+      "task_events": 1000,
+      "task_ids_sha256": "2512a1eed10576c6a4824d898dddd5e4db8088ec47fc45cbdb5088586f693251",
+      "unique_sources": 1000
+    },
+    {
+      "all_backfill": true,
+      "all_incidents_once": true,
+      "automatic_sound_observations": 0,
+      "database": "preview_mw75_final",
+      "database_bytes": 28380507,
+      "epoch": "c392122e-fe48-4bf0-9631-667918b90a73",
+      "health": {
+        "at": 1792340877042,
+        "batch_count": 0,
+        "error_type": null,
+        "oldest_pending_at": null,
+        "pending_sources": 0,
+        "state": "ok"
+      },
+      "incident_count_sum": 1000,
+      "incident_counts_sha256": "5929e7e6f5ffd57a54fad0d5a8c30f13c4756efe5f9f6ef917e55b6a809cb0aa",
+      "outbox_count": 0,
+      "stage": "after1",
+      "stream_seq": 0,
+      "task_events": 1000,
+      "task_ids_sha256": "2512a1eed10576c6a4824d898dddd5e4db8088ec47fc45cbdb5088586f693251",
+      "unique_sources": 1000
+    },
+    {
+      "all_backfill": true,
+      "all_incidents_once": true,
+      "automatic_sound_observations": 0,
+      "database": "preview_mw75_final",
+      "database_bytes": 27176283,
+      "epoch": "7f798b5d-ac5d-47da-8639-b92c70af5f4e",
+      "health": {
+        "at": 1792340929617,
+        "batch_count": 0,
+        "error_type": null,
+        "oldest_pending_at": null,
+        "pending_sources": 0,
+        "state": "ok"
+      },
+      "incident_count_sum": 1000,
+      "incident_counts_sha256": "5929e7e6f5ffd57a54fad0d5a8c30f13c4756efe5f9f6ef917e55b6a809cb0aa",
+      "outbox_count": 0,
+      "stage": "after2",
+      "stream_seq": 0,
+      "task_events": 1000,
+      "task_ids_sha256": "2512a1eed10576c6a4824d898dddd5e4db8088ec47fc45cbdb5088586f693251",
+      "unique_sources": 1000
+    }
+  ]
+}

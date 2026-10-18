@@ -6,8 +6,8 @@
 
 - 固定基线：`v1.26.1 / 2fe919a23d4adcb97ca1a98caafbad8693a410d3`。
 - 需求依据：[Issue #75 V2 完整方案](../../unified-notification-center-plan-20261016.md)，以及记录 Issue V2 同步和重新开发边界的[基线重新评估](../../issues/issue-75-v1261-reassessment-20261018.md)。未把关闭的 #85 作为实现或验收依据。
-- 工作树：`/home/quant/repos/market-watch-issue75-implementation-20261018`；分支 `feat/issue75-chart-notifications-20261018`；已提交检查点 `67d24ace0a7c1794524bfb77eebfb6dc3bb49372`，复核包含其后的全部当前未提交产品改动。
-- 比较命令：`git diff 2fe919a23d4adcb97ca1a98caafbad8693a410d3`。产品差异指纹为 `git diff BASE -- advanced-host backend/alerts web/src migrations compose.yaml compose.production.yaml | sha256sum`，结果 `af5d0754e9a78c76e4f8ffaafb6e825fd79a633077db16a1825d34010f0a85ea`；BASE 为上述固定提交。
+- 工作树：`/home/quant/repos/market-watch-issue75-implementation-20261018`；分支 `feat/issue75-chart-notifications-20261018`；当前已提交检查点 `df6460cb978413ca003ad87c6f16d14bd2ddbe1a`。此前 da5a2eb 后的三项产品增量及最新浅色 severity CSS 修正均已限定复核，见下方增量说明。
+- 比较命令：`git diff 2fe919a23d4adcb97ca1a98caafbad8693a410d3`。当前最终产品差异指纹为 `git diff BASE -- advanced-host backend/alerts web/src migrations compose.yaml compose.production.yaml | sha256sum`，结果 `1ec7c6d410da7ce36baa49782cb78aa1a7fe9621b0187e5e48583e54346246b7`；BASE 为上述固定提交。
 
 **本次最终源码复核：未发现仍未解决的具体 P1/P2 Spec 问题。**此前提出的来源覆盖、错误恢复、定位动作及 Runtime 入口竞态均已复核修正。该结论表示当前已检查实现没有已知阻断级需求偏差，**不表示 A1–A20/B1–B9 全部通过，也不表示 W6、合并或发布已获签收**。
 
@@ -44,3 +44,19 @@
 实施者另在进行 Playwriter 真实来源与边界验收；本复核读取了其任务临时目录中的 actual-producers-results.json 和 boundary-results.json。前者含收藏终态失败恢复、容量保存失败恢复及数据中心 create 失败；后者含实际 Store/Runtime 的数量/字节/TTL/单条限制、声音受限/失败/预留崩溃、暂停会话和存储不可用结果。临时文件尚不能代替已归档的最终源码/镜像验收台账，实施者应把选取的脱敏结果、命令和最终候选关联写入本证据目录。
 
 本报告不把上述有限路径扩大成全部 A/B 签收。仍需由最终验收台账逐项区分：真实生产者与种子负载、最终镜像与中间镜像、独立测试与人工检查。尤其多图/多指标和风暴下的持续交互/内存/DB 增长、完整键盘/焦点/读屏、全部故障组合、应用回退与恢复链路，不能仅凭静态源码或组件探针宣称完成。本复核未访问生产、未验证真实供应商或真实手机送达，也未执行最终 CI；后续产品源码变化须重新评估本结论适用范围。
+
+## da5a2eb 后的限定增量复核
+
+2026-10-18 补充复核，范围严格限定为 `git diff da5a2eb -- web/src/notifications/runtime.ts web/src/notifications/native.tsx web/src/notifications/notifications.css`。同时核对该提交之后的产品路径，只有上述三项文件有变化。**本增量未发现具体 P1/P2 阻断项，前述验收限制仍有效。**
+
+- **A13：epoch/reset。** Runtime 把换代恢复进度写入瞬态 `status`，保留已有真实 `gap`；重置 `nextHealth` 使下一次成功同步刷新健康状态。既有清空候选/气泡、重取历史基线和 epoch 传播路径保持，未新增历史事件重弹或声音尝试。新增回归验证 reset 后真实缺失信息保留、恢复状态最终回到已同步；本复核独立重跑 `cd web && node tests/notifications-runtime.cjs`，PASS。
+- **A1：筛选布局与气泡锚点。** 筛选网格采用 `minmax(0, 1fr)`，输入/select 明确 border-box、min-width 和 max-width，约束 vendor 样式下的横向扩张；不改变过滤语义或图表高度。入口查找排除无布局框、visibility 不可见、aria-hidden 或 inert 的副本，气泡定位使用同一可见入口。
+- **A20：焦点与增量影响。** 入口查找的同一修正用于关闭中心后及角标更新后的焦点恢复，避免选中 vendor 测量副本；不扩大动作权限、不改变主体/会话/来源接收与持久格式。`git diff --check da5a2eb --` 上述三项文件无输出。
+
+本增量的前端重建、最终镜像 TypeScript/CI 结果和 Playwriter 实际焦点、窄屏筛选及气泡定位复验由实施者继续记录；静态核对和上述 Runtime 回归不替代这些浏览器结果，不据此签收全部 A1/A13/A20。
+
+## df6460c：浅色严重级别文本限定复核
+
+2026-10-18，检查 `git diff df6460c^ df6460c -- web/src/notifications/notifications.css`。该提交仅把 error/critical 与 warning 文本色提取为主题变量：暗色保留原值，浅色分别使用 `#b42318` 和 `#82580e`。变量定义在现有 `.nc-panel` 主题作用域，列表和详情的 severity 文本位于该作用域内；没有改变来源、严重级别含义、筛选、动作或接收生命周期。
+
+**此 CSS 增量未发现具体 P1/P2 Spec 阻断项。**按源码中浅色纯色背景 `#fff`/`#f4f5f7` 计算，danger 对比分别约 6.57:1/6.03:1，warning 约 6.27:1/5.74:1，均超过普通文本 4.5:1。此为颜色值计算，不能替代最终样式镜像的 Playwriter 渲染截图检查。`git diff --check df6460c^ df6460c -- web/src/notifications/notifications.css` 无输出；按本次限定范围未重跑全量测试。A1 的主题可读性有所改善，A20 的完整无障碍和全部 A/B 签收仍以最终验收台账为准。

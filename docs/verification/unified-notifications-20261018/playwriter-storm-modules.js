@@ -1,0 +1,27 @@
+const fs=require('node:fs');
+state.stormProbe=await state.finalContext.newPage();
+const bundle=fs.readFileSync('/tmp/mw75-playwriter/probes.bundle.js','utf8');
+await state.stormProbe.route('http://localhost:18275/__mw75_storm',r=>r.fulfill({status:200,contentType:'text/html',body:'<!doctype html><title>Actual Runtime storm probe</title><script>'+bundle+'</script>'}));
+await state.stormProbe.goto('http://localhost:18275/__mw75_storm');
+const result=await state.stormProbe.evaluate(async()=>{
+ const assert=(value,message)=>{if(!value)throw Error(message)};
+ const {NoticeRuntime,NoticeStore}=NoticeProbes,store=new NoticeStore();await store.open();
+ const runtime=new NoticeRuntime(),subject='storm:'+crypto.randomUUID();
+ runtime.subject=subject;runtime.profile='probe';runtime.ready=true;runtime.store=store;
+ runtime.schedule=()=>{};runtime.nextHealth=Infinity;runtime.nextPrune=Infinity;
+ runtime.serverAnchor=Date.now();runtime.monoAnchor=performance.now();runtime.after='baseline';
+ const event=(id,severity='info')=>({id,version:1,source_kind:'data_center',kind:'failure',severity,attention:true,backfill:false,accepted_at:Date.now(),occurred_at:Date.now(),incident_id:id});
+ for(let i=0;i<100;i++)runtime.enqueue(event('s:normal:'+i));
+ runtime.enqueue(event('s:critical','critical'));runtime.enqueue(event('s:critical','critical'));
+ assert(runtime.queue.length===20,'bubble queue bounded20');assert(runtime.queue[0].id==='s:critical','critical first ahead of normal backlog');
+ const queue={retained:runtime.queue.length,overflow:runtime.state.overflow,critical_first:true,duplicate_critical:runtime.queue.filter(e=>e.id==='s:critical').length};
+ runtime.presentation=true;await runtime.pop();assert(runtime.state.bubble.id==='s:critical','next actual bubble critical');
+ runtime.presentation=false;runtime.observation=async()=>{};
+ globalThis.probeAPI=async path=>{if(path.startsWith('/notification-center/changes'))return{changes:Array.from({length:500},(_,i)=>({kind:'created',event_id:'s:bulk:'+i,body:event('s:bulk:'+i)})),after:'after500',epoch:'probe-epoch',unread:500,server_time:Date.now(),more:false};throw Error('unexpected '+path);};
+ const start=performance.now();await runtime.cycle(0);
+ assert(runtime.state.events.length===200,'summary window bounded200');assert(runtime.queue.length<=20,'queue stays bounded after500');
+ const progress=await store.get("meta",subject+":progress");assert(progress.after==='after500','progress saved after500');
+ const result={actual_runtime_and_indexeddb:true,isolated_module_probe:true,synthetic_only:true,queue,critical_displayed:true,summary:runtime.state.events.length,cycle500Ms:Math.round(performance.now()-start),progress_saved:true};
+ runtime.dispose();return result;
+});
+fs.writeFileSync('/tmp/mw75-playwriter/storm-module-results.json',JSON.stringify(result,null,2));console.log(result);await state.stormProbe.close();

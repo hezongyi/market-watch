@@ -5,10 +5,10 @@
 ## 范围与基线
 
 - 工作树：`/home/quant/repos/market-watch-issue75-implementation-20261018`。
-- 基线：`v1.26.1`，`2fe919a23d4adcb97ca1a98caafbad8693a410d3`；覆盖实现检查点 `67d24ace0a7c1794524bfb77eebfb6dc3bb49372` 及当前未提交修复。
+- 基线：`v1.26.1`，`2fe919a23d4adcb97ca1a98caafbad8693a410d3`；覆盖实现检查点 `67d24ace0a7c1794524bfb77eebfb6dc3bb49372` 及后续修复，最新 CSS 增量为 `df6460cb978413ca003ad87c6f16d14bd2ddbe1a`。
 - 规范来源：仓库 `AGENTS.md`；代码异味仅作启发式判断，与硬性规范违规分开。
 - 重点：通知 Runtime/Store、provider/market 回调、真实 data-center API wrapper 与注入式对话框、native history 来源/范围身份、后台可靠来源与接收顺序。
-- 产品差异快照：`git diff 2fe919a23d4adcb97ca1a98caafbad8693a410d3 -- advanced-host backend/alerts web/src` 的 SHA-256 为 `22ffcb454725f8f190069fd562a901542067f6586edc26e04d6e67d400db5e35`。
+- 当前产品差异快照（17:20 UTC CSS 增量后）：输入路径为 `advanced-host`、`backend/alerts`、`web/src`；对 `git diff 2fe919a23d4adcb97ca1a98caafbad8693a410d3 -- advanced-host backend/alerts web/src` 的输出计算 SHA-256，结果为 `a1320eb720a36ebc35e6f86a70165561c9977c8770bb40f9c0ed37ba0c534819`。文档和测试文件不在该指纹输入中。
 
 ## 实际验证
 
@@ -30,3 +30,17 @@ Store 探针及结果位于 `/tmp/mw75-standards-idb-20261018/`；未编辑产�
 ## 局限
 
 fake-indexeddb 证明逻辑与事务合同，不能替代真实浏览器的配额、崩溃和磁盘故障验证。本轮未独立重跑 PostgreSQL 迁移、Docker R2/D1、Playwriter、音频或性能验收；不将父任务尚未完成部分记为通过。结论仅适用于上述源码快照，不代表整体验收完成。
+
+## 16:54 UTC 增量复核
+
+只读审查 `git diff da5a2eb -- web/src/notifications/runtime.ts web/src/notifications/native.tsx web/src/notifications/notifications.css`：未发现新的 P1/P2 或具体阻断问题。
+
+确认 epoch reset 使用瞬态 status，保留已有真实 gap，并重置 health 刷新时机；筛选控件使用 border-box、min-width/max-width 与可收缩 grid 列，约束局限于通知筛选区；入口查找同时核查布局矩形、computed visibility 及 aria-hidden/inert 祖先，排除隐藏测量副本。
+
+本审查者重新执行 `node tests/notifications-runtime.cjs`，包含新增 reset 后恢复且保留真实 gap 的回归，最终 PASS、退出码 0。三个产品文件的 `git diff --check` 通过。本增量未独立运行 TypeScript、重建或 Playwriter；焦点回归、气泡锚点与 vendor 样式实际效果仍由最终镜像的浏览器复验确认，不提前记为通过。未修改产品代码、未提交。
+
+## 17:20 UTC CSS 增量复核
+
+限定审查 `git diff df6460c^ df6460c -- web/src/notifications/notifications.css`：未发现新的 P1/P2 或阻断问题。Severity 文本改用通知面板主题变量；暗色值保持原值，浅色 danger/warning 分别为 `#b42318`、`#82580e`。按相对亮度公式计算，在已定义浅色背景 `#fff`、`#f4f5f7` 上的对比分别为 6.57/6.03、6.27/5.74，均超过普通文本 4.5:1。
+
+该 CSS 提交的 `git diff --check` 通过。本次未新增全量测试、构建或浏览器验收；未将旧提交 CI 状态当作新提交验证。仅更新审查文档，未修改产品、未提交。

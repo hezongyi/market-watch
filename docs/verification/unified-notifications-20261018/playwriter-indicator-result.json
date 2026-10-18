@@ -1,0 +1,61 @@
+{
+  "injection": "actual charts/data request failed; native Python STOCH consumer reached terminal failure; user retry succeeded",
+  "events": [
+    {
+      "id": "b:33cb0ab9-9cb2-2f36-c599-0252f7ddff09",
+      "source_domain": "pro_chart",
+      "source_kind": "indicator",
+      "source_id": "a17a65e8-eb34-4664-a7a1-92f78a5ef962",
+      "incident_id": "2336959a-0575-42cf-b7db-52367d7d454a",
+      "occurred_at": 1792339172695,
+      "recorded_at": 1792339173886,
+      "version": 2126,
+      "first_seq": 2124,
+      "severity": "error",
+      "kind": "failure",
+      "workspace": "mw75-b",
+      "instrument": "MWH:17EE3194-F959-4FCD-BFB1-1464862C5EF3",
+      "viewed_at": null,
+      "handled_at": null,
+      "attention": true,
+      "backfill": false,
+      "title": "图格指标计算失败",
+      "message": "ApiError: MW75_INDICATOR_TERMINAL_FAILURE",
+      "context": {
+        "chart_index": 0,
+        "consumer": "heahJd",
+        "instrument": "MWH:17EE3194-F959-4FCD-BFB1-1464862C5EF3",
+        "timeframe": "60",
+        "workspace_id": "mw75-b",
+        "epoch": 0
+      },
+      "evidence": {
+        "reason_code": "INDICATOR_UNAVAILABLE",
+        "params": {
+          "k": 14,
+          "smooth": 3,
+          "d": 3
+        },
+        "algorithm_version": "1",
+        "visible_from": 1791158400000,
+        "visible_to": 1792191600000,
+        "calculation_origin": 1791158400000,
+        "accepted_scope": null
+      },
+      "notify_web": true,
+      "client_reported_time": true,
+      "profile": "145693fe-28f9-4b3b-9902-8117c46720f0",
+      "code": "INDICATOR_TERMINAL_FAILED",
+      "accepted_at": 1792339172976,
+      "incident": {
+        "id": "2336959a-0575-42cf-b7db-52367d7d454a",
+        "first_at": 1792339172695,
+        "last_at": 1792339172695,
+        "closed_at": 1792339204979,
+        "count": 1,
+        "count_scope": "当前事故已接受发生数",
+        "severity_rank": 2
+      }
+    }
+  ]
+}
