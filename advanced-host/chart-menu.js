@@ -281,6 +281,7 @@ function chartThemeMenu(chartWidget, report, grid, actions, createWorkspace, aut
   for (const action of actions) {
     const entry = doc.createElement("button");
     entry.type = "button";
+    if (action.action) entry.dataset.appAction = action.action;
     entry.className = "mw-chart-menu-action item-jFqVJoPk";
     entry.innerHTML = '<span class="labelRow-jFqVJoPk"><span class="label-jFqVJoPk"></span></span>';
     entry.firstElementChild.firstElementChild.textContent = action.label;
@@ -333,6 +334,10 @@ function chartThemeMenu(chartWidget, report, grid, actions, createWorkspace, aut
   chartWidget.subscribe("chart_theme_changed", sync);
   sync();
   return {
+    setPending(count) {
+      const entry = panel.querySelector('[data-app-action="signals"] .label-jFqVJoPk');
+      if (entry) entry.textContent = "通知" + (Number.isSafeInteger(count) && count > 0 ? `（${count} 待确认）` : "");
+    },
     changePassword: () => chartPasswordDialog(chartWidget, doc, changePassword, report),
     setDraftBlocked(blocked) {
     for (const entry of panel.querySelectorAll('[data-recovery="true"]'))

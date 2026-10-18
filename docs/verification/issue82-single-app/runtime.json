@@ -1,0 +1,143 @@
+{
+  "captured_at": "2026-10-17T19:08:01.923394+00:00",
+  "host": "quant-server",
+  "os": "Linux-5.15.0-198-generic-x86_64-with-glibc2.35",
+  "project": "mw-issue82-20261017",
+  "application": "https://192.168.7.232:18282",
+  "chart_origin": "https://192.168.7.232:18283",
+  "builder": "market-watch-ubuntu",
+  "baseline_commit": "51e5d1e2cc6dd241b4aa276a4c02aef6500f5dc3",
+  "branch": "feat/issue82-single-app-20261017",
+  "services": [
+    {
+      "name": "mw-issue82-20261017-chart-1",
+      "image": "market-watch-chart-origin:issue82-single-app",
+      "image_id": "sha256:e3ba104ca5aa928379d50c2131d30fe2572ca7b8b3296e580bc7b78c0164fb0f",
+      "memory_bytes": 134217728,
+      "nano_cpus": 250000000,
+      "networks": [
+        "mw-issue82-20261017_default"
+      ],
+      "mounts": [],
+      "ports": {
+        "80/tcp": null
+      }
+    },
+    {
+      "name": "mw-issue82-20261017-web-1",
+      "image": "market-watch-web:issue82-single-app",
+      "image_id": "sha256:9b5d53f7a1cb77c4ac87ad5ad4d158e22797d67d4c099701db08d367f1050d96",
+      "memory_bytes": 67108864,
+      "nano_cpus": 150000000,
+      "networks": [
+        "mw-issue82-20261017_default"
+      ],
+      "mounts": [],
+      "ports": {
+        "80/tcp": null
+      }
+    },
+    {
+      "name": "mw-issue82-20261017-api-1",
+      "image": "market-watch-api:issue82-single-app",
+      "image_id": "sha256:2ebb937569d94e5fc8705288791f8fb06ef7e237f8d6f58b42616655eaa07226",
+      "memory_bytes": 1073741824,
+      "nano_cpus": 900000000,
+      "networks": [
+        "mw-issue82-20261017_default"
+      ],
+      "mounts": [
+        {
+          "type": "bind",
+          "name": null,
+          "destination": "/fixtures/single_app_fixture.py"
+        }
+      ],
+      "ports": {
+        "8000/tcp": null
+      }
+    },
+    {
+      "name": "mw-issue82-20261017-tls-1",
+      "image": "nginx:1.28-alpine",
+      "image_id": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "memory_bytes": 67108864,
+      "nano_cpus": 100000000,
+      "networks": [
+        "mw-issue82-20261017_default"
+      ],
+      "mounts": [
+        {
+          "type": "bind",
+          "name": null,
+          "destination": "/tls"
+        },
+        {
+          "type": "bind",
+          "name": null,
+          "destination": "/etc/nginx/conf.d/default.conf"
+        }
+      ],
+      "ports": {
+        "443/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "18282"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "18282"
+          }
+        ],
+        "444/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "18283"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "18283"
+          }
+        ],
+        "80/tcp": null
+      }
+    },
+    {
+      "name": "mw-issue82-20261017-postgres-1",
+      "image": "postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "image_id": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "memory_bytes": 536870912,
+      "nano_cpus": 500000000,
+      "networks": [
+        "mw-issue82-20261017_default"
+      ],
+      "mounts": [
+        {
+          "type": "volume",
+          "name": "mw-issue82-20261017_postgres-data",
+          "destination": "/var/lib/postgresql/data"
+        }
+      ],
+      "ports": {
+        "5432/tcp": null
+      }
+    }
+  ],
+  "other_projects": [
+    {
+      "Name": "mw-issue75-20261017",
+      "Status": "running(5)",
+      "ConfigFiles": "/home/quant/dsh/market-watch-issue75-20261017/deploy/ubuntu/unified-notifications.acceptance.yaml"
+    },
+    {
+      "Name": "mw-issue82-20261017",
+      "Status": "running(5)",
+      "ConfigFiles": "/home/quant/repos/market-watch-issue82-20261017/deploy/ubuntu/single-app.acceptance.yaml"
+    },
+    {
+      "Name": "mw-v1257-restore",
+      "Status": "running(11)",
+      "ConfigFiles": "/tmp/market-watch-rest-analysis-20261016/runtime-r11.private.yaml,/tmp/market-watch-rest-analysis-20261016/runtime-r6.private.yaml,/home/quant/.local/state/mw-v1257-release-20261015/runtime-compose.private.yaml,/home/quant/.local/state/mw-v1257-release-20261015/restore-compose.yaml"
+    }
+  ]
+}

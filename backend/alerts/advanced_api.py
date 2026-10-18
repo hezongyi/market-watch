@@ -123,6 +123,15 @@ def router(authenticated):
 
     @r.post("/preferences/save")
     def save_preference(body: PreferenceWrite):
+        if body.kind == "setting" and body.name == "mw.symbol-flags.v1":
+            from .symbol_flags import validate_flags
+
+            try:
+                if body.tool:
+                    raise ValueError("收藏不属于绘图模板")
+                validate_flags(body.content)
+            except (ValueError, TypeError, KeyError) as error:
+                raise HTTPException(422, str(error)) from error
         try:
             if len(json.dumps(body.content, allow_nan=False)) > 1_000_000:
                 raise ValueError()
@@ -279,6 +288,14 @@ def router(authenticated):
                 # symbols. Never replace the workspace or its series here.
                 pass
         return rows
+
+    @r.get("/workspaces/{id}")
+    def workspace(id: str):
+        with transaction() as db:
+            row = db.get(AdvancedWorkspace, id)
+            if not row:
+                raise HTTPException(404, "工作区不存在")
+            return serialized(row)
 
     @r.post("/workspaces")
     def create(body: WorkspaceCreate):

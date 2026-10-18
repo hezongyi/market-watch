@@ -16,9 +16,10 @@ app.mount("/assets", StaticFiles(directory=ROOT / "assets"), name="web-assets")
 
 @app.get("/{path:path}", include_in_schema=False)
 def website(path: str):
-    if path.startswith(("api/", "healthz/", "readyz/")) or path == "api":
+    if path.split("/", 1)[0] in {"api", "healthz", "readyz", "mcp", "assets"}:
         raise HTTPException(404, "Not found")
-    # Only known client routes get an HTML fallback; never expose repository files.
-    if path not in {"", "signals", "replay", "settings"}:
-        raise HTTPException(404, "Not found")
+    if path == "favicon.svg":
+        return FileResponse(ROOT / "favicon.svg", media_type="image/svg+xml")
+    # All business and unknown locations use the same router/404 view. Never
+    # resolve the requested path against the repository or swallow protocols.
     return FileResponse(ROOT / "index.html", headers={"Cache-Control": "no-cache"})

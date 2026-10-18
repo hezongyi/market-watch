@@ -1,0 +1,89 @@
+{
+  "results": [
+    {
+      "name": "login: root, animation, focus/caret, error and real authentication",
+      "passed": true
+    },
+    {
+      "name": "login: valid deep link keeps search/hash; illegal destinations fall back",
+      "passed": true
+    },
+    {
+      "name": "login: mobile dark/light and read-only chart",
+      "passed": true
+    },
+    {
+      "name": "mobile: platform entry never creates; desktop/mobile empty states are explicit",
+      "passed": true
+    },
+    {
+      "name": "routes: explicit workspace, refresh, back/forward, unavailable and unknown",
+      "passed": true
+    },
+    {
+      "name": "navigation: native menu, pending count, alerts panel and return",
+      "passed": true
+    },
+    {
+      "name": "workspace: native load keeps iframe, synchronizes URL and quote subscription",
+      "passed": true
+    },
+    {
+      "name": "data center: native window keeps chart and restores URL",
+      "passed": true
+    },
+    {
+      "name": "data center: failed native assets use real internal iframe and close cleanly",
+      "passed": true
+    },
+    {
+      "name": "notifications: precise legacy/chart events, no view ack, retry and confirm",
+      "passed": true
+    },
+    {
+      "name": "legacy: Watch cancel remains and old editor identity is retained",
+      "passed": true
+    },
+    {
+      "name": "replay: fixed dataset deep link creates and resumes same run",
+      "passed": true
+    },
+    {
+      "name": "flags: seven choices, clear, identity, keyboard, retry and real persistence",
+      "passed": true
+    },
+    {
+      "name": "flags: cross-list/workspace, independent membership and concurrent revision rebase",
+      "passed": true
+    },
+    {
+      "name": "title: active pane, comparison, inactive edits, crosshair, off-list ticker and rapid switches",
+      "passed": true,
+      "evidence": {
+        "title": "XAUUSD 2,600.00 ▲ +0.00%",
+        "previousTitle": "XAUUSD 2,600.00 ▲ +0.00%"
+      }
+    },
+    {
+      "name": "title: missing values, historical/delayed labels, duplicate suppression and 1 Hz",
+      "passed": true
+    },
+    {
+      "name": "dirty settings: cancel/discard/save, failure retains edits; network does not log out",
+      "passed": true
+    },
+    {
+      "name": "dirty chart: cancel/discard/save, failed save, workspace and logout",
+      "passed": true
+    },
+    {
+      "name": "401: actual expired session preserves dirty chart and closes save dialog",
+      "passed": true
+    },
+    {
+      "name": "protocol: API/device/action/MCP/health remain protocols; favicon and SPA routes",
+      "passed": true
+    }
+  ],
+  "errors": []
+}

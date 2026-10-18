@@ -24,6 +24,7 @@ export type NativeAlertDialog = (options: {
   onClose: () => void;
 }) => Promise<NativeAlertDialogHandle>;
 type Shell = {
+  isOpen?: () => boolean;
   open: () => void;
   close: () => void;
   destroy: () => void;
@@ -56,6 +57,7 @@ type Options = {
   report: (error: unknown) => void;
   initialDraft?: AlertDraft | null;
   persistDraft?: (draft: AlertDraft | null) => void;
+  panelChanged?: (open: boolean) => void;
 };
 async function attach({
   widget,
@@ -66,6 +68,7 @@ async function attach({
   report,
   initialDraft,
   persistDraft,
+  panelChanged,
 }: Options) {
   let target: HTMLElement | null = null,
     disposed = false;
@@ -155,14 +158,17 @@ async function attach({
   root.render(<App />);
   let notices: Record<string, string> = {};
   let lastInstrument = "";
+  let lastPanel: boolean | undefined;
   const timer = setInterval(() => {
+    const opened = shell.isOpen?.();
+    if (opened !== undefined && opened !== lastPanel) { lastPanel = opened; panelChanged?.(opened); }
     const instrument = bridge.currentInstrument(),
       identity = JSON.stringify(instrument);
     if (identity !== lastInstrument) {
       lastInstrument = identity;
       update({ instrument });
     }
-  }, 500);
+  }, 250);
   return {
     open: shell.open,
     context: (context: AlertContext) => {

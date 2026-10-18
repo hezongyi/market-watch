@@ -26,7 +26,7 @@ function indicatorKey(ticker,res){
   const id=decode(ticker);
   return MWSeries.encode(id.symbol,id.series_kind)+'|'+res;
 }
-let studyTemplates;
+let studyTemplates, restoreAlertsPanel = false;
 function showNextNotice() {
   if (!ready || noticeDialogOpen) return;
   const notice = activeNotices.find(entry => entry.recover && !acknowledgedNotices.has(entry.key));
@@ -54,7 +54,8 @@ let seq = 0,
   workspaceEpoch = 0,
   nativeReadonly = false;
 let barRangeMapping, syncCoordinator;
-let watchlistLayout;
+let watchlistLayout, symbolFlags, activeTab;
+let captureWorkspaceState, discardWorkspaceChanges;
 const watchlistMetadata = new Map();
 let rangeGuard, edgeGuard, demandReporter, progressivePages, progressivePoll, beforeInitialHistory, initialSymbol;
 let prewarming = false;
@@ -2032,10 +2033,12 @@ function boot(
       const instance = await MWNativeAlerts.attach({widget, scope: {workspace_id: workspaceId, session}, readonly,
         initialDraft: alertUIDraft,
         persistDraft: draft => send({type:'chart-alert-ui-draft', workspace_id: workspaceId, session, draft}),
+        panelChanged: open => {restoreAlertsPanel = open; send({type:'alerts-panel-state',workspace_id:workspaceId,open});},
         bridge: alertBridge, request: query => request(query, 'chart-alert-ui-rpc', () => attempt === attachingAlerts && session === alertUISession),
         report: error => send({type:'error', error:String(error)})});
       if (attempt !== attachingAlerts || session !== alertUISession || alertUIStopped) {instance.destroy();return;}
       alertUI = instance; instance.theme(widget.getTheme());
+      if (restoreAlertsPanel) instance.open();
     } catch (error) {if (attempt === attachingAlerts && !alertUIStopped) send({type:'error', error:'原生告警接入失败：' + String(error)});}
     });
     return alertAttachQueue;
@@ -2076,6 +2079,16 @@ function boot(
   let initialNativeSave = false;
   let initialNativeSaveError;
   let busySaveNoticeShown = false;
+  captureWorkspaceState = async () => {
+    const state = await captureChartLayout(widget);
+    alertBridge.persist(state);
+    state._mwGridStyle = grid.value;
+    state._mwTheme = chartThemeName(widget.getTheme());
+    state._mwBarRangeMapping = barRangeMapping.snapshot();
+    state._mwDrawingProjection = captureDrawingProjection(widget);
+    return state;
+  };
+  discardWorkspaceChanges = () => {dirty = false; layouts.discardChanges();};
   layouts.saveChart = async (data) => {
     try {
       if (viewportRestoring || globalThis.MWNativeNavigation?.busy() || rangeGuard?.busy() || edgeGuard?.busy()) {
@@ -2097,12 +2110,7 @@ function boot(
       // workspace when the native library has no ID; later Save As stays a copy.
       if (initialNativeSave && data.id == null) data = {...data, id: workspace.id};
       const revision = editRevision, epoch = workspaceEpoch;
-      const state = await captureChartLayout(widget);
-      alertBridge.persist(state);
-      state._mwGridStyle = grid.value;
-      state._mwTheme = chartThemeName(widget.getTheme());
-      state._mwBarRangeMapping = barRangeMapping.snapshot();
-      state._mwDrawingProjection = captureDrawingProjection(widget);
+      const state = await captureWorkspaceState();
       if (epoch !== workspaceEpoch || editRevision !== revision) {
         dirty = true;
         throw new Error("图表在保存期间已修改，请重试保存");
@@ -2163,7 +2171,8 @@ function boot(
       if (dirty) {
         // Loading another layout must not silently discard edits when the
         // user explicitly disabled automatic saving.
-        throw Error("当前布局有未保存更改，请先保存布局再打开其他布局");
+        if (!await request({}, "confirm-leave")) throw Error("已取消切换工作区");
+        dirty = false; layouts.discardChanges();
       }
       const state = JSON.parse(await loadContent(id));
       pendingThemeState = state;
@@ -2318,7 +2327,7 @@ function boot(
         send({type: "diagnostic", source: "watchlist-layout", error: String(error)}), ticker => {
           const meta=presentationFor(ticker);
           return meta?.display_symbol || meta?.symbol;
-        });
+        }, ticker => symbolFlags?.colorFor?.(ticker));
       if (!readonly) indicatorPicker = chartIndicatorPicker(widget, catalog, (e) =>
         send({type: "error", error: String(e)}), () => dataCenter?.nativeUi);
       // Public left-aligned buttons retain their creation order in the header.
@@ -2333,6 +2342,8 @@ function boot(
     .catch((e) => send({ type: "error", error: String(e) }));
   widget.onChartReady(async () => {
     await restoreTheme();
+    activeTab?.dispose();
+    activeTab = chartTab({widget,feed,send,workspace:()=>currentNativeWorkspace,epoch:()=>workspaceEpoch,metadata:presentationFor});
     startIndicatorCoordinator(catalog);
     globalThis.MWChartMaximize = chartBlankDoubleClick(widget, { readonly });
     ensureSync();
@@ -2379,7 +2390,7 @@ function boot(
         chartMenu = chartThemeMenu(widget, (e) =>
           send({ type: "error", error: String(e) }),
           grid, [
-            {label: "守望主页", run: () => send({type: "workspace-action", action: "home"})},
+            ...[["通知","signals"],["历史演练","replay"],["设置","settings"],["兼容功能 · 旧版监控","legacy"]].map(([label,action]) => ({label, action, run:() => send({type:"workspace-action",action})})),
             {label: "历史数据容量", run: () => send({type:"history-capacity-open",usage:MWNativeNavigation.diagnostics().resident})},
             ...(!readonly ? [{label: "保存样式", title: "保存图表样式模板", run: async () => {
               try {
@@ -2403,12 +2414,8 @@ function boot(
                 send({ type: "error", error: String(error) });
               }
             }}] : []),
-            {label: "刷新历史", title: "载入新发布历史，保留柱宽与查看位置", run: async () => {
-              await refreshProviderHistoryCorrections();
-              await refreshManagedHistory();
-            }},
             {label: "修改密码", run: () => chartMenu.changePassword()},
-            {label: "登出", run: () => send({type: "workspace-action", action: "logout"})},
+            {label: "退出登录", action:"logout", run: () => send({type: "workspace-action", action: "logout"})},
             ...(!readonly ? [{label: "复制恢复草稿", recovery: true,
               run: () => send({type: "workspace-action", action: "recover"})}] : []),
           ], readonly ? undefined : () => send({type: "workspace-action", action: "create"}), autoSave, () => snapshot(), body => request(body, "account-password"), barRangeMapping, syncCoordinator,
@@ -2451,6 +2458,11 @@ function boot(
           send({ type: "error", error: "主题保存失败：" + String(e) }),
         );
     });
+    symbolFlags?.dispose();
+    try {
+      symbolFlags = MWSymbolFlags.attach(widget, preferences.find(p=>p.kind==="setting" && p.name===MWSymbolFlags.name), readonly,
+        (op,args)=>request({op,args},"symbol-flags"), error=>send({type:"error",error:"收藏保存失败："+String(error)}));
+    } catch(error) {send({type:"error",error:"收藏增强不可用："+String(error)});}
     nativeWatchlists(
       widget,
       preferences.find(
@@ -2812,6 +2824,15 @@ addEventListener("message", async (e) => {
     boot(m.document, m.readonly, m.catalog, m.preferences, m.workspace, m.initial_symbol, m.watchlist_metadata);
   }
   else if (m.type === 'refresh-managed') await refreshManagedHistory(m.instrument);
+  else if (m.type === "capture-draft" && ready && widget) {
+    try {
+      const state = await captureWorkspaceState();
+      send({type:"draft-captured",workspace_id:alertUIWorkspace,document:{...savedDoc,engine:"tv31",schemaVersion:1,state}});
+    } catch (error) { send({type:"error",error:"草稿捕获失败："+String(error)}); }
+  }
+  else if (m.type === "discard-changes") { discardWorkspaceChanges?.(); }
+  else if (m.type === "app-state") chartMenu?.setPending?.(m.pending);
+  else if (m.type === "open-alerts") { restoreAlertsPanel = true; alertUI?.open?.(); }
   else if (m.type === "save") snapshot();
   else if (m.type === "theme" && ready) {
     savedDoc.theme = m.theme;
@@ -2828,6 +2849,7 @@ addEventListener("pagehide", () => {
   alertUI?.destroy();
   alertBridge?.destroy();
   watchlistLayout?.dispose();
+  symbolFlags?.dispose(); activeTab?.dispose();
   unbindActiveChartEvent();
   for (const [api, changed] of timezoneBindings) api.onTimezoneChanged().unsubscribe(null, changed);
   timezoneBindings.clear();
