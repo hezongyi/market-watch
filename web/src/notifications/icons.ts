@@ -5,6 +5,7 @@ export const messageIcons = {
   bell: svg(
     '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z"/><path d="M10 21h4M12 2V1"/>',
   ),
+  trade: svg('<path d="M4 3v17h17M7 14l4-4 4 2 5-7M16 5h4v4"/>'),
   close: svg('<path d="m5 5 14 14M5 19 19 5"/>'),
   back: svg('<path d="m14 5-7 7 7 7"/>'),
   more: svg(

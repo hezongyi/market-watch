@@ -78,6 +78,7 @@ export type NoticeState = {
   systemPopups: boolean;
   bubble: Notice | null;
   overflow: number;
+  alertPending?: number;
   serverTime: number;
 };
 export type NoticeAction = {

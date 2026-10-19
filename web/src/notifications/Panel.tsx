@@ -18,6 +18,7 @@ import {
   AlertSearch,
   AlertIconButton,
   NativeScrollClass,
+  NativeControl,
 } from "../advanced/NativeAlertControls";
 import { AlertMenu } from "../advanced/AlertMenu";
 import type {
@@ -846,18 +847,23 @@ export function NoticeBubble({
   request,
   onOpen,
   onLocate,
+  pending = 0,
+  nativePresentation = false,
 }: {
   notice: Notice;
+  pending?: number;
+  nativePresentation?: boolean;
   request: NoticeTransport;
   onOpen: () => void | Promise<void>;
   onLocate?: () => void | Promise<void>;
 }) {
+  const trading = !system(notice);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null),
     inside = useRef(false),
     hovered = useRef(false);
   const [error, setError] = useState("");
   const dismiss = () => {
-    void request({ action: "dismiss" }).catch((error) =>
+    void request({ action: "dismiss", event_id: notice.id }).catch((error) =>
       setError(String(error)),
     );
   };
@@ -866,7 +872,7 @@ export function NoticeBubble({
   };
   const resume = () => {
     pause();
-    if (!inside.current && !hovered.current)
+    if (!trading && !inside.current && !hovered.current)
       timer.current = setTimeout(dismiss, 8000);
   };
   useEffect(() => {
@@ -883,14 +889,21 @@ export function NoticeBubble({
   const open = async (action: () => void | Promise<void>) => {
     try {
       await action();
-      dismiss();
+      if (!trading) dismiss();
+    } catch (error) {
+      setError(String(error));
+    }
+  };
+  const confirm = async () => {
+    try {
+      await request({ action: "confirm-alert", event_id: notice.id });
     } catch (error) {
       setError(String(error));
     }
   };
   return (
     <aside
-      className="nc-bubble"
+      className={`nc-bubble${nativePresentation ? " nc-native-bubble" : ""}`}
       aria-label="即时通知"
       onMouseEnter={() => {
         hovered.current = true;
@@ -911,30 +924,40 @@ export function NoticeBubble({
         }
       }}
       onKeyDown={(event) => {
-        if (event.key === "Escape") {
+        if (event.key === "Escape" && !trading) {
           event.stopPropagation();
           dismiss();
         }
       }}
     >
       <div className="nc-bubble-heading">
-        <SourceIcon row={notice} />
-        <strong>
-          {system(notice) ? "系统消息" : noticeInstrument(notice) || "交易告警"}
-        </strong>
-        <small>
-          {String(
-            notice.context.timeframe || sourceLabels[notice.source_kind] || "",
-          )}
-        </small>
-        <button
-          type="button"
-          className="nc-icon"
-          aria-label="关闭即时通知"
-          onClick={dismiss}
-        >
-          <X size={16} aria-hidden />
-        </button>
+        <span
+          className="nc-bubble-symbol"
+          aria-hidden
+          dangerouslySetInnerHTML={{
+            __html: trading ? messageIcons.trade : messageIcons.bell,
+          }}
+        />
+        <strong>{system(notice) ? "系统消息" : "交易告警"}</strong>
+        {!trading &&
+          (nativePresentation ? (
+            <span className="nc-instant-close">
+              <AlertIconButton
+                icon={messageIcons.close}
+                label="关闭即时通知"
+                onClick={dismiss}
+              />
+            </span>
+          ) : (
+            <button
+              type="button"
+              className="nc-icon"
+              aria-label="关闭即时通知"
+              onClick={dismiss}
+            >
+              <X size={16} aria-hidden />
+            </button>
+          ))}
       </div>
       <div role="status" aria-live="polite" aria-atomic="true">
         <h3>{notice.title}</h3>
@@ -959,25 +982,56 @@ export function NoticeBubble({
           {error}
         </p>
       )}
+      {trading && pending > 0 && (
+        <p className="nc-pending" role="status">
+          另有 {pending} 条交易告警待确认
+        </p>
+      )}
       <div className="nc-bubble-actions">
-        {onLocate && (
-          <AlertButton primary onClick={() => void open(onLocate)}>
-            查看图表
-          </AlertButton>
-        )}
-        <button
-          type="button"
-          className="nc-link"
-          onClick={() => void open(onOpen)}
-        >
-          {system(notice) ? "查看消息" : "告警记录"}
-        </button>
         <small>
           {new Date(notice.occurred_at).toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
           })}
         </small>
+        {trading && onLocate && (
+          <button
+            type="button"
+            className="nc-link"
+            onClick={() => void open(onLocate)}
+          >
+            查看图表
+          </button>
+        )}
+        {trading && (
+          <button
+            type="button"
+            className="nc-link"
+            onClick={() => void open(onOpen)}
+          >
+            告警记录
+          </button>
+        )}
+        {nativePresentation ? (
+          <NativeControl
+            kind="button"
+            properties={{
+              type: "button",
+              size: "m",
+              appearance: "default",
+              intent: "primary",
+              onClick: () => (trading ? void confirm() : void open(onOpen)),
+              children: trading ? "确定" : "查看消息",
+            }}
+          />
+        ) : (
+          <AlertButton
+            primary
+            onClick={() => (trading ? void confirm() : void open(onOpen))}
+          >
+            {trading ? "确定" : "查看消息"}
+          </AlertButton>
+        )}
       </div>
     </aside>
   );

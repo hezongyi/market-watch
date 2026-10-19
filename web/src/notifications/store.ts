@@ -177,6 +177,7 @@ export class NoticeStore {
     events: any[],
     unread: number,
     projectedIds: string[] = events.map((event) => event.id),
+    instantAlerts: any[] = [],
   ) {
     return new Promise<void>((resolve, reject) => {
       const tx = this.db!.transaction(
@@ -195,6 +196,22 @@ export class NoticeStore {
         at: Date.now(),
         value: { after, epoch, unread },
       });
+      // Persist eligible live alerts before advancing the cursor. Keep the v1
+      // schema readable by older clients; queue records use separate cache keys.
+      const cache = tx.objectStore("cache");
+      for (const event of instantAlerts) {
+        const key = subject + ":alert-popup:" + event.id;
+        const request = cache.get(key);
+        request.onsuccess = () => {
+          if (!request.result)
+            cache.put({
+              key,
+              subject,
+              at: Date.now(),
+              value: { event, confirmed_at: null },
+            });
+        };
+      }
       const pending = tx.objectStore("pending");
       for (const id of projectedIds) {
         const key = subject + ":" + id;
@@ -227,6 +244,14 @@ export class NoticeStore {
         )
           await this.remove(name, row.key);
     }
+    // Waiting alerts have no TTL. Only old, explicitly confirmed receipts age out.
+    for (const row of await this.all("cache", subject))
+      if (
+        row.key.startsWith(subject + ":alert-popup:") &&
+        row.value.confirmed_at &&
+        row.value.confirmed_at < Date.now() - 31 * 86400000
+      )
+        await this.remove("cache", row.key);
     const lost = expired.filter((row) => row.value.status !== "accepted");
     return { lost: lost.length, from: lost[0]?.at || null };
   }

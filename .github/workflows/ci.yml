@@ -190,6 +190,7 @@ jobs:
           node tests/chart-tab.cjs
           node tests/symbol-flags.cjs
           node tests/notifications-runtime.cjs
+          node tests/notifications-persistence.cjs
 
       - name: Watchlist native DOM regressions
         working-directory: web

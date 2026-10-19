@@ -48,6 +48,11 @@ async function nativeNotificationSurface(widget, report) {
         R.createElement(NavButton, rest),
       );
     }
+    const noticeCSS = req(412377);
+    const style = doc.createElement("link");
+    style.rel = "stylesheet";
+    style.href = `${globalThis.MW_CHART_LIBRARY_PATH || "/charting_library/"}bundles/2371.3fc94a1aa7a1e03d91e4.css`;
+    doc.head.append(style);
     const roots = new Set();
     function managed(element, target) {
       const root = createRoot(element, target, "modern");
@@ -79,15 +84,15 @@ async function nativeNotificationSurface(widget, report) {
           destroy: () => handle.destroy(),
         };
       },
-      mount(target, content) {
+      mount(target, content, instant = false) {
         const tree = (props) =>
           R.createElement(
             Dialog,
             {
-              className: "nc-native-surface",
+              className: instant ? `${noticeCSS.popupDialog} nc-native-instant` : "nc-native-surface",
               containerTabIndex: -1,
-              containerAriaLabel: "系统消息",
-              "data-name": "mw-native-system-message-center",
+              containerAriaLabel: instant ? "即时通知" : "系统消息",
+              "data-name": instant ? "mw-native-instant-notice" : "mw-native-system-message-center",
               backdrop: false,
               reference: (node) => {
                 if (node) {
@@ -98,14 +103,16 @@ async function nativeNotificationSurface(widget, report) {
               style: {
                 position: "fixed",
                 width: props.width,
-                height: props.height,
+                height: instant ? undefined : props.height,
                 top: props.top,
-                right: props.right,
-                zIndex: 140,
+                right: instant ? undefined : props.right,
+                left: instant ? "50%" : undefined,
+                transform: instant ? "translateX(-50%)" : undefined,
+                zIndex: instant ? 151 : 140,
               },
             },
             R.createElement("div", {
-              className: "nc-native-content",
+              className: instant ? "nc-native-instant-content" : "nc-native-content",
               ref: content,
             }),
           );
@@ -119,6 +126,7 @@ async function nativeNotificationSurface(widget, report) {
         };
       },
       destroy() {
+        style.remove();
         for (const root of roots) root.unmount();
         roots.clear();
         common.destroy();

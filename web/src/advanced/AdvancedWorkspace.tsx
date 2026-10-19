@@ -1795,12 +1795,12 @@ export default function AdvancedWorkspace() {
         <button type="button" onClick={()=>void appRef.current.confirmLeave().then(ok=>{if(ok){setNativeReady(false);setNotificationReady(false);setFrameKey(key=>key+1);}})}>重新加载图表</button><p>{nativeReady?'原生通知暂不可用':error?'图表加载失败，可查看排查记录':'图表正在启动'}{noticeState.gap?' · '+noticeState.gap:''}</p>
         {blocked.current&&!mobile&&<button onClick={copy}>复制恢复草稿</button>}
       </div>}
-      {!notificationReady&&noticeState.bubble&&<NoticeBubble notice={noticeState.bubble} request={noticeRequest} onOpen={()=>{
+      {!notificationReady&&noticeState.bubble&&<NoticeBubble notice={noticeState.bubble} pending={Math.max(0,(noticeState.alertPending||0)-1)} request={noticeRequest} onOpen={()=>{
         const row=noticeState.bubble!;
         if(row.source_kind==='chart_alert') {const url=new URL(location.href);url.searchParams.set('panel','alerts');url.searchParams.set('signal',row.source_id);url.searchParams.delete('event');navigate(url.pathname+url.search,{replace:true});post({type:'chart-alert-event-open',signal_id:row.source_id});}
         else openNotices(row.local_status ? undefined : row.id);
       }}/> }
-      {!notificationReady&&noticeOpen&&<div className="nc-fallback"><NoticePanel state={noticeState} request={noticeRequest} eventId={noticeEvent} onClose={closeNotices}/></div>}
+      {!notificationReady&&noticeOpen&&<div className="nc-fallback"><NoticePanel nativePresentation focusOnOpen={false} state={noticeState} request={noticeRequest} eventId={noticeEvent} onClose={closeNotices}/></div>}
       {active ? (
         <iframe
           key={frameKey}

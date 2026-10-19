@@ -15,7 +15,7 @@ import { messageIcons } from "./icons";
 import "./native-system-messages.css";
 
 type Geometry = { width: number; height: number; top: number; right: number };
-type Surface = {
+export type Surface = {
   document: Document;
   scrollClass: string;
   prepareEntry: (entry: HTMLElement) => void;
@@ -24,10 +24,12 @@ type Surface = {
     top: number;
     width: number;
     height: number;
+    panelLeft: number;
   };
   mount: (
     target: HTMLElement,
     content: (node: HTMLElement | null) => void,
+    instant?: boolean,
   ) => { update: (p: Geometry) => void; destroy: () => void };
   destroy: () => void;
 };
@@ -51,7 +53,7 @@ export async function attachNativeSystemMessages({
   request: NoticeTransport;
   onLocate?: (notice: Notice) => void | Promise<void>;
   report: (error: unknown) => void;
-  onOpenChanged?: (opened: boolean) => void;
+  onOpenChanged?: (opened: boolean, eventId?: string) => void;
 }) {
   const native = await globalThis.nativeNotificationSurface(widget, report),
     doc = native.document;
@@ -103,7 +105,7 @@ export async function attachNativeSystemMessages({
     opened = true;
     entry.setAttribute("aria-expanded", "true");
     render({ opened: true, eventId: id });
-    onOpenChanged?.(true);
+    onOpenChanged?.(true, id);
   }
   function View() {
     const [view, setView] = useState({

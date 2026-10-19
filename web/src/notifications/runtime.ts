@@ -25,6 +25,7 @@ const initial: NoticeState = {
   systemPopups: true,
   bubble: null,
   overflow: 0,
+  alertPending: 0,
   serverTime: 0,
 };
 const rank: Record<string, number> = {
@@ -103,6 +104,8 @@ export class NoticeRuntime {
   private monoAnchor = 0;
   private soundAllowed = false;
   private queue: Notice[] = [];
+  private alertQueue: Notice[] = [];
+  private alertRead = 0;
   private candidates = new Map<string, Notice>();
   private presentation = false;
   private displayEnabled = true;
@@ -151,6 +154,7 @@ export class NoticeRuntime {
     this.channel?.close();
     this.channel = null;
     this.queue = [];
+    this.alertQueue = [];
     this.candidates.clear();
     this.after = "";
     this.epoch = "";
@@ -244,8 +248,15 @@ export class NoticeRuntime {
             event.data.type === "system-popups"
           )
             this.applySystemPopups(event.data.enabled !== false);
+          if (
+            event.data?.subject === this.subject &&
+            event.data.type === "alert-popup"
+          )
+            void this.refreshAlerts(generation);
         };
       }
+      await this.restoreAlerts(generation);
+      await this.pop();
       await this.loadPending(generation);
       for (const claim of await this.store.all("claims", subject)) {
         if (
@@ -275,7 +286,7 @@ export class NoticeRuntime {
   }
   setPresentation(visible: boolean) {
     this.presentation = visible;
-    if (visible) void this.pop();
+    if (visible && this.ready) void this.refreshAlerts(this.generation);
   }
   private estimateNow() {
     return this.serverAnchor
@@ -530,10 +541,57 @@ export class NoticeRuntime {
     }
     return result;
   }
-  private enqueue(event: Notice) {
+  private async refreshAlerts(generation: number) {
+    try {
+      await this.restoreAlerts(generation);
+      await this.pop();
+    } catch (error) {
+      if (this.current(generation))
+        this.patch({ gap: "待确认告警恢复受限：" + String(error) });
+    }
+  }
+  private async restoreAlerts(generation: number) {
+    const subject = this.subject,
+      read = ++this.alertRead;
+    if (!subject || !this.ready) return;
+    const receipts = await this.store.all("cache", subject);
+    if (!this.current(generation) || read !== this.alertRead) return;
+    this.alertQueue = receipts
+      .filter(
+        (row) =>
+          row.key.startsWith(subject + ":alert-popup:") &&
+          !row.value.confirmed_at,
+      )
+      .sort(
+        (a, b) =>
+          a.at - b.at ||
+          a.value.event.first_seq - b.value.event.first_seq ||
+          a.key.localeCompare(b.key),
+      )
+      .map((row) => row.value.event);
+    const active = this.state.bubble;
+    if (this.alertQueue.length) {
+      // A waiting trade preempts passive notices. Never replay the displaced or
+      // intervening system messages after the user finishes confirming trades.
+      this.queue = [];
+      if (active && active.source_kind !== "chart_alert")
+        this.patch({ bubble: null });
+    }
     if (
-      event.source_kind !== "chart_alert" &&
-      (!this.state.systemPopups || event.severity === "info")
+      active?.source_kind === "chart_alert" &&
+      !this.alertQueue.some((row) => row.id === active.id)
+    )
+      this.patch({ bubble: null });
+    this.patch({ alertPending: this.alertQueue.length });
+  }
+  private enqueue(event: Notice) {
+    // Trading alerts enter through the same transaction as the changes cursor.
+    if (event.source_kind === "chart_alert") return;
+    if (
+      !this.state.systemPopups ||
+      event.severity === "info" ||
+      this.alertQueue.length ||
+      this.state.bubble?.source_kind === "chart_alert"
     )
       return;
     if (
@@ -568,12 +626,17 @@ export class NoticeRuntime {
       this.popping ||
       !subject ||
       !this.presentation ||
+      !this.displayEnabled ||
       document.visibilityState !== "visible" ||
       this.state.bubble
     )
       return;
     this.popping = true;
     try {
+      if (this.alertQueue.length) {
+        this.patch({ bubble: this.alertQueue[0] });
+        return;
+      }
       while (this.queue.length && this.current(generation)) {
         const event = this.queue.shift()!;
         if (
@@ -587,7 +650,13 @@ export class NoticeRuntime {
           subject,
           (old) => (old ? undefined : { reserved: true }),
         );
-        if (!prior && this.current(generation)) {
+        if (!this.current(generation)) return;
+        // A trade can arrive while the passive display claim is being stored.
+        if (this.alertQueue.length) {
+          this.patch({ bubble: this.alertQueue[0] });
+          break;
+        }
+        if (!prior) {
           this.patch({ bubble: event });
           break;
         }
@@ -599,9 +668,39 @@ export class NoticeRuntime {
       this.popping = false;
     }
   }
-  dismiss() {
+  dismiss(eventId?: string) {
+    const active = this.state.bubble;
+    if (
+      !active ||
+      active.source_kind === "chart_alert" ||
+      (eventId && eventId !== active.id)
+    )
+      return;
     this.patch({ bubble: null });
     void this.pop();
+  }
+  private async confirmAlert(eventId: string) {
+    const generation = this.generation,
+      subject = this.subject;
+    // Stale or duplicate clicks cannot confirm the next queued event.
+    if (
+      this.state.bubble?.source_kind !== "chart_alert" ||
+      this.state.bubble.id !== eventId
+    )
+      return;
+    await this.store.update(
+      "cache",
+      subject + ":alert-popup:" + eventId,
+      subject,
+      (old) =>
+        old && !old.confirmed_at
+          ? { ...old, confirmed_at: Date.now() }
+          : undefined,
+    );
+    if (!this.current(generation)) return;
+    this.channel?.postMessage({ subject, type: "alert-popup" });
+    await this.restoreAlerts(generation);
+    await this.pop();
   }
   private async observation(
     eventId: string,
@@ -732,6 +831,14 @@ export class NoticeRuntime {
                 change.kind === "deleted",
             )
             .map((change: any) => change.event_id),
+          candidates.filter(
+            (event) =>
+              event.source_kind === "chart_alert" &&
+              event.kind === "alert" &&
+              event.attention &&
+              !event.backfill &&
+              event.notify_web !== false,
+          ),
         );
         if (!this.current(generation)) return;
         this.after = result.after;
@@ -742,6 +849,9 @@ export class NoticeRuntime {
           unread,
           revision: this.state.revision + (result.changes.length ? 1 : 0),
         });
+        await this.restoreAlerts(generation);
+        if (!this.current(generation)) return;
+        await this.pop();
         for (const event of candidates) {
           void this.observation(event.id, "received");
           this.enqueue(event);
@@ -917,6 +1027,7 @@ export class NoticeRuntime {
       }
       await this.loadPending(generation);
       void this.playCandidates();
+      void this.pop();
       this.schedule(generation, more ? 20 : 2000);
     } catch (error) {
       if (!this.current(generation)) return;
@@ -933,7 +1044,10 @@ export class NoticeRuntime {
         this.patch({
           epoch: "",
           events: [],
-          bubble: null,
+          bubble:
+            this.state.bubble?.source_kind === "chart_alert"
+              ? this.state.bubble
+              : null,
           status: "通知日志已换代，正在恢复；历史不会重新提示或响铃",
         });
         this.schedule(generation, 0);
@@ -1186,8 +1300,11 @@ export class NoticeRuntime {
     } else if (action.action === "unlock") {
       await this.unlock();
       result = { ok: true };
+    } else if (action.action === "confirm-alert" && id) {
+      await this.confirmAlert(id);
+      result = { ok: true };
     } else if (action.action === "dismiss") {
-      this.dismiss();
+      this.dismiss(id);
       result = { ok: true };
     } else throw Error("不允许的通知操作");
     if (!this.current(generation)) throw Error("通知会话已失效，忽略过期响应");

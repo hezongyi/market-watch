@@ -319,37 +319,132 @@ const assert = require("node:assert/strict"),
   const unified = fixture();
   unified.runtime.pop = async () => {};
   unified.runtime.estimateNow = () => 1000;
-  unified.runtime.state.systemPopups = false;
   const instant = {id:"trade",source_kind:"chart_alert",kind:"alert",severity:"warning",attention:true,occurred_at:1000};
+  unified.runtime.state.systemPopups = false;
   unified.runtime.enqueue({...instant,id:"system",source_kind:"workspace"});
-  unified.runtime.enqueue(instant);
-  assert.equal(unified.runtime.queue.length,1,"system popup preference cannot suppress trading alerts");
+  assert.equal(unified.runtime.queue.length,0);
   unified.runtime.state.systemPopups = true;
   unified.runtime.enqueue({...instant,id:"ordinary",source_kind:"workspace",severity:"info"});
-  assert.equal(unified.runtime.queue.length,1,"ordinary system records stay in the center without a popup");
+  assert.equal(unified.runtime.queue.length,0,"ordinary system records never pop");
   unified.runtime.enqueue({...instant,id:"abnormal",source_kind:"workspace",severity:"error"});
-  assert.equal(unified.runtime.queue.length,2,"system abnormalities join the same bounded instant queue");
+  assert.equal(unified.runtime.queue.length,1);
   unified.runtime.state.bubble = unified.runtime.queue.shift();
   unified.runtime.applySystemPopups(false);
-  assert.equal(unified.runtime.state.bubble,null,"disabling system popups dismisses the active system card");
-  assert.equal(unified.runtime.queue.length,1);
+  assert.equal(unified.runtime.state.bubble,null);
   const delayed = fixture();
   sandbox.document = {visibilityState:"visible"};
   delayed.runtime.presentation = true;
   delayed.runtime.estimateNow = () => 40001;
   delayed.runtime.queue = [
-    {...instant,id:"expired",occurred_at:1000},
-    {...instant,id:"fresh",occurred_at:40000},
+    {...instant,id:"expired",source_kind:"workspace",occurred_at:1000},
+    {...instant,id:"fresh",source_kind:"workspace",occurred_at:40000},
   ];
   const claimed = [];
   delayed.runtime.store.update = async (_name,key) => {claimed.push(key);};
   await delayed.runtime.pop();
-  assert.equal(delayed.runtime.state.bubble.id,"fresh","a hovered card cannot cause stale queued server messages to pop later");
-  assert.equal(claimed.length,1,"expired queued messages do not acquire display claims");
-  sandbox.testAPI = async path => {
-    assert.match(path,/audience=system/);
-    return {events:[]};
+  assert.equal(delayed.runtime.state.bubble.id,"fresh","system messages still respect freshness");
+  assert.equal(claimed.length,1);
+  const receipts = new Map(Array.from({length:25},(_,i)=> {
+    const key="admin:alert-popup:trade-"+i;
+    return [key,{key,at:1,value:{event:{...instant,id:"trade-"+i,first_seq:i},confirmed_at:null}}];
+  }));
+  const tradeRuntime = () => {
+    const r=new Runtime();r.ready=true;r.subject="admin";r.presentation=true;
+    r.estimateNow=()=>1e12;
+    r.store={all:async(name)=>name==="cache"?[...receipts.values()]:[],
+      update:async(name,key,subject,fn)=>{const row=receipts.get(key);const old=row?.value;const next=fn(old);if(next!==undefined)row.value=next;return old;}};
+    return r;
   };
+  const trades=tradeRuntime();
+  trades.state.bubble={...instant,id:"passive",source_kind:"workspace"};
+  await trades.restoreAlerts(0);await trades.pop();
+  assert.equal(trades.state.bubble.id,"trade-0");
+  assert.equal(trades.state.alertPending,25);
+  trades.enqueue({...instant,id:"during",source_kind:"workspace",severity:"critical"});
+  assert.equal(trades.queue.length,0,"system messages during trade confirmation cannot replay");
+  trades.dismiss("trade-0");assert.equal(trades.state.bubble.id,"trade-0","dismiss is never trade confirmation");
+  const refresh=tradeRuntime();await refresh.restoreAlerts(0);await refresh.pop();
+  assert.equal(refresh.state.bubble.id,"trade-0","refresh restores the same pending alert");
+  await trades.action({action:"confirm-alert",event_id:"trade-0"});
+  assert.equal(trades.state.bubble.id,"trade-1");
+  assert.equal(trades.state.alertPending,24);
+  await trades.action({action:"confirm-alert",event_id:"trade-0"});
+  assert.equal(trades.state.bubble.id,"trade-1","a stale double-click cannot confirm the next alert");
+  await refresh.restoreAlerts(0);await refresh.pop();
+  assert.equal(refresh.state.bubble.id,"trade-1","same-profile tabs reconcile confirmation");
+  assert.equal(receipts.get("admin:alert-popup:trade-0").value.event.viewed_at,undefined);
+  assert.equal(receipts.get("admin:alert-popup:trade-0").value.event.handled_at,undefined);
+  const preemption = fixture();
+  preemption.runtime.presentation = true;
+  preemption.runtime.state.bubble = {...instant,id:"passive-before-trade",source_kind:"workspace"};
+  const preemptionReceipts = [];
+  const preemptionStore = preemption.runtime.store;
+  preemption.runtime.store = {
+    ...preemptionStore,
+    all: async name => name === "cache" ? preemptionReceipts : preemptionStore.all(name),
+    saveProgress: async (...args) => {
+      await preemptionStore.saveProgress(...args);
+      for (const event of args[6] || [])
+        preemptionReceipts.push({key:"admin:alert-popup:"+event.id,at:1,value:{event,confirmed_at:null}});
+    },
+  };
+  let uploadStarted, releaseUpload;
+  const uploading = new Promise(resolve => {uploadStarted=resolve;});
+  const uploadGate = new Promise(resolve => {releaseUpload=resolve;});
+  const preemptionAPI = sandbox.testAPI;
+  sandbox.testAPI = async (path,body,...args) => {
+    if (path.startsWith("/notification-center/changes"))
+      return {changes:[{kind:"created",body:{...instant,id:"priority-trade",notify_web:true,first_seq:1}}],
+        after:"next",epoch:"epoch",unread:0,server_time:Date.now(),more:false};
+    if (path === "/notification-center/events" && body) {
+      uploadStarted();
+      await uploadGate;
+      return {status:"accepted"};
+    }
+    return preemptionAPI(path,body,...args);
+  };
+  const preemptionCycle = preemption.runtime.cycle(0);
+  await uploading;
+  try {
+    assert.equal(preemption.runtime.state.bubble?.id,"priority-trade",
+      "a persisted live trade immediately replaces a system card before unrelated background uploads complete");
+    assert.equal(preemption.runtime.state.alertPending,1);
+  } finally {
+    releaseUpload();
+  }
+  await preemptionCycle;
+  const offlineStartup = new Runtime();
+  offlineStartup.attach = () => {};
+  offlineStartup.schedule = () => {};
+  sandbox.navigator = {};
+  let openStartupStore;
+  const startupStoreGate = new Promise(resolve => {openStartupStore=resolve;});
+  offlineStartup.store = {
+    open: () => startupStoreGate,
+    update: async () => "profile",
+    prune: async () => ({lost:0}),
+    get: async (_name,key) => key === "admin:progress"
+      ? {after:"saved-cursor",epoch:"epoch",unread:0} : undefined,
+    all: async name => name === "cache"
+      ? [{key:"admin:alert-popup:offline-trade",at:1,
+        value:{event:{...instant,id:"offline-trade",first_seq:1},confirmed_at:null}}] : [],
+  };
+  let networkStarted;
+  const startupNetwork = new Promise(resolve => {networkStarted=resolve;});
+  sandbox.testAPI = async () => {
+    networkStarted();
+    return new Promise(() => {});
+  };
+  const startingOffline = offlineStartup.start("admin");
+  offlineStartup.setPresentation(true);
+  openStartupStore();
+  await startingOffline;
+  await startupNetwork;
+  assert.equal(offlineStartup.state.bubble?.id,"offline-trade",
+    "startup restores persisted unconfirmed trades without waiting for the network, even when presentation mounts before IDB opens");
+  assert.equal(offlineStartup.state.alertPending,1);
+  offlineStartup.pause();
+  sandbox.testAPI = async path => {assert.match(path,/audience=system/);return {events:[]};};
   await unified.runtime.action({action:"history",filters:{audience:"alerts"}});
   const counts=fixture();
   const unscoped=sandbox.testAPI;
