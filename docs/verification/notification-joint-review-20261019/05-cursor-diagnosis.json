@@ -1,0 +1,33 @@
+{
+  "oldCursorStatus": 400,
+  "oldCursorError": "无效通知游标",
+  "freshBaselineStatus": 200,
+  "freshCursorStatus": 200,
+  "projectionState": "ok",
+  "pendingSources": 0,
+  "checkedAt": "2026-10-19T12:22:51.142Z",
+  "userEvidence": "05-user-pending-109.png",
+  "reportedLocalCount": 109,
+  "serverLogSample": {
+    "window": "previous 1h; tail capped at 30000 lines",
+    "invalidCursorDistinctCount": 1,
+    "invalidCursor400Count": 113
+  },
+  "readOnlyServerValidation": {
+    "payloadParseOk": true,
+    "cursorKind": "changes",
+    "signatureMatchesCurrent": false,
+    "epochMatchesCurrent": false,
+    "cursorSeq": 276,
+    "currentSeqAtProbe": 2176
+  },
+  "isolatedRuntimeReproduction": {
+    "cycles": 3,
+    "uploadAttempts": 0,
+    "pendingStatus": "pending",
+    "footer": "连接受限，本机待同步记录保留",
+    "freshBaselineComparison": "upload reaches accepted",
+    "recoveryAssertion": "FAIL as expected; current runtime retains invalid cursor"
+  },
+  "scope": "No production/runtime source changes, no user cache cleanup or queue edits. Invalid logged cursor not directly attributed to a specific browser because access log has no browser identity."
+}
