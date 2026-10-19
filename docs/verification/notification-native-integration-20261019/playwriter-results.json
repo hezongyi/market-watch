@@ -1,0 +1,470 @@
+{
+  "started": "2026-10-19T05:26:06.066Z",
+  "realData": true,
+  "checks": [
+    {
+      "name": "real-worker-triggered-four-distinct-alerts",
+      "text": "交易告警\n真实行情验收 4\n\n价格 低于 1.12274 · 触发价 1.12273 · 比较值 1.12274\n\n另有 3 条交易告警待确认\n\n05:27 AM\n查看图表\n告警记录\n确定"
+    },
+    {
+      "name": "actual-save-failure-recorded-without-replacing-trade",
+      "passed": true
+    },
+    {
+      "name": "view-alert-record-is-not-confirmation",
+      "passed": true
+    },
+    {
+      "name": "cross-tab-explicit-confirm-only-current-event",
+      "passed": true
+    },
+    {
+      "name": "explicit-fifo-confirmation-drains-without-replaying-system",
+      "passed": true
+    },
+    {
+      "name": "real-delayed-history-switch-no-layout-shift",
+      "passed": true,
+      "evidence": {
+        "before": {
+          "frame": {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 960
+          },
+          "canvas": {
+            "x": 56,
+            "y": 42,
+            "width": 972,
+            "height": 809
+          }
+        },
+        "requests": [
+          {
+            "url": "https://192.168.7.232:18280/api/charts/history-loads",
+            "body": {
+              "request_id": "58d6befc-f325-4cb9-8efb-5fd3b705b148",
+              "query": {
+                "instrument": "EURUSD",
+                "series_kind": "provider",
+                "published": false,
+                "client": "5fb27322-62e3-4ff8-86db-0684d9f3d789",
+                "timeframe": "M30",
+                "limit": 172,
+                "countBack": 172,
+                "from": 1792079404000,
+                "firstDataRequest": true,
+                "native_history": {
+                  "chart_count": 1,
+                  "focused": true,
+                  "historical_navigation": false,
+                  "screen_bars": 162,
+                  "batch_screens": 1
+                },
+                "history_page_bars": 4000,
+                "indicators": [],
+                "before": 1792389004000,
+                "track_history": false
+              },
+              "notice_context": {
+                "workspace_id": "mw75-real",
+                "chart_index": ""
+              }
+            },
+            "started": 1792388952871
+          }
+        ],
+        "during": {
+          "frame": {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 960
+          },
+          "canvas": {
+            "x": 56,
+            "y": 42,
+            "width": 972,
+            "height": 809
+          },
+          "strips": 0
+        },
+        "after": {
+          "frame": {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 960
+          },
+          "canvas": {
+            "x": 56,
+            "y": 42,
+            "width": 972,
+            "height": 809
+          }
+        }
+      }
+    },
+    {
+      "name": "popup-confirm-does-not-view-handle-or-stop-phone",
+      "passed": true,
+      "phone": [
+        {
+          "id": "s:7f80ed27-91c9-5ea5-8fda-42768a1759c1",
+          "viewed": null,
+          "handled": null,
+          "channels": {
+            "phone_state:": {
+              "signal_id": "e3460f66-0be8-433d-974a-dacdf7bb5640",
+              "notification_id": "e5197987-554b-43d6-bd42-e6a65968f842",
+              "status": "pending",
+              "stopped_at": null
+            }
+          }
+        },
+        {
+          "id": "s:44a2dca9-ae62-5f41-924c-71a0885362fb",
+          "viewed": null,
+          "handled": null,
+          "channels": {
+            "phone_state:": {
+              "signal_id": "b3ad2da6-8220-45d7-b976-64fd6860e1f3",
+              "notification_id": "eafc61ed-f735-4994-a7ef-b6918c5bffc4",
+              "status": "pending",
+              "stopped_at": null
+            }
+          }
+        },
+        {
+          "id": "s:b5576ee8-c853-514d-92fb-68a52a729164",
+          "viewed": null,
+          "handled": null,
+          "channels": {
+            "phone_state:": {
+              "signal_id": "b8beb390-e0c1-4d27-9e51-f42218d9bfe0",
+              "notification_id": "4f30d56f-360d-4128-b218-60725729889c",
+              "status": "pending",
+              "stopped_at": null
+            }
+          }
+        },
+        {
+          "id": "s:ac1ab94c-2dc7-5e70-8a24-82c266ce6578",
+          "viewed": null,
+          "handled": null,
+          "channels": {
+            "phone_state:": {
+              "signal_id": "efcf9e0f-ed67-48fa-a032-4c790ae3f76b",
+              "notification_id": "11d7e3c4-a7db-49b9-9972-9338fcb963b4",
+              "status": "pending",
+              "stopped_at": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "native-system-card-no-autofocus-hover-pause-eight-second-dismiss",
+      "passed": true,
+      "evidence": {
+        "text": "系统消息\n关闭即时通知\n工作区保存失败，请保留草稿\n\nTypeError: Failed to fetch\n\n06:01 AM\n查看消息",
+        "focused": false,
+        "geometry": {
+          "x": 542.5,
+          "y": 46,
+          "width": 355,
+          "height": 192
+        },
+        "hoverPause": true,
+        "autoDismiss": true
+      }
+    },
+    {
+      "name": "real-system-center-search-scroll-theme-narrow",
+      "passed": true,
+      "evidence": {
+        "searchWithoutAutofocusOrOutline": true,
+        "systemOnly": true,
+        "noPageControls": true,
+        "rows": 84,
+        "narrow": {
+          "x": 438,
+          "y": 46,
+          "width": 400,
+          "height": 590
+        }
+      }
+    }
+  ],
+  "errors": [],
+  "completedAt": "2026-10-19T06:17:09.110Z",
+  "sourceCandidate": "f00235f4bf57b0b2654801fa8e6db5673850a5c1",
+  "slowLoading": {
+    "before": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "width": 1440,
+        "height": 960
+      },
+      "canvas": {
+        "x": 56,
+        "y": 42,
+        "width": 972,
+        "height": 809
+      }
+    },
+    "requests": [
+      {
+        "url": "https://192.168.7.232:18280/api/charts/history-loads",
+        "body": {
+          "request_id": "58d6befc-f325-4cb9-8efb-5fd3b705b148",
+          "query": {
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "published": false,
+            "client": "5fb27322-62e3-4ff8-86db-0684d9f3d789",
+            "timeframe": "M30",
+            "limit": 172,
+            "countBack": 172,
+            "from": 1792079404000,
+            "firstDataRequest": true,
+            "native_history": {
+              "chart_count": 1,
+              "focused": true,
+              "historical_navigation": false,
+              "screen_bars": 162,
+              "batch_screens": 1
+            },
+            "history_page_bars": 4000,
+            "indicators": [],
+            "before": 1792389004000,
+            "track_history": false
+          },
+          "notice_context": {
+            "workspace_id": "mw75-real",
+            "chart_index": ""
+          }
+        },
+        "started": 1792388952871
+      }
+    ],
+    "during": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "width": 1440,
+        "height": 960
+      },
+      "canvas": {
+        "x": 56,
+        "y": 42,
+        "width": 972,
+        "height": 809
+      },
+      "strips": 0
+    },
+    "after": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "width": 1440,
+        "height": 960
+      },
+      "canvas": {
+        "x": 56,
+        "y": 42,
+        "width": 972,
+        "height": 809
+      }
+    }
+  },
+  "systemTimer": {
+    "text": "系统消息\n关闭即时通知\n工作区保存失败，请保留草稿\n\nTypeError: Failed to fetch\n\n06:01 AM\n查看消息",
+    "focused": false,
+    "geometry": {
+      "x": 542.5,
+      "y": 46,
+      "width": 355,
+      "height": 192
+    },
+    "hoverPause": true,
+    "autoDismiss": true
+  },
+  "center": {
+    "searchWithoutAutofocusOrOutline": true,
+    "systemOnly": true,
+    "noPageControls": true,
+    "rows": 84,
+    "narrow": {
+      "x": 438,
+      "y": 46,
+      "width": 400,
+      "height": 590
+    }
+  },
+  "realTradeEvents": [
+    {
+      "id": "s:44a2dca9-ae62-5f41-924c-71a0885362fb",
+      "title": "真实行情验收 1",
+      "confirmed": null,
+      "occurred": 1792387664174
+    },
+    {
+      "id": "s:7f80ed27-91c9-5ea5-8fda-42768a1759c1",
+      "title": "真实行情验收 2",
+      "confirmed": null,
+      "occurred": 1792387664174
+    },
+    {
+      "id": "s:ac1ab94c-2dc7-5e70-8a24-82c266ce6578",
+      "title": "真实行情验收 4",
+      "confirmed": null,
+      "occurred": 1792387650090
+    },
+    {
+      "id": "s:b5576ee8-c853-514d-92fb-68a52a729164",
+      "title": "真实行情验收 3",
+      "confirmed": null,
+      "occurred": 1792387650090
+    }
+  ],
+  "confirmedPopups": [
+    {
+      "id": "s:44a2dca9-ae62-5f41-924c-71a0885362fb",
+      "title": "真实行情验收 1",
+      "confirmed": 1792388836772,
+      "occurred": 1792387664174
+    },
+    {
+      "id": "s:7f80ed27-91c9-5ea5-8fda-42768a1759c1",
+      "title": "真实行情验收 2",
+      "confirmed": 1792388837771,
+      "occurred": 1792387664174
+    },
+    {
+      "id": "s:ac1ab94c-2dc7-5e70-8a24-82c266ce6578",
+      "title": "真实行情验收 4",
+      "confirmed": 1792388663067,
+      "occurred": 1792387650090
+    },
+    {
+      "id": "s:b5576ee8-c853-514d-92fb-68a52a729164",
+      "title": "真实行情验收 3",
+      "confirmed": 1792388835669,
+      "occurred": 1792387650090
+    }
+  ],
+  "phoneBefore": [
+    {
+      "id": "s:7f80ed27-91c9-5ea5-8fda-42768a1759c1",
+      "viewed": null,
+      "handled": null,
+      "channels": {
+        "phone_state:": {
+          "signal_id": "e3460f66-0be8-433d-974a-dacdf7bb5640",
+          "notification_id": "e5197987-554b-43d6-bd42-e6a65968f842",
+          "status": "pending",
+          "stopped_at": null
+        }
+      }
+    },
+    {
+      "id": "s:44a2dca9-ae62-5f41-924c-71a0885362fb",
+      "viewed": null,
+      "handled": null,
+      "channels": {
+        "phone_state:": {
+          "signal_id": "b3ad2da6-8220-45d7-b976-64fd6860e1f3",
+          "notification_id": "eafc61ed-f735-4994-a7ef-b6918c5bffc4",
+          "status": "pending",
+          "stopped_at": null
+        }
+      }
+    },
+    {
+      "id": "s:b5576ee8-c853-514d-92fb-68a52a729164",
+      "viewed": null,
+      "handled": null,
+      "channels": {
+        "phone_state:": {
+          "signal_id": "b8beb390-e0c1-4d27-9e51-f42218d9bfe0",
+          "notification_id": "4f30d56f-360d-4128-b218-60725729889c",
+          "status": "pending",
+          "stopped_at": null
+        }
+      }
+    },
+    {
+      "id": "s:ac1ab94c-2dc7-5e70-8a24-82c266ce6578",
+      "viewed": null,
+      "handled": null,
+      "channels": {
+        "phone_state:": {
+          "signal_id": "efcf9e0f-ed67-48fa-a032-4c790ae3f76b",
+          "notification_id": "11d7e3c4-a7db-49b9-9972-9338fcb963b4",
+          "status": "pending",
+          "stopped_at": null
+        }
+      }
+    }
+  ],
+  "phoneAfter": [
+    {
+      "id": "s:7f80ed27-91c9-5ea5-8fda-42768a1759c1",
+      "viewed": null,
+      "handled": null,
+      "channels": {
+        "phone_state:": {
+          "signal_id": "e3460f66-0be8-433d-974a-dacdf7bb5640",
+          "notification_id": "e5197987-554b-43d6-bd42-e6a65968f842",
+          "status": "pending",
+          "stopped_at": null
+        }
+      }
+    },
+    {
+      "id": "s:44a2dca9-ae62-5f41-924c-71a0885362fb",
+      "viewed": null,
+      "handled": null,
+      "channels": {
+        "phone_state:": {
+          "signal_id": "b3ad2da6-8220-45d7-b976-64fd6860e1f3",
+          "notification_id": "eafc61ed-f735-4994-a7ef-b6918c5bffc4",
+          "status": "pending",
+          "stopped_at": null
+        }
+      }
+    },
+    {
+      "id": "s:b5576ee8-c853-514d-92fb-68a52a729164",
+      "viewed": null,
+      "handled": null,
+      "channels": {
+        "phone_state:": {
+          "signal_id": "b8beb390-e0c1-4d27-9e51-f42218d9bfe0",
+          "notification_id": "4f30d56f-360d-4128-b218-60725729889c",
+          "status": "pending",
+          "stopped_at": null
+        }
+      }
+    },
+    {
+      "id": "s:ac1ab94c-2dc7-5e70-8a24-82c266ce6578",
+      "viewed": null,
+      "handled": null,
+      "channels": {
+        "phone_state:": {
+          "signal_id": "efcf9e0f-ed67-48fa-a032-4c790ae3f76b",
+          "notification_id": "11d7e3c4-a7db-49b9-9972-9338fcb963b4",
+          "status": "pending",
+          "stopped_at": null
+        }
+      }
+    }
+  ],
+  "pageErrors": [],
+  "chartLibraryVersion": "TT v31.1.0 (internal id 6b804c486857f27920cf761aa7eb6e29d9bb6362 @ 2026-04-08T18:21:25.992Z)",
+  "note": "Real provider data and normal alert workers; browser save failure and 12-second history transport delay are controlled network faults. External phone delivery disabled. No credentials or full browser state exported."
+}
