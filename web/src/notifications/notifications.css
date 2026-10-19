@@ -409,7 +409,8 @@
 }
 .nc-popup {
   position: fixed;
-  z-index: 200;
+  /* Native chart menus and dialogs use the overlap layer at 150. */
+  z-index: 140;
   top: 48px;
   right: 12px;
   width: min(400px, calc(100vw - 24px));
@@ -421,7 +422,7 @@
 }
 .nc-bubble {
   position: fixed;
-  z-index: 210;
+  z-index: 145;
   top: 48px;
   left: 50%;
   transform: translateX(-50%);

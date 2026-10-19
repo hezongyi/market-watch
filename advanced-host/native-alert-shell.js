@@ -170,6 +170,26 @@ async function nativeAlertShell(
 
   function NativeMenu({ anchor, label, items, opened, onClose }) {
     const reference = nativeReact.useRef(null);
+    nativeReact.useEffect(() => {
+      if (!opened) return;
+      const frame = doc.defaultView.requestAnimationFrame(() => {
+        reference.current?.querySelector("button:not(:disabled)")?.focus();
+      });
+      return () => doc.defaultView.cancelAnimationFrame(frame);
+    }, [opened]);
+    nativeReact.useLayoutEffect(() => {
+      const buttons = reference.current?.querySelectorAll("button") || [];
+      buttons.forEach((button, index) => {
+        const item = items[index];
+        button.setAttribute(
+          "role",
+          item.checked === undefined ? "menuitem" : "menuitemcheckbox",
+        );
+        button.setAttribute("tabindex", "-1");
+        if (item.checked !== undefined)
+          button.setAttribute("aria-checked", String(item.checked));
+      });
+    });
     const close = () => {
       onClose();
       if (anchor?.isConnected) anchor.focus();
@@ -195,75 +215,81 @@ async function nativeAlertShell(
         },
         onClose: close,
         onKeyboardClose: close,
-        onOpen: () =>
-          reference.current
-            ?.querySelector('[role^="menuitem"]:not(:disabled)')
-            ?.focus(),
-        onKeyDown: (event) => {
-          const buttons = [
-            ...reference.current.querySelectorAll(
-              '[role^="menuitem"]:not(:disabled)',
-            ),
-          ];
-          const index = buttons.indexOf(event.target);
-          if (event.key === "Escape" || event.key === "Tab") {
+      },
+      nativeReact.createElement(
+        "div",
+        {
+          ref: reference,
+          role: "menu",
+          "aria-label": label,
+          "data-name": "mw-native-alert-menu",
+          onKeyDown: (event) => {
+            const buttons = [
+              ...reference.current.querySelectorAll(
+                '[role^="menuitem"]:not(:disabled)',
+              ),
+            ];
+            const index = buttons.indexOf(event.target);
+            if (event.key === "Escape" || event.key === "Tab") {
+              event.preventDefault();
+              event.stopPropagation();
+              close();
+              return;
+            }
+            let next;
+            if (event.key === "ArrowDown") next = (index + 1) % buttons.length;
+            else if (event.key === "ArrowUp")
+              next = (index - 1 + buttons.length) % buttons.length;
+            else if (event.key === "Home") next = 0;
+            else if (event.key === "End") next = buttons.length - 1;
+            else return;
             event.preventDefault();
             event.stopPropagation();
-            close();
-            return;
-          }
-          let next;
-          if (event.key === "ArrowDown") next = (index + 1) % buttons.length;
-          else if (event.key === "ArrowUp")
-            next = (index - 1 + buttons.length) % buttons.length;
-          else if (event.key === "Home") next = 0;
-          else if (event.key === "End") next = buttons.length - 1;
-          else return;
-          event.preventDefault();
-          event.stopPropagation();
-          buttons[next]?.focus();
+            buttons[next]?.focus();
+          },
         },
-      },
-      items.flatMap((item, index) =>
-        [
-          item.divider &&
-            nativeReact.createElement(PopupMenuSeparator, {
-              key: "separator-" + index,
+        items.flatMap((item, index) =>
+          [
+            item.divider &&
+              nativeReact.createElement(PopupMenuSeparator, {
+                key: "separator-" + index,
+              }),
+            nativeReact.createElement(PopupMenuItem, {
+              key: index,
+              label: item.label,
+              tagName: "button",
+              type: "button",
+              tabIndex: -1,
+              role:
+                item.checked === undefined ? "menuitem" : "menuitemcheckbox",
+              "aria-checked": item.checked,
+              "aria-disabled": Boolean(item.disabled),
+              disabled: item.disabled,
+              isDisabled: item.disabled,
+              toolbox: item.checked
+                ? nativeReact.createElement(
+                    "svg",
+                    {
+                      width: 16,
+                      height: 16,
+                      viewBox: "0 0 16 16",
+                      "aria-hidden": true,
+                    },
+                    nativeReact.createElement("path", {
+                      d: "m3 8 3 3 7-7",
+                      fill: "none",
+                      stroke: "currentColor",
+                      strokeWidth: 1.5,
+                    }),
+                  )
+                : null,
+              onClick: () => {
+                close();
+                item.run();
+              },
             }),
-          nativeReact.createElement(PopupMenuItem, {
-            key: index,
-            label: item.label,
-            tagName: "button",
-            type: "button",
-            tabIndex: -1,
-            role: item.checked === undefined ? "menuitem" : "menuitemcheckbox",
-            "aria-checked": item.checked,
-            "aria-disabled": Boolean(item.disabled),
-            disabled: item.disabled,
-            isDisabled: item.disabled,
-            toolbox: item.checked
-              ? nativeReact.createElement(
-                  "svg",
-                  {
-                    width: 16,
-                    height: 16,
-                    viewBox: "0 0 16 16",
-                    "aria-hidden": true,
-                  },
-                  nativeReact.createElement("path", {
-                    d: "m3 8 3 3 7-7",
-                    fill: "none",
-                    stroke: "currentColor",
-                    strokeWidth: 1.5,
-                  }),
-                )
-              : null,
-            onClick: () => {
-              close();
-              item.run();
-            },
-          }),
-        ].filter(Boolean),
+          ].filter(Boolean),
+        ),
       ),
     );
   }
@@ -466,7 +492,7 @@ async function nativeAlertShell(
         height = doc.defaultView.innerHeight;
       const panel = bar._wrap?.getBoundingClientRect();
       const toolbar = doc
-        .querySelector('.innerWrap-OhqNVIYA')
+        .querySelector(".innerWrap-OhqNVIYA")
         ?.getBoundingClientRect();
       return {
         width,
