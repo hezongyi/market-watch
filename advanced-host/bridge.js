@@ -177,7 +177,30 @@ function presentQuote(row) {
   // remains useful without a successful price; fetch_status carries the error.
   return {...result, s:result.s === "error" && value?.market_session ? "ok" : result.s, v: value};
 }
+function publishNotificationTimezone(zone, label) {
+  globalThis.MWChartTime?.set(zone, label);
+  send({type:"chart-timezone", zone, label, session:alertUISession, workspace_id:alertUIWorkspace});
+}
+function refreshNotificationTimezone() {
+  let zone = "UTC", label = "UTC（图表初始化前）";
+  try {
+    if (ready && !loading && widget) {
+      const chart = widget.activeChart();
+      const id = chart.getTimezoneApi().getTimezone().id;
+      zone = id;
+      label = id;
+      if (id === "exchange") {
+        const meta = presentationFor(chart.symbol());
+        // Match the timezone supplied to the chart datafeed exactly.
+        zone = meta ? meta.timezone || (meta.calendar === "utc0" ? "Etc/UTC" : "America/New_York") : "UTC";
+        label = meta ? `交易所 · ${zone}` : "UTC（交易所时区待解析）";
+      }
+    }
+  } catch (_) { zone = "UTC"; label = "UTC（图表时区暂不可用）"; }
+  publishNotificationTimezone(zone, label);
+}
 function refreshQuotePresentation() {
+  refreshNotificationTimezone();
   if (typeof dataCenter !== "undefined") dataCenter?.refreshTimezone?.();
   for (const sub of quoteSubscriptions.values()) {
     const rows = sub.symbols.map(ticker => quoteSnapshotRows.get(ticker)).filter(Boolean);
@@ -188,15 +211,22 @@ function bindTimezoneEvents() {
   if (!widget) return;
   for (const [api, changed] of timezoneBindings) api.onTimezoneChanged().unsubscribe(null, changed);
   timezoneBindings.clear();
+  for (const [chart, changed] of timezoneSymbolBindings) chart.onSymbolChanged().unsubscribe(null, changed);
+  timezoneSymbolBindings.clear();
   for (let index = 0; index < widget.chartsCount(); index++) {
     const api = widget.chart(index).getTimezoneApi?.();
     if (!api?.onTimezoneChanged) continue;
     const changed = () => refreshQuotePresentation();
     api.onTimezoneChanged().subscribe(null, changed);
     timezoneBindings.set(api, changed);
+    const chart = widget.chart(index);
+    chart.onSymbolChanged().subscribe(null, changed);
+    timezoneSymbolBindings.set(chart, changed);
   }
+  refreshNotificationTimezone();
 }
 const timezoneBindings = new Map();
+const timezoneSymbolBindings = new Map();
 let activeChartEventWidget;
 function unbindActiveChartEvent() {
   if (!activeChartEventWidget) return;
@@ -1133,6 +1163,7 @@ const feed = {
       if (!symbolPresentations.has(symbol)) symbolPresentations.set(symbol,meta);
       while(symbolPresentations.size>250) symbolPresentations.delete(symbolPresentations.keys().next().value);
       watchlistLayout?.refresh();
+      refreshNotificationTimezone();
       cb({
         name: meta.display_symbol || meta.symbol || MWSeries.display(symbol),
         ticker,
@@ -2066,6 +2097,7 @@ function boot(
   let attachingAlerts = 0, alertAttachQueue = Promise.resolve(), alertUIStopped = false;
   invalidateAlertUI = () => {
     attachingAlerts++;
+    publishNotificationTimezone("UTC", "UTC（图表初始化前）");
     noticeUI?.destroy(); noticeUI = undefined;
     alertUI?.destroy(); alertUI = undefined;
   };
@@ -2079,6 +2111,7 @@ function boot(
     noticeUI?.destroy(); noticeUI = undefined;
     alertUI?.destroy(); alertUI = undefined;
     try {
+      refreshNotificationTimezone();
       const instance = await MWNativeAlerts.attach({widget, scope: {workspace_id: workspaceId, session}, readonly,
         initialDraft: alertUIDraft,
         noticeRequest: query => request({workspace_id:workspaceId,session,...query}, 'notice-center-rpc', () => attempt === attachingAlerts && session === alertUISession),
@@ -2914,5 +2947,7 @@ addEventListener("pagehide", () => {
   unbindActiveChartEvent();
   for (const [api, changed] of timezoneBindings) api.onTimezoneChanged().unsubscribe(null, changed);
   timezoneBindings.clear();
+  for (const [chart, changed] of timezoneSymbolBindings) chart.onSymbolChanged().unsubscribe(null, changed);
+  timezoneSymbolBindings.clear();
   globalThis.MWChartMaximize?.dispose();barRangeMapping?.dispose();syncCoordinator?.dispose();
 }, {once:true});

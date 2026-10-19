@@ -1,5 +1,6 @@
 import {useNotices,useNoticeState} from "../notifications/context";
 import {NoticePanel,NoticeBubble} from "../notifications/Panel";
+import {setChartTime} from "../time/ChartTimeContext";
 import {operationFault} from "../notifications/operations";
 import type {NoticeAction} from "../notifications/types";
 import { validIndicatorRead } from "./indicatorRequests";
@@ -104,6 +105,10 @@ export default function AdvancedWorkspace() {
   >(null);
   const [datasetViews, setDatasetViews] = useState<DatasetViews>({});
   const [frameKey, setFrameKey] = useState(0);
+  useEffect(() => {
+    setChartTime("UTC", "UTC（图表初始化前）");
+    return () => setChartTime("UTC", "UTC（图表初始化前）");
+  }, [frameKey]);
   const [exportSelection, setExportSelection] =
     useState<ExportSelection | null>(null);
   const [historyProgress, setHistoryProgress] = useState<
@@ -184,6 +189,7 @@ export default function AdvancedWorkspace() {
       }, 15000);
     });
   const select = (row: Workspace) => {
+    setChartTime("UTC", "UTC（图表初始化前）");
     setNativeReady(false);setNotificationReady(false);
     setPollErrors({});
     setHistoryProgress({});
@@ -403,6 +409,10 @@ export default function AdvancedWorkspace() {
           if(source===frame.current?.contentWindow && session===alertUiSession.current && scope===current.current?.id)
             reply({type:'result',id:m.id,result});
         }catch(error){reply({type:'result',id:m.id,error:String(error),errorDetails:apiErrorDetails(error)});}return;
+      }
+      if(m.type==='chart-timezone' && m.session===alertUiSession.current && m.workspace_id===current.current?.id){
+        if(typeof m.zone==='string' && typeof m.label==='string' && m.zone.length<100 && m.label.length<160)setChartTime(m.zone,m.label);
+        return;
       }
       if(m.type==='notice-center-ready' && m.session===alertUiSession.current && m.workspace_id===current.current?.id){setNotificationReady(true);return;}
       if(m.type==='notice-center-unavailable' && m.session===alertUiSession.current){setNotificationReady(false);void notices.report({source_kind:'chart_shell',attempt_id:m.session+':notice-shell',code:'CHART_SHELL_UNAVAILABLE',title:'原生系统消息暂不可用',message:String(m.error||'接入失败'),context:{workspace_id:current.current?.id}});return;}

@@ -32,10 +32,9 @@ import "./notifications.css";
 import { SystemOccurrences } from "./SystemOccurrences";
 import { messageIcons } from "./icons";
 import { useSystemHistory } from "./useSystemHistory";
-const time = (value: number | null | undefined) =>
-  value ? new Date(value).toLocaleString() : "未知";
-const utc = (value: number | null | undefined) =>
-  value ? new Date(value).toISOString() : "未知";
+import { useChartTime, ChartTimeLabel } from "../time/ChartTimeContext";
+import { formatTimestamp, dayKey, clockTime } from "../time/chartTime";
+import { ZonedDateTimeInput } from "../time/ZonedDateTimeInput";
 const system = (row: Notice) => row.source_kind !== "chart_alert";
 const observationLabels: Record<string, string> = {
   received: "网页收到",
@@ -82,9 +81,22 @@ export function NoticePanel({
   onClose: () => void;
   onLocate?: (notice: Notice) => void | Promise<void>;
 }) {
+  const { zone } = useChartTime();
+  const time = (value: number | null | undefined) =>
+    formatTimestamp(value, zone);
+  const [timeValidity, setTimeValidity] = useState({
+    since: true,
+    until: true,
+  });
   const [debugOpen, setDebugOpen] = useState(false);
   const [pagedPage, setPage] = useState<HistoryPage | null>(null);
   const [filters, setFilters] = useState<Record<string, string>>({});
+  const rangeValid =
+    !filters.since ||
+    !filters.until ||
+    Number(filters.since) < Number(filters.until);
+  const timeFiltersValid =
+    timeValidity.since && timeValidity.until && rangeValid;
   const [selection, setSelection] = useState(eventId || ""),
     [settings, setSettings] = useState(false),
     [advanced, setAdvanced] = useState(false);
@@ -102,13 +114,19 @@ export function NoticePanel({
   const list = useRef<HTMLDivElement>(null),
     sentinel = useRef<HTMLDivElement>(null);
   const scrollClass = useContext(NativeScrollClass);
+  useEffect(() => {
+    if (!advanced)
+      setTimeValidity((old) =>
+        old.since && old.until ? old : { since: true, until: true },
+      );
+  }, [advanced]);
   const filterKey = JSON.stringify(filters);
   const history = useSystemHistory({
     request,
     filters,
     epoch: state.epoch,
     revision: state.revision,
-    enabled: nativePresentation && active && !settings,
+    enabled: nativePresentation && active && !settings && timeFiltersValid,
   });
   const page = nativePresentation ? history.page : pagedPage;
   const busy =
@@ -137,7 +155,7 @@ export function NoticePanel({
     setPage(null);
   }, [state.epoch]);
   useEffect(() => {
-    if (!active || settings || nativePresentation) return;
+    if (!active || settings || nativePresentation || !timeFiltersValid) return;
     const current = ++revision.current;
     setError("");
     setBusy(true);
@@ -174,6 +192,7 @@ export function NoticePanel({
   }, [
     request,
     filterKey,
+    timeFiltersValid,
     before,
     state.revision,
     state.epoch,
@@ -290,9 +309,9 @@ export function NoticePanel({
         epoch: page.epoch,
       }),
     );
-  const rows = (page?.events || []).filter(system),
+  const rows = (timeFiltersValid ? page?.events || [] : []).filter(system),
     pending = state.pending.filter(system);
-  const date = (row: Notice) => new Date(row.occurred_at).toLocaleDateString();
+  const date = (row: Notice) => dayKey(row.occurred_at, zone);
   return (
     <section
       className={"nc-panel" + (nativePresentation ? " nc-native-panel" : "")}
@@ -368,9 +387,15 @@ export function NoticePanel({
           )}
         </div>
       </header>
+      <ChartTimeLabel />
+      {!rangeValid && (
+        <p className="nc-problem" role="alert">
+          截止时间必须晚于起始时间。
+        </p>
+      )}
       {state.gap && (
         <p className="nc-problem" role="alert">
-          {state.gap}
+          {state.gap.replace(/（最早 .*?）$/, "")}
         </p>
       )}
       {problem && (
@@ -490,15 +515,9 @@ export function NoticePanel({
                 <dt>
                   发生时间{detail.client_reported_time ? "（客户端报告）" : ""}
                 </dt>
-                <dd>
-                  {time(detail.occurred_at)}
-                  <small>{utc(detail.occurred_at)}</small>
-                </dd>
+                <dd>{time(detail.occurred_at)}</dd>
                 <dt>服务端记录</dt>
-                <dd>
-                  {time(detail.recorded_at)}
-                  <small>{utc(detail.recorded_at)}</small>
-                </dd>
+                <dd>{time(detail.recorded_at)}</dd>
                 <dt>已读 / 处理</dt>
                 <dd>
                   {time(detail.viewed_at)} / {time(detail.handled_at)}
@@ -686,33 +705,36 @@ export function NoticePanel({
               </label>
               <label>
                 起始时间
-                <AlertInput
-                  type="datetime-local"
-                  aria-label="起始时间"
-                  onChange={(e) =>
-                    setFilter(
-                      "since",
-                      e.target.value
-                        ? String(new Date(e.target.value).getTime())
-                        : "",
+                <ZonedDateTimeInput
+                  label="起始时间"
+                  zone={zone}
+                  value={filters.since ? Number(filters.since) : null}
+                  onChange={(value) =>
+                    setFilter("since", value == null ? "" : String(value))
+                  }
+                  onValidityChange={(valid) =>
+                    setTimeValidity((old) =>
+                      old.since === valid ? old : { ...old, since: valid },
                     )
                   }
                 />
               </label>
               <label>
                 截止时间
-                <AlertInput
-                  type="datetime-local"
-                  aria-label="截止时间"
-                  onChange={(e) =>
-                    setFilter(
-                      "until",
-                      e.target.value
-                        ? String(new Date(e.target.value).getTime())
-                        : "",
+                <ZonedDateTimeInput
+                  label="截止时间"
+                  zone={zone}
+                  value={filters.until ? Number(filters.until) : null}
+                  onChange={(value) =>
+                    setFilter("until", value == null ? "" : String(value))
+                  }
+                  onValidityChange={(valid) =>
+                    setTimeValidity((old) =>
+                      old.until === valid ? old : { ...old, until: valid },
                     )
                   }
                 />
+                <small>截止时刻不包含在结果内；输入按 {zone} 解释。</small>
               </label>
             </div>
           )}
@@ -752,12 +774,7 @@ export function NoticePanel({
                   <span className="nc-row-copy">
                     <span className="nc-row-meta">
                       <strong>{noticeInstrument(row)}</strong>
-                      <time>
-                        {new Date(row.occurred_at).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </time>
+                      <time>{clockTime(row.occurred_at, zone)}</time>
                     </span>
                     <span>{row.title}</span>
                     <small>
@@ -857,6 +874,7 @@ export function NoticeBubble({
   onOpen: () => void | Promise<void>;
   onLocate?: () => void | Promise<void>;
 }) {
+  const { zone } = useChartTime();
   const trading = !system(notice);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null),
     inside = useRef(false),
@@ -989,10 +1007,7 @@ export function NoticeBubble({
       )}
       <div className="nc-bubble-actions">
         <small>
-          {new Date(notice.occurred_at).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
+          {formatTimestamp(notice.occurred_at, zone)} · {zone}
         </small>
         {trading && onLocate && (
           <button

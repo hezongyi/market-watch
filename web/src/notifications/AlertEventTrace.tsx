@@ -1,3 +1,5 @@
+import { useChartTime } from "../time/ChartTimeContext";
+import { formatTimestamp } from "../time/chartTime";
 import { useEffect, useState } from "react";
 import { AlertButton } from "../advanced/NativeAlertControls";
 import type { Notice, NoticeTransport } from "./types";
@@ -10,6 +12,7 @@ export function AlertEventTrace({
   signalId: string;
   request: NoticeTransport;
 }) {
+  const { zone } = useChartTime();
   const [opened, setOpened] = useState(false),
     [row, setRow] = useState<Notice | null>(null),
     [error, setError] = useState("");
@@ -62,10 +65,40 @@ export function AlertEventTrace({
           <p>
             网页已读：
             {row.viewed_at
-              ? new Date(row.viewed_at).toLocaleString()
+              ? formatTimestamp(row.viewed_at, zone)
               : "本次已查看，等待同步"}
           </p>
           <p>网页渲染、声音开始、服务接受与设备收到分别记录。</p>
+          <p>事件时间：{formatTimestamp(row.occurred_at, zone)}</p>
+          {Object.entries(row.channels || {}).map(([channel, facts]) => (
+            <p key={channel}>
+              {channel} · {facts.status || ""}
+              {(["at", "received_at", "stopped_at"] as const).map((key) =>
+                typeof facts[key] === "number" ? (
+                  <span key={key}>
+                    {" "}
+                    ·{" "}
+                    {key === "at"
+                      ? "尝试"
+                      : key === "received_at"
+                        ? "收到"
+                        : "停止"}{" "}
+                    {formatTimestamp(facts[key], zone)}
+                  </span>
+                ) : null,
+              )}
+            </p>
+          ))}
+          <ol>
+            {observations.map((item) => (
+              <li key={item.id}>
+                {item.kind} · 服务端 {formatTimestamp(item.received_at, zone)}
+                {item.reported_at != null && (
+                  <> · 客户端 {formatTimestamp(item.reported_at, zone)}</>
+                )}
+              </li>
+            ))}
+          </ol>
           <pre>
             {JSON.stringify(
               { channels: row.channels || {}, observations },

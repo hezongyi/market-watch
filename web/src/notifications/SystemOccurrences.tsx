@@ -1,3 +1,5 @@
+import { useChartTime } from "../time/ChartTimeContext";
+import { formatTimestamp } from "../time/chartTime";
 import { useEffect, useState } from "react";
 import { AlertButton } from "../advanced/NativeAlertControls";
 import type { HistoryPage, NoticeTransport } from "./types";
@@ -9,6 +11,7 @@ export function SystemOccurrences({
   incident: string;
   request: NoticeTransport;
 }) {
+  const { zone } = useChartTime();
   const [page, setPage] = useState<HistoryPage | null>(null),
     [before, setBefore] = useState<string | null>(null),
     [error, setError] = useState("");
@@ -37,7 +40,7 @@ export function SystemOccurrences({
       {page?.events.map((row) => (
         <details key={row.id}>
           <summary>
-            {new Date(row.occurred_at).toLocaleString()} · {row.title}
+            {formatTimestamp(row.occurred_at, zone)} · {row.title}
           </summary>
           <pre>
             {JSON.stringify(

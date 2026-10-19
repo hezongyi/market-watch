@@ -1,0 +1,23 @@
+.chart-time-label {
+  padding: 5px 12px;
+  color: inherit;
+  opacity: 0.85;
+  font-size: 11px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  flex: 0 0 auto;
+}
+.zoned-time-input {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.zoned-time-error {
+  color: #f23645;
+  font-size: 12px;
+}
+.zoned-time-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}

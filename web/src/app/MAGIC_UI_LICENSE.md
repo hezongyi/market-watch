@@ -1,11 +1,7 @@
 # Magic UI attribution
 
-The selected breathing dot background adapts the visual behavior of Magic UI's
-Dot Pattern / Glow to native SVG and CSS. It does not bundle Motion or Tailwind.
-
-Source: https://github.com/magicuidesign/magicui/blob/85f97fd27b053339af74ba9dd4ca428ee25989fb/apps/www/registry/magicui/dot-pattern.tsx
-
-License source: https://github.com/magicuidesign/magicui/blob/85f97fd27b053339af74ba9dd4ca428ee25989fb/LICENSE.md
+The login background adapts Magic UI's Canvas Particles component. The pinned
+source and adaptation details are recorded below.
 
 MIT License
 

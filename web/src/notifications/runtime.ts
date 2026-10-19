@@ -212,7 +212,7 @@ export class NoticeRuntime {
       this.nextPrune = performance.now() + 60000;
       if (!this.current(generation)) return;
       if (pruned.lost) {
-        const gap = `${pruned.lost} 条本机待同步记录超过七天，未能保存到服务器（最早 ${new Date(pruned.from!).toLocaleString()}）`;
+        const gap = `${pruned.lost} 条本机待同步记录超过七天，未能保存到服务器`;
         await this.store.update("meta", subject + ":gap", subject, () => gap);
       }
       const gap = await this.store.get("meta", subject + ":gap");
@@ -1020,7 +1020,7 @@ export class NoticeRuntime {
         const pruned = await this.store.prune(subject);
         this.nextPrune = performance.now() + 60000;
         if (pruned.lost) {
-          const gap = `${pruned.lost} 条本机记录超过七天，未能保存到服务器（最早 ${new Date(pruned.from!).toLocaleString()}）`;
+          const gap = `${pruned.lost} 条本机记录超过七天，未能保存到服务器`;
           await this.store.update("meta", subject + ":gap", subject, () => gap);
           if (this.current(generation)) this.patch({ gap });
         }

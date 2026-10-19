@@ -188,6 +188,8 @@ jobs:
         run: |
           node tests/single-app-routing.cjs
           node tests/chart-tab.cjs
+          TZ=Asia/Shanghai node tests/chart-time.cjs
+          TZ=America/Los_Angeles node tests/chart-time.cjs
           node tests/symbol-flags.cjs
           node tests/notifications-runtime.cjs
           node tests/notifications-persistence.cjs

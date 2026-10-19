@@ -1,3 +1,6 @@
+import { useChartTime, ChartTimeLabel } from "../time/ChartTimeContext";
+import { formatTimestamp } from "../time/chartTime";
+import { ZonedDateTimeInput } from "../time/ZonedDateTimeInput";
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 import { AlertMenu } from "./AlertMenu";
@@ -9,7 +12,7 @@ import {
   AlertTextarea,
   NativeControlsDisabled,
 } from "./NativeAlertControls";
-import { api, date } from "../api";
+import { api } from "../api";
 import { createPortal } from "react-dom";
 import type { AlertApi } from "./chartAlertUiApi";
 import type {
@@ -133,6 +136,10 @@ export function ChartAlertDialog({
   onOpenError?: (message: string) => void;
   onDelete?: () => Promise<void>;
 }) {
+  const { zone } = useChartTime();
+  const date = (stamp: number) => formatTimestamp(stamp, zone);
+  const [expiryValid, setExpiryValid] = useState(true);
+  const [expiryInputRevision, setExpiryInputRevision] = useState(0);
   const dialog = useRef<HTMLDialogElement>(null),
     errorBox = useRef<HTMLParagraphElement>(null);
   const [draft, setDraft] = useState(initial),
@@ -230,11 +237,20 @@ export function ChartAlertDialog({
   function change(value: Partial<AlertConfig>) {
     setDraft((p) => ({ ...p, ...value }));
   }
+  function expirationPreset(expires_at: number | null) {
+    change({ expires_at });
+    setExpiryValid(true);
+    setExpiryInputRevision((value) => value + 1);
+  }
   function operand(side: "left" | "right", value: Operand) {
     change({ condition: { ...draft.condition, [side]: value } });
   }
   async function submit() {
     if (submitting.current) return;
+    if (!expiryValid) {
+      setError("请修正到期时间并明确夏令时重复时刻");
+      return;
+    }
     if (offset && (!offsetSupported || !atrFrames.includes(offset.timeframe))) {
       setError("ATR 阈值需要价格单位的有向比较，并选择此来源支持的 ATR K线周期");
       errorBox.current?.focus();
@@ -305,14 +321,6 @@ export function ChartAlertDialog({
       if (mounted.current) setBusy(false);
     }
   }
-  const expires = draft.expires_at
-    ? new Date(
-        draft.expires_at -
-          new Date(draft.expires_at).getTimezoneOffset() * 60_000,
-      )
-        .toISOString()
-        .slice(0, 16)
-    : "";
   useEffect(() => {
     if (!native) return;
     native.setBusy(busy);
@@ -450,6 +458,7 @@ export function ChartAlertDialog({
             返回
           </button>
         )}
+        <ChartTimeLabel />
         <fieldset disabled={busy} className="alert-form-body">
           {page === "message" ? (
             <div className="alert-message-page">
@@ -728,7 +737,7 @@ export function ChartAlertDialog({
                       {
                         label: "不限",
                         checked: !draft.expires_at,
-                        run: () => change({ expires_at: null }),
+                        run: () => expirationPreset(null),
                       },
                       ...[
                         ["1 天", 1],
@@ -737,9 +746,7 @@ export function ChartAlertDialog({
                       ].map(([label, days]) => ({
                         label: String(label),
                         run: () =>
-                          change({
-                            expires_at: Date.now() + Number(days) * 86400000,
-                          }),
+                          expirationPreset(Date.now() + Number(days) * 86400000),
                       })),
                       {
                         label: "自定义日期",
@@ -899,17 +906,14 @@ export function ChartAlertDialog({
                     : "后台按收到的观察值判定，不代表完整市场逐笔。"}
                 </p>
                 <label>
-                  到期时间（{Intl.DateTimeFormat().resolvedOptions().timeZone}）
-                  <AlertInput
-                    type="datetime-local"
-                    value={expires}
-                    onChange={(event) =>
-                      change({
-                        expires_at: event.target.value
-                          ? new Date(event.target.value).getTime()
-                          : null,
-                      })
-                    }
+                  到期时间（{zone}）
+                  <ZonedDateTimeInput
+                    key={expiryInputRevision}
+                    label="到期时间"
+                    zone={zone}
+                    value={draft.expires_at ?? null}
+                    onChange={(expires_at) => change({ expires_at })}
+                    onValidityChange={setExpiryValid}
                   />
                 </label>
                 {draft.series_kind === "composite" && (
@@ -990,7 +994,7 @@ export function ChartAlertDialog({
               </AlertButton>
               <AlertButton
                 primary
-                disabled={busy || !source?.available}
+                disabled={busy || !source?.available || !expiryValid}
                 onClick={() => {
                   if (formRef.current?.reportValidity()) void submit();
                 }}
