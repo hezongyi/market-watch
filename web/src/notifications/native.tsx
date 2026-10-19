@@ -61,10 +61,11 @@ async function attach({
         !node.closest('[aria-hidden="true"],[inert]'),
     );
   function close(restoreFocus = true) {
+    const wasOpened = opened;
     opened = false;
     selected = undefined;
     render({ opened: false, eventId: undefined });
-    panelChanged(false);
+    if (wasOpened) panelChanged(false);
     if (restoreFocus) findEntry()?.focus();
   }
   async function open(eventId?: string) {
