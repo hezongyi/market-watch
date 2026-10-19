@@ -390,6 +390,9 @@ def observe(db, subject, value):
 
 def list_events(db, subject, filters, *, before=None, limit=100):
     state = stream(db, subject)
+    # Keep default-order cursor fingerprints compatible with existing clients.
+    filters = {key: value for key, value in filters.items() if key != 'sort' or value != 'newest'}
+    oldest = filters.get('sort') == 'oldest'
     fingerprint = intent_hash({'subject': subject, **filters})
     high, anchor = state.seq, None
     if before:
@@ -435,10 +438,12 @@ def list_events(db, subject, filters, *, before=None, limit=100):
         searchable.extend([NoticeEvent.instrument, NoticeEvent.workspace, cast(NoticeEvent.body, String)])
         clauses.append(or_(*(column.contains(filters['q'], autoescape=True) for column in searchable)))
     if anchor:
-        clauses.append(or_(NoticeEvent.occurred_at < anchor[0],
-            and_(NoticeEvent.occurred_at == anchor[0], NoticeEvent.id < anchor[1])))
+        next_time = NoticeEvent.occurred_at > anchor[0] if oldest else NoticeEvent.occurred_at < anchor[0]
+        next_id = NoticeEvent.id > anchor[1] if oldest else NoticeEvent.id < anchor[1]
+        clauses.append(or_(next_time, and_(NoticeEvent.occurred_at == anchor[0], next_id)))
     rows = list(db.scalars(select(NoticeEvent).where(*clauses)
-        .order_by(NoticeEvent.occurred_at.desc(), NoticeEvent.id.desc()).limit(limit + 1)))
+        .order_by(NoticeEvent.occurred_at.asc() if oldest else NoticeEvent.occurred_at.desc(),
+                  NoticeEvent.id.asc() if oldest else NoticeEvent.id.desc()).limit(limit + 1)))
     page = rows[:limit]
     next_cursor = _cursor(state, {'kind': 'history', 'query': fingerprint, 'high': high,
         'anchor': [page[-1].occurred_at, page[-1].id]}) if len(rows) > limit else None

@@ -8,13 +8,13 @@ export const newestFirst = (
 
 /** Only controls still offered by the system-message list may restrict its query. */
 export type SystemFilters = Partial<
-  Record<"q" | "state" | "severity" | "source", string>
+  Record<"q" | "state" | "severity" | "source" | "sort", string>
 >;
 export function systemListFilters(
   filters: Record<string, string>,
 ): SystemFilters {
   return Object.fromEntries(
-    ["q", "state", "severity", "source"]
+    ["q", "state", "severity", "source", "sort"]
       .filter((key) => filters[key])
       .map((key) => [key, filters[key]]),
   );

@@ -47,7 +47,7 @@ async function ready(name, query = true, reload = false) {
   if(query) {
     await native.locator('.nc-native-panel').waitFor({state:'visible',timeout:10000});
     await native.locator('.nc-list .nc-row').first().waitFor({state:'visible',timeout:10000});
-    assert.equal(await native.locator('.nc-search input').evaluate(el=>el===el.ownerDocument.activeElement),false);
+    assert.equal(await native.locator('.nc-search input').count(),0, 'Search stays collapsed on startup');
   }
   assert(!value.transitions.some(x=>x.recovery),'Healthy startup must not show recovery controls');
   results.cases.push({name,...value});

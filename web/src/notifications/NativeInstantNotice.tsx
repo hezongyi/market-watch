@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { createPortal, flushSync } from "react-dom";
-import { useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { NativeControls } from "../advanced/NativeAlertControls";
 import { NoticeBubble } from "./Panel";
 import type { Notice, NoticeState, NoticeTransport } from "./types";
@@ -48,9 +48,44 @@ export async function attachNativeInstantNotice({
   };
   function View() {
     const [state, setState] = useState(initial),
-      [target, setTarget] = useState<HTMLElement | null>(null);
+      [target, setTarget] = useState<HTMLElement | null>(null),
+      [presented, setPresented] = useState(initial.bubble),
+      [phase, setPhase] = useState("enter");
+    const latest = useRef(state),
+      displayed = useRef(presented);
+    latest.current = state;
+    displayed.current = presented;
     render = setState;
-    const showing = !!state.bubble;
+    const showing = !!presented;
+    const reduced = () =>
+      doc.defaultView!.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    useLayoutEffect(() => {
+      if (displayed.current?.id === state.bubble?.id) {
+        setPhase((value) => (value === "exit" ? "enter" : value));
+        return;
+      }
+      if (!displayed.current) {
+        setPresented(state.bubble);
+        setPhase("enter");
+        return;
+      }
+      // Business state advances immediately. This inert snapshot exists only
+      // long enough to show that one event left before another takes its place.
+      setPhase("exit");
+      const timer = setTimeout(
+        () => {
+          setPresented(latest.current.bubble);
+          setPhase("enter");
+        },
+        reduced() ? 0 : 160,
+      );
+      return () => clearTimeout(timer);
+    }, [state.bubble?.id]);
+    useLayoutEffect(() => {
+      if (!target || !presented || phase !== "enter") return;
+      const timer = setTimeout(() => setPhase("shown"), reduced() ? 0 : 220);
+      return () => clearTimeout(timer);
+    }, [target, presented?.id, phase]);
     useLayoutEffect(() => {
       if (!showing) return;
       surface = native.mount(host, setTarget, true);
@@ -60,21 +95,26 @@ export async function attachNativeInstantNotice({
         surface = null;
       };
     }, [showing]);
-    return showing && target
+    const current = state.bubble?.id === presented?.id;
+    const notice = current ? state.bubble : presented;
+    return notice && target
       ? createPortal(
           <NativeControls.Provider value={native.control}>
-            <NoticeBubble
-              key={state.bubble!.id}
-              notice={state.bubble!}
-              pending={Math.max(0, (state.alertPending || 0) - 1)}
-              request={request}
-              onOpen={() => onOpen(state.bubble!)}
-              onLocate={
-                state.bubble!.workspace
-                  ? () => onLocate(state.bubble!)
-                  : undefined
-              }
-            />
+            <div
+              data-notice-phase={phase}
+              inert={!current || phase !== "shown"}
+            >
+              <NoticeBubble
+                key={notice.id}
+                notice={notice}
+                active={current && phase === "shown"}
+                popupSeconds={state.systemPopupSeconds}
+                pending={Math.max(0, (state.alertPending || 0) - 1)}
+                request={request}
+                onOpen={() => onOpen(notice)}
+                onLocate={notice.workspace ? () => onLocate(notice) : undefined}
+              />
+            </div>
           </NativeControls.Provider>,
           target,
         )

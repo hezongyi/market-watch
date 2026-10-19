@@ -1,0 +1,48 @@
+{
+  "mode": "Read-only presentation with real historical events; no alert confirmation or queue mutation",
+  "focus": "BODY",
+  "geometry": {
+    "dialog": {
+      "x": 622.5,
+      "y": 46,
+      "width": 355,
+      "height": 254
+    },
+    "close": {
+      "x": 935.5,
+      "y": 54,
+      "width": 34,
+      "height": 34
+    },
+    "svg": {
+      "x": 943.5,
+      "y": 62,
+      "width": 18,
+      "height": 18
+    },
+    "clock": "rgb(255, 183, 77)",
+    "focus": "BODY"
+  },
+  "hoverPause": true,
+  "defaultDismiss": true,
+  "replacementExit": "exit",
+  "oldContentInert": true,
+  "sameEventNoReplay": true,
+  "exitCancelledBySameEvent": true,
+  "reduced": {
+    "matches": true,
+    "animations": 0
+  },
+  "actions": [
+    {
+      "action": "rendered",
+      "id": "b:e0501224-92b2-a3b3-9be1-aeffed56560d",
+      "at": 477532.3000000119
+    },
+    {
+      "action": "dismiss",
+      "id": "b:e0501224-92b2-a3b3-9be1-aeffed56560d",
+      "at": 484280.60000002384
+    }
+  ]
+}

@@ -386,6 +386,24 @@ const assert = require("node:assert/strict"),
   assert.equal(unauthorized.pending.get("admin:b:test").value.status, "pending",
     "authentication failure must not continue uploads");
 
+  const preferences = fixture();
+  const savedPreferences = new Map();
+  const broadcasts = [];
+  preferences.runtime.store.update = async (table, key, subject, fn) => {
+    const next = fn(savedPreferences.get(key));
+    savedPreferences.set(key, next);
+  };
+  preferences.runtime.channel = {postMessage: value => broadcasts.push(value)};
+  assert.equal(preferences.runtime.state.systemPopupSeconds, 3);
+  preferences.runtime.state.bubble = {id: "keep-trade", source_kind: "chart_alert"};
+  await preferences.runtime.action({action:"system-popup-seconds", seconds:10});
+  assert.equal(preferences.runtime.state.systemPopupSeconds,10);
+  assert.equal(savedPreferences.get("admin:system-popup-seconds"),10);
+  assert.equal(broadcasts[0].seconds,10);
+  assert.equal(preferences.runtime.state.bubble.id,"keep-trade","duration cannot dismiss or confirm a trade");
+  await preferences.runtime.action({action:"system-popup-seconds", seconds:NaN});
+  assert.equal(preferences.runtime.state.systemPopupSeconds,3,"invalid persisted/input duration falls back to 3 seconds");
+
   const unified = fixture();
   unified.runtime.pop = async () => {};
   unified.runtime.estimateNow = () => 1000;

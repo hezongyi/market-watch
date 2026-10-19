@@ -77,12 +77,14 @@ def router(authenticated):
                instrument: str = '', state: str = '', q: str = Query('', max_length=120),
                since: int | None = None, until: int | None = None,
                audience: Literal['all', 'system', 'alerts'] = 'all',
-               incident: str = Query('', max_length=100), grouped: bool = True):
+               incident: str = Query('', max_length=100), grouped: bool = True,
+               sort: Literal['newest', 'oldest'] = 'newest'):
         with transaction() as db:
             return center.list_events(db, center.SUBJECT, {'severity': severity, 'kind': kind,
                 'source': source, 'workspace': workspace, 'instrument': instrument, 'state': state,
                 'q': q, 'since': since, 'until': until, 'audience': audience,
-                'incident': incident, 'grouped': grouped}, before=before, limit=limit)
+                'incident': incident, 'grouped': grouped,
+                **({'sort': sort} if sort != 'newest' else {})}, before=before, limit=limit)
 
     @routes.post('/system/read')
     def read_system(value: SystemRead):

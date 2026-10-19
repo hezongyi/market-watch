@@ -486,3 +486,21 @@
   border-bottom: 1px solid var(--nc-border);
   font-size: 11px;
 }
+
+/* A complete instant, read as date / clock / chart-zone offset. */
+.nc-timestamp {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 2px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-align: left;
+  line-height: 18px;
+  font-size: 12px;
+  color: inherit;
+}
+.nc-timestamp-clock {
+  font-size: 13px;
+  font-weight: 600;
+}

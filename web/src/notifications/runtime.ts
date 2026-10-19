@@ -1,6 +1,7 @@
 import { api, ApiError } from "../api";
 import { NoticeStore } from "./store";
 import { newestFirst } from "./systemMessages";
+import { systemPopupSeconds, defaultSystemPopupSeconds } from "./preferences";
 import type {
   BrowserFault,
   Intake,
@@ -24,6 +25,7 @@ const initial: NoticeState = {
   soundLimited: false,
   soundStatus: "网页声音未启用",
   systemPopups: true,
+  systemPopupSeconds: defaultSystemPopupSeconds,
   bubble: null,
   overflow: 0,
   alertPending: 0,
@@ -221,6 +223,10 @@ export class NoticeRuntime {
         "meta",
         subject + ":system-popups",
       );
+      const popupSeconds = await this.store.get(
+        "meta",
+        subject + ":system-popup-seconds",
+      );
       if (!this.current(generation)) return;
       this.ready = true;
       this.after = progress?.after || "";
@@ -231,6 +237,7 @@ export class NoticeRuntime {
         unread: progress?.unread || 0,
         enabled: !!enabled,
         systemPopups: systemPopups !== false,
+        systemPopupSeconds: systemPopupSeconds(popupSeconds),
         gap: gap || "",
         status: "正在同步",
         soundLimited: !navigator.locks,
@@ -249,6 +256,13 @@ export class NoticeRuntime {
             event.data.type === "system-popups"
           )
             this.applySystemPopups(event.data.enabled !== false);
+          if (
+            event.data?.subject === this.subject &&
+            event.data.type === "system-popup-seconds"
+          )
+            this.patch({
+              systemPopupSeconds: systemPopupSeconds(event.data.seconds),
+            });
           if (
             event.data?.subject === this.subject &&
             event.data.type === "alert-popup"
@@ -1290,6 +1304,22 @@ export class NoticeRuntime {
       });
       this.schedule(generation, 0);
       if (more) throw Error("部分系统消息已读，请再次执行以继续处理剩余记录");
+    } else if (action.action === "system-popup-seconds") {
+      const seconds = systemPopupSeconds(action.seconds);
+      await this.store.update(
+        "meta",
+        this.subject + ":system-popup-seconds",
+        this.subject,
+        () => seconds,
+      );
+      if (!this.current(generation)) throw Error("通知会话已失效");
+      this.patch({ systemPopupSeconds: seconds });
+      this.channel?.postMessage({
+        type: "system-popup-seconds",
+        subject: this.subject,
+        seconds,
+      });
+      result = { ok: true };
     } else if (action.action === "system-popups") {
       await this.store.update(
         "meta",

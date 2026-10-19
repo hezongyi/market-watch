@@ -203,6 +203,7 @@ async function nativeAlertShell(
         "data-name": "mw-native-alert-menu",
         reference,
         minWidth: 180,
+        maxHeight: doc.defaultView.innerHeight - 16,
         doNotCloseOn: anchor,
         repositionOnScroll: true,
         position: () => {

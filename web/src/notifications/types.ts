@@ -76,6 +76,7 @@ export type NoticeState = {
   soundLimited: boolean;
   soundStatus: string;
   systemPopups: boolean;
+  systemPopupSeconds?: number;
   bubble: Notice | null;
   overflow: number;
   alertPending?: number;
@@ -88,6 +89,7 @@ export type NoticeAction = {
   filters?: Record<string, string>;
   kind?: "viewed" | "handled";
   enabled?: boolean;
+  seconds?: number;
   through?: number;
   epoch?: string;
   incident_id?: string;

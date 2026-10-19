@@ -22,13 +22,10 @@ import "./notifications.css";
 import { SystemOccurrences } from "./SystemOccurrences";
 import { messageIcons } from "./icons";
 import { useSystemHistory } from "./useSystemHistory";
+import { NoticeTimestamp } from "./Timestamp";
+import { systemPopupDurations, systemPopupSeconds } from "./preferences";
 import { useChartTime } from "../time/ChartTimeContext";
-import {
-  formatTimestamp,
-  dayKey,
-  clockTime,
-  offsetLabel,
-} from "../time/chartTime";
+import { formatTimestamp, dayKey } from "../time/chartTime";
 import {
   newestFirst,
   matchesSystemFilters,
@@ -84,7 +81,7 @@ export function NoticePanel({
   const [filters, setFilters] = useState<SystemFilters>({});
   const [selection, setSelection] = useState(eventId || ""),
     [settings, setSettings] = useState(false),
-    [advanced, setAdvanced] = useState(false);
+    [searchOpen, setSearchOpen] = useState(false);
   const [detail, setDetail] = useState<Notice | null>(null),
     [timeline, setTimeline] = useState<any[]>([]),
     [timelineBefore, setTimelineBefore] = useState<string | null>(null);
@@ -226,7 +223,20 @@ export function NoticePanel({
   const rows = (page?.events || []).filter(system),
     pending = state.pending
       .filter((row) => matchesSystemFilters(row, filters))
-      .sort(newestFirst);
+      .sort((a, b) =>
+        filters.sort === "oldest" ? -newestFirst(a, b) : newestFirst(a, b),
+      );
+  const filterSummary = [
+    filters.state === "unread" ? "未读" : "",
+    filters.severity ? severityLabels[filters.severity] : "",
+    filters.source ? sourceLabels[filters.source] : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  const closeSearch = () => {
+    setSearchOpen(false);
+    setFilter("q", "");
+  };
   const date = (row: Notice) => dayKey(row.occurred_at, zone);
   return (
     <section
@@ -283,6 +293,31 @@ export function NoticePanel({
           />
           <p className="nc-muted">
             首次异常或严重程度升级时，使用顶部居中浮窗。重复异常合并计数；普通状态变化只保留记录，恢复后更新原记录。
+          </p>
+          <label className="nc-popup-duration">
+            浮窗显示时长
+            <AlertSelect
+              aria-label="浮窗显示时长"
+              disabled={working}
+              value={systemPopupSeconds(state.systemPopupSeconds)}
+              onChange={(event) =>
+                void run(() =>
+                  request({
+                    action: "system-popup-seconds",
+                    seconds: Number(event.target.value),
+                  }),
+                )
+              }
+            >
+              {systemPopupDurations.map((seconds) => (
+                <option key={seconds} value={seconds}>
+                  {seconds} 秒
+                </option>
+              ))}
+            </AlertSelect>
+          </label>
+          <p className="nc-muted">
+            用于下一条系统消息；鼠标悬停或键盘焦点停留时暂停关闭。交易告警须点击“确定”。
           </p>
           <h3>交易告警</h3>
           <p className="nc-muted">
@@ -448,91 +483,101 @@ export function NoticePanel({
         )
       ) : (
         <>
-          <div className="nc-search">
-            <AlertSearch
-              autoFocus={false}
-              maxLength={120}
-              aria-label="搜索系统消息"
-              placeholder="搜索系统消息"
-              value={filters.q || ""}
-              onChange={(event) => setFilter("q", event.target.value)}
+          <div className="nc-message-toolbar">
+            <AlertIconButton
+              icon={messageIcons.search}
+              label="搜索系统消息"
+              expanded={searchOpen}
+              onClick={() => (searchOpen ? closeSearch() : setSearchOpen(true))}
+            />
+            <AlertMenu
+              label="系统消息排序"
+              icon={messageIcons.sort}
+              items={[
+                {
+                  label: "最新消息在前",
+                  checked: filters.sort !== "oldest",
+                  run: () => setFilter("sort", ""),
+                },
+                {
+                  label: "最早消息在前",
+                  checked: filters.sort === "oldest",
+                  run: () => setFilter("sort", "oldest"),
+                },
+              ]}
             />
             <AlertMenu
               label="筛选系统消息"
               icon={messageIcons.more}
               items={[
                 {
-                  label: "全部消息",
+                  label: "全部",
                   checked: !filters.state,
-                  run: () => {
-                    setFilters({});
-                  },
+                  run: () => setFilter("state", ""),
                 },
                 {
-                  label: "仅未读",
+                  label: "未读",
                   checked: filters.state === "unread",
-                  run: () =>
-                    setFilter(
-                      "state",
-                      filters.state === "unread" ? "" : "unread",
-                    ),
+                  run: () => setFilter("state", "unread"),
                 },
                 {
-                  label: "更多筛选",
-                  checked: advanced,
-                  run: () => setAdvanced((value) => !value),
+                  label: "全部级别",
+                  divider: true,
+                  checked: !filters.severity,
+                  run: () => setFilter("severity", ""),
                 },
+                ...Object.entries(severityLabels).map(([value, label]) => ({
+                  label,
+                  checked: filters.severity === value,
+                  run: () => setFilter("severity", value),
+                })),
+                {
+                  label: "全部来源",
+                  divider: true,
+                  checked: !filters.source,
+                  run: () => setFilter("source", ""),
+                },
+                ...Object.entries(sourceLabels)
+                  .filter(([value]) => value !== "chart_alert")
+                  .map(([value, label]) => ({
+                    label,
+                    checked: filters.source === value,
+                    run: () => setFilter("source", value),
+                  })),
               ]}
-            >
-              <MoreHorizontal size={18} aria-hidden />
-            </AlertMenu>
+            />
           </div>
-          {filters.state === "unread" && (
+          {searchOpen && (
+            <div className="nc-search">
+              <AlertSearch
+                autoFocus={false}
+                maxLength={120}
+                aria-label="搜索系统消息内容"
+                placeholder="搜索系统消息"
+                value={filters.q || ""}
+                onChange={(event) => setFilter("q", event.target.value)}
+              />
+              <AlertIconButton
+                icon={messageIcons.close}
+                label="关闭搜索"
+                onClick={closeSearch}
+              />
+            </div>
+          )}
+          {filterSummary && (
             <div className="nc-filter-status">
-              仅未读
+              <span>{filterSummary}</span>
               <button
                 type="button"
                 className="nc-link"
-                onClick={() => setFilter("state", "")}
+                onClick={() =>
+                  setFilters((old) =>
+                    systemListFilters({ q: old.q || "", sort: old.sort || "" }),
+                  )
+                }
               >
-                清除
+                清除筛选
               </button>
-            </div>
-          )}
-          {advanced && (
-            <div className={"nc-filters" + scrollStyle}>
-              <label>
-                级别
-                <AlertSelect
-                  aria-label="系统消息级别"
-                  value={filters.severity || ""}
-                  onChange={(e) => setFilter("severity", e.target.value)}
-                >
-                  <option value="">全部</option>
-                  {Object.entries(severityLabels).map(([key, label]) => (
-                    <option key={key} value={key}>
-                      {label}
-                    </option>
-                  ))}
-                </AlertSelect>
-              </label>
-              <label>
-                来源
-                <AlertSelect
-                  aria-label="系统消息来源"
-                  value={filters.source || ""}
-                  onChange={(e) => setFilter("source", e.target.value)}
-                >
-                  <option value="">全部</option>
-                  {Object.entries(sourceLabels)
-                    .filter(([key]) => key !== "chart_alert")
-                    .map(([key, label]) => (
-                      <option key={key} value={key}>
-                        {label}
-                      </option>
-                    ))}
-                </AlertSelect>
-              </label>
             </div>
           )}
           <div ref={list} className={"nc-list" + scrollStyle} aria-busy={busy}>
@@ -553,9 +598,9 @@ export function NoticePanel({
                       : row.local_status === "rejected"
                         ? "服务端拒绝，本机证据保留"
                         : "仅本机待同步"}{" "}
-                    · {time(row.occurred_at)}
                   </small>
                 </div>
+                <NoticeTimestamp stamp={row.occurred_at} />
               </article>
             ))}
             {pending.length > 0 && rows.length > 0 && (
@@ -578,10 +623,6 @@ export function NoticePanel({
                   <span className="nc-row-copy">
                     <span className="nc-row-meta">
                       <strong>{noticeInstrument(row)}</strong>
-                      <time>
-                        {clockTime(row.occurred_at, zone)}{" "}
-                        {offsetLabel(row.occurred_at, zone)}
-                      </time>
                     </span>
                     <span>{row.title}</span>
                     <small>
@@ -594,6 +635,7 @@ export function NoticePanel({
                       {row.backfill ? " · 历史记录" : ""}
                     </small>
                   </span>
+                  <NoticeTimestamp stamp={row.occurred_at} />
                 </button>
               </div>
             ))}
@@ -607,15 +649,15 @@ export function NoticePanel({
               <div ref={sentinel} className="nc-load-status" role="status">
                 {history.moreError ? (
                   <>
-                    <span>暂时无法加载更早消息</span>
+                    <span>暂时无法加载更多消息</span>
                     <AlertButton onClick={history.loadMore}>
                       重试加载
                     </AlertButton>
                   </>
                 ) : history.loadingMore ? (
-                  "正在加载更早消息…"
+                  "正在加载更多消息…"
                 ) : page?.before ? (
-                  "向下滚动加载更早消息"
+                  filters.sort === "oldest" ? "向下滚动加载更新消息" : "向下滚动加载更早消息"
                 ) : (
                   "已显示全部消息"
                 )}
@@ -647,14 +689,18 @@ export function NoticeBubble({
   onOpen,
   onLocate,
   pending = 0,
+  popupSeconds = 3,
+  active = true,
 }: {
   notice: Notice;
   pending?: number;
+  popupSeconds?: number;
+  active?: boolean;
   request: NoticeTransport;
   onOpen: () => void | Promise<void>;
   onLocate?: () => void | Promise<void>;
 }) {
-  const { zone } = useChartTime();
+  const duration = useRef(systemPopupSeconds(popupSeconds) * 1000);
   const trading = !system(notice);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null),
     inside = useRef(false),
@@ -670,20 +716,20 @@ export function NoticeBubble({
   };
   const resume = () => {
     pause();
-    if (!trading && !inside.current && !hovered.current)
-      timer.current = setTimeout(dismiss, 8000);
+    if (active && !trading && !inside.current && !hovered.current)
+      timer.current = setTimeout(dismiss, duration.current);
   };
   useEffect(() => {
     setError("");
     resume();
     return pause;
-  }, [notice.id]);
+  }, [notice.id, active]);
   useEffect(() => {
-    if (document.visibilityState === "visible")
+    if (active && document.visibilityState === "visible")
       void request({ action: "rendered", event_id: notice.id }).catch((error) =>
         setError(String(error)),
       );
-  }, [notice.id, request]);
+  }, [notice.id, request, active]);
   const open = async (action: () => void | Promise<void>) => {
     try {
       await action();
@@ -775,8 +821,10 @@ export function NoticeBubble({
           另有 {pending} 条交易告警待确认
         </p>
       )}
+      <div className="nc-bubble-time">
+        <NoticeTimestamp stamp={notice.occurred_at} />
+      </div>
       <div className="nc-bubble-actions">
-        <small>{formatTimestamp(notice.occurred_at, zone)}</small>
         {trading && onLocate && (
           <button
             type="button"

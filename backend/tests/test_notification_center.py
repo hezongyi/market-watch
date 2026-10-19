@@ -620,3 +620,33 @@ def test_system_search_decodes_unicode_and_treats_wildcards_literally(database):
         for query in ('连接异常', '50%_', '受控验收'):
             rows = center.list_events(db, center.SUBJECT, {'audience': 'system', 'q': query})['events']
             assert {row['id'] for row in rows} == ({'chinese', 'other'} if query == '受控验收' else {'chinese'})
+
+
+def test_history_sort_cursors_cover_all_rows_and_keep_default_compatible(database):
+    at = now_ms() - 20000
+    values = [browser(occurred_at=at + i // 2 * 1000, code=f"SORT_{i}") for i in range(7)]
+    with database.begin() as db:
+        center.stream(db)
+        for value in reversed(values):
+            center.accept_browser(db, center.SUBJECT, value)
+    drain(database)
+    with database() as db:
+        expected = sorted([(value.occurred_at, value.event_id) for value in values])
+        for sort in ('oldest', 'newest'):
+            filters = {'audience': 'system', 'sort': sort}
+            page = center.list_events(db, center.SUBJECT, filters, limit=2)
+            found = []
+            while True:
+                found.extend((row['occurred_at'], row['id']) for row in page['events'])
+                if not page['before']:
+                    break
+                with pytest.raises(HTTPException):
+                    center.list_events(db, center.SUBJECT,
+                        {'audience': 'system', 'sort': 'newest' if sort == 'oldest' else 'oldest'},
+                        before=page['before'], limit=2)
+                page = center.list_events(db, center.SUBJECT, filters, before=page['before'], limit=2)
+            assert found == (expected if sort == 'oldest' else list(reversed(expected)))
+        default = center.list_events(db, center.SUBJECT, {'audience': 'system'}, limit=2)
+        implicit = center.list_events(db, center.SUBJECT, {'audience': 'system'}, before=default['before'])
+        explicit = center.list_events(db, center.SUBJECT, {'audience': 'system', 'sort': 'newest'}, before=default['before'])
+        assert [row['id'] for row in implicit['events']] == [row['id'] for row in explicit['events']]

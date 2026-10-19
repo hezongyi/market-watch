@@ -1,0 +1,44 @@
+[
+  {
+    "service": "api",
+    "image": "sha256:6303d9b9701b19c244c5bb75bb143094a823f30d83f7b20f18685661c6f51103",
+    "labels": {
+      "io.market-watch.built-at": "2026-10-19T16:09:34.263663+00:00",
+      "io.market-watch.commit": "ed77152e6f2914a465e73755e5cb08c395b77f76",
+      "io.market-watch.dirty": "true",
+      "io.market-watch.expires-at": "2026-10-26T16:09:34.263663+00:00",
+      "io.market-watch.managed": "true",
+      "io.market-watch.project": "mw-issue75-v2-20261018",
+      "io.market-watch.purpose": "acceptance",
+      "io.market-watch.task": "mw-issue75-v2-20261018"
+    }
+  },
+  {
+    "service": "web",
+    "image": "sha256:c9a63acde345822a2ab8b24e3b9db5534d81d44a35f37e300b8304b79c2e29ed",
+    "labels": {
+      "io.market-watch.built-at": "2026-10-19T16:25:41.997309+00:00",
+      "io.market-watch.commit": "ed77152e6f2914a465e73755e5cb08c395b77f76",
+      "io.market-watch.dirty": "true",
+      "io.market-watch.expires-at": "2026-10-26T16:25:41.997309+00:00",
+      "io.market-watch.managed": "true",
+      "io.market-watch.project": "mw-issue75-v2-20261018",
+      "io.market-watch.purpose": "acceptance",
+      "io.market-watch.task": "mw-issue75-v2-20261018"
+    }
+  },
+  {
+    "service": "chart",
+    "image": "sha256:34ea1efb8b7dfe416a2f461d4ac340585e099748819b245e15df09680ae37826",
+    "labels": {
+      "io.market-watch.built-at": "2026-10-19T16:26:09.365224+00:00",
+      "io.market-watch.commit": "ed77152e6f2914a465e73755e5cb08c395b77f76",
+      "io.market-watch.dirty": "true",
+      "io.market-watch.expires-at": "2026-10-26T16:26:09.365224+00:00",
+      "io.market-watch.managed": "true",
+      "io.market-watch.project": "mw-issue75-v2-20261018",
+      "io.market-watch.purpose": "acceptance",
+      "io.market-watch.task": "mw-issue75-v2-20261018"
+    }
+  }
+]

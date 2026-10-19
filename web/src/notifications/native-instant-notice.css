@@ -79,3 +79,70 @@
   color: #f79996;
   margin-top: 12px;
 }
+
+/* Isolate the native NavButton from the content border-box reset. */
+.nc-native-instant .nc-instant-close .nc-native-icon-holder button {
+  box-sizing: content-box;
+  width: 18px;
+  height: 18px;
+  padding: 8px;
+}
+.nc-native-instant .nc-instant-close svg {
+  width: 18px;
+  height: 18px;
+}
+.nc-native-instant .nc-bubble.nc-native-bubble .nc-bubble-heading {
+  padding-right: 28px;
+}
+.nc-native-instant .nc-bubble-time {
+  margin-top: 14px;
+}
+.nc-native-instant .nc-timestamp-clock {
+  font-size: 14px;
+  color: #ffb74d;
+}
+html:not(.theme-dark) .nc-native-instant .nc-timestamp-clock {
+  color: #9b4b00;
+}
+.nc-native-instant .nc-bubble.nc-native-bubble .nc-bubble-actions {
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+/* Individual translate preserves native horizontal centering. Clip the travel
+   at the notice's top edge so it cannot sweep across the toolbar. */
+.nc-native-instant:has([data-notice-phase="enter"]) {
+  animation: nc-notice-in 220ms ease-out both;
+}
+.nc-native-instant:has([data-notice-phase="exit"]) {
+  animation: nc-notice-out 160ms ease-in both;
+  pointer-events: none;
+}
+@keyframes nc-notice-in {
+  from {
+    translate: 0 -16px;
+    opacity: 0;
+    clip-path: inset(16px -16px -16px);
+  }
+  to {
+    translate: 0 0;
+    opacity: 1;
+    clip-path: inset(0 -16px -16px);
+  }
+}
+@keyframes nc-notice-out {
+  from {
+    translate: 0 0;
+    opacity: 1;
+    clip-path: inset(0 -16px -16px);
+  }
+  to {
+    translate: 0 -16px;
+    opacity: 0;
+    clip-path: inset(16px -16px -16px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nc-native-instant {
+    animation: none !important;
+  }
+}

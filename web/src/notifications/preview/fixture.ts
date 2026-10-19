@@ -1,3 +1,5 @@
+import { newestFirst } from "../systemMessages";
+import { systemPopupSeconds } from "../preferences";
 import type {
   Notice,
   NoticeState,
@@ -146,6 +148,7 @@ export function createMessageFixture(changed: (state: NoticeState) => void) {
     soundLimited: false,
     soundStatus: "",
     systemPopups: true,
+    systemPopupSeconds: 3,
     bubble: null,
     overflow: 0,
     serverTime: now,
@@ -179,6 +182,9 @@ export function createMessageFixture(changed: (state: NoticeState) => void) {
           (!f.workspace || row.workspace.includes(f.workspace)) &&
           (!f.since || row.occurred_at >= Number(f.since)) &&
           (!f.until || row.occurred_at <= Number(f.until)),
+      );
+      matches.sort((a, b) =>
+        f.sort === "oldest" ? -newestFirst(a, b) : newestFirst(a, b),
       );
       const start = Number(action.before || 0),
         size = f.incident ? 20 : 6;
@@ -220,6 +226,14 @@ export function createMessageFixture(changed: (state: NoticeState) => void) {
           (!action.incident_id || row.incident_id === action.incident_id)
         )
           row.viewed_at = Date.now();
+      refresh();
+      return { ok: true };
+    }
+    if (action.action === "system-popup-seconds") {
+      state = {
+        ...state,
+        systemPopupSeconds: systemPopupSeconds(action.seconds),
+      };
       refresh();
       return { ok: true };
     }
