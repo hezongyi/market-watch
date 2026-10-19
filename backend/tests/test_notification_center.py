@@ -609,3 +609,14 @@ def test_system_read_is_bounded_and_incident_scoped(database):
         assert second['read'] == 5 and not second['more']
         assert other.viewed_at is None
         assert center.system_unread(db, center.SUBJECT) == 1
+
+
+def test_system_search_decodes_unicode_and_treats_wildcards_literally(database):
+    with database.begin() as db:
+        state = center.stream(db, lock=True)
+        for ident, title in [('chinese', '连接异常：完成 50%_检查'), ('other', '连接已恢复')]:
+            center._new_event(db, state, ident=ident, source_kind='connection', source_id=ident,
+                occurred_at=now_ms(), body={'title': title, 'message': '受控验收记录'})
+        for query in ('连接异常', '50%_', '受控验收'):
+            rows = center.list_events(db, center.SUBJECT, {'audience': 'system', 'q': query})['events']
+            assert {row['id'] for row in rows} == ({'chinese', 'other'} if query == '受控验收' else {'chinese'})

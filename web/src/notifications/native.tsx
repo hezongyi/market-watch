@@ -264,7 +264,7 @@ async function attach({
           ? 2 * (bounds.panelLeft - bounds.width / 2 - 8)
           : bounds.width - 24;
       bubble.style.width =
-        Math.min(355, bounds.width - 24, Math.max(180, clear)) + "px";
+        Math.min(355, bounds.width - 24, clear) + "px";
     }
   }
   const schedulePosition = () => {

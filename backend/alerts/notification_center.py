@@ -430,7 +430,10 @@ def list_events(db, subject, filters, *, before=None, limit=100):
         clauses.append(NoticeEvent.occurred_at < filters['until'])
     if filters.get('q'):
         # Literal substring search; wildcard characters have no special meaning.
-        clauses.append(cast(NoticeEvent.body, String).contains(filters['q'], autoescape=True))
+        # JSON text may contain escaped Unicode. Search decoded user-facing values too.
+        searchable = [NoticeEvent.body[key].as_string() for key in ('title', 'message', 'code')]
+        searchable.extend([NoticeEvent.instrument, NoticeEvent.workspace, cast(NoticeEvent.body, String)])
+        clauses.append(or_(*(column.contains(filters['q'], autoescape=True) for column in searchable)))
     if anchor:
         clauses.append(or_(NoticeEvent.occurred_at < anchor[0],
             and_(NoticeEvent.occurred_at == anchor[0], NoticeEvent.id < anchor[1])))
