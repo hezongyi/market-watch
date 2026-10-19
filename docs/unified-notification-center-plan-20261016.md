@@ -1,5 +1,7 @@
 # 专业图表统一通知中心与排查时间线方案
 
+> **2026-10-19 界面修订：**本文的原生通知侧栏和混合消息中心设计已被用户确认的新合同替代。当前实现为右上角非模态系统消息中心、右侧交易告警日志和共用顶部居中浮窗。此前验收仅对应原底座；当前界面验收见[新验收记录](verification/notification-ui-implementation-20261019/README.md)，合同见[当前交互合同](notification-ui-contract-20261019.md)。
+
 初稿：2026-10-16；本轮修订：2026-10-18（V2，基于 v1.26.1 重新开发）。关联 [Issue #75](https://github.com/hezongyi/market-watch/issues/75)；保留用户已认可的[六项方案评审](issues/issue-75-plan-review-20261016.md)，补充[本轮基线分析](issues/issue-75-v1261-reassessment-20261018.md)和[来源合同核查](research/issue75-v1261-source-contracts-20261018.md)。本轮实施与验收进行中；实际状态见 [执行记录](verification/unified-notifications-20261018/execution.md)。
 
 用户已明确废弃 [PR #85](https://github.com/hezongyi/market-watch/pull/85)。该 PR 已于 2026-10-18 关闭，对应远端分支已删除。重新开发从 `v1.26.1`（`2fe919a23d4adcb97ca1a98caafbad8693a410d3`）建立新分支，不合并、cherry-pick 或复制 #85 的业务实现；其 CI、截图和验收结论不计入本轮交付。这里恢复并修订的方案及历史评审来自已认可的 PR #77 文档提交 `e868fe6c9d0008ff32d46dbed2a125115a86cfe3`，不是恢复 #85 实现。

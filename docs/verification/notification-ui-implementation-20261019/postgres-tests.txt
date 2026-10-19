@@ -1,0 +1,10 @@
+......                                                                   [100%]
+=============================== warnings summary ===============================
+backend/tests/test_notification_center_postgres.py::test_av49_to_aw50_is_additive_repeatable_and_retains_demands
+backend/tests/test_notification_center_postgres.py::test_av49_to_aw50_is_additive_repeatable_and_retains_demands
+backend/tests/test_notification_center_postgres.py::test_av49_to_aw50_is_additive_repeatable_and_retains_demands
+  /usr/local/lib/python3.11/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+6 passed, 3 warnings in 12.37s

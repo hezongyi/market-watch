@@ -1,0 +1,282 @@
+{
+  "host": "Ubuntu quant-server",
+  "url": "https://192.168.7.232:18280/advanced-charts/mw75-a",
+  "cases": [
+    {
+      "name": "badge update preserves toolbar focus",
+      "semanticFocus": "系统消息，10 条未读"
+    },
+    {
+      "name": "top card retains stable focus and chart Escape/drag/wheel",
+      "input": "synthetic BrowserEvent through real intake/projector/runtime",
+      "geometry": {
+        "centerError": 0,
+        "toolbarGap": 8,
+        "focusPreserved": true,
+        "modal": 0,
+        "legacyCards": 0,
+        "card": {
+          "x": 542.5,
+          "y": 46,
+          "width": 355,
+          "height": 149,
+          "top": 46,
+          "right": 897.5,
+          "bottom": 195,
+          "left": 542.5
+        },
+        "chart": {
+          "x": 56,
+          "y": 42,
+          "width": 1034,
+          "height": 877,
+          "top": 42,
+          "right": 1090,
+          "bottom": 919,
+          "left": 56
+        }
+      },
+      "before": {
+        "from": 1791640800,
+        "to": 1792227600
+      },
+      "dragged": {
+        "from": 1791540000,
+        "to": 1792126800
+      },
+      "zoomed": {
+        "from": 1791594000,
+        "to": 1792126800
+      }
+    },
+    {
+      "name": "system card opens center detail without chart resize",
+      "chartAfter": {
+        "x": 56,
+        "y": 42,
+        "width": 1034,
+        "height": 877
+      },
+      "text": "系统消息\n10 条未读\n系统消息\n\n连接 · EURUSD\n\n图表操作与焦点验收\n\n隔离实例受控消息，用于检查通知交互。\n\n当前状态\n仍需关注\n首次发生\n10/19/2026, 1:27:56 AM\n最近发生\n10/19/2026, 1:27:56 AM\n累计发生\n1 次\n查看相关图表\n标为已处理\n\nmw75-a\n\n排查详情\n已同步 · 保留 30 天"
+    },
+    {
+      "name": "trade shares top card and opens existing alert log",
+      "fixture": {
+        "signal_id": "bcb889c6-9b5a-4b9c-9d65-207192ebe80e",
+        "alert_id": "3fbbb380-f9fd-4f69-8c95-309d8b43e3eb",
+        "fixture": "real create/consume producer with synthetic observations; no external delivery"
+      },
+      "text": "EURUSD\nM5\nEURUSD 突破提醒（验收）\n\n价格 上穿 1.10200 · 触发价 1.10300 · 比较值 1.10200\n\n查看图表\n告警记录\n01:30 AM",
+      "geometry": {
+        "x": 542.5,
+        "y": 46,
+        "width": 355,
+        "height": 149
+      },
+      "destination": {
+        "domain": "pro_chart",
+        "event_id": "s:20dcd770-8807-5b49-aabc-711266f088dc",
+        "destination": "/advanced-charts/mw75-a?panel=alerts&signal=bcb889c6-9b5a-4b9c-9d65-207192ebe80e"
+      },
+      "bodyTail": "Tradingview是交互式的，并且具有与屏幕阅读器一起使用的命令。以下是可用于在平台上交互的键盘命令列表\n\n开始使用键盘导航模式。按Alt + Z\n快速搜索。按Ctrl + K\n更改商品。开始输入商品名称\n更改时间周期。按数字或逗号\n指标、指标和策略。按斜线\n开放式布局。按下句号\nEURUSD\n1小时\n指标\n数据中心\n指标模板\nmw75-a 合成验收\n保存\n系统消息 · 10\nEURUSD · 自建行情 · bid · 来源量\n1小时\nDUKASCOPY\n开=\n1.10\n高=\n1.12\n低=\n1.09\n收=\n1.10\n0.00 (+0.05%)\n3个月\n1天\n01:30:29 UTC\nlog\n自动\n当您希望放大您鼠标聚焦的点位时，请按住Ctrl 键。\n警报\n日志\n2026/10/19\nEURUSD 突破提醒（验收）\nEURUSD · 自建行情 · bid · M5 · DUKASCOPY\n01:30:30\n\n事件时间 2026/10/19 01:30:30\n\n检测时间 2026/10/19 01:30:30\n\n实际值 1.10300 · 比较值 1.10200 · 市场价格 1.10300\n\n规则版本 1 · 第 1 次\n\n等待投递\n\n查看消息和当时证据\n网页与投递记录\n\n查看记录不会停止手机提醒；显式停止无法撤回已在途发送。\n\n定位触发位置\n停止后续手机提醒\nEURUSD 突破提醒（验收）\nEURUSD · 自建行情 · bid · M5 · DUKASCOPY\n01:28:48\nEURUSD 突破提醒（验收）\nEURUSD · 自建行情 · bid · M5 · DUKASCOPY\n01:16:06\n账户管理器\n按住可查看详细图表值\n了解！"
+    },
+    {
+      "name": "repeat grouped and recovery updates original without extra card",
+      "incident": {
+        "id": "6413a9fb-52d1-48d4-8964-9873ea380348",
+        "first_at": 1792373820895,
+        "last_at": 1792373823084,
+        "closed_at": null,
+        "count": 2,
+        "count_scope": "当前事故已接受发生数",
+        "severity_rank": 2
+      }
+    },
+    {
+      "name": "system preference survives refresh and records without popup",
+      "event": "b:e44c757e-9b68-4073-9e30-0a1c598f394c"
+    },
+    {
+      "name": "trade shares top card and opens existing alert log",
+      "fixture": {
+        "signal_id": "8829bdb7-5ef0-43ad-9650-56a02a066729",
+        "alert_id": "d1df15b7-e0f2-4816-ad28-313f2224d116",
+        "fixture": "real create/consume producer with synthetic observations; no external delivery"
+      },
+      "text": "EURUSD\nM5\nEURUSD 突破提醒（验收）\n\n价格 上穿 1.10200 · 触发价 1.10300 · 比较值 1.10200\n\n查看图表\n告警记录\n01:59 AM",
+      "geometry": {
+        "x": 542.5,
+        "y": 46,
+        "width": 355,
+        "height": 149
+      },
+      "destination": {
+        "domain": "pro_chart",
+        "event_id": "s:21b3aa9c-b6e5-54f8-9eb5-995faf141f86",
+        "destination": "/advanced-charts/mw75-a?panel=alerts&signal=8829bdb7-5ef0-43ad-9650-56a02a066729"
+      },
+      "bodyTail": "Tradingview是交互式的，并且具有与屏幕阅读器一起使用的命令。以下是可用于在平台上交互的键盘命令列表\n\n开始使用键盘导航模式。按Alt + Z\n快速搜索。按Ctrl + K\n更改商品。开始输入商品名称\n更改时间周期。按数字或逗号\n指标、指标和策略。按斜线\n开放式布局。按下句号\nEURUSD\n1小时\n指标\n数据中心\n指标模板\nmw75-a 合成验收\n保存\n系统消息 · 18\nEURUSD · 自建行情 · bid · 来源量\n1小时\nDUKASCOPY\n开=\n1.10\n高=\n1.12\n低=\n1.09\n收=\n1.10\n0.00 (−0.22%)\n3个月\n1天\n01:59:26 UTC\nlog\n自动\n警报\n日志\n2026/10/19\nEURUSD 突破提醒（验收）\nEURUSD · 自建行情 · bid · M5 · DUKASCOPY\n01:59:24\n\n事件时间 2026/10/19 01:59:24\n\n检测时间 2026/10/19 01:59:24\n\n实际值 1.10300 · 比较值 1.10200 · 市场价格 1.10300\n\n规则版本 1 · 第 1 次\n\n等待投递\n\n查看消息和当时证据\n网页与投递记录\n\n查看记录不会停止手机提醒；显式停止无法撤回已在途发送。\n\n定位触发位置\n停止后续手机提醒\nEURUSD 突破提醒（验收）\nEURUSD · 自建行情 · bid · M5 · DUKASCOPY\n01:30:30\nEURUSD 突破提醒（验收）\nEURUSD · 自建行情 · bid · M5 · DUKASCOPY\n01:28:48\nEURUSD 突破提醒（验收）\nEURUSD · 自建行情 · bid · M5 · DUKASCOPY\n01:16:06\n账户管理器"
+    },
+    {
+      "name": "system history scope and native sidebar contract",
+      "pages": [
+        "base",
+        "alerts",
+        "data-window",
+        "object_tree"
+      ],
+      "systemRows": 19,
+      "excludedTrades": true
+    },
+    {
+      "name": "light and dark theme use chart appearance",
+      "light": {
+        "background": "rgb(255, 255, 255)",
+        "color": "rgb(19, 23, 34)"
+      }
+    },
+    {
+      "name": "nonmodal system center at 850",
+      "dimensions": {
+        "x": 436,
+        "y": 46,
+        "width": 402,
+        "height": 592,
+        "viewport": 850,
+        "overflow": false,
+        "modal": 0,
+        "chart": {
+          "x": 56,
+          "y": 42,
+          "width": 444,
+          "height": 777,
+          "top": 42,
+          "right": 500,
+          "bottom": 819,
+          "left": 56
+        }
+      }
+    },
+    {
+      "name": "nonmodal system center at 390",
+      "dimensions": {
+        "x": 10,
+        "y": 46,
+        "width": 368,
+        "height": 592,
+        "viewport": 390,
+        "overflow": false,
+        "modal": 0,
+        "chart": {
+          "x": 56,
+          "y": 42,
+          "width": 334,
+          "height": 819,
+          "top": 42,
+          "right": 390,
+          "bottom": 861,
+          "left": 56
+        }
+      }
+    },
+    {
+      "name": "native menu keyboard/select, system-only search/grouping/read all",
+      "rows": [
+        "EURUSD01:37 AM重复与恢复验收已恢复 · 累计 2 次"
+      ],
+      "systemRows": 28,
+      "tradeRows": 4,
+      "tradeStateUnchanged": true
+    },
+    {
+      "name": "legacy trade deep link targets actual alert",
+      "from": "/signals?signal=8829bdb7-5ef0-43ad-9650-56a02a066729",
+      "to": "https://192.168.7.232:18280/advanced-charts/mw75-a?panel=alerts",
+      "selected": "8829bdb7-5ef0-43ad-9650-56a02a066729"
+    },
+    {
+      "name": "blocked native shell uses same parent center and restores exclusively",
+      "blocked": "/native-alert-shell.js",
+      "geometry": {
+        "x": 1028,
+        "y": 48,
+        "width": 400,
+        "height": 590
+      },
+      "parentGone": true,
+      "nativeEntry": 1,
+      "errors": []
+    },
+    {
+      "name": "850px shared card stays centered and clear of open watchlist",
+      "dimensions": {
+        "card": {
+          "x": 354,
+          "y": 46,
+          "width": 142,
+          "height": 234,
+          "top": 46,
+          "right": 496,
+          "bottom": 280,
+          "left": 354
+        },
+        "panel": {
+          "x": 504,
+          "y": 42,
+          "width": 346,
+          "height": 858,
+          "top": 42,
+          "right": 850,
+          "bottom": 900,
+          "left": 504
+        },
+        "centerError": 0,
+        "overlap": false
+      }
+    },
+    {
+      "name": "390px shared card remains inside viewport",
+      "phone": {
+        "x": 17.5,
+        "y": 46,
+        "width": 355,
+        "height": 149
+      }
+    },
+    {
+      "name": "legacy trade deep link targets actual alert",
+      "from": "/signals?signal=8829bdb7-5ef0-43ad-9650-56a02a066729",
+      "to": "https://192.168.7.232:18280/advanced-charts/mw75-a?panel=alerts&signal=8829bdb7-5ef0-43ad-9650-56a02a066729",
+      "selected": "8829bdb7-5ef0-43ad-9650-56a02a066729"
+    },
+    {
+      "name": "legacy trade deep link targets actual alert",
+      "from": "/signals?signal=8829bdb7-5ef0-43ad-9650-56a02a066729",
+      "to": "https://192.168.7.232:18280/advanced-charts/mw75-a?panel=alerts&signal=8829bdb7-5ef0-43ad-9650-56a02a066729",
+      "selected": "8829bdb7-5ef0-43ad-9650-56a02a066729"
+    },
+    {
+      "name": "legacy trade deep link targets actual alert",
+      "from": "/advanced-charts/mw75-a?panel=notifications&event=s%3A21b3aa9c-b6e5-54f8-9eb5-995faf141f86",
+      "to": "https://192.168.7.232:18280/advanced-charts/mw75-a?panel=alerts&signal=8829bdb7-5ef0-43ad-9650-56a02a066729",
+      "selected": "8829bdb7-5ef0-43ad-9650-56a02a066729"
+    },
+    {
+      "name": "system popup preference synchronizes across same-origin tabs",
+      "original": true,
+      "changedAndRestored": true
+    },
+    {
+      "name": "system popup preference synchronizes across same-origin tabs",
+      "original": true,
+      "changedAndRestored": true
+    },
+    {
+      "name": "final candidate decoded search and native menu/select regression",
+      "rows": [
+        "重复与恢复验收"
+      ],
+      "errors": []
+    }
+  ]
+}
