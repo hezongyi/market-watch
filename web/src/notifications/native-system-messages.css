@@ -55,6 +55,9 @@ html.theme-dark .nc-panel.nc-native-panel {
 .nc-panel.nc-native-panel .mw-native-search input {
   font-size: 14px;
 }
+.nc-panel.nc-native-panel .mw-native-search input:focus {
+  outline: none;
+}
 .nc-panel.nc-native-panel .mw-native-search > div > div {
   box-sizing: content-box;
 }
