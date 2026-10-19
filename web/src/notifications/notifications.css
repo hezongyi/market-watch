@@ -254,15 +254,6 @@
   padding: 48px 18px;
   color: var(--nc-muted);
 }
-.nc-pagination {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 8px 16px;
-  border-top: 1px solid var(--nc-border);
-  flex: none;
-}
 .nc-footer {
   display: flex;
   align-items: center;
@@ -407,19 +398,6 @@
   padding: 4px 0;
   border: 0;
 }
-.nc-popup {
-  position: fixed;
-  /* Native chart menus and dialogs use the overlap layer at 150. */
-  z-index: 140;
-  top: 48px;
-  right: 12px;
-  width: min(400px, calc(100vw - 24px));
-  height: min(590px, calc(100dvh - 64px));
-  border: 1px solid var(--nc-border, #787b86);
-  border-radius: 6px;
-  box-shadow: 0 6px 24px #0003;
-  overflow: hidden;
-}
 .nc-bubble {
   position: fixed;
   z-index: 145;
@@ -481,43 +459,6 @@
   margin-left: auto;
   color: var(--nc-muted);
   font-size: 11px;
-}
-.nc-fallback {
-  position: absolute;
-  inset: 48px 12px auto auto;
-  width: min(400px, calc(100% - 24px));
-  height: min(590px, calc(100% - 64px));
-  z-index: 200;
-  border: 1px solid #787b86;
-  border-radius: 6px;
-  box-shadow: 0 6px 24px #0003;
-  overflow: hidden;
-}
-.nc-fallback-entry {
-  position: absolute;
-  right: 12px;
-  top: 6px;
-  z-index: 109;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  max-width: calc(100% - 24px);
-  background: var(--app-panel, #1e222d);
-  color: var(--app-text, #d1d4dc);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-}
-.nc-fallback-entry button {
-  font: inherit;
-  padding: 4px 8px;
-}
-.nc-fallback-entry p {
-  margin: 0;
-}
-.advanced-workspace .nc-panel {
-  padding: 0;
-  position: relative;
 }
 @media (max-width: 480px) {
   .nc-heading {

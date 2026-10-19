@@ -4,15 +4,11 @@ import {
   Bell,
   ChevronLeft,
   MoreHorizontal,
-  Search,
-  Settings,
   Wifi,
-  X,
 } from "lucide-react";
 import {
   AlertButton,
   AlertCheckbox,
-  AlertInput,
   AlertSelect,
   AlertSearch,
   AlertIconButton,
@@ -20,12 +16,7 @@ import {
   NativeControl,
 } from "../advanced/NativeAlertControls";
 import { AlertMenu } from "../advanced/AlertMenu";
-import type {
-  HistoryPage,
-  Notice,
-  NoticeState,
-  NoticeTransport,
-} from "./types";
+import type { Notice, NoticeState, NoticeTransport } from "./types";
 import { severityLabels, sourceLabels, noticeInstrument } from "./types";
 import "./notifications.css";
 import { SystemOccurrences } from "./SystemOccurrences";
@@ -78,14 +69,10 @@ export function NoticePanel({
   onClose,
   onLocate,
   active = true,
-  nativePresentation = false,
-  focusOnOpen = true,
 }: {
   state: NoticeState;
   request: NoticeTransport;
   active?: boolean;
-  nativePresentation?: boolean;
-  focusOnOpen?: boolean;
   eventId?: string;
   onClose: () => void;
   onLocate?: (notice: Notice) => void | Promise<void>;
@@ -94,7 +81,6 @@ export function NoticePanel({
   const time = (value: number | null | undefined) =>
     formatTimestamp(value, zone);
   const [debugOpen, setDebugOpen] = useState(false);
-  const [pagedPage, setPage] = useState<HistoryPage | null>(null);
   const [filters, setFilters] = useState<SystemFilters>({});
   const [selection, setSelection] = useState(eventId || ""),
     [settings, setSettings] = useState(false),
@@ -104,12 +90,8 @@ export function NoticePanel({
     [timelineBefore, setTimelineBefore] = useState<string | null>(null);
   const [error, setError] = useState(""),
     [working, setBusy] = useState(false);
-  const [before, setBefore] = useState<string | null>(null),
-    [previous, setPrevious] = useState<(string | null)[]>([]);
   const currentSelection = useRef(selection),
-    mounted = useRef(true),
-    revision = useRef(0),
-    closeButton = useRef<HTMLButtonElement>(null);
+    mounted = useRef(true);
   const list = useRef<HTMLDivElement>(null),
     sentinel = useRef<HTMLDivElement>(null);
   const scrollClass = useContext(NativeScrollClass);
@@ -119,20 +101,17 @@ export function NoticePanel({
     filters,
     epoch: state.epoch,
     revision: state.revision,
-    enabled: nativePresentation && active && !settings,
+    enabled: active && !settings,
   });
-  const page = nativePresentation ? history.page : pagedPage;
-  const busy =
-    working || (nativePresentation && (history.loading || history.loadingMore));
-  const problem = error || (nativePresentation ? history.error : "");
-  const scrollStyle =
-    nativePresentation && scrollClass ? " " + scrollClass : "";
+  const page = history.page;
+  const busy = working || history.loading || history.loadingMore;
+  const problem = error || history.error;
+  const scrollStyle = scrollClass ? " " + scrollClass : "";
   currentSelection.current = selection;
   useEffect(() => {
     mounted.current = true;
     return () => {
       mounted.current = false;
-      revision.current++;
     };
   }, []);
   useEffect(() => {
@@ -140,64 +119,10 @@ export function NoticePanel({
     setSettings(false);
   }, [eventId]);
   useEffect(() => {
-    if (active && focusOnOpen) closeButton.current?.focus();
-  }, [active, focusOnOpen]);
-  useEffect(() => {
-    setBefore(null);
-    setPrevious([]);
-    setPage(null);
-  }, [state.epoch]);
-  useEffect(() => {
-    if (!active || settings || nativePresentation) return;
-    const current = ++revision.current;
-    setError("");
-    setBusy(true);
-    // Debounce text input without delaying reads, filters or pagination.
-    const timer = setTimeout(
-      () => {
-        void request({ action: "history", filters, before })
-          .then((result) => {
-            if (mounted.current && revision.current === current)
-              setPage(result);
-          })
-          .catch((error) => {
-            if (!mounted.current || revision.current !== current) return;
-            if (
-              error?.code === "NOTICE_RESET" ||
-              String(error).includes("NOTICE_RESET")
-            ) {
-              setBefore(null);
-              setPrevious([]);
-              setPage(null);
-            }
-            setError(String(error));
-          })
-          .finally(() => {
-            if (mounted.current && revision.current === current) setBusy(false);
-          });
-      },
-      filters.q ? 250 : 0,
-    );
-    return () => {
-      clearTimeout(timer);
-      revision.current++;
-    };
-  }, [
-    request,
-    filterKey,
-    before,
-    state.revision,
-    state.epoch,
-    active,
-    settings,
-    nativePresentation,
-  ]);
-  useEffect(() => {
-    if (nativePresentation && list.current) list.current.scrollTop = 0;
-  }, [nativePresentation, filterKey, state.epoch]);
+    if (list.current) list.current.scrollTop = 0;
+  }, [filterKey, state.epoch]);
   useEffect(() => {
     if (
-      !nativePresentation ||
       !active ||
       settings ||
       selection ||
@@ -220,7 +145,6 @@ export function NoticePanel({
     observer.observe(sentinel.current);
     return () => observer.disconnect();
   }, [
-    nativePresentation,
     active,
     settings,
     selection,
@@ -278,8 +202,6 @@ export function NoticePanel({
   }, [request, selection, active]);
   const setFilter = (key: keyof SystemFilters, value: string) => {
     setFilters((old) => systemListFilters({ ...old, [key]: value }));
-    setBefore(null);
-    setPrevious([]);
   };
   const run = async (action: () => Promise<unknown>) => {
     setBusy(true);
@@ -308,7 +230,7 @@ export function NoticePanel({
   const date = (row: Notice) => dayKey(row.occurred_at, zone);
   return (
     <section
-      className={"nc-panel" + (nativePresentation ? " nc-native-panel" : "")}
+      className="nc-panel nc-native-panel"
       aria-label="系统消息"
       onKeyDown={(event) => {
         if (event.key !== "Escape" || event.defaultPrevented) return;
@@ -327,44 +249,18 @@ export function NoticePanel({
         <div className="nc-heading-tools">
           {!settings && (
             <>
-              {nativePresentation ? (
-                <AlertIconButton
-                  icon={messageIcons.settings}
-                  label="系统消息设置"
-                  onClick={() => setSettings(true)}
-                />
-              ) : (
-                <button
-                  type="button"
-                  className="nc-icon"
-                  aria-label="系统消息设置"
-                  onClick={() => setSettings(true)}
-                >
-                  <Settings size={18} aria-hidden />
-                </button>
-              )}
+              <AlertIconButton
+                icon={messageIcons.settings}
+                label="系统消息设置"
+                onClick={() => setSettings(true)}
+              />
             </>
           )}
-          {nativePresentation ? (
-            <AlertIconButton
-              icon={messageIcons.close}
-              label="关闭系统消息"
-              reference={(node) => {
-                closeButton.current = node;
-              }}
-              onClick={onClose}
-            />
-          ) : (
-            <button
-              ref={closeButton}
-              type="button"
-              className="nc-icon"
-              aria-label="关闭系统消息"
-              onClick={onClose}
-            >
-              <X size={18} aria-hidden />
-            </button>
-          )}
+          <AlertIconButton
+            icon={messageIcons.close}
+            label="关闭系统消息"
+            onClick={onClose}
+          />
         </div>
       </header>
       {settings ? (
@@ -553,37 +449,23 @@ export function NoticePanel({
       ) : (
         <>
           <div className="nc-search">
-            {!nativePresentation && <Search size={16} aria-hidden />}
-            {nativePresentation ? (
-              <AlertSearch
-                autoFocus={false}
-                aria-label="搜索系统消息"
-                placeholder="搜索系统消息"
-                value={filters.q || ""}
-                maxLength={120}
-                onChange={(event) => setFilter("q", event.target.value)}
-              />
-            ) : (
-              <AlertInput
-                type="search"
-                aria-label="搜索系统消息"
-                placeholder="搜索系统消息"
-                value={filters.q || ""}
-                maxLength={120}
-                onChange={(event) => setFilter("q", event.target.value)}
-              />
-            )}
+            <AlertSearch
+              autoFocus={false}
+              maxLength={120}
+              aria-label="搜索系统消息"
+              placeholder="搜索系统消息"
+              value={filters.q || ""}
+              onChange={(event) => setFilter("q", event.target.value)}
+            />
             <AlertMenu
               label="筛选系统消息"
-              icon={nativePresentation ? messageIcons.more : undefined}
+              icon={messageIcons.more}
               items={[
                 {
                   label: "全部消息",
                   checked: !filters.state,
                   run: () => {
                     setFilters({});
-                    setBefore(null);
-                    setPrevious([]);
                   },
                 },
                 {
@@ -654,30 +536,29 @@ export function NoticePanel({
             </div>
           )}
           <div ref={list} className={"nc-list" + scrollStyle} aria-busy={busy}>
-            {!before && pending.length > 0 && (
+            {pending.length > 0 && (
               <div className="nc-section-label">
                 本机记录 · {pending.length} 条 · 等待同步
               </div>
             )}
-            {!before &&
-              pending.map((row) => (
-                <article className="nc-row nc-pending" key={row.id}>
-                  <SourceIcon row={row} />
-                  <div className="nc-row-copy">
-                    <strong>{row.title}</strong>
-                    <span>{row.message}</span>
-                    <small>
-                      {row.local_status === "accepted"
-                        ? "服务端已接收，等待投影"
-                        : row.local_status === "rejected"
-                          ? "服务端拒绝，本机证据保留"
-                          : "仅本机待同步"}{" "}
-                      · {time(row.occurred_at)}
-                    </small>
-                  </div>
-                </article>
-              ))}
-            {!before && pending.length > 0 && rows.length > 0 && (
+            {pending.map((row) => (
+              <article className="nc-row nc-pending" key={row.id}>
+                <SourceIcon row={row} />
+                <div className="nc-row-copy">
+                  <strong>{row.title}</strong>
+                  <span>{row.message}</span>
+                  <small>
+                    {row.local_status === "accepted"
+                      ? "服务端已接收，等待投影"
+                      : row.local_status === "rejected"
+                        ? "服务端拒绝，本机证据保留"
+                        : "仅本机待同步"}{" "}
+                    · {time(row.occurred_at)}
+                  </small>
+                </div>
+              </article>
+            ))}
+            {pending.length > 0 && rows.length > 0 && (
               <div className="nc-section-label">历史消息</div>
             )}
             {rows.map((row, index) => (
@@ -722,7 +603,7 @@ export function NoticePanel({
                 <p>{busy ? "正在读取系统消息…" : "没有符合条件的系统消息"}</p>
               </div>
             )}
-            {nativePresentation && !!rows.length && (
+            {!!rows.length && (
               <div ref={sentinel} className="nc-load-status" role="status">
                 {history.moreError ? (
                   <>
@@ -741,31 +622,6 @@ export function NoticePanel({
               </div>
             )}
           </div>
-          {!nativePresentation &&
-            page &&
-            (previous.length > 0 || page.before) && (
-              <div className="nc-pagination">
-                <AlertButton
-                  disabled={busy || !previous.length}
-                  onClick={() => {
-                    setBefore(previous[previous.length - 1]);
-                    setPrevious((old) => old.slice(0, -1));
-                  }}
-                >
-                  上一页
-                </AlertButton>
-                <small>第 {previous.length + 1} 页</small>
-                <AlertButton
-                  disabled={busy || !page.before}
-                  onClick={() => {
-                    setPrevious((old) => [...old, before]);
-                    setBefore(page.before);
-                  }}
-                >
-                  下一页
-                </AlertButton>
-              </div>
-            )}
         </>
       )}
       <footer className="nc-footer">
@@ -791,11 +647,9 @@ export function NoticeBubble({
   onOpen,
   onLocate,
   pending = 0,
-  nativePresentation = false,
 }: {
   notice: Notice;
   pending?: number;
-  nativePresentation?: boolean;
   request: NoticeTransport;
   onOpen: () => void | Promise<void>;
   onLocate?: () => void | Promise<void>;
@@ -847,7 +701,7 @@ export function NoticeBubble({
   };
   return (
     <aside
-      className={`nc-bubble${nativePresentation ? " nc-native-bubble" : ""}`}
+      className="nc-bubble nc-native-bubble"
       aria-label="即时通知"
       onMouseEnter={() => {
         hovered.current = true;
@@ -883,25 +737,15 @@ export function NoticeBubble({
           }}
         />
         <strong>{system(notice) ? "系统消息" : "交易告警"}</strong>
-        {!trading &&
-          (nativePresentation ? (
-            <span className="nc-instant-close">
-              <AlertIconButton
-                icon={messageIcons.close}
-                label="关闭即时通知"
-                onClick={dismiss}
-              />
-            </span>
-          ) : (
-            <button
-              type="button"
-              className="nc-icon"
-              aria-label="关闭即时通知"
+        {!trading && (
+          <span className="nc-instant-close">
+            <AlertIconButton
+              icon={messageIcons.close}
+              label="关闭即时通知"
               onClick={dismiss}
-            >
-              <X size={16} aria-hidden />
-            </button>
-          ))}
+            />
+          </span>
+        )}
       </div>
       <div role="status" aria-live="polite" aria-atomic="true">
         <h3>{notice.title}</h3>
@@ -951,26 +795,17 @@ export function NoticeBubble({
             告警记录
           </button>
         )}
-        {nativePresentation ? (
-          <NativeControl
-            kind="button"
-            properties={{
-              type: "button",
-              size: "m",
-              appearance: "default",
-              intent: "primary",
-              onClick: () => (trading ? void confirm() : void open(onOpen)),
-              children: trading ? "确定" : "查看消息",
-            }}
-          />
-        ) : (
-          <AlertButton
-            primary
-            onClick={() => (trading ? void confirm() : void open(onOpen))}
-          >
-            {trading ? "确定" : "查看消息"}
-          </AlertButton>
-        )}
+        <NativeControl
+          kind="button"
+          properties={{
+            type: "button",
+            size: "m",
+            appearance: "default",
+            intent: "primary",
+            onClick: () => (trading ? void confirm() : void open(onOpen)),
+            children: trading ? "确定" : "查看消息",
+          }}
+        />
       </div>
     </aside>
   );

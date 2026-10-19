@@ -151,8 +151,6 @@ export async function attachNativeSystemMessages({
           <NativeControls.Provider value={native.control}>
             <NativeScrollClass.Provider value={native.scrollClass}>
               <NoticePanel
-                nativePresentation
-                focusOnOpen={false}
                 state={view.state}
                 request={request}
                 eventId={view.eventId}

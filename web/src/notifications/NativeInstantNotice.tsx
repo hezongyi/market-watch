@@ -65,7 +65,6 @@ export async function attachNativeInstantNotice({
           <NativeControls.Provider value={native.control}>
             <NoticeBubble
               key={state.bubble!.id}
-              nativePresentation
               notice={state.bubble!}
               pending={Math.max(0, (state.alertPending || 0) - 1)}
               request={request}

@@ -1,14 +1,12 @@
 import {useNotices,useNoticeState} from "../notifications/context";
-import {NoticePanel,NoticeBubble} from "../notifications/Panel";
 import {setChartTime} from "../time/ChartTimeContext";
 import {operationFault} from "../notifications/operations";
-import type {NoticeAction} from "../notifications/types";
 import { validIndicatorRead } from "./indicatorRequests";
 import {
   loadNativeHistory,
   type HistoryCapabilities,
 } from "./nativeHistoryLoads";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams, NavLink } from "react-router-dom";
 import { useApp } from "../app/context";
 import { defaultChart, pageName } from "../app/navigation";
@@ -57,8 +55,8 @@ export default function AdvancedWorkspace() {
     return fault?notices.operation(fault,()=>requestAPI<T>(path,body,signal)):requestAPI<T>(path,body,signal);
   }
   const noticeStateRef=useRef(noticeState);noticeStateRef.current=noticeState;
-  const noticeRequest=useCallback((q:NoticeAction)=>notices.action(q),[notices]);
   const [notificationReady,setNotificationReady]=useState(false);
+  const [notificationFailed,setNotificationFailed]=useState(false);
   const notificationReadyRef=useRef(notificationReady);notificationReadyRef.current=notificationReady;
   const noticeOpen=new URLSearchParams(appLocation.search).get('panel')==='notifications';
   const noticeEvent=new URLSearchParams(appLocation.search).get('event') || undefined;
@@ -98,6 +96,7 @@ export default function AdvancedWorkspace() {
 
   const [, setRows] = useState<Workspace[]>([]),
     [active, setActive] = useState<Workspace | null>(null);
+  const [workspaceOpening,setWorkspaceOpening]=useState(true);
   const [historyPlansOpen, setHistoryPlansOpen] = useState(false);
   const [historyDetailsOpen, setHistoryDetailsOpen] = useState(false);
   const [maintenanceInstrument, setMaintenanceInstrument] = useState<
@@ -190,7 +189,7 @@ export default function AdvancedWorkspace() {
     });
   const select = (row: Workspace) => {
     setChartTime("UTC", "UTC（图表初始化前）");
-    setNativeReady(false);setNotificationReady(false);
+    setNativeReady(false);setNotificationReady(false);setNotificationFailed(false);
     setPollErrors({});
     setHistoryProgress({});
     setNativeLoads({});
@@ -302,6 +301,7 @@ export default function AdvancedWorkspace() {
   }, [app.registerGuard, origin, mobile]);
   useEffect(() => {
     if (current.current && current.current.id === workspaceId) return;
+    setWorkspaceOpening(true);
     let cancelled = false;
     const opening = workspaceId
       ? api<Workspace>("/advanced-charts/workspaces/" + encodeURIComponent(workspaceId)).then(row => [row])
@@ -319,7 +319,7 @@ export default function AdvancedWorkspace() {
       if (cancelled) return;
       if (list[0]) { setError(""); select(list[0]); }
       else { current.current = null; setActive(null); setStatus(mobile ? "请在桌面浏览器创建工作区" : "新建工作区开始使用"); }
-    }).catch(e => { if (!cancelled) { setActive(null); current.current = null; setError(workspaceId ? "工作区不可用：" + String(e) : String(e)); } });
+    }).catch(e => { if (!cancelled) { setActive(null); current.current = null; setError(workspaceId ? "工作区不可用：" + String(e) : String(e)); } }).finally(()=>{if(!cancelled)setWorkspaceOpening(false);});
     return () => { cancelled = true; };
   }, [workspaceId, requestedPlatform, mobile]);
   useEffect(() => {
@@ -330,7 +330,11 @@ export default function AdvancedWorkspace() {
     if(!active?.id)return;
     const context={workspace_id:active.id};
     const attempt=crypto.randomUUID();
-    const timer=setTimeout(()=>{if(!notificationReadyRef.current)void notices.report({source_kind:'chart_shell',attempt_id:attempt,code:'CHART_SHELL_UNAVAILABLE',title:'图表通知接入尚未完成',message:'图表通知接入超时，可在主页面查记录并重新加载图表',context});},25000);
+    const timer=setTimeout(()=>{
+      if(notificationReadyRef.current)return;
+      setNotificationFailed(true);
+      void notices.report({source_kind:'chart_shell',attempt_id:attempt,code:'CHART_SHELL_UNAVAILABLE',title:'图表通知接入尚未完成',message:'图表通知接入超时，请重新加载图表；恢复后可查看消息记录',context});
+    },25000);
     return()=>clearTimeout(timer);
   },[active?.id,frameKey,notices]);
   useEffect(()=>{if(notificationReady&&active?.id)void notices.resolve({source_kind:'chart_shell',attempt_id:alertUiSession.current,code:'CHART_SHELL_UNAVAILABLE',title:'图表通知接入已恢复',message:'当前工作区原生通知已接入',context:{workspace_id:active.id}});},[notificationReady,active?.id,notices]);
@@ -414,8 +418,8 @@ export default function AdvancedWorkspace() {
         if(typeof m.zone==='string' && typeof m.label==='string' && m.zone.length<100 && m.label.length<160)setChartTime(m.zone,m.label);
         return;
       }
-      if(m.type==='notice-center-ready' && m.session===alertUiSession.current && m.workspace_id===current.current?.id){setNotificationReady(true);return;}
-      if(m.type==='notice-center-unavailable' && m.session===alertUiSession.current){setNotificationReady(false);void notices.report({source_kind:'chart_shell',attempt_id:m.session+':notice-shell',code:'CHART_SHELL_UNAVAILABLE',title:'原生系统消息暂不可用',message:String(m.error||'接入失败'),context:{workspace_id:current.current?.id}});return;}
+      if(m.type==='notice-center-ready' && m.session===alertUiSession.current && m.workspace_id===current.current?.id){setNotificationReady(true);setNotificationFailed(false);return;}
+      if(m.type==='notice-center-unavailable' && m.session===alertUiSession.current && m.workspace_id===current.current?.id){setNotificationReady(false);setNotificationFailed(true);void notices.report({source_kind:'chart_shell',attempt_id:m.session+':notice-shell',code:'CHART_SHELL_UNAVAILABLE',title:'原生系统消息暂不可用',message:String(m.error||'接入失败'),context:{workspace_id:current.current?.id}});return;}
       if(m.type==='notice-center-panel' && m.session===alertUiSession.current && m.workspace_id===current.current?.id){
         if(m.open)openNotices(typeof m.event==='string'?m.event:undefined);
         else if(new URLSearchParams(location.search).get('panel')==='notifications')closeNotices();return;
@@ -1820,16 +1824,16 @@ export default function AdvancedWorkspace() {
       >
         {status}
       </div>
-      {!notificationReady&&<div className="nc-fallback-entry"><button type="button" onClick={()=>openNotices()}>系统消息（{noticeState.unread} 未读）</button>
-        <button type="button" onClick={()=>void appRef.current.confirmLeave().then(ok=>{if(ok){setNativeReady(false);setNotificationReady(false);setFrameKey(key=>key+1);}})}>重新加载图表</button><p>{nativeReady?'原生通知暂不可用':error?'图表加载失败，可查看排查记录':'图表正在启动'}{noticeState.gap?' · '+noticeState.gap:''}</p>
-        {blocked.current&&!mobile&&<button onClick={copy}>复制恢复草稿</button>}
-      </div>}
-      {!notificationReady&&noticeState.bubble&&<NoticeBubble notice={noticeState.bubble} pending={Math.max(0,(noticeState.alertPending||0)-1)} request={noticeRequest} onOpen={()=>{
-        const row=noticeState.bubble!;
-        if(row.source_kind==='chart_alert') {const url=new URL(location.href);url.searchParams.set('panel','alerts');url.searchParams.set('signal',row.source_id);url.searchParams.delete('event');navigate(url.pathname+url.search,{replace:true});post({type:'chart-alert-event-open',signal_id:row.source_id});}
-        else openNotices(row.local_status ? undefined : row.id);
-      }}/> }
-      {!notificationReady&&noticeOpen&&<div className="nc-fallback"><NoticePanel nativePresentation focusOnOpen={false} state={noticeState} request={noticeRequest} eventId={noticeEvent} onClose={closeNotices}/></div>}
+      {notificationFailed && !notificationReady && (
+        <div className="advanced-shell-recovery" role="status">
+          <span>图表界面接入未完成，请重新加载。</span>
+          <button type="button" onClick={()=>void appRef.current.confirmLeave().then(ok=>{
+            if(!ok)return;
+            setNativeReady(false);setNotificationReady(false);setNotificationFailed(false);
+            setFrameKey(key=>key+1);
+          })}>重新加载图表</button>
+        </div>
+      )}
       {active ? (
         <iframe
           key={frameKey}
@@ -1841,11 +1845,11 @@ export default function AdvancedWorkspace() {
           allowFullScreen
           referrerPolicy="no-referrer"
         />
-      ) : (
+      ) : workspaceOpening ? null : (
         <section>
           <h1>{error && workspaceId ? "工作区不可用" : "图表工作区"}</h1>
           <p>{mobile ? "手机只读看盘，请在桌面浏览器创建工作区。" : "选择已有工作区，或新建工作区开始使用。"}</p>
-          <NavLink to="/advanced-charts">选择默认工作区</NavLink> · <button onClick={()=>openNotices()}>图表通知</button> · <NavLink to="/settings">设置</NavLink>
+          <NavLink to="/advanced-charts">选择默认工作区</NavLink> · <NavLink to="/settings">设置</NavLink>
           <button disabled={mobile} onClick={create}>
             新建工作区
           </button>

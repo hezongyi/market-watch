@@ -126,3 +126,28 @@
 .advanced-load-details header {display:flex;align-items:center;justify-content:space-between;gap:16px}
 .advanced-load-details .advanced-history-failures,.advanced-load-details .advanced-loading-notice {position:static;inset:auto;width:auto;max-width:none;max-height:none;margin:12px 0 0;border:0;border-radius:0;padding:0;background:transparent;box-shadow:none}
 .advanced-workspace[data-theme="light"] .advanced-load-details {background:#fff;color:#131722;border-color:#b2b5be}
+
+/* Chart-shell recovery is an action prompt, never a second notification UI. */
+.advanced-shell-recovery {
+  position: absolute;
+  z-index: 200;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: max-content;
+  max-width: calc(100% - 32px);
+  box-sizing: border-box;
+  padding: 12px 16px;
+  border: 1px solid #434651;
+  border-radius: 6px;
+  background: #1e222d;
+  color: #d1d4dc;
+}
+.advanced-workspace[data-theme="light"] .advanced-shell-recovery {
+  background: #fff;
+  color: #131722;
+  border-color: #b2b5be;
+}
