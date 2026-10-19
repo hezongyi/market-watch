@@ -7,6 +7,7 @@
 ## 实例与操作
 
 - Ubuntu 本机 quant-server（192.168.7.232），Docker project `mw-issue75-v2-20261018`；全服务状态和镜像 ID 见 [runtime.json](runtime.json)。API、PG 和供源/投影/告警 worker 继续运行，更新 web/chart 两个容器；重载当前 gateway 的 Nginx 使它刷新容器 DNS。
+- 当前运行代码候选 `3210242`；原生通知和备用呈现的最终复验 `pageerror=[]`，恢复单图 UTC，不保存验收中临时的布局切换。
 - 正式登录：<https://192.168.7.232:18280/login>；真实图表：<https://192.168.7.232:18280/advanced-charts/mw75-real>。图表隔离源 18281。凭据沿用现有实例，单独保存，不提交。
 - 当前实例私有 Compose 启停入口：`python3 /tmp/mw75-integrated-compose.py up -d --no-build --no-deps web chart`；停止本轮展示服务：`python3 /tmp/mw75-integrated-compose.py stop web chart`。完整项目按相同 wrapper 的 `up -d --no-build` / `stop` 操作，不使用 `down -v`。不要停止其他 project。
 - 构建只走 `mw-docker build --repo . --component web|chart --tag market-watch-web:issue75-v2-candidate|market-watch-chart:issue75-v2-candidate --task mw-issue75-v2-20261018 --project mw-issue75-v2-20261018 --purpose acceptance`；Web 额外传 `--build-arg VITE_ADVANCED_CHART_ORIGIN=https://192.168.7.232:18281`。
@@ -25,7 +26,7 @@
 | 跨午夜分组 | 两条 23:30Z/00:30Z 隔离验收记录，在 UTC 分两天、上海同为 19 日、纽约同为 18 日；[UTC](midnight-UTC.png)、[上海](midnight-Shanghai.png)、[纽约](midnight-New_York.png) |
 | 筛选转换 | 纽约当地零点实际请求 since=1792296000000 / until=1792382400000；切 UTC 保留区间并显示 04:00；[转换后的输入](filter-utc-converted.png)。三个时区按各自日期边界查询分别命中 1/2/2 条跨午夜记录 |
 | 纽约 DST 日期边界 | 3 月 8 日请求 05:00Z 至次日 04:00Z（23 小时）；11 月 1 日请求 04:00Z 至次日 05:00Z（25 小时）；[25 小时范围](filter-dst-25-hours.png)。超出留存的日期/未来日期返回 0 条，仅证明转换和实际查询，不伪称有该日期真实事件 |
-| 多图激活图格 | 两图分别设上海/纽约，切激活图通知时区对应更新；[双图截图](multi-chart-active-ny.png)；整条记录 timestamp 不变。截图拍在清除筛选刷新间隙，分组数据另有上面的稳定截图 |
+| 多图激活图格 | 两图分别设上海/纽约，切激活图通知时区对应更新；[双图截图](multi-chart-active-ny.png)；整条记录 timestamp 不变，最新候选已重新截图，列表保持正常显示 |
 | 交易事件、检测和通知记录 | 原有真实事件同时显示事件/检测时间、网页/投递记录和服务端生成消息行；[上海详情](alert-detail-shanghai.png)、[UTC 详情](alert-detail-utc.png)。原始技术 JSON 保留 UTC 数字 |
 | 即时浮窗与同条详情 | 同一系统事件 1792405973483 在 [纽约浮窗](instant-new-york.png)显示 06:32:53，[UTC 浮窗](instant-utc.png)显示 10:32:53，与 [详情](instant-matching-detail.png)一致。交易浮窗复用同一个 NoticeBubble/formatter；本增量未重新触发真实交易，队列/确认回归沿用既有验收及持久化测试 |
 | exchange 与备用界面 | EURUSD 的 exchange 解析为 America/New_York；主动模拟原生呈现不可用后，[备用界面](fallback-shanghai.png)仍显示上海。检查完刷新恢复原生入口，移除浏览器临时拦截 |
@@ -42,3 +43,9 @@ DST 重复时刻曾尝试原生 Select；实际鼠标验收发现菜单被原生
 - `notifications-runtime.cjs`、真实 IndexedDB `notifications-persistence.cjs`、`chart-tab.cjs`、`single-app-routing.cjs` 通过；无新依赖、DB 迁移或后端源码改动。
 - 排查 JSON 和手机已有投递正文是原始证据，仍保留底层 UTC 格式；网页生成的可读时间均随图表。无法重新解释的旧本机缺失警示浏览器时间后缀在显示时省略，保留条数且不迁移持久格式。
 - 不宣称覆盖每个 IANA 历史时区、每种浏览器、物理手机送达、长时间压力或重新触发真实交易；本轮重点是显示/输入转换与正式登录。图表库为当前版本，未修改其许可库文件。
+
+## 系统浮窗自动消失反馈复验
+
+用户反馈系统消息不自动消失后，在当前候选 `3210242` 的同一实例/session 7 通过真实 API 创建明确标注的系统验收消息，驱动原生浮窗并断言消失。未修改展示或关闭代码。鼠标与焦点在外时约 8 秒自动消失；悬停 9 秒保留，移开后约 8 秒消失；关闭按钮获得键盘焦点 9 秒保留，焦点移到系统入口后约 8 秒消失。连续切换纽约/上海时区仍在 8106ms 内消失，见 [显示前](system-auto-dismiss-visible.png)、[自动关闭后](system-auto-dismiss-hidden.png)及 results.json 的 `systemAutoDismissFollowup`。截图只证明前后状态，时间线与 DOM 断言来自 Playwriter。
+
+当前已确认合同规定“悬停或焦点进入暂停”；这些路径表现与合同一致。尚未复现用户所述在移开鼠标和焦点后仍不消失，已询问具体消息标题及操作路径。此反馈保持待定位，不把本次复验称为故障修复；原时区截图曾通过悬停保持浮窗，不能单凭该截图证明自动消失。交易告警继续必须点击确定，本次未确认任何原有交易。
