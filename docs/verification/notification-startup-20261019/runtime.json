@@ -1,0 +1,50 @@
+{
+  "host": "Ubuntu quant-server 192.168.7.232",
+  "project": "mw-issue75-v2-20261018",
+  "url": "https://192.168.7.232:18280/advanced-charts/mw75-real?panel=notifications",
+  "containers": [
+    {
+      "name": "mw-issue75-v2-20261018-web-1",
+      "image": "sha256:9eb379df42f1c377931dbbf891d490d1baddc7b7cd9ca9fc926a779744197f90",
+      "status": "running",
+      "health": null
+    },
+    {
+      "name": "mw-issue75-v2-20261018-chart-1",
+      "image": "sha256:9434784b6aea1a5aa7ae22e94234aceb86d5d1bca8ea465d911fcf2df10b64ce",
+      "status": "running",
+      "health": null
+    },
+    {
+      "name": "mw-issue75-v2-20261018-api-1",
+      "image": "sha256:c1dcf532213e5205471a92487e0b6c051fab4a0d1191124acff32f67f5764ea2",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "mw-issue75-v2-20261018-postgres-1",
+      "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "mw-issue75-v2-20261018-gateway-1",
+      "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "status": "running",
+      "health": null
+    },
+    {
+      "name": "mw-issue75-v2-20261018-projector-1",
+      "image": "sha256:c1dcf532213e5205471a92487e0b6c051fab4a0d1191124acff32f67f5764ea2",
+      "status": "running",
+      "health": null
+    },
+    {
+      "name": "mw-issue75-v2-20261018-notify-worker-1",
+      "image": "sha256:c1dcf532213e5205471a92487e0b6c051fab4a0d1191124acff32f67f5764ea2",
+      "status": "running",
+      "health": null
+    }
+  ],
+  "source": "1f3385b"
+}

@@ -124,3 +124,7 @@
 ## 实施记录
 
 运行源码候选 `87a5db8`，增量 F0 / Ubuntu R1（现有通知 PR 的 F1/R2 分类和证据保留）。无服务端源码、schema、IndexedDB 格式、UTC 存储或手机协议变化；仅更新当前实例 web/chart。实施及截图/网络/109 条恢复结果见[本轮执行记录](verification/notification-joint-review-20261019/README.md)。未合并、未发布生产。
+
+## 07. 刷新时旧 UI 闪现（已修复）
+
+用户随后要求只保留新 UI、不要旧版备份。`1f3385b` 已删除父页备用通知入口/面板/浮窗及旧控件、分页分支，正常初始化等待原生界面；失败只提供重载操作。Playwriter 正常/慢加载/25 秒超时/明确接入失败与恢复全部通过，未确认交易保留。见[根因、截图及回归](verification/notification-startup-20261019/README.md)。

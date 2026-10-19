@@ -1,0 +1,22 @@
+{
+  "normalRefresh": [
+    {
+      "ms": 62,
+      "entry": false,
+      "panel": false
+    },
+    {
+      "ms": 266,
+      "entry": true,
+      "panel": true
+    },
+    {
+      "ms": 2743,
+      "entry": false,
+      "panel": false
+    }
+  ],
+  "initialRepro": "/tmp/mw75-refresh-ui-repro.js",
+  "regression": "web/tests/notification-startup.playwriter.cjs",
+  "beforeVerdict": "FAIL: Old fallback panel must not flash before native notification center is ready"
+}
