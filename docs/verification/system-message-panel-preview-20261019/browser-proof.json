@@ -1,0 +1,94 @@
+{
+  "cases": [
+    {
+      "name": "Search never autofocused on open and actual native 5px scrollbar",
+      "scrollSkin": {
+        "nativeClass": "nc-list scrollContainer-vVf9OJ2A",
+        "bar": "5px",
+        "thumb": "rgb(61, 61, 61)"
+      }
+    },
+    {
+      "name": "Native surface, mouse focus and unchanged chart geometry",
+      "palette": {
+        "surface": "rgb(31, 31, 31)",
+        "panel": "rgba(0, 0, 0, 0)",
+        "searchHeight": "24px",
+        "modal": "false"
+      },
+      "geometry": {
+        "width": 972,
+        "height": 749,
+        "x": 56,
+        "y": 42,
+        "w": 972,
+        "h": 749
+      }
+    },
+    {
+      "name": "Keyboard opening, Chinese search, refresh preservation, detail/read/handled and Escape return"
+    },
+    {
+      "name": "Continuous history 6/12/18/21, retry, refresh retention, end, filtering and stale response isolation"
+    },
+    {
+      "name": "Native PopupMenu and Select, unread filtering and nested Escape"
+    },
+    {
+      "name": "Native settings, read-all and fixed 0/23/99+ badge",
+      "widths": [
+        52,
+        52,
+        52
+      ]
+    },
+    {
+      "name": "Outside click passes through; chart panning remains usable",
+      "rangeBefore": {
+        "from": 1791835200,
+        "to": 1792414800
+      },
+      "rangeAfter": {
+        "from": 1791756000,
+        "to": 1792339200
+      }
+    },
+    {
+      "name": "Native dark/light themes",
+      "dark": "rgb(31, 31, 31)",
+      "light": "rgb(255, 255, 255)"
+    },
+    {
+      "name": "Responsive geometry",
+      "width": 850,
+      "bounds": {
+        "left": 438,
+        "right": 838,
+        "top": 46,
+        "bottom": 636,
+        "width": 400,
+        "viewport": 850,
+        "overflow": false
+      }
+    },
+    {
+      "name": "Responsive geometry",
+      "width": 390,
+      "bounds": {
+        "left": 12,
+        "right": 378,
+        "top": 46,
+        "bottom": 636,
+        "width": 366,
+        "viewport": 390,
+        "overflow": false
+      }
+    },
+    {
+      "name": "Idempotent destroy and ignored late update"
+    }
+  ],
+  "errors": [],
+  "mutations": [],
+  "passed": true
+}

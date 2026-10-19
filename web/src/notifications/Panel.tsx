@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import {
   AlertTriangle,
   Bell,
@@ -15,6 +15,9 @@ import {
   AlertCheckbox,
   AlertInput,
   AlertSelect,
+  AlertSearch,
+  AlertIconButton,
+  NativeScrollClass,
 } from "../advanced/NativeAlertControls";
 import { AlertMenu } from "../advanced/AlertMenu";
 import type {
@@ -26,6 +29,8 @@ import type {
 import { severityLabels, sourceLabels, noticeInstrument } from "./types";
 import "./notifications.css";
 import { SystemOccurrences } from "./SystemOccurrences";
+import { messageIcons } from "./icons";
+import { useSystemHistory } from "./useSystemHistory";
 const time = (value: number | null | undefined) =>
   value ? new Date(value).toLocaleString() : "未知";
 const utc = (value: number | null | undefined) =>
@@ -64,16 +69,20 @@ export function NoticePanel({
   onClose,
   onLocate,
   active = true,
+  nativePresentation = false,
+  focusOnOpen = true,
 }: {
   state: NoticeState;
   request: NoticeTransport;
   active?: boolean;
+  nativePresentation?: boolean;
+  focusOnOpen?: boolean;
   eventId?: string;
   onClose: () => void;
   onLocate?: (notice: Notice) => void | Promise<void>;
 }) {
   const [debugOpen, setDebugOpen] = useState(false);
-  const [page, setPage] = useState<HistoryPage | null>(null);
+  const [pagedPage, setPage] = useState<HistoryPage | null>(null);
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [selection, setSelection] = useState(eventId || ""),
     [settings, setSettings] = useState(false),
@@ -82,13 +91,30 @@ export function NoticePanel({
     [timeline, setTimeline] = useState<any[]>([]),
     [timelineBefore, setTimelineBefore] = useState<string | null>(null);
   const [error, setError] = useState(""),
-    [busy, setBusy] = useState(false);
+    [working, setBusy] = useState(false);
   const [before, setBefore] = useState<string | null>(null),
     [previous, setPrevious] = useState<(string | null)[]>([]);
   const currentSelection = useRef(selection),
     mounted = useRef(true),
     revision = useRef(0),
     closeButton = useRef<HTMLButtonElement>(null);
+  const list = useRef<HTMLDivElement>(null),
+    sentinel = useRef<HTMLDivElement>(null);
+  const scrollClass = useContext(NativeScrollClass);
+  const filterKey = JSON.stringify(filters);
+  const history = useSystemHistory({
+    request,
+    filters,
+    epoch: state.epoch,
+    revision: state.revision,
+    enabled: nativePresentation && active && !settings,
+  });
+  const page = nativePresentation ? history.page : pagedPage;
+  const busy =
+    working || (nativePresentation && (history.loading || history.loadingMore));
+  const problem = error || (nativePresentation ? history.error : "");
+  const scrollStyle =
+    nativePresentation && scrollClass ? " " + scrollClass : "";
   currentSelection.current = selection;
   useEffect(() => {
     mounted.current = true;
@@ -102,16 +128,15 @@ export function NoticePanel({
     setSettings(false);
   }, [eventId]);
   useEffect(() => {
-    if (active) closeButton.current?.focus();
-  }, [active]);
+    if (active && focusOnOpen) closeButton.current?.focus();
+  }, [active, focusOnOpen]);
   useEffect(() => {
     setBefore(null);
     setPrevious([]);
     setPage(null);
   }, [state.epoch]);
-  const filterKey = JSON.stringify(filters);
   useEffect(() => {
-    if (!active || settings) return;
+    if (!active || settings || nativePresentation) return;
     const current = ++revision.current;
     setError("");
     setBusy(true);
@@ -153,6 +178,46 @@ export function NoticePanel({
     state.epoch,
     active,
     settings,
+    nativePresentation,
+  ]);
+  useEffect(() => {
+    if (nativePresentation && list.current) list.current.scrollTop = 0;
+  }, [nativePresentation, filterKey, state.epoch]);
+  useEffect(() => {
+    if (
+      !nativePresentation ||
+      !active ||
+      settings ||
+      selection ||
+      !page?.before ||
+      history.loading ||
+      history.loadingMore ||
+      history.error ||
+      history.moreError ||
+      !list.current ||
+      !sentinel.current
+    )
+      return;
+    const observer =
+      new list.current.ownerDocument.defaultView!.IntersectionObserver(
+        (entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) history.loadMore();
+        },
+        { root: list.current, rootMargin: "0px 0px 80px 0px" },
+      );
+    observer.observe(sentinel.current);
+    return () => observer.disconnect();
+  }, [
+    nativePresentation,
+    active,
+    settings,
+    selection,
+    page?.before,
+    history.loading,
+    history.loadingMore,
+    history.error,
+    history.moreError,
+    history.loadMore,
   ]);
   useEffect(() => {
     if (!selection || !active) {
@@ -229,7 +294,7 @@ export function NoticePanel({
   const date = (row: Notice) => new Date(row.occurred_at).toLocaleDateString();
   return (
     <section
-      className="nc-panel"
+      className={"nc-panel" + (nativePresentation ? " nc-native-panel" : "")}
       aria-label="系统消息"
       onKeyDown={(event) => {
         if (event.key !== "Escape" || event.defaultPrevented) return;
@@ -248,16 +313,25 @@ export function NoticePanel({
         <div className="nc-heading-tools">
           {!settings && (
             <>
-              <button
-                type="button"
-                className="nc-icon"
-                aria-label="系统消息设置"
-                onClick={() => setSettings(true)}
-              >
-                <Settings size={18} aria-hidden />
-              </button>
+              {nativePresentation ? (
+                <AlertIconButton
+                  icon={messageIcons.settings}
+                  label="系统消息设置"
+                  onClick={() => setSettings(true)}
+                />
+              ) : (
+                <button
+                  type="button"
+                  className="nc-icon"
+                  aria-label="系统消息设置"
+                  onClick={() => setSettings(true)}
+                >
+                  <Settings size={18} aria-hidden />
+                </button>
+              )}
               <AlertMenu
                 label="系统消息操作"
+                icon={nativePresentation ? messageIcons.more : undefined}
                 items={[
                   {
                     label: "全部标为已读",
@@ -271,15 +345,26 @@ export function NoticePanel({
               </AlertMenu>
             </>
           )}
-          <button
-            ref={closeButton}
-            type="button"
-            className="nc-icon"
-            aria-label="关闭系统消息"
-            onClick={onClose}
-          >
-            <X size={18} aria-hidden />
-          </button>
+          {nativePresentation ? (
+            <AlertIconButton
+              icon={messageIcons.close}
+              label="关闭系统消息"
+              reference={(node) => {
+                closeButton.current = node;
+              }}
+              onClick={onClose}
+            />
+          ) : (
+            <button
+              ref={closeButton}
+              type="button"
+              className="nc-icon"
+              aria-label="关闭系统消息"
+              onClick={onClose}
+            >
+              <X size={18} aria-hidden />
+            </button>
+          )}
         </div>
       </header>
       {state.gap && (
@@ -287,13 +372,13 @@ export function NoticePanel({
           {state.gap}
         </p>
       )}
-      {error && (
+      {problem && (
         <p className="nc-problem" role="alert">
-          {error}
+          {problem}
         </p>
       )}
       {settings ? (
-        <div className="nc-detail nc-settings">
+        <div className={"nc-detail nc-settings" + scrollStyle}>
           <button
             type="button"
             className="nc-back"
@@ -320,7 +405,7 @@ export function NoticePanel({
         </div>
       ) : selection ? (
         detail ? (
-          <div className="nc-detail">
+          <div className={"nc-detail" + scrollStyle}>
             <button
               type="button"
               className="nc-back"
@@ -484,17 +569,29 @@ export function NoticePanel({
       ) : (
         <>
           <div className="nc-search">
-            <Search size={16} aria-hidden />
-            <AlertInput
-              type="search"
-              aria-label="搜索系统消息"
-              placeholder="搜索系统消息"
-              value={filters.q || ""}
-              maxLength={120}
-              onChange={(event) => setFilter("q", event.target.value)}
-            />
+            {!nativePresentation && <Search size={16} aria-hidden />}
+            {nativePresentation ? (
+              <AlertSearch
+                autoFocus={false}
+                aria-label="搜索系统消息"
+                placeholder="搜索系统消息"
+                value={filters.q || ""}
+                maxLength={120}
+                onChange={(event) => setFilter("q", event.target.value)}
+              />
+            ) : (
+              <AlertInput
+                type="search"
+                aria-label="搜索系统消息"
+                placeholder="搜索系统消息"
+                value={filters.q || ""}
+                maxLength={120}
+                onChange={(event) => setFilter("q", event.target.value)}
+              />
+            )}
             <AlertMenu
               label="筛选系统消息"
+              icon={nativePresentation ? messageIcons.filter : undefined}
               items={[
                 {
                   label: "全部消息",
@@ -537,7 +634,7 @@ export function NoticePanel({
             </div>
           )}
           {advanced && (
-            <div className="nc-filters">
+            <div className={"nc-filters" + scrollStyle}>
               <label>
                 级别
                 <AlertSelect
@@ -618,7 +715,7 @@ export function NoticePanel({
               </label>
             </div>
           )}
-          <div className="nc-list" aria-busy={busy}>
+          <div ref={list} className={"nc-list" + scrollStyle} aria-busy={busy}>
             {!before &&
               pending.map((row) => (
                 <article className="nc-row nc-pending" key={row.id}>
@@ -681,30 +778,50 @@ export function NoticePanel({
                 <p>{busy ? "正在读取系统消息…" : "没有符合条件的系统消息"}</p>
               </div>
             )}
+            {nativePresentation && !!rows.length && (
+              <div ref={sentinel} className="nc-load-status" role="status">
+                {history.moreError ? (
+                  <>
+                    <span>暂时无法加载更早消息</span>
+                    <AlertButton onClick={history.loadMore}>
+                      重试加载
+                    </AlertButton>
+                  </>
+                ) : history.loadingMore ? (
+                  "正在加载更早消息…"
+                ) : page?.before ? (
+                  "向下滚动加载更早消息"
+                ) : (
+                  "已显示全部消息"
+                )}
+              </div>
+            )}
           </div>
-          {page && (previous.length > 0 || page.before) && (
-            <div className="nc-pagination">
-              <AlertButton
-                disabled={busy || !previous.length}
-                onClick={() => {
-                  setBefore(previous[previous.length - 1]);
-                  setPrevious((old) => old.slice(0, -1));
-                }}
-              >
-                上一页
-              </AlertButton>
-              <small>第 {previous.length + 1} 页</small>
-              <AlertButton
-                disabled={busy || !page.before}
-                onClick={() => {
-                  setPrevious((old) => [...old, before]);
-                  setBefore(page.before);
-                }}
-              >
-                下一页
-              </AlertButton>
-            </div>
-          )}
+          {!nativePresentation &&
+            page &&
+            (previous.length > 0 || page.before) && (
+              <div className="nc-pagination">
+                <AlertButton
+                  disabled={busy || !previous.length}
+                  onClick={() => {
+                    setBefore(previous[previous.length - 1]);
+                    setPrevious((old) => old.slice(0, -1));
+                  }}
+                >
+                  上一页
+                </AlertButton>
+                <small>第 {previous.length + 1} 页</small>
+                <AlertButton
+                  disabled={busy || !page.before}
+                  onClick={() => {
+                    setPrevious((old) => [...old, before]);
+                    setBefore(page.before);
+                  }}
+                >
+                  下一页
+                </AlertButton>
+              </div>
+            )}
         </>
       )}
       <footer className="nc-footer">
