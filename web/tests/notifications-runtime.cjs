@@ -316,6 +316,76 @@ const assert = require("node:assert/strict"),
   assert.equal(resetCase.runtime.state.status, "已同步");
   assert.equal(resetCase.runtime.state.gap, "已有本机记录未能保存",
     "successful reset clears transient progress without hiding persistent storage loss");
+  // A previous server's signed cursor can fail validation before epoch comparison.
+  for (const invalid of [
+    new sandbox.TestApiError("无效通知游标", 400, "HISTORY_UNAVAILABLE"),
+    new sandbox.TestApiError("cursor invalid", 400, "NOTICE_CURSOR_INVALID"),
+  ]) {
+    const stale = fixture();
+    stale.runtime.after = "old-signed-cursor";
+    stale.runtime.state.gap = "已有持久证据";
+    const trade = { id: "waiting-trade", source_kind: "chart_alert" };
+    stale.runtime.state.bubble = trade;
+    stale.runtime.alertQueue = [trade];
+    const regular = sandbox.testAPI;
+    sandbox.testAPI = async (path, ...args) => {
+      if (path.includes("/changes?after=old-signed-cursor")) throw invalid;
+      if (path === "/notification-center/health")
+        return { at: Date.now(), display_enabled: true, state: "ok" };
+      return regular(path, ...args);
+    };
+    await stale.runtime.cycle(0);
+    assert.equal(stale.runtime.after, "", "invalid changes cursor must rebuild baseline");
+    assert.equal(stale.pending.get("admin:b:test").value.status, "accepted",
+      "a failed changes read must not prevent local intake upload");
+    assert.equal(stale.runtime.state.bubble, trade, "waiting trade survives reset");
+    assert.equal(stale.runtime.state.gap, "已有持久证据");
+    // Isolate the subsequent read from the separate persisted-alert restoration suite.
+    stale.runtime.restoreAlerts = async () => {};
+    await stale.runtime.cycle(0);
+    assert.equal(stale.runtime.after, "next");
+    assert.equal(stale.calls.filter(p => p === "/notification-center/events").length, 2,
+      "one upload and one fresh baseline; accepted records are not uploaded twice");
+  }
+  for (const failure of [
+    new sandbox.TestApiError("unrelated bad request", 400),
+    new sandbox.TestApiError("service unavailable", 503),
+  ]) {
+    const limited = fixture();
+    limited.runtime.after = "current-cursor";
+    const regular = sandbox.testAPI;
+    sandbox.testAPI = async (path, ...args) => {
+      if (path.startsWith("/notification-center/changes")) throw failure;
+      return regular(path, ...args);
+    };
+    await limited.runtime.cycle(0);
+    assert.equal(limited.runtime.after, "current-cursor", "arbitrary errors must not reset cursor");
+    assert.equal(limited.pending.get("admin:b:test").value.status, "accepted");
+  }
+  const ordered = fixture();
+  ordered.pending.clear();
+  for (let i = 0; i < 210; i++) {
+    const id = "b:" + String(999 - i);
+    ordered.pending.set("admin:" + id, {key:"admin:" + id,at:i,
+      value:{status:"pending",event:{event_id:id,occurred_at:i,context:{},evidence:{}}}});
+  }
+  await ordered.runtime.loadPending(0);
+  assert.equal(ordered.runtime.state.pending.length, 200);
+  assert.equal(ordered.runtime.state.pending[0].occurred_at, 209,
+    "newest evidence is retained regardless of IndexedDB key order");
+  assert.equal(ordered.runtime.state.pending.at(-1).occurred_at, 10);
+  ordered.pending.clear();
+  for (const id of ["a", "c", "b"]) ordered.pending.set(id, {key:id,at:1,
+    value:{status:"pending",event:{event_id:id,occurred_at:1,context:{},evidence:{}}}});
+  await ordered.runtime.loadPending(0);
+  assert.equal(ordered.runtime.state.pending.map(r=>r.id).join(","), "c,b,a");
+  const unauthorized = fixture();
+  unauthorized.runtime.after = "current-cursor";
+  sandbox.testAPI = async () => { throw new sandbox.TestApiError("expired", 401); };
+  await unauthorized.runtime.cycle(0);
+  assert.equal(unauthorized.pending.get("admin:b:test").value.status, "pending",
+    "authentication failure must not continue uploads");
+
   const unified = fixture();
   unified.runtime.pop = async () => {};
   unified.runtime.estimateNow = () => 1000;

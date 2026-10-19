@@ -3,7 +3,6 @@ import {
   AlertTriangle,
   Bell,
   ChevronLeft,
-  Filter,
   MoreHorizontal,
   Search,
   Settings,
@@ -32,9 +31,19 @@ import "./notifications.css";
 import { SystemOccurrences } from "./SystemOccurrences";
 import { messageIcons } from "./icons";
 import { useSystemHistory } from "./useSystemHistory";
-import { useChartTime, ChartTimeLabel } from "../time/ChartTimeContext";
-import { formatTimestamp, dayKey, clockTime } from "../time/chartTime";
-import { ZonedDateTimeInput } from "../time/ZonedDateTimeInput";
+import { useChartTime } from "../time/ChartTimeContext";
+import {
+  formatTimestamp,
+  dayKey,
+  clockTime,
+  offsetLabel,
+} from "../time/chartTime";
+import {
+  newestFirst,
+  matchesSystemFilters,
+  systemListFilters,
+  type SystemFilters,
+} from "./systemMessages";
 const system = (row: Notice) => row.source_kind !== "chart_alert";
 const observationLabels: Record<string, string> = {
   received: "网页收到",
@@ -84,19 +93,9 @@ export function NoticePanel({
   const { zone } = useChartTime();
   const time = (value: number | null | undefined) =>
     formatTimestamp(value, zone);
-  const [timeValidity, setTimeValidity] = useState({
-    since: true,
-    until: true,
-  });
   const [debugOpen, setDebugOpen] = useState(false);
   const [pagedPage, setPage] = useState<HistoryPage | null>(null);
-  const [filters, setFilters] = useState<Record<string, string>>({});
-  const rangeValid =
-    !filters.since ||
-    !filters.until ||
-    Number(filters.since) < Number(filters.until);
-  const timeFiltersValid =
-    timeValidity.since && timeValidity.until && rangeValid;
+  const [filters, setFilters] = useState<SystemFilters>({});
   const [selection, setSelection] = useState(eventId || ""),
     [settings, setSettings] = useState(false),
     [advanced, setAdvanced] = useState(false);
@@ -114,19 +113,13 @@ export function NoticePanel({
   const list = useRef<HTMLDivElement>(null),
     sentinel = useRef<HTMLDivElement>(null);
   const scrollClass = useContext(NativeScrollClass);
-  useEffect(() => {
-    if (!advanced)
-      setTimeValidity((old) =>
-        old.since && old.until ? old : { since: true, until: true },
-      );
-  }, [advanced]);
   const filterKey = JSON.stringify(filters);
   const history = useSystemHistory({
     request,
     filters,
     epoch: state.epoch,
     revision: state.revision,
-    enabled: nativePresentation && active && !settings && timeFiltersValid,
+    enabled: nativePresentation && active && !settings,
   });
   const page = nativePresentation ? history.page : pagedPage;
   const busy =
@@ -155,7 +148,7 @@ export function NoticePanel({
     setPage(null);
   }, [state.epoch]);
   useEffect(() => {
-    if (!active || settings || nativePresentation || !timeFiltersValid) return;
+    if (!active || settings || nativePresentation) return;
     const current = ++revision.current;
     setError("");
     setBusy(true);
@@ -192,7 +185,6 @@ export function NoticePanel({
   }, [
     request,
     filterKey,
-    timeFiltersValid,
     before,
     state.revision,
     state.epoch,
@@ -284,8 +276,8 @@ export function NoticePanel({
       alive = false;
     };
   }, [request, selection, active]);
-  const setFilter = (key: string, value: string) => {
-    setFilters((old) => ({ ...old, [key]: value }));
+  const setFilter = (key: keyof SystemFilters, value: string) => {
+    setFilters((old) => systemListFilters({ ...old, [key]: value }));
     setBefore(null);
     setPrevious([]);
   };
@@ -309,8 +301,10 @@ export function NoticePanel({
         epoch: page.epoch,
       }),
     );
-  const rows = (timeFiltersValid ? page?.events || [] : []).filter(system),
-    pending = state.pending.filter(system);
+  const rows = (page?.events || []).filter(system),
+    pending = state.pending
+      .filter((row) => matchesSystemFilters(row, filters))
+      .sort(newestFirst);
   const date = (row: Notice) => dayKey(row.occurred_at, zone);
   return (
     <section
@@ -349,20 +343,6 @@ export function NoticePanel({
                   <Settings size={18} aria-hidden />
                 </button>
               )}
-              <AlertMenu
-                label="系统消息操作"
-                icon={nativePresentation ? messageIcons.more : undefined}
-                items={[
-                  {
-                    label: "全部标为已读",
-                    disabled: busy || !page || !state.unread,
-                    run: readAll,
-                  },
-                  { label: "系统消息设置", run: () => setSettings(true) },
-                ]}
-              >
-                <MoreHorizontal size={18} aria-hidden />
-              </AlertMenu>
             </>
           )}
           {nativePresentation ? (
@@ -387,22 +367,6 @@ export function NoticePanel({
           )}
         </div>
       </header>
-      <ChartTimeLabel />
-      {!rangeValid && (
-        <p className="nc-problem" role="alert">
-          截止时间必须晚于起始时间。
-        </p>
-      )}
-      {state.gap && (
-        <p className="nc-problem" role="alert">
-          {state.gap.replace(/（最早 .*?）$/, "")}
-        </p>
-      )}
-      {problem && (
-        <p className="nc-problem" role="alert">
-          {problem}
-        </p>
-      )}
       {settings ? (
         <div className={"nc-detail nc-settings" + scrollStyle}>
           <button
@@ -611,11 +575,11 @@ export function NoticePanel({
             )}
             <AlertMenu
               label="筛选系统消息"
-              icon={nativePresentation ? messageIcons.filter : undefined}
+              icon={nativePresentation ? messageIcons.more : undefined}
               items={[
                 {
                   label: "全部消息",
-                  checked: !filters.state && !filters.workspace,
+                  checked: !filters.state,
                   run: () => {
                     setFilters({});
                     setBefore(null);
@@ -638,7 +602,7 @@ export function NoticePanel({
                 },
               ]}
             >
-              <Filter size={18} aria-hidden />
+              <MoreHorizontal size={18} aria-hidden />
             </AlertMenu>
           </div>
           {filters.state === "unread" && (
@@ -687,58 +651,14 @@ export function NoticePanel({
                     ))}
                 </AlertSelect>
               </label>
-              <label>
-                品种
-                <AlertInput
-                  aria-label="系统消息品种"
-                  value={filters.instrument || ""}
-                  onChange={(e) => setFilter("instrument", e.target.value)}
-                />
-              </label>
-              <label>
-                工作区
-                <AlertInput
-                  aria-label="系统消息工作区"
-                  value={filters.workspace || ""}
-                  onChange={(e) => setFilter("workspace", e.target.value)}
-                />
-              </label>
-              <label>
-                起始时间
-                <ZonedDateTimeInput
-                  label="起始时间"
-                  zone={zone}
-                  value={filters.since ? Number(filters.since) : null}
-                  onChange={(value) =>
-                    setFilter("since", value == null ? "" : String(value))
-                  }
-                  onValidityChange={(valid) =>
-                    setTimeValidity((old) =>
-                      old.since === valid ? old : { ...old, since: valid },
-                    )
-                  }
-                />
-              </label>
-              <label>
-                截止时间
-                <ZonedDateTimeInput
-                  label="截止时间"
-                  zone={zone}
-                  value={filters.until ? Number(filters.until) : null}
-                  onChange={(value) =>
-                    setFilter("until", value == null ? "" : String(value))
-                  }
-                  onValidityChange={(valid) =>
-                    setTimeValidity((old) =>
-                      old.until === valid ? old : { ...old, until: valid },
-                    )
-                  }
-                />
-                <small>截止时刻不包含在结果内；输入按 {zone} 解释。</small>
-              </label>
             </div>
           )}
           <div ref={list} className={"nc-list" + scrollStyle} aria-busy={busy}>
+            {!before && pending.length > 0 && (
+              <div className="nc-section-label">
+                本机记录 · {pending.length} 条 · 等待同步
+              </div>
+            )}
             {!before &&
               pending.map((row) => (
                 <article className="nc-row nc-pending" key={row.id}>
@@ -757,6 +677,9 @@ export function NoticePanel({
                   </div>
                 </article>
               ))}
+            {!before && pending.length > 0 && rows.length > 0 && (
+              <div className="nc-section-label">历史消息</div>
+            )}
             {rows.map((row, index) => (
               <div key={row.id}>
                 {(!index || date(row) !== date(rows[index - 1])) && (
@@ -774,7 +697,10 @@ export function NoticePanel({
                   <span className="nc-row-copy">
                     <span className="nc-row-meta">
                       <strong>{noticeInstrument(row)}</strong>
-                      <time>{clockTime(row.occurred_at, zone)}</time>
+                      <time>
+                        {clockTime(row.occurred_at, zone)}{" "}
+                        {offsetLabel(row.occurred_at, zone)}
+                      </time>
                     </span>
                     <span>{row.title}</span>
                     <small>
@@ -1006,9 +932,7 @@ export function NoticeBubble({
         </p>
       )}
       <div className="nc-bubble-actions">
-        <small>
-          {formatTimestamp(notice.occurred_at, zone)} · {zone}
-        </small>
+        <small>{formatTimestamp(notice.occurred_at, zone)}</small>
         {trading && onLocate && (
           <button
             type="button"

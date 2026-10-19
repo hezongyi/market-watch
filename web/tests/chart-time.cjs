@@ -41,9 +41,9 @@ assert.equal(
     stamp,
     "Asia/Shanghai",
   ),
-  "发生时间 2026-10-19 07:30:12 UTC+08:00 / 检测延迟 0.4s",
+  "发生时间 2026-10-19 07:30:12 UTC+8 / 检测延迟 0.4s",
 );
-assert.equal(t.formatTimestamp(0, "UTC"), "1970-01-01 00:00:00 UTC");
+assert.equal(t.formatTimestamp(0, "UTC"), "1970-01-01 00:00:00 UTC+0");
 assert.equal(
   t.wallTimeCandidates("2026-03-08T02:30", "America/New_York").length,
   0,
@@ -55,8 +55,8 @@ assert.deepEqual(fold, [
   Date.parse("2026-11-01T05:30:00Z"),
   Date.parse("2026-11-01T06:30:00Z"),
 ]);
-assert.match(t.formatTimestamp(fold[0], "America/New_York"), /UTC-04:00/);
-assert.match(t.formatTimestamp(fold[1], "America/New_York"), /UTC-05:00/);
+assert.match(t.formatTimestamp(fold[0], "America/New_York"), /UTC-4/);
+assert.match(t.formatTimestamp(fold[1], "America/New_York"), /UTC-5/);
 for (const [day, hours] of [
   ["2026-03-08", 23],
   ["2026-11-01", 25],
@@ -70,6 +70,9 @@ assert.equal(t.wallTimeCandidates("2026-02-30T12:00", "UTC").length, 0);
 assert.equal(t.wallTimeCandidates("2026-01-01T24:00", "UTC").length, 0);
 assert.equal(t.validTimeZone("exchange"), null);
 assert.equal(t.validTimeZone("not/a-zone"), null);
+assert.equal(t.offsetLabel(stamp, "Asia/Kolkata"), "UTC+5:30");
+assert.equal(t.offsetLabel(stamp, "Asia/Kathmandu"), "UTC+5:45");
+assert.equal(t.offsetLabel(stamp, "America/St_Johns"), "UTC-2:30");
 // Exercise the real bridge publisher and rebind/dispose functions against chart subscriptions.
 const source = fs.readFileSync("../advanced-host/bridge.js", "utf8");
 const functions = source.slice(

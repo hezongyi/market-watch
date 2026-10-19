@@ -1,5 +1,6 @@
 import { api, ApiError } from "../api";
 import { NoticeStore } from "./store";
+import { newestFirst } from "./systemMessages";
 import type {
   BrowserFault,
   Intake,
@@ -304,8 +305,9 @@ export class NoticeRuntime {
     this.patch({
       pending: rows
         .filter((row) => !row.value.event.recovery_of)
-        .slice(-200)
-        .map((row) => this.localNotice(row.value.event, row.value.status)),
+        .map((row) => this.localNotice(row.value.event, row.value.status))
+        .sort(newestFirst)
+        .slice(0, 200),
     });
   }
   private localNotice(event: Intake, status: string): Notice {
@@ -422,10 +424,9 @@ export class NoticeRuntime {
       if (!this.current(generation)) return null;
       const notice = this.localNotice(event, "pending");
       this.patch({
-        pending: [
-          ...this.state.pending.filter((r) => r.id !== id),
-          notice,
-        ].slice(-200),
+        pending: [...this.state.pending.filter((r) => r.id !== id), notice]
+          .sort(newestFirst)
+          .slice(0, 200),
       });
       if (!old?.open) this.enqueue(notice);
       this.schedule(generation, 0);
@@ -750,10 +751,93 @@ export class NoticeRuntime {
       void this.cycle(generation);
     }, ms);
   }
+  private async syncPending(generation: number) {
+    const subject = this.subject;
+    // Projection acknowledgement is independent of the 200-summary window.
+    for (const item of (await this.store.all("pending", subject))
+      .filter(
+        (row) =>
+          row.value.status === "accepted" &&
+          (row.value.nextCheck || 0) <= Date.now(),
+      )
+      .slice(0, 10)) {
+      if (!this.current(generation)) return;
+      try {
+        await api(
+          base + "/events/" + encodeURIComponent(item.value.event.event_id),
+          undefined,
+          AbortSignal.timeout(2000),
+        );
+        if (!this.current(generation)) return;
+        await this.store.remove("pending", item.key);
+      } catch (error) {
+        if (!this.current(generation)) return;
+        if (error instanceof ApiError && error.status === 401) throw error;
+        await this.store.update("pending", item.key, subject, (old) =>
+          old ? { ...old, nextCheck: Date.now() + 30000 } : undefined,
+        );
+        if (!(error instanceof ApiError && error.status === 404)) break;
+      }
+    }
+    // Live consumption has priority. A poison intake must never block it.
+    const pending = await this.store.all("pending", subject);
+    for (const item of pending
+      .filter(
+        (r) =>
+          r.value.status === "pending" && performance.now() >= this.nextUpload,
+      )
+      .sort((a, b) => (a.order ?? a.at) - (b.order ?? b.at))
+      .slice(0, 10)) {
+      if (!this.current(generation)) return;
+      try {
+        await api(
+          base + "/events",
+          item.value.event,
+          AbortSignal.timeout(2000),
+        );
+        if (!this.current(generation)) return;
+        if (item.value.event.recovery_of) {
+          // Recovery intake closes its incident without creating an event
+          // under the recovery ID. Durable acceptance completes this upload.
+          await this.store.remove("pending", item.key);
+        } else {
+          await this.store.update("pending", item.key, subject, (old) =>
+            old ? { ...old, status: "accepted" } : undefined,
+          );
+        }
+        this.uploadErrors = 0;
+      } catch (error) {
+        if (!this.current(generation)) return;
+        if (error instanceof ApiError && error.status === 401) throw error;
+        if (
+          error instanceof ApiError &&
+          [400, 409, 413, 422].includes(error.status)
+        ) {
+          await this.store.update("pending", item.key, subject, (old) =>
+            old
+              ? { ...old, status: "rejected", rejection: String(error) }
+              : undefined,
+          );
+          this.patch({
+            gap: "有本机通知被服务端拒绝，未保存到服务器；证据仍保留在本机",
+          });
+          continue;
+        }
+        this.patch({ status: "本机记录待同步，服务端通知继续接收" });
+        this.nextUpload =
+          performance.now() +
+          Math.min(60000, 1000 * 2 ** Math.min(6, ++this.uploadErrors)) *
+            (0.8 + Math.random() * 0.4);
+        break;
+      }
+    }
+  }
   private async cycle(generation: number) {
     if (!this.current(generation) || !this.ready || this.working) return;
     this.working = true;
     const subject = this.subject;
+    let phase = "读取历史基线",
+      pendingSynced = false;
     try {
       if (!this.after) {
         const requestStarted = performance.now();
@@ -779,10 +863,12 @@ export class NoticeRuntime {
       let more = false;
       for (let batch = 0; batch < 10; batch++) {
         const requestStarted = performance.now();
+        phase = "读取新消息";
         const result = await api(
           base + "/changes?after=" + encodeURIComponent(this.after),
         );
         if (!this.current(generation)) return;
+        phase = "保存同步进度";
         this.clock(result.server_time, performance.now() - requestStarted);
         const rows = new Map(this.state.events.map((row) => [row.id, row]));
         const candidates: Notice[] = [];
@@ -870,85 +956,11 @@ export class NoticeRuntime {
         if (!more) break;
       }
       if (this.nextHealth > 0) void this.playCandidates();
-      // Projection acknowledgement is independent of the 200-summary window.
-      for (const item of (await this.store.all("pending", subject))
-        .filter(
-          (row) =>
-            row.value.status === "accepted" &&
-            (row.value.nextCheck || 0) <= Date.now(),
-        )
-        .slice(0, 10)) {
-        if (!this.current(generation)) return;
-        try {
-          await api(
-            base + "/events/" + encodeURIComponent(item.value.event.event_id),
-            undefined,
-            AbortSignal.timeout(2000),
-          );
-          if (!this.current(generation)) return;
-          await this.store.remove("pending", item.key);
-        } catch (error) {
-          if (!this.current(generation)) return;
-          if (error instanceof ApiError && error.status === 401) throw error;
-          await this.store.update("pending", item.key, subject, (old) =>
-            old ? { ...old, nextCheck: Date.now() + 30000 } : undefined,
-          );
-          if (!(error instanceof ApiError && error.status === 404)) break;
-        }
-      }
-      // Live consumption has priority. A poison intake must never block it.
-      const pending = await this.store.all("pending", subject);
-      for (const item of pending
-        .filter(
-          (r) =>
-            r.value.status === "pending" &&
-            performance.now() >= this.nextUpload,
-        )
-        .sort((a, b) => (a.order ?? a.at) - (b.order ?? b.at))
-        .slice(0, 10)) {
-        if (!this.current(generation)) return;
-        try {
-          await api(
-            base + "/events",
-            item.value.event,
-            AbortSignal.timeout(2000),
-          );
-          if (!this.current(generation)) return;
-          if (item.value.event.recovery_of) {
-            // Recovery intake closes its incident without creating an event
-            // under the recovery ID. Durable acceptance completes this upload.
-            await this.store.remove("pending", item.key);
-          } else {
-            await this.store.update("pending", item.key, subject, (old) =>
-              old ? { ...old, status: "accepted" } : undefined,
-            );
-          }
-          this.uploadErrors = 0;
-        } catch (error) {
-          if (!this.current(generation)) return;
-          if (error instanceof ApiError && error.status === 401) throw error;
-          if (
-            error instanceof ApiError &&
-            [400, 409, 413, 422].includes(error.status)
-          ) {
-            await this.store.update("pending", item.key, subject, (old) =>
-              old
-                ? { ...old, status: "rejected", rejection: String(error) }
-                : undefined,
-            );
-            this.patch({
-              gap: "有本机通知被服务端拒绝，未保存到服务器；证据仍保留在本机",
-            });
-            continue;
-          }
-          this.patch({ status: "本机记录待同步，服务端通知继续接收" });
-          this.nextUpload =
-            performance.now() +
-            Math.min(60000, 1000 * 2 ** Math.min(6, ++this.uploadErrors)) *
-              (0.8 + Math.random() * 0.4);
-          break;
-        }
-      }
+      phase = "上传本机记录";
+      pendingSynced = true;
+      await this.syncPending(generation);
+      if (!this.current(generation)) return;
+      phase = "同步网页观察";
       const observations = await this.store.all("observations", subject);
       for (const item of observations
         .filter(
@@ -995,6 +1007,7 @@ export class NoticeRuntime {
         }));
       }
       if (performance.now() > this.nextHealth) {
+        phase = "检查通知服务";
         const health = await api(base + "/health");
         if (!this.current(generation)) return;
         this.nextHealth = performance.now() + 30000;
@@ -1031,10 +1044,39 @@ export class NoticeRuntime {
       this.schedule(generation, more ? 20 : 2000);
     } catch (error) {
       if (!this.current(generation)) return;
-      if (
+      if (error instanceof ApiError && error.status === 401) {
+        this.pause();
+        return;
+      }
+      // Reads can fail while POST intake remains available. Never let a stale
+      // change cursor starve durable local uploads (or delete them to recover).
+      if (!pendingSynced) {
+        try {
+          await this.syncPending(generation);
+          if (!this.current(generation)) return;
+          await this.loadPending(generation);
+        } catch (uploadError) {
+          if (!this.current(generation)) return;
+          if (uploadError instanceof ApiError && uploadError.status === 401) {
+            this.pause();
+            return;
+          }
+          this.patch({
+            gap: "本机同步暂不可用，记录保留：" + String(uploadError),
+          });
+        }
+      }
+      const invalidChangesCursor =
+        phase === "读取新消息" &&
         error instanceof ApiError &&
-        error.status === 409 &&
-        error.code === "NOTICE_RESET"
+        error.status === 400 &&
+        (error.code === "NOTICE_CURSOR_INVALID" ||
+          error.message === "无效通知游标");
+      if (
+        invalidChangesCursor ||
+        (error instanceof ApiError &&
+          error.status === 409 &&
+          error.code === "NOTICE_RESET")
       ) {
         this.after = "";
         this.epoch = "";
@@ -1048,13 +1090,15 @@ export class NoticeRuntime {
             this.state.bubble?.source_kind === "chart_alert"
               ? this.state.bubble
               : null,
-          status: "通知日志已换代，正在恢复；历史不会重新提示或响铃",
+          status: invalidChangesCursor
+            ? "同步进度已失效，正在自动恢复；本机记录保留"
+            : "通知日志已换代，正在恢复；历史不会重新提示或响铃",
         });
         this.schedule(generation, 0);
-      } else if (error instanceof ApiError && error.status === 401) {
-        this.pause();
       } else {
-        this.patch({ status: "连接受限，本机待同步记录保留" });
+        this.patch({
+          status: `${phase}受限，本机记录保留（${error instanceof ApiError ? `HTTP ${error.status}` : "网络或存储错误"}）`,
+        });
         this.schedule(
           generation,
           Math.min(60000, 1000 * 2 ** Math.min(6, ++this.errorCount)) *

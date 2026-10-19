@@ -24,17 +24,6 @@ export function setChartTime(zone: string, label: string) {
 }
 export const useChartTime = () =>
   useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
-export function ChartTimeLabel() {
-  const time = useChartTime();
-  return (
-    <div
-      className="chart-time-label"
-      title="系统消息、交易告警和时间输入跟随当前激活图表"
-    >
-      显示时区：<span>{time.label}</span>
-    </div>
-  );
-}
 declare global {
   var MWChartTime: { set: typeof setChartTime };
 }

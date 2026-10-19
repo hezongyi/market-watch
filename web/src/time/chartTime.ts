@@ -50,7 +50,11 @@ export function offsetLabel(stamp: number, zone: string) {
     })
       .formatToParts(stamp)
       .find((p) => p.type === "timeZoneName")?.value || "GMT";
-  return label.replace(/^GMT/, "UTC").replace(/^UTC[+-]00:00$/, "UTC");
+  const offset = /^GMT([+-])(\d{2}):(\d{2})(?::(\d{2}))?$/.exec(label);
+  if (!offset) return "UTC+0";
+  const [, sign, hours, minutes, seconds] = offset;
+  if (+hours === 0 && +minutes === 0 && !Number(seconds)) return "UTC+0";
+  return `UTC${sign}${Number(hours)}${+minutes || Number(seconds) ? ":" + minutes : ""}${Number(seconds) ? ":" + seconds : ""}`;
 }
 export function formatTimestamp(
   stamp: number | null | undefined,

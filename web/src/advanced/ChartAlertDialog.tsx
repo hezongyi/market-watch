@@ -1,4 +1,4 @@
-import { useChartTime, ChartTimeLabel } from "../time/ChartTimeContext";
+import { useChartTime } from "../time/ChartTimeContext";
 import { formatTimestamp } from "../time/chartTime";
 import { ZonedDateTimeInput } from "../time/ZonedDateTimeInput";
 import { useEffect, useRef, useState } from "react";
@@ -458,7 +458,6 @@ export function ChartAlertDialog({
             返回
           </button>
         )}
-        <ChartTimeLabel />
         <fieldset disabled={busy} className="alert-form-body">
           {page === "message" ? (
             <div className="alert-message-page">
@@ -906,7 +905,7 @@ export function ChartAlertDialog({
                     : "后台按收到的观察值判定，不代表完整市场逐笔。"}
                 </p>
                 <label>
-                  到期时间（{zone}）
+                  到期时间
                   <ZonedDateTimeInput
                     key={expiryInputRevision}
                     label="到期时间"

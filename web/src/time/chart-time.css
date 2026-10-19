@@ -1,12 +1,3 @@
-.chart-time-label {
-  padding: 5px 12px;
-  color: inherit;
-  opacity: 0.85;
-  font-size: 11px;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-  flex: 0 0 auto;
-}
 .zoned-time-input {
   display: grid;
   gap: 6px;
@@ -20,4 +11,10 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+}
+
+.zoned-time-hint {
+  color: inherit;
+  opacity: 0.8;
+  font-size: 11px;
 }

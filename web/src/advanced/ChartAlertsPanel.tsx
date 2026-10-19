@@ -1,5 +1,11 @@
-import { useChartTime, ChartTimeLabel } from "../time/ChartTimeContext";
-import { formatTimestamp, dayKey, clockTime, formatAlertMessage } from "../time/chartTime";
+import { useChartTime } from "../time/ChartTimeContext";
+import {
+  formatTimestamp,
+  dayKey,
+  clockTime,
+  offsetLabel,
+  formatAlertMessage,
+} from "../time/chartTime";
 import { AlertEventTrace } from "../notifications/AlertEventTrace";
 import type { NoticeTransport } from "../notifications/types";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -334,7 +340,6 @@ export function ChartAlertsPanel({
           </button>
         ))}
       </div>
-      <ChartTimeLabel />
       <div className="alert-panel-toolbar">
         {tab === "alerts" && (
           <button
@@ -702,7 +707,8 @@ export function ChartAlertsPanel({
                           {event.display_label || event.evidence.config.name}
                         </span>
                         <span className="alert-row-time">
-                          {clockTime(event.occurred_at, zone)}
+                          {clockTime(event.occurred_at, zone)}{" "}
+                          {offsetLabel(event.occurred_at, zone)}
                           {event.evidence.late ? " · 迟到" : ""}
                         </span>
                       </span>
@@ -733,7 +739,13 @@ export function ChartAlertsPanel({
                         </p>
                         <details>
                           <summary>查看消息和当时证据</summary>
-                          <p className="alert-message-text">{formatAlertMessage(event.message, event.occurred_at, zone)}</p>
+                          <p className="alert-message-text">
+                            {formatAlertMessage(
+                              event.message,
+                              event.occurred_at,
+                              zone,
+                            )}
+                          </p>
                           <pre>
                             {JSON.stringify(
                               event.evidence.observation,

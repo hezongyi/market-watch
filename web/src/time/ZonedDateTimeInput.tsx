@@ -56,6 +56,13 @@ export function ZonedDateTimeInput({
           if (ok) onChange(options[0] ?? null);
         }}
       />
+      <small className="zoned-time-hint">
+        {candidates.length === 1 || (valid && choice != null)
+          ? `按 ${offsetLabel(choice ?? candidates[0], zone)} 输入`
+          : ambiguous
+            ? "请选择下方实际 UTC 偏移"
+            : `跟随激活图表${text ? "，请修正时间" : `（当前 ${offsetLabel(Date.now(), zone)}）`}`}
+      </small>
       {ambiguous && (
         <span
           className="zoned-time-choices"
