@@ -1,0 +1,13 @@
+.login-particles {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+.login-particles canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

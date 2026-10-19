@@ -28,3 +28,17 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+## Particles
+
+`Particles.tsx` adapts the upstream Canvas particle generation, circles, edge
+fading, drift and eased mouse translation. It removes framework utilities and
+React pointer state, fixes duplicate initialization, and adds bounded density /
+frame rate / DPR, quiet card area, slow opacity variation, pause, visibility and
+reduced-motion lifecycle handling. No Motion, Tailwind or UI framework added.
+
+Source (pinned): https://github.com/magicuidesign/magicui/blob/efe76fc5755eca1142dd4f74c1d6f0ace2887e3c/apps/www/registry/magicui/particles.tsx
+
+License: https://github.com/magicuidesign/magicui/blob/efe76fc5755eca1142dd4f74c1d6f0ace2887e3c/LICENSE.md
+
+The MIT license and copyright notice above apply to this adaptation as well.
