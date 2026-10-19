@@ -55,12 +55,14 @@ function operationPages(notice: CapacityNotice, loads: Record<string, NativeLoad
 }
 export function HistoryLoadingNotice({
   loads,
+  immediate = false,
   onCancel,
   capacities,
   onDismiss,
   onSettings,
 }: {
   loads: Record<string, NativeLoad>;
+  immediate?: boolean;
   onCancel: () => void;
   capacities: Record<string, CapacityNotice>;
   onDismiss: () => void;
@@ -78,7 +80,7 @@ export function HistoryLoadingNotice({
   for (const load of Object.values(loads)) {
     const capacity = Object.values(capacities).some((notice) =>
       notice.instrument === load.instrument && notice.timeframe === load.timeframe);
-    if (now - load.started < HISTORY_NOTICE_DELAY_MS && !capacity) continue;
+    if (!immediate && now - load.started < HISTORY_NOTICE_DELAY_MS && !capacity) continue;
     const key = load.instrument + "|" + load.timeframe;
     groups.set(key, [...(groups.get(key) || []), load]);
   }

@@ -98,6 +98,7 @@ export default function AdvancedWorkspace() {
   const [, setRows] = useState<Workspace[]>([]),
     [active, setActive] = useState<Workspace | null>(null);
   const [historyPlansOpen, setHistoryPlansOpen] = useState(false);
+  const [historyDetailsOpen, setHistoryDetailsOpen] = useState(false);
   const [maintenanceInstrument, setMaintenanceInstrument] = useState<
     string | null
   >(null);
@@ -190,6 +191,7 @@ export default function AdvancedWorkspace() {
     setCapacityNotices({});
     nativeLoadEpoch.current = 0;
     setCapacityDialog(null);
+    setHistoryDetailsOpen(false);
     setDatasetViews({});
     setSyncNotices({});
     unsaved.current = false;
@@ -685,6 +687,10 @@ export default function AdvancedWorkspace() {
         );
         return;
       }
+      if (m.type === "history-load-details-open") {
+        setHistoryDetailsOpen(true);
+        return;
+      }
       if (m.type === "history-plans-open") {
         setHistoryPlansOpen(true);
         return;
@@ -720,6 +726,7 @@ export default function AdvancedWorkspace() {
         nativeLoadEpoch.current = m.epoch;
         setNativeLoads({});
         setCapacityNotices({});
+        setHistoryDetailsOpen(false);
         setCapacityDialog(null);
         return;
       }
@@ -1722,17 +1729,26 @@ export default function AdvancedWorkspace() {
   }
   return (
     <main className="advanced-workspace" data-theme={chartTheme}>
-      {noticeState.enabled&&!noticeState.unlocked&&<div className="nc-parent-unlock" role="status"><span>{noticeState.soundStatus}</span><button type="button" onClick={()=>void notices.unlock()}>在主页面解锁声音</button></div>}
       {mobile && <p className="advanced-readonly-note" role="note">手机只读看盘。编辑图表、绘图和告警请使用桌面浏览器；桌面工作区布局仍保留。</p>}
+      {historyDetailsOpen && (
+        <div className="advanced-load-details" role="dialog" aria-modal="false" aria-label="历史加载详情">
+          <header>
+            <strong>历史加载详情</strong>
+            <button type="button" aria-label="关闭历史加载详情" onClick={() => setHistoryDetailsOpen(false)}>关闭</button>
+          </header>
       {Object.keys(indicatorStates).length>0 && <aside className="advanced-history-failures" aria-label="图格指标状态">{Object.entries(indicatorStates).map(([key,item])=><p key={key} role="status">图格 {item.index+1} · {item.name}：{item.state==='error' ? item.error : '正在计算'}{item.previousParams && <>（暂显旧参数：{item.previousParams}）</>}{item.state==='error' && <button onClick={()=>post({type:'retry-chart-indicators',index:item.index,epoch:item.epoch})}>重试指标</button>}</p>)}</aside>}
       {chartFailures.length>0 && <aside className="advanced-history-failures" aria-label="图格历史加载失败">{chartFailures.map(item=><p key={item.index} role="status">图格 {item.index+1} · {item.label} · {item.resolution}：{item.error}<button onClick={()=>post({type:'retry-chart-history',...item})}>重试此图格</button></p>)}</aside>}
       {(Object.keys(nativeLoads).length > 0 ||
         Object.keys(capacityNotices).length > 0) && (
         <HistoryLoadingNotice
+          immediate
           loads={nativeLoads}
           capacities={capacityNotices}
           onCancel={() => post({ type: "cancel-history" })}
-          onSettings={() => post({ type: "history-capacity-open" })}
+          onSettings={() => {
+            setHistoryDetailsOpen(false);
+            post({ type: "history-capacity-open" });
+          }}
           onDismiss={() =>
             setCapacityNotices((previous) =>
               Object.fromEntries(
@@ -1743,6 +1759,9 @@ export default function AdvancedWorkspace() {
             )
           }
         />
+      )}
+      {!Object.keys(nativeLoads).length && !Object.keys(capacityNotices).length && !Object.keys(indicatorStates).length && !chartFailures.length && <p>当前没有进行中的加载任务。</p>}
+        </div>
       )}
       {capacityDialog && (
         <HistoryCapacityDialog

@@ -121,6 +121,8 @@
 .volume-job { padding:16px 0; border-top:1px solid #78849a55; overflow-wrap:anywhere; }
 .volume-job button { min-height:44px; margin:4px; }
 
-/* Local actionable load status shares one strip; ordinary incidents live in the native center. */
-.advanced-workspace .advanced-history-failures,.advanced-workspace .advanced-loading-notice{position:relative;inset:auto;flex-shrink:0;width:auto;max-width:none;max-height:140px;margin:0;border-radius:0;padding:6px 12px;font-size:12px;overflow:auto}
-.nc-parent-unlock{display:flex;gap:12px;align-items:center;padding:4px 12px;font-size:12px;flex-shrink:0}.nc-parent-unlock button{font:inherit;padding:4px 8px}
+/* Loading remains inside the native chart. These controls only open on request. */
+.advanced-load-details {position:fixed;z-index:130;top:46px;left:50%;transform:translateX(-50%);box-sizing:border-box;width:min(440px,calc(100vw - 24px));max-height:calc(100vh - 64px);overflow:auto;padding:16px 24px;border:1px solid #454545;border-radius:6px;background:#1f1f1f;color:#eee;box-shadow:0 4px 16px #0004}
+.advanced-load-details header {display:flex;align-items:center;justify-content:space-between;gap:16px}
+.advanced-load-details .advanced-history-failures,.advanced-load-details .advanced-loading-notice {position:static;inset:auto;width:auto;max-width:none;max-height:none;margin:12px 0 0;border:0;border-radius:0;padding:0;background:transparent;box-shadow:none}
+.advanced-workspace[data-theme="light"] .advanced-load-details {background:#fff;color:#131722;border-color:#b2b5be}

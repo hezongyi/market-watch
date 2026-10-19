@@ -10,6 +10,8 @@ module.exports = async ({
   save,
 }) => {
   const dialog = page.locator(".history-capacity-dialog");
+  // Progress is an explicitly requested operation view, never an automatic strip.
+  await frame.evaluate(() => send({type:"history-load-details-open"}));
   async function capacity(value) {
     await native.getByRole("button", { name: "图表菜单", exact: true }).click();
     await native

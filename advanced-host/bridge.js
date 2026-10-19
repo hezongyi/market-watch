@@ -2450,6 +2450,8 @@ function boot(
           send({ type: "error", error: String(e) }),
           grid, [
             ...[["系统消息","signals"],["历史演练","replay"],["设置","settings"],["兼容功能 · 旧版监控","legacy"]].map(([label,action]) => ({label, action, run:() => send({type:"workspace-action",action})})),
+            {label: "历史加载详情", run: () => send({type:"history-load-details-open"})},
+            {label: "取消历史加载", run: () => MWNativeNavigation.cancelAll()},
             {label: "历史数据容量", run: () => send({type:"history-capacity-open",usage:MWNativeNavigation.diagnostics().resident})},
             ...(!readonly ? [{label: "保存样式", title: "保存图表样式模板", run: async () => {
               try {
