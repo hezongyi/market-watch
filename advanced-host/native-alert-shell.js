@@ -220,9 +220,6 @@ async function nativeAlertShell(
         "div",
         {
           ref: reference,
-          role: "menu",
-          "aria-label": label,
-          "data-name": "mw-native-alert-menu",
           onKeyDown: (event) => {
             const buttons = [
               ...reference.current.querySelectorAll(
