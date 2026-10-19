@@ -539,3 +539,70 @@ def test_native_recovery_requires_matching_request_range():
     assert native_key(query) == native_key(dict(query))
     assert native_key(query) != native_key({**query, 'before': 2000000})
     assert native_key(query) != native_key({**query, 'countBack': 100})
+
+
+def test_system_center_groups_occurrences_excludes_trades_and_reads_only_snapshot(database):
+    from alerts.notification_center_api import SystemRead
+
+    signal_id = trigger(database)
+    first = browser(attempt_id='first', context={'workspace_id': 'workspace-a', 'source_id': 'save'})
+    repeat = browser(attempt_id='repeat', context={'workspace_id': 'workspace-a', 'source_id': 'save'})
+    other = browser(source_kind='market', code='MARKET_FAILED')
+    with database.begin() as db:
+        for value in (first, repeat, other):
+            center.accept_browser(db, center.SUBJECT, value)
+    drain(database)
+    with database.begin() as db:
+        page = center.list_events(db, center.SUBJECT, {'audience': 'system'}, limit=1)
+        all_rows = page['events'][:]
+        cursor = page['before']
+        while cursor:
+            following = center.list_events(db, center.SUBJECT, {'audience': 'system'}, before=cursor, limit=1)
+            all_rows.extend(following['events'])
+            cursor = following['before']
+        assert len(all_rows) == 2
+        assert {row['source_kind'] for row in all_rows} == {'workspace', 'market'}
+        assert sorted(row['incident']['count'] for row in all_rows) == [1, 2]
+        assert page['system_unread'] == 2
+        cutoff, epoch = page['highwater'], page['epoch']
+        newer = browser(source_kind='indicator', code='INDICATOR_FAILED')
+        center.accept_browser(db, center.SUBJECT, newer)
+    drain(database)
+    with database.begin() as db:
+        result = center.read_system(db, center.SUBJECT, SystemRead(profile=PROFILE, through=cutoff, epoch=epoch))
+        assert result == {'read': 3, 'more': False, 'system_unread': 1}
+        trade = db.get(NoticeEvent, center.signal_event_id(signal_id))
+        assert trade.viewed_at is None and trade.handled_at is None
+        phone = db.scalar(select(Notification).where(Notification.signal_id == signal_id))
+        assert phone.ack_at is None
+        assert db.get(NoticeEvent, newer.event_id).viewed_at is None
+        assert db.get(NoticeEvent, first.event_id).handled_at is None
+        assert center.read_system(db, center.SUBJECT, SystemRead(profile=PROFILE, through=cutoff, epoch=epoch))['read'] == 0
+        assert '?panel=alerts&signal=' in center.resolve_signal(db, signal_id)['destination']
+        with pytest.raises(HTTPException) as error:
+            center.read_system(db, center.SUBJECT, SystemRead(profile=PROFILE, through=cutoff, epoch='obsolete'))
+        assert error.value.status_code == 409
+
+
+def test_system_read_is_bounded_and_incident_scoped(database):
+    from alerts.notification_center_api import SystemRead
+
+    with database.begin() as db:
+        state = center.stream(db, lock=True)
+        for i in range(105):
+            center._new_event(db, state, ident='bounded-' + str(i), source_kind='workspace',
+                source_id=str(i), occurred_at=now_ms(), body={'title': 'failure'}, dedupe='one-incident')
+        other = center._new_event(db, state, ident='other', source_kind='market', source_id='other',
+            occurred_at=now_ms(), body={'title': 'other'})
+        grouped = center.list_events(db, center.SUBJECT, {'audience': 'system'})
+        incident = next(row for row in grouped['events'] if row['id'] != other.id)['incident_id']
+        raw = center.list_events(db, center.SUBJECT, {'audience': 'system', 'grouped': False, 'incident': incident})
+        assert len(raw['events']) == 100 and raw['before']
+        assert len(center.list_events(db, center.SUBJECT, {'audience': 'system', 'grouped': False, 'incident': incident}, before=raw['before'])['events']) == 5
+        read = SystemRead(profile=PROFILE, through=state.seq, epoch=state.epoch, incident_id=incident)
+        first = center.read_system(db, center.SUBJECT, read)
+        assert first['read'] == 100 and first['more']
+        second = center.read_system(db, center.SUBJECT, read)
+        assert second['read'] == 5 and not second['more']
+        assert other.viewed_at is None
+        assert center.system_unread(db, center.SUBJECT) == 1

@@ -322,7 +322,7 @@ export default function AdvancedWorkspace() {
     if(!active?.id)return;
     const context={workspace_id:active.id};
     const attempt=crypto.randomUUID();
-    const timer=setTimeout(()=>{if(!notificationReadyRef.current)void notices.report({source_kind:'chart_shell',attempt_id:attempt,code:'CHART_SHELL_UNAVAILABLE',title:'图表通知接入尚未完成',message:'图表启动或原生侧栏接入超时，可在主页面查记录并重新加载图表',context});},25000);
+    const timer=setTimeout(()=>{if(!notificationReadyRef.current)void notices.report({source_kind:'chart_shell',attempt_id:attempt,code:'CHART_SHELL_UNAVAILABLE',title:'图表通知接入尚未完成',message:'图表通知接入超时，可在主页面查记录并重新加载图表',context});},25000);
     return()=>clearTimeout(timer);
   },[active?.id,frameKey,notices]);
   useEffect(()=>{if(notificationReady&&active?.id)void notices.resolve({source_kind:'chart_shell',attempt_id:alertUiSession.current,code:'CHART_SHELL_UNAVAILABLE',title:'图表通知接入已恢复',message:'当前工作区原生通知已接入',context:{workspace_id:active.id}});},[notificationReady,active?.id,notices]);
@@ -330,6 +330,16 @@ export default function AdvancedWorkspace() {
   useEffect(()=>{if(nativeReady)post({type:'app-state',pending:noticeState.unread});
     if(notificationReady)post({type:'notice-center-state',session:alertUiSession.current,workspace_id:current.current?.id,state:noticeState});
   },[nativeReady,notificationReady,noticeState]);
+  useEffect(()=>{if(nativeReady && new URLSearchParams(appLocation.search).get('panel')==='alerts') { const signal=new URLSearchParams(appLocation.search).get('signal'); if(signal)post({type:'chart-alert-event-open',signal_id:signal}); }},[nativeReady,appLocation.search]);
+  useEffect(()=>{
+    if(!noticeOpen || !noticeEvent)return;
+    let alive=true;
+    void notices.action({action:'detail',event_id:noticeEvent}).then(row=>{
+      if(!alive || row.source_kind!=='chart_alert')return;
+      const url=new URL(location.href);url.searchParams.set('panel','alerts');url.searchParams.set('signal',row.source_id);url.searchParams.delete('event');navigate(url.pathname+url.search+url.hash,{replace:true});
+    }).catch(()=>{});
+    return()=>{alive=false;};
+  },[noticeOpen,noticeEvent,notices]);
   useEffect(()=>{if(notificationReady && noticeOpen)post({type:'notice-center-open',event_id:noticeEvent});},[notificationReady,noticeOpen,noticeEvent]);
   useEffect(() => () => { if (titleTimer.current) clearTimeout(titleTimer.current); }, []);
   useEffect(() => {
@@ -393,7 +403,7 @@ export default function AdvancedWorkspace() {
         }catch(error){reply({type:'result',id:m.id,error:String(error),errorDetails:apiErrorDetails(error)});}return;
       }
       if(m.type==='notice-center-ready' && m.session===alertUiSession.current && m.workspace_id===current.current?.id){setNotificationReady(true);return;}
-      if(m.type==='notice-center-unavailable' && m.session===alertUiSession.current){setNotificationReady(false);void notices.report({source_kind:'chart_shell',attempt_id:m.session+':notice-shell',code:'CHART_SHELL_UNAVAILABLE',title:'原生通知侧栏暂不可用',message:String(m.error||'接入失败'),context:{workspace_id:current.current?.id}});return;}
+      if(m.type==='notice-center-unavailable' && m.session===alertUiSession.current){setNotificationReady(false);void notices.report({source_kind:'chart_shell',attempt_id:m.session+':notice-shell',code:'CHART_SHELL_UNAVAILABLE',title:'原生系统消息暂不可用',message:String(m.error||'接入失败'),context:{workspace_id:current.current?.id}});return;}
       if(m.type==='notice-center-panel' && m.session===alertUiSession.current && m.workspace_id===current.current?.id){
         if(m.open)openNotices(typeof m.event==='string'?m.event:undefined);
         else if(new URLSearchParams(location.search).get('panel')==='notifications')closeNotices();return;
@@ -441,7 +451,7 @@ export default function AdvancedWorkspace() {
       }
       if (m.type === "alerts-panel-state" && m.workspace_id === current.current?.id && typeof m.open === "boolean") {
         const url = new URL(location.href);
-        if (m.open) url.searchParams.set("panel", "alerts"); else if(url.searchParams.get("panel")==="alerts") url.searchParams.delete("panel");
+        if (m.open) url.searchParams.set("panel", "alerts"); else if(url.searchParams.get("panel")==="alerts") {url.searchParams.delete("panel");url.searchParams.delete("signal");}
         navigate(url.pathname + url.search + url.hash, {replace:true}); return;
       }
       if (m.type === "data-center-state" && typeof m.session === "string" && /^[a-f0-9-]{36}$/.test(m.session)) {
@@ -1776,11 +1786,15 @@ export default function AdvancedWorkspace() {
       >
         {status}
       </div>
-      {!notificationReady&&<div className="nc-fallback-entry"><button type="button" onClick={()=>openNotices()}>图表通知（{noticeState.unread} 未读）</button>
+      {!notificationReady&&<div className="nc-fallback-entry"><button type="button" onClick={()=>openNotices()}>系统消息（{noticeState.unread} 未读）</button>
         <button type="button" onClick={()=>void appRef.current.confirmLeave().then(ok=>{if(ok){setNativeReady(false);setNotificationReady(false);setFrameKey(key=>key+1);}})}>重新加载图表</button><p>{nativeReady?'原生通知暂不可用':error?'图表加载失败，可查看排查记录':'图表正在启动'}{noticeState.gap?' · '+noticeState.gap:''}</p>
         {blocked.current&&!mobile&&<button onClick={copy}>复制恢复草稿</button>}
-        {noticeState.bubble&&<NoticeBubble notice={noticeState.bubble} request={noticeRequest} onOpen={()=>openNotices(noticeState.bubble!.id)}/>}
       </div>}
+      {!notificationReady&&noticeState.bubble&&<NoticeBubble notice={noticeState.bubble} request={noticeRequest} onOpen={()=>{
+        const row=noticeState.bubble!;
+        if(row.source_kind==='chart_alert') {const url=new URL(location.href);url.searchParams.set('panel','alerts');url.searchParams.set('signal',row.source_id);url.searchParams.delete('event');navigate(url.pathname+url.search,{replace:true});post({type:'chart-alert-event-open',signal_id:row.source_id});}
+        else openNotices(row.local_status ? undefined : row.id);
+      }}/> }
       {!notificationReady&&noticeOpen&&<div className="nc-fallback"><NoticePanel state={noticeState} request={noticeRequest} eventId={noticeEvent} onClose={closeNotices}/></div>}
       {active ? (
         <iframe

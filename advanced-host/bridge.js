@@ -14,7 +14,7 @@ const pending = new Map();
 // Only draft recovery requires a native confirmation.
 const acknowledgedNotices = new Set();
 let ordinaryNotices;
-let noticeUI, noticeState, noticeOpenEvent;
+let noticeUI, noticeState, noticeOpenEvent, alertOpenSignal;
 let activeNotices = [], noticeDialogOpen = false, chartMenu, indicatorPicker, alertBridge, alertUI, alertUISession, alertUIDraft, alertUIWorkspace, alertUIAttach, dataCenter;
 let invalidateAlertUI = () => {};
 // Lazy loading keeps ordinary datafeed consumers independent of the renderer.
@@ -2081,6 +2081,7 @@ function boot(
     try {
       const instance = await MWNativeAlerts.attach({widget, scope: {workspace_id: workspaceId, session}, readonly,
         initialDraft: alertUIDraft,
+        noticeRequest: query => request({workspace_id:workspaceId,session,...query}, 'notice-center-rpc', () => attempt === attachingAlerts && session === alertUISession),
         persistDraft: draft => send({type:'chart-alert-ui-draft', workspace_id: workspaceId, session, draft}),
         panelChanged: open => {restoreAlertsPanel = open; send({type:'alerts-panel-state',workspace_id:workspaceId,open});},
         bridge: alertBridge, request: query => request(query, 'chart-alert-ui-rpc', () => attempt === attachingAlerts && session === alertUISession),
@@ -2088,11 +2089,13 @@ function boot(
       if (attempt !== attachingAlerts || session !== alertUISession || alertUIStopped) {instance.destroy();return;}
       alertUI = instance; instance.theme(widget.getTheme());
       if (restoreAlertsPanel) instance.open();
+      if (alertOpenSignal) {instance.event(alertOpenSignal);alertOpenSignal=undefined;}
       try {
         const scope={workspace_id:workspaceId,session,epoch:workspaceEpoch};
         const notification=await MWNativeNotifications.attach({widget,scope,state:noticeState,
           request:query=>request({...scope,...query},'notice-center-rpc',()=>attempt===attachingAlerts && session===alertUISession),
           panelChanged:(open,event)=>send({type:'notice-center-panel',...scope,open,event}),
+          alert:signal=>{alertUI?.event(signal);send({type:'alerts-panel-state',workspace_id:workspaceId,open:true});},
           locate:row=>send({type:'notice-center-locate',...scope,event_id:row.id}),
           report:error=>send({type:'error',error:String(error)})});
         if(attempt!==attachingAlerts || session!==alertUISession || alertUIStopped){notification.destroy();return;}
@@ -2156,11 +2159,7 @@ function boot(
         dirty = true;
         if (!busySaveNoticeShown) {
           busySaveNoticeShown = true;
-          widget.showNoticeDialog({
-            title: "等待图表就绪",
-            body: "图表正在切换，数据就绪后自动保存",
-            callback: () => {},
-          });
+          emitNotice({source_kind:'workspace',attempt_id:crypto.randomUUID(),code:'WORKSPACE_SAVE_WAITING',severity:'info',title:'等待图表就绪',message:'图表正在切换，数据就绪后自动保存'});
         }
         // Native save callbacks serialize rejection values; Error becomes {}.
         return Promise.reject("图表正在切换，数据就绪后自动保存");
@@ -2450,7 +2449,7 @@ function boot(
         chartMenu = chartThemeMenu(widget, (e) =>
           send({ type: "error", error: String(e) }),
           grid, [
-            ...[["通知","signals"],["历史演练","replay"],["设置","settings"],["兼容功能 · 旧版监控","legacy"]].map(([label,action]) => ({label, action, run:() => send({type:"workspace-action",action})})),
+            ...[["系统消息","signals"],["历史演练","replay"],["设置","settings"],["兼容功能 · 旧版监控","legacy"]].map(([label,action]) => ({label, action, run:() => send({type:"workspace-action",action})})),
             {label: "历史数据容量", run: () => send({type:"history-capacity-open",usage:MWNativeNavigation.diagnostics().resident})},
             ...(!readonly ? [{label: "保存样式", title: "保存图表样式模板", run: async () => {
               try {
@@ -2465,11 +2464,7 @@ function boot(
                 if (epoch !== workspaceEpoch)
                   throw Error("工作区已切换，请重新保存样式");
                 await prefs.templates.saveChartTemplate(name, content);
-                widget.showNoticeDialog({
-                  title: "样式已保存",
-                  body: "在图表设置 → 模板中选择应用。",
-                  callback: () => {},
-                });
+                emitNotice({source_kind:'preferences',attempt_id:crypto.randomUUID(),code:'CHART_TEMPLATE_SAVED',severity:'info',title:'样式已保存',message:'在图表设置 → 模板中选择应用。'});
               } catch (error) {
                 send({ type: "error", error: String(error) });
               }
@@ -2478,7 +2473,7 @@ function boot(
             {label: "退出登录", action:"logout", run: () => send({type: "workspace-action", action: "logout"})},
             ...(!readonly ? [{label: "复制恢复草稿", recovery: true,
               run: () => send({type: "workspace-action", action: "recover"})}] : []),
-          ], readonly ? undefined : () => send({type: "workspace-action", action: "create"}), autoSave, () => snapshot(), body => request(body, "account-password"), barRangeMapping, syncCoordinator,
+          ], readonly ? undefined : () => send({type: "workspace-action", action: "create"}), autoSave, () => snapshot(), async body => {const result=await request(body,"account-password");emitNotice({source_kind:"preferences",attempt_id:crypto.randomUUID(),code:"ACCOUNT_PASSWORD_SAVED",severity:"info",title:"密码已修改",message:"其他设备需要重新登录。"});return result;}, barRangeMapping, syncCoordinator,
         );
 
       })
@@ -2691,6 +2686,10 @@ addEventListener("message", async (e) => {
   const m = e.data;
   if(m.type==='notice-center-state' && m.session===alertUISession && m.workspace_id===alertUIWorkspace){noticeState=m.state;noticeUI?.update(m.state);return;}
   if(m.type==='notice-center-open'){noticeOpenEvent=typeof m.event_id==='string'?m.event_id:'';if(noticeUI){noticeUI.open(noticeOpenEvent || undefined);noticeOpenEvent=undefined;}return;}
+  if(m.type==='chart-alert-event-open' && typeof m.signal_id==='string' && /^[a-f0-9-]{36}$/.test(m.signal_id)) {
+    if(alertUI)alertUI.event(m.signal_id);else {alertOpenSignal=m.signal_id;restoreAlertsPanel=true;}
+    return;
+  }
   if (m.type === "data-center-open" && ready && !loading && typeof m.location === "string" && m.location.length <= 4000) { dataCenter?.open(m.location); return; }
   if (m.type === 'chart-alert-ui-scope') {
     if (typeof m.session !== 'string' || typeof m.workspace_id !== 'string') return;

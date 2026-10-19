@@ -2,7 +2,10 @@
  * Vendor bytes are untouched. Business state outlives native page recreation. */
 const nativeAlertRuntimes = new WeakMap();
 const nativePageRegistries = new WeakMap();
-async function nativeAlertShell(widget, { mount, unmount, report, page = "alerts", title = "警报", icon }) {
+async function nativeAlertShell(
+  widget,
+  { mount, unmount, report, page = "alerts", title = "警报", icon },
+) {
   const version = globalThis.TradingView?.version?.();
   if (
     !version ||
@@ -77,72 +80,88 @@ async function nativeAlertShell(widget, { mount, unmount, report, page = "alerts
     ].every(Boolean)
   )
     throw Error("v31.1.0 原生告警控件契约不匹配");
-  let registry = nativePageRegistries.get(bar);
-  if (!registry) {
-    registry = {originalState: bar.getLayoutState, entries: new Map()};
-    nativePageRegistries.set(bar, registry);
-    bar.getLayoutState = function () {
-      const state = registry.originalState.call(this);
-      for (const [name, entry] of registry.entries) {
-        if (!state.pages.some(item => item.name === name))
-          state.pages.splice(1, 0, {name, title: entry.title, icon: entry.icon, widgets: [{type:name}]});
-      }
-      return state;
-    };
-  }
-  if (registry.entries.has(page)) throw Error("原生侧栏页面重复接入：" + page);
-  const originalConfig = bar.widgetConfig[page];
-  const releasePage = () => {
-    registry.entries.delete(page);
-    if (originalConfig) bar.widgetConfig[page] = originalConfig; else delete bar.widgetConfig[page];
-    if (!registry.entries.size) {
-      bar.getLayoutState = registry.originalState;
-      nativePageRegistries.delete(bar);
-    }
-  };
+  let releasePage = () => {};
   let disposed = false,
     dialog = null,
     cancelOpening = null;
   const nodes = new Set();
-  class AlertContent {
-    constructor(props) {
-      this.node = props.container.ownerDocument.createElement("div");
-      this.node.dataset.name = "mw-native-alert-content";
-      this.node.style.cssText =
-        "height:100%;min-height:0;display:flex;flex-direction:column";
-      props.container.appendChild(this.node);
-      nodes.add(this.node);
-      if (!disposed) mount(this.node);
+  // Controls-only clients must never register or resize a widgetbar page.
+  if (page !== null) {
+    let registry = nativePageRegistries.get(bar);
+    if (!registry) {
+      registry = { originalState: bar.getLayoutState, entries: new Map() };
+      nativePageRegistries.set(bar, registry);
+      bar.getLayoutState = function () {
+        const state = registry.originalState.call(this);
+        for (const [name, entry] of registry.entries) {
+          if (!state.pages.some((item) => item.name === name))
+            state.pages.splice(1, 0, {
+              name,
+              title: entry.title,
+              icon: entry.icon,
+              widgets: [{ type: name }],
+            });
+        }
+        return state;
+      };
     }
-    destroy() {
-      nodes.delete(this.node);
-      unmount(this.node);
-      this.node.remove();
+    if (registry.entries.has(page))
+      throw Error("原生侧栏页面重复接入：" + page);
+    const originalConfig = bar.widgetConfig[page];
+    releasePage = () => {
+      registry.entries.delete(page);
+      if (originalConfig) bar.widgetConfig[page] = originalConfig;
+      else delete bar.widgetConfig[page];
+      if (!registry.entries.size) {
+        bar.getLayoutState = registry.originalState;
+        nativePageRegistries.delete(bar);
+      }
+    };
+    class AlertContent {
+      constructor(props) {
+        this.node = props.container.ownerDocument.createElement("div");
+        this.node.dataset.name = "mw-native-alert-content";
+        this.node.style.cssText =
+          "height:100%;min-height:0;display:flex;flex-direction:column";
+        props.container.appendChild(this.node);
+        nodes.add(this.node);
+        if (!disposed) mount(this.node);
+      }
+      destroy() {
+        nodes.delete(this.node);
+        unmount(this.node);
+        this.node.remove();
+      }
     }
-  }
-  bar.widgetConfig[page] = {
-    ...bar.widgetConfig.alerts,
-    noHeader: true,
-    ctor: AlertContent,
-  };
-  registry.entries.set(page, {title, icon: icon || '<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.5"><g transform="translate(8 8)"><circle cx="14" cy="15" r="8"/><path d="M14 10v5h4M5 6l3-3M20 3l3 3M9 23l-2 2M19 23l2 2"/></g></svg>'});
-  // Rebuild only once. Native refreshes use the wrapped state factory thereafter.
-  try {
-    bar.refreshFromTVSettings();
-  } catch (error) {
-    disposed = true;
-    releasePage();
-    for (const node of nodes) {
-      unmount(node);
-      node.remove();
-    }
-    nodes.clear();
+    bar.widgetConfig[page] = {
+      ...bar.widgetConfig.alerts,
+      noHeader: true,
+      ctor: AlertContent,
+    };
+    registry.entries.set(page, {
+      title,
+      icon:
+        icon ||
+        '<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.5"><g transform="translate(8 8)"><circle cx="14" cy="15" r="8"/><path d="M14 10v5h4M5 6l3-3M20 3l3 3M9 23l-2 2M19 23l2 2"/></g></svg>',
+    });
+    // Rebuild only once. Native refreshes use the wrapped state factory thereafter.
     try {
       bar.refreshFromTVSettings();
-    } catch (rollbackError) {
-      report(rollbackError);
+    } catch (error) {
+      disposed = true;
+      releasePage();
+      for (const node of nodes) {
+        unmount(node);
+        node.remove();
+      }
+      nodes.clear();
+      try {
+        bar.refreshFromTVSettings();
+      } catch (rollbackError) {
+        report(rollbackError);
+      }
+      throw error;
     }
-    throw error;
   }
   const style = doc.createElement("link");
   style.rel = "stylesheet";
@@ -424,12 +443,17 @@ async function nativeAlertShell(widget, { mount, unmount, report, page = "alerts
     });
   }
   return {
-    isOpen: () => !disposed && bar.layout.getActivePage()?.name === page && !bar.layout.minimized,
+    isOpen: () =>
+      page !== null &&
+      !disposed &&
+      bar.layout.getActivePage()?.name === page &&
+      !bar.layout.minimized,
     open: () => {
-      if (!disposed) bar.setPage(page);
+      if (page !== null && !disposed) bar.setPage(page);
     },
     close: () => {
       if (
+        page !== null &&
         !disposed &&
         bar.layout.getActivePage()?.name === page &&
         !bar.layout.minimized
@@ -437,6 +461,22 @@ async function nativeAlertShell(widget, { mount, unmount, report, page = "alerts
         bar.layout.onTabClick(bar.layout.getActivePage());
     },
     openDialog,
+    overlayBounds: (anchor) => {
+      const width = doc.defaultView.innerWidth,
+        height = doc.defaultView.innerHeight;
+      const panel = bar._wrap?.getBoundingClientRect();
+      const toolbar = doc
+        .querySelector('[data-name="header-toolbar"]')
+        ?.getBoundingClientRect();
+      return {
+        width,
+        height,
+        top:
+          (toolbar?.bottom || anchor?.getBoundingClientRect().bottom || 40) + 8,
+        panelLeft:
+          !bar.layout.minimized && panel?.width > 60 ? panel.left : width,
+      };
+    },
     control: (kind, container, props) => {
       const component = nativeComponents[kind];
       if (!component) throw Error("未知原生告警控件");
@@ -463,7 +503,7 @@ async function nativeAlertShell(widget, { mount, unmount, report, page = "alerts
       style.remove();
       releasePage();
       try {
-        bar.refreshFromTVSettings();
+        if (page !== null) bar.refreshFromTVSettings();
       } catch (error) {
         report(error);
       }

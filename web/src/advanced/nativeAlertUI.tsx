@@ -1,4 +1,5 @@
 import "../notifications/native";
+import type { NoticeTransport } from "../notifications/types";
 import { createRoot } from "react-dom/client";
 import { useState } from "react";
 import { ChartAlertsPanel, type AlertDraft } from "./ChartAlertsPanel";
@@ -31,6 +32,12 @@ type Shell = {
   destroy: () => void;
   openDialog: NativeAlertDialog;
   control: NativeControlFactory;
+  overlayBounds: (anchor?: HTMLElement) => {
+    width: number;
+    height: number;
+    top: number;
+    panelLeft: number;
+  };
 };
 declare global {
   var nativeAlertShell: (
@@ -39,7 +46,9 @@ declare global {
       mount: (node: HTMLElement) => void;
       unmount: (node: HTMLElement) => void;
       report: (error: unknown) => void;
-      page?: string; title?: string; icon?: string;
+      page?: string | null;
+      title?: string;
+      icon?: string;
     },
   ) => Promise<Shell>;
   var MWNativeAlerts: { attach: typeof attach };
@@ -59,6 +68,7 @@ type Options = {
   report: (error: unknown) => void;
   initialDraft?: AlertDraft | null;
   persistDraft?: (draft: AlertDraft | null) => void;
+  noticeRequest?: NoticeTransport;
   panelChanged?: (open: boolean) => void;
 };
 async function attach({
@@ -71,6 +81,7 @@ async function attach({
   initialDraft,
   persistDraft,
   panelChanged,
+  noticeRequest,
 }: Options) {
   let target: HTMLElement | null = null,
     disposed = false;
@@ -115,6 +126,7 @@ async function attach({
   type State = {
     target: HTMLElement | null;
     context: AlertContext | null;
+    focusEvent?: { id: string; revision: number };
     theme: string;
     notices: Record<string, string>;
     instrument: { instrument: string; series_kind: string } | null;
@@ -136,6 +148,8 @@ async function attach({
         <ChartAlertsPanel
           workspaceId={scope.workspace_id}
           context={state.context}
+          focusEvent={state.focusEvent}
+          noticeRequest={noticeRequest}
           open
           theme={state.theme}
           readonly={readonly}
@@ -163,7 +177,10 @@ async function attach({
   let lastPanel: boolean | undefined;
   const timer = setInterval(() => {
     const opened = shell.isOpen?.();
-    if (opened !== undefined && opened !== lastPanel) { lastPanel = opened; panelChanged?.(opened); }
+    if (opened !== undefined && opened !== lastPanel) {
+      lastPanel = opened;
+      panelChanged?.(opened);
+    }
     const instrument = bridge.currentInstrument(),
       identity = JSON.stringify(instrument);
     if (identity !== lastInstrument) {
@@ -173,6 +190,10 @@ async function attach({
   }, 250);
   return {
     open: shell.open,
+    event: (id: string) => {
+      update({ focusEvent: { id, revision: Date.now() } });
+      shell.open();
+    },
     context: (context: AlertContext) => {
       if (context.association.workspace_id === scope.workspace_id) {
         update({ context });

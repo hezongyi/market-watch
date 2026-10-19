@@ -14,6 +14,7 @@ import uuid
 from fastapi import HTTPException
 from sqlalchemy import BigInteger, String, and_, cast, delete, exists, func, or_, select
 
+from .chart_alert_message import condition_label
 from .notification_sources import safe_text
 from .storage import (
     Audit,
@@ -199,7 +200,7 @@ def _signal(db, state, ident, at):
     return _new_event(db, state, ident=signal_event_id(ident), source_kind='chart_alert',
         source_id=ident, occurred_at=signal.occurred_at, severity='warning', kind='alert',
         backfill=at < state.started_at, accepted_at=evidence.get('detected_at', at), body={'title': signal.reason,
-            'message': '专业图表告警已触发',
+            'message': condition_label(config['condition']),
             'notify_web': config.get('notify_web', True) and not (evidence.get('late') and config.get('late_delivery', 'log_only') == 'log_only'),
             'notify_ntfy': config.get('notify_ntfy', False),
             'late_delivery': config.get('late_delivery'),
@@ -397,13 +398,27 @@ def list_events(db, subject, filters, *, before=None, limit=100):
             raise HTTPException(400, '筛选已变化，请重新加载通知')
         high, anchor = cursor['high'], cursor['anchor']
     clauses = [NoticeEvent.subject == subject, NoticeEvent.source_domain == 'pro_chart', NoticeEvent.first_seq <= high]
+    if filters.get('audience') == 'system':
+        clauses.append(NoticeEvent.source_kind != 'chart_alert')
+    if filters.get('incident'):
+        clauses.append(NoticeEvent.incident_id == filters['incident'])
+    if filters.get('audience') == 'system' and filters.get('grouped', True):
+        # One row per incident; all accepted occurrences remain available as evidence.
+        latest = select(func.max(NoticeEvent.first_seq)).where(
+            NoticeEvent.subject == subject, NoticeEvent.source_domain == 'pro_chart',
+            NoticeEvent.source_kind != 'chart_alert', NoticeEvent.first_seq <= high,
+        ).group_by(NoticeEvent.incident_id)
+        clauses.append(NoticeEvent.first_seq.in_(latest))
+    elif filters.get('audience') == 'alerts':
+        clauses.append(NoticeEvent.source_kind == 'chart_alert')
     for key, column in [('severity', NoticeEvent.severity), ('kind', NoticeEvent.kind),
                         ('source', NoticeEvent.source_kind), ('workspace', NoticeEvent.workspace),
                         ('instrument', NoticeEvent.instrument)]:
         if filters.get(key):
             clauses.append(column == filters[key])
     if filters.get('state') == 'unread':
-        clauses.append(NoticeEvent.viewed_at.is_(None))
+        clauses.append(NoticeEvent.incident_id.in_(unread_system_incidents(subject))
+                       if filters.get('audience') == 'system' else NoticeEvent.viewed_at.is_(None))
     if filters.get('state') == 'unhandled':
         clauses.append(NoticeEvent.handled_at.is_(None))
     if filters.get('state') == 'handled':
@@ -425,9 +440,53 @@ def list_events(db, subject, filters, *, before=None, limit=100):
         'anchor': [page[-1].occurred_at, page[-1].id]}) if len(rows) > limit else None
     unread = db.scalar(select(func.count()).select_from(NoticeEvent).where(
         NoticeEvent.subject == subject, NoticeEvent.source_domain == 'pro_chart', NoticeEvent.viewed_at.is_(None)))
-    return {'events': [summary(db, row) for row in page], 'before': next_cursor,
+    events = [summary(db, row) for row in page]
+    if filters.get('audience') == 'system' and filters.get('grouped', True):
+        unread_groups = set(db.scalars(unread_system_incidents(subject)))
+        for event in events:
+            if event['incident_id'] in unread_groups:
+                event['viewed_at'] = None
+    return {'events': events, 'before': next_cursor,
         'epoch': state.epoch, 'highwater': high, 'after': _cursor(state, {'kind': 'changes', 'seq': high}),
-        'unread': unread, 'server_time': now_ms(), 'retention_days': 30}
+        'unread': unread, 'system_unread': system_unread(db, subject),
+        'server_time': now_ms(), 'retention_days': 30}
+
+
+def unread_system_incidents(subject):
+    return select(NoticeEvent.incident_id).where(
+        NoticeEvent.subject == subject, NoticeEvent.source_domain == 'pro_chart',
+        NoticeEvent.source_kind != 'chart_alert', NoticeEvent.viewed_at.is_(None)).distinct()
+
+
+def system_unread(db, subject):
+    return db.scalar(select(func.count()).select_from(unread_system_incidents(subject).subquery()))
+
+
+def read_system(db, subject, value):
+    """Bounded, explicit reading of system records; never acknowledges a phone alert."""
+    state = stream(db, subject, lock=True)
+    if value.epoch != state.epoch:
+        raise reset(state, '通知日志已重建，请重新打开列表后标为已读')
+    through = min(value.through, state.seq)
+    clauses = [NoticeEvent.subject == subject, NoticeEvent.source_domain == 'pro_chart',
+               NoticeEvent.source_kind != 'chart_alert', NoticeEvent.first_seq <= through,
+               NoticeEvent.viewed_at.is_(None)]
+    if value.incident_id:
+        clauses.append(NoticeEvent.incident_id == value.incident_id)
+    rows = list(db.scalars(select(NoticeEvent).where(*clauses)
+                          .order_by(NoticeEvent.first_seq).limit(100)))
+    at = now_ms()
+    for row in rows:
+        row.viewed_at = at
+        row.version = state.seq + 1
+        db.add(NoticeObservation(id=str(uuid.uuid4()), subject=subject, event_id=row.id,
+            profile=value.profile, kind='viewed', reported_at=at,
+            details={'operation': 'explicit_system_read'}, intent_hash=intent_hash([row.id, at])))
+        db.flush()
+        publish(db, state, 'updated', row.id, summary(db, row))
+    db.flush()
+    return {'read': len(rows), 'more': bool(db.scalar(select(exists().where(*clauses)))),
+            'system_unread': system_unread(db, subject)}
 
 
 def changes(db, subject, after, *, limit=100):
@@ -442,6 +501,7 @@ def changes(db, subject, after, *, limit=100):
     return {'changes': [{'seq': r.seq, 'kind': r.kind, 'event_id': r.event_id, 'body': r.body} for r in rows],
         'after': _cursor(state, {'kind': 'changes', 'seq': last}), 'epoch': state.epoch,
         'highwater': state.seq, 'more': last < state.seq, 'server_time': now_ms(),
+        'system_unread': system_unread(db, subject),
         'unread': db.scalar(select(func.count()).select_from(NoticeEvent).where(
             NoticeEvent.subject == subject, NoticeEvent.viewed_at.is_(None)))}
 
@@ -560,8 +620,8 @@ def resolve_signal(db, ident):
         return {'domain': 'legacy_watch' if signal.watch_id else 'legacy_unknown', 'destination': None}
     workspace = (version.config.get('association') or {}).get('workspace_id')
     from urllib.parse import quote
-    return {'domain': 'pro_chart', 'destination': '/advanced-charts/' + quote(workspace or '', safe='') +
-        '?panel=notifications&event=' + quote(signal_event_id(ident), safe='')}
+    return {'domain': 'pro_chart', 'event_id': signal_event_id(ident), 'destination': '/advanced-charts/' + quote(workspace or '', safe='') +
+        '?panel=alerts&signal=' + quote(ident, safe='')}
 
 
 def backfill(db, *, limit=100):

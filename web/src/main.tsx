@@ -190,7 +190,7 @@ function AppHeader({ logout, sound, toggleSound }: { logout: () => void; sound: 
     return () => { document.removeEventListener("pointerdown", close); document.removeEventListener("keydown", keys); };
   }, [open]);
   return <header className="app-header"><button ref={button} type="button" aria-label="应用菜单" aria-expanded={open} aria-controls="app-menu" onClick={() => setOpen(!open)}><Menu size={20} aria-hidden="true" /></button><Waves size={23} aria-hidden="true" /><strong>{pageName(location.pathname)}</strong><NavLink to={chartReturn()}>返回图表</NavLink><button onClick={toggleSound} aria-pressed={sound}>{sound ? "网页声音已开" : "开启网页声音"}</button><span role="status">{sound&&!noticeState.unlocked&&<button onClick={()=>void noticeRuntime.unlock()}>解锁网页声音</button>}</span><button aria-label={theme === "dark" ? "切换浅色主题" : "切换暗色主题"} onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>{theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}</button>
-    {open && <nav id="app-menu" className="app-menu" ref={menu} aria-label="应用导航" onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget as Node) && e.relatedTarget !== button.current) setOpen(false); }}><NavLink to={chartReturn()}>图表</NavLink><NavLink to={notificationReturn()}>图表通知</NavLink><NavLink to="/signals">兼容历史{pending>0?`（${pending} 待手机确认）`:""}</NavLink><NavLink to="/replay">历史演练</NavLink><NavLink to="/settings">设置</NavLink><small>兼容功能</small><NavLink to="/legacy/monitoring">旧版监控</NavLink><hr /><button onClick={logout}>退出登录</button></nav>}
+    {open && <nav id="app-menu" className="app-menu" ref={menu} aria-label="应用导航" onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget as Node) && e.relatedTarget !== button.current) setOpen(false); }}><NavLink to={chartReturn()}>图表</NavLink><NavLink to={notificationReturn()}>系统消息</NavLink><NavLink to="/signals">兼容历史{pending>0?`（${pending} 待手机确认）`:""}</NavLink><NavLink to="/replay">历史演练</NavLink><NavLink to="/settings">设置</NavLink><small>兼容功能</small><NavLink to="/legacy/monitoring">旧版监控</NavLink><hr /><button onClick={logout}>退出登录</button></nav>}
   </header>;
 }
 
@@ -788,7 +788,8 @@ function Signals({
     return () => controller.abort();
   }, [target, signals]);
   useEffect(() => { if (located?.id === target && focusedTarget.current !== target) { document.getElementById("signal-" + located.id)?.focus({ preventScroll: false }); focusedTarget.current = target; } }, [located?.id, target]);
-  const displayed = located && !signals.some(s => s.id === located.id) ? [located, ...signals] : signals;
+  const compatible = signals.filter(s => !s.evidence?.chart_alert);
+  const displayed = located && !located.evidence?.chart_alert && !compatible.some(s => s.id === located.id) ? [located, ...compatible] : compatible;
   async function ack(id: string) {
     try {
       await api(`/notifications/${id}/ack`, {});
@@ -803,7 +804,7 @@ function Signals({
         <div>
           <span className="eyebrow">SIGNAL JOURNAL</span>
           <h1>兼容提醒历史</h1>
-          <p>旧版记录仅作查询。专业图表的即时通知请从图表通知中心查看；下面的停止动作仅影响此事件后续手机提醒。</p>
+          <p>旧版记录仅作查询。系统消息请从图表通知中心查看，交易告警请从右侧告警模块查看；下面的停止动作仅影响此事件后续手机提醒。</p>
         </div>
       </div>
       {error && (

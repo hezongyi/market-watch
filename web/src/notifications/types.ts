@@ -75,6 +75,7 @@ export type NoticeState = {
   unlocked: boolean;
   soundLimited: boolean;
   soundStatus: string;
+  systemPopups: boolean;
   bubble: Notice | null;
   overflow: number;
   serverTime: number;
@@ -86,6 +87,9 @@ export type NoticeAction = {
   filters?: Record<string, string>;
   kind?: "viewed" | "handled";
   enabled?: boolean;
+  through?: number;
+  epoch?: string;
+  incident_id?: string;
 };
 export type NoticeTransport = (action: NoticeAction) => Promise<any>;
 export type HistoryPage = {
@@ -95,6 +99,7 @@ export type HistoryPage = {
   after: string;
   epoch: string;
   unread: number;
+  system_unread?: number;
   server_time: number;
 };
 export const severityLabels: Record<string, string> = {
@@ -104,7 +109,7 @@ export const severityLabels: Record<string, string> = {
   info: "信息",
 };
 export const sourceLabels: Record<string, string> = {
-  chart_alert: "业务告警",
+  chart_alert: "交易告警",
   workspace: "工作区",
   indicator: "指标",
   history: "图格历史",
@@ -115,3 +120,15 @@ export const sourceLabels: Record<string, string> = {
   connection: "连接",
   chart_shell: "图表启动",
 };
+
+/** Presentation only; opaque storage IDs stay in the expandable diagnostics. */
+export function noticeInstrument(notice: Notice): string {
+  const raw = notice.instrument || "";
+  if (/^[a-f0-9]{8}-[a-f0-9-]{27}$/i.test(raw))
+    return sourceLabels[notice.source_kind] || "系统消息";
+  return (
+    raw.replace(/^MW[PCI]:/, "") ||
+    sourceLabels[notice.source_kind] ||
+    "系统消息"
+  );
+}

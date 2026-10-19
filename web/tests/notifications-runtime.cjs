@@ -26,6 +26,7 @@ const assert = require("node:assert/strict"),
     console,
     crypto: webcrypto,
     TextEncoder,
+    URLSearchParams,
     performance,
     AbortSignal,
     DOMException,
@@ -315,6 +316,33 @@ const assert = require("node:assert/strict"),
   assert.equal(resetCase.runtime.state.status, "已同步");
   assert.equal(resetCase.runtime.state.gap, "已有本机记录未能保存",
     "successful reset clears transient progress without hiding persistent storage loss");
+  const unified = fixture();
+  unified.runtime.pop = async () => {};
+  unified.runtime.estimateNow = () => 1000;
+  unified.runtime.state.systemPopups = false;
+  const instant = {id:"trade",source_kind:"chart_alert",kind:"alert",severity:"warning",attention:true,occurred_at:1000};
+  unified.runtime.enqueue({...instant,id:"system",source_kind:"workspace"});
+  unified.runtime.enqueue(instant);
+  assert.equal(unified.runtime.queue.length,1,"system popup preference cannot suppress trading alerts");
+  unified.runtime.state.systemPopups = true;
+  unified.runtime.enqueue({...instant,id:"ordinary",source_kind:"workspace",severity:"info"});
+  assert.equal(unified.runtime.queue.length,1,"ordinary system records stay in the center without a popup");
+  unified.runtime.enqueue({...instant,id:"abnormal",source_kind:"workspace",severity:"error"});
+  assert.equal(unified.runtime.queue.length,2,"system abnormalities join the same bounded instant queue");
+  unified.runtime.state.bubble = unified.runtime.queue.shift();
+  unified.runtime.applySystemPopups(false);
+  assert.equal(unified.runtime.state.bubble,null,"disabling system popups dismisses the active system card");
+  assert.equal(unified.runtime.queue.length,1);
+  sandbox.testAPI = async path => {
+    assert.match(path,/audience=system/);
+    return {events:[]};
+  };
+  await unified.runtime.action({action:"history",filters:{audience:"alerts"}});
+  const counts=fixture();
+  const unscoped=sandbox.testAPI;
+  sandbox.testAPI=async(path,...args)=>({...await unscoped(path,...args),unread:42,system_unread:2});
+  await counts.runtime.cycle(0);
+  assert.equal(counts.runtime.state.unread,2,"trading alerts never increase the system-message badge");
   console.log(
     "PASS notification intake isolation, permanent rejection, accepted projection gap and business outcome",
   );

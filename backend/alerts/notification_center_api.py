@@ -55,6 +55,14 @@ class Observation(BaseModel):
         return value
 
 
+class SystemRead(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    profile: str = Field(pattern=r'^[a-f0-9-]{36}$')
+    epoch: str = Field(min_length=1, max_length=100)
+    through: int = Field(ge=0)
+    incident_id: str | None = Field(default=None, max_length=100)
+
+
 def router(authenticated):
     routes = APIRouter(prefix='/api/notification-center', dependencies=[Depends(authenticated)])
 
@@ -67,11 +75,19 @@ def router(authenticated):
     def events(before: str | None = Query(None, max_length=2000), limit: int = Query(100, ge=1, le=500),
                severity: str = '', kind: str = '', source: str = '', workspace: str = '',
                instrument: str = '', state: str = '', q: str = Query('', max_length=120),
-               since: int | None = None, until: int | None = None):
+               since: int | None = None, until: int | None = None,
+               audience: Literal['all', 'system', 'alerts'] = 'all',
+               incident: str = Query('', max_length=100), grouped: bool = True):
         with transaction() as db:
             return center.list_events(db, center.SUBJECT, {'severity': severity, 'kind': kind,
                 'source': source, 'workspace': workspace, 'instrument': instrument, 'state': state,
-                'q': q, 'since': since, 'until': until}, before=before, limit=limit)
+                'q': q, 'since': since, 'until': until, 'audience': audience,
+                'incident': incident, 'grouped': grouped}, before=before, limit=limit)
+
+    @routes.post('/system/read')
+    def read_system(value: SystemRead):
+        with transaction() as db:
+            return center.read_system(db, center.SUBJECT, value)
 
     @routes.post('/events', status_code=202)
     def intake(value: BrowserEvent):

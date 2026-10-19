@@ -1,3 +1,5 @@
+import { AlertEventTrace } from "../notifications/AlertEventTrace";
+import type { NoticeTransport } from "../notifications/types";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ApiError, api, date } from "../api";
@@ -55,7 +57,11 @@ export function ChartAlertsPanel({
   mountTarget,
   initialDraft,
   persistDraft,
+  focusEvent,
+  noticeRequest,
 }: {
+  focusEvent?: {id:string; revision:number};
+  noticeRequest?: NoticeTransport;
   workspaceId: string;
   context: AlertContext | null;
   open: boolean;
@@ -243,6 +249,15 @@ export function ChartAlertsPanel({
           row.config.series_kind ===
             (activeInstrument || context)?.series_kind)),
   );
+  useEffect(() => {
+    if (!focusEvent) return;
+    setTab("events"); setSearch(""); setStatus(""); setCurrentOnly(false); setSelected(focusEvent.id);
+    void refresh();
+  }, [focusEvent]);
+  useEffect(() => {
+    if (!focusEvent || selected !== focusEvent.id) return;
+    mountTarget?.querySelector<HTMLElement>('[data-signal-id="'+focusEvent.id+'"]')?.scrollIntoView({block:"nearest"});
+  }, [focusEvent, selected, events, mountTarget]);
   const filteredEvents = events.filter(
     (event) =>
       (!search ||
@@ -646,6 +661,7 @@ export function ChartAlertsPanel({
                 {entries.map((event) => (
                   <article
                     key={event.id}
+                    data-signal-id={event.id}
                     className={`chart-alert-card ${selected === event.id ? "alert-selected" : ""}`}
                   >
                     <button
@@ -707,6 +723,8 @@ export function ChartAlertsPanel({
                             )}
                           </pre>
                         </details>
+                        {noticeRequest && <AlertEventTrace signalId={event.id} request={noticeRequest}/> }
+                        <p className="nc-muted">查看记录不会停止手机提醒；显式停止无法撤回已在途发送。</p>
                         <div className="alert-inline-actions">
                           <button
                             disabled={
@@ -725,7 +743,7 @@ export function ChartAlertsPanel({
                             disabled={!!event.ack_at || busy === event.id}
                             onClick={() => ack(event)}
                           >
-                            {event.ack_at ? "已确认" : "确认此事件"}
+                            {event.ack_at ? "已停止后续提醒" : "停止后续手机提醒"}
                           </button>
                         </div>
                       </div>

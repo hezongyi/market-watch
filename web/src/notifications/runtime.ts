@@ -22,6 +22,7 @@ const initial: NoticeState = {
   unlocked: false,
   soundLimited: false,
   soundStatus: "网页声音未启用",
+  systemPopups: true,
   bubble: null,
   overflow: 0,
   serverTime: 0,
@@ -211,6 +212,10 @@ export class NoticeRuntime {
         await this.store.update("meta", subject + ":gap", subject, () => gap);
       }
       const gap = await this.store.get("meta", subject + ":gap");
+      const systemPopups = await this.store.get(
+        "meta",
+        subject + ":system-popups",
+      );
       if (!this.current(generation)) return;
       this.ready = true;
       this.after = progress?.after || "";
@@ -220,6 +225,7 @@ export class NoticeRuntime {
         events: cached || [],
         unread: progress?.unread || 0,
         enabled: !!enabled,
+        systemPopups: systemPopups !== false,
         gap: gap || "",
         status: "正在同步",
         soundLimited: !navigator.locks,
@@ -233,6 +239,11 @@ export class NoticeRuntime {
             event.data.type === "sound"
           )
             this.patch({ enabled: !!event.data.enabled });
+          if (
+            event.data?.subject === this.subject &&
+            event.data.type === "system-popups"
+          )
+            this.applySystemPopups(event.data.enabled !== false);
         };
       }
       await this.loadPending(generation);
@@ -320,7 +331,10 @@ export class NoticeRuntime {
     );
     // Producer callbacks may report failure and recovery without awaiting each
     // other. Serialize before hashes/IDB reads, not merely during upload.
-    this.faultIngress = next.then(() => {}, () => {});
+    this.faultIngress = next.then(
+      () => {},
+      () => {},
+    );
     return next;
   }
   report(fault: BrowserFault): Promise<string | null> {
@@ -518,6 +532,11 @@ export class NoticeRuntime {
   }
   private enqueue(event: Notice) {
     if (
+      event.source_kind !== "chart_alert" &&
+      (!this.state.systemPopups || event.severity === "info")
+    )
+      return;
+    if (
       !this.displayEnabled ||
       (!event.local_status &&
         this.estimateNow() - (event.accepted_at ?? event.occurred_at) > 30000)
@@ -642,14 +661,14 @@ export class NoticeRuntime {
           page.after,
           page.epoch,
           page.events,
-          page.unread,
+          page.system_unread ?? page.unread,
         );
         if (!this.current(generation)) return;
         this.after = page.after;
         this.epoch = page.epoch;
         this.patch({
           events: page.events,
-          unread: page.unread,
+          unread: page.system_unread ?? page.unread,
           epoch: page.epoch,
         });
       }
@@ -691,7 +710,8 @@ export class NoticeRuntime {
             (a, b) => b.occurred_at - a.occurred_at || b.id.localeCompare(a.id),
           )
           .slice(0, 200);
-        const unread = result.unread ?? this.state.unread;
+        const unread =
+          result.system_unread ?? result.unread ?? this.state.unread;
         // Persist records and progress together before advancing the recovery cursor.
         await this.store.saveProgress(
           subject,
@@ -1081,8 +1101,49 @@ export class NoticeRuntime {
     let result: any;
     if (action.action === "history") {
       const query = new URLSearchParams(action.filters || {});
+      query.set("audience", "system");
       if (action.before) query.set("before", action.before);
       result = await api(base + "/events?" + query);
+    } else if (
+      action.action === "read-system" &&
+      action.through !== undefined &&
+      action.epoch
+    ) {
+      let more = true,
+        batches = 0;
+      while (more && batches++ < 100) {
+        result = await api(base + "/system/read", {
+          profile: this.profile,
+          through: action.through,
+          epoch: action.epoch,
+          incident_id: action.incident_id || null,
+        });
+        if (!this.current(generation)) throw Error("通知会话已失效");
+        more = result.more;
+      }
+      this.patch({
+        unread: result.system_unread,
+        revision: this.state.revision + 1,
+      });
+      this.schedule(generation, 0);
+      if (more) throw Error("部分系统消息已读，请再次执行以继续处理剩余记录");
+    } else if (action.action === "system-popups") {
+      await this.store.update(
+        "meta",
+        this.subject + ":system-popups",
+        this.subject,
+        () => action.enabled !== false,
+      );
+      if (!this.current(generation)) throw Error("通知会话已失效");
+      this.applySystemPopups(action.enabled !== false);
+      this.channel?.postMessage({
+        type: "system-popups",
+        subject: this.subject,
+        enabled: this.state.systemPopups,
+      });
+      result = { ok: true };
+    } else if (action.action === "resolve-alert" && id) {
+      result = await api(base + "/resolve?signal=" + encodeURIComponent(id));
     } else if (action.action === "detail" && id) {
       result = await api(base + "/events/" + encodeURIComponent(id));
     } else if (action.action === "timeline" && id) {
@@ -1126,5 +1187,17 @@ export class NoticeRuntime {
     } else throw Error("不允许的通知操作");
     if (!this.current(generation)) throw Error("通知会话已失效，忽略过期响应");
     return result;
+  }
+  private applySystemPopups(enabled: boolean) {
+    if (!enabled)
+      this.queue = this.queue.filter(
+        (row) => row.source_kind === "chart_alert",
+      );
+    const dismiss =
+      !enabled &&
+      this.state.bubble &&
+      this.state.bubble.source_kind !== "chart_alert";
+    this.patch({ systemPopups: enabled });
+    if (dismiss) this.dismiss();
   }
 }

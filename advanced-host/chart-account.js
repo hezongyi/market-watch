@@ -99,7 +99,7 @@ function chartPasswordDialog(widget, doc, submit, report) {
         for (const input of inputs) input.value = "";
         closeButton.disabled = false;
         closeButton.click();
-        widget.showNoticeDialog({title: "密码已修改", body: "其他设备需要重新登录。", callback: () => {}});
+        // The parent records success in the system center; no second notice dialog.
       } catch (failure) {showError(String(failure).replace(/^Error:\s*/, ""));center();}
       finally {
         busy = false;
