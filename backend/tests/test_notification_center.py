@@ -602,6 +602,9 @@ def test_system_read_is_bounded_and_incident_scoped(database):
         read = SystemRead(profile=PROFILE, through=state.seq, epoch=state.epoch, incident_id=incident)
         first = center.read_system(db, center.SUBJECT, read)
         assert first['read'] == 100 and first['more']
+        unread = center.list_events(db, center.SUBJECT, {
+            'audience': 'system', 'grouped': False, 'incident': incident, 'state': 'unread'})
+        assert len(unread['events']) == 5
         second = center.read_system(db, center.SUBJECT, read)
         assert second['read'] == 5 and not second['more']
         assert other.viewed_at is None

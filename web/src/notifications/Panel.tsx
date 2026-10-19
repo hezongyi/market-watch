@@ -855,7 +855,12 @@ export function NoticeBubble({
         >
           {system(notice) ? "查看消息" : "告警记录"}
         </button>
-        <small>刚刚</small>
+        <small>
+          {new Date(notice.occurred_at).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </small>
       </div>
     </aside>
   );

@@ -288,9 +288,10 @@ async function attach({
   };
   doc.addEventListener("pointerdown", outside);
   const sync = (state: NoticeState) => {
+    // Locate the existing entry using its old label before the unread count changes.
+    const focused = findEntry() === doc.activeElement;
     current = state;
     if (count !== state.unread) {
-      const focused = findEntry() === doc.activeElement;
       count = state.unread;
       if (entry) widget.removeButton(entry);
       entry = widget.createButton({

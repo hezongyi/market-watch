@@ -466,7 +466,7 @@ async function nativeAlertShell(
         height = doc.defaultView.innerHeight;
       const panel = bar._wrap?.getBoundingClientRect();
       const toolbar = doc
-        .querySelector('[data-name="header-toolbar"]')
+        .querySelector('.innerWrap-OhqNVIYA')
         ?.getBoundingClientRect();
       return {
         width,

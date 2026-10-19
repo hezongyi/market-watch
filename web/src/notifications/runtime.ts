@@ -576,6 +576,11 @@ export class NoticeRuntime {
     try {
       while (this.queue.length && this.current(generation)) {
         const event = this.queue.shift()!;
+        if (
+          !event.local_status &&
+          this.estimateNow() - (event.accepted_at ?? event.occurred_at) > 30000
+        )
+          continue;
         const prior = await this.store.update(
           "claims",
           subject + ":bubble:" + event.id,

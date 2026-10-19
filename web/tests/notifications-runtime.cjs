@@ -333,6 +333,19 @@ const assert = require("node:assert/strict"),
   unified.runtime.applySystemPopups(false);
   assert.equal(unified.runtime.state.bubble,null,"disabling system popups dismisses the active system card");
   assert.equal(unified.runtime.queue.length,1);
+  const delayed = fixture();
+  sandbox.document = {visibilityState:"visible"};
+  delayed.runtime.presentation = true;
+  delayed.runtime.estimateNow = () => 40001;
+  delayed.runtime.queue = [
+    {...instant,id:"expired",occurred_at:1000},
+    {...instant,id:"fresh",occurred_at:40000},
+  ];
+  const claimed = [];
+  delayed.runtime.store.update = async (_name,key) => {claimed.push(key);};
+  await delayed.runtime.pop();
+  assert.equal(delayed.runtime.state.bubble.id,"fresh","a hovered card cannot cause stale queued server messages to pop later");
+  assert.equal(claimed.length,1,"expired queued messages do not acquire display claims");
   sandbox.testAPI = async path => {
     assert.match(path,/audience=system/);
     return {events:[]};

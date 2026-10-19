@@ -418,7 +418,8 @@ def list_events(db, subject, filters, *, before=None, limit=100):
             clauses.append(column == filters[key])
     if filters.get('state') == 'unread':
         clauses.append(NoticeEvent.incident_id.in_(unread_system_incidents(subject))
-                       if filters.get('audience') == 'system' else NoticeEvent.viewed_at.is_(None))
+                       if filters.get('audience') == 'system' and filters.get('grouped', True)
+                       else NoticeEvent.viewed_at.is_(None))
     if filters.get('state') == 'unhandled':
         clauses.append(NoticeEvent.handled_at.is_(None))
     if filters.get('state') == 'handled':
@@ -442,7 +443,8 @@ def list_events(db, subject, filters, *, before=None, limit=100):
         NoticeEvent.subject == subject, NoticeEvent.source_domain == 'pro_chart', NoticeEvent.viewed_at.is_(None)))
     events = [summary(db, row) for row in page]
     if filters.get('audience') == 'system' and filters.get('grouped', True):
-        unread_groups = set(db.scalars(unread_system_incidents(subject)))
+        unread_groups = set(db.scalars(unread_system_incidents(subject).where(
+            NoticeEvent.incident_id.in_([event['incident_id'] for event in events]))))
         for event in events:
             if event['incident_id'] in unread_groups:
                 event['viewed_at'] = None
