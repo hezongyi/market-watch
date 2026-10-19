@@ -69,7 +69,7 @@ type Options = {
   initialDraft?: AlertDraft | null;
   persistDraft?: (draft: AlertDraft | null) => void;
   noticeRequest?: NoticeTransport;
-  panelChanged?: (open: boolean) => void;
+  panelChanged?: (open: boolean, signalId?: string) => void;
 };
 async function attach({
   widget,
@@ -193,6 +193,7 @@ async function attach({
     event: (id: string) => {
       update({ focusEvent: { id, revision: Date.now() } });
       shell.open();
+      panelChanged?.(true, id);
     },
     context: (context: AlertContext) => {
       if (context.association.workspace_id === scope.workspace_id) {

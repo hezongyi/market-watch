@@ -2083,7 +2083,7 @@ function boot(
         initialDraft: alertUIDraft,
         noticeRequest: query => request({workspace_id:workspaceId,session,...query}, 'notice-center-rpc', () => attempt === attachingAlerts && session === alertUISession),
         persistDraft: draft => send({type:'chart-alert-ui-draft', workspace_id: workspaceId, session, draft}),
-        panelChanged: open => {restoreAlertsPanel = open; send({type:'alerts-panel-state',workspace_id:workspaceId,open});},
+        panelChanged: (open,signal_id) => {restoreAlertsPanel = open; send({type:'alerts-panel-state',workspace_id:workspaceId,open,signal_id});},
         bridge: alertBridge, request: query => request(query, 'chart-alert-ui-rpc', () => attempt === attachingAlerts && session === alertUISession),
         report: error => send({type:'error', error:String(error)})});
       if (attempt !== attachingAlerts || session !== alertUISession || alertUIStopped) {instance.destroy();return;}

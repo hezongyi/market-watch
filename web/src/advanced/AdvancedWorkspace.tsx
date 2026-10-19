@@ -451,7 +451,12 @@ export default function AdvancedWorkspace() {
       }
       if (m.type === "alerts-panel-state" && m.workspace_id === current.current?.id && typeof m.open === "boolean") {
         const url = new URL(location.href);
-        if (m.open) url.searchParams.set("panel", "alerts"); else if(url.searchParams.get("panel")==="alerts") {url.searchParams.delete("panel");url.searchParams.delete("signal");}
+        if (m.open) {
+          url.searchParams.set("panel", "alerts");
+          if(typeof m.signal_id==='string' && /^[a-f0-9-]{36}$/.test(m.signal_id)) {
+            url.searchParams.set('signal',m.signal_id);url.searchParams.delete('event');
+          }
+        } else if(url.searchParams.get("panel")==="alerts") {url.searchParams.delete("panel");url.searchParams.delete("signal");}
         navigate(url.pathname + url.search + url.hash, {replace:true}); return;
       }
       if (m.type === "data-center-state" && typeof m.session === "string" && /^[a-f0-9-]{36}$/.test(m.session)) {
