@@ -179,7 +179,8 @@ function presentQuote(row) {
 }
 function publishNotificationTimezone(zone, label) {
   globalThis.MWChartTime?.set(zone, label);
-  send({type:"chart-timezone", zone, label, session:alertUISession, workspace_id:alertUIWorkspace});
+  if (alertUISession && alertUIWorkspace)
+    send({type:"chart-timezone", zone, label, session:alertUISession, workspace_id:alertUIWorkspace});
 }
 function refreshNotificationTimezone() {
   let zone = "UTC", label = "UTC（图表初始化前）";

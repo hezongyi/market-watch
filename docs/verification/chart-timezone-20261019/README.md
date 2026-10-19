@@ -38,6 +38,7 @@ DST 重复时刻曾尝试原生 Select；实际鼠标验收发现菜单被原生
 
 - `npm run build`（TypeScript/Vite/数据中心 bundle）、正式 Web/chart Docker 构建、`node --check advanced-host/bridge.js`、`git diff --check` 通过。
 - `chart-time.cjs` 在 `TZ=Asia/Shanghai` 和 `TZ=America/Los_Angeles` 都通过，覆盖 UTC/上海/纽约、毫秒往返、epoch 0、半小时/45 分钟时区、DST gap/fold、23/25 小时边界，以及真实桥接函数的激活图/交易所解析/重复订阅检查。
+- 首轮 CI 发现启动元数据阶段多发了一条无会话的时区消息，破坏既有启动通信约束；桥接改为仅在 workspace/session 已明确后发送。`advanced-startup-metadata.cjs` 及全部自选表/供源桥接回归已复验通过。
 - `notifications-runtime.cjs`、真实 IndexedDB `notifications-persistence.cjs`、`chart-tab.cjs`、`single-app-routing.cjs` 通过；无新依赖、DB 迁移或后端源码改动。
 - 排查 JSON 和手机已有投递正文是原始证据，仍保留底层 UTC 格式；网页生成的可读时间均随图表。无法重新解释的旧本机缺失警示浏览器时间后缀在显示时省略，保留条数且不迁移持久格式。
 - 不宣称覆盖每个 IANA 历史时区、每种浏览器、物理手机送达、长时间压力或重新触发真实交易；本轮重点是显示/输入转换与正式登录。图表库为当前版本，未修改其许可库文件。
