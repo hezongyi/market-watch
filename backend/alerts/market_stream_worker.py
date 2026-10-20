@@ -24,6 +24,7 @@ from .storage import (
     Instrument,
     MarketComposite,
     MarketStreamTask,
+    Preference,
     ProviderDataset,
     now_ms,
     transaction,
@@ -153,6 +154,17 @@ class Calculator:
                     return None, delay
             rows = quote_snapshot(QuoteQuery(symbols=[encode(query.instrument, query.series_kind)],
                 composite_revision_id=query.composite_revision_id, input_revision=query.input_revision))
+            if settings.notification_center_sources_enabled and source == 'oanda' and query.series_kind == 'provider' and any(
+                    row.get('v', {}).get('fetch_status') in ('pending', 'stale') for row in rows):
+                # Only reread the collector's cache; never accelerate supplier
+                # HTTP collection. Fast probes end with the durable grace;
+                # without notice tracking retain the normal polling cadence.
+                from .market_notices import QUOTE_WAIT_GRACE_MS
+                with transaction() as db:
+                    observed = db.get(Preference, 'notice:market-stream:' + work['id'])
+                    since = observed.value.get('waiting_since', now_ms()) if observed else now_ms()
+                if now_ms() - since < QUOTE_WAIT_GRACE_MS:
+                    delay = 2000 + int(work['id'][:4], 16) % 501
             # Age is status evidence, not a new price result every half second.
             for row in rows:
                 row.pop("age_ms", None)
@@ -230,7 +242,7 @@ class Calculator:
                 state = live_snapshot(db, revision)
                 page["status"] = {key: state[key] for key in (
                     "quote_ready", "candle_ready", "sample_ready", "observation_mode",
-                    "confirmed_tail_ready", "owned", "connection", "current_account")}
+                    "confirmed_tail_ready", "owned", "connection", "connection_error", "current_account")}
         return {"type": "bars", **page}, 500
 
     def retire_memory(self):
@@ -246,8 +258,11 @@ def calculate_work(calculator, work):
     try:
         payload, delay = calculator.build(work)
     except Exception as error:
+        from .market_notices import error_evidence
         log.warning("market calculation failed: %s", type(error).__name__)
-        payload, delay = {"type": "status", "status": "error", "error": "行情暂不可用，后台重试中"}, 2000
+        payload, delay = {"type": "status", "status": "error", "error": "行情暂不可用，后台重试中",
+                          "error_evidence": error_evidence(error, provider=work['identity'].get('metadata', {}).get('source', ''),
+                                                           operation='shared_' + work['identity'].get('kind', 'bars'))}, 2000
         calculator.signals.pop(work["id"], None)
     try:
         stream.commit(work, copy.deepcopy(payload), delay_ms=delay)

@@ -1,6 +1,10 @@
 import { useContext, useId, useRef, useState } from "react";
 import { Check } from "lucide-react";
-import { NativeControl, NativeControls } from "./NativeAlertControls";
+import {
+  AlertIconButton,
+  NativeControl,
+  NativeControls,
+} from "./NativeAlertControls";
 export type AlertMenuItem = {
   label: string;
   run: () => void;
@@ -12,14 +16,16 @@ export function AlertMenu({
   label,
   children,
   items,
+  icon,
 }: {
   label: string;
   children?: React.ReactNode;
   items: AlertMenuItem[];
+  icon?: string;
 }) {
   const factory = useContext(NativeControls);
   return factory ? (
-    <NativeAlertMenu label={label} items={items}>
+    <NativeAlertMenu label={label} items={items} icon={icon}>
       {children}
     </NativeAlertMenu>
   ) : (
@@ -32,25 +38,57 @@ function NativeAlertMenu({
   label,
   children,
   items,
+  icon,
 }: {
   label: string;
   children?: React.ReactNode;
   items: AlertMenuItem[];
+  icon?: string;
 }) {
   const trigger = useRef<HTMLButtonElement>(null),
     [opened, setOpened] = useState(false);
+  const openState = useRef(false);
+  const changeOpened = (next: boolean) => {
+    openState.current = next;
+    setOpened(next);
+  };
   return (
-    <span className="alert-menu-wrap">
-      <button
-        ref={trigger}
-        type="button"
-        aria-label={label}
-        aria-haspopup="menu"
-        aria-expanded={opened}
-        onClick={() => setOpened((value) => !value)}
-      >
-        {children || label}
-      </button>
+    <span
+      className="alert-menu-wrap"
+      onKeyDown={(event) => {
+        // Escape can arrive before the separately mounted native menu has
+        // focused its first item. Close this level before the owning panel.
+        if (event.key === "Escape" && openState.current) {
+          event.preventDefault();
+          event.stopPropagation();
+          changeOpened(false);
+          trigger.current?.focus();
+        }
+      }}
+    >
+      {icon ? (
+        <AlertIconButton
+          icon={icon}
+          label={label}
+          expanded={opened}
+          hasPopup="menu"
+          reference={(node) => {
+            trigger.current = node;
+          }}
+          onClick={() => changeOpened(!openState.current)}
+        />
+      ) : (
+        <button
+          ref={trigger}
+          type="button"
+          aria-label={label}
+          aria-haspopup="menu"
+          aria-expanded={opened}
+          onClick={() => changeOpened(!openState.current)}
+        >
+          {children || label}
+        </button>
+      )}
       <NativeControl
         kind="menu"
         properties={{
@@ -58,7 +96,7 @@ function NativeAlertMenu({
           items,
           anchor: trigger.current,
           opened,
-          onClose: () => setOpened(false),
+          onClose: () => changeOpened(false),
         }}
       />
     </span>

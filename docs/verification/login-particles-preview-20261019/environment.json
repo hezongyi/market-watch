@@ -1,0 +1,23 @@
+{
+  "host": "Ubuntu quant-server / 192.168.7.232",
+  "project": "mw-login-particles-20261019",
+  "container": "mw-login-particles-20261019-preview-1",
+  "image": "sha256:c7b12e179f77b4a436fa200b5a431738739677a599b5d65475c179f0d6056de7",
+  "baseline": "2fe919a",
+  "worktree": "/home/quant/repos/market-watch-login-particles-20261019",
+  "branch": "feat/login-particles-preview-20261019",
+  "preview": "http://192.168.7.232:18320/login-preview.html",
+  "backend": "None: visual confirmation gate",
+  "limits": {
+    "memoryMiB": 64,
+    "cpus": 0.25
+  },
+  "sourceSha256": {
+    "web/src/app/Particles.tsx": "476aeaafc8ba4118ff7162dcb83e0b0971de78a3b72b0119725ec1e79c6e6241",
+    "web/src/app/ParticlesLogin.tsx": "0931e22f8c0f3c15d8c5df2b1b6bc1000c9a6ec5829f767bab8324f49e7935df",
+    "web/src/app/particles.css": "51af6d0eea63c8516d93db9416edf7abf858e4adc2e28a8eca7be456828ee743",
+    "web/src/app/Login.tsx": "d749b53119e5330ae14621c295822eec7aa484ea80a30b041f74c2f0db2d6b7b",
+    "web/src/main.tsx": "50e9cdf56d665319adf3b29bb94017b26a0042e134aebc82ee2668e9747dc43d",
+    "web/src/app/app.css": "e070abd7e3e8d91a371446020c4c7043043db9e0898e6122339366c137df5061"
+  }
+}

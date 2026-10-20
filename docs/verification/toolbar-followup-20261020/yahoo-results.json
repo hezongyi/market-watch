@@ -1,0 +1,21 @@
+{
+  "running_backend_services_enabled": 11,
+  "settings_enabled": true,
+  "proxy_configured": true,
+  "catalog": {
+    "status": 200,
+    "symbol": "AAPL",
+    "source": "yahoo",
+    "available": true,
+    "supported": true
+  },
+  "live_read": {
+    "symbol": "AAPL",
+    "source": "yahoo",
+    "status": "ok",
+    "price": "342.94",
+    "quote_time": 1792440001000,
+    "fetched_at": 1792500826857
+  },
+  "note": "Yahoo was already enabled in file and all running services. Verified existing configuration and live supplier read; no configuration change or credential output."
+}

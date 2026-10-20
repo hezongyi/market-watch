@@ -1,0 +1,75 @@
+{
+  "cases": [
+    {
+      "variant": "A",
+      "label": "系统消息，0 条未读；样式预览",
+      "width": 52,
+      "text": "0",
+      "badge": "hidden"
+    },
+    {
+      "variant": "A",
+      "label": "系统消息，23 条未读；样式预览",
+      "width": 52,
+      "text": "23",
+      "badge": "visible"
+    },
+    {
+      "variant": "A",
+      "label": "系统消息，128 条未读；样式预览",
+      "width": 52,
+      "text": "99+",
+      "badge": "visible"
+    },
+    {
+      "variant": "B",
+      "label": "系统消息，0 条未读；样式预览",
+      "width": 76,
+      "text": "0",
+      "badge": "hidden"
+    },
+    {
+      "variant": "B",
+      "label": "系统消息，23 条未读；样式预览",
+      "width": 76,
+      "text": "23",
+      "badge": "visible"
+    },
+    {
+      "variant": "B",
+      "label": "系统消息，128 条未读；样式预览",
+      "width": 76,
+      "text": "99+",
+      "badge": "visible"
+    },
+    {
+      "variant": "C",
+      "label": "系统消息，0 条未读；样式预览",
+      "width": 132,
+      "text": "系统消息0",
+      "badge": "hidden"
+    },
+    {
+      "variant": "C",
+      "label": "系统消息，23 条未读；样式预览",
+      "width": 132,
+      "text": "系统消息23",
+      "badge": "visible"
+    },
+    {
+      "variant": "C",
+      "label": "系统消息，128 条未读；样式预览",
+      "width": 132,
+      "text": "系统消息99+",
+      "badge": "visible"
+    }
+  ],
+  "canvas_geometry_stable": true,
+  "errors": [],
+  "badge_99plus_inside_entry": true,
+  "static_page_switching": [
+    "A initial",
+    "B link changes URL and content",
+    "Right arrow changes B to C"
+  ]
+}

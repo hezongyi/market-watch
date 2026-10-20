@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[2]
 # The display-observation, indicator-task and demand migrations are part of the
 # current single line of deployed schema.  Keep the upgrade-path contract tied
 # to the actual Alembic head so new branches cannot silently regress it.
-HEAD = "av49_indicator_demands"
+HEAD = "aw50_notice_center"
 
 
 def configuration():

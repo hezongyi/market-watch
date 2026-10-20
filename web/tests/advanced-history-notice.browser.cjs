@@ -38,9 +38,13 @@ const fs = require("node:fs"), assert = require("node:assert/strict");
     const base={type:"native-load-start",id:"notice-timing",instrument:"EURUSD",timeframe:"M5",
       count:12000,estimatedPages:3,from:1752451200000,to:1752537600000};
     await send(base);
-    await page.waitForTimeout(4400);
-    assert.equal(await page.locator(".advanced-loading-notice").count(),0,"ordinary notice stays hidden before five seconds");
+    const before=await page.locator('iframe[title="专业图表工作区"]').boundingBox();
+    await page.waitForTimeout(6500);
+    assert.equal(await page.locator(".advanced-loading-notice").count(),0,"slow loading never opens a passive status strip");
+    assert.deepEqual(await page.locator('iframe[title="专业图表工作区"]').boundingBox(),before,"slow loading preserves chart frame bounds");
+    await frame.evaluate(() => send({type:"history-load-details-open"}));
     await page.locator(".advanced-loading-notice").waitFor({timeout:2000});
+    assert.deepEqual(await page.locator('iframe[title="专业图表工作区"]').boundingBox(),before,"requested details overlay preserves frame bounds");
     const text=await page.locator(".advanced-loading-notice").textContent();
     assert.ok(text.includes("预计缓存总共约 3 页"));
     await send({type:"native-load-end",id:base.id});
@@ -50,7 +54,7 @@ const fs = require("node:fs"), assert = require("node:assert/strict");
       phase:"filling",message:"已超过容量，正在加载可到达的最早位置"});
     await page.locator(".history-capacity-result").waitFor({timeout:1500});
     assert.ok((await page.locator(".advanced-loading-notice").textContent()).includes("请求 12,000 根"),
-      "capacity-associated loading detail bypasses the five-second gate");
+      "requested details include capacity-associated loading immediately");
     await send({type:"native-load-end",id:"capacity-timing"});
     const started=Date.now()-12000;
     await send({type:"capacity-notice",key:"MWP:EURUSD|5|",id:101,symbol:"MWP:EURUSD",resolution:"5",
@@ -69,10 +73,10 @@ const fs = require("node:fs"), assert = require("node:assert/strict");
     await send({type:"capacity-notice",key:"MWP:EURUSD|5|",id:101,phase:"clear"});
     await page.locator(".advanced-loading-notice").waitFor({state:"hidden",timeout:2000});
     const report={passed:true,scope:"trusted iframe notice messages; actual UI visibility, not provider performance",
-      hiddenBeforeFiveSeconds:true,estimateText:text,capacityImmediate:true,
+      noAutomaticStrip:true,stableFrameBounds:true,userRequestedDetails:true,estimateText:text,capacityImmediate:true,
       boundaryElapsedBefore:elapsedBefore,boundaryElapsedAfter:elapsedAfter,
       operationTotalsSeparateFromBatches:true,cleanup:true};
     if(process.env.NATIVE_SYNC_OUTPUT)fs.writeFileSync(process.env.NATIVE_SYNC_OUTPUT,JSON.stringify(report,null,2));
-    console.log("History notice: five-second delay, estimated pages, immediate capacity detail and cleanup passed");
+    console.log("History notice: no automatic strip, stable frame, requested detail and cleanup passed");
   } finally { await browser.close(); }
 })().catch(e=>{console.error(e);process.exit(1)});

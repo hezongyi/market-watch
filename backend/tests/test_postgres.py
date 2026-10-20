@@ -272,7 +272,8 @@ def test_postgres_weekly_migration_roundtrip():
         env["ALERTS_DATABASE_URL"] = make_url(URL).update_query_dict(
             {"options":f"-csearch_path={schema}"}).render_as_string(hide_password=False)
         env["PYTHONPATH"] = str(root / "backend")
-        for action, target in [("upgrade","head"),("downgrade","h9_chart_preferences"),("upgrade","head")]:
+        # Exercise the historical reversible range; aw50 deliberately retains notice data.
+        for action, target in [("upgrade","av49_indicator_demands"),("downgrade","h9_chart_preferences"),("upgrade","av49_indicator_demands")]:
             result = subprocess.run([sys.executable, '-m', 'alembic', action, target],
                 cwd=root,env=env,capture_output=True,text=True,timeout=60)
             # Do not print the captured output: connection failures may include credentials.

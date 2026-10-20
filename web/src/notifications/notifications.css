@@ -1,0 +1,530 @@
+/* Use chart theme tokens and existing native controls; surfaces never join chart layout. */
+.nc-panel,
+.nc-bubble {
+  --nc-bg: var(--themed-color-popup-background, #1e222d);
+  --nc-text: var(--themed-color-text-primary, #d1d4dc);
+  --nc-muted: #9598a1;
+  --nc-border: #363a45;
+  --nc-hover: #2a2e39;
+  --nc-accent: #2962ff;
+  --nc-danger: #f79996;
+  --nc-warning: #d9ac60;
+  box-sizing: border-box;
+  color: var(--nc-text);
+  background: var(--nc-bg);
+  font:
+    13px/1.5 -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  text-align: left;
+  color-scheme: dark;
+}
+[data-theme="light"] .nc-panel,
+[data-theme="light"] .nc-bubble,
+[data-app-theme="light"] .nc-panel,
+[data-app-theme="light"] .nc-bubble {
+  --nc-bg: var(--themed-color-popup-background, #fff);
+  --nc-text: var(--themed-color-text-primary, #131722);
+  --nc-muted: #60646f;
+  --nc-border: #e0e3eb;
+  --nc-hover: #f0f3fa;
+  --nc-danger: #b42318;
+  --nc-warning: #82580e;
+  color-scheme: light;
+}
+.nc-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+.nc-panel *,
+.nc-bubble * {
+  box-sizing: border-box;
+}
+.nc-panel button,
+.nc-bubble button {
+  font: inherit;
+  cursor: pointer;
+}
+.nc-panel button:disabled,
+.nc-bubble button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.nc-panel :focus-visible,
+.nc-bubble :focus-visible {
+  outline: 2px solid var(--nc-accent);
+  outline-offset: 2px;
+}
+.nc-panel p,
+.nc-panel h3 {
+  margin: 0 0 12px;
+}
+.nc-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 8px 12px 8px 18px;
+  border-bottom: 1px solid var(--nc-border);
+  flex: none;
+}
+.nc-heading h2 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+  white-space: nowrap;
+}
+.nc-heading small {
+  font-size: 11px;
+  color: var(--nc-muted);
+}
+.nc-heading-tools {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+}
+.nc-panel .nc-icon,
+.nc-bubble .nc-icon,
+.nc-panel .alert-menu-wrap > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  min-height: 30px;
+  padding: 5px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+}
+.nc-icon:hover,
+.nc-panel .alert-menu-wrap > button:hover {
+  background: var(--nc-hover);
+}
+.nc-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  flex: none;
+  color: var(--nc-muted);
+  border-bottom: 1px solid var(--nc-border);
+}
+.nc-search > .mw-native-input {
+  flex: 1;
+}
+.nc-search > input {
+  flex: 1;
+  min-width: 0;
+}
+.nc-panel input:not(.mw-native-control input),
+.nc-panel select:not(.mw-native-control select) {
+  font: inherit;
+  color: var(--nc-text);
+  background: transparent;
+  border: 1px solid var(--nc-border);
+  border-radius: 4px;
+  min-height: 32px;
+  padding: 5px 8px;
+  max-width: 100%;
+  min-width: 0;
+}
+.nc-panel .mw-native-input input {
+  min-width: 0;
+}
+.nc-filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--nc-border);
+  flex: none;
+  max-height: 38vh;
+  overflow: auto;
+}
+.nc-filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--nc-muted);
+  font-size: 12px;
+  min-width: 0;
+}
+.nc-filter-status {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 18px;
+  color: var(--nc-muted);
+  font-size: 12px;
+  flex: none;
+}
+.nc-list {
+  flex: 1;
+  min-height: 60px;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.nc-history-placeholder > p {
+  padding: 0 16px;
+  color: var(--nc-text);
+  font-size: 13px;
+}
+.nc-history-placeholder .nc-placeholder-icon,
+.nc-history-placeholder .nc-row-copy > span {
+  display: block;
+  background: currentColor;
+  opacity: 0.12;
+  border-radius: 3px;
+}
+.nc-history-placeholder .nc-placeholder-icon {
+  width: 20px;
+  height: 20px;
+}
+.nc-history-placeholder .nc-row-copy > span {
+  width: 75%;
+  height: 12px;
+  margin: 5px 0;
+}
+.nc-history-placeholder .nc-row-copy > span + span {
+  width: 50%;
+}
+.nc-day {
+  padding: 12px 18px 6px;
+  color: var(--nc-muted);
+  font-size: 11px;
+}
+.nc-panel .nc-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  color: inherit;
+  border: 0;
+  border-radius: 0;
+  padding: 12px 18px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.nc-panel .nc-row:hover {
+  background: var(--nc-hover);
+}
+.nc-source {
+  position: relative;
+  color: var(--nc-muted);
+  margin-top: 4px;
+  flex: none;
+}
+.nc-source i {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--nc-accent);
+  top: -2px;
+  right: -4px;
+}
+.nc-source.nc-error,
+.nc-source.nc-critical {
+  color: var(--nc-danger);
+}
+.nc-source.nc-warning {
+  color: var(--nc-warning);
+}
+.nc-row-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+.nc-row-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.nc-row-meta strong {
+  font-size: 12px;
+  font-weight: 600;
+}
+.nc-row-meta time {
+  margin-left: auto;
+  color: var(--nc-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+.nc-row-copy small,
+.nc-muted,
+.nc-panel small {
+  color: var(--nc-muted);
+  font-size: 11px;
+}
+.nc-pending {
+  border-left: 2px solid var(--nc-warning) !important;
+}
+.nc-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 18px;
+  color: var(--nc-muted);
+}
+.nc-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 42px;
+  padding: 8px 12px 8px 18px;
+  border-top: 1px solid var(--nc-border);
+  flex: none;
+  font-size: 11px;
+  color: var(--nc-muted);
+}
+.nc-footer > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.nc-footer > .mw-native-button {
+  flex: none;
+}
+.nc-detail {
+  padding: 16px 20px;
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+  overscroll-behavior: contain;
+}
+.nc-panel .nc-back {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--nc-muted);
+  min-height: 28px;
+  margin-bottom: 20px;
+}
+.nc-detail-source {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--nc-muted);
+  font-size: 12px;
+}
+.nc-detail h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 12px 0;
+}
+.nc-detail p {
+  overflow-wrap: anywhere;
+}
+.nc-values {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr);
+  gap: 12px 8px;
+  margin: 24px 0;
+  font-size: 12px;
+}
+.nc-detail dt {
+  color: var(--nc-muted);
+}
+.nc-detail dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.nc-detail dd small {
+  display: block;
+}
+.nc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+.nc-debug {
+  border-top: 1px solid var(--nc-border);
+  padding-top: 16px;
+  margin-top: 24px;
+}
+.nc-debug summary {
+  cursor: pointer;
+  color: var(--nc-muted);
+  font-size: 12px;
+}
+.nc-debug dl {
+  display: grid;
+  gap: 6px;
+}
+.nc-debug dt {
+  margin-top: 8px;
+  font-size: 11px;
+}
+.nc-debug pre,
+.nc-debug dd {
+  font:
+    11px/1.5 ui-monospace,
+    SFMono-Regular,
+    monospace;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.nc-debug h3 {
+  font-size: 13px;
+}
+.nc-timeline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.nc-timeline li {
+  padding: 8px 0 8px 12px;
+  border-left: 2px solid var(--nc-border);
+}
+.nc-timeline time,
+.nc-timeline small {
+  display: block;
+  font-size: 11px;
+}
+.nc-settings h3 {
+  font-size: 13px;
+  margin-top: 24px;
+}
+.nc-settings .nc-muted {
+  font-size: 12px;
+  line-height: 1.7;
+  margin-top: 12px;
+}
+.nc-problem {
+  flex: none;
+  font-size: 12px;
+  color: var(--nc-danger);
+  padding: 8px 16px;
+  margin: 0 !important;
+  overflow-wrap: anywhere;
+  border-bottom: 1px solid var(--nc-border);
+}
+.nc-panel .nc-link,
+.nc-bubble .nc-link {
+  background: none;
+  color: var(--nc-accent);
+  padding: 4px 0;
+  border: 0;
+}
+.nc-bubble {
+  position: fixed;
+  z-index: 145;
+  top: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(355px, calc(100vw - 24px));
+  padding: 12px 14px;
+  border: 1px solid var(--nc-border);
+  border-radius: 6px;
+  box-shadow: 0 6px 20px #0003;
+  overflow-wrap: anywhere;
+}
+.nc-bubble-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nc-bubble-heading > svg {
+  color: var(--nc-accent);
+  flex: none;
+}
+.nc-bubble-heading strong {
+  font-size: 12px;
+}
+.nc-bubble-heading small {
+  font-size: 11px;
+  color: var(--nc-muted);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nc-bubble-heading .nc-icon {
+  margin-left: auto;
+  flex: none;
+}
+.nc-bubble h3 {
+  font-size: 14px;
+  margin: 6px 0;
+  font-weight: 600;
+}
+.nc-bubble p {
+  font-size: 12px;
+  color: var(--nc-muted);
+  margin: 6px 0;
+  max-height: 72px;
+  overflow: auto;
+}
+.nc-bubble-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-top: 14px;
+  font-size: 12px;
+}
+.nc-bubble-actions small {
+  margin-left: auto;
+  color: var(--nc-muted);
+  font-size: 11px;
+}
+@media (max-width: 480px) {
+  .nc-heading {
+    padding-left: 12px;
+    gap: 6px;
+  }
+  .nc-footer {
+    flex-wrap: wrap;
+  }
+  .nc-bubble {
+    max-width: calc(100vw - 24px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nc-panel *,
+  .nc-bubble * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+.nc-section-label {
+  padding: 8px 18px;
+  color: var(--nc-muted);
+  border-bottom: 1px solid var(--nc-border);
+  font-size: 11px;
+}
+
+/* A complete instant, read as date / clock / chart-zone offset. */
+.nc-timestamp {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 2px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-align: left;
+  line-height: 18px;
+  font-size: 12px;
+  color: inherit;
+}
+.nc-timestamp-clock {
+  font-size: 13px;
+  font-weight: 600;
+}

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { api } from '../api';
+import { api as defaultRequest } from '../api';
 export type DatasetViews = Record<string,{plot_width:number;bar_spacing:number;threshold:number}>;
 
 type VolumeJob = {id:string;instrument_id:string;status:string;start:number;end:number;cursor:number;
@@ -12,7 +12,7 @@ type Plan = {instrument:string;status:string;start:number;end:number;covered_ms:
   download_errors?:{id:string;start:number;end:number;error:string;attempts:number;retry_at:number;status:string}[];
   aggregation_errors?:{id:string;timeframe:string;start:number;end:number;error:string;attempts:number;retry_at:number}[];
   periods:{timeframe:string;start:number|null;end:number|null;complete_count:number;threshold:number;ready:boolean;initialized:boolean}[]};
-export function HistoryPlansDialog({onClose,readonly,onRefresh,views={}}:{onClose:()=>void;readonly:boolean;onRefresh?:()=>void;views?:DatasetViews}) {
+export function HistoryPlansDialog({onClose,readonly,onRefresh,views={},request:api=defaultRequest}:{request?:typeof defaultRequest;onClose:()=>void;readonly:boolean;onRefresh?:()=>void;views?:DatasetViews}) {
   const dialog=useRef<HTMLDialogElement>(null);
   const [plans,setPlans]=useState<Plan[]>([]),[error,setError]=useState('');
   const [busy,setBusy]=useState('');

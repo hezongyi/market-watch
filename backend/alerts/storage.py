@@ -1528,3 +1528,112 @@ class AgentOperation(Base):
     intent_hash: Mapped[str] = mapped_column(String(64))
     result: Mapped[dict] = mapped_column(JSON)
     created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class NoticeStream(Base):
+    """Commit-order publication lock; IDs and source audit IDs are not cursors."""
+    __tablename__ = "notice_streams"
+    subject: Mapped[str] = mapped_column(String(80), primary_key=True)
+    epoch: Mapped[str] = mapped_column(String(36), default=uid)
+    seq: Mapped[int] = mapped_column(BigInteger, default=0)
+    floor: Mapped[int] = mapped_column(BigInteger, default=0)
+    started_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    cursor_secret: Mapped[str] = mapped_column(String(64), default=lambda: uuid.uuid4().hex)
+
+
+class NoticeIncident(Base):
+    __tablename__ = "notice_incidents"
+    __table_args__ = (Index("ix_notice_incident_open", "subject", "dedupe_key", "closed_at"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    subject: Mapped[str] = mapped_column(String(80), index=True)
+    dedupe_key: Mapped[str] = mapped_column(String(64))
+    first_at: Mapped[int] = mapped_column(BigInteger)
+    last_at: Mapped[int] = mapped_column(BigInteger)
+    closed_at: Mapped[int | None] = mapped_column(BigInteger)
+    count: Mapped[int] = mapped_column(default=0)
+    severity: Mapped[int] = mapped_column(default=0)
+    source_version: Mapped[int] = mapped_column(BigInteger, default=0)
+    last_event_id: Mapped[str] = mapped_column(String(80), default="")
+
+
+class NoticeEvent(Base):
+    __tablename__ = "notice_events"
+    __table_args__ = (
+        Index("ix_notice_history", "subject", "occurred_at", "id"),
+        Index("ix_notice_source", "subject", "source_kind", "source_id"),
+    )
+    id: Mapped[str] = mapped_column(String(80), primary_key=True)
+    subject: Mapped[str] = mapped_column(String(80), index=True)
+    source_domain: Mapped[str] = mapped_column(String(20), index=True)
+    source_kind: Mapped[str] = mapped_column(String(40))
+    source_id: Mapped[str] = mapped_column(String(100))
+    incident_id: Mapped[str] = mapped_column(String(36), index=True)
+    occurred_at: Mapped[int] = mapped_column(BigInteger)
+    recorded_at: Mapped[int] = mapped_column(BigInteger)
+    first_seq: Mapped[int] = mapped_column(BigInteger)
+    version: Mapped[int] = mapped_column(BigInteger)
+    severity: Mapped[str] = mapped_column(String(12), index=True)
+    kind: Mapped[str] = mapped_column(String(32), index=True)
+    workspace: Mapped[str] = mapped_column(String(80), default="", index=True)
+    instrument: Mapped[str] = mapped_column(String(120), default="", index=True)
+    viewed_at: Mapped[int | None] = mapped_column(BigInteger)
+    handled_at: Mapped[int | None] = mapped_column(BigInteger)
+    attention: Mapped[bool] = mapped_column(Boolean, default=False)
+    backfill: Mapped[bool] = mapped_column(Boolean, default=False)
+    body: Mapped[dict] = mapped_column(JSON)
+    intake_hash: Mapped[str | None] = mapped_column(String(64))
+
+
+class NoticeChange(Base):
+    __tablename__ = "notice_changes"
+    subject: Mapped[str] = mapped_column(String(80), primary_key=True)
+    seq: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    event_id: Mapped[str] = mapped_column(String(80), index=True)
+    at: Mapped[int] = mapped_column(BigInteger, index=True)
+    kind: Mapped[str] = mapped_column(String(20))
+    body: Mapped[dict] = mapped_column(JSON)
+
+
+class NoticeSourceReceipt(Base):
+    """Never discard receipts while the corresponding reliable source can replay."""
+    __tablename__ = "notice_source_receipts"
+    source_key: Mapped[str] = mapped_column(String(100), primary_key=True)
+    event_id: Mapped[str | None] = mapped_column(String(80))
+    at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class NoticeObservation(Base):
+    __tablename__ = "notice_observations"
+    __table_args__ = (Index("ix_notice_observation_timeline", "event_id", "at", "id"),)
+    id: Mapped[str] = mapped_column(String(100), primary_key=True)
+    event_id: Mapped[str] = mapped_column(String(80))
+    subject: Mapped[str] = mapped_column(String(80))
+    profile: Mapped[str] = mapped_column(String(80))
+    kind: Mapped[str] = mapped_column(String(24))
+    reported_at: Mapped[int | None] = mapped_column(BigInteger)
+    at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    details: Mapped[dict] = mapped_column(JSON, default=dict)
+    intent_hash: Mapped[str] = mapped_column(String(64))
+
+
+class NoticeIntake(Base):
+    """Authenticated browser source, independent of projection availability."""
+    __tablename__ = "notice_intakes"
+    id: Mapped[str] = mapped_column(String(80), primary_key=True)
+    subject: Mapped[str] = mapped_column(String(80), index=True)
+    profile: Mapped[str] = mapped_column(String(80))
+    at: Mapped[int] = mapped_column(BigInteger, default=now_ms, index=True)
+    intent_hash: Mapped[str] = mapped_column(String(64))
+    body: Mapped[dict] = mapped_column(JSON)
+
+
+class NoticeIntakeBudget(Base):
+    __tablename__ = "notice_intake_budgets"
+    subject: Mapped[str] = mapped_column(String(80), primary_key=True)
+    at: Mapped[int] = mapped_column(BigInteger)
+    tokens: Mapped[float]
+
+
+# Capture writes only to the existing reliable Audit table in the source transaction.
+# It never accesses notification projections or calls external channels.
+from . import notification_sources as _notification_sources  # noqa: E402,F401

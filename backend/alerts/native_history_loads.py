@@ -68,7 +68,9 @@ def read_cached(body):
 
 
 def public(row):
+    from .notification_sources import native_key
     return {"id": row.id, "state": row.state, "pages": row.pages,
+            "notice_source_id": native_key(row.query_json),
             "deadline": row.deadline, "error": row.error_json}
 
 
@@ -88,9 +90,11 @@ def refresh(row):
         row.consumer_until = min(row.deadline, now_ms() + 45000)
 
 
-def submit(owner, request_id, body):
+def submit(owner, request_id, body, notice_context=None):
     admit(body)
     query = body.model_dump(by_alias=True, mode="json")
+    if notice_context:
+        query['_notice_context'] = notice_context
     with transaction() as db:
         old = db.scalar(select(NativeHistoryLoad).where(
             NativeHistoryLoad.owner == owner, NativeHistoryLoad.request_id == request_id))
@@ -100,7 +104,11 @@ def submit(owner, request_id, body):
             refresh(old)
             return {"load": public(old)}
     try:
-        return {"result": read_cached(body)}
+        result = read_cached(body)
+        from .notification_sources import native_recovery
+        with transaction() as db:
+            native_recovery(db.connection(), request_id, query)
+        return {"result": result}
     except cache.HistoryPending:
         pass
     with transaction() as db:
@@ -225,13 +233,16 @@ def once():
         log.warning("History page failed type=%s", type(exc).__name__)
         state, failure = "failed", error("HISTORY_PROVIDER_FAILED", "平台历史暂不可用，请重试")
     with transaction() as db:
-        db.execute(update(NativeHistoryLoad).where(
+        result = db.execute(update(NativeHistoryLoad).where(
             NativeHistoryLoad.id == ident, NativeHistoryLoad.generation == generation,
             NativeHistoryLoad.state == "filling", NativeHistoryLoad.lease_until > now_ms())
             .values(state=state, error_json=failure,
                     lease_until=now_ms()+1000 if waiting_latest else 0,
                     pages=pages+progress["pages"],
                     stalls=0 if progress["advanced"] else stalls if waiting_latest else stalls+1))
+        if result.rowcount and state in ('failed', 'ready'):
+            from .notification_sources import native_result
+            native_result(db, ident)
     return True
 
 

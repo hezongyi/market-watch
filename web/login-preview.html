@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>守望 · 登录页预览</title>
+    <link rel="icon" href="/favicon.svg" />
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; color: #e8e8e8; background: #090909; font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      header { padding: 14px 24px; border-bottom: 1px solid #2a2a2a; background: #161616; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+      strong { font-size: 15px; font-weight: 600; }
+      nav { display: flex; gap: 6px; }
+      button, a { font: inherit; border-radius: 5px; padding: 8px 12px; }
+      button { color: #b0b0b0; background: transparent; border: 1px solid transparent; cursor: pointer; min-height: 40px; }
+      button[aria-pressed="true"] { color: #e8e8e8; background: #242424; border-color: #454545; }
+      button:focus-visible, a:focus-visible { outline: 2px solid #599bff; outline-offset: 2px; }
+      a { color: #b5c9ff; text-decoration: none; }
+      .links { margin-left: auto; display: flex; gap: 4px; }
+      p { padding: 0 24px; margin: 12px 0; color: #b0b0b0; font-size: 12px; }
+      .stage { display: flex; justify-content: center; padding: 0 16px 16px; }
+      iframe { border: 0; box-shadow: 0 0 0 1px #2a2a2a; width: 100%; height: calc(100dvh - 136px); min-height: 568px; background: #0f0f0f; }
+      .stage.mobile iframe { width: 390px; height: 844px; max-width: 100%; }
+      @media(max-width: 640px) { header { padding: 12px; gap: 8px; } .links { margin-left: 0; } p { padding: 0 12px; } .stage { padding: 0; } }
+    </style>
+  </head>
+  <body>
+    <header>
+      <strong>登录页预览</strong>
+      <nav aria-label="预览尺寸与主题">
+        <button type="button" data-view="dark">深色</button>
+        <button type="button" data-view="light">浅色</button>
+        <button type="button" data-view="mobile">窄屏</button>
+      </nav>
+      <div class="links">
+        <a id="fullscreen" href="/login-particles.html?theme=dark" target="_blank" rel="noopener">全屏打开 ↗</a>
+        <a href="/evidence/particles-demo.mp4" target="_blank" rel="noopener">动态录屏 ↗</a>
+      </div>
+    </header>
+    <p>使用待接入的最终组件。本轮仅确认外观与动效，登录按钮不发送认证请求，正式登录页尚未替换。</p>
+    <div class="stage"><iframe title="守望登录页实时预览" src="/login-particles.html?theme=dark"></iframe></div>
+    <script>
+      const stage = document.querySelector('.stage');
+      const frame = document.querySelector('iframe');
+      function select(view) {
+        const chosen = ['dark', 'light', 'mobile'].includes(view) ? view : 'dark';
+        const url = '/login-particles.html?theme=' + (chosen === 'light' ? 'light' : 'dark');
+        document.querySelectorAll('[data-view]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.view === chosen)));
+        stage.classList.toggle('mobile', chosen === 'mobile');
+        if (frame.getAttribute('src') !== url) frame.src = url;
+        document.querySelector('#fullscreen').href = url;
+        history.replaceState(null, '', '?view=' + chosen);
+      }
+      document.querySelectorAll('[data-view]').forEach(button => button.addEventListener('click', () => select(button.dataset.view)));
+      select(new URLSearchParams(location.search).get('view'));
+    </script>
+  </body>
+</html>

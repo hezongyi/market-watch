@@ -10,6 +10,7 @@ vm.runInContext(
   const stored = new Map();
   let serial = 0;
   async function rpc(op, args) {
+    if (op === "read") return [...stored.values()];
     if (op === "delete") {
       const row = [...stored.values()].find((r) => r.id === args.id);
       assert.equal(row.revision, args.revision);
@@ -66,7 +67,7 @@ vm.runInContext(
   await first.templates.saveStudyTemplate({ name: "SMA", content: "v3" });
   await assert.rejects(
     second.templates.saveStudyTemplate({ name: "SMA", content: "stale" }),
-    /conflict/,
+    /未保存/,
   );
   const readonly = context.nativePreferences(
     [...stored.values()],
@@ -88,7 +89,8 @@ vm.runInContext(
     (await first.templates.getDrawingTemplates("trend_line")).length,
     1,
   );
-  assert.deepEqual(errors, []);
+  assert.equal(errors.length, 2, "native template failures are reported even when the library swallows rejection");
+  assert.ok(errors.every(error => error.includes("设置未保存")));
   console.log(
     "native adapters: queued writes, namespaces, reload, conflict and readonly passed",
   );

@@ -668,3 +668,31 @@ html:not(.theme-dark) .alert-menu {
   color: var(--alert-error);
   border-color: var(--alert-error);
 }
+
+/* Pinned widgetbar tokens, verified against the native watchlist. Dialog
+   surfaces intentionally keep their own native palette. */
+.chart-alert-panel,
+.chart-alert-panel[data-theme="light"] {
+  --alert-bg: var(--color-pane-bg);
+  --alert-surface: var(--color-pane-secondary-bg);
+  --alert-text: var(--color-text-primary);
+  --alert-muted: var(--color-text-secondary);
+  --alert-divider: var(--color-divider-line-primary);
+  --alert-border: var(--color-divider-line-primary);
+  --alert-hover: var(--color-item-hover-bg);
+  background: var(--alert-bg);
+}
+.chart-alert-panel .alert-panel-tabs {
+  background: transparent;
+  border-radius: 0;
+  border-bottom: 1px solid var(--alert-divider);
+  padding: 0;
+}
+.chart-alert-panel .alert-panel-tabs [aria-selected="true"] {
+  background: var(--alert-hover);
+  color: var(--alert-text);
+  box-shadow: none;
+}
+.chart-alert-panel .alert-row-actions {
+  background: var(--alert-bg);
+}

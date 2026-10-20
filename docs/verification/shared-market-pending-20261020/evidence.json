@@ -1,0 +1,456 @@
+{
+  "observed_at": "2026-10-20T13:14:04.088000+00:00",
+  "read_only": true,
+  "failure_counts": {
+    "oanda:HistoryPending": 17,
+    "binance:ConnectTimeout": 2
+  },
+  "messages": [
+    {
+      "instrument": "XAUUSD",
+      "occurred_at": "2026-10-20T13:10:42.421000+00:00",
+      "closed_at": "2026-10-20T13:10:57.601000+00:00",
+      "provider": "oanda",
+      "error": {
+        "provider": "oanda",
+        "operation": "quote_page",
+        "error_type": "HistoryPending",
+        "error_chain": [
+          "HistoryPending"
+        ],
+        "stage": "read"
+      },
+      "operation": "shared_quotes"
+    },
+    {
+      "instrument": "XAUUSD",
+      "occurred_at": "2026-10-20T13:03:11.091000+00:00",
+      "closed_at": "2026-10-20T13:03:26.389000+00:00",
+      "provider": "oanda",
+      "error": {
+        "provider": "oanda",
+        "operation": "quote_page",
+        "error_type": "HistoryPending",
+        "error_chain": [
+          "HistoryPending"
+        ],
+        "stage": "read"
+      },
+      "operation": "shared_quotes"
+    },
+    {
+      "instrument": "EURUSD",
+      "occurred_at": "2026-10-20T13:03:09.507000+00:00",
+      "closed_at": "2026-10-20T13:03:25.174000+00:00",
+      "provider": "oanda",
+      "error": {
+        "provider": "oanda",
+        "operation": "quote_page",
+        "error_type": "HistoryPending",
+        "error_chain": [
+          "HistoryPending"
+        ],
+        "stage": "read"
+      },
+      "operation": "shared_quotes"
+    },
+    {
+      "instrument": "OANDA:GBP_USD",
+      "occurred_at": "2026-10-20T13:03:05.054000+00:00",
+      "closed_at": "2026-10-20T13:03:20.285000+00:00",
+      "provider": "oanda",
+      "error": {
+        "provider": "oanda",
+        "operation": "quote_page",
+        "error_type": "HistoryPending",
+        "error_chain": [
+          "HistoryPending"
+        ],
+        "stage": "read"
+      },
+      "operation": "shared_quotes"
+    },
+    {
+      "instrument": "EURUSD",
+      "occurred_at": "2026-10-20T12:43:39.620000+00:00",
+      "closed_at": "2026-10-20T12:43:55.031000+00:00",
+      "provider": "oanda",
+      "error": {
+        "provider": "oanda",
+        "operation": "quote_page",
+        "error_type": "HistoryPending",
+        "error_chain": [
+          "HistoryPending"
+        ],
+        "stage": "read"
+      },
+      "operation": "shared_quotes"
+    },
+    {
+      "instrument": "OANDA:GBP_USD",
+      "occurred_at": "2026-10-20T12:43:38.384000+00:00",
+      "closed_at": "2026-10-20T12:43:54.078000+00:00",
+      "provider": "oanda",
+      "error": {
+        "provider": "oanda",
+        "operation": "quote_snapshot",
+        "error_type": "HistoryPending",
+        "error_chain": [
+          "HistoryPending"
+        ],
+        "stage": "read"
+      },
+      "operation": "shared_quotes"
+    },
+    {
+      "instrument": "OANDA:GBP_USD",
+      "occurred_at": "2026-10-20T12:43:22.881000+00:00",
+      "closed_at": null,
+      "provider": "oanda",
+      "error": {
+        "provider": "oanda",
+        "operation": "quote_snapshot",
+        "error_type": "HistoryPending",
+        "error_chain": [
+          "HistoryPending"
+        ],
+        "stage": "read"
+      },
+      "operation": "shared_quotes"
+    },
+    {
+      "instrument": "EURUSD",
+      "occurred_at": "2026-10-20T12:43:22.865000+00:00",
+      "closed_at": null,
+      "provider": "oanda",
+      "error": {
+        "provider": "oanda",
+        "operation": "quote_page",
+        "error_type": "HistoryPending",
+        "error_chain": [
+          "HistoryPending"
+        ],
+        "stage": "read"
+      },
+      "operation": "shared_quotes"
+    },
+    {
+      "instrument": "OANDA:GBP_USD",
+      "occurred_at": "2026-10-20T12:43:07.565000+00:00",
+      "closed_at": null,
+      "provider": "oanda",
+      "error": {
+        "provider": "oanda",
+        "operation": "quote_snapshot",
+        "error_type": "HistoryPending",
+        "error_chain": [
+          "HistoryPending"
+        ],
+        "stage": "read"
+      },
+      "operation": "shared_quotes"
+    },
+    {
+      "instrument": "EURUSD",
+      "occurred_at": "2026-10-20T12:43:07.477000+00:00",
+      "closed_at": null,
+      "provider": "oanda",
+      "error": {
+        "provider": "oanda",
+        "operation": "quote_page",
+        "error_type": "HistoryPending",
+        "error_chain": [
+          "HistoryPending"
+        ],
+        "stage": "read"
+      },
+      "operation": "shared_quotes"
+    },
+    {
+      "instrument": "XAUUSD",
+      "occurred_at": "2026-10-20T12:43:00.612000+00:00",
+      "closed_at": "2026-10-20T12:43:15.770000+00:00",
+      "provider": "oanda",
+      "error": {
+        "provider": "oanda",
+        "operation": "quote_page",
+        "error_type": "HistoryPending",
+        "error_chain": [
+          "HistoryPending"
+        ],
+        "stage": "read"
+      },
+      "operation": "shared_quotes"
+    },
+    {
+      "instrument": "OANDA:GBP_USD",
+      "occurred_at": "2026-10-20T12:42:47.975000+00:00",
+      "closed_at": null,
+      "provider": "oanda",
+      "error": {
+        "provider": "oanda",
+        "operation": "quote_snapshot",
+        "error_type": "HistoryPending",
+        "error_chain": [
+          "HistoryPending"
+        ],
+        "stage": "read"
+      },
+      "operation": "shared_quotes"
+    },
+    {
+      "instrument": "XAUUSD",
+      "occurred_at": "2026-10-20T12:40:41.285000+00:00",
+      "closed_at": "2026-10-20T12:40:56.410000+00:00",
+      "provider": "oanda",
+      "error": {
+        "provider": "oanda",
+        "operation": "quote_page",
+        "error_type": "HistoryPending",
+        "error_chain": [
+          "HistoryPending"
+        ],
+        "stage": "read"
+      },
+      "operation": "shared_quotes"
+    },
+    {
+      "instrument": "EURUSD",
+      "occurred_at": "2026-10-20T12:40:17.775000+00:00",
+      "closed_at": "2026-10-20T12:40:32.812000+00:00",
+      "provider": "oanda",
+      "error": {
+        "provider": "oanda",
+        "operation": "quote_page",
+        "error_type": "HistoryPending",
+        "error_chain": [
+          "HistoryPending"
+        ],
+        "stage": "read"
+      },
+      "operation": "shared_quotes"
+    },
+    {
+      "instrument": "XAUUSD",
+      "occurred_at": "2026-10-20T12:17:14.885000+00:00",
+      "closed_at": "2026-10-20T12:17:30.208000+00:00",
+      "provider": "oanda",
+      "error": {
+        "provider": "oanda",
+        "operation": "quote_page",
+        "error_type": "HistoryPending",
+        "error_chain": [
+          "HistoryPending"
+        ],
+        "stage": "read"
+      },
+      "operation": "shared_quotes"
+    },
+    {
+      "instrument": "BTCUSDT",
+      "occurred_at": "2026-10-20T11:36:44.406000+00:00",
+      "closed_at": "2026-10-20T11:37:06.902000+00:00",
+      "provider": "binance",
+      "error": {
+        "provider": "binance",
+        "operation": "quote_page",
+        "error_type": "ConnectTimeout",
+        "error_chain": [
+          "ConnectTimeout",
+          "ConnectTimeout",
+          "TimeoutError"
+        ],
+        "stage": "timeout"
+      },
+      "operation": "shared_quotes"
+    },
+    {
+      "instrument": "BTCUSDT",
+      "occurred_at": "2026-10-20T11:35:49.587000+00:00",
+      "closed_at": "2026-10-20T11:36:07.069000+00:00",
+      "provider": "binance",
+      "error": {
+        "provider": "binance",
+        "operation": "quote_page",
+        "error_type": "ConnectTimeout",
+        "error_chain": [
+          "ConnectTimeout",
+          "ConnectTimeout",
+          "TimeoutError"
+        ],
+        "stage": "timeout"
+      },
+      "operation": "shared_quotes"
+    },
+    {
+      "instrument": "EURUSD",
+      "occurred_at": "2026-10-20T10:29:57.672000+00:00",
+      "closed_at": "2026-10-20T10:30:22.234000+00:00",
+      "provider": "oanda",
+      "error": {
+        "provider": "oanda",
+        "operation": "quote_snapshot",
+        "error_type": "HistoryPending",
+        "error_chain": [
+          "HistoryPending"
+        ],
+        "stage": "read"
+      },
+      "operation": "shared_quotes"
+    },
+    {
+      "instrument": "XAUUSD",
+      "occurred_at": "2026-10-20T10:29:57.593000+00:00",
+      "closed_at": "2026-10-20T10:30:16.876000+00:00",
+      "provider": "oanda",
+      "error": {
+        "provider": "oanda",
+        "operation": "quote_snapshot",
+        "error_type": "HistoryPending",
+        "error_chain": [
+          "HistoryPending"
+        ],
+        "stage": "read"
+      },
+      "operation": "shared_quotes"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "7cf1f507cffb05fb09c2842f06d46fb3956e1fb324119c1c2b6d262f476daade",
+      "instrument": "EURUSD",
+      "kind": "quotes",
+      "metadata": {
+        "source": "oanda",
+        "symbol": "EUR_USD",
+        "dataset_id": null
+      },
+      "updated": "2026-10-20T13:13:49.490000+00:00",
+      "expires": "2026-10-20T13:15:39.240000+00:00",
+      "sequence": 675,
+      "payload_type": "quotes",
+      "error": {
+        "error_type": null,
+        "error_chain": null,
+        "stage": null,
+        "http_status": null
+      },
+      "quotes": [
+        {
+          "name": "MWP:EURUSD",
+          "status": "ok",
+          "fetch_status": "ok",
+          "error": {
+            "error_type": null,
+            "error_chain": null,
+            "stage": null,
+            "http_status": null
+          }
+        }
+      ],
+      "notice_open": false
+    },
+    {
+      "id": "efd0aa305e8105d44441fac516ce5fce65e7247082b2edf0c785dbe42b0b97cf",
+      "instrument": "BTCUSDT",
+      "kind": "quotes",
+      "metadata": {
+        "source": "binance",
+        "symbol": "BTCUSDT",
+        "dataset_id": null
+      },
+      "updated": "2026-10-20T13:13:55.780000+00:00",
+      "expires": "2026-10-20T13:15:39.240000+00:00",
+      "sequence": 658,
+      "payload_type": "quotes",
+      "error": {
+        "error_type": null,
+        "error_chain": null,
+        "stage": null,
+        "http_status": null
+      },
+      "quotes": [
+        {
+          "name": "MWP:BTCUSDT",
+          "status": "ok",
+          "fetch_status": "ok",
+          "error": {
+            "error_type": null,
+            "error_chain": null,
+            "stage": null,
+            "http_status": null
+          }
+        }
+      ],
+      "notice_open": false
+    },
+    {
+      "id": "613e1fa3a0b6c39dd47fa7b93a7cca0aa57c7244df99737a14d01a92a48aae28",
+      "instrument": "OANDA:GBP_USD",
+      "kind": "quotes",
+      "metadata": {
+        "source": "oanda",
+        "symbol": "GBP_USD",
+        "dataset_id": null
+      },
+      "updated": "2026-10-20T13:13:53.008000+00:00",
+      "expires": "2026-10-20T13:15:39.240000+00:00",
+      "sequence": 119,
+      "payload_type": "quotes",
+      "error": {
+        "error_type": null,
+        "error_chain": null,
+        "stage": null,
+        "http_status": null
+      },
+      "quotes": [
+        {
+          "name": "MWP:OANDA:GBP_USD",
+          "status": "ok",
+          "fetch_status": "ok",
+          "error": {
+            "error_type": null,
+            "error_chain": null,
+            "stage": null,
+            "http_status": null
+          }
+        }
+      ],
+      "notice_open": false
+    },
+    {
+      "id": "51eba6f5feb377fd89b3c7c1e316057748fe32b1ef27b7edfafb1d09b531c29d",
+      "instrument": "XAUUSD",
+      "kind": "quotes",
+      "metadata": {
+        "source": "oanda",
+        "symbol": "XAU_USD",
+        "dataset_id": null
+      },
+      "updated": "2026-10-20T13:14:02.873000+00:00",
+      "expires": "2026-10-20T13:15:40.374000+00:00",
+      "sequence": 676,
+      "payload_type": "quotes",
+      "error": {
+        "error_type": null,
+        "error_chain": null,
+        "stage": null,
+        "http_status": null
+      },
+      "quotes": [
+        {
+          "name": "MWP:XAUUSD",
+          "status": "ok",
+          "fetch_status": "ok",
+          "error": {
+            "error_type": null,
+            "error_chain": null,
+            "stage": null,
+            "http_status": null
+          }
+        }
+      ],
+      "notice_open": false
+    }
+  ]
+}

@@ -122,14 +122,14 @@ def full_legacy_upgrade(engine, monkeypatch):
             consume(db, ident, sample(i, price), detected_at=i*300_000)
         assert db.get(ChartAlert, ident).status == "completed"
         assert len(list(db.scalars(select(SignalRow).where(SignalRow.chart_alert_id == ident)))) == 3
-    with pytest.raises(RuntimeError, match="backup"):
+    with pytest.raises(RuntimeError, match="roll back the application"):
         command.downgrade(alembic, "r19_native_history_loads")
     with engine.connect() as connection:
-        # PostgreSQL rolls back the complete downgrade transaction, including
-        # the empty market-data branch. SQLite retains those earlier DDL steps.
+        # The additive notice migration refuses downgrade before any DDL;
+        # application rollback preserves both legacy and notification evidence.
         from alembic.script import ScriptDirectory
 
-        expected = ScriptDirectory.from_config(alembic).get_current_head() if engine.dialect.name == "postgresql" else "u22_chart_alert_actions"
+        expected = ScriptDirectory.from_config(alembic).get_current_head()
         assert connection.execute(text("SELECT version_num FROM alembic_version")).scalar() == expected
         assert connection.execute(text("SELECT count(*) FROM signals")).scalar() == 4
     # Empty market-data branch can downgrade before the populated alert branch

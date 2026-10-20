@@ -1,0 +1,38 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_stale_cache_retains_price_without_failure_or_fake_recovery ________
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+waiting = ([1792505730000], '1cf27331df3dce84209a1392f438b65be347bbf71e9a0dd79c6960dbdf2d2972')
+
+    def test_stale_cache_retains_price_without_failure_or_fake_recovery(database, waiting):
+>       result = quote()
+                 ^^^^^^^
+
+backend/tests/test_shared_quote_waiting.py:57:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend/tests/test_shared_quote_waiting.py:53: in quote
+    return {'type':'quotes', 'quotes':quote_snapshot(QuoteQuery(symbols=['MWP:'+META['id']]))}
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/market_data.py:1194: in quote_snapshot
+    previous = quote_previous_close(meta, latest)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/provider_chart.py:545: in quote_previous_close
+    page = cached_page(meta, "D1", current_label, 2, quote=True, cache_seconds=300)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/provider_chart.py:480: in cached_page
+    page = native_page(meta, frame, before, count, deadline=deadline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+a = ({'id': 'OANDA:CACHE_TEST', 'symbol': 'CACHE_TEST', 'source': 'oanda', 'basis': 'bid', ...}, 'D1', 1792454400000, 2)
+kw = {'deadline': 483837.896793976}
+
+>   monkeypatch.setattr(provider, 'native_page', lambda *a, **kw: pytest.fail('shared wait cannot poll upstream'))
+                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: shared wait cannot poll upstream
+
+backend/tests/test_shared_quote_waiting.py:35: Failed
+=========================== short test summary info ============================
+FAILED backend/tests/test_shared_quote_waiting.py::test_stale_cache_retains_price_without_failure_or_fake_recovery
+1 failed in 0.54s

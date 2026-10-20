@@ -1,0 +1,1728 @@
+{
+  "candidate": "87a5db8",
+  "fixtureCount": 109,
+  "serverCount": 109,
+  "uniqueServerIds": 109,
+  "tradeConfirmedAt": null,
+  "tradeId": "s:7f80ed27-91c9-5ea5-8fda-42768a1759c1",
+  "expectedTrade": "s:7f80ed27-91c9-5ea5-8fda-42768a1759c1",
+  "errors": [],
+  "network": [
+    {
+      "path": "/api/notification-center/events",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414101987
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 400,
+      "at": 1792414102172
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414102310
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414102413
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414102546
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414103604
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414104591
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414105594
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414105680
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414105681
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414105873
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414106474
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414106607
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414106885
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414107074
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414107216
+    },
+    {
+      "path": "/api/notification-center/events/b%3A6b5167f3-fb5c-4d4e-bb2c-23187f73dc21",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414107217
+    },
+    {
+      "path": "/api/notification-center/events/b%3A6ca2abfa-01dd-4769-9bda-fb0f76d8f77a",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414107338
+    },
+    {
+      "path": "/api/notification-center/events/b%3A7d51af2e-e151-4c6e-8c06-eefbac3327f9",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414107352
+    },
+    {
+      "path": "/api/notification-center/events/b%3Aa7134bfb-8b95-417c-a41a-0c1e4246e1cf",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414107361
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414107416
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414107434
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414107516
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414107693
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414107723
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414107788
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414107816
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414107898
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414107919
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414107938
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414107973
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414107999
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414108068
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414108134
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414108186
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414108201
+    },
+    {
+      "path": "/api/notification-center/health",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414108217
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414110393
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414110658
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414110793
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414111042
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414111123
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414111167
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414111370
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414111405
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414111495
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414111526
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414111721
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414112072
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414112171
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414112272
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414112399
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414112488
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414112527
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414112711
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414112814
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414112937
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414112979
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414113014
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414115106
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414115325
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414115572
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414115711
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414115768
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414115864
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414116029
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414116121
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414116200
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414116298
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414116485
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414116804
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414117408
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414118312
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414118589
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414118606
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414118626
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414118677
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414118696
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414118711
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414118730
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414118747
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414120769
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414121100
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414121135
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414121183
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414121277
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414121298
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414121318
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414121382
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414121474
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414121598
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414121630
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414121731
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414122173
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414122218
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414122275
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414122293
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414122383
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414122489
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414122519
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414122533
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414122591
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414122618
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414124680
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414125031
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414125105
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414125174
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414125286
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414125302
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414125409
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414125439
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414125482
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414125507
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414125584
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414125714
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414125818
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414125881
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414125908
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414125947
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414125977
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414126018
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414126042
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414126265
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414126284
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414126311
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414128338
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414128517
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414128598
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414128671
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414128698
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414128781
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414128816
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414128835
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414128888
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414128920
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414128941
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414129020
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414129089
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414129213
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414129242
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414129296
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414129380
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414129474
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414129514
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414129570
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414129618
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414129648
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414131662
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414131820
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414131888
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414132000
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414132054
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414132109
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414132137
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414132173
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414132228
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414132328
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414132380
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414132419
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414132502
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414132872
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414133174
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414133294
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414133386
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414133426
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414133504
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414133650
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414133832
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414133869
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414135919
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414136146
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414136397
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414136435
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414136577
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414136616
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414136689
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414136777
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414136810
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414136936
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414137032
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414137121
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414137211
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414137297
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414137342
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414137358
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414137393
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414137468
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414137485
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414137597
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414137680
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414137862
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414139900
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414140084
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414140171
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414140198
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414140273
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414140300
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414140395
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414140503
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414140538
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414140553
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414140619
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414140695
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414140797
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414140887
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414141015
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414141407
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414141546
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414141574
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414141659
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414141681
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414141703
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414141726
+    },
+    {
+      "path": "/api/notification-center/health",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414141740
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414143768
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414144045
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414144287
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414144606
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414144726
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414144766
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414144899
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414144951
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414145003
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414145081
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414145088
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414145154
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414145265
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414145394
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414145503
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414145576
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414145603
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414145624
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414145677
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414145692
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414145706
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414145720
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414145738
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414147892
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414148233
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414148484
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414148591
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414148704
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414148792
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414148873
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414148901
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414148994
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414149070
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414149148
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414149178
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414149278
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414149393
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414149427
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414149443
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414149477
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414149505
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414149722
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414149747
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414149785
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414149805
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414151830
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "POST",
+      "status": 202,
+      "at": 1792414151995
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414152041
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414152196
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414152243
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414152292
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414152310
+    },
+    {
+      "path": "/api/notification-center/observations",
+      "method": "POST",
+      "status": 200,
+      "at": 1792414152329
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414154349
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414154767
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414156480
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414156918
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414158629
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414160776
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414162892
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414165057
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414165305
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414167169
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414169281
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414171385
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414171574
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414173508
+    },
+    {
+      "path": "/api/notification-center/health",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414173619
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414173688
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414175674
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414177790
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "GET",
+      "status": 200,
+      "at": 1792414178212
+    }
+  ]
+}

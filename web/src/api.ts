@@ -1,12 +1,13 @@
 let csrf = "";
 export class ApiError extends Error {
+  notice_source_id?:string;
   constructor(message: string, public status: number, public code: string, public display_retry?: Record<string, string>) {
     super(message);
     this.name = "ApiError";
   }
 }
 export function apiErrorDetails(error: unknown) {
-  return error instanceof ApiError ? {code:error.code, status:error.status, ...(error.display_retry ? {display_retry:error.display_retry} : {})} :
+  return error instanceof ApiError ? {code:error.code, status:error.status, ...(error.notice_source_id?{notice_source_id:error.notice_source_id}:{}), ...(error.display_retry ? {display_retry:error.display_retry} : {})} :
     {code:error instanceof DOMException && error.name === 'AbortError' ? 'HISTORY_CANCELLED' :
       error instanceof DOMException && error.name === 'TimeoutError' ? 'HISTORY_TIMEOUT' :
       error instanceof TypeError ? 'NETWORK_FAILED' : 'HISTORY_UNAVAILABLE'};

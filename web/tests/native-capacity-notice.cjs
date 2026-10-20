@@ -10,6 +10,8 @@ module.exports = async ({
   save,
 }) => {
   const dialog = page.locator(".history-capacity-dialog");
+  // Progress is an explicitly requested operation view, never an automatic strip.
+  await frame.evaluate(() => send({type:"history-load-details-open"}));
   async function open() {
     await native.getByRole("button", { name: "图表菜单", exact: true }).click();
     await native
@@ -94,7 +96,7 @@ module.exports = async ({
       item.capacityRejected.view.charts[1].range.from > target,
   );
   assert.ok(!item.capacityRejected.notices.some((entry) => entry.text.includes("容量")),
-    "capacity result belongs to the bottom-right historical notice");
+    "capacity result belongs to the requested history detail view");
   await page.getByRole("button", { name: "关闭提示", exact: true }).click();
   await capacity(200000);
   const events = [];

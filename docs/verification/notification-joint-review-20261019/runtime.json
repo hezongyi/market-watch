@@ -1,0 +1,88 @@
+{
+  "host": "Ubuntu quant-server / 192.168.7.232",
+  "project": "mw-issue75-v2-20261018",
+  "source_candidate": "87a5db8",
+  "images": {
+    "web": "sha256:ae8b806e138b3b04561902177b825e61406256ec0789f880b1c450ac05f0dc07",
+    "chart": "sha256:18809b10cdabbc4eff1781951b28ac83d27381bbb9501dce3e61c4156e7cf4c3",
+    "api": "sha256:c1dcf532213e5205471a92487e0b6c051fab4a0d1191124acff32f67f5764ea2"
+  },
+  "services": [
+    {
+      "service": "api",
+      "state": "running",
+      "health": "healthy"
+    },
+    {
+      "service": "chart",
+      "state": "running",
+      "health": ""
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "state": "running",
+      "health": ""
+    },
+    {
+      "service": "chart-history-worker",
+      "state": "running",
+      "health": ""
+    },
+    {
+      "service": "composite-aggregate-worker",
+      "state": "running",
+      "health": ""
+    },
+    {
+      "service": "gateway",
+      "state": "running",
+      "health": ""
+    },
+    {
+      "service": "history-worker",
+      "state": "running",
+      "health": ""
+    },
+    {
+      "service": "market-stream-worker",
+      "state": "running",
+      "health": ""
+    },
+    {
+      "service": "native-history-worker",
+      "state": "running",
+      "health": ""
+    },
+    {
+      "service": "notify-worker",
+      "state": "running",
+      "health": ""
+    },
+    {
+      "service": "postgres",
+      "state": "running",
+      "health": "healthy"
+    },
+    {
+      "service": "pricing-worker",
+      "state": "running",
+      "health": ""
+    },
+    {
+      "service": "projector",
+      "state": "running",
+      "health": ""
+    },
+    {
+      "service": "realtime-worker",
+      "state": "running",
+      "health": ""
+    },
+    {
+      "service": "web",
+      "state": "running",
+      "health": ""
+    }
+  ],
+  "all_services_running": true
+}

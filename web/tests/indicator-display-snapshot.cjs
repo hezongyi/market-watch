@@ -8,7 +8,7 @@ const chart={symbol:()=> 'TEST',resolution:()=> '1',dataReady:()=>true,getAllStu
  onDataLoaded:()=>({subscribe(){},unsubscribe(){}})};
 const adapter={scope:()=>({...scope}),attach:(_,__,identity)=>({generation:1,identity}),detach(){},invalidate:async()=>true,
  applyBatch:async(_,batch)=>{assert.equal(batch.current(),true);batches.push(batch);return true;}};
-const context={MWNativeIndicatorResults:adapter,queueMicrotask,Date,setInterval:()=>1,clearInterval(){}};
+const context={crypto:require('node:crypto').webcrypto,MWNativeIndicatorResults:adapter,queueMicrotask,Date,setInterval:()=>1,clearInterval(){}};
 vm.runInNewContext(fs.readFileSync('../advanced-host/indicator-coordinator.js','utf8'),context);
 const coordinator=context.chartIndicatorCoordinator({chartsCount:()=>1,chart:()=>chart},
  {LWMA:{params:{period:5},series:[{key:'value'}]}},{

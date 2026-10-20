@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict"),
   fs = require("node:fs"),
   vm = require("node:vm");
-const c = vm.createContext({});
+const c = vm.createContext({crypto:require('node:crypto').webcrypto});
 vm.runInContext(
   fs.readFileSync("../advanced-host/series.js", "utf8") +
     "\n" +

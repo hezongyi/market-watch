@@ -1,0 +1,45 @@
+.......................F................................................ [ 75%]
+.......................                                                  [100%]
+=================================== FAILURES ===================================
+_ test_provider_api_deadline_includes_running_http_without_cancelling_shared_page _
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f58c338f790>
+
+    def test_provider_api_deadline_includes_running_http_without_cancelling_shared_page(database, monkeypatch):
+        import threading
+        import time
+
+        from alerts import provider_cache
+
+        completed = threading.Event()
+        cancelled = []
+        def slow_page(body):
+            event = provider_cache.CANCELLED.get()
+            time.sleep(0.2)  # Simulate a request whose per-phase timeouts exceed its total budget.
+            cancelled.append(event.is_set())
+            completed.set()
+            return {"bars": [], "history_boundary": False}
+
+        monkeypatch.setattr(provider, "data", slow_page)
+        monkeypatch.setattr(settings, "provider_request_seconds", 0.06)
+        api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+        try:
+            with TestClient(api_module.app) as client:
+                started = time.monotonic()
+                response = client.post('/api/charts/data', json={
+                    'instrument': 'BTCUSDT', 'series_kind': 'provider', 'timeframe': 'M1', 'limit': 200,
+                })
+                elapsed = time.monotonic() - started
+                assert response.status_code == 503
+                assert elapsed < 0.15, "HTTP waiter must not inherit each transport phase's full budget"
+>               assert completed.wait(1), "an already-sent shared page can finish for other readers"
+E               AssertionError: an already-sent shared page can finish for other readers
+E               assert False
+E                +  where False = wait(1)
+E                +    where wait = <threading.Event at 0x7f58c338ded0: unset>.wait
+
+backend/tests/test_provider_chart.py:207: AssertionError
+=========================== short test summary info ============================
+FAILED backend/tests/test_provider_chart.py::test_provider_api_deadline_includes_running_http_without_cancelling_shared_page
+1 failed, 94 passed in 10.31s

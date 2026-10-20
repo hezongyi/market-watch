@@ -1,0 +1,185 @@
+{
+  "favorites": [
+    {
+      "id": "b:1d8c6000-00eb-0ab0-bd02-538ec0cb6087",
+      "source_domain": "pro_chart",
+      "source_kind": "preferences",
+      "source_id": "5ba928e3-416d-4af9-8566-2f01ebf0974a",
+      "incident_id": "3c07a199-3ece-46cc-9c55-b639de8da744",
+      "occurred_at": 1792338593069,
+      "recorded_at": 1792338594300,
+      "version": 2110,
+      "first_seq": 2108,
+      "severity": "error",
+      "kind": "failure",
+      "workspace": "mw75-b",
+      "instrument": "",
+      "viewed_at": null,
+      "handled_at": null,
+      "attention": true,
+      "backfill": false,
+      "title": "收藏偏好保存失败",
+      "message": "Error: ApiError: MW75_FAVORITE_TERMINAL_FAILURE",
+      "context": {
+        "source_id": "setting:mw.symbol-flags.v1",
+        "endpoint": "/advanced-charts/preferences/save",
+        "workspace_id": "mw75-b",
+        "epoch": 0
+      },
+      "evidence": {},
+      "notify_web": true,
+      "client_reported_time": true,
+      "profile": "145693fe-28f9-4b3b-9902-8117c46720f0",
+      "code": "PREFERENCE_SAVE_FAILED",
+      "accepted_at": 1792338593322,
+      "incident": {
+        "id": "3c07a199-3ece-46cc-9c55-b639de8da744",
+        "first_at": 1792338593069,
+        "last_at": 1792338593069,
+        "closed_at": 1792338609087,
+        "count": 1,
+        "count_scope": "当前事故已接受发生数",
+        "severity_rank": 2
+      }
+    }
+  ],
+  "capacity": [
+    {
+      "id": "b:5f0c7fd0-286d-6d01-17b3-89ad14162ef5",
+      "source_domain": "pro_chart",
+      "source_kind": "data_center",
+      "source_id": "545d419a-cc87-42aa-b8c1-5f2ed808aed9",
+      "incident_id": "5da19e33-11d8-43f3-b3b0-04a6a9f61892",
+      "occurred_at": 1792338956880,
+      "recorded_at": 1792338958671,
+      "version": 2118,
+      "first_seq": 2116,
+      "severity": "error",
+      "kind": "failure",
+      "workspace": "mw75-b",
+      "instrument": "",
+      "viewed_at": null,
+      "handled_at": null,
+      "attention": true,
+      "backfill": false,
+      "title": "图表数据中心操作失败",
+      "message": "ApiError: MW75_DATA_CENTER_CREATE_FAILURE",
+      "context": {
+        "workspace_id": "mw75-b",
+        "endpoint": "/market-data/center/datasets",
+        "source_id": ""
+      },
+      "evidence": {
+        "operation": "write",
+        "revision": null,
+        "result": "失败或结果未知；重试前核查原操作"
+      },
+      "notify_web": true,
+      "client_reported_time": true,
+      "profile": "145693fe-28f9-4b3b-9902-8117c46720f0",
+      "code": "DATA_OPERATION_FAILED",
+      "accepted_at": 1792338957188,
+      "incident": {
+        "id": "5da19e33-11d8-43f3-b3b0-04a6a9f61892",
+        "first_at": 1792338956880,
+        "last_at": 1792338956880,
+        "closed_at": null,
+        "count": 1,
+        "count_scope": "当前事故已接受发生数",
+        "severity_rank": 2
+      }
+    },
+    {
+      "id": "b:fca9baf0-284b-5039-cda8-a9f49ea2ba2b",
+      "source_domain": "pro_chart",
+      "source_kind": "data_center",
+      "source_id": "3c050ac3-f626-43aa-9e10-eda86bab1060",
+      "incident_id": "b3c2c46d-baa1-4ee3-b7b4-c3652d35286c",
+      "occurred_at": 1792338645784,
+      "recorded_at": 1792338647197,
+      "version": 2114,
+      "first_seq": 2112,
+      "severity": "error",
+      "kind": "failure",
+      "workspace": "mw75-b",
+      "instrument": "",
+      "viewed_at": null,
+      "handled_at": null,
+      "attention": true,
+      "backfill": false,
+      "title": "图表数据中心操作失败",
+      "message": "ApiError: MW75_CAPACITY_SAVE_FAILURE",
+      "context": {
+        "workspace_id": "mw75-b",
+        "endpoint": "/charts/history-capacity",
+        "source_id": ""
+      },
+      "evidence": {
+        "operation": "write",
+        "revision": null,
+        "result": "失败或结果未知；重试前核查原操作"
+      },
+      "notify_web": true,
+      "client_reported_time": true,
+      "profile": "145693fe-28f9-4b3b-9902-8117c46720f0",
+      "code": "DATA_OPERATION_FAILED",
+      "accepted_at": 1792338646396,
+      "incident": {
+        "id": "b3c2c46d-baa1-4ee3-b7b4-c3652d35286c",
+        "first_at": 1792338645784,
+        "last_at": 1792338645784,
+        "closed_at": 1792338663090,
+        "count": 1,
+        "count_scope": "当前事故已接受发生数",
+        "severity_rank": 2
+      }
+    }
+  ],
+  "data_center": [
+    {
+      "id": "b:5f0c7fd0-286d-6d01-17b3-89ad14162ef5",
+      "source_domain": "pro_chart",
+      "source_kind": "data_center",
+      "source_id": "545d419a-cc87-42aa-b8c1-5f2ed808aed9",
+      "incident_id": "5da19e33-11d8-43f3-b3b0-04a6a9f61892",
+      "occurred_at": 1792338956880,
+      "recorded_at": 1792338958671,
+      "version": 2118,
+      "first_seq": 2116,
+      "severity": "error",
+      "kind": "failure",
+      "workspace": "mw75-b",
+      "instrument": "",
+      "viewed_at": null,
+      "handled_at": null,
+      "attention": true,
+      "backfill": false,
+      "title": "图表数据中心操作失败",
+      "message": "ApiError: MW75_DATA_CENTER_CREATE_FAILURE",
+      "context": {
+        "workspace_id": "mw75-b",
+        "endpoint": "/market-data/center/datasets",
+        "source_id": ""
+      },
+      "evidence": {
+        "operation": "write",
+        "revision": null,
+        "result": "失败或结果未知；重试前核查原操作"
+      },
+      "notify_web": true,
+      "client_reported_time": true,
+      "profile": "145693fe-28f9-4b3b-9902-8117c46720f0",
+      "code": "DATA_OPERATION_FAILED",
+      "accepted_at": 1792338957188,
+      "incident": {
+        "id": "5da19e33-11d8-43f3-b3b0-04a6a9f61892",
+        "first_at": 1792338956880,
+        "last_at": 1792338956880,
+        "closed_at": null,
+        "count": 1,
+        "count_scope": "当前事故已接受发生数",
+        "severity_rank": 2
+      }
+    }
+  ]
+}

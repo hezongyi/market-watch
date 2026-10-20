@@ -1,0 +1,73 @@
+{
+  "read_only": true,
+  "source_counts_since_deployment": {
+    "task_failure": 2,
+    "recovery": 2
+  },
+  "safe_failure_samples": [
+    {
+      "task_id": "51eba6f5feb377fd89b3c7c1e316057748fe32b1ef27b7edfafb1d09b531c29d",
+      "result_epoch": "e23c23fd-94d9-45c8-8f29-f70d8b5bf134",
+      "sequence": 40,
+      "operation": "shared_quotes",
+      "provider": "oanda",
+      "affected_subscriptions": 1,
+      "affected_clients": 1,
+      "subscription_sample_limit": 30,
+      "error": {
+        "error_type": "HistoryPending",
+        "error_chain": [
+          "HistoryPending"
+        ],
+        "stage": "read",
+        "http_status": null
+      }
+    },
+    {
+      "task_id": "7cf1f507cffb05fb09c2842f06d46fb3956e1fb324119c1c2b6d262f476daade",
+      "result_epoch": "e260368d-3bed-45b3-b025-0d5a8e2f0ef4",
+      "sequence": 40,
+      "operation": "shared_quotes",
+      "provider": "oanda",
+      "affected_subscriptions": 3,
+      "affected_clients": 1,
+      "subscription_sample_limit": 30,
+      "error": {
+        "error_type": "HistoryPending",
+        "error_chain": [
+          "HistoryPending"
+        ],
+        "stage": "read",
+        "http_status": null
+      }
+    }
+  ],
+  "shared_task_projections": [
+    {
+      "task_id": "51eba6f5feb377fd89b3c7c1e316057748fe32b1ef27b7edfafb1d09b531c29d",
+      "projected_rows": 1,
+      "incidents": 1
+    },
+    {
+      "task_id": "7cf1f507cffb05fb09c2842f06d46fb3956e1fb324119c1c2b6d262f476daade",
+      "projected_rows": 1,
+      "incidents": 1
+    }
+  ],
+  "history_query_measurements": [
+    {
+      "iteration": 0,
+      "rows": 100,
+      "sql_total": 7,
+      "incident_queries": 1,
+      "milliseconds": 101.6
+    },
+    {
+      "iteration": 1,
+      "rows": 100,
+      "sql_total": 7,
+      "incident_queries": 1,
+      "milliseconds": 95.0
+    }
+  ]
+}

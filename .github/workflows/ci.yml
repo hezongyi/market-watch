@@ -180,6 +180,7 @@ jobs:
           node tests/advanced-watchlist-metadata.cjs
           node tests/advanced-startup-metadata.cjs
           node tests/advanced-market-stream.cjs
+          node tests/advanced-provider-subscriptions.cjs
           node tests/advanced-watchlists.cjs
 
       - name: Single application regressions
@@ -187,7 +188,17 @@ jobs:
         run: |
           node tests/single-app-routing.cjs
           node tests/chart-tab.cjs
+          TZ=Asia/Shanghai node tests/chart-time.cjs
+          TZ=America/Los_Angeles node tests/chart-time.cjs
           node tests/symbol-flags.cjs
+          node tests/notifications-runtime.cjs
+          node tests/notifications-persistence.cjs
+          node tests/advanced-preferences.cjs
+          node tests/advanced-preferences-conflict.cjs
+          node tests/native-preference-notice.cjs
+          node tests/market-notice-lifecycle.cjs
+          node tests/provider-notice-lifecycle.cjs
+          node tests/native-chunk-recovery.cjs
 
       - name: Watchlist native DOM regressions
         working-directory: web
@@ -196,6 +207,8 @@ jobs:
           node tests/advanced-watchlist-layout.browser.cjs
           node tests/advanced-watchlist-names.browser.cjs
           node tests/symbol-flags.browser.cjs
+          node tests/system-history.browser.cjs
+          node tests/notice-page-exit.browser.cjs
 
   compose_checks:
     name: Compose checks

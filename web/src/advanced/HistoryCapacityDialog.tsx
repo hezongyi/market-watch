@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState } from "react";
-import { api } from "../api";
+import { api as defaultRequest } from "../api";
 import type { HistoryCapabilities } from "./nativeHistoryLoads";
 
 export function HistoryCapacityDialog({
+  request: api = defaultRequest,
   capabilities,
   usage,
   theme,
   onSaved,
   onClose,
 }: {
+  request?: typeof defaultRequest;
   capabilities: HistoryCapabilities;
   usage: number;
   theme: string;

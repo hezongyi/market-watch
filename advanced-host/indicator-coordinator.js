@@ -1,6 +1,6 @@
 /* Main-chart ranges drive Python demand. One read includes all plots; shared
  * results stay time-keyed until the native adapter maps them to current indexes. */
-function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=()=>{},status=()=>{},presentation=()=>{},demand=()=>{},leases=()=>{},release=()=>{}}) {
+function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=()=>{},occurrence=()=>{},recovered=()=>{},status=()=>{},presentation=()=>{},demand=()=>{},leases=()=>{},release=()=>{}}) {
   const results=globalThis.MWNativeIndicatorResults;
   read=chartIndicatorReadBatch(read);
   const consumers=new Map(),shared=new Map(),charts=new WeakMap(),rangeEvents=new Map(),operations=new Set();
@@ -110,6 +110,7 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
     if(consumer.pending===signature)return;
     consumer.inputRevision=binding.inputRevision;consumer.correctionVersion=binding.correctionVersion;
     consumer.pending=signature;
+    const attemptId=crypto.randomUUID();
     // The adapter knows whether native restart retained these results. A
     // consumer's previous scope alone cannot prove that its cache still exists.
     const previous=scope.coverage;
@@ -221,7 +222,7 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
       if(accepted){consumer.acceptedScope={...coverage,generation:consumer.handle.generation};
         consumer.accepted=JSON.stringify([consumer.handle.generation,nextIdentity,binding.inputRevision,scope.first,scope.last,scope.count,binding.tailVersion,binding.correctionVersion,binding.displaySnapshot,binding.providerSnapshot,inputs.showsignals,inputs.highlighting]);
         consumer.requested=consumer.accepted;
-        consumer.failures=0;consumer.retryAt=0;consumer.waitSignature=null;consumer.displayRetry=null;consumer.failedRetry=null;status(consumer,'ready');
+        consumer.failures=0;consumer.retryAt=0;consumer.waitSignature=null;consumer.displayRetry=null;consumer.failedRetry=null;status(consumer,'ready');recovered(consumer);
         for(const {page} of batch.pages)presentation(chart.symbol(),scope.resolution,{...page,indicators:[{name:scope.name,params,presentation:page.presentation}]});}
     }catch(error){if(current()){
       consumer.failedSignature=signature;
@@ -233,7 +234,7 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
           await recover(chart.symbol(),scope.resolution,binding.displaySnapshot ?? binding.providerSnapshot);
           consumer.retryAt=0;
         } catch(recoveryError) {
-          if(current()){status(consumer,'error',recoveryError);report(recoveryError,consumer);}
+          if(current()){status(consumer,'error',recoveryError);report(recoveryError,consumer);occurrence(recoveryError,consumer,attemptId);}
         }
         return;
       }
@@ -242,6 +243,7 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
       consumer.retryAt=['DISPLAY_SUFFIX_CAPACITY_EXCEEDED','DISPLAY_REPLAY_FAILED','INDICATOR_TIMEOUT'].includes(error.code) || consumer.failures>=3 ?
         Infinity:Date.now()+1000*2**consumer.failures;
       status(consumer,'error',error);report(error,consumer);
+      if(consumer.retryAt===Infinity)occurrence(error,consumer,attemptId);
     }}
     finally{if(consumer.pending===signature)consumer.pending=null;prune();}
   }

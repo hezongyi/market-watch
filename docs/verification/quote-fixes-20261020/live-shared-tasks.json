@@ -1,0 +1,142 @@
+{
+  "observed_at": "2026-10-20T13:55:16.305000+00:00",
+  "read_only": true,
+  "tasks": [
+    {
+      "id": "7cf1f507cffb05fb09c2842f06d46fb3956e1fb324119c1c2b6d262f476daade",
+      "instrument": "EURUSD",
+      "kind": "quotes",
+      "metadata": {
+        "source": "oanda",
+        "symbol": "EUR_USD",
+        "dataset_id": null
+      },
+      "updated": "2026-10-20T13:55:11.377000+00:00",
+      "expires": "2026-10-20T13:57:13.606000+00:00",
+      "sequence": 836,
+      "payload_type": "quotes",
+      "error": {
+        "error_type": null,
+        "error_chain": null,
+        "stage": null,
+        "http_status": null
+      },
+      "quotes": [
+        {
+          "name": "MWP:EURUSD",
+          "status": "ok",
+          "fetch_status": "ok",
+          "error": {
+            "error_type": null,
+            "error_chain": null,
+            "stage": null,
+            "http_status": null
+          }
+        }
+      ],
+      "notice_open": false
+    },
+    {
+      "id": "51eba6f5feb377fd89b3c7c1e316057748fe32b1ef27b7edfafb1d09b531c29d",
+      "instrument": "XAUUSD",
+      "kind": "quotes",
+      "metadata": {
+        "source": "oanda",
+        "symbol": "XAU_USD",
+        "dataset_id": null
+      },
+      "updated": "2026-10-20T13:55:08.300000+00:00",
+      "expires": "2026-10-20T13:57:13.606000+00:00",
+      "sequence": 836,
+      "payload_type": "quotes",
+      "error": {
+        "error_type": null,
+        "error_chain": null,
+        "stage": null,
+        "http_status": null
+      },
+      "quotes": [
+        {
+          "name": "MWP:XAUUSD",
+          "status": "ok",
+          "fetch_status": "ok",
+          "error": {
+            "error_type": null,
+            "error_chain": null,
+            "stage": null,
+            "http_status": null
+          }
+        }
+      ],
+      "notice_open": false
+    },
+    {
+      "id": "613e1fa3a0b6c39dd47fa7b93a7cca0aa57c7244df99737a14d01a92a48aae28",
+      "instrument": "OANDA:GBP_USD",
+      "kind": "quotes",
+      "metadata": {
+        "source": "oanda",
+        "symbol": "GBP_USD",
+        "dataset_id": null
+      },
+      "updated": "2026-10-20T13:55:08.691000+00:00",
+      "expires": "2026-10-20T13:57:14.390000+00:00",
+      "sequence": 280,
+      "payload_type": "quotes",
+      "error": {
+        "error_type": null,
+        "error_chain": null,
+        "stage": null,
+        "http_status": null
+      },
+      "quotes": [
+        {
+          "name": "MWP:OANDA:GBP_USD",
+          "status": "ok",
+          "fetch_status": "ok",
+          "error": {
+            "error_type": null,
+            "error_chain": null,
+            "stage": null,
+            "http_status": null
+          }
+        }
+      ],
+      "notice_open": false
+    },
+    {
+      "id": "efd0aa305e8105d44441fac516ce5fce65e7247082b2edf0c785dbe42b0b97cf",
+      "instrument": "BTCUSDT",
+      "kind": "quotes",
+      "metadata": {
+        "source": "binance",
+        "symbol": "BTCUSDT",
+        "dataset_id": null
+      },
+      "updated": "2026-10-20T13:55:14.625000+00:00",
+      "expires": "2026-10-20T13:57:13.606000+00:00",
+      "sequence": 812,
+      "payload_type": "quotes",
+      "error": {
+        "error_type": null,
+        "error_chain": null,
+        "stage": null,
+        "http_status": null
+      },
+      "quotes": [
+        {
+          "name": "MWP:BTCUSDT",
+          "status": "ok",
+          "fetch_status": "ok",
+          "error": {
+            "error_type": null,
+            "error_chain": null,
+            "stage": null,
+            "http_status": null
+          }
+        }
+      ],
+      "notice_open": false
+    }
+  ]
+}

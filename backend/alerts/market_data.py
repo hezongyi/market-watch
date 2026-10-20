@@ -1179,6 +1179,8 @@ def quote_snapshot(body: QuoteQuery):
             values = {"short_name": shown, "description": shown + " · 平台行情" + (" · " + meta["price_description"] if meta.get("price_description") else ""),
                       "exchange": meta["source"].upper(), **session, **conflict,
                       "fetched_at": page.get("as_of"), "read_at": read_at, "fetch_status": fetch_status,
+                      **{key:page[key] for key in ("wait_reason", "last_success_at", "cache_age_ms") if key in page},
+                      **({'error_evidence': page['error_evidence']} if page.get('error_evidence') else {}),
                       "time_type": "source_m1" if latest else None, "resolution": "M1"}
             if latest:
                 values["lp"] = float(latest["close"])
@@ -1187,21 +1189,25 @@ def quote_snapshot(body: QuoteQuery):
                     values["bid"] = values["lp"]
                 elif meta["basis"] == "ask":
                     values["ask"] = values["lp"]
-                # Missing prior-session data must not hide a valid last price.
-                try:
-                    previous = quote_previous_close(meta, latest)
-                    if previous is not None and previous > 0:
-                        delta = Decimal(latest["close"]) - previous
-                        values.update(ch=float(delta), chp=float(delta / previous * 100),
-                                      prev_close_price=float(previous))
-                except Exception:
-                    pass
+                # Waiting reads are cache-only, including derived fields: a
+                # cold previous-close lookup can otherwise open supplier HTTP.
+                if fetch_status not in ("pending", "stale"):
+                    # Missing prior-session data must not hide a valid last price.
+                    try:
+                        previous = quote_previous_close(meta, latest)
+                        if previous is not None and previous > 0:
+                            delta = Decimal(latest["close"]) - previous
+                            values.update(ch=float(delta), chp=float(delta / previous * 100),
+                                          prev_close_price=float(previous))
+                    except Exception:
+                        pass
             result.append({"s": "ok", "n": ticker, "v": values, **session,
                            **conflict, "fetched_at": page.get("as_of"), "read_at": read_at,
                            "fetch_status": fetch_status, "data_start": latest.get("start") if latest else None,
                            "data_end": latest.get("end") if latest else None, "time_type": "source_m1" if latest else None,
                            "resolution": "M1"})
-        except Exception:
+        except Exception as error:
+            from .market_notices import error_evidence
             observed_now = now_ms()
             session = session_status(meta["source"], meta["symbol"], observed_now, metadata=meta) if meta else {
                 "market_session": "unknown", "session_reason": None, "calendar_verified": False, "calendar_version": None}
@@ -1209,6 +1215,8 @@ def quote_snapshot(body: QuoteQuery):
                            "v": {"description": "平台报价暂不可用，请重试", **session,
                                  "quote_time": None, "data_start": None, "read_at": observed_now,
                                  "fetch_status": "fetch_failed",
+                                 "error_evidence": error_evidence(
+                                     error, provider=meta.get('source', '') if meta else '', operation='quote_snapshot'),
                                  **({"short_name": meta.get("display_symbol") or display_code(meta["symbol"], meta["source"]),
                                      "exchange": meta["source"].upper()} if meta else {})}})
     with transaction() as db:

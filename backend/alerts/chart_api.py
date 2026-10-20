@@ -13,7 +13,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse, Response, StreamingResponse
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 from sqlalchemy import delete, func, select, update
 
 from .calendar_profile import closures_from
@@ -197,6 +197,14 @@ class DataQuery(BaseModel):
 class HistoryLoadQuery(BaseModel):
     request_id: str = Field(min_length=1, max_length=100, pattern=r"^[a-zA-Z0-9._:-]+$")
     query: DataQuery
+    notice_context: dict[str, str] = Field(default_factory=dict, max_length=2)
+
+    @field_validator('notice_context')
+    @classmethod
+    def bounded_notice_context(cls, value):
+        if any(key not in ('workspace_id', 'chart_index') or len(item) > 80 for key, item in value.items()):
+            raise ValueError('无效图格通知上下文')
+        return value
 
 
 class HistoryCapacityWrite(BaseModel):
@@ -205,6 +213,7 @@ class HistoryCapacityWrite(BaseModel):
 
 
 class ExportQuery(BaseModel):
+    notice_workspace: str = Field(default="", max_length=80)
     instrument: str = Field(max_length=80)
     series_kind: SeriesKind = "managed"
     published: bool = False
@@ -612,6 +621,8 @@ def router(authenticated):
                     a, b = missing[-1]
                     span = max(4000 * 60000, min(31 * 86400000, 2001 * FRAME_MS[body.timeframe]))
                     jobs, planned_coverage = queue_history(db, inst, max(a, b - span), b)
+                    from .notification_sources import chart_import_scope
+                    chart_import_scope(db, jobs, {'workspace_id': body.notice_workspace, 'timeframe': body.timeframe, 'endpoint': '/charts/export'})
                     coverage = coverage + planned_coverage
                 if not covers_interval(coverage, left, right):
                     failed = [job for job in jobs if job.status == "failed"]
@@ -813,7 +824,7 @@ def router(authenticated):
     @r.post("/history-loads")
     async def history_submit(body: HistoryLoadQuery, request: Request):
         from .native_history_loads import owner_of, submit
-        return await history_operation(submit, owner_of(request), body.request_id, body.query)
+        return await history_operation(submit, owner_of(request), body.request_id, body.query, body.notice_context)
 
     @r.get("/history-loads/{id}")
     async def history_status(id: str, request: Request):

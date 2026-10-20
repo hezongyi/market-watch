@@ -1,6 +1,16 @@
+import { useChartTime } from "../time/ChartTimeContext";
+import {
+  formatTimestamp,
+  dayKey,
+  clockTime,
+  offsetLabel,
+  formatAlertMessage,
+} from "../time/chartTime";
+import { AlertEventTrace } from "../notifications/AlertEventTrace";
+import type { NoticeTransport } from "../notifications/types";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ApiError, api, date } from "../api";
+import { ApiError, api } from "../api";
 import { ChartAlertDialog } from "./ChartAlertDialog";
 import {
   deliveryNames,
@@ -55,7 +65,11 @@ export function ChartAlertsPanel({
   mountTarget,
   initialDraft,
   persistDraft,
+  focusEvent,
+  noticeRequest,
 }: {
+  focusEvent?: { id: string; revision: number };
+  noticeRequest?: NoticeTransport;
   workspaceId: string;
   context: AlertContext | null;
   open: boolean;
@@ -74,6 +88,8 @@ export function ChartAlertsPanel({
   initialDraft?: AlertDraft | null;
   persistDraft?: (draft: AlertDraft | null) => void;
 }) {
+  const { zone } = useChartTime();
+  const date = (stamp: number) => formatTimestamp(stamp, zone);
   const draftKey = "mw-chart-alert-draft:" + workspaceId;
   const [rows, setRows] = useState<AlertRow[]>([]),
     [events, setEvents] = useState<AlertEvent[]>([]);
@@ -243,6 +259,21 @@ export function ChartAlertsPanel({
           row.config.series_kind ===
             (activeInstrument || context)?.series_kind)),
   );
+  useEffect(() => {
+    if (!focusEvent) return;
+    setTab("events");
+    setSearch("");
+    setStatus("");
+    setCurrentOnly(false);
+    setSelected(focusEvent.id);
+    void refresh();
+  }, [focusEvent]);
+  useEffect(() => {
+    if (!focusEvent || selected !== focusEvent.id) return;
+    mountTarget
+      ?.querySelector<HTMLElement>('[data-signal-id="' + focusEvent.id + '"]')
+      ?.scrollIntoView({ block: "nearest" });
+  }, [focusEvent, selected, events, mountTarget]);
   const filteredEvents = events.filter(
     (event) =>
       (!search ||
@@ -269,7 +300,7 @@ export function ChartAlertsPanel({
   );
   const grouped = new Map<string, AlertEvent[]>();
   for (const event of filteredEvents) {
-    const day = new Date(event.occurred_at).toLocaleDateString("zh-CN");
+    const day = dayKey(event.occurred_at, zone);
     grouped.set(day, [...(grouped.get(day) || []), event]);
   }
   const panel = open && mountTarget !== null && (
@@ -608,12 +639,19 @@ export function ChartAlertsPanel({
                       {healthNames[row.health]}
                       {row.health_reason ? "：" + row.health_reason : ""}
                     </p>
-                    {row.config.series_kind === "composite" && typeof row.runtime.quote_health === "string" && (
-                      <p>当前报价：{row.runtime.quote_health === "ready" ? "正常" : "暂不可用或已过期"}</p>
-                    )}
-                    {row.config.condition.offset && offsetSnapshot(row.runtime.offset) && (
-                      <p>{offsetSnapshot(row.runtime.offset)}</p>
-                    )}
+                    {row.config.series_kind === "composite" &&
+                      typeof row.runtime.quote_health === "string" && (
+                        <p>
+                          当前报价：
+                          {row.runtime.quote_health === "ready"
+                            ? "正常"
+                            : "暂不可用或已过期"}
+                        </p>
+                      )}
+                    {row.config.condition.offset &&
+                      offsetSnapshot(row.runtime.offset) && (
+                        <p>{offsetSnapshot(row.runtime.offset)}</p>
+                      )}
                     <p>
                       版本 {row.version} · 生效 {date(row.effective_at)}
                     </p>
@@ -646,6 +684,7 @@ export function ChartAlertsPanel({
                 {entries.map((event) => (
                   <article
                     key={event.id}
+                    data-signal-id={event.id}
                     className={`chart-alert-card ${selected === event.id ? "alert-selected" : ""}`}
                   >
                     <button
@@ -661,15 +700,15 @@ export function ChartAlertsPanel({
                       <span className="alert-row-subtitle">
                         <span
                           className="alert-row-identity"
-                          title={event.display_label || event.evidence.config.name}
+                          title={
+                            event.display_label || event.evidence.config.name
+                          }
                         >
                           {event.display_label || event.evidence.config.name}
                         </span>
                         <span className="alert-row-time">
-                          {new Date(event.occurred_at).toLocaleTimeString(
-                            "zh-CN",
-                            { hour12: false },
-                          )}
+                          {clockTime(event.occurred_at, zone)}{" "}
+                          {offsetLabel(event.occurred_at, zone)}
                           {event.evidence.late ? " · 迟到" : ""}
                         </span>
                       </span>
@@ -683,7 +722,9 @@ export function ChartAlertsPanel({
                           {event.threshold} · 市场价格 {event.price}
                         </p>
                         {offsetSnapshot(event.evidence.observation.offset) && (
-                          <p>{offsetSnapshot(event.evidence.observation.offset)}</p>
+                          <p>
+                            {offsetSnapshot(event.evidence.observation.offset)}
+                          </p>
                         )}
                         <p>
                           规则版本 {event.evidence.rule_version} · 第{" "}
@@ -698,7 +739,13 @@ export function ChartAlertsPanel({
                         </p>
                         <details>
                           <summary>查看消息和当时证据</summary>
-                          <p className="alert-message-text">{event.message}</p>
+                          <p className="alert-message-text">
+                            {formatAlertMessage(
+                              event.message,
+                              event.occurred_at,
+                              zone,
+                            )}
+                          </p>
                           <pre>
                             {JSON.stringify(
                               event.evidence.observation,
@@ -707,6 +754,15 @@ export function ChartAlertsPanel({
                             )}
                           </pre>
                         </details>
+                        {noticeRequest && (
+                          <AlertEventTrace
+                            signalId={event.id}
+                            request={noticeRequest}
+                          />
+                        )}
+                        <p className="nc-muted">
+                          查看记录不会停止手机提醒；显式停止无法撤回已在途发送。
+                        </p>
                         <div className="alert-inline-actions">
                           <button
                             disabled={
@@ -725,7 +781,9 @@ export function ChartAlertsPanel({
                             disabled={!!event.ack_at || busy === event.id}
                             onClick={() => ack(event)}
                           >
-                            {event.ack_at ? "已确认" : "确认此事件"}
+                            {event.ack_at
+                              ? "已停止后续提醒"
+                              : "停止后续手机提醒"}
                           </button>
                         </div>
                       </div>

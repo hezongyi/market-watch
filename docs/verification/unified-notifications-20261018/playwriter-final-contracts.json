@@ -1,0 +1,36 @@
+{
+  "database": "preview_mw75_final",
+  "synthetic_load_only": true,
+  "pagination": {
+    "pages": 10,
+    "events": 1000,
+    "unique": 1000,
+    "latency_ms": [
+      106,
+      95,
+      112,
+      109,
+      179,
+      227,
+      184,
+      294,
+      95,
+      111
+    ]
+  },
+  "filters": {
+    "mismatch_empty": true,
+    "matching_source_workspace_severity": true
+  },
+  "history": {
+    "all_backfill": true,
+    "attention": false,
+    "incidents_once": true
+  },
+  "json_sse_parity": {
+    "matching_cursor": true,
+    "matching_changes": true,
+    "epoch": "7f798b5d-ac5d-47da-8639-b92c70af5f4e"
+  },
+  "viewed_handled_independent": true
+}

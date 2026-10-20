@@ -1,0 +1,179 @@
+{
+  "browserZone": "Asia/Shanghai",
+  "loginError": "密码不正确",
+  "loginIdleAndInputMotion": true,
+  "pausePersists": true,
+  "reducedMotion": true,
+  "loginRedirect": true,
+  "systemRecord": {
+    "id": "b:c8ded8e2-4485-3bee-b03b-8e822aa5f230",
+    "occurred_at": 1792403924794
+  },
+  "zoneDisplays": [
+    {
+      "zone": "Etc/UTC",
+      "expected": "09:58:44"
+    },
+    {
+      "zone": "Asia/Shanghai",
+      "expected": "17:58:44"
+    },
+    {
+      "zone": "America/New_York",
+      "expected": "05:58:44"
+    }
+  ],
+  "systemDetail": true,
+  "filterNY": {
+    "since": 1792296000000,
+    "until": 1792382400000
+  },
+  "filterPreservedInstant": true,
+  "multiChart": [
+    {
+      "active": 0,
+      "zone": "显示时区：Asia/Shanghai"
+    },
+    {
+      "active": 1,
+      "zone": "显示时区：America/New_York"
+    }
+  ],
+  "timestampsUnchanged": {
+    "occurred_at": 1792403924794,
+    "recorded_at": 1792403928698
+  },
+  "expiryGapRejected": true,
+  "boundaryFixtures": [
+    {
+      "id": "b:12934d4e-9f4d-4a89-8b91-690e0cea7688",
+      "occurred_at": 1792366212123,
+      "result": {
+        "id": "b:12934d4e-9f4d-4a89-8b91-690e0cea7688",
+        "status": "accepted",
+        "recorded_at": 1792405085886
+      }
+    },
+    {
+      "id": "b:f660b3d4-9aba-4858-9589-05da94b81cce",
+      "occurred_at": 1792369812123,
+      "result": {
+        "id": "b:f660b3d4-9aba-4858-9589-05da94b81cce",
+        "status": "accepted",
+        "recorded_at": 1792405085923
+      }
+    }
+  ],
+  "expiryFoldSaved": {
+    "id": "27da8ffe-5711-4b10-99b2-b31878472fd5",
+    "expires_at": 1793514600000
+  },
+  "expiryEditRoundTrip": {
+    "zone": "Asia/Shanghai",
+    "value": "2026-11-01T14:30",
+    "expires_at": 1793514600000
+  },
+  "alertDetailShanghai": true,
+  "alertDetailUTC": true,
+  "midnightGroups": [
+    {
+      "zone": "Etc/UTC",
+      "groups": [
+        "2026-10-19",
+        "2026-10-18"
+      ]
+    },
+    {
+      "zone": "Asia/Shanghai",
+      "groups": [
+        "2026-10-19"
+      ]
+    },
+    {
+      "zone": "America/New_York",
+      "groups": [
+        "2026-10-18"
+      ]
+    }
+  ],
+  "dayQueries": [
+    {
+      "zone": "Etc/UTC",
+      "day": "2026-10-19",
+      "since": 1792368000000,
+      "until": 1792454400000,
+      "hours": 24,
+      "count": 1
+    },
+    {
+      "zone": "Asia/Shanghai",
+      "day": "2026-10-19",
+      "since": 1792339200000,
+      "until": 1792425600000,
+      "hours": 24,
+      "count": 2
+    },
+    {
+      "zone": "America/New_York",
+      "day": "2026-10-18",
+      "since": 1792296000000,
+      "until": 1792382400000,
+      "hours": 24,
+      "count": 2
+    },
+    {
+      "zone": "America/New_York",
+      "day": "2026-03-08",
+      "since": 1772946000000,
+      "until": 1773028800000,
+      "hours": 23,
+      "count": 0
+    },
+    {
+      "zone": "America/New_York",
+      "day": "2026-11-01",
+      "since": 1793505600000,
+      "until": 1793595600000,
+      "hours": 25,
+      "count": 0
+    }
+  ],
+  "exchange": "交易所 · America/New_York",
+  "bubbleNY": "系统消息\n关闭即时通知\n时区即时浮窗验收\n\n验收实例专用；同一时刻按激活图表显示\n\n2026-10-19 06:32:53 UTC-04:00 · America/New_York\n查看消息",
+  "bubbleUTC": "系统消息\n关闭即时通知\n时区即时浮窗验收\n\n验收实例专用；同一时刻按激活图表显示\n\n2026-10-19 10:32:53 UTC · UTC\n查看消息",
+  "bubbleFixture": {
+    "id": "b:e153f5d5-8f8a-4f5a-8f5d-6584ce7bc464",
+    "occurred_at": 1792405973483
+  },
+  "fallbackTimezone": "显示时区：Asia/Shanghai",
+  "finalCandidate": "3210242",
+  "finalPageErrors": [],
+  "systemAutoDismissFollowup": {
+    "candidate": "3210242",
+    "reportedIssue": "用户反馈系统浮窗不自动消失；当前验收会话尚未复现移开鼠标/焦点后仍不消失",
+    "playwriterSession": 7,
+    "browserCDP": 19276,
+    "checks": [
+      {
+        "scenario": "鼠标和焦点在浮窗外",
+        "result": "出现后约8秒自动消失"
+      },
+      {
+        "scenario": "悬停9秒，再移开",
+        "result": "悬停期间保留，移开后约8秒消失"
+      },
+      {
+        "scenario": "关闭按钮获得键盘焦点9秒，再移到系统入口",
+        "result": "焦点在内时保留，移出后约8秒消失"
+      },
+      {
+        "scenario": "浮窗出现后连续切换纽约和上海时区",
+        "eventId": "b:2f9c2eac-8456-4706-be0d-e36953898279",
+        "elapsedMs": 8106,
+        "result": "自动消失，时区更新未重置计时"
+      }
+    ],
+    "sourceChanges": false,
+    "pending": "待用户提供停留消息标题和操作路径，不能据此宣称已修复用户反馈"
+  }
+}

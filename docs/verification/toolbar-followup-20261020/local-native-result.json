@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "nativeButtonHTML": "<button aria-label=\"系统消息\" tabindex=\"-1\" data-tooltip-show-on-focus=\"true\" type=\"button\" class=\"nc-system-entry button-xNqEcuN2 button-GwQQdU8S apply-common-tooltip isInteractive-GwQQdU8S accessible-GwQQdU8S\" data-tooltip=\"系统消息\"><span role=\"img\" class=\"icon-GwQQdU8S\" aria-hidden=\"true\"><svg width=\"28\" height=\"28\" viewBox=\"0 0 28 28\"></svg></span></button>",
+  "checks": [
+    "actual vendor ToolbarIconButton render",
+    "native interactive class and semantic button",
+    "one click callback",
+    "native root cleanup",
+    "template visual order in live and measurement toolbar",
+    "rebuilt toolbar observed",
+    "order and separator cleanup"
+  ],
+  "limits": "JSDOM verification; no browser layout/hover painting or deployed-instance verification in restricted sandbox"
+}

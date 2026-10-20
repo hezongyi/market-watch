@@ -7,7 +7,6 @@ from pathlib import Path
 import pytest
 from alembic import command
 from alembic.config import Config
-from alembic.script import ScriptDirectory
 from alerts.config import settings
 from sqlalchemy import create_engine, inspect, text
 
@@ -25,7 +24,8 @@ def test_actual_predecessor_upgrade_pending_downgrade_guard_and_schema_roundtrip
     monkeypatch.setattr(settings, 'database_url', url.render_as_string(hide_password=False))
     config = Config(str(ROOT / 'alembic.ini'))
     config.set_main_option('script_location', str(ROOT / 'migrations'))
-    head = ScriptDirectory.from_config(config).get_current_head()
+    # The historical reversible range ends before aw50's data-preserving guard.
+    head = 'av49_indicator_demands'
     try:
         command.upgrade(config, 'am40_chart_revision_demand')
         with engine.begin() as conn:
@@ -42,8 +42,8 @@ def test_actual_predecessor_upgrade_pending_downgrade_guard_and_schema_roundtrip
                 '(id,instrument_id,source,basis,start,"end",observed,queried_at) '
                 "VALUES ('proof','kept','binance','last',0,60000,1,65000)"))
             before = conn.execute(text('SELECT * FROM chart_published_bars')).all()
-        command.upgrade(config, 'head')
-        command.upgrade(config, 'head')
+        command.upgrade(config, 'av49_indicator_demands')
+        command.upgrade(config, 'av49_indicator_demands')
         with engine.connect() as conn:
             assert conn.execute(text('SELECT * FROM chart_published_bars')).all() == before
             assert conn.scalar(text('SELECT count(*) FROM chart_publication_state WHERE requested>processed')) == 9
@@ -60,7 +60,7 @@ def test_actual_predecessor_upgrade_pending_downgrade_guard_and_schema_roundtrip
         with engine.connect() as conn:
             assert conn.execute(text('SELECT * FROM chart_published_bars')).all() == before
             assert conn.scalar(text('SELECT count(*) FROM market_data_coverage')) == 1
-        command.upgrade(config, 'head')
+        command.upgrade(config, 'av49_indicator_demands')
         with engine.connect() as conn:
             assert conn.execute(text('SELECT * FROM chart_published_bars')).all() == before
             assert conn.scalar(text('SELECT count(*) FROM chart_publication_state')) == 9
@@ -90,7 +90,7 @@ def test_aggregation_service_migration_keeps_pending_jobs_and_roundtrips(monkeyp
                 '(id,instrument_id,timeframe,start,"end",created_at,attempts,next_at) '
                 "VALUES ('kept','BTCUSDT','M5',0,86400000,1,0,0)"))
             before = conn.execute(text('SELECT * FROM chart_aggregation_jobs')).all()
-        command.upgrade(config, 'head')
+        command.upgrade(config, 'av49_indicator_demands')
         with engine.begin() as conn:
             assert conn.execute(text('SELECT * FROM chart_aggregation_jobs')).all() == before
             conn.execute(text("INSERT INTO chart_aggregation_state "
@@ -100,7 +100,7 @@ def test_aggregation_service_migration_keeps_pending_jobs_and_roundtrips(monkeyp
         with engine.connect() as conn:
             assert not inspect(conn).has_table('chart_aggregation_state')
             assert conn.execute(text('SELECT * FROM chart_aggregation_jobs')).all() == before
-        command.upgrade(config, 'head')
+        command.upgrade(config, 'av49_indicator_demands')
         with engine.connect() as conn:
             assert inspect(conn).has_table('chart_aggregation_state')
             assert conn.execute(text('SELECT * FROM chart_aggregation_jobs')).all() == before

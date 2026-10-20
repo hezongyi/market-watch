@@ -1,0 +1,19 @@
+services:
+  preview:
+    image: market-watch-web:login-particles-preview-20261019
+    ports:
+      - "192.168.7.232:18320:80"
+    mem_limit: 64m
+    cpus: 0.25
+    restart: unless-stopped
+    read_only: true
+    volumes:
+      - ./docs/verification/login-particles-preview-20261019:/usr/share/nginx/html/evidence:ro
+    tmpfs:
+      - /var/cache/nginx
+      - /var/run
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"

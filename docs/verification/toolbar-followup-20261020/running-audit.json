@@ -1,0 +1,143 @@
+{
+  "source_commit": "c53abdf",
+  "host": "quant-server",
+  "project": "mw-issue75-v2-20261018",
+  "mount_comparison": "list ordering ignored; full mount objects compared to before hashes",
+  "services": [
+    {
+      "service": "chart",
+      "running": true,
+      "image_id": "sha256:5b52fd9d36f24c5657c11a4bb8a91b77a42764b7cf86a15da5a3c9ce317f54b6",
+      "container_unchanged": false,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "image_tag": "market-watch-chart:toolbar-20261020-c4"
+    },
+    {
+      "service": "web",
+      "running": true,
+      "image_id": "sha256:3b2e7705b107daadb58cf232d7932f7a4923ad15015aeeaabe2dea4ea128e85e",
+      "container_unchanged": false,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "image_tag": "market-watch-web:toolbar-20261020-c4"
+    },
+    {
+      "service": "realtime-worker",
+      "running": true,
+      "image_id": "sha256:cf441c424eb2afda9ec1c7cad4fb3dc97645b1e7ff45fc361d30ee7e2682bd20",
+      "container_unchanged": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": "true"
+    },
+    {
+      "service": "history-worker",
+      "running": true,
+      "image_id": "sha256:cf441c424eb2afda9ec1c7cad4fb3dc97645b1e7ff45fc361d30ee7e2682bd20",
+      "container_unchanged": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": "true"
+    },
+    {
+      "service": "market-stream-worker",
+      "running": true,
+      "image_id": "sha256:cf441c424eb2afda9ec1c7cad4fb3dc97645b1e7ff45fc361d30ee7e2682bd20",
+      "container_unchanged": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": "true"
+    },
+    {
+      "service": "pricing-worker",
+      "running": true,
+      "image_id": "sha256:cf441c424eb2afda9ec1c7cad4fb3dc97645b1e7ff45fc361d30ee7e2682bd20",
+      "container_unchanged": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": "true"
+    },
+    {
+      "service": "notify-worker",
+      "running": true,
+      "image_id": "sha256:cf441c424eb2afda9ec1c7cad4fb3dc97645b1e7ff45fc361d30ee7e2682bd20",
+      "container_unchanged": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": "true"
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "running": true,
+      "image_id": "sha256:cf441c424eb2afda9ec1c7cad4fb3dc97645b1e7ff45fc361d30ee7e2682bd20",
+      "container_unchanged": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": "true"
+    },
+    {
+      "service": "chart-history-worker",
+      "running": true,
+      "image_id": "sha256:cf441c424eb2afda9ec1c7cad4fb3dc97645b1e7ff45fc361d30ee7e2682bd20",
+      "container_unchanged": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": "true"
+    },
+    {
+      "service": "projector",
+      "running": true,
+      "image_id": "sha256:cf441c424eb2afda9ec1c7cad4fb3dc97645b1e7ff45fc361d30ee7e2682bd20",
+      "container_unchanged": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": "true"
+    },
+    {
+      "service": "composite-aggregate-worker",
+      "running": true,
+      "image_id": "sha256:cf441c424eb2afda9ec1c7cad4fb3dc97645b1e7ff45fc361d30ee7e2682bd20",
+      "container_unchanged": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": "true"
+    },
+    {
+      "service": "native-history-worker",
+      "running": true,
+      "image_id": "sha256:cf441c424eb2afda9ec1c7cad4fb3dc97645b1e7ff45fc361d30ee7e2682bd20",
+      "container_unchanged": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": "true"
+    },
+    {
+      "service": "api",
+      "running": true,
+      "image_id": "sha256:cf441c424eb2afda9ec1c7cad4fb3dc97645b1e7ff45fc361d30ee7e2682bd20",
+      "container_unchanged": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "health": "healthy",
+      "yahoo_enabled": "true"
+    },
+    {
+      "service": "gateway",
+      "running": true,
+      "image_id": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "container_unchanged": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true
+    },
+    {
+      "service": "postgres",
+      "running": true,
+      "image_id": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "container_unchanged": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "health": "healthy"
+    }
+  ]
+}

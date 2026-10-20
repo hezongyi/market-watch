@@ -1,0 +1,38 @@
+{
+  "origin": "http://localhost:18275",
+  "actual_modules": true,
+  "count_budget": {
+    "retained": 1000,
+    "overflow_rejected": true
+  },
+  "byte_budget": {
+    "preseeded": 700,
+    "overflow_rejected": true
+  },
+  "ttl": {
+    "lost": 1,
+    "accepted_not_counted_lost": true
+  },
+  "payload_budget": {
+    "oversize_rejected": true
+  },
+  "muted": "sound_suppressed",
+  "gesture_locked": "sound_blocked",
+  "expired": "sound_expired",
+  "coordination_limited": "sound_blocked",
+  "audio_failure": "sound_failed",
+  "shared_claim": {
+    "attempts": 1,
+    "starts": 1
+  },
+  "paused_session": {
+    "new_attempts": 0
+  },
+  "storage_unavailable": {
+    "status": "本机持久存储不可用",
+    "gap": "新增故障未能持久保存：SecurityError: denied"
+  },
+  "crash_after_reservation": "sound_unknown",
+  "full_runtime_gap": "新增通知未能保存：Error: 本机通知队列已满或不能写入；新增事件未能保存",
+  "tones": 1
+}

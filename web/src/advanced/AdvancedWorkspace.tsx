@@ -1,3 +1,6 @@
+import {useNotices,useNoticeState} from "../notifications/context";
+import {setChartTime} from "../time/ChartTimeContext";
+import {operationFault} from "../notifications/operations";
 import { validIndicatorRead } from "./indicatorRequests";
 import {
   loadNativeHistory,
@@ -8,7 +11,7 @@ import { useLocation, useNavigate, useParams, NavLink } from "react-router-dom";
 import { useApp } from "../app/context";
 import { defaultChart, pageName } from "../app/navigation";
 import { centerLocation } from "../market-data/location";
-import { api, apiErrorDetails } from "../api";
+import { api as requestAPI, apiErrorDetails } from "../api";
 import "./advanced.css";
 import { HistoryPlansDialog, type DatasetViews } from "./HistoryPlansDialog";
 import { MaintenanceDialog } from "./MaintenanceDialog";
@@ -46,6 +49,19 @@ const frames = new Set([
 
 export default function AdvancedWorkspace() {
   const appLocation = useLocation(), navigate = useNavigate(), { workspaceId } = useParams();
+  const notices=useNotices(), noticeState=useNoticeState();
+  function api<T=any>(path:string,body?:unknown,signal?:AbortSignal):Promise<T>{
+    const fault=operationFault(path,body,current.current?.id||workspaceId);
+    return fault?notices.operation(fault,()=>requestAPI<T>(path,body,signal)):requestAPI<T>(path,body,signal);
+  }
+  const noticeStateRef=useRef(noticeState);noticeStateRef.current=noticeState;
+  const [notificationReady,setNotificationReady]=useState(false);
+  const [notificationFailed,setNotificationFailed]=useState(false);
+  const notificationReadyRef=useRef(notificationReady);notificationReadyRef.current=notificationReady;
+  const noticeOpen=new URLSearchParams(appLocation.search).get('panel')==='notifications';
+  const noticeEvent=new URLSearchParams(appLocation.search).get('event') || undefined;
+  const closeNotices=()=>{const url=new URL(location.href);url.searchParams.delete('panel');url.searchParams.delete('event');navigate(url.pathname+url.search+url.hash,{replace:true});};
+  const openNotices=(event?:string)=>{const url=new URL(location.href);url.searchParams.set('panel','notifications');if(event)url.searchParams.set('event',event);else url.searchParams.delete('event');navigate(url.pathname+url.search+url.hash,{replace:true});};
   const app = useApp(), appRef = useRef(app); appRef.current = app;
   const urlRef = useRef(appLocation); urlRef.current = appLocation;
   const capturing = useRef<{resolve: () => void; reject: (error: Error) => void} | null>(null);
@@ -80,12 +96,18 @@ export default function AdvancedWorkspace() {
 
   const [, setRows] = useState<Workspace[]>([]),
     [active, setActive] = useState<Workspace | null>(null);
+  const [workspaceOpening,setWorkspaceOpening]=useState(true);
   const [historyPlansOpen, setHistoryPlansOpen] = useState(false);
+  const [historyDetailsOpen, setHistoryDetailsOpen] = useState(false);
   const [maintenanceInstrument, setMaintenanceInstrument] = useState<
     string | null
   >(null);
   const [datasetViews, setDatasetViews] = useState<DatasetViews>({});
   const [frameKey, setFrameKey] = useState(0);
+  useEffect(() => {
+    setChartTime("UTC", "UTC（图表初始化前）");
+    return () => setChartTime("UTC", "UTC（图表初始化前）");
+  }, [frameKey]);
   const [exportSelection, setExportSelection] =
     useState<ExportSelection | null>(null);
   const [historyProgress, setHistoryProgress] = useState<
@@ -166,13 +188,15 @@ export default function AdvancedWorkspace() {
       }, 15000);
     });
   const select = (row: Workspace) => {
-    setNativeReady(false);
+    setChartTime("UTC", "UTC（图表初始化前）");
+    setNativeReady(false);setNotificationReady(false);setNotificationFailed(false);
     setPollErrors({});
     setHistoryProgress({});
     setNativeLoads({});
     setCapacityNotices({});
     nativeLoadEpoch.current = 0;
     setCapacityDialog(null);
+    setHistoryDetailsOpen(false);
     setDatasetViews({});
     setSyncNotices({});
     unsaved.current = false;
@@ -217,7 +241,7 @@ export default function AdvancedWorkspace() {
       text,
     })),
   ];
-  const notificationState = JSON.stringify(noticeMessages);
+  const notificationState = JSON.stringify(noticeMessages.filter(row=>row.recover));
   useEffect(() => {
     if (nativeReady)
       post({
@@ -277,6 +301,7 @@ export default function AdvancedWorkspace() {
   }, [app.registerGuard, origin, mobile]);
   useEffect(() => {
     if (current.current && current.current.id === workspaceId) return;
+    setWorkspaceOpening(true);
     let cancelled = false;
     const opening = workspaceId
       ? api<Workspace>("/advanced-charts/workspaces/" + encodeURIComponent(workspaceId)).then(row => [row])
@@ -294,17 +319,62 @@ export default function AdvancedWorkspace() {
       if (cancelled) return;
       if (list[0]) { setError(""); select(list[0]); }
       else { current.current = null; setActive(null); setStatus(mobile ? "请在桌面浏览器创建工作区" : "新建工作区开始使用"); }
-    }).catch(e => { if (!cancelled) { setActive(null); current.current = null; setError(workspaceId ? "工作区不可用：" + String(e) : String(e)); } });
+    }).catch(e => { if (!cancelled) { setActive(null); current.current = null; setError(workspaceId ? "工作区不可用：" + String(e) : String(e)); } }).finally(()=>{if(!cancelled)setWorkspaceOpening(false);});
     return () => { cancelled = true; };
   }, [workspaceId, requestedPlatform, mobile]);
   useEffect(() => {
     if (active) sessionStorage.setItem("mw.chart-return.v1", appLocation.pathname + appLocation.search + appLocation.hash);
   }, [active?.id, appLocation]);
   useEffect(() => { updateTitle(true); }, [active?.id, active?.name]);
-  useEffect(() => { if (nativeReady) post({ type: "app-state", pending: app.pending }); }, [nativeReady, app.pending]);
+  useEffect(()=>{
+    if(!active?.id)return;
+    const context={workspace_id:active.id};
+    const attempt=crypto.randomUUID();
+    const timer=setTimeout(()=>{
+      if(notificationReadyRef.current)return;
+      setNotificationFailed(true);
+      void notices.report({source_kind:'chart_shell',attempt_id:attempt,code:'CHART_SHELL_UNAVAILABLE',title:'图表通知接入尚未完成',message:'图表通知接入超时，请重新加载图表；恢复后可查看消息记录',context});
+    },25000);
+    return()=>clearTimeout(timer);
+  },[active?.id,frameKey,notices]);
+  useEffect(()=>{if(notificationReady&&active?.id)void notices.resolve({source_kind:'chart_shell',attempt_id:alertUiSession.current,code:'CHART_SHELL_UNAVAILABLE',title:'图表通知接入已恢复',message:'当前工作区原生通知已接入',context:{workspace_id:active.id}});},[notificationReady,active?.id,notices]);
+  useEffect(()=>{notices.setPresentation(true);return()=>notices.setPresentation(false);},[notices]);
+  useEffect(()=>{if(nativeReady)post({type:'app-state',pending:noticeState.unread});
+    if(notificationReady)post({type:'notice-center-state',session:alertUiSession.current,workspace_id:current.current?.id,state:noticeState});
+  },[nativeReady,notificationReady,noticeState]);
+  useEffect(()=>{if(nativeReady && new URLSearchParams(appLocation.search).get('panel')==='alerts') { const signal=new URLSearchParams(appLocation.search).get('signal'); if(signal)post({type:'chart-alert-event-open',signal_id:signal}); }},[nativeReady,appLocation.search]);
+  useEffect(()=>{
+    if(!noticeOpen || !noticeEvent)return;
+    let alive=true;
+    void notices.action({action:'detail',event_id:noticeEvent}).then(row=>{
+      if(!alive || row.source_kind!=='chart_alert')return;
+      const url=new URL(location.href);url.searchParams.set('panel','alerts');url.searchParams.set('signal',row.source_id);url.searchParams.delete('event');navigate(url.pathname+url.search+url.hash,{replace:true});
+    }).catch(()=>{});
+    return()=>{alive=false;};
+  },[noticeOpen,noticeEvent,notices]);
+  useEffect(()=>{if(notificationReady && noticeOpen)post({type:'notice-center-open',event_id:noticeEvent});},[notificationReady,noticeOpen,noticeEvent]);
   useEffect(() => () => { if (titleTimer.current) clearTimeout(titleTimer.current); }, []);
   useEffect(() => {
     const marketRequests = new Map<Window, Map<number, AbortController>>();
+    const subscriptionScopes = new WeakMap<object, {workspace: string; session: string; epoch: number}>();
+    const observeSubscription = (args: any, kind: 'market' | 'connection' | 'subscription', error: unknown | null, attempt: string, lifecycle?: 'ended') => {
+      const scope = subscriptionScopes.get(args);
+      if (!scope || (!lifecycle && (scope.workspace !== current.current?.id || scope.session !== alertUiSession.current || scope.epoch !== nativeLoadEpoch.current))) return;
+      const query = args.query || args;
+      const shared = kind === 'connection', failed = error as {status?: number; code?: string; name?: string} | null;
+      const fault = {source_kind: kind === 'subscription' ? 'market' as const : kind,
+        attempt_id: (shared ? args.client : args.listener + ':' + String(args.generation ?? '')) + ':' + attempt,
+        code: shared ? 'MARKET_CONNECTION_FAILED' : kind === 'subscription' ? 'MARKET_SUBSCRIPTION_FAILED' : 'MARKET_READ_FAILED',
+        title: shared ? '图表行情连接中断' : kind === 'subscription' ? '行情订阅未成功注册' : '图表行情读取失败',
+        message: lifecycle ? '订阅观察已结束，无法继续确认恢复' : error == null ? '对应操作已明确恢复' : String(error),
+        ...(lifecycle ? {observation_ended: true} : {}),
+        context: {workspace_id: scope.workspace, epoch: scope.epoch, source_id: shared ? args.client : args.listener,
+          generation: shared ? 0 : args.generation ?? 0, instrument: shared ? '' : query.instrument || '',
+          timeframe: shared ? '' : query.timeframe || '', consumer: shared ? 'stream' : args.kind || 'bars'},
+        evidence: {operation: shared ? 'sse_transport' : kind === 'subscription' ? 'subscription_register' : 'market_read',
+          error_type: failed?.name || '', code: failed?.code || '', http_status: failed?.status || null}};
+      if (error == null) void notices.resolve(fault); else void notices.report(fault);
+    };
     const provider = providerSubscriptions(
       api,
       (client) =>
@@ -318,11 +388,12 @@ export default function AdvancedWorkspace() {
         ),
       (error) => setError(String(error)),
       {subscribe: '/charts/stream/subscribe', unsubscribe: '/charts/stream/unsubscribe'},
+      observeSubscription,
     );
     const legacyProvider = providerSubscriptions(api,
       client => new EventSource('/api/charts/provider/events?client=' + encodeURIComponent(client)),
       event => frame.current?.contentWindow?.postMessage({channel, type:'provider-event', event}, origin),
-      error => setError(String(error)));
+      error => setError(String(error)), undefined, observeSubscription);
     const listener = async (e: MessageEvent) => {
       if (
         e.source !== frame.current?.contentWindow ||
@@ -334,6 +405,49 @@ export default function AdvancedWorkspace() {
         source = e.source as Window;
       const reply = (value: object) =>
         source.postMessage({ channel, ...value }, origin);
+      if(m.type==='notice-source'){
+        if(m.session!==alertUiSession.current||m.workspace_id!==current.current?.id||m.epoch!==nativeLoadEpoch.current||
+          !m.fault||JSON.stringify(m.fault).length>16000||!['indicator','history','capacity','market','connection','chart_shell','data_center','preferences'].includes(m.fault.source_kind))return;
+        const fault={...m.fault,context:{...m.fault.context,workspace_id:current.current?.id,epoch:m.epoch}};
+        if(m.recovered===true)void notices.resolve(fault);else void notices.report(fault);
+        return;
+      }
+      if(m.type==='notice-center-rpc'){
+        const q=m.query,scope=current.current?.id,session=alertUiSession.current;
+        if(!q || q.workspace_id!==scope || q.session!==session ||
+          !Number.isSafeInteger(m.id) || JSON.stringify(q).length>6000){reply({type:'result',id:m.id,error:'通知上下文已失效'});return;}
+        try{const result=await notices.action(q);
+          if(source===frame.current?.contentWindow && session===alertUiSession.current && scope===current.current?.id)
+            reply({type:'result',id:m.id,result});
+        }catch(error){reply({type:'result',id:m.id,error:String(error),errorDetails:apiErrorDetails(error)});}return;
+      }
+      if(m.type==='chart-timezone' && m.session===alertUiSession.current && m.workspace_id===current.current?.id){
+        if(typeof m.zone==='string' && typeof m.label==='string' && m.zone.length<100 && m.label.length<160)setChartTime(m.zone,m.label);
+        return;
+      }
+      if(m.type==='notice-center-ready' && m.session===alertUiSession.current && m.workspace_id===current.current?.id){setNotificationReady(true);setNotificationFailed(false);return;}
+      if(m.type==='notice-center-unavailable' && m.session===alertUiSession.current && m.workspace_id===current.current?.id){setNotificationReady(false);setNotificationFailed(true);void notices.report({source_kind:'chart_shell',attempt_id:m.session+':notice-shell',code:'CHART_SHELL_UNAVAILABLE',title:'原生系统消息暂不可用',message:String(m.error||'接入失败'),context:{workspace_id:current.current?.id}});return;}
+      if(m.type==='notice-center-panel' && m.session===alertUiSession.current && m.workspace_id===current.current?.id){
+        if(m.open)openNotices(typeof m.event==='string'?m.event:undefined);
+        else if(new URLSearchParams(location.search).get('panel')==='notifications')closeNotices();return;
+      }
+      if(m.type==='notice-center-locate' && m.session===alertUiSession.current && typeof m.event_id==='string'){
+        const row=await notices.action({action:'detail',event_id:m.event_id});
+        const workspace=row.workspace;if(typeof workspace!=='string'||!workspace) return;
+        if(workspace!==current.current?.id){
+          const session=alertUiSession.current,from=current.current?.id;
+          if(!await appRef.current.confirmLeave() || session!==alertUiSession.current || from!==current.current?.id)return;
+          navigate('/advanced-charts/'+encodeURIComponent(workspace)+'?panel=notifications&event='+encodeURIComponent(row.id));return;
+        }
+        if(row.source_kind==='data_center' || row.context?.consumer==='quotes' || row.context?.timeframe==='quotes') {
+          reply({type:'data-center-open',location:'/market-data'});return;
+        }
+        if(row.source_kind==='capacity') {reply({type:'history-capacity-open'});return;}
+        if(row.source_kind==='chart_alert'){
+          const rows=await api('/chart-alerts');const alert=rows.find((a:any)=>a.id===row.original_evidence?.alert_id);
+          if(alert && source===frame.current?.contentWindow)reply({type:'chart-alert-locate',row:alert,event:row.original_evidence});
+        }return;
+      }
       if (m.type === "draft-captured") {
         const waiter = capturing.current; capturing.current = null;
         if (!waiter) return;
@@ -360,7 +474,12 @@ export default function AdvancedWorkspace() {
       }
       if (m.type === "alerts-panel-state" && m.workspace_id === current.current?.id && typeof m.open === "boolean") {
         const url = new URL(location.href);
-        if (m.open) url.searchParams.set("panel", "alerts"); else url.searchParams.delete("panel");
+        if (m.open) {
+          url.searchParams.set("panel", "alerts");
+          if(typeof m.signal_id==='string' && /^[a-f0-9-]{36}$/.test(m.signal_id)) {
+            url.searchParams.set('signal',m.signal_id);url.searchParams.delete('event');
+          }
+        } else if(url.searchParams.get("panel")==="alerts") {url.searchParams.delete("panel");url.searchParams.delete("signal");}
         navigate(url.pathname + url.search + url.hash, {replace:true}); return;
       }
       if (m.type === "data-center-state" && typeof m.session === "string" && /^[a-f0-9-]{36}$/.test(m.session)) {
@@ -559,6 +678,7 @@ export default function AdvancedWorkspace() {
           if (m.type === 'market-accept') {
             await provider.accept(args);
           } else if (m.type.endsWith('-subscribe')) {
+            subscriptionScopes.set(args, {workspace:current.current?.id || '',session:alertUiSession.current,epoch:nativeLoadEpoch.current});
             await transport.subscribe(args);
           } else {
             await transport.unsubscribe(args);
@@ -586,6 +706,10 @@ export default function AdvancedWorkspace() {
             Object.entries(previous).filter(([key]) => keys.has(key)),
           ),
         );
+        return;
+      }
+      if (m.type === "history-load-details-open") {
+        setHistoryDetailsOpen(true);
         return;
       }
       if (m.type === "history-plans-open") {
@@ -623,6 +747,7 @@ export default function AdvancedWorkspace() {
         nativeLoadEpoch.current = m.epoch;
         setNativeLoads({});
         setCapacityNotices({});
+        setHistoryDetailsOpen(false);
         setCapacityDialog(null);
         return;
       }
@@ -870,6 +995,7 @@ export default function AdvancedWorkspace() {
           reply({
             type: "init",
             alert_ui_session: alertUiSession.current,
+            notice_state: noticeStateRef.current,
             alert_ui_draft: readAlertDraft(current.current?.id),
             history_capabilities: capabilities,
             document: current.current?.document || {},
@@ -899,8 +1025,9 @@ export default function AdvancedWorkspace() {
         )
           setExportSelection(value);
       } else if (m.type === "workspace-action") {
-        const paths: Record<string,string> = {home: location.pathname, charts: location.pathname, signals:"/signals", replay:"/replay", settings:"/settings", legacy:"/legacy/monitoring"};
-        if (paths[m.action]) navigate(paths[m.action]);
+        const paths: Record<string,string> = {home: location.pathname, charts: location.pathname, signals:location.pathname+"?panel=notifications", replay:"/replay", settings:"/settings", legacy:"/legacy/monitoring"};
+        if(m.action==='signals')openNotices();
+        else if (paths[m.action]) navigate(paths[m.action]);
         else if (m.action === "logout") {
           try { await appRef.current.logout(); } catch(e) { setError(String(e)); }
         } else if (!mobile && m.action === "create") await create();
@@ -916,7 +1043,7 @@ export default function AdvancedWorkspace() {
 
         }
         if (new URLSearchParams(location.search).get("panel") === "alerts") reply({type:"open-alerts"});
-        reply({ type:"app-state", pending:appRef.current.pending });
+        reply({ type:"app-state", pending:noticeStateRef.current.unread });
         setStatus("已加载 · 行情按需更新");
       } else if (m.type === "viewport-notice") {
         if (typeof m.key !== "string" || m.key.length > 200) return;
@@ -992,6 +1119,7 @@ export default function AdvancedWorkspace() {
               localStorage.setItem("mw-tv-draft:" + draftId, draft);
             } catch {
               setError("本地草稿空间不足，请勿关闭页面，等待服务器保存完成");
+              void notices.report({source_kind:'workspace',attempt_id:crypto.randomUUID(),code:'LOCAL_DRAFT_FAILED',title:'图表草稿未能保存到本机',message:'本机存储写入失败，请勿关闭页面',context:{workspace_id:draftId}});
             }
           }
           let result;
@@ -1141,16 +1269,17 @@ export default function AdvancedWorkspace() {
             result = rows.find(row=>row.kind==="setting" && row.name==="mw.symbol-flags.v1" && !row.tool) || null;
           } else {
             if (mobile || q.args?.kind !== "setting" || q.args?.name !== "mw.symbol-flags.v1" || q.args?.tool) throw Error("收藏保存请求不允许");
-            result = await api("/advanced-charts/preferences/save", q.args);
+            // The native producer owns the bounded 409 rebase/retry loop.
+            result = await requestAPI("/advanced-charts/preferences/save", q.args);
           }
           reply({type:"result",id:m.id,result});
         } catch(e) { reply({type:"result",id:m.id,error:String(e),errorDetails:apiErrorDetails(e)}); }
       } else if (m.type === "preferences") {
         const q = m.query;
         if (
-          mobile ||
+          (mobile && q?.op !== "read") ||
           !q ||
-          !["save", "delete"].includes(q.op) ||
+          !["read", "save", "delete"].includes(q.op) ||
           JSON.stringify(q).length > 1_100_000
         ) {
           reply({ type: "result", id: m.id, error: "设置请求不允许" });
@@ -1161,10 +1290,16 @@ export default function AdvancedWorkspace() {
           return;
         }
         try {
+          if (q.op === "read") {
+            reply({type: "result", id: m.id, result: await api("/advanced-charts/preferences")});
+            return;
+          }
           reply({
             type: "result",
             id: m.id,
-            result: await api(
+            // The adapter reports the final save/merge/readonly outcome. A raw
+            // RPC failure here would duplicate it before the adapter can decide.
+            result: await requestAPI(
               q.op === "save"
                 ? "/advanced-charts/preferences/save"
                 : "/advanced-charts/preferences/" + q.args.id + "/delete",
@@ -1428,6 +1563,7 @@ export default function AdvancedWorkspace() {
                             [key]: { ...previous[key], ...progress },
                           };
                         }),
+                      {workspace_id:current.current?.id || "",chart_index:String(q.notice_chart_index ?? "")},
                     )
                 : (body: unknown, signal: AbortSignal) =>
                     api(
@@ -1534,6 +1670,7 @@ export default function AdvancedWorkspace() {
           localStorage.setItem("mw-tv-draft:" + id, JSON.stringify(document));
         } catch (e) {
           setError("本地草稿空间不足，将继续尝试服务器保存");
+          void notices.report({source_kind:'workspace',attempt_id:crypto.randomUUID(),code:'LOCAL_DRAFT_FAILED',title:'图表草稿未能保存到本机',message:String(e),context:{workspace_id:id},evidence:{server_save:'继续尝试；请勿关闭页面'}});
         }
         setStatus("正在保存");
         queue.current = queue.current.then(async () => {
@@ -1620,15 +1757,25 @@ export default function AdvancedWorkspace() {
   return (
     <main className="advanced-workspace" data-theme={chartTheme}>
       {mobile && <p className="advanced-readonly-note" role="note">手机只读看盘。编辑图表、绘图和告警请使用桌面浏览器；桌面工作区布局仍保留。</p>}
+      {historyDetailsOpen && (
+        <div className="advanced-load-details" role="dialog" aria-modal="false" aria-label="历史加载详情">
+          <header>
+            <strong>历史加载详情</strong>
+            <button type="button" aria-label="关闭历史加载详情" onClick={() => setHistoryDetailsOpen(false)}>关闭</button>
+          </header>
       {Object.keys(indicatorStates).length>0 && <aside className="advanced-history-failures" aria-label="图格指标状态">{Object.entries(indicatorStates).map(([key,item])=><p key={key} role="status">图格 {item.index+1} · {item.name}：{item.state==='error' ? item.error : '正在计算'}{item.previousParams && <>（暂显旧参数：{item.previousParams}）</>}{item.state==='error' && <button onClick={()=>post({type:'retry-chart-indicators',index:item.index,epoch:item.epoch})}>重试指标</button>}</p>)}</aside>}
       {chartFailures.length>0 && <aside className="advanced-history-failures" aria-label="图格历史加载失败">{chartFailures.map(item=><p key={item.index} role="status">图格 {item.index+1} · {item.label} · {item.resolution}：{item.error}<button onClick={()=>post({type:'retry-chart-history',...item})}>重试此图格</button></p>)}</aside>}
       {(Object.keys(nativeLoads).length > 0 ||
         Object.keys(capacityNotices).length > 0) && (
         <HistoryLoadingNotice
+          immediate
           loads={nativeLoads}
           capacities={capacityNotices}
           onCancel={() => post({ type: "cancel-history" })}
-          onSettings={() => post({ type: "history-capacity-open" })}
+          onSettings={() => {
+            setHistoryDetailsOpen(false);
+            post({ type: "history-capacity-open" });
+          }}
           onDismiss={() =>
             setCapacityNotices((previous) =>
               Object.fromEntries(
@@ -1640,8 +1787,12 @@ export default function AdvancedWorkspace() {
           }
         />
       )}
+      {!Object.keys(nativeLoads).length && !Object.keys(capacityNotices).length && !Object.keys(indicatorStates).length && !chartFailures.length && <p>当前没有进行中的加载任务。</p>}
+        </div>
+      )}
       {capacityDialog && (
         <HistoryCapacityDialog
+          request={api}
           {...capacityDialog}
           theme={chartTheme}
           onClose={() => setCapacityDialog(null)}
@@ -1653,6 +1804,7 @@ export default function AdvancedWorkspace() {
       )}
       {historyPlansOpen && (
         <HistoryPlansDialog
+          request={api}
           onClose={() => setHistoryPlansOpen(false)}
           readonly={mobile}
           onRefresh={() => post({ type: "refresh-managed" })}
@@ -1661,6 +1813,7 @@ export default function AdvancedWorkspace() {
       )}
       {maintenanceInstrument && (
         <MaintenanceDialog
+          request={api}
           instrument={maintenanceInstrument}
           onClose={() => setMaintenanceInstrument(null)}
           onSubmitted={() => {
@@ -1672,6 +1825,7 @@ export default function AdvancedWorkspace() {
       {exportSelection && (
         <ExportDialog
           selection={exportSelection}
+          workspace={active?.id}
           onClose={() => setExportSelection(null)}
         />
       )}
@@ -1683,14 +1837,14 @@ export default function AdvancedWorkspace() {
       >
         {status}
       </div>
-      {!nativeReady && noticeMessages.length > 0 && (
-        <div className="advanced-loading-notice" role="alert">
-          {noticeMessages
-            .map((notice) => notice.text.replace(/^(?:Error:\s*)+/, ""))
-            .join("；")}
-          {blocked.current && !mobile && (
-            <button onClick={copy}>复制恢复草稿</button>
-          )}
+      {notificationFailed && !notificationReady && (
+        <div className="advanced-shell-recovery" role="status">
+          <span>图表界面接入未完成，请重新加载。</span>
+          <button type="button" onClick={()=>void appRef.current.confirmLeave().then(ok=>{
+            if(!ok)return;
+            setNativeReady(false);setNotificationReady(false);setNotificationFailed(false);
+            setFrameKey(key=>key+1);
+          })}>重新加载图表</button>
         </div>
       )}
       {active ? (
@@ -1704,11 +1858,11 @@ export default function AdvancedWorkspace() {
           allowFullScreen
           referrerPolicy="no-referrer"
         />
-      ) : (
+      ) : workspaceOpening ? null : (
         <section>
           <h1>{error && workspaceId ? "工作区不可用" : "图表工作区"}</h1>
           <p>{mobile ? "手机只读看盘，请在桌面浏览器创建工作区。" : "选择已有工作区，或新建工作区开始使用。"}</p>
-          <NavLink to="/advanced-charts">选择默认工作区</NavLink> · <NavLink to="/signals">通知</NavLink> · <NavLink to="/settings">设置</NavLink>
+          <NavLink to="/advanced-charts">选择默认工作区</NavLink> · <NavLink to="/settings">设置</NavLink>
           <button disabled={mobile} onClick={create}>
             新建工作区
           </button>

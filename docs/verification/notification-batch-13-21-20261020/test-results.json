@@ -1,0 +1,42 @@
+{
+  "backend_initial_without_pg": {
+    "passed": 2050,
+    "skipped": 562,
+    "errors": 38,
+    "cause": "Missing TEST_POSTGRES_URL, not a passing run"
+  },
+  "backend_with_isolated_pg": {
+    "passed": 2620,
+    "skipped": 16,
+    "errors": 14,
+    "seconds": 2004.39,
+    "cause": "task-only 768MiB tmpfs PostgreSQL storage exhausted, later connections failed"
+  },
+  "backend_failed_nodes_fresh_pg": {
+    "passed": 14,
+    "seconds": 17.7,
+    "errors": 0
+  },
+  "combined_backend_outcome": "All 2634 executed test cases passed across the full run and its 14-node infrastructure rerun; 16 skipped. Do not describe the first full invocation as green.",
+  "frontend_focused": [
+    "native-preference-notice",
+    "advanced-preferences",
+    "advanced-preferences-conflict",
+    "provider-notice-lifecycle",
+    "market-notice-lifecycle",
+    "native-chunk-recovery",
+    "api-read-recovery",
+    "notifications-runtime",
+    "notifications-persistence",
+    "system-history.browser",
+    "notice-page-exit.browser"
+  ],
+  "review": "Independent Standards and Spec both passed after final native preference outcome fixes",
+  "product_head": "b32c2f82da82f0a8c8a8b662f692e5334c3a0b97",
+  "product_ci": {
+    "run_id": 39414732895,
+    "head": "b32c2f82da82f0a8c8a8b662f692e5334c3a0b97",
+    "status": "completed",
+    "conclusion": "success"
+  }
+}

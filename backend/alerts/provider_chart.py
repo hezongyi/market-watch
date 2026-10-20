@@ -410,7 +410,7 @@ def cached_page(meta, frame, before, count, *, latest=False, quote=False, deadli
     if meta["source"] == "oanda" and settings.oanda_acquisition_mode == "rest_batch" and latest:
         from sqlalchemy import select
 
-        from .provider_cache import HistoryPending, snapshot_transaction
+        from .provider_cache import LatestObservationPending, snapshot_transaction
         from .provider_cache import ensure as ensure_cache
         from .storage import ProviderInterest, now_ms, transaction
 
@@ -424,19 +424,20 @@ def cached_page(meta, frame, before, count, *, latest=False, quote=False, deadli
         if active:
             with snapshot_transaction(dataset_id, before, count) as (_, cached):
                 fresh = now_ms() - cached["latest_at"] < fresh_seconds("oanda") * 1000
+                page = {
+                    **cached,
+                    "bars": cached["bars"][-count:],
+                    "series_kind": "provider",
+                    "basis": meta["basis"],
+                    "calendar": meta["calendar"],
+                    "precision": meta["precision"],
+                    "dataset_id": dataset_id,
+                    "cache_hit": True,
+                    "indicators": [],
+                }
                 if cached["bars"] and fresh:
-                    return {
-                        **cached,
-                        "bars": cached["bars"][-count:],
-                        "series_kind": "provider",
-                        "basis": meta["basis"],
-                        "calendar": meta["calendar"],
-                        "precision": meta["precision"],
-                        "dataset_id": dataset_id,
-                        "cache_hit": True,
-                        "indicators": [],
-                    }
-            raise HistoryPending()
+                    return page
+            raise LatestObservationPending(page)
     from .market_calendar import observation_identity
 
     identity = observation_identity(meta["source"], meta["symbol"], meta)
@@ -504,14 +505,27 @@ def quote_page(meta):
     key = (meta["source"], meta["id"], meta["basis"], meta.get("calendar"),
            meta.get("calendar_version"), identity.get("channel"),
            identity.get("environment"), identity.get("account_scope"))
+    from .provider_cache import LatestObservationPending
     try:
         page = cached_page(meta, "M1", before, 1, latest=True, quote=True)
-    except Exception:
+    except LatestObservationPending as waiting:
+        # The account collector owns this refresh. Reading its old snapshot is
+        # neither another supplier request nor proof of failure or recovery.
+        page = waiting.page or {"bars": []}
+        last_success = page.get("latest_at") or None
+        return {**page, "fetch_status": "stale" if page["bars"] else "pending",
+                "wait_reason": "shared_refresh" if page["bars"] else "first_quote",
+                "last_success_at": last_success,
+                "cache_age_ms": max(0, now_ms() - last_success) if last_success else None,
+                "read_at": now_ms()}
+    except Exception as error:
         with _LOCK:
             previous = _QUOTE_LAST.get(key)
         if previous is None:
             raise
+        from .market_notices import error_evidence
         return {**copy.deepcopy(previous), "fetch_status": "fetch_failed",
+                "error_evidence": error_evidence(error, provider=meta['source'], operation='quote_page'),
                 "read_at": now_ms()}
     with _LOCK:
         _QUOTE_LAST[key] = copy.deepcopy(page)

@@ -1,0 +1,18 @@
+const assert = require('assert').strict;
+await state.hub.goto('http://192.168.7.232:18320/');
+console.log(await snapshot({page:state.hub}));console.log(await getLatestLogs({page:state.hub,sinceLastCall:true}));
+assert.equal(new URL(state.hub.url()).port,'18320');
+await state.hub.getByRole('button',{name:'窄屏',exact:true}).click();
+console.log(await getLatestLogs({page:state.hub,sinceLastCall:true}));
+await state.hub.frameLocator('iframe').getByRole('heading',{name:'登录守望'}).waitFor();
+assert.equal(await state.hub.frameLocator('iframe').locator('main').evaluate(()=>innerWidth),390);
+await state.hub.getByRole('button',{name:'浅色',exact:true}).click();
+console.log(await getLatestLogs({page:state.hub,sinceLastCall:true}));
+await state.hub.frameLocator('iframe').locator('main[data-theme="light"]').waitFor();
+await state.hub.getByRole('button',{name:'深色',exact:true}).click();
+console.log(await getLatestLogs({page:state.hub,sinceLastCall:true}));
+await state.hub.frameLocator('iframe').locator('main[data-theme="dark"]').waitFor();
+await state.hub.setViewportSize({width:1440,height:1050});await ghostCursor.hide({page:state.hub});
+await state.hub.screenshot({path:'/home/quant/repos/market-watch-login-particles-20261019/docs/verification/login-particles-preview-20261019/preview-hub.png',scale:'css'});
+console.log('Preview hub: relative redirect preserves port; dark/light/narrow tabs passed');
+require('node:fs').writeFileSync('/home/quant/repos/market-watch-login-particles-20261019/docs/verification/login-particles-preview-20261019/hub-contract.json',JSON.stringify({url:state.hub.url(),relativeRedirectPreservesPort:true,dark:true,light:true,narrowViewport:390},null,2));

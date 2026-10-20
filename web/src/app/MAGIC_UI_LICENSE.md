@@ -1,11 +1,7 @@
 # Magic UI attribution
 
-The selected breathing dot background adapts the visual behavior of Magic UI's
-Dot Pattern / Glow to native SVG and CSS. It does not bundle Motion or Tailwind.
-
-Source: https://github.com/magicuidesign/magicui/blob/85f97fd27b053339af74ba9dd4ca428ee25989fb/apps/www/registry/magicui/dot-pattern.tsx
-
-License source: https://github.com/magicuidesign/magicui/blob/85f97fd27b053339af74ba9dd4ca428ee25989fb/LICENSE.md
+The login background adapts Magic UI's Canvas Particles component. The pinned
+source and adaptation details are recorded below.
 
 MIT License
 
@@ -28,3 +24,17 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+## Particles
+
+`Particles.tsx` adapts the upstream Canvas particle generation, circles, edge
+fading, drift and eased mouse translation. It removes framework utilities and
+React pointer state, fixes duplicate initialization, and adds bounded density /
+frame rate / DPR, quiet card area, slow opacity variation, pause, visibility and
+reduced-motion lifecycle handling. No Motion, Tailwind or UI framework added.
+
+Source (pinned): https://github.com/magicuidesign/magicui/blob/efe76fc5755eca1142dd4f74c1d6f0ace2887e3c/apps/www/registry/magicui/particles.tsx
+
+License: https://github.com/magicuidesign/magicui/blob/efe76fc5755eca1142dd4f74c1d6f0ace2887e3c/LICENSE.md
+
+The MIT license and copyright notice above apply to this adaptation as well.

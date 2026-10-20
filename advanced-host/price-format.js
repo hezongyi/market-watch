@@ -40,6 +40,11 @@ function chartPriceFormatter(symbolInfo, minTick) {
 
 /* Quote display metadata is independent of the unrounded snapshot values. */
 function chartQuotePresentation({ s, n, v }, meta) {
+  // Custom series declare their own tick precision through resolveSymbol.
+  // Supplier display heuristics must not override that native price scale.
+  let kind = meta?.series_kind;
+  try { if (typeof MWSeries !== "undefined") kind = MWSeries.decode(n).series_kind; } catch (_) {}
+  if (["managed", "history", "composite"].includes(kind)) return { s, n, v };
   const precisionFor = chartPricePrecision({ mw_range_source: meta?.source,
     mw_display_precision: meta?.display_precision,
     type: ({ EQUITY: "stock", ETF: "fund", CURRENCY: "forex", METAL: "commodity" })[meta?.asset_type] });

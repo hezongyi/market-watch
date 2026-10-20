@@ -1,0 +1,37 @@
+{
+  "startedAt": "2026-10-18T07:21:03.283Z",
+  "pendingSnapshot": "URL: http://127.0.0.1:18275/advanced-charts/mw75-a?panel=notifications\n              - text: \"2\"\n              - text: \"条未读\"\n            - role=button[name=\"关闭通知中心\"i]:\n              - text: \"×\"\n          - status:\n            - text: \"本机记录待同步，服务端通知继续接收\"\n            - text: \"· 1 条本机记录\"\n              - role=checkbox[name=\"网页声音\"i]\n              - text: \"已关闭\"\n            - labeltext:\n              - text: \"关键词\"\n              - role=searchbox[name=\"关键词\"i]\n---\n                    - role=option[name=\"连接\"i]\n                    - role=option[name=\"图表启动\"i]\n              - disclosuretriangle \"更多筛选\"\n          - article:\n            - strong:\n              - text: \"工作区保存失败，请保留草稿\"\n            - paragraph:\n              - text: \"ApiError: MW75 Playwriter 保存失败注入\"\n            - text: \"仅本机待同步\"\n            - text: \"·\"\n            - text: \"10/18/2026, 7:19:37 AM\"\n          - role=button[name=\"错误 · 工作区 工作区读取失败 mw75-a 10/18/2026, 6:47:35 AM · 同事故 2 次\"i]\n          - role=button[name=\"错误 · 工作区 工作区读取失败 mw75-a 10/18/2026, 6:44:37 AM · 同事故 2 次\"i]\n          - sectionfooter:",
+  "pending": [
+    {
+      "id": "b:0dda7b03-c529-41da-9177-cf1decde122f",
+      "status": "accepted",
+      "title": "工作区读取失败",
+      "attempt": "e9e2a8f2-f85c-4960-bf6a-3cd0b7c6fd56"
+    },
+    {
+      "id": "b:16595089-605f-0f89-216d-6f76afe96d67",
+      "status": "pending",
+      "title": "工作区保存失败，请保留草稿",
+      "attempt": "6172e3de-9da6-4d80-9e5b-a9c5139572ad"
+    }
+  ],
+  "refreshedSnapshot": "URL: http://127.0.0.1:18275/advanced-charts/mw75-a?panel=notifications\n              - text: \"2\"\n              - text: \"条未读\"\n            - role=button[name=\"关闭通知中心\"i]:\n              - text: \"×\"\n          - status:\n            - text: \"本机记录待同步，服务端通知继续接收\"\n            - text: \"· 1 条本机记录\"\n              - role=checkbox[name=\"网页声音\"i]\n              - text: \"已关闭\"\n            - labeltext:\n              - text: \"关键词\"\n              - role=searchbox[name=\"关键词\"i]\n---\n                    - role=option[name=\"连接\"i]\n                    - role=option[name=\"图表启动\"i]\n              - disclosuretriangle \"更多筛选\"\n          - article:\n            - strong:\n              - text: \"工作区保存失败，请保留草稿\"\n            - paragraph:\n              - text: \"ApiError: MW75 Playwriter 保存失败注入\"\n            - text: \"仅本机待同步\"\n            - text: \"·\"\n            - text: \"10/18/2026, 7:19:37 AM\"\n          - role=button[name=\"错误 · 工作区 工作区读取失败 mw75-a 10/18/2026, 6:47:35 AM · 同事故 2 次\"i]\n          - role=button[name=\"错误 · 工作区 工作区读取失败 mw75-a 10/18/2026, 6:44:37 AM · 同事故 2 次\"i]\n          - sectionfooter:",
+  "server": [
+    {
+      "id": "b:16595089-605f-0f89-216d-6f76afe96d67",
+      "source": "workspace",
+      "title": "工作区保存失败，请保留草稿",
+      "workspace": "mw75-a",
+      "incident": {
+        "id": "33004ee0-9edc-46ca-b3c6-00d37b039b59",
+        "first_at": 1792307977903,
+        "last_at": 1792307977903,
+        "closed_at": null,
+        "count": 1,
+        "count_scope": "当前事故已接受发生数",
+        "severity_rank": 2
+      }
+    }
+  ],
+  "acceptedSnapshot": "URL: http://127.0.0.1:18275/advanced-charts/mw75-a?panel=notifications\n              - text: \"3\"\n              - text: \"条未读\"\n            - role=button[name=\"关闭通知中心\"i]:\n              - text: \"×\"\n          - status:\n            - text: \"已同步\"\n              - role=checkbox[name=\"网页声音\"i]\n              - text: \"已关闭\"\n            - labeltext:\n              - text: \"关键词\"\n              - role=searchbox[name=\"关键词\"i]\n---\n                    - role=option[name=\"偏好设置\"i]\n                    - role=option[name=\"行情\"i]\n                    - role=option[name=\"连接\"i]\n                    - role=option[name=\"图表启动\"i]\n              - disclosuretriangle \"更多筛选\"\n          - role=button[name=\"错误 · 工作区 工作区保存失败，请保留草稿 mw75-a 10/18/2026, 7:19:37 AM\"i]\n          - role=button[name=\"错误 · 工作区 工作区读取失败 mw75-a 10/18/2026, 6:47:35 AM · 同事故 2 次\"i]\n          - role=button[name=\"错误 · 工作区 工作区读取失败 mw75-a 10/18/2026, 6:44:37 AM · 同事故 2 次\"i]\n          - sectionfooter:\n            - role=button[name=\"上一页\"i]\n            - text: \"保留 30 天 · 本页\""
+}

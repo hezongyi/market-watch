@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>系统消息中心 · 原生组件预览</title>
+    <style>
+      html,
+      body,
+      #chart {
+        height: 100%;
+        margin: 0;
+        background: #0f0f0f;
+      }
+      #preview-guide {
+        position: fixed;
+        bottom: 22px;
+        left: 76px;
+        max-width: 580px;
+        z-index: 300;
+        padding: 14px 16px;
+        background: #242424;
+        color: #dbdbdb;
+        border: 1px solid #555;
+        border-radius: 8px;
+        box-shadow: 0 8px 32px #0005;
+        font: 13px/1.6 system-ui;
+      }
+      #preview-guide[hidden] {
+        display: none;
+      }
+      #preview-guide strong {
+        font-size: 14px;
+      }
+      #preview-guide p {
+        margin: 4px 0 10px;
+        color: #aaa;
+      }
+      #preview-guide button {
+        font: inherit;
+        background: #333;
+        border: 1px solid #555;
+        color: inherit;
+        padding: 5px 10px;
+        margin-right: 6px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      #preview-status {
+        font-size: 12px;
+        color: #bbb;
+        margin-top: 8px;
+      }
+      @media (max-width: 600px) {
+        #preview-guide {
+          left: 12px;
+          right: 12px;
+          bottom: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="chart"></div>
+    <aside id="preview-guide">
+      <strong>系统消息中心 · 可交互预览</strong>
+      <p>
+        使用后续接入的同一套界面组件。搜索、筛选、滚动加载、详情、设置和已读操作均使用本页样例数据。
+      </p>
+      <button id="reopen">打开系统消息</button
+      ><button id="theme">浅色主题</button><button id="reset">重置样例</button
+      ><button id="close-guide">隐藏说明</button>
+      <div id="preview-status">正在加载原生图表组件…</div>
+    </aside>
+    <script src="/charting_library_91bf3b2668480f58/charting_library.js"></script>
+    <script src="/native-alert-shell.js"></script>
+    <script src="./native-notification-surface.js"></script>
+    <script src="./system-messages.js"></script>
+  </body>
+</html>

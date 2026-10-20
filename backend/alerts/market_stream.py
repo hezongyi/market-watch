@@ -158,6 +158,10 @@ def cancel(session_hash, client, listener, generation):
         task = db.scalar(select(MarketStreamTask).options(defer(MarketStreamTask.payload)).where(MarketStreamTask.id == task_id)
                          .with_for_update()) if task_id else None
         sub.generation, sub.active = generation, False
+        if task_id:
+            # A loaded legacy client may upload a durable fault after cancel.
+            # Keep only this generation's owner for notice dedupe, not demand.
+            sub.state = {**sub.state, '_notice_task_id': task_id}
         sub.task_id = None
         db.flush()
         if task_id and not db.scalar(select(MarketStreamSubscription.id).where(
@@ -172,7 +176,8 @@ def accept_provider(session_hash, client, listener, generation, result_epoch, se
     Never reread mutable provider bars to mint acceptance: a repair can commit
     between publication and this acknowledgement.
     """
-    from .provider_acceptance import BATCH, merge, receipts as bar_receipts
+    from .provider_acceptance import BATCH, merge
+    from .provider_acceptance import receipts as bar_receipts
 
     if not receipts or len(receipts) > BATCH:
         raise ValueError("无效行情接受批次")
@@ -220,6 +225,9 @@ def accept_provider(session_hash, client, listener, generation, result_epoch, se
 def _release_demand(db, task, *, keep_revision=None):
     """Delete only this calculation's browser demand; alerts keep their owners."""
     from .storage import MarketComposite, MarketDemand, ProviderInterest
+    if keep_revision is None:
+        from .market_notices import end_observation
+        end_observation(db, task)
 
     identity = task.identity
     if identity.get("series_kind") == "provider":
@@ -364,6 +372,8 @@ def commit(ownership, payload, *, delay_ms=500):
                 db.add(MarketStreamResult(task_id=task.id, sequence=task.sequence, payload=wire))
                 db.execute(delete(MarketStreamResult).where(MarketStreamResult.task_id == task.id,
                     MarketStreamResult.sequence <= task.sequence - RESULT_LIMIT))
+            from .market_notices import record_result
+            record_result(db, task, payload, fingerprint=fingerprint)
         task.lease_token, task.lease_until = None, 0
         if "new_input_signal" in ownership:
             task.input_signal = ownership["new_input_signal"]
@@ -400,6 +410,9 @@ def events(session_hash, client, cursors):
                 .order_by(MarketStreamResult.sequence).limit(RESULT_LIMIT)))
             common = {"listener": sub.listener, "generation": sub.generation, "identity": task.identity,
                       "result_epoch": task.result_epoch}
+            from .config import settings
+            if settings.notification_center_sources_enabled:
+                common.update(notice_owner='server', task_id=task.id)
             if sequence > task.sequence or rows and rows[0].sequence != sequence + 1:
                 output.append({**common, "type": "reset", "sequence": task.sequence,
                                "reason": "recovery_budget"})
@@ -670,8 +683,12 @@ def cleanup():
             MarketStreamSubscription.client_id.in_(clients),
             MarketStreamSubscription.expires <= stamp,
             or_(MarketStreamSubscription.task_id.in_(tasks), MarketStreamSubscription.task_id.is_(None))))
-        retired = select(MarketStreamTask.id).where(MarketStreamTask.id.in_(tasks),
-            MarketStreamTask.expires <= stamp, MarketStreamTask.lease_until <= stamp, ~referenced)
+        retired = list(db.scalars(select(MarketStreamTask.id).where(MarketStreamTask.id.in_(tasks),
+            MarketStreamTask.expires <= stamp, MarketStreamTask.lease_until <= stamp, ~referenced)))
+        from .market_notices import end_observation
+        for ident in retired:
+            task = db.get(MarketStreamTask, ident, options=[defer(MarketStreamTask.payload)])
+            end_observation(db, task)
         db.execute(delete(MarketStreamResult).where(MarketStreamResult.task_id.in_(retired)))
         db.execute(delete(MarketStreamTask).where(MarketStreamTask.id.in_(retired)))
         subscribed = select(MarketStreamSubscription.id).where(

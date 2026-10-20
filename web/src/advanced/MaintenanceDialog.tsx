@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { api } from '../api';
+import { api as defaultRequest } from '../api';
 
-export function MaintenanceDialog({instrument,onClose,onSubmitted}:{
+export function MaintenanceDialog({instrument,onClose,onSubmitted,request:api=defaultRequest}:{
+  request?:typeof defaultRequest;
   instrument:string;onClose:()=>void;onSubmitted:()=>void;
 }) {
   const dialog=useRef<HTMLDialogElement>(null);

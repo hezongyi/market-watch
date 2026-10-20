@@ -47,6 +47,10 @@ class HistoryPending(Exception):
 class LatestObservationPending(HistoryPending):
     """Wait for the account collector without declaring historical pagination stalled."""
 
+    def __init__(self, page=None):
+        super().__init__()
+        self.page = page
+
 
 def rest_batch_owner_active(key):
     """Whether an OANDA latest demand is owned by the account worker."""

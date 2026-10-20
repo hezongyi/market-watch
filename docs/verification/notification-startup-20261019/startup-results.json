@@ -1,0 +1,281 @@
+{
+  "cases": [
+    {
+      "name": "normal deep link",
+      "transitions": [
+        {
+          "ms": 148,
+          "old": false,
+          "recovery": false,
+          "frame": false
+        },
+        {
+          "ms": 255,
+          "old": false,
+          "recovery": false,
+          "frame": true,
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 1600,
+            "height": 1000
+          }
+        }
+      ],
+      "messages": [
+        {
+          "ms": 2125,
+          "type": "notice-center-ready"
+        }
+      ]
+    },
+    {
+      "name": "reload deep link",
+      "transitions": [
+        {
+          "ms": 73,
+          "old": false,
+          "recovery": false,
+          "frame": false
+        },
+        {
+          "ms": 202,
+          "old": false,
+          "recovery": false,
+          "frame": true,
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 1600,
+            "height": 1000
+          }
+        }
+      ],
+      "messages": [
+        {
+          "ms": 1609,
+          "type": "notice-center-ready"
+        }
+      ]
+    },
+    {
+      "name": "normal chart without panel",
+      "transitions": [
+        {
+          "ms": 399,
+          "old": false,
+          "recovery": false,
+          "frame": false
+        },
+        {
+          "ms": 1209,
+          "old": false,
+          "recovery": false,
+          "frame": true,
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 1600,
+            "height": 1000
+          }
+        }
+      ],
+      "messages": [
+        {
+          "ms": 2787,
+          "type": "notice-center-ready"
+        }
+      ]
+    },
+    {
+      "name": "chart host delayed 6 seconds",
+      "transitions": [
+        {
+          "ms": 153,
+          "old": false,
+          "recovery": false,
+          "frame": false
+        },
+        {
+          "ms": 327,
+          "old": false,
+          "recovery": false,
+          "frame": true,
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 1600,
+            "height": 1000
+          }
+        }
+      ],
+      "messages": [
+        {
+          "ms": 8270,
+          "type": "notice-center-ready"
+        }
+      ]
+    },
+    {
+      "name": "blocked chart reaches existing 25 second timeout",
+      "transitions": [
+        {
+          "ms": 161,
+          "old": false,
+          "recovery": false,
+          "frame": false
+        },
+        {
+          "ms": 483,
+          "old": false,
+          "recovery": false,
+          "frame": true,
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 1600,
+            "height": 1000
+          }
+        },
+        {
+          "ms": 25485,
+          "old": false,
+          "recovery": true,
+          "frame": true,
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 1600,
+            "height": 1000
+          }
+        }
+      ],
+      "messages": []
+    },
+    {
+      "name": "reload action restores native center",
+      "transitions": [
+        {
+          "ms": 161,
+          "old": false,
+          "recovery": false,
+          "frame": false
+        },
+        {
+          "ms": 483,
+          "old": false,
+          "recovery": false,
+          "frame": true,
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 1600,
+            "height": 1000
+          }
+        },
+        {
+          "ms": 25485,
+          "old": false,
+          "recovery": true,
+          "frame": true,
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 1600,
+            "height": 1000
+          }
+        },
+        {
+          "ms": 26136,
+          "old": false,
+          "recovery": false,
+          "frame": true,
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 1600,
+            "height": 1000
+          }
+        }
+      ],
+      "messages": [
+        {
+          "ms": 28601,
+          "type": "notice-center-ready"
+        }
+      ]
+    },
+    {
+      "name": "explicit native attach failure",
+      "transitions": [
+        {
+          "ms": 180,
+          "old": false,
+          "recovery": false,
+          "frame": false
+        },
+        {
+          "ms": 524,
+          "old": false,
+          "recovery": false,
+          "frame": true,
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 1600,
+            "height": 1000
+          }
+        },
+        {
+          "ms": 2936,
+          "old": false,
+          "recovery": true,
+          "frame": true,
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 1600,
+            "height": 1000
+          }
+        }
+      ],
+      "messages": [
+        {
+          "ms": 2934,
+          "type": "notice-center-unavailable"
+        }
+      ]
+    },
+    {
+      "name": "native center restored after failure",
+      "transitions": [
+        {
+          "ms": 113,
+          "old": false,
+          "recovery": false,
+          "frame": false
+        },
+        {
+          "ms": 638,
+          "old": false,
+          "recovery": false,
+          "frame": true,
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 1600,
+            "height": 1000
+          }
+        }
+      ],
+      "messages": [
+        {
+          "ms": 2430,
+          "type": "notice-center-ready"
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "passed": true
+}
