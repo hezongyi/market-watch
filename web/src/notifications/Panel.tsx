@@ -709,6 +709,7 @@ export function NoticePanel({
           </div>
         </>
       )}
+      {problem && <p className="nc-problem" role="alert">{problem}</p>}
       <footer className="nc-footer">
         <span role="status">
           {state.status}

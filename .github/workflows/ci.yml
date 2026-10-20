@@ -195,6 +195,7 @@ jobs:
           node tests/notifications-persistence.cjs
           node tests/advanced-preferences.cjs
           node tests/advanced-preferences-conflict.cjs
+          node tests/native-preference-notice.cjs
           node tests/market-notice-lifecycle.cjs
           node tests/provider-notice-lifecycle.cjs
           node tests/native-chunk-recovery.cjs

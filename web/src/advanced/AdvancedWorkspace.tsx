@@ -1297,7 +1297,9 @@ export default function AdvancedWorkspace() {
           reply({
             type: "result",
             id: m.id,
-            result: await api(
+            // The adapter reports the final save/merge/readonly outcome. A raw
+            // RPC failure here would duplicate it before the adapter can decide.
+            result: await requestAPI(
               q.op === "save"
                 ? "/advanced-charts/preferences/save"
                 : "/advanced-charts/preferences/" + q.args.id + "/delete",

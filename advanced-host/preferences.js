@@ -1,5 +1,12 @@
 /* Official storage adapters; user-level templates never contain workspace drawings. */
-function nativePreferences(initial, rpc, readonly, report) {
+function nativePreferences(
+  initial,
+  rpc,
+  readonly,
+  report,
+  recovered = () => {},
+  captureScope = () => undefined,
+) {
   const rows = new Map(
     initial.map((row) => [JSON.stringify([row.kind, row.name, row.tool]), row]),
   );
@@ -165,12 +172,26 @@ function nativePreferences(initial, rpc, readonly, report) {
   }
   // The pinned library converts adapter rejections into fulfilled error objects
   // and can close its native template dialog. Surface failure independently.
-  const templateWrite = (promise) => promise.catch((error) => {
-    report(error);
-    throw error;
-  });
+  const templateWrite = (promise, context) => {
+    const scope = captureScope();
+    return promise
+      .then((result) => {
+        recovered(context, scope);
+        return result;
+      })
+      .catch((error) => {
+        report(error, context, scope);
+        throw error;
+      });
+  };
   return {
-    savePreference: save,
+    savePreference: (kind, name, value, tool = "") =>
+      templateWrite(save(kind, name, value, tool), {
+        kind,
+        name,
+        tool,
+        operation: "save",
+      }),
     settings: {
       initialSettings: Object.fromEntries(
         list("setting")
@@ -178,10 +199,20 @@ function nativePreferences(initial, rpc, readonly, report) {
           .map((r) => [r.name, r.content.value]),
       ),
       setValue: (name, value) => {
-        if (!readonly) save("setting", name, value).catch(report);
+        if (!readonly)
+          templateWrite(save("setting", name, value), {
+            kind: "setting",
+            name,
+            operation: "save",
+          }).catch(() => {});
       },
       removeValue: (name) => {
-        if (!readonly) remove("setting", name).catch(report);
+        if (!readonly)
+          templateWrite(remove("setting", name), {
+            kind: "setting",
+            name,
+            operation: "delete",
+          }).catch(() => {});
       },
     },
     templates: {
@@ -193,8 +224,18 @@ function nativePreferences(initial, rpc, readonly, report) {
         await refresh("study");
         return get("study", name);
       },
-      saveStudyTemplate: ({ name, content }) => templateWrite(save("study", name, content)),
-      removeStudyTemplate: ({ name }) => templateWrite(remove("study", name)),
+      saveStudyTemplate: ({ name, content }) =>
+        templateWrite(save("study", name, content), {
+          kind: "study",
+          name,
+          operation: "save",
+        }),
+      removeStudyTemplate: ({ name }) =>
+        templateWrite(remove("study", name), {
+          kind: "study",
+          name,
+          operation: "delete",
+        }),
       getDrawingTemplates: async (tool) => {
         await refresh("drawing");
         return list("drawing", tool).map((r) => r.name);
@@ -204,8 +245,19 @@ function nativePreferences(initial, rpc, readonly, report) {
         return get("drawing", name, tool);
       },
       saveDrawingTemplate: (tool, name, content) =>
-        templateWrite(save("drawing", name, content, tool)),
-      removeDrawingTemplate: (tool, name) => templateWrite(remove("drawing", name, tool)),
+        templateWrite(save("drawing", name, content, tool), {
+          kind: "drawing",
+          name,
+          tool,
+          operation: "save",
+        }),
+      removeDrawingTemplate: (tool, name) =>
+        templateWrite(remove("drawing", name, tool), {
+          kind: "drawing",
+          name,
+          tool,
+          operation: "delete",
+        }),
       getAllChartTemplates: async () => {
         await refresh("chart");
         return list("chart").map((r) => r.name);
@@ -214,8 +266,18 @@ function nativePreferences(initial, rpc, readonly, report) {
         await refresh("chart");
         return { content: get("chart", name) };
       },
-      saveChartTemplate: (name, content) => templateWrite(save("chart", name, content)),
-      removeChartTemplate: (name) => templateWrite(remove("chart", name)),
+      saveChartTemplate: (name, content) =>
+        templateWrite(save("chart", name, content), {
+          kind: "chart",
+          name,
+          operation: "save",
+        }),
+      removeChartTemplate: (name) =>
+        templateWrite(remove("chart", name), {
+          kind: "chart",
+          name,
+          operation: "delete",
+        }),
     },
   };
 }

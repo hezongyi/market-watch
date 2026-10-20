@@ -313,6 +313,17 @@ function rememberIndicatorBinding(ticker,res,page,{correction=false}={}) {
 function emitNotice(fault,recovered=false){
   send({type:'notice-source',workspace_id:alertUIWorkspace,session:alertUISession,epoch:workspaceEpoch,fault,recovered});
 }
+function capturePreferenceScope() {
+  return {workspace_id:alertUIWorkspace,session:alertUISession,epoch:workspaceEpoch};
+}
+function reportPreferenceOutcome(error, context = {}, scope = capturePreferenceScope()) {
+  if(scope.workspace_id!==alertUIWorkspace || scope.session!==alertUISession || scope.epoch!==workspaceEpoch)return;
+  emitNotice({source_kind:'preferences',attempt_id:crypto.randomUUID(),code:'PREFERENCE_SAVE_FAILED',
+    title:error ? '设置未保存' : '设置已保存',message:error ? String(error) : '偏好操作已成功',
+    context:{source_id:JSON.stringify([context.kind || '',context.name || '',context.tool || '',context.operation || 'save']),
+      consumer:'preferences-adapter',endpoint:'/advanced-charts/preferences'},
+    evidence:{operation:context.operation || 'save'}}, !error);
+}
 // Each live request owner carries at most one outage per instrument/period.
 // Callers fence cancellation/generation before recording a transition.
 function marketRequestNotice(owner,ticker,res,error,observationEnded=false){
@@ -2310,7 +2321,9 @@ function boot(
     preferences,
     (op, args) => request({ op, args }, "preferences"),
     readonly,
-    (e) => send({ type: "error", error: String(e) }),
+    reportPreferenceOutcome,
+    (context, scope) => reportPreferenceOutcome(null, context, scope),
+    capturePreferenceScope,
   );
   autoSave?.dispose();
   autoSave = chartAutoSave(preferences,
