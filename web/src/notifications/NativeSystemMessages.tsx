@@ -19,7 +19,7 @@ type Geometry = { width: number; height: number; top: number; right: number };
 export type Surface = {
   document: Document;
   scrollClass: string;
-  prepareEntry: (entry: HTMLElement) => void;
+  createEntry: (slot: HTMLElement, icon: string) => Promise<HTMLElement>;
   control: NativeControlFactory;
   overlayBounds: (anchor?: HTMLElement) => {
     top: number;
@@ -58,25 +58,25 @@ export async function attachNativeSystemMessages({
 }) {
   const native = await globalThis.nativeNotificationSurface(widget, report),
     doc = native.document;
-  const entry: HTMLElement = widget.createButton({
+  const slot: HTMLElement = widget.createButton({
     align: "right",
     useTradingViewStyle: false,
   });
   const historyCache = new SystemHistoryCache();
-  native.prepareEntry(entry);
-  entry.classList.add("nc-system-entry");
-  // Pinned v31.1.0: hide only the line immediately before this entry's group.
-  // Keep its wrapper and dimensions so the native button spacing stays intact.
+  const entry = await native.createEntry(slot, messageIcons.bell);
+  // Pinned v31.1.0: remove this entry's group separator, including its gap.
   const entrySeparatorStyle = doc.createElement("style");
   entrySeparatorStyle.textContent = `
-    .separatorWrap-MBOVGQRI:has(+ .group-MBOVGQRI .nc-system-entry) > .separator-MBOVGQRI {
-      visibility: hidden;
+    .separatorWrap-MBOVGQRI:has(+ .group-MBOVGQRI .nc-system-entry-slot) {
+      display: none;
     }
   `;
   doc.head.append(entrySeparatorStyle);
-  entry.setAttribute("role", "button");
   entry.tabIndex = 0;
-  entry.innerHTML = `<span class="nc-entry-symbol" aria-hidden="true">${messageIcons.bell}<span class="nc-entry-count"></span></span>`;
+  const badge = doc.createElement("span");
+  badge.className = "nc-entry-count";
+  badge.setAttribute("aria-hidden", "true");
+  entry.append(badge);
   let current = initial,
     opened = false,
     disposed = false,
@@ -186,6 +186,7 @@ export async function attachNativeSystemMessages({
     entry.setAttribute("aria-label", `系统消息，${state.unread} 条未读`);
     entry.setAttribute("aria-haspopup", "dialog");
     entry.setAttribute("title", `系统消息，${state.unread} 条未读`);
+    entry.setAttribute("data-tooltip", `系统消息，${state.unread} 条未读`);
     render({ state });
   };
   const click = (event: MouseEvent) =>
@@ -241,7 +242,7 @@ export async function attachNativeSystemMessages({
       root.unmount();
       native.destroy();
       entrySeparatorStyle.remove();
-      widget.removeButton(entry);
+      widget.removeButton(slot);
       nativeHost.remove();
       reactHost.remove();
       if (wasOpened) onOpenChanged?.(false);

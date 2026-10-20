@@ -32,8 +32,9 @@ async function nativeNotificationSurface(widget, report) {
       createRoot = req(590263).createReactRoot;
     const Dialog = req(491617).Dialog,
       NavButton = req(569716).NavButton,
-      Search = req(357723).DialogSearch;
-    if (!Dialog || !NavButton || !Search)
+      Search = req(357723).DialogSearch,
+      ToolbarIconButton = req(51061).ToolbarIconButton;
+    if (!Dialog || !NavButton || !Search || !ToolbarIconButton)
       throw Error("系统消息原生组件契约不匹配");
     function Icon(props) {
       const ref = R.useRef(null);
@@ -68,10 +69,25 @@ async function nativeNotificationSurface(widget, report) {
     return {
       document: doc,
       scrollClass: req(421859).scrollContainer,
-      prepareEntry(node) {
+      async createEntry(node, icon) {
         // v31's custom-header observer otherwise disables keyboard navigation
         // for custom HTML and its descendants after every badge text update.
         node.dataset.internalAllowKeyboardNavigation = "true";
+        node.classList.add("nc-system-entry-slot");
+        return new Promise((resolve) => {
+          managed(R.createElement(ToolbarIconButton, {
+            icon,
+            tooltip: "系统消息",
+            "aria-label": "系统消息",
+            className: "nc-system-entry",
+            // Native ToolWidgetButton enables its interactive state from this
+            // prop; the owning controller installs the business click handler.
+            onClick: () => {},
+            ref: (button) => {
+              if (button) resolve(button);
+            },
+          }), node);
+        });
       },
       overlayBounds: common.overlayBounds,
       control(kind, target, props) {

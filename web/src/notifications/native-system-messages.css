@@ -105,32 +105,22 @@ html.theme-dark .nc-panel.nc-native-panel {
   font-size: 11px;
   padding: 12px 16px;
 }
-.nc-system-entry {
+.nc-system-entry-slot {
   box-sizing: border-box !important;
-  width: 52px !important;
-  min-width: 52px !important;
-  max-width: 52px !important;
+  width: 38px !important;
+  min-width: 38px !important;
+  max-width: 38px !important;
   height: 38px !important;
+  padding: 0 !important;
   display: flex !important;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  cursor: pointer;
 }
-.nc-entry-symbol {
+.nc-system-entry {
   position: relative;
-  display: inline-flex;
-  width: 22px;
-  height: 22px;
-}
-.nc-entry-symbol > svg {
-  width: 22px;
-  height: 22px;
 }
 .nc-entry-count {
   position: absolute;
-  top: -5px;
-  right: -10px;
+  top: 0;
+  right: 0;
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
