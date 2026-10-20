@@ -172,6 +172,8 @@ function presentQuote(row) {
       .replace(/ · (?:最后更新于|最后行情时间|历史数据时间) .*?(?= · |$)/g, "")
       .replace(/ · 来源 M1 分钟数据/g, "");
     value.description = base;
+    if (["pending", "stale"].includes(value.fetch_status))
+      value.description += value.lp == null ? " · 等待首次报价" : " · 报价暂未更新，保留上次数据";
   }
   // Native details ignores the description on error rows. A resolved session
   // remains useful without a successful price; fetch_status carries the error.
@@ -589,6 +591,11 @@ function synchronizeMarketVisibility() {
 const symbolPresentations = new Map();
 const quoteSnapshotRows = new Map();
 const quoteResetTokens = new Map();
+function quoteReadState(row) {
+  const status = row.v?.fetch_status;
+  if (row.s === "error" || status && !["ok", "pending", "stale"].includes(status)) return "failed";
+  return ["pending", "stale"].includes(status) ? "waiting" : "healthy";
+}
 function presentationFor(ticker) {
   const exact = symbolPresentations.get(ticker) ||
     watchlistMetadata.get(ticker) || watchlistMetadata.get(ticker.toLowerCase());
@@ -602,11 +609,13 @@ function rememberQuoteRows(rows) {
     // The subscription generation handles identity changes; read time fences
     // delayed initial snapshots from overwriting a newer stream observation.
     if (previous?.v?.read_at != null && row.v?.read_at != null && row.v.read_at < previous.v.read_at) continue;
-    const failed = row.s === "error" || (row.v?.fetch_status && row.v.fetch_status !== "ok");
+    const failed = quoteReadState(row) !== "healthy";
     const sameBinding = ["revision_id", "input_revision", "source_identity"].every(key =>
       row.v?.[key] == null || JSON.stringify(row.v[key]) === JSON.stringify(previous?.v?.[key]));
     if (failed && row.v?.lp == null && previous?.v?.lp != null && sameBinding) {
       const value = {...previous.v, fetch_status: row.v?.fetch_status || "fetch_failed"};
+      for (const key of ["wait_reason", "last_success_at", "cache_age_ms"])
+        if (Object.hasOwn(row.v || {}, key)) value[key] = row.v[key];
       for (const key of ["market_session", "session_reason", "session_conflict_reason", "calendar_verified", "calendar_version"])
         if (Object.hasOwn(row.v || {}, key)) value[key] = row.v[key];
       quoteSnapshotRows.set(row.n, {...previous, v: value});
@@ -1122,10 +1131,11 @@ const feed = {
         // or active-chart change can reformat the same stored epoch without
         // issuing another provider request.
         for(const row of rows) {
-          const failed=row.s==='error' || (row.v?.fetch_status && row.v.fetch_status!=='ok');
+          const state=quoteReadState(row), failed=state==='failed';
           // Shared supplier failures belong to the server task. A failed HTTP
           // snapshot request remains local and can recover from a good SSE row.
-          if(!failed || marketPollingFallback) marketRequestNotice(quoteSub,row.n,'quotes',failed ? Error('报价抓取失败') : null);
+          if(state !== 'waiting' && (!failed || marketPollingFallback))
+            marketRequestNotice(quoteSub,row.n,'quotes',failed ? Error('报价抓取失败') : null);
         }
         cb(rows);
       },
@@ -1788,7 +1798,10 @@ async function tick() {
           if (!current(binding)) continue;
           const {sub} = binding;
           const symbols = sub.symbols.filter(ticker => active.has(ticker));
-          for(const row of rows.filter(row=>symbols.includes(row.n)))marketRequestNotice(sub,row.n,'quotes',row.s==='error' || (row.v?.fetch_status && row.v.fetch_status!=='ok') ? Error('报价抓取失败') : null);
+          for(const row of rows.filter(row=>symbols.includes(row.n))) {
+            const state=quoteReadState(row);
+            if(state !== 'waiting') marketRequestNotice(sub,row.n,'quotes',state==='failed' ? Error('报价抓取失败') : null);
+          }
           if (symbols.length) sub.cb(symbols.map(ticker => quoteSnapshotRows.get(ticker)).filter(Boolean).map(presentQuote));
         }
         send({ type: "feed-poll-state", key: "@quotes", error: "" });

@@ -1179,6 +1179,7 @@ def quote_snapshot(body: QuoteQuery):
             values = {"short_name": shown, "description": shown + " · 平台行情" + (" · " + meta["price_description"] if meta.get("price_description") else ""),
                       "exchange": meta["source"].upper(), **session, **conflict,
                       "fetched_at": page.get("as_of"), "read_at": read_at, "fetch_status": fetch_status,
+                      **{key:page[key] for key in ("wait_reason", "last_success_at", "cache_age_ms") if key in page},
                       **({'error_evidence': page['error_evidence']} if page.get('error_evidence') else {}),
                       "time_type": "source_m1" if latest else None, "resolution": "M1"}
             if latest:

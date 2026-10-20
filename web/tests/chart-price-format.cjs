@@ -4,6 +4,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 const context = vm.createContext({ Intl, Number, Math });
 vm.runInContext(fs.readFileSync(path.resolve(__dirname, '../../advanced-host/price-format.js'), 'utf8'), context);
+vm.runInContext(fs.readFileSync(path.resolve(__dirname, '../../advanced-host/series.js'), 'utf8'), context);
 const factory = context.chartPriceFormatter;
 // The initiating chart's formatter controls defaults; storage gets a separate
 // canonical decimal, never its grouped display text or interpolated JS number.
@@ -72,4 +73,23 @@ assert.equal(context.chartQuoteScale(displayQuote, { pricescale: 1e8 }), 100);
 assert.equal(context.chartQuoteScale(quote, { pricescale: 1e8 }), 1e8);
 assert.equal(context.chartQuoteScale({ ...quote, v: { mw_display_pricescale: 25 } }, { pricescale: 1e8 }), 1e8);
 assert.equal(context.chartQuoteScale(displayQuote, { pricescale: 1e8, fractional: true }), 1e8);
-console.log('38 price formatting checks passed');
+// The series owns its precision even when its historical supplier has no
+// asset_type/display_precision. Quote formatting must retain native scale.
+for (const [ticker, precision, price, expected] of [
+  ['MWH:63bc01d4-3943-45cc-93a5-b04c3caaab16', 5, 1.12224, '1.12224'],
+  ['MWH:f0ac6c23-8b4e-4a10-a485-c6565ec9494c', 5, 1.4042, '1.40420'],
+  ['MWH:7fe123c5-1038-4edc-800f-b8f9685c9ad4', 3, 4114.705, '4,114.705'],
+  ['MWC:' + 'a'.repeat(64), 6, .123456, '0.123456'],
+  ['EURUSD', 4, 1.1, '1.1000'],
+  ['XAUUSD', 0, 4115, '4,115'],
+]) {
+  const raw = {s:'ok',n:ticker,v:{lp:price}};
+  const shown = context.chartQuotePresentation(raw, {source:'dukascopy',precision});
+  const scale = context.chartQuoteScale(shown, {pricescale:10 ** precision});
+  assert.equal(scale, 10 ** precision, ticker + ' uses its declared precision');
+  assert.equal(new Intl.NumberFormat('en-US', {
+    minimumFractionDigits:Math.log10(scale), maximumFractionDigits:Math.log10(scale),
+  }).format(shown.v.lp), expected);
+  assert.equal(shown.v.lp, price, 'display formatting must not round stored data');
+}
+console.log('Price formatting checks passed, including custom-series precision');

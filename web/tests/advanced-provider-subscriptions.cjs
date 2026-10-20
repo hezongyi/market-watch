@@ -137,6 +137,12 @@ const watchdog=setTimeout(()=>{console.error('Provider subscription test timed o
   assert.notEqual(facts.at(-1).attempt,recovered.attempt,'recurrence gets a distinct failure attempt');
   stream.onmessage({data:JSON.stringify({listener:'active',generation:1,sequence:5,type:'quotes',quotes:[{s:'ok',v:{lp:1,fetch_status:'fetch_failed'}}]})});
   assert.equal(facts.at(-1).error,true,'cached price with failed fetch cannot resolve an outage');
+  const beforeWaiting=facts.length;
+  let waitingSequence=5;
+  for(const state of ['pending','stale']) {
+    stream.onmessage({data:JSON.stringify({listener:'active',generation:1,sequence:waitingSequence+=.25,type:'quotes',quotes:[{s:'ok',v:{lp:1,fetch_status:state}}]})});
+    assert.equal(facts.length,beforeWaiting,'shared waiting neither fails nor recovers a market observation');
+  }
   stream.onmessage({data:JSON.stringify({listener:'active',generation:1,sequence:6,type:'quotes',quotes:[{s:'error',v:{}}]})});
   assert.equal(facts.at(-1).error,true,'error quote is a persistent failure');
   stream.onmessage({data:JSON.stringify({listener:'active',generation:1,sequence:7,type:'quotes',quotes:[{s:'ok',v:{lp:2,fetch_status:'ok'}}]})});

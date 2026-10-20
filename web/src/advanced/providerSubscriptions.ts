@@ -153,10 +153,11 @@ export function providerSubscriptions(
           if (epochChanged) current.sequence = 0;
           if (value.result_epoch != null) current.result_epoch = value.result_epoch;
           if (value.notice_owner === 'server') end(current, 'market');
-          const quoteError = value.type === 'quotes' && value.quotes?.some((row: any) => row.s === 'error' || (row.v?.fetch_status && row.v.fetch_status !== 'ok'));
+          const quoteWaiting = value.type === 'quotes' && value.quotes?.some((row: any) => ['pending', 'stale'].includes(row.v?.fetch_status));
+          const quoteError = value.type === 'quotes' && value.quotes?.some((row: any) => row.s === 'error' || (row.v?.fetch_status && !['ok', 'pending', 'stale'].includes(row.v.fetch_status)));
           if (value.notice_owner !== 'server' && (quoteError || value.status?.connection_error || value.status?.error || value.type === 'error' || (value.type === 'status' && (value.error || value.status === 'error'))))
             status(current, 'market', Error(value.error || value.status?.error || value.status?.connection_error || '行情读取失败'));
-          else if (value.notice_owner !== 'server' && ((value.type === 'bars' && (!value.status || value.status.state === 'ready' || (value.status.connection === 'connected' && value.status.owned === true && value.status.current_account === true && (value.status.sample_ready === true || value.status.confirmed_tail_ready === true)))) || (value.type === 'quotes' && value.quotes?.length))) status(current, 'market', null);
+          else if (value.notice_owner !== 'server' && ((value.type === 'bars' && (!value.status || value.status.state === 'ready' || (value.status.connection === 'connected' && value.status.owned === true && value.status.current_account === true && (value.status.sample_ready === true || value.status.confirmed_tail_ready === true)))) || (value.type === 'quotes' && value.quotes?.length && !quoteWaiting))) status(current, 'market', null);
           receive(value);
           if(value.type === 'bars') {
             if(value.cursor != null) current.cursor=value.cursor;

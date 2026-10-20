@@ -24,6 +24,7 @@ from .storage import (
     Instrument,
     MarketComposite,
     MarketStreamTask,
+    Preference,
     ProviderDataset,
     now_ms,
     transaction,
@@ -153,6 +154,16 @@ class Calculator:
                     return None, delay
             rows = quote_snapshot(QuoteQuery(symbols=[encode(query.instrument, query.series_kind)],
                 composite_revision_id=query.composite_revision_id, input_revision=query.input_revision))
+            if source == 'oanda' and query.series_kind == 'provider' and any(
+                    row.get('v', {}).get('fetch_status') in ('pending', 'stale') for row in rows):
+                # Only reread the collector's cache; never accelerate supplier
+                # HTTP collection. Fast probes end with the durable grace.
+                from .market_notices import QUOTE_WAIT_GRACE_MS
+                with transaction() as db:
+                    observed = db.get(Preference, 'notice:market-stream:' + work['id'])
+                    since = observed.value.get('waiting_since', now_ms()) if observed else now_ms()
+                if now_ms() - since < QUOTE_WAIT_GRACE_MS:
+                    delay = 2000 + int(work['id'][:4], 16) % 501
             # Age is status evidence, not a new price result every half second.
             for row in rows:
                 row.pop("age_ms", None)

@@ -16,7 +16,9 @@ def describe(value):
             parts.append(value["session_reason"])
     if value.get("session_conflict_reason"):
         parts.append(value["session_conflict_reason"])
-    if value.get("fetch_status") not in (None, "ok"):
+    if value.get("fetch_status") in ("pending", "stale"):
+        parts.append("报价暂未更新，保留上次数据" if value.get("lp") is not None else "等待首次报价")
+    elif value.get("fetch_status") not in (None, "ok"):
         parts.append("更新失败，保留上次数据" if value.get("lp") is not None else "更新失败，暂无成功行情")
     event = value.get("quote_time")
     at = event if event is not None else value.get("data_start")

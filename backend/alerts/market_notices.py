@@ -8,6 +8,8 @@ from sqlalchemy import or_, select
 from .notification_sources import _append
 from .storage import Audit, MarketStreamClient, MarketStreamSubscription, Preference, now_ms
 
+QUOTE_WAIT_GRACE_MS = 30_000
+
 
 def result_state(payload):
     status = payload.get('status')
@@ -18,8 +20,11 @@ def result_state(payload):
             return 'failed'
     if payload.get('type') == 'quotes':
         rows = payload.get('quotes') or []
-        if any(row.get('s') == 'error' or row.get('v', {}).get('fetch_status', 'ok') != 'ok' for row in rows):
+        if any(row.get('s') == 'error' or row.get('v', {}).get('fetch_status', 'ok') not in
+               ('ok', 'pending', 'stale') for row in rows):
             return 'failed'
+        if any(row.get('v', {}).get('fetch_status') in ('pending', 'stale') for row in rows):
+            return 'waiting'
         return 'healthy' if rows and all(row.get('s') == 'ok' for row in rows) else None
     if payload.get('type') == 'bars':
         if not status or isinstance(status, dict) and (status.get('state') == 'ready' or (
@@ -104,15 +109,23 @@ def record_result(db, task, payload, *, fingerprint):
         return
     row = state_row(db, task)
     state = dict(row.value) if row else {'open': False, 'observation': 0, 'last_notification_at': 0}
-    if state.get('last_fingerprint') == fingerprint:
+    if outcome != 'waiting' and state.get('last_fingerprint') == fingerprint:
         return
     state['last_fingerprint'] = fingerprint
     stamp = now_ms()
+    waiting_timeout = False
+    if outcome == 'waiting':
+        state.setdefault('waiting_since', stamp)
+        waiting_timeout = stamp - state['waiting_since'] >= QUOTE_WAIT_GRACE_MS
+        if waiting_timeout:
+            outcome = 'failed'
+    else:
+        state.pop('waiting_since', None)
     if outcome == 'healthy':
         if state['open']:
             _append(db.connection(), 'recovery', task.id, {'source_kind': 'market', 'dedupe_key': dedupe(task, state)})
             state['open'] = False
-    else:
+    elif outcome == 'failed':
         subscriptions = list(db.execute(select(MarketStreamSubscription.listener,
             MarketStreamSubscription.generation, MarketStreamClient.client).join(MarketStreamClient,
                 MarketStreamSubscription.client_id == MarketStreamClient.id).where(
@@ -131,12 +144,23 @@ def record_result(db, task, payload, *, fingerprint):
                         if quote.get('v', {}).get('error_evidence')]
         if quote_errors:
             evidence['error'] = quote_errors[0]
+        if waiting_timeout:
+            waiting = next(quote['v'] for quote in payload.get('quotes', [])
+                           if quote.get('v', {}).get('fetch_status') in ('pending', 'stale'))
+            evidence['error'] = {'error_type': 'SharedQuoteWaitTimeout', 'stage': 'shared_cache',
+                'wait_ms': stamp - state['waiting_since'],
+                **{key: waiting.get(key) for key in ('wait_reason', 'cache_age_ms', 'last_success_at')}}
+        provider = evidence['provider'].upper() or '共享'
+        title = provider + ' 报价暂未更新' if waiting_timeout else '共享行情读取失败'
+        if evidence['error'].get('stage') == 'timeout':
+            title = provider + (' 行情连接超时' if 'ConnectTimeout' in
+                evidence['error'].get('error_chain', [evidence['error'].get('error_type')]) else ' 行情读取超时')
         notify = not state['open'] and (not state['last_notification_at'] or stamp - state['last_notification_at'] >= 60_000)
         if notify:
             state['last_notification_at'] = stamp
         _append(db.connection(), 'task_failure', task.id, {'source_kind': 'market',
             'dedupe_key': dedupe(task, state), 'code': 'MARKET_READ_FAILED',
-            'title': '共享行情读取失败', 'attempt': str(task.result_epoch) + ':' + str(task.sequence),
+            'title': title, 'attempt': str(task.result_epoch) + ':' + str(task.sequence),
             'notify_web': notify or state['open'],
             'context': {'instrument': task.query.get('instrument', ''),
                         'timeframe': 'quotes' if task.identity.get('kind') == 'quotes' else task.query.get('timeframe', ''),
@@ -151,9 +175,11 @@ def record_result(db, task, payload, *, fingerprint):
 
 def end_observation(db, task):
     row = state_row(db, task)
-    if not row or not row.value.get('open'):
+    if not row:
         return
     state = dict(row.value)
-    _append(db.connection(), 'observation_end', task.id, {'source_kind': 'market', 'dedupe_key': dedupe(task, state)})
+    if state.get('open'):
+        _append(db.connection(), 'observation_end', task.id, {'source_kind': 'market', 'dedupe_key': dedupe(task, state)})
+    state.pop('waiting_since', None)
     state.update(open=False, observation=state.get('observation', 0) + 1, last_fingerprint='')
     row.value = state
