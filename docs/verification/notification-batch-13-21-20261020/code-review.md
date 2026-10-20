@@ -21,3 +21,13 @@
 Spec 独立复审确认：模板提示和旧 epoch 顺序已修，无交易确认副作用。最终页面退出实现的复审回执另行追加。
 
 代码审查通过不替代原生 UI、实例业务、静态依赖及候选 CI 验收。相关结果见本目录 README。
+
+## 最终实例验收返工与复审（b32c2f8）
+
+真实原生失败注入发现：此前adapter独立report仍走type:error，普通旧错误通道不再呈现，用户仅看到泛化失败。新增实际adapter→真实bridge callback回归在旧HEAD明确失败（error != notice-source），修复后通过。
+
+所有公开偏好写入口（含savePreference）统一最终outcome；父preferences RPC使用requestAPI，避免在adapter决策前产生重复泛化事故。失败进入notice-source原生浮窗，成功按同kind/name/tool/operation恢复；save/delete分离。每次入口同步捕获scope，异步完成校验workspace/session/epoch，旧结果不污染新工作区。回归涵盖网络单次写、只读零写、直接设置、成功恢复以及挂起RPC后切scope的成功/失败。
+
+Standards和Spec分别独立复审上述最终差异，三个偏好窄测试均独立重跑PASS；两轴均报告**最终通过、无剩余明确阻断**。Spec此前页面退出竞态亦已独立复审通过（原子fault+intent及真实reload回归）。历史刷新已有problem现在可见，保留缓存行。
+
+最终新候选实例实拍确认“设置未保存”可见、写失败不落库/不盲重试、只读0次写，及刷新503保留100行并显示错误。审查通过与业务实拍、CI分别记录，不互相替代。

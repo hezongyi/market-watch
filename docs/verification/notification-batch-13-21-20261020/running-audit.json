@@ -1,0 +1,121 @@
+{
+  "services": [
+    {
+      "service": "chart",
+      "image_tag": "market-watch-chart:notice1321-20261020-c2",
+      "image_id": "sha256:d26e7e2fdd3ee832636dff1d259dd0390349e5a674e1b2ae3278f3d2706732f6",
+      "running": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true
+    },
+    {
+      "service": "web",
+      "image_tag": "market-watch-web:notice1321-20261020-c2",
+      "image_id": "sha256:49aca302e735d91c0734eaed988d45932acd4de38d7668e79ae3b75203f86982",
+      "running": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true
+    },
+    {
+      "service": "api",
+      "image_tag": "market-watch-api:notice1321-20261020-c1",
+      "image_id": "sha256:cf441c424eb2afda9ec1c7cad4fb3dc97645b1e7ff45fc361d30ee7e2682bd20",
+      "running": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true
+    },
+    {
+      "service": "native-history-worker",
+      "image_tag": "market-watch-api:notice1321-20261020-c1",
+      "image_id": "sha256:cf441c424eb2afda9ec1c7cad4fb3dc97645b1e7ff45fc361d30ee7e2682bd20",
+      "running": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true
+    },
+    {
+      "service": "notify-worker",
+      "image_tag": "market-watch-api:notice1321-20261020-c1",
+      "image_id": "sha256:cf441c424eb2afda9ec1c7cad4fb3dc97645b1e7ff45fc361d30ee7e2682bd20",
+      "running": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true
+    },
+    {
+      "service": "market-stream-worker",
+      "image_tag": "market-watch-api:notice1321-20261020-c1",
+      "image_id": "sha256:cf441c424eb2afda9ec1c7cad4fb3dc97645b1e7ff45fc361d30ee7e2682bd20",
+      "running": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true
+    },
+    {
+      "service": "projector",
+      "image_tag": "market-watch-api:notice1321-20261020-c1",
+      "image_id": "sha256:cf441c424eb2afda9ec1c7cad4fb3dc97645b1e7ff45fc361d30ee7e2682bd20",
+      "running": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true
+    },
+    {
+      "service": "composite-aggregate-worker",
+      "image_tag": "market-watch-api:notice1321-20261020-c1",
+      "image_id": "sha256:cf441c424eb2afda9ec1c7cad4fb3dc97645b1e7ff45fc361d30ee7e2682bd20",
+      "running": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true
+    },
+    {
+      "service": "realtime-worker",
+      "image_tag": "market-watch-api:notice1321-20261020-c1",
+      "image_id": "sha256:cf441c424eb2afda9ec1c7cad4fb3dc97645b1e7ff45fc361d30ee7e2682bd20",
+      "running": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true
+    },
+    {
+      "service": "chart-history-worker",
+      "image_tag": "market-watch-api:notice1321-20261020-c1",
+      "image_id": "sha256:cf441c424eb2afda9ec1c7cad4fb3dc97645b1e7ff45fc361d30ee7e2682bd20",
+      "running": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "image_tag": "market-watch-api:notice1321-20261020-c1",
+      "image_id": "sha256:cf441c424eb2afda9ec1c7cad4fb3dc97645b1e7ff45fc361d30ee7e2682bd20",
+      "running": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true
+    },
+    {
+      "service": "history-worker",
+      "image_tag": "market-watch-api:notice1321-20261020-c1",
+      "image_id": "sha256:cf441c424eb2afda9ec1c7cad4fb3dc97645b1e7ff45fc361d30ee7e2682bd20",
+      "running": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true
+    },
+    {
+      "service": "pricing-worker",
+      "image_tag": "market-watch-api:notice1321-20261020-c1",
+      "image_id": "sha256:cf441c424eb2afda9ec1c7cad4fb3dc97645b1e7ff45fc361d30ee7e2682bd20",
+      "running": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true
+    }
+  ],
+  "protected": {
+    "gateway": {
+      "same_container": true,
+      "same_image": true,
+      "running": true
+    },
+    "postgres": {
+      "same_container": true,
+      "same_image": true,
+      "running": true
+    }
+  },
+  "captured_at": "2026-10-20T11:44:38.415996+00:00"
+}
