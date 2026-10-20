@@ -1,0 +1,177 @@
+{
+  "host": "quant-server",
+  "project": "mw-issue75-v2-20261018",
+  "source_commit": "1796ade",
+  "services": [
+    {
+      "service": "chart-history-worker",
+      "image_tag": "market-watch-api:quote-fixes-20261020-c1",
+      "image_id": "sha256:11a7e86758538da2659ee7515cb4939598944cb6580b1457e9cb2a71348ed216",
+      "state": "running",
+      "container_unchanged": false,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": "true"
+    },
+    {
+      "service": "notify-worker",
+      "image_tag": "market-watch-api:quote-fixes-20261020-c1",
+      "image_id": "sha256:11a7e86758538da2659ee7515cb4939598944cb6580b1457e9cb2a71348ed216",
+      "state": "running",
+      "container_unchanged": false,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": "true"
+    },
+    {
+      "service": "market-stream-worker",
+      "image_tag": "market-watch-api:quote-fixes-20261020-c1",
+      "image_id": "sha256:11a7e86758538da2659ee7515cb4939598944cb6580b1457e9cb2a71348ed216",
+      "state": "running",
+      "container_unchanged": false,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": "true"
+    },
+    {
+      "service": "history-worker",
+      "image_tag": "market-watch-api:quote-fixes-20261020-c1",
+      "image_id": "sha256:11a7e86758538da2659ee7515cb4939598944cb6580b1457e9cb2a71348ed216",
+      "state": "running",
+      "container_unchanged": false,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": "true"
+    },
+    {
+      "service": "projector",
+      "image_tag": "market-watch-api:quote-fixes-20261020-c1",
+      "image_id": "sha256:11a7e86758538da2659ee7515cb4939598944cb6580b1457e9cb2a71348ed216",
+      "state": "running",
+      "container_unchanged": false,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": "true"
+    },
+    {
+      "service": "native-history-worker",
+      "image_tag": "market-watch-api:quote-fixes-20261020-c1",
+      "image_id": "sha256:11a7e86758538da2659ee7515cb4939598944cb6580b1457e9cb2a71348ed216",
+      "state": "running",
+      "container_unchanged": false,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": "true"
+    },
+    {
+      "service": "realtime-worker",
+      "image_tag": "market-watch-api:quote-fixes-20261020-c1",
+      "image_id": "sha256:11a7e86758538da2659ee7515cb4939598944cb6580b1457e9cb2a71348ed216",
+      "state": "running",
+      "container_unchanged": false,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": "true"
+    },
+    {
+      "service": "composite-aggregate-worker",
+      "image_tag": "market-watch-api:quote-fixes-20261020-c1",
+      "image_id": "sha256:11a7e86758538da2659ee7515cb4939598944cb6580b1457e9cb2a71348ed216",
+      "state": "running",
+      "container_unchanged": false,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": "true"
+    },
+    {
+      "service": "web",
+      "image_tag": "market-watch-web:quote-fixes-20261020-c1",
+      "image_id": "sha256:bde9ec702519142fa969377440a987f6c09bd14b622bf513d1b8e6fa25e142e5",
+      "state": "running",
+      "container_unchanged": false,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": null
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "image_tag": "market-watch-api:quote-fixes-20261020-c1",
+      "image_id": "sha256:11a7e86758538da2659ee7515cb4939598944cb6580b1457e9cb2a71348ed216",
+      "state": "running",
+      "container_unchanged": false,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": "true"
+    },
+    {
+      "service": "pricing-worker",
+      "image_tag": "market-watch-api:quote-fixes-20261020-c1",
+      "image_id": "sha256:11a7e86758538da2659ee7515cb4939598944cb6580b1457e9cb2a71348ed216",
+      "state": "running",
+      "container_unchanged": false,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": "true"
+    },
+    {
+      "service": "api",
+      "image_tag": "market-watch-api:quote-fixes-20261020-c1",
+      "image_id": "sha256:11a7e86758538da2659ee7515cb4939598944cb6580b1457e9cb2a71348ed216",
+      "state": "running",
+      "container_unchanged": false,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": "true"
+    },
+    {
+      "service": "chart",
+      "image_tag": "market-watch-chart:quote-fixes-20261020-c1",
+      "image_id": "sha256:affc34fdc1e69acfe6bf0b4f0f1debf763c60c1bc458ae37a6f3e8489a9bf410",
+      "state": "running",
+      "container_unchanged": false,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": null
+    },
+    {
+      "service": "migrate",
+      "image_tag": "market-watch-api:issue75-v2-candidate",
+      "image_id": "sha256:c1dcf532213e5205471a92487e0b6c051fab4a0d1191124acff32f67f5764ea2",
+      "state": "exited",
+      "container_unchanged": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": "true"
+    },
+    {
+      "service": "gateway",
+      "image_tag": "nginx@sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "image_id": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "state": "running",
+      "container_unchanged": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": null
+    },
+    {
+      "service": "seed",
+      "image_tag": "market-watch-api:issue75-v2-candidate",
+      "image_id": "sha256:d755dc1552b5d365ac2271f57a094e0db8d529d23be373a4965d3641b2ef6b25",
+      "state": "exited",
+      "container_unchanged": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": "false"
+    },
+    {
+      "service": "postgres",
+      "image_tag": "postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "image_id": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "state": "running",
+      "container_unchanged": true,
+      "environment_unchanged": true,
+      "mounts_unchanged": true,
+      "yahoo_enabled": null
+    }
+  ]
+}

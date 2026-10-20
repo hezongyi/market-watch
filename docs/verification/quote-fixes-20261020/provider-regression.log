@@ -1,0 +1,18 @@
+.......................F................................................ [ 75%]
+.......................                                                  [100%]
+=================================== FAILURES ===================================
+_ test_provider_api_deadline_includes_running_http_without_cancelling_shared_page _
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fac5cbba8d0>
+
+>   ???
+E   AssertionError: an already-sent shared page can finish for other readers
+E   assert False
+E    +  where False = wait(1)
+E    +    where wait = <threading.Event at 0x7fac5ca36450: unset>.wait
+
+/home/quant/repos/market-watch-issue75-integrated-20261019/backend/tests/test_provider_chart.py:207: AssertionError
+=========================== short test summary info ============================
+FAILED backend/tests/test_provider_chart.py::test_provider_api_deadline_includes_running_http_without_cancelling_shared_page
+1 failed, 94 passed in 11.36s
