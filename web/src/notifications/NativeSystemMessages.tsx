@@ -63,6 +63,15 @@ export async function attachNativeSystemMessages({
   });
   native.prepareEntry(entry);
   entry.classList.add("nc-system-entry");
+  // Pinned v31.1.0: hide only the line immediately before this entry's group.
+  // Keep its wrapper and dimensions so the native button spacing stays intact.
+  const entrySeparatorStyle = doc.createElement("style");
+  entrySeparatorStyle.textContent = `
+    .separatorWrap-MBOVGQRI:has(+ .group-MBOVGQRI .nc-system-entry) > .separator-MBOVGQRI {
+      visibility: hidden;
+    }
+  `;
+  doc.head.append(entrySeparatorStyle);
   entry.setAttribute("role", "button");
   entry.tabIndex = 0;
   entry.innerHTML = `<span class="nc-entry-symbol" aria-hidden="true">${messageIcons.bell}<span class="nc-entry-count"></span></span>`;
@@ -228,6 +237,7 @@ export async function attachNativeSystemMessages({
       entry.removeEventListener("keydown", keys);
       root.unmount();
       native.destroy();
+      entrySeparatorStyle.remove();
       widget.removeButton(entry);
       nativeHost.remove();
       reactHost.remove();
