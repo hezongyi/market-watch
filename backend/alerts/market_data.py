@@ -1189,15 +1189,18 @@ def quote_snapshot(body: QuoteQuery):
                     values["bid"] = values["lp"]
                 elif meta["basis"] == "ask":
                     values["ask"] = values["lp"]
-                # Missing prior-session data must not hide a valid last price.
-                try:
-                    previous = quote_previous_close(meta, latest)
-                    if previous is not None and previous > 0:
-                        delta = Decimal(latest["close"]) - previous
-                        values.update(ch=float(delta), chp=float(delta / previous * 100),
-                                      prev_close_price=float(previous))
-                except Exception:
-                    pass
+                # Waiting reads are cache-only, including derived fields: a
+                # cold previous-close lookup can otherwise open supplier HTTP.
+                if fetch_status not in ("pending", "stale"):
+                    # Missing prior-session data must not hide a valid last price.
+                    try:
+                        previous = quote_previous_close(meta, latest)
+                        if previous is not None and previous > 0:
+                            delta = Decimal(latest["close"]) - previous
+                            values.update(ch=float(delta), chp=float(delta / previous * 100),
+                                          prev_close_price=float(previous))
+                    except Exception:
+                        pass
             result.append({"s": "ok", "n": ticker, "v": values, **session,
                            **conflict, "fetched_at": page.get("as_of"), "read_at": read_at,
                            "fetch_status": fetch_status, "data_start": latest.get("start") if latest else None,

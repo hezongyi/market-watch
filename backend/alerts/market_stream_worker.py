@@ -154,10 +154,11 @@ class Calculator:
                     return None, delay
             rows = quote_snapshot(QuoteQuery(symbols=[encode(query.instrument, query.series_kind)],
                 composite_revision_id=query.composite_revision_id, input_revision=query.input_revision))
-            if source == 'oanda' and query.series_kind == 'provider' and any(
+            if settings.notification_center_sources_enabled and source == 'oanda' and query.series_kind == 'provider' and any(
                     row.get('v', {}).get('fetch_status') in ('pending', 'stale') for row in rows):
                 # Only reread the collector's cache; never accelerate supplier
-                # HTTP collection. Fast probes end with the durable grace.
+                # HTTP collection. Fast probes end with the durable grace;
+                # without notice tracking retain the normal polling cadence.
                 from .market_notices import QUOTE_WAIT_GRACE_MS
                 with transaction() as db:
                     observed = db.get(Preference, 'notice:market-stream:' + work['id'])

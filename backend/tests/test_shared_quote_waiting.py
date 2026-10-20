@@ -32,7 +32,6 @@ def waiting(database, monkeypatch):
     monkeypatch.setattr(settings, 'oanda_account_id', 'waiting-test-account')
     monkeypatch.setattr(settings, 'provider_fresh_seconds', 15)
     monkeypatch.setattr(provider, 'metadata', lambda *a, **kw: {**META, 'name':'EURUSD'})
-    monkeypatch.setattr(provider, 'quote_previous_close', lambda *_: None)
     monkeypatch.setattr(provider, 'native_page', lambda *a, **kw: pytest.fail('shared wait cannot poll upstream'))
     provider._QUOTE_LAST.clear()
     key = cache.ensure(META, 'M1')
@@ -74,7 +73,7 @@ def test_stale_cache_retains_price_without_failure_or_fake_recovery(database, wa
         assert db.scalar(select(NoticeIncident)).closed_at is None
 
 
-def test_persistent_wait_escalates_once_per_shared_task_and_recovers_on_new_read(database, waiting):
+def test_persistent_wait_escalates_once_per_shared_task_and_recovers_on_new_read(database, waiting, monkeypatch):
     clock, key = waiting
     publish(database, quote())
     clock[0] += 31000
@@ -95,6 +94,9 @@ def test_persistent_wait_escalates_once_per_shared_task_and_recovers_on_new_read
     cache.commit_page(key, lease, page(clock[0]-90000, clock[0], close='1.12345'),
                       clock[0]+1, clock[0], latest=True)
     cache.release(key, lease)
+    # The collector has recovered; unrelated prior-session history may now be
+    # acquired normally, outside the cache-only waiting path under test.
+    monkeypatch.setattr(provider, 'quote_previous_close', lambda *_: None)
     publish(database, quote())
     drain(database)
     with database() as db:
@@ -148,3 +150,19 @@ def test_pending_worker_rechecks_only_cache_with_bounded_delay(database, waiting
                           value={'waiting_since':waiting[0][0]-31000}))
     _, delay = Calculator().build(work)
     assert delay == 15000, 'persistent waits return to normal cadence'
+
+
+def test_pending_worker_without_notice_tracking_keeps_normal_cadence(database, waiting, monkeypatch):
+    from alerts.chart_api import DataQuery
+    from alerts.market_stream_worker import Calculator
+    from alerts.provider_cache import identity
+    monkeypatch.setattr(settings, 'notification_center_sources_enabled', False)
+    work = {'id':'b'*64, 'query':DataQuery(instrument=META['id'],series_kind='provider',
+        timeframe='M1').model_dump(), 'identity':{'kind':'quotes','metadata':META,
+        'dataset_id':identity(META,'M1')}}
+    calculator = Calculator()
+    for elapsed in (0, 31000):
+        waiting[0][0] += elapsed
+        payload, delay = calculator.build(work)
+        assert payload['quotes'][0]['v']['fetch_status'] == 'stale'
+        assert delay == 15000, 'disabled notices cannot leave fast probes running indefinitely'
