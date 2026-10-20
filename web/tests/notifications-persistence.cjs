@@ -88,6 +88,27 @@ const assert = require("node:assert/strict"),
     ),
   );
   store.db.transaction = transaction;
+  // A failed metadata write must roll back the source fault as well.
+  abort = true;
+  store.db.transaction = (...args) => {
+    const tx = transaction(...args), objectStore = tx.objectStore.bind(tx);
+    if (abort) { abort=false; tx.objectStore = name => {
+      const table=objectStore(name);
+      if(name==='meta'){const put=table.put.bind(table);table.put=(...values)=>{
+        const request=put(...values);request.onsuccess=()=>tx.abort();return request;};}
+      return table;
+    }; }
+    return tx;
+  };
+  await assert.rejects(store.stage('atomic-exit',{event_id:'b:atomic'},
+    {key:'atomic-exit:fault:one',value:{open:true,exit:{document:'one'}}}));
+  store.db.transaction=transaction;
+  assert.equal(await store.get('pending','atomic-exit:b:atomic'),undefined,
+    'failure and its exit intent are atomic even if metadata commit fails');
+  await store.stage('atomic-exit',{event_id:'b:atomic'},
+    {key:'atomic-exit:fault:one',value:{open:true,exit:{document:'one'}}});
+  assert.ok(await store.get('pending','atomic-exit:b:atomic'));
+  assert.equal((await store.get('meta','atomic-exit:fault:one')).exit.document,'one');
   assert.equal((await store.get("meta", "admin:progress")).after, "cursor-2");
   assert.equal(await store.get("cache", "admin:alert-popup:s:lost"), undefined);
   await store.saveProgress(

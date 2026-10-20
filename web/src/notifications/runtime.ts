@@ -436,19 +436,6 @@ export class NoticeRuntime {
         context: fault.context || {},
         evidence: fault.evidence || {},
       }) as Intake;
-      const observed = fault.source_kind === "market" || fault.source_kind === "connection";
-      if (observed) {
-        this.documentId ||= crypto.randomUUID();
-        this.observations.set(id, { ...fault, context: event.context });
-      }
-      await this.store.stage(subject, event);
-      await this.store.update(
-        "claims",
-        subject + ":occurrence:" + id,
-        subject,
-        (old) => (old ? undefined : { id }),
-      );
-      if (!this.current(generation)) return null;
       const grouping = JSON.stringify([
         fault.source_kind,
         fault.code,
@@ -464,7 +451,13 @@ export class NoticeRuntime {
         ].map((k) => event.context[k] ?? ""),
       ]);
       const groupKey = subject + ":fault:" + (await stableId(grouping));
-      const old = await this.store.update("meta", groupKey, subject, (old) => ({
+      if (!this.current(generation)) return null;
+      const observed = fault.source_kind === "market" || fault.source_kind === "connection";
+      if (observed) {
+        this.documentId ||= crypto.randomUUID();
+        this.observations.set(id, { ...fault, context: event.context });
+      }
+      const old = await this.store.stage(subject, event, { key: groupKey, value: {
         latest: id,
         open: true,
         ...(observed ? { exit: { document: this.documentId, event: scrub({
@@ -472,7 +465,9 @@ export class NoticeRuntime {
           recovery_of: id, observation_ended: true,
           message: "页面观察已结束，未确认恢复",
         }) } } : {}),
-      }));
+      } });
+      await this.store.update("claims", subject + ":occurrence:" + id, subject,
+        (old) => (old ? undefined : { id }));
       if (!this.current(generation)) return null;
       const notice = this.localNotice(event, "pending");
       this.patch({

@@ -44,6 +44,31 @@ const {chromium}=require('playwright');
     assert.equal(end.value.event.context.epoch,7);
     assert.deepEqual(end.value.event.context,fault.value.event.context);
     assert.ok(end.order>fault.order,'ordinary uploader sends original failure before its end');
+    // Exit immediately after the fault transaction, before occurrence claims
+    // finish. The exit intent must already be present in that same transaction.
+    await page.evaluate(()=>{
+      const runtime=window.runtime=new Notices.NoticeRuntime();runtime.attach();runtime.schedule=()=>{};
+      runtime.subject='exit-test';runtime.ready=true;runtime.profile=crypto.randomUUID();
+      void runtime.store.open().then(()=>{
+        const update=runtime.store.update.bind(runtime.store);
+        runtime.store.update=(name,...args)=>{
+          if(name==='claims'){window.atomicStageReached=true;return new Promise(()=>{});}
+          return update(name,...args);
+        };
+        void runtime.report({source_kind:'connection',code:'MARKET_CONNECTION_FAILED',attempt_id:'two',
+          title:'exit race',message:'offline',context:{epoch:8,acceptance_run:'page-exit',source_id:'stream-two'}});
+      });
+    });
+    await page.waitForFunction(()=>window.atomicStageReached);
+    await page.reload();
+    await page.addScriptTag({content:built.outputFiles[0].text});
+    const raced=await page.evaluate(async()=>{
+      const runtime=new Notices.NoticeRuntime();runtime.subject='exit-test';runtime.ready=true;
+      await runtime.store.open();await runtime.stageObservationEnds();
+      const rows=await runtime.store.all('pending','exit-test');runtime.store.close();return rows;
+    });
+    const racedFault=raced.find(row=>row.value.event.attempt_id==='two'&&!row.value.event.recovery_of);
+    assert.ok(raced.some(row=>row.value.event.recovery_of===racedFault.value.event.event_id && row.value.event.observation_ended));
     console.log('PASS real pagehide durably stages observation end with original context and ordered offline upload');
   }finally{await context.close();await browser.close();}
 })().catch(error=>{console.error(error);process.exitCode=1});

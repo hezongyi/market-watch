@@ -282,8 +282,10 @@ const assert = require("node:assert/strict"),
       const id = name + ':' + key, old = durable.get(id), next = create(old);
       if (next !== undefined) durable.set(id, next); return old;
     },
-    stage: async (subject, value) => {
+    stage: async (subject, value, observation) => {
       staged.push(value); durable.set('pending:' + subject + ':' + value.event_id, value);
+      if (observation) { const key='meta:'+observation.key, old=durable.get(key);
+        durable.set(key, observation.value); return old; }
     },
   };
   const fault = {source_kind:'market',attempt_id:'attempt-a',code:'READ_FAILED',title:'读取失败',message:'503',context:{workspace_id:'a',source_id:'owner'}};

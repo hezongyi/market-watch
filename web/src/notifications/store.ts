@@ -127,10 +127,11 @@ export class NoticeStore {
       tx.onerror = () => reject(tx.error);
     });
   }
-  async stage(subject: string, value: any) {
-    return new Promise<void>((resolve, reject) => {
-      const tx = this.db!.transaction("pending", "readwrite"),
+  async stage(subject: string, value: any, observation?: { key: string; value: any }) {
+    return new Promise<any>((resolve, reject) => {
+      const tx = this.db!.transaction(observation ? ["pending", "meta"] : "pending", "readwrite"),
         store = tx.objectStore("pending");
+      let previous: any;
       const request = store.index("subject").getAll(subject);
       request.onsuccess = () => {
         const rows = request.result as Item[],
@@ -163,8 +164,25 @@ export class NoticeStore {
           ),
           value: { event: value, status: "pending" },
         });
+        if (observation) {
+          const meta = tx.objectStore("meta"), read = meta.get(observation.key);
+          read.onsuccess = () => {
+            previous = read.result?.value;
+            const write = () => meta.put({ key: observation.key, subject, at: Date.now(), value: observation.value });
+            if (previous !== undefined) write();
+            else {
+              const all = meta.index("subject").getAll(subject);
+              all.onsuccess = () => {
+                if (all.result.length >= 1100 || new TextEncoder().encode(JSON.stringify(observation.value)).length +
+                    all.result.reduce((bytes, row) => bytes + new TextEncoder().encode(JSON.stringify(row.value)).length, 0) > 2 * 1024 * 1024)
+                  tx.abort();
+                else write();
+              };
+            }
+          };
+        }
       };
-      tx.oncomplete = () => resolve();
+      tx.oncomplete = () => resolve(previous);
       tx.onerror = () => reject(tx.error);
       tx.onabort = () =>
         reject(Error("本机通知队列已满或不能写入；新增事件未能保存"));
