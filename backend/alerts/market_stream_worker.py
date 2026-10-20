@@ -246,8 +246,11 @@ def calculate_work(calculator, work):
     try:
         payload, delay = calculator.build(work)
     except Exception as error:
+        from .market_notices import error_evidence
         log.warning("market calculation failed: %s", type(error).__name__)
-        payload, delay = {"type": "status", "status": "error", "error": "行情暂不可用，后台重试中"}, 2000
+        payload, delay = {"type": "status", "status": "error", "error": "行情暂不可用，后台重试中",
+                          "error_evidence": error_evidence(error, provider=work['identity'].get('metadata', {}).get('source', ''),
+                                                           operation='shared_' + work['identity'].get('kind', 'bars'))}, 2000
         calculator.signals.pop(work["id"], None)
     try:
         stream.commit(work, copy.deepcopy(payload), delay_ms=delay)

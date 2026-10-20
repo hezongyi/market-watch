@@ -170,6 +170,30 @@
   overflow: auto;
   overscroll-behavior: contain;
 }
+.nc-history-placeholder > p {
+  padding: 0 16px;
+  color: var(--nc-text);
+  font-size: 13px;
+}
+.nc-history-placeholder .nc-placeholder-icon,
+.nc-history-placeholder .nc-row-copy > span {
+  display: block;
+  background: currentColor;
+  opacity: 0.12;
+  border-radius: 3px;
+}
+.nc-history-placeholder .nc-placeholder-icon {
+  width: 20px;
+  height: 20px;
+}
+.nc-history-placeholder .nc-row-copy > span {
+  width: 75%;
+  height: 12px;
+  margin: 5px 0;
+}
+.nc-history-placeholder .nc-row-copy > span + span {
+  width: 50%;
+}
 .nc-day {
   padding: 12px 18px 6px;
   color: var(--nc-muted);

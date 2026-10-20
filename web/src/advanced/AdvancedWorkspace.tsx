@@ -357,15 +357,22 @@ export default function AdvancedWorkspace() {
   useEffect(() => {
     const marketRequests = new Map<Window, Map<number, AbortController>>();
     const subscriptionScopes = new WeakMap<object, {workspace: string; session: string; epoch: number}>();
-    const observeSubscription = (args: any, kind: 'market' | 'connection', error: unknown | null, attempt: string) => {
+    const observeSubscription = (args: any, kind: 'market' | 'connection' | 'subscription', error: unknown | null, attempt: string, lifecycle?: 'ended') => {
       const scope = subscriptionScopes.get(args);
-      if (!scope || scope.workspace !== current.current?.id || scope.session !== alertUiSession.current || scope.epoch !== nativeLoadEpoch.current) return;
+      if (!scope || (!lifecycle && (scope.workspace !== current.current?.id || scope.session !== alertUiSession.current || scope.epoch !== nativeLoadEpoch.current))) return;
       const query = args.query || args;
-      const fault = {source_kind: kind, attempt_id: args.listener + ':' + String(args.generation ?? '') + ':' + attempt,
-        code: kind === 'connection' ? 'MARKET_CONNECTION_FAILED' : 'MARKET_READ_FAILED',
-        title: kind === 'connection' ? '图表行情连接中断' : '图表行情读取失败', message: error == null ? '当前订阅已明确恢复' : String(error),
-        context: {workspace_id: scope.workspace, epoch: scope.epoch, source_id: args.listener,
-          generation: args.generation ?? 0, instrument: query.instrument || '', timeframe: query.timeframe || '', consumer: args.kind || 'bars'}};
+      const shared = kind === 'connection', failed = error as {status?: number; code?: string; name?: string} | null;
+      const fault = {source_kind: kind === 'subscription' ? 'market' as const : kind,
+        attempt_id: (shared ? args.client : args.listener + ':' + String(args.generation ?? '')) + ':' + attempt,
+        code: shared ? 'MARKET_CONNECTION_FAILED' : kind === 'subscription' ? 'MARKET_SUBSCRIPTION_FAILED' : 'MARKET_READ_FAILED',
+        title: shared ? '图表行情连接中断' : kind === 'subscription' ? '行情订阅未成功注册' : '图表行情读取失败',
+        message: lifecycle ? '订阅观察已结束，无法继续确认恢复' : error == null ? '对应操作已明确恢复' : String(error),
+        ...(lifecycle ? {observation_ended: true} : {}),
+        context: {workspace_id: scope.workspace, epoch: scope.epoch, source_id: shared ? args.client : args.listener,
+          generation: shared ? 0 : args.generation ?? 0, instrument: shared ? '' : query.instrument || '',
+          timeframe: shared ? '' : query.timeframe || '', consumer: shared ? 'stream' : args.kind || 'bars'},
+        evidence: {operation: shared ? 'sse_transport' : kind === 'subscription' ? 'subscription_register' : 'market_read',
+          error_type: failed?.name || '', code: failed?.code || '', http_status: failed?.status || null}};
       if (error == null) void notices.resolve(fault); else void notices.report(fault);
     };
     const provider = providerSubscriptions(
@@ -1270,9 +1277,9 @@ export default function AdvancedWorkspace() {
       } else if (m.type === "preferences") {
         const q = m.query;
         if (
-          mobile ||
+          (mobile && q?.op !== "read") ||
           !q ||
-          !["save", "delete"].includes(q.op) ||
+          !["read", "save", "delete"].includes(q.op) ||
           JSON.stringify(q).length > 1_100_000
         ) {
           reply({ type: "result", id: m.id, error: "设置请求不允许" });
@@ -1283,6 +1290,10 @@ export default function AdvancedWorkspace() {
           return;
         }
         try {
+          if (q.op === "read") {
+            reply({type: "result", id: m.id, result: await api("/advanced-charts/preferences")});
+            return;
+          }
           reply({
             type: "result",
             id: m.id,

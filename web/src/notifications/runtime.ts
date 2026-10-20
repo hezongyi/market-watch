@@ -114,6 +114,26 @@ export class NoticeRuntime {
   private displayEnabled = true;
   private popping = false;
   private attached = false;
+  private observations = new Map<string, BrowserFault>();
+  private documentId = "";
+  private needsEnds = true;
+  private storage = (event: StorageEvent) => {
+    if (!event.key?.startsWith("mw-notice-document-ended:")) return;
+    this.needsEnds = true;
+    if (this.ready) this.schedule(this.generation, 0);
+  };
+  private pagehide = (event: PageTransitionEvent) => {
+    if (event.persisted || !this.ready || !this.subject || !this.observations.size) return;
+    // End intents were already committed with each fault. An unload cannot
+    // reliably finish async IDB callbacks, so only mark this document closed
+    // synchronously. Another tab or the next launch promotes those intents.
+    try {
+      localStorage.setItem("mw-notice-document-ended:" + this.documentId, String(Date.now()));
+    } catch (error) {
+      this.patch({ gap: "页面观察结束标记未能保存：" + String(error) });
+    }
+    this.observations.clear();
+  };
   private faultListener = (event: Event) => {
     if (this.ready)
       void this.report((event as CustomEvent<BrowserFault>).detail);
@@ -130,6 +150,8 @@ export class NoticeRuntime {
     this.attached = true;
     addEventListener("mw-notice-fault", this.faultListener);
     addEventListener("mw-session-expired", this.expired);
+    addEventListener("pagehide", this.pagehide);
+    addEventListener("storage", this.storage);
     document.addEventListener("visibilitychange", this.visibility);
   }
 
@@ -159,6 +181,9 @@ export class NoticeRuntime {
     this.queue = [];
     this.alertQueue = [];
     this.candidates.clear();
+    this.observations.clear();
+    this.documentId = "";
+    this.needsEnds = true;
     this.after = "";
     this.epoch = "";
     this.nextUpload = 0;
@@ -172,6 +197,8 @@ export class NoticeRuntime {
     this.attached = false;
     removeEventListener("mw-notice-fault", this.faultListener);
     removeEventListener("mw-session-expired", this.expired);
+    removeEventListener("pagehide", this.pagehide);
+    removeEventListener("storage", this.storage);
     document.removeEventListener("visibilitychange", this.visibility);
   }
   start(subject: string) {
@@ -409,6 +436,11 @@ export class NoticeRuntime {
         context: fault.context || {},
         evidence: fault.evidence || {},
       }) as Intake;
+      const observed = fault.source_kind === "market" || fault.source_kind === "connection";
+      if (observed) {
+        this.documentId ||= crypto.randomUUID();
+        this.observations.set(id, { ...fault, context: event.context });
+      }
       await this.store.stage(subject, event);
       await this.store.update(
         "claims",
@@ -428,12 +460,18 @@ export class NoticeRuntime {
           "consumer",
           "source_id",
           "endpoint",
+          "acceptance_run",
         ].map((k) => event.context[k] ?? ""),
       ]);
       const groupKey = subject + ":fault:" + (await stableId(grouping));
       const old = await this.store.update("meta", groupKey, subject, (old) => ({
         latest: id,
         open: true,
+        ...(observed ? { exit: { document: this.documentId, event: scrub({
+          ...event, event_id: "b:" + crypto.randomUUID(), severity: "info",
+          recovery_of: id, observation_ended: true,
+          message: "页面观察已结束，未确认恢复",
+        }) } } : {}),
       }));
       if (!this.current(generation)) return null;
       const notice = this.localNotice(event, "pending");
@@ -475,6 +513,7 @@ export class NoticeRuntime {
     });
     try {
       await this.store.stage(subject, event);
+      this.observations.delete(eventId);
       const grouping = JSON.stringify([
         fault.source_kind,
         fault.code,
@@ -486,6 +525,7 @@ export class NoticeRuntime {
           "consumer",
           "source_id",
           "endpoint",
+          "acceptance_run",
         ].map((k) => event.context[k] ?? ""),
       ]);
       const groupKey = subject + ":fault:" + (await stableId(grouping));
@@ -517,6 +557,7 @@ export class NoticeRuntime {
         "consumer",
         "source_id",
         "endpoint",
+        "acceptance_run",
       ].map((k) => context[k] ?? ""),
     ]);
     const key = subject + ":fault:" + (await stableId(grouping));
@@ -765,7 +806,32 @@ export class NoticeRuntime {
       void this.cycle(generation);
     }, ms);
   }
+  private async stageObservationEnds() {
+    if (!this.needsEnds) return;
+    this.needsEnds = false;
+    const subject = this.subject, generation = this.generation;
+    const completed = new Set<string>();
+    try {
+      for (const row of await this.store.all("meta", subject)) {
+        if (!this.current(generation)) return;
+        const intent = row.value?.exit;
+        if (!row.key.includes(":fault:") || !row.value.open || !intent) continue;
+        const at = Number(localStorage.getItem("mw-notice-document-ended:" + intent.document));
+        if (!at) continue;
+        await this.store.stage(subject, { ...intent.event, occurred_at: at });
+        await this.store.update("meta", row.key, subject, (old) =>
+          old?.latest === row.value.latest ? { ...old, open: false, exit: null } : undefined);
+        completed.add(intent.document);
+      }
+      for (const document of completed)
+        localStorage.removeItem("mw-notice-document-ended:" + document);
+    } catch (error) {
+      this.needsEnds = true;
+      if (this.current(generation)) this.patch({ gap: "观察结束事实尚未保存：" + String(error) });
+    }
+  }
   private async syncPending(generation: number) {
+    await this.stageObservationEnds();
     const subject = this.subject;
     // Projection acknowledgement is independent of the 200-summary window.
     for (const item of (await this.store.all("pending", subject))

@@ -13,6 +13,7 @@ import { NoticePanel } from "./Panel";
 import type { Notice, NoticeState, NoticeTransport } from "./types";
 import { messageIcons } from "./icons";
 import "./native-system-messages.css";
+import { SystemHistoryCache } from "./useSystemHistory";
 
 type Geometry = { width: number; height: number; top: number; right: number };
 export type Surface = {
@@ -61,6 +62,7 @@ export async function attachNativeSystemMessages({
     align: "right",
     useTradingViewStyle: false,
   });
+  const historyCache = new SystemHistoryCache();
   native.prepareEntry(entry);
   entry.classList.add("nc-system-entry");
   // Pinned v31.1.0: hide only the line immediately before this entry's group.
@@ -160,6 +162,7 @@ export async function attachNativeSystemMessages({
           <NativeControls.Provider value={native.control}>
             <NativeScrollClass.Provider value={native.scrollClass}>
               <NoticePanel
+                historyCache={historyCache}
                 state={view.state}
                 request={request}
                 eventId={view.eventId}

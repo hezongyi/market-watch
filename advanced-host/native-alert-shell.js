@@ -2,6 +2,40 @@
  * Vendor bytes are untouched. Business state outlives native page recreation. */
 const nativeAlertRuntimes = new WeakMap();
 const nativePageRegistries = new WeakMap();
+const nativeChunkFlights = new WeakMap();
+async function nativeAlertChunks(runtime, chunks) {
+  let flights = nativeChunkFlights.get(runtime);
+  if (!flights) {
+    flights = new Map();
+    nativeChunkFlights.set(runtime, flights);
+  }
+  await Promise.all(
+    chunks.map((chunk) => {
+      let flight = flights.get(chunk);
+      if (!flight) {
+        flight = (async () => {
+          try {
+            await runtime.e(chunk);
+          } catch (error) {
+            if (
+              error?.name !== "ChunkLoadError" &&
+              error?.code !== "CSS_CHUNK_LOAD_FAILED"
+            )
+              throw error;
+            await new Promise((resolve) => setTimeout(resolve, 200));
+            await runtime.e(chunk);
+          }
+        })();
+        flights.set(chunk, flight);
+        const clear = () => {
+          if (flights.get(chunk) === flight) flights.delete(chunk);
+        };
+        flight.then(clear, clear);
+      }
+      return flight;
+    }),
+  );
+}
 async function nativeAlertShell(
   widget,
   { mount, unmount, report, page = "alerts", title = "警报", icon },
@@ -44,18 +78,14 @@ async function nativeAlertShell(
       },
     ]);
   if (!vendor?.e) throw Error("v31.1.0 原生控件运行时契约不匹配");
-  await Promise.all([
-    // Select imports DOM IDs (210754) and keyboard navigation (409286)
-    // from shared chunks. Other lazy UI may not have finished loading them.
-    vendor.e(32171),
-    vendor.e(36145),
-    vendor.e(21981),
-    vendor.e(42706),
-    vendor.e(34540),
-    vendor.e(56595),
-    vendor.e(91676),
-    vendor.e(39218),
-  ]);
+  await nativeAlertChunks(
+    vendor,
+    [
+      // Select imports DOM IDs (210754) and keyboard navigation (409286)
+      // from shared chunks. Other lazy UI may not have finished loading them.
+      32171, 36145, 21981, 42706, 34540, 56595, 91676, 39218,
+    ],
+  );
   const nativeReact = vendor(779474),
     createNativeRoot = vendor(590263).createReactRoot;
   const PopupMenu = vendor(986418).PopupMenu,

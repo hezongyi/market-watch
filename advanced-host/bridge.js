@@ -315,7 +315,7 @@ function emitNotice(fault,recovered=false){
 }
 // Each live request owner carries at most one outage per instrument/period.
 // Callers fence cancellation/generation before recording a transition.
-function marketRequestNotice(owner,ticker,res,error){
+function marketRequestNotice(owner,ticker,res,error,observationEnded=false){
   if(error?.code==='HISTORY_CANCELLED' || error?.name==='AbortError')return;
   const key=ticker+'|'+res;
   const outages=owner.noticeOutages || (owner.noticeOutages=new Map());
@@ -324,8 +324,16 @@ function marketRequestNotice(owner,ticker,res,error){
   else if(error || !attempt)return;
   if(!error)outages.delete(key);
   emitNotice({source_kind:'market',attempt_id:attempt,code:'MARKET_REQUEST_FAILED',title:'图表行情请求失败',
-    message:error ? String(error) : '当前有效行情请求已成功',
+    message:observationEnded ? '请求观察已结束，未确认恢复' : error ? String(error) : '当前有效行情请求已成功',
+    ...(observationEnded ? {observation_ended:true} : {}),
+    evidence:{operation:'initial_or_poll_request',error_type:error?.name||'',code:error?.code||'',http_status:error?.status||null},
     context:{instrument:ticker,timeframe:res,consumer:'request',source_id:owner.noticeSourceId || (owner.noticeSourceId=crypto.randomUUID())}},!error);
+}
+function endMarketRequestObservation(owner){
+  for(const key of [...owner?.noticeOutages?.keys() || []]) {
+    const split=key.lastIndexOf('|');
+    marketRequestNotice(owner,key.slice(0,split),key.slice(split+1),null,true);
+  }
 }
 function indicatorFault(consumer,error,attempt_id){
   const binding=indicatorBindings.get(indicatorKey(consumer.chart.symbol(),consumer.chart.resolution()))||{};
@@ -1102,7 +1110,12 @@ const feed = {
         // Keep the first snapshot beside streaming/polling rows so a timezone
         // or active-chart change can reformat the same stored epoch without
         // issuing another provider request.
-        for(const row of rows)marketRequestNotice(quoteSub,row.n,'quotes',row.s==='error' || (row.v?.fetch_status && row.v.fetch_status!=='ok') ? Error('报价抓取失败') : null);
+        for(const row of rows) {
+          const failed=row.s==='error' || (row.v?.fetch_status && row.v.fetch_status!=='ok');
+          // Shared supplier failures belong to the server task. A failed HTTP
+          // snapshot request remains local and can recover from a good SSE row.
+          if(!failed || marketPollingFallback) marketRequestNotice(quoteSub,row.n,'quotes',failed ? Error('报价抓取失败') : null);
+        }
         cb(rows);
       },
         error=>{if(quoteSubscriptions.get(id)!==quoteSub)return;for(const ticker of presented)marketRequestNotice(quoteSub,ticker,'quotes',error);send({type:"feed-poll-state",key:"@quotes",error:String(error)});},
@@ -1110,6 +1123,7 @@ const feed = {
     }
   },
   unsubscribeQuotes: (id) => {
+    endMarketRequestObservation(quoteSubscriptions.get(id));
     for(const entry of quoteSubscriptions.get(id)?.listeners || [])
       send({type:'market-unsubscribe',args:{client:clientId,listener:entry.listener,generation:entry.generation}});
     quoteSubscriptions.delete(id);
@@ -1481,6 +1495,7 @@ const feed = {
   },
   unsubscribeBars: id => {
     const sub=subscriptions.get(id);
+    endMarketRequestObservation(sub);
     if(sub)compositeDisplayBatches.cancel(indicatorKey(sub.symbol,sub.res));
     clearTimeout(sub?.marketRetry);
     if(sub?.marketListener)
@@ -2399,7 +2414,6 @@ function boot(
       "use_localstorage_for_settings",
       "open_account_manager",
       "create_volume_indicator_by_default",
-      "header_indicators",
       ...(readonly
         ? [
             "left_toolbar",
@@ -2407,7 +2421,6 @@ function boot(
             "order_panel",
             "broker_button",
             "context_menus",
-            "header_indicators",
             "header_settings",
           ]
         : []),
@@ -2611,13 +2624,16 @@ function boot(
       edgeGuard = undefined;
       rangeGuard?.dispose();
       rangeGuard = undefined;
+      // End held request observations under their original epoch. The parent
+      // fences notice-source messages after native-load-reset, so doing this
+      // after the reset would discard the end or mismatch its durable context.
+      for(const [id] of subscriptions) feed.unsubscribeBars(id);
+      for(const [id] of quoteSubscriptions) feed.unsubscribeQuotes(id);
       workspaceEpoch++;
       indicatorCoordinator?.dispose();indicatorCoordinator=undefined;indicatorBindings.clear();
       send({type:'native-load-reset',epoch:workspaceEpoch});
       syncCoordinator.resetWorkspace(pendingSync);
       workspaceLoadPause = syncCoordinator.acquirePause("workspace-load",["date","time","barWidth"]);
-      for(const [id] of subscriptions) feed.unsubscribeBars(id);
-      for(const [id] of quoteSubscriptions) feed.unsubscribeQuotes(id);
       quoteSnapshotRows.clear();
       quoteResetTokens.clear();
       marketHistoryState.clear();
@@ -2766,6 +2782,8 @@ addEventListener("message", async (e) => {
       entry.sequence=event.sequence;
       if(event.type==='quotes') {
         const rows = event.quotes.map(({s,v})=>({s,n:entry.ticker,v}));
+        for(const row of rows) if(row.s==='ok' && (!row.v?.fetch_status || row.v.fetch_status==='ok'))
+          marketRequestNotice(quote,row.n,'quotes',null);
         rememberQuoteRows(rows);
         quote.lastRows = rows;
         quote.cb(rows.map(row => quoteSnapshotRows.get(row.n)).filter(Boolean).map(presentQuote));

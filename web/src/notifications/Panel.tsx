@@ -21,7 +21,7 @@ import { severityLabels, sourceLabels, noticeInstrument } from "./types";
 import "./notifications.css";
 import { SystemOccurrences } from "./SystemOccurrences";
 import { messageIcons } from "./icons";
-import { useSystemHistory } from "./useSystemHistory";
+import { useSystemHistory, type SystemHistoryCache } from "./useSystemHistory";
 import { NoticeTimestamp } from "./Timestamp";
 import { systemPopupDurations, systemPopupSeconds } from "./preferences";
 import { useChartTime } from "../time/ChartTimeContext";
@@ -66,10 +66,12 @@ export function NoticePanel({
   onClose,
   onLocate,
   active = true,
+  historyCache,
 }: {
   state: NoticeState;
   request: NoticeTransport;
   active?: boolean;
+  historyCache?: SystemHistoryCache;
   eventId?: string;
   onClose: () => void;
   onLocate?: (notice: Notice) => void | Promise<void>;
@@ -78,7 +80,9 @@ export function NoticePanel({
   const time = (value: number | null | undefined) =>
     formatTimestamp(value, zone);
   const [debugOpen, setDebugOpen] = useState(false);
-  const [filters, setFilters] = useState<SystemFilters>({});
+  const [filters, setFilters] = useState<SystemFilters>(
+    historyCache?.filters || {},
+  );
   const [selection, setSelection] = useState(eventId || ""),
     [settings, setSettings] = useState(false),
     [searchOpen, setSearchOpen] = useState(false);
@@ -99,6 +103,7 @@ export function NoticePanel({
     epoch: state.epoch,
     revision: state.revision,
     enabled: active && !settings,
+    historyCache,
   });
   const page = history.page;
   const busy = working || history.loading || history.loadingMore;
@@ -116,8 +121,9 @@ export function NoticePanel({
     setSettings(false);
   }, [eventId]);
   useEffect(() => {
-    if (list.current) list.current.scrollTop = 0;
-  }, [filterKey, state.epoch]);
+    if (historyCache) historyCache.filters = filters;
+    if (list.current) list.current.scrollTop = history.scrollTop;
+  }, [filterKey, state.epoch, selection, settings]);
   useEffect(() => {
     if (
       !active ||
@@ -347,9 +353,11 @@ export function NoticePanel({
               <dd>
                 {detail.incident?.closed_at
                   ? "已恢复"
-                  : detail.handled_at
-                    ? "已处理"
-                    : "仍需关注"}
+                  : detail.observation_status === "ended"
+                    ? "观察已结束，未确认恢复"
+                    : detail.handled_at
+                      ? "已处理"
+                      : "仍需关注"}
               </dd>
               <dt>首次发生</dt>
               <dd>{time(detail.incident?.first_at || detail.occurred_at)}</dd>
@@ -580,7 +588,14 @@ export function NoticePanel({
               </button>
             </div>
           )}
-          <div ref={list} className={"nc-list" + scrollStyle} aria-busy={busy}>
+          <div
+            ref={list}
+            className={"nc-list" + scrollStyle}
+            aria-busy={busy}
+            onScroll={(event) =>
+              history.saveScroll(event.currentTarget.scrollTop)
+            }
+          >
             {pending.length > 0 && (
               <div className="nc-section-label">
                 本机记录 · {pending.length} 条 · 等待同步
@@ -628,7 +643,9 @@ export function NoticePanel({
                     <small>
                       {row.incident?.closed_at
                         ? "已恢复"
-                        : sourceLabels[row.source_kind]}
+                        : row.observation_status === "ended"
+                          ? "观察已结束，未确认恢复"
+                          : sourceLabels[row.source_kind]}
                       {row.incident && row.incident.count > 1
                         ? ` · 累计 ${row.incident.count} 次`
                         : ""}
@@ -639,10 +656,32 @@ export function NoticePanel({
                 </button>
               </div>
             ))}
-            {!rows.length && !pending.length && (
+            {!rows.length && !pending.length && busy && (
+              <div
+                className="nc-history-placeholder"
+                role="status"
+                aria-label="正在读取系统消息"
+              >
+                <p>正在读取系统消息…</p>
+                {[0, 1, 2].map((index) => (
+                  <div key={index} className="nc-row" aria-hidden="true">
+                    <span className="nc-placeholder-icon" />
+                    <span className="nc-row-copy">
+                      <span />
+                      <span />
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {!rows.length && !pending.length && !busy && (
               <div className="nc-empty">
                 <Bell size={28} aria-hidden />
-                <p>{busy ? "正在读取系统消息…" : "没有符合条件的系统消息"}</p>
+                <p>
+                  {history.error
+                    ? "系统消息读取失败，请重试"
+                    : "没有符合条件的系统消息"}
+                </p>
               </div>
             )}
             {!!rows.length && (
@@ -657,7 +696,11 @@ export function NoticePanel({
                 ) : history.loadingMore ? (
                   "正在加载更多消息…"
                 ) : page?.before ? (
-                  filters.sort === "oldest" ? "向下滚动加载更新消息" : "向下滚动加载更早消息"
+                  filters.sort === "oldest" ? (
+                    "向下滚动加载更新消息"
+                  ) : (
+                    "向下滚动加载更早消息"
+                  )
                 ) : (
                   "已显示全部消息"
                 )}
@@ -824,37 +867,39 @@ export function NoticeBubble({
       <div className="nc-bubble-time">
         <NoticeTimestamp stamp={notice.occurred_at} />
       </div>
-      <div className="nc-bubble-actions">
-        {trading && onLocate && (
-          <button
-            type="button"
-            className="nc-link"
-            onClick={() => void open(onLocate)}
-          >
-            查看图表
-          </button>
-        )}
-        {trading && (
-          <button
-            type="button"
-            className="nc-link"
-            onClick={() => void open(onOpen)}
-          >
-            告警记录
-          </button>
-        )}
-        <NativeControl
-          kind="button"
-          properties={{
-            type: "button",
-            size: "m",
-            appearance: "default",
-            intent: "primary",
-            onClick: () => (trading ? void confirm() : void open(onOpen)),
-            children: trading ? "确定" : "查看消息",
-          }}
-        />
-      </div>
+      {trading && (
+        <div className="nc-bubble-actions">
+          {trading && onLocate && (
+            <button
+              type="button"
+              className="nc-link"
+              onClick={() => void open(onLocate)}
+            >
+              查看图表
+            </button>
+          )}
+          {trading && (
+            <button
+              type="button"
+              className="nc-link"
+              onClick={() => void open(onOpen)}
+            >
+              告警记录
+            </button>
+          )}
+          <NativeControl
+            kind="button"
+            properties={{
+              type: "button",
+              size: "m",
+              appearance: "default",
+              intent: "primary",
+              onClick: () => void confirm(),
+              children: "确定",
+            }}
+          />
+        </div>
+      )}
     </aside>
   );
 }

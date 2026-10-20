@@ -51,6 +51,46 @@ def browser(**changes):
         'context': {'workspace_id': 'workspace-a'}, **changes})
 
 
+def test_browser_observation_end_is_not_recovery_and_samples_are_isolated(database):
+    first = browser(source_kind='market', code='MARKET_READ_FAILED')
+    sample_fault = browser(source_kind='market', code='MARKET_READ_FAILED',
+        context={**first.context, 'acceptance_run': 'batch-13-21'})
+    with database.begin() as db:
+        center.stream(db)
+        center.accept_browser(db, center.SUBJECT, first)
+        center.accept_browser(db, center.SUBJECT, sample_fault)
+    drain(database)
+    end = browser(source_kind='market', code='MARKET_READ_FAILED',
+        context=first.context, recovery_of=first.event_id, observation_ended=True)
+    with database.begin() as db:
+        center.accept_browser(db, center.SUBJECT, end)
+    drain(database)
+    with database() as db:
+        natural = center.detail(db, center.SUBJECT, first.event_id)
+        sample_event = center.detail(db, center.SUBJECT, sample_fault.event_id)
+        assert natural['incident_id'] != sample_event['incident_id']
+        assert natural['observation_status'] == 'ended'
+        assert natural['incident']['closed_at'] is None
+        assert not sample_event.get('observation_status')
+    wrong_recovery = browser(source_kind='market', code='MARKET_READ_FAILED',
+        context=sample_fault.context, recovery_of=first.event_id)
+    with database.begin() as db:
+        center.accept_browser(db, center.SUBJECT, wrong_recovery)
+    drain(database)
+    with database() as db:
+        assert center.detail(db, center.SUBJECT, first.event_id)['incident']['closed_at'] is None
+
+
+def test_browser_default_end_flag_keeps_old_intake_signature(database):
+    value = browser()
+    with database.begin() as db:
+        center.accept_browser(db, center.SUBJECT, value)
+        intake = db.get(NoticeIntake, value.event_id)
+        assert 'observation_ended' not in intake.body
+        assert center.accept_browser(db, center.SUBJECT,
+            value.model_copy(update={'observation_ended': False}))['id'] == value.event_id
+
+
 def observe(ident, kind='viewed', **changes):
     return Observation.model_validate({'observation_id': str(uuid.uuid4()), 'event_id': ident,
         'profile': PROFILE, 'kind': kind, **changes})
@@ -133,6 +173,32 @@ def test_browser_idempotence_conflict_and_sanitized_evidence(database):
         row = center.detail(db, center.SUBJECT, event.event_id)
         assert 'password' not in row['evidence'] and 'private.example' not in str(row)
         assert db.scalar(select(func.count()).select_from(NoticeEvent)) == 1
+
+
+def test_history_incident_queries_are_batched_for_a_full_page(database):
+    from sqlalchemy import event
+
+    with database.begin() as db:
+        state = center.stream(db, lock=True)
+        for i in range(100):
+            center._new_event(db, state, ident='batch:' + str(i), source_kind='market',
+                source_id=str(i), occurred_at=now_ms(), body={'title': 'batch', 'context': {}},
+                dedupe=['batch', i])
+    statements = []
+    with database() as db:
+        engine = db.get_bind()
+        def count(_conn, _cursor, statement, _parameters, _context, _many):
+            statements.append(statement)
+        event.listen(engine, 'before_cursor_execute', count)
+        try:
+            page = center.list_events(db, center.SUBJECT, {'audience': 'system'}, limit=100)
+        finally:
+            event.remove(engine, 'before_cursor_execute', count)
+    assert len(page['events']) == 100
+    assert all(row['incident']['count'] == 1 for row in page['events'])
+    incident_reads = [sql for sql in statements if 'FROM notice_incidents' in sql]
+    assert len(incident_reads) == 1, f'expected one batch read, got {len(incident_reads)}'
+    assert len(statements) <= 10, len(statements)
 
 
 def test_fault_attempts_group_retransmit_does_not_and_explicit_recovery_reopens(database):

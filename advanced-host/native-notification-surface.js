@@ -27,7 +27,7 @@ async function nativeNotificationSurface(widget, report) {
   ]);
   try {
     // DialogSearch's own shared chunk. Do not load the symbol-search application.
-    await req.e(3854);
+    await nativeAlertChunks(req, [3854]);
     const R = req(779474),
       createRoot = req(590263).createReactRoot;
     const Dialog = req(491617).Dialog,
@@ -89,10 +89,14 @@ async function nativeNotificationSurface(widget, report) {
           R.createElement(
             Dialog,
             {
-              className: instant ? `${noticeCSS.popupDialog} nc-native-instant` : "nc-native-surface",
+              className: instant
+                ? `${noticeCSS.popupDialog} nc-native-instant`
+                : "nc-native-surface",
               containerTabIndex: -1,
               containerAriaLabel: instant ? "即时通知" : "系统消息",
-              "data-name": instant ? "mw-native-instant-notice" : "mw-native-system-message-center",
+              "data-name": instant
+                ? "mw-native-instant-notice"
+                : "mw-native-system-message-center",
               backdrop: false,
               reference: (node) => {
                 if (node) {
@@ -112,7 +116,9 @@ async function nativeNotificationSurface(widget, report) {
               },
             },
             R.createElement("div", {
-              className: instant ? "nc-native-instant-content" : "nc-native-content",
+              className: instant
+                ? "nc-native-instant-content"
+                : "nc-native-content",
               ref: content,
             }),
           );

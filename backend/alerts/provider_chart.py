@@ -506,12 +506,14 @@ def quote_page(meta):
            identity.get("environment"), identity.get("account_scope"))
     try:
         page = cached_page(meta, "M1", before, 1, latest=True, quote=True)
-    except Exception:
+    except Exception as error:
         with _LOCK:
             previous = _QUOTE_LAST.get(key)
         if previous is None:
             raise
+        from .market_notices import error_evidence
         return {**copy.deepcopy(previous), "fetch_status": "fetch_failed",
+                "error_evidence": error_evidence(error, provider=meta['source'], operation='quote_page'),
                 "read_at": now_ms()}
     with _LOCK:
         _QUOTE_LAST[key] = copy.deepcopy(page)

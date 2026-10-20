@@ -28,6 +28,7 @@ class BrowserEvent(BaseModel):
     context: dict = Field(default_factory=dict)
     evidence: dict = Field(default_factory=dict)
     recovery_of: str | None = Field(default=None, pattern=r'^b:[a-f0-9-]{36}$')
+    observation_ended: bool = False
 
     @field_validator('context', 'evidence')
     @classmethod

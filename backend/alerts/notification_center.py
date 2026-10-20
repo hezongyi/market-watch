@@ -42,7 +42,7 @@ CONTEXT_KEYS = {'workspace_id', 'chart_index', 'instrument', 'timeframe', 'serie
                 'provider', 'epoch', 'generation', 'attempt_id', 'code', 'consumer',
                 'input_fingerprint', 'params_fingerprint', 'algorithm_version',
                 'snapshot_id', 'source_id', 'dataset_id', 'task_id', 'revision',
-                'visible_from', 'visible_to', 'endpoint'}
+                'visible_from', 'visible_to', 'endpoint', 'acceptance_run'}
 BROWSER_SOURCES = {'workspace', 'indicator', 'history', 'capacity', 'data_center',
                    'preferences', 'market', 'connection', 'chart_shell'}
 OBSERVATIONS = {'received', 'rendered', 'viewed', 'handled', 'sound_blocked',
@@ -127,8 +127,8 @@ def incident_dict(row):
             'count_scope': '当前事故已接受发生数', 'severity_rank': row.severity}
 
 
-def summary(db, row):
-    group = db.get(NoticeIncident, row.incident_id)
+def summary(db, row, *, incidents=None):
+    group = incidents.get(row.incident_id) if incidents is not None else db.get(NoticeIncident, row.incident_id)
     return {'id': row.id, 'source_domain': row.source_domain, 'source_kind': row.source_kind,
         'source_id': row.source_id, 'incident_id': row.incident_id, 'occurred_at': row.occurred_at,
         'recorded_at': row.recorded_at, 'version': row.version, 'first_seq': row.first_seq,
@@ -252,16 +252,22 @@ def _server_source(db, state, audit):
         row = _new_event(db, state, ident=ident, source_kind=facts.get('source_kind', 'data_center'),
             source_id=source['source_id'], occurred_at=audit.at, source_version=audit.id,
             dedupe=facts['dedupe_key'], backfill=audit.at < state.started_at,
-            body={'title': facts['title'], 'message': facts['code'], 'notify_web': True,
+            body={'title': facts['title'], 'message': facts['code'], 'notify_web': facts.get('notify_web', True),
                   'context': facts.get('context', {}), 'evidence': facts.get('evidence', {})})
         return row.id
-    if kind == 'recovery':
+    if kind in ('recovery', 'observation_end'):
         dedupe = intent_hash([state.subject, facts.get('source_kind', 'data_center'), facts['dedupe_key']])
         group = db.scalar(select(NoticeIncident).where(NoticeIncident.subject == state.subject,
             NoticeIncident.dedupe_key == dedupe, NoticeIncident.closed_at.is_(None)))
-        if group and audit.id > group.source_version:
+        if group and audit.id > group.source_version and kind == 'recovery':
             group.closed_at = audit.at
             publish(db, state, 'incident', '', incident_dict(group))
+        elif group and kind == 'observation_end':
+            row = db.get(NoticeEvent, group.last_event_id)
+            if row:
+                row.body = {**row.body, 'observation_status': 'ended', 'observation_ended_at': audit.at}
+                row.version = state.seq + 1
+                publish(db, state, 'updated', row.id, summary(db, row))
         return None
     raise ValueError('Unsupported reliable notice source')
 
@@ -287,15 +293,25 @@ def project(db, *, limit=100, fail_after=None):
     for intake in intakes:
         value = intake.body
         event_id = intake.id
-        if value.get('recovery_of'):
+        if value.get('_server_task'):
+            # Old loaded bundles still report per listener after a deployment.
+            # The fenced worker is authoritative; retain this receipt without
+            # another occurrence or allowing a browser to assert its recovery.
+            event_id = None
+        elif value.get('recovery_of'):
             prior = db.get(NoticeEvent, value['recovery_of'])
             group = db.get(NoticeIncident, prior.incident_id) if prior else None
             if (prior and prior.subject == state.subject and prior.source_kind == value['source_kind']
                     and prior.body.get('profile') == intake.profile
                     and prior.body.get('context') == value.get('context')
                     and group.last_event_id == prior.id and not group.closed_at):
-                group.closed_at = intake.at
-                publish(db, state, 'incident', '', incident_dict(group))
+                if value.get('observation_ended'):
+                    prior.body = {**prior.body, 'observation_status': 'ended', 'observation_ended_at': intake.at}
+                    prior.version = state.seq + 1
+                    publish(db, state, 'updated', prior.id, summary(db, prior))
+                else:
+                    group.closed_at = intake.at
+                    publish(db, state, 'incident', '', incident_dict(group))
         else:
             _new_event(db, state, ident=intake.id, source_kind=value['source_kind'],
                 source_id=value['attempt_id'], occurred_at=value['occurred_at'],
@@ -315,11 +331,14 @@ def project(db, *, limit=100, fail_after=None):
 
 def accept_browser(db, subject, value):
     raw = value.model_dump(mode='json')
+    # Preserve the intake signature of clients predating this additive field.
+    if not raw.get('observation_ended'):
+        raw.pop('observation_ended', None)
     if len(canonical(raw).encode()) > 16 * 1024:
         raise HTTPException(413, '单条通知超过16 KiB，未保存')
     raw['context'] = {k: clean(v) for k, v in raw['context'].items() if k in CONTEXT_KEYS}
     raw['dedupe_context'] = {k: v for k, v in raw['context'].items()
-        if k in ('workspace_id', 'chart_index', 'instrument', 'timeframe', 'consumer', 'source_id', 'endpoint')}
+        if k in ('workspace_id', 'chart_index', 'instrument', 'timeframe', 'consumer', 'source_id', 'endpoint', 'acceptance_run')}
     raw = clean(raw)
     signature = intent_hash(raw)
     prior = db.get(NoticeIntake, value.event_id)
@@ -327,6 +346,10 @@ def accept_browser(db, subject, value):
         if prior.subject != subject or prior.intent_hash != signature:
             raise HTTPException(409, '通知身份对应不同内容，未覆盖原记录')
         return {'id': prior.id, 'status': 'accepted', 'recorded_at': prior.at}
+    from .market_notices import legacy_shared_task
+    shared_task = legacy_shared_task(db, raw)
+    if shared_task:
+        raw['_server_task'] = shared_task
     _insert_once(db, NoticeIntakeBudget, {'subject': subject, 'at': now_ms(), 'tokens': 120}, ['subject'])
     budget = db.scalar(select(NoticeIntakeBudget).where(
         NoticeIntakeBudget.subject == subject).with_for_update().execution_options(populate_existing=True))
@@ -449,7 +472,10 @@ def list_events(db, subject, filters, *, before=None, limit=100):
         'anchor': [page[-1].occurred_at, page[-1].id]}) if len(rows) > limit else None
     unread = db.scalar(select(func.count()).select_from(NoticeEvent).where(
         NoticeEvent.subject == subject, NoticeEvent.source_domain == 'pro_chart', NoticeEvent.viewed_at.is_(None)))
-    events = [summary(db, row) for row in page]
+    incidents = {group.id: group for group in db.scalars(select(NoticeIncident).where(
+        NoticeIncident.subject == subject,
+        NoticeIncident.id.in_({row.incident_id for row in page}))) } if page else {}
+    events = [summary(db, row, incidents=incidents) for row in page]
     if filters.get('audience') == 'system' and filters.get('grouped', True):
         unread_groups = set(db.scalars(unread_system_incidents(subject).where(
             NoticeEvent.incident_id.in_([event['incident_id'] for event in events]))))
@@ -517,6 +543,13 @@ def changes(db, subject, after, *, limit=100):
 
 
 def detail(db, subject, ident):
+    intake = db.get(NoticeIntake, ident) if ident.startswith('b:') else None
+    if (intake and intake.subject == subject and intake.body.get('_server_task')
+            and db.get(NoticeSourceReceipt, 'browser:' + ident)):
+        # Old clients use this GET solely to acknowledge durable projection.
+        # No synthetic history row is needed to retire their local pending item.
+        return {'id': ident, 'projection_status': 'shared_source',
+                'task_id': intake.body['_server_task']}
     row = event_for(db, subject, ident)
     result = summary(db, row)
     reference = row.body.get('evidence_ref', {})

@@ -34,6 +34,8 @@ export type Notice = {
   };
   local_status?: string;
   client_reported_time?: boolean;
+  observation_status?: "ended";
+  observation_ended_at?: number;
 };
 export type BrowserFault = {
   source_kind:
@@ -53,6 +55,7 @@ export type BrowserFault = {
   context?: Record<string, unknown>;
   evidence?: Record<string, unknown>;
   severity?: "info" | "warning" | "error" | "critical";
+  observation_ended?: boolean;
 };
 export type Intake = BrowserFault & {
   schema_version: 1;
