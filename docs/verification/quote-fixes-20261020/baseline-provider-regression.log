@@ -9,9 +9,9 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f58c338f790>
     def test_provider_api_deadline_includes_running_http_without_cancelling_shared_page(database, monkeypatch):
         import threading
         import time
-    
+
         from alerts import provider_cache
-    
+
         completed = threading.Event()
         cancelled = []
         def slow_page(body):
@@ -20,7 +20,7 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f58c338f790>
             cancelled.append(event.is_set())
             completed.set()
             return {"bars": [], "history_boundary": False}
-    
+
         monkeypatch.setattr(provider, "data", slow_page)
         monkeypatch.setattr(settings, "provider_request_seconds", 0.06)
         api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"

@@ -348,21 +348,21 @@
 
 ## 22. 共享行情等待状态与真实读取失败混淆
 
-**状态：已修复并通过实例验收，等待最终PR review/CI。用户于 2026-10-20 后续要求将本项与第23项一并修复、验收、提交PR并review，取代此前暂不实现的决定。**
+**状态：已修复并通过实例验收，Standards/Spec review已完成，最终CI以PR当前HEAD checks为准。用户于 2026-10-20 后续要求将本项与第23项一并修复、验收、提交PR并review，取代此前暂不实现的决定。**
 
 - 已在长期验收实例只读定位：截至 2026-10-20 13:14 UTC，过去24小时查询到19条“共享行情读取失败”，其中17条为OANDA `HistoryPending`，2条为Binance `ConnectTimeout`；观察时相关4个共享报价任务均已正常。
 - OANDA在REST批次模式下由账户worker更新共享缓存。缓存为空或距更新达到15秒时，读取端抛`HistoryPending`；通用异常分支将其归为`fetch_failed`，通知端再生成“共享行情读取失败”。隔离回放已证明缓存14秒正常、16秒生成同标题，过程中无供应商HTTP请求。
 - 日志另有OANDA超时、504及缓存写入繁忙，可能推迟更新；现有证据不能把每次等待都精确归因于这些日志。Binance两条为真实连接超时，不将其当作等待状态。
-- 待实施方案：区分pending/stale/failed；旧价格保留真实采样时间并标注暂未更新；共享任务有限短间隔重读缓存，持续等待按独立阈值升级；真实网络/鉴权错误保留告警；补充缓存年龄、最近成功与采集结果。pending和旧缓存不能充当恢复证据。
+- 原方案（核心修复已实施）：区分pending/stale/failed；旧价格保留真实采样时间并标注暂未更新；共享任务有限短间隔重读缓存，持续等待按独立阈值升级；真实网络/鉴权错误保留告警；补充缓存年龄、最近成功与采集结果。pending和旧缓存不能充当恢复证据。
 - 后续验收覆盖冷启动、短暂过期、持续超期、写入竞争、上游504、连接超时和真实恢复，保留共享任务去重、多窗口隔离及历史记录。不通过单纯扩大15秒阈值或屏蔽消息隐藏故障。
-- [详细诊断与方案](verification/shared-market-pending-20261020/README.md)、[脱敏只读证据](verification/shared-market-pending-20261020/evidence.json)。本项只记录，没有产品实现或部署。
+- [详细诊断与方案](verification/shared-market-pending-20261020/README.md)、[脱敏只读证据](verification/shared-market-pending-20261020/evidence.json)保留分析当时的只读状态；当前实现及部署以本节状态和下方22–23完成记录为准。
 
 ## 23. 自选表自建行情最新价格未按配置精度显示
 
-**状态：已记录待改动，并已修复通过实例验收，等待最终PR review/CI。**
+**状态：已记录待改动，并已修复通过实例验收，Standards/Spec review已完成，最终CI以PR当前HEAD checks为准。**
 
 - Playwriter实际登录验收页复现：自建历史EURUSD原值1.12224、精度5位却显示1.12；USDCAD原值1.4042、精度5位却显示1.40；黄金原值4114.705、精度3位却显示4,114.71。
 - 原始报价与precision配置正确；共用报价呈现逻辑忽略自建系列precision，缺少asset_type/display_precision时按Dukascopy默认两位覆盖了原生pricescale。
 - 修复要求：自建系列采用该系列配置精度，固定小数位并补尾零；原始数值保留；平台供应商显示政策不受影响。检查初始快照、持续更新、商品详情、刷新与切换，不用统一硬编码位数。
 - [只读分析与实拍](verification/watchlist-precision-analysis-20261020/README.md)。本次作为F0兼容性修复，无schema或持久格式迁移；验证采用定向回归、既有PR CI及原长期实例R1业务验收。按用户要求提交PR并完成Standards/Spec双轴review，不合并、不发布生产。
-- 22–23修复源码`1796ade`已更新至原长期实例；[修复与验收证据](verification/quote-fixes-20261020/README.md)。第22项原“只记录”描述为历史分析时状态，本条完成记录取代旧状态。
+- 22–23首轮源码`1796ade`及review返工`25152a4`已更新至原长期实例（API c2 / Chart-Web c1）；[修复与验收证据](verification/quote-fixes-20261020/README.md)。第22项原“只记录”描述为历史分析时状态，本条完成记录取代旧状态。

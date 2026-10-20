@@ -1,0 +1,70 @@
+{
+  "observed_at": "2026-10-20T14:27:26.677706+00:00",
+  "read_only": true,
+  "tasks": [
+    {
+      "task_id": "efd0aa305e8105d44441fac516ce5fce65e7247082b2edf0c785dbe42b0b97cf",
+      "instrument": "BTCUSDT",
+      "source": "binance",
+      "sequence": 930,
+      "updated_at": 1792506432473,
+      "quotes": [
+        {
+          "name": "MWP:BTCUSDT",
+          "status": "ok",
+          "fetch_status": "ok",
+          "cache_age_ms": null
+        }
+      ],
+      "notice_open": false
+    },
+    {
+      "task_id": "7cf1f507cffb05fb09c2842f06d46fb3956e1fb324119c1c2b6d262f476daade",
+      "instrument": "EURUSD",
+      "source": "oanda",
+      "sequence": 962,
+      "updated_at": 1792506443875,
+      "quotes": [
+        {
+          "name": "MWP:EURUSD",
+          "status": "ok",
+          "fetch_status": "ok",
+          "cache_age_ms": null
+        }
+      ],
+      "notice_open": false
+    },
+    {
+      "task_id": "51eba6f5feb377fd89b3c7c1e316057748fe32b1ef27b7edfafb1d09b531c29d",
+      "instrument": "XAUUSD",
+      "source": "oanda",
+      "sequence": 964,
+      "updated_at": 1792506444488,
+      "quotes": [
+        {
+          "name": "MWP:XAUUSD",
+          "status": "ok",
+          "fetch_status": "ok",
+          "cache_age_ms": null
+        }
+      ],
+      "notice_open": false
+    },
+    {
+      "task_id": "613e1fa3a0b6c39dd47fa7b93a7cca0aa57c7244df99737a14d01a92a48aae28",
+      "instrument": "OANDA:GBP_USD",
+      "source": "oanda",
+      "sequence": 410,
+      "updated_at": 1792506438390,
+      "quotes": [
+        {
+          "name": "MWP:OANDA:GBP_USD",
+          "status": "ok",
+          "fetch_status": "ok",
+          "cache_age_ms": null
+        }
+      ],
+      "notice_open": false
+    }
+  ]
+}
