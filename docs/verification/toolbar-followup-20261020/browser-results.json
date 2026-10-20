@@ -1,0 +1,119 @@
+{
+  "cases": [
+    {
+      "theme": "Light",
+      "settings": {
+        "before": {
+          "color": "rgb(15, 15, 15)",
+          "background": "rgba(0, 0, 0, 0)",
+          "content": "none",
+          "width": 38
+        },
+        "after": {
+          "color": "rgb(15, 15, 15)",
+          "background": "rgb(242, 242, 242)",
+          "content": "\"\"",
+          "width": 38
+        }
+      },
+      "system": {
+        "before": {
+          "color": "rgb(15, 15, 15)",
+          "background": "rgba(0, 0, 0, 0)",
+          "content": "none",
+          "width": 38
+        },
+        "after": {
+          "color": "rgb(15, 15, 15)",
+          "background": "rgb(242, 242, 242)",
+          "content": "\"\"",
+          "width": 38
+        }
+      },
+      "geometry": {
+        "gap": 0,
+        "centerDistance": 38,
+        "separatorWidth": 0,
+        "separatorDisplay": "none"
+      }
+    },
+    {
+      "theme": "Dark",
+      "settings": {
+        "before": {
+          "color": "rgb(219, 219, 219)",
+          "background": "rgba(0, 0, 0, 0)",
+          "content": "none",
+          "width": 38
+        },
+        "after": {
+          "color": "rgb(219, 219, 219)",
+          "background": "rgb(46, 46, 46)",
+          "content": "\"\"",
+          "width": 38
+        }
+      },
+      "system": {
+        "before": {
+          "color": "rgb(219, 219, 219)",
+          "background": "rgba(0, 0, 0, 0)",
+          "content": "none",
+          "width": 38
+        },
+        "after": {
+          "color": "rgb(219, 219, 219)",
+          "background": "rgb(46, 46, 46)",
+          "content": "\"\"",
+          "width": 38
+        }
+      },
+      "geometry": {
+        "gap": 0,
+        "centerDistance": 38,
+        "separatorWidth": 0,
+        "separatorDisplay": "none"
+      }
+    },
+    {
+      "name": "template immediately after indicators",
+      "indicatorLeft": 603.21875,
+      "indicatorRight": 673.21875,
+      "templateLeft": 673.21875,
+      "gap": 0
+    },
+    {
+      "name": "keyboard open/close",
+      "key": "Enter",
+      "focusRestored": true
+    },
+    {
+      "name": "keyboard open/close",
+      "key": " ",
+      "focusRestored": true
+    },
+    {
+      "name": "synthetic local unread counts",
+      "counts": [
+        0,
+        1,
+        120
+      ],
+      "noServerWrites": true
+    },
+    {
+      "name": "dark narrow toolbar",
+      "width": 38,
+      "x": 722.21875,
+      "right": 760.21875,
+      "background": "rgb(46, 46, 46)"
+    },
+    {
+      "name": "reload lifecycle",
+      "buttons": 1,
+      "width": 38,
+      "templateAfterIndicator": true
+    }
+  ],
+  "errors": [],
+  "passed": true
+}
