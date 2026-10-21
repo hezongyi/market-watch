@@ -228,6 +228,24 @@ def test_missing_volume_preserves_legacy_decimal_observation(store, monkeypatch)
     assert read(indicators=[SPEC], provider_snapshot_id=price['provider_snapshot_id'])['bars'] == price['bars']
 
 
+def test_tail_completion_and_rollover_keep_accepted_prices_and_indicators(store, monkeypatch):
+    monkeypatch.setattr(upstream, 'metadata', lambda _: META)
+    seed(META, 'M1', 999000, page(0, 999000, boundary=True))
+    seed(META, 'M1', 1000000, page(999000, 1000000, complete=False, close='1.2'))
+    price = read()
+    original = read(indicators=[SPEC], provider_snapshot_id=price['provider_snapshot_id'])
+    for end, complete, close in [(1000000, False, '1.3'), (1000000, True, '1.4'),
+                                 (1001000, True, '1.5')]:
+        seed(META, 'M1', end, page(999000, end, complete=complete, close=close))
+        result = read(indicators=[SPEC], provider_snapshot_id=price['provider_snapshot_id'])
+        assert result['bars'] == price['bars']
+        assert stable_indicators(result) == stable_indicators(original)
+        inputs._INPUTS.clear()
+        inputs._RESULTS.clear()
+        assert stable_indicators(read(indicators=[SPEC], provider_snapshot_id=price['provider_snapshot_id'])) == stable_indicators(original)
+        assert read()['bars'][-1]['close'] != price['bars'][-1]['close']
+
+
 @requires_postgres
 @pytest.mark.parametrize('correction', [False, True])
 def test_repeatable_read_during_concurrent_writer(provider_pg, monkeypatch, correction):
