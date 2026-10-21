@@ -194,7 +194,7 @@ function fixture() {
       resolution = "5";
       intervalEvent.fire();
     },
-    switchSource: () => (source = "oanda"),
+    switchSource: (value = "oanda") => (source = value),
     switchScale: (value) => (priceScaleMode = value),
     layoutLoad: () => {
       loading = true;
@@ -374,4 +374,16 @@ test("price-axis presentation changes cannot silently replace the saved coordina
   await tick();
   assert.equal(f.row.version, 2);
   assert.equal(f.row.config.condition.right.line.points[0].price, "102");
+});
+
+test('visible create paths explain loading and unresolved metadata', async () => {
+  const f=fixture();
+  f.layoutLoad();await f.api.create();
+  assert.ok(f.failures.length,'loading creates visible feedback');
+  assert.equal(f.messages.filter(m=>m.type==='chart-alert-context').length,0);
+  const items=await f.api.menu([], {createAction:options=>options}, {});
+  assert.equal(items[0].disabled,true);assert.match(items[0].label,/加载/);
+  const g=fixture();g.switchSource(null);await g.api.create();
+  assert.ok(g.failures.length,'metadata missing creates visible feedback');
+  assert.equal(g.messages.filter(m=>m.type==='chart-alert-context').length,0);
 });

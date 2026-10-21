@@ -6,6 +6,7 @@ import logging
 import math
 import threading
 import time
+import uuid
 from contextlib import contextmanager
 from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
@@ -120,7 +121,7 @@ def _retry_seconds(value):
 
 
 @contextmanager
-def _operation(deadline):
+def _operation(deadline, *, stage="request"):
     global _LAST_START
     if not settings.yahoo_enabled:
         raise YahooError("disabled", "Yahoo 行情源未启用")
@@ -166,6 +167,12 @@ def _operation(deadline):
                 if time.monotonic() >= deadline:
                     raise TimeoutError("Yahoo 请求超过时间预算")
             except Exception as error:
+                # Only bounded type/phase/status identifiers; no URL, exception
+                # text, cookies, credentials or user-supplied instrument.
+                logging.getLogger(__name__).warning(
+                    "yahoo_operation_failed attempt_id=%s stage=%s exception_class=%s upstream_status=%s",
+                    uuid.uuid4().hex, stage, type(error).__name__, session.last_status,
+                )
                 if session.rate_limited or isinstance(error, YFRateLimitError):
                     cooldown("yahoo", retry_seconds=_retry_seconds(session.retry_after))
                     raise YahooError("rate_limited", "Yahoo 限流，已进入源级冷却") from None
@@ -277,7 +284,7 @@ def _metadata(info):
 
 def metadata(symbol, *, deadline=None):
     deadline = deadline or time.monotonic() + settings.provider_request_seconds
-    with _operation(deadline) as session:
+    with _operation(deadline, stage="metadata") as session:
         info = yf.Ticker(symbol, session=session).info
         if not info or not info.get("symbol"):
             raise YahooError("metadata_unavailable", "Yahoo 元数据暂不可用")

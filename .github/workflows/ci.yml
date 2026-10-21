@@ -179,6 +179,9 @@ jobs:
           node tests/advanced-watchlist-prewarm.cjs
           node tests/advanced-watchlist-metadata.cjs
           node tests/advanced-startup-metadata.cjs
+          node tests/resolve-recovery.cjs
+          node tests/api-read-recovery.cjs
+          node --test tests/chart-alerts-bridge.test.cjs
           node tests/advanced-market-stream.cjs
           node tests/advanced-provider-subscriptions.cjs
           node tests/advanced-watchlists.cjs
@@ -208,6 +211,7 @@ jobs:
           node tests/advanced-watchlist-names.browser.cjs
           node tests/symbol-flags.browser.cjs
           node tests/system-history.browser.cjs
+          node tests/alert-editing.browser.cjs
           node tests/notice-page-exit.browser.cjs
 
   compose_checks:

@@ -1,14 +1,9 @@
 let csrf = "";
-export class ApiError extends Error {
-  notice_source_id?:string;
-  constructor(message: string, public status: number, public code: string, public display_retry?: Record<string, string>) {
-    super(message);
-    this.name = "ApiError";
-  }
-}
+import { ApiError, responseError, errorMessage } from "./apiErrors";
+export { ApiError, errorMessage, rpcError } from "./apiErrors";
 export function apiErrorDetails(error: unknown) {
-  return error instanceof ApiError ? {code:error.code, status:error.status, ...(error.notice_source_id?{notice_source_id:error.notice_source_id}:{}), ...(error.display_retry ? {display_retry:error.display_retry} : {})} :
-    {code:error instanceof DOMException && error.name === 'AbortError' ? 'HISTORY_CANCELLED' :
+  return error instanceof ApiError ? {code:error.code, status:error.status, message:error.message, fieldErrors:error.fieldErrors, retryable:error.retryable, retryAfter:error.retryAfter, ...(error.notice_source_id?{notice_source_id:error.notice_source_id}:{}), ...(error.display_retry ? {display_retry:error.display_retry} : {})} :
+    {message:errorMessage(error), code:error instanceof DOMException && error.name === 'AbortError' ? 'HISTORY_CANCELLED' :
       error instanceof DOMException && error.name === 'TimeoutError' ? 'HISTORY_TIMEOUT' :
       error instanceof TypeError ? 'NETWORK_FAILED' : 'HISTORY_UNAVAILABLE'};
 }
@@ -88,6 +83,8 @@ async function readFetch(path: string, init: RequestInit, signal?: AbortSignal) 
       finally {clearTimeout(timer);signal?.removeEventListener("abort",cancel);}
       if(!readable || attempt>=3 || ![408,429,502,503,504].includes(response.status))return response;
       const retryAfter=response.headers.get("Retry-After");
+      // A permanent source/configuration failure must not consume retry budget.
+      try { if ((await response.clone().json())?.detail?.retryable === false) return response; } catch { /* non-JSON upstream */ }
       // Long supplier cooldowns are surfaced, not shortened into more requests.
       if(retryAfter && (!/^\d+$/.test(retryAfter) || Number(retryAfter)>2))return response;
       await response.body?.cancel();
@@ -139,17 +136,7 @@ export async function api<T = any>(path: string, body?: unknown, signal?: AbortS
     result={detail:`请求失败（HTTP ${response.status}）`};
   }
   if (!response.ok)
-    throw new ApiError(
-      typeof result.detail === "string"
-        ? result.detail
-        : typeof result.detail?.message === "string"
-          ? result.detail.message
-          : JSON.stringify(result.detail),
-      response.status,
-      typeof result.detail?.code === 'string' ? result.detail.code :
-        response.status === 503 ? 'HISTORY_BUSY' : 'HISTORY_UNAVAILABLE',
-      result.detail?.display_retry,
-    );
+    throw responseError(result.detail, response.status, response.headers.get("Retry-After"));
   return result;
 }
 export type Bar = {

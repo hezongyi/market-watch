@@ -31,7 +31,7 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
   });
   const parentBundle = await build({
     stdin: {
-      contents: `import {chartAlertUiRequest} from './src/advanced/chartAlertUiApi';import {api,setCsrf} from './src/api';import {validAlertContext} from './src/advanced/chartAlerts';setCsrf('parent-only-secret');globalThis.calls=[];globalThis.fixtureErrors=[];addEventListener('message',async event=>{const frame=document.querySelector('iframe');if(event.source!==frame.contentWindow||event.origin!=='https://alert-chart.invalid'||event.data?.channel!=='mw-chart-v1')return;const m=event.data;const reply=value=>frame.contentWindow.postMessage({channel:'mw-chart-v1',...value},'https://alert-chart.invalid');if(m.type==='chart-alert-context'&&validAlertContext(m.context,'fixture'))reply({type:'chart-alert-ui-context',context:m.context});if(m.type==='fixture-error')fixtureErrors.push(m.error);if(m.type==='chart-alert-ui-rpc'){calls.push(m.query);try{const result=await chartAlertUiRequest(m.query,{workspace_id:'fixture',session:'fixture-session'},()=>true,api);reply({type:'result',id:m.id,result});}catch(e){reply({type:'result',id:m.id,error:String(e),errorDetails:{status:e.status,code:e.code}});}}});`,
+      contents: `import {chartAlertUiRequest} from './src/advanced/chartAlertUiApi';import {api,setCsrf,apiErrorDetails,errorMessage} from './src/api';import {validAlertContext} from './src/advanced/chartAlerts';setCsrf('parent-only-secret');globalThis.calls=[];globalThis.fixtureErrors=[];addEventListener('message',async event=>{const frame=document.querySelector('iframe');if(event.source!==frame.contentWindow||event.origin!=='https://alert-chart.invalid'||event.data?.channel!=='mw-chart-v1')return;const m=event.data;const reply=value=>frame.contentWindow.postMessage({channel:'mw-chart-v1',...value},'https://alert-chart.invalid');if(m.type==='chart-alert-context'&&validAlertContext(m.context,'fixture'))reply({type:'chart-alert-ui-context',context:m.context});if(m.type==='fixture-error')fixtureErrors.push(m.error);if(m.type==='chart-alert-ui-rpc'){calls.push(m.query);try{const result=await chartAlertUiRequest(m.query,{workspace_id:'fixture',session:'fixture-session'},()=>true,api);reply({type:'result',id:m.id,result});}catch(e){reply({type:'result',id:m.id,error:errorMessage(e),errorDetails:apiErrorDetails(e)});}}});`,
       resolveDir: path.join(root, "web"),
       loader: "ts",
     },
@@ -141,6 +141,7 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
       const row = {
         id: crypto.randomUUID(),
         name: body.config.name,
+        display_label: body.config.instrument,
         version: 1,
         control_revision: 1,
         run: 1,
@@ -165,6 +166,7 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
       row.config = body.config;
       row.name = body.config.name;
       row.version++;
+      row.control_revision++;
       return reply(row);
     }
     if (u.pathname.endsWith("/lifecycle")) {
@@ -193,7 +195,7 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
           "Content-Security-Policy":
             "default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'none'; frame-src 'self' blob:; worker-src 'self' blob:; form-action 'none'",
         },
-        body: '<!doctype html><html><head><meta charset="utf-8"><style>html,body,#chart{margin:0;height:100%}</style></head><body><div id="chart"></div><script src="/charting_library/charting_library.js"></script><script src="/series.js"></script><script src="/chart-alerts.js"></script><script src="/native-alert-shell.js"></script><script src="/alert-ui.js"></script><script src="/fixture.js"></script></body></html>',
+        body: '<!doctype html><html><head><meta charset="utf-8"><style>html,body,#chart{margin:0;height:100%}</style></head><body><div id="chart"></div><script src="/charting_library/charting_library.js"></script><script src="/series.js"></script><script src="/price-format.js"></script><script src="/chart-alerts.js"></script><script src="/native-alert-shell.js"></script><script src="/alert-ui.js"></script><script src="/fixture.js"></script></body></html>',
       });
     if (u.pathname === "/fixture.js")
       return route.fulfill({ contentType: "text/javascript", body: fixture });
@@ -494,8 +496,8 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
     await page.screenshot({ path: path.join(output, "log-native-menu.png") });
     await page.keyboard.press("Escape");
     await chart.locator(".alert-event-day .alert-row-summary").click();
-    await chart.getByRole("button", { name: "确认此事件" }).click();
-    await chart.getByRole("button", { name: "已确认", exact: true }).waitFor();
+    await chart.getByRole("button", { name: "停止后续手机提醒" }).click();
+    await chart.getByRole("button", { name: "已停止后续提醒", exact: true }).waitFor();
     await page.screenshot({ path: path.join(output, "log-dark.png") });
     report.cases.push(
       "Date-grouped log retains late evidence, rule version, delivery status and independent acknowledgement",

@@ -249,3 +249,31 @@ export function freshDraft(context: AlertContext): AlertConfig {
       seam_policy:"reject" as const} : {}),
   };
 }
+
+/** A relation owns one mutually exclusive payload, including restored drafts. */
+export function normalizeCondition(value: Condition, relation = value.relation): Condition {
+  if (["enter", "exit", "break_upper", "break_lower"].includes(relation))
+    return { relation, left: { kind: "price" }, lower: value.lower ?? "", upper: value.upper ?? "" };
+  const left = value.left;
+  const unit = (operand: Operand) => operand.kind === "constant" ? "constant" :
+    operand.indicator && ["RSI", "MACD"].includes(operand.indicator.name) ? operand.indicator.name : "price";
+  let right = value.right ?? { kind: "constant" as const, value: "" };
+  if (unit(right) !== "constant" && unit(left) !== unit(right)) right = { kind: "constant", value: "" };
+  const offset = value.offset && ["cross_up", "cross_down", "above", "below"].includes(relation) &&
+    unit(left) === "price" && ["constant", "line", "indicator"].includes(right.kind) &&
+    ["price", "constant"].includes(unit(right)) ? value.offset : undefined;
+  return { relation, left, right, ...(offset ? { offset } : {}) };
+}
+
+/** Historical presentation is derived solely from the event's frozen config. */
+export function eventPresentation(event: AlertEvent) {
+  const config = event.evidence?.config;
+  const operand = (value?: Operand | null) => value?.kind === "indicator" ?
+    `${value.indicator?.name ?? "指标"} ${value.indicator?.output ?? ""}` :
+    value?.kind === "constant" ? value.value ?? "" : value?.kind === "line" ? "画线" : "价格";
+  const c = config?.condition;
+  const summary = c ? `${operand(c.left)} ${relations[c.relation] ?? c.relation} ${
+    ["enter", "exit", "break_upper", "break_lower"].includes(c.relation) ? `${c.lower ?? ""}–${c.upper ?? ""}` : operand(c.right)}` : "";
+  const name = config?.name ?? "";
+  return { name, summary, search: [name, summary, config?.instrument, event.display_label, event.message].filter(Boolean).join(" ").toLocaleLowerCase() };
+}

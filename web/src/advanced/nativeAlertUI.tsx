@@ -3,7 +3,7 @@ import type { NoticeTransport } from "../notifications/types";
 import { createRoot } from "react-dom/client";
 import { useState } from "react";
 import { ChartAlertsPanel, type AlertDraft } from "./ChartAlertsPanel";
-import { ApiError } from "../api";
+import { rpcError } from "../api";
 import type { AlertApi, AlertUiScope } from "./chartAlertUiApi";
 import type { AlertContext } from "./chartAlerts";
 import {
@@ -60,6 +60,7 @@ type Options = {
   request: (query: object) => Promise<any>;
   bridge: {
     create: () => unknown;
+    creationReason?: () => string;
     setRows: (rows: any) => void;
     locate: (row: any, event?: any) => void;
     drawingAction: (id: string, action: string) => void;
@@ -116,11 +117,7 @@ async function attach({
         ...(body === undefined ? {} : { body }),
       });
     } catch (error: any) {
-      throw new ApiError(
-        String(error.message || error),
-        error.status || 500,
-        error.code || "ALERT_REQUEST_FAILED",
-      );
+      throw rpcError(error);
     }
   };
   type State = {
@@ -128,6 +125,7 @@ async function attach({
     context: AlertContext | null;
     focusEvent?: { id: string; revision: number };
     theme: string;
+    creationReason: string;
     notices: Record<string, string>;
     instrument: { instrument: string; series_kind: string } | null;
   };
@@ -136,6 +134,7 @@ async function attach({
       target,
       context: null,
       theme: "dark",
+      creationReason: bridge.creationReason?.() || "",
       notices: {},
       instrument: bridge.currentInstrument(),
       ...pendingState,
@@ -153,6 +152,7 @@ async function attach({
           open
           theme={state.theme}
           readonly={readonly}
+          creationUnavailable={state.creationReason}
           request={call}
           activeInstrument={state.instrument}
           nativeDialog={shell.openDialog}
@@ -173,7 +173,7 @@ async function attach({
   }
   root.render(<App />);
   let notices: Record<string, string> = {};
-  let lastInstrument = "";
+  let lastInstrument = "", lastReason = "";
   let lastPanel: boolean | undefined;
   const timer = setInterval(() => {
     const opened = shell.isOpen?.();
@@ -181,6 +181,8 @@ async function attach({
       lastPanel = opened;
       panelChanged?.(opened);
     }
+    const reason = bridge.creationReason?.() || "";
+    if (reason !== lastReason) {lastReason=reason; update({creationReason:reason});}
     const instrument = bridge.currentInstrument(),
       identity = JSON.stringify(instrument);
     if (identity !== lastInstrument) {
