@@ -4,6 +4,7 @@ const assert = require("node:assert/strict"),
 const run = () => new Promise((resolve) => setImmediate(resolve));
 (async () => {
   const ctx = vm.createContext({
+    crypto: require('node:crypto').webcrypto,
     Map,
     Set,
     Promise,

@@ -1056,7 +1056,8 @@ def data_sync(body: DataQuery):
         detail = {"code": e.code, "message": str(e)} if hasattr(e, "code") else str(e)
         if hasattr(e, "display_retry"):
             detail["display_retry"] = e.display_retry
-        raise HTTPException(422, detail) from e
+        headers = {'X-MW-Attempt-Ref': e.attempt_ref} if hasattr(e, 'attempt_ref') else None
+        raise HTTPException(422, detail, headers=headers) from e
 
 
 async def query_chart(body: DataQuery, disconnected=None, deadline=None, retain_work=False):

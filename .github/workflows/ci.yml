@@ -172,6 +172,15 @@ jobs:
           node tests/indicator-snapshot-recovery.cjs
           node tests/display-recovery-lifecycle.cjs
           node tests/provider-credential-recovery.cjs
+          node tests/issue89-sampling.cjs
+          node tests/issue89-native-lifecycle.cjs
+          node tests/advanced-history-empty-failure.cjs
+          node tests/advanced-capacity-boundary.cjs
+          node tests/advanced-continuous-navigation.cjs
+          node tests/advanced-refresh-range-cancellation.cjs
+          node tests/advanced-refresh-failure.cjs
+          node tests/advanced-refresh-interaction.cjs
+          node tests/advanced-viewports.cjs
 
       - name: Watchlist bridge regressions
         working-directory: web

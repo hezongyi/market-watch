@@ -22,6 +22,8 @@ from alerts.provider_acceptance import receipts
 from alerts.provider_capabilities import versions
 from alerts.storage import ProviderBar, ProviderDataset, ProviderInterest
 from sqlalchemy import select
+from test_oanda_payload_semantics import provider_pg as provider_pg
+from test_oanda_payload_semantics import store as store
 
 META = dict(id="OANDA:GBP_JPY", source="oanda", symbol="GBP_JPY", basis="bid",
             calendar="ny17", precision=3)
@@ -42,7 +44,8 @@ def candle(start, *, account=True, corrected=False):
 
 
 def test_native_history_then_account_latest_does_not_reset_but_real_repair_does(
-        database, monkeypatch, configured):
+        store, monkeypatch, configured):
+    database = store
     clock = [1000000]
     for module in (provider_chart, provider_cache, oanda_worker):
         monkeypatch.setattr(module, "now_ms", lambda: clock[0])
@@ -63,6 +66,8 @@ def test_native_history_then_account_latest_does_not_reset_but_real_repair_does(
         lease = provider_cache.claim(key)
         provider_cache.commit_page(key, lease, history, clock[0], clock[0])
         provider_cache.release(key, lease)
+        with database.begin() as db:
+            history_epoch = db.get(ProviderDataset, key).metadata_json['indicator_history_epoch']
         state = dict(history_accepted=True, loaded_after=0, loaded_before=300000,
                      cursor=300000, observed_at=clock[0], provider_acceptance=receipts(history["bars"], False))
         task = SimpleNamespace(query=dict(instrument=META["id"], series_kind="provider", timeframe="M5"),
@@ -79,6 +84,17 @@ def test_native_history_then_account_latest_does_not_reset_but_real_repair_does(
             batch = adapter.latest([spec], generation=epoch, sequence=1 + repair, demand_revision="demand")
             oanda_worker.publish_native_rest_batch(ownership, epoch, batch, [(key, "M5", spec)])
             page = provider_cache.snapshot(key, clock[0], 3)
+            with database.begin() as db:
+                current_epoch = db.get(ProviderDataset, key).metadata_json['indicator_history_epoch']
+            assert (current_epoch != history_epoch) == repair
+            if not repair:
+                # Exercise the opposite writer after the batch observation too.
+                history_again = provider_chart.native_page(META, "M5", clock[0], 3, client=client)
+                lease = provider_cache.claim(key)
+                assert provider_cache.commit_page(key, lease, history_again, clock[0], clock[0]) == []
+                provider_cache.release(key, lease)
+                with database.begin() as db:
+                    assert db.get(ProviderDataset, key).metadata_json['indicator_history_epoch'] == history_epoch
             payload = dict(type="bars", bars=page["bars"], latest_bar=page["bars"][-1:], latest_time=300000)
             with database.begin() as db:
                 result = market_stream.delivery(db, task, sub, payload, {})

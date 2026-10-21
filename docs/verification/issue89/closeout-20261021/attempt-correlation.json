@@ -1,0 +1,74 @@
+{
+  "passed": true,
+  "source": "be20392c99906a4971f3359c8d8877befdb75632",
+  "matches": [
+    {
+      "http": {
+        "at": 1792574757775,
+        "status": 422,
+        "frame": "H1",
+        "code": "DISPLAY_SNAPSHOT_EXPIRED",
+        "attempt": "a7cf86a75ff34b5790e52ac50f415384",
+        "requestCredential": "e9602eedfae41806"
+      },
+      "server": {
+        "attempt_ref": "a7cf86a75ff34b5790e52ac50f415384",
+        "credential_ref": "e9602eedfae41806",
+        "current_revision": 55,
+        "reason": "ttl",
+        "snapshot_revision": 55
+      }
+    },
+    {
+      "http": {
+        "at": 1792574798267,
+        "status": 422,
+        "frame": "H1",
+        "code": "DISPLAY_SNAPSHOT_EXPIRED",
+        "attempt": "701a4e9cbd3d48b9a7068b130549e8a4",
+        "requestCredential": "cad3dab92219cedb"
+      },
+      "server": {
+        "attempt_ref": "701a4e9cbd3d48b9a7068b130549e8a4",
+        "credential_ref": "cad3dab92219cedb",
+        "current_revision": 57,
+        "reason": "epoch",
+        "snapshot_revision": 55
+      }
+    },
+    {
+      "http": {
+        "at": 1792574811076,
+        "status": 422,
+        "frame": "H4",
+        "code": "DISPLAY_SNAPSHOT_EXPIRED",
+        "attempt": "a5c3923d2df942a0af7389b5c58c439c",
+        "requestCredential": "54987adb59c3379b"
+      },
+      "server": {
+        "attempt_ref": "a5c3923d2df942a0af7389b5c58c439c",
+        "credential_ref": "54987adb59c3379b",
+        "current_revision": 50,
+        "reason": "epoch",
+        "snapshot_revision": 48
+      }
+    },
+    {
+      "http": {
+        "at": 1792574873074,
+        "status": 422,
+        "frame": "H1",
+        "code": "DISPLAY_SNAPSHOT_EXPIRED",
+        "attempt": "42ef7c5b199c47d0b7e1b1b6d128bdf8",
+        "requestCredential": "d325efff96deb631"
+      },
+      "server": {
+        "attempt_ref": "42ef7c5b199c47d0b7e1b1b6d128bdf8",
+        "credential_ref": "d325efff96deb631",
+        "current_revision": 59,
+        "reason": "ttl",
+        "snapshot_revision": 59
+      }
+    }
+  ]
+}

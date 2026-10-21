@@ -313,26 +313,16 @@ def publish_native_rest_batch(ownership, epoch, batch, datasets, *, demand_revis
         series = next((row for row in batch.series if row.spec == spec), None)
         if series is None or not series.result.successful:
             continue
-        from .native_series import chart_label
+        from .oanda_candles import native_bar
 
         bars = []
         coverage = []
         for candle in series.candles:
             end = candle.end
-            bar = {
-                "start": candle.start,
-                "end": end,
-                "chart_time": chart_label(candle.start, frame, spec.parameters.model_dump()),
-                "open": candle.open,
-                "high": candle.high,
-                "low": candle.low,
-                "close": candle.close,
-                "volume": candle.volume,
-                "volume_complete": bool(candle.complete and candle.volume is not None),
-                "complete": candle.complete,
-                "source_confirmed": candle.complete,
-                "coverage_complete": candle.complete,
-            }
+            bar = native_bar(start=candle.start, frame=frame,
+                parameters=spec.parameters.model_dump(), complete=candle.complete,
+                volume=candle.volume, open=candle.open, high=candle.high,
+                low=candle.low, close=candle.close)
             bars.append(bar)
             if candle.complete:
                 coverage.append([candle.start, end])

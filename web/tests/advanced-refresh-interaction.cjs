@@ -15,6 +15,7 @@ vm.runInContext(fs.readFileSync('../advanced-host/viewports.js','utf8'),context)
  const widget={chartsCount:()=>1,chart:()=>chart,subscribe:(name,fn)=>events.set(name,fn),
   unsubscribe:name=>events.delete(name),dateRangeSync:()=>({value:()=>false,setValue(){}}),
   timeSync:()=>({value:()=>false,setValue(){}})};
+ require('./fixtures/sync-coordinator.cjs')(context,widget);
  let job=context.refreshChartHistory(widget,chart,()=>{},()=>true);
  events.get('mouse_down')();assert.equal(await job,false);assert.equal(restores,0);
  assert.equal(events.size,0);

@@ -476,7 +476,9 @@ async function recoverDisplaySnapshot(ticker,res,token,retry=false){
   entry.promise=(async()=>{
     if(!current())return;
     notify('preparing');
-    if(ticker.startsWith('MWP:')) {
+    // Failed native resets can leave old model rows after detaching the source.
+    // Explicit retry must restart it; unchanged prices alone cannot restore it.
+    if(ticker.startsWith('MWP:') && !(retry && previous?.state==='error')) {
       try {
         if(await refreshProviderDisplayCredential(ticker,res,token,charts,current)) {
           if(current()) {

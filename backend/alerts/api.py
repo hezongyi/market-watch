@@ -22,6 +22,7 @@ from .chart_alert_message import signal_message, signal_title
 from .chart_series import is_gold
 from .config import settings
 from .domain import TIMEFRAMES, calendar_for, previous_session
+from .logging_config import configure_api_logging
 from .notify import DEFAULTS
 from .replay_history import history_rows, pack_history
 from .service import acknowledge, add_replay_watch, replay_step
@@ -82,6 +83,7 @@ async def lifespan(app):
         close_clients()
 
 
+configure_api_logging()
 app = FastAPI(title="守望 · Market Watch", lifespan=lifespan)
 
 

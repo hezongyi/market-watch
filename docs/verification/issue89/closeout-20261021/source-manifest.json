@@ -1,0 +1,101 @@
+{
+  "head": "be20392c99906a4971f3359c8d8877befdb75632",
+  "integrationBaseline": "199bb734cffa5cc4da4ad9f5a039c247ec333d76",
+  "dirty": false,
+  "files": {
+    ".github/workflows/ci.yml": "5d641a742ba9d7417449e0591a80bf5a7f011ab843d498389fed641f3453cfac",
+    "advanced-host/bridge.js": "cfafe64ac96105a2fc139cc814d2147086ac82a2f3b1c3ff42ce8479d2e8aaf8",
+    "advanced-host/native-navigation.js": "0e261adc354162dd27ccc24962f2f35f35994b70763405d2750470943fcd0f17",
+    "advanced-host/viewports.js": "88bc6e28cb3eb2047479a6f207efec1b9e9e35d227e17bfb4c9eb414c5045fb4",
+    "backend/alerts/api.py": "3e618db702eca3947ab29f795a6486f0198211ba7378375243412344a6107e08",
+    "backend/alerts/chart_api.py": "ac76b4e0da5e71ec07f7369f705230472ebe17d2c88d973a2541df5b1a4c5f69",
+    "backend/alerts/logging_config.py": "213f21e4a65ea9f7bb27eb5ea0f8b923f8368c85c01a5ea7215645ae38c3807a",
+    "backend/alerts/oanda_candles.py": "0dce41c58190d4e502fae12beb7dfa8a95b1c5df663cf1793b6d3003806d4b86",
+    "backend/alerts/oanda_worker.py": "52c32c019bd4b7adb6ddfcfc81aa8e4c4bf361b2e5cde55b2358d94609ecac3c",
+    "backend/alerts/provider_cache.py": "4fff243a2786d5858014deec541a23eaa7a392d857dedcc62cb4f6f4beb23c3e",
+    "backend/alerts/provider_chart.py": "e6470e6468af5a750c938502ee6ee2177b7083bf159cd07f2aa335d3afb4c134",
+    "backend/alerts/provider_display_snapshots.py": "145c9feee03eae90ff3e5d786889401050b571db045fac3e2883253ec025e95d",
+    "backend/tests/test_api_logging.py": "10b69fc5d429343f799e0bdb8d79e2468dc51105fc8c7b8c46e33294a9b69677",
+    "backend/tests/test_issue89_fixture_calendar.py": "563c54dda52cfdc01ffc18deb2f43f501a0c4c26cb4a52884df565cf455166e1",
+    "backend/tests/test_oanda_payload_semantics.py": "b91593f2a83733cc4a68f64c5d375c1c2b9ce87760ecca346f8b4297ef9d9c67",
+    "backend/tests/test_oanda_provider_account_prices.py": "3905c976f332046e2e3bdc16625d7e075cdc0828cdaae366a70c53c974f8aaba",
+    "docs/issues/issue-89-closeout-plan-20261021.md": "4886bbbd22881e731d22ae93ffca76e5d572454b072b67f317ce142c2b8f8262",
+    "docs/verification/issue89/verification.md": "28c23a68d4f0bbd9a7ec0b07d5e6f677cb88b48f10bfad0ff067e415918f7852",
+    "scripts/issue89_acceptance_fixture.py": "15b6165a4b1e3ddb3f4fad6f2ce08da51f95a5b4b8c565139498e2153afed0b8",
+    "scripts/issue89_rollback_compatibility.py": "f98616f6040c6977086bb4bb1c2b884b857b1b8a02e92b4fac65a62b2213f9f1",
+    "web/tests/advanced-capacity-boundary.cjs": "3a181c7bb4a842fe2bb4865e3eadfe8295197cc19894a078505b444d2e172a91",
+    "web/tests/advanced-continuous-navigation.cjs": "561fd68e1acaa32a7dc0897eb0e42b3fe1afc61125f878c2b2e53efdffb4e3b5",
+    "web/tests/advanced-history-empty-failure.cjs": "74493200cef7dc9dbb2a60677843b6150f35e4719ed0a3610a3d95835aa969f6",
+    "web/tests/advanced-native-empty-failure.private.cjs": "08b5253cc4b0105149fd8384b80ac1f0989c37ee998627db368e3417da54522f",
+    "web/tests/advanced-native-error-contract.private.cjs": "d3879ed9bee31a3e61e68fa11f6cfe6aa9c0fdd2aaa6b90d6dbb08d2f4f278a4",
+    "web/tests/advanced-refresh-failure.cjs": "3e632b2d809d1fbb5bca74065d8b4fbbbbcd5284530d4c1fc75d59c0894836cf",
+    "web/tests/advanced-refresh-interaction.cjs": "aeb4f0df6a263c63622650794a327ed685b3f5fa8b77439f0180af8e98fa08ca",
+    "web/tests/advanced-refresh-range-cancellation.cjs": "3483ac957d058791778b3349e60fb2102e5c0d7701c68b8210915c6f17ab01ed",
+    "web/tests/fixtures/issue89-sampling.cjs": "d7a9d62122263ef22c0c8dbaae750bca08a798ebb720a8b1d77bce5be33272ac",
+    "web/tests/issue89-native-lifecycle.cjs": "5fea52a59edc3a0e7a99ad0f17d1aaa26fd0bb00264a2a32f5ba5a4947819617",
+    "web/tests/issue89-native-recovery.browser.cjs": "4a46e93c3470dfbab42a94202e299b4124da106b72e66f9e9219b2201227ebfe",
+    "web/tests/issue89-sampling.cjs": "d2aefea1a26c088f43b93957e32d5394b70a48b55255712053897b8f3903e540",
+    "web/tests/provider-credential-recovery.cjs": "aaa181f5cdbe0e992a8d11b2f1cb6b02f3e7bf44648010ef04f421a76a2b0d50"
+  },
+  "served": {
+    "native-navigation.js": {
+      "source": "0e261adc354162dd27ccc24962f2f35f35994b70763405d2750470943fcd0f17",
+      "http": "0e261adc354162dd27ccc24962f2f35f35994b70763405d2750470943fcd0f17"
+    },
+    "viewports.js": {
+      "source": "88bc6e28cb3eb2047479a6f207efec1b9e9e35d227e17bfb4c9eb414c5045fb4",
+      "http": "88bc6e28cb3eb2047479a6f207efec1b9e9e35d227e17bfb4c9eb414c5045fb4"
+    },
+    "bridge.js": {
+      "source": "cfafe64ac96105a2fc139cc814d2147086ac82a2f3b1c3ff42ce8479d2e8aaf8",
+      "http": "cfafe64ac96105a2fc139cc814d2147086ac82a2f3b1c3ff42ce8479d2e8aaf8"
+    }
+  },
+  "components": [
+    {
+      "name": "/mw-issue89-20261021-api-1",
+      "image": "sha256:7dfcdbf74b0248e07ab968090114309076626e1a631a9db74540cf740c17055b",
+      "source": "be20392c99906a4971f3359c8d8877befdb75632",
+      "dirty": "false",
+      "status": "running"
+    },
+    {
+      "name": "/mw-issue89-20261021-web-1",
+      "image": "sha256:d7edddb147e8766f1692d882e1ccb9a4b66c8ad3cf364c25552739e20f1e05c4",
+      "source": "86bef8aae34cfbe214bc2b5310c73c6304c5779e",
+      "dirty": "true",
+      "status": "running"
+    },
+    {
+      "name": "/mw-issue89-20261021-chart-origin-1",
+      "image": "sha256:373e13eaba150388cce331cecb86db76fabbc37c8b18db38238cd604b304a46c",
+      "source": "7948047c1b1174e6948cdaac1f5257ab3e889fa2",
+      "dirty": "false",
+      "status": "running"
+    },
+    {
+      "name": "/mw-issue89-20261021-postgres-1",
+      "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "source": null,
+      "dirty": null,
+      "status": "running"
+    },
+    {
+      "name": "/mw-issue89-20261021-tls-1",
+      "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "source": null,
+      "dirty": null,
+      "status": "running"
+    }
+  ],
+  "apiFileHashes": {
+    "backend/alerts/api.py": "3e618db702eca3947ab29f795a6486f0198211ba7378375243412344a6107e08",
+    "backend/alerts/chart_api.py": "ac76b4e0da5e71ec07f7369f705230472ebe17d2c88d973a2541df5b1a4c5f69",
+    "backend/alerts/logging_config.py": "213f21e4a65ea9f7bb27eb5ea0f8b923f8368c85c01a5ea7215645ae38c3807a",
+    "backend/alerts/oanda_candles.py": "0dce41c58190d4e502fae12beb7dfa8a95b1c5df663cf1793b6d3003806d4b86",
+    "backend/alerts/oanda_worker.py": "52c32c019bd4b7adb6ddfcfc81aa8e4c4bf361b2e5cde55b2358d94609ecac3c",
+    "backend/alerts/provider_cache.py": "4fff243a2786d5858014deec541a23eaa7a392d857dedcc62cb4f6f4beb23c3e",
+    "backend/alerts/provider_chart.py": "e6470e6468af5a750c938502ee6ee2177b7083bf159cd07f2aa335d3afb4c134",
+    "backend/alerts/provider_display_snapshots.py": "145c9feee03eae90ff3e5d786889401050b571db045fac3e2883253ec025e95d"
+  }
+}

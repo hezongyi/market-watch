@@ -7,6 +7,8 @@ The existing preference store keeps this accelerator compatible with old images.
 
 import hashlib
 import json
+import logging
+import uuid
 
 from sqlalchemy import delete, select, text
 
@@ -17,6 +19,7 @@ from .storage import Preference, ProviderBar, ProviderDataset, now_ms
 PREFIX = 'provider-display:'
 LEASE_MS = 120000
 MAX_SNAPSHOTS = 2048
+log = logging.getLogger(__name__)
 
 
 def _calendar(meta):
@@ -79,12 +82,33 @@ def resolve(db, ident, dataset_id):
     dataset = db.get(ProviderDataset, dataset_id)
     content = record.value['content'] if record else None
     epoch = dataset.metadata_json.get('indicator_history_epoch') if dataset else None
-    if (not content or not dataset or record.value['expires'] <= now_ms()
-            or content['dataset'] != dataset_id or content['epoch'] != epoch
-            or content['calendar'] != _calendar(dataset.metadata_json)
-            or epoch is None and content['revision'] != dataset.revision):
-        raise DisplaySnapshotError('DISPLAY_SNAPSHOT_EXPIRED',
-                                   '平台展示快照已过期或历史已修订，请重新读取价格快照')
+    reason = None
+    if not content or not dataset:
+        reason = 'missing'
+    elif record.value['expires'] <= now_ms():
+        reason = 'ttl'
+    elif content['dataset'] != dataset_id:
+        reason = 'identity'
+    elif content['epoch'] != epoch:
+        reason = 'epoch'
+    elif content['calendar'] != _calendar(dataset.metadata_json):
+        reason = 'calendar'
+    elif epoch is None and content['revision'] != dataset.revision:
+        reason = 'legacy'
+    if reason:
+        error = DisplaySnapshotError('DISPLAY_SNAPSHOT_EXPIRED',
+                                     '平台展示快照已过期或历史已修订，请重新读取价格快照')
+        error.attempt_ref = uuid.uuid4().hex
+        # Per-attempt correlation plus a one-way credential reference; never log
+        # tokens, supplier/account identities, candle values or calendar payloads.
+        log.info('provider-display-snapshot-rejected %s', json.dumps({
+            'attempt_ref': error.attempt_ref,
+            'credential_ref': hashlib.sha256(ident.encode()).hexdigest()[:16],
+            'reason': reason,
+            'snapshot_revision': content.get('revision') if content else None,
+            'current_revision': dataset.revision if dataset else None,
+        }, sort_keys=True))
+        raise error
     return content
 
 

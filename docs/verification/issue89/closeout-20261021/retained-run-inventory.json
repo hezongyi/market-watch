@@ -1,0 +1,227 @@
+[
+  {
+    "path": "/tmp/issue89-closeout-783661f-correction-1/result.json",
+    "sha256": "f9282a5f31adb35f80d64300fc7f2d432945cac2a9d0662bdf2364bdacda4f38",
+    "source": "783661faa006358a1b4da01f7c59156098c42a71",
+    "dirty": false,
+    "passed": true,
+    "failure": "",
+    "completedAt": 1792565875978
+  },
+  {
+    "path": "/tmp/issue89-closeout-783661f-correction-2/result.json",
+    "sha256": "d5b6f3b6d13c618d55809d979f0a95e706a581fce6ee91abd2e2c596474360ea",
+    "source": "783661faa006358a1b4da01f7c59156098c42a71",
+    "dirty": false,
+    "passed": true,
+    "failure": "",
+    "completedAt": 1792565938078
+  },
+  {
+    "path": "/tmp/issue89-closeout-783661f-correction-3/result.json",
+    "sha256": "0e67a0a96bb85b3b98b60fd00783758d96fee6c9f3c4e0203595c553e0d777f9",
+    "source": "783661faa006358a1b4da01f7c59156098c42a71",
+    "dirty": false,
+    "passed": true,
+    "failure": "",
+    "completedAt": 1792566003082
+  },
+  {
+    "path": "/tmp/issue89-closeout-783661f-full-1/result.json",
+    "sha256": "c834fdf3236707624534f47a3ec0505b6fd499246d61443c6199aff018fe6cd3",
+    "source": "783661faa006358a1b4da01f7c59156098c42a71",
+    "dirty": false,
+    "passed": null,
+    "failure": "frame.waitForFunction: Timeout 45000ms exceeded.\n    at /home/quant/repos/market-watch-issue89-20261021/web/tests/issue89-native-recovery.browser.cjs:555:23\n    at async withFrames (/home/quant/repos/market-watch-issue89-20261021/web/tests/issue89-native-recovery.browser.cjs:309:16)\n    at async /home/quant/repos/market-watch-issue89-20261021/web/tests/issue89-native-recovery.browser.cjs:553:9",
+    "completedAt": 1792566226873
+  },
+  {
+    "path": "/tmp/issue89-closeout-7948047-correction-1/result.json",
+    "sha256": "5e1d5aaa86b1988c158cc470e55b65f7bcb1b4eb5033846dbf6475e400effc33",
+    "source": "7948047c1b1174e6948cdaac1f5257ab3e889fa2",
+    "dirty": false,
+    "passed": true,
+    "failure": "",
+    "completedAt": 1792573961873
+  },
+  {
+    "path": "/tmp/issue89-closeout-7948047-correction-2/result.json",
+    "sha256": "6bbcf961487ebd3008f250f64f7bafccc3645c3a28b16faa2a1616f3a8d6474c",
+    "source": "7948047c1b1174e6948cdaac1f5257ab3e889fa2",
+    "dirty": false,
+    "passed": true,
+    "failure": "",
+    "completedAt": 1792574046995
+  },
+  {
+    "path": "/tmp/issue89-closeout-7ba2732-exhaustion-1/result.json",
+    "sha256": "955b1f69116751154b3de9eb066e675acefaa5b410a6e55ded3e0f669520d61e",
+    "source": "7ba2732bef4fb27f13ec9c7349a5d55cf4cc8bf2",
+    "dirty": false,
+    "passed": null,
+    "failure": "Error: native sampling deadline exhausted: bounded recovery exhaustion and visible retry\n    at Timeout.<anonymous> (/home/quant/repos/market-watch-issue89-20261021/web/tests/fixtures/issue89-sampling.cjs:8:33)\n    at listOnTimeout (node:internal/timers:585:17)\n    at process.processTimers (node:internal/timers:521:7)",
+    "completedAt": 1792570287879
+  },
+  {
+    "path": "/tmp/issue89-closeout-7ba2732-exhaustion-debug/result.json",
+    "sha256": "48e1ed94e54abc2917620772ddcafc25a62fa981104457dce194a49566a09713",
+    "source": "dfafdad206e5e1beb1edbc9827d393afc0cc34ee",
+    "dirty": false,
+    "passed": null,
+    "failure": "locator.waitFor: Timeout 15826ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('complementary', { name: '\u56fe\u683c\u6307\u6807\u72b6\u6001' }).getByRole('button', { name: '\u91cd\u8bd5\u6307\u6807' }).first() to be visible\u001b[22m\n\n    at /home/quant/repos/market-watch-issue89-20261021/web/tests/issue89-native-recovery.browser.cjs:564:14\n    at async withFrames (/home/quant/repos/market-watch-issue89-20261021/web/tests/issue89-native-recovery.browser.cjs:309:16)\n    at async withinDeadline (/home/quant/repos/market-watch-issue89-20261021/web/tests/fixtures/issue89-sampling.cjs:7:14)\n    at async /home/quant/repos/market-watch-issue89-20261021/web/tests/issue89-native-recovery.browser.cjs:559:9",
+    "completedAt": 1792570655081
+  },
+  {
+    "path": "/tmp/issue89-closeout-be20392-correction-3/result.json",
+    "sha256": "964aeecd7ecfacc115673ca458afd64d2ef0d4d7e16cbd42559ab872b54916db",
+    "source": "be20392c99906a4971f3359c8d8877befdb75632",
+    "dirty": false,
+    "passed": true,
+    "failure": "",
+    "completedAt": 1792574415188
+  },
+  {
+    "path": "/tmp/issue89-closeout-be20392-full-1/result.json",
+    "sha256": "5994c7ce787253b0dc84b728409d12f22f2a527ca38ee6b4c6525b78ce442696",
+    "source": "be20392c99906a4971f3359c8d8877befdb75632",
+    "dirty": false,
+    "passed": true,
+    "failure": "",
+    "completedAt": 1792574893188
+  },
+  {
+    "path": "/tmp/issue89-closeout-ce558eb-correction-1/result.json",
+    "sha256": "1a241c34c97ffefa580dc243ad44c686248989d92bd33a0c27d08ae871d7e4f2",
+    "source": "ce558eb77d8f84a9b993a4f3299001ba944ecd59",
+    "dirty": false,
+    "passed": true,
+    "failure": "",
+    "completedAt": 1792572221169
+  },
+  {
+    "path": "/tmp/issue89-closeout-ce558eb-correction-2/result.json",
+    "sha256": "84001310752ffdd6f2bd97fc1a6cbbf007bb16903cbfa1a4913d776315924963",
+    "source": "ce558eb77d8f84a9b993a4f3299001ba944ecd59",
+    "dirty": false,
+    "passed": true,
+    "failure": "",
+    "completedAt": 1792572361780
+  },
+  {
+    "path": "/tmp/issue89-closeout-ce558eb-correction-3/result.json",
+    "sha256": "6223cb4d03a2387ffa10761552588fcea03128af2d3c743f796e59d90047753f",
+    "source": "ce558eb77d8f84a9b993a4f3299001ba944ecd59",
+    "dirty": false,
+    "passed": true,
+    "failure": "",
+    "completedAt": 1792572426269
+  },
+  {
+    "path": "/tmp/issue89-closeout-ce558eb-exhaustion-1/result.json",
+    "sha256": "f633b3dcaa8814fcfe3ba96760d92e08d5f522d87f4b583510a5ab95a6c84790",
+    "source": "ce558eb77d8f84a9b993a4f3299001ba944ecd59",
+    "dirty": false,
+    "passed": true,
+    "failure": "",
+    "completedAt": 1792572087380
+  },
+  {
+    "path": "/tmp/issue89-closeout-ce558eb-full-1/result.json",
+    "sha256": "c619676a1f1c385cb85ed9f6525106d94baa18ba41866ce791d4c307928f9251",
+    "source": "ce558eb77d8f84a9b993a4f3299001ba944ecd59",
+    "dirty": false,
+    "passed": null,
+    "failure": "AssertionError [ERR_ASSERTION]: charts/data 422\n    at api (/home/quant/repos/market-watch-issue89-20261021/web/tests/issue89-native-recovery.browser.cjs:370:60)\n    at async /home/quant/repos/market-watch-issue89-20261021/web/tests/issue89-native-recovery.browser.cjs:512:26\n    at async withFrames (/home/quant/repos/market-watch-issue89-20261021/web/tests/issue89-native-recovery.browser.cjs:309:16)\n    at async /home/quant/repos/market-watch-issue89-20261021/web/tests/issue89-native-recovery.browser.cjs:510:23",
+    "completedAt": 1792572573284
+  },
+  {
+    "path": "/tmp/issue89-closeout-correction-probe6/result.json",
+    "sha256": "89624229bd2bd454f786876bd0b2381c33952a9d15ee16e2316baf59ee24e6c7",
+    "source": "86bef8aae34cfbe214bc2b5310c73c6304c5779e",
+    "dirty": true,
+    "passed": true,
+    "failure": "",
+    "completedAt": null
+  },
+  {
+    "path": "/tmp/issue89-closeout-d8f892d-correction-1/result.json",
+    "sha256": "e30520a3207371a476609c3fb8a46bdfc2dd7075d33b3573f3bf882f1eb427c1",
+    "source": "d8f892d1af416cb237dd337cb041684d8df3f38c",
+    "dirty": false,
+    "passed": true,
+    "failure": "",
+    "completedAt": null
+  },
+  {
+    "path": "/tmp/issue89-closeout-d8f892d-correction-2/result.json",
+    "sha256": "4c132a81a4e2f4cef7ffb95bc11e3d5e16de917a2feb4ba1d7c8a9afc398663e",
+    "source": "d8f892d1af416cb237dd337cb041684d8df3f38c",
+    "dirty": false,
+    "passed": true,
+    "failure": "",
+    "completedAt": null
+  },
+  {
+    "path": "/tmp/issue89-closeout-d8f892d-correction-3/result.json",
+    "sha256": "bcfc6ed4614aecefa7b095381d829c85914e1cf750bfe675985cc0a810884c8e",
+    "source": "d8f892d1af416cb237dd337cb041684d8df3f38c",
+    "dirty": false,
+    "passed": true,
+    "failure": "",
+    "completedAt": null
+  },
+  {
+    "path": "/tmp/issue89-closeout-ec1288e-exhaustion-1/result.json",
+    "sha256": "2b8ab4e1310b80a20c542b2b70d9e6e1594eea424261235f5f4d445a0ba1f3c6",
+    "source": "ec1288e423de4302143f490931d8111b168bdd85",
+    "dirty": false,
+    "passed": null,
+    "failure": "Error: native sampling deadline exhausted: operation\n    at Timeout.<anonymous> (/home/quant/repos/market-watch-issue89-20261021/web/tests/fixtures/issue89-sampling.cjs:8:33)\n    at listOnTimeout (node:internal/timers:585:17)\n    at process.processTimers (node:internal/timers:521:7)",
+    "completedAt": 1792571447385
+  },
+  {
+    "path": "/tmp/issue89-closeout-probe1/result.json",
+    "sha256": "6e710aaca5555673ae9980f5861b0392db2b4afe42ee445860899b026a97e280",
+    "source": "86bef8aae34cfbe214bc2b5310c73c6304c5779e",
+    "dirty": true,
+    "passed": null,
+    "failure": "frame.waitForFunction: Timeout 45000ms exceeded.\n    at /home/quant/repos/market-watch-issue89-20261021/web/tests/issue89-native-recovery.browser.cjs:225:17",
+    "completedAt": null
+  },
+  {
+    "path": "/tmp/issue89-closeout-probe2/result.json",
+    "sha256": "5d2fe782202e4206a56c18b2a1a47db359ea5456218c610e4f20ce0042ec00a1",
+    "source": "86bef8aae34cfbe214bc2b5310c73c6304c5779e",
+    "dirty": true,
+    "passed": null,
+    "failure": "frame.waitForFunction: Timeout 45000ms exceeded.\n    at /home/quant/repos/market-watch-issue89-20261021/web/tests/issue89-native-recovery.browser.cjs:229:17",
+    "completedAt": null
+  },
+  {
+    "path": "/tmp/issue89-closeout-probe3/result.json",
+    "sha256": "97c539fce50f24faffc214689de1e8e74cb62e38d7915e05b954490d55617724",
+    "source": "86bef8aae34cfbe214bc2b5310c73c6304c5779e",
+    "dirty": true,
+    "passed": null,
+    "failure": "frame.waitForFunction: Timeout 45000ms exceeded.\n    at /home/quant/repos/market-watch-issue89-20261021/web/tests/issue89-native-recovery.browser.cjs:229:17",
+    "completedAt": null
+  },
+  {
+    "path": "/tmp/issue89-closeout-probe4/result.json",
+    "sha256": "10e32ee5dc353911a0013c9f17ffc40570a312f21d6ea503e80fa48cb1d5adc9",
+    "source": "86bef8aae34cfbe214bc2b5310c73c6304c5779e",
+    "dirty": true,
+    "passed": null,
+    "failure": "frame.waitForFunction: Timeout 45000ms exceeded.\n    at /home/quant/repos/market-watch-issue89-20261021/web/tests/issue89-native-recovery.browser.cjs:239:17",
+    "completedAt": null
+  },
+  {
+    "path": "/tmp/issue89-closeout-probe5/result.json",
+    "sha256": "3efd9b31ca3dd2dd09d59d02d6327f5f85fa82ce0b23d98c2d1fca523fd59930",
+    "source": "86bef8aae34cfbe214bc2b5310c73c6304c5779e",
+    "dirty": true,
+    "passed": true,
+    "failure": "",
+    "completedAt": null
+  }
+]

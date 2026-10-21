@@ -22,6 +22,7 @@ const turn = () => new Promise((r) => setImmediate(r));
   const symbolEvent = event(),
     intervalEvent = event();
   const ctx = vm.createContext({
+    crypto: require('node:crypto').webcrypto,
     Map,
     Set,
     Promise,
