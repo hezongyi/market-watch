@@ -96,17 +96,19 @@ def resolve(db, ident, dataset_id):
     elif epoch is None and content['revision'] != dataset.revision:
         reason = 'legacy'
     if reason:
+        error = DisplaySnapshotError('DISPLAY_SNAPSHOT_EXPIRED',
+                                     '平台展示快照已过期或历史已修订，请重新读取价格快照')
+        error.attempt_ref = uuid.uuid4().hex
         # Per-attempt correlation plus a one-way credential reference; never log
         # tokens, supplier/account identities, candle values or calendar payloads.
         log.info('provider-display-snapshot-rejected %s', json.dumps({
-            'attempt_ref': uuid.uuid4().hex,
+            'attempt_ref': error.attempt_ref,
             'credential_ref': hashlib.sha256(ident.encode()).hexdigest()[:16],
             'reason': reason,
             'snapshot_revision': content.get('revision') if content else None,
             'current_revision': dataset.revision if dataset else None,
         }, sort_keys=True))
-        raise DisplaySnapshotError('DISPLAY_SNAPSHOT_EXPIRED',
-                                   '平台展示快照已过期或历史已修订，请重新读取价格快照')
+        raise error
     return content
 
 

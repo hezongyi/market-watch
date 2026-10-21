@@ -23,6 +23,7 @@ from alerts.provider_capabilities import versions
 from alerts.storage import ProviderBar, ProviderDataset, ProviderInterest
 from sqlalchemy import select
 from test_oanda_payload_semantics import provider_pg as provider_pg
+from test_oanda_payload_semantics import store as store
 
 META = dict(id="OANDA:GBP_JPY", source="oanda", symbol="GBP_JPY", basis="bid",
             calendar="ny17", precision=3)
@@ -43,8 +44,8 @@ def candle(start, *, account=True, corrected=False):
 
 
 def test_native_history_then_account_latest_does_not_reset_but_real_repair_does(
-        writer_store, monkeypatch, configured):
-    database = writer_store
+        store, monkeypatch, configured):
+    database = store
     clock = [1000000]
     for module in (provider_chart, provider_cache, oanda_worker):
         monkeypatch.setattr(module, "now_ms", lambda: clock[0])

@@ -21,6 +21,8 @@ from test_provider_indicator_inputs import SPEC, stable_indicators
 from test_provider_postgres import provider_pg as _provider_pg
 
 provider_pg = _provider_pg
+requires_postgres = pytest.mark.skipif(not os.getenv('TEST_POSTGRES_URL'),
+                                      reason='Requires task-owned PostgreSQL')
 
 
 @pytest.fixture(params=['sqlite', 'postgres'])
@@ -186,8 +188,47 @@ def test_rejection_reason_is_internal_and_redacted(store, monkeypatch, caplog, r
     assert entry['reason'] == reason
     assert len(entry['attempt_ref']) == 32
     assert token not in caplog.text and META['id'] not in caplog.text
+    assert error.value.attempt_ref == entry['attempt_ref']
 
 
+def test_rejection_attempt_matches_http_diagnostic_header(store, monkeypatch, caplog):
+    from alerts.chart_api import DataQuery, data_sync
+    from fastapi import HTTPException
+
+    monkeypatch.setattr(upstream, 'metadata', lambda _: META)
+    seed(META, 'M1', 1000000, page(0, 1000000, boundary=True))
+    with caplog.at_level(logging.INFO, logger=snapshots.__name__):
+        with pytest.raises(HTTPException) as error:
+            data_sync(DataQuery(instrument=META['id'], series_kind='provider',
+                timeframe='M1', before=1000000, limit=200, indicators=[SPEC],
+                provider_snapshot_id='0' * 64))
+    entry = json.loads(caplog.records[-1].message.split(' ', 1)[1])
+    assert error.value.headers == {'X-MW-Attempt-Ref': entry['attempt_ref']}
+    assert error.value.status_code == 422
+    assert error.value.detail == {'code': 'DISPLAY_SNAPSHOT_EXPIRED',
+                                'message': '平台展示快照已过期或历史已修订，请重新读取价格快照'}
+
+
+def test_missing_volume_preserves_legacy_decimal_observation(store, monkeypatch):
+    monkeypatch.setattr(upstream, 'metadata', lambda _: META)
+    initial = page(0, 1000000, boundary=True, close='2.000')
+    for bar in initial['bars']:
+        bar.update(volume='7', volume_complete=True)
+    key = seed(META, 'M1', 1000000, initial)
+    legacy_payload(store, key, {})
+    with store.begin() as db:
+        old = db.get(ProviderBar, (key, 998000))
+        old.payload = {**old.payload, 'close': '2.000'}
+    price = read()
+    before = bar_state(store, key)
+    incoming = page(998000, 999000, close='2.000')
+    incoming['bars'][0].update(volume=None, volume_complete=False)
+    seed(META, 'M1', 999000, incoming)
+    assert bar_state(store, key)[:5] == before[:5]
+    assert read(indicators=[SPEC], provider_snapshot_id=price['provider_snapshot_id'])['bars'] == price['bars']
+
+
+@requires_postgres
 @pytest.mark.parametrize('correction', [False, True])
 def test_repeatable_read_during_concurrent_writer(provider_pg, monkeypatch, correction):
     store, engine = provider_pg
@@ -236,6 +277,7 @@ def test_repeatable_read_during_concurrent_writer(provider_pg, monkeypatch, corr
         event.remove(engine, 'after_cursor_execute', pause_reader)
 
 
+@requires_postgres
 def test_concurrent_writer_lease_and_retry_preserve_equivalent_snapshot(provider_pg, monkeypatch):
     store, _ = provider_pg
     monkeypatch.setattr(upstream, 'metadata', lambda _: META)

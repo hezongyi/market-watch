@@ -417,10 +417,10 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
                 if observation:
                     observation.counts["rejected"] += 1
                 continue
-            if old and old.payload.get("volume") is not None and bar.get("volume") is None and all(
-                    old.payload.get(k) == bar.get(k) for k in ("open", "high", "low", "close", "complete", "end")):
-                bar = {**bar, "volume": old.payload.get("volume"),
-                       "volume_complete": old.payload.get("volume_complete", False)}
+            if old and old_payload.get("volume") is not None and bar.get("volume") is None and all(
+                    old_payload.get(k) == bar.get(k) for k in ("open", "high", "low", "close", "complete", "end")):
+                bar = {**bar, "volume": old_payload.get("volume"),
+                       "volume_complete": old_payload.get("volume_complete", False)}
             if observation:
                 observation.accept(old_payload, bar, observed_at)
             revision = 1
