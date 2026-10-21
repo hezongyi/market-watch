@@ -510,9 +510,15 @@ const report = { checks: [], errors: [], passed: false },
       name: "关闭即时通知",
       exact: true,
     });
-    for (let i = 0; i < 10 && (await toast.count()); i++)
-      await toast.first().click();
+    // Fault-injection notifications may auto-dismiss during their exit animation.
+    // Clear them atomically for screenshots; this is not an interaction assertion.
+    await toast.evaluateAll((buttons) =>
+      buttons.forEach((button) => button.click()),
+    );
+    await expect(toast).toHaveCount(0);
+    await host().evaluate(() => widget.changeTheme("Dark"));
     await open(gold.id);
+    await expect(dc()).toHaveAttribute("data-theme", "dark");
     await select("XAU_USD");
     await dc().getByRole("button", { name: "补充说明", exact: true }).click();
     await expect(

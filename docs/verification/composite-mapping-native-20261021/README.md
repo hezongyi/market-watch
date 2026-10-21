@@ -18,8 +18,8 @@ Ubuntu `quant-server` 本机 Docker；独立 project/task `mw-composite-mapping-
 
 ```bash
 # 在本任务 worktree 中。首次已通过 mw-docker preview prepare/up 初始化。
-# 复用固定 run.json 与本任务合成账户 overlay；不要重新 seed 其他实例。
-sg docker -c 'docker compose -p mw-composite-mapping-20261021 -f /home/quant/.local/share/market-watch-docker/previews/mw-composite-mapping-20261021/run.json -f /home/quant/.local/share/market-watch-docker/previews/mw-composite-mapping-20261021/fixture-env.json up -d --no-build'
+# 复用最终固定 candidate-run.json 与本任务合成账户 overlay；不要重新 seed 其他实例。
+sg docker -c 'docker compose -p mw-composite-mapping-20261021 -f /home/quant/.local/share/market-watch-docker/previews/mw-composite-mapping-20261021/candidate-run.json -f /home/quant/.local/share/market-watch-docker/previews/mw-composite-mapping-20261021/fixture-env.json up -d --no-build'
 # 停止并保留数据
 sg docker -c 'python3 deploy/ubuntu/mw_docker.py preview stop --task mw-composite-mapping-20261021 --project mw-composite-mapping-20261021'
 
@@ -35,8 +35,14 @@ Playwright 从私有 credentials.json 本地读取登录信息；不得提交完
 
 开发期检查已通过：Web/TypeScript 构建；匹配推导、关系/依据验证与 URL 规范化回归；原生 chunk 恢复、单应用路由、原生重启生命周期和凭据恢复回归。
 
-实际 Playwright 已通过十组原生页面检查：三品种推导、真实仅保存、真实保存并打开（组合图表 dataReady，另一图格不变）、空目录及刷新失败重试、丢失保存响应核查及打开失败重试、多映射明确选择、旧账户配置隔离、目录失效重新选择、离开后的迟到响应、深浅主题及 390px 视口。真实保存与首次使用使用隔离 API/PG；异常分支为精确路径注入。开发期覆盖本地 native bundle；最终固定制品复验和 CI 结果待补充。
+实际 Playwright 已通过十组原生页面检查：三品种推导、真实仅保存、真实保存并打开（组合图表 dataReady，另一图格不变）、空目录及刷新失败重试、丢失保存响应核查及打开失败重试、多映射明确选择、旧账户配置隔离、目录失效重新选择、离开后的迟到响应、深浅主题及 390px 视口。真实保存与首次使用使用隔离 API/PG；异常分支为精确路径注入。
+
+最终 Docker 制品来自干净提交 `c2b7e23855f5a01a57f52feb9de5e99b5bd90127`，三个应用镜像均核对 `dirty=false`，实际容器镜像与[固定清单](candidate.json)一致；API、PG、TLS 健康，Web/图表服务运行，网络与 PG volume 归属本任务。最终浏览器复验未设置 `MW_LOCAL_ASSETS`，直接加载镜像内资源，结果见[报告](report.json)。深色检查显式切换到 Dark 并断言主题，再切换 Light；截图前清除故障注入通知，避免通知自动消失与点击产生测试竞态。后续提交仅补验收脚本与证据，不修改应用制品。
+
+实现提交的 [CI](https://github.com/hezongyi/market-watch/actions/runs/39689947017) 全部通过，包含 Backend、Web、Compose。交付为 [Draft PR #93](https://github.com/hezongyi/market-watch/pull/93)，未合并或创建正式 tag，未替换 mwa。未运行四个旧端到端完整场景（仅更新相关选择器并检查语法）；本次以专门的十组真实浏览器检查覆盖映射链路。合成目录与行情不验证供应商联网、凭据或真实产品合约。
+
+截图：[深色](mapping-dark.png)、[展开匹配说明](mapping-proof-dark.png)、[浅色](mapping-light.png)、[390px 窄屏](mapping-mobile.png)。
 
 本人自审：仅前端和原生适配层变更；无数据库或供源规则修改；原生依赖沿用固定图表版本；产品关系不自动确认、依据不自动生成；保存请求不自动重发；未知结果须核查；已保存映射复用于打开重试；上下文切换及卸载阻止迟到应用。单独记录的“系统消息图标对齐”不在本次范围。
 
-浏览器原始报告及截图位于本任务忽略目录 `artifacts/composite-mapping-native/`。
+浏览器原始报告及截图位于本任务忽略目录 `artifacts/composite-mapping-native/`；本目录仅保留无凭据、无浏览器存储的报告、制品清单与页面截图。
