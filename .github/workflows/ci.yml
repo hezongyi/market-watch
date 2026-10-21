@@ -199,6 +199,7 @@ jobs:
       - name: Single application regressions
         working-directory: web
         run: |
+          node tests/composite-mapping.cjs
           node tests/single-app-routing.cjs
           node tests/chart-tab.cjs
           TZ=Asia/Shanghai node tests/chart-time.cjs

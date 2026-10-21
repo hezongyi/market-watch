@@ -261,7 +261,7 @@ export default function DataCenterWindow({ hosted }: { hosted?: HostedCenter } =
     addEventListener("beforeunload", unload); addEventListener("keydown", keyboard, true);
     return () => { removeEventListener("beforeunload", unload); removeEventListener("keydown", keyboard, true); };
   }, [close, guard, hosted]);
-  return <CenterContext value={{ workspace: context?.workspace, timezone:context?.timezone, returns: returns.current, location: route, navigate, apply, setDirty, clearDirty, busy }}>
+  return <CenterContext value={{ workspace: context?.workspace, target: context?.target, timezone:context?.timezone, returns: returns.current, location: route, navigate, apply, setDirty, clearDirty, busy }}>
     <main className={`dc-window${hosted ? " dc-window-native" : ""}`} data-theme={context?.theme || "dark"}>
       {!hosted && <header className="dc-window-header"><h2><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3" /><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3" /></svg>数据中心</h2><button ref={closeButton} aria-label="关闭数据中心" onClick={close}><svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true"><path stroke="currentColor" strokeWidth="1.2" d="m1.5 1.5 15 15m0-15-15 15" /></svg></button></header>}
       <div className="dc-window-body" inert={guard !== null}>

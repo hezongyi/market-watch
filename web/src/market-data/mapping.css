@@ -1,0 +1,216 @@
+.dc-window .data-center.dc-mapping-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+}
+.dc-mapping-header {
+  flex: 0 0 auto;
+  padding: 12px 20px;
+}
+.dc-window .dc-mapping-header h1 {
+  margin-top: 10px;
+}
+.dc-mapping-header p {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+.dc-mapping-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 0 20px 16px;
+  overscroll-behavior: contain;
+}
+.dc-mapping-fields {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.dc-mapping-fields > label {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.dc-mapping-source {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+.dc-mapping-source > span {
+  flex: 0 0 64px;
+  color: var(--muted);
+}
+.dc-mapping-source > div:not(.dc-catalog-picker) {
+  flex: 1;
+  min-width: 0;
+}
+.dc-mapping-source strong,
+.dc-mapping-source small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+.dc-mapping-source small {
+  margin-top: 4px;
+}
+.dc-mapping-source > small,
+.dc-mapping-source .dc-native-slot {
+  flex-shrink: 0;
+}
+.dc-mapping-catalog {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0 16px;
+}
+.dc-mapping-empty {
+  padding: 24px 0;
+}
+.dc-mapping-empty h2 {
+  margin: 0;
+}
+.dc-mapping-empty p {
+  margin: 6px 0 16px;
+  color: var(--muted);
+}
+.dc-mapping-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  padding: 8px 0 20px;
+}
+.dc-mapping-facts span,
+.dc-mapping-facts strong {
+  display: block;
+  overflow-wrap: anywhere;
+}
+.dc-mapping-facts span {
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+.dc-mapping-proof {
+  border-block: 1px solid var(--line);
+}
+.dc-mapping-proof-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 0;
+}
+.dc-mapping-proof-head small {
+  display: block;
+  margin-top: 4px;
+}
+.dc-mapping-proof-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  padding-bottom: 20px;
+}
+.dc-mapping-field {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+}
+.dc-mapping-field:nth-last-child(-n + 4) {
+  grid-column: 1 / -1;
+}
+.dc-mapping-field .dc-native-slot,
+.dc-mapping-field textarea {
+  width: 100%;
+}
+.dc-window .dc-mapping-confirm {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 20px 0 0;
+  color: var(--ink);
+}
+.dc-mapping-confirm > .dc-native-check {
+  padding-top: 2px;
+}
+.dc-mapping-note {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 12px 0 0;
+}
+.dc-mapping-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex: 0 0 auto;
+  padding: 12px 20px;
+  border-top: 1px solid var(--line);
+}
+.dc-mapping-actions > div {
+  display: flex;
+  gap: 8px;
+}
+.dc-catalog-picker {
+  min-width: 0;
+}
+.dc-catalog-fallback {
+  display: grid;
+  gap: 8px;
+  padding: 12px 0;
+}
+.dc-catalog-fallback > label {
+  display: grid;
+  gap: 6px;
+}
+@container (max-width: 720px) {
+  .dc-mapping-header,
+  .dc-mapping-actions {
+    padding-inline: 12px;
+  }
+  .dc-mapping-scroll {
+    padding-inline: 12px;
+  }
+  .dc-mapping-source {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .dc-mapping-source > span {
+    flex-basis: 56px;
+  }
+  .dc-mapping-source > small {
+    display: none;
+  }
+  .dc-mapping-source .dc-catalog-picker {
+    margin-left: auto;
+  }
+  .dc-mapping-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .dc-mapping-proof-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .dc-mapping-actions {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+}
+@media (max-height: 650px) {
+  .dc-mapping-header {
+    padding-block: 6px;
+  }
+  .dc-window .dc-mapping-header h1 {
+    margin-top: 4px;
+  }
+  .dc-mapping-header p {
+    display: none;
+  }
+  .dc-mapping-actions {
+    padding-block: 8px;
+  }
+}

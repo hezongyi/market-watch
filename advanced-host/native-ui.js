@@ -48,7 +48,7 @@ function chartNativeUi(widget, doc, searchSymbols) {
       // Load the same dependency chunks as this build's settings UI, without
       // opening settings, changing a property, or creating an undo transaction.
       const chunks = [50591,83159,82593,43946,34663,74219,1355,52485,50160,85997,17039,10162,16651,70221,18566,55578,50779,85715,15043,67351,69437,96868,84551,34853,10627,4500,43296,16687,97839,39983,8117,15211,88090,75856,23819,32327,38729,47649,29520,1644,9876,60451,55921,5840,87829,16468,19937,39047,57818,13885,31049,72414,39919,93041,30714,79086,8318,99224,84277,26703,70814,20774,29365,50254,91947,36145,83520,32171,50225,3854,36702,34540,39218,56595,50625];
-      await Promise.all([req(114063).loadNewSymbolSearch(), ...chunks.map(id => req.e(id))]);
+      await Promise.all([req(114063).loadNewSymbolSearch(), ...[...chunks,21981,42706,91676].map(id => req.e(id))]);
       const R = req(779474), createRoot = req(590263).createReactRoot;
       const Search = req(154676).SymbolSearchItemsDialog;
       const SearchContext = req(886925).SymbolSearchItemsDialogContext;
@@ -295,6 +295,8 @@ function chartNativeUi(widget, doc, searchSymbols) {
         sidebarItem: req(649867).DialogSidebarItem,
         search: req(357723).DialogSearch,
         input: req(909536).InputControl,
+        button: req(536605).Button,
+        textarea: req(165770).Textarea,
         checkbox: req(343577).Checkbox,
         select: req(221339).Select,
         operationHint: req(989231).SymbolSearchDialogFooter,
@@ -333,12 +335,13 @@ function chartNativeUi(widget, doc, searchSymbols) {
         },
         cancelPopups() {if(!popupCancels.size)return;widget.closePopupsAndDialogs();for(const cancel of [...popupCancels]) cancel();popupCancels.clear();},
         sidebarClasses: req(40806),
-        pick(options) {
+        pick({initialSymbolType, ...options}) {
           return new Promise((resolve, reject) => {
             let completed = false, picker;
             const cancel=()=>{popupCancels.delete(cancel);completed=true;resolve(null);};
             popupCancels.add(cancel);
             try {
+              if(typeof initialSymbolType === "string") req(371996).setValue(options.selectedSymbolSettingsKey || "mw.data-center.picker", initialSymbolType);
               picker = req(21021).showSymbolSearchItemsDialog({
                 dialogTitle: "选择品种", showSpreadActions: false,
                 disableRecents: true, shouldReturnFocus: true,

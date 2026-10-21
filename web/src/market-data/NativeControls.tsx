@@ -1,4 +1,4 @@
-import { Children, createContext, isValidElement, useContext, useLayoutEffect, useRef, useId, useState, type InputHTMLAttributes, type SelectHTMLAttributes, type ReactNode } from "react";
+import { Children, createContext, isValidElement, useContext, useLayoutEffect, useRef, useId, useState, type InputHTMLAttributes, type SelectHTMLAttributes, type TextareaHTMLAttributes, type ButtonHTMLAttributes, type ReactNode } from "react";
 
 import { createPortal } from "react-dom";
 
@@ -54,7 +54,7 @@ export function NativeInput(props: InputHTMLAttributes<HTMLInputElement>) {
   });
   if (!ui || ["date", "datetime-local", "radio", "hidden", "file"].includes(props.type || "")) return <input {...props} />;
   const kind = props.type === "checkbox" ? "checkbox" : props.type === "search" ? "search" : "input";
-  const mapped = { ...props, id, size: "small", readonly: props.readOnly,
+  const mapped = { ...props, id, size: "small", ...(kind === "input" ? { stretch: true } : {}), readonly: props.readOnly,
     reference: (node:HTMLInputElement|null)=>{input.current=node;if(node) {node.required=!!props.required;node.readOnly=!!props.readOnly;}}, ariaInvalid: props["aria-invalid"], ariaDescribedby: props["aria-describedby"], ariaRequired: props.required };
   return <NativeSlot kind={kind} props={mapped} className={kind === "checkbox" ? "dc-native-check" : ""} />;
 }
@@ -118,4 +118,29 @@ export function NativeSelect(props: SelectHTMLAttributes<HTMLSelectElement>) {
 export function NativeSidebar({children}:{children:ReactNode}) {
   const [node,setNode]=useState<HTMLElement|null>(null);
   return <><NativeSlot kind="sidebar" props={{className:"dc-native-sidebar",contentRef:setNode}} />{node && createPortal(children,node)}</>;
+}
+
+export function NativeButton({ primary = false, ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { primary?: boolean }) {
+  const ui = useContext(NativeUiContext);
+  if (!ui) return <button {...props} type={props.type || "button"} className={`${props.className || ""}${primary ? " primary" : ""}`} />;
+  return <NativeSlot kind="button" props={{ ...props, type: props.type || "button", size: "s",
+    appearance: primary ? "default" : "stroke", intent: "default" }} />;
+}
+
+export function NativeTextarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  const ui = useContext(NativeUiContext), generated = useId();
+  const id = props.id || `dc-textarea-${generated.replace(/[^a-zA-Z0-9-]/g, "")}`;
+  if (!ui) return <textarea {...props} />;
+  const { "aria-label": labelText, ...nativeProps } = props;
+  return <NativeSlot kind="textarea" props={{ ...nativeProps, id, size: "small", stretch: true,
+    style: { height: "auto", minHeight: `${(props.rows || 3) * 24}px`, ...props.style },
+    resize: "vertical", readonly: props.readOnly, ref: (node: HTMLTextAreaElement | null) => {
+      if (!node) return;
+      // This native component forwards the accessible label to its shell.
+      // Keep the actual editable field named, including after async mounting.
+      const label = node.closest("label");
+      const title = labelText || (label && [...label.childNodes]
+        .filter(child => child.nodeType === Node.TEXT_NODE).map(child => child.textContent).join(" ").trim());
+      if (title) node.setAttribute("aria-label", title);
+    } }} />;
 }
