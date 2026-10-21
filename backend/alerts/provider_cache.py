@@ -407,6 +407,7 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
         values = []
         for bar in rows:
             old = existing.get(bar["start"])
+            incoming_payload = bar
             old_payload = old.payload if old else None
             if dataset.source == "oanda":
                 from .oanda_candles import canonical_payload
@@ -442,7 +443,8 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
                     complete=bar["complete"],
                     # An equivalent observation need not rewrite legacy fields;
                     # retained prefixes and old price pages keep identical values.
-                    payload=bar if payload_changed else old.payload,
+                    payload=(incoming_payload if old is None else
+                             bar if payload_changed else old.payload),
                     observed_at=observed_at,
                     changed_at=observed_at if payload_changed else old.changed_at,
                     price_confirmed_at=observed_at if price_changed else (

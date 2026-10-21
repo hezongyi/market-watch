@@ -5,6 +5,16 @@ from .oanda_rest_batch import decimal_text
 from .volume import encoded
 
 
+def _price_text(value):
+    try:
+        return decimal_text(value)
+    except (TypeError, ValueError):
+        # The foreground writer historically retained supplier text verbatim.
+        # Keep that boundary compatible; canonical_payload only equates values
+        # that the exact Decimal contract can prove equivalent.
+        return str(value)
+
+
 def canonical_payload(payload):
     """Only completed OANDA bars prove absent confirmation flags equivalent to true.
 
@@ -18,7 +28,7 @@ def canonical_payload(payload):
     # Reuse its bounded price contract, preserving unproven legacy values.
     for field in ('open', 'high', 'low', 'close'):
         try:
-            result[field] = decimal_text(result[field])
+            result[field] = _price_text(result[field])
         except (KeyError, ValueError):
             pass
     if result.get("complete") is True:
@@ -34,8 +44,8 @@ def native_bar(*, start, frame, parameters, complete, volume, open, high, low, c
         "start": start,
         "end": interval_end(start, frame, parameters),
         "chart_time": chart_label(start, frame, parameters),
-        "open": decimal_text(open), "high": decimal_text(high),
-        "low": decimal_text(low), "close": decimal_text(close),
+        "open": _price_text(open), "high": _price_text(high),
+        "low": _price_text(low), "close": _price_text(close),
         "volume": volume,
         "volume_complete": bool(complete and volume is not None),
         "complete": complete,

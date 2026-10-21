@@ -41,6 +41,12 @@ not logged; public error code/message remain compatible.
   legacy flags/decimal strings, idempotency, volume retention, full mutation
   matrix, insert/delete, RR overlapping reads, lease competition and HTTP attempt
   correlation. Each case uses a disposable unique schema in this task's DB.
+- After rebasing onto v1.26.3, the previous CI compatibility failures were fixed:
+  canonical comparison still treats completed missing flags and exact decimal
+  forms as equivalent, while new/changed rows preserve the incoming payload;
+  legacy zero-valued provider text remains accepted at the foreground writer
+  boundary. The focused PG14.24 rerun (diagnostic rollback plus OANDA,
+  account-price and provider-Postgres suites) is **103 passed** in 131.29s.
 - Additional tail/forming/completion/rollover regression: **2 passed** (SQLite and PG), including warm/cold values and old-price binding.
 - Web tests from `web/`: `indicator-snapshot-recovery.cjs`,
   `provider-credential-recovery.cjs`, `display-recovery-lifecycle.cjs`,
