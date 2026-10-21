@@ -373,13 +373,24 @@ const MWNativeNavigation = (() => {
       try { result = resume(); }
       catch (error) { result = Promise.reject(error); }
       finally { invokingRange = previousRange; state.publicRangeDepth = 0; state.depth--; }
-      return Promise.race([Promise.resolve(result), cancellation]).finally(() => {
+      const operation = Promise.race([Promise.resolve(result), cancellation]).finally(() => {
         if (state.publicRange === token) state.publicRange = null;
         if (models.get(m) === state && state.generation === generation) {
           state.phase = "idle";
           replay(m, state);
         }
       });
+      token.promise = operation;
+      return operation;
+    },
+    cancelRange(chart, operation) {
+      const m = chart._chartWidget.model().model(), state = models.get(m);
+      // An expired host wait can only cancel its own still-current operation.
+      // A subsequent user navigation or another pane keeps its own generation.
+      if (!operation || state?.publicRange?.promise !== operation) return false;
+      begin(m, state);
+      state.phase = "idle";
+      return true;
     },
     engineRangeCurrent() {
       const range = invokingRange;
@@ -827,8 +838,12 @@ const MWNativeNavigation = (() => {
       // error callback. A successful nonterminal empty barset makes the main
       // series recreate its sources and immediately request the same data again.
       // Native cache reset clears this error before an explicit recovery retry.
-      if (!thread._cache.bars.length && !capacityFailure && error?.code !== "HISTORY_CANCELLED")
+      if (!thread._cache.bars.length && !capacityFailure && error?.code !== "HISTORY_CANCELLED") {
+        // The vendor series receiver accepts a string or {error}, not Error.
+        // Keep the original structured failure in mw_lastFailure for diagnostics.
+        thread._errorMessage = String(error);
         return false;
+      }
       // Retain accepted history without marking it exhausted or invalid.
       const subscribers = thread._pendingSubscribers;
       thread._pendingSubscribers = [];

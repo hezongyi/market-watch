@@ -29,8 +29,8 @@ for(const code of ['NETWORK_FAILED','HISTORY_UNAVAILABLE','HISTORY_TIMEOUT']){
   const result=deliverFailure([],error);
   assert.equal(result.handled,false);
   assert.equal(result.delivered.history,0,'empty failed history must not masquerade as successful data');
-  assert.deepEqual(result.delivered.errors,[error]);
-  assert.equal(result.thread._errorMessage,error,'preserve the actual read error for retry UI');
+  assert.deepEqual(result.delivered.errors,[String(error)]);
+  assert.equal(result.thread._errorMessage,String(error),'adapt the failure to the vendor series-error contract');
 }
 const network=Object.assign(Error('read failed'),{code:'NETWORK_FAILED'});
 const retained=deliverFailure([{time:100}],network);

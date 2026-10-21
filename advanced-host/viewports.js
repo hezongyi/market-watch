@@ -84,7 +84,8 @@ async function restoreChartViewports(widget, viewports, isCurrent, wait = promis
       // per-pane mutations interrupt native pending range operations.
       const chart = widget.activeChart(), state = viewports[widget.activeChartIndex()];
       if (state.offset < 0) {
-        await wait(chart.setVisibleRange(state.range, { rejectByTimeout: 30000 }));
+        await wait(chart.setVisibleRange(state.range, { rejectByTimeout: 30000 }), chart);
+        if (!isCurrent()) return;
         restoreHistoricalSpacing(chart,state.spacing);
       } else {
         // A latest viewport is geometry relative to the current last bar.
@@ -124,7 +125,7 @@ async function restoreChartViewports(widget, viewports, isCurrent, wait = promis
         for (let attempt=0;;attempt++) {
           if (!isCurrent()) return;
           try {
-            await wait(chart.setVisibleRange(state.range, { rejectByTimeout: 30000 }));
+            await wait(chart.setVisibleRange(state.range, { rejectByTimeout: 30000 }), chart);
             break;
           } catch(error) {
             if (error?.message !== 'Value is null' || attempt >= 20) throw error;
@@ -337,14 +338,20 @@ async function refreshChartHistory(widget, chart, invalidate, isCurrent) {
   // onDataLoaded can precede dataReady, including an unsuccessful empty load.
   // One budget must cover readiness and viewport restoration as well as reset.
   const budget = new Promise((_, reject) => {
-    failed = error => reject(error instanceof Error ? error : Error(String(error || "历史读取失败")));
+    failed = error => {
+      expired = true;
+      reject(error instanceof Error ? error : Error(String(error || "历史读取失败")));
+    };
     timeout = setTimeout(() => {
       expired = true;
       reject(Error("历史刷新等待超时"));
     }, 15000);
   });
   seriesErrors?.subscribe(null, failed);
-  const wait = promise => Promise.race([promise, budget]);
+  const wait = (promise, target) => Promise.race([promise, budget]).catch(error => {
+    if (target) globalThis.MWNativeNavigation?.cancelRange(target, promise);
+    throw error;
+  });
   const completion = new Promise(resolve => {
     loaded = () => resolve();
     chart.onDataLoaded().subscribe(null, loaded);
