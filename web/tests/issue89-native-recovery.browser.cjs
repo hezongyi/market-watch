@@ -11,6 +11,9 @@ fs.mkdirSync(OUT,{recursive:true});
 const report={app:APP,chart:CHART,task:TASK,input:'synthetic offline OANDA; no real upstream',
   source:execFileSync('git',['rev-parse','HEAD']).toString().trim(),http:[],stages:[],errors:[]};
 const credentialRef=value=>value?createHash('sha256').update(value).digest('hex').slice(0,16):null;
+const sameConsumer=(http,accepted,id)=>http.consumer?.some(c=>c.id.endsWith('|'+id)&&
+  (c.generation===accepted.generation||c.generation===accepted.establishedOriginFrom&&
+    http.origin===accepted.identity.calculationStart));
 // Raw response values/credentials stay in memory, never in the evidence file.
 const observations=[];
 function fixture(operation,frame='H1'){
@@ -22,7 +25,7 @@ const save=()=>fs.writeFileSync(path.join(OUT,'result.json'),JSON.stringify(repo
 (async()=>{
   const browser=await chromium.launch({headless:true,executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE});
   const context=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width:1500,height:960}});
-  const page=await context.newPage();let frame;
+  const page=await context.newPage();let frame,referenceRead;
   const pending=[];
   page.on('pageerror',e=>report.errors.push(e.message));
   page.on('response',r=>{
@@ -34,6 +37,7 @@ const save=()=>fs.writeFileSync(path.join(OUT,'result.json'),JSON.stringify(repo
         consumer:q.indicator_consumers?.map(c=>({id:c.id,generation:c.generation})),
         requestCredential:credentialRef(q.provider_snapshot_id),credential:credentialRef(b.provider_snapshot_id),
         revision:String(b.input_revision??b.cache_revision??b.revision??''),
+        origin:b.calculation_origin??b.origin,
         indicators:q.indicators?.map(i=>i.name)||[],code:b.detail?.code,
         attempt:r.headers()['x-mw-attempt-ref'],bars:b.bars?.length,
         calculation:b.indicators?.map(i=>({name:i.name,coverage:i.calculation?.coverage,
@@ -62,7 +66,7 @@ const save=()=>fs.writeFileSync(path.join(OUT,'result.json'),JSON.stringify(repo
         x.identity.period===res&&x.start>=rejection.at&&report.http.some(h=>
           h.started>=rejection.at&&h.status===200&&h.indicators.length&&
           h.credential===x.credential&&h.revision===x.revision&&
-          h.consumer?.some(c=>c.id.endsWith('|'+studyId)&&c.generation===x.generation)));
+          sameConsumer(h,x,studyId)));
       assert.ok(accepted,name+': same-study new-read/native acceptance missing');
       report.stages.push({name:name+'-association',rejectedAttempt:rejection.attempt,
         rejectedCredential:rejection.requestCredential,acceptedCredential:accepted.credential,
@@ -78,25 +82,38 @@ const save=()=>fs.writeFileSync(path.join(OUT,'result.json'),JSON.stringify(repo
         ({id:s.id,values:Object.fromEntries(chart.getStudyById(s.id).getInputValues().map(x=>[x.id,x.value]))}))};
     }))){
       for(const input of c.inputs){
-        const accepted=await frame.evaluate(id=>issue89Trace.findLast(x=>x.studyId===id&&x.accepted&&x.valid>0),input.id);
+        const accepted=await frame.evaluate(({id,index})=>issue89Trace.findLast(x=>x.chartIndex===index&&
+          x.studyId===id&&x.accepted&&x.valid>0),{id:input.id,index:c.index});
         assert.ok(accepted,'study has no accepted result');
         const pages=observations.filter(({summary:h})=>h.status===200&&h.credential===accepted.credential&&
-          h.revision===accepted.revision&&h.consumer?.some(x=>x.id.endsWith('|'+input.id)&&x.generation===accepted.generation));
+          h.revision===accepted.revision&&sameConsumer(h,accepted,input.id));
+        assert.ok(pages.length,'accepted batch must match an observed HTTP result');
+        const scope=await frame.evaluate(({index,id})=>MWNativeIndicatorResults.scope(widget.chart(index),id),{index:c.index,id:input.id});
+        assert.ok(scope.count<=2000,'reference read must cover the complete native range');
+        // A retry can append only one tail row. Independently read the complete
+        // accepted credential so stale native values outside that batch fail too.
+        const {q,b}=pages.at(-1);
+        const reference=await referenceRead({instrument:q.instrument,series_kind:'provider',published:false,
+          timeframe:q.timeframe,indicators:q.indicators,provider_snapshot_id:b.provider_snapshot_id,
+          calculation_origin:accepted.identity.calculationStart,
+          before:scope.last+1,limit:scope.count});
+        assert.equal(credentialRef(reference.provider_snapshot_id),accepted.credential);
+        assert.equal(String(reference.input_revision??reference.cache_revision??reference.revision),accepted.revision);
+        assert.equal(reference.calculation_origin??reference.origin,accepted.identity.calculationStart);
         const expected=new Map();
-        for(const {b} of pages){
-          const result=b.indicators?.find(x=>x.name===accepted.name);if(!result)continue;
-          const series=new Map(result.series.map(s=>[s.key,new Map(s.values.map(p=>[p.time,p]))]));
-          for(const bar of b.bars){
-            const point=key=>{const p=series.get(key)?.get(bar.start);return p?.value??null;};
-            let values;
-            if(/supertrend/i.test(accepted.name)){
-              const broken=key=>series.get(key)?.get(bar.start)?.break_before?null:point(key);
-              const up=broken('up'),down=broken('down'),reference=broken('fill_reference');
-              values=[up,down,reference,input.values.highlighting?up:null,input.values.highlighting?down:null,
-                point('buy_price'),point('sell_price'),input.values.showsignals?point('buy_price'):null,input.values.showsignals?point('sell_price'):null];
-            }else values=result.series.map(s=>point(s.key));
-            expected.set(bar.chart_time??bar.start,values);
-          }
+        const result=reference.indicators?.find(x=>x.name===accepted.name);
+        assert.ok(result,'reference calculation must include the accepted study');
+        const series=new Map(result.series.map(s=>[s.key,new Map(s.values.map(p=>[p.time,p]))]));
+        for(const bar of reference.bars){
+          const point=key=>{const p=series.get(key)?.get(bar.start);return p?.value??null;};
+          let values;
+          if(/supertrend/i.test(accepted.name)){
+            const broken=key=>series.get(key)?.get(bar.start)?.break_before?null:point(key);
+            const up=broken('up'),down=broken('down'),fill=broken('fill_reference');
+            values=[up,down,fill,input.values.highlighting?up:null,input.values.highlighting?down:null,
+              point('buy_price'),point('sell_price'),input.values.showsignals?point('buy_price'):null,input.values.showsignals?point('sell_price'):null];
+          }else values=result.series.map(s=>point(s.key));
+          expected.set(bar.chart_time??bar.start,values);
         }
         const comparison=await frame.evaluate(({index,id,expected})=>{
           const chart=widget.chart(index),model=chart._chartWidget.model().model();
@@ -113,7 +130,8 @@ const save=()=>fs.writeFileSync(path.join(OUT,'result.json'),JSON.stringify(repo
           return {rows,valid,mismatches,generation:scope?.generation,coverage:scope?.coverage,
             first:scope?.first,last:scope?.last,count:scope?.count};
         },{index:c.index,id:input.id,expected:[...expected]});
-        assert.ok(comparison.rows>0&&comparison.valid>0,'expected/native overlap must contain valid values');
+        assert.equal(comparison.rows,scope.count,'reference calculation must cover every native main row');
+        assert.ok(comparison.valid>0,'reference/native comparison must contain valid values');
         assert.equal(comparison.mismatches,0,'native values must equal the accepted HTTP calculation');
         assert.equal(comparison.generation,accepted.generation);
         for(const key of ['first','last','count'])assert.equal(comparison.coverage[key],comparison[key],'native coverage '+key);
@@ -150,6 +168,7 @@ const save=()=>fs.writeFileSync(path.join(OUT,'result.json'),JSON.stringify(repo
     assert.ok(login.ok());const {csrf}=await login.json();
     async function api(p,data){const r=await context.request.post(APP+'/api/'+p,
       {headers:{'X-CSRF-Token':csrf},data});assert.ok(r.ok(),p+' '+r.status());return r.json();}
+    referenceRead=data=>api('charts/data',data);
     const w=await api('advanced-charts/workspaces',{name:'Issue89 native acceptance'});
     await api('advanced-charts/workspaces/'+w.id+'/save',{name:w.name,revision:w.revision,
       document:{engine:'tv31',schemaVersion:1,symbol:'MWP:OANDA:AUD_JPY',series_kind:'provider',interval:'60'}});
@@ -159,9 +178,16 @@ const save=()=>fs.writeFileSync(path.join(OUT,'result.json'),JSON.stringify(repo
     await frame.waitForFunction(()=>typeof ready!=='undefined'&&ready&&widget.activeChart().dataReady(),null,{timeout:45000});
     await frame.evaluate(()=>{
       globalThis.issue89Trace=[];globalThis.issue89Reloads=[];
-      const owners=new WeakMap(),attach=MWNativeIndicatorResults.attach;
+      const owners=new WeakMap(),latest=new WeakMap(),attach=MWNativeIndicatorResults.attach;
       MWNativeIndicatorResults.attach=function(chart,id,...args){
-        const handle=attach.call(this,chart,id,...args);owners.set(handle,{chart,id});return handle;
+        const owner=chart._chartWidget||chart;
+        let studies=latest.get(owner);if(!studies){studies=new Map();latest.set(owner,studies);}
+        const previous=studies.get(id),handle=attach.call(this,chart,id,...args);
+        const originOnly=previous&&previous.generation!==handle.generation&&previous.identity.calculationStart===0&&
+          handle.identity.calculationStart>0&&['main','fixedRevision','paramsFingerprint','algorithmVersion','period']
+            .every(key=>previous.identity[key]===handle.identity[key]);
+        owners.set(handle,{chart,id,establishedOriginFrom:originOnly?previous.generation:null});
+        studies.set(id,handle);return handle;
       };
       const original=MWNativeIndicatorResults.applyBatch;
       MWNativeIndicatorResults.applyBatch=async function(handle,batch){
@@ -171,6 +197,9 @@ const save=()=>fs.writeFileSync(path.join(OUT,'result.json'),JSON.stringify(repo
         const credential=digest?Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,'0')).join('').slice(0,16):null;
         issue89Trace.push({start,elapsed:Date.now()-start,accepted,generation:batch.generation,
           studyId:owner?.id,name:owner?MWNativeIndicatorResults.scope(owner.chart,owner.id)?.name:null,
+          chartIndex:owner?Array.from({length:widget.chartsCount()},(_,i)=>i).find(i=>
+            (widget.chart(i)._chartWidget||widget.chart(i))===(owner.chart._chartWidget||owner.chart)):null,
+          establishedOriginFrom:owner?.establishedOriginFrom??null,
           identity:batch.identity,coverage:batch.coverage,revision:String(batch.inputRevision),credential,
           rows:batch.rows.length,valid:batch.rows.reduce((n,r)=>n+r.valid.filter(Boolean).length,0)});
         return accepted;

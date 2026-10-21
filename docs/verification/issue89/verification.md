@@ -89,8 +89,12 @@ standards/privacy/isolation findings. Spec found two P2 gaps in the **unexecuted
 native harness: stage-specific request/result association and proof of correct
 native values/coverage/rendering. The harness now asserts each stage's own
 structured 422/attempt, same-study acceptance with matching HTTP credential
-reference/input revision/generation, and compares native values against the
-accepted HTTP calculation with coverage checks. These new assertions have only
+reference/input revision/generation, and compares every native main-series row
+against an independent full-range HTTP calculation bound to the exact accepted
+credential and origin. Follow-up static review caught a valid first-read
+origin-establishment generation transition and partial-tail comparison; the
+harness now records the explicit origin-only handle transition and requires
+reference values for every claimed row. These new assertions have only
 passed syntax validation; execution and target-layer screenshot assessment are
 still pending. Do not interpret prepared assertions as acceptance evidence.
 
