@@ -37,6 +37,7 @@
 | `alert-editing.browser.cjs` | 9 组真实 React/Chromium 回归通过 |
 | `native-alert-ui.integration.cjs` | 13 组真实许可图表/原生窗口回归通过 |
 | `native-alert-workspace.integration.cjs` | 6 组真实 AdvancedWorkspace + 许可图表回归通过；无浏览器异常或意外请求 |
+| PR #91 CI `39525469540` | 分类、PostgreSQL 14.24 后端全量测试、Web 和 Compose 全部通过；后端 16m29s |
 
 原生工作区回归验证：三次失败后显示图格反馈并禁用创建；显式重试同品种仅增加一次 resolve；原生 dataReady 且 stream subscribe 的 history_accepted 为 true；D1 加载；H4 切 Yahoo 后迁移 H1 并接受历史数据。API 为浏览器受控替身，**不是部署 R1 或真实 Yahoo 网络验收**。
 
@@ -74,4 +75,4 @@ R1 **待完成**。此前 `preview up` 因主机高负载被工具拒绝；已�
 .venv/bin/python deploy/ubuntu/mw_docker.py preview stop --task mw-issue88-20261021 --project mw-issue88-20261021
 ```
 
-PR CI 待创建 Draft PR 后运行。R1 与 CI 证据补齐前不关闭 issue、不合并；生产发布另行授权。
+PR #91 CI 已全部通过：分类、后端、Web、Compose 及必需检查均为 pass。F0 R1 尚未运行，因此 issue 保持开放、PR 保持 Draft；不合并或发布生产。
