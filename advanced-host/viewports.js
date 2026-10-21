@@ -59,7 +59,7 @@ function restoreHistoricalSpacing(chart, spacing) {
   scale.setBarSpacing(spacing);
   scale.setRightOffset(centerOffset+scale.width()/spacing/2);
 }
-async function restoreChartViewports(widget, viewports, isCurrent) {
+async function restoreChartViewports(widget, viewports, isCurrent, wait = promise => promise) {
   if (!Array.isArray(viewports) || !isCurrent()) return;
   const coordinator = widget._mwSyncCoordinator,
     desired = coordinator.snapshot().date;
@@ -73,9 +73,9 @@ async function restoreChartViewports(widget, viewports, isCurrent) {
     // Let the saved native synchronization finish loading its peers before
     // changing either toggle. Switching it off while a peer's initial range
     // call is pending can leave a rejected native deferred without a handler.
-    await Promise.all(Array.from({ length: widget.chartsCount() }, (_, index) =>
-      new Promise(resolve => widget.chart(index).dataReady(resolve))));
-    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    await wait(Promise.all(Array.from({ length: widget.chartsCount() }, (_, index) =>
+      new Promise(resolve => widget.chart(index).dataReady(resolve)))));
+    await wait(new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
     if (!isCurrent()) return;
     if (desired && widget.chartsCount() > 1 && viewports.length >= widget.chartsCount() &&
         viewports.slice(0, widget.chartsCount()).every((state, index) => matches(state, widget.chart(index)))) {
@@ -84,7 +84,7 @@ async function restoreChartViewports(widget, viewports, isCurrent) {
       // per-pane mutations interrupt native pending range operations.
       const chart = widget.activeChart(), state = viewports[widget.activeChartIndex()];
       if (state.offset < 0) {
-        await chart.setVisibleRange(state.range, { rejectByTimeout: 30000 });
+        await wait(chart.setVisibleRange(state.range, { rejectByTimeout: 30000 }));
         restoreHistoricalSpacing(chart,state.spacing);
       } else {
         // A latest viewport is geometry relative to the current last bar.
@@ -107,9 +107,9 @@ async function restoreChartViewports(widget, viewports, isCurrent) {
       const state = viewports[index],
         chart = widget.chart(index);
       if (!matches(state, chart)) continue;
-      await new Promise((resolve) => chart.dataReady(resolve));
+      await wait(new Promise((resolve) => chart.dataReady(resolve)));
       // Leave native data-ready dispatch before mutating its scale or sync state.
-      await new Promise((resolve) => setTimeout(resolve, 0));
+      await wait(new Promise((resolve) => setTimeout(resolve, 0)));
       if (!isCurrent()) return;
       if (
         state.symbol !== chart.symbol() ||
@@ -124,11 +124,11 @@ async function restoreChartViewports(widget, viewports, isCurrent) {
         for (let attempt=0;;attempt++) {
           if (!isCurrent()) return;
           try {
-            await chart.setVisibleRange(state.range, { rejectByTimeout: 30000 });
+            await wait(chart.setVisibleRange(state.range, { rejectByTimeout: 30000 }));
             break;
           } catch(error) {
             if (error?.message !== 'Value is null' || attempt >= 20) throw error;
-            await new Promise(resolve=>setTimeout(resolve,100));
+            await wait(new Promise(resolve=>setTimeout(resolve,100)));
           }
         }
       } else {
@@ -321,7 +321,8 @@ async function refreshChartHistory(widget, chart, invalidate, isCurrent) {
   const index = Array.from({ length: widget.chartsCount() }, (_, i) => widget.chart(i)).indexOf(chart);
   if (index < 0) return false;
   const selected = state.map((value, i) => i === index ? value : null);
-  let loaded, timeout, interacted = false;
+  let loaded, failed, timeout, expired = false, interacted = false;
+  const seriesErrors = chart.onSeriesError?.();
   const interaction = () => { interacted = true; };
   const wheelDocuments = typeof document === 'undefined' ? [] : [document,
     ...Array.from(document.querySelectorAll('iframe'), frame => {
@@ -331,23 +332,33 @@ async function refreshChartHistory(widget, chart, invalidate, isCurrent) {
   widget.subscribe("mouse_down", interaction);
   widget.subscribe("activeChartChanged", interaction);
   widget.subscribe("layout_about_to_be_changed", interaction);
-  const current = () => isCurrent() && !interacted &&
+  const current = () => isCurrent() && !interacted && !expired &&
     index < widget.chartsCount() && widget.chart(index) === chart;
-  const completion = new Promise((resolve, reject) => {
+  // onDataLoaded can precede dataReady, including an unsuccessful empty load.
+  // One budget must cover readiness and viewport restoration as well as reset.
+  const budget = new Promise((_, reject) => {
+    failed = error => reject(error instanceof Error ? error : Error(String(error || "历史读取失败")));
+    timeout = setTimeout(() => {
+      expired = true;
+      reject(Error("历史刷新等待超时"));
+    }, 15000);
+  });
+  seriesErrors?.subscribe(null, failed);
+  const wait = promise => Promise.race([promise, budget]);
+  const completion = new Promise(resolve => {
     loaded = () => resolve();
     chart.onDataLoaded().subscribe(null, loaded);
-    timeout = setTimeout(() => reject(Error("历史刷新等待超时")), 15000);
   });
   try {
     invalidate();
     chart.resetData();
-    await completion;
+    await wait(completion);
     // Native scale geometry settles on the render cycle after data dispatch.
-    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    await wait(new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
     if (!current()) return false;
     // Native reload can change spacing itself. Only actual user interaction
     // supersedes restoration; a numeric spacing difference is not evidence of it.
-    await restoreChartViewports(widget, selected, current);
+    await restoreChartViewports(widget, selected, current, wait);
     return current();
   } finally {
     for (const target of wheelDocuments) target.removeEventListener('wheel', interaction, true);
@@ -356,6 +367,7 @@ async function refreshChartHistory(widget, chart, invalidate, isCurrent) {
     widget.unsubscribe("layout_about_to_be_changed", interaction);
     clearTimeout(timeout);
     chart.onDataLoaded().unsubscribe(null, loaded);
+    seriesErrors?.unsubscribe(null, failed);
   }
 }
 // Import old native layouts before loading can replace their watched values

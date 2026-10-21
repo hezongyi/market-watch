@@ -9,7 +9,7 @@ const APP='https://localhost:18389',CHART='https://localhost:18390';
 const TASK='mw-issue89-20261021';
 const OUT=process.env.ISSUE89_OUTPUT||'/tmp/issue89-native';
 const SCENARIO=process.env.ISSUE89_SCENARIO||'full';
-assert.ok(['full','correction'].includes(SCENARIO));
+assert.ok(['full','correction','exhaustion'].includes(SCENARIO));
 fs.mkdirSync(OUT,{recursive:true});
 const report={app:APP,chart:CHART,task:TASK,scenario:SCENARIO,input:'synthetic offline OANDA; no real upstream',
   source:execFileSync('git',['rev-parse','HEAD']).toString().trim(),
@@ -487,7 +487,7 @@ function startFixtureObserver(){
         otherStable(before,equivalent,index);before=equivalent;
       }
     }
-    for(const index of [0,1]){
+    if(SCENARIO!=='exhaustion')for(const index of [0,1]){
       const name='real-correction-'+(index?'H4':'H1'),mark=before.accepted.length;
       const began=Date.now(),deadline=began+45000,studyId=before.charts[index].studies[0].id;
       const corrected=await withFrames(name,async()=>{
@@ -533,6 +533,8 @@ function startFixtureObserver(){
         report.stages.push({name:name+'-old-binding-preserved',credential:credentialRef(original.query.provider_snapshot_id),
           rows:original.value.bars.length,last:previousTail.start});
       }
+    }
+    if(SCENARIO==='full'||SCENARIO==='exhaustion'){
       const fault={started:Date.now(),requests:[],inflight:0};report.fault=fault;
       const pattern=/\/api\/charts\/(?:data|history-loads)$/;
       const inject=async route=>{
@@ -550,12 +552,19 @@ function startFixtureObserver(){
       await page.route(pattern,inject);
       try{
         fixture('expire');
-        await withFrames('budget-exhaustion',async()=>{
+        // Comparison has a 10s budget; three complete refreshes take at most
+        // 3 * 15s plus 1s/2s backoff. This fixed bound also covers response reads.
+        const exhaustionDeadline=Date.now()+65000;
+        fault.deadline=exhaustionDeadline;
+        await withinDeadline(exhaustionDeadline,()=>withFrames('budget-exhaustion',async()=>{
           await frame.evaluate(()=>indicatorCoordinator.retry(0));
-          await frame.waitForFunction(()=>[...displayRecoveries.values()].some(r=>r.state==='error'),null,{timeout:45000});
-          await page.getByRole('complementary',{name:'图格指标状态'}).getByRole('button',{name:'重试指标'}).first().waitFor();
-        });
-        await Promise.all(pending);failureState=await state();
+          await frame.waitForFunction(()=>[...displayRecoveries.values()].some(r=>r.state==='error'),null,
+            {timeout:Math.max(1,exhaustionDeadline-Date.now())});
+          await page.getByRole('complementary',{name:'图格指标状态'}).getByRole('button',{name:'重试指标'}).first()
+            .waitFor({timeout:Math.max(1,exhaustionDeadline-Date.now())});
+        }),{reason:'bounded recovery exhaustion and visible retry'});
+        await withinDeadline(exhaustionDeadline,()=>Promise.all(pending),{reason:'exhaustion response gathering'});
+        failureState=await withinDeadline(exhaustionDeadline,()=>state(),{reason:'exhausted recovery state'});
         const rejected=report.http.filter(h=>h.started>=fault.started&&h.frame==='H1'&&h.status===422&&h.code==='DISPLAY_SNAPSHOT_EXPIRED');
         assert.ok(rejected.length>0,'failure must begin with actual TTL 422');
         assert.equal(failureState.reloads.length-before.reloads.length,3,'three logical reload attempts');
@@ -599,7 +608,7 @@ function startFixtureObserver(){
         seam:'React button → retry-chart-indicators message → existing recovery/coordinator'});
       before=recovered;
     }
-    await Promise.all(pending);
+    await withinDeadline(Date.now()+5000,()=>Promise.all(pending),{reason:'final response gathering'});
     assert.ok(report.http.filter(x=>x.status===422).every(x=>x.code==='DISPLAY_SNAPSHOT_EXPIRED'));
     assert.deepEqual(report.errors,[]);
     report.lifecycle=await frame.evaluate(()=>globalThis.issue89Events);

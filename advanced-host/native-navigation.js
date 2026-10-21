@@ -823,7 +823,13 @@ const MWNativeNavigation = (() => {
         if (points && visible && visible.firstBar() < points.firstIndex)
           ts.setRightOffset(points.firstIndex + screen(m) - ts.baseIndex());
       }
-      // End this request without marking history exhausted or the symbol invalid.
+      // With no accepted bars, an ordinary read failure must reach the native
+      // error callback. A successful nonterminal empty barset makes the main
+      // series recreate its sources and immediately request the same data again.
+      // Native cache reset clears this error before an explicit recovery retry.
+      if (!thread._cache.bars.length && !capacityFailure && error?.code !== "HISTORY_CANCELLED")
+        return false;
+      // Retain accepted history without marking it exhausted or invalid.
       const subscribers = thread._pendingSubscribers;
       thread._pendingSubscribers = [];
       thread._errorMessage = null;
