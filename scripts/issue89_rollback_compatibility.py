@@ -1,9 +1,10 @@
-"""Read/write compatibility with the exact v1.26.2 source artifact on isolated PG.
+"""Read/write compatibility with an explicit baseline source artifact on isolated PG.
 
 Requires TEST_POSTGRES_URL pointing to the issue89 preview, supplied privately by
 the caller. Uses a new disposable schema, never clears the preview's public data.
 """
 
+import argparse
 import hashlib
 import json
 import os
@@ -15,8 +16,6 @@ import uuid
 from pathlib import Path
 
 from sqlalchemy import create_engine, text
-
-BASELINE = '762067a83fa2fca20c9158ea67cafae838861c19'
 
 # Separate interpreters prevent current modules leaking into the rollback read.
 PROBE = r'''
@@ -85,10 +84,16 @@ engine.dispose()
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--baseline', required=True, help='Exact baseline commit or tag to verify')
+    args = parser.parse_args()
     if os.getenv('ISSUE89_TASK_PG') != 'mw-issue89-20261021':
         raise SystemExit('Requires explicit task-owned PostgreSQL environment')
     root = Path(__file__).resolve().parents[1]
-    archive = subprocess.check_output(['git', 'archive', BASELINE], cwd=root)
+    baseline_commit = subprocess.check_output(
+        ['git', 'rev-parse', '--verify', '--end-of-options', args.baseline+'^{commit}'],
+        cwd=root, text=True).strip()
+    archive = subprocess.check_output(['git', 'archive', baseline_commit], cwd=root)
     schema = 'rollback89_' + uuid.uuid4().hex
     admin = create_engine(os.environ['TEST_POSTGRES_URL'])
     with admin.begin() as db:
@@ -108,7 +113,7 @@ def main():
                     'ISSUE89_STATE': str(path / 'state.json'), 'ISSUE89_PHASE': phase,
                     'PYTHONPATH': os.pathsep.join(str(source / p) for p in ['backend', 'backend/tests'])}
                 subprocess.run([sys.executable, '-c', PROBE], cwd=source, env=environment, check=True)
-        print(json.dumps({'baseline': BASELINE, 'artifact_sha256': hashlib.sha256(archive).hexdigest(),
+        print(json.dumps({'baseline': baseline_commit, 'artifact_sha256': hashlib.sha256(archive).hexdigest(),
                           'locked_dependencies_unchanged': True, 'schema_cleared_between_phases': False,
                           'passed': True}))
     finally:
