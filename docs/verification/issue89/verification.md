@@ -84,6 +84,16 @@ could not identify its HTTP attempt. Both fixed with regression coverage and
 matching exception/header reference. Follow-up: **zero outstanding findings**.
 Browser rendering and rollback evidence were outside these code-only reviews.
 
+Final tooling review (`c689e7e`→`ee0d87b`): Standards found no actionable
+standards/privacy/isolation findings. Spec found two P2 gaps in the **unexecuted**
+native harness: stage-specific request/result association and proof of correct
+native values/coverage/rendering. The harness now asserts each stage's own
+structured 422/attempt, same-study acceptance with matching HTTP credential
+reference/input revision/generation, and compares native values against the
+accepted HTTP calculation with coverage checks. These new assertions have only
+passed syntax validation; execution and target-layer screenshot assessment are
+still pending. Do not interpret prepared assertions as acceptance evidence.
+
 Self-review checked full-payload invalidation, preserved frozen prefixes,
 non-OANDA isolation, explicit false, volume/labels, unchanged public errors,
 secret exclusion and no dependence on #88.
@@ -122,9 +132,11 @@ behavior, not real OANDA transport or market correctness. Copy it to the task AP
 container as `/tmp/issue89_acceptance_fixture.py`, then run `seed` there.
 `web/tests/issue89-native-recovery.browser.cjs` drives real React/RPC/API/PG and
 the licensed native adapter, wrapping and calling the actual `applyBatch`.
-It checks H1 Supertrend/H4 Swing native data and screenshots, equivalent writes,
+It prepares H1 Supertrend/H4 Swing native data checks and screenshots, equivalent writes,
 real TTL expiry/unchanged-price renewal and real early OHLC correction recovery.
-It classifies 422 by structured code and requires subsequent accepted results.
+It classifies 422 by structured code and requires stage-specific same-study
+accepted results. Raw credentials and response values remain in process memory;
+the evidence file keeps hashed credential references and bounded comparisons.
 
 Pending before acceptance is complete: confirm final running image, execute
 native R1 including tail/rollover and bounded-failure retry UI, preserve rendered

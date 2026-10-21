@@ -3,12 +3,16 @@
 const {chromium}=require('@playwright/test');
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const {execFileSync}=require('node:child_process');
+const {createHash}=require('node:crypto');
 const APP='https://localhost:18389',CHART='https://localhost:18390';
 const TASK='mw-issue89-20261021';
 const OUT=process.env.ISSUE89_OUTPUT||'/tmp/issue89-native';
 fs.mkdirSync(OUT,{recursive:true});
 const report={app:APP,chart:CHART,task:TASK,input:'synthetic offline OANDA; no real upstream',
   source:execFileSync('git',['rev-parse','HEAD']).toString().trim(),http:[],stages:[],errors:[]};
+const credentialRef=value=>value?createHash('sha256').update(value).digest('hex').slice(0,16):null;
+// Raw response values/credentials stay in memory, never in the evidence file.
+const observations=[];
 function fixture(operation,frame='H1'){
   const result=execFileSync('docker',['exec',TASK+'-api-1','python',
     '/tmp/issue89_acceptance_fixture.py',operation,'--frame',frame],{timeout:30000}).toString();
@@ -23,19 +27,100 @@ const save=()=>fs.writeFileSync(path.join(OUT,'result.json'),JSON.stringify(repo
   page.on('pageerror',e=>report.errors.push(e.message));
   page.on('response',r=>{
     if(!r.url().includes('/api/charts/data'))return;
+    const received=Date.now();
     pending.push((async()=>{
       const q=r.request().postDataJSON(),b=await r.json().catch(()=>({}));
-      report.http.push({at:Date.now(),status:r.status(),frame:q.timeframe,
+      const summary={at:received,started:r.request().timing().startTime,status:r.status(),frame:q.timeframe,
+        consumer:q.indicator_consumers?.map(c=>({id:c.id,generation:c.generation})),
+        requestCredential:credentialRef(q.provider_snapshot_id),credential:credentialRef(b.provider_snapshot_id),
+        revision:String(b.input_revision??b.cache_revision??b.revision??''),
         indicators:q.indicators?.map(i=>i.name)||[],code:b.detail?.code,
         attempt:r.headers()['x-mw-attempt-ref'],bars:b.bars?.length,
         calculation:b.indicators?.map(i=>({name:i.name,coverage:i.calculation?.coverage,
-          status:i.calculation?.status,valid:i.series.reduce((n,s)=>n+s.values.filter(p=>p.value!==null).length,0)}))});
+          status:i.calculation?.status,valid:i.series.reduce((n,s)=>n+s.values.filter(p=>p.value!==null).length,0)}))};
+      observations.push({q,b,summary});report.http.push(summary);
     })());
   });
-  async function acceptedSince(mark,res){
-    await frame.waitForFunction(({mark,res})=>issue89Trace.slice(mark).some(x=>
-      x.accepted&&x.identity.period===res&&x.valid>0),{mark,res},{timeout:45000});
+  async function acceptedSince(mark,res,studyId){
+    await frame.waitForFunction(({mark,res,studyId})=>issue89Trace.slice(mark).some(x=>
+      x.accepted&&x.identity.period===res&&(!studyId||x.studyId===studyId)&&x.valid>0),
+      {mark,res,studyId},{timeout:45000});
     await frame.evaluate(()=>new Promise(ok=>requestAnimationFrame(()=>requestAnimationFrame(ok))));
+  }
+  // Associate this stage's rejected request with the same native study's actual
+  // accepted credential and input revision. An unrelated 200 cannot satisfy it.
+  async function recoveryEvidence(name,started,mark,res,studyId){
+    await Promise.all(pending);
+    const trace=await frame.evaluate(()=>issue89Trace);
+    const rejected=report.http.filter(x=>x.started>=started&&x.frame===(res==='60'?'H1':'H4')&&
+      x.status===422&&x.code==='DISPLAY_SNAPSHOT_EXPIRED'&&
+      x.consumer?.some(c=>c.id.endsWith('|'+studyId)));
+    assert.ok(rejected.length>0,name+': own old-credential 422 missing');
+    for(const rejection of rejected){
+      assert.ok(rejection.attempt,name+': rejection lacks HTTP/log attempt reference');
+      const accepted=trace.slice(mark).find(x=>x.accepted&&x.valid>0&&x.studyId===studyId&&
+        x.identity.period===res&&x.start>=rejection.at&&report.http.some(h=>
+          h.started>=rejection.at&&h.status===200&&h.indicators.length&&
+          h.credential===x.credential&&h.revision===x.revision&&
+          h.consumer?.some(c=>c.id.endsWith('|'+studyId)&&c.generation===x.generation)));
+      assert.ok(accepted,name+': same-study new-read/native acceptance missing');
+      report.stages.push({name:name+'-association',rejectedAttempt:rejection.attempt,
+        rejectedCredential:rejection.requestCredential,acceptedCredential:accepted.credential,
+        studyId,generation:accepted.generation,revision:accepted.revision,
+        elapsed:accepted.start+accepted.elapsed-rejection.at});
+    }
+  }
+  async function verifyNative(){
+    await Promise.all(pending);
+    const checks=[];
+    for(const c of await frame.evaluate(()=>Array.from({length:widget.chartsCount()},(_,index)=>{
+      const chart=widget.chart(index);return {index,inputs:chart.getAllStudies().map(s=>
+        ({id:s.id,values:Object.fromEntries(chart.getStudyById(s.id).getInputValues().map(x=>[x.id,x.value]))}))};
+    }))){
+      for(const input of c.inputs){
+        const accepted=await frame.evaluate(id=>issue89Trace.findLast(x=>x.studyId===id&&x.accepted&&x.valid>0),input.id);
+        assert.ok(accepted,'study has no accepted result');
+        const pages=observations.filter(({summary:h})=>h.status===200&&h.credential===accepted.credential&&
+          h.revision===accepted.revision&&h.consumer?.some(x=>x.id.endsWith('|'+input.id)&&x.generation===accepted.generation));
+        const expected=new Map();
+        for(const {b} of pages){
+          const result=b.indicators?.find(x=>x.name===accepted.name);if(!result)continue;
+          const series=new Map(result.series.map(s=>[s.key,new Map(s.values.map(p=>[p.time,p]))]));
+          for(const bar of b.bars){
+            const point=key=>{const p=series.get(key)?.get(bar.start);return p?.value??null;};
+            let values;
+            if(/supertrend/i.test(accepted.name)){
+              const broken=key=>series.get(key)?.get(bar.start)?.break_before?null:point(key);
+              const up=broken('up'),down=broken('down'),reference=broken('fill_reference');
+              values=[up,down,reference,input.values.highlighting?up:null,input.values.highlighting?down:null,
+                point('buy_price'),point('sell_price'),input.values.showsignals?point('buy_price'):null,input.values.showsignals?point('sell_price'):null];
+            }else values=result.series.map(s=>point(s.key));
+            expected.set(bar.chart_time??bar.start,values);
+          }
+        }
+        const comparison=await frame.evaluate(({index,id,expected})=>{
+          const chart=widget.chart(index),model=chart._chartWidget.model().model();
+          const main=new Set();model.mainSeries().data().each((_,row)=>{main.add(Math.round(row[0]*1000));});
+          const actual=new Map();model.dataSourceForId(id).data().each((_,row)=>{actual.set(Math.round(row[0]*1000),row.slice(1));});
+          let rows=0,valid=0,mismatches=0;
+          for(const [time,values] of expected){if(!main.has(time))continue;rows++;
+            const row=actual.get(time);values.forEach((v,i)=>{
+              if(Number.isFinite(v))valid++;
+              if(!row||v!==row[i])mismatches++;
+            });
+          }
+          const scope=MWNativeIndicatorResults.scope(chart,id);
+          return {rows,valid,mismatches,generation:scope?.generation,coverage:scope?.coverage,
+            first:scope?.first,last:scope?.last,count:scope?.count};
+        },{index:c.index,id:input.id,expected:[...expected]});
+        assert.ok(comparison.rows>0&&comparison.valid>0,'expected/native overlap must contain valid values');
+        assert.equal(comparison.mismatches,0,'native values must equal the accepted HTTP calculation');
+        assert.equal(comparison.generation,accepted.generation);
+        for(const key of ['first','last','count'])assert.equal(comparison.coverage[key],comparison[key],'native coverage '+key);
+        checks.push({index:c.index,studyId:input.id,...comparison});
+      }
+    }
+    return checks;
   }
   async function state(){return frame.evaluate(()=>({
     accepted:issue89Trace, reloads:issue89Reloads,
@@ -53,8 +138,9 @@ const save=()=>fs.writeFileSync(path.join(OUT,'result.json'),JSON.stringify(repo
   async function checkpoint(name){
     const s=await state();
     for(const c of s.charts){assert.ok(c.ready&&c.mainRows>0);assert.ok(c.studies.some(x=>x.valid>0));}
+    const nativeChecks=await verifyNative();
     // The full fingerprint is used in-process only; evidence keeps bounded summaries.
-    report.stages.push({name,at:Date.now(),...s,charts:s.charts.map(({mainFingerprint,...c})=>c)});
+    report.stages.push({name,at:Date.now(),...s,nativeChecks,charts:s.charts.map(({mainFingerprint,...c})=>c)});
     await page.screenshot({path:path.join(OUT,name+'.png')});save();return s;
   }
   try{
@@ -73,11 +159,19 @@ const save=()=>fs.writeFileSync(path.join(OUT,'result.json'),JSON.stringify(repo
     await frame.waitForFunction(()=>typeof ready!=='undefined'&&ready&&widget.activeChart().dataReady(),null,{timeout:45000});
     await frame.evaluate(()=>{
       globalThis.issue89Trace=[];globalThis.issue89Reloads=[];
+      const owners=new WeakMap(),attach=MWNativeIndicatorResults.attach;
+      MWNativeIndicatorResults.attach=function(chart,id,...args){
+        const handle=attach.call(this,chart,id,...args);owners.set(handle,{chart,id});return handle;
+      };
       const original=MWNativeIndicatorResults.applyBatch;
       MWNativeIndicatorResults.applyBatch=async function(handle,batch){
+        const owner=owners.get(handle);
         const start=Date.now(),accepted=await original.call(this,handle,batch);
+        const digest=batch.displaySnapshot?await crypto.subtle.digest('SHA-256',new TextEncoder().encode(batch.displaySnapshot)):null;
+        const credential=digest?Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,'0')).join('').slice(0,16):null;
         issue89Trace.push({start,elapsed:Date.now()-start,accepted,generation:batch.generation,
-          identity:batch.identity,coverage:batch.coverage,revision:batch.inputRevision,
+          studyId:owner?.id,name:owner?MWNativeIndicatorResults.scope(owner.chart,owner.id)?.name:null,
+          identity:batch.identity,coverage:batch.coverage,revision:String(batch.inputRevision),credential,
           rows:batch.rows.length,valid:batch.rows.reduce((n,r)=>n+r.valid.filter(Boolean).length,0)});
         return accepted;
       };
@@ -111,8 +205,10 @@ const save=()=>fs.writeFileSync(path.join(OUT,'result.json'),JSON.stringify(repo
     assert.equal(equivalent.charts[0].mainFingerprint,before.charts[0].mainFingerprint);
     assert.equal(equivalent.reloads.length,before.reloads.length);
     // Actual DB TTL expiry, unchanged prices: real 422 and credential-only renewal.
-    fixture('expire');mark=equivalent.accepted.length;
-    await frame.evaluate(()=>indicatorCoordinator.retry(0));await acceptedSince(mark,'60');
+    fixture('expire');mark=equivalent.accepted.length;const renewalStart=Date.now();
+    const studyId=equivalent.charts[0].studies[0].id;
+    await frame.evaluate(()=>indicatorCoordinator.retry(0));await acceptedSince(mark,'60',studyId);
+    await recoveryEvidence('credential-renewal',renewalStart,mark,'60',studyId);
     const renewed=await checkpoint('credential-renewal');
     assert.equal(renewed.reloads.length,equivalent.reloads.length);
     assert.equal(renewed.charts[0].mainFingerprint,equivalent.charts[0].mainFingerprint);
@@ -120,7 +216,8 @@ const save=()=>fs.writeFileSync(path.join(OUT,'result.json'),JSON.stringify(repo
     assert.equal(renewed.charts[1].mainFingerprint,before.charts[1].mainFingerprint);
     // Genuine persisted early OHLC correction: old token must fail, then native acceptance.
     fixture('correct');mark=renewed.accepted.length;const began=Date.now();
-    await frame.evaluate(()=>indicatorCoordinator.retry(0));await acceptedSince(mark,'60');
+    await frame.evaluate(()=>indicatorCoordinator.retry(0));await acceptedSince(mark,'60',studyId);
+    await recoveryEvidence('real-correction',began,mark,'60',studyId);
     const corrected=await checkpoint('real-correction');
     assert.notEqual(corrected.charts[0].mainFingerprint,renewed.charts[0].mainFingerprint);
     assert.equal(corrected.charts[0].studies[0].id,renewed.charts[0].studies[0].id);
@@ -128,7 +225,6 @@ const save=()=>fs.writeFileSync(path.join(OUT,'result.json'),JSON.stringify(repo
     assert.equal(corrected.charts[1].studies[0].scope.generation,renewed.charts[1].studies[0].scope.generation);
     report.correctionRecoveryMs=Date.now()-began;
     await Promise.all(pending);
-    assert.ok(report.http.filter(x=>x.status===422).length>=2);
     assert.ok(report.http.filter(x=>x.status===422).every(x=>x.code==='DISPLAY_SNAPSHOT_EXPIRED'));
     assert.deepEqual(report.errors,[]);
     report.passed=true;
