@@ -407,6 +407,12 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
         values = []
         for bar in rows:
             old = existing.get(bar["start"])
+            old_payload = old.payload if old else None
+            if dataset.source == "oanda":
+                from .oanda_candles import canonical_payload
+
+                bar = canonical_payload(bar)
+                old_payload = canonical_payload(old_payload) if old else None
             if old and (old.observed_at > observed_at or old.complete and not bar["complete"] and not page.get("revalidation") and not dataset.metadata_json.get("revalidation_generation") == dataset.generation):
                 if observation:
                     observation.counts["rejected"] += 1
@@ -416,16 +422,17 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
                 bar = {**bar, "volume": old.payload.get("volume"),
                        "volume_complete": old.payload.get("volume_complete", False)}
             if observation:
-                observation.accept(old.payload if old else None, bar, observed_at)
+                observation.accept(old_payload, bar, observed_at)
             revision = 1
-            useful_bars |= old is None or old.payload != bar
+            payload_changed = old is None or old_payload != bar
+            useful_bars |= payload_changed
             if old:
-                revision = old.revision + (old.payload != bar)
-                if old.payload != bar:
+                revision = old.revision + payload_changed
+                if payload_changed:
                     changed.append(bar["chart_time"])
-            price_changed = not old or price_input(old.payload) != price_input(bar)
+            price_changed = not old or price_input(old_payload) != price_input(bar)
             if (indicator_tail is not None and bar["start"] < indicator_tail
-                    and (not old or old.payload != bar)):
+                    and payload_changed):
                 reset_indicators = True
             values.append(
                 dict(
@@ -433,9 +440,11 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
                     start=bar["start"],
                     chart_time=bar["chart_time"],
                     complete=bar["complete"],
-                    payload=bar,
+                    # An equivalent observation need not rewrite legacy fields;
+                    # retained prefixes and old price pages keep identical values.
+                    payload=bar if payload_changed else old.payload,
                     observed_at=observed_at,
-                    changed_at=observed_at if not old or old.payload != bar else old.changed_at,
+                    changed_at=observed_at if payload_changed else old.changed_at,
                     price_confirmed_at=observed_at if price_changed else (
                         old.price_confirmed_at if old.price_confirmed_at is not None else old.changed_at or old.observed_at),
                     revision=revision,

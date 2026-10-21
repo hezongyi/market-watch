@@ -294,7 +294,8 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
             count - len(rows) + optional + (3 if frame in ("D1", "W1", "MN") else 0),
         )
         if source == "oanda":
-            from .native_series import chart_label, interval_end, parameters
+            from .native_series import parameters
+            from .oanda_candles import native_bar
             native = parameters(meta)
             if not settings.oanda_token or not settings.oanda_account_id:
                 raise ValueError("OANDA认证或账户未配置")
@@ -312,20 +313,10 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
             for candle in candles:
                 start = int(Decimal(candle["time"]) * 1000)
                 prices = candle[{"B": "bid", "A": "ask", "M": "mid"}[native["price"]]]
-                batch.append(
-                    {
-                        "start": start,
-                        "end": interval_end(start, frame, native),
-                        "chart_time": chart_label(start, frame, native),
-                        "complete": bool(candle["complete"]),
-                        "volume": encoded(candle.get("volume"), tick=True),
-                        "volume_complete": bool(candle["complete"] and candle.get("volume") is not None),
-                        **{
-                            k: prices[v]
-                            for k, v in (("open", "o"), ("high", "h"), ("low", "l"), ("close", "c"))
-                        },
-                    }
-                )
+                batch.append(native_bar(start=start, frame=frame, parameters=native,
+                    complete=bool(candle["complete"]), volume=candle.get("volume"),
+                    **{k: prices[v] for k, v in
+                       (("open", "o"), ("high", "h"), ("low", "l"), ("close", "c"))}))
         else:
             candles = _request(
                 client,
