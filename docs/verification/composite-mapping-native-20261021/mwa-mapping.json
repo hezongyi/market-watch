@@ -1,0 +1,40 @@
+{
+  "at": "2026-10-21T23:13:36.013Z",
+  "target": "https://192.168.7.232:18280",
+  "checks": [
+    "real mwa UI login and native chart startup",
+    "composite candidate row navigates to the new mapping page with real account directory",
+    "single real native symbol picker, native actions and fresh manual review",
+    "actual native proof controls and light/dark themes",
+    "390px viewport keeps fixed save actions visible without horizontal overflow",
+    "cancel discards draft; saved workspace and mappings remain unchanged"
+  ],
+  "errors": [],
+  "blockedWrites": [
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    }
+  ],
+  "passed": true,
+  "symbol": "XAUUSD",
+  "workspaceUnchanged": true,
+  "mappingsUnchanged": true,
+  "revision": 42
+}
