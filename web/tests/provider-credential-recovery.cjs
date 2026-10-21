@@ -25,7 +25,7 @@ function harness(change=()=>{}){
   reloadHistory:async()=>{reloads++;return true;},registerMarketBar:()=>registered++};
  vm.runInNewContext(source.slice(source.indexOf('function rememberIndicatorBinding('),source.indexOf('function startIndicatorCoordinator('))+
   source.slice(recoveryStart,end)+'\nglobalThis.recover=recoverDisplaySnapshot;',ctx);
- return {ctx,get binding(){return ctx.indicatorBindings.get(key);},events,rows,run:()=>ctx.recover(symbol,'1','expired'),counts:()=>({reloads,reads,registered})};
+ return {ctx,get binding(){return ctx.indicatorBindings.get(key);},events,rows,run:(retry=false)=>ctx.recover(symbol,'1','expired',retry),counts:()=>({reloads,reads,registered})};
 }
 (async()=>{
  let h=harness();await h.run();assert.equal(h.counts().reloads,0,'unchanged accepted provider prices must renew without resetting the main chart');
@@ -42,5 +42,20 @@ function harness(change=()=>{}){
  h=harness(({setSymbol})=>setSymbol('MWP:DUKA:other'));await h.run();assert.equal(h.counts().reloads,0);assert.equal(h.binding.providerSnapshot,'expired');
  h=harness(({ctx})=>ctx.indicatorBindings.get('MWP:DUKA:test|1').providerSnapshot='newer-stream');await h.run();
  assert.equal(h.counts().reloads,0,'a newer accepted stream credential supersedes a delayed expiry recovery');
+ // Failed resets detach the native consumer while the model can retain old rows.
+ // A manual retry must rebuild that source even when fresh prices are unchanged.
+ let offline=true;
+ h=harness(()=>{if(offline)throw Error('offline comparison');});
+ const reload=h.ctx.reloadHistory;
+ h.ctx.reloadHistory=async()=>{await reload();if(offline)throw Error('offline history');return true;};
+ await assert.rejects(h.run(),/offline history/);
+ assert.equal(h.counts().reloads,3);
+ assert.equal(h.ctx.subscriptions.get('sub').needsHistoryReload,true);
+ offline=false;
+ await h.run(true);
+ assert.equal(h.counts().reloads,4,'manual retry must restart the failed native source, not just renew its credential');
+ assert.equal(h.counts().reads,1,'retained model rows cannot certify a failed native source as restored');
+ assert.equal(h.ctx.subscriptions.get('sub').needsHistoryReload,false);
+ assert.equal(h.counts().registered,1);
  console.log('PASS provider credential-only recovery preserves main prices; corrections and stale navigation remain fenced');
 })().catch(e=>{console.error(e);process.exitCode=1;});
