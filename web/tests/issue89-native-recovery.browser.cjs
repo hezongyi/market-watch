@@ -4,7 +4,7 @@ const {chromium}=require('@playwright/test');
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const {execFileSync,spawn}=require('node:child_process');
 const {createHash}=require('node:crypto');
-const {sampleNative}=require('./fixtures/issue89-sampling.cjs');
+const {sampleNative,withinDeadline}=require('./fixtures/issue89-sampling.cjs');
 const APP='https://localhost:18389',CHART='https://localhost:18390';
 const TASK='mw-issue89-20261021';
 const OUT=process.env.ISSUE89_OUTPUT||'/tmp/issue89-native';
@@ -20,7 +20,7 @@ const report={app:APP,chart:CHART,task:TASK,scenario:SCENARIO,input:'synthetic o
   components:JSON.parse(execFileSync('docker',['inspect',...['api','web','chart-origin','postgres','tls']
     .map(service=>TASK+'-'+service+'-1')]).toString()).map(c=>({name:c.Name,image:c.Image,
       source:c.Config.Labels['io.market-watch.commit']??null,dirty:c.Config.Labels['io.market-watch.dirty']??null})),
-  http:[],stages:[],samples:[],errors:[],diagnostics:[],renderFrames:[]};
+  http:[],requests:[],stages:[],samples:[],errors:[],diagnostics:[],renderFrames:[]};
 const credentialRef=value=>value?createHash('sha256').update(value).digest('hex').slice(0,16):null;
 const sameConsumer=(http,accepted,id)=>http.consumer?.some(c=>c.id.endsWith('|'+id)&&
   (c.generation===accepted.generation||c.generation===accepted.establishedOriginFrom&&
@@ -76,12 +76,30 @@ function startFixtureObserver(){
   const page=await context.newPage();let frame,referenceRead,observer;
   let activeStage='setup';
   const pending=[];
+  const requestFlights=new Map(),requestRecords=new WeakMap();
+  page.on('request',request=>{
+    const pathname=new URL(request.url()).pathname;
+    if(!['/api/charts/data','/api/charts/history-loads'].includes(pathname)||request.method()!=='POST')return;
+    const payload=request.postDataJSON(),q=payload?.query??payload;
+    if(q?.instrument!=='OANDA:AUD_JPY')return;
+    const record={at:Date.now(),path:pathname,frame:q.timeframe,
+      kind:q.indicators?.length?'indicator':q.native_history?'native-history':'price',
+      consumer:q.indicator_consumers?.map(c=>({id:c.id,generation:c.generation}))};
+    requestFlights.set(request,record);requestRecords.set(request,record);report.requests.push(record);
+  });
+  const finishRequest=(request,outcome)=>{
+    const record=requestRecords.get(request);
+    if(record){record.ended=Date.now();record.outcome=outcome;requestFlights.delete(request);}
+  };
+  page.on('requestfinished',r=>finishRequest(r,'finished'));
+  page.on('requestfailed',r=>finishRequest(r,'failed'));
   page.on('pageerror',e=>report.errors.push(e.message));
   page.on('console',m=>{if(['warning','error'].includes(m.type()))report.diagnostics.push({
     type:m.type(),text:m.text().slice(0,700)});});
   page.on('requestfailed',r=>report.diagnostics.push({type:'requestfailed',
     path:new URL(r.url()).pathname,error:r.failure()?.errorText}));
   page.on('response',r=>{
+    const record=requestRecords.get(r.request());if(record)record.status=r.status();
     const pathname=new URL(r.url()).pathname;
     if(pathname.startsWith('/api/charts/')&&!pathname.includes('stream/events'))report.diagnostics.push({
       type:'http',path:pathname,status:r.status()});
@@ -111,9 +129,9 @@ function startFixtureObserver(){
   });
   // Associate this stage's rejected request with the same native study's actual
   // accepted credential and input revision. An unrelated 200 cannot satisfy it.
-  async function recoveryEvidence(name,started,mark,res,studyId){
-    await Promise.all(pending);
-    const trace=await frame.evaluate(()=>issue89Trace);
+  async function recoveryEvidence(name,started,mark,res,studyId,deadline){
+    await withinDeadline(deadline,()=>Promise.all(pending));
+    const trace=await withinDeadline(deadline,()=>frame.evaluate(()=>issue89Trace));
     const rejected=report.http.filter(x=>x.started>=started&&x.frame===(res==='60'?'H1':'H4')&&
       x.status===422&&x.code==='DISPLAY_SNAPSHOT_EXPIRED'&&
       x.consumer?.some(c=>c.id.endsWith('|'+studyId)));
@@ -166,10 +184,10 @@ function startFixtureObserver(){
       fingerprint:createHash('sha256').update(JSON.stringify(snapshot)).digest('hex')};
   }
   async function verifyNative(deadline,marks={}){
-    await Promise.all(pending);
+    await withinDeadline(deadline,()=>Promise.all(pending),{reason:'pending HTTP bodies'});
     const checks=[];
-    const charts=await frame.evaluate(()=>Array.from({length:widget.chartsCount()},(_,index)=>
-      ({index,ids:widget.chart(index).getAllStudies().map(s=>s.id)})));
+    const charts=await withinDeadline(deadline,()=>frame.evaluate(()=>Array.from({length:widget.chartsCount()},(_,index)=>
+      ({index,ids:widget.chart(index).getAllStudies().map(s=>s.id)}))));
     for(const c of charts)for(const id of c.ids){
       const sampled=await sampleNative({deadline,
         read:()=>readStudy(c.index,id,marks[c.index]??0),
@@ -253,6 +271,7 @@ function startFixtureObserver(){
         })};
     })}));}
   async function checkpoint(name,{deadline=Date.now()+45000,marks={}}={}){
+    return withinDeadline(deadline,async()=>{
     activeStage=name;
     report.currentCheckpoint={name,deadline,started:Date.now()};save();
     await verifyNative(deadline,marks);
@@ -271,6 +290,7 @@ function startFixtureObserver(){
     // The full fingerprint is used in-process only; evidence keeps bounded summaries.
     report.stages.push({name,at:Date.now(),...s,nativeChecks,charts:s.charts.map(({mainFingerprint,...c})=>c)});
     await page.screenshot({path:path.join(OUT,name+'.png')});save();return {...s,nativeChecks};
+    });
   }
   async function withFrames(name,run){
     activeStage=name;
@@ -305,7 +325,7 @@ function startFixtureObserver(){
       visibleRows:visible.length,mainRowsBefore:a.mainRows,mainRowsAfter:b.mainRows});
   }
   async function boundReference(snapshot,index,deadline){
-    await Promise.all(pending);
+    await withinDeadline(deadline,()=>Promise.all(pending));
     const id=snapshot.charts[index].studies[0].id,scope=snapshot.charts[index].studies[0].scope;
     const accepted=snapshot.accepted.findLast(x=>x.accepted&&x.studyId===id&&x.generation===scope.generation);
     assert.ok(accepted);
@@ -447,7 +467,7 @@ function startFixtureObserver(){
         await frame.evaluate(()=>indicatorCoordinator.retry(0));
         return checkpoint('credential-renewal',{deadline,marks:{0:mark}});
       });
-      await recoveryEvidence('credential-renewal',began,mark,'60',studyId);
+      await recoveryEvidence('credential-renewal',began,mark,'60',studyId,deadline);
       assert.equal(renewed.reloads.length,before.reloads.length);
       assert.equal(renewed.charts[0].mainFingerprint,before.charts[0].mainFingerprint);
       assert.equal(renewed.charts[0].studies[0].scope.generation,before.charts[0].studies[0].scope.generation);
@@ -475,7 +495,7 @@ function startFixtureObserver(){
         await frame.evaluate(index=>indicatorCoordinator.retry(index),index);
         return checkpoint(name,{deadline,marks:{[index]:mark}});
       });
-      await recoveryEvidence(name,began,mark,index?'240':'60',studyId);
+      await recoveryEvidence(name,began,mark,index?'240':'60',studyId,deadline);
       assert.notEqual(corrected.charts[index].mainFingerprint,before.charts[index].mainFingerprint);
       assert.equal(corrected.charts[index].studies[0].id,studyId);
       visibleRetained(before,corrected,index);otherStable(before,corrected,index);
@@ -542,10 +562,19 @@ function startFixtureObserver(){
         assert.ok(fault.requests.some(x=>x.kind==='price-comparison'));
         assert.ok(fault.requests.some(x=>x.kind==='native-history'));
         assert.equal(fault.inflight,0);
+        const related=r=>r.frame==='H1'&&(r.kind!=='indicator'||r.consumer?.some(c=>c.id.endsWith('|'+studyId)));
+        await withinDeadline(Date.now()+5000,async()=>{
+          while([...requestFlights.values()].some(related))await page.waitForTimeout(50);
+        },{reason:'in-flight recovery requests must finish before quiet observation'});
+        const httpBefore=report.requests.filter(related).length;
+        const indicatorsBefore=report.requests.filter(r=>related(r)&&r.kind==='indicator').length;
         const count=fault.requests.length,quietStarted=Date.now();
         await page.screenshot({path:path.join(OUT,'budget-exhaustion-error.png')});
         await page.waitForTimeout(11000);
         assert.equal(fault.requests.length,count,'automatic failed recovery must stop after work ends');
+        assert.equal(report.requests.filter(related).length,httpBefore,'all related HTTP requests must stop');
+        assert.equal(report.requests.filter(r=>related(r)&&r.kind==='indicator').length,indicatorsBefore,'old-credential indicator polling must stop');
+        assert.equal([...requestFlights.values()].filter(related).length,0,'no related request left in flight');
         assert.equal((await state()).reloads.length,failureState.reloads.length,'no further automatic logical reload');
         otherStable(before,await state(),0);
         report.stages.push({name:'budget-exhaustion',logicalReloads:3,
@@ -553,6 +582,9 @@ function startFixtureObserver(){
           historyHttp:fault.requests.filter(r=>r.kind==='native-history').length,
           indicatorHttp:report.http.filter(h=>h.started>=fault.started&&h.frame==='H1'&&h.indicators.length).length,
           quietStarted,quietMilliseconds:Date.now()-quietStarted,automaticRequestsBefore:count,automaticRequestsAfter:fault.requests.length,
+          relatedHttpBefore:httpBefore,relatedHttpAfter:report.requests.filter(related).length,
+          indicatorHttpBefore:indicatorsBefore,indicatorHttpAfter:report.requests.filter(r=>related(r)&&r.kind==='indicator').length,
+          relatedInFlightAfter:0,
           actualUiRetryVisible:true});
       }finally{await page.unroute(pattern,inject);fault.removed=Date.now();}
       const retryStarted=Date.now(),deadline=retryStarted+45000;
@@ -560,7 +592,7 @@ function startFixtureObserver(){
         await page.getByRole('complementary',{name:'图格指标状态'}).getByRole('button',{name:'重试指标'}).first().click();
         return checkpoint('manual-ui-retry',{deadline,marks:{0:mark}});
       });
-      await recoveryEvidence('manual-ui-retry',fault.started,mark,'60',studyId);
+      await recoveryEvidence('manual-ui-retry',fault.started,mark,'60',studyId,deadline);
       otherStable(before,recovered,0);
       assert.equal(await page.getByRole('complementary',{name:'图格指标状态'}).getByRole('button',{name:'重试指标'}).count(),0);
       report.stages.push({name:'manual-ui-retry-elapsed',elapsed:Date.now()-retryStarted,
@@ -588,8 +620,19 @@ function startFixtureObserver(){
         [...displayRecoveries.values()].map(x=>({state:x.state}))})).catch(()=>null);
     await page.screenshot({path:path.join(OUT,'failure.png')}).catch(()=>{});throw e;
   }finally{
-    await browser.close();
-    if(observer)await observer.stop();
-    await Promise.allSettled(pending);save();
+    report.cleanupPending=true;save();
+    try{
+      const cleanup=await Promise.allSettled([
+        withinDeadline(Date.now()+10000,()=>browser.close(),{reason:'browser cleanup'}),
+        observer?observer.stop():Promise.resolve(),
+        withinDeadline(Date.now()+10000,()=>Promise.allSettled(pending),{reason:'response cleanup'}),
+      ]);
+      report.cleanup=cleanup.map(result=>result.status==='fulfilled'?{status:result.status}:
+        {status:result.status,error:String(result.reason)});
+      if(cleanup.some(result=>result.status==='rejected')){
+        report.passed=false;report.failure=report.failure||'acceptance cleanup failed';
+        throw Error(report.failure);
+      }
+    }finally{delete report.cleanupPending;report.completedAt=Date.now();save();}
   }
 })().catch(e=>{console.error(e.message);process.exitCode=1;});

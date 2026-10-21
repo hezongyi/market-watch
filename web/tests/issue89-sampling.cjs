@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict');
-const {sampleNative}=require('./fixtures/issue89-sampling.cjs');
+const {sampleNative,withinDeadline}=require('./fixtures/issue89-sampling.cjs');
 
 async function scenario(change){
   let clock=0,version=1,reads=0,references=0,comparisons=0;
@@ -39,5 +39,11 @@ async function scenario(change){
     read:async()=>({eligible:true,fingerprint:'fixed',summary:{}}),
     reference:()=>new Promise(()=>{}),compare:()=>assert.fail(),
   }),/deadline exhausted/);
+  await assert.rejects(withinDeadline(Date.now()+20,
+    ()=>Promise.all([new Promise(()=>{})]),{reason:'response body never completed'}),
+  /deadline exhausted: response body never completed/);
+  let started=false;
+  await assert.rejects(withinDeadline(100,()=>{started=true;},{now:()=>100}),/deadline exhausted/);
+  assert.equal(started,false,'expired setup budget cannot begin another operation');
   console.log('PASS native sampling: generation/price races, fixed deadline, stalled read and stable correctness failures');
 })().catch(e=>{console.error(e);process.exitCode=1;});
