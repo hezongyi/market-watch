@@ -11,7 +11,7 @@ import { useLocation, useNavigate, useParams, NavLink } from "react-router-dom";
 import { useApp } from "../app/context";
 import { defaultChart, pageName } from "../app/navigation";
 import { centerLocation } from "../market-data/location";
-import { api as requestAPI, apiErrorDetails } from "../api";
+import { api as requestAPI, apiErrorDetails, errorMessage } from "../api";
 import "./advanced.css";
 import { HistoryPlansDialog, type DatasetViews } from "./HistoryPlansDialog";
 import { MaintenanceDialog } from "./MaintenanceDialog";
@@ -128,6 +128,14 @@ export default function AdvancedWorkspace() {
     {},
   );
   const [indicatorStates,setIndicatorStates]=useState<Record<string,{index:number;name:string;state:string;error:string;epoch:number;previousParams:string}>>({});
+  const [resolveStates,setResolveStates]=useState<{index:number;symbol:string;resolution:string;generation:number;state:string;message:string;retryAt:number;retryable:boolean;epoch:number}[]>([]);
+  const [resolveNow, setResolveNow] = useState(Date.now());
+  useEffect(() => {
+    setResolveNow(Date.now());
+    if (!resolveStates.some(item => item.retryAt > Date.now())) return;
+    const timer = window.setInterval(() => setResolveNow(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, [resolveStates]);
   const [chartFailures,setChartFailures]=useState<{index:number;symbol:string;resolution:string;label:string;error:string;epoch:number}[]>([]);
   const [capacityDialog, setCapacityDialog] = useState<{
     capabilities: HistoryCapabilities;
@@ -584,7 +592,7 @@ export default function AdvancedWorkspace() {
           reply({
             type: "result",
             id: m.id,
-            error: String(e),
+            error: errorMessage(e),
             errorDetails: { ...apiErrorDetails(e), status: (e as any)?.status },
           });
         }
@@ -653,7 +661,7 @@ export default function AdvancedWorkspace() {
           reply({
             type: "result",
             id: m.id,
-            error: String(e),
+            error: errorMessage(e),
             errorDetails: apiErrorDetails(e),
           });
         }
@@ -743,7 +751,7 @@ export default function AdvancedWorkspace() {
         return;
       }
       if (m.type === "native-load-reset" && Number.isSafeInteger(m.epoch)) {
-        setChartFailures([]);setIndicatorStates({});
+        setChartFailures([]);setIndicatorStates({});setResolveStates([]);
         nativeLoadEpoch.current = m.epoch;
         setNativeLoads({});
         setCapacityNotices({});
@@ -761,6 +769,12 @@ export default function AdvancedWorkspace() {
               ? Object.entries(m.previousParams).filter(([key,value])=>key.length<80 && ['string','number','boolean'].includes(typeof value))
                 .map(([key,value])=>key+'='+String(value).slice(0,100)).join(', ') : ''};
           return next;});return;
+      }
+      if(m.type==='chart-resolve-states' && m.epoch===nativeLoadEpoch.current && Array.isArray(m.states)) {
+        setResolveStates(m.states.filter((item:any)=>Number.isSafeInteger(item.index) && item.index>=0 && item.index<8 &&
+          typeof item.symbol==='string' && typeof item.resolution==='string' && Number.isSafeInteger(item.generation) &&
+          ['loading','error'].includes(item.state) && typeof item.message==='string' && Number.isFinite(item.retryAt))
+          .map((item:any)=>({...item,epoch:m.epoch})));return;
       }
       if (m.type === 'chart-history-failures' && m.epoch===nativeLoadEpoch.current && Array.isArray(m.failures)) {
         setChartFailures(m.failures.filter((item:any)=>Number.isSafeInteger(item.index) &&
@@ -1224,7 +1238,7 @@ export default function AdvancedWorkspace() {
           reply({
             type: "result",
             id: m.id,
-            error: String(e),
+            error: errorMessage(e),
             errorDetails: apiErrorDetails(e),
           });
         }
@@ -1310,7 +1324,7 @@ export default function AdvancedWorkspace() {
           reply({
             type: "result",
             id: m.id,
-            error: String(e),
+            error: errorMessage(e),
             errorDetails: apiErrorDetails(e),
           });
         }
@@ -1423,7 +1437,7 @@ export default function AdvancedWorkspace() {
           reply({
             type: "result",
             id: m.id,
-            error: String(e),
+            error: errorMessage(e),
             errorDetails: apiErrorDetails(e),
           });
         } finally {
@@ -1635,7 +1649,7 @@ export default function AdvancedWorkspace() {
           reply({
             type: "result",
             id: m.id,
-            error: String(e),
+            error: errorMessage(e),
             errorDetails: apiErrorDetails(e),
           });
         } finally {
@@ -1757,6 +1771,7 @@ export default function AdvancedWorkspace() {
   return (
     <main className="advanced-workspace" data-theme={chartTheme}>
       {mobile && <p className="advanced-readonly-note" role="note">手机只读看盘。编辑图表、绘图和告警请使用桌面浏览器；桌面工作区布局仍保留。</p>}
+      {resolveStates.length>0 && <aside className="advanced-history-failures" aria-label="图格行情解析状态">{resolveStates.map(item=><p key={item.index} role="status">图格 {item.index+1}：{item.message}{item.state==='error' && <button disabled={item.retryAt>resolveNow} onClick={()=>post({type:'retry-chart-resolve',...item})}>{item.retryAt>resolveNow ? `冷却 ${Math.ceil((item.retryAt-resolveNow)/1000)} 秒后重试` : '重试行情解析'}</button>}</p>)}</aside>}
       {historyDetailsOpen && (
         <div className="advanced-load-details" role="dialog" aria-modal="false" aria-label="历史加载详情">
           <header>

@@ -1,9 +1,10 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict'),ts=require('typescript');
-const code=ts.transpileModule(fs.readFileSync('src/api.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+const code=require('esbuild').buildSync({entryPoints:['src/api.ts'],bundle:true,write:false,platform:'browser',format:'cjs',target:'es2022'}).outputFiles[0].text;
 let calls=0,mode='network';const scheduled=[];
- const context={exports:{},Response,ReadableStream,DOMException,AbortController,performance,Date,Map,Set,Promise,TypeError,
+ const apiModule={exports:{}}; const context={module:apiModule,exports:apiModule.exports,Response,ReadableStream,DOMException,AbortController,performance,Date,Map,Set,Promise,TypeError,
  setTimeout:(fn,ms)=>{scheduled.push(ms);return setTimeout(fn,ms>=30000?(mode==='timeout'?1:1000000):0);},clearTimeout,Math,fetch:async(url,init)=>{
   calls++;
+  if(mode==='supplier' && calls<2 || mode==='sustained' || mode==='source-auth')return new Response(JSON.stringify({detail:{code:mode==='source-auth'?'authentication':'request_failed',message:'行情来源暂不可用',retryable:mode!=='source-auth'}}),{status:503});
   if(mode==='timeout')return new Promise((resolve,reject)=>init.signal.addEventListener('abort',()=>reject(init.signal.reason),{once:true}));
   if(mode==='network' && calls<3)throw new TypeError('Load failed');
   if(mode==='body' && calls<3)return new Response(new ReadableStream({start(controller){controller.error(new TypeError('Load failed'));}}));
@@ -13,10 +14,22 @@ let calls=0,mode='network';const scheduled=[];
   if(mode==='busy')return new Response('{"detail":"busy"}',{status:503,headers:{'Retry-After':'30'}});
   return new Response('{"bars":[1]}',{headers:{'content-type':'application/json'}});
  }};
-vm.runInNewContext(code,context);const {api,apiErrorDetails,apiRequestDiagnostics}=context.exports;
+vm.runInNewContext(code,context);const {api,apiErrorDetails,apiRequestDiagnostics}=apiModule.exports;
+const errorModule={exports:{}};
+vm.runInNewContext(require('esbuild').buildSync({entryPoints:['src/apiErrors.ts'],bundle:true,write:false,platform:'node',format:'cjs'}).outputFiles[0].text,{module:errorModule,exports:errorModule.exports,Error});
+const {responseError,rpcError}=errorModule.exports;
 (async()=>{
+ assert.equal(responseError({unexpected:{input:'secret'}},422).message,'输入不合法，请检查条件和到期时间');
+ assert.equal(responseError({message:'Traceback: secret'},500).message,'服务暂不可用，请稍后重试');
+ assert.equal(responseError('{"input":"secret"}',422).message,'输入不合法，请检查条件和到期时间');
+ assert.equal(rpcError('告警版本冲突，请重新读取').message,'告警版本冲突，请重新读取','old plain RPC remains usable');
+ const structured=rpcError({message:'行情来源限流，请稍后重试',code:'rate_limited',status:503,retryable:true,retryAfter:61,display_retry:{key:'value'},notice_source_id:'notice'});
+ assert.equal(structured.code,'rate_limited');assert.equal(structured.retryAfter,61);assert.equal(structured.notice_source_id,'notice');assert.equal(structured.display_retry.key,'value');
  const replies=await Promise.all([api('/charts/data',{instrument:'private'}),api('/charts/data',{instrument:'private'})]);
  assert.equal(calls,3,'shared read has one bounded retry sequence');assert.deepEqual(JSON.parse(JSON.stringify(replies)),[{bars:[1]},{bars:[1]}]);
+ mode='supplier';calls=0;await api('/market-data/resolve',{});assert.equal(calls,2,'temporary resolve failure recovers within a bounded read');
+ mode='sustained';calls=0;await assert.rejects(api('/market-data/resolve',{}),e=>e.code==='request_failed' && e.retryable);assert.equal(calls,3);
+ mode='source-auth';calls=0;await assert.rejects(api('/market-data/resolve',{}),e=>e.code==='authentication' && !e.retryable);assert.equal(calls,1);
  mode='invalid';calls=0;await assert.rejects(api('/charts/data',{}),e=>e.code==='INVALID_RESPONSE');assert.equal(calls,1);assert.equal(apiRequestDiagnostics().at(-1).outcome,'payload');
  mode='body';calls=0;await api('/charts/data',{});assert.equal(calls,3,'body transport failures share the bounded retry path');
  mode='auth';calls=0;await assert.rejects(api('/session'),e=>e.status===401);assert.equal(calls,1,'authentication is not retried');

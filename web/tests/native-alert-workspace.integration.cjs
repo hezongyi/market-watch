@@ -1,6 +1,6 @@
 // Full AdvancedWorkspace + shipped host, actual licensed widget, synthetic API.
 // In-process browser routes only: no deployed application or production access.
-const { chromium } = require("@playwright/test");
+const { chromium, expect } = require("@playwright/test");
 const { build } = require("esbuild");
 const { execFileSync } = require("node:child_process");
 const fs = require("node:fs"),
@@ -32,9 +32,9 @@ const workspaces = [a],
   unexpected = [];
 let delayedRead,
   releaseRead,
-  conflict = false;
+  conflict = false, resolveFailure = false, resolveCalls = 0;
 function history(q) {
-  const step = 3600000,
+  const step = q.timeframe === "D1" ? 86400000 : q.timeframe === "H4" ? 14400000 : 3600000,
     end = Math.floor((q.before || Date.now()) / step) * step;
   const count = Math.min(q.countBack || q.limit || 400, 2000);
   const bars = Array.from({ length: count }, (_, i) => {
@@ -80,7 +80,7 @@ function history(q) {
   ]);
   const bundle = await build({
     stdin: {
-      contents: `import React from 'react';import {createRoot} from 'react-dom/client';import AdvancedWorkspace from './src/advanced/AdvancedWorkspace';import {setCsrf} from './src/api';setCsrf('parent-only-fixture');createRoot(document.getElementById('root')).render(<AdvancedWorkspace/>);`,
+      contents: `import React from 'react';import {createRoot} from 'react-dom/client';import {MemoryRouter} from 'react-router-dom';import {NoticeProvider} from './src/notifications/context';import AdvancedWorkspace from './src/advanced/AdvancedWorkspace';import {setCsrf} from './src/api';setCsrf('parent-only-fixture');createRoot(document.getElementById('root')).render(<MemoryRouter><NoticeProvider active={false} subject="fixture"><AdvancedWorkspace/></NoticeProvider></MemoryRouter>);`,
       loader: "tsx",
       resolveDir: path.join(root, "web"),
     },
@@ -208,20 +208,25 @@ function history(q) {
         hard_max_bars: 20000,
         default_bars: 4000,
       });
-    if (url.pathname === "/api/market-data/resolve")
+    if (url.pathname === "/api/market-data/resolve") {
+      if (body.instrument.startsWith('YAHOO:')) {
+        resolveCalls++;
+        if(resolveFailure) return reply({detail:{code:'request_failed',message:'行情来源暂不可用，请重试',retryable:true}},503);
+      }
       return reply({
         instrument: body.instrument,
         symbol: body.instrument,
         name: body.instrument,
-        source: "fixture",
+        source: body.instrument.startsWith('YAHOO:') ? "yahoo" : "fixture",
         basis: "last",
         calendar: "utc0",
         precision: 5,
         session: "24x7",
         timezone: "Etc/UTC",
-        frames: ["H1"],
+        frames: body.instrument.startsWith('YAHOO:') ? ["M1","H1","D1"] : ["H1","H4","D1"],
         volume_kind: "unavailable",
       });
+    }
     if (url.pathname === "/api/market-data/quotes")
       return reply(
         body.symbols.map((n) => ({
@@ -288,7 +293,7 @@ function history(q) {
     }
     if (url.pathname.endsWith("/edit")) {
       if (conflict) {
-        conflict = false;
+        conflict = false, resolveFailure = false, resolveCalls = 0;
         return reply({ detail: "告警版本冲突，请核对后重试" }, 409);
       }
       const row = rows.find((row) => row.id === url.pathname.split("/")[3]);
@@ -467,6 +472,37 @@ function history(q) {
     report.cases.push(
       "Version conflict preserves edited input and exposes native-window feedback",
     );
+    resolveFailure = true;
+    const yahoo='MWP:YAHOO:'+'a'.repeat(32);
+    await host.evaluate(symbol=>{widget.activeChart().setSymbol(symbol,{doNotActivateChart:true});},yahoo);
+    const recovery=page.getByRole('button',{name:'重试行情解析',exact:true});
+    await recovery.waitFor({timeout:30000});
+    assert.equal(resolveCalls,3,'actual native resolve consumes only the bounded read budget');
+    const target=await host.evaluate(()=>[...chartResolves.values()].find(item=>item.state==='error')?.symbol);
+    assert.equal(target,yahoo,'resolve belongs to the requesting native chart');
+    await host.evaluate(()=>alertUI.open());
+    await chart.getByRole('button',{name:'创建告警',exact:true}).first().waitFor();
+    assert.equal(await chart.getByRole('button',{name:'创建告警',exact:true}).first().isDisabled(),true);
+    resolveFailure=false;
+    await host.evaluate(()=>{globalThis.retryMessages=[];addEventListener('message',e=>{if(e.data?.type==='retry-chart-resolve')retryMessages.push(e.data);});});
+    await recovery.click();
+    await host.waitForFunction(()=>widget.activeChart().symbol().startsWith('MWP:YAHOO:') && widget.activeChart().dataReady(),null,{timeout:30000});
+    await recovery.waitFor({state:'detached'});
+    assert.equal(resolveCalls,4,'same failed symbol is re-resolved by restarting only the failed native series');
+    await expect.poll(()=>requests.some(r=>r.path==='/api/charts/stream/subscribe' && r.body.query?.instrument===yahoo.slice(4) && r.body.query.timeframe==='H1' && r.body.history_accepted),{timeout:30000,message:'native datafeed accepts recovered history'}).toBe(true);
+    await host.evaluate(()=>widget.activeChart().setResolution('1D',{doNotActivateChart:true}));
+    await host.waitForFunction(()=>widget.activeChart().resolution()==='1D' && widget.activeChart().dataReady());
+    await expect.poll(()=>requests.some(r=>r.path==='/api/charts/stream/subscribe' && r.body.query?.instrument===yahoo.slice(4) && r.body.query.timeframe==='D1' && r.body.history_accepted),{timeout:30000,message:'native datafeed accepts D1 history'}).toBe(true);
+    await expect(chart.getByRole('button',{name:'创建告警',exact:true}).first()).toBeEnabled();
+    report.cases.push('Native Yahoo failure → 3 bounded attempts → chart-scoped feedback/disabled alert → explicit same-symbol recovery → real datafeed bars and D1');
+    await host.evaluate(()=>{widget.activeChart().setSymbol('MWP:EURUSD',{doNotActivateChart:true});});
+    await host.waitForFunction(()=>widget.activeChart().symbol()==='MWP:EURUSD' && widget.activeChart().dataReady());
+    await host.evaluate(()=>widget.activeChart().setResolution('240',{doNotActivateChart:true}));
+    await host.waitForFunction(()=>widget.activeChart().resolution()==='240' && widget.activeChart().dataReady());
+    await host.evaluate(()=>{widget.activeChart().setSymbol('MWP:YAHOO:'+'b'.repeat(32),{doNotActivateChart:true});});
+    await host.waitForFunction(()=>widget.activeChart().symbol().includes('YAHOO:') && widget.activeChart().resolution()==='60' && widget.activeChart().dataReady(),null,{timeout:30000});
+    await expect.poll(()=>requests.some(r=>r.path==='/api/charts/stream/subscribe' && r.body.query?.instrument==='YAHOO:'+'b'.repeat(32) && r.body.query.timeframe==='H1' && r.body.history_accepted),{timeout:30000,message:'native Yahoo H4 fallback accepts H1 history'}).toBe(true);
+    report.cases.push('Native H4 source switch migrates unsupported Yahoo interval to H1 and displays bars');
     await page.screenshot({ path: path.join(output, "workspace.png") });
     assert.deepEqual(errors, []);
     assert.deepEqual(unexpected, []);
@@ -478,6 +514,8 @@ function history(q) {
     report.passed = true;
   } catch (error) {
     report.failure = String(error);
+    const debugHost=page.frames().find(f=>f.url().startsWith(CHART));
+    if(debugHost) report.resolveDebug=await debugHost.evaluate(()=>({epoch:workspaceEpoch,ready,loading,retries:globalThis.retryMessages,charts:Array.from({length:widget.chartsCount()},(_,i)=>({symbol:widget.chart(i).symbol(),res:widget.chart(i).resolution(),source:widget.chart(i)._chartWidget.model().model().mainSeries().seriesSource().instanceId()})),targets:[...chartResolves.values()].map(t=>({symbol:t.symbol,res:t.resolution,generation:t.generation,state:t.state,message:t.message,current:resolveCurrent(t)}))})).catch(String);
     await page.screenshot({ path: path.join(output, "failure.png") });
     process.exitCode = 1;
   } finally {

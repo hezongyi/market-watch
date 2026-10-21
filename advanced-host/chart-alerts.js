@@ -6,6 +6,7 @@ function chartAlertBridge({
   isLoading,
   readonly,
   metadata,
+  unavailable = () => null,
   frames,
   calculationOrigin = () => null,
   compositeRevision = () => null,
@@ -67,6 +68,9 @@ function chartAlertBridge({
     return null;
   }
   function snapshot(chart) {
+    if (isLoading()) throw Error("图表正在加载，请等待完成后创建告警");
+    const reason = unavailable(chart);
+    if (reason) throw Error(reason);
     const identity = MWSeries.decode(chart.symbol()),
       meta = metadata(chart.symbol());
     if (!meta?.source || !frames[chart.resolution()])
@@ -193,7 +197,8 @@ function chartAlertBridge({
     object,
     context: initialContext,
   } = {}) {
-    if (readonly || disposed || isLoading()) return;
+    if (disposed) return;
+    if (readonly) {fail(Error("只读图表不能创建告警"));return;}
     try {
       const context = initialContext
         ? structuredClone(initialContext)
@@ -225,7 +230,7 @@ function chartAlertBridge({
     }
   }
   async function menu(items, actionsFactory, params) {
-    if (readonly || isLoading()) return items;
+    if (readonly || disposed) return items;
     const chart =
       params.detail?.type === "priceScale"
         ? chartList()[params.detail.chartIndex]
@@ -241,8 +246,9 @@ function chartAlertBridge({
     let context;
     try {
       context = snapshot(chart);
-    } catch {
-      return items;
+    } catch (error) {
+      return [actionsFactory.createAction({actionId:"mw-chart-alert-unavailable",label:`创建告警不可用：${error.message}`,
+        disabled:true,onExecute:()=>fail(error)}),...items];
     }
     // Capture the initiating chart now; executing a menu item never re-reads
     // whichever pane became active during an asynchronous native operation.
@@ -738,7 +744,16 @@ function chartAlertBridge({
     }
     bindings.clear();
   }
+  function creationReason(chart = getWidget()?.activeChart()) {
+    if (disposed) return "图表已关闭";
+    if (isLoading()) return "图表正在加载，请等待完成后创建告警";
+    if (!chart) return "图表尚未就绪";
+    if (unavailable(chart)) return unavailable(chart);
+    if (!metadata(chart.symbol())?.source) return "请等待图表行情身份解析后创建告警";
+    return "";
+  }
   return {
+    creationReason,
     create,
     menu,
     persist,

@@ -12,7 +12,7 @@ import {
   AlertTextarea,
   NativeControlsDisabled,
 } from "./NativeAlertControls";
-import { api } from "../api";
+import { api, ApiError, errorMessage } from "../api";
 import { createPortal } from "react-dom";
 import type { AlertApi } from "./chartAlertUiApi";
 import type {
@@ -20,6 +20,7 @@ import type {
   NativeAlertDialogHandle,
 } from "./nativeAlertUI";
 import {
+  normalizeCondition,
   indicatorDefaults,
   relations,
   type AlertConfig,
@@ -34,7 +35,9 @@ function IndicatorFields({
   value,
   onChange,
   metadata,
+  side,
 }: {
+  side: "left" | "right";
   value: IndicatorSpec;
   onChange: (v: IndicatorSpec) => void;
   metadata?: Capabilities["indicator_metadata"];
@@ -66,6 +69,7 @@ function IndicatorFields({
         <label key={key}>
           {metadata?.[value.name]?.parameter_schema[key]?.label || key}
           <AlertInput
+            data-alert-field={`condition.${side}.indicator.params.${key}`}
             type="number"
             min={metadata?.[value.name]?.parameter_schema[key]?.min ?? 2}
             max={metadata?.[value.name]?.parameter_schema[key]?.max ?? 500}
@@ -122,6 +126,7 @@ export function ChartAlertDialog({
   nativeDialog,
   onOpenError,
   onDelete,
+  onReload,
 }: {
   initial: AlertConfig;
   displayLabel?: string;
@@ -135,6 +140,7 @@ export function ChartAlertDialog({
   nativeDialog?: NativeAlertDialog;
   onOpenError?: (message: string) => void;
   onDelete?: () => Promise<void>;
+  onReload?: (row: AlertRow) => void;
 }) {
   const { zone } = useChartTime();
   const date = (stamp: number) => formatTimestamp(stamp, zone);
@@ -142,12 +148,15 @@ export function ChartAlertDialog({
   const [expiryInputRevision, setExpiryInputRevision] = useState(0);
   const dialog = useRef<HTMLDialogElement>(null),
     errorBox = useRef<HTMLParagraphElement>(null);
-  const [draft, setDraft] = useState(initial),
+  const [draft, setDraft] = useState(() => ({...initial, condition: normalizeCondition(initial.condition)})),
     [capabilities, setCapabilities] = useState<Capabilities | null>(null);
   const [page, setPage] = useState<"condition" | "message" | "notifications">(
       "condition",
     ),
     [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<{field:string;message:string}[]>([]);
+  const [editVersion, setEditVersion] = useState(editing?.version);
+  const [conflict, setConflict] = useState(false);
   const [busy, setBusy] = useState(false),
     [message, setMessage] = useState(initial.message),
     [name, setName] = useState(initial.name);
@@ -178,8 +187,8 @@ export function ChartAlertDialog({
         })
         .catch((error) => {
           if (mounted.current) {
-            setError(String(error));
-            onOpenError?.(String(error));
+            setError(errorMessage(error));
+            onOpenError?.(errorMessage(error));
           }
         });
     } else dialog.current?.showModal();
@@ -216,7 +225,7 @@ export function ChartAlertDialog({
         }
       })
       .catch((e) => {
-        if (current) setError(String(e));
+        if (current) setError(errorMessage(e));
       });
     return () => {
       current = false;
@@ -235,7 +244,7 @@ export function ChartAlertDialog({
     && ["constant", "line", "indicator"].includes(draft.condition.right?.kind || "");
   const atrFrames = source?.atr_frames || [];
   function change(value: Partial<AlertConfig>) {
-    setDraft((p) => ({ ...p, ...value }));
+    setDraft((p) => ({ ...p, ...value, condition: normalizeCondition(value.condition ?? p.condition) }));
   }
   function expirationPreset(expires_at: number | null) {
     change({ expires_at });
@@ -266,8 +275,10 @@ export function ChartAlertDialog({
     setBusy(true);
     submitting.current = true;
     setError("");
+    setFieldErrors([]);
+    setConflict(false);
     try {
-      let config = draft;
+      let config = {...draft, condition: normalizeCondition(draft.condition)};
       const line = draft.condition.right?.line;
       if (draft.condition.right?.kind === "line" && line) {
         // Bar indices belong to a market/period. Recompute them from timestamps
@@ -296,9 +307,9 @@ export function ChartAlertDialog({
         // A retry after an uncertain save must reuse the same configuration.
         mappedGeometry.current = { key, line: mapped };
         config = {
-          ...draft,
+          ...config,
           condition: {
-            ...draft.condition,
+            ...config.condition,
             right: { kind: "line", line: mapped },
           },
         };
@@ -307,14 +318,15 @@ export function ChartAlertDialog({
       const saved = await request<AlertRow>(
         editing ? `/chart-alerts/${editing.id}/edit` : "/chart-alerts",
         editing
-          ? { version: editing.version, config }
+          ? { version: editVersion, config }
           : { request_id: requestId, config },
       );
       if (mounted.current) onSaved(saved);
     } catch (e) {
       if (mounted.current) {
-        setError(String(e));
-        setTimeout(() => errorBox.current?.focus(), 0);
+        setError(errorMessage(e));
+        setFieldErrors(e instanceof ApiError ? e.fieldErrors : []);
+        setConflict(e instanceof ApiError && e.status === 409);
       }
     } finally {
       submitting.current = false;
@@ -336,6 +348,33 @@ export function ChartAlertDialog({
     native.recenter();
   }, [native, page, busy]);
   const formRef = useRef<HTMLFormElement>(null);
+  useEffect(() => {
+    if (!error) return;
+    const timer = setTimeout(() => {
+      const controls = [...(formRef.current?.querySelectorAll<HTMLElement>("[data-alert-field]") || [])];
+      const affected = controls.filter(control => fieldErrors.some(issue => {
+        const field = control.dataset.alertField!;
+        return field === issue.field || field.startsWith(issue.field + ".");
+      }));
+      const inputs = affected.map(control => control.matches("input,select,textarea,button") ? control : control.querySelector<HTMLElement>("input,select,textarea,button")).filter((control):control is HTMLElement=>!!control);
+      for (const control of inputs) {
+        control.setAttribute("aria-invalid", "true");
+        control.setAttribute("aria-describedby", [control.getAttribute("aria-describedby"), "alert-validation-error"].filter(Boolean).join(" "));
+        control.dataset.serverInvalid = "true";
+      }
+      const target = inputs[0];
+      target?.closest("details")?.setAttribute("open", "");
+      (target || errorBox.current)?.focus();
+    }, 0);
+    return () => { clearTimeout(timer);
+      for (const control of formRef.current?.querySelectorAll<HTMLElement>("[data-server-invalid]") || []) {
+        control.removeAttribute("aria-invalid");
+        const description = (control.getAttribute("aria-describedby") || "").split(" ").filter(id => id !== "alert-validation-error").join(" ");
+        if (description) control.setAttribute("aria-describedby", description); else control.removeAttribute("aria-describedby");
+        delete control.dataset.serverInvalid;
+      }
+    };
+  }, [error, fieldErrors, native, busy]);
   const pageTrigger = useRef<HTMLButtonElement | null>(null);
   const returning = useRef(false);
   function returnToCondition() {
@@ -552,6 +591,7 @@ export function ChartAlertDialog({
                 </label>
                 {draft.condition.left.indicator && (
                   <IndicatorFields
+                    side="left"
                     value={draft.condition.left.indicator}
                     metadata={capabilities?.indicator_metadata}
                     onChange={(indicator) =>
@@ -565,31 +605,7 @@ export function ChartAlertDialog({
                     aria-label="关系"
                     value={draft.condition.relation}
                     onChange={(event) => {
-                      const relation = event.target.value,
-                        range = [
-                          "enter",
-                          "exit",
-                          "break_upper",
-                          "break_lower",
-                        ].includes(relation);
-                      change({
-                        condition: range
-                          ? {
-                              relation,
-                              left: { kind: "price" },
-                              lower: draft.condition.lower || "",
-                              upper: draft.condition.upper || "",
-                            }
-                          : {
-                              ...draft.condition,
-                              relation,
-                              left: draft.condition.left,
-                              right: draft.condition.right || {
-                                kind: "constant",
-                                value: "",
-                              },
-                            },
-                      });
+                      change({ condition: normalizeCondition(draft.condition, event.target.value) });
                     }}
                   >
                     {Object.entries(relations).map(([value, label]) => (
@@ -606,7 +622,8 @@ export function ChartAlertDialog({
                       <AlertInput
                         required
                         inputMode="decimal"
-                        value={draft.condition.lower || ""}
+                        data-alert-field="condition.lower"
+                        value={draft.condition.lower ?? ""}
                         onChange={(event) =>
                           change({
                             condition: {
@@ -622,7 +639,8 @@ export function ChartAlertDialog({
                       <AlertInput
                         required
                         inputMode="decimal"
-                        value={draft.condition.upper || ""}
+                        data-alert-field="condition.upper"
+                        value={draft.condition.upper ?? ""}
                         onChange={(event) =>
                           change({
                             condition: {
@@ -642,10 +660,11 @@ export function ChartAlertDialog({
                       <label>
                         <span className="sr-only">比较值</span>
                         <AlertInput
+                          data-alert-field="condition.right.value"
                           aria-label="比较值"
                           required
                           inputMode="decimal"
-                          value={draft.condition.right.value || ""}
+                          value={draft.condition.right.value ?? ""}
                           onChange={(event) =>
                             operand("right", {
                               kind: "constant",
@@ -657,6 +676,7 @@ export function ChartAlertDialog({
                     )}
                     {draft.condition.right?.indicator && (
                       <IndicatorFields
+                        side="right"
                         value={draft.condition.right.indicator}
                         metadata={capabilities?.indicator_metadata}
                         onChange={(indicator) =>
@@ -904,7 +924,7 @@ export function ChartAlertDialog({
                     ? "等待来源确认完整 K 线。"
                     : "后台按收到的观察值判定，不代表完整市场逐笔。"}
                 </p>
-                <label>
+                <label data-alert-field="expires_at">
                   到期时间
                   <ZonedDateTimeInput
                     key={expiryInputRevision}
@@ -950,8 +970,22 @@ export function ChartAlertDialog({
               {source?.reason && <p role="status">{source.reason}</p>}
             </>
           )}
+          {conflict && editing && <AlertButton disabled={busy} onClick={async () => {
+            setBusy(true);
+            try {
+              const latest = await request<AlertRow>(`/chart-alerts/${editing.id}`);
+              if (!mounted.current) return;
+              if (latest.status === "archived") throw Error("告警已归档，请复制草稿创建新告警");
+              setEditVersion(latest.version);
+              onReload?.(latest);
+              setConflict(false);
+              setError(`已读取版本 ${latest.version}，草稿已保留；请核对后再次保存`);
+            } catch (e) { if (mounted.current) setError(errorMessage(e)); }
+            finally { if (mounted.current) setBusy(false); }
+          }}>保留草稿并重新读取</AlertButton>}
           {error && (
             <p
+              id="alert-validation-error"
               ref={errorBox}
               tabIndex={-1}
               className="alert-error"
@@ -978,7 +1012,7 @@ export function ChartAlertDialog({
                     try {
                       await onDelete();
                     } catch (error) {
-                      if (mounted.current) setError(String(error));
+                      if (mounted.current) setError(errorMessage(error));
                     } finally {
                       submitting.current = false;
                       if (mounted.current) setBusy(false);

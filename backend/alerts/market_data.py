@@ -561,9 +561,22 @@ def router(authenticated):
     @r.post("/resolve")
     def symbol(body: HistoryQuery):
         if body.series_kind == "provider":
-            from .provider_chart import metadata
+            import httpx
 
-            return metadata(body.instrument)
+            from .provider_chart import metadata
+            from .provider_errors import resolve_error
+            from .provider_yahoo import YahooError
+
+            try:
+                return metadata(body.instrument)
+            except (YahooError, TimeoutError, httpx.HTTPError) as error:
+                raise resolve_error(error) from None
+            except HTTPException as error:
+                if error.status_code == 404:
+                    raise HTTPException(404, {"code": "unknown_symbol", "status": "unknown_symbol",
+                                               "message": "品种不存在，请刷新品种目录",
+                                               "retryable": False}) from None
+                raise
         if body.series_kind in ("history", "composite"):
             from .series_access import metadata
             with transaction() as db:

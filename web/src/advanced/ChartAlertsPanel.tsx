@@ -8,12 +8,15 @@ import {
 } from "../time/chartTime";
 import { AlertEventTrace } from "../notifications/AlertEventTrace";
 import type { NoticeTransport } from "../notifications/types";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ApiError, api } from "../api";
+import { ApiError, api, errorMessage } from "../api";
+import { useAlertData } from "./useAlertData";
 import { ChartAlertDialog } from "./ChartAlertDialog";
 import {
   deliveryNames,
+  eventPresentation,
+  normalizeCondition,
   freshDraft,
   healthNames,
   offsetSnapshot,
@@ -47,7 +50,10 @@ export type AlertDraft = {
   editing: { id: string; version: number } | null;
   displayLabel?: string;
 };
-export function ChartAlertsPanel({
+export function ChartAlertsPanel(props: Parameters<typeof ScopedChartAlertsPanel>[0]) {
+  return <ScopedChartAlertsPanel key={`${props.workspaceId}:${props.open}`} {...props} />;
+}
+function ScopedChartAlertsPanel({
   workspaceId,
   context,
   open,
@@ -67,7 +73,9 @@ export function ChartAlertsPanel({
   persistDraft,
   focusEvent,
   noticeRequest,
+  creationUnavailable,
 }: {
+  creationUnavailable?: string;
   focusEvent?: { id: string; revision: number };
   noticeRequest?: NoticeTransport;
   workspaceId: string;
@@ -91,14 +99,12 @@ export function ChartAlertsPanel({
   const { zone } = useChartTime();
   const date = (stamp: number) => formatTimestamp(stamp, zone);
   const draftKey = "mw-chart-alert-draft:" + workspaceId;
-  const [rows, setRows] = useState<AlertRow[]>([]),
-    [events, setEvents] = useState<AlertEvent[]>([]);
+  const { rows, events, error, setError, refresh, commit } = useAlertData(request, onRows);
   const [tab, setTab] = useState("alerts"),
     [search, setSearch] = useState(""),
     [status, setStatus] = useState(""),
     [currentOnly, setCurrentOnly] = useState(false);
-  const [error, setError] = useState(""),
-    [feedback, setFeedback] = useState(""),
+  const [feedback, setFeedback] = useState(""),
     [busy, setBusy] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false),
     [draft, setDraft] = useState<AlertDraft | null>(() => {
@@ -110,8 +116,7 @@ export function ChartAlertsPanel({
         return null;
       }
     });
-  const mounted = useRef(true),
-    refreshing = useRef(false);
+  const mounted = useRef(true);
   const pendingActions = useRef(
     new Map<
       string,
@@ -134,27 +139,8 @@ export function ChartAlertsPanel({
     const timer = setTimeout(() => setFeedback(""), 5000);
     return () => clearTimeout(timer);
   }, [feedback]);
-  const refresh = useCallback(async () => {
-    if (refreshing.current) return;
-    refreshing.current = true;
-    try {
-      const [nextRows, nextEvents] = await Promise.all([
-        request<AlertRow[]>("/chart-alerts"),
-        request<AlertEvent[]>("/chart-alerts/events"),
-      ]);
-      if (mounted.current) {
-        setRows(nextRows);
-        setEvents(nextEvents);
-        onRows(nextRows);
-        setError("");
-      }
-    } catch (e) {
-      if (mounted.current) setError(String(e));
-    } finally {
-      refreshing.current = false;
-    }
-  }, [workspaceId]);
   useEffect(() => {
+    if (!open) return;
     void refresh();
     const timer = setInterval(refresh, 5000);
     return () => clearInterval(timer);
@@ -201,8 +187,9 @@ export function ChartAlertsPanel({
       );
       pendingActions.current.delete(key);
       if (mounted.current) {
+        commit(saved);
         setFeedback(`${saved.name}：${statuses[saved.status]}`);
-        await refresh();
+        void refresh();
       }
       return null;
     } catch (e) {
@@ -210,8 +197,8 @@ export function ChartAlertsPanel({
         pendingActions.current.delete(key);
         await refresh();
       }
-      if (mounted.current) setError(String(e));
-      return String(e);
+      if (mounted.current) setError(errorMessage(e));
+      return errorMessage(e);
     } finally {
       if (mounted.current) setBusy(null);
     }
@@ -222,7 +209,7 @@ export function ChartAlertsPanel({
       await request(`/notifications/${event.notification_id}/ack`, {});
       if (mounted.current) await refresh();
     } catch (e) {
-      if (mounted.current) setError(String(e));
+      if (mounted.current) setError(errorMessage(e));
     } finally {
       if (mounted.current) setBusy(null);
     }
@@ -235,7 +222,7 @@ export function ChartAlertsPanel({
             name: row.name + " 副本",
             association: null,
           }
-        : structuredClone(row.config),
+        : {...structuredClone(row.config), condition: normalizeCondition(row.config.condition)},
       requestId: crypto.randomUUID(),
       editing: copy ? null : { id: row.id, version: row.version },
       displayLabel: row.display_label || row.name,
@@ -277,8 +264,7 @@ export function ChartAlertsPanel({
   const filteredEvents = events.filter(
     (event) =>
       (!search ||
-        (event.message + event.evidence.config.instrument)
-          .toLowerCase()
+        eventPresentation(event).search
           .includes(search.toLowerCase())) &&
       (!currentOnly ||
         (event.evidence.config.instrument ===
@@ -343,14 +329,15 @@ export function ChartAlertsPanel({
       <div className="alert-panel-toolbar">
         {tab === "alerts" && (
           <button
-            disabled={readonly}
+            disabled={readonly || !!creationUnavailable}
             onClick={onRequest}
             aria-label="创建告警"
-            title="创建警报"
+            title={creationUnavailable || "创建警报"}
           >
             <Plus size={20} aria-hidden />
           </button>
         )}
+        {tab === "alerts" && creationUnavailable && <small role="status">{creationUnavailable}</small>}
         <span className="alert-toolbar-spacer" />
         <button
           aria-label="搜索告警"
@@ -695,7 +682,7 @@ export function ChartAlertsPanel({
                       }
                     >
                       <span className="alert-row-title">
-                        {event.evidence.config.name}
+                        {eventPresentation(event).name}
                       </span>
                       <span className="alert-row-subtitle">
                         <span
@@ -715,6 +702,7 @@ export function ChartAlertsPanel({
                     </button>
                     {selected === event.id && (
                       <div className="alert-row-detail">
+                        <p>{eventPresentation(event).summary}</p>
                         <p>事件时间 {date(event.occurred_at)}</p>
                         <p>检测时间 {date(event.detected_at)}</p>
                         <p>
@@ -834,7 +822,9 @@ export function ChartAlertsPanel({
             setDraft((previous) => (previous ? { ...previous, config } : null))
           }
           onClose={() => setFormOpen(false)}
+          onReload={(row) => {commit(row);setDraft(previous=>previous ? {...previous,editing:{id:row.id,version:row.version}} : null);}}
           onSaved={(row) => {
+            commit(row);
             setDraft(null);
             setFormOpen(false);
             setFeedback(

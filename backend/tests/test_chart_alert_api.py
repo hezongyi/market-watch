@@ -67,6 +67,36 @@ def test_invalid_contract_and_message_placeholders_are_rejected(database, monkey
         assert client.get("/api/chart-alerts?status=unknown").status_code == 422
 
 
+def test_range_single_edits_persist_precision_and_keep_strict_contract(database, monkeypatch):
+    """Real saves complement the browser's normalized request-shape matrix."""
+    with TestClient(api_module.app) as client:
+        login(client, monkeypatch)
+        for interval in ("enter", "exit", "break_upper", "break_lower"):
+            for single in ("cross", "cross_up", "cross_down", "above", "below"):
+                payload = config().model_dump(mode="json")
+                bounds = {"relation": interval, "left": {"kind": "price"},
+                          "lower": "1.12345", "upper": "2.123"}
+                payload["condition"] = bounds
+                created = client.post("/api/chart-alerts", json={
+                    "request_id": f"matrix-{interval}-{single}", "config": payload})
+                assert created.status_code == 201, created.text
+                row = created.json()
+                path = f"/api/chart-alerts/{row['id']}/edit"
+                comparison = {"relation": single, "left": {"kind": "price"},
+                              "right": {"kind": "constant", "value": "0"}}
+                payload["condition"] = {**comparison, "lower": "1.12345", "upper": "2.123"}
+                assert client.post(path, json={"version": 1, "config": payload}).status_code == 422
+                payload["condition"] = comparison
+                saved = client.post(path, json={"version": 1, "config": payload})
+                assert saved.status_code == 200, saved.text
+                assert saved.json()["config"]["condition"]["right"]["value"] == "0"
+                payload["condition"] = bounds
+                saved = client.post(path, json={"version": 2, "config": payload})
+                assert saved.status_code == 200, saved.text
+                assert saved.json()["config"]["condition"]["lower"] == "1.12345"
+                assert saved.json()["config"]["condition"]["upper"] == "2.123"
+
+
 def test_rule_versions_cannot_be_mutated_or_deleted(database):
     import pytest
     from alerts.chart_alert_service import create

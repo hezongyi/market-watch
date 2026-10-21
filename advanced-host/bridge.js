@@ -642,6 +642,45 @@ function quoteFailureRows(symbols, initialRows) {
   return failed.map(presentQuote);
 }
 const alertSourceMetadata = new Map();
+// Native resolve callbacks also serve watchlists. Only matching chart targets
+// own visible recovery state; every completion retains its original lifetime.
+const chartResolves = new Map();
+let resolveDisposed = false, resolveGeneration = 0;
+function resolveCharts(ticker) {
+  if (!widget || resolveDisposed) return [];
+  try { return Array.from({length:widget.chartsCount()},(_,index)=>({chart:widget.chart(index),index}))
+    .filter(({chart})=>MWSeries.same(chart.symbol(),ticker)); } catch { return []; }
+}
+const resolveChartKey = chart => chart._chartWidget || chart;
+function resolveCurrent(target) {
+  return !resolveDisposed && target.epoch===workspaceEpoch && chartResolves.get(resolveChartKey(target.chart))===target &&
+    resolveCharts(target.symbol).some(({chart})=>resolveChartKey(chart)===resolveChartKey(target.chart)) && target.chart.resolution()===target.resolution;
+}
+function reportResolveStates() {
+  const states=[];
+  for (const [chart,target] of chartResolves) {
+    if (!resolveCurrent(target)) {chartResolves.delete(chart);continue;}
+    if (target.state!=='ready') states.push({index:target.index,symbol:target.symbol,resolution:target.resolution,
+      generation:target.generation,state:target.state,message:target.message,code:target.code,
+      retryable:target.retryable,retryAt:target.retryAt});
+  }
+  send({type:'chart-resolve-states',epoch:workspaceEpoch,states});
+}
+function beginResolve(ticker) {
+  const targets=resolveCharts(ticker).map(({chart,index})=>{
+    const previous=chartResolves.get(resolveChartKey(chart));
+    // The library can resolve one symbol for several chart/watchlist consumers
+    // concurrently. They share the chart lifetime instead of cancelling each
+    // other's legitimate callback. A completed/failed attempt gets a new one.
+    if(previous?.state==='loading' && resolveCurrent(previous)) return previous;
+    return {chart,index,symbol:ticker,resolution:chart.resolution(),
+      epoch:workspaceEpoch,generation:++resolveGeneration,state:'loading',message:'正在解析行情身份，完成后可创建告警',retryable:false,retryAt:0};
+  });
+  for (const target of targets) chartResolves.set(resolveChartKey(target.chart),target);
+  if(targets.length) reportResolveStates();
+  const epoch=workspaceEpoch;
+  return {targets,current:()=>!resolveDisposed && epoch===workspaceEpoch && (!targets.length || targets.some(resolveCurrent))};
+}
 const alertCalculationOrigins = new Map();
 const lastHistory = new Map();
 const providerHistoryState = new Map();
@@ -1174,6 +1213,7 @@ const feed = {
       .catch(error=>{cb([],0);send({type:"error",error:String(error)});});
   },
   resolveSymbol: async (ticker, cb, err) => {
+    const operation=beginResolve(ticker);
     try {
       const {symbol,series_kind} = decode(ticker);
       // One-time startup metadata rides with workspace configuration. Candle
@@ -1188,8 +1228,11 @@ const feed = {
       }
       const meta = supplied || await request(
         { op: "resolve", args: { instrument: symbol, series_kind, timeframe: "M1" } },
-        "market",
+        "market", operation.current,
       );
+      if(!operation.current()) throw Object.assign(Error("已取消旧图表的行情解析"),{code:"HISTORY_CANCELLED"});
+      for(const target of operation.targets) if(resolveCurrent(target)) target.state="ready";
+      if(operation.targets.length) reportResolveStates();
       alertSourceMetadata.set(MWSeries.encode(symbol,series_kind),meta);
       while(alertSourceMetadata.size>250) alertSourceMetadata.delete(alertSourceMetadata.keys().next().value);
       // Quote descriptions are reformatted when the active chart timezone
@@ -1235,14 +1278,19 @@ const feed = {
       // The library keeps the old interval on a source switch even if the
       // newly resolved symbol excludes it. Use its public chart method.
       if(meta.source === "yahoo") setTimeout(()=>{
-        for(let index=0; widget && index<widget.chartsCount(); index++) {
-          const chart=widget.chart(index);
-          if(MWSeries.same(chart.symbol(),ticker) && !meta.frames.includes(frames[chart.resolution()]))
-            chart.setResolution("60",{doNotActivateChart:true});
+        for(const target of operation.targets) {
+          if(resolveCurrent(target) && !meta.frames.includes(frames[target.resolution]))
+            target.chart.setResolution("60",{doNotActivateChart:true});
         }
       },0);
     } catch (e) {
-      err(String(e));
+      if(operation.current()) {
+        for(const target of operation.targets) if(resolveCurrent(target)) Object.assign(target,{state:'error',
+          message:typeof e.message==='string'?e.message:'行情身份解析失败，请重试',code:e.code || 'RESOLVE_FAILED',
+          retryable:e.retryable===true,retryAt:Date.now()+Math.max(0,Number(e.retryAfter)||0)*1000});
+        if(operation.targets.length) reportResolveStates();
+      }
+      err(e.message || '行情身份解析失败');
       // The library also resolves watchlist entries. Its error callback marks
       // an unavailable entry (or chart symbol) at the requesting surface;
       // escalating it to a workspace modal blocks unrelated valid charts.
@@ -2185,6 +2233,10 @@ function boot(
   alertBridge = chartAlertBridge({getWidget:()=>widget,getWorkspace:()=>currentNativeWorkspace,
     getEpoch:()=>workspaceEpoch,isLoading:()=>loading||!ready,readonly,
     metadata:ticker=>alertSourceMetadata.get(MWSeries.encode(MWSeries.decode(ticker).symbol,MWSeries.decode(ticker).series_kind)),frames,
+    unavailable:chart=>{
+      const target=chartResolves.get(resolveChartKey(chart));
+      return target && resolveCurrent(target) && target.state!=='ready' ? target.message : null;
+    },
     calculationOrigin:(ticker,res)=>alertCalculationOrigins.get(MWSeries.encode(MWSeries.decode(ticker).symbol,MWSeries.decode(ticker).series_kind)+'|'+res) ??
       (MWSeries.decode(ticker).series_kind === "managed" ? managedSessions.get(MWSeries.decode(ticker).symbol+'|'+res)?.start : null),
     compositeRevision:(ticker,res)=>alertCompositeRevisions.get(MWSeries.encode(MWSeries.decode(ticker).symbol,'composite')+'|'+res) ?? null,
@@ -2279,6 +2331,7 @@ function boot(
         if(info.ticker && decode(info.ticker).symbol.startsWith("YAHOO:") &&
            info.supported_resolutions && !info.supported_resolutions.includes(chart.resolution()))
           chart.setResolution("60",{doNotActivateChart:true});
+        reportResolveStates();
         synchronizeMarketVisibility();
       };
       chart.onSymbolChanged().subscribe(null,changed);
@@ -2948,6 +3001,38 @@ addEventListener("message", async (e) => {
       }
     }
     void indicatorCoordinator?.retry(m.index);
+  } else if (m.type === 'retry-chart-resolve' && ready && !loading && m.epoch===workspaceEpoch &&
+      Number.isSafeInteger(m.index) && m.index>=0 && m.index<widget.chartsCount()) {
+    const chart=widget.chart(m.index),target=chartResolves.get(resolveChartKey(chart));
+    if(target && resolveCurrent(target) && target.generation===m.generation && target.state==='error' && Date.now()>=target.retryAt) {
+      // v31 caches rejected resolves even across resetData/source restarts.
+      // Evict only this symbol's rejected promises, then allocate a new series
+      // identity on the requesting chart. Successful metadata stays cached.
+      // This adapter is pinned to, and integration-tested against, licensed v31.
+      try {
+        const source=chart._chartWidget?.model().model().mainSeries().seriesSource();
+        const cache=source?._gateway?._getChartApi?.()._studyEngine?._resolveRequests;
+        if(typeof source?.stop!=='function' || typeof source?.start!=='function' || !cache)
+          throw Error('当前图表无法重新解析，请重新打开此工作区');
+        target.state='loading';
+        target.message='正在重新解析行情身份，完成后可创建告警';
+        reportResolveStates();
+        for(const key of Object.keys(cache)) {
+          if(key!==target.symbol && !key.startsWith(target.symbol+'_#_'))continue;
+          const promise=cache[key];
+          const rejected=await promise.then(()=>false,()=>true);
+          if(!resolveCurrent(target))return;
+          if(rejected && cache[key]===promise)delete cache[key];
+        }
+        if(!resolveCurrent(target))return;
+        source.stop(); source.start();
+      } catch(error) {
+        if(!resolveCurrent(target))return;
+        target.state='error';
+        target.message='重新解析未完成，请重新打开此工作区';
+        reportResolveStates();
+      }
+    }
   } else if (m.type === 'retry-chart-history' && ready && !loading && m.epoch===workspaceEpoch &&
       Number.isSafeInteger(m.index) && m.index>=0 && m.index<widget.chartsCount()) {
     const chart=widget.chart(m.index);
@@ -2981,6 +3066,7 @@ addEventListener("message", async (e) => {
 send({ type: "loaded" });
 
 addEventListener("pagehide", () => {
+  resolveDisposed=true; chartResolves.clear();
   compositeDisplayBatches.dispose();
   indicatorCoordinator?.dispose();
   ordinaryNotices?.dispose();
