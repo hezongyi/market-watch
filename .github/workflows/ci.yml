@@ -189,6 +189,7 @@ jobs:
           node tests/advanced-watchlist-metadata.cjs
           node tests/advanced-startup-metadata.cjs
           node tests/resolve-recovery.cjs
+          node tests/multi-chart-resolve-init.cjs
           node tests/api-read-recovery.cjs
           node --test tests/chart-alerts-bridge.test.cjs
           node tests/advanced-market-stream.cjs

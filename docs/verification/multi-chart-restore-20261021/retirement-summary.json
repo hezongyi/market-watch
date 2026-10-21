@@ -1,0 +1,19 @@
+{
+  "project": "mw-issue89-20261021",
+  "task": "mw-issue89-20261021",
+  "at": "2026-10-21T14:32:22.815986+00:00",
+  "containers": 5,
+  "volumes": [
+    "mw-issue89-20261021_postgres-data"
+  ],
+  "networks": [
+    "1c8178cf87dd",
+    "44cd612865f6"
+  ],
+  "retained_images": [
+    "sha256:373e13eaba150388cce331cecb86db76fabbc37c8b18db38238cd604b304a46c",
+    "sha256:7dfcdbf74b0248e07ab968090114309076626e1a631a9db74540cf740c17055b"
+  ],
+  "restore_verified": true,
+  "database_count": 2
+}

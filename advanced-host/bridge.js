@@ -650,13 +650,24 @@ const chartResolves = new Map();
 let resolveDisposed = false, resolveGeneration = 0;
 function resolveCharts(ticker) {
   if (!widget || resolveDisposed) return [];
-  try { return Array.from({length:widget.chartsCount()},(_,index)=>({chart:widget.chart(index),index}))
-    .filter(({chart})=>MWSeries.same(chart.symbol(),ticker)); } catch { return []; }
+  const targets=[];
+  try {
+    for(let index=0;index<widget.chartsCount();index++) {
+      try {
+        const chart=widget.chart(index);
+        // Layout restore exposes chart APIs before their models attach. Read
+        // both accessors together; one incomplete peer must not block resolve.
+        if(MWSeries.same(chart.symbol(),ticker))
+          targets.push({chart,index,resolution:chart.resolution()});
+      } catch { /* This chart is still attaching or has already detached. */ }
+    }
+  } catch { /* The widget itself may be disposing. */ }
+  return targets;
 }
 const resolveChartKey = chart => chart._chartWidget || chart;
 function resolveCurrent(target) {
   return !resolveDisposed && target.epoch===workspaceEpoch && chartResolves.get(resolveChartKey(target.chart))===target &&
-    resolveCharts(target.symbol).some(({chart})=>resolveChartKey(chart)===resolveChartKey(target.chart)) && target.chart.resolution()===target.resolution;
+    resolveCharts(target.symbol).some(({chart,resolution})=>resolveChartKey(chart)===resolveChartKey(target.chart) && resolution===target.resolution);
 }
 function reportResolveStates() {
   const states=[];
@@ -669,13 +680,13 @@ function reportResolveStates() {
   send({type:'chart-resolve-states',epoch:workspaceEpoch,states});
 }
 function beginResolve(ticker) {
-  const targets=resolveCharts(ticker).map(({chart,index})=>{
+  const targets=resolveCharts(ticker).map(({chart,index,resolution})=>{
     const previous=chartResolves.get(resolveChartKey(chart));
     // The library can resolve one symbol for several chart/watchlist consumers
     // concurrently. They share the chart lifetime instead of cancelling each
     // other's legitimate callback. A completed/failed attempt gets a new one.
     if(previous?.state==='loading' && resolveCurrent(previous)) return previous;
-    return {chart,index,symbol:ticker,resolution:chart.resolution(),
+    return {chart,index,symbol:ticker,resolution,
       epoch:workspaceEpoch,generation:++resolveGeneration,state:'loading',message:'正在解析行情身份，完成后可创建告警',retryable:false,retryAt:0};
   });
   for (const target of targets) chartResolves.set(resolveChartKey(target.chart),target);

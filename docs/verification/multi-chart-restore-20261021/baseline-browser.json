@@ -1,0 +1,16 @@
+{
+  "target": "https://192.168.7.232:18280/advanced-charts/7d72eead-6be5-41a4-b3d5-bfdfff98b2bb",
+  "at": "2026-10-21T14:43:00.703Z",
+  "errors": [
+    {
+      "message": "Value is null",
+      "stack": "Error: Value is null\n    at r (https://192.168.7.232:18281/charting_library_91bf3b2668480f58/bundles/41890.26660955cd3bff3b75c4.js:1:243)\n    at Vg.model (https://192.168.7.232:18281/charting_library_91bf3b2668480f58/bundles/library.e2f8b3a016c9e1a0b7a5.js:712:2191)\n    at Oy.resolution (https://192.168.7.232:18281/charting_library_91bf3b2668480f58/bundles/library.e2f8b3a016c9e1a0b7a5.js:782:1201)\n    at https://192.168.7.232:18281/host.501f3914eaf37e68.js:11423:56\n    at Array.map (<anonymous>)\n    at beginResolve (https://192.168.7.232:18281/host.501f3914eaf37e68.js:11417:39)\n    at Object.resolveSymbol (https://192.168.7.232:18281/host.501f3914eaf37e68.js:11963:21)\n    at https://192.168.7.232:18281/charting_library_91bf3b2668480f58/bundles/library.e2f8b3a016c9e1a0b7a5.js:843:2626\n    at new Promise (<anonymous>)\n    at Pb._resolveSymbolInternal (https://192.168.7.232:18281/charting_library_91bf3b2668480f58/bundles/library.e2f8b3a016c9e1a0b7a5.js:843:2490)"
+    }
+  ],
+  "samples": [],
+  "protectedWrites": [],
+  "failure": {
+    "message": "frame.waitForFunction: Timeout 45000ms exceeded.",
+    "stack": "frame.waitForFunction: Timeout 45000ms exceeded.\n    at /home/quant/repos/market-watch-chart-init-20261021/web/tests/multi-chart-restore.browser.cjs:72:18"
+  }
+}
