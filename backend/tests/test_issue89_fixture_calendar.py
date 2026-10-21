@@ -93,3 +93,20 @@ def test_delayed_fixture_observation_satisfies_native_first_read(database, monke
     query = queries[0].model_copy(update={'before': clock[0]+1})
     reseeded = loads.read_cached(query)
     assert reseeded['bars'][-1]['start'] == fixture.fixture_starts('H1', clock[0], 1801)[-2]
+    # Replay is a new synthetic baseline: a prior rollover must not leave the
+    # monotonic production high-water mark ahead of its deliberately older tail.
+    for frame in ('H1', 'H4'):
+        monkeypatch.setattr('sys.argv', ['fixture', 'rollover', '--frame', frame])
+        fixture.main()
+    monkeypatch.setattr('sys.argv', ['fixture', 'seed', '--rollover-ready'])
+    fixture.main()
+    with database() as db:
+        epochs = {d.id: d.metadata_json['indicator_history_epoch']
+                  for d in db.scalars(select(storage.ProviderDataset))}
+    for frame in ('H1', 'H4'):
+        monkeypatch.setattr('sys.argv', ['fixture', 'tail', '--frame', frame])
+        fixture.main()
+    with database() as db:
+        for dataset in db.scalars(select(storage.ProviderDataset)):
+            assert dataset.metadata_json['indicator_history_epoch'] == epochs[dataset.id], (
+                'a reseeded forming tail must not be mistaken for an early correction')

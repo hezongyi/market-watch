@@ -196,6 +196,12 @@ def main():
             cache.release(key, lease)
         with transaction() as db:
             dataset = db.get(ProviderDataset, key)
+            if args.operation == 'seed':
+                # A replay deliberately rewinds this task's synthetic tail.
+                # Production commits keep a monotonic high-water mark; reset
+                # only this fixture baseline so repeated runs test tail updates.
+                dataset.metadata_json = {**dataset.metadata_json,
+                                         'indicator_tail_start': payload['bars'][-1]['start']}
             after = dataset.metadata_json['indicator_history_epoch']
             if args.operation == 'equivalent':
                 assert not changed and after == epoch

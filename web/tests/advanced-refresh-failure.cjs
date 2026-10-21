@@ -24,7 +24,7 @@ async function stalledRestore(stall){
     onSeriesError:()=>({subscribe:(_,callback)=>{failed=callback;},unsubscribe:()=>{failed=null;}}),
     resetData:()=>{
       ready=stall==='visible-range';
-      setImmediate(()=>stall==='series-error'?failed?.(Error('network read failed')):loaded?.());
+      setImmediate(()=>stall.startsWith('series-error')?failed?.(stall==='series-error-object'?{error:'network read failed'}:Error('network read failed')):loaded?.());
     },
     setVisibleRange:()=>stall==='visible-range'?new Promise(()=>{}):Promise.resolve(),
   };
@@ -40,7 +40,7 @@ async function stalledRestore(stall){
     const result=context.refreshChartHistory(widget,chart,()=>{},()=>true);
     await assert.rejects(Promise.race([result,new Promise((_,reject)=>{
       watchdog=setTimeout(()=>reject(Error('refresh remained pending beyond its whole-operation budget')),150);
-    })]),stall==='series-error'?/network read failed/:/历史刷新等待超时/);
+    })]),stall.startsWith('series-error')?/network read failed/:/历史刷新等待超时/);
     assert.equal(pauses,0,'failed restoration must release synchronization pauses');
     assert.equal(events.size,0);assert.equal(wheel.size,0);assert.equal(loaded,null);assert.equal(failed,null);
     assert.equal(timers.size,0,'refresh must clear its timer');
@@ -58,5 +58,6 @@ async function stalledRestore(stall){
   await stalledRestore('data-ready');
   await stalledRestore('visible-range');
   await stalledRestore('series-error');
+  await stalledRestore('series-error-object');
   console.log('History refresh bounds readiness/range restoration and releases all listeners/pauses');
 })().catch(error=>{console.error(error);process.exit(1);});

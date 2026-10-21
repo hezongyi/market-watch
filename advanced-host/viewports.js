@@ -340,7 +340,8 @@ async function refreshChartHistory(widget, chart, invalidate, isCurrent) {
   const budget = new Promise((_, reject) => {
     failed = error => {
       expired = true;
-      reject(error instanceof Error ? error : Error(String(error || "历史读取失败")));
+      const reason = error?.error ?? error;
+      reject(reason instanceof Error ? reason : Error(String(reason || "历史读取失败")));
     };
     timeout = setTimeout(() => {
       expired = true;
