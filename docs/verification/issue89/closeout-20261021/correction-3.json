@@ -1,0 +1,4644 @@
+{
+  "app": "https://localhost:18389",
+  "chart": "https://localhost:18390",
+  "task": "mw-issue89-20261021",
+  "scenario": "correction",
+  "input": "synthetic offline OANDA; no real upstream",
+  "source": "be20392c99906a4971f3359c8d8877befdb75632",
+  "dirty": false,
+  "tools": {
+    "scripts/issue89_acceptance_fixture.py": "15b6165a4b1e3ddb3f4fad6f2ce08da51f95a5b4b8c565139498e2153afed0b8",
+    "web/tests/issue89-native-recovery.browser.cjs": "4a46e93c3470dfbab42a94202e299b4124da106b72e66f9e9219b2201227ebfe",
+    "web/tests/fixtures/issue89-sampling.cjs": "d7a9d62122263ef22c0c8dbaae750bca08a798ebb720a8b1d77bce5be33272ac"
+  },
+  "components": [
+    {
+      "name": "/mw-issue89-20261021-api-1",
+      "image": "sha256:de621bd02d8a2b94892e8e90418c26809c6cb7efa6e8617442365efade87e17a",
+      "source": "86bef8aae34cfbe214bc2b5310c73c6304c5779e",
+      "dirty": "false"
+    },
+    {
+      "name": "/mw-issue89-20261021-web-1",
+      "image": "sha256:d7edddb147e8766f1692d882e1ccb9a4b66c8ad3cf364c25552739e20f1e05c4",
+      "source": "86bef8aae34cfbe214bc2b5310c73c6304c5779e",
+      "dirty": "true"
+    },
+    {
+      "name": "/mw-issue89-20261021-chart-origin-1",
+      "image": "sha256:373e13eaba150388cce331cecb86db76fabbc37c8b18db38238cd604b304a46c",
+      "source": "7948047c1b1174e6948cdaac1f5257ab3e889fa2",
+      "dirty": "false"
+    },
+    {
+      "name": "/mw-issue89-20261021-postgres-1",
+      "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "source": null,
+      "dirty": null
+    },
+    {
+      "name": "/mw-issue89-20261021-tls-1",
+      "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "source": null,
+      "dirty": null
+    }
+  ],
+  "http": [
+    {
+      "at": 1792574378675,
+      "started": 1792574377980.863,
+      "status": 200,
+      "frame": "H4",
+      "consumer": [
+        {
+          "id": "2|LsNESc",
+          "generation": 2
+        }
+      ],
+      "requestCredential": "9f0ea59abf70dd24",
+      "credential": "9f0ea59abf70dd24",
+      "revision": "46",
+      "origin": 1756270800000,
+      "indicators": [
+        "SWING_SR_V1"
+      ],
+      "bars": 172,
+      "calculation": [
+        {
+          "name": "SWING_SR_V1",
+          "coverage": [
+            {
+              "start": 1789059600000,
+              "end": 1789160400000
+            },
+            {
+              "start": 1789333200000,
+              "end": 1789765200000
+            },
+            {
+              "start": 1789938000000,
+              "end": 1790370000000
+            },
+            {
+              "start": 1790542800000,
+              "end": 1790974800000
+            },
+            {
+              "start": 1791147600000,
+              "end": 1791579600000
+            },
+            {
+              "start": 1791752400000,
+              "end": 1792184400000
+            },
+            {
+              "start": 1792357200000,
+              "end": 1792573200000
+            }
+          ],
+          "status": "complete",
+          "valid": 688
+        }
+      ]
+    },
+    {
+      "at": 1792574379069,
+      "started": 1792574377976.3848,
+      "status": 200,
+      "frame": "H1",
+      "consumer": [
+        {
+          "id": "1|vz5KjY",
+          "generation": 1
+        }
+      ],
+      "requestCredential": "1fe8f2359539947e",
+      "credential": "1fe8f2359539947e",
+      "revision": "53",
+      "origin": 1783490400000,
+      "indicators": [
+        "SUPERTREND_PINE_V1"
+      ],
+      "bars": 546,
+      "calculation": [
+        {
+          "name": "SUPERTREND_PINE_V1",
+          "coverage": [
+            {
+              "start": 1789743600000,
+              "end": 1789765200000
+            },
+            {
+              "start": 1789938000000,
+              "end": 1790370000000
+            },
+            {
+              "start": 1790542800000,
+              "end": 1790974800000
+            },
+            {
+              "start": 1791147600000,
+              "end": 1791579600000
+            },
+            {
+              "start": 1791752400000,
+              "end": 1792184400000
+            },
+            {
+              "start": 1792357200000,
+              "end": 1792573200000
+            }
+          ],
+          "status": "complete",
+          "valid": 1652
+        }
+      ]
+    },
+    {
+      "at": 1792574381373,
+      "started": 1792574379421.758,
+      "status": 200,
+      "frame": "H4",
+      "consumer": [
+        {
+          "id": "2|LsNESc",
+          "generation": 5
+        }
+      ],
+      "requestCredential": "9f0ea59abf70dd24",
+      "credential": "9f0ea59abf70dd24",
+      "revision": "46",
+      "origin": 1756270800000,
+      "indicators": [
+        "SWING_SR_V1"
+      ],
+      "bars": 334,
+      "calculation": [
+        {
+          "name": "SWING_SR_V1",
+          "coverage": [
+            {
+              "start": 1782363600000,
+              "end": 1782507600000
+            },
+            {
+              "start": 1782680400000,
+              "end": 1783112400000
+            },
+            {
+              "start": 1783285200000,
+              "end": 1783717200000
+            },
+            {
+              "start": 1783890000000,
+              "end": 1784322000000
+            },
+            {
+              "start": 1784494800000,
+              "end": 1784926800000
+            },
+            {
+              "start": 1785099600000,
+              "end": 1785531600000
+            },
+            {
+              "start": 1785704400000,
+              "end": 1786136400000
+            },
+            {
+              "start": 1786309200000,
+              "end": 1786741200000
+            },
+            {
+              "start": 1786914000000,
+              "end": 1787346000000
+            },
+            {
+              "start": 1787518800000,
+              "end": 1787950800000
+            },
+            {
+              "start": 1788123600000,
+              "end": 1788555600000
+            },
+            {
+              "start": 1788728400000,
+              "end": 1789074000000
+            }
+          ],
+          "status": "complete",
+          "valid": 2020
+        }
+      ]
+    },
+    {
+      "at": 1792574396494,
+      "started": 1792574396479.243,
+      "status": 422,
+      "frame": "H1",
+      "consumer": [
+        {
+          "id": "1|vz5KjY",
+          "generation": 4
+        }
+      ],
+      "requestCredential": "1fe8f2359539947e",
+      "credential": null,
+      "revision": "",
+      "indicators": [
+        "SUPERTREND_PINE_V1"
+      ],
+      "code": "DISPLAY_SNAPSHOT_EXPIRED",
+      "attempt": "24bffd694851430c80cde2319c8a79f6"
+    },
+    {
+      "at": 1792574396668,
+      "started": 1792574396498.368,
+      "status": 200,
+      "frame": "H1",
+      "requestCredential": null,
+      "credential": "5c9d047417db4207",
+      "revision": "54",
+      "origin": 1789747200000,
+      "indicators": [],
+      "bars": 545,
+      "calculation": []
+    },
+    {
+      "at": 1792574397883,
+      "started": 1792574397500.6052,
+      "status": 200,
+      "frame": "H1",
+      "consumer": [
+        {
+          "id": "1|vz5KjY",
+          "generation": 7
+        }
+      ],
+      "requestCredential": "29e7a7e3cdbd00ce",
+      "credential": "29e7a7e3cdbd00ce",
+      "revision": "54",
+      "origin": 1783490400000,
+      "indicators": [
+        "SUPERTREND_PINE_V1"
+      ],
+      "bars": 244,
+      "calculation": [
+        {
+          "name": "SUPERTREND_PINE_V1",
+          "coverage": [
+            {
+              "start": 1791349200000,
+              "end": 1791579600000
+            },
+            {
+              "start": 1791752400000,
+              "end": 1792184400000
+            },
+            {
+              "start": 1792357200000,
+              "end": 1792573200000
+            }
+          ],
+          "status": "complete",
+          "valid": 738
+        }
+      ]
+    },
+    {
+      "at": 1792574410683,
+      "started": 1792574410484.284,
+      "status": 422,
+      "frame": "H4",
+      "consumer": [
+        {
+          "id": "2|LsNESc",
+          "generation": 5
+        }
+      ],
+      "requestCredential": "9f0ea59abf70dd24",
+      "credential": null,
+      "revision": "",
+      "indicators": [
+        "SWING_SR_V1"
+      ],
+      "code": "DISPLAY_SNAPSHOT_EXPIRED",
+      "attempt": "b88974ed8d30432a8630e9ac8e8c15a9"
+    },
+    {
+      "at": 1792574410784,
+      "started": 1792574410682.44,
+      "status": 200,
+      "frame": "H4",
+      "requestCredential": null,
+      "credential": "d17cf56e7ac95da0",
+      "revision": "47",
+      "origin": 1785877200000,
+      "indicators": [],
+      "bars": 333,
+      "calculation": []
+    },
+    {
+      "at": 1792574411280,
+      "started": 1792574411023.284,
+      "status": 200,
+      "frame": "H4",
+      "consumer": [
+        {
+          "id": "2|LsNESc",
+          "generation": 8
+        }
+      ],
+      "requestCredential": "d17cf56e7ac95da0",
+      "credential": "d17cf56e7ac95da0",
+      "revision": "47",
+      "origin": 1756270800000,
+      "indicators": [
+        "SWING_SR_V1"
+      ],
+      "bars": 238,
+      "calculation": [
+        {
+          "name": "SWING_SR_V1",
+          "coverage": [
+            {
+              "start": 1787763600000,
+              "end": 1787950800000
+            },
+            {
+              "start": 1788123600000,
+              "end": 1788555600000
+            },
+            {
+              "start": 1788728400000,
+              "end": 1789160400000
+            },
+            {
+              "start": 1789333200000,
+              "end": 1789765200000
+            },
+            {
+              "start": 1789938000000,
+              "end": 1790370000000
+            },
+            {
+              "start": 1790542800000,
+              "end": 1790974800000
+            },
+            {
+              "start": 1791147600000,
+              "end": 1791579600000
+            },
+            {
+              "start": 1791752400000,
+              "end": 1792184400000
+            },
+            {
+              "start": 1792357200000,
+              "end": 1792573200000
+            }
+          ],
+          "status": "complete",
+          "valid": 952
+        }
+      ]
+    }
+  ],
+  "requests": [
+    {
+      "at": 1792574374743,
+      "path": "/api/charts/history-loads",
+      "frame": "H1",
+      "kind": "native-history",
+      "status": 200,
+      "ended": 1792574375277,
+      "outcome": "finished"
+    },
+    {
+      "at": 1792574376224,
+      "path": "/api/charts/history-loads",
+      "frame": "H4",
+      "kind": "native-history",
+      "status": 200,
+      "ended": 1792574377604,
+      "outcome": "finished"
+    },
+    {
+      "at": 1792574378116,
+      "path": "/api/charts/data",
+      "frame": "H1",
+      "kind": "indicator",
+      "consumer": [
+        {
+          "id": "1|vz5KjY",
+          "generation": 1
+        }
+      ],
+      "status": 200,
+      "ended": 1792574379077,
+      "outcome": "finished"
+    },
+    {
+      "at": 1792574378116,
+      "path": "/api/charts/data",
+      "frame": "H4",
+      "kind": "indicator",
+      "consumer": [
+        {
+          "id": "2|LsNESc",
+          "generation": 2
+        }
+      ],
+      "status": 200,
+      "ended": 1792574378675,
+      "outcome": "finished"
+    },
+    {
+      "at": 1792574379422,
+      "path": "/api/charts/data",
+      "frame": "H4",
+      "kind": "indicator",
+      "consumer": [
+        {
+          "id": "2|LsNESc",
+          "generation": 5
+        }
+      ],
+      "status": 200,
+      "ended": 1792574381386,
+      "outcome": "finished"
+    },
+    {
+      "at": 1792574396484,
+      "path": "/api/charts/data",
+      "frame": "H1",
+      "kind": "indicator",
+      "consumer": [
+        {
+          "id": "1|vz5KjY",
+          "generation": 4
+        }
+      ],
+      "status": 422,
+      "ended": 1792574396495,
+      "outcome": "finished"
+    },
+    {
+      "at": 1792574396500,
+      "path": "/api/charts/data",
+      "frame": "H1",
+      "kind": "price",
+      "status": 200,
+      "ended": 1792574396674,
+      "outcome": "finished"
+    },
+    {
+      "at": 1792574396722,
+      "path": "/api/charts/history-loads",
+      "frame": "H1",
+      "kind": "native-history",
+      "status": 200,
+      "ended": 1792574397190,
+      "outcome": "finished"
+    },
+    {
+      "at": 1792574397218,
+      "path": "/api/charts/data",
+      "frame": "H1",
+      "kind": "indicator",
+      "consumer": [
+        {
+          "id": "1|vz5KjY",
+          "generation": 6
+        }
+      ],
+      "ended": 1792574397415,
+      "outcome": "failed"
+    },
+    {
+      "at": 1792574397526,
+      "path": "/api/charts/data",
+      "frame": "H1",
+      "kind": "indicator",
+      "consumer": [
+        {
+          "id": "1|vz5KjY",
+          "generation": 7
+        }
+      ],
+      "status": 200,
+      "ended": 1792574397884,
+      "outcome": "finished"
+    },
+    {
+      "at": 1792574410486,
+      "path": "/api/charts/data",
+      "frame": "H4",
+      "kind": "indicator",
+      "consumer": [
+        {
+          "id": "2|LsNESc",
+          "generation": 5
+        }
+      ],
+      "status": 422,
+      "ended": 1792574410683,
+      "outcome": "finished"
+    },
+    {
+      "at": 1792574410684,
+      "path": "/api/charts/data",
+      "frame": "H4",
+      "kind": "price",
+      "status": 200,
+      "ended": 1792574410785,
+      "outcome": "finished"
+    },
+    {
+      "at": 1792574410826,
+      "path": "/api/charts/history-loads",
+      "frame": "H4",
+      "kind": "native-history",
+      "status": 200,
+      "ended": 1792574411029,
+      "outcome": "finished"
+    },
+    {
+      "at": 1792574411031,
+      "path": "/api/charts/data",
+      "frame": "H4",
+      "kind": "indicator",
+      "consumer": [
+        {
+          "id": "2|LsNESc",
+          "generation": 8
+        }
+      ],
+      "status": 200,
+      "ended": 1792574411283,
+      "outcome": "finished"
+    }
+  ],
+  "stages": [
+    {
+      "fixture": "seed",
+      "frame": "H1",
+      "result": [
+        {
+          "frame": "H1",
+          "operation": "seed",
+          "changed": 1,
+          "epoch_changed": false,
+          "first": 1783501200000,
+          "last": 1792569600000,
+          "freshness_simulated": true
+        },
+        {
+          "frame": "H4",
+          "operation": "seed",
+          "changed": 1,
+          "epoch_changed": false,
+          "first": 1756285200000,
+          "last": 1792558800000,
+          "freshness_simulated": true
+        }
+      ]
+    },
+    {
+      "name": "initial",
+      "at": 1792574384443,
+      "accepted": [
+        {
+          "start": 1792574378686,
+          "acceptedAt": 1792574378691,
+          "elapsed": 5,
+          "accepted": true,
+          "generation": 3,
+          "studyId": "LsNESc",
+          "name": "SWING_SR_V1",
+          "chartIndex": 1,
+          "establishedOriginFrom": 2,
+          "identity": {
+            "main": "MWP:OANDA:AUD_JPY",
+            "fixedRevision": "provider:OANDA:AUD_JPY",
+            "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+            "algorithmVersion": "SWING_SR_V1:1",
+            "calculationStart": 1756270800000,
+            "period": "240"
+          },
+          "coverage": {
+            "first": 1789074000000,
+            "last": 1792558800000,
+            "count": 171,
+            "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+            "sourceFirst": 1789074000000,
+            "correctionVersion": 0,
+            "tailVersion": 46
+          },
+          "revision": "46",
+          "credential": "9f0ea59abf70dd24",
+          "rows": 171,
+          "valid": 684
+        },
+        {
+          "start": 1792574379148,
+          "acceptedAt": 1792574379158,
+          "elapsed": 10,
+          "accepted": true,
+          "generation": 4,
+          "studyId": "vz5KjY",
+          "name": "SUPERTREND_PINE_V1",
+          "chartIndex": 0,
+          "establishedOriginFrom": 1,
+          "identity": {
+            "main": "MWP:OANDA:AUD_JPY",
+            "fixedRevision": "provider:OANDA:AUD_JPY",
+            "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+            "algorithmVersion": "SUPERTREND_PINE_V1:1",
+            "calculationStart": 1783490400000,
+            "period": "60"
+          },
+          "coverage": {
+            "first": 1789747200000,
+            "last": 1792569600000,
+            "count": 545,
+            "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+            "sourceFirst": 1789747200000,
+            "correctionVersion": 0,
+            "tailVersion": 53
+          },
+          "revision": "53",
+          "credential": "1fe8f2359539947e",
+          "rows": 545,
+          "valid": 1663
+        },
+        {
+          "start": 1792574381411,
+          "acceptedAt": 1792574381415,
+          "elapsed": 4,
+          "accepted": true,
+          "generation": 5,
+          "studyId": "LsNESc",
+          "name": "SWING_SR_V1",
+          "chartIndex": 1,
+          "establishedOriginFrom": null,
+          "identity": {
+            "main": "MWP:OANDA:AUD_JPY",
+            "fixedRevision": "provider:OANDA:AUD_JPY",
+            "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+            "algorithmVersion": "SWING_SR_V1:1",
+            "calculationStart": 1756270800000,
+            "period": "240"
+          },
+          "coverage": {
+            "first": 1785877200000,
+            "last": 1792558800000,
+            "count": 333,
+            "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+            "sourceFirst": 1785877200000,
+            "correctionVersion": 0,
+            "tailVersion": 46
+          },
+          "revision": "46",
+          "credential": "9f0ea59abf70dd24",
+          "rows": 162,
+          "valid": 648
+        }
+      ],
+      "reloads": [],
+      "charts": [
+        {
+          "index": 0,
+          "symbol": "MWP:OANDA:AUD_JPY",
+          "resolution": "60",
+          "ready": true,
+          "viewport": {
+            "from": 1792144800,
+            "to": 1792605600
+          },
+          "mainRows": 545,
+          "studies": [
+            {
+              "id": "vz5KjY",
+              "name": "守望 Python SUPERTREND_PINE_V1",
+              "scope": {
+                "generation": 4,
+                "name": "SUPERTREND_PINE_V1",
+                "resolution": "60",
+                "first": 1789747200000,
+                "last": 1792569600000,
+                "count": 545,
+                "coverage": {
+                  "first": 1789747200000,
+                  "last": 1792569600000,
+                  "count": 545,
+                  "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+                  "sourceFirst": 1789747200000,
+                  "correctionVersion": 0,
+                  "tailVersion": 53,
+                  "generation": 4
+                },
+                "transition": null
+              },
+              "rows": 545,
+              "valid": 1663
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "symbol": "MWP:OANDA:AUD_JPY",
+          "resolution": "240",
+          "ready": true,
+          "viewport": {
+            "from": 1791234000,
+            "to": 1792702800
+          },
+          "mainRows": 333,
+          "studies": [
+            {
+              "id": "LsNESc",
+              "name": "守望 Python SWING_SR_V1",
+              "scope": {
+                "generation": 5,
+                "name": "SWING_SR_V1",
+                "resolution": "240",
+                "first": 1785877200000,
+                "last": 1792558800000,
+                "count": 333,
+                "coverage": {
+                  "first": 1785877200000,
+                  "last": 1792558800000,
+                  "count": 333,
+                  "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+                  "sourceFirst": 1785877200000,
+                  "correctionVersion": 0,
+                  "tailVersion": 46,
+                  "generation": 5
+                },
+                "transition": null
+              },
+              "rows": 333,
+              "valid": 1332
+            }
+          ]
+        }
+      ],
+      "nativeChecks": [
+        {
+          "index": 0,
+          "studyId": "vz5KjY",
+          "rows": 545,
+          "valid": 1663,
+          "missing": 0,
+          "priceMismatches": 0,
+          "mismatches": 0,
+          "samples": [],
+          "generation": 4,
+          "acceptedGeneration": 4,
+          "coverage": {
+            "first": 1789747200000,
+            "last": 1792569600000,
+            "count": 545,
+            "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+            "sourceFirst": 1789747200000,
+            "correctionVersion": 0,
+            "tailVersion": 53,
+            "generation": 4
+          },
+          "first": 1789747200000,
+          "last": 1792569600000,
+          "count": 545,
+          "viewport": {
+            "from": 1792144800,
+            "to": 1792605600
+          },
+          "identity": {
+            "main": "MWP:OANDA:AUD_JPY",
+            "fixedRevision": "provider:OANDA:AUD_JPY",
+            "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+            "algorithmVersion": "SUPERTREND_PINE_V1:1",
+            "calculationStart": 1783490400000,
+            "period": "60"
+          },
+          "credential": "1fe8f2359539947e",
+          "revision": "53"
+        },
+        {
+          "index": 1,
+          "studyId": "LsNESc",
+          "rows": 333,
+          "valid": 1332,
+          "missing": 0,
+          "priceMismatches": 0,
+          "mismatches": 0,
+          "samples": [],
+          "generation": 5,
+          "acceptedGeneration": 5,
+          "coverage": {
+            "first": 1785877200000,
+            "last": 1792558800000,
+            "count": 333,
+            "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+            "sourceFirst": 1785877200000,
+            "correctionVersion": 0,
+            "tailVersion": 46,
+            "generation": 5
+          },
+          "first": 1785877200000,
+          "last": 1792558800000,
+          "count": 333,
+          "viewport": {
+            "from": 1791234000,
+            "to": 1792702800
+          },
+          "identity": {
+            "main": "MWP:OANDA:AUD_JPY",
+            "fixedRevision": "provider:OANDA:AUD_JPY",
+            "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+            "algorithmVersion": "SWING_SR_V1:1",
+            "calculationStart": 1756270800000,
+            "period": "240"
+          },
+          "credential": "9f0ea59abf70dd24",
+          "revision": "46"
+        }
+      ]
+    },
+    {
+      "fixture": "correct",
+      "frame": "H1",
+      "result": [
+        {
+          "frame": "H1",
+          "operation": "correct",
+          "changed": 1,
+          "epoch_changed": true,
+          "first": 1792465200000,
+          "last": 1792465200000,
+          "freshness_simulated": true
+        }
+      ]
+    },
+    {
+      "name": "real-correction-H1",
+      "at": 1792574400049,
+      "accepted": [
+        {
+          "start": 1792574378686,
+          "acceptedAt": 1792574378691,
+          "elapsed": 5,
+          "accepted": true,
+          "generation": 3,
+          "studyId": "LsNESc",
+          "name": "SWING_SR_V1",
+          "chartIndex": 1,
+          "establishedOriginFrom": 2,
+          "identity": {
+            "main": "MWP:OANDA:AUD_JPY",
+            "fixedRevision": "provider:OANDA:AUD_JPY",
+            "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+            "algorithmVersion": "SWING_SR_V1:1",
+            "calculationStart": 1756270800000,
+            "period": "240"
+          },
+          "coverage": {
+            "first": 1789074000000,
+            "last": 1792558800000,
+            "count": 171,
+            "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+            "sourceFirst": 1789074000000,
+            "correctionVersion": 0,
+            "tailVersion": 46
+          },
+          "revision": "46",
+          "credential": "9f0ea59abf70dd24",
+          "rows": 171,
+          "valid": 684
+        },
+        {
+          "start": 1792574379148,
+          "acceptedAt": 1792574379158,
+          "elapsed": 10,
+          "accepted": true,
+          "generation": 4,
+          "studyId": "vz5KjY",
+          "name": "SUPERTREND_PINE_V1",
+          "chartIndex": 0,
+          "establishedOriginFrom": 1,
+          "identity": {
+            "main": "MWP:OANDA:AUD_JPY",
+            "fixedRevision": "provider:OANDA:AUD_JPY",
+            "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+            "algorithmVersion": "SUPERTREND_PINE_V1:1",
+            "calculationStart": 1783490400000,
+            "period": "60"
+          },
+          "coverage": {
+            "first": 1789747200000,
+            "last": 1792569600000,
+            "count": 545,
+            "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+            "sourceFirst": 1789747200000,
+            "correctionVersion": 0,
+            "tailVersion": 53
+          },
+          "revision": "53",
+          "credential": "1fe8f2359539947e",
+          "rows": 545,
+          "valid": 1663
+        },
+        {
+          "start": 1792574381411,
+          "acceptedAt": 1792574381415,
+          "elapsed": 4,
+          "accepted": true,
+          "generation": 5,
+          "studyId": "LsNESc",
+          "name": "SWING_SR_V1",
+          "chartIndex": 1,
+          "establishedOriginFrom": null,
+          "identity": {
+            "main": "MWP:OANDA:AUD_JPY",
+            "fixedRevision": "provider:OANDA:AUD_JPY",
+            "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+            "algorithmVersion": "SWING_SR_V1:1",
+            "calculationStart": 1756270800000,
+            "period": "240"
+          },
+          "coverage": {
+            "first": 1785877200000,
+            "last": 1792558800000,
+            "count": 333,
+            "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+            "sourceFirst": 1785877200000,
+            "correctionVersion": 0,
+            "tailVersion": 46
+          },
+          "revision": "46",
+          "credential": "9f0ea59abf70dd24",
+          "rows": 162,
+          "valid": 648
+        },
+        {
+          "start": 1792574397894,
+          "acceptedAt": 1792574397896,
+          "elapsed": 2,
+          "accepted": true,
+          "generation": 7,
+          "studyId": "vz5KjY",
+          "name": "SUPERTREND_PINE_V1",
+          "chartIndex": 0,
+          "establishedOriginFrom": null,
+          "identity": {
+            "main": "MWP:OANDA:AUD_JPY",
+            "fixedRevision": "provider:OANDA:AUD_JPY",
+            "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+            "algorithmVersion": "SUPERTREND_PINE_V1:1",
+            "calculationStart": 1783490400000,
+            "period": "60"
+          },
+          "coverage": {
+            "first": 1791352800000,
+            "last": 1792569600000,
+            "count": 243,
+            "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+            "sourceFirst": 1791352800000,
+            "correctionVersion": 0,
+            "tailVersion": 54
+          },
+          "revision": "54",
+          "credential": "29e7a7e3cdbd00ce",
+          "rows": 243,
+          "valid": 741
+        }
+      ],
+      "reloads": [
+        {
+          "symbol": "MWP:OANDA:AUD_JPY",
+          "res": "60",
+          "at": 1792574396685
+        }
+      ],
+      "charts": [
+        {
+          "index": 0,
+          "symbol": "MWP:OANDA:AUD_JPY",
+          "resolution": "60",
+          "ready": true,
+          "viewport": {
+            "from": 1792144800,
+            "to": 1792605600
+          },
+          "mainRows": 243,
+          "studies": [
+            {
+              "id": "vz5KjY",
+              "name": "守望 Python SUPERTREND_PINE_V1",
+              "scope": {
+                "generation": 7,
+                "name": "SUPERTREND_PINE_V1",
+                "resolution": "60",
+                "first": 1791352800000,
+                "last": 1792569600000,
+                "count": 243,
+                "coverage": {
+                  "first": 1791352800000,
+                  "last": 1792569600000,
+                  "count": 243,
+                  "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+                  "sourceFirst": 1791352800000,
+                  "correctionVersion": 0,
+                  "tailVersion": 54,
+                  "generation": 7
+                },
+                "transition": null
+              },
+              "rows": 243,
+              "valid": 741
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "symbol": "MWP:OANDA:AUD_JPY",
+          "resolution": "240",
+          "ready": true,
+          "viewport": {
+            "from": 1791234000,
+            "to": 1792702800
+          },
+          "mainRows": 333,
+          "studies": [
+            {
+              "id": "LsNESc",
+              "name": "守望 Python SWING_SR_V1",
+              "scope": {
+                "generation": 5,
+                "name": "SWING_SR_V1",
+                "resolution": "240",
+                "first": 1785877200000,
+                "last": 1792558800000,
+                "count": 333,
+                "coverage": {
+                  "first": 1785877200000,
+                  "last": 1792558800000,
+                  "count": 333,
+                  "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+                  "sourceFirst": 1785877200000,
+                  "correctionVersion": 0,
+                  "tailVersion": 46,
+                  "generation": 5
+                },
+                "transition": null
+              },
+              "rows": 333,
+              "valid": 1332
+            }
+          ]
+        }
+      ],
+      "nativeChecks": [
+        {
+          "index": 0,
+          "studyId": "vz5KjY",
+          "rows": 243,
+          "valid": 741,
+          "missing": 0,
+          "priceMismatches": 0,
+          "mismatches": 0,
+          "samples": [],
+          "generation": 7,
+          "acceptedGeneration": 7,
+          "coverage": {
+            "first": 1791352800000,
+            "last": 1792569600000,
+            "count": 243,
+            "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+            "sourceFirst": 1791352800000,
+            "correctionVersion": 0,
+            "tailVersion": 54,
+            "generation": 7
+          },
+          "first": 1791352800000,
+          "last": 1792569600000,
+          "count": 243,
+          "viewport": {
+            "from": 1792144800,
+            "to": 1792605600
+          },
+          "identity": {
+            "main": "MWP:OANDA:AUD_JPY",
+            "fixedRevision": "provider:OANDA:AUD_JPY",
+            "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+            "algorithmVersion": "SUPERTREND_PINE_V1:1",
+            "calculationStart": 1783490400000,
+            "period": "60"
+          },
+          "credential": "29e7a7e3cdbd00ce",
+          "revision": "54"
+        },
+        {
+          "index": 1,
+          "studyId": "LsNESc",
+          "rows": 333,
+          "valid": 1332,
+          "missing": 0,
+          "priceMismatches": 0,
+          "mismatches": 0,
+          "samples": [],
+          "generation": 5,
+          "acceptedGeneration": 5,
+          "coverage": {
+            "first": 1785877200000,
+            "last": 1792558800000,
+            "count": 333,
+            "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+            "sourceFirst": 1785877200000,
+            "correctionVersion": 0,
+            "tailVersion": 46,
+            "generation": 5
+          },
+          "first": 1785877200000,
+          "last": 1792558800000,
+          "count": 333,
+          "viewport": {
+            "from": 1791234000,
+            "to": 1792702800
+          },
+          "identity": {
+            "main": "MWP:OANDA:AUD_JPY",
+            "fixedRevision": "provider:OANDA:AUD_JPY",
+            "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+            "algorithmVersion": "SWING_SR_V1:1",
+            "calculationStart": 1756270800000,
+            "period": "240"
+          },
+          "credential": "9f0ea59abf70dd24",
+          "revision": "46"
+        }
+      ]
+    },
+    {
+      "name": "real-correction-H1-association",
+      "rejectedAttempt": "24bffd694851430c80cde2319c8a79f6",
+      "rejectedCredential": "1fe8f2359539947e",
+      "acceptedCredential": "29e7a7e3cdbd00ce",
+      "studyId": "vz5KjY",
+      "generation": 7,
+      "revision": "54",
+      "elapsed": 1402
+    },
+    {
+      "name": "visible-range-preserved",
+      "index": 0,
+      "viewport": {
+        "from": 1792144800,
+        "to": 1792605600
+      },
+      "visibleRows": 71,
+      "mainRowsBefore": 545,
+      "mainRowsAfter": 243
+    },
+    {
+      "name": "real-correction-H1-elapsed",
+      "elapsed": 15875
+    },
+    {
+      "fixture": "correct",
+      "frame": "H4",
+      "result": [
+        {
+          "frame": "H4",
+          "operation": "correct",
+          "changed": 1,
+          "epoch_changed": true,
+          "first": 1791968400000,
+          "last": 1791968400000,
+          "freshness_simulated": true
+        }
+      ]
+    },
+    {
+      "name": "real-correction-H4",
+      "at": 1792574413328,
+      "accepted": [
+        {
+          "start": 1792574378686,
+          "acceptedAt": 1792574378691,
+          "elapsed": 5,
+          "accepted": true,
+          "generation": 3,
+          "studyId": "LsNESc",
+          "name": "SWING_SR_V1",
+          "chartIndex": 1,
+          "establishedOriginFrom": 2,
+          "identity": {
+            "main": "MWP:OANDA:AUD_JPY",
+            "fixedRevision": "provider:OANDA:AUD_JPY",
+            "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+            "algorithmVersion": "SWING_SR_V1:1",
+            "calculationStart": 1756270800000,
+            "period": "240"
+          },
+          "coverage": {
+            "first": 1789074000000,
+            "last": 1792558800000,
+            "count": 171,
+            "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+            "sourceFirst": 1789074000000,
+            "correctionVersion": 0,
+            "tailVersion": 46
+          },
+          "revision": "46",
+          "credential": "9f0ea59abf70dd24",
+          "rows": 171,
+          "valid": 684
+        },
+        {
+          "start": 1792574379148,
+          "acceptedAt": 1792574379158,
+          "elapsed": 10,
+          "accepted": true,
+          "generation": 4,
+          "studyId": "vz5KjY",
+          "name": "SUPERTREND_PINE_V1",
+          "chartIndex": 0,
+          "establishedOriginFrom": 1,
+          "identity": {
+            "main": "MWP:OANDA:AUD_JPY",
+            "fixedRevision": "provider:OANDA:AUD_JPY",
+            "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+            "algorithmVersion": "SUPERTREND_PINE_V1:1",
+            "calculationStart": 1783490400000,
+            "period": "60"
+          },
+          "coverage": {
+            "first": 1789747200000,
+            "last": 1792569600000,
+            "count": 545,
+            "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+            "sourceFirst": 1789747200000,
+            "correctionVersion": 0,
+            "tailVersion": 53
+          },
+          "revision": "53",
+          "credential": "1fe8f2359539947e",
+          "rows": 545,
+          "valid": 1663
+        },
+        {
+          "start": 1792574381411,
+          "acceptedAt": 1792574381415,
+          "elapsed": 4,
+          "accepted": true,
+          "generation": 5,
+          "studyId": "LsNESc",
+          "name": "SWING_SR_V1",
+          "chartIndex": 1,
+          "establishedOriginFrom": null,
+          "identity": {
+            "main": "MWP:OANDA:AUD_JPY",
+            "fixedRevision": "provider:OANDA:AUD_JPY",
+            "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+            "algorithmVersion": "SWING_SR_V1:1",
+            "calculationStart": 1756270800000,
+            "period": "240"
+          },
+          "coverage": {
+            "first": 1785877200000,
+            "last": 1792558800000,
+            "count": 333,
+            "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+            "sourceFirst": 1785877200000,
+            "correctionVersion": 0,
+            "tailVersion": 46
+          },
+          "revision": "46",
+          "credential": "9f0ea59abf70dd24",
+          "rows": 162,
+          "valid": 648
+        },
+        {
+          "start": 1792574397894,
+          "acceptedAt": 1792574397896,
+          "elapsed": 2,
+          "accepted": true,
+          "generation": 7,
+          "studyId": "vz5KjY",
+          "name": "SUPERTREND_PINE_V1",
+          "chartIndex": 0,
+          "establishedOriginFrom": null,
+          "identity": {
+            "main": "MWP:OANDA:AUD_JPY",
+            "fixedRevision": "provider:OANDA:AUD_JPY",
+            "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+            "algorithmVersion": "SUPERTREND_PINE_V1:1",
+            "calculationStart": 1783490400000,
+            "period": "60"
+          },
+          "coverage": {
+            "first": 1791352800000,
+            "last": 1792569600000,
+            "count": 243,
+            "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+            "sourceFirst": 1791352800000,
+            "correctionVersion": 0,
+            "tailVersion": 54
+          },
+          "revision": "54",
+          "credential": "29e7a7e3cdbd00ce",
+          "rows": 243,
+          "valid": 741
+        },
+        {
+          "start": 1792574411292,
+          "acceptedAt": 1792574411293,
+          "elapsed": 1,
+          "accepted": true,
+          "generation": 8,
+          "studyId": "LsNESc",
+          "name": "SWING_SR_V1",
+          "chartIndex": 1,
+          "establishedOriginFrom": null,
+          "identity": {
+            "main": "MWP:OANDA:AUD_JPY",
+            "fixedRevision": "provider:OANDA:AUD_JPY",
+            "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+            "algorithmVersion": "SWING_SR_V1:1",
+            "calculationStart": 1756270800000,
+            "period": "240"
+          },
+          "coverage": {
+            "first": 1787778000000,
+            "last": 1792558800000,
+            "count": 237,
+            "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+            "sourceFirst": 1787778000000,
+            "correctionVersion": 0,
+            "tailVersion": 47
+          },
+          "revision": "47",
+          "credential": "d17cf56e7ac95da0",
+          "rows": 237,
+          "valid": 948
+        }
+      ],
+      "reloads": [
+        {
+          "symbol": "MWP:OANDA:AUD_JPY",
+          "res": "60",
+          "at": 1792574396685
+        },
+        {
+          "symbol": "MWP:OANDA:AUD_JPY",
+          "res": "240",
+          "at": 1792574410792
+        }
+      ],
+      "charts": [
+        {
+          "index": 0,
+          "symbol": "MWP:OANDA:AUD_JPY",
+          "resolution": "60",
+          "ready": true,
+          "viewport": {
+            "from": 1792144800,
+            "to": 1792605600
+          },
+          "mainRows": 243,
+          "studies": [
+            {
+              "id": "vz5KjY",
+              "name": "守望 Python SUPERTREND_PINE_V1",
+              "scope": {
+                "generation": 7,
+                "name": "SUPERTREND_PINE_V1",
+                "resolution": "60",
+                "first": 1791352800000,
+                "last": 1792569600000,
+                "count": 243,
+                "coverage": {
+                  "first": 1791352800000,
+                  "last": 1792569600000,
+                  "count": 243,
+                  "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+                  "sourceFirst": 1791352800000,
+                  "correctionVersion": 0,
+                  "tailVersion": 54,
+                  "generation": 7
+                },
+                "transition": null
+              },
+              "rows": 243,
+              "valid": 741
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "symbol": "MWP:OANDA:AUD_JPY",
+          "resolution": "240",
+          "ready": true,
+          "viewport": {
+            "from": 1791234000,
+            "to": 1792702800
+          },
+          "mainRows": 237,
+          "studies": [
+            {
+              "id": "LsNESc",
+              "name": "守望 Python SWING_SR_V1",
+              "scope": {
+                "generation": 8,
+                "name": "SWING_SR_V1",
+                "resolution": "240",
+                "first": 1787778000000,
+                "last": 1792558800000,
+                "count": 237,
+                "coverage": {
+                  "first": 1787778000000,
+                  "last": 1792558800000,
+                  "count": 237,
+                  "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+                  "sourceFirst": 1787778000000,
+                  "correctionVersion": 0,
+                  "tailVersion": 47,
+                  "generation": 8
+                },
+                "transition": null
+              },
+              "rows": 237,
+              "valid": 948
+            }
+          ]
+        }
+      ],
+      "nativeChecks": [
+        {
+          "index": 0,
+          "studyId": "vz5KjY",
+          "rows": 243,
+          "valid": 741,
+          "missing": 0,
+          "priceMismatches": 0,
+          "mismatches": 0,
+          "samples": [],
+          "generation": 7,
+          "acceptedGeneration": 7,
+          "coverage": {
+            "first": 1791352800000,
+            "last": 1792569600000,
+            "count": 243,
+            "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+            "sourceFirst": 1791352800000,
+            "correctionVersion": 0,
+            "tailVersion": 54,
+            "generation": 7
+          },
+          "first": 1791352800000,
+          "last": 1792569600000,
+          "count": 243,
+          "viewport": {
+            "from": 1792144800,
+            "to": 1792605600
+          },
+          "identity": {
+            "main": "MWP:OANDA:AUD_JPY",
+            "fixedRevision": "provider:OANDA:AUD_JPY",
+            "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+            "algorithmVersion": "SUPERTREND_PINE_V1:1",
+            "calculationStart": 1783490400000,
+            "period": "60"
+          },
+          "credential": "29e7a7e3cdbd00ce",
+          "revision": "54"
+        },
+        {
+          "index": 1,
+          "studyId": "LsNESc",
+          "rows": 237,
+          "valid": 948,
+          "missing": 0,
+          "priceMismatches": 0,
+          "mismatches": 0,
+          "samples": [],
+          "generation": 8,
+          "acceptedGeneration": 8,
+          "coverage": {
+            "first": 1787778000000,
+            "last": 1792558800000,
+            "count": 237,
+            "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+            "sourceFirst": 1787778000000,
+            "correctionVersion": 0,
+            "tailVersion": 47,
+            "generation": 8
+          },
+          "first": 1787778000000,
+          "last": 1792558800000,
+          "count": 237,
+          "viewport": {
+            "from": 1791234000,
+            "to": 1792702800
+          },
+          "identity": {
+            "main": "MWP:OANDA:AUD_JPY",
+            "fixedRevision": "provider:OANDA:AUD_JPY",
+            "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+            "algorithmVersion": "SWING_SR_V1:1",
+            "calculationStart": 1756270800000,
+            "period": "240"
+          },
+          "credential": "d17cf56e7ac95da0",
+          "revision": "47"
+        }
+      ]
+    },
+    {
+      "name": "real-correction-H4-association",
+      "rejectedAttempt": "b88974ed8d30432a8630e9ac8e8c15a9",
+      "rejectedCredential": "9f0ea59abf70dd24",
+      "acceptedCredential": "d17cf56e7ac95da0",
+      "studyId": "LsNESc",
+      "generation": 8,
+      "revision": "47",
+      "elapsed": 610
+    },
+    {
+      "name": "visible-range-preserved",
+      "index": 1,
+      "viewport": {
+        "from": 1791234000,
+        "to": 1792702800
+      },
+      "visibleRows": 69,
+      "mainRowsBefore": 333,
+      "mainRowsAfter": 237
+    },
+    {
+      "name": "real-correction-H4-elapsed",
+      "elapsed": 13037
+    }
+  ],
+  "samples": [
+    {
+      "stage": "initial",
+      "at": 1792574378047,
+      "event": "candidate",
+      "attempt": 1,
+      "index": 0,
+      "studyId": "vz5KjY",
+      "ready": true,
+      "generation": 1,
+      "scope": {
+        "generation": 1,
+        "name": "SUPERTREND_PINE_V1",
+        "resolution": "60",
+        "first": 1789747200000,
+        "last": 1792569600000,
+        "count": 545,
+        "coverage": null,
+        "transition": null
+      },
+      "viewport": {
+        "from": 1792144800,
+        "to": 1792605600
+      },
+      "mainRows": 545,
+      "mainFingerprint": "52d48bf6695fd58b5bb7a2837082f17ff887e7759775a48c5bef6148e93a8e27",
+      "reason": "current generation has no stage acceptance"
+    },
+    {
+      "stage": "initial",
+      "at": 1792574378226,
+      "event": "candidate",
+      "attempt": 2,
+      "index": 0,
+      "studyId": "vz5KjY",
+      "ready": true,
+      "generation": 1,
+      "scope": {
+        "generation": 1,
+        "name": "SUPERTREND_PINE_V1",
+        "resolution": "60",
+        "first": 1789747200000,
+        "last": 1792569600000,
+        "count": 545,
+        "coverage": null,
+        "transition": null
+      },
+      "viewport": {
+        "from": 1792144800,
+        "to": 1792605600
+      },
+      "mainRows": 545,
+      "mainFingerprint": "52d48bf6695fd58b5bb7a2837082f17ff887e7759775a48c5bef6148e93a8e27",
+      "reason": "current generation has no stage acceptance"
+    },
+    {
+      "stage": "initial",
+      "at": 1792574378333,
+      "event": "candidate",
+      "attempt": 3,
+      "index": 0,
+      "studyId": "vz5KjY",
+      "ready": true,
+      "generation": 1,
+      "scope": {
+        "generation": 1,
+        "name": "SUPERTREND_PINE_V1",
+        "resolution": "60",
+        "first": 1789747200000,
+        "last": 1792569600000,
+        "count": 545,
+        "coverage": null,
+        "transition": null
+      },
+      "viewport": {
+        "from": 1792144800,
+        "to": 1792605600
+      },
+      "mainRows": 545,
+      "mainFingerprint": "52d48bf6695fd58b5bb7a2837082f17ff887e7759775a48c5bef6148e93a8e27",
+      "reason": "current generation has no stage acceptance"
+    },
+    {
+      "stage": "initial",
+      "at": 1792574378433,
+      "event": "candidate",
+      "attempt": 4,
+      "index": 0,
+      "studyId": "vz5KjY",
+      "ready": true,
+      "generation": 1,
+      "scope": {
+        "generation": 1,
+        "name": "SUPERTREND_PINE_V1",
+        "resolution": "60",
+        "first": 1789747200000,
+        "last": 1792569600000,
+        "count": 545,
+        "coverage": null,
+        "transition": null
+      },
+      "viewport": {
+        "from": 1792144800,
+        "to": 1792605600
+      },
+      "mainRows": 545,
+      "mainFingerprint": "52d48bf6695fd58b5bb7a2837082f17ff887e7759775a48c5bef6148e93a8e27",
+      "reason": "current generation has no stage acceptance"
+    },
+    {
+      "stage": "initial",
+      "at": 1792574378532,
+      "event": "candidate",
+      "attempt": 5,
+      "index": 0,
+      "studyId": "vz5KjY",
+      "ready": true,
+      "generation": 1,
+      "scope": {
+        "generation": 1,
+        "name": "SUPERTREND_PINE_V1",
+        "resolution": "60",
+        "first": 1789747200000,
+        "last": 1792569600000,
+        "count": 545,
+        "coverage": null,
+        "transition": null
+      },
+      "viewport": {
+        "from": 1792144800,
+        "to": 1792605600
+      },
+      "mainRows": 545,
+      "mainFingerprint": "52d48bf6695fd58b5bb7a2837082f17ff887e7759775a48c5bef6148e93a8e27",
+      "reason": "current generation has no stage acceptance"
+    },
+    {
+      "stage": "initial",
+      "at": 1792574378625,
+      "event": "candidate",
+      "attempt": 6,
+      "index": 0,
+      "studyId": "vz5KjY",
+      "ready": true,
+      "generation": 1,
+      "scope": {
+        "generation": 1,
+        "name": "SUPERTREND_PINE_V1",
+        "resolution": "60",
+        "first": 1789747200000,
+        "last": 1792569600000,
+        "count": 545,
+        "coverage": null,
+        "transition": null
+      },
+      "viewport": {
+        "from": 1792144800,
+        "to": 1792605600
+      },
+      "mainRows": 545,
+      "mainFingerprint": "52d48bf6695fd58b5bb7a2837082f17ff887e7759775a48c5bef6148e93a8e27",
+      "reason": "current generation has no stage acceptance"
+    },
+    {
+      "stage": "initial",
+      "at": 1792574378827,
+      "event": "candidate",
+      "attempt": 7,
+      "index": 0,
+      "studyId": "vz5KjY",
+      "ready": true,
+      "generation": 1,
+      "scope": {
+        "generation": 1,
+        "name": "SUPERTREND_PINE_V1",
+        "resolution": "60",
+        "first": 1789747200000,
+        "last": 1792569600000,
+        "count": 545,
+        "coverage": null,
+        "transition": null
+      },
+      "viewport": {
+        "from": 1792144800,
+        "to": 1792605600
+      },
+      "mainRows": 545,
+      "mainFingerprint": "52d48bf6695fd58b5bb7a2837082f17ff887e7759775a48c5bef6148e93a8e27",
+      "reason": "current generation has no stage acceptance"
+    },
+    {
+      "stage": "initial",
+      "at": 1792574378961,
+      "event": "candidate",
+      "attempt": 8,
+      "index": 0,
+      "studyId": "vz5KjY",
+      "ready": true,
+      "generation": 1,
+      "scope": {
+        "generation": 1,
+        "name": "SUPERTREND_PINE_V1",
+        "resolution": "60",
+        "first": 1789747200000,
+        "last": 1792569600000,
+        "count": 545,
+        "coverage": null,
+        "transition": null
+      },
+      "viewport": {
+        "from": 1792144800,
+        "to": 1792605600
+      },
+      "mainRows": 545,
+      "mainFingerprint": "52d48bf6695fd58b5bb7a2837082f17ff887e7759775a48c5bef6148e93a8e27",
+      "reason": "current generation has no stage acceptance"
+    },
+    {
+      "stage": "initial",
+      "at": 1792574379059,
+      "event": "candidate",
+      "attempt": 9,
+      "index": 0,
+      "studyId": "vz5KjY",
+      "ready": true,
+      "generation": 1,
+      "scope": {
+        "generation": 1,
+        "name": "SUPERTREND_PINE_V1",
+        "resolution": "60",
+        "first": 1789747200000,
+        "last": 1792569600000,
+        "count": 545,
+        "coverage": null,
+        "transition": null
+      },
+      "viewport": {
+        "from": 1792144800,
+        "to": 1792605600
+      },
+      "mainRows": 545,
+      "mainFingerprint": "52d48bf6695fd58b5bb7a2837082f17ff887e7759775a48c5bef6148e93a8e27",
+      "reason": "current generation has no stage acceptance"
+    },
+    {
+      "stage": "initial",
+      "at": 1792574379297,
+      "event": "candidate",
+      "attempt": 10,
+      "index": 0,
+      "studyId": "vz5KjY",
+      "ready": true,
+      "generation": 4,
+      "acceptedGeneration": 4,
+      "revision": "53",
+      "credential": "1fe8f2359539947e",
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+        "algorithmVersion": "SUPERTREND_PINE_V1:1",
+        "calculationStart": 1783490400000,
+        "period": "60"
+      },
+      "scope": {
+        "generation": 4,
+        "name": "SUPERTREND_PINE_V1",
+        "resolution": "60",
+        "first": 1789747200000,
+        "last": 1792569600000,
+        "count": 545,
+        "coverage": {
+          "first": 1789747200000,
+          "last": 1792569600000,
+          "count": 545,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+          "sourceFirst": 1789747200000,
+          "correctionVersion": 0,
+          "tailVersion": 53,
+          "generation": 4
+        },
+        "transition": null
+      },
+      "viewport": {
+        "from": 1792144800,
+        "to": 1792605600
+      },
+      "mainRows": 545,
+      "mainFingerprint": "52d48bf6695fd58b5bb7a2837082f17ff887e7759775a48c5bef6148e93a8e27"
+    },
+    {
+      "stage": "initial",
+      "event": "reference",
+      "started": 1792574379298,
+      "elapsed": 2296,
+      "credential": "1fe8f2359539947e",
+      "revision": "53",
+      "origin": 1783490400000,
+      "rows": 545
+    },
+    {
+      "stage": "initial",
+      "at": 1792574381690,
+      "event": "comparison",
+      "attempt": 10,
+      "result": {
+        "index": 0,
+        "studyId": "vz5KjY",
+        "rows": 545,
+        "valid": 1663,
+        "missing": 0,
+        "priceMismatches": 0,
+        "mismatches": 0,
+        "samples": [],
+        "generation": 4,
+        "acceptedGeneration": 4,
+        "coverage": {
+          "first": 1789747200000,
+          "last": 1792569600000,
+          "count": 545,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+          "sourceFirst": 1789747200000,
+          "correctionVersion": 0,
+          "tailVersion": 53,
+          "generation": 4
+        },
+        "first": 1789747200000,
+        "last": 1792569600000,
+        "count": 545,
+        "viewport": {
+          "from": 1792144800,
+          "to": 1792605600
+        },
+        "identity": {
+          "main": "MWP:OANDA:AUD_JPY",
+          "fixedRevision": "provider:OANDA:AUD_JPY",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1783490400000,
+          "period": "60"
+        },
+        "credential": "1fe8f2359539947e",
+        "revision": "53"
+      }
+    },
+    {
+      "stage": "initial",
+      "at": 1792574381733,
+      "event": "candidate",
+      "attempt": 1,
+      "index": 1,
+      "studyId": "LsNESc",
+      "ready": true,
+      "generation": 5,
+      "acceptedGeneration": 5,
+      "revision": "46",
+      "credential": "9f0ea59abf70dd24",
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+        "algorithmVersion": "SWING_SR_V1:1",
+        "calculationStart": 1756270800000,
+        "period": "240"
+      },
+      "scope": {
+        "generation": 5,
+        "name": "SWING_SR_V1",
+        "resolution": "240",
+        "first": 1785877200000,
+        "last": 1792558800000,
+        "count": 333,
+        "coverage": {
+          "first": 1785877200000,
+          "last": 1792558800000,
+          "count": 333,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+          "sourceFirst": 1785877200000,
+          "correctionVersion": 0,
+          "tailVersion": 46,
+          "generation": 5
+        },
+        "transition": null
+      },
+      "viewport": {
+        "from": 1791234000,
+        "to": 1792702800
+      },
+      "mainRows": 333,
+      "mainFingerprint": "935342f1c1c2b5e0692d9314de922cc5059eaca4dbd0b5a18065aff4ff0e5584"
+    },
+    {
+      "stage": "initial",
+      "event": "reference",
+      "started": 1792574381733,
+      "elapsed": 472,
+      "credential": "9f0ea59abf70dd24",
+      "revision": "46",
+      "origin": 1756270800000,
+      "rows": 333
+    },
+    {
+      "stage": "initial",
+      "at": 1792574382243,
+      "event": "comparison",
+      "attempt": 1,
+      "result": {
+        "index": 1,
+        "studyId": "LsNESc",
+        "rows": 333,
+        "valid": 1332,
+        "missing": 0,
+        "priceMismatches": 0,
+        "mismatches": 0,
+        "samples": [],
+        "generation": 5,
+        "acceptedGeneration": 5,
+        "coverage": {
+          "first": 1785877200000,
+          "last": 1792558800000,
+          "count": 333,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+          "sourceFirst": 1785877200000,
+          "correctionVersion": 0,
+          "tailVersion": 46,
+          "generation": 5
+        },
+        "first": 1785877200000,
+        "last": 1792558800000,
+        "count": 333,
+        "viewport": {
+          "from": 1791234000,
+          "to": 1792702800
+        },
+        "identity": {
+          "main": "MWP:OANDA:AUD_JPY",
+          "fixedRevision": "provider:OANDA:AUD_JPY",
+          "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1756270800000,
+          "period": "240"
+        },
+        "credential": "9f0ea59abf70dd24",
+        "revision": "46"
+      }
+    },
+    {
+      "stage": "initial",
+      "at": 1792574383874,
+      "event": "candidate",
+      "attempt": 1,
+      "index": 0,
+      "studyId": "vz5KjY",
+      "ready": true,
+      "generation": 4,
+      "acceptedGeneration": 4,
+      "revision": "53",
+      "credential": "1fe8f2359539947e",
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+        "algorithmVersion": "SUPERTREND_PINE_V1:1",
+        "calculationStart": 1783490400000,
+        "period": "60"
+      },
+      "scope": {
+        "generation": 4,
+        "name": "SUPERTREND_PINE_V1",
+        "resolution": "60",
+        "first": 1789747200000,
+        "last": 1792569600000,
+        "count": 545,
+        "coverage": {
+          "first": 1789747200000,
+          "last": 1792569600000,
+          "count": 545,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+          "sourceFirst": 1789747200000,
+          "correctionVersion": 0,
+          "tailVersion": 53,
+          "generation": 4
+        },
+        "transition": null
+      },
+      "viewport": {
+        "from": 1792144800,
+        "to": 1792605600
+      },
+      "mainRows": 545,
+      "mainFingerprint": "52d48bf6695fd58b5bb7a2837082f17ff887e7759775a48c5bef6148e93a8e27"
+    },
+    {
+      "stage": "initial",
+      "event": "reference",
+      "started": 1792574383875,
+      "elapsed": 216,
+      "credential": "1fe8f2359539947e",
+      "revision": "53",
+      "origin": 1783490400000,
+      "rows": 545
+    },
+    {
+      "stage": "initial",
+      "at": 1792574384231,
+      "event": "comparison",
+      "attempt": 1,
+      "result": {
+        "index": 0,
+        "studyId": "vz5KjY",
+        "rows": 545,
+        "valid": 1663,
+        "missing": 0,
+        "priceMismatches": 0,
+        "mismatches": 0,
+        "samples": [],
+        "generation": 4,
+        "acceptedGeneration": 4,
+        "coverage": {
+          "first": 1789747200000,
+          "last": 1792569600000,
+          "count": 545,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+          "sourceFirst": 1789747200000,
+          "correctionVersion": 0,
+          "tailVersion": 53,
+          "generation": 4
+        },
+        "first": 1789747200000,
+        "last": 1792569600000,
+        "count": 545,
+        "viewport": {
+          "from": 1792144800,
+          "to": 1792605600
+        },
+        "identity": {
+          "main": "MWP:OANDA:AUD_JPY",
+          "fixedRevision": "provider:OANDA:AUD_JPY",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1783490400000,
+          "period": "60"
+        },
+        "credential": "1fe8f2359539947e",
+        "revision": "53"
+      }
+    },
+    {
+      "stage": "initial",
+      "at": 1792574384268,
+      "event": "candidate",
+      "attempt": 1,
+      "index": 1,
+      "studyId": "LsNESc",
+      "ready": true,
+      "generation": 5,
+      "acceptedGeneration": 5,
+      "revision": "46",
+      "credential": "9f0ea59abf70dd24",
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+        "algorithmVersion": "SWING_SR_V1:1",
+        "calculationStart": 1756270800000,
+        "period": "240"
+      },
+      "scope": {
+        "generation": 5,
+        "name": "SWING_SR_V1",
+        "resolution": "240",
+        "first": 1785877200000,
+        "last": 1792558800000,
+        "count": 333,
+        "coverage": {
+          "first": 1785877200000,
+          "last": 1792558800000,
+          "count": 333,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+          "sourceFirst": 1785877200000,
+          "correctionVersion": 0,
+          "tailVersion": 46,
+          "generation": 5
+        },
+        "transition": null
+      },
+      "viewport": {
+        "from": 1791234000,
+        "to": 1792702800
+      },
+      "mainRows": 333,
+      "mainFingerprint": "935342f1c1c2b5e0692d9314de922cc5059eaca4dbd0b5a18065aff4ff0e5584"
+    },
+    {
+      "stage": "initial",
+      "event": "reference",
+      "started": 1792574384268,
+      "elapsed": 139,
+      "credential": "9f0ea59abf70dd24",
+      "revision": "46",
+      "origin": 1756270800000,
+      "rows": 333
+    },
+    {
+      "stage": "initial",
+      "at": 1792574384436,
+      "event": "comparison",
+      "attempt": 1,
+      "result": {
+        "index": 1,
+        "studyId": "LsNESc",
+        "rows": 333,
+        "valid": 1332,
+        "missing": 0,
+        "priceMismatches": 0,
+        "mismatches": 0,
+        "samples": [],
+        "generation": 5,
+        "acceptedGeneration": 5,
+        "coverage": {
+          "first": 1785877200000,
+          "last": 1792558800000,
+          "count": 333,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+          "sourceFirst": 1785877200000,
+          "correctionVersion": 0,
+          "tailVersion": 46,
+          "generation": 5
+        },
+        "first": 1785877200000,
+        "last": 1792558800000,
+        "count": 333,
+        "viewport": {
+          "from": 1791234000,
+          "to": 1792702800
+        },
+        "identity": {
+          "main": "MWP:OANDA:AUD_JPY",
+          "fixedRevision": "provider:OANDA:AUD_JPY",
+          "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1756270800000,
+          "period": "240"
+        },
+        "credential": "9f0ea59abf70dd24",
+        "revision": "46"
+      }
+    },
+    {
+      "stage": "real-correction-H1",
+      "at": 1792574397295,
+      "event": "candidate",
+      "attempt": 1,
+      "index": 0,
+      "studyId": "vz5KjY",
+      "ready": true,
+      "generation": 6,
+      "scope": {
+        "generation": 6,
+        "name": "SUPERTREND_PINE_V1",
+        "resolution": "60",
+        "first": 1791853200000,
+        "last": 1792569600000,
+        "count": 152,
+        "coverage": {
+          "first": 1789747200000,
+          "last": 1792569600000,
+          "count": 545,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+          "sourceFirst": 1789747200000,
+          "correctionVersion": 0,
+          "tailVersion": 53,
+          "generation": 6
+        },
+        "transition": null
+      },
+      "viewport": {
+        "from": 1792144800,
+        "to": 1792605600
+      },
+      "mainRows": 152,
+      "mainFingerprint": "e3fbc9bb84c76e3289fc6a22169866607ed68ae5da2faf08aa292e8c6697f1ad",
+      "reason": "current generation has no stage acceptance"
+    },
+    {
+      "stage": "real-correction-H1",
+      "at": 1792574397363,
+      "event": "candidate",
+      "attempt": 2,
+      "index": 0,
+      "studyId": "vz5KjY",
+      "ready": true,
+      "generation": 6,
+      "scope": {
+        "generation": 6,
+        "name": "SUPERTREND_PINE_V1",
+        "resolution": "60",
+        "first": 1791853200000,
+        "last": 1792569600000,
+        "count": 152,
+        "coverage": {
+          "first": 1789747200000,
+          "last": 1792569600000,
+          "count": 545,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+          "sourceFirst": 1789747200000,
+          "correctionVersion": 0,
+          "tailVersion": 53,
+          "generation": 6
+        },
+        "transition": null
+      },
+      "viewport": {
+        "from": 1792144800,
+        "to": 1792605600
+      },
+      "mainRows": 152,
+      "mainFingerprint": "e3fbc9bb84c76e3289fc6a22169866607ed68ae5da2faf08aa292e8c6697f1ad",
+      "reason": "current generation has no stage acceptance"
+    },
+    {
+      "stage": "real-correction-H1",
+      "at": 1792574397452,
+      "event": "candidate",
+      "attempt": 3,
+      "index": 0,
+      "studyId": "vz5KjY",
+      "ready": true,
+      "generation": 7,
+      "scope": {
+        "generation": 7,
+        "name": "SUPERTREND_PINE_V1",
+        "resolution": "60",
+        "first": 1791352800000,
+        "last": 1792569600000,
+        "count": 243,
+        "coverage": {
+          "first": 1789747200000,
+          "last": 1792569600000,
+          "count": 545,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+          "sourceFirst": 1789747200000,
+          "correctionVersion": 0,
+          "tailVersion": 53,
+          "generation": 7
+        },
+        "transition": null
+      },
+      "viewport": {
+        "from": 1792144800,
+        "to": 1792605600
+      },
+      "mainRows": 243,
+      "mainFingerprint": "97e31a030fba8ea93abdea51b6a5fd2c3dd82e6870e76c8f4488420c6d59eb1c",
+      "reason": "current generation has no stage acceptance"
+    },
+    {
+      "stage": "real-correction-H1",
+      "at": 1792574397551,
+      "event": "candidate",
+      "attempt": 4,
+      "index": 0,
+      "studyId": "vz5KjY",
+      "ready": true,
+      "generation": 7,
+      "scope": {
+        "generation": 7,
+        "name": "SUPERTREND_PINE_V1",
+        "resolution": "60",
+        "first": 1791352800000,
+        "last": 1792569600000,
+        "count": 243,
+        "coverage": {
+          "first": 1789747200000,
+          "last": 1792569600000,
+          "count": 545,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+          "sourceFirst": 1789747200000,
+          "correctionVersion": 0,
+          "tailVersion": 53,
+          "generation": 7
+        },
+        "transition": null
+      },
+      "viewport": {
+        "from": 1792144800,
+        "to": 1792605600
+      },
+      "mainRows": 243,
+      "mainFingerprint": "97e31a030fba8ea93abdea51b6a5fd2c3dd82e6870e76c8f4488420c6d59eb1c",
+      "reason": "current generation has no stage acceptance"
+    },
+    {
+      "stage": "real-correction-H1",
+      "at": 1792574397626,
+      "event": "candidate",
+      "attempt": 5,
+      "index": 0,
+      "studyId": "vz5KjY",
+      "ready": true,
+      "generation": 7,
+      "scope": {
+        "generation": 7,
+        "name": "SUPERTREND_PINE_V1",
+        "resolution": "60",
+        "first": 1791352800000,
+        "last": 1792569600000,
+        "count": 243,
+        "coverage": {
+          "first": 1789747200000,
+          "last": 1792569600000,
+          "count": 545,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+          "sourceFirst": 1789747200000,
+          "correctionVersion": 0,
+          "tailVersion": 53,
+          "generation": 7
+        },
+        "transition": null
+      },
+      "viewport": {
+        "from": 1792144800,
+        "to": 1792605600
+      },
+      "mainRows": 243,
+      "mainFingerprint": "97e31a030fba8ea93abdea51b6a5fd2c3dd82e6870e76c8f4488420c6d59eb1c",
+      "reason": "current generation has no stage acceptance"
+    },
+    {
+      "stage": "real-correction-H1",
+      "at": 1792574397705,
+      "event": "candidate",
+      "attempt": 6,
+      "index": 0,
+      "studyId": "vz5KjY",
+      "ready": true,
+      "generation": 7,
+      "scope": {
+        "generation": 7,
+        "name": "SUPERTREND_PINE_V1",
+        "resolution": "60",
+        "first": 1791352800000,
+        "last": 1792569600000,
+        "count": 243,
+        "coverage": {
+          "first": 1789747200000,
+          "last": 1792569600000,
+          "count": 545,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+          "sourceFirst": 1789747200000,
+          "correctionVersion": 0,
+          "tailVersion": 53,
+          "generation": 7
+        },
+        "transition": null
+      },
+      "viewport": {
+        "from": 1792144800,
+        "to": 1792605600
+      },
+      "mainRows": 243,
+      "mainFingerprint": "97e31a030fba8ea93abdea51b6a5fd2c3dd82e6870e76c8f4488420c6d59eb1c",
+      "reason": "current generation has no stage acceptance"
+    },
+    {
+      "stage": "real-correction-H1",
+      "at": 1792574397783,
+      "event": "candidate",
+      "attempt": 7,
+      "index": 0,
+      "studyId": "vz5KjY",
+      "ready": true,
+      "generation": 7,
+      "scope": {
+        "generation": 7,
+        "name": "SUPERTREND_PINE_V1",
+        "resolution": "60",
+        "first": 1791352800000,
+        "last": 1792569600000,
+        "count": 243,
+        "coverage": {
+          "first": 1789747200000,
+          "last": 1792569600000,
+          "count": 545,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+          "sourceFirst": 1789747200000,
+          "correctionVersion": 0,
+          "tailVersion": 53,
+          "generation": 7
+        },
+        "transition": null
+      },
+      "viewport": {
+        "from": 1792144800,
+        "to": 1792605600
+      },
+      "mainRows": 243,
+      "mainFingerprint": "97e31a030fba8ea93abdea51b6a5fd2c3dd82e6870e76c8f4488420c6d59eb1c",
+      "reason": "current generation has no stage acceptance"
+    },
+    {
+      "stage": "real-correction-H1",
+      "at": 1792574397859,
+      "event": "candidate",
+      "attempt": 8,
+      "index": 0,
+      "studyId": "vz5KjY",
+      "ready": true,
+      "generation": 7,
+      "scope": {
+        "generation": 7,
+        "name": "SUPERTREND_PINE_V1",
+        "resolution": "60",
+        "first": 1791352800000,
+        "last": 1792569600000,
+        "count": 243,
+        "coverage": {
+          "first": 1789747200000,
+          "last": 1792569600000,
+          "count": 545,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+          "sourceFirst": 1789747200000,
+          "correctionVersion": 0,
+          "tailVersion": 53,
+          "generation": 7
+        },
+        "transition": null
+      },
+      "viewport": {
+        "from": 1792144800,
+        "to": 1792605600
+      },
+      "mainRows": 243,
+      "mainFingerprint": "97e31a030fba8ea93abdea51b6a5fd2c3dd82e6870e76c8f4488420c6d59eb1c",
+      "reason": "current generation has no stage acceptance"
+    },
+    {
+      "stage": "real-correction-H1",
+      "at": 1792574397986,
+      "event": "candidate",
+      "attempt": 9,
+      "index": 0,
+      "studyId": "vz5KjY",
+      "ready": true,
+      "generation": 7,
+      "acceptedGeneration": 7,
+      "revision": "54",
+      "credential": "29e7a7e3cdbd00ce",
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+        "algorithmVersion": "SUPERTREND_PINE_V1:1",
+        "calculationStart": 1783490400000,
+        "period": "60"
+      },
+      "scope": {
+        "generation": 7,
+        "name": "SUPERTREND_PINE_V1",
+        "resolution": "60",
+        "first": 1791352800000,
+        "last": 1792569600000,
+        "count": 243,
+        "coverage": {
+          "first": 1791352800000,
+          "last": 1792569600000,
+          "count": 243,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+          "sourceFirst": 1791352800000,
+          "correctionVersion": 0,
+          "tailVersion": 54,
+          "generation": 7
+        },
+        "transition": null
+      },
+      "viewport": {
+        "from": 1792144800,
+        "to": 1792605600
+      },
+      "mainRows": 243,
+      "mainFingerprint": "97e31a030fba8ea93abdea51b6a5fd2c3dd82e6870e76c8f4488420c6d59eb1c"
+    },
+    {
+      "stage": "real-correction-H1",
+      "event": "reference",
+      "started": 1792574397989,
+      "elapsed": 193,
+      "credential": "29e7a7e3cdbd00ce",
+      "revision": "54",
+      "origin": 1783490400000,
+      "rows": 243
+    },
+    {
+      "stage": "real-correction-H1",
+      "at": 1792574398226,
+      "event": "comparison",
+      "attempt": 9,
+      "result": {
+        "index": 0,
+        "studyId": "vz5KjY",
+        "rows": 243,
+        "valid": 741,
+        "missing": 0,
+        "priceMismatches": 0,
+        "mismatches": 0,
+        "samples": [],
+        "generation": 7,
+        "acceptedGeneration": 7,
+        "coverage": {
+          "first": 1791352800000,
+          "last": 1792569600000,
+          "count": 243,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+          "sourceFirst": 1791352800000,
+          "correctionVersion": 0,
+          "tailVersion": 54,
+          "generation": 7
+        },
+        "first": 1791352800000,
+        "last": 1792569600000,
+        "count": 243,
+        "viewport": {
+          "from": 1792144800,
+          "to": 1792605600
+        },
+        "identity": {
+          "main": "MWP:OANDA:AUD_JPY",
+          "fixedRevision": "provider:OANDA:AUD_JPY",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1783490400000,
+          "period": "60"
+        },
+        "credential": "29e7a7e3cdbd00ce",
+        "revision": "54"
+      }
+    },
+    {
+      "stage": "real-correction-H1",
+      "at": 1792574398263,
+      "event": "candidate",
+      "attempt": 1,
+      "index": 1,
+      "studyId": "LsNESc",
+      "ready": true,
+      "generation": 5,
+      "acceptedGeneration": 5,
+      "revision": "46",
+      "credential": "9f0ea59abf70dd24",
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+        "algorithmVersion": "SWING_SR_V1:1",
+        "calculationStart": 1756270800000,
+        "period": "240"
+      },
+      "scope": {
+        "generation": 5,
+        "name": "SWING_SR_V1",
+        "resolution": "240",
+        "first": 1785877200000,
+        "last": 1792558800000,
+        "count": 333,
+        "coverage": {
+          "first": 1785877200000,
+          "last": 1792558800000,
+          "count": 333,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+          "sourceFirst": 1785877200000,
+          "correctionVersion": 0,
+          "tailVersion": 46,
+          "generation": 5
+        },
+        "transition": null
+      },
+      "viewport": {
+        "from": 1791234000,
+        "to": 1792702800
+      },
+      "mainRows": 333,
+      "mainFingerprint": "935342f1c1c2b5e0692d9314de922cc5059eaca4dbd0b5a18065aff4ff0e5584"
+    },
+    {
+      "stage": "real-correction-H1",
+      "event": "reference",
+      "started": 1792574398263,
+      "elapsed": 107,
+      "credential": "9f0ea59abf70dd24",
+      "revision": "46",
+      "origin": 1756270800000,
+      "rows": 333
+    },
+    {
+      "stage": "real-correction-H1",
+      "at": 1792574398398,
+      "event": "comparison",
+      "attempt": 1,
+      "result": {
+        "index": 1,
+        "studyId": "LsNESc",
+        "rows": 333,
+        "valid": 1332,
+        "missing": 0,
+        "priceMismatches": 0,
+        "mismatches": 0,
+        "samples": [],
+        "generation": 5,
+        "acceptedGeneration": 5,
+        "coverage": {
+          "first": 1785877200000,
+          "last": 1792558800000,
+          "count": 333,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+          "sourceFirst": 1785877200000,
+          "correctionVersion": 0,
+          "tailVersion": 46,
+          "generation": 5
+        },
+        "first": 1785877200000,
+        "last": 1792558800000,
+        "count": 333,
+        "viewport": {
+          "from": 1791234000,
+          "to": 1792702800
+        },
+        "identity": {
+          "main": "MWP:OANDA:AUD_JPY",
+          "fixedRevision": "provider:OANDA:AUD_JPY",
+          "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1756270800000,
+          "period": "240"
+        },
+        "credential": "9f0ea59abf70dd24",
+        "revision": "46"
+      }
+    },
+    {
+      "stage": "real-correction-H1",
+      "at": 1792574399834,
+      "event": "candidate",
+      "attempt": 1,
+      "index": 0,
+      "studyId": "vz5KjY",
+      "ready": true,
+      "generation": 7,
+      "acceptedGeneration": 7,
+      "revision": "54",
+      "credential": "29e7a7e3cdbd00ce",
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+        "algorithmVersion": "SUPERTREND_PINE_V1:1",
+        "calculationStart": 1783490400000,
+        "period": "60"
+      },
+      "scope": {
+        "generation": 7,
+        "name": "SUPERTREND_PINE_V1",
+        "resolution": "60",
+        "first": 1791352800000,
+        "last": 1792569600000,
+        "count": 243,
+        "coverage": {
+          "first": 1791352800000,
+          "last": 1792569600000,
+          "count": 243,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+          "sourceFirst": 1791352800000,
+          "correctionVersion": 0,
+          "tailVersion": 54,
+          "generation": 7
+        },
+        "transition": null
+      },
+      "viewport": {
+        "from": 1792144800,
+        "to": 1792605600
+      },
+      "mainRows": 243,
+      "mainFingerprint": "97e31a030fba8ea93abdea51b6a5fd2c3dd82e6870e76c8f4488420c6d59eb1c"
+    },
+    {
+      "stage": "real-correction-H1",
+      "event": "reference",
+      "started": 1792574399835,
+      "elapsed": 60,
+      "credential": "29e7a7e3cdbd00ce",
+      "revision": "54",
+      "origin": 1783490400000,
+      "rows": 243
+    },
+    {
+      "stage": "real-correction-H1",
+      "at": 1792574399928,
+      "event": "comparison",
+      "attempt": 1,
+      "result": {
+        "index": 0,
+        "studyId": "vz5KjY",
+        "rows": 243,
+        "valid": 741,
+        "missing": 0,
+        "priceMismatches": 0,
+        "mismatches": 0,
+        "samples": [],
+        "generation": 7,
+        "acceptedGeneration": 7,
+        "coverage": {
+          "first": 1791352800000,
+          "last": 1792569600000,
+          "count": 243,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+          "sourceFirst": 1791352800000,
+          "correctionVersion": 0,
+          "tailVersion": 54,
+          "generation": 7
+        },
+        "first": 1791352800000,
+        "last": 1792569600000,
+        "count": 243,
+        "viewport": {
+          "from": 1792144800,
+          "to": 1792605600
+        },
+        "identity": {
+          "main": "MWP:OANDA:AUD_JPY",
+          "fixedRevision": "provider:OANDA:AUD_JPY",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1783490400000,
+          "period": "60"
+        },
+        "credential": "29e7a7e3cdbd00ce",
+        "revision": "54"
+      }
+    },
+    {
+      "stage": "real-correction-H1",
+      "at": 1792574399962,
+      "event": "candidate",
+      "attempt": 1,
+      "index": 1,
+      "studyId": "LsNESc",
+      "ready": true,
+      "generation": 5,
+      "acceptedGeneration": 5,
+      "revision": "46",
+      "credential": "9f0ea59abf70dd24",
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+        "algorithmVersion": "SWING_SR_V1:1",
+        "calculationStart": 1756270800000,
+        "period": "240"
+      },
+      "scope": {
+        "generation": 5,
+        "name": "SWING_SR_V1",
+        "resolution": "240",
+        "first": 1785877200000,
+        "last": 1792558800000,
+        "count": 333,
+        "coverage": {
+          "first": 1785877200000,
+          "last": 1792558800000,
+          "count": 333,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+          "sourceFirst": 1785877200000,
+          "correctionVersion": 0,
+          "tailVersion": 46,
+          "generation": 5
+        },
+        "transition": null
+      },
+      "viewport": {
+        "from": 1791234000,
+        "to": 1792702800
+      },
+      "mainRows": 333,
+      "mainFingerprint": "935342f1c1c2b5e0692d9314de922cc5059eaca4dbd0b5a18065aff4ff0e5584"
+    },
+    {
+      "stage": "real-correction-H1",
+      "event": "reference",
+      "started": 1792574399963,
+      "elapsed": 45,
+      "credential": "9f0ea59abf70dd24",
+      "revision": "46",
+      "origin": 1756270800000,
+      "rows": 333
+    },
+    {
+      "stage": "real-correction-H1",
+      "at": 1792574400042,
+      "event": "comparison",
+      "attempt": 1,
+      "result": {
+        "index": 1,
+        "studyId": "LsNESc",
+        "rows": 333,
+        "valid": 1332,
+        "missing": 0,
+        "priceMismatches": 0,
+        "mismatches": 0,
+        "samples": [],
+        "generation": 5,
+        "acceptedGeneration": 5,
+        "coverage": {
+          "first": 1785877200000,
+          "last": 1792558800000,
+          "count": 333,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+          "sourceFirst": 1785877200000,
+          "correctionVersion": 0,
+          "tailVersion": 46,
+          "generation": 5
+        },
+        "first": 1785877200000,
+        "last": 1792558800000,
+        "count": 333,
+        "viewport": {
+          "from": 1791234000,
+          "to": 1792702800
+        },
+        "identity": {
+          "main": "MWP:OANDA:AUD_JPY",
+          "fixedRevision": "provider:OANDA:AUD_JPY",
+          "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1756270800000,
+          "period": "240"
+        },
+        "credential": "9f0ea59abf70dd24",
+        "revision": "46"
+      }
+    },
+    {
+      "stage": "real-correction-H4",
+      "at": 1792574411115,
+      "event": "candidate",
+      "attempt": 1,
+      "index": 0,
+      "studyId": "vz5KjY",
+      "ready": true,
+      "generation": 7,
+      "acceptedGeneration": 7,
+      "revision": "54",
+      "credential": "29e7a7e3cdbd00ce",
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+        "algorithmVersion": "SUPERTREND_PINE_V1:1",
+        "calculationStart": 1783490400000,
+        "period": "60"
+      },
+      "scope": {
+        "generation": 7,
+        "name": "SUPERTREND_PINE_V1",
+        "resolution": "60",
+        "first": 1791352800000,
+        "last": 1792569600000,
+        "count": 243,
+        "coverage": {
+          "first": 1791352800000,
+          "last": 1792569600000,
+          "count": 243,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+          "sourceFirst": 1791352800000,
+          "correctionVersion": 0,
+          "tailVersion": 54,
+          "generation": 7
+        },
+        "transition": null
+      },
+      "viewport": {
+        "from": 1792144800,
+        "to": 1792605600
+      },
+      "mainRows": 243,
+      "mainFingerprint": "97e31a030fba8ea93abdea51b6a5fd2c3dd82e6870e76c8f4488420c6d59eb1c"
+    },
+    {
+      "stage": "real-correction-H4",
+      "event": "reference",
+      "started": 1792574411116,
+      "elapsed": 281,
+      "credential": "29e7a7e3cdbd00ce",
+      "revision": "54",
+      "origin": 1783490400000,
+      "rows": 243
+    },
+    {
+      "stage": "real-correction-H4",
+      "at": 1792574411430,
+      "event": "comparison",
+      "attempt": 1,
+      "result": {
+        "index": 0,
+        "studyId": "vz5KjY",
+        "rows": 243,
+        "valid": 741,
+        "missing": 0,
+        "priceMismatches": 0,
+        "mismatches": 0,
+        "samples": [],
+        "generation": 7,
+        "acceptedGeneration": 7,
+        "coverage": {
+          "first": 1791352800000,
+          "last": 1792569600000,
+          "count": 243,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+          "sourceFirst": 1791352800000,
+          "correctionVersion": 0,
+          "tailVersion": 54,
+          "generation": 7
+        },
+        "first": 1791352800000,
+        "last": 1792569600000,
+        "count": 243,
+        "viewport": {
+          "from": 1792144800,
+          "to": 1792605600
+        },
+        "identity": {
+          "main": "MWP:OANDA:AUD_JPY",
+          "fixedRevision": "provider:OANDA:AUD_JPY",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1783490400000,
+          "period": "60"
+        },
+        "credential": "29e7a7e3cdbd00ce",
+        "revision": "54"
+      }
+    },
+    {
+      "stage": "real-correction-H4",
+      "at": 1792574411513,
+      "event": "candidate",
+      "attempt": 1,
+      "index": 1,
+      "studyId": "LsNESc",
+      "ready": true,
+      "generation": 8,
+      "acceptedGeneration": 8,
+      "revision": "47",
+      "credential": "d17cf56e7ac95da0",
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+        "algorithmVersion": "SWING_SR_V1:1",
+        "calculationStart": 1756270800000,
+        "period": "240"
+      },
+      "scope": {
+        "generation": 8,
+        "name": "SWING_SR_V1",
+        "resolution": "240",
+        "first": 1787778000000,
+        "last": 1792558800000,
+        "count": 237,
+        "coverage": {
+          "first": 1787778000000,
+          "last": 1792558800000,
+          "count": 237,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+          "sourceFirst": 1787778000000,
+          "correctionVersion": 0,
+          "tailVersion": 47,
+          "generation": 8
+        },
+        "transition": null
+      },
+      "viewport": {
+        "from": 1791234000,
+        "to": 1792702800
+      },
+      "mainRows": 237,
+      "mainFingerprint": "14fd0169e3e83d1b8d5179f87ecec63b4158e38578609770038d16b956e8bb81"
+    },
+    {
+      "stage": "real-correction-H4",
+      "event": "reference",
+      "started": 1792574411514,
+      "elapsed": 54,
+      "credential": "d17cf56e7ac95da0",
+      "revision": "47",
+      "origin": 1756270800000,
+      "rows": 237
+    },
+    {
+      "stage": "real-correction-H4",
+      "at": 1792574411606,
+      "event": "comparison",
+      "attempt": 1,
+      "result": {
+        "index": 1,
+        "studyId": "LsNESc",
+        "rows": 237,
+        "valid": 948,
+        "missing": 0,
+        "priceMismatches": 0,
+        "mismatches": 0,
+        "samples": [],
+        "generation": 8,
+        "acceptedGeneration": 8,
+        "coverage": {
+          "first": 1787778000000,
+          "last": 1792558800000,
+          "count": 237,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+          "sourceFirst": 1787778000000,
+          "correctionVersion": 0,
+          "tailVersion": 47,
+          "generation": 8
+        },
+        "first": 1787778000000,
+        "last": 1792558800000,
+        "count": 237,
+        "viewport": {
+          "from": 1791234000,
+          "to": 1792702800
+        },
+        "identity": {
+          "main": "MWP:OANDA:AUD_JPY",
+          "fixedRevision": "provider:OANDA:AUD_JPY",
+          "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1756270800000,
+          "period": "240"
+        },
+        "credential": "d17cf56e7ac95da0",
+        "revision": "47"
+      }
+    },
+    {
+      "stage": "real-correction-H4",
+      "at": 1792574413136,
+      "event": "candidate",
+      "attempt": 1,
+      "index": 0,
+      "studyId": "vz5KjY",
+      "ready": true,
+      "generation": 7,
+      "acceptedGeneration": 7,
+      "revision": "54",
+      "credential": "29e7a7e3cdbd00ce",
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+        "algorithmVersion": "SUPERTREND_PINE_V1:1",
+        "calculationStart": 1783490400000,
+        "period": "60"
+      },
+      "scope": {
+        "generation": 7,
+        "name": "SUPERTREND_PINE_V1",
+        "resolution": "60",
+        "first": 1791352800000,
+        "last": 1792569600000,
+        "count": 243,
+        "coverage": {
+          "first": 1791352800000,
+          "last": 1792569600000,
+          "count": 243,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+          "sourceFirst": 1791352800000,
+          "correctionVersion": 0,
+          "tailVersion": 54,
+          "generation": 7
+        },
+        "transition": null
+      },
+      "viewport": {
+        "from": 1792144800,
+        "to": 1792605600
+      },
+      "mainRows": 243,
+      "mainFingerprint": "97e31a030fba8ea93abdea51b6a5fd2c3dd82e6870e76c8f4488420c6d59eb1c"
+    },
+    {
+      "stage": "real-correction-H4",
+      "event": "reference",
+      "started": 1792574413137,
+      "elapsed": 68,
+      "credential": "29e7a7e3cdbd00ce",
+      "revision": "54",
+      "origin": 1783490400000,
+      "rows": 243
+    },
+    {
+      "stage": "real-correction-H4",
+      "at": 1792574413233,
+      "event": "comparison",
+      "attempt": 1,
+      "result": {
+        "index": 0,
+        "studyId": "vz5KjY",
+        "rows": 243,
+        "valid": 741,
+        "missing": 0,
+        "priceMismatches": 0,
+        "mismatches": 0,
+        "samples": [],
+        "generation": 7,
+        "acceptedGeneration": 7,
+        "coverage": {
+          "first": 1791352800000,
+          "last": 1792569600000,
+          "count": 243,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+          "sourceFirst": 1791352800000,
+          "correctionVersion": 0,
+          "tailVersion": 54,
+          "generation": 7
+        },
+        "first": 1791352800000,
+        "last": 1792569600000,
+        "count": 243,
+        "viewport": {
+          "from": 1792144800,
+          "to": 1792605600
+        },
+        "identity": {
+          "main": "MWP:OANDA:AUD_JPY",
+          "fixedRevision": "provider:OANDA:AUD_JPY",
+          "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+          "algorithmVersion": "SUPERTREND_PINE_V1:1",
+          "calculationStart": 1783490400000,
+          "period": "60"
+        },
+        "credential": "29e7a7e3cdbd00ce",
+        "revision": "54"
+      }
+    },
+    {
+      "stage": "real-correction-H4",
+      "at": 1792574413257,
+      "event": "candidate",
+      "attempt": 1,
+      "index": 1,
+      "studyId": "LsNESc",
+      "ready": true,
+      "generation": 8,
+      "acceptedGeneration": 8,
+      "revision": "47",
+      "credential": "d17cf56e7ac95da0",
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+        "algorithmVersion": "SWING_SR_V1:1",
+        "calculationStart": 1756270800000,
+        "period": "240"
+      },
+      "scope": {
+        "generation": 8,
+        "name": "SWING_SR_V1",
+        "resolution": "240",
+        "first": 1787778000000,
+        "last": 1792558800000,
+        "count": 237,
+        "coverage": {
+          "first": 1787778000000,
+          "last": 1792558800000,
+          "count": 237,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+          "sourceFirst": 1787778000000,
+          "correctionVersion": 0,
+          "tailVersion": 47,
+          "generation": 8
+        },
+        "transition": null
+      },
+      "viewport": {
+        "from": 1791234000,
+        "to": 1792702800
+      },
+      "mainRows": 237,
+      "mainFingerprint": "14fd0169e3e83d1b8d5179f87ecec63b4158e38578609770038d16b956e8bb81"
+    },
+    {
+      "stage": "real-correction-H4",
+      "event": "reference",
+      "started": 1792574413258,
+      "elapsed": 45,
+      "credential": "d17cf56e7ac95da0",
+      "revision": "47",
+      "origin": 1756270800000,
+      "rows": 237
+    },
+    {
+      "stage": "real-correction-H4",
+      "at": 1792574413323,
+      "event": "comparison",
+      "attempt": 1,
+      "result": {
+        "index": 1,
+        "studyId": "LsNESc",
+        "rows": 237,
+        "valid": 948,
+        "missing": 0,
+        "priceMismatches": 0,
+        "mismatches": 0,
+        "samples": [],
+        "generation": 8,
+        "acceptedGeneration": 8,
+        "coverage": {
+          "first": 1787778000000,
+          "last": 1792558800000,
+          "count": 237,
+          "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+          "sourceFirst": 1787778000000,
+          "correctionVersion": 0,
+          "tailVersion": 47,
+          "generation": 8
+        },
+        "first": 1787778000000,
+        "last": 1792558800000,
+        "count": 237,
+        "viewport": {
+          "from": 1791234000,
+          "to": 1792702800
+        },
+        "identity": {
+          "main": "MWP:OANDA:AUD_JPY",
+          "fixedRevision": "provider:OANDA:AUD_JPY",
+          "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+          "algorithmVersion": "SWING_SR_V1:1",
+          "calculationStart": 1756270800000,
+          "period": "240"
+        },
+        "credential": "d17cf56e7ac95da0",
+        "revision": "47"
+      }
+    }
+  ],
+  "errors": [],
+  "diagnostics": [
+    {
+      "type": "http",
+      "path": "/api/charts/history-capabilities",
+      "status": 200
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 422 (Unprocessable Entity)"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 422 (Unprocessable Entity)"
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/history-loads",
+      "status": 200
+    },
+    {
+      "type": "history-load",
+      "path": "/api/charts/history-loads",
+      "resultRows": 365,
+      "query": {
+        "instrument": "OANDA:AUD_JPY",
+        "timeframe": "H1",
+        "limit": 183,
+        "before": 1792574434000,
+        "from": 1791657154000,
+        "countBack": 183
+      }
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/reserve",
+      "status": 200
+    },
+    {
+      "type": "requestfailed",
+      "path": "/api/market-data/quotes",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/unsubscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "requestfailed",
+      "path": "/api/market-data/quotes",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/history-loads",
+      "status": 200
+    },
+    {
+      "type": "history-load",
+      "path": "/api/charts/history-loads",
+      "resultRows": 171,
+      "query": {
+        "instrument": "OANDA:AUD_JPY",
+        "timeframe": "H4",
+        "limit": 86,
+        "before": 1792574435000,
+        "from": 1790840675000,
+        "countBack": 86
+      }
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 422 (Unprocessable Entity)"
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/unsubscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 422 (Unprocessable Entity)"
+    },
+    {
+      "type": "warning",
+      "text": "2026-10-21T09:19:38.007Z Error resolving for market status watcher MWP:EURUSD:\n该品种的平台周期或交易日历尚未接入"
+    },
+    {
+      "type": "warning",
+      "text": "2026-10-21T09:19:38.012Z Error resolving for market status watcher MWP:XAUUSD:\n该品种的平台周期或交易日历尚未接入"
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/data",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/data",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/reserve",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/indicator-demands/release",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/data",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/unsubscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/unsubscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/unsubscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/unsubscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/unsubscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/data",
+      "status": 422
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 422 (Unprocessable Entity)"
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/data",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/unsubscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/history-loads",
+      "status": 200
+    },
+    {
+      "type": "history-load",
+      "path": "/api/charts/history-loads",
+      "resultRows": 162,
+      "query": {
+        "instrument": "OANDA:AUD_JPY",
+        "timeframe": "H1",
+        "limit": 81,
+        "before": 1792574456000,
+        "from": 1792282856000,
+        "countBack": 81
+      }
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/indicator-demands/release",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/reserve",
+      "status": 200
+    },
+    {
+      "type": "requestfailed",
+      "path": "/api/charts/data",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/indicator-demands/release",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/data",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/data",
+      "status": 422
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 422 (Unprocessable Entity)"
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/data",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/unsubscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/indicator-demands/release",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/history-loads",
+      "status": 200
+    },
+    {
+      "type": "history-load",
+      "path": "/api/charts/history-loads",
+      "resultRows": 237,
+      "query": {
+        "instrument": "OANDA:AUD_JPY",
+        "timeframe": "H4",
+        "limit": 79,
+        "before": 1792574470000,
+        "from": 1790981830000,
+        "countBack": 79
+      }
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/data",
+      "status": 200
+    },
+    {
+      "type": "http",
+      "path": "/api/charts/stream/subscribe",
+      "status": 200
+    }
+  ],
+  "renderFrames": [
+    {
+      "name": "initial",
+      "file": "initial-settled-0.png",
+      "at": 1792574382424,
+      "charts": [
+        {
+          "index": 0,
+          "ready": true,
+          "valid": [
+            1663
+          ]
+        },
+        {
+          "index": 1,
+          "ready": true,
+          "valid": [
+            1332
+          ]
+        }
+      ]
+    },
+    {
+      "name": "initial",
+      "file": "initial-settled-1.png",
+      "at": 1792574383123,
+      "charts": [
+        {
+          "index": 0,
+          "ready": true,
+          "valid": [
+            1663
+          ]
+        },
+        {
+          "index": 1,
+          "ready": true,
+          "valid": [
+            1332
+          ]
+        }
+      ]
+    },
+    {
+      "name": "initial",
+      "file": "initial-settled-2.png",
+      "at": 1792574383800,
+      "charts": [
+        {
+          "index": 0,
+          "ready": true,
+          "valid": [
+            1663
+          ]
+        },
+        {
+          "index": 1,
+          "ready": true,
+          "valid": [
+            1332
+          ]
+        }
+      ]
+    },
+    {
+      "name": "real-correction-H1",
+      "file": "real-correction-H1-during-000.png",
+      "at": 1792574396548,
+      "charts": [
+        {
+          "index": 0,
+          "ready": true,
+          "valid": [
+            1663
+          ]
+        },
+        {
+          "index": 1,
+          "ready": true,
+          "valid": [
+            1332
+          ]
+        }
+      ]
+    },
+    {
+      "name": "real-correction-H1",
+      "file": "real-correction-H1-during-001.png",
+      "at": 1792574397042,
+      "charts": [
+        {
+          "index": 0,
+          "ready": true,
+          "valid": [
+            1663
+          ]
+        },
+        {
+          "index": 1,
+          "ready": true,
+          "valid": [
+            1332
+          ]
+        }
+      ]
+    },
+    {
+      "name": "real-correction-H1",
+      "file": "real-correction-H1-during-002.png",
+      "at": 1792574397558,
+      "charts": [
+        {
+          "index": 0,
+          "ready": true,
+          "valid": [
+            741
+          ]
+        },
+        {
+          "index": 1,
+          "ready": true,
+          "valid": [
+            1332
+          ]
+        }
+      ]
+    },
+    {
+      "name": "real-correction-H1",
+      "file": "real-correction-H1-during-003.png",
+      "at": 1792574398078,
+      "charts": [
+        {
+          "index": 0,
+          "ready": true,
+          "valid": [
+            741
+          ]
+        },
+        {
+          "index": 1,
+          "ready": true,
+          "valid": [
+            1332
+          ]
+        }
+      ]
+    },
+    {
+      "name": "real-correction-H1",
+      "file": "real-correction-H1-settled-0.png",
+      "at": 1792574398470,
+      "charts": [
+        {
+          "index": 0,
+          "ready": true,
+          "valid": [
+            741
+          ]
+        },
+        {
+          "index": 1,
+          "ready": true,
+          "valid": [
+            1332
+          ]
+        }
+      ]
+    },
+    {
+      "name": "real-correction-H1",
+      "file": "real-correction-H1-during-004.png",
+      "at": 1792574398544,
+      "charts": [
+        {
+          "index": 0,
+          "ready": true,
+          "valid": [
+            741
+          ]
+        },
+        {
+          "index": 1,
+          "ready": true,
+          "valid": [
+            1332
+          ]
+        }
+      ]
+    },
+    {
+      "name": "real-correction-H1",
+      "file": "real-correction-H1-during-005.png",
+      "at": 1792574399014,
+      "charts": [
+        {
+          "index": 0,
+          "ready": true,
+          "valid": [
+            741
+          ]
+        },
+        {
+          "index": 1,
+          "ready": true,
+          "valid": [
+            1332
+          ]
+        }
+      ]
+    },
+    {
+      "name": "real-correction-H1",
+      "file": "real-correction-H1-settled-1.png",
+      "at": 1792574399136,
+      "charts": [
+        {
+          "index": 0,
+          "ready": true,
+          "valid": [
+            741
+          ]
+        },
+        {
+          "index": 1,
+          "ready": true,
+          "valid": [
+            1332
+          ]
+        }
+      ]
+    },
+    {
+      "name": "real-correction-H1",
+      "file": "real-correction-H1-during-006.png",
+      "at": 1792574399488,
+      "charts": [
+        {
+          "index": 0,
+          "ready": true,
+          "valid": [
+            741
+          ]
+        },
+        {
+          "index": 1,
+          "ready": true,
+          "valid": [
+            1332
+          ]
+        }
+      ]
+    },
+    {
+      "name": "real-correction-H1",
+      "file": "real-correction-H1-settled-2.png",
+      "at": 1792574399803,
+      "charts": [
+        {
+          "index": 0,
+          "ready": true,
+          "valid": [
+            741
+          ]
+        },
+        {
+          "index": 1,
+          "ready": true,
+          "valid": [
+            1332
+          ]
+        }
+      ]
+    },
+    {
+      "name": "real-correction-H1",
+      "file": "real-correction-H1-during-007.png",
+      "at": 1792574399993,
+      "charts": [
+        {
+          "index": 0,
+          "ready": true,
+          "valid": [
+            741
+          ]
+        },
+        {
+          "index": 1,
+          "ready": true,
+          "valid": [
+            1332
+          ]
+        }
+      ]
+    },
+    {
+      "name": "real-correction-H4",
+      "file": "real-correction-H4-during-000.png",
+      "at": 1792574410546,
+      "charts": [
+        {
+          "index": 0,
+          "ready": true,
+          "valid": [
+            741
+          ]
+        },
+        {
+          "index": 1,
+          "ready": true,
+          "valid": [
+            1332
+          ]
+        }
+      ]
+    },
+    {
+      "name": "real-correction-H4",
+      "file": "real-correction-H4-during-001.png",
+      "at": 1792574411057,
+      "charts": [
+        {
+          "index": 0,
+          "ready": true,
+          "valid": [
+            741
+          ]
+        },
+        {
+          "index": 1,
+          "ready": true,
+          "valid": [
+            948
+          ]
+        }
+      ]
+    },
+    {
+      "name": "real-correction-H4",
+      "file": "real-correction-H4-during-002.png",
+      "at": 1792574411614,
+      "charts": [
+        {
+          "index": 0,
+          "ready": true,
+          "valid": [
+            741
+          ]
+        },
+        {
+          "index": 1,
+          "ready": true,
+          "valid": [
+            948
+          ]
+        }
+      ]
+    },
+    {
+      "name": "real-correction-H4",
+      "file": "real-correction-H4-settled-0.png",
+      "at": 1792574411687,
+      "charts": [
+        {
+          "index": 0,
+          "ready": true,
+          "valid": [
+            741
+          ]
+        },
+        {
+          "index": 1,
+          "ready": true,
+          "valid": [
+            948
+          ]
+        }
+      ]
+    },
+    {
+      "name": "real-correction-H4",
+      "file": "real-correction-H4-during-003.png",
+      "at": 1792574412080,
+      "charts": [
+        {
+          "index": 0,
+          "ready": true,
+          "valid": [
+            741
+          ]
+        },
+        {
+          "index": 1,
+          "ready": true,
+          "valid": [
+            948
+          ]
+        }
+      ]
+    },
+    {
+      "name": "real-correction-H4",
+      "file": "real-correction-H4-settled-1.png",
+      "at": 1792574412353,
+      "charts": [
+        {
+          "index": 0,
+          "ready": true,
+          "valid": [
+            741
+          ]
+        },
+        {
+          "index": 1,
+          "ready": true,
+          "valid": [
+            948
+          ]
+        }
+      ]
+    },
+    {
+      "name": "real-correction-H4",
+      "file": "real-correction-H4-during-004.png",
+      "at": 1792574412551,
+      "charts": [
+        {
+          "index": 0,
+          "ready": true,
+          "valid": [
+            741
+          ]
+        },
+        {
+          "index": 1,
+          "ready": true,
+          "valid": [
+            948
+          ]
+        }
+      ]
+    },
+    {
+      "name": "real-correction-H4",
+      "file": "real-correction-H4-during-005.png",
+      "at": 1792574413030,
+      "charts": [
+        {
+          "index": 0,
+          "ready": true,
+          "valid": [
+            741
+          ]
+        },
+        {
+          "index": 1,
+          "ready": true,
+          "valid": [
+            948
+          ]
+        }
+      ]
+    },
+    {
+      "name": "real-correction-H4",
+      "file": "real-correction-H4-settled-2.png",
+      "at": 1792574413105,
+      "charts": [
+        {
+          "index": 0,
+          "ready": true,
+          "valid": [
+            741
+          ]
+        },
+        {
+          "index": 1,
+          "ready": true,
+          "valid": [
+            948
+          ]
+        }
+      ]
+    }
+  ],
+  "observer": {
+    "events": [
+      {
+        "observer": "ready",
+        "frames": [
+          {
+            "frame": "H1",
+            "coverage_through": 1792574371772,
+            "freshness_simulated": true
+          },
+          {
+            "frame": "H4",
+            "coverage_through": 1792574371794,
+            "freshness_simulated": true
+          }
+        ],
+        "interval_seconds": 2,
+        "max_seconds": 900
+      },
+      {
+        "observer": "stopped",
+        "iterations": 19
+      }
+    ],
+    "stderr": "",
+    "exit": {
+      "code": 0,
+      "signal": null
+    }
+  },
+  "names": [
+    "Accumulative Swing Index",
+    "SuperTrend",
+    "守望 Python SWING_SR_V1",
+    "守望 Python SUPERTREND_PINE_V1"
+  ],
+  "currentCheckpoint": {
+    "name": "real-correction-H4",
+    "deadline": 1792574445399,
+    "started": 1792574411073
+  },
+  "lifecycle": [
+    {
+      "sequence": 1,
+      "at": 1792574377823,
+      "event": "start",
+      "source": "vz5KjY",
+      "session": "cs_9jXhqbDS2OkJ",
+      "resolution": "60",
+      "parent": "sds_1",
+      "turnaround": "st1",
+      "previousGeneration": null,
+      "previousCoverage": null
+    },
+    {
+      "sequence": 2,
+      "at": 1792574377825,
+      "event": "attach",
+      "studyId": "vz5KjY",
+      "generation": 1,
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+        "algorithmVersion": "SUPERTREND_PINE_V1:1",
+        "calculationStart": 0,
+        "period": "60"
+      },
+      "originOnly": false
+    },
+    {
+      "sequence": 3,
+      "at": 1792574377840,
+      "event": "start",
+      "source": "LsNESc",
+      "session": "cs_rZ7cr3YtWeK8",
+      "resolution": "240",
+      "parent": "sds_2",
+      "turnaround": "st1",
+      "previousGeneration": null,
+      "previousCoverage": null
+    },
+    {
+      "sequence": 4,
+      "at": 1792574377841,
+      "event": "attach",
+      "studyId": "LsNESc",
+      "generation": 2,
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+        "algorithmVersion": "SWING_SR_V1:1",
+        "calculationStart": 0,
+        "period": "240"
+      },
+      "originOnly": false
+    },
+    {
+      "sequence": 5,
+      "at": 1792574378686,
+      "event": "attach",
+      "studyId": "LsNESc",
+      "generation": 3,
+      "previousGeneration": 2,
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+        "algorithmVersion": "SWING_SR_V1:1",
+        "calculationStart": 1756270800000,
+        "period": "240"
+      },
+      "originOnly": true
+    },
+    {
+      "sequence": 6,
+      "at": 1792574378691,
+      "event": "applyBatch",
+      "studyId": "LsNESc",
+      "accepted": true,
+      "generation": 3,
+      "observedGeneration": 3,
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+        "algorithmVersion": "SWING_SR_V1:1",
+        "calculationStart": 1756270800000,
+        "period": "240"
+      },
+      "revision": "46",
+      "credential": "9f0ea59abf70dd24",
+      "coverage": {
+        "first": 1789074000000,
+        "last": 1792558800000,
+        "count": 171,
+        "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+        "sourceFirst": 1789074000000,
+        "correctionVersion": 0,
+        "tailVersion": 46
+      }
+    },
+    {
+      "sequence": 7,
+      "at": 1792574379148,
+      "event": "attach",
+      "studyId": "vz5KjY",
+      "generation": 4,
+      "previousGeneration": 1,
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+        "algorithmVersion": "SUPERTREND_PINE_V1:1",
+        "calculationStart": 1783490400000,
+        "period": "60"
+      },
+      "originOnly": true
+    },
+    {
+      "sequence": 8,
+      "at": 1792574379159,
+      "event": "applyBatch",
+      "studyId": "vz5KjY",
+      "accepted": true,
+      "generation": 4,
+      "observedGeneration": 4,
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+        "algorithmVersion": "SUPERTREND_PINE_V1:1",
+        "calculationStart": 1783490400000,
+        "period": "60"
+      },
+      "revision": "53",
+      "credential": "1fe8f2359539947e",
+      "coverage": {
+        "first": 1789747200000,
+        "last": 1792569600000,
+        "count": 545,
+        "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+        "sourceFirst": 1789747200000,
+        "correctionVersion": 0,
+        "tailVersion": 53
+      }
+    },
+    {
+      "sequence": 9,
+      "at": 1792574379367,
+      "event": "start",
+      "source": "LsNESc",
+      "session": "cs_rZ7cr3YtWeK8",
+      "resolution": "240",
+      "parent": "sds_2",
+      "turnaround": "st1",
+      "previousGeneration": 3,
+      "previousCoverage": null
+    },
+    {
+      "sequence": 10,
+      "at": 1792574379368,
+      "event": "detach",
+      "studyId": "LsNESc",
+      "generation": 3
+    },
+    {
+      "sequence": 11,
+      "at": 1792574379380,
+      "event": "attach",
+      "studyId": "LsNESc",
+      "generation": 5,
+      "previousGeneration": 3,
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+        "algorithmVersion": "SWING_SR_V1:1",
+        "calculationStart": 1756270800000,
+        "period": "240"
+      },
+      "originOnly": false
+    },
+    {
+      "sequence": 12,
+      "at": 1792574381415,
+      "event": "applyBatch",
+      "studyId": "LsNESc",
+      "accepted": true,
+      "generation": 5,
+      "observedGeneration": 5,
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+        "algorithmVersion": "SWING_SR_V1:1",
+        "calculationStart": 1756270800000,
+        "period": "240"
+      },
+      "revision": "46",
+      "credential": "9f0ea59abf70dd24",
+      "coverage": {
+        "first": 1785877200000,
+        "last": 1792558800000,
+        "count": 333,
+        "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+        "sourceFirst": 1785877200000,
+        "correctionVersion": 0,
+        "tailVersion": 46
+      }
+    },
+    {
+      "sequence": 13,
+      "at": 1792574396688,
+      "event": "start",
+      "source": "vz5KjY",
+      "session": "cs_9jXhqbDS2OkJ",
+      "resolution": "60",
+      "parent": "sds_1",
+      "turnaround": "st1",
+      "previousGeneration": 4,
+      "previousCoverage": null
+    },
+    {
+      "sequence": 14,
+      "at": 1792574396690,
+      "event": "detach",
+      "studyId": "vz5KjY",
+      "generation": 4
+    },
+    {
+      "sequence": 15,
+      "at": 1792574397201,
+      "event": "attach",
+      "studyId": "vz5KjY",
+      "generation": 6,
+      "previousGeneration": 4,
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+        "algorithmVersion": "SUPERTREND_PINE_V1:1",
+        "calculationStart": 1783490400000,
+        "period": "60"
+      },
+      "originOnly": false
+    },
+    {
+      "sequence": 16,
+      "at": 1792574397398,
+      "event": "start",
+      "source": "vz5KjY",
+      "session": "cs_9jXhqbDS2OkJ",
+      "resolution": "60",
+      "parent": "sds_1",
+      "turnaround": "st1",
+      "previousGeneration": 6,
+      "previousCoverage": {
+        "first": 1789747200000,
+        "last": 1792569600000,
+        "count": 545,
+        "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+        "sourceFirst": 1789747200000,
+        "correctionVersion": 0,
+        "tailVersion": 53,
+        "generation": 6
+      }
+    },
+    {
+      "sequence": 17,
+      "at": 1792574397399,
+      "event": "detach",
+      "studyId": "vz5KjY",
+      "generation": 6
+    },
+    {
+      "sequence": 18,
+      "at": 1792574397404,
+      "event": "attach",
+      "studyId": "vz5KjY",
+      "generation": 7,
+      "previousGeneration": 6,
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+        "algorithmVersion": "SUPERTREND_PINE_V1:1",
+        "calculationStart": 1783490400000,
+        "period": "60"
+      },
+      "originOnly": false
+    },
+    {
+      "sequence": 19,
+      "at": 1792574397896,
+      "event": "applyBatch",
+      "studyId": "vz5KjY",
+      "accepted": true,
+      "generation": 7,
+      "observedGeneration": 7,
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"atr_method\":\"wilder\",\"multiplier\":3,\"period\":10,\"source\":\"hl2\"}",
+        "algorithmVersion": "SUPERTREND_PINE_V1:1",
+        "calculationStart": 1783490400000,
+        "period": "60"
+      },
+      "revision": "54",
+      "credential": "29e7a7e3cdbd00ce",
+      "coverage": {
+        "first": 1791352800000,
+        "last": 1792569600000,
+        "count": 243,
+        "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"atr_method\\\":\\\"wilder\\\",\\\"multiplier\\\":3,\\\"period\\\":10,\\\"source\\\":\\\"hl2\\\"}\",\"algorithmVersion\":\"SUPERTREND_PINE_V1:1\",\"calculationStart\":1783490400000,\"period\":\"60\"}",
+        "sourceFirst": 1791352800000,
+        "correctionVersion": 0,
+        "tailVersion": 54
+      }
+    },
+    {
+      "sequence": 20,
+      "at": 1792574410793,
+      "event": "start",
+      "source": "LsNESc",
+      "session": "cs_rZ7cr3YtWeK8",
+      "resolution": "240",
+      "parent": "sds_2",
+      "turnaround": "st1",
+      "previousGeneration": 5,
+      "previousCoverage": {
+        "first": 1789074000000,
+        "last": 1792558800000,
+        "count": 171,
+        "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+        "sourceFirst": 1789074000000,
+        "correctionVersion": 0,
+        "tailVersion": 46,
+        "generation": 5
+      }
+    },
+    {
+      "sequence": 21,
+      "at": 1792574410795,
+      "event": "detach",
+      "studyId": "LsNESc",
+      "generation": 5
+    },
+    {
+      "sequence": 22,
+      "at": 1792574411006,
+      "event": "attach",
+      "studyId": "LsNESc",
+      "generation": 8,
+      "previousGeneration": 5,
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+        "algorithmVersion": "SWING_SR_V1:1",
+        "calculationStart": 1756270800000,
+        "period": "240"
+      },
+      "originOnly": false
+    },
+    {
+      "sequence": 23,
+      "at": 1792574411293,
+      "event": "applyBatch",
+      "studyId": "LsNESc",
+      "accepted": true,
+      "generation": 8,
+      "observedGeneration": 8,
+      "identity": {
+        "main": "MWP:OANDA:AUD_JPY",
+        "fixedRevision": "provider:OANDA:AUD_JPY",
+        "paramsFingerprint": "{\"high_strength\":5,\"low_strength\":5}",
+        "algorithmVersion": "SWING_SR_V1:1",
+        "calculationStart": 1756270800000,
+        "period": "240"
+      },
+      "revision": "47",
+      "credential": "d17cf56e7ac95da0",
+      "coverage": {
+        "first": 1787778000000,
+        "last": 1792558800000,
+        "count": 237,
+        "identity": "{\"main\":\"MWP:OANDA:AUD_JPY\",\"fixedRevision\":\"provider:OANDA:AUD_JPY\",\"paramsFingerprint\":\"{\\\"high_strength\\\":5,\\\"low_strength\\\":5}\",\"algorithmVersion\":\"SWING_SR_V1:1\",\"calculationStart\":1756270800000,\"period\":\"240\"}",
+        "sourceFirst": 1787778000000,
+        "correctionVersion": 0,
+        "tailVersion": 47
+      }
+    }
+  ],
+  "passed": true,
+  "cleanup": [
+    {
+      "status": "fulfilled"
+    },
+    {
+      "status": "fulfilled"
+    },
+    {
+      "status": "fulfilled"
+    }
+  ],
+  "completedAt": 1792574415188
+}

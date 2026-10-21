@@ -1,0 +1,197 @@
+{
+  "head": "7948047c1b1174e6948cdaac1f5257ab3e889fa2",
+  "environment": {
+    "PYTHONPATH": "backend"
+  },
+  "checks": [
+    {
+      "command": [
+        "node",
+        "tests/issue89-sampling.cjs"
+      ],
+      "cwd": "web",
+      "exit": 0,
+      "stdout": "PASS native sampling: generation/price races, fixed deadline, stalled read and stable correctness failures\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "tests/issue89-native-lifecycle.cjs"
+      ],
+      "cwd": "web",
+      "exit": 0,
+      "stdout": "PASS: native restart retains values, advances generation and rejects the old handle\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "tests/advanced-history-empty-failure.cjs"
+      ],
+      "cwd": "web",
+      "exit": 0,
+      "stdout": "Empty read failures preserve native error delivery; accepted cache/cancellation/capacity remain unchanged\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "tests/advanced-refresh-failure.cjs"
+      ],
+      "cwd": "web",
+      "exit": 0,
+      "stdout": "History refresh bounds readiness/range restoration and releases all listeners/pauses\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "tests/advanced-refresh-range-cancellation.cjs"
+      ],
+      "cwd": "web",
+      "exit": 0,
+      "stdout": "{\"afterTimeout\":{\"fence\":false,\"busy\":false,\"pauses\":0,\"mutations\":0,\"timers\":0},\"afterLate\":{\"fence\":false,\"busy\":false,\"mutations\":0}}\nPASS refresh: exact operation cancellation, peer isolation and stale token rejection\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "tests/advanced-refresh-interaction.cjs"
+      ],
+      "cwd": "web",
+      "exit": 0,
+      "stdout": "History refresh yields to new mouse/focus/zoom intent and removes listeners\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "tests/advanced-viewports.cjs"
+      ],
+      "cwd": "web",
+      "exit": 0,
+      "stdout": "Viewport restoration preserves preferences and checks symbol identity\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "tests/advanced-capacity-boundary.cjs"
+      ],
+      "cwd": "web",
+      "exit": 0,
+      "stdout": "Capacity boundary: fill remaining quota, separate failed navigation, actual earliest viewport and notice passed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "tests/advanced-continuous-navigation.cjs"
+      ],
+      "cwd": "web",
+      "exit": 0,
+      "stdout": "Continuous navigation: concurrent admission, cancellation, stale callbacks, source purge and release passed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "tests/indicator-snapshot-recovery.cjs"
+      ],
+      "cwd": "web",
+      "exit": 0,
+      "stdout": "PASS expired credential recovers parent prices before accepting new study results\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "tests/provider-credential-recovery.cjs"
+      ],
+      "cwd": "web",
+      "exit": 0,
+      "stdout": "PASS provider credential-only recovery preserves main prices; corrections and stale navigation remain fenced\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "tests/display-recovery-lifecycle.cjs"
+      ],
+      "cwd": "web",
+      "exit": 0,
+      "stdout": "PASS price-only retry, recovery deduplication, workspace cancellation\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "tests/indicator-display-snapshot.cjs"
+      ],
+      "cwd": "web",
+      "exit": 0,
+      "stdout": "PASS exact display snapshot, display readiness and queued acceptance fencing\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "tests/advanced-native-empty-failure.private.cjs"
+      ],
+      "cwd": "web",
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Error: Cannot find module '@babel/parser'\nRequire stack:\n- /home/quant/repos/market-watch-issue89-20261021/web/tests/advanced-native-empty-failure.private.cjs\n    at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)\n    at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)\n    at Function._load (node:internal/modules/cjs/loader:1216:25)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)\n    at Module.require (node:internal/modules/cjs/loader:1527:12)\n    at require (node:internal/modules/helpers:147:16)\n    at Object.<anonymous> (/home/quant/repos/market-watch-issue89-20261021/web/tests/advanced-native-empty-failure.private.cjs:8:15)\n    at Module._compile (node:internal/modules/cjs/loader:1781:14)\n    at Object..js (node:internal/modules/cjs/loader:1913:10)\n"
+    },
+    {
+      "command": [
+        "node",
+        "tests/advanced-native-error-contract.private.cjs"
+      ],
+      "cwd": "web",
+      "exit": 1,
+      "stdout": "",
+      "stderr": "node:internal/modules/cjs/loader:1433\n  throw err;\n  ^\n\nError: Cannot find module '@babel/parser'\nRequire stack:\n- /home/quant/repos/market-watch-issue89-20261021/web/tests/advanced-native-error-contract.private.cjs\n    at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)\n    at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)\n    at Function._load (node:internal/modules/cjs/loader:1216:25)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)\n    at Module.require (node:internal/modules/cjs/loader:1527:12)\n    at require (node:internal/modules/helpers:147:16)\n    at Object.<anonymous> (/home/quant/repos/market-watch-issue89-20261021/web/tests/advanced-native-error-contract.private.cjs:7:15)\n    at Module._compile (node:internal/modules/cjs/loader:1781:14)\n    at Object..js (node:internal/modules/cjs/loader:1913:10) {\n  code: 'MODULE_NOT_FOUND',\n  requireStack: [\n    '/home/quant/repos/market-watch-issue89-20261021/web/tests/advanced-native-error-contract.private.cjs'\n  ]\n}\n\nNode.js v22.23.2\n"
+    },
+    {
+      "command": [
+        "/home/quant/repos/market-watch/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "backend/tests/test_issue89_fixture_calendar.py"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "stdout": "..........                                                               [100%]\n10 passed in 2.86s\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/home/quant/repos/market-watch/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "backend/tests/test_oanda_payload_semantics.py",
+        "backend/tests/test_oanda_provider_account_prices.py",
+        "backend/tests/test_provider_display_snapshots.py"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "stdout": "......ssssss............ssssssssssss..ss...sss......ssssss.s.s.ssss.s... [ 80%]\n..................                                                       [100%]\n54 passed, 36 skipped in 12.28s\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "--check",
+        "web/tests/issue89-native-recovery.browser.cjs"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

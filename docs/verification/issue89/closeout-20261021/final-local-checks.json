@@ -1,0 +1,37 @@
+{
+  "implementation": "be20392c99906a4971f3359c8d8877befdb75632",
+  "observed_results": [
+    {
+      "command": "PYTHONPATH=backend /home/quant/repos/market-watch/.venv/bin/python -m pytest -q backend/tests/test_issue89_fixture_calendar.py backend/tests/test_oanda_payload_semantics.py backend/tests/test_oanda_provider_account_prices.py backend/tests/test_provider_display_snapshots.py backend/tests/test_api_logging.py",
+      "result": "66 passed, 36 skipped in 17.68s",
+      "exit": 0
+    },
+    {
+      "command": "PYTHONPATH=backend /home/quant/repos/market-watch/.venv/bin/python -m pytest -q backend/tests/test_api_logging.py",
+      "result": "2 passed in 3.49s",
+      "exit": 0
+    },
+    {
+      "command": "NODE_PATH=/home/quant/repos/market-watch/web/node_modules node tests/advanced-native-empty-failure.private.cjs",
+      "cwd": "web",
+      "result": "baseline ordinary empty failure: reads=13 recreated=12; current ordinary empty failure: reads=1 recreated=0 errors=1; accepted cache/cancellation/capacity/purge recovery assertions pass",
+      "exit": 0
+    },
+    {
+      "command": "NODE_PATH=/home/quant/repos/market-watch/web/node_modules node tests/advanced-native-error-contract.private.cjs",
+      "cwd": "web",
+      "result": "baseline: nativePayloadType=object deliveryException=Cannot read properties of undefined (reading startsWith); current: nativePayloadType=string seriesErrors=1 completed=1; PASS real native thread to main-series receiver and retry/diagnostic semantics",
+      "exit": 0
+    },
+    {
+      "command": "Ruff all changed Python application/tests/scripts; git diff --check",
+      "result": "All checks passed",
+      "exit": 0
+    }
+  ],
+  "notes": [
+    "Private probes initially failed at missing @babel/parser; corrected NODE_PATH and rerun both passed. Original failed records retained in local-checks-initial.json.",
+    "PYTHONPATH=backend is required because shared venv editable installation points at the main checkout.",
+    "No TEST_POSTGRES_URL supplied for this local pytest invocation; skips are not PG coverage."
+  ]
+}

@@ -1,7 +1,12 @@
 # Issue #89 — OANDA equivalent observations and display snapshots
 
-Status: implementation and database compatibility verified; final native R1 pending.
-Baseline: `762067a83fa2fca20c9158ea67cafae838861c19` (v1.26.2).
+Status (2026-10-21): final native matrix, three correction repeats and independent
+PR reviews passed. See [final closeout](closeout-20261021.md) for the authoritative
+runtime, evidence, limitations and final-head CI status. The sections below are
+the retained earlier-stage record; their pending states and image references are
+historical and do not describe the final candidate.
+Final integration/rollback baseline: v1.26.3 / `767cd4275a3be1d3ce27880dab1ef6dded3e11dc`.
+Original investigation baseline: `762067a83fa2fca20c9158ea67cafae838861c19` (v1.26.2).
 Branch: `fix/issue89-oanda-snapshot-semantics-20261021`.
 
 ## Scope and risk
