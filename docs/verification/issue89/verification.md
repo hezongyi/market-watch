@@ -97,6 +97,9 @@ harness now records the explicit origin-only handle transition and requires
 reference values for every claimed row. These new assertions have only
 passed syntax validation; execution and target-layer screenshot assessment are
 still pending. Do not interpret prepared assertions as acceptance evidence.
+Static follow-ups through `d3506b0`: Standards **zero actionable findings**;
+Spec **zero new actionable findings** after those assertion fixes. Neither axis
+certifies runtime or rendered-layer acceptance.
 
 Self-review checked full-payload invalidation, preserved frozen prefixes,
 non-OANDA isolation, explicit false, volume/labels, unchanged public errors,
