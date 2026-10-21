@@ -93,7 +93,7 @@ function startFixtureObserver(){
   };
   page.on('requestfinished',r=>finishRequest(r,'finished'));
   page.on('requestfailed',r=>finishRequest(r,'failed'));
-  page.on('pageerror',e=>report.errors.push(e.message));
+  page.on('pageerror',e=>report.errors.push(e.stack || e.message));
   page.on('console',m=>{if(['warning','error'].includes(m.type()))report.diagnostics.push({
     type:m.type(),text:m.text().slice(0,700)});});
   page.on('requestfailed',r=>report.diagnostics.push({type:'requestfailed',
