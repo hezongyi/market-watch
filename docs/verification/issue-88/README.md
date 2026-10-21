@@ -5,8 +5,8 @@
 - 基线：`762067a83fa2fca20c9158ea67cafae838861c19`（v1.26.2）。
 - 分支：`fix/issue88-alert-editing-recovery-20261021`。
 - 风险分类：**F0**。兼容扩展 API/RPC/UI；不改变 schema、持久格式或告警判定语义；不包含 #89。
-- 最小检查：真实组件和确定性请求竞态、真实 HTTP 路由错误映射、Web build、PR CI、自审、Ubuntu R1。
-- 不操作长期验收规则、生产实例或外部通知。
+- 最小检查：真实组件和确定性请求竞态、真实 HTTP 路由错误映射、Web build、PR CI、自审、长期验收实例。
+- 本轮更新长期验收实例；生产发布和通知发送未执行。
 
 ## 改动与自审
 
@@ -59,20 +59,12 @@ MW_PROBE_LIBRARY=/private/path/charting_library node tests/native-alert-ui.integ
 MW_PROBE_LIBRARY=/private/path/charting_library node tests/native-alert-workspace.integration.cjs
 ```
 
-## Ubuntu R1 与 CI 状态
+## 长期实例验收与 CI
 
-R1 **待完成**。此前 `preview up` 因主机高负载被工具拒绝；已请求用户协调并发，不绕过保护或停止其他任务。01:04 UTC 只读复查：已有 `mw-issue75-v2-20261018`（15 容器）与 `mw-issue89-20261021`（5 容器），可用内存约 7.6 GiB、磁盘约 28 GiB。本任务预计常驻约 1.2 GiB，使用独立 PG/API/Web/Chart/网关及 project/network/volume/凭据；等待协调回复后再启动。
+2026-10-21 UTC，候选 `5f67b16b98057efde3a2b0394e7ab5562eade587` 已更新至登记的长期实例 `mw-issue75-v2-20261018`。入口为 `https://192.168.7.232:18280`，图表 origin 为 `https://192.168.7.232:18281`。应用服务运行于候选镜像：API `sha256:b74b4541bd3742c03b18fb0efdfcd2520e754203546657f756ce78b298416b30`、Web `sha256:ca0ced42ff77eb4c3d0928725a01ee7a1f227daa389a406ee2fe622ae6dd6a93`、Chart `sha256:26d903c0e74f0d913b0dcede9ab49a4d74135e87653e74160220dccaf88bfbd6`。API、PostgreSQL healthy；13 个应用容器运行，gateway 与 PostgreSQL 容器未替换，两个入口 HTTP 200。更新沿用原 Compose project 和配置；未运行 seed/migrate，未清理既有容器或数据。
 
-- 任务/project：`mw-issue88-20261021`。
-- 计划地址（尚未运行）：`https://localhost:18488`，Chart `https://localhost:17488`。
-- D1 数据集：`d1-v1-ef528135a493`；通知与 Yahoo 默认禁用。
-- 旧 c1 候选已过时，需同任务重建；最终实际镜像 ID 应以 `run.json` 为准。
-- 私有状态：`~/.local/share/market-watch-docker/previews/mw-issue88-20261021/`；不提交凭据或完整浏览器状态。
+使用独立、临时 Playwright context 登录真实实例，没有连接或改动受保护的浏览器 profile。原生告警列表、条件关系切换（区间与标量互切）、同一草稿连续编辑和历史事件搜索通过；草稿以取消结束。告警写请求被拦截，没有创建、编辑、暂停或归档任何告警。Yahoo 实测将 AAPL resolve 请求拦截为三次结构化 503，主页面显示显式重试；点击后实际 resolve 返回 200，图表重新进入 `dataReady`，无残留 resolve 错误。测试后恢复原 `MWP:EURUSD` 图表；服务端工作区仍为 EURUSD / 60，revision 7。工作区保存请求在恢复测试期间拦截，未保存临时 Yahoo 状态。无浏览器 page error。
 
-```sh
-.venv/bin/python deploy/ubuntu/mw_docker.py preview up --task mw-issue88-20261021 --project mw-issue88-20261021
-.venv/bin/python deploy/ubuntu/mw_docker.py preview status --task mw-issue88-20261021 --project mw-issue88-20261021
-.venv/bin/python deploy/ubuntu/mw_docker.py preview stop --task mw-issue88-20261021 --project mw-issue88-20261021
-```
+数据源与投递开关保持原配置：Yahoo 和 OANDA stream 已启用，通知投递保持关闭；没有发送真实通知。PostgreSQL 持久卷、认证、端口、TLS、gateway、图表 origin、私有配置及受保护浏览器现场保留。精确回退 overlay：`/home/quant/repos/.mw-issue88-longterm-20261021/rollback-override.json`。
 
-PR #91 CI 已全部通过：分类、后端、Web、Compose 及必需检查均为 pass。F0 R1 尚未运行，因此 issue 保持开放、PR 保持 Draft；不合并或发布生产。
+PR #91 第二轮 CI 全部通过：分类、Backend、Web、Compose 均为 pass；Backend 全量测试耗时 16m28s。Issue 仍开放，PR 保持 Draft；未合并、未发布生产。
