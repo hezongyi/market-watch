@@ -5,7 +5,8 @@ const base='https://192.168.7.232:18280',origin='https://192.168.7.232:18281',wo
  const browser=await chromium.launch({args:['--no-sandbox']});const context=await browser.newContext({ignoreHTTPSErrors:true,viewport:{width:1440,height:950}});const page=await context.newPage();
  const report={started:new Date().toISOString(),errors:[],checks:[],blockedWrites:[],blockedNoticeWrites:[]};page.on('pageerror',e=>report.errors.push(e.message));
  const mock=await require(process.cwd()+'/web/tests/helpers/readOnlyAcceptance.cjs').readOnlyAcceptance(context,report);
- const get=async path=>{const r=await context.request.get(base+'/api'+path);assert.equal(r.status(),200);return r.json()};
+ const noticeUntil=Date.parse('2026-10-22T11:24:24.420Z');
+ const get=async path=>{if(path.startsWith('/notification-center/events?'))path+='&until='+noticeUntil;const r=await context.request.get(base+'/api'+path);assert.equal(r.status(),200);return r.json()};
  let original,prefs,remote,shadow,forced=false,host;
  await context.addInitScript(()=>{window.acceptanceMessages=[];addEventListener('message',e=>{if(e.data?.type?.includes('preference')||['preferences','result'].includes(e.data?.type))window.acceptanceMessages.push({type:e.data.type,op:e.data.query?.op,id:e.data.id,error:e.data.error});});});
  const connect=async()=>{await expect.poll(()=>page.frames().some(f=>f.url().startsWith(origin+'/')),{timeout:90000}).toBe(true);host=page.frames().find(f=>f.url().startsWith(origin+'/'));await host.waitForFunction(()=>typeof ready!=='undefined'&&ready&&!loading&&activePreferences,null,{timeout:90000});await host.evaluate(()=>autoSave?.dispose());};
@@ -31,16 +32,17 @@ const base='https://192.168.7.232:18280',origin='https://192.168.7.232:18281',wo
   },{value,base:remote});
   await seed('local-choice');await page.reload();await connect();
   await page.getByRole('button',{name:'处理设置草稿',exact:true}).click();const dialog=page.getByRole('dialog',{name:'处理设置草稿'});await expect(dialog).toBeVisible();
+  const chooseSeed=async()=>{const option=dialog.locator('option').filter({hasText:'mw.acceptance-draft ·'});await expect(option).toHaveCount(1);await dialog.getByLabel('未保存的设置').selectOption(await option.getAttribute('value'));};await chooseSeed();
   await expect(dialog.getByLabel('服务器设置')).toHaveValue('server-3');remote={...remote,revision:4,content:{value:'server-4'}};mock.rows.set(settingKey,remote);
   await dialog.getByRole('button',{name:'提交本地修改',exact:true}).click();await expect(dialog.getByRole('alert')).toContainText('再次变化',{timeout:45000});
   await expect(dialog.getByLabel('服务器设置')).toHaveValue('server-4');
-  await dialog.getByRole('button',{name:'提交本地修改',exact:true}).click();await expect(dialog).toContainText('当前没有未保存');assert.equal(remote.content.value,'local-choice');
+  await dialog.getByRole('button',{name:'提交本地修改',exact:true}).click();await expect(dialog.locator('option').filter({hasText:'mw.acceptance-draft ·'})).toHaveCount(0);assert.equal(remote.content.value,'local-choice');
   await host.evaluate(()=>activePreferences.settings.setValue('mw.acceptance-draft','stale-widget'));await page.waitForTimeout(250);assert.equal(remote.content.value,'local-choice');
-  await dialog.getByRole('button',{name:'关闭',exact:true}).click();await expect(page.getByRole('button',{name:'重新打开图表',exact:true})).toBeVisible();
+  await dialog.getByRole('button',{name:/^(关闭|稍后处理)$/,exact:true}).click();await expect(page.getByRole('button',{name:'重新打开图表',exact:true})).toBeVisible();
   report.checks.push({name:'local-draft-native-ui',conflictRefreshed:true,selectedValuePreserved:true,staleWidgetBlocked:true});
-  await seed('discard-choice');await page.reload();await connect();await page.getByRole('button',{name:'处理设置草稿',exact:true}).click();await expect(dialog.getByLabel('服务器设置')).toHaveValue('local-choice');
-  await dialog.getByRole('button',{name:'采用服务器设置',exact:true}).click();await expect(dialog).toContainText('当前没有未保存');await host.evaluate(()=>activePreferences.settings.setValue('mw.acceptance-draft','stale-after-discard'));await page.waitForTimeout(250);assert.equal(remote.content.value,'local-choice');
-  report.checks.push({name:'remote-draft-native-ui',staleWidgetBlocked:true});await dialog.getByRole('button',{name:'关闭',exact:true}).click();
+  await seed('discard-choice');await page.reload();await connect();await page.getByRole('button',{name:'处理设置草稿',exact:true}).click();await chooseSeed();await expect(dialog.getByLabel('服务器设置')).toHaveValue('local-choice');
+  await dialog.getByRole('button',{name:'采用服务器设置',exact:true}).click();await expect(dialog.locator('option').filter({hasText:'mw.acceptance-draft ·'})).toHaveCount(0);await host.evaluate(()=>activePreferences.settings.setValue('mw.acceptance-draft','stale-after-discard'));await page.waitForTimeout(250);assert.equal(remote.content.value,'local-choice');
+  report.checks.push({name:'remote-draft-native-ui',staleWidgetBlocked:true});await dialog.getByRole('button',{name:/^(关闭|稍后处理)$/,exact:true}).click();
   // Reload discovers no remaining draft; ongoing cross-tab handled hint stays visible until reopen.
   await page.screenshot({path:'/tmp/mwa-notice-reliability-20261022/draft-reopen-desktop.png'});
   await page.setViewportSize({width:390,height:850});await page.screenshot({path:'/tmp/mwa-notice-reliability-20261022/draft-reopen-mobile.png'});

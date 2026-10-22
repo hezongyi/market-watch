@@ -1,5 +1,5 @@
 {
-  "started": "2026-10-22T14:35:45.588Z",
+  "started": "2026-10-22T15:24:22.823Z",
   "errors": [],
   "checks": [
     {
@@ -8,7 +8,7 @@
       "count": 100,
       "examples": [
         {
-          "id": "t:f7dfdcca-d58e-54cf-8225-df175a0d0928",
+          "id": "t:85ccb5cf-0ded-5e67-b448-f29f86960cac",
           "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
           "display": {
             "series_kind": "composite",
@@ -18,7 +18,7 @@
           }
         },
         {
-          "id": "t:acaaac05-f152-563e-997d-ee808a818ef6",
+          "id": "t:a3c57515-78e9-5d30-9ec9-2581796fe1bc",
           "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
           "display": {
             "series_kind": "composite",
@@ -28,7 +28,7 @@
           }
         },
         {
-          "id": "t:1d99ac60-f7d3-501e-a1eb-eeaf0a72385e",
+          "id": "t:7b0cb756-3d55-5939-b987-c3db6a77eadd",
           "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
           "display": {
             "series_kind": "composite",
@@ -45,33 +45,33 @@
       "count": 100,
       "examples": [
         {
-          "id": "b:8392b19f-fa11-063a-82db-048657b2d724",
-          "instrument": "MWC:4087CAEE7E525A3864EE1B083B8FE65F6DDD13A738D72681EC92CD46D5615EA6",
+          "id": "t:d7048966-a57c-57ef-85c1-ac8d9565c9d7",
+          "instrument": "4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6",
           "display": {
             "series_kind": "composite",
             "symbol": "XAUUSD",
             "label": "XAUUSD",
-            "provenance": "event_snapshot"
+            "provenance": "resolved_current"
           }
         },
         {
-          "id": "b:8dbd3a65-e5ae-4030-e6ad-a943fc53f0f1",
-          "instrument": "MWC:4087CAEE7E525A3864EE1B083B8FE65F6DDD13A738D72681EC92CD46D5615EA6",
+          "id": "t:6a4e5385-68fe-58cb-8c7b-f65b59bad558",
+          "instrument": "4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6",
           "display": {
             "series_kind": "composite",
             "symbol": "XAUUSD",
             "label": "XAUUSD",
-            "provenance": "event_snapshot"
+            "provenance": "resolved_current"
           }
         },
         {
-          "id": "b:68075485-4a25-0822-2c20-58494f3310e0",
-          "instrument": "MWC:4087CAEE7E525A3864EE1B083B8FE65F6DDD13A738D72681EC92CD46D5615EA6",
+          "id": "t:0efbf42d-d7e7-5c7d-85d3-fe55c0c96dab",
+          "instrument": "4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6",
           "display": {
             "series_kind": "composite",
             "symbol": "XAUUSD",
             "label": "XAUUSD",
-            "provenance": "event_snapshot"
+            "provenance": "resolved_current"
           }
         }
       ]
@@ -79,10 +79,10 @@
     {
       "name": "legacy-name-search",
       "symbol": "USDCAD",
-      "count": 44,
+      "count": 30,
       "examples": [
         {
-          "id": "t:baffb33f-f0cd-5ea4-85c0-b0981582ba0a",
+          "id": "t:407de4cb-6fee-5602-ba66-ccc1002bef2f",
           "instrument": "54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982",
           "display": {
             "series_kind": "composite",
@@ -92,7 +92,7 @@
           }
         },
         {
-          "id": "t:35c6fd33-43ad-5b2b-854f-1311bf0cd30a",
+          "id": "t:e3b10960-20e1-5c34-8102-00eba01c1b92",
           "instrument": "54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982",
           "display": {
             "series_kind": "composite",
@@ -102,7 +102,7 @@
           }
         },
         {
-          "id": "t:11a0ee80-cc19-5d7d-b280-ddfb79bb96ae",
+          "id": "t:1392bea3-454b-58c6-a4d8-8b27faeee943",
           "instrument": "54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982",
           "display": {
             "series_kind": "composite",
@@ -166,10 +166,12 @@
       "method": "POST"
     }
   ],
-  "blockedNoticeWrites": [],
+  "blockedNoticeWrites": [
+    "/api/notification-center/observations"
+  ],
   "workspaceCheck": {
-    "beforeRevision": 73,
-    "afterRevision": 73,
+    "beforeRevision": 75,
+    "afterRevision": 75,
     "changed": []
   },
   "externalWorkspaceChange": false,
