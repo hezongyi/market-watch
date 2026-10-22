@@ -1,0 +1,139 @@
+{
+  "checks": [
+    {
+      "ticker": "MWP:EURUSD",
+      "title": "EURUSD 1.12418 ▲ +0.09% 我的图表",
+      "symbol": "MWP:EURUSD",
+      "rows": [
+        {
+          "n": "MWH:63bc01d4-3943-45cc-93a5-b04c3caaab16",
+          "s": "ok",
+          "lp": 1.12224
+        },
+        {
+          "n": "MWH:f0ac6c23-8b4e-4a10-a485-c6565ec9494c",
+          "s": "ok",
+          "lp": 1.4042,
+          "ch": -0.0068,
+          "chp": -0.4819277108433735
+        },
+        {
+          "n": "MWH:7fe123c5-1038-4edc-800f-b8f9685c9ad4",
+          "s": "ok",
+          "lp": 4114.705
+        },
+        {
+          "n": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+          "s": "ok",
+          "lp": 1.12414,
+          "ch": 0.00103,
+          "chp": 0.0917096277301422
+        }
+      ]
+    },
+    {
+      "ticker": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+      "title": "EURUSD 1.12414 ▲ +0.09% 我的图表",
+      "symbol": "MWC:8C490DF00408ED7102D9106E2AD6D3991D3E6488DE0B0905D92A2EC052343CBB",
+      "rows": [
+        {
+          "n": "MWH:63bc01d4-3943-45cc-93a5-b04c3caaab16",
+          "s": "ok",
+          "lp": 1.12224
+        },
+        {
+          "n": "MWH:f0ac6c23-8b4e-4a10-a485-c6565ec9494c",
+          "s": "ok",
+          "lp": 1.4042,
+          "ch": -0.0068,
+          "chp": -0.4819277108433735
+        },
+        {
+          "n": "MWH:7fe123c5-1038-4edc-800f-b8f9685c9ad4",
+          "s": "ok",
+          "lp": 4114.705
+        },
+        {
+          "n": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+          "s": "ok",
+          "lp": 1.12414,
+          "ch": 0.00103,
+          "chp": 0.0917096277301422
+        },
+        {
+          "n": "MWC:8C490DF00408ED7102D9106E2AD6D3991D3E6488DE0B0905D92A2EC052343CBB",
+          "s": "ok",
+          "lp": 1.12414,
+          "ch": 0.00103,
+          "chp": 0.0917096277301422
+        }
+      ]
+    },
+    {
+      "ticker": "MWH:63bc01d4-3943-45cc-93a5-b04c3caaab16",
+      "title": "EURUSD·历史 [我的图表]",
+      "symbol": "MWH:63BC01D4-3943-45CC-93A5-B04C3CAAAB16",
+      "rows": [
+        {
+          "n": "MWH:63bc01d4-3943-45cc-93a5-b04c3caaab16",
+          "s": "ok",
+          "lp": 1.12224
+        },
+        {
+          "n": "MWH:f0ac6c23-8b4e-4a10-a485-c6565ec9494c",
+          "s": "ok",
+          "lp": 1.4042,
+          "ch": -0.0068,
+          "chp": -0.4819277108433735
+        },
+        {
+          "n": "MWH:7fe123c5-1038-4edc-800f-b8f9685c9ad4",
+          "s": "ok",
+          "lp": 4114.705
+        },
+        {
+          "n": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+          "s": "ok",
+          "lp": 1.12414,
+          "ch": 0.00103,
+          "chp": 0.0917096277301422
+        },
+        {
+          "n": "MWC:8C490DF00408ED7102D9106E2AD6D3991D3E6488DE0B0905D92A2EC052343CBB",
+          "s": "ok",
+          "lp": 1.12414,
+          "ch": 0.00103,
+          "chp": 0.0917096277301422
+        },
+        {
+          "n": "MWH:63BC01D4-3943-45CC-93A5-B04C3CAAAB16",
+          "s": "ok",
+          "lp": 1.12224
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "blockedWrites": [
+    {
+      "path": "/api/advanced-charts/preferences/migrate",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/migrate",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    }
+  ],
+  "refreshPassed": true,
+  "workspaceUnchanged": true,
+  "preferencesUnchanged": false,
+  "passed": true
+}

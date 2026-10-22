@@ -66,9 +66,10 @@ export default function AdvancedWorkspace() {
   const urlRef = useRef(appLocation); urlRef.current = appLocation;
   const capturing = useRef<{resolve: () => void; reject: (error: Error) => void} | null>(null);
   const titleTimer = useRef<ReturnType<typeof setTimeout> | null>(null), titleText = useRef(""), titleQuote = useRef(""), titleLast = useRef(0), titleIdentity = useRef("");
+  const titleHistorical = useRef(false);
   const updateTitle = (immediate = false) => {
     const layout = current.current?.name?.trim();
-    titleText.current = [titleQuote.current || pageName(appLocation.pathname), layout]
+    titleText.current = [titleQuote.current || pageName(appLocation.pathname), layout && titleHistorical.current ? `[${layout}]` : layout]
       .filter(Boolean)
       .join(" ");
     const write = () => {
@@ -210,6 +211,7 @@ export default function AdvancedWorkspace() {
     unsaved.current = false;
     current.current = row;
     titleQuote.current = "";
+    titleHistorical.current = false;
     titleIdentity.current = "";
     updateTitle(true);
     alertUiSession.current = "";
@@ -475,7 +477,8 @@ export default function AdvancedWorkspace() {
         const identity = `${m.workspace_id}:${m.generation}:${m.ticker}`;
         const price = Number.isFinite(m.price) && typeof m.formatted === "string" ? " " + m.formatted.slice(0, 60) : "";
         const percent = price && Number.isFinite(m.change) ? ` ${m.change > 0 ? "▲ +" : m.change < 0 ? "▼ −" : ""}${Math.abs(m.change).toFixed(2)}%` : "";
-        titleQuote.current = m.label + price + percent + (m.historical ? " · 历史" : m.delayed ? " · 迟延" : "");
+        titleHistorical.current = m.historical === true;
+        titleQuote.current = titleHistorical.current ? m.label + "·历史" : m.label + price + percent + (m.delayed ? " · 迟延" : "");
         updateTitle(identity !== titleIdentity.current);
         titleIdentity.current = identity;
         return;

@@ -1,6 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 
+import pytest
 from alerts import market_data
 from alerts.chart_series import encode
 from alerts.domain import Candle
@@ -99,6 +100,63 @@ def test_history_and_composite_snapshots_preserve_observation_type_and_demand(da
     with database() as db:
         assert db.scalar(select(MarketDemand)) is None
         assert db.get(MarketComposite, composite_id).active_revision_id == revision_id
+
+
+def test_fixed_history_watchlist_derives_change_from_same_version_closed_daily_close(monkeypatch):
+    from alerts.quote_presentation import fixed_snapshot
+
+    latest = {"start": stamp("2026-01-07T12:00:00+00:00"),
+        "end": stamp("2026-01-07T12:01:00+00:00"), "close": "1.12000"}
+    previous = {"start": stamp("2026-01-05T22:00:00+00:00"),
+        "end": stamp("2026-01-06T22:00:00+00:00"), "close": "1.10000",
+        "complete": False, "time_closed": True, "coverage_complete": False,
+        "source_confirmed": True}
+    calls = []
+
+    def page(db, version_id, frame, *, before=None, count=2000):
+        calls.append((version_id, frame, before, count))
+        return {"bars": [latest] if frame == "M1" else [previous]}
+
+    monkeypatch.setattr("alerts.history_artifacts.chart_page", page)
+    value = fixed_snapshot(None, "fixed-version", {"frames": ["M1"], "calendar": "ny17"})
+
+    assert value["lp"] == 1.12
+    assert value["prev_close_price"] == 1.1
+    assert value["ch"] == 0.02
+    assert value["chp"] == pytest.approx(100 * 0.02 / 1.1)
+    assert calls == [
+        ("fixed-version", "M1", None, 1),
+        ("fixed-version", "D1", stamp("2026-01-06T22:00:00+00:00"), 1),
+    ]
+
+
+@pytest.mark.parametrize("daily_page", [
+    {"bars": [{"end": 1767736800000, "close": "1.10", "time_closed": False,
+        "source_confirmed": True}]},
+    {"bars": [{"end": 1767736800000, "close": "1.10", "time_closed": True,
+        "source_confirmed": False}]},
+    {"bars": [{"end": 1767736800001, "close": "1.10", "time_closed": True,
+        "source_confirmed": True}]},
+    ValueError("D1 该周期产物尚未发布"),
+])
+def test_fixed_history_keeps_last_price_without_verified_daily_close(monkeypatch, daily_page):
+    from alerts.quote_presentation import fixed_snapshot
+
+    latest = {"start": stamp("2026-01-07T12:00:00+00:00"),
+        "end": stamp("2026-01-07T12:01:00+00:00"), "close": "1.12000"}
+
+    def page(db, version_id, frame, *, before=None, count=2000):
+        if frame == "M1":
+            return {"bars": [latest]}
+        if isinstance(daily_page, Exception):
+            raise daily_page
+        return daily_page
+
+    monkeypatch.setattr("alerts.history_artifacts.chart_page", page)
+    value = fixed_snapshot(None, "fixed-version", {"frames": ["M1"], "calendar": "ny17"})
+
+    assert value["lp"] == 1.12
+    assert all(key not in value for key in ("ch", "chp", "prev_close_price"))
 
 
 def test_composite_stored_source_conflict_and_failure_follow_same_revision(database, monkeypatch):

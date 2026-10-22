@@ -163,7 +163,7 @@ def observation_evidence(sample):
 
 
 def previous_close(db, composite, *, revision, input_revision, observed_at):
-    """Return the last confirmed NY17 daily close before ``observed_at``.
+    """Return the prior closed, source-confirmed NY17 daily close.
 
     Composite quotes can be sampled from a live bid, a forming REST candle, or
     a stored M1 tail.  Their observation clocks differ, but the change shown in
@@ -196,8 +196,6 @@ def previous_close(db, composite, *, revision, input_revision, observed_at):
         if row.get("end", 0) <= session_start
         and row.get("source_confirmed") is True
         and row.get("time_closed") is True
-        and row.get("complete") is True
-        and row.get("coverage_complete") is True
     ]
     if not bars:
         # An artifact can publish later without changing the pinned minute
@@ -209,7 +207,7 @@ def previous_close(db, composite, *, revision, input_revision, observed_at):
     except (InvalidOperation, TypeError, ValueError):
         value = None
     else:
-        value = value if value.is_finite() and value != 0 else None
+        value = value if value.is_finite() and value > 0 else None
     if value is None:
         return None
     _previous_close_cache[key] = value

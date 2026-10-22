@@ -198,9 +198,12 @@ def http_contract(factory, monkeypatch):
             assert quote["v"]["lp"] == float("1.123456789012345678")
             assert quote["v"]["price_type"] == "sampled_bid"
             assert quote["snapshot"]["price"] == "1.123456789012345678"
-            # This fixture has a sparse historical D1; its early observation
-            # is not a verified session close and must not produce changes.
-            assert all(key not in quote["v"] for key in ("ch", "chp", "prev_close_price"))
+            # Match provider quotes: a closed, source-confirmed D1 close is
+            # usable even when its minute coverage is sparse.
+            previous = Decimal(str(quote["v"]["prev_close_price"]))
+            price = Decimal(str(quote["v"]["lp"]))
+            assert quote["v"]["ch"] == pytest.approx(float(price - previous))
+            assert quote["v"]["chp"] == pytest.approx(float((price - previous) / previous * 100))
             assert "抽样Bid" in quote["v"]["description"]
             with factory() as db:
                 assert db.scalar(select(MarketDemand)) is None
@@ -254,9 +257,8 @@ def test_watchlist_http_keeps_latest_price_without_unverified_change(database, m
 
 
 @pytest.mark.parametrize("invalid", [
-    {"complete": False}, {"coverage_complete": False},
     {"source_confirmed": False}, {"time_closed": False},
-    {"close": "NaN"}, {"close": "0"},
+    {"close": "NaN"}, {"close": "0"}, {"close": "-1"},
 ])
 def test_previous_close_rejects_unverified_daily_bars(database, monkeypatch, invalid):
     composite_id, revision_id, _ = populated(database, monkeypatch)
@@ -268,6 +270,18 @@ def test_previous_close_rejects_unverified_daily_bars(database, monkeypatch, inv
         assert composite_quotes.previous_close(db, db.get(MarketComposite, composite_id),
             revision=db.get(CompositeRevision, revision_id), input_revision=0,
             observed_at=200010000) is None
+
+
+def test_previous_close_matches_provider_closed_candle_with_incomplete_minute_coverage(database, monkeypatch):
+    composite_id, revision_id, _ = populated(database, monkeypatch)
+    bar = {"end": 0, "complete": False, "coverage_complete": False,
+        "source_confirmed": True, "time_closed": True, "close": "1.11"}
+    monkeypatch.setattr(composite_quotes, "chart_page", lambda *args, **kwargs: {"bars": [bar]})
+    composite_quotes._previous_close_cache.clear()
+    with database() as db:
+        assert composite_quotes.previous_close(db, db.get(MarketComposite, composite_id),
+            revision=db.get(CompositeRevision, revision_id), input_revision=0,
+            observed_at=200010000) == Decimal("1.11")
 
 
 def test_previous_close_recovers_after_artifact_publication_without_input_change(database, monkeypatch):
