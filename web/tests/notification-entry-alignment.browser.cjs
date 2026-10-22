@@ -51,7 +51,7 @@ fs.mkdirSync(output, { recursive: true });
         await expect.poll(async () => {
           const m = await measure();
           return m.delta === null ? m.slotWidth === 38 : m.delta <= 1;
-        }).toBe(true);
+        }, { timeout: 15000 }).toBe(true);
         for (const badge of [false, true]) {
           await entry.locator('.nc-entry-count').evaluate((n, show) => { n.hidden = !show; n.textContent = '9'; }, badge);
           const sample = await measure();

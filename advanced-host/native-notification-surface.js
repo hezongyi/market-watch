@@ -75,12 +75,14 @@ async function nativeNotificationSurface(widget, report) {
           if (watchlist) resize.observe(watchlist);
         }
         const icon = watchlist?.getBoundingClientRect();
-        const slot = node.getBoundingClientRect();
         const visible = icon?.width > 0 && icon.height > 0 &&
           icon.right > 0 && icon.left < win.innerWidth;
         // Reserve real toolbar space on both sides of the 38px native button.
         // The right edge stays anchored; no translated hit area overlaps peers.
-        const width = visible ? Math.max(38, 2 * (slot.right - icon.left - icon.width / 2)) : 38;
+        // Use the viewport's anchored right edge. The toolbar can temporarily
+        // overflow while recomputing responsive groups; using the slot's moving
+        // edge here creates a positive feedback loop and expands it each frame.
+        const width = visible ? Math.max(38, 2 * (doc.documentElement.clientWidth - icon.left - icon.width / 2)) : 38;
         const value = `${width}px`;
         for (const property of ["width", "min-width", "max-width"]) {
           if (node.style.getPropertyValue(property) !== value)

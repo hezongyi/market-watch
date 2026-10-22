@@ -94,7 +94,9 @@ export function CreationCatalog({
       const source = fixedSource || exchange.toLowerCase(),
         signature = JSON.stringify([source, text, type]);
       if (signature !== active.current || start === 0) {
-        known.current.clear();
+        // Native search retains its rendered rows while a replacement query is
+        // pending. Keep their exact draft identities selectable until replaced;
+        // the mapping check/save revalidates current account and availability.
         active.current = signature;
       }
       const result = await api<CatalogPage>(

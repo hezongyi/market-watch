@@ -18,7 +18,7 @@ if (new URL(base).hostname !== 'localhost') throw Error('v2 R1 accepts loopback 
   const dc = () => native().locator('.dc-window');
   const apiGet = async endpoint => { const r = await page.request.get(base + '/api' + endpoint); expect(r.ok(), await r.text()).toBe(true); return r.json(); };
   const record = name => { report.checks.push(name); console.log('PASS', name); };
-  const closeCenter = async () => { if (!await dc().count()) return; await dc().getByRole('button', { name: '关闭数据中心', exact: true }).click(); if (await dc().getByRole('button', { name: '放弃修改', exact: true }).count()) await dc().getByRole('button', { name: '放弃修改', exact: true }).click(); };
+  const closeCenter = async () => { if (!await dc().count()) return; await native().getByRole('button', { name: '关闭数据中心', exact: true }).click(); if (await dc().getByRole('button', { name: '放弃修改', exact: true }).count()) await dc().getByRole('button', { name: '放弃修改', exact: true }).click(); await expect(dc()).toHaveCount(0); };
   const openMapping = async id => {
     await host().evaluate(() => dataCenter.open('/market-data?tab=composite&view=candidates'));
     await expect(dc().getByText('建立条件', { exact: true })).toBeVisible({ timeout: 20000 });
@@ -47,6 +47,31 @@ if (new URL(base).hostname !== 'localhost') throw Error('v2 R1 accepts loopback 
     const eur = datasets.find(x => x.logical_symbol === 'EURUSD'), gold = datasets.find(x => x.logical_symbol === 'XAUUSD'),
       usd = datasets.find(x => x.logical_symbol === 'USDCAD');
     expect(eur && gold && usd).toBeTruthy();
+    // A rendered result remains selectable while native search fetches a new
+    // query. Hold that response and click the still-visible exact EURUSD row.
+    const freshSelection = route => route.request().method() === 'GET' ? route.fulfill({ json: { items: [] } }) : route.continue();
+    const freshPattern = `**/api/market-data/datasets/${eur.id}/mappings`;
+    await page.route(freshPattern, freshSelection);
+    await openMapping(eur.id);
+    const exactEur = (await apiGet('/market-data/history-catalog?source=oanda&query=EUR_USD&page_size=50')).items.find(x => x.provider_symbol === 'EUR_USD');
+    await expect(dc().locator(`[data-symbol-name="${exactEur.catalog_id}"]`)).toBeVisible();
+    let releaseSearch, searchStarted;
+    const searchHeld = new Promise(r => { releaseSearch = r; });
+    const searchArrived = new Promise(r => { searchStarted = r; });
+    const holdSearch = async route => {
+      if (new URL(route.request().url()).searchParams.get('query') !== 'EUR_USD') return route.continue();
+      searchStarted(); await searchHeld; await route.continue().catch(() => {});
+    };
+    await page.route('**/api/market-data/history-catalog/search?*', holdSearch);
+    await dc().getByRole('searchbox', { name: '搜索品种' }).fill('EUR_USD');
+    await searchArrived;
+    await expect(dc().getByRole('button', { name: '配置实时 →', exact: true })).toBeDisabled();
+    await dc().locator(`[data-symbol-name="${exactEur.catalog_id}"]`).getByRole('button', { name: /^(选择|已选择)$/ }).click();
+    await expect(dc().getByRole('button', { name: '配置实时 →', exact: true })).toBeEnabled();
+    releaseSearch(); await page.unroute('**/api/market-data/history-catalog/search?*', holdSearch);
+    await closeCenter();
+    await page.unroute(freshPattern, freshSelection);
+    record('visible exact catalogue row remains selectable during a replacement search');
     const writesBefore = report.writes.length;
     await openMapping(eur.id);
     await choose('EUR_USD');
