@@ -159,3 +159,26 @@ def test_sampling_evidence_is_safe_epoch_fenced_and_independent(running):
         sampling_evidence(db, state, result=RequestResult(status='data'))
     with factory() as db:
         assert not sampling_evidence(db, db.get(LiveState, identity.key))
+
+
+def test_unestablished_subscription_returns_specific_code_without_creating_composite(database,monkeypatch):
+    from alerts import api
+    from alerts.series_access import search
+    from alerts.storage import LoginSession,MarketStreamSubscription
+    from fastapi.testclient import TestClient
+    from sqlalchemy import func
+    fixture(database,monkeypatch)
+    with database.begin() as db:
+        candidate=search(db,'EURUSD',kind='composite')[0]
+        db.add(LoginSession(token_hash=api.digest('notice-test'),csrf='notice-csrf',expires=now_ms()+60000))
+        before=db.scalar(select(func.count()).select_from(MarketComposite))
+    with TestClient(api.app) as client:
+        client.cookies.set('session','notice-test')
+        result=client.post('/api/charts/stream/subscribe',headers={'x-csrf-token':'notice-csrf'},json={
+            'client':'notice-test','listener':'quote','generation':1,'kind':'quotes',
+            'query':{'instrument':candidate['id'],'series_kind':'composite','timeframe':'M1'}})
+        assert result.status_code==422
+        assert result.json()['detail']['code']=='COMPOSITE_NOT_ESTABLISHED'
+    with database() as db:
+        assert db.scalar(select(func.count()).select_from(MarketComposite))==before
+        assert db.scalar(select(func.count()).select_from(MarketStreamSubscription))==0
