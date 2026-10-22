@@ -38,7 +38,9 @@
 
 ## 03. 自建／组合行情 Python 指标加载与输入口径
 
-**状态：已真实复现并形成可实施方案，用户已确认，开始实施。**
+**状态：实施、独立 review、真实 PostgreSQL 和 mwa 浏览器验收已完成；待用户安排集中 PR。**
+
+- [实施与验收记录](verification/python-indicators-20261022/README.md)。已包含组合月线重复后缀读取修复及移动端状态摘要。
 
 - [完整实施方案](mwa-python-indicators-implementation-plan-20261022.md)。集成基线 `3bcf5e7`，整批按 F1 准备。
 - 已确认 Swing 展示缓存写入与读取的行情身份大小写不一致，导致统计卡片和辅助绘图缺失。
