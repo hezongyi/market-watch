@@ -1,0 +1,35 @@
+{
+  "host": "quant-server",
+  "project": "mw-notice-reliability-20261022",
+  "postgresVersion": 140024,
+  "isolation": "unique test schema per case, task-owned PostgreSQL volume",
+  "existingSuites": {
+    "tests": 29,
+    "passed": 29,
+    "seconds": 56.84,
+    "suites": [
+      "test_live_pricing_postgres.py",
+      "test_notification_center_postgres.py",
+      "test_market_stream_lifecycle_postgres.py",
+      "test_series_access_postgres.py"
+    ]
+  },
+  "newContracts": {
+    "tests": 6,
+    "passed": 6,
+    "seconds": 18.43,
+    "suite": "test_notice_reliability_postgres.py",
+    "contracts": [
+      "independent confirmation/sampling recovery",
+      "future window cursor and bounded retry",
+      "legacy names/search/page/detail/changes/permissions/snapshot",
+      "100-record single-kind batch query",
+      "epoch-fenced sampling evidence",
+      "specific 422 and no implicit creation"
+    ]
+  },
+  "state": "stopped",
+  "dataVolume": "preserved",
+  "usedMwaDatabase": false,
+  "resetMwa": false
+}
