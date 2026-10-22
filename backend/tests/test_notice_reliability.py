@@ -108,6 +108,13 @@ def test_legacy_names_batch_search_changes_and_snapshot_survive_registry_loss(da
         assert all(row['body']['instrument_display']['symbol']=='EURUSD' for row in changes['changes'])
         assert [(row.id,row.body,row.viewed_at) for row in db.scalars(select(NoticeEvent))]==before
         assert enrich(db,[{'instrument':composite.id}],subject='other')[0].get('instrument_display') is None
+    with database.begin() as db:
+        row=db.get(NoticeEvent,'legacy:0')
+        row.instrument='MWC:' + composite.id.upper()
+        row.body={**row.body,'instrument':row.instrument,'context':{**row.body['context'],'instrument':row.instrument}}
+    with database() as db:
+        assert center.detail(db,center.SUBJECT,'legacy:0')['instrument_display']['symbol']=='EURUSD'
+        assert len(center.list_events(db,center.SUBJECT,{'q':'EUR/USD'},limit=100)['events'])==3
     # A registry permission change never leaks a resolved name to old records;
     # the new event's own snapshot remains a historical fact.
     with database.begin() as db:

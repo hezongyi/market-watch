@@ -14,7 +14,7 @@ exports.readOnlyAcceptance=async function(context,report={}) {
   (report.blockedWrites ||= []).push({path:url.pathname,method});
   if(url.pathname.endsWith('/preferences/migrate'))return route.fulfill({json:{ok:true}});
   if(url.pathname.endsWith('/preferences/save')){
-   if(!initialized){const response=await route.fetch({method:'GET',url:url.origin+'/api/advanced-charts/preferences',postData:undefined});if(!response.ok())return route.fulfill({response});for(const row of await response.json())rows.set(k(row),row);initialized=true;}
+   if(!initialized){const response=await context.request.get(url.origin+'/api/advanced-charts/preferences');if(!response.ok())return route.fulfill({response});for(const row of await response.json())rows.set(k(row),row);initialized=true;}
    const body=request.postDataJSON(),key=k(body),old=rows.get(key);
    if((old?.revision || 0)!==body.revision)return route.fulfill({status:409,json:{detail:{code:'PREFERENCE_REVISION_CONFLICT',message:'设置版本冲突，草稿已保留'}}});
    const row={...body,id:old?.id || crypto.createHash('sha256').update(key).digest('hex'),revision:body.revision+1,updated_at:Date.now()};rows.set(key,row);
@@ -32,4 +32,5 @@ exports.readOnlyAcceptance=async function(context,report={}) {
   (report.blockedNoticeWrites ||= []).push(new URL(request.url()).pathname);
   const body=request.postDataJSON();return route.fulfill({json:request.url().endsWith('/intake')?{id:body.event_id,status:'accepted',recorded_at:Date.now()}:{ok:true,read:0,more:false}});
  });
+ return {rows};
 };

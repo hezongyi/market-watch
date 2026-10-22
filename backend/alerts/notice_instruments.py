@@ -5,7 +5,7 @@ are restricted to its existing workspace:default scope. Names never enter identi
 """
 import re
 
-from sqlalchemy import and_, exists, or_, select
+from sqlalchemy import and_, exists, func, or_, select
 
 from .market_names import code_search, display_code
 from .storage import (CompositeRevision, HistoryReclamation, HistoryVersion, Instrument,
@@ -99,7 +99,7 @@ def search_clause(event, term, *, subject='admin'):
         ident, symbol, label = list(registry.c)
         prefixed = next((prefix for prefix, value in PREFIXES.items() if value == kind), '')
         kind_value = event.body['context']['series_kind'].as_string()
-        match = and_(or_(event.instrument == ident, event.instrument == prefixed + ident) if prefixed else event.instrument == ident,
+        match = and_(or_(func.lower(event.instrument) == func.lower(ident), func.lower(event.instrument) == prefixed.lower() + func.lower(ident)) if prefixed else event.instrument == ident,
                      or_(kind_value.is_(None), kind_value == kind), (True if kind in matching_kinds else code_search(term, symbol, label)))
         clauses.append(and_(display['symbol'].as_string().is_(None), exists(select(ident).where(match))))
     return or_(*clauses)
