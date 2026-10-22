@@ -1,0 +1,179 @@
+{
+  "checks": [
+    {
+      "ticker": "MWP:EURUSD",
+      "title": "EURUSD 1.12349 \u25b2 +0.02% \u6211\u7684\u56fe\u8868",
+      "message": {
+        "channel": "mw-chart-v1",
+        "type": "active-quote",
+        "workspace_id": "7d72eead-6be5-41a4-b3d5-bfdfff98b2bb",
+        "generation": 2,
+        "ticker": "MWP:EURUSD",
+        "label": "EURUSD",
+        "price": 1.12349,
+        "formatted": "1.12349",
+        "change": 0.02403803351079931,
+        "historical": false,
+        "delayed": false
+      },
+      "symbol": "MWP:EURUSD",
+      "rows": []
+    },
+    {
+      "ticker": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+      "title": "EURUSD 1.12358 \u25b2 +0.04% \u6211\u7684\u56fe\u8868",
+      "message": {
+        "channel": "mw-chart-v1",
+        "type": "active-quote",
+        "workspace_id": "7d72eead-6be5-41a4-b3d5-bfdfff98b2bb",
+        "generation": 3,
+        "ticker": "MWC:8C490DF00408ED7102D9106E2AD6D3991D3E6488DE0B0905D92A2EC052343CBB",
+        "label": "EURUSD",
+        "price": 1.12358,
+        "formatted": "1.12358",
+        "change": 0.041848082556472654,
+        "historical": false,
+        "delayed": false
+      },
+      "symbol": "MWC:8C490DF00408ED7102D9106E2AD6D3991D3E6488DE0B0905D92A2EC052343CBB",
+      "rows": [
+        {
+          "n": "MWC:8C490DF00408ED7102D9106E2AD6D3991D3E6488DE0B0905D92A2EC052343CBB",
+          "s": "ok",
+          "lp": 1.12358,
+          "ch": 0.00047,
+          "chp": 0.041848082556472654
+        }
+      ]
+    },
+    {
+      "ticker": "MWH:63bc01d4-3943-45cc-93a5-b04c3caaab16",
+      "title": "EURUSD\u00b7\u5386\u53f2 [\u6211\u7684\u56fe\u8868]",
+      "message": {
+        "channel": "mw-chart-v1",
+        "type": "active-quote",
+        "workspace_id": "7d72eead-6be5-41a4-b3d5-bfdfff98b2bb",
+        "generation": 4,
+        "ticker": "MWH:63BC01D4-3943-45CC-93A5-B04C3CAAAB16",
+        "label": "EURUSD",
+        "price": 1.12224,
+        "formatted": "1.12224",
+        "change": 0.09632880231189125,
+        "historical": true
+      },
+      "symbol": "MWH:63BC01D4-3943-45CC-93A5-B04C3CAAAB16",
+      "rows": [
+        {
+          "n": "MWC:8C490DF00408ED7102D9106E2AD6D3991D3E6488DE0B0905D92A2EC052343CBB",
+          "s": "ok",
+          "lp": 1.12358,
+          "ch": 0.00047,
+          "chp": 0.041848082556472654
+        },
+        {
+          "n": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+          "s": "ok",
+          "lp": 1.12358,
+          "ch": 0.00047,
+          "chp": 0.041848082556472654
+        },
+        {
+          "n": "MWH:63BC01D4-3943-45CC-93A5-B04C3CAAAB16",
+          "s": "ok",
+          "lp": 1.12224,
+          "ch": 0.00108,
+          "chp": 0.09632880231189125
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "messages": [
+    {
+      "channel": "mw-chart-v1",
+      "type": "active-quote",
+      "workspace_id": "7d72eead-6be5-41a4-b3d5-bfdfff98b2bb",
+      "generation": 1,
+      "ticker": "MWP:XAUUSD",
+      "label": "XAUUSD",
+      "historical": false
+    },
+    {
+      "channel": "mw-chart-v1",
+      "type": "active-quote",
+      "workspace_id": "7d72eead-6be5-41a4-b3d5-bfdfff98b2bb",
+      "generation": 1,
+      "ticker": "MWP:XAUUSD",
+      "label": "XAUUSD",
+      "price": 4087.305,
+      "formatted": "4,087.305",
+      "change": -1.289873850289141,
+      "historical": false,
+      "delayed": false
+    },
+    {
+      "channel": "mw-chart-v1",
+      "type": "active-quote",
+      "workspace_id": "7d72eead-6be5-41a4-b3d5-bfdfff98b2bb",
+      "generation": 2,
+      "ticker": "MWH:63BC01D4-3943-45CC-93A5-B04C3CAAAB16",
+      "label": "EURUSD",
+      "historical": true
+    },
+    {
+      "channel": "mw-chart-v1",
+      "type": "active-quote",
+      "workspace_id": "7d72eead-6be5-41a4-b3d5-bfdfff98b2bb",
+      "generation": 2,
+      "ticker": "MWH:63BC01D4-3943-45CC-93A5-B04C3CAAAB16",
+      "label": "EURUSD",
+      "historical": true
+    },
+    {
+      "channel": "mw-chart-v1",
+      "type": "active-quote",
+      "workspace_id": "7d72eead-6be5-41a4-b3d5-bfdfff98b2bb",
+      "generation": 2,
+      "ticker": "MWH:63BC01D4-3943-45CC-93A5-B04C3CAAAB16",
+      "label": "EURUSD",
+      "price": 1.12224,
+      "formatted": "1.12224",
+      "change": 0.09632880231189125,
+      "historical": true
+    },
+    {
+      "channel": "mw-chart-v1",
+      "type": "active-quote",
+      "workspace_id": "7d72eead-6be5-41a4-b3d5-bfdfff98b2bb",
+      "generation": 2,
+      "ticker": "MWH:63BC01D4-3943-45CC-93A5-B04C3CAAAB16",
+      "label": "EURUSD",
+      "price": 1.12224,
+      "formatted": "1.12224",
+      "change": 0.09632880231189125,
+      "historical": true
+    }
+  ],
+  "blockedWrites": [
+    {
+      "path": "/api/advanced-charts/preferences/migrate",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/migrate",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    }
+  ],
+  "refreshPassed": true,
+  "workspaceUnchanged": true,
+  "preferencesUnchanged": true,
+  "passed": true
+}

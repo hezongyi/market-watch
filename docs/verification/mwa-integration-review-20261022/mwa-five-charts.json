@@ -1,0 +1,90 @@
+{
+  "target": "https://192.168.7.232:18280/advanced-charts/7d72eead-6be5-41a4-b3d5-bfdfff98b2bb",
+  "at": "2026-10-22T08:48:52.982Z",
+  "errors": [],
+  "samples": [
+    {
+      "pass": 0,
+      "charts": [
+        {
+          "index": 0,
+          "symbol": "MWP:XAUUSD",
+          "resolution": "60",
+          "dataReady": true
+        },
+        {
+          "index": 1,
+          "symbol": "MWP:XAUUSD",
+          "resolution": "5",
+          "dataReady": true
+        },
+        {
+          "index": 2,
+          "symbol": "MWP:XAUUSD",
+          "resolution": "1W",
+          "dataReady": true
+        },
+        {
+          "index": 3,
+          "symbol": "MWP:XAUUSD",
+          "resolution": "1D",
+          "dataReady": true
+        },
+        {
+          "index": 4,
+          "symbol": "MWP:XAUUSD",
+          "resolution": "240",
+          "dataReady": true
+        }
+      ]
+    },
+    {
+      "pass": 1,
+      "charts": [
+        {
+          "index": 0,
+          "symbol": "MWP:XAUUSD",
+          "resolution": "60",
+          "dataReady": true
+        },
+        {
+          "index": 1,
+          "symbol": "MWP:XAUUSD",
+          "resolution": "5",
+          "dataReady": true
+        },
+        {
+          "index": 2,
+          "symbol": "MWP:XAUUSD",
+          "resolution": "1W",
+          "dataReady": true
+        },
+        {
+          "index": 3,
+          "symbol": "MWP:XAUUSD",
+          "resolution": "1D",
+          "dataReady": true
+        },
+        {
+          "index": 4,
+          "symbol": "MWP:XAUUSD",
+          "resolution": "240",
+          "dataReady": true
+        }
+      ]
+    }
+  ],
+  "protectedWrites": [
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    }
+  ],
+  "workspaceUnchanged": true,
+  "revision": 43,
+  "passed": true
+}
