@@ -1,8 +1,8 @@
 """Authenticated management is pure; only explicit first-use commands demand live."""
 
 from alerts import api
-from alerts.storage import MarketComposite, MarketDemand
 from alerts.history_maintenance import configure
+from alerts.storage import MarketComposite, MarketDemand
 from fastapi.testclient import TestClient
 from sqlalchemy import func, select
 from test_composite_definitions import PROOF, prepare, publish

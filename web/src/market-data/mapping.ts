@@ -16,6 +16,7 @@ export type ProductMatch = {
 };
 export type CatalogSnapshot = {
   account_scope: string;
+  target_dataset_id: string;
   provider_symbol: string;
   asset_type: string;
   precision: number;

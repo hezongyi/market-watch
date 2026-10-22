@@ -111,11 +111,12 @@ def test_fixed_history_watchlist_derives_change_from_same_version_closed_daily_c
         "end": stamp("2026-01-06T22:00:00+00:00"), "close": "1.10000",
         "complete": False, "time_closed": True, "coverage_complete": False,
         "source_confirmed": True}
+    closing = {**previous, "start": previous["end"] - 60000, "complete": True}
     calls = []
 
     def page(db, version_id, frame, *, before=None, count=2000):
         calls.append((version_id, frame, before, count))
-        return {"bars": [latest] if frame == "M1" else [previous]}
+        return {"bars": [previous] if frame == "D1" else [closing if before is not None else latest]}
 
     monkeypatch.setattr("alerts.history_artifacts.chart_page", page)
     value = fixed_snapshot(None, "fixed-version", {"frames": ["M1"], "calendar": "ny17"})
@@ -127,6 +128,7 @@ def test_fixed_history_watchlist_derives_change_from_same_version_closed_daily_c
     assert calls == [
         ("fixed-version", "M1", None, 1),
         ("fixed-version", "D1", stamp("2026-01-06T22:00:00+00:00"), 1),
+        ("fixed-version", "M1", stamp("2026-01-06T22:00:00+00:00"), 1),
     ]
 
 

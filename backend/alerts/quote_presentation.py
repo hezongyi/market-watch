@@ -3,6 +3,8 @@
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
 
+from .quote_close import confirmed_daily_close
+
 SESSION_LABELS = {"closed": "休市", "scheduled_open": "交易时段内", "unknown": "时段未核实"}
 
 
@@ -59,18 +61,19 @@ def fixed_snapshot(db, ident, metadata):
             previous_page = chart_page(db, ident, "D1", before=before, count=1)
         except ValueError:
             previous_page = {"bars": []}
-        # Match provider D1 semantics: a closed, source-confirmed candle is a
-        # valid close even when its minute history has interior gaps.
         previous_bars = [bar for bar in previous_page.get("bars", [])
             if bar.get("end", 0) <= before and bar.get("time_closed") is True
             and bar.get("source_confirmed") is True]
         if previous_bars:
+            daily = previous_bars[-1]
+            closing_page = chart_page(db, ident, "M1", before=daily["end"], count=1)
+            closing = closing_page.get("bars", [])
+            previous = confirmed_daily_close(daily, closing[-1]) if closing else None
             try:
-                previous = Decimal(str(previous_bars[-1].get("close")))
                 price = Decimal(str(last["close"]))
             except (InvalidOperation, TypeError, ValueError):
-                previous = None
-            if previous is not None and previous.is_finite() and previous > 0 and price.is_finite():
+                price = None
+            if previous is not None and price is not None and price.is_finite():
                 change = price - previous
                 result.update(ch=float(change), chp=float(change / previous * 100),
                     prev_close_price=float(previous))

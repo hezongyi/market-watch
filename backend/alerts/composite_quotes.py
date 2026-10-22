@@ -8,6 +8,7 @@ from .config import settings
 from .history_catalog import account_scope
 from .live_pricing import account_key
 from .live_session import session_status
+from .quote_close import confirmed_daily_close
 from .storage import (
     CompositePreparation,
     CompositeRevision,
@@ -201,13 +202,11 @@ def previous_close(db, composite, *, revision, input_revision, observed_at):
         # An artifact can publish later without changing the pinned minute
         # input revision. Never retain a missing/unverified baseline.
         return None
-    value = bars[-1].get("close")
-    try:
-        value = Decimal(str(value))
-    except (InvalidOperation, TypeError, ValueError):
-        value = None
-    else:
-        value = value if value.is_finite() and value > 0 else None
+    daily = bars[-1]
+    closing = chart_page(db, composite.id, "M1", before=daily["end"], count=1,
+        revision_id=revision.id, input_revision=input_revision, provisional=False, now=observed_at)
+    minutes = closing.get("bars", [])
+    value = confirmed_daily_close(daily, minutes[-1]) if minutes else None
     if value is None:
         return None
     _previous_close_cache[key] = value

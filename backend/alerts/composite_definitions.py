@@ -143,7 +143,14 @@ def latest_note(db, mapping_id):
 
 
 def save_checked_mapping(db, dataset_id, catalog_id, draft, *, permission_scope, snapshot, reuse_mapping_id):
-    from .composite_matching import CatalogSnapshot, MappingDraft, PRODUCT_FIELDS, check_match, selection
+    from .composite_matching import (
+        PRODUCT_FIELDS,
+        CatalogSnapshot,
+        MappingDraft,
+        check_match,
+        live_identity,
+        selection,
+    )
 
     # Also serializes note versions and reuse with legacy/new save commands.
     db.scalar(select(MarketDataset).where(MarketDataset.id == dataset_id).with_for_update())
@@ -154,9 +161,7 @@ def save_checked_mapping(db, dataset_id, catalog_id, draft, *, permission_scope,
     if result["status"] != "ready":
         raise ValueError("；".join(result["errors"].values()))
     dataset, _, entry, _ = selection(db, dataset_id, catalog_id)
-    identity = DatasetIdentity(source="oanda", channel="v20", environment="practice",
-        account_scope=account_scope(), provider_symbol=entry.symbol, basis="bid",
-        calendar_version=settings.oanda_calendar_version)
+    identity = live_identity(entry.symbol)
     operational = {field: getattr(draft, field) for field in PRODUCT_FIELDS}
     compatible = [row for row in db.scalars(select(RealtimeMapping).where(
         RealtimeMapping.dataset_id == dataset_id, RealtimeMapping.target_dataset_id == identity.key,

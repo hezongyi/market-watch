@@ -5,6 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const base = process.env.MW_MAPPING_URL || 'https://localhost:18481';
+const chart = process.env.MW_MAPPING_CHART_URL || 'https://localhost:18482';
 const creds = JSON.parse(fs.readFileSync(process.env.MW_MAPPING_CREDENTIALS || '/home/quant/.local/share/market-watch-docker/previews/mw-composite-mapping-20261021/credentials.json'));
 if (new URL(base).hostname !== 'localhost') throw Error('v2 R1 accepts loopback only');
 (async () => {
@@ -13,7 +14,7 @@ if (new URL(base).hostname !== 'localhost') throw Error('v2 R1 accepts loopback 
   const report = { base, checks: [], errors: [], writes: [], passed: false };
   page.on('pageerror', e => report.errors.push(e.message));
   page.on('request', r => { if (r.method() === 'POST' && !r.url().endsWith('/login')) report.writes.push(new URL(r.url()).pathname); });
-  const host = () => page.frames().find(f => f.url().startsWith(base.replace('https://localhost:18481', 'https://localhost:18482') + '/?'));
+  const host = () => page.frames().find(f => f.url().startsWith(chart + '/?'));
   const native = () => page.frames().find(f => f.url().startsWith('blob:'));
   const dc = () => native().locator('.dc-window');
   const apiGet = async endpoint => { const r = await page.request.get(base + '/api' + endpoint); expect(r.ok(), await r.text()).toBe(true); return r.json(); };

@@ -14,8 +14,8 @@ from .composite_center import (
 from .composite_chart import chart_page
 from .composite_definitions import ProductMatch, first_use, save_mapping
 from .composite_matching import CatalogSnapshot, MappingDraft, check_match
-from .storage import Instrument, transaction
 from .composite_recheck import RecheckRequest
+from .storage import Instrument, transaction
 
 
 class MappingRequest(BaseModel):

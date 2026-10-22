@@ -30,14 +30,14 @@ def mapping_report(db, row):
     target = db.get(MarketDataset, row.target_dataset_id)
     identity = target.identity
     note = latest_note(db, row.id)
-    from .composite_matching import PRODUCT_FIELDS, check_match
+    from .composite_matching import PRODUCT_FIELDS, check_match, live_identity
 
     valid = False
     try:
         from .history_catalog import catalog
         entries = catalog(db, source="oanda", query=identity["provider_symbol"], page_size=100)["items"]
         entry = next((item for item in entries if item["provider_symbol"] == identity["provider_symbol"]), None)
-        if entry and identity["account_scope"] == account_scope():
+        if entry and target.id == live_identity(entry["provider_symbol"]).key:
             check = check_match(db, row.dataset_id, entry["catalog_id"])
             valid = check["status"] == "ready" and all(
                 row.match.get(field) == check["suggestion"][field] for field in PRODUCT_FIELDS) and (

@@ -198,12 +198,9 @@ def http_contract(factory, monkeypatch):
             assert quote["v"]["lp"] == float("1.123456789012345678")
             assert quote["v"]["price_type"] == "sampled_bid"
             assert quote["snapshot"]["price"] == "1.123456789012345678"
-            # Match provider quotes: a closed, source-confirmed D1 close is
-            # usable even when its minute coverage is sparse.
-            previous = Decimal(str(quote["v"]["prev_close_price"]))
-            price = Decimal(str(quote["v"]["lp"]))
-            assert quote["v"]["ch"] == pytest.approx(float(price - previous))
-            assert quote["v"]["chp"] == pytest.approx(float((price - previous) / previous * 100))
+            # This fixture has only early daily observations, not a verified
+            # closing minute. Keep the price without inventing a daily change.
+            assert all(key not in quote["v"] for key in ("prev_close_price", "ch", "chp"))
             assert "抽样Bid" in quote["v"]["description"]
             with factory() as db:
                 assert db.scalar(select(MarketDemand)) is None
@@ -272,11 +269,13 @@ def test_previous_close_rejects_unverified_daily_bars(database, monkeypatch, inv
             observed_at=200010000) is None
 
 
-def test_previous_close_matches_provider_closed_candle_with_incomplete_minute_coverage(database, monkeypatch):
+def test_previous_close_allows_interior_gaps_with_confirmed_closing_minute(database, monkeypatch):
     composite_id, revision_id, _ = populated(database, monkeypatch)
-    bar = {"end": 0, "complete": False, "coverage_complete": False,
+    bar = {"start": 79200000, "end": 165600000, "complete": False, "coverage_complete": False,
         "source_confirmed": True, "time_closed": True, "close": "1.11"}
-    monkeypatch.setattr(composite_quotes, "chart_page", lambda *args, **kwargs: {"bars": [bar]})
+    minute = {**bar, "start": bar["end"] - 60000, "complete": True}
+    monkeypatch.setattr(composite_quotes, "chart_page",
+        lambda db, ident, frame, **kwargs: {"bars": [bar if frame == "D1" else minute]})
     composite_quotes._previous_close_cache.clear()
     with database() as db:
         assert composite_quotes.previous_close(db, db.get(MarketComposite, composite_id),
@@ -286,12 +285,14 @@ def test_previous_close_matches_provider_closed_candle_with_incomplete_minute_co
 
 def test_previous_close_recovers_after_artifact_publication_without_input_change(database, monkeypatch):
     composite_id, revision_id, _ = populated(database, monkeypatch)
-    pages = [[], [{"end": 0, "complete": True, "coverage_complete": True,
-                  "source_confirmed": True, "time_closed": True, "close": "1.11"}]]
+    bar = {"start": 79200000, "end": 165600000, "complete": True, "coverage_complete": True,
+        "source_confirmed": True, "time_closed": True, "close": "1.11"}
+    minute = {**bar, "start": bar["end"] - 60000}
+    pages = [[], [bar]]
     calls = []
-    def read(*args, **kwargs):
+    def read(db, ident, frame, **kwargs):
         calls.append(kwargs)
-        return {"bars": pages.pop(0)}
+        return {"bars": pages.pop(0) if frame == "D1" else [minute]}
     monkeypatch.setattr(composite_quotes, "chart_page", read)
     composite_quotes._previous_close_cache.clear()
     with database() as db:
@@ -302,5 +303,5 @@ def test_previous_close_recovers_after_artifact_publication_without_input_change
         assert value() is None
         assert value() == Decimal("1.11")
         assert value() == Decimal("1.11")
-        assert len(calls) == 2, "only confirmed, complete baselines are cached"
+        assert len(calls) == 3, "cache only after both daily and closing-minute evidence are confirmed"
         assert all(call["input_revision"] == 0 and call["revision_id"] == revision_id for call in calls)

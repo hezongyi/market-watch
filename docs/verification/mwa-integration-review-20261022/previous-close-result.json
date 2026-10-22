@@ -1,0 +1,24 @@
+{
+  "source": "/home/quant/repos/market-watch-composite-mapping-20261021",
+  "reviewed_head": "c4086d1f4c01c28afb519cc45e58f5c87b7e9d62",
+  "scenario": "Only the first minute of the prior daily bucket exists; its ending observations are missing.",
+  "daily_bucket": {
+    "start": 1767650400000,
+    "end": 1767736800000,
+    "observed_minutes": 1,
+    "expected_minutes": 1440,
+    "time_closed": true,
+    "source_confirmed": true,
+    "complete": false,
+    "coverage_complete": false,
+    "close": "1.10"
+  },
+  "fixed_snapshot": {
+    "lp": 1.12,
+    "prev_close_price": 1.1,
+    "ch": 0.02,
+    "chp": 1.8181818181818181
+  },
+  "composite_previous_close": "1.10",
+  "defect_reproduced": true
+}

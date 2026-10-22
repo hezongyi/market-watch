@@ -45,9 +45,16 @@ class MappingDraft(BaseModel):
 class CatalogSnapshot(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
     account_scope: str
+    target_dataset_id: str
     provider_symbol: str
     asset_type: str
     precision: int
+
+
+def live_identity(provider_symbol):
+    return DatasetIdentity(source="oanda", channel="v20", environment="practice",
+        account_scope=account_scope(), provider_symbol=provider_symbol, basis="bid",
+        calendar_version=settings.oanda_calendar_version)
 
 
 def selection(db, dataset_id, catalog_id):
@@ -63,7 +70,8 @@ def selection(db, dataset_id, catalog_id):
         raise ValueError("请选择当前OANDA Practice账户目录中的准确品种")
     if not settings.oanda_account_id or not settings.oanda_token:
         raise ValueError("OANDA Practice连接尚未配置")
-    snapshot = CatalogSnapshot(account_scope=account_scope(), provider_symbol=entry.symbol,
+    snapshot = CatalogSnapshot(account_scope=account_scope(), target_dataset_id=live_identity(entry.symbol).key,
+        provider_symbol=entry.symbol,
         asset_type=entry.asset_type, precision=entry.precision)
     return dataset, historical, entry, snapshot
 
@@ -119,9 +127,7 @@ def check_match(db, dataset_id, catalog_id, draft=None):
                 errors[field] = "与服务端核实的准确来源身份/产品规则不一致，请更正或更换品种。"
         if difference and not supplied.reviewed:
             errors["reviewed"] = "请确认所示黄金报价产品差异与 Bid 原价接续。"
-    target_identity = DatasetIdentity(source="oanda", channel="v20", environment="practice",
-        account_scope=account_scope(), provider_symbol=entry.symbol, basis="bid",
-        calendar_version=settings.oanda_calendar_version)
+    target_identity = live_identity(entry.symbol)
     target = db.get(MarketDataset, target_identity.key)
     if target and db.get(Instrument, target.instrument_id).precision != entry.precision:
         errors["relationship"] = "当前目录精度与已登记实时数据集冲突，请先维护来源数据集；不能自动改写既有数据或组合。"

@@ -1,6 +1,7 @@
 """Synthetic mapping R1 only; refuses every other database/project."""
 import hashlib
 import json
+import os
 from sqlalchemy import select
 from sqlalchemy.engine import make_url
 from alerts.config import settings
@@ -13,7 +14,9 @@ from alerts.history_catalog import account_scope
 from alerts.history_maintenance import configure
 
 url = make_url(settings.database_url)
-assert settings.database_application_name == "mw-composite-mapping-20261021"
+task = os.environ.get("MW_MAPPING_FIXTURE_TASK", "mw-composite-mapping-20261021")
+assert task in {"mw-composite-mapping-20261021", "mw-integration-20261022"}
+assert settings.database_application_name == task
 assert url.host == "postgres" and url.database == "preview" and url.username == "preview"
 assert not settings.delivery_enabled and not settings.yahoo_enabled and not settings.oanda_stream_enabled
 assert settings.oanda_account_id == "mapping-synthetic-account"

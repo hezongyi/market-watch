@@ -202,6 +202,7 @@ jobs:
           node tests/composite-mapping.cjs
           node tests/single-app-routing.cjs
           node tests/chart-tab.cjs
+          node tests/chart-tab-title.cjs
           TZ=Asia/Shanghai node tests/chart-time.cjs
           TZ=America/Los_Angeles node tests/chart-time.cjs
           node tests/symbol-flags.cjs

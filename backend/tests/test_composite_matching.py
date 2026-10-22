@@ -7,8 +7,16 @@ from alerts.composite_center import mapping_report
 from alerts.composite_definitions import first_use, key, save_mapping
 from alerts.composite_matching import MappingDraft, check_match
 from alerts.config import settings
-from alerts.storage import (CompositePreparation, CompositeRevision, MarketCatalog, MarketComposite,
-    MarketDataset, MarketDemand, RealtimeMapping, RealtimeMappingNote)
+from alerts.storage import (
+    CompositePreparation,
+    CompositeRevision,
+    MarketCatalog,
+    MarketComposite,
+    MarketDataset,
+    MarketDemand,
+    RealtimeMapping,
+    RealtimeMappingNote,
+)
 from sqlalchemy import func, select
 from test_composite_definitions import PROOF, prepare, publish
 from test_market_contracts import identity
@@ -150,3 +158,24 @@ def test_gold_rule_records_cfd_and_metal_quote_without_asserting_legal_equivalen
         saved = save_mapping(db, gold.key, catalog, draft.model_copy(update={"reviewed": True}),
             snapshot=result["snapshot"])
         assert saved.match["relationship"] == "same_underlying_different_product"
+
+
+def test_calendar_identity_change_invalidates_selection_and_check_snapshot(database, monkeypatch):
+    catalog = prepare(database, monkeypatch)
+    with database.begin() as db:
+        check, draft = checked(db, catalog)
+        old = save_mapping(db, identity().key, catalog, draft, snapshot=check["snapshot"])
+        old_id, old_target, old_match = old.id, old.target_dataset_id, copy.deepcopy(old.match)
+        assert mapping_report(db, old)["valid_for_selection"]
+    monkeypatch.setattr(settings, "oanda_calendar_version", settings.oanda_calendar_version + "-next")
+    with database.begin() as db:
+        old = db.get(RealtimeMapping, old_id)
+        assert not mapping_report(db, old)["valid_for_selection"]
+        updated, current_draft = checked(db, catalog)
+        assert updated["snapshot"] != check["snapshot"]
+        with pytest.raises(ValueError, match="关键属性"):
+            save_mapping(db, identity().key, catalog, current_draft, snapshot=check["snapshot"])
+        new = save_mapping(db, identity().key, catalog, current_draft, snapshot=updated["snapshot"])
+        assert new.id != old_id and new.target_dataset_id != old_target
+        assert mapping_report(db, new)["valid_for_selection"]
+        assert old.match == old_match and old.target_dataset_id == old_target
