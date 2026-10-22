@@ -93,11 +93,16 @@ def request(db, page, spec, *, stamp=None, input_policy=STRICT):
     value = page.get("input_revision", 0)
     target = version.end
     if revision:
+        # A retained price credential owns its clock as well as its OHLC.
+        # Crossing a period boundary must not confirm that snapshot's preview.
+        calculation_stamp = stamp
+        if input_policy == OBSERVED and page.get("display_snapshot_id"):
+            calculation_stamp = db.get(DisplaySnapshot, page["display_snapshot_id"]).content["now"]
         latest = db.scalar(select(func.max(CompositeMinuteInput.start)).where(
             CompositeMinuteInput.revision_id == revision.id, CompositeMinuteInput.input_revision <= value))
         # No new job merely because the wall clock advances beyond fixed input.
         # Keep the clock boundary only while the last observed bucket is open.
-        target = min(period(stamp, page["timeframe"], phase)[0],
+        target = min(period(calculation_stamp, page["timeframe"], phase)[0],
                      period(max(revision.seam, latest if latest is not None else revision.seam), page["timeframe"], phase)[1])
     group = digest([version.id, revision_id, page["timeframe"], engine.spec, engine.algorithm])
     ident = digest([group, value, target])

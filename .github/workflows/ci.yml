@@ -140,6 +140,9 @@ jobs:
           CHART_ALERT_TEST_DATABASE_URL: ${{ env.TEST_POSTGRES_URL }}
         run: python -m pytest -q backend/tests/test_composite_mapping_postgres.py
 
+      - name: Observed indicator PostgreSQL policy compatibility
+        run: python -m pytest -q backend/tests/test_observed_indicators_postgres.py
+
       - name: Backend checks skipped
         if: needs.changes.outputs.backend_changed != 'true'
         run: echo "No backend runtime or dependency changes; full backend tests skipped."

@@ -307,3 +307,124 @@ def test_observed_encoded_identity_accepts_legacy_managed_entry():
         indicator_input_policy=OBSERVED,
     )
     assert body.indicator_input_policy == OBSERVED
+
+
+def test_retained_snapshot_keeps_its_original_forming_clock(database, monkeypatch):
+    from alerts.composite_chart import chart_page
+    from test_composite_aggregates import drain as aggregates
+    from test_composite_chart import populated
+
+    composite, revision, seam = populated(database, monkeypatch)
+    aggregates(revision, "M5")
+    old_stamp = seam + 9 * 60000 + 1000
+    new_stamp = old_stamp + 60000
+    with database.begin() as db:
+        price = chart_page(db, composite, "M5", count=30, now=old_stamp, provisional=True)
+    monkeypatch.setattr("alerts.series_access.now_ms", lambda: new_stamp)
+    spec = {"name": "EMA", "params": {"period": 2}}
+    body = DataQuery(
+        instrument=composite,
+        series_kind="composite",
+        timeframe="M5",
+        limit=30,
+        provisional=True,
+        indicators=[spec],
+        indicator_input_policy="observed_display_v1",
+        display_snapshot_id=price["display_snapshot_id"],
+    )
+    pending = data_sync(body)
+    ident = pending["indicator_progress"][0]["run_id"]
+    drain(ident)
+    actual = data_sync(body)
+    if not actual["bars"][-1]["time_closed"]:
+        assert actual["indicators"][0]["dependencies"][-1]["provisional"]
+
+
+def test_foreground_never_substitutes_durable_prices_for_snapshot(database, monkeypatch):
+    from alerts.composite_chart import chart_page
+    from alerts.composite_inputs import apply_minutes
+    from alerts.confirmed_minutes import record
+    from alerts.market_contracts import DatasetIdentity
+    from alerts.storage import CompositeRevision, MarketDataset, ObservedMinute, RealtimeMapping
+    from test_composite_aggregates import drain as aggregates
+    from test_composite_preparation import ready
+    from test_market_contracts import batch, minute
+
+    revision_id = ready(database, monkeypatch)
+    with database.begin() as db:
+        revision = db.get(CompositeRevision, revision_id)
+        target = db.get(
+            MarketDataset, db.get(RealtimeMapping, revision.mapping_id).target_dataset_id
+        )
+        ident = DatasetIdentity.model_validate(target.identity)
+        seam = revision.seam
+        source = batch(
+            identity=ident,
+            window_start=seam,
+            window_end=seam + 600000,
+            checkpoint=seam + 600000,
+            observed_at=seam + 600000,
+            volume_kind="price_count",
+            volume_unit="quotes",
+            rows=tuple(
+                minute(at, volume="3")
+                for at in range(seam, seam + 600000, 60000)
+                if at != seam + 240000
+            ),
+        )
+        apply_minutes(db, record(db, source))
+        composite = revision.composite_id
+        parent = revision.history_version_id
+        db.add(
+            ObservedMinute(
+                dataset_id=target.id,
+                start=seam + 240000,
+                epoch=1,
+                observed_at=seam + 240500,
+                sequence=1,
+                content={
+                    "start": seam + 240000,
+                    "end": seam + 300000,
+                    "open": "10",
+                    "high": "15",
+                    "low": "9",
+                    "close": "12",
+                    "complete": False,
+                    "volume": None,
+                },
+            )
+        )
+    from alerts.history_artifacts import artifact_tick
+    while artifact_tick(parent):
+        pass
+    aggregates(revision_id, "M5")
+    stamp = seam + 600000 + 1000
+    monkeypatch.setattr("alerts.series_access.now_ms", lambda: stamp)
+    with database.begin() as db:
+        price = chart_page(
+            db, composite, "M5", before=seam + 600000, count=30, now=stamp, provisional=True
+        )
+    spec = {"name": "EMA", "params": {"period": 2}}
+    body = DataQuery(
+        instrument=composite,
+        series_kind="composite",
+        timeframe="M5",
+        before=seam + 600000,
+        limit=30,
+        provisional=True,
+        indicators=[spec],
+        indicator_input_policy="observed_display_v1",
+        display_snapshot_id=price["display_snapshot_id"],
+        client="probe",
+        indicator_consumers=[{"id": "probe", "generation": 1, "spec": spec}],
+    )
+    first = data_sync(body)
+    ident = first["indicator_progress"][0]["run_id"]
+    drain(ident)
+    later = data_sync(body)
+    assert not first["indicators"][0]["calculation"]["visible_complete"]
+    assert later["indicators"][0]["calculation"]["visible_complete"]
+    expected = calculate([{**bar, "complete": True} for bar in later["bars"]], spec)
+    assert [p["value"] for p in later["indicators"][0]["series"][0]["values"]] == pytest.approx(
+        [p["value"] for p in expected["series"][0]["values"]]
+    )

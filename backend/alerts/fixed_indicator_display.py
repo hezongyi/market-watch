@@ -40,7 +40,10 @@ def confirmed_page(db, page):
 def prepare(db, page, body):
     """Freeze a complete, confirmed prefix or leave the bounded queue response."""
     observed = body.indicator_input_policy == "observed_display_v1"
-    if not body.client or not body.indicator_consumers or not observed and not confirmed_page(db, page):
+    # Composite foreground replay reads durable inputs. Mutable snapshot
+    # observations must wait for the policy-aware snapshot suffix instead.
+    if (not body.client or not body.indicator_consumers or
+            not (observed and body.series_kind == "history") and not confirmed_page(db, page)):
         return []
     pending = [item for item in page.get("indicators", []) if not item["calculation"].get("visible_complete")]
     if not pending:
