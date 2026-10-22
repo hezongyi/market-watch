@@ -30,4 +30,4 @@ def upgrade():
 
 
 def downgrade():
-    raise RuntimeError("Mapping notes are retained for application rollback; restore a verified backup for schema rollback")
+    raise RuntimeError("Mapping notes are retained: roll back the application; restore a verified backup for schema rollback")
