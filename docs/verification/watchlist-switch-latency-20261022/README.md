@@ -1,5 +1,7 @@
 # 自选切换延迟诊断
 
+修复候选、验证结果与未完成验收见 [RESULTS.md](RESULTS.md)。下文及原始测量保留修复前的历史事实，不能作为候选版本的性能成绩。`deep/probe-cleanup.cjs` 断言旧缺陷，修复后预期失败；修复回归使用 `web/tests/advanced-history-loading.cjs` 与 `advanced-history-admission.cjs`。
+
 后续深入分析见 [DEEP-ANALYSIS.md](DEEP-ANALYSIS.md)：补齐真实队列阻塞者、默认预热／快照锁分段，以及成功读取后等待 cancel 的证据。本文保留首轮诊断与原始测量，不将后续观察回写为首轮结论。
 
 2026-10-22，Ubuntu `quant-server`，现有 `mw-acceptance`，入口 https://192.168.7.232:18280 。只做诊断，未修改产品代码、更新容器或保存测试布局。使用独立 Playwright context 登录，保护原浏览器 profile。

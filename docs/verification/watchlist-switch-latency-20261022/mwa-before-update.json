@@ -1,0 +1,175 @@
+{
+  "observed_at": "2026-10-22T23:29:46.369192+00:00",
+  "host": "quant-server",
+  "compose_project": "mw-issue75-v2-20261018",
+  "web": "https://192.168.7.232:18280",
+  "chart": "https://192.168.7.232:18281",
+  "updated_by_this_task": false,
+  "services": [
+    {
+      "service": "api",
+      "container_id": "cce304aedb799519500b9a6611eb4db5583eed1df9d0274a6aefd782bcd13046",
+      "image_id": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+      "image_reference": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+      "status": "running",
+      "started_at": "2026-10-22T22:53:03.570390613Z",
+      "restarts": 0,
+      "oom_killed": false,
+      "health": "healthy"
+    },
+    {
+      "service": "chart",
+      "container_id": "d934073c00d4cdb698bf6d03a74a4f6d94e18a528d8c88e8ce7d501aaf0a7e5f",
+      "image_id": "sha256:c7dfff56aa5cb9f9baaff314700a77bd0cd76ad92ebbb8d40defd0bfbbeccb0a",
+      "image_reference": "sha256:c7dfff56aa5cb9f9baaff314700a77bd0cd76ad92ebbb8d40defd0bfbbeccb0a",
+      "status": "running",
+      "started_at": "2026-10-22T15:23:25.825859242Z",
+      "restarts": 0,
+      "oom_killed": false,
+      "health": null
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "container_id": "c7a278bbc1eaf68a910111d891b4d1a76542746e32e9740c1e70da0d4818ac25",
+      "image_id": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+      "image_reference": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+      "status": "running",
+      "started_at": "2026-10-22T15:07:54.704314243Z",
+      "restarts": 0,
+      "oom_killed": false,
+      "health": null
+    },
+    {
+      "service": "chart-history-worker",
+      "container_id": "43e0304c6b99c61e5ac43fe282fd5970e98cce77d2a003a2ad8571388d498583",
+      "image_id": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+      "image_reference": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+      "status": "running",
+      "started_at": "2026-10-22T15:07:54.735354198Z",
+      "restarts": 0,
+      "oom_killed": false,
+      "health": null
+    },
+    {
+      "service": "composite-aggregate-worker",
+      "container_id": "32a4c3e8d65f802c8447d3a824dfea62a592bef253177b758b8ffaef8a0b5b20",
+      "image_id": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+      "image_reference": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+      "status": "running",
+      "started_at": "2026-10-22T15:07:54.69248554Z",
+      "restarts": 0,
+      "oom_killed": false,
+      "health": null
+    },
+    {
+      "service": "gateway",
+      "container_id": "9492f307fdf9bfdbec7641c4e0b3554bed39340bc73a57448fdbd39e34d79ca9",
+      "image_id": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "image_reference": "nginx@sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "status": "running",
+      "started_at": "2026-10-19T06:05:49.728822361Z",
+      "restarts": 0,
+      "oom_killed": false,
+      "health": null
+    },
+    {
+      "service": "history-worker",
+      "container_id": "65382cf76a71d405fdb588913c15b35d723f1fbc19029cc4a906124bb8fd7054",
+      "image_id": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+      "image_reference": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+      "status": "running",
+      "started_at": "2026-10-22T15:07:54.715286268Z",
+      "restarts": 0,
+      "oom_killed": false,
+      "health": null
+    },
+    {
+      "service": "market-stream-worker",
+      "container_id": "cd621ad832cb00df972582df203bb98966bc11d7c571ce5dd5421291e4a1c1e6",
+      "image_id": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+      "image_reference": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+      "status": "running",
+      "started_at": "2026-10-22T15:07:54.681462988Z",
+      "restarts": 0,
+      "oom_killed": false,
+      "health": null
+    },
+    {
+      "service": "native-history-worker",
+      "container_id": "32147aa1e8368e6a9342bb404c60d8b36fb3597388681ea9f29b96d76053f0d9",
+      "image_id": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+      "image_reference": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+      "status": "running",
+      "started_at": "2026-10-22T15:07:54.741688149Z",
+      "restarts": 0,
+      "oom_killed": false,
+      "health": null
+    },
+    {
+      "service": "notify-worker",
+      "container_id": "91dd49cee398a82e73779feb9b062de2e45a83dc73c2c20b8fb92fe9199a5d89",
+      "image_id": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+      "image_reference": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+      "status": "running",
+      "started_at": "2026-10-22T15:07:54.74389288Z",
+      "restarts": 0,
+      "oom_killed": false,
+      "health": null
+    },
+    {
+      "service": "postgres",
+      "container_id": "3de49cbde9a20c6640092181c04d35df41677566795cfecae18c0ab284b0aba8",
+      "image_id": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "image_reference": "postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "status": "running",
+      "started_at": "2026-10-18T06:31:25.191805014Z",
+      "restarts": 0,
+      "oom_killed": false,
+      "health": "healthy"
+    },
+    {
+      "service": "pricing-worker",
+      "container_id": "b7e88dad2330df9c12631f24729225d023467d6a32888c770832ce80d549c37e",
+      "image_id": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+      "image_reference": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+      "status": "running",
+      "started_at": "2026-10-22T15:07:54.713894671Z",
+      "restarts": 0,
+      "oom_killed": false,
+      "health": null
+    },
+    {
+      "service": "projector",
+      "container_id": "32987a563ff5777346f3100a5a3ed9900ef646f9b7d91e44da239d0a368864ff",
+      "image_id": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+      "image_reference": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+      "status": "running",
+      "started_at": "2026-10-22T15:07:54.736965205Z",
+      "restarts": 0,
+      "oom_killed": false,
+      "health": null
+    },
+    {
+      "service": "realtime-worker",
+      "container_id": "639da09f2ccbce469c9eb37c3394560ce9072e4ff1b7d7c8392eec9e2a3eb9b0",
+      "image_id": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+      "image_reference": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+      "status": "running",
+      "started_at": "2026-10-22T15:07:54.740308066Z",
+      "restarts": 0,
+      "oom_killed": false,
+      "health": null
+    },
+    {
+      "service": "web",
+      "container_id": "89de765a30e34be869d9dc7646e2b12fa7901a1f431859ad6060ba45b5563d2c",
+      "image_id": "sha256:86ed4a885afaee93db9d7d9a368c4a01dac72e30fab626e550a6126103f30342",
+      "image_reference": "sha256:86ed4a885afaee93db9d7d9a368c4a01dac72e30fab626e550a6126103f30342",
+      "status": "running",
+      "started_at": "2026-10-22T15:07:54.738401571Z",
+      "restarts": 0,
+      "oom_killed": false,
+      "health": null
+    }
+  ]
+}

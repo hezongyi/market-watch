@@ -19,12 +19,13 @@ globalThis.__MWLAT={records:[],next:0,byId:new Map(),byResolve:new WeakMap()};
   first:q.firstDataRequest,focused:q.native_history?.focused,countBack:q.countBack,limit:q.limit,
   before:q.before,from:q.from,background:q.background});
  const occupancy=()=>[...pending.entries()].map(([id,e])=>({id,qid:d.byId.get(id)?.qid,
-  quote:!!e.quote,reserve:!!e.reserve,management:!!e.management}));
+  quote:!!e.quote,reserve:!!e.reserve,management:!!e.management,
+  background:!!e.background,purpose:e.purpose,nativeHistory:!!e.nativeHistory}));
  const push=requests.push;
  requests.push=function(...entries){
   for(const e of entries){
    const row={qid:++d.next,enqueued:Date.now(),query:brief(e.query,e.type),
-    queued_before:this.length,blockers:occupancy()};
+    purpose:e.scheduling?.purpose,queued_before:this.length,blockers:occupancy()};
    if(d.records.length<4000)d.records.push(row);
    const resolve=e.resolve,reject=e.reject;
    e.resolve=function(value){row.completed=Date.now();row.result={bars:value?.bars?.length,
@@ -58,7 +59,8 @@ globalThis.__MWLAT={records:[],next:0,byId:new Map(),byResolve:new WeakMap()};
   const bridge=fs.readFileSync('advanced-host/bridge.js','utf8');
   report.host_asset_sha256=hash(source);
   report.bridge_sha256=hash(bridge);
-  if(report.bridge_sha256!=='f8ee68492e938cc8736cdca6d059d94c3125e1624e6cbde6d1547b2182dfe825'||!source.includes(bridge)){
+  report.expected_bridge_sha256=process.env.MW_EXPECTED_BRIDGE_SHA256||hash(bridge);
+  if(report.bridge_sha256!==report.expected_bridge_sha256||!source.includes(bridge)){
    report.bridgeMismatch=true;return route.abort('blockedbyclient');
   }
   const anchor='let initialHistoryGate;';
@@ -168,10 +170,18 @@ globalThis.__MWLAT={records:[],next:0,byId:new Map(),byResolve:new WeakMap()};
     trial.all_ready=Date.now();
    }catch{trial.all_timeout=true;}
    trial.slow=!!(trial.active_timeout||trial.all_timeout||(trial.active_ready-trial.start)>3000||(trial.all_ready-trial.start)>3000);
+   trial.historyLoads=await page.evaluate(()=>window.MWHistoryLoadDiagnostics?.()||null);
    console.log(JSON.stringify({ticker,quiet:precondition.quiet,active_ms:trial.active_ready-trial.start,all_ms:trial.all_ready-trial.start,slow:trial.slow}));
    report.queue=await host.evaluate(()=>({records:__MWLAT.records,feed:__MWLAT.feed}));save();
   }
   report.afterSettle=await waitQuiet();
+  try {
+   await page.waitForFunction(()=>{
+    const state=window.MWHistoryLoadDiagnostics?.();
+    return !state || state.admitted===0 && state.cleaning===0 && state.queued===0;
+   },null,{timeout:15000});
+  } catch { report.historyLoadsDidNotSettle=true; }
+  report.historyLoads=await page.evaluate(()=>window.MWHistoryLoadDiagnostics?.()||null);
   report.queue=await host.evaluate(()=>({records:__MWLAT.records,feed:__MWLAT.feed,remaining:requests.length,pending:pending.size}));
   report.workspaceAfter=summary(await(await context.request.get(base+'/api/advanced-charts/workspaces/'+workspace)).json());
   report.workspaceUnchanged=report.workspaceBefore.hash===report.workspaceAfter.hash;
@@ -180,7 +190,10 @@ globalThis.__MWLAT={records:[],next:0,byId:new Map(),byResolve:new WeakMap()};
   await Promise.allSettled([...responses]);
   save();await browser.close();
  }
- const failed=report.error||report.trials.some(t=>t.slow||t.active_timeout||t.all_timeout);
- console.log(JSON.stringify({verdict:failed?'SLOW_REPRODUCED':'NO_SLOW',error:report.error,workspaceUnchanged:report.workspaceUnchanged,records:report.queue?.records?.length,trials:report.trials.length}));
+ const invalid=report.error||report.workspaceUnchanged!==true||report.errors.length>0;
+ const slow=report.trials.some(t=>t.slow||t.active_timeout||t.all_timeout);
+ const failed=invalid||report.historyLoadsDidNotSettle||slow;
+ const verdict=invalid?'PROBE_FAILED':report.historyLoadsDidNotSettle?'RESOURCE_NOT_SETTLED':slow?'SLOW_REPRODUCED':'NO_SLOW';
+ console.log(JSON.stringify({verdict,error:report.error,workspaceUnchanged:report.workspaceUnchanged,records:report.queue?.records?.length,trials:report.trials.length}));
  if(failed)process.exitCode=1;
 })().catch(error=>{console.error(error.message);process.exitCode=1;});

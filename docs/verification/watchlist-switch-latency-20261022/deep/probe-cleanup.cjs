@@ -1,3 +1,6 @@
+// Historical bug witness: this deliberately asserts the old blocked delivery.
+// It should fail on the repaired module. Use web/tests/advanced-history-loading.cjs
+// and advanced-history-admission.cjs for the repair's pass/fail regressions.
 const fs=require('node:fs');
 const vm=require('node:vm');
 const assert=require('node:assert/strict');
