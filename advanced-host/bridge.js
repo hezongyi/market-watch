@@ -747,17 +747,20 @@ function offerHistoryRetry() {
 const clientId = crypto.randomUUID();
 const requests = [];
 let initialHistoryGate;
+const managementRequest = type => type === 'data-center-api' || type === 'preferences';
 function drain() {
   while (requests.length) {
     const managementBusy=[...pending.values()].filter(entry=>entry.management).length;
-    const management=requests.findIndex(entry=>entry.type === "data-center-api");
+    // Local draft durability and explicit recovery must remain available while
+    // the four market slots wait for a slow supplier. Reuse the bounded pool.
+    const management=requests.findIndex(entry=>managementRequest(entry.type));
     const managementSlot=management>=0 && managementBusy<2;
     if(!managementSlot && pending.size-managementBusy>=4) break;
     // Pointer-driven viewport checks must not sit behind queued prewarming.
     // Keep the same four in-flight limit and leave ongoing reads untouched.
     const quoteBusy = [...pending.values()].some(entry => entry.quote);
     const reserveBusy = [...pending.values()].filter(entry => entry.reserve).length;
-    const eligible = entry => entry.type !== 'data-center-api' && (entry.query.op !== 'quotes' || !quoteBusy) &&
+    const eligible = entry => !managementRequest(entry.type) && (entry.query.op !== 'quotes' || !quoteBusy) &&
       (!entry.query.native_reserve || reserveBusy < 2);
     let interaction = managementSlot ? management : requests.findIndex(entry => entry.query.op === "viewport");
     if (interaction < 0) interaction = requests.findIndex(entry =>
@@ -782,7 +785,7 @@ function drain() {
       drain();
     }, query.native_history && !query.native_reserve ? ((globalThis.MW_HISTORY_CAPABILITIES?.task_seconds || 600)+10)*1000 : 30000);
     const entry = { resolve, reject, timer, cancellationTimer: null, quote: query.op === 'quotes',
-      reserve: !!query.native_reserve, management:type === "data-center-api" };
+      reserve: !!query.native_reserve, management:managementRequest(type) };
     pending.set(id, entry);
     if (isCurrent) {
       const check = () => {
