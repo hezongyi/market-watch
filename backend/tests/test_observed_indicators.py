@@ -273,7 +273,15 @@ def test_composite_snapshot_suffix_and_pagination_are_fenced(database, monkeypat
     drain(ident)
     with database.begin() as db:
         original = copy.deepcopy(db.get(FixedIndicatorRun, ident).state)
+    reads = []
+
+    def measured_read(*args, **kwargs):
+        reads.append(kwargs)
+        return chart_page(*args, **kwargs)
+
+    monkeypatch.setattr("alerts.composite_chart.chart_page", measured_read)
     actual = data_sync(body)["indicators"][0]
+    assert len(reads) == 1, "An accepted current page must not re-read its M1 suffix"
     assert actual["calculation"]["visible_complete"]
     assert actual["dependencies"][-1]["provisional"]
     assert not actual["dependencies"][-2]["provisional"]
@@ -292,6 +300,15 @@ def test_composite_snapshot_suffix_and_pagination_are_fenced(database, monkeypat
     assert frozen.get("presentation") == actual.get("presentation")
     older = data_sync(body.model_copy(update={"before": seam + 7 * 60000}))["indicators"][0]
     assert older.get("presentation") == actual.get("presentation")
+    if spec == SPEC:
+        batch_body = body.model_copy(update={"indicators": [SPEC, SWING, SUPER]})
+        batch = data_sync(batch_body)
+        for progress in batch["indicator_progress"]:
+            drain(progress["run_id"])
+        reads.clear()
+        batch = data_sync(batch_body.model_copy(update={"before": seam + 7 * 60000}))
+        assert all(item["calculation"]["visible_complete"] for item in batch["indicators"])
+        assert len(reads) == 3, "Paged studies must share the frozen tail and suffix reads"
     with database.begin() as db:
         assert db.get(FixedIndicatorRun, ident).state == original
         from alerts.storage import DisplayIndicatorTask

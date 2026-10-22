@@ -264,7 +264,7 @@ def status(rows, *, complete):
     )
 
 
-def chart_result(db, page, spec, run, *, provisional, stamp):
+def chart_result(db, page, spec, run, *, provisional, stamp, replay_pages=None):
     from . import fixed_indicators as jobs
     from .indicator_state import presentation
 
@@ -273,7 +273,7 @@ def chart_result(db, page, spec, run, *, provisional, stamp):
     engine = engine_for(run, run.state)
     display = getattr(engine, "last_presentation", None)
     if run.status == "complete" and run.revision_id and provisional:
-        repaired = suffix(db, run, page, stamp=stamp)
+        repaired = suffix(db, run, page, stamp=stamp, replay_pages=replay_pages)
         if repaired:
             affected, extra, display = repaired
             rows = [row for row in rows if row["start"] < affected]
@@ -344,7 +344,7 @@ def chart_result(db, page, spec, run, *, provisional, stamp):
     )
 
 
-def suffix(db, run, page, *, stamp):
+def suffix(db, run, page, *, stamp, replay_pages=None):
     """Replay only snapshot observations/current buckets after a compatible seed.
 
     Closed coverage-only uncertainty already belongs to the independent durable
@@ -366,16 +366,24 @@ def suffix(db, run, page, *, stamp):
     phase = revision.rules["aggregation_calendar"]
     observed = snapshot.content["observations"] if snapshot else []
     affected = [jobs.period(row["start"], run.timeframe, phase)[0] for row in observed]
-    latest = chart_page(
-        db,
-        page["composite_id"],
-        run.timeframe,
-        count=1,
-        revision_id=run.revision_id,
-        provisional=True,
-        now=stamp,
-        display_snapshot=snapshot,
-    )
+    # All indicators in this response share immutable snapshot price pages.
+    # In particular, never re-aggregate a month of M1 for each study/seed.
+    replay_pages = {} if replay_pages is None else replay_pages
+
+    def read_page(before=None, count=1):
+        key = (run.revision_id, run.input_revision, run.timeframe,
+               snapshot.id if snapshot else stamp, before, count)
+        if key not in replay_pages:
+            replay_pages[key] = chart_page(
+                db, page["composite_id"], run.timeframe, before=before, count=count,
+                revision_id=run.revision_id, provisional=True, now=stamp,
+                display_snapshot=snapshot,
+            )
+        return replay_pages[key]
+
+    # A page containing the snapshot's forming bucket already proves its tail.
+    # Historical pagination must still fetch that tail from the same snapshot.
+    latest = page if snapshot and page["bars"][-1]["end"] > snapshot.content["now"] else read_page()
     if latest["input_revision"] != run.input_revision:
         from .display_snapshots import DisplaySnapshotError
 
@@ -392,28 +400,22 @@ def suffix(db, run, page, *, stamp):
     engine = engine_for(run, checkpoint)
     end = max(run.target_end, tail[-1]["end"] if tail else run.target_end)
     before, inputs = end, {}
-    for _ in range(2):
-        part = chart_page(
-            db,
-            page["composite_id"],
-            run.timeframe,
-            before=before,
-            count=2000,
-            revision_id=run.revision_id,
-            provisional=True,
-            now=stamp,
-            display_snapshot=snapshot,
-        )
-        inputs.update((bar["start"], bar) for bar in part["bars"] if cursor <= bar["start"] < end)
-        if not part["bars"] or part["bars"][0]["start"] <= cursor or not part["has_more"]:
-            break
-        before = part["next_before"]
+    if (snapshot and page["bars"][0]["start"] <= cursor
+            and page["bars"][-1]["end"] >= end):
+        inputs.update((bar["start"], bar) for bar in page["bars"] if cursor <= bar["start"] < end)
     else:
-        from .display_snapshots import DisplaySnapshotError
+        for _ in range(2):
+            part = read_page(before=before, count=2000)
+            inputs.update((bar["start"], bar) for bar in part["bars"] if cursor <= bar["start"] < end)
+            if not part["bars"] or part["bars"][0]["start"] <= cursor or not part["has_more"]:
+                break
+            before = part["next_before"]
+        else:
+            from .display_snapshots import DisplaySnapshotError
 
-        raise DisplaySnapshotError(
-            "DISPLAY_SUFFIX_CAPACITY_EXCEEDED", "展示依赖超过4000根，等待确认输入收敛后重试"
-        )
+            raise DisplaySnapshotError(
+                "DISPLAY_SUFFIX_CAPACITY_EXCEEDED", "展示依赖超过4000根，等待确认输入收敛后重试"
+            )
     _, _, _, profiles = jobs._context(db, run)
     output = []
     for bar in sorted(inputs.values(), key=lambda row: row["start"]):

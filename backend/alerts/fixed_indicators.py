@@ -340,6 +340,7 @@ def outputs(db, run, start, end):
 
 def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='display', display_retry=None, client=None, consumers=(), foreground=False, input_policy=STRICT):
     results, progress, display_errors, restarted = [], [], [], {}
+    replay_pages = {}
     if not page["bars"]:
         return results, progress
     artifact_rows = None
@@ -360,7 +361,7 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='di
             from .observed_indicators import chart_result
 
             result, status = chart_result(db, page, spec, run, provisional=provisional,
-                                          stamp=stamp or now_ms())
+                                          stamp=stamp or now_ms(), replay_pages=replay_pages)
             results.append(result)
             progress.append(status)
             continue
