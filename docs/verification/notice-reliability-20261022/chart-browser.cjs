@@ -45,22 +45,24 @@ try{
   }
  }
  await page.setViewportSize({width:1440,height:900});
+ await connect();await wait();console.log('CHECK layouts complete');
  const native=host.childFrames()[0];
  await native.getByRole('button',{name:'图表菜单',exact:true}).click();
  await native.getByRole('button',{name:'历史加载详情',exact:true}).click();
  const detail=page.getByRole('dialog',{name:'历史加载详情'});await expect(detail).toBeVisible();
  report.historyDetailsText=await detail.innerText();assert.ok(report.historyDetailsText.trim().length>10);
  await page.getByRole('button',{name:'关闭历史加载详情',exact:true}).click();
- const layout=await host.evaluate(()=>new Promise(resolve=>widget.save(resolve)));
+ console.log('CHECK history details complete');
+ const layout=await host.evaluate(()=>Promise.race([new Promise(resolve=>widget.save(resolve)),new Promise((_,reject)=>setTimeout(()=>reject(Error('Native layout snapshot timed out')),20000))]));console.log('CHECK layout saved');
  await page.reload({timeout:90000});await connect();await host.evaluate(()=>autoSave?.dispose());await wait();
- await host.evaluate(s=>widget.load(s),layout);
+ console.log('CHECK reloaded');await host.evaluate(s=>widget.load(s),layout);
  await expect.poll(async()=>{const sample=await host.evaluate(()=>{const c=widget.activeChart();return c.getAllStudies().every(x=>{let n=0;c._chartWidget.model().model().dataSourceForId(x.id)?.data()?.each((i,r)=>{if(r.slice(1).some(Number.isFinite))n++;});return n>0;})&&c.getAllStudies().length===3;});return sample;},{timeout:90000}).toBe(true);
  await expect(page.locator('[aria-label="图格指标状态"]')).toHaveCount(0);
  report.reloadPassed=true;
  const after=await get('/api/advanced-charts/workspaces/'+workspace);report.workspaceCheck={beforeRevision:before.revision,afterRevision:after.revision,changed:Object.keys(before).filter(k=>JSON.stringify(before[k])!==JSON.stringify(after[k]))};report.workspaceUnchanged=JSON.stringify(before)===JSON.stringify(after);report.externalWorkspaceChange=!report.workspaceUnchanged;
  assert.deepEqual(report.errors,[]);report.passed=true;
 }catch(e){report.failure=e.stack;process.exitCode=1;await page.screenshot({path:'/tmp/mwa-notice-reliability-20261022/failure.png'}).catch(()=>{});}
-finally{await Promise.allSettled([...pending]);
+finally{await Promise.race([Promise.allSettled([...pending]),new Promise(r=>setTimeout(r,5000))]);
  const result={started:report.started,checks:report.checks,layouts:report.layouts,historyDetailsText:report.historyDetailsText,reloadPassed:report.reloadPassed,workspaceUnchanged:report.workspaceUnchanged,workspaceCheck:report.workspaceCheck,blockedWrites:report.blockedWrites,blockedNoticeWrites:report.blockedNoticeWrites,errors:report.errors,passed:report.passed,failure:report.failure,httpErrors:report.responses.filter(r=>r.status>=400).map(r=>({status:r.status,error:r.error}))};
  fs.writeFileSync('/tmp/mwa-notice-reliability-20261022/chart-browser.json',JSON.stringify(result,null,2));
  console.log(JSON.stringify({passed:report.passed,failure:report.failure,errors:report.errors}));await browser.close();}})();

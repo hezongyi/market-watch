@@ -24,10 +24,10 @@
 
 - 最终相关后端回归 **171 passed**（notice reliability、live pricing、market notices、notification center、advanced preferences、series access、OANDA REST/recovery、market stream API/quotes）。新增时间偏移/延迟、故障通道隔离、安全证据、名称分页/权限/快照、大小写 ID 和无副作用订阅用例。
 - 真实模块 Node 回归：notice-reliability、advanced-preferences、advanced-preferences-conflict、advanced-provider-subscriptions、notifications-runtime、api-read-recovery、preference-request-queue；TypeScript 检查、生产 Web/Chart/API 构建和 diff 检查通过。
-- 核心实现经独立 Standards/Spec 复审无剩余 P1 或合并阻断；发现的草稿丢失、跨 writer 清理、订阅丢唤醒均已修复。见 `review.md`。
+- 核心实现经独立 Standards/Spec 复审无剩余 P1 或合并阻断；发现的草稿丢失、跨 writer 清理、订阅丢唤醒均已修复。见 `review.md`。最终增量已自审并回归，但追加独立复审因服务不可用未取得结论，不将其登记为通过。
 - 全新 Playwright context 真实登录 mwa。自建/组合 EURUSD 日线的 Swing、EMA、RSI 原生数值有效；深浅主题 1440/390/375px、刷新、历史详情正常；指标悬浮窗保持取消。见 `chart-browser.json`。
 - 真实原生草稿对话框验证远端版本变化自动刷新差异、提交本地/采用远端、旧 widget 回调阻断、重开提示。实际 EURUSD/XAUUSD/USDCAD 历史名称和 EUR/USD/eurusd 搜索通过，无 pageerror。见 `notice-browser.json`。
-- 验收 helper 在临时 context 拦截工作区/设置/通知写入，偏好模拟 GET/写入共用影子 Map；未连接受保护 profile。草稿验收服务端工作区前后一致、偏好一致（确切revision见最终browser报告）。此前指标检查期间工作区68→69有外部写入，因此不宣称整个时段服务端始终无变化，不回写用户现场。
+- 验收 helper 在临时 context 拦截工作区/设置/通知写入，偏好模拟 GET/写入共用影子 Map；未连接受保护 profile。最终两项browser验收服务端工作区revision75前后一致、偏好一致。此前指标检查期间工作区68→69有外部写入，因此不宣称整个时段服务端始终无变化，不回写用户现场。
 - 原基准198条组合消息全部在实际PostgreSQL只读事务中解析成功：EURUSD103、XAUUSD77、USDCAD18，按四类注册表批量读取4次；三类详情与批量名称一致，身份/消息body/处理状态及组合/需求计数不变，见 `all-198-readonly.json`。
 - 实际 PostgreSQL 只读运行新名称 SQL；载入基线42a1b71旧snapshot模块读取新增JSON后的现场通过，见 `old-reader-compatibility.json`。这不是完整旧镜像写入兼容验证。
 - 主机时钟原先快约6秒；经无后退跳时的渐进校准，timesyncd持久使用已验证的字面NTP地址。独立30次主机同步采样全部同步，见 `clock-boundaries.json`。这与下面的行情观察是不同检查。
@@ -39,3 +39,6 @@
 - 采用远端只结束能匹配当前profile/workspace/上下文的原观察。跨workspace/刷新后不匹配的历史失败不会被批量结案；不声称所有历史设置事故自动恢复或处理。
 - 历史无法解析的名称仍显示类型与短ID。通知历史、未读/处理状态保持既有语义；未批量标记已读/处理。
 - 本次未提交PR、未推送、未合并main、未创建正式tag、未发布生产。保留当前专用分支，供用户控制后续集成频率。
+
+
+最终逐项核对见 `completion-matrix.md`。本轮实现与适用验证收口；30分钟观察按用户指令跳过。最终Chart追加修复后的Playwright再次通过；独立复审服务不可用的边界已在review中列明。
