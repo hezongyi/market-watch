@@ -151,3 +151,8 @@
   color: #131722;
   border-color: #b2b5be;
 }
+
+.advanced-indicator-status {color:inherit;}
+.advanced-indicator-status summary {cursor:pointer;min-height:28px;line-height:28px;}
+.advanced-indicator-status summary:focus-visible {outline:2px solid #599bff;outline-offset:2px;}
+.advanced-indicator-status-list {max-height:min(50vh,360px);overflow:auto;}
