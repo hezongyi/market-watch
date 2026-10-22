@@ -11,7 +11,7 @@ const source = ts.transpileModule(
     },
   },
 ).outputText;
-function loader(api) {
+function loader(api, clock = Date) {
   const exports = {};
   class ApiError extends Error {
     constructor(message, status, code) {
@@ -22,7 +22,7 @@ function loader(api) {
   vm.runInNewContext(source, {
     exports,
     require: () => ({ api, ApiError }),
-    Date,
+    Date: clock,
     crypto: require("node:crypto").webcrypto,
     DOMException,
     AbortSignal,
@@ -136,6 +136,27 @@ function loader(api) {
   assert.equal(bounded.diagnostics().admitted, 0, "all lifecycle slots return after cleanup");
   assert.equal(bounded.diagnostics().cleaning, 0);
   assert.equal(bounded.diagnostics().queued, 0);
+
+  let now = Date.now(), expirySubmissions = 0;
+  const expiryCleanups = [];
+  const expiresWhileQueued = loader(async path => {
+    if(path.endsWith('/cancel')) return new Promise(resolve=>expiryCleanups.push(resolve));
+    if(path.endsWith('/result')) return {result:{bars:[1]}};
+    return {load:{id:`expiry-${++expirySubmissions}`,state:'ready',pages:1}};
+  }, {now:()=>now});
+  for(let index=0;index<4;index++)
+    await expiresWhileQueued(body,new AbortController().signal,cap,()=>{});
+  const expiredQueued = assert.rejects(expiresWhileQueued(body,new AbortController().signal,
+    {task_seconds:1},()=>{}),error=>error.code==='HISTORY_TIMEOUT');
+  // Advance the clock without running the timer, as happens when completion
+  // microtasks run after a busy event loop. Admission must check the deadline.
+  now += 2000;
+  expiryCleanups[0]();
+  await expiredQueued;
+  assert.equal(expirySubmissions,4,'a passed deadline cannot be admitted before its timeout callback runs');
+  for(const finish of expiryCleanups) finish();
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(expiresWhileQueued.diagnostics().admitted,0);
   const cleanupFailure = loader(async path => {
     if (path.endsWith("/cancel")) throw new TypeError("cleanup transport unavailable");
     return path.endsWith("/result") ? {result:{bars:[1]}} :

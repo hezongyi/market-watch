@@ -32,6 +32,23 @@ const admissions: Array<{
   grant: () => void;
   cancel: (error: Error) => void;
 }> = [];
+const capacityListeners = new Set<(available: number) => void>();
+
+// The bridge keeps unsent work in its own focus-aware queue. Snapshots include
+// cleanup from a previous workspace; its local dispatches remain provisional
+// until the loader acknowledges that they acquired a lifetime.
+export function subscribeHistoryLoadCapacity(listener: (available: number) => void) {
+  capacityListeners.add(listener);
+  listener(historyLifetimes - admitted);
+  return () => { capacityListeners.delete(listener); };
+}
+
+function notifyCapacity() {
+  for (const listener of capacityListeners) {
+    try { listener(historyLifetimes - admitted); }
+    catch { /* An observer must not interrupt lifetime acquisition or release. */ }
+  }
+}
 
 export function historyLoadDiagnostics() {
   return { admitted, cleaning, queued: admissions.length, cleanupFailures };
@@ -47,7 +64,7 @@ if (typeof window !== "undefined")
 
 function drainAdmissions() {
   while (admitted < historyLifetimes && admissions.length)
-    admissions.shift()!.grant();
+    admissions[0].grant();
 }
 
 function acquireLifetime(signal: AbortSignal, deadline: number) {
@@ -70,14 +87,25 @@ function acquireLifetime(signal: AbortSignal, deadline: number) {
     };
     const entry = {
       grant: () => {
+        if (signal.aborted) {
+          entry.cancel(new DOMException("已取消历史加载", "AbortError"));
+          return;
+        }
+        if (deadline <= Date.now()) {
+          entry.cancel(new ApiError("历史加载超过时间预算，请重试", 503, "HISTORY_TIMEOUT"));
+          return;
+        }
+        admissions.splice(admissions.indexOf(entry), 1);
         dispose();
         admitted++;
+        notifyCapacity();
         let released = false;
         resolve(() => {
           if (released) return;
           released = true;
           admitted--;
           drainAdmissions();
+          notifyCapacity();
         });
       },
       cancel: (error: Error) => {
@@ -106,6 +134,7 @@ export async function loadNativeHistory(
   capabilities: HistoryCapabilities,
   progress: (state: HistoryProgress) => void,
   noticeContext: Record<string, string> = {},
+  onAdmitted?: (available: number) => void,
 ) {
   let handle: string | undefined;
   let delivered = false;
@@ -115,6 +144,7 @@ export async function loadNativeHistory(
   const estimate = Math.max(1, Math.ceil((demand.countBack || demand.limit || 1) / pageBars));
   const release = await acquireLifetime(signal, deadline);
   try {
+    onAdmitted?.(historyLifetimes - admitted);
     progress({ phase: "checking", estimatedPages: estimate });
     let reply = await api(
       "/charts/history-loads",

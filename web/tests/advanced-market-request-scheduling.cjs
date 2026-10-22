@@ -15,7 +15,7 @@ function harness() {
   for (const file of ['series.js','composite-display-batches.js','bridge.js'])
     vm.runInContext(fs.readFileSync('../advanced-host/'+file,'utf8'),ctx);
   const run = code => vm.runInContext(code,ctx);
-  const sent = () => messages.filter(m=>m.type==='data' || m.type==='indicator-demand-release');
+  const sent = () => messages.filter(m=>['data','indicator-demand-release','indicator-demand-update'].includes(m.type));
   async function finish(message) {
     assert.ok(message,'request must have been dispatched');
     await handlers[0]({source:ctx.parent,origin:'http://localhost',data:{
@@ -41,6 +41,17 @@ function harness() {
     assert.equal(h.run('pending.size'),4,'ordinary concurrency remains four');
     assert.ok(h.run('[...pending.values()].filter(e=>e.background).length')<=2,
       'auxiliary and reserve traffic share a bounded background budget');
+  } finally { h.dispose(); }
+
+  h = harness();
+  try {
+    h.run(`
+      for(let i=0;i<4;i++) void request({name:'renew'+i},'indicator-demand-update');
+      void request({name:'active'},'data',undefined,{purpose:'first-screen',focused:()=>true});
+    `);
+    assert.ok(h.sent().some(m=>m.query.name==='active'),
+      'indicator lease renewals cannot occupy all slots before active first-screen prices');
+    assert.equal(h.run('[...pending.values()].filter(e=>e.background).length'),2);
   } finally { h.dispose(); }
 
   h = harness();

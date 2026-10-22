@@ -197,6 +197,7 @@ jobs:
         run: |
           node tests/advanced-history-loading.cjs
           node tests/advanced-market-request-scheduling.cjs
+          node tests/advanced-history-admission.cjs
           node tests/advanced-native-reserve-scheduler.cjs
           node tests/advanced-inflight-cancellation.cjs
           node tests/advanced-provider-request-lifetime.cjs

@@ -752,18 +752,21 @@ const managementRequest = type => type === 'data-center-api' || type === 'prefer
 // Keep admission and fairness here rather than adding exceptions at callers.
 const requestPolicy = (() => {
   let turn = 0;
+  let nativeAvailable = 4;
+  const nativeDispatches = new Set();
   function describe(entry) {
     const query=entry.query;
     const management=managementRequest(entry.type);
     const reserve=!!query.native_reserve || entry.scheduling?.purpose==='reserve';
     const purpose=management ? 'management' : reserve ? 'reserve' :
       query.indicators?.length ? 'indicator' : entry.scheduling?.purpose ||
-      (entry.type==='indicator-demand-release' ? 'release' : query.op==='quotes' ? 'quote' :
+      (entry.type==='indicator-demand-release' ? 'release' : entry.type==='indicator-demand-update' ? 'renewal' : query.op==='quotes' ? 'quote' :
         query.op==='viewport' || query.op==='historyCache' && !query.background || entry.type==='workspace' ? 'interaction' :
         query.op==='historyCache' && query.background ? 'auxiliary' :
         query.firstDataRequest ? 'first-screen' : 'read');
     return {management,reserve,quote:query.op==='quotes',
-      background:['reserve','release','quote','auxiliary'].includes(purpose),purpose};
+      nativeHistory:entry.type==='data' && query.series_kind==='provider' && !!query.native_history && !query.native_reserve,
+      background:['reserve','release','renewal','quote','auxiliary'].includes(purpose),purpose};
   }
   function priority(entry) {
     const {purpose,background}=describe(entry);
@@ -783,7 +786,8 @@ const requestPolicy = (() => {
     const eligible=[];
     for(let index=0;index<queued.length;index++) {
       const entry=describe(queued[index]);
-      if(!entry.management && (!entry.background || backgroundBusy<2) && (!entry.quote || !quoteBusy))
+      if(!entry.management && (!entry.background || backgroundBusy<2) && (!entry.quote || !quoteBusy) &&
+        (!entry.nativeHistory || nativeAvailable>nativeDispatches.size))
         eligible.push(index);
     }
     if(!eligible.length) return -1;
@@ -794,13 +798,21 @@ const requestPolicy = (() => {
     turn=(turn+1)%4;
     return selected;
   }
-  return {describe,next};
+  function capacity(available, id) {
+    if(!Number.isInteger(available) || available<0 || available>4) return;
+    if(id!==undefined) nativeDispatches.delete(id);
+    nativeAvailable=available;
+  }
+  function dispatched(id, entry) {
+    if(describe(entry).nativeHistory) nativeDispatches.add(id);
+  }
+  return {describe,next,capacity,dispatched,completed:id=>nativeDispatches.delete(id)};
 })();
 function drain() {
   while (requests.length) {
-    const interaction=requestPolicy.next(requests,pending);
-    if (interaction < 0) break;
-    const selected=requests.splice(interaction,1)[0];
+    const selectedIndex=requestPolicy.next(requests,pending);
+    if (selectedIndex < 0) break;
+    const selected=requests.splice(selectedIndex,1)[0];
     const {query,type,resolve,reject,isCurrent}=selected;
     if (isCurrent && !isCurrent()) {
       const error = Error("已取消旧图表的历史加载");
@@ -834,7 +846,8 @@ function drain() {
       };
       entry.cancellationTimer = setTimeout(check, 100);
     }
-    send({ type, id, query });
+    requestPolicy.dispatched(id,selected);
+    send({ type, id, query, ...(entry.nativeHistory ? {history_client:clientId} : {}) });
   }
 }
 function request(query, type = "data", isCurrent, scheduling) {
@@ -2882,6 +2895,12 @@ addEventListener("message", async (e) => {
   )
     return;
   const m = e.data;
+  if(m.type==='history-load-capacity' || m.type==='history-load-admitted') {
+    if(m.type==='history-load-admitted' && m.history_client!==clientId) return;
+    requestPolicy.capacity(m.available,m.type==='history-load-admitted' ? m.id : undefined);
+    drain();
+    return;
+  }
   if(m.type==='notice-center-state' && m.session===alertUISession && m.workspace_id===alertUIWorkspace){noticeState=m.state;noticeUI?.update(m.state);return;}
   if(m.type==='notice-center-open'){noticeOpenEvent=typeof m.event_id==='string'?m.event_id:'';if(noticeUI){noticeUI.open(noticeOpenEvent || undefined);noticeOpenEvent=undefined;}return;}
   if(m.type==='chart-alert-event-open' && typeof m.signal_id==='string' && /^[a-f0-9-]{36}$/.test(m.signal_id)) {
@@ -3040,8 +3059,10 @@ addEventListener("message", async (e) => {
     return;
   }
   if (m.type === "result") {
+    if(m.history_client!==undefined && m.history_client!==clientId) return;
+    requestPolicy.completed(m.id);
     const p = pending.get(m.id);
-    if (!p) return;
+    if (!p) {drain();return;}
     pending.delete(m.id);
     clearTimeout(p.timer);
     clearTimeout(p.cancellationTimer);
@@ -3105,6 +3126,7 @@ addEventListener("message", async (e) => {
     const chart=widget.chart(m.index);
     if(chart.symbol()===m.symbol && chart.resolution()===m.resolution) MWNativeNavigation.recoverInitial(chart,true);
   } else if (m.type === "init" && !widget) {
+    requestPolicy.capacity(m.history_load_available);
     alertUISession = m.alert_ui_session;
     noticeState = m.notice_state;
     alertUIDraft = m.alert_ui_draft;

@@ -10,11 +10,13 @@ const producers = bridge.slice(
   bridge.indexOf("function emitNotice("),
   bridge.indexOf("// Each live request owner"),
 );
+const adapterStart = bridge.indexOf("  const prefs = ");
+assert.ok(adapterStart >= 0, "production preference adapter must be located");
 const adapter = bridge.slice(
-  bridge.indexOf("  const prefs = nativePreferences("),
+  adapterStart,
   bridge.indexOf(
     "  autoSave?.dispose();",
-    bridge.indexOf("  const prefs = nativePreferences("),
+    adapterStart,
   ),
 );
 
@@ -37,6 +39,7 @@ const adapter = bridge.slice(
       send: (message) => sent.push(message),
       request: async ({ op, args }) => {
         if (op === "read") return [];
+        if (op.startsWith("draft")) return true;
         writes.push(op);
         if (fail)
           throw Object.assign(Error("scoped write failure"), { status: 503 });
@@ -132,6 +135,7 @@ const adapter = bridge.slice(
       send: (message) => sent.push(message),
       request: async ({ op, args }) => {
         if (op === "read") return [];
+        if (op.startsWith("draft")) return true;
         started();
         return new Promise((resolve, reject) => {
           finish = () =>

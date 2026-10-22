@@ -6,6 +6,7 @@ import {operationFault} from "../notifications/operations";
 import { validIndicatorRead } from "./indicatorRequests";
 import {
   loadNativeHistory,
+  subscribeHistoryLoadCapacity,
   type HistoryCapabilities,
 } from "./nativeHistoryLoads";
 import { useEffect, useRef, useState } from "react";
@@ -372,6 +373,11 @@ export default function AdvancedWorkspace() {
   useEffect(() => () => { if (titleTimer.current) clearTimeout(titleTimer.current); }, []);
   useEffect(() => {
     const marketRequests = new Map<Window, Map<number, AbortController>>();
+    let historyLoadAvailable = 0;
+    const unsubscribeHistoryCapacity = subscribeHistoryLoadCapacity((available) => {
+      historyLoadAvailable = available;
+      post({type:'history-load-capacity',available});
+    });
     const subscriptionScopes = new WeakMap<object, {workspace: string; session: string; epoch: number}>();
     const observeSubscription = (args: any, kind: 'market' | 'connection' | 'subscription', error: unknown | null, attempt: string, lifecycle?: 'ended') => {
       const scope = subscriptionScopes.get(args);
@@ -434,7 +440,9 @@ export default function AdvancedWorkspace() {
       const m = e.data,
         source = e.source as Window;
       const reply = (value: object) =>
-        source.postMessage({ channel, ...value }, origin);
+        source.postMessage({ channel,
+          ...(typeof m.history_client==='string' && m.history_client.length<=64
+            ? {history_client:m.history_client} : {}), ...value }, origin);
       if(m.type==='notice-source'){
         if(m.session!==alertUiSession.current||m.workspace_id!==current.current?.id||m.epoch!==nativeLoadEpoch.current||
           !m.fault||JSON.stringify(m.fault).length>16000||!['indicator','history','capacity','market','connection','chart_shell','data_center','preferences'].includes(m.fault.source_kind))return;
@@ -1030,6 +1038,7 @@ export default function AdvancedWorkspace() {
             notice_state: noticeStateRef.current,
             alert_ui_draft: readAlertDraft(current.current?.id),
             history_capabilities: capabilities,
+            history_load_available: historyLoadAvailable,
             document: current.current?.document || {},
             workspace: current.current,
             readonly: mobile,
@@ -1606,6 +1615,7 @@ export default function AdvancedWorkspace() {
                           };
                         }),
                       {workspace_id:current.current?.id || "",chart_index:String(q.notice_chart_index ?? "")},
+                      available=>reply({type:'history-load-admitted',id:m.id,available}),
                     )
                 : (body: unknown, signal: AbortSignal) =>
                     api(
@@ -1754,6 +1764,7 @@ export default function AdvancedWorkspace() {
     };
     addEventListener("message", listener);
     return () => {
+      unsubscribeHistoryCapacity();
       removeEventListener("message", listener);
       establishedChannel?.close();
       void provider.dispose();
