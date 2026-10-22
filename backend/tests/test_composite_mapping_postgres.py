@@ -5,6 +5,7 @@ from pathlib import Path
 
 from alembic import command
 from alembic.config import Config
+from alerts import storage
 from alerts.composite_center import mapping_report
 from alerts.composite_definitions import first_use, save_mapping
 from alerts.composite_matching import MappingDraft, check_match
@@ -28,6 +29,8 @@ def test_mapping_notes_upgrade_preserves_existing_mapping_and_composite(postgres
     with postgres_alerts.begin() as connection:
         connection.execute(text("DROP TABLE IF EXISTS market_realtime_mapping_notes"))
     factory = sessionmaker(postgres_alerts, expire_on_commit=False)
+    monkeypatch.setattr(storage, "Session", factory)
+    monkeypatch.setattr(settings, "fx_source", "dukascopy")
     catalog_id = prepare(factory, monkeypatch)
     publish(factory)
     with factory.begin() as db:
