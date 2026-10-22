@@ -18,6 +18,8 @@ from .domain import calendar_from
 from .history_artifacts import read_artifact
 from .indicator_state import ALGORITHM as ALGORITHM
 from .indicator_state import ALGORITHMS, IndicatorState, presentation
+from .observed_indicators import ALGORITHMS as OBSERVED_ALGORITHMS
+from .observed_indicators import OBSERVED, STRICT, ObservedState, is_observed
 from .source_history_store import _insert
 from .storage import (
     CompositeMinuteInput,
@@ -74,13 +76,17 @@ def checkpoint_before(db, run, boundary):
     return None
 
 
-def request(db, page, spec, *, stamp=None):
-    engine = IndicatorState(spec)
+def request(db, page, spec, *, stamp=None, input_policy=STRICT):
+    if input_policy not in (STRICT, OBSERVED):
+        raise ValueError("Unknown indicator input policy")
     stamp = now_ms() if stamp is None else stamp
     revision_id = page.get("revision_id")
     version_id = page.get("history_version_id", page.get("version_id"))
     version = db.get(HistoryVersion, version_id)
     revision = db.get(CompositeRevision, revision_id) if revision_id else None
+    engine = (ObservedState(spec, source_start=version.start,
+                           source_end=None if revision else version.end)
+              if input_policy == OBSERVED else IndicatorState(spec))
     inst = db.get(Instrument, db.get(MarketDataset, version.dataset_id).instrument_id)
     phase = revision.rules["aggregation_calendar"] if revision else inst.calendar
     origin = period(version.start, page["timeframe"], phase)[0]
@@ -190,7 +196,7 @@ def input_rows(db, run):
 def claim(run_id=None):
     with transaction() as db:
         stamp = now_ms()
-        query = select(FixedIndicatorRun).where(FixedIndicatorRun.status == "pending", FixedIndicatorRun.algorithm.in_(ALGORITHMS),
+        query = select(FixedIndicatorRun).where(FixedIndicatorRun.status == "pending", FixedIndicatorRun.algorithm.in_((*ALGORITHMS, *OBSERVED_ALGORITHMS)),
             FixedIndicatorRun.lease_until <= stamp, FixedIndicatorRun.next_at <= stamp)
         if run_id:
             query = query.where(FixedIndicatorRun.id == run_id)
@@ -221,6 +227,10 @@ def build(ownership):
 
 def calculate_inputs(run, rows, phase, profiles, *, seam=None, initial_state=None, batch=False):
     """One exact numerical path for worker pages and bounded foreground replay."""
+    if is_observed(run):
+        from .observed_indicators import calculate
+
+        return calculate(run, rows, phase, profiles, seam=seam, initial_state=initial_state)
     if batch and run.spec["name"] in ("SMA", "EMA", "LWMA", "BBANDS", "RSI", "ATR", "MACD", "STOCH"):
         from .chart_indicators import calculate
         from .indicator_state import advance_dependencies
@@ -323,7 +333,7 @@ def outputs(db, run, start, end):
     return sorted(rows, key=lambda row: row["start"])
 
 
-def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='display', display_retry=None, client=None, consumers=(), foreground=False):
+def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='display', display_retry=None, client=None, consumers=(), foreground=False, input_policy=STRICT):
     results, progress, display_errors, restarted = [], [], [], {}
     if not page["bars"]:
         return results, progress
@@ -334,11 +344,21 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='di
         artifact_rows = published_artifact(db, page.get('history_version_id', page.get('version_id')),
                                            page['timeframe']).count
     for spec in specs:
-        run = request(db, page, spec, stamp=stamp)
+        if input_policy != STRICT and purpose != 'display':
+            raise ValueError("Observed inputs are only available for chart display")
+        run = request(db, page, spec, stamp=stamp, input_policy=input_policy)
         start, end = page["bars"][0]["start"], page["bars"][-1]["end"]
         from .indicator_demands import renew
         renew(db,client,consumers,run,snapshot_id=page.get('display_snapshot_id'),
             start=start,end=end,stamp=stamp or now_ms())
+        if is_observed(run):
+            from .observed_indicators import chart_result
+
+            result, status = chart_result(db, page, spec, run, provisional=provisional,
+                                          stamp=stamp or now_ms())
+            results.append(result)
+            progress.append(status)
+            continue
         rows = outputs(db, run, start, min(end, run.cursor))
         status = {"id": spec.get("id", spec["name"]), "run_id": run.id, "status": run.status,
             "cursor": run.cursor, "target_end": run.target_end, "input_revision": run.input_revision,

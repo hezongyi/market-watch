@@ -2,6 +2,10 @@
  * Derived drawings/rows are disposable; only native study inputs are persisted.
  */
 function swingSnapshotKey(symbol, resolution, params) {
+  if(typeof MWSeries!=='undefined'){
+    const identity=MWSeries.decode(symbol);
+    symbol=MWSeries.encode(identity.symbol,identity.series_kind);
+  }
   return JSON.stringify([symbol, resolution, params.high_strength, params.low_strength]);
 }
 
@@ -196,13 +200,16 @@ function chartSwingDisplay(widget, store, {root, identity, chartTime = time=>tim
     }
     const parts = binding.parts;
     parts.name.textContent = `${widget.chartsCount()>1 ? '图表 '+(binding.index+1)+' · ' : ''}Swing ${input.params.high_strength} ${input.params.low_strength} high low`;
+    if(p.input_quality?.coverage==='unverified')parts.name.textContent+=' · 覆盖未核实';
+    if(p.input_quality?.provisional)parts.name.textContent+=' · 实时预览';
     for(const side of ['high','low']) parts[side].textContent =
       `${side==='high'?'高点':'低点'} ${p.statistics[side].display_integer ?? '—'}${p.statistics[side].display_integer == null ? '' : '根'}`;
     const date = value=>value == null ? '—' : new Date(value).toLocaleString('zh-CN');
     parts.detail.textContent = `范围 ${date(p.statistics_origin)} — ${date(p.as_of_bar_time)}；`+
       `事件 高点 ${p.statistics.high.confirmed_count}（预览 ${p.statistics.high.preview_count}），`+
       `低点 ${p.statistics.low.confirmed_count}（预览 ${p.statistics.low.preview_count}）`+
-      (p.history_complete ? '' : '；历史统计尚未完成');
+      (p.history_complete ? '' : '；历史统计尚未完成')+
+      (p.statistics_quality==='unverified' ? '；累计统计含覆盖未核实的观察价格' : '');
     const groups=input.position==='below_name'?infoGroups:cardGroups;
     let parent=groups.get(binding.index);
     if(!parent) {

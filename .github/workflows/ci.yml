@@ -170,6 +170,7 @@ jobs:
       - name: Indicator runtime regressions
         working-directory: web
         run: |
+          node tests/swing-fixed-identity.cjs
           node tests/indicator-high-rate.cjs
           node tests/indicator-high-rate.cjs --provider
           node tests/indicator-shared-read.cjs

@@ -128,7 +128,7 @@ export default function AdvancedWorkspace() {
   const [nativeLoads, setNativeLoads] = useState<Record<string, NativeLoad>>(
     {},
   );
-  const [indicatorStates,setIndicatorStates]=useState<Record<string,{index:number;name:string;state:string;error:string;epoch:number;previousParams:string}>>({});
+  const [indicatorStates,setIndicatorStates]=useState<Record<string,{index:number;name:string;state:string;error:string;epoch:number;previousParams:string;unverified:boolean;provisional:boolean;reason:string}>>({});
   const [resolveStates,setResolveStates]=useState<{index:number;symbol:string;resolution:string;generation:number;state:string;message:string;retryAt:number;retryable:boolean;epoch:number}[]>([]);
   const [resolveNow, setResolveNow] = useState(Date.now());
   useEffect(() => {
@@ -764,10 +764,12 @@ export default function AdvancedWorkspace() {
       }
       if(m.type==='chart-indicator-state' && m.epoch===nativeLoadEpoch.current &&
         Number.isSafeInteger(m.index) && m.index>=0 && m.index<8 && typeof m.id==='string' &&
-        typeof m.name==='string' && typeof m.error==='string' && ['preparing','ready','error','removed'].includes(m.state)) {
+        typeof m.name==='string' && typeof m.error==='string' && ['preparing','ready','insufficient_input','unavailable','error','removed'].includes(m.state)) {
         setIndicatorStates(old=>{const next={...old},key=m.index+'|'+m.id;
-          if(m.state==='ready' || m.state==='removed')delete next[key];
+          if(m.state==='ready' && m.quality?.coverage!=='unverified' && !m.quality?.provisional || m.state==='removed')delete next[key];
           else next[key]={index:m.index,name:m.name,state:m.state,error:m.error,epoch:m.epoch,
+            unverified:m.quality?.coverage==='unverified',provisional:m.quality?.provisional===true,
+            reason:Number.isSafeInteger(m.quality?.sampleSize) && Number.isSafeInteger(m.quality?.requiredSamples) ? `已有 ${m.quality.sampleSize} 根可用观察，至少需要 ${m.quality.requiredSamples} 根。` : '',
             previousParams:m.previousParams && typeof m.previousParams==='object' && !Array.isArray(m.previousParams)
               ? Object.entries(m.previousParams).filter(([key,value])=>key.length<80 && ['string','number','boolean'].includes(typeof value))
                 .map(([key,value])=>key+'='+String(value).slice(0,100)).join(', ') : ''};
@@ -1775,13 +1777,13 @@ export default function AdvancedWorkspace() {
     <main className="advanced-workspace" data-theme={chartTheme}>
       {mobile && <p className="advanced-readonly-note" role="note">手机只读看盘。编辑图表、绘图和告警请使用桌面浏览器；桌面工作区布局仍保留。</p>}
       {resolveStates.length>0 && <aside className="advanced-history-failures" aria-label="图格行情解析状态">{resolveStates.map(item=><p key={item.index} role="status">图格 {item.index+1}：{item.message}{item.state==='error' && <button disabled={item.retryAt>resolveNow} onClick={()=>post({type:'retry-chart-resolve',...item})}>{item.retryAt>resolveNow ? `冷却 ${Math.ceil((item.retryAt-resolveNow)/1000)} 秒后重试` : '重试行情解析'}</button>}</p>)}</aside>}
+      {Object.keys(indicatorStates).length>0 && <aside className="advanced-history-failures" aria-label="图格指标状态">{Object.entries(indicatorStates).map(([key,item])=><p key={key} role="status" title={(item.state==='insufficient_input' ? item.reason : '')+(item.unverified ? '按图表已观察价格计算，依赖的分钟覆盖尚未核实；不代表严格确认信号。' : '')}>图格 {item.index+1} · {item.name}：{item.state==='error' ? item.error : item.state==='preparing' ? '正在计算' : item.state==='insufficient_input' ? '样本不足' : item.state==='unavailable' ? '输入价格不可用' : '已计算'}{item.unverified && ' · 覆盖未核实'}{item.provisional && ' · 含实时预览'}{item.previousParams && <>（暂显旧参数：{item.previousParams}）</>}{item.state==='error' && <button onClick={()=>post({type:'retry-chart-indicators',index:item.index,epoch:item.epoch})}>重试指标</button>}</p>)}</aside>}
       {historyDetailsOpen && (
         <div className="advanced-load-details" role="dialog" aria-modal="false" aria-label="历史加载详情">
           <header>
             <strong>历史加载详情</strong>
             <button type="button" aria-label="关闭历史加载详情" onClick={() => setHistoryDetailsOpen(false)}>关闭</button>
           </header>
-      {Object.keys(indicatorStates).length>0 && <aside className="advanced-history-failures" aria-label="图格指标状态">{Object.entries(indicatorStates).map(([key,item])=><p key={key} role="status">图格 {item.index+1} · {item.name}：{item.state==='error' ? item.error : '正在计算'}{item.previousParams && <>（暂显旧参数：{item.previousParams}）</>}{item.state==='error' && <button onClick={()=>post({type:'retry-chart-indicators',index:item.index,epoch:item.epoch})}>重试指标</button>}</p>)}</aside>}
       {chartFailures.length>0 && <aside className="advanced-history-failures" aria-label="图格历史加载失败">{chartFailures.map(item=><p key={item.index} role="status">图格 {item.index+1} · {item.label} · {item.resolution}：{item.error}<button onClick={()=>post({type:'retry-chart-history',...item})}>重试此图格</button></p>)}</aside>}
       {(Object.keys(nativeLoads).length > 0 ||
         Object.keys(capacityNotices).length > 0) && (

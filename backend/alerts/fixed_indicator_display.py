@@ -10,7 +10,9 @@ from time import perf_counter
 from types import SimpleNamespace
 
 from . import fixed_indicators as jobs
-from .indicator_state import IndicatorState, presentation
+from .indicator_state import presentation
+from .observed_indicators import engine_for, is_observed
+from .observed_indicators import status as observed_status
 from .provider_indicator_inputs import (
     _INPUTS,
     _RESULTS,
@@ -37,17 +39,18 @@ def confirmed_page(db, page):
 
 def prepare(db, page, body):
     """Freeze a complete, confirmed prefix or leave the bounded queue response."""
-    if not body.client or not body.indicator_consumers or not confirmed_page(db, page):
+    observed = body.indicator_input_policy == "observed_display_v1"
+    if not body.client or not body.indicator_consumers or not observed and not confirmed_page(db, page):
         return []
     pending = [item for item in page.get("indicators", []) if not item["calculation"].get("visible_complete")]
     if not pending:
         return []
     run = db.get(FixedIndicatorRun, pending[0]["calculation"]["run_id"])
-    if page["bars"][-1]["end"] > run.target_end:
+    if page["bars"][-1]["end"] > run.target_end and not (observed and not run.revision_id):
         return []
     version, revision, phase, profiles = jobs._context(db, run)
     key = (db.get_bind(), "fixed-display", version.id, page["timeframe"], run.revision_id,
-           run.input_revision, run.target_end, page["origin"])
+           run.input_revision, run.target_end, page["origin"], body.indicator_input_policy)
     entry = _entry(_INPUTS, key, MAX_ROWS)
     with entry.lock:
         if entry.value is False:
@@ -90,7 +93,7 @@ def complete(page, prepared):
             result_hit = entry.value is not None
             if not result_hit:
                 entry.value = jobs.calculate_inputs(run, frozen.rows, phase, profiles, seam=seam,
-                    initial_state=IndicatorState(run.spec).checkpoint(), batch=True)
+                    initial_state=engine_for(run).checkpoint(), batch=True)
                 entry.weight = len(frozen.rows) * max(6, len(item["series"]))
             calculated = entry.value
         _prune(_RESULTS, MAX_VALUES)
@@ -101,7 +104,8 @@ def complete(page, prepared):
             display = display | {"history_complete": True, "history_revision": run.id}
         item.update(presentation(run.spec, rows, display))
         item["dependencies"] = [{key: row.get(key) for key in
-            ("start", "dependency_origin", "seam_dependency", "initialized", "provisional")} for row in rows]
+            ("start", "dependency_origin", "seam_dependency", "initialized", "provisional",
+             *(('input_quality',) if is_observed(run) else ()))} for row in rows]
         status = item["calculation"]
         status.update(visible_complete=True, coverage=jobs.coverage(page["bars"]),
             display_status="complete", producer="backend", accuracy="oracle_equivalent", canonical_verified=True,
@@ -110,4 +114,6 @@ def complete(page, prepared):
                        "input_rows": len(frozen.rows), "calculation_steps": 0 if result_hit else len(frozen.rows),
                        "input_accepted_at_ms": input_accepted_at,
                        "calculation_ms": round((perf_counter()-started)*1000, 2)})
+        if is_observed(run):
+            status.update(observed_status(rows, complete=True))
     return page

@@ -370,8 +370,10 @@ function startIndicatorCoordinator(catalog) {
         return {...base,revision:base.revision || (id.series_kind==='history'?id.symbol:
           id.series_kind==='managed'?'published:'+String(session?.revision):'provider:'+id.symbol),
           calculationStart:base.calculationStart ?? session?.start ?? 0,
+          inputPolicy:['history','composite'].includes(id.series_kind) ? 'observed_display_v1' : 'strict_confirmed_v1',
           before:Number.isFinite(base.lastChartTime ?? base.lastStart) ? (base.lastChartTime ?? base.lastStart)+1 : undefined,
           query:{...(base.revision && id.series_kind==='composite'?{composite_revision_id:base.revision}:{}),
+            ...(['history','composite'].includes(id.series_kind)?{indicator_input_policy:'observed_display_v1'}:{}),
             ...(base.displaySnapshot && id.series_kind==='composite'?{display_snapshot_id:base.displaySnapshot}:{}),
             ...(base.providerSnapshot && id.series_kind==='provider'?{provider_snapshot_id:base.providerSnapshot}:{}),
             ...(id.series_kind==='provider' && base.calculationStart?{calculation_origin:base.calculationStart}:{}),
@@ -384,8 +386,9 @@ function startIndicatorCoordinator(catalog) {
           dependencyBefore:page.dependency_before ?? old.dependencyBefore,
           dependencyRevision:page.dependency_revision ?? old.dependencyRevision});},
     },
-    status:(consumer,state,error)=>send({type:'chart-indicator-state',epoch:workspaceEpoch,index:consumer.index,
+    status:(consumer,state,error,quality)=>send({type:'chart-indicator-state',epoch:workspaceEpoch,index:consumer.index,
       id:consumer.id,name:consumer.meta.label || consumer.id,state,error:error?.message || '',
+      quality,
       previousParams:MWNativeIndicatorResults.scope(consumer.chart,consumer.id)?.transition?.params || null}),
     occurrence:(error,consumer,attempt)=>{if(!['HISTORY_CANCELLED','DISPLAY_SNAPSHOT_EXPIRED'].includes(error.code))emitNotice(indicatorFault(consumer,error,attempt));},
     recovered:consumer=>emitNotice(indicatorFault(consumer),true),
@@ -992,6 +995,7 @@ function query(ticker, res, args, expires = Infinity, current = () => true) {
         ? {dataset_start:managedSessions.get(symbol+'|'+res).start} : {})} : {}),
     ...args,
     ...(spec ? { indicators: [spec] } : {}),
+    ...(spec && ['history','composite'].includes(series_kind) ? {indicator_input_policy:'observed_display_v1'} : {}),
   };
   const key = JSON.stringify(q);
   const old = cache.get(key);
