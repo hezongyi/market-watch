@@ -1469,6 +1469,11 @@ export default function AdvancedWorkspace() {
         if (
           !q ||
           !validIndicatorRead(q.indicators) ||
+          (q.indicator_input_policy !== undefined &&
+            !["strict_confirmed_v1", "observed_display_v1"].includes(q.indicator_input_policy)) ||
+          (q.indicator_input_policy === "observed_display_v1" &&
+            (!["history", "composite"].includes(q.series_kind) || q.input_revision !== undefined)) ||
+          (q.provisional !== undefined && typeof q.provisional !== "boolean") ||
           (q.client !== undefined && (typeof q.client !== "string" || q.client.length < 1 || q.client.length > 64)) ||
           (q.indicator_consumers !== undefined && (
             !Array.isArray(q.indicator_consumers) || q.indicator_consumers.length > 64 ||
@@ -1595,6 +1600,8 @@ export default function AdvancedWorkspace() {
                 instrument: q.instrument,
                 series_kind: q.series_kind || "managed",
                 published: q.series_kind !== "provider",
+                ...(q.indicator_input_policy !== undefined ? {indicator_input_policy:q.indicator_input_policy} : {}),
+                ...(q.provisional !== undefined ? {provisional:q.provisional} : {}),
                 ...(q.client !== undefined ? { client: q.client } : {}),
                 ...(q.indicator_consumers !== undefined ? { indicator_consumers: q.indicator_consumers } : {}),
                 ...(q.series_kind === "composite"
