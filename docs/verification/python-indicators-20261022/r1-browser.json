@@ -1,0 +1,691 @@
+{
+  "checks": [
+    {
+      "name": "SWING_SR_V1",
+      "version": "d644ab5f-e39b-43f2-99a0-fd003548dc14",
+      "id": "xJ4p5R",
+      "symbol": "MWH:D644AB5F-E39B-43F2-99A0-FD003548DC14",
+      "rows": 25,
+      "finite": 12,
+      "last": [
+        1790380800,
+        null,
+        null,
+        null,
+        null
+      ],
+      "cards": [
+        "Swing 5 5 high low · 覆盖未核实平均间隔：高点 6根 · 低点 6根范围 2026/9/1 21:00:00 — 2026/9/25 21:00:00；事件 高点 2（预览 0），低点 2（预览 0）；累计统计含覆盖未核实的观察价格"
+      ]
+    },
+    {
+      "name": "EMA",
+      "version": "d644ab5f-e39b-43f2-99a0-fd003548dc14",
+      "id": "w4rkMA",
+      "symbol": "MWH:D644AB5F-E39B-43F2-99A0-FD003548DC14",
+      "rows": 25,
+      "finite": 4,
+      "last": [
+        1790380800,
+        null
+      ],
+      "cards": [
+        "Swing 5 5 high low · 覆盖未核实平均间隔：高点 6根 · 低点 6根范围 2026/9/1 21:00:00 — 2026/9/25 21:00:00；事件 高点 2（预览 0），低点 2（预览 0）；累计统计含覆盖未核实的观察价格"
+      ]
+    },
+    {
+      "name": "RSI",
+      "version": "d644ab5f-e39b-43f2-99a0-fd003548dc14",
+      "id": "gyy1MI",
+      "symbol": "MWH:D644AB5F-E39B-43F2-99A0-FD003548DC14",
+      "rows": 25,
+      "finite": 9,
+      "last": [
+        1790380800,
+        null
+      ],
+      "cards": [
+        "Swing 5 5 high low · 覆盖未核实平均间隔：高点 6根 · 低点 6根范围 2026/9/1 21:00:00 — 2026/9/25 21:00:00；事件 高点 2（预览 0），低点 2（预览 0）；累计统计含覆盖未核实的观察价格"
+      ]
+    },
+    {
+      "name": "SWING_SR_V1",
+      "version": "db8542be-59ed-47b5-8916-a6b92443c433",
+      "id": "wMMLgh",
+      "symbol": "MWH:DB8542BE-59ED-47B5-8916-A6B92443C433",
+      "rows": 25,
+      "finite": 12,
+      "last": [
+        1790380800,
+        null,
+        null,
+        null,
+        null
+      ],
+      "cards": [
+        "Swing 5 5 high low · 覆盖未核实平均间隔：高点 6根 · 低点 6根范围 2026/9/1 21:00:00 — 2026/9/25 21:00:00；事件 高点 2（预览 0），低点 2（预览 0）；累计统计含覆盖未核实的观察价格"
+      ]
+    },
+    {
+      "name": "EMA",
+      "version": "db8542be-59ed-47b5-8916-a6b92443c433",
+      "id": "6Pcp0N",
+      "symbol": "MWH:DB8542BE-59ED-47B5-8916-A6B92443C433",
+      "rows": 25,
+      "finite": 4,
+      "last": [
+        1790380800,
+        null
+      ],
+      "cards": [
+        "Swing 5 5 high low · 覆盖未核实平均间隔：高点 6根 · 低点 6根范围 2026/9/1 21:00:00 — 2026/9/25 21:00:00；事件 高点 2（预览 0），低点 2（预览 0）；累计统计含覆盖未核实的观察价格"
+      ]
+    },
+    {
+      "name": "RSI",
+      "version": "db8542be-59ed-47b5-8916-a6b92443c433",
+      "id": "e3Iu55",
+      "symbol": "MWH:DB8542BE-59ED-47B5-8916-A6B92443C433",
+      "rows": 25,
+      "finite": 9,
+      "last": [
+        1790380800,
+        null
+      ],
+      "cards": [
+        "Swing 5 5 high low · 覆盖未核实平均间隔：高点 6根 · 低点 6根范围 2026/9/1 21:00:00 — 2026/9/25 21:00:00；事件 高点 2（预览 0），低点 2（预览 0）；累计统计含覆盖未核实的观察价格"
+      ]
+    }
+  ],
+  "errors": [],
+  "responses": [
+    {
+      "q": {
+        "instrument": "d644ab5f-e39b-43f2-99a0-fd003548dc14",
+        "series_kind": "history",
+        "published": true,
+        "indicator_input_policy": "observed_display_v1",
+        "provisional": true,
+        "client": "6aa83794-7ec5-42d7-b988-745a62e977dc",
+        "indicator_consumers": [
+          {
+            "id": "1|xJ4p5R",
+            "generation": 1,
+            "spec": {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 5,
+                "low_strength": 5
+              }
+            }
+          }
+        ],
+        "dependency_before": 1788296400000,
+        "timeframe": "D1",
+        "limit": 26,
+        "indicators": [
+          {
+            "name": "SWING_SR_V1",
+            "params": {
+              "high_strength": 5,
+              "low_strength": 5
+            }
+          }
+        ],
+        "before": 1790380800001,
+        "track_history": false
+      },
+      "status": 200,
+      "progress": [
+        {
+          "id": "SWING_SR_V1",
+          "run_id": "ae8a278d309d0335303a76d40a48dc65c5483a05ceffc5a04186fa884b19b69a",
+          "status": "pending",
+          "cursor": 1788296400000,
+          "target_end": 1790373600000,
+          "input_revision": 0,
+          "algorithm": "observed-v1:fixed-indicator-state-v3",
+          "error": null,
+          "next_at": 0,
+          "parent_run_id": null,
+          "reused_prefix_end": 1788296400000,
+          "calculation_origin": 1788300000000,
+          "producer": "backend",
+          "visible_complete": true,
+          "coverage": [
+            {
+              "start": 1788296400000,
+              "end": 1790456400000
+            }
+          ],
+          "required_coverage": [
+            {
+              "start": 1788296400000,
+              "end": 1790456400000
+            }
+          ],
+          "input_evidence": {
+            "revision_id": null,
+            "input_revision": 0,
+            "history_version_id": "d644ab5f-e39b-43f2-99a0-fd003548dc14",
+            "display_snapshot_id": null,
+            "input_policy": "observed_display_v1"
+          },
+          "display_task_ids": [],
+          "execution": {
+            "path": "bounded-fixed-replay",
+            "input_cache": "miss",
+            "result_cache": "miss",
+            "input_rows": 25,
+            "calculation_steps": 25,
+            "input_accepted_at_ms": 1792670282498,
+            "calculation_ms": 2.64
+          },
+          "input_policy": "observed_display_v1",
+          "value_status": "ready",
+          "reason_code": null,
+          "input_quality": {
+            "coverage": "unverified",
+            "provisional": false,
+            "dependency_origin": 1788296400000,
+            "sample_size": 0,
+            "required_samples": 11,
+            "reason_code": "PARTIAL_PERIOD"
+          },
+          "accuracy": "observed_sequence_exact",
+          "canonical_verified": false,
+          "display_status": "complete"
+        }
+      ]
+    },
+    {
+      "q": {
+        "instrument": "d644ab5f-e39b-43f2-99a0-fd003548dc14",
+        "series_kind": "history",
+        "published": true,
+        "indicator_input_policy": "observed_display_v1",
+        "provisional": true,
+        "client": "6aa83794-7ec5-42d7-b988-745a62e977dc",
+        "indicator_consumers": [
+          {
+            "id": "1|w4rkMA",
+            "generation": 2,
+            "spec": {
+              "name": "EMA",
+              "params": {
+                "period": 20
+              }
+            }
+          }
+        ],
+        "dependency_before": 1788296400000,
+        "timeframe": "D1",
+        "limit": 26,
+        "indicators": [
+          {
+            "name": "EMA",
+            "params": {
+              "period": 20
+            }
+          }
+        ],
+        "before": 1790380800001,
+        "track_history": false
+      },
+      "status": 200,
+      "progress": [
+        {
+          "id": "EMA",
+          "run_id": "ea23a82120195689c11126bc5b7bf8485e15ab01f8c38f1d31b76388e7dab901",
+          "status": "pending",
+          "cursor": 1788296400000,
+          "target_end": 1790373600000,
+          "input_revision": 0,
+          "algorithm": "observed-v1:fixed-indicator-state-v3",
+          "error": null,
+          "next_at": 0,
+          "parent_run_id": null,
+          "reused_prefix_end": 1788296400000,
+          "calculation_origin": 1788300000000,
+          "producer": "backend",
+          "visible_complete": true,
+          "coverage": [
+            {
+              "start": 1788296400000,
+              "end": 1790456400000
+            }
+          ],
+          "required_coverage": [
+            {
+              "start": 1788296400000,
+              "end": 1790456400000
+            }
+          ],
+          "input_evidence": {
+            "revision_id": null,
+            "input_revision": 0,
+            "history_version_id": "d644ab5f-e39b-43f2-99a0-fd003548dc14",
+            "display_snapshot_id": null,
+            "input_policy": "observed_display_v1"
+          },
+          "display_task_ids": [],
+          "execution": {
+            "path": "bounded-fixed-replay",
+            "input_cache": "hit",
+            "result_cache": "miss",
+            "input_rows": 25,
+            "calculation_steps": 25,
+            "input_accepted_at_ms": 1792670283376,
+            "calculation_ms": 0.64
+          },
+          "input_policy": "observed_display_v1",
+          "value_status": "ready",
+          "reason_code": null,
+          "input_quality": {
+            "coverage": "unverified",
+            "provisional": false,
+            "dependency_origin": null,
+            "sample_size": 0,
+            "required_samples": 20,
+            "reason_code": "PARTIAL_PERIOD"
+          },
+          "accuracy": "observed_sequence_exact",
+          "canonical_verified": false,
+          "display_status": "complete"
+        }
+      ]
+    },
+    {
+      "q": {
+        "instrument": "d644ab5f-e39b-43f2-99a0-fd003548dc14",
+        "series_kind": "history",
+        "published": true,
+        "indicator_input_policy": "observed_display_v1",
+        "provisional": true,
+        "client": "6aa83794-7ec5-42d7-b988-745a62e977dc",
+        "indicator_consumers": [
+          {
+            "id": "1|gyy1MI",
+            "generation": 3,
+            "spec": {
+              "name": "RSI",
+              "params": {
+                "period": 14
+              }
+            }
+          }
+        ],
+        "dependency_before": 1788296400000,
+        "timeframe": "D1",
+        "limit": 26,
+        "indicators": [
+          {
+            "name": "RSI",
+            "params": {
+              "period": 14
+            }
+          }
+        ],
+        "before": 1790380800001,
+        "track_history": false
+      },
+      "status": 200,
+      "progress": [
+        {
+          "id": "RSI",
+          "run_id": "e17efb22e667b99dd503e3d88c0bd0ab04906392825c095326592f6f910fc509",
+          "status": "pending",
+          "cursor": 1788296400000,
+          "target_end": 1790373600000,
+          "input_revision": 0,
+          "algorithm": "observed-v1:fixed-indicator-state-v3",
+          "error": null,
+          "next_at": 0,
+          "parent_run_id": null,
+          "reused_prefix_end": 1788296400000,
+          "calculation_origin": 1788300000000,
+          "producer": "backend",
+          "visible_complete": true,
+          "coverage": [
+            {
+              "start": 1788296400000,
+              "end": 1790456400000
+            }
+          ],
+          "required_coverage": [
+            {
+              "start": 1788296400000,
+              "end": 1790456400000
+            }
+          ],
+          "input_evidence": {
+            "revision_id": null,
+            "input_revision": 0,
+            "history_version_id": "d644ab5f-e39b-43f2-99a0-fd003548dc14",
+            "display_snapshot_id": null,
+            "input_policy": "observed_display_v1"
+          },
+          "display_task_ids": [],
+          "execution": {
+            "path": "bounded-fixed-replay",
+            "input_cache": "hit",
+            "result_cache": "miss",
+            "input_rows": 25,
+            "calculation_steps": 25,
+            "input_accepted_at_ms": 1792670284183,
+            "calculation_ms": 3.73
+          },
+          "input_policy": "observed_display_v1",
+          "value_status": "ready",
+          "reason_code": null,
+          "input_quality": {
+            "coverage": "unverified",
+            "provisional": false,
+            "dependency_origin": null,
+            "sample_size": 0,
+            "required_samples": 15,
+            "reason_code": "PARTIAL_PERIOD"
+          },
+          "accuracy": "observed_sequence_exact",
+          "canonical_verified": false,
+          "display_status": "complete"
+        }
+      ]
+    },
+    {
+      "q": {
+        "instrument": "db8542be-59ed-47b5-8916-a6b92443c433",
+        "series_kind": "history",
+        "published": true,
+        "indicator_input_policy": "observed_display_v1",
+        "provisional": true,
+        "client": "6aa83794-7ec5-42d7-b988-745a62e977dc",
+        "indicator_consumers": [
+          {
+            "id": "1|wMMLgh",
+            "generation": 6,
+            "spec": {
+              "name": "SWING_SR_V1",
+              "params": {
+                "high_strength": 5,
+                "low_strength": 5
+              }
+            }
+          }
+        ],
+        "dependency_before": 1788296400000,
+        "timeframe": "D1",
+        "limit": 26,
+        "indicators": [
+          {
+            "name": "SWING_SR_V1",
+            "params": {
+              "high_strength": 5,
+              "low_strength": 5
+            }
+          }
+        ],
+        "before": 1790380800001,
+        "track_history": false
+      },
+      "status": 200,
+      "progress": [
+        {
+          "id": "SWING_SR_V1",
+          "run_id": "e7ec1ba50b92c593908927afb5195d4470acfdf4e76da3179ecf8c7a20c204a9",
+          "status": "pending",
+          "cursor": 1788296400000,
+          "target_end": 1790373600000,
+          "input_revision": 0,
+          "algorithm": "observed-v1:fixed-indicator-state-v3",
+          "error": null,
+          "next_at": 0,
+          "parent_run_id": null,
+          "reused_prefix_end": 1788296400000,
+          "calculation_origin": 1788300000000,
+          "producer": "backend",
+          "visible_complete": true,
+          "coverage": [
+            {
+              "start": 1788296400000,
+              "end": 1790456400000
+            }
+          ],
+          "required_coverage": [
+            {
+              "start": 1788296400000,
+              "end": 1790456400000
+            }
+          ],
+          "input_evidence": {
+            "revision_id": null,
+            "input_revision": 0,
+            "history_version_id": "db8542be-59ed-47b5-8916-a6b92443c433",
+            "display_snapshot_id": null,
+            "input_policy": "observed_display_v1"
+          },
+          "display_task_ids": [],
+          "execution": {
+            "path": "bounded-fixed-replay",
+            "input_cache": "miss",
+            "result_cache": "miss",
+            "input_rows": 25,
+            "calculation_steps": 25,
+            "input_accepted_at_ms": 1792670285658,
+            "calculation_ms": 6.38
+          },
+          "input_policy": "observed_display_v1",
+          "value_status": "ready",
+          "reason_code": null,
+          "input_quality": {
+            "coverage": "unverified",
+            "provisional": false,
+            "dependency_origin": 1788296400000,
+            "sample_size": 0,
+            "required_samples": 11,
+            "reason_code": "PARTIAL_PERIOD"
+          },
+          "accuracy": "observed_sequence_exact",
+          "canonical_verified": false,
+          "display_status": "complete"
+        }
+      ]
+    },
+    {
+      "q": {
+        "instrument": "db8542be-59ed-47b5-8916-a6b92443c433",
+        "series_kind": "history",
+        "published": true,
+        "indicator_input_policy": "observed_display_v1",
+        "provisional": true,
+        "client": "6aa83794-7ec5-42d7-b988-745a62e977dc",
+        "indicator_consumers": [
+          {
+            "id": "1|6Pcp0N",
+            "generation": 7,
+            "spec": {
+              "name": "EMA",
+              "params": {
+                "period": 20
+              }
+            }
+          }
+        ],
+        "dependency_before": 1788296400000,
+        "timeframe": "D1",
+        "limit": 26,
+        "indicators": [
+          {
+            "name": "EMA",
+            "params": {
+              "period": 20
+            }
+          }
+        ],
+        "before": 1790380800001,
+        "track_history": false
+      },
+      "status": 200,
+      "progress": [
+        {
+          "id": "EMA",
+          "run_id": "a51a741c639612ee87b07904b66717bb79640ceaf511ac5108f139a4f857a959",
+          "status": "pending",
+          "cursor": 1788296400000,
+          "target_end": 1790373600000,
+          "input_revision": 0,
+          "algorithm": "observed-v1:fixed-indicator-state-v3",
+          "error": null,
+          "next_at": 0,
+          "parent_run_id": null,
+          "reused_prefix_end": 1788296400000,
+          "calculation_origin": 1788300000000,
+          "producer": "backend",
+          "visible_complete": true,
+          "coverage": [
+            {
+              "start": 1788296400000,
+              "end": 1790456400000
+            }
+          ],
+          "required_coverage": [
+            {
+              "start": 1788296400000,
+              "end": 1790456400000
+            }
+          ],
+          "input_evidence": {
+            "revision_id": null,
+            "input_revision": 0,
+            "history_version_id": "db8542be-59ed-47b5-8916-a6b92443c433",
+            "display_snapshot_id": null,
+            "input_policy": "observed_display_v1"
+          },
+          "display_task_ids": [],
+          "execution": {
+            "path": "bounded-fixed-replay",
+            "input_cache": "hit",
+            "result_cache": "miss",
+            "input_rows": 25,
+            "calculation_steps": 25,
+            "input_accepted_at_ms": 1792670286279,
+            "calculation_ms": 0.66
+          },
+          "input_policy": "observed_display_v1",
+          "value_status": "ready",
+          "reason_code": null,
+          "input_quality": {
+            "coverage": "unverified",
+            "provisional": false,
+            "dependency_origin": null,
+            "sample_size": 0,
+            "required_samples": 20,
+            "reason_code": "PARTIAL_PERIOD"
+          },
+          "accuracy": "observed_sequence_exact",
+          "canonical_verified": false,
+          "display_status": "complete"
+        }
+      ]
+    },
+    {
+      "q": {
+        "instrument": "db8542be-59ed-47b5-8916-a6b92443c433",
+        "series_kind": "history",
+        "published": true,
+        "indicator_input_policy": "observed_display_v1",
+        "provisional": true,
+        "client": "6aa83794-7ec5-42d7-b988-745a62e977dc",
+        "indicator_consumers": [
+          {
+            "id": "1|e3Iu55",
+            "generation": 8,
+            "spec": {
+              "name": "RSI",
+              "params": {
+                "period": 14
+              }
+            }
+          }
+        ],
+        "dependency_before": 1788296400000,
+        "timeframe": "D1",
+        "limit": 26,
+        "indicators": [
+          {
+            "name": "RSI",
+            "params": {
+              "period": 14
+            }
+          }
+        ],
+        "before": 1790380800001,
+        "track_history": false
+      },
+      "status": 200,
+      "progress": [
+        {
+          "id": "RSI",
+          "run_id": "0e6041702df3c56f57da6728473b8020154df89f6565e2089eae1eb9d24e78ea",
+          "status": "pending",
+          "cursor": 1788296400000,
+          "target_end": 1790373600000,
+          "input_revision": 0,
+          "algorithm": "observed-v1:fixed-indicator-state-v3",
+          "error": null,
+          "next_at": 0,
+          "parent_run_id": null,
+          "reused_prefix_end": 1788296400000,
+          "calculation_origin": 1788300000000,
+          "producer": "backend",
+          "visible_complete": true,
+          "coverage": [
+            {
+              "start": 1788296400000,
+              "end": 1790456400000
+            }
+          ],
+          "required_coverage": [
+            {
+              "start": 1788296400000,
+              "end": 1790456400000
+            }
+          ],
+          "input_evidence": {
+            "revision_id": null,
+            "input_revision": 0,
+            "history_version_id": "db8542be-59ed-47b5-8916-a6b92443c433",
+            "display_snapshot_id": null,
+            "input_policy": "observed_display_v1"
+          },
+          "display_task_ids": [],
+          "execution": {
+            "path": "bounded-fixed-replay",
+            "input_cache": "hit",
+            "result_cache": "miss",
+            "input_rows": 25,
+            "calculation_steps": 25,
+            "input_accepted_at_ms": 1792670286738,
+            "calculation_ms": 0.62
+          },
+          "input_policy": "observed_display_v1",
+          "value_status": "ready",
+          "reason_code": null,
+          "input_quality": {
+            "coverage": "unverified",
+            "provisional": false,
+            "dependency_origin": null,
+            "sample_size": 0,
+            "required_samples": 15,
+            "reason_code": "PARTIAL_PERIOD"
+          },
+          "accuracy": "observed_sequence_exact",
+          "canonical_verified": false,
+          "display_status": "complete"
+        }
+      ]
+    }
+  ],
+  "status": "图格 1 · Swing 高低点支撑阻力：已计算 · 覆盖未核实\n\n图格 1 · EMA 指数均线：已计算 · 覆盖未核实\n\n图格 1 · 相对强弱指数：已计算 · 覆盖未核实",
+  "passed": true
+}
