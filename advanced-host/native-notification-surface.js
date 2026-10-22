@@ -58,7 +58,7 @@ async function nativeNotificationSurface(widget, report) {
     const entryCleanups = new Set();
     function alignEntry(node) {
       const win = doc.defaultView;
-      let frame = 0, watchlist = null;
+      let frame = 0, watchlist = null, offset = 0;
       const resize = new win.ResizeObserver(schedule);
       const mutations = new win.MutationObserver(schedule);
       function schedule() {
@@ -79,9 +79,11 @@ async function nativeNotificationSurface(widget, report) {
           icon.right > 0 && icon.left < win.innerWidth;
         // Reserve real toolbar space on both sides of the 38px native button.
         // The right edge stays anchored; no translated hit area overlaps peers.
+        const rect = node.getBoundingClientRect();
         const delta = visible
-          ? icon.left + icon.width / 2 - (node.getBoundingClientRect().left + node.getBoundingClientRect().width / 2)
+          ? offset + icon.left + icon.width / 2 - (rect.left + rect.width / 2)
           : 0;
+        offset = delta;
         node.style.transform = visible ? `translateX(${delta}px)` : "";
       }
       node.style.justifyContent = "center";
