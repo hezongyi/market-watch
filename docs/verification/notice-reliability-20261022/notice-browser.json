@@ -1,0 +1,179 @@
+{
+  "started": "2026-10-22T14:35:45.588Z",
+  "errors": [],
+  "checks": [
+    {
+      "name": "legacy-name-search",
+      "symbol": "EURUSD",
+      "count": 100,
+      "examples": [
+        {
+          "id": "t:f7dfdcca-d58e-54cf-8225-df175a0d0928",
+          "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+          "display": {
+            "series_kind": "composite",
+            "symbol": "EURUSD",
+            "label": "EURUSD",
+            "provenance": "resolved_current"
+          }
+        },
+        {
+          "id": "t:acaaac05-f152-563e-997d-ee808a818ef6",
+          "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+          "display": {
+            "series_kind": "composite",
+            "symbol": "EURUSD",
+            "label": "EURUSD",
+            "provenance": "resolved_current"
+          }
+        },
+        {
+          "id": "t:1d99ac60-f7d3-501e-a1eb-eeaf0a72385e",
+          "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+          "display": {
+            "series_kind": "composite",
+            "symbol": "EURUSD",
+            "label": "EURUSD",
+            "provenance": "resolved_current"
+          }
+        }
+      ]
+    },
+    {
+      "name": "legacy-name-search",
+      "symbol": "XAUUSD",
+      "count": 100,
+      "examples": [
+        {
+          "id": "b:8392b19f-fa11-063a-82db-048657b2d724",
+          "instrument": "MWC:4087CAEE7E525A3864EE1B083B8FE65F6DDD13A738D72681EC92CD46D5615EA6",
+          "display": {
+            "series_kind": "composite",
+            "symbol": "XAUUSD",
+            "label": "XAUUSD",
+            "provenance": "event_snapshot"
+          }
+        },
+        {
+          "id": "b:8dbd3a65-e5ae-4030-e6ad-a943fc53f0f1",
+          "instrument": "MWC:4087CAEE7E525A3864EE1B083B8FE65F6DDD13A738D72681EC92CD46D5615EA6",
+          "display": {
+            "series_kind": "composite",
+            "symbol": "XAUUSD",
+            "label": "XAUUSD",
+            "provenance": "event_snapshot"
+          }
+        },
+        {
+          "id": "b:68075485-4a25-0822-2c20-58494f3310e0",
+          "instrument": "MWC:4087CAEE7E525A3864EE1B083B8FE65F6DDD13A738D72681EC92CD46D5615EA6",
+          "display": {
+            "series_kind": "composite",
+            "symbol": "XAUUSD",
+            "label": "XAUUSD",
+            "provenance": "event_snapshot"
+          }
+        }
+      ]
+    },
+    {
+      "name": "legacy-name-search",
+      "symbol": "USDCAD",
+      "count": 44,
+      "examples": [
+        {
+          "id": "t:baffb33f-f0cd-5ea4-85c0-b0981582ba0a",
+          "instrument": "54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982",
+          "display": {
+            "series_kind": "composite",
+            "symbol": "USDCAD",
+            "label": "USDCAD",
+            "provenance": "resolved_current"
+          }
+        },
+        {
+          "id": "t:35c6fd33-43ad-5b2b-854f-1311bf0cd30a",
+          "instrument": "54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982",
+          "display": {
+            "series_kind": "composite",
+            "symbol": "USDCAD",
+            "label": "USDCAD",
+            "provenance": "resolved_current"
+          }
+        },
+        {
+          "id": "t:11a0ee80-cc19-5d7d-b280-ddfb79bb96ae",
+          "instrument": "54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982",
+          "display": {
+            "series_kind": "composite",
+            "symbol": "USDCAD",
+            "label": "USDCAD",
+            "provenance": "resolved_current"
+          }
+        }
+      ]
+    },
+    {
+      "name": "normalized-name-search",
+      "count": 100
+    },
+    {
+      "name": "local-draft-native-ui",
+      "conflictRefreshed": true,
+      "selectedValuePreserved": true,
+      "staleWidgetBlocked": true
+    },
+    {
+      "name": "remote-draft-native-ui",
+      "staleWidgetBlocked": true
+    }
+  ],
+  "blockedWrites": [
+    {
+      "path": "/api/advanced-charts/preferences/migrate",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/migrate",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/migrate",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    }
+  ],
+  "blockedNoticeWrites": [],
+  "workspaceCheck": {
+    "beforeRevision": 73,
+    "afterRevision": 73,
+    "changed": []
+  },
+  "externalWorkspaceChange": false,
+  "browserWorkspaceWrites": [],
+  "preferencesUnchanged": true,
+  "passed": true
+}

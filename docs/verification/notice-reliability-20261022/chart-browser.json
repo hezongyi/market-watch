@@ -1,0 +1,209 @@
+{
+  "started": "2026-10-22T14:37:58.907Z",
+  "checks": [
+    {
+      "ticker": "MWH:63bc01d4-3943-45cc-93a5-b04c3caaab16",
+      "res": "1D",
+      "ms": 11001,
+      "symbol": "MWH:63BC01D4-3943-45CC-93A5-B04C3CAAAB16",
+      "resolution": "1D",
+      "range": {
+        "from": 1786492800,
+        "to": 1793656800
+      },
+      "cards": [
+        "图表 2 · Swing 5 5 high low · 覆盖未核实平均间隔：高点 18根 · 低点 18根范围 2026/1/1 22:00:00 — 2026/10/20 12:35:00；事件 高点 3333（预览 0），低点 3287（预览 0）；累计统计含覆盖未核实的观察价格",
+        "图表 1 · Swing 5 5 high low · 覆盖未核实平均间隔：高点 16根 · 低点 14根范围 2026/1/1 22:00:00 — 2026/10/19 21:00:00；事件 高点 11（预览 0），低点 13（预览 0）；累计统计含覆盖未核实的观察价格"
+      ],
+      "studies": [
+        {
+          "id": "Khr5lW",
+          "name": "SWING_SR_V1",
+          "rows": 208,
+          "finite": 191,
+          "last": [
+            1792454400,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "id": "LpSEqv",
+          "name": "EMA",
+          "rows": 208,
+          "finite": 188,
+          "last": [
+            1792454400,
+            null
+          ]
+        },
+        {
+          "id": "9iQfZO",
+          "name": "RSI",
+          "rows": 208,
+          "finite": 193,
+          "last": [
+            1792454400,
+            null
+          ]
+        }
+      ],
+      "statusWindowAbsent": true
+    },
+    {
+      "ticker": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+      "res": "1D",
+      "ms": 18152,
+      "symbol": "MWC:8C490DF00408ED7102D9106E2AD6D3991D3E6488DE0B0905D92A2EC052343CBB",
+      "resolution": "1D",
+      "range": {
+        "from": 1786665600,
+        "to": 1793829600
+      },
+      "cards": [
+        "图表 1 · Swing 5 5 high low · 覆盖未核实 · 实时预览平均间隔：高点 16根 · 低点 15根范围 2026/1/1 22:00:00 — 2026/10/21 21:00:00；事件 高点 11（预览 0），低点 14（预览 0）；累计统计含覆盖未核实的观察价格",
+        "图表 2 · Swing 5 5 high low · 覆盖未核实 · 实时预览平均间隔：高点 18根 · 低点 18根范围 2026/1/1 22:00:00 — 2026/10/22 14:35:00；事件 高点 3366（预览 0），低点 3320（预览 0）；累计统计含覆盖未核实的观察价格"
+      ],
+      "studies": [
+        {
+          "id": "RW7V6P",
+          "name": "SWING_SR_V1",
+          "rows": 104,
+          "finite": 103,
+          "last": [
+            1792627200,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "id": "U0uq7P",
+          "name": "EMA",
+          "rows": 104,
+          "finite": 104,
+          "last": [
+            1792627200,
+            1.1262015117552304
+          ]
+        },
+        {
+          "id": "LWec3d",
+          "name": "RSI",
+          "rows": 104,
+          "finite": 104,
+          "last": [
+            1792627200,
+            36.6713680747052
+          ]
+        }
+      ],
+      "statusWindowAbsent": true
+    }
+  ],
+  "layouts": [
+    {
+      "theme": "Light",
+      "width": 1440,
+      "statusWindowAbsent": true
+    },
+    {
+      "theme": "Light",
+      "width": 390,
+      "statusWindowAbsent": true
+    },
+    {
+      "theme": "Light",
+      "width": 375,
+      "statusWindowAbsent": true
+    },
+    {
+      "theme": "Dark",
+      "width": 1440,
+      "statusWindowAbsent": true
+    },
+    {
+      "theme": "Dark",
+      "width": 390,
+      "statusWindowAbsent": true
+    },
+    {
+      "theme": "Dark",
+      "width": 375,
+      "statusWindowAbsent": true
+    }
+  ],
+  "historyDetailsText": "历史加载详情\n关闭\n\n当前没有进行中的加载任务。",
+  "reloadPassed": true,
+  "workspaceUnchanged": false,
+  "workspaceCheck": {
+    "beforeRevision": 74,
+    "afterRevision": 75,
+    "changed": [
+      "document",
+      "revision",
+      "updated_at"
+    ]
+  },
+  "blockedWrites": [
+    {
+      "path": "/api/advanced-charts/preferences/migrate",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/migrate",
+      "method": "POST"
+    }
+  ],
+  "blockedNoticeWrites": [],
+  "errors": [],
+  "passed": true,
+  "httpErrors": []
+}
