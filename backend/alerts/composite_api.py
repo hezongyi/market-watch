@@ -13,6 +13,7 @@ from .composite_center import (
 )
 from .composite_chart import chart_page
 from .composite_definitions import ProductMatch, first_use, save_mapping
+from .composite_matching import CatalogSnapshot, MappingDraft, check_match
 from .storage import Instrument, transaction
 from .composite_recheck import RecheckRequest
 
@@ -20,7 +21,15 @@ from .composite_recheck import RecheckRequest
 class MappingRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     catalog_id: str = Field(min_length=1, max_length=64)
-    match: ProductMatch
+    match: ProductMatch | MappingDraft
+    snapshot: CatalogSnapshot | None = None
+    reuse_mapping_id: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
+
+
+class MappingCheckRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    catalog_id: str = Field(min_length=1, max_length=64)
+    match: MappingDraft | None = None
 
 
 class UseRequest(BaseModel):
@@ -135,8 +144,13 @@ def router(authenticated):
     @routes.post("/datasets/{dataset_id}/mappings", status_code=201)
     def save(dataset_id: str, body: MappingRequest):
         def command(db):
-            return mapping_report(db, save_mapping(db, dataset_id, body.catalog_id, body.match))
+            return mapping_report(db, save_mapping(db, dataset_id, body.catalog_id, body.match,
+                snapshot=body.snapshot, reuse_mapping_id=body.reuse_mapping_id))
         return invoke(command)
+
+    @routes.post("/datasets/{dataset_id}/mapping-check")
+    def mapping_check(dataset_id: str, body: MappingCheckRequest):
+        return invoke(check_match, dataset_id, body.catalog_id, body.match)
 
     @routes.post("/composites/use", status_code=201)
     def open_composite(body: UseRequest):

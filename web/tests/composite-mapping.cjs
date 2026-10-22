@@ -19,18 +19,19 @@ const dataset = (symbol, asset_class) => ({
   identity: { provider_symbol: symbol },
   asset_class,
 });
-for (const [symbol, asset, base, currency, product] of [
-  ["EURUSD", "forex", "EUR", "USD", "spot_fx"],
-  ["USD_CAD", "forex", "USD", "CAD", "spot_fx"],
-  ["XAU/USD", "metal", "XAU", "USD", "spot_metal"],
+for (const [symbol, asset, base, currency] of [
+  ["EURUSD", "forex", "EUR", "USD"],
+  ["USD_CAD", "forex", "USD", "CAD"],
+  ["XAU/USD", "metal", "XAU", "USD"],
 ]) {
   const draft = initialMatch(dataset(symbol, asset));
   assert.equal(draft.underlying, base);
   assert.equal(draft.quote_currency, currency);
-  assert.equal(draft.historical_product, product);
+  assert.equal(draft.historical_product, ""); // product rules come from the server
+  assert.equal(draft.schema_version, 2);
   assert.equal(draft.reviewed, false);
   assert.equal(draft.relationship, "");
-  assert.equal(draft.live_evidence, "");
+  assert.equal(draft.live_evidence, null);
 }
 assert.equal(pair("USD__CAD", "forex"), null);
 assert.equal(pair("NAS100_USD", "index"), null);
@@ -38,6 +39,7 @@ assert.equal(pair("ABCDEF", "cfd"), null);
 assert.equal(initialMatch(dataset("NAS100_USD", "index")).quote_currency, "");
 const match = {
   ...initialMatch(dataset("USDCAD", "forex")),
+  historical_product: "spot_fx",
   live_product: "spot_fx",
   relationship: "same_product",
   historical_evidence: "https://history.example",
@@ -54,20 +56,21 @@ assert.equal(
   matchKey(match),
   matchKey({ ...match, target_catalog: { symbol: "USD_CAD" }, basis: "bid" }),
 );
-assert.equal(Object.keys(matchFields({ ...match, basis: "bid" })).length, 9);
+assert.equal(Object.keys(matchFields({ ...match, basis: "bid" })).length, 10);
 for (const [changes, field] of [
   [{ relationship: "" }, "relationship"],
-  [{ live_product: "cfd" }, "relationship"],
+  [{ live_product: "unverified" }, "live_product"],
   [
     { historical_evidence: "https://user:secret@example.test" },
     "historical_evidence",
   ],
   [{ live_evidence: "file:///tmp/evidence" }, "live_evidence"],
-  [{ reviewed: false }, "reviewed"],
-  [{ rationale: "short" }, "rationale"],
+  [{ rationale: "x".repeat(1001) }, "rationale"],
   [{ quote_currency: "" }, "quote_currency"],
 ])
   assert.ok(validMatch({ ...match, ...changes })[field]);
+assert.equal(Object.keys(validMatch({ ...match, reviewed: false,
+  rationale: "", historical_evidence: null, live_evidence: null })).length, 0);
 assert.equal(
   Object.keys(
     validMatch({
@@ -79,5 +82,5 @@ assert.equal(
   0,
 );
 console.log(
-  "PASS mapping inference, explicit product review, evidence validity and canonical reconciliation",
+  "PASS v2 draft hints, optional notes/evidence, field validation and canonical reconciliation",
 );

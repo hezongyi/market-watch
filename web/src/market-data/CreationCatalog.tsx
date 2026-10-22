@@ -44,11 +44,19 @@ export function CreationCatalog({
   saveFilters,
   selected,
   select,
+  fixedSource,
+  autoRefresh = false,
+  onRefresh,
+  disabled = false,
 }: {
   initialFilters: CatalogFilters;
   saveFilters: (filters: CatalogFilters) => void;
   selected: CatalogItem | null;
   select: (item: CatalogItem) => void;
+  fixedSource?: "oanda";
+  autoRefresh?: boolean;
+  onRefresh?: () => void;
+  disabled?: boolean;
 }) {
   const ui = useContext(NativeUiContext);
   const [filters, setFilters] = useState(initialFilters);
@@ -72,6 +80,9 @@ export function CreationCatalog({
   latest.current = select;
   const savedFilters = useRef(saveFilters);
   savedFilters.current = saveFilters;
+  const refreshed = useRef(onRefresh);
+  refreshed.current = onRefresh;
+  const attemptedRefresh = useRef(false);
   useEffect(() => {
     alive.current = true;
     return () => {
@@ -80,7 +91,7 @@ export function CreationCatalog({
   }, []);
   const getPage = useCallback(
     async ({ text = "", type = "", exchange = "", start = 0, signal }: any) => {
-      const source = exchange.toLowerCase(),
+      const source = fixedSource || exchange.toLowerCase(),
         signature = JSON.stringify([source, text, type]);
       if (signature !== active.current || start === 0) {
         known.current.clear();
@@ -97,7 +108,7 @@ export function CreationCatalog({
       savedFilters.current({ source, query: text, asset: type });
       setMetadata(result.sources);
       return {
-        symbols: result.items.map((item) => {
+        symbols: result.items.filter(item => !fixedSource || item.source === fixedSource).map((item) => {
           known.current.set(item.catalog_id, item);
           return {
             ticker: item.catalog_id,
@@ -125,7 +136,7 @@ export function CreationCatalog({
         ),
       };
     },
-    [],
+    [fixedSource],
   );
   const choose = useCallback(async (ticker: string) => {
     const item = known.current.get(ticker);
@@ -138,7 +149,7 @@ export function CreationCatalog({
     setLoading(true);
     setError("");
     void api<CatalogPage>(
-      `/market-data/history-catalog/search?${new URLSearchParams({ source: filters.source, query: filters.query, symbol_type: filters.asset, offset: String(offset), limit: "50" })}`,
+        `/market-data/history-catalog/search?${new URLSearchParams({ source: fixedSource || filters.source, query: filters.query, symbol_type: filters.asset, offset: String(offset), limit: "50" })}`,
       undefined,
       controller.signal,
     )
@@ -147,8 +158,8 @@ export function CreationCatalog({
         setMetadata(result.sources);
         setFallback((old) => ({
           items: offset
-            ? [...(old?.items || []), ...result.items]
-            : result.items,
+            ? [...(old?.items || []), ...result.items.filter(item => !fixedSource || item.source === fixedSource)]
+            : result.items.filter(item => !fixedSource || item.source === fixedSource),
           total: result.total,
         }));
       })
@@ -167,6 +178,7 @@ export function CreationCatalog({
     offset,
     revision,
     retry,
+    fixedSource,
   ]);
   useEffect(() => {
     if (
@@ -194,14 +206,23 @@ export function CreationCatalog({
     setError("");
     try {
       await api("/market-data/history-catalog/refresh", {});
+      if (!alive.current) return;
       setOffset(0);
       refresh((v) => v + 1);
+      refreshed.current?.();
     } catch (e) {
-      setError(String(e));
+      if (alive.current) setError(String(e));
     } finally {
-      setBusy(false);
+      if (alive.current) setBusy(false);
     }
   }
+  useEffect(() => {
+    if (!autoRefresh || attemptedRefresh.current || busy) return;
+    if (metadata.some(s => s.source === "oanda" && s.connection_configured && s.requires_refresh)) {
+      attemptedRefresh.current = true;
+      void refreshDirectory();
+    }
+  }, [autoRefresh, metadata, busy]);
   function change(key: keyof typeof filters, value: string) {
     const next = { ...filters, [key]: value };
     setFilters(next);
@@ -220,7 +241,7 @@ export function CreationCatalog({
           {metadata.find((s) => s.source === "oanda")?.connection_configured ? (
             <>
               OANDA 账户目录尚未准备。
-              <button disabled={busy} onClick={() => void refreshDirectory()}>
+              <button disabled={busy || disabled} onClick={() => void refreshDirectory()}>
                 {busy ? "刷新中…" : "刷新账户品种目录"}
               </button>
             </>
@@ -236,15 +257,16 @@ export function CreationCatalog({
           kind="platformSearch"
           props={{
             mode: "select",
-            title: "选择自建品种",
-            settingsScope: "mw.data-center.creation",
-            allowedSources: ["dukascopy", "oanda"],
+            title: fixedSource ? "选择实时品种" : "选择自建品种",
+            settingsScope: fixedSource ? "mw.data-center.mapping" : "mw.data-center.creation",
+            allowedSources: fixedSource ? [fixedSource] : ["dukascopy", "oanda"],
+            fixedSource,
             query: filters.query,
-            source: filters.source,
+            source: fixedSource || filters.source,
             asset: filters.asset,
             symbolTypes: categories.map(([value, name]) => ({ value, name })),
             selectedTicker: selected?.catalog_id,
-            busy,
+            busy: busy || disabled,
             getPage,
             onOpen: choose,
           }}
@@ -266,7 +288,7 @@ export function CreationCatalog({
           />
           <div className="dc-market-table-head">
             <span>品种与名称</span>
-            <NativeSelect
+            {fixedSource ? <span>OANDA Practice · 当前账户</span> : <NativeSelect
               aria-label="来源"
               value={filters.source}
               onChange={(e) => change("source", e.target.value)}
@@ -274,7 +296,7 @@ export function CreationCatalog({
               <option value="">全部来源</option>
               <option value="dukascopy">Dukascopy</option>
               <option value="oanda">OANDA Practice</option>
-            </NativeSelect>
+            </NativeSelect>}
           </div>
           <div className="dc-market-list" ref={list}>
             {fallback?.items.map((item) => (
@@ -283,13 +305,14 @@ export function CreationCatalog({
                 key={item.catalog_id}
                 data-selected={selected?.catalog_id === item.catalog_id}
               >
-                <button onClick={() => select(item)}>
+                <button disabled={busy || disabled} onClick={() => select(item)}>
                   {item.display_symbol || item.provider_symbol}
                 </button>
                 <span>
                   {item.label} · {names[item.source]}
                 </span>
                 <button
+                  disabled={busy || disabled}
                   aria-pressed={selected?.catalog_id === item.catalog_id}
                   onClick={() => select(item)}
                 >
@@ -324,7 +347,7 @@ export function CreationCatalog({
           !s.requires_refresh,
       ) && (
         <div className="dc-create-catalog-tools">
-          <button disabled={busy} onClick={() => void refreshDirectory()}>
+          <button disabled={busy || disabled} onClick={() => void refreshDirectory()}>
             {busy ? "刷新中…" : "刷新账户品种目录"}
           </button>
         </div>

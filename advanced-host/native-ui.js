@@ -86,7 +86,8 @@ function chartNativeUi(widget, doc, searchSymbols) {
         const ctx = R.useContext(SearchContext), platform = R.useContext(PlatformContext);
         const container=R.useRef(null);
         const [sourceHeader,setSourceHeader]=R.useState(null);
-        const [source, setSource] = R.useState(platform.latest.current.source || "");
+        const [sourceState, setSource] = R.useState(platform.latest.current.source || "");
+        const source=platform.latest.current.fixedSource || sourceState;
         const selected = ctx.searchSources.find(item => item.value().toLowerCase() === source) || ctx.searchSources.find(item => item.value() === "");
         // The native controller normally persists its source to the main
         // symbol-search settings. Give this embedded search its own source.
@@ -116,7 +117,7 @@ function chartNativeUi(widget, doc, searchSymbols) {
         const items=ctx.searchSources.filter(item=>!platform.latest.current.allowedSources || !item.value() || platform.latest.current.allowedSources.includes(item.value().toLowerCase())).map(item=>({value:item.value().toLowerCase(),content:item.value() ? item.name() : "全部来源"}));
         return R.createElement(SearchContext.Provider,{value:scoped},R.createElement("div",{
           ref:container,className:"mw-platform-inline",onKeyDown:keyboard,"aria-label":"平台行情搜索",
-        },platform.latest.current.mode !== "select" && R.createElement("small",{className:"mw-platform-status"},"打开将关闭品种和周期同步，保留其他图格。"),props.render(),sourceHeader && createPortal(R.createElement("div",{className:"dc-select-control mw-platform-source"},
+        },platform.latest.current.mode !== "select" && R.createElement("small",{className:"mw-platform-status"},"打开将关闭品种和周期同步，保留其他图格。"),props.render(),sourceHeader && createPortal(platform.latest.current.fixedSource ? R.createElement("span",{className:"mw-platform-source"},"OANDA Practice · 当前账户") : R.createElement("div",{className:"dc-select-control mw-platform-source"},
           R.createElement("div",{className:"dc-native-slot","data-native-component":"select"},
             R.createElement(Select,{value:source,items,onChange:value=>{setSource(value);ctx.setSelectedIndex(-1);},
               "aria-label":"来源",size:"small",className:"dc-native-select"}))),sourceHeader)));
@@ -335,13 +336,12 @@ function chartNativeUi(widget, doc, searchSymbols) {
         },
         cancelPopups() {if(!popupCancels.size)return;widget.closePopupsAndDialogs();for(const cancel of [...popupCancels]) cancel();popupCancels.clear();},
         sidebarClasses: req(40806),
-        pick({initialSymbolType, ...options}) {
+        pick(options) {
           return new Promise((resolve, reject) => {
             let completed = false, picker;
             const cancel=()=>{popupCancels.delete(cancel);completed=true;resolve(null);};
             popupCancels.add(cancel);
             try {
-              if(typeof initialSymbolType === "string") req(371996).setValue(options.selectedSymbolSettingsKey || "mw.data-center.picker", initialSymbolType);
               picker = req(21021).showSymbolSearchItemsDialog({
                 dialogTitle: "选择品种", showSpreadActions: false,
                 disableRecents: true, shouldReturnFocus: true,

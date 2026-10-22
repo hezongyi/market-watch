@@ -286,6 +286,17 @@ class RealtimeMapping(Base):
     created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
 
 
+class RealtimeMappingNote(Base):
+    """Append-only explanatory revisions, independent of runtime identity."""
+    __tablename__ = "market_realtime_mapping_notes"
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    mapping_id: Mapped[str] = mapped_column(ForeignKey("market_realtime_mappings.id"), index=True)
+    version: Mapped[int] = mapped_column()
+    content: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    __table_args__ = (UniqueConstraint("mapping_id", "version"),)
+
+
 class MarketComposite(Base):
     __tablename__ = "market_composites"
     id: Mapped[str] = mapped_column(String(64), primary_key=True)
@@ -575,7 +586,7 @@ def immutable_dataset_identity(db, flush_context, instances):
             raise ValueError("Historical snapshots cannot be deleted by runtime writers")
         if isinstance(row, (MarketDataset, SourceSeries, DatasetSource)):
             raise ValueError("Explicit dataset/source bindings cannot be removed by runtime writers")
-        if isinstance(row, (RealtimeMapping, MarketComposite, CompositeRevision)):
+        if isinstance(row, (RealtimeMapping, RealtimeMappingNote, MarketComposite, CompositeRevision)):
             raise ValueError("Composite identities and revisions cannot be removed by runtime writers")
         if isinstance(row, Instrument) and db.scalar(
                 select(MarketDataset.id).where(MarketDataset.instrument_id == row.id)):
@@ -596,7 +607,7 @@ def immutable_dataset_identity(db, flush_context, instances):
                 state.attrs[key].history.has_changes() for key in (
                     ("source_id", "start") if isinstance(row, SourceMinute) else ("revision_id", "start"))):
             raise ValueError("Confirmed minute head identity is immutable")
-        if isinstance(row, RealtimeMapping) and any(attr.history.has_changes() for attr in state.attrs):
+        if isinstance(row, (RealtimeMapping, RealtimeMappingNote)) and any(attr.history.has_changes() for attr in state.attrs):
             raise ValueError("Realtime mappings are immutable; save a new mapping version")
         if isinstance(row, MarketComposite) and any(state.attrs[key].history.has_changes() for key in (
                 "id", "instrument_id", "dataset_id", "mapping_id", "permission_scope", "rules", "created_at")):

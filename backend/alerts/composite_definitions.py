@@ -32,6 +32,7 @@ from .storage import (
     MarketComposite,
     MarketDataset,
     RealtimeMapping,
+    RealtimeMappingNote,
     instant,
     ms,
     now_ms,
@@ -67,7 +68,13 @@ def key(document):
     return hashlib.sha256(json.dumps(document, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
 
-def save_mapping(db, dataset_id, catalog_id, match, *, permission_scope="workspace:default"):
+def save_mapping(db, dataset_id, catalog_id, match, *, permission_scope="workspace:default",
+                 snapshot=None, reuse_mapping_id=None):
+    from .composite_matching import MappingDraft, check_match
+
+    if isinstance(match, MappingDraft) or isinstance(match, dict) and match.get("schema_version") == 2:
+        return save_checked_mapping(db, dataset_id, catalog_id, match, permission_scope=permission_scope,
+            snapshot=snapshot, reuse_mapping_id=reuse_mapping_id)
     match = ProductMatch.model_validate(match)
     dataset = db.scalar(select(MarketDataset).where(MarketDataset.id == dataset_id).with_for_update())
     if not dataset:
@@ -97,6 +104,12 @@ def save_mapping(db, dataset_id, catalog_id, match, *, permission_scope="workspa
             raise ValueError("匹配依据的标的/报价币种与历史准确代码不一致")
         if entry.symbol != match.underlying + "_" + match.quote_currency:
             raise ValueError("匹配依据的标的/报价币种与实时准确代码不一致")
+    # Existing legacy rows keep their identities; every new legacy-format write
+    # must satisfy the same source/product rules as a v2 write.
+    checked = check_match(db, dataset_id, catalog_id,
+        MappingDraft.model_validate(match.model_dump(mode="json")))
+    if checked["status"] != "ready":
+        raise ValueError("；".join(checked["errors"].values()))
     logical = entry.symbol.replace("_", "")
     if not 0 < len(logical) <= 10:
         raise ValueError("目标品种尚未支持实时身份登记")
@@ -120,6 +133,73 @@ def save_mapping(db, dataset_id, catalog_id, match, *, permission_scope="workspa
         mapping = RealtimeMapping(id=ident, dataset_id=dataset_id, target_dataset_id=identity.key,
             permission_scope=permission_scope, match=proof)
         db.add(mapping)
+        db.flush()
+    return mapping
+
+
+def latest_note(db, mapping_id):
+    return db.scalar(select(RealtimeMappingNote).where(RealtimeMappingNote.mapping_id == mapping_id)
+        .order_by(RealtimeMappingNote.version.desc()).limit(1))
+
+
+def save_checked_mapping(db, dataset_id, catalog_id, draft, *, permission_scope, snapshot, reuse_mapping_id):
+    from .composite_matching import CatalogSnapshot, MappingDraft, PRODUCT_FIELDS, check_match, selection
+
+    # Also serializes note versions and reuse with legacy/new save commands.
+    db.scalar(select(MarketDataset).where(MarketDataset.id == dataset_id).with_for_update())
+    draft = MappingDraft.model_validate(draft)
+    result = check_match(db, dataset_id, catalog_id, draft)
+    if snapshot is None or CatalogSnapshot.model_validate(snapshot).model_dump() != result["snapshot"]:
+        raise ValueError("账户、品种或目录关键属性已变化，请重新核对配置")
+    if result["status"] != "ready":
+        raise ValueError("；".join(result["errors"].values()))
+    dataset, _, entry, _ = selection(db, dataset_id, catalog_id)
+    identity = DatasetIdentity(source="oanda", channel="v20", environment="practice",
+        account_scope=account_scope(), provider_symbol=entry.symbol, basis="bid",
+        calendar_version=settings.oanda_calendar_version)
+    operational = {field: getattr(draft, field) for field in PRODUCT_FIELDS}
+    compatible = [row for row in db.scalars(select(RealtimeMapping).where(
+        RealtimeMapping.dataset_id == dataset_id, RealtimeMapping.target_dataset_id == identity.key,
+        RealtimeMapping.permission_scope == permission_scope))
+        if all(row.match.get(field) == value for field, value in operational.items()) and
+        row.match.get("target_catalog", {}).get("type") == entry.asset_type and
+        row.match.get("target_catalog", {}).get("precision") == entry.precision]
+    if reuse_mapping_id:
+        mapping = next((row for row in compatible if row.id == reuse_mapping_id), None)
+        if not mapping:
+            raise ValueError("所选已保存配置已不适用，请重新选择并核对")
+    elif len(compatible) > 1:
+        raise ValueError("存在多条不同的有效配置，请明确选择要使用的配置")
+    else:
+        mapping = compatible[0] if compatible else None
+    if mapping is None:
+        logical = entry.symbol.replace("_", "")
+        register_dataset(db, identity, logical_symbol=logical, label=entry.label,
+            calendar="ny17", precision=entry.precision, volume_kind="price_count", volume_unit="quotes",
+            calendar_profile=settings.oanda_calendar_profiles.get(entry.symbol))
+        if not db.get(LiveState, identity.key):
+            db.add(LiveState(dataset_id=identity.key))
+        # Exclude note, review clicks, URLs and catalog read timestamps. Identity
+        # covers behaviour and source attributes, not explanatory revisions.
+        document = {"schema_version": 2, "dataset_id": dataset_id, "permission_scope": permission_scope,
+            "target_identity": identity.model_dump(), "product": operational,
+            "target_attributes": {"type": entry.asset_type, "precision": entry.precision}}
+        mapping = RealtimeMapping(id=key(document), dataset_id=dataset_id, target_dataset_id=identity.key,
+            permission_scope=permission_scope, match={"schema_version": 2, **operational,
+                "basis": "bid", "historical_identity": dataset.identity, "target_identity": identity.model_dump(),
+                "target_catalog": {"symbol": entry.symbol, "type": entry.asset_type,
+                    "precision": entry.precision, "updated_at": entry.updated_at},
+                "collection_identity": collection_identity(identity).model_dump(),
+                "rule": result["rule"], "sources": result["sources"], "difference": result["difference"]})
+        db.add(mapping)
+        db.flush()
+    content = {field: getattr(draft, field) for field in ("historical_evidence", "live_evidence", "rationale")}
+    content = {field: str(value) if value is not None else None for field, value in content.items()}
+    previous = latest_note(db, mapping.id)
+    if not previous or previous.content != content:
+        version = previous.version + 1 if previous else 1
+        db.add(RealtimeMappingNote(id=key({"mapping_id": mapping.id, "version": version, "content": content}),
+            mapping_id=mapping.id, version=version, content=content))
         db.flush()
     return mapping
 
