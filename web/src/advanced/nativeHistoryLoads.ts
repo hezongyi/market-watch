@@ -21,6 +21,84 @@ export type HistoryProgress = {
   received?: number;
 };
 
+// Returning prices releases the bridge request, not the server handle. Keep
+// the original four-load budget until cleanup finishes so rapid switches do
+// not turn detached cleanup into unbounded owner tasks or API traffic.
+const historyLifetimes = 4;
+let admitted = 0;
+let cleaning = 0;
+let cleanupFailures = 0;
+const admissions: Array<{
+  grant: () => void;
+  cancel: (error: Error) => void;
+}> = [];
+
+export function historyLoadDiagnostics() {
+  return { admitted, cleaning, queued: admissions.length, cleanupFailures };
+}
+
+declare global {
+  interface Window { MWHistoryLoadDiagnostics: typeof historyLoadDiagnostics }
+}
+if (typeof window !== "undefined")
+  Object.defineProperty(window, "MWHistoryLoadDiagnostics", {
+    value: historyLoadDiagnostics, configurable: true,
+  });
+
+function drainAdmissions() {
+  while (admitted < historyLifetimes && admissions.length)
+    admissions.shift()!.grant();
+}
+
+function acquireLifetime(signal: AbortSignal, deadline: number) {
+  return new Promise<() => void>((resolve, reject) => {
+    if (signal.aborted) {
+      reject(new DOMException("已取消历史加载", "AbortError"));
+      return;
+    }
+    if (deadline <= Date.now()) {
+      reject(new ApiError("历史加载超过时间预算，请重试", 503, "HISTORY_TIMEOUT"));
+      return;
+    }
+    if (admissions.length >= 64) {
+      reject(new ApiError("历史加载任务繁忙，请稍后重试", 503, "HISTORY_BUSY"));
+      return;
+    }
+    const dispose = () => {
+      clearTimeout(timer);
+      signal.removeEventListener("abort", abort);
+    };
+    const entry = {
+      grant: () => {
+        dispose();
+        admitted++;
+        let released = false;
+        resolve(() => {
+          if (released) return;
+          released = true;
+          admitted--;
+          drainAdmissions();
+        });
+      },
+      cancel: (error: Error) => {
+        const index = admissions.indexOf(entry);
+        if (index < 0) return;
+        admissions.splice(index, 1);
+        dispose();
+        reject(error);
+      },
+    };
+    const abort = () => entry.cancel(new DOMException("已取消历史加载", "AbortError"));
+    const timer = setTimeout(() => entry.cancel(new ApiError(
+      "历史加载超过时间预算，请重试", 503, "HISTORY_TIMEOUT",
+    )), Math.max(0, deadline - Date.now()));
+    admissions.push(entry);
+    signal.addEventListener("abort", abort, { once: true });
+    if (signal.aborted) abort();
+    else drainAdmissions();
+  });
+}
+
 /** One final datafeed result; progress belongs to the host UI, not getBars. */
 export async function loadNativeHistory(
   query: unknown,
@@ -30,10 +108,12 @@ export async function loadNativeHistory(
   noticeContext: Record<string, string> = {},
 ) {
   let handle: string | undefined;
+  let delivered = false;
   const deadline = Date.now() + capabilities.task_seconds * 1000;
   const demand = query as { countBack?: number; limit?: number; history_page_bars?: number };
   const pageBars = demand.history_page_bars === 1000 ? 1000 : 4000;
   const estimate = Math.max(1, Math.ceil((demand.countBack || demand.limit || 1) / pageBars));
+  const release = await acquireLifetime(signal, deadline);
   try {
     progress({ phase: "checking", estimatedPages: estimate });
     let reply = await api(
@@ -46,6 +126,7 @@ export async function loadNativeHistory(
         phase: "delivering",
         received: reply.result.bars?.length || 0,
       });
+      delivered = true;
       return {...reply.result,history_pages:0};
     }
     handle = reply.load?.id;
@@ -111,15 +192,26 @@ export async function loadNativeHistory(
           estimatedPages: state?.pages || 0,
           received: reply.result.bars?.length || 0,
         });
+        delivered = true;
         return {...reply.result,history_pages:state?.pages || 0};
       }
     }
   } finally {
-    if (handle)
-      await api(
+    if (handle) {
+      cleaning++;
+      const cleanup = api(
         `/charts/history-loads/${handle}/cancel`,
         {},
         AbortSignal.timeout(5000),
-      ).catch(() => {});
+      ).catch(() => {
+        // Remote TTL remains the fallback after a transport failure. Retain
+        // a bounded counter so failures are distinguishable from completion.
+        cleanupFailures++;
+      }).finally(() => {
+        cleaning--;
+        release();
+      });
+      if (!delivered) await cleanup;
+    } else release();
   }
 }

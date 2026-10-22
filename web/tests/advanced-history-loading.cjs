@@ -29,7 +29,7 @@ function loader(api) {
     setTimeout,
     clearTimeout,
   });
-  return exports.loadNativeHistory;
+  return Object.assign(exports.loadNativeHistory, {diagnostics:exports.historyLoadDiagnostics});
 }
 (async () => {
   const progress = [],
@@ -81,6 +81,74 @@ function loader(api) {
   assert.equal(coldProgress.at(-1).estimatedPages, 3);
   assert.equal(coldProgress.at(-1).received, 3);
   assert.ok(paths.at(-1).endsWith("/cancel"));
+  let finishCleanup, cleanupStarted;
+  const cleanupPending = new Promise(resolve => { finishCleanup = resolve; });
+  const cleanupEntered = new Promise(resolve => { cleanupStarted = resolve; });
+  const immediate = loader(async path => {
+    if (path.endsWith("/cancel")) {
+      cleanupStarted();
+      await cleanupPending;
+      return {};
+    }
+    return path.endsWith("/result")
+      ? {result:{bars:["available"]}}
+      : {load:{id:"cleanup-pending",state:"ready",pages:1}};
+  });
+  let delivered = false;
+  const immediateResult = immediate(body, new AbortController().signal, cap, () => {})
+    .then(value => { delivered = true; return value; });
+  await cleanupEntered;
+  await new Promise(resolve => setImmediate(resolve));
+  try {
+    assert.equal(delivered, true,
+      "available price data must be delivered while successful handle cleanup is pending");
+  } finally {
+    finishCleanup();
+    await immediateResult;
+  }
+
+  const deferredCleanups = [];
+  let submitted = 0;
+  const bounded = loader(async path => {
+    if (path.endsWith("/cancel")) {
+      await new Promise(resolve => deferredCleanups.push(resolve));
+      return {};
+    }
+    if (path.endsWith("/result")) return {result:{bars:[1]}};
+    return {load:{id:`bounded-${++submitted}`,state:"ready",pages:1}};
+  });
+  for (let index = 0; index < 4; index++)
+    await bounded(body, new AbortController().signal, cap, () => {});
+  const queuedAbort = new AbortController();
+  const queued = bounded(body, queuedAbort.signal, cap, () => {});
+  await new Promise(resolve => setImmediate(resolve));
+  try {
+    assert.equal(submitted, 4,
+      "returning successful prices cannot admit unlimited handles before cleanup finishes");
+    queuedAbort.abort();
+    await assert.rejects(queued, {name:"AbortError"});
+    assert.equal(submitted, 4, "a cancelled admission must never submit a server task");
+  } finally {
+    queuedAbort.abort();
+    for (const finish of deferredCleanups) finish();
+  }
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(bounded.diagnostics().admitted, 0, "all lifecycle slots return after cleanup");
+  assert.equal(bounded.diagnostics().cleaning, 0);
+  assert.equal(bounded.diagnostics().queued, 0);
+  const cleanupFailure = loader(async path => {
+    if (path.endsWith("/cancel")) throw new TypeError("cleanup transport unavailable");
+    return path.endsWith("/result") ? {result:{bars:[1]}} :
+      {load:{id:"cleanup-failure",state:"ready",pages:1}};
+  });
+  assert.equal((await cleanupFailure(body, new AbortController().signal, cap, () => {})).bars.length, 1);
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(cleanupFailure.diagnostics().cleanupFailures, 1,
+    "cleanup transport failures stay observable without hiding delivered prices");
+  assert.equal(cleanupFailure.diagnostics().admitted, 0);
+  await assert.rejects(cleanupFailure(body, new AbortController().signal, {task_seconds:0}, () => {}),
+    error => error.code === "HISTORY_TIMEOUT");
+  assert.equal(cleanupFailure.diagnostics().admitted, 0, "expired admissions cannot leak capacity");
   const estimated = [];
   const estimates = loader(async (path) => path.endsWith("/cancel") ? {} :
     {load:{id:"estimate",state:"waiting",pages:4}});

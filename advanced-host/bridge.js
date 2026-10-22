@@ -748,29 +748,60 @@ const clientId = crypto.randomUUID();
 const requests = [];
 let initialHistoryGate;
 const managementRequest = type => type === 'data-center-api' || type === 'preferences';
+// Local scheduling purpose is independent of transport/body/cache identity.
+// Keep admission and fairness here rather than adding exceptions at callers.
+const requestPolicy = (() => {
+  let turn = 0;
+  function describe(entry) {
+    const query=entry.query;
+    const management=managementRequest(entry.type);
+    const reserve=!!query.native_reserve || entry.scheduling?.purpose==='reserve';
+    const purpose=management ? 'management' : reserve ? 'reserve' :
+      query.indicators?.length ? 'indicator' : entry.scheduling?.purpose ||
+      (entry.type==='indicator-demand-release' ? 'release' : query.op==='quotes' ? 'quote' :
+        query.op==='viewport' || query.op==='historyCache' && !query.background || entry.type==='workspace' ? 'interaction' :
+        query.op==='historyCache' && query.background ? 'auxiliary' :
+        query.firstDataRequest ? 'first-screen' : 'read');
+    return {management,reserve,quote:query.op==='quotes',
+      background:['reserve','release','quote','auxiliary'].includes(purpose),purpose};
+  }
+  function priority(entry) {
+    const {purpose,background}=describe(entry);
+    if(purpose==='interaction') return 0;
+    if(['first-screen','navigation'].includes(purpose))
+      return entry.scheduling?.focused?.() ? 1 : 2;
+    return background ? 4 : 3;
+  }
+  function next(queued, running) {
+    const entries=[...running.values()];
+    const managementBusy=entries.filter(entry=>entry.management).length;
+    const management=queued.findIndex(entry=>managementRequest(entry.type));
+    if(management>=0 && managementBusy<2) return management;
+    if(entries.length-managementBusy>=4) return -1;
+    const backgroundBusy=entries.filter(entry=>entry.background).length;
+    const quoteBusy=entries.some(entry=>entry.quote);
+    const eligible=[];
+    for(let index=0;index<queued.length;index++) {
+      const entry=describe(queued[index]);
+      if(!entry.management && (!entry.background || backgroundBusy<2) && (!entry.quote || !quoteBusy))
+        eligible.push(index);
+    }
+    if(!eligible.length) return -1;
+    // One FIFO turn in four prevents a stream of focused reads from starving
+    // peers, indicators or background work. Eligibility preserves hard caps.
+    const selected=turn===3 ? eligible[0] : eligible.reduce((best,index)=>
+      priority(queued[index])<priority(queued[best]) ? index : best);
+    turn=(turn+1)%4;
+    return selected;
+  }
+  return {describe,next};
+})();
 function drain() {
   while (requests.length) {
-    const managementBusy=[...pending.values()].filter(entry=>entry.management).length;
-    // Local draft durability and explicit recovery must remain available while
-    // the four market slots wait for a slow supplier. Reuse the bounded pool.
-    const management=requests.findIndex(entry=>managementRequest(entry.type));
-    const managementSlot=management>=0 && managementBusy<2;
-    if(!managementSlot && pending.size-managementBusy>=4) break;
-    // Pointer-driven viewport checks must not sit behind queued prewarming.
-    // Keep the same four in-flight limit and leave ongoing reads untouched.
-    const quoteBusy = [...pending.values()].some(entry => entry.quote);
-    const reserveBusy = [...pending.values()].filter(entry => entry.reserve).length;
-    const eligible = entry => !managementRequest(entry.type) && (entry.query.op !== 'quotes' || !quoteBusy) &&
-      (!entry.query.native_reserve || reserveBusy < 2);
-    let interaction = managementSlot ? management : requests.findIndex(entry => entry.query.op === "viewport");
-    if (interaction < 0) interaction = requests.findIndex(entry =>
-      entry.query.op === "historyCache" && !entry.query.background);
-    if (interaction < 0) interaction = requests.findIndex(entry => eligible(entry) && !entry.query.op && !entry.query.native_reserve);
-    if (interaction < 0) interaction = requests.findIndex(entry => entry.type === 'workspace');
-    if (interaction < 0) interaction = requests.findIndex(eligible);
+    const interaction=requestPolicy.next(requests,pending);
     if (interaction < 0) break;
-    const { query, type, resolve, reject, isCurrent } =
-      requests.splice(interaction, 1)[0];
+    const selected=requests.splice(interaction,1)[0];
+    const {query,type,resolve,reject,isCurrent}=selected;
     if (isCurrent && !isCurrent()) {
       const error = Error("已取消旧图表的历史加载");
       error.code = "HISTORY_CANCELLED";
@@ -784,8 +815,7 @@ function drain() {
       reject(Object.assign(Error("行情请求超时"),{code:"HISTORY_TIMEOUT"}));
       drain();
     }, query.native_history && !query.native_reserve ? ((globalThis.MW_HISTORY_CAPABILITIES?.task_seconds || 600)+10)*1000 : 30000);
-    const entry = { resolve, reject, timer, cancellationTimer: null, quote: query.op === 'quotes',
-      reserve: !!query.native_reserve, management:managementRequest(type) };
+    const entry = {resolve,reject,timer,cancellationTimer:null,...requestPolicy.describe(selected)};
     pending.set(id, entry);
     if (isCurrent) {
       const check = () => {
@@ -807,10 +837,10 @@ function drain() {
     send({ type, id, query });
   }
 }
-function request(query, type = "data", isCurrent) {
+function request(query, type = "data", isCurrent, scheduling) {
   return new Promise((resolve, reject) => {
     if (requests.length >= 64) return reject(Error("图表请求过多，请减少指标"));
-    requests.push({ query, type, resolve, reject, isCurrent });
+    requests.push({query,type,resolve,reject,isCurrent,scheduling});
     drain();
   });
 }
@@ -936,7 +966,7 @@ globalThis.MWNativeReserve?.configure(async ({symbol, resolution, before, screen
     const binding=acceptedState?.binding;
     const inputRevision=acceptedState?.input_revision;
     const page=await query(symbol,resolution,{before,limit:Math.min(2000,screen_bars*batch_screens),
-      ...(binding ? {composite_revision_id:binding,input_revision:inputRevision} : {})},Date.now()+30000,current);
+      ...(binding ? {composite_revision_id:binding,input_revision:inputRevision} : {})},Date.now()+30000,current,{purpose:'reserve'});
     const latest=marketHistoryState.get(stateKey);
     if(!current() || binding && (latest?.binding!==binding || latest?.input_revision!==inputRevision))
       throw Object.assign(Error('已取消旧图表的历史加载'),{code:'HISTORY_CANCELLED'});
@@ -986,7 +1016,7 @@ function reportHistoryFailures() {
 }
 globalThis.addEventListener('mw-history-state',()=>setTimeout(reportHistoryFailures,0));
 
-function query(ticker, res, args, expires = Infinity, current = () => true) {
+function query(ticker, res, args, expires = Infinity, current = () => true, scheduling = {}) {
   const { symbol, spec, series_kind } = decode(ticker);
   const q = {
     instrument: symbol,
@@ -1011,7 +1041,12 @@ function query(ticker, res, args, expires = Infinity, current = () => true) {
   // does not cancel a getBars callback that it can reuse when switching back.
   const currentRead = () => epoch === workspaceEpoch && current() && Date.now() < expires &&
     (series_kind !== 'managed' || hasHistoryViewer({instrument:MWSeries.encode(symbol,series_kind),timeframe:frames[res]}));
-  const promise = request(q, "data", currentRead)
+  const promise = request(q, "data", currentRead, {purpose:scheduling.purpose,focused:()=>{
+    try {
+      const active=widget?.activeChart?.();
+      return !!active && MWSeries.same(active.symbol(),ticker) && active.resolution()===res;
+    } catch { return false; }
+  }})
     .then(page=>{
       if (!currentRead()) throw Object.assign(Error('已取消旧图表的历史加载'), {code:'HISTORY_CANCELLED'});
       if(epoch===workspaceEpoch && series_kind==='composite' && page.revision_id)
@@ -1365,7 +1400,8 @@ const feed = {
           firstDataRequest:p.firstDataRequest, client:clientId,
           native_history:nativeHistoryContext(s.ticker,res)};
         let page = globalThis.MWNativeNavigation?.takeSeed(s, res, p) ||
-          await query(s.ticker, res, args, Infinity, () => (!s.mw_current || s.mw_current()) && (!s.mw_window || MWNativeNavigation.hasWindow(s.mw_window)));
+          await query(s.ticker, res, args, Infinity, () => (!s.mw_current || s.mw_current()) && (!s.mw_window || MWNativeNavigation.hasWindow(s.mw_window)),
+            {purpose:p.firstDataRequest ? 'first-screen' : 'navigation'});
         if (epoch !== workspaceEpoch) {
           const error = Error("已取消旧图表的历史加载");
           error.code = "HISTORY_CANCELLED"; throw error;
@@ -1454,7 +1490,8 @@ const feed = {
           {composite_revision_id:acceptedSnapshot.revision,display_snapshot_id:acceptedSnapshot.displaySnapshot} : {};
         for (let partition=0; rows.length<requested; partition++) {
           if(partition>=pageBudget) throw Object.assign(Error('固定历史分页预算已耗尽，请缩小范围后重试'),{code:'HISTORY_PAGE_BUDGET'});
-          const page=await query(s.ticker,res,{before,limit:Math.min(2000,requested-rows.length),...fixed},deadline,current);
+          const page=await query(s.ticker,res,{before,limit:Math.min(2000,requested-rows.length),...fixed},deadline,current,
+            {purpose:p.firstDataRequest ? 'first-screen' : 'navigation'});
           if (!current()) throw Object.assign(Error('已取消旧图表的历史加载'), {code:'HISTORY_CANCELLED'});
           marketHistoryPage ||= page;
           if (identity.spec) fixedIndicatorPending.set(historyKey,
@@ -1517,7 +1554,8 @@ const feed = {
       let before=p.to*1000 + (['1D','1W','1M'].includes(res) ? 2*86400000 : 0);
       let rows=[], rawRows=[], boundary=false;
       while(rows.length < requested) {
-        const page=await query(s.ticker,res,{before,limit:Math.min(2000,requested-rows.length)});
+        const page=await query(s.ticker,res,{before,limit:Math.min(2000,requested-rows.length)},Infinity,undefined,
+          {purpose:p.firstDataRequest ? 'first-screen' : 'navigation'});
         marketHistoryPage ||= page;
         if(epoch!==workspaceEpoch || !hasHistoryViewer({instrument:symbol,timeframe:frames[res]})) {
           const error=Error('已取消旧图表的历史加载');error.code='HISTORY_CANCELLED';throw error;

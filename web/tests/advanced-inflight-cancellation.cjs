@@ -2,10 +2,11 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const events=[];
-const context=vm.createContext({URL,URLSearchParams,Map,Promise,Date,Intl,Error,
+const context=vm.createContext({document:{createElement:()=>({}),head:{append:()=>{}}},URL,URLSearchParams,Map,Promise,Date,Intl,Error,
  location:{search:'?parent=http://localhost'},parent:{postMessage:m=>events.push(m)},
  crypto:{randomUUID:()=> 'test'},addEventListener(){},setTimeout,clearTimeout});
 vm.runInContext(fs.readFileSync("../advanced-host/series.js", "utf8"), context);
+vm.runInContext(fs.readFileSync("../advanced-host/composite-display-batches.js", "utf8"), context);
 vm.runInContext(fs.readFileSync('../advanced-host/bridge.js','utf8'),context);
 (async()=>{
  vm.runInContext(`

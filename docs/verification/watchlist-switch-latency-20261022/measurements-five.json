@@ -1,0 +1,5272 @@
+{
+  "at": "2026-10-22T15:40:53.958Z",
+  "trials": [
+    {
+      "ticker": "MWP:EURUSD",
+      "start": 1792683659839,
+      "requests": [
+        {
+          "path": "/api/charts/stream/events",
+          "method": "GET",
+          "at_ms": 65,
+          "headers_ms": 1593,
+          "status": 200,
+          "ms": 1593
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 310,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "M1",
+            "series_kind": "provider"
+          },
+          "headers_ms": 2093,
+          "status": 200,
+          "ms": 2093
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 310,
+          "query": {},
+          "headers_ms": 2376,
+          "status": 200,
+          "ms": 2376
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 311,
+          "query": {},
+          "headers_ms": 2287,
+          "status": 200,
+          "ms": 2287
+        },
+        {
+          "path": "/api/chart-alerts",
+          "method": "GET",
+          "at_ms": 325,
+          "headers_ms": 2195,
+          "status": 200,
+          "ms": 2195
+        },
+        {
+          "path": "/api/chart-alerts/events",
+          "method": "GET",
+          "at_ms": 362,
+          "headers_ms": 2503,
+          "status": 200,
+          "ms": 2503
+        },
+        {
+          "path": "/api/notification-center/events",
+          "method": "POST",
+          "at_ms": 438,
+          "query": {},
+          "headers_ms": 9,
+          "status": 409,
+          "ms": 9
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 754,
+          "query": {},
+          "headers_ms": 2110,
+          "status": 200,
+          "ms": 2110
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 756,
+          "query": {},
+          "headers_ms": 2134,
+          "status": 200,
+          "ms": 2134
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 757,
+          "query": {},
+          "headers_ms": 2147,
+          "status": 200,
+          "ms": 2147
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 760,
+          "query": {},
+          "headers_ms": 2176,
+          "status": 200,
+          "ms": 2176
+        },
+        {
+          "path": "/api/advanced-charts/preferences/save",
+          "method": "POST",
+          "at_ms": 863,
+          "query": {},
+          "headers_ms": 3,
+          "status": 409,
+          "ms": 3
+        },
+        {
+          "path": "/api/advanced-charts/preferences",
+          "method": "GET",
+          "at_ms": 869,
+          "headers_ms": 2095,
+          "status": 200,
+          "ms": 2095
+        },
+        {
+          "path": "/api/charts/data",
+          "method": "POST",
+          "at_ms": 1682,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "D1",
+            "series_kind": "composite",
+            "indicators": 0
+          },
+          "headers_ms": 1908,
+          "status": 200,
+          "ms": 1918,
+          "bars": 92,
+          "timings_ms": {
+            "fixed_read_freeze": 618.68
+          },
+          "keys": [
+            "composite_id",
+            "revision_id",
+            "input_revision",
+            "history_version_id",
+            "seam",
+            "timeframe",
+            "bars",
+            "next_before",
+            "has_more",
+            "history_revision",
+            "origin",
+            "rule_version",
+            "preparation_status",
+            "pending",
+            "bounded_partitions",
+            "materialized",
+            "queried_cutoff",
+            "current_observed_confirmed_end",
+            "indicator_progress",
+            "history_check",
+            "basis",
+            "calendar",
+            "precision",
+            "volume_kind",
+            "volume_unit",
+            "indicators",
+            "dependency_before",
+            "dependency_revision",
+            "future",
+            "bounded_history",
+            "as_of",
+            "series_kind",
+            "symbol",
+            "timings_ms"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/notification-center/changes",
+          "method": "GET",
+          "at_ms": 2393,
+          "headers_ms": 864,
+          "status": 200,
+          "ms": 864
+        },
+        {
+          "path": "/api/charts/indicator-demands/release",
+          "method": "POST",
+          "at_ms": 2394,
+          "query": {},
+          "headers_ms": 1046,
+          "status": 200,
+          "ms": 1046
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 2408,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "M1",
+            "series_kind": "provider"
+          },
+          "headers_ms": 1076,
+          "status": 200,
+          "ms": 1076
+        },
+        {
+          "path": "/api/charts/history-loads",
+          "method": "POST",
+          "at_ms": 2534,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "H1",
+            "series_kind": "provider",
+            "countBack": 77,
+            "firstDataRequest": true,
+            "indicators": 0
+          },
+          "headers_ms": 1617,
+          "status": 200,
+          "ms": 1618,
+          "keys": [
+            "load"
+          ],
+          "summary": {
+            "state": "waiting"
+          }
+        },
+        {
+          "path": "/api/charts/history-loads",
+          "method": "POST",
+          "at_ms": 2869,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "M5",
+            "series_kind": "provider",
+            "countBack": 104,
+            "firstDataRequest": true,
+            "indicators": 0
+          },
+          "headers_ms": 1181,
+          "status": 200,
+          "ms": 1183,
+          "keys": [
+            "load"
+          ],
+          "summary": {
+            "state": "waiting"
+          }
+        },
+        {
+          "path": "/api/advanced-charts/preferences/save",
+          "method": "POST",
+          "at_ms": 2971,
+          "query": {},
+          "headers_ms": 7,
+          "status": 409,
+          "ms": 7
+        },
+        {
+          "path": "/api/notification-center/observations",
+          "method": "POST",
+          "at_ms": 3288,
+          "query": {},
+          "headers_ms": 2,
+          "status": 409,
+          "ms": 2
+        },
+        {
+          "path": "/api/charts/history-loads",
+          "method": "POST",
+          "at_ms": 3453,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "W1",
+            "series_kind": "provider",
+            "countBack": 28,
+            "firstDataRequest": true,
+            "indicators": 0
+          },
+          "headers_ms": 786,
+          "status": 200,
+          "ms": 789,
+          "keys": [
+            "load"
+          ],
+          "summary": {
+            "state": "waiting"
+          }
+        },
+        {
+          "path": "/api/charts/history-loads",
+          "method": "POST",
+          "at_ms": 3602,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "D1",
+            "series_kind": "provider",
+            "countBack": 50,
+            "firstDataRequest": true,
+            "indicators": 0
+          },
+          "headers_ms": 701,
+          "status": 200,
+          "ms": 708,
+          "keys": [
+            "load"
+          ],
+          "summary": {
+            "state": "waiting"
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/04fa572f-c488-429b-b061-2f614c04a16a",
+          "method": "GET",
+          "at_ms": 4252,
+          "headers_ms": 129,
+          "status": 200,
+          "ms": 132,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/fbbb9bb4-227e-42d1-8a8a-cafa2f373f4a",
+          "method": "GET",
+          "at_ms": 4354,
+          "headers_ms": 179,
+          "status": 200,
+          "ms": 183,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/9d20f434-494d-44b4-be52-4210036daa14",
+          "method": "GET",
+          "at_ms": 4450,
+          "headers_ms": 69,
+          "status": 200,
+          "ms": 79,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/d8d26b96-1dc3-4e1f-a701-38c27cd8d58e",
+          "method": "GET",
+          "at_ms": 4511,
+          "headers_ms": 31,
+          "status": 200,
+          "ms": 35,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/04fa572f-c488-429b-b061-2f614c04a16a",
+          "method": "GET",
+          "at_ms": 4666,
+          "headers_ms": 1229,
+          "status": 200,
+          "ms": 1230,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "filling",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/9d20f434-494d-44b4-be52-4210036daa14",
+          "method": "GET",
+          "at_ms": 4810,
+          "headers_ms": 890,
+          "status": 200,
+          "ms": 892,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/fbbb9bb4-227e-42d1-8a8a-cafa2f373f4a",
+          "method": "GET",
+          "at_ms": 4813,
+          "headers_ms": 897,
+          "status": 200,
+          "ms": 900,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/d8d26b96-1dc3-4e1f-a701-38c27cd8d58e",
+          "method": "GET",
+          "at_ms": 4835,
+          "headers_ms": 779,
+          "status": 200,
+          "ms": 789,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/signals/pending-count",
+          "method": "GET",
+          "at_ms": 4979,
+          "headers_ms": 978,
+          "status": 200,
+          "ms": 978
+        },
+        {
+          "path": "/api/notification-center/changes",
+          "method": "GET",
+          "at_ms": 5305,
+          "headers_ms": 1371,
+          "status": 200,
+          "ms": 1371
+        },
+        {
+          "path": "/api/charts/history-loads/d8d26b96-1dc3-4e1f-a701-38c27cd8d58e",
+          "method": "GET",
+          "at_ms": 6017,
+          "headers_ms": 782,
+          "status": 200,
+          "ms": 784,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/9d20f434-494d-44b4-be52-4210036daa14",
+          "method": "GET",
+          "at_ms": 6097,
+          "headers_ms": 877,
+          "status": 200,
+          "ms": 879,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/fbbb9bb4-227e-42d1-8a8a-cafa2f373f4a",
+          "method": "GET",
+          "at_ms": 6104,
+          "headers_ms": 872,
+          "status": 200,
+          "ms": 874,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/04fa572f-c488-429b-b061-2f614c04a16a",
+          "method": "GET",
+          "at_ms": 6290,
+          "headers_ms": 489,
+          "status": 200,
+          "ms": 496,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "filling",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/04fa572f-c488-429b-b061-2f614c04a16a",
+          "method": "GET",
+          "at_ms": 7338,
+          "headers_ms": 26,
+          "status": 200,
+          "ms": 32,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "filling",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/d8d26b96-1dc3-4e1f-a701-38c27cd8d58e",
+          "method": "GET",
+          "at_ms": 7353,
+          "headers_ms": 43,
+          "status": 200,
+          "ms": 45,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/9d20f434-494d-44b4-be52-4210036daa14",
+          "method": "GET",
+          "at_ms": 7524,
+          "headers_ms": 12,
+          "status": 200,
+          "ms": 19,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/fbbb9bb4-227e-42d1-8a8a-cafa2f373f4a",
+          "method": "GET",
+          "at_ms": 7536,
+          "headers_ms": 27,
+          "status": 200,
+          "ms": 31,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/04fa572f-c488-429b-b061-2f614c04a16a",
+          "method": "GET",
+          "at_ms": 8135,
+          "headers_ms": 13,
+          "status": 200,
+          "ms": 18,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "filling",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/d8d26b96-1dc3-4e1f-a701-38c27cd8d58e",
+          "method": "GET",
+          "at_ms": 8165,
+          "headers_ms": 11,
+          "status": 200,
+          "ms": 13,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/9d20f434-494d-44b4-be52-4210036daa14",
+          "method": "GET",
+          "at_ms": 8305,
+          "headers_ms": 11,
+          "status": 200,
+          "ms": 13,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/fbbb9bb4-227e-42d1-8a8a-cafa2f373f4a",
+          "method": "GET",
+          "at_ms": 8340,
+          "headers_ms": 20,
+          "status": 200,
+          "ms": 23,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/notification-center/changes",
+          "method": "GET",
+          "at_ms": 8732,
+          "headers_ms": 61,
+          "status": 200,
+          "ms": 61
+        },
+        {
+          "path": "/api/charts/history-loads/04fa572f-c488-429b-b061-2f614c04a16a",
+          "method": "GET",
+          "at_ms": 9226,
+          "headers_ms": 15,
+          "status": 200,
+          "ms": 21,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "ready",
+            "pages": 1
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/04fa572f-c488-429b-b061-2f614c04a16a/result",
+          "method": "GET",
+          "at_ms": 9245,
+          "headers_ms": 170,
+          "status": 200,
+          "ms": 176,
+          "bars": 104,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 107.61,
+            "metadata": 3.5
+          },
+          "keys": [
+            "result"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/history-loads/d8d26b96-1dc3-4e1f-a701-38c27cd8d58e",
+          "method": "GET",
+          "at_ms": 9253,
+          "headers_ms": 194,
+          "status": 200,
+          "ms": 200,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/9d20f434-494d-44b4-be52-4210036daa14",
+          "method": "GET",
+          "at_ms": 9394,
+          "headers_ms": 150,
+          "status": 200,
+          "ms": 152,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/04fa572f-c488-429b-b061-2f614c04a16a/cancel",
+          "method": "POST",
+          "at_ms": 9417,
+          "query": {},
+          "headers_ms": 148,
+          "status": 200,
+          "ms": 166,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "cancelled",
+            "pages": 1
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/fbbb9bb4-227e-42d1-8a8a-cafa2f373f4a",
+          "method": "GET",
+          "at_ms": 9437,
+          "headers_ms": 173,
+          "status": 200,
+          "ms": 181,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "filling",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads",
+          "method": "POST",
+          "at_ms": 9583,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "H4",
+            "series_kind": "provider",
+            "countBack": 46,
+            "firstDataRequest": true,
+            "indicators": 0
+          },
+          "headers_ms": 133,
+          "status": 200,
+          "ms": 135,
+          "keys": [
+            "load"
+          ],
+          "summary": {
+            "state": "waiting"
+          }
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 9607,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "M5",
+            "series_kind": "provider"
+          },
+          "headers_ms": 287,
+          "status": 200,
+          "ms": 287
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 9897,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "M5",
+            "series_kind": "provider"
+          },
+          "headers_ms": 121,
+          "status": 200,
+          "ms": 121
+        },
+        {
+          "path": "/api/charts/history-loads/699667da-df50-4f04-a26a-6e0989ef21a0",
+          "method": "GET",
+          "at_ms": 9918,
+          "headers_ms": 68,
+          "status": 200,
+          "ms": 72,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 10207,
+          "query": {},
+          "headers_ms": 1338,
+          "status": 200,
+          "ms": 1338
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 10213,
+          "query": {},
+          "headers_ms": 949,
+          "status": 200,
+          "ms": 949
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 10215,
+          "query": {},
+          "headers_ms": 1316,
+          "status": 200,
+          "ms": 1316
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 10216,
+          "query": {},
+          "headers_ms": 1418,
+          "status": 200,
+          "ms": 1418
+        },
+        {
+          "path": "/api/charts/history-loads/699667da-df50-4f04-a26a-6e0989ef21a0",
+          "method": "GET",
+          "at_ms": 10268,
+          "headers_ms": 1467,
+          "status": 200,
+          "ms": 1469,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/notification-center/changes",
+          "method": "GET",
+          "at_ms": 10857,
+          "headers_ms": 795,
+          "status": 200,
+          "ms": 795
+        },
+        {
+          "path": "/api/charts/history-loads/d8d26b96-1dc3-4e1f-a701-38c27cd8d58e",
+          "method": "GET",
+          "at_ms": 10953,
+          "headers_ms": 1005,
+          "status": 200,
+          "ms": 1008,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "ready",
+            "pages": 1
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/9d20f434-494d-44b4-be52-4210036daa14",
+          "method": "GET",
+          "at_ms": 11046,
+          "headers_ms": 834,
+          "status": 200,
+          "ms": 836,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "ready",
+            "pages": 1
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/fbbb9bb4-227e-42d1-8a8a-cafa2f373f4a",
+          "method": "GET",
+          "at_ms": 11118,
+          "headers_ms": 752,
+          "status": 200,
+          "ms": 756,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "ready",
+            "pages": 1
+          }
+        },
+        {
+          "path": "/api/charts/stream/accept",
+          "method": "POST",
+          "at_ms": 11367,
+          "query": {},
+          "headers_ms": 579,
+          "status": 200,
+          "ms": 579
+        },
+        {
+          "path": "/api/charts/history-loads/fbbb9bb4-227e-42d1-8a8a-cafa2f373f4a/result",
+          "method": "GET",
+          "at_ms": 11874,
+          "headers_ms": 194,
+          "status": 200,
+          "ms": 201,
+          "bars": 149,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 71.55,
+            "metadata": 3.21
+          },
+          "keys": [
+            "result"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/history-loads/9d20f434-494d-44b4-be52-4210036daa14/result",
+          "method": "GET",
+          "at_ms": 11882,
+          "headers_ms": 292,
+          "status": 200,
+          "ms": 295,
+          "bars": 28,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 74.34,
+            "metadata": 13.75
+          },
+          "keys": [
+            "result"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/history-loads/d8d26b96-1dc3-4e1f-a701-38c27cd8d58e/result",
+          "method": "GET",
+          "at_ms": 11959,
+          "headers_ms": 409,
+          "status": 200,
+          "ms": 413,
+          "bars": 50,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 106.23,
+            "metadata": 4.52
+          },
+          "keys": [
+            "result"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/history-loads/fbbb9bb4-227e-42d1-8a8a-cafa2f373f4a/cancel",
+          "method": "POST",
+          "at_ms": 12076,
+          "query": {},
+          "headers_ms": 321,
+          "status": 200,
+          "ms": 333,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "cancelled",
+            "pages": 1
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/699667da-df50-4f04-a26a-6e0989ef21a0",
+          "method": "GET",
+          "at_ms": 12131,
+          "headers_ms": 255,
+          "status": 200,
+          "ms": 263,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "ready",
+            "pages": 1
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/9d20f434-494d-44b4-be52-4210036daa14/cancel",
+          "method": "POST",
+          "at_ms": 12175,
+          "query": {},
+          "headers_ms": 219,
+          "status": 200,
+          "ms": 272,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "cancelled",
+            "pages": 1
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/d8d26b96-1dc3-4e1f-a701-38c27cd8d58e/cancel",
+          "method": "POST",
+          "at_ms": 12371,
+          "query": {},
+          "headers_ms": 145,
+          "status": 200,
+          "ms": 156,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "cancelled",
+            "pages": 1
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/699667da-df50-4f04-a26a-6e0989ef21a0/result",
+          "method": "GET",
+          "at_ms": 12392,
+          "headers_ms": 455,
+          "status": 200,
+          "ms": 461,
+          "bars": 52,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 176.11,
+            "metadata": 24.53
+          },
+          "keys": [
+            "result"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 12410,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "H1",
+            "series_kind": "provider"
+          },
+          "headers_ms": 188,
+          "status": 200,
+          "ms": 188
+        },
+        {
+          "path": "/api/chart-alerts",
+          "method": "GET",
+          "at_ms": 12462,
+          "headers_ms": 255,
+          "status": 200,
+          "ms": 255
+        },
+        {
+          "path": "/api/chart-alerts/events",
+          "method": "GET",
+          "at_ms": 12515,
+          "headers_ms": 362,
+          "status": 200,
+          "ms": 362
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 12516,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "W1",
+            "series_kind": "provider"
+          },
+          "headers_ms": 295,
+          "status": 200,
+          "ms": 295
+        },
+        {
+          "path": "/api/charts/indicator-demands/release",
+          "method": "POST",
+          "at_ms": 12536,
+          "query": {},
+          "headers_ms": 282,
+          "status": 200,
+          "ms": 282
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 12539,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "D1",
+            "series_kind": "provider"
+          },
+          "headers_ms": 357,
+          "status": 200,
+          "ms": 357
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 12601,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "H1",
+            "series_kind": "provider"
+          },
+          "headers_ms": 342,
+          "status": 200,
+          "ms": 342
+        },
+        {
+          "path": "/api/charts/indicator-demands/release",
+          "method": "POST",
+          "at_ms": 12726,
+          "query": {},
+          "headers_ms": 180,
+          "status": 200,
+          "ms": 180
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 12814,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "W1",
+            "series_kind": "provider"
+          },
+          "headers_ms": 170,
+          "status": 200,
+          "ms": 170
+        },
+        {
+          "path": "/api/charts/history-loads",
+          "method": "POST",
+          "at_ms": 12821,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "M5",
+            "series_kind": "provider",
+            "countBack": 9,
+            "firstDataRequest": false,
+            "indicators": 0
+          },
+          "headers_ms": 355,
+          "status": 200,
+          "ms": 378,
+          "bars": 9,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 132.37,
+            "metadata": 3.78
+          },
+          "keys": [
+            "result"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/history-loads/699667da-df50-4f04-a26a-6e0989ef21a0/cancel",
+          "method": "POST",
+          "at_ms": 12851,
+          "query": {},
+          "headers_ms": 122,
+          "status": 200,
+          "ms": 132,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "cancelled",
+            "pages": 1
+          }
+        },
+        {
+          "path": "/api/chart-alerts",
+          "method": "GET",
+          "at_ms": 12882,
+          "headers_ms": 202,
+          "status": 200,
+          "ms": 202
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 12898,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "D1",
+            "series_kind": "provider"
+          },
+          "headers_ms": 573,
+          "status": 200,
+          "ms": 573
+        },
+        {
+          "path": "/api/chart-alerts/events",
+          "method": "GET",
+          "at_ms": 12909,
+          "headers_ms": 321,
+          "status": 200,
+          "ms": 321
+        },
+        {
+          "path": "/api/market-data/quotes",
+          "method": "POST",
+          "at_ms": 12982,
+          "query": {},
+          "headers_ms": 429,
+          "status": 200,
+          "ms": 429
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 12985,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "H4",
+            "series_kind": "provider"
+          },
+          "headers_ms": 585,
+          "status": 200,
+          "ms": 585
+        },
+        {
+          "path": "/api/charts/indicator-demands/release",
+          "method": "POST",
+          "at_ms": 13088,
+          "query": {},
+          "headers_ms": 1495,
+          "status": 200,
+          "ms": 1495
+        }
+      ],
+      "click_ms": 326,
+      "ready_ms": 12417,
+      "charts": [
+        {
+          "symbol": "MWP:EURUSD",
+          "res": "60",
+          "ready": true
+        },
+        {
+          "symbol": "MWP:EURUSD",
+          "res": "5",
+          "ready": true
+        },
+        {
+          "symbol": "MWP:EURUSD",
+          "res": "1W",
+          "ready": false
+        },
+        {
+          "symbol": "MWP:EURUSD",
+          "res": "1D",
+          "ready": false
+        },
+        {
+          "symbol": "MWP:EURUSD",
+          "res": "240",
+          "ready": false
+        }
+      ],
+      "all_ready_ms": 12989,
+      "feed": [
+        {
+          "method": "getBars",
+          "at": 1792683660137,
+          "symbol": "MWP:EURUSD",
+          "resolution": "60",
+          "ms": 12097,
+          "bars": 149
+        },
+        {
+          "method": "getBars",
+          "at": 1792683660139,
+          "symbol": "MWP:EURUSD",
+          "resolution": "5",
+          "ms": 9266,
+          "bars": 104
+        },
+        {
+          "method": "getBars",
+          "at": 1792683660140,
+          "symbol": "MWP:EURUSD",
+          "resolution": "1W",
+          "ms": 12182,
+          "bars": 28
+        },
+        {
+          "method": "getBars",
+          "at": 1792683660140,
+          "symbol": "MWP:EURUSD",
+          "resolution": "1D",
+          "ms": 12226,
+          "bars": 50
+        },
+        {
+          "method": "getBars",
+          "at": 1792683660141,
+          "symbol": "MWP:EURUSD",
+          "resolution": "240",
+          "ms": 12671,
+          "bars": 52
+        },
+        {
+          "method": "getBars",
+          "at": 1792683669454,
+          "symbol": "MWP:EURUSD",
+          "resolution": "5"
+        }
+      ],
+      "slow": true
+    },
+    {
+      "ticker": "MWH:2a673b63-2922-497e-bec9-d0231be55934",
+      "start": 1792683673818,
+      "requests": [
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 133,
+          "query": {},
+          "headers_ms": 620,
+          "status": 200,
+          "ms": 620
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 133,
+          "query": {
+            "instrument": "2a673b63-2922-497e-bec9-d0231be55934",
+            "timeframe": "M1",
+            "series_kind": "history"
+          },
+          "headers_ms": 767,
+          "status": 200,
+          "ms": 767
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 140,
+          "query": {},
+          "headers_ms": 1061,
+          "status": 200,
+          "ms": 1061
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 140,
+          "query": {},
+          "headers_ms": 1128,
+          "status": 200,
+          "ms": 1128
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 141,
+          "query": {},
+          "headers_ms": 1955,
+          "status": 200,
+          "ms": 1955
+        },
+        {
+          "path": "/api/charts/indicator-demands/release",
+          "method": "POST",
+          "at_ms": 141,
+          "query": {},
+          "headers_ms": 1741,
+          "status": 200,
+          "ms": 1741
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 506,
+          "query": {},
+          "headers_ms": 1376,
+          "status": 200,
+          "ms": 1376
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 506,
+          "query": {},
+          "headers_ms": 1501,
+          "status": 200,
+          "ms": 1501
+        },
+        {
+          "path": "/api/charts/indicator-demands/release",
+          "method": "POST",
+          "at_ms": 606,
+          "query": {},
+          "headers_ms": 1582,
+          "status": 200,
+          "ms": 1582
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 679,
+          "query": {},
+          "headers_ms": 1448,
+          "status": 200,
+          "ms": 1448
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 799,
+          "query": {},
+          "headers_ms": 1497,
+          "status": 200,
+          "ms": 1497
+        },
+        {
+          "path": "/api/charts/indicator-demands/release",
+          "method": "POST",
+          "at_ms": 821,
+          "query": {},
+          "headers_ms": 1431,
+          "status": 200,
+          "ms": 1431
+        },
+        {
+          "path": "/api/signals/pending-count",
+          "method": "GET",
+          "at_ms": 994,
+          "headers_ms": 1309,
+          "status": 200,
+          "ms": 1309
+        },
+        {
+          "path": "/api/charts/data",
+          "method": "POST",
+          "at_ms": 1884,
+          "query": {
+            "instrument": "2a673b63-2922-497e-bec9-d0231be55934",
+            "timeframe": "H1",
+            "series_kind": "history",
+            "indicators": 0
+          },
+          "headers_ms": 773,
+          "status": 200,
+          "ms": 794,
+          "bars": 77,
+          "timings_ms": {
+            "fixed_read_freeze": 345.3
+          },
+          "keys": [
+            "version_id",
+            "timeframe",
+            "bars",
+            "next_before",
+            "rule_version",
+            "has_more",
+            "origin",
+            "history_revision",
+            "pending",
+            "input_manifest",
+            "indicator_progress",
+            "history_check",
+            "basis",
+            "calendar",
+            "precision",
+            "volume_kind",
+            "volume_unit",
+            "indicators",
+            "dependency_before",
+            "dependency_revision",
+            "future",
+            "bounded_history",
+            "as_of",
+            "series_kind",
+            "symbol",
+            "timings_ms"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/data",
+          "method": "POST",
+          "at_ms": 2190,
+          "query": {
+            "instrument": "2a673b63-2922-497e-bec9-d0231be55934",
+            "timeframe": "M5",
+            "series_kind": "history",
+            "indicators": 0
+          },
+          "headers_ms": 1233,
+          "status": 200,
+          "ms": 1253,
+          "bars": 104,
+          "timings_ms": {
+            "fixed_read_freeze": 1107.3
+          },
+          "keys": [
+            "version_id",
+            "timeframe",
+            "bars",
+            "next_before",
+            "rule_version",
+            "has_more",
+            "origin",
+            "history_revision",
+            "pending",
+            "input_manifest",
+            "indicator_progress",
+            "history_check",
+            "basis",
+            "calendar",
+            "precision",
+            "volume_kind",
+            "volume_unit",
+            "indicators",
+            "dependency_before",
+            "dependency_revision",
+            "future",
+            "bounded_history",
+            "as_of",
+            "series_kind",
+            "symbol",
+            "timings_ms"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/data",
+          "method": "POST",
+          "at_ms": 2257,
+          "query": {
+            "instrument": "2a673b63-2922-497e-bec9-d0231be55934",
+            "timeframe": "W1",
+            "series_kind": "history",
+            "indicators": 0
+          },
+          "headers_ms": 1341,
+          "status": 200,
+          "ms": 1352,
+          "bars": 28,
+          "timings_ms": {
+            "fixed_read_freeze": 1271.86
+          },
+          "keys": [
+            "version_id",
+            "timeframe",
+            "bars",
+            "next_before",
+            "rule_version",
+            "has_more",
+            "origin",
+            "history_revision",
+            "pending",
+            "input_manifest",
+            "indicator_progress",
+            "history_check",
+            "basis",
+            "calendar",
+            "precision",
+            "volume_kind",
+            "volume_unit",
+            "indicators",
+            "dependency_before",
+            "dependency_revision",
+            "future",
+            "bounded_history",
+            "as_of",
+            "series_kind",
+            "symbol",
+            "timings_ms"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/data",
+          "method": "POST",
+          "at_ms": 2674,
+          "query": {
+            "instrument": "2a673b63-2922-497e-bec9-d0231be55934",
+            "timeframe": "D1",
+            "series_kind": "history",
+            "indicators": 0
+          },
+          "headers_ms": 1085,
+          "status": 200,
+          "ms": 1096,
+          "bars": 50,
+          "timings_ms": {
+            "fixed_read_freeze": 298.29
+          },
+          "keys": [
+            "version_id",
+            "timeframe",
+            "bars",
+            "next_before",
+            "rule_version",
+            "has_more",
+            "origin",
+            "history_revision",
+            "pending",
+            "input_manifest",
+            "indicator_progress",
+            "history_check",
+            "basis",
+            "calendar",
+            "precision",
+            "volume_kind",
+            "volume_unit",
+            "indicators",
+            "dependency_before",
+            "dependency_revision",
+            "future",
+            "bounded_history",
+            "as_of",
+            "series_kind",
+            "symbol",
+            "timings_ms"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 2679,
+          "query": {
+            "instrument": "2a673b63-2922-497e-bec9-d0231be55934",
+            "timeframe": "H1",
+            "series_kind": "history"
+          },
+          "headers_ms": 1166,
+          "status": 200,
+          "ms": 1166
+        },
+        {
+          "path": "/api/notification-center/changes",
+          "method": "GET",
+          "at_ms": 2718,
+          "headers_ms": 911,
+          "status": 200,
+          "ms": 911
+        },
+        {
+          "path": "/api/charts/data",
+          "method": "POST",
+          "at_ms": 3477,
+          "query": {
+            "instrument": "2a673b63-2922-497e-bec9-d0231be55934",
+            "timeframe": "H4",
+            "series_kind": "history",
+            "indicators": 0
+          },
+          "headers_ms": 505,
+          "status": 200,
+          "ms": 514,
+          "bars": 46,
+          "timings_ms": {
+            "fixed_read_freeze": 278.05
+          },
+          "keys": [
+            "version_id",
+            "timeframe",
+            "bars",
+            "next_before",
+            "rule_version",
+            "has_more",
+            "origin",
+            "history_revision",
+            "pending",
+            "input_manifest",
+            "indicator_progress",
+            "history_check",
+            "basis",
+            "calendar",
+            "precision",
+            "volume_kind",
+            "volume_unit",
+            "indicators",
+            "dependency_before",
+            "dependency_revision",
+            "future",
+            "bounded_history",
+            "as_of",
+            "series_kind",
+            "symbol",
+            "timings_ms"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 3508,
+          "query": {
+            "instrument": "2a673b63-2922-497e-bec9-d0231be55934",
+            "timeframe": "M5",
+            "series_kind": "history"
+          },
+          "headers_ms": 530,
+          "status": 200,
+          "ms": 530
+        },
+        {
+          "path": "/api/chart-alerts",
+          "method": "GET",
+          "at_ms": 3608,
+          "headers_ms": 496,
+          "status": 200,
+          "ms": 496
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 3608,
+          "query": {
+            "instrument": "2a673b63-2922-497e-bec9-d0231be55934",
+            "timeframe": "W1",
+            "series_kind": "history"
+          },
+          "headers_ms": 482,
+          "status": 200,
+          "ms": 482
+        },
+        {
+          "path": "/api/chart-alerts/events",
+          "method": "GET",
+          "at_ms": 3780,
+          "headers_ms": 337,
+          "status": 200,
+          "ms": 337
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 3816,
+          "query": {
+            "instrument": "2a673b63-2922-497e-bec9-d0231be55934",
+            "timeframe": "D1",
+            "series_kind": "history"
+          },
+          "headers_ms": 373,
+          "status": 200,
+          "ms": 373
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 3866,
+          "query": {
+            "instrument": "2a673b63-2922-497e-bec9-d0231be55934",
+            "timeframe": "H1",
+            "series_kind": "history"
+          },
+          "headers_ms": 355,
+          "status": 200,
+          "ms": 355
+        },
+        {
+          "path": "/api/charts/data",
+          "method": "POST",
+          "at_ms": 3995,
+          "query": {
+            "instrument": "2a673b63-2922-497e-bec9-d0231be55934",
+            "timeframe": "H1",
+            "series_kind": "history",
+            "indicators": 0
+          },
+          "headers_ms": 285,
+          "status": 200,
+          "ms": 290,
+          "bars": 72,
+          "timings_ms": {
+            "fixed_read_freeze": 145.85
+          },
+          "keys": [
+            "version_id",
+            "timeframe",
+            "bars",
+            "next_before",
+            "rule_version",
+            "has_more",
+            "origin",
+            "history_revision",
+            "pending",
+            "input_manifest",
+            "indicator_progress",
+            "history_check",
+            "basis",
+            "calendar",
+            "precision",
+            "volume_kind",
+            "volume_unit",
+            "indicators",
+            "dependency_before",
+            "dependency_revision",
+            "future",
+            "bounded_history",
+            "as_of",
+            "series_kind",
+            "symbol",
+            "timings_ms"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 3997,
+          "query": {
+            "instrument": "2a673b63-2922-497e-bec9-d0231be55934",
+            "timeframe": "H4",
+            "series_kind": "history"
+          },
+          "headers_ms": 275,
+          "status": 200,
+          "ms": 275
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 4059,
+          "query": {
+            "instrument": "2a673b63-2922-497e-bec9-d0231be55934",
+            "timeframe": "M5",
+            "series_kind": "history"
+          },
+          "headers_ms": 265,
+          "status": 200,
+          "ms": 265
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 4092,
+          "query": {
+            "instrument": "2a673b63-2922-497e-bec9-d0231be55934",
+            "timeframe": "W1",
+            "series_kind": "history"
+          },
+          "headers_ms": 215,
+          "status": 200,
+          "ms": 215
+        },
+        {
+          "path": "/api/charts/indicator-demands/release",
+          "method": "POST",
+          "at_ms": 4108,
+          "query": {},
+          "headers_ms": 282,
+          "status": 200,
+          "ms": 282
+        }
+      ],
+      "click_ms": 145,
+      "ready_ms": 2678,
+      "charts": [
+        {
+          "symbol": "MWH:2A673B63-2922-497E-BEC9-D0231BE55934",
+          "res": "60",
+          "ready": true
+        },
+        {
+          "symbol": "MWH:2A673B63-2922-497E-BEC9-D0231BE55934",
+          "res": "5",
+          "ready": false
+        },
+        {
+          "symbol": "MWH:2A673B63-2922-497E-BEC9-D0231BE55934",
+          "res": "1W",
+          "ready": false
+        },
+        {
+          "symbol": "MWH:2A673B63-2922-497E-BEC9-D0231BE55934",
+          "res": "1D",
+          "ready": false
+        },
+        {
+          "symbol": "MWH:2A673B63-2922-497E-BEC9-D0231BE55934",
+          "res": "240",
+          "ready": false
+        }
+      ],
+      "all_ready_ms": 4000,
+      "feed": [
+        {
+          "method": "getBars",
+          "at": 1792683673938,
+          "symbol": "MWH:2a673b63-2922-497e-bec9-d0231be55934",
+          "resolution": "60",
+          "ms": 2540,
+          "bars": 77
+        },
+        {
+          "method": "getBars",
+          "at": 1792683673939,
+          "symbol": "MWH:2a673b63-2922-497e-bec9-d0231be55934",
+          "resolution": "5",
+          "ms": 3324,
+          "bars": 104
+        },
+        {
+          "method": "getBars",
+          "at": 1792683673939,
+          "symbol": "MWH:2a673b63-2922-497e-bec9-d0231be55934",
+          "resolution": "1W",
+          "ms": 3476,
+          "bars": 28
+        },
+        {
+          "method": "getBars",
+          "at": 1792683673939,
+          "symbol": "MWH:2a673b63-2922-497e-bec9-d0231be55934",
+          "resolution": "1D",
+          "ms": 3650,
+          "bars": 50
+        },
+        {
+          "method": "getBars",
+          "at": 1792683673940,
+          "symbol": "MWH:2a673b63-2922-497e-bec9-d0231be55934",
+          "resolution": "240",
+          "ms": 3861,
+          "bars": 46
+        },
+        {
+          "method": "getBars",
+          "at": 1792683677349,
+          "symbol": "MWH:2a673b63-2922-497e-bec9-d0231be55934",
+          "resolution": "5"
+        }
+      ],
+      "slow": true
+    },
+    {
+      "ticker": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+      "start": 1792683678786,
+      "requests": [
+        {
+          "path": "/api/charts/indicator-demands/release",
+          "method": "POST",
+          "at_ms": 42,
+          "query": {},
+          "headers_ms": 670,
+          "status": 200,
+          "ms": 670
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 122,
+          "query": {
+            "instrument": "2a673b63-2922-497e-bec9-d0231be55934",
+            "timeframe": "H4",
+            "series_kind": "history"
+          },
+          "headers_ms": 561,
+          "status": 200,
+          "ms": 561
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 243,
+          "query": {
+            "instrument": "2a673b63-2922-497e-bec9-d0231be55934",
+            "timeframe": "M5",
+            "series_kind": "history"
+          },
+          "headers_ms": 377,
+          "status": 200,
+          "ms": 377
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 247,
+          "query": {},
+          "headers_ms": 737,
+          "status": 200,
+          "ms": 737
+        },
+        {
+          "path": "/api/market-data/resolve",
+          "method": "POST",
+          "at_ms": 248,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "M1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 785,
+          "status": 200,
+          "ms": 788,
+          "keys": [
+            "id",
+            "symbol",
+            "name",
+            "display_symbol",
+            "series_kind",
+            "source",
+            "historical_source",
+            "basis",
+            "calendar",
+            "precision",
+            "frames",
+            "volume_kind",
+            "volume_unit",
+            "composite_id",
+            "dataset_id",
+            "mapping_id",
+            "history_version_id",
+            "seam",
+            "created"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 265,
+          "query": {},
+          "headers_ms": 789,
+          "status": 200,
+          "ms": 789
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 267,
+          "query": {},
+          "headers_ms": 835,
+          "status": 200,
+          "ms": 835
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 268,
+          "query": {},
+          "headers_ms": 852,
+          "status": 200,
+          "ms": 852
+        },
+        {
+          "path": "/api/charts/indicator-demands/release",
+          "method": "POST",
+          "at_ms": 292,
+          "query": {},
+          "headers_ms": 913,
+          "status": 200,
+          "ms": 913
+        },
+        {
+          "path": "/api/charts/indicator-demands/release",
+          "method": "POST",
+          "at_ms": 502,
+          "query": {},
+          "headers_ms": 648,
+          "status": 200,
+          "ms": 648
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 622,
+          "query": {},
+          "headers_ms": 574,
+          "status": 200,
+          "ms": 574
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 685,
+          "query": {},
+          "headers_ms": 600,
+          "status": 200,
+          "ms": 600
+        },
+        {
+          "path": "/api/charts/indicator-demands/release",
+          "method": "POST",
+          "at_ms": 715,
+          "query": {},
+          "headers_ms": 687,
+          "status": 200,
+          "ms": 687
+        },
+        {
+          "path": "/api/notification-center/changes",
+          "method": "GET",
+          "at_ms": 729,
+          "headers_ms": 580,
+          "status": 200,
+          "ms": 580
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 1036,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "M1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 666,
+          "status": 200,
+          "ms": 666
+        },
+        {
+          "path": "/api/market-data/resolve",
+          "method": "POST",
+          "at_ms": 1038,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "M1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 349,
+          "status": 200,
+          "ms": 353,
+          "keys": [
+            "id",
+            "symbol",
+            "name",
+            "display_symbol",
+            "series_kind",
+            "source",
+            "historical_source",
+            "basis",
+            "calendar",
+            "precision",
+            "frames",
+            "volume_kind",
+            "volume_unit",
+            "composite_id",
+            "dataset_id",
+            "mapping_id",
+            "history_version_id",
+            "seam",
+            "created"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/data",
+          "method": "POST",
+          "at_ms": 1152,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "H1",
+            "series_kind": "composite",
+            "indicators": 0
+          },
+          "headers_ms": 2383,
+          "status": 200,
+          "ms": 2394,
+          "bars": 77,
+          "timings_ms": {
+            "fixed_read_freeze": 2112.31
+          },
+          "keys": [
+            "composite_id",
+            "revision_id",
+            "input_revision",
+            "history_version_id",
+            "seam",
+            "timeframe",
+            "bars",
+            "display_snapshot_id",
+            "next_before",
+            "has_more",
+            "history_revision",
+            "origin",
+            "rule_version",
+            "preparation_status",
+            "pending",
+            "bounded_partitions",
+            "materialized",
+            "queried_cutoff",
+            "current_observed_confirmed_end",
+            "indicator_progress",
+            "history_check",
+            "basis",
+            "calendar",
+            "precision",
+            "volume_kind",
+            "volume_unit",
+            "indicators",
+            "dependency_before",
+            "dependency_revision",
+            "future",
+            "bounded_history",
+            "as_of",
+            "series_kind",
+            "symbol",
+            "timings_ms"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/data",
+          "method": "POST",
+          "at_ms": 1217,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "W1",
+            "series_kind": "composite",
+            "indicators": 0
+          },
+          "headers_ms": 1288,
+          "status": 200,
+          "ms": 1301,
+          "bars": 28,
+          "timings_ms": {
+            "fixed_read_freeze": 982.81
+          },
+          "keys": [
+            "composite_id",
+            "revision_id",
+            "input_revision",
+            "history_version_id",
+            "seam",
+            "timeframe",
+            "bars",
+            "display_snapshot_id",
+            "next_before",
+            "has_more",
+            "history_revision",
+            "origin",
+            "rule_version",
+            "preparation_status",
+            "pending",
+            "bounded_partitions",
+            "materialized",
+            "queried_cutoff",
+            "current_observed_confirmed_end",
+            "indicator_progress",
+            "history_check",
+            "basis",
+            "calendar",
+            "precision",
+            "volume_kind",
+            "volume_unit",
+            "indicators",
+            "dependency_before",
+            "dependency_revision",
+            "future",
+            "bounded_history",
+            "as_of",
+            "series_kind",
+            "symbol",
+            "timings_ms"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 1391,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "M5",
+            "series_kind": "composite"
+          },
+          "headers_ms": 1670,
+          "status": 200,
+          "ms": 1670
+        },
+        {
+          "path": "/api/charts/data",
+          "method": "POST",
+          "at_ms": 1404,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "D1",
+            "series_kind": "composite",
+            "indicators": 0
+          },
+          "headers_ms": 2544,
+          "status": 200,
+          "ms": 2555,
+          "bars": 50,
+          "timings_ms": {
+            "fixed_read_freeze": 1248.74
+          },
+          "keys": [
+            "composite_id",
+            "revision_id",
+            "input_revision",
+            "history_version_id",
+            "seam",
+            "timeframe",
+            "bars",
+            "display_snapshot_id",
+            "next_before",
+            "has_more",
+            "history_revision",
+            "origin",
+            "rule_version",
+            "preparation_status",
+            "pending",
+            "bounded_partitions",
+            "materialized",
+            "queried_cutoff",
+            "current_observed_confirmed_end",
+            "indicator_progress",
+            "history_check",
+            "basis",
+            "calendar",
+            "precision",
+            "volume_kind",
+            "volume_unit",
+            "indicators",
+            "dependency_before",
+            "dependency_revision",
+            "future",
+            "bounded_history",
+            "as_of",
+            "series_kind",
+            "symbol",
+            "timings_ms"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/data",
+          "method": "POST",
+          "at_ms": 2515,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "H4",
+            "series_kind": "composite",
+            "indicators": 0
+          },
+          "headers_ms": 2808,
+          "status": 200,
+          "ms": 2820,
+          "bars": 46,
+          "timings_ms": {
+            "fixed_read_freeze": 2246.18
+          },
+          "keys": [
+            "composite_id",
+            "revision_id",
+            "input_revision",
+            "history_version_id",
+            "seam",
+            "timeframe",
+            "bars",
+            "display_snapshot_id",
+            "next_before",
+            "has_more",
+            "history_revision",
+            "origin",
+            "rule_version",
+            "preparation_status",
+            "pending",
+            "bounded_partitions",
+            "materialized",
+            "queried_cutoff",
+            "current_observed_confirmed_end",
+            "indicator_progress",
+            "history_check",
+            "basis",
+            "calendar",
+            "precision",
+            "volume_kind",
+            "volume_unit",
+            "indicators",
+            "dependency_before",
+            "dependency_revision",
+            "future",
+            "bounded_history",
+            "as_of",
+            "series_kind",
+            "symbol",
+            "timings_ms"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/market-data/resolve",
+          "method": "POST",
+          "at_ms": 2538,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "M1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 1610,
+          "status": 200,
+          "ms": 1613,
+          "keys": [
+            "id",
+            "symbol",
+            "name",
+            "display_symbol",
+            "series_kind",
+            "source",
+            "historical_source",
+            "basis",
+            "calendar",
+            "precision",
+            "frames",
+            "volume_kind",
+            "volume_unit",
+            "composite_id",
+            "dataset_id",
+            "mapping_id",
+            "history_version_id",
+            "seam",
+            "created"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/notification-center/changes",
+          "method": "GET",
+          "at_ms": 3354,
+          "headers_ms": 764,
+          "status": 200,
+          "ms": 764
+        },
+        {
+          "path": "/api/charts/indicator-demands/release",
+          "method": "POST",
+          "at_ms": 3548,
+          "query": {},
+          "headers_ms": 655,
+          "status": 200,
+          "ms": 655
+        },
+        {
+          "path": "/api/charts/indicator-demands/release",
+          "method": "POST",
+          "at_ms": 3956,
+          "query": {},
+          "headers_ms": 246,
+          "status": 200,
+          "ms": 246
+        },
+        {
+          "path": "/api/market-data/resolve",
+          "method": "POST",
+          "at_ms": 4153,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "M1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 1254,
+          "status": 200,
+          "ms": 1263,
+          "keys": [
+            "id",
+            "symbol",
+            "name",
+            "display_symbol",
+            "series_kind",
+            "source",
+            "historical_source",
+            "basis",
+            "calendar",
+            "precision",
+            "frames",
+            "volume_kind",
+            "volume_unit",
+            "composite_id",
+            "dataset_id",
+            "mapping_id",
+            "history_version_id",
+            "seam",
+            "created"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/data",
+          "method": "POST",
+          "at_ms": 4204,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "M5",
+            "series_kind": "composite",
+            "indicators": 0
+          }
+        },
+        {
+          "path": "/api/chart-alerts",
+          "method": "GET",
+          "at_ms": 4208,
+          "headers_ms": 1496,
+          "status": 200,
+          "ms": 1496
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 5097,
+          "query": {},
+          "headers_ms": 805,
+          "status": 200,
+          "ms": 805
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 5101,
+          "query": {},
+          "headers_ms": 647,
+          "status": 200,
+          "ms": 647
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 5106,
+          "query": {},
+          "headers_ms": 828,
+          "status": 200,
+          "ms": 828
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 5109,
+          "query": {},
+          "headers_ms": 847,
+          "status": 200,
+          "ms": 847
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 5110,
+          "query": {},
+          "headers_ms": 893,
+          "status": 200,
+          "ms": 893
+        },
+        {
+          "path": "/api/chart-alerts/events",
+          "method": "GET",
+          "at_ms": 5334,
+          "headers_ms": 705,
+          "status": 200,
+          "ms": 705
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 5421,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "W1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 1766,
+          "status": 200,
+          "ms": 1766
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 5422,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "H1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 1803,
+          "status": 200,
+          "ms": 1803
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 5422,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "D1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 2573,
+          "status": 200,
+          "ms": 2573
+        },
+        {
+          "path": "/api/market-data/resolve",
+          "method": "POST",
+          "at_ms": 5424,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "M1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 2481,
+          "status": 200,
+          "ms": 2485,
+          "keys": [
+            "id",
+            "symbol",
+            "name",
+            "display_symbol",
+            "series_kind",
+            "source",
+            "historical_source",
+            "basis",
+            "calendar",
+            "precision",
+            "frames",
+            "volume_kind",
+            "volume_unit",
+            "composite_id",
+            "dataset_id",
+            "mapping_id",
+            "history_version_id",
+            "seam",
+            "created"
+          ],
+          "summary": {}
+        }
+      ],
+      "click_ms": 290,
+      "ready_ms": 3548,
+      "charts": [
+        {
+          "symbol": "MWC:8C490DF00408ED7102D9106E2AD6D3991D3E6488DE0B0905D92A2EC052343CBB",
+          "res": "60",
+          "ready": true
+        },
+        {
+          "symbol": "MWC:8C490DF00408ED7102D9106E2AD6D3991D3E6488DE0B0905D92A2EC052343CBB",
+          "res": "5",
+          "ready": true
+        },
+        {
+          "symbol": "MWC:8C490DF00408ED7102D9106E2AD6D3991D3E6488DE0B0905D92A2EC052343CBB",
+          "res": "1W",
+          "ready": true
+        },
+        {
+          "symbol": "MWC:8C490DF00408ED7102D9106E2AD6D3991D3E6488DE0B0905D92A2EC052343CBB",
+          "res": "1D",
+          "ready": false
+        },
+        {
+          "symbol": "MWC:8C490DF00408ED7102D9106E2AD6D3991D3E6488DE0B0905D92A2EC052343CBB",
+          "res": "240",
+          "ready": false
+        }
+      ],
+      "all_ready_ms": 5335,
+      "feed": [
+        {
+          "method": "getBars",
+          "at": 1792683679021,
+          "symbol": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+          "resolution": "60",
+          "ms": 3302,
+          "bars": 77
+        },
+        {
+          "method": "getBars",
+          "at": 1792683679028,
+          "symbol": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+          "resolution": "1W",
+          "ms": 2266,
+          "bars": 28
+        },
+        {
+          "method": "getBars",
+          "at": 1792683679029,
+          "symbol": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+          "resolution": "1D",
+          "ms": 3706,
+          "bars": 50
+        },
+        {
+          "method": "getBars",
+          "at": 1792683679029,
+          "symbol": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+          "resolution": "240",
+          "ms": 5080,
+          "bars": 46
+        },
+        {
+          "method": "getBars",
+          "at": 1792683679071,
+          "symbol": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+          "resolution": "5"
+        }
+      ],
+      "slow": true
+    },
+    {
+      "ticker": "MWP:EURUSD",
+      "start": 1792683685087,
+      "requests": [
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 197,
+          "query": {},
+          "headers_ms": 2798,
+          "status": 200,
+          "ms": 2798
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 201,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "M1",
+            "series_kind": "provider"
+          },
+          "headers_ms": 2931,
+          "status": 200,
+          "ms": 2931
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 207,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "M1",
+            "series_kind": "provider"
+          },
+          "headers_ms": 3056,
+          "status": 200,
+          "ms": 3056
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 210,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "M1",
+            "series_kind": "provider"
+          },
+          "headers_ms": 3286,
+          "status": 200,
+          "ms": 3286
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 372,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "M1",
+            "series_kind": "provider"
+          },
+          "headers_ms": 3054,
+          "status": 200,
+          "ms": 3054
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 886,
+          "query": {},
+          "headers_ms": 2618,
+          "status": 200,
+          "ms": 2618
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 927,
+          "query": {},
+          "headers_ms": 2594,
+          "status": 200,
+          "ms": 2594
+        },
+        {
+          "path": "/api/charts/data",
+          "method": "POST",
+          "at_ms": 1551,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "H4",
+            "series_kind": "composite",
+            "indicators": 0
+          },
+          "headers_ms": 2060,
+          "status": 200,
+          "ms": 2065,
+          "bars": 43,
+          "timings_ms": {
+            "fixed_read_freeze": 274.1
+          },
+          "keys": [
+            "composite_id",
+            "revision_id",
+            "input_revision",
+            "history_version_id",
+            "seam",
+            "timeframe",
+            "bars",
+            "next_before",
+            "has_more",
+            "history_revision",
+            "origin",
+            "rule_version",
+            "preparation_status",
+            "pending",
+            "bounded_partitions",
+            "materialized",
+            "queried_cutoff",
+            "current_observed_confirmed_end",
+            "indicator_progress",
+            "history_check",
+            "basis",
+            "calendar",
+            "precision",
+            "volume_kind",
+            "volume_unit",
+            "indicators",
+            "dependency_before",
+            "dependency_revision",
+            "future",
+            "bounded_history",
+            "as_of",
+            "series_kind",
+            "symbol",
+            "timings_ms"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 1613,
+          "query": {},
+          "headers_ms": 1923,
+          "status": 200,
+          "ms": 1923
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 1614,
+          "query": {},
+          "headers_ms": 2018,
+          "status": 200,
+          "ms": 2018
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 1615,
+          "query": {},
+          "headers_ms": 2083,
+          "status": 200,
+          "ms": 2083
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 1615,
+          "query": {},
+          "headers_ms": 2011,
+          "status": 200,
+          "ms": 2011
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 1698,
+          "query": {},
+          "headers_ms": 2005,
+          "status": 200,
+          "ms": 2005
+        },
+        {
+          "path": "/api/charts/data",
+          "method": "POST",
+          "at_ms": 2416,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "M5",
+            "series_kind": "composite",
+            "indicators": 0
+          },
+          "headers_ms": 2077,
+          "status": 200,
+          "ms": 2084,
+          "bars": 99,
+          "timings_ms": {
+            "fixed_read_freeze": 734.43
+          },
+          "keys": [
+            "composite_id",
+            "revision_id",
+            "input_revision",
+            "history_version_id",
+            "seam",
+            "timeframe",
+            "bars",
+            "display_snapshot_id",
+            "next_before",
+            "has_more",
+            "history_revision",
+            "origin",
+            "rule_version",
+            "preparation_status",
+            "pending",
+            "bounded_partitions",
+            "materialized",
+            "queried_cutoff",
+            "current_observed_confirmed_end",
+            "indicator_progress",
+            "history_check",
+            "basis",
+            "calendar",
+            "precision",
+            "volume_kind",
+            "volume_unit",
+            "indicators",
+            "dependency_before",
+            "dependency_revision",
+            "future",
+            "bounded_history",
+            "as_of",
+            "series_kind",
+            "symbol",
+            "timings_ms"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/chart-alerts",
+          "method": "GET",
+          "at_ms": 2717,
+          "headers_ms": 1922,
+          "status": 200,
+          "ms": 1922
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 2720,
+          "query": {
+            "instrument": "BTCUSDT",
+            "timeframe": "M1",
+            "series_kind": "provider"
+          },
+          "headers_ms": 1811,
+          "status": 200,
+          "ms": 1811
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 2722,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "M1",
+            "series_kind": "provider"
+          },
+          "headers_ms": 1829,
+          "status": 200,
+          "ms": 1829
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 2724,
+          "query": {
+            "instrument": "OANDA:GBP_USD",
+            "timeframe": "M1",
+            "series_kind": "provider"
+          },
+          "headers_ms": 1905,
+          "status": 200,
+          "ms": 1905
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 2728,
+          "query": {
+            "instrument": "XAUUSD",
+            "timeframe": "M1",
+            "series_kind": "provider"
+          },
+          "headers_ms": 2059,
+          "status": 200,
+          "ms": 2059
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 2728,
+          "query": {
+            "instrument": "2a673b63-2922-497e-bec9-d0231be55934",
+            "timeframe": "M1",
+            "series_kind": "history"
+          },
+          "headers_ms": 2100,
+          "status": 200,
+          "ms": 2100
+        },
+        {
+          "path": "/api/market-data/resolve",
+          "method": "POST",
+          "at_ms": 2729,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "M1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 2194,
+          "status": 200,
+          "ms": 2199,
+          "keys": [
+            "id",
+            "symbol",
+            "name",
+            "display_symbol",
+            "series_kind",
+            "source",
+            "historical_source",
+            "basis",
+            "calendar",
+            "precision",
+            "frames",
+            "volume_kind",
+            "volume_unit",
+            "composite_id",
+            "dataset_id",
+            "mapping_id",
+            "history_version_id",
+            "seam",
+            "created"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/market-data/resolve",
+          "method": "POST",
+          "at_ms": 2729,
+          "query": {
+            "instrument": "54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982",
+            "timeframe": "M1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 2305,
+          "status": 200,
+          "ms": 2308,
+          "keys": [
+            "id",
+            "symbol",
+            "name",
+            "display_symbol",
+            "series_kind",
+            "source",
+            "historical_source",
+            "basis",
+            "calendar",
+            "precision",
+            "frames",
+            "volume_kind",
+            "volume_unit",
+            "composite_id",
+            "dataset_id",
+            "mapping_id",
+            "history_version_id",
+            "seam",
+            "created"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/market-data/resolve",
+          "method": "POST",
+          "at_ms": 2731,
+          "query": {
+            "instrument": "4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6",
+            "timeframe": "M1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 2225,
+          "status": 200,
+          "ms": 2254,
+          "keys": [
+            "id",
+            "symbol",
+            "name",
+            "display_symbol",
+            "series_kind",
+            "source",
+            "historical_source",
+            "basis",
+            "calendar",
+            "precision",
+            "frames",
+            "volume_kind",
+            "volume_unit",
+            "composite_id",
+            "dataset_id",
+            "mapping_id",
+            "history_version_id",
+            "seam",
+            "created"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/notification-center/health",
+          "method": "GET",
+          "at_ms": 3235,
+          "headers_ms": 1800,
+          "status": 200,
+          "ms": 1800
+        },
+        {
+          "path": "/api/chart-alerts/events",
+          "method": "GET",
+          "at_ms": 3255,
+          "headers_ms": 1766,
+          "status": 200,
+          "ms": 1766
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 3267,
+          "query": {},
+          "headers_ms": 1791,
+          "status": 200,
+          "ms": 1791
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 3498,
+          "query": {},
+          "headers_ms": 1595,
+          "status": 200,
+          "ms": 1595
+        },
+        {
+          "path": "/api/charts/indicator-demands/release",
+          "method": "POST",
+          "at_ms": 3620,
+          "query": {},
+          "headers_ms": 1438,
+          "status": 200,
+          "ms": 1438
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 3894,
+          "query": {},
+          "headers_ms": 1222,
+          "status": 200,
+          "ms": 1222
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 3894,
+          "query": {},
+          "headers_ms": 1223,
+          "status": 200,
+          "ms": 1223
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 3895,
+          "query": {},
+          "headers_ms": 1232,
+          "status": 200,
+          "ms": 1232
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 3895,
+          "query": {},
+          "headers_ms": 1230,
+          "status": 200,
+          "ms": 1230
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 3900,
+          "query": {},
+          "headers_ms": 1252,
+          "status": 200,
+          "ms": 1252
+        },
+        {
+          "path": "/api/charts/history-loads",
+          "method": "POST",
+          "at_ms": 4503,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "H1",
+            "series_kind": "provider",
+            "countBack": 77,
+            "firstDataRequest": true,
+            "indicators": 0
+          },
+          "headers_ms": 743,
+          "status": 200,
+          "ms": 744,
+          "keys": [
+            "load"
+          ],
+          "summary": {
+            "state": "waiting"
+          }
+        },
+        {
+          "path": "/api/charts/history-loads",
+          "method": "POST",
+          "at_ms": 4645,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "M5",
+            "series_kind": "provider",
+            "countBack": 99,
+            "firstDataRequest": true,
+            "indicators": 0
+          },
+          "headers_ms": 590,
+          "status": 200,
+          "ms": 592,
+          "keys": [
+            "load"
+          ],
+          "summary": {
+            "state": "waiting"
+          }
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 4929,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "M1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 486,
+          "status": 200,
+          "ms": 486
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 4987,
+          "query": {
+            "instrument": "4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6",
+            "timeframe": "M1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 446,
+          "status": 200,
+          "ms": 446
+        },
+        {
+          "path": "/api/charts/history-loads",
+          "method": "POST",
+          "at_ms": 5028,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "W1",
+            "series_kind": "provider",
+            "countBack": 28,
+            "firstDataRequest": true,
+            "indicators": 0
+          },
+          "headers_ms": 664,
+          "status": 200,
+          "ms": 667,
+          "keys": [
+            "load"
+          ],
+          "summary": {
+            "state": "waiting"
+          }
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 5046,
+          "query": {
+            "instrument": "54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982",
+            "timeframe": "M1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 655,
+          "status": 200,
+          "ms": 655
+        },
+        {
+          "path": "/api/charts/history-loads",
+          "method": "POST",
+          "at_ms": 5066,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "D1",
+            "series_kind": "provider",
+            "countBack": 50,
+            "firstDataRequest": true,
+            "indicators": 0
+          },
+          "headers_ms": 1064,
+          "status": 200,
+          "ms": 1067,
+          "keys": [
+            "load"
+          ],
+          "summary": {
+            "state": "waiting"
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/29a5313a-7a74-4d4f-a472-84cc64a64220",
+          "method": "GET",
+          "at_ms": 5436,
+          "headers_ms": 452,
+          "status": 200,
+          "ms": 455,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "filling",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/f3bfc156-f851-47e4-aac7-9755cb5ec40d",
+          "method": "GET",
+          "at_ms": 5447,
+          "headers_ms": 278,
+          "status": 200,
+          "ms": 285,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/f22b7f59-287e-4ee0-bea0-c45bb60708ad",
+          "method": "GET",
+          "at_ms": 5894,
+          "headers_ms": 297,
+          "status": 200,
+          "ms": 299,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/f3bfc156-f851-47e4-aac7-9755cb5ec40d",
+          "method": "GET",
+          "at_ms": 6017,
+          "headers_ms": 307,
+          "status": 200,
+          "ms": 309,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "filling",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/29a5313a-7a74-4d4f-a472-84cc64a64220",
+          "method": "GET",
+          "at_ms": 6175,
+          "headers_ms": 157,
+          "status": 200,
+          "ms": 162,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "ready",
+            "pages": 1
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/23ed534f-4615-4745-8af1-6da5ac2c17f0",
+          "method": "GET",
+          "at_ms": 6332,
+          "headers_ms": 19,
+          "status": 200,
+          "ms": 20,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/29a5313a-7a74-4d4f-a472-84cc64a64220/result",
+          "method": "GET",
+          "at_ms": 6335,
+          "headers_ms": 260,
+          "status": 200,
+          "ms": 268,
+          "bars": 99,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 105.29,
+            "metadata": 32.62
+          },
+          "keys": [
+            "result"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/history-loads/f22b7f59-287e-4ee0-bea0-c45bb60708ad",
+          "method": "GET",
+          "at_ms": 6472,
+          "headers_ms": 30,
+          "status": 200,
+          "ms": 31,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/29a5313a-7a74-4d4f-a472-84cc64a64220/cancel",
+          "method": "POST",
+          "at_ms": 6597,
+          "query": {},
+          "headers_ms": 22,
+          "status": 200,
+          "ms": 37,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "cancelled",
+            "pages": 1
+          }
+        },
+        {
+          "path": "/api/charts/history-loads",
+          "method": "POST",
+          "at_ms": 6634,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "H4",
+            "series_kind": "provider",
+            "countBack": 46,
+            "firstDataRequest": true,
+            "indicators": 0
+          },
+          "headers_ms": 161,
+          "status": 200,
+          "ms": 167,
+          "keys": [
+            "load"
+          ],
+          "summary": {
+            "state": "waiting"
+          }
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 6659,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "M5",
+            "series_kind": "provider"
+          },
+          "headers_ms": 63,
+          "status": 200,
+          "ms": 63
+        },
+        {
+          "path": "/api/charts/history-loads/23ed534f-4615-4745-8af1-6da5ac2c17f0",
+          "method": "GET",
+          "at_ms": 6660,
+          "headers_ms": 102,
+          "status": 200,
+          "ms": 104,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/f3bfc156-f851-47e4-aac7-9755cb5ec40d",
+          "method": "GET",
+          "at_ms": 6718,
+          "headers_ms": 259,
+          "status": 200,
+          "ms": 265,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "filling",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 6727,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "M5",
+            "series_kind": "provider"
+          },
+          "headers_ms": 254,
+          "status": 200,
+          "ms": 254
+        },
+        {
+          "path": "/api/charts/history-loads/f22b7f59-287e-4ee0-bea0-c45bb60708ad",
+          "method": "GET",
+          "at_ms": 6895,
+          "headers_ms": 300,
+          "status": 200,
+          "ms": 303,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/cd713c84-85fe-4470-b017-785bfc095678",
+          "method": "GET",
+          "at_ms": 6997,
+          "headers_ms": 308,
+          "status": 200,
+          "ms": 311,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/notification-center/changes",
+          "method": "GET",
+          "at_ms": 7045,
+          "headers_ms": 303,
+          "status": 200,
+          "ms": 303
+        },
+        {
+          "path": "/api/charts/history-loads/23ed534f-4615-4745-8af1-6da5ac2c17f0",
+          "method": "GET",
+          "at_ms": 7156,
+          "headers_ms": 248,
+          "status": 200,
+          "ms": 262,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/stream/accept",
+          "method": "POST",
+          "at_ms": 7464,
+          "query": {},
+          "headers_ms": 32,
+          "status": 200,
+          "ms": 32
+        },
+        {
+          "path": "/api/charts/history-loads/f3bfc156-f851-47e4-aac7-9755cb5ec40d",
+          "method": "GET",
+          "at_ms": 7528,
+          "headers_ms": 16,
+          "status": 200,
+          "ms": 17,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "filling",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/cd713c84-85fe-4470-b017-785bfc095678",
+          "method": "GET",
+          "at_ms": 7589,
+          "headers_ms": 27,
+          "status": 200,
+          "ms": 30,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/f22b7f59-287e-4ee0-bea0-c45bb60708ad",
+          "method": "GET",
+          "at_ms": 7746,
+          "headers_ms": 17,
+          "status": 200,
+          "ms": 21,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/23ed534f-4615-4745-8af1-6da5ac2c17f0",
+          "method": "GET",
+          "at_ms": 7967,
+          "headers_ms": 1426,
+          "status": 200,
+          "ms": 1430,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/cd713c84-85fe-4470-b017-785bfc095678",
+          "method": "GET",
+          "at_ms": 8011,
+          "headers_ms": 1415,
+          "status": 200,
+          "ms": 1416,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/f3bfc156-f851-47e4-aac7-9755cb5ec40d",
+          "method": "GET",
+          "at_ms": 8314,
+          "headers_ms": 1548,
+          "status": 200,
+          "ms": 1550,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "ready",
+            "pages": 1
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/f22b7f59-287e-4ee0-bea0-c45bb60708ad",
+          "method": "GET",
+          "at_ms": 8531,
+          "headers_ms": 1282,
+          "status": 200,
+          "ms": 1290,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "ready",
+            "pages": 1
+          }
+        },
+        {
+          "path": "/api/notification-center/changes",
+          "method": "GET",
+          "at_ms": 9406,
+          "headers_ms": 877,
+          "status": 200,
+          "ms": 877
+        },
+        {
+          "path": "/api/signals/pending-count",
+          "method": "GET",
+          "at_ms": 9724,
+          "headers_ms": 187,
+          "status": 200,
+          "ms": 187
+        },
+        {
+          "path": "/api/charts/history-loads/f22b7f59-287e-4ee0-bea0-c45bb60708ad/result",
+          "method": "GET",
+          "at_ms": 9817,
+          "headers_ms": 412,
+          "status": 200,
+          "ms": 440,
+          "bars": 28,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 80.92,
+            "metadata": 8.73
+          },
+          "keys": [
+            "result"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/history-loads/f3bfc156-f851-47e4-aac7-9755cb5ec40d/result",
+          "method": "GET",
+          "at_ms": 9864,
+          "headers_ms": 558,
+          "status": 200,
+          "ms": 569,
+          "bars": 149,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 81.66,
+            "metadata": 2.65
+          },
+          "keys": [
+            "result"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/history-loads/cd713c84-85fe-4470-b017-785bfc095678",
+          "method": "GET",
+          "at_ms": 9975,
+          "headers_ms": 338,
+          "status": 200,
+          "ms": 354,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 10099,
+          "query": {},
+          "headers_ms": 217,
+          "status": 200,
+          "ms": 217
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 10106,
+          "query": {},
+          "headers_ms": 428,
+          "status": 200,
+          "ms": 428
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 10112,
+          "query": {},
+          "headers_ms": 243,
+          "status": 200,
+          "ms": 243
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 10113,
+          "query": {},
+          "headers_ms": 317,
+          "status": 200,
+          "ms": 317
+        },
+        {
+          "path": "/api/charts/history-loads/23ed534f-4615-4745-8af1-6da5ac2c17f0",
+          "method": "GET",
+          "at_ms": 10165,
+          "headers_ms": 281,
+          "status": 200,
+          "ms": 282,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "filling",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/f22b7f59-287e-4ee0-bea0-c45bb60708ad/cancel",
+          "method": "POST",
+          "at_ms": 10253,
+          "query": {},
+          "headers_ms": 202,
+          "status": 200,
+          "ms": 206,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "cancelled",
+            "pages": 1
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/f3bfc156-f851-47e4-aac7-9755cb5ec40d/cancel",
+          "method": "POST",
+          "at_ms": 10433,
+          "query": {},
+          "headers_ms": 110,
+          "status": 200,
+          "ms": 117,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "cancelled",
+            "pages": 1
+          }
+        },
+        {
+          "path": "/api/chart-alerts",
+          "method": "GET",
+          "at_ms": 10466,
+          "headers_ms": 245,
+          "status": 200,
+          "ms": 245
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 10469,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "W1",
+            "series_kind": "provider"
+          },
+          "headers_ms": 169,
+          "status": 200,
+          "ms": 169
+        },
+        {
+          "path": "/api/chart-alerts/events",
+          "method": "GET",
+          "at_ms": 10551,
+          "headers_ms": 111,
+          "status": 200,
+          "ms": 111
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 10553,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "H1",
+            "series_kind": "provider"
+          },
+          "headers_ms": 169,
+          "status": 200,
+          "ms": 169
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 10644,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "W1",
+            "series_kind": "provider"
+          },
+          "headers_ms": 102,
+          "status": 200,
+          "ms": 102
+        },
+        {
+          "path": "/api/charts/indicator-demands/release",
+          "method": "POST",
+          "at_ms": 10667,
+          "query": {},
+          "headers_ms": 68,
+          "status": 200,
+          "ms": 68
+        },
+        {
+          "path": "/api/charts/stream/accept",
+          "method": "POST",
+          "at_ms": 10669,
+          "query": {},
+          "headers_ms": 81,
+          "status": 200,
+          "ms": 81
+        },
+        {
+          "path": "/api/charts/indicator-demands/release",
+          "method": "POST",
+          "at_ms": 10719,
+          "query": {},
+          "headers_ms": 110,
+          "status": 200,
+          "ms": 110
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 10731,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "H1",
+            "series_kind": "provider"
+          },
+          "headers_ms": 122,
+          "status": 200,
+          "ms": 122
+        },
+        {
+          "path": "/api/charts/history-loads",
+          "method": "POST",
+          "at_ms": 10735,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "M5",
+            "series_kind": "provider",
+            "countBack": 9,
+            "firstDataRequest": false,
+            "indicators": 0
+          },
+          "headers_ms": 325,
+          "status": 200,
+          "ms": 368,
+          "bars": 9,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 147.15,
+            "metadata": 2.38
+          },
+          "keys": [
+            "result"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/chart-alerts/events",
+          "method": "GET",
+          "at_ms": 10832,
+          "headers_ms": 79,
+          "status": 200,
+          "ms": 79
+        },
+        {
+          "path": "/api/chart-alerts",
+          "method": "GET",
+          "at_ms": 10917,
+          "headers_ms": 131,
+          "status": 200,
+          "ms": 131
+        },
+        {
+          "path": "/api/market-data/quotes",
+          "method": "POST",
+          "at_ms": 11054,
+          "query": {},
+          "headers_ms": 248,
+          "status": 200,
+          "ms": 248
+        },
+        {
+          "path": "/api/charts/reserve",
+          "method": "POST",
+          "at_ms": 11081,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "H1",
+            "series_kind": "provider",
+            "countBack": 144,
+            "firstDataRequest": false,
+            "indicators": 0
+          },
+          "headers_ms": 105,
+          "status": 200,
+          "ms": 105
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 11088,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "M5",
+            "series_kind": "provider"
+          },
+          "headers_ms": 164,
+          "status": 200,
+          "ms": 164
+        },
+        {
+          "path": "/api/charts/history-loads/cd713c84-85fe-4470-b017-785bfc095678",
+          "method": "GET",
+          "at_ms": 11118,
+          "headers_ms": 157,
+          "status": 200,
+          "ms": 164,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "waiting",
+            "pages": 0
+          }
+        },
+        {
+          "path": "/api/charts/data",
+          "method": "POST",
+          "at_ms": 11205,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "M5",
+            "series_kind": "provider",
+            "firstDataRequest": false,
+            "indicators": 2
+          },
+          "headers_ms": 242,
+          "status": 200,
+          "ms": 261,
+          "bars": 89,
+          "cache_hit": true,
+          "timings_ms": {
+            "metadata": 33.65
+          },
+          "keys": [
+            "dataset_id",
+            "bars",
+            "has_more",
+            "history_boundary",
+            "as_of",
+            "cache_revision",
+            "provider_snapshot_id",
+            "cache_hit",
+            "native_parameters",
+            "timings_ms",
+            "provider_acceptance",
+            "history_dependency_first",
+            "calculation_origin",
+            "indicators"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 11255,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "M5",
+            "series_kind": "provider"
+          },
+          "headers_ms": 146,
+          "status": 200,
+          "ms": 146
+        },
+        {
+          "path": "/api/market-data/quotes",
+          "method": "POST",
+          "at_ms": 11316,
+          "query": {},
+          "headers_ms": 272,
+          "status": 200,
+          "ms": 272
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 11321,
+          "query": {},
+          "headers_ms": 170,
+          "status": 200,
+          "ms": 170
+        },
+        {
+          "path": "/api/market-data/resolve",
+          "method": "POST",
+          "at_ms": 11321,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "M1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 212,
+          "status": 200,
+          "ms": 216,
+          "keys": [
+            "id",
+            "symbol",
+            "name",
+            "display_symbol",
+            "series_kind",
+            "source",
+            "historical_source",
+            "basis",
+            "calendar",
+            "precision",
+            "frames",
+            "volume_kind",
+            "volume_unit",
+            "composite_id",
+            "dataset_id",
+            "mapping_id",
+            "history_version_id",
+            "seam",
+            "created"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/reserve",
+          "method": "POST",
+          "at_ms": 11463,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "W1",
+            "series_kind": "provider",
+            "countBack": 52,
+            "firstDataRequest": false,
+            "indicators": 0
+          },
+          "headers_ms": 534,
+          "status": 200,
+          "ms": 534
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 11494,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "M5",
+            "series_kind": "provider"
+          },
+          "headers_ms": 130,
+          "status": 200,
+          "ms": 130
+        },
+        {
+          "path": "/api/charts/history-loads/23ed534f-4615-4745-8af1-6da5ac2c17f0",
+          "method": "GET",
+          "at_ms": 11523,
+          "headers_ms": 607,
+          "status": 200,
+          "ms": 611,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "ready",
+            "pages": 1
+          }
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 11535,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "M1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 585,
+          "status": 200,
+          "ms": 585
+        },
+        {
+          "path": "/api/market-data/quotes",
+          "method": "POST",
+          "at_ms": 11593,
+          "query": {},
+          "headers_ms": 1991,
+          "status": 200,
+          "ms": 1991
+        },
+        {
+          "path": "/api/market-data/resolve",
+          "method": "POST",
+          "at_ms": 11595,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "M1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 808,
+          "status": 200,
+          "ms": 810,
+          "keys": [
+            "id",
+            "symbol",
+            "name",
+            "display_symbol",
+            "series_kind",
+            "source",
+            "historical_source",
+            "basis",
+            "calendar",
+            "precision",
+            "frames",
+            "volume_kind",
+            "volume_unit",
+            "composite_id",
+            "dataset_id",
+            "mapping_id",
+            "history_version_id",
+            "seam",
+            "created"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/reserve",
+          "method": "POST",
+          "at_ms": 12050,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "W1",
+            "series_kind": "provider",
+            "countBack": 52,
+            "firstDataRequest": false,
+            "indicators": 0
+          },
+          "headers_ms": 645,
+          "status": 200,
+          "ms": 645
+        },
+        {
+          "path": "/api/charts/stream/accept",
+          "method": "POST",
+          "at_ms": 12072,
+          "query": {},
+          "headers_ms": 526,
+          "status": 200,
+          "ms": 526
+        },
+        {
+          "path": "/api/charts/stream/accept",
+          "method": "POST",
+          "at_ms": 12074,
+          "query": {},
+          "headers_ms": 426,
+          "status": 200,
+          "ms": 426
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 12132,
+          "query": {},
+          "headers_ms": 682,
+          "status": 200,
+          "ms": 682
+        },
+        {
+          "path": "/api/charts/history-loads/23ed534f-4615-4745-8af1-6da5ac2c17f0/result",
+          "method": "GET",
+          "at_ms": 12133,
+          "headers_ms": 1666,
+          "status": 200,
+          "ms": 1670,
+          "bars": 50,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 98.32,
+            "metadata": 2.52
+          },
+          "keys": [
+            "result"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/notification-center/changes",
+          "method": "GET",
+          "at_ms": 12333,
+          "headers_ms": 577,
+          "status": 200,
+          "ms": 577
+        },
+        {
+          "path": "/api/charts/history-loads/cd713c84-85fe-4470-b017-785bfc095678",
+          "method": "GET",
+          "at_ms": 12355,
+          "headers_ms": 666,
+          "status": 200,
+          "ms": 668,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "ready",
+            "pages": 1
+          }
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 12405,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "M1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 709,
+          "status": 200,
+          "ms": 709
+        },
+        {
+          "path": "/api/charts/history-loads/cd713c84-85fe-4470-b017-785bfc095678/result",
+          "method": "GET",
+          "at_ms": 13024,
+          "headers_ms": 722,
+          "status": 200,
+          "ms": 727,
+          "bars": 52,
+          "cache_hit": true,
+          "timings_ms": {
+            "read_total": 77.56,
+            "metadata": 6.87
+          },
+          "keys": [
+            "result"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/stream/accept",
+          "method": "POST",
+          "at_ms": 13359,
+          "query": {},
+          "headers_ms": 527,
+          "status": 200,
+          "ms": 527
+        },
+        {
+          "path": "/api/charts/stream/accept",
+          "method": "POST",
+          "at_ms": 13360,
+          "query": {},
+          "headers_ms": 288,
+          "status": 200,
+          "ms": 288
+        },
+        {
+          "path": "/api/market-data/quotes",
+          "method": "POST",
+          "at_ms": 13590,
+          "query": {},
+          "headers_ms": 338,
+          "status": 200,
+          "ms": 338
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 13595,
+          "query": {},
+          "headers_ms": 233,
+          "status": 200,
+          "ms": 233
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 13599,
+          "query": {},
+          "headers_ms": 410,
+          "status": 200,
+          "ms": 410
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 13603,
+          "query": {},
+          "headers_ms": 429,
+          "status": 200,
+          "ms": 429
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 13608,
+          "query": {},
+          "headers_ms": 504,
+          "status": 200,
+          "ms": 504
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 13612,
+          "query": {},
+          "headers_ms": 598,
+          "status": 200,
+          "ms": 598
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 13616,
+          "query": {},
+          "headers_ms": 573,
+          "status": 200,
+          "ms": 573
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 13621,
+          "query": {},
+          "headers_ms": 1192,
+          "status": 200,
+          "ms": 1192
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 13622,
+          "query": {},
+          "headers_ms": 874,
+          "status": 200,
+          "ms": 874
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 13622,
+          "query": {
+            "instrument": "BTCUSDT",
+            "timeframe": "M1",
+            "series_kind": "provider"
+          },
+          "headers_ms": 906,
+          "status": 200,
+          "ms": 906
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 13622,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "M1",
+            "series_kind": "provider"
+          },
+          "headers_ms": 1075,
+          "status": 200,
+          "ms": 1075
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 13642,
+          "query": {
+            "instrument": "OANDA:GBP_USD",
+            "timeframe": "M1",
+            "series_kind": "provider"
+          },
+          "headers_ms": 1011,
+          "status": 200,
+          "ms": 1011
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 13644,
+          "query": {
+            "instrument": "XAUUSD",
+            "timeframe": "M1",
+            "series_kind": "provider"
+          },
+          "headers_ms": 1092,
+          "status": 200,
+          "ms": 1092
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 13645,
+          "query": {
+            "instrument": "2a673b63-2922-497e-bec9-d0231be55934",
+            "timeframe": "M1",
+            "series_kind": "history"
+          },
+          "headers_ms": 1147,
+          "status": 200,
+          "ms": 1147
+        },
+        {
+          "path": "/api/market-data/resolve",
+          "method": "POST",
+          "at_ms": 13645,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "M1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 1316,
+          "status": 200,
+          "ms": 1319,
+          "keys": [
+            "id",
+            "symbol",
+            "name",
+            "display_symbol",
+            "series_kind",
+            "source",
+            "historical_source",
+            "basis",
+            "calendar",
+            "precision",
+            "frames",
+            "volume_kind",
+            "volume_unit",
+            "composite_id",
+            "dataset_id",
+            "mapping_id",
+            "history_version_id",
+            "seam",
+            "created"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/market-data/resolve",
+          "method": "POST",
+          "at_ms": 13647,
+          "query": {
+            "instrument": "54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982",
+            "timeframe": "M1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 1187,
+          "status": 200,
+          "ms": 1190,
+          "keys": [
+            "id",
+            "symbol",
+            "name",
+            "display_symbol",
+            "series_kind",
+            "source",
+            "historical_source",
+            "basis",
+            "calendar",
+            "precision",
+            "frames",
+            "volume_kind",
+            "volume_unit",
+            "composite_id",
+            "dataset_id",
+            "mapping_id",
+            "history_version_id",
+            "seam",
+            "created"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/market-data/resolve",
+          "method": "POST",
+          "at_ms": 13648,
+          "query": {
+            "instrument": "4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6",
+            "timeframe": "M1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 1277,
+          "status": 200,
+          "ms": 1282,
+          "keys": [
+            "id",
+            "symbol",
+            "name",
+            "display_symbol",
+            "series_kind",
+            "source",
+            "historical_source",
+            "basis",
+            "calendar",
+            "precision",
+            "frames",
+            "volume_kind",
+            "volume_unit",
+            "composite_id",
+            "dataset_id",
+            "mapping_id",
+            "history_version_id",
+            "seam",
+            "created"
+          ],
+          "summary": {}
+        },
+        {
+          "path": "/api/charts/history-loads/cd713c84-85fe-4470-b017-785bfc095678/cancel",
+          "method": "POST",
+          "at_ms": 13751,
+          "query": {},
+          "headers_ms": 1354,
+          "status": 200,
+          "ms": 1377,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "cancelled",
+            "pages": 1
+          }
+        },
+        {
+          "path": "/api/charts/history-loads/23ed534f-4615-4745-8af1-6da5ac2c17f0/cancel",
+          "method": "POST",
+          "at_ms": 13802,
+          "query": {},
+          "headers_ms": 1326,
+          "status": 200,
+          "ms": 1337,
+          "keys": [
+            "id",
+            "state",
+            "pages",
+            "notice_source_id",
+            "deadline",
+            "error"
+          ],
+          "summary": {
+            "state": "cancelled",
+            "pages": 1
+          }
+        },
+        {
+          "path": "/api/market-data/quotes",
+          "method": "POST",
+          "at_ms": 13931,
+          "query": {},
+          "headers_ms": 2057,
+          "status": 200,
+          "ms": 2057
+        },
+        {
+          "path": "/api/charts/stream/unsubscribe",
+          "method": "POST",
+          "at_ms": 13932,
+          "query": {},
+          "headers_ms": 2173,
+          "status": 200,
+          "ms": 2173
+        },
+        {
+          "path": "/api/chart-alerts",
+          "method": "GET",
+          "at_ms": 14534,
+          "headers_ms": 1192,
+          "status": 200,
+          "ms": 1192
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 14839,
+          "query": {
+            "instrument": "54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982",
+            "timeframe": "M1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 1052,
+          "status": 200,
+          "ms": 1052
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 14932,
+          "query": {
+            "instrument": "4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6",
+            "timeframe": "M1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 1380,
+          "status": 200,
+          "ms": 1380
+        },
+        {
+          "path": "/api/notification-center/changes",
+          "method": "GET",
+          "at_ms": 14939,
+          "headers_ms": 1452,
+          "status": 200,
+          "ms": 1452
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 14963,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "M1",
+            "series_kind": "composite"
+          },
+          "headers_ms": 1531,
+          "status": 200,
+          "ms": 1531
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 14963,
+          "query": {
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "timeframe": "M1",
+            "series_kind": "composite"
+          }
+        },
+        {
+          "path": "/api/chart-alerts/events",
+          "method": "GET",
+          "at_ms": 15142
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 15144,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "H4",
+            "series_kind": "provider"
+          }
+        },
+        {
+          "path": "/api/charts/data",
+          "method": "POST",
+          "at_ms": 15197,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "H4",
+            "series_kind": "provider",
+            "firstDataRequest": false,
+            "indicators": 1
+          }
+        },
+        {
+          "path": "/api/charts/stream/subscribe",
+          "method": "POST",
+          "at_ms": 15204,
+          "query": {
+            "instrument": "EURUSD",
+            "timeframe": "D1",
+            "series_kind": "provider"
+          }
+        },
+        {
+          "path": "/api/charts/indicator-demands/release",
+          "method": "POST",
+          "at_ms": 15265,
+          "query": {}
+        }
+      ],
+      "click_ms": 218,
+      "ready_ms": 10557,
+      "charts": [
+        {
+          "symbol": "MWP:EURUSD",
+          "res": "60",
+          "ready": true
+        },
+        {
+          "symbol": "MWP:EURUSD",
+          "res": "5",
+          "ready": true
+        },
+        {
+          "symbol": "MWP:EURUSD",
+          "res": "1W",
+          "ready": true
+        },
+        {
+          "symbol": "MWP:EURUSD",
+          "res": "1D",
+          "ready": false
+        },
+        {
+          "symbol": "MWP:EURUSD",
+          "res": "240",
+          "ready": false
+        }
+      ],
+      "all_ready_ms": 15169,
+      "feed": [
+        {
+          "method": "getBars",
+          "at": 1792683685280,
+          "symbol": "MWP:EURUSD",
+          "resolution": "60",
+          "ms": 10351,
+          "bars": 149
+        },
+        {
+          "method": "getBars",
+          "at": 1792683685281,
+          "symbol": "MWP:EURUSD",
+          "resolution": "5",
+          "ms": 6425,
+          "bars": 99
+        },
+        {
+          "method": "getBars",
+          "at": 1792683685281,
+          "symbol": "MWP:EURUSD",
+          "resolution": "1W",
+          "ms": 10265,
+          "bars": 28
+        },
+        {
+          "method": "getBars",
+          "at": 1792683685282,
+          "symbol": "MWP:EURUSD",
+          "resolution": "1D",
+          "ms": 14966,
+          "bars": 50
+        },
+        {
+          "method": "getBars",
+          "at": 1792683685282,
+          "symbol": "MWP:EURUSD",
+          "resolution": "240",
+          "ms": 14937,
+          "bars": 52
+        },
+        {
+          "method": "getBars",
+          "at": 1792683691757,
+          "symbol": "MWP:EURUSD",
+          "resolution": "5",
+          "ms": 4396,
+          "bars": 9
+        }
+      ],
+      "slow": true
+    }
+  ],
+  "errors": [],
+  "blocked": [
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/migrate"
+    },
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/save"
+    },
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/save"
+    },
+    {
+      "method": "POST",
+      "path": "/api/notification-center/events"
+    },
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/save"
+    },
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/save"
+    },
+    {
+      "method": "POST",
+      "path": "/api/notification-center/observations"
+    }
+  ],
+  "rows": [
+    "MWP:BTCUSDT",
+    "MWP:EURUSD",
+    "MWP:OANDA:GBP_USD",
+    "MWP:XAUUSD",
+    "MWH:2a673b63-2922-497e-bec9-d0231be55934",
+    "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+    "MWC:54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982",
+    "MWC:4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6"
+  ],
+  "workspaceUnchanged": true,
+  "workspaceBeforeSummary": {
+    "id": "7d72eead-6be5-41a4-b3d5-bfdfff98b2bb",
+    "revision": 75,
+    "sha256": "c9afabb493b23d16260a3cc61f16240bfb1dae3896823bc175da1c4980a43ca0"
+  },
+  "workspaceAfterSummary": {
+    "id": "7d72eead-6be5-41a4-b3d5-bfdfff98b2bb",
+    "revision": 75,
+    "sha256": "c9afabb493b23d16260a3cc61f16240bfb1dae3896823bc175da1c4980a43ca0"
+  }
+}
