@@ -76,6 +76,7 @@ class Settings(BaseSettings):
     # Status/scheduling evidence may be reviewed without reinterpreting an
     # immutable history calendar. Identity and finite applicability still apply.
     oanda_live_session_profiles: dict[str, dict] = Field(default_factory=dict)
+    oanda_confirmation_margin_seconds: int = Field(default=15, ge=10, le=60)
     oanda_recovery_minutes: int = Field(default=1500, ge=120, le=20000)
     oanda_stream_lease_seconds: int = Field(default=30, ge=20, le=90)
     oanda_idle_grace_seconds: int = Field(default=60, ge=0, le=900)

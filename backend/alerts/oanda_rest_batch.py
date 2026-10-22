@@ -402,7 +402,7 @@ class OandaRestBatch(OandaPractice):
         except (httpx.HTTPError, TimeoutError, ValueError, KeyError, TypeError, OverflowError) as error:
             trace.rest_failed("candles_latest", error, response)
             received_at = self.clock()
-            result = failed_request(error, observed_at=received_at)
+            result = failed_request(error, observed_at=received_at).model_copy(update={"operation": "candles_latest"})
             if result.status == "rate_limited":
                 cooldown("oanda", retry_seconds=max(1, (result.retry_at - received_at) / 1000)
                          if result.retry_at else None)
@@ -482,7 +482,7 @@ class OandaRestBatch(OandaPractice):
         except (httpx.HTTPError, TimeoutError, ValueError, KeyError, TypeError, OverflowError) as error:
             trace.rest_failed("candles", error, response)
             observed = self.clock()
-            result = failed_request(error, observed_at=observed)
+            result = failed_request(error, observed_at=observed).model_copy(update={"operation": "candles", "window_start": start, "window_end": end})
             if result.status == "rate_limited":
                 cooldown("oanda", retry_seconds=max(1, (result.retry_at - observed) / 1000)
                          if result.retry_at else None)

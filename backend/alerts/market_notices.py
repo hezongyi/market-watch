@@ -158,14 +158,17 @@ def record_result(db, task, payload, *, fingerprint):
         notify = not state['open'] and (not state['last_notification_at'] or stamp - state['last_notification_at'] >= 60_000)
         if notify:
             state['last_notification_at'] = stamp
+        from .notice_instruments import snapshot
+
+        display = snapshot({**task.identity.get('metadata', {}), 'series_kind': task.identity.get('series_kind') or task.identity.get('metadata', {}).get('series_kind', 'provider')})
         _append(db.connection(), 'task_failure', task.id, {'source_kind': 'market',
             'dedupe_key': dedupe(task, state), 'code': 'MARKET_READ_FAILED',
-            'title': title, 'attempt': str(task.result_epoch) + ':' + str(task.sequence),
+            'instrument_display': display, 'title': title, 'attempt': str(task.result_epoch) + ':' + str(task.sequence),
             'notify_web': notify or state['open'],
             'context': {'instrument': task.query.get('instrument', ''),
                         'timeframe': 'quotes' if task.identity.get('kind') == 'quotes' else task.query.get('timeframe', ''),
                         'provider': evidence['provider'], 'task_id': task.id, 'source_id': task.id,
-                        'consumer': task.identity.get('kind', 'bars')}, 'evidence': evidence})
+                        'consumer': task.identity.get('kind', 'bars'), 'series_kind': task.identity.get('series_kind', '')}, 'evidence': evidence})
         state['open'] = True
     if row:
         row.value = state

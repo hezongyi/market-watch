@@ -341,12 +341,15 @@ def begin_connection(ownership, identities, *, now=None):
             from .display_observations import handover_legacy
 
             handover_legacy(db, state)
+            from .live_confirmation import outcome
+
+            outcome(db, state, stamp=stamp, reset=True)
             state.epoch = owner.epoch
             state.connection = "connecting"
             state.ready = False
             state.forming = {}
             state.recovery_started = stamp
-            cutoff = (stamp - 5000) // 60000 * 60000
+            cutoff = confirmation_cutoff(stamp)
             dataset = db.get(MarketDataset, identity.key)
             db.get(Instrument, dataset.instrument_id).enabled = True
             watches = list(db.scalars(select(Watch).where(Watch.instrument_id == dataset.instrument_id,
@@ -450,7 +453,9 @@ def publish_event(ownership, epoch, event, identities, *, now=None):
                 if watch.rule["timeframe"] == "tick":
                     watch.state = {}
                     watch.paused_reason = "报价期间缺少连续观测，重新建立同源判断前态"
-        if (state.ready and session_status(event.identity.model_dump(), inst.calendar_profile, stamp)['market_session'] != 'closed'
+        from .live_confirmation import health
+
+        if (state.ready and not state.error and not health(db, state).get("error") and session_status(event.identity.model_dump(), inst.calendar_profile, stamp)['market_session'] != 'closed'
                 and event.tradeable and event.bid is not None and event.ask is not None
                 and Decimal(event.ask) >= Decimal(event.bid)
                 and 0 <= stamp - event.source_time <= 15000):
@@ -488,7 +493,7 @@ def publish_rest_batch(ownership, epoch, batch, identities, *, now=None, demand_
     confirmed = [confirmed for identity in identities.values()
                  for confirmed in batch.confirmed_minutes(identity)]
     for pending in _pending_rest_confirmations(ownership, epoch, confirmed, now=now):
-        commit_confirmation(ownership, epoch, pending, now=now)
+        commit_confirmation(ownership, epoch, pending, now=now, operation="candles_latest")
 
     stamp = now_ms() if now is None else now
     with transaction() as db:
@@ -509,6 +514,9 @@ def publish_rest_batch(ownership, epoch, batch, identities, *, now=None, demand_
             series = next((row for row in batch.series if row.spec == CandleSpec.from_dataset(identity)), None)
             if series is None:
                 continue
+            from .live_confirmation import sampling_evidence
+
+            sampling_evidence(db, state, result=series.result)
             if not series.result.successful:
                 state.error = series.result.status
                 state.connection = 'recovering'
@@ -539,7 +547,9 @@ def publish_rest_batch(ownership, epoch, batch, identities, *, now=None, demand_
             # baseline from a potentially incomplete prefix and could emit a
             # crossing before the confirmation gate has been rebuilt.  The
             # next ready-generation sample will establish/evaluate it.
-            if sample.recovery == "ready" and state.ready:
+            from .live_confirmation import health
+
+            if sample.recovery == "ready" and state.ready and not health(db, state).get("error"):
                 evaluate_close_sample(
                     db, inst, sample.received_at, sample.close,
                     received_at=sample.received_at, sequence=sample.sequence,
@@ -650,6 +660,10 @@ def disconnected(ownership, epoch, identities, result, *, now=None, intentional=
                     "effective_at": stamp}))
 
 
+def confirmation_cutoff(stamp):
+    return max(0, (stamp - settings.oanda_confirmation_margin_seconds * 1000) // 60000 * 60000)
+
+
 def confirmation_window(ownership, epoch, identity, *, now=None):
     stamp = now_ms() if now is None else now
     with transaction() as db:
@@ -657,9 +671,14 @@ def confirmation_window(ownership, epoch, identity, *, now=None):
         state = db.get(LiveState, identity.key)
         if state.epoch != epoch or state.next_confirm_at > stamp:
             return None
-        cutoff = (stamp - 5000) // 60000 * 60000
+        cutoff = confirmation_cutoff(stamp)
         start = state.recovery_cursor if not state.ready else max(0, state.confirmed_end - 2 * 60000)
-        start = min(start, cutoff - 2 * 60000)
+        start = min(start, max(0, cutoff - 2 * 60000))
+        from .live_confirmation import health
+
+        pending_health = health(db, state)
+        if pending_health.get('open'):
+            start = min(start, pending_health.get('window_start', start))
         # A later confirmed minute is not proof that earlier observations were
         # confirmed. Keep shared backfill demand across connections/restarts.
         from sqlalchemy import exists
@@ -717,7 +736,7 @@ def _minute_observation(db, identity, state, start, stamp, cache=None):
     return metric
 
 
-def commit_confirmation(ownership, epoch, batch, *, now=None):
+def commit_confirmation(ownership, epoch, batch, *, now=None, operation="candles"):
     stamp = now_ms() if now is None else now
     with transaction() as db:
         owner = lock_owner(db, ownership, epoch, now=stamp)
@@ -745,7 +764,11 @@ def commit_confirmation(ownership, epoch, batch, *, now=None):
             for observation in observations.values():
                 observation.failures += 1
             state.attempts += 1
-            state.error = batch.result.status
+            from .live_confirmation import outcome
+
+            outcome(db, state, error=batch.result.status,
+                    evidence={**batch.result.model_dump(mode="json", exclude_none=True),
+                        "window_start": batch.window_start, "window_end": batch.window_end}, stamp=stamp)
             state.next_confirm_at = max(stamp + min(60000, 1000 * 2 ** min(state.attempts, 6)),
                                          batch.result.retry_at or 0)
             if batch.result.status in ('unauthorized', 'provider_maintenance'):
@@ -806,7 +829,18 @@ def commit_confirmation(ownership, epoch, batch, *, now=None):
         # Only confirmed target bars or an independently proven closure allow
         # the current open-market gate to recover. Empty success alone never does.
         current_confirmed = target in confirmed
-        if not state.ready and batch.window_end >= (stamp - 5000) // 60000 * 60000:
+        from .live_confirmation import health, outcome
+
+        confirmation = health(db, state)
+        pending_start = confirmation.get('window_start', batch.window_start)
+        pending_end = confirmation.get('window_end', batch.window_end)
+        fully_confirmed = (operation == 'candles' and batch.window_start <= pending_start
+            and batch.window_end >= pending_end and all(
+                at in confirmed or (observations.get(at) and (observations[at].confirmed_at is not None or observations[at].expected is False))
+                for at in range(pending_start, pending_end, 60000)))
+        if fully_confirmed:
+            outcome(db, state, stamp=stamp)
+        if not state.ready and batch.window_end >= confirmation_cutoff(stamp):
             if current_confirmed or metric.expected is False:
                 from .service import rewarm_watch
 
@@ -821,7 +855,7 @@ def commit_confirmation(ownership, epoch, batch, *, now=None):
                 db.add(Audit(kind="pricing_recovered", details={"dataset": batch.identity.key,
                     "epoch": epoch, "confirmed_end": state.confirmed_end,
                     "effective_at": stamp, "historical_notifications": "suppressed"}))
-        if state.ready and current_confirmed and session_status(batch.identity.model_dump(), inst.calendar_profile, stamp)['market_session'] != 'closed':
+        if state.ready and not state.error and not health(db, state).get('error') and current_confirmed and session_status(batch.identity.model_dump(), inst.calendar_profile, stamp)['market_session'] != 'closed':
             from .service import evaluate_watch, rewarm_watch
 
             emit_after = max(state.recovery_started, stamp - 30000)
@@ -841,15 +875,23 @@ def commit_confirmation(ownership, epoch, batch, *, now=None):
                 "m1_to_evaluation_ms": evaluated_at - batch.window_end,
                 "processing_ms": evaluated_at - stamp,
                 "timing_scope": "ingestion and watch computation flushed; excludes transaction commit and delivery"}
+        if operation != "candles":
+            return
         if current_confirmed or metric.expected is False:
             state.attempts = 0
-            state.error = None
-            state.next_confirm_at = batch.window_end + 65000
-        elif not state.ready and state.recovery_cursor < (stamp - 5000) // 60000 * 60000:
+            from .live_confirmation import outcome
+
+            if fully_confirmed:
+                outcome(db, state, stamp=stamp)
+            state.next_confirm_at = (stamp + 1000 if health(db, state).get("open") else batch.window_end + 60000 + settings.oanda_confirmation_margin_seconds * 1000)
+        elif not state.ready and state.recovery_cursor < confirmation_cutoff(stamp):
             state.next_confirm_at = stamp
         else:
             state.attempts += 1
-            state.error = "m1_late" if stamp >= batch.window_end + 30000 else None
+            if stamp >= batch.window_end + 30000:
+                from .live_confirmation import outcome
+
+                outcome(db, state, error="m1_late", evidence={"window_start": batch.window_start, "window_end": batch.window_end}, stamp=stamp)
             retry = (15000, 25000)[state.attempts - 1] if state.attempts <= 2 else 30000 + min(
                 60000, 1000 * 2 ** min(state.attempts, 6))
             state.next_confirm_at = max(stamp + 1000, batch.window_end + retry)
@@ -889,6 +931,9 @@ def snapshots(*, now=None):
             connection_error = state.error
             if scoped_owner and scoped_owner.error:
                 connection_error = (probe.value.get('error') if probe and authentication_hold else None) or scoped_owner.error
+            from .live_confirmation import health, sampling_evidence
+
+            confirmation = health(db, state)
             quote = state.quote
             forming = state.forming or {}
             rest_sample = forming.get("acquisition_mode") == "rest_batch"
@@ -907,7 +952,7 @@ def snapshots(*, now=None):
                        "not_tradeable" if quote and not quote["tradeable"] else
                        "stale" if ((not rest_sample and (age is None or age > 15000 or age < 0))
                                    or (rest_sample and not valid_candle)) else
-                       "degraded" if state.error or (not rest_sample and not valid_quote) else "healthy")
+                       "degraded" if state.error or confirmation.get("error") or (not rest_sample and not valid_quote) else "healthy")
             result.append({"dataset_id": dataset.id, "instrument_id": dataset.instrument_id,
                 "logical_symbol": dataset.logical_symbol, "identity": dataset.identity,
                 "revision": state.revision, "quote": quote, "forming": forming,
@@ -915,6 +960,8 @@ def snapshots(*, now=None):
                 "heartbeat_at": state.heartbeat_at, "last_confirmed_m1": state.confirmed_end,
                 "cooldown_until": source_cooldowns[source],
                 "recovery_ready": state.ready, "error": state.error,
+                "confirmation_error": confirmation.get("error"), "confirmation_health": confirmation,
+                "sampling_evidence": sampling_evidence(db, state),
                 **session_view, 'authentication_hold': authentication_hold,
                 'connection_error': connection_error,
                 'next_probe_at': scoped_owner.next_at or None if scoped_owner else None,
@@ -929,7 +976,8 @@ def snapshots(*, now=None):
             available = not authentication_hold and connection_error != 'provider_maintenance' and session_view['market_session'] != 'closed'
             result[-1]["quote_ready"] = bool(not rest_sample and available and connected and valid_quote and quote["tradeable"]
                 and age is not None and 0 <= age <= 15000)
-            result[-1]["candle_ready"] = bool(available and connected and state.ready and not state.error
+            result[-1]["sample_ready"] = bool(available and connected and not state.error and (valid_candle if rest_sample else valid_quote))
+            result[-1]["candle_ready"] = bool(available and connected and state.ready and not state.error and not confirmation.get("error")
                 and (valid_candle if rest_sample else True))
             result[-1]["precision"] = inst.precision
             result[-1]["alert_readiness"] = [{"watch_id": watch.id, "reason": watch.paused_reason,

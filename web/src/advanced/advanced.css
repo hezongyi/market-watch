@@ -151,3 +151,16 @@
   color: #131722;
   border-color: #b2b5be;
 }
+
+.preference-draft-banner {display:flex;gap:12px;align-items:center;padding:6px 12px;flex-wrap:wrap;}
+.preference-draft-dialog {width:min(720px,calc(100vw - 32px));max-height:85vh;overflow:auto;background:#202020;color:#ddd;border:1px solid #787b86;border-radius:6px;padding:20px;}
+.preference-draft-dialog::backdrop {background:rgb(0 0 0 / 45%);}
+.preference-draft-dialog h2 {font-size:18px;margin:0 0 12px;}
+.preference-draft-dialog p {line-height:1.5;}
+.preference-draft-dialog label {display:grid;gap:8px;min-width:0;}
+.preference-draft-values {display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;}
+.preference-draft-dialog textarea {width:100%;min-height:180px;box-sizing:border-box;background:inherit;color:inherit;border:1px solid #787b86;padding:8px;resize:vertical;}
+.preference-draft-dialog footer {display:flex;gap:8px;flex-wrap:wrap;}
+.preference-draft-dialog button {min-height:40px;}
+.advanced-workspace[data-theme="light"] .preference-draft-dialog {background:#fff;color:#131722;}
+@media(max-width:600px){.preference-draft-values{grid-template-columns:1fr;}.preference-draft-dialog textarea{min-height:100px;}}

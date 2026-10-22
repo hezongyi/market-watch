@@ -16,7 +16,7 @@ from alerts.market_contracts import (
 from alerts.oanda_stream import OandaPractice
 from alerts.storage import Instrument, LiveState, MarketDataset, PricingOwner, SignalRow
 from sqlalchemy import select
-from test_live_pricing import candles, quote
+from test_live_pricing import minute, candles, quote
 from test_live_pricing import running as _running
 
 running = _running
@@ -131,7 +131,7 @@ def test_already_issued_confirmation_pair_preserves_strongest_fault(running, sta
             calls.append(identity.provider_symbol)
             status = results[identity.provider_symbol]
             return candles(identity, window_start=start, window_end=end,
-                **({'rows': (), 'checkpoint': start} if status != 'data' else {}),
+                **({'rows': (), 'checkpoint': start} if status != 'data' else {'rows': (minute(start, volume="3"),), 'checkpoint': end}),
                 result=RequestResult(status=status))
 
     failure = oanda_worker.confirm_pages(Adapter(), ownership, epoch, identities, lambda: False)

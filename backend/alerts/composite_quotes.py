@@ -66,17 +66,22 @@ def live_snapshot(db, revision, *, now=None):
         and quote.get("connection_epoch") == state.epoch
         and age is not None and 0 <= age <= 15000
         and received_age is not None and 0 <= received_age <= 15000)
+    from .live_confirmation import health, sampling_evidence
+
+    confirmation = health(db, state) if state else {}
     candle_ready = bool(available and owned and state and state.ready and not state.error
         and rest_sample and forming.get("close")
         and received_age is not None and 0 <= received_age <= 15000)
     return {"current_account": current, "owned": owned,
         **session, 'authentication_hold': held, 'connection_error': error,
+        "confirmation_error": confirmation.get("error"), "confirmation_health": confirmation,
+        "error_evidence": {'sampling': sampling_evidence(db, state) if state else {}, 'confirmation': confirmation.get('evidence', {})},
         'next_probe_at': owner.next_at or None if current and owner else None,
         "connection": state.connection if state else "inactive",
         "quote_ready": quote_ready, "candle_ready": candle_ready,
         "sample_ready": bool(quote_ready or candle_ready),
         "observation_mode": "candle_close_sample" if rest_sample else "stream_quote",
-        "confirmed_tail_ready": bool(available and owned and state.ready and not state.error),
+        "confirmed_tail_ready": bool(available and owned and state.ready and not state.error and not confirmation.get("error")),
         "quote_age_ms": age, "received_age_ms": received_age,
         "source_confirmed_end": state.confirmed_end if state else 0,
         "quote": dict(quote) if quote else {}, "forming": dict(forming) if forming else {},
@@ -244,7 +249,10 @@ def snapshot(db, composite, *, now=None, revision_id=None, input_revision=None):
         "previous_close": None,
         "quality": "pending", "price_type": None, "provenance": None,
         **session, "read_at": stamp, "source_identity": target.identity,
-        "fetch_status": live["connection_error"] or "ok"}
+        "fetch_status": live["connection_error"] or "ok",
+        "error_evidence": live["error_evidence"],
+        "confirmation_error": live.get("confirmation_error"),
+        "confirmation_status": "分钟确认延迟" if live.get("confirmation_error") else "ok"}
     def presented():
         # Compare only observations from the selected continuation source;
         # historical-side bars carry their own immutable source identity.

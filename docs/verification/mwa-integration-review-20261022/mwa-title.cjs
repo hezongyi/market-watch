@@ -9,16 +9,7 @@ const workspace='7d72eead-6be5-41a4-b3d5-bfdfff98b2bb';
  const page=await context.newPage();
  const report={checks:[],errors:[],messages:[],blockedWrites:[]};
  page.on('pageerror',e=>report.errors.push(e.message));
- await context.route('**/api/advanced-charts/**',async route=>{
-   if(['GET','HEAD','OPTIONS'].includes(route.request().method()))return route.continue();
-   report.blockedWrites.push({path:new URL(route.request().url()).pathname,method:route.request().method()});
-   if(route.request().url().endsWith('/preferences/migrate'))return route.fulfill({json:{ok:true}});
-   if(route.request().url().endsWith('/preferences/save')){
-    const body=route.request().postDataJSON();
-    return route.fulfill({json:{...body,id:'inspection-only',revision:body.revision+1,updated_at:Date.now()}});
-   }
-   return route.fulfill({status:409,json:{detail:'Read-only title inspection'}});
- });
+ await require(process.cwd()+'/web/tests/helpers/readOnlyAcceptance.cjs').readOnlyAcceptance(context,report);
  await page.addInitScript(()=>{window.tabMessages=[];window.addEventListener('message',e=>{if(e.data?.type==='active-quote')window.tabMessages.push(e.data);});});
  try{
   await page.goto(base+'/advanced-charts/'+workspace);

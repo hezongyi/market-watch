@@ -1,3 +1,5 @@
+import {preferenceDrafts,putPreferenceDraft,dropPreferenceDraft,workspaceDraftKey,workspaceDraft,putWorkspaceDraft,workspaceDraftEntries,dropWorkspaceDraft,type PreferenceDraft} from "./localDrafts";
+import {PreferenceDraftDialog} from "./PreferenceDraftDialog";
 import {useNotices,useNoticeState} from "../notifications/context";
 import {setChartTime} from "../time/ChartTimeContext";
 import {operationFault} from "../notifications/operations";
@@ -64,6 +66,11 @@ export default function AdvancedWorkspace() {
   const openNotices=(event?:string)=>{const url=new URL(location.href);url.searchParams.set('panel','notifications');if(event)url.searchParams.set('event',event);else url.searchParams.delete('event');navigate(url.pathname+url.search+url.hash,{replace:true});};
   const app = useApp(), appRef = useRef(app); appRef.current = app;
   const urlRef = useRef(appLocation); urlRef.current = appLocation;
+  const [savedPreferenceDrafts,setSavedPreferenceDrafts]=useState<PreferenceDraft[]>(()=>{try{return preferenceDrafts();}catch{return [];}});
+  const [preferenceDraftsOpen,setPreferenceDraftsOpen]=useState(false);
+  const [preferenceReopenRequired,setPreferenceReopenRequired]=useState(()=>savedPreferenceDrafts.length>0);
+  const preferenceRecovery=useRef(new Map<string,{resolve:()=>void;reject:(error:Error)=>void}>());
+  const refreshPreferenceDrafts=()=>{try{setSavedPreferenceDrafts(preferenceDrafts());}catch{setError("无法读取本机设置草稿，请勿关闭页面");}};
   const capturing = useRef<{resolve: () => void; reject: (error: Error) => void} | null>(null);
   const titleTimer = useRef<ReturnType<typeof setTimeout> | null>(null), titleText = useRef(""), titleQuote = useRef(""), titleLast = useRef(0), titleIdentity = useRef("");
   const titleHistorical = useRef(false);
@@ -215,7 +222,7 @@ export default function AdvancedWorkspace() {
     updateTitle(true);
     alertUiSession.current = "";
     blocked.current =
-      !mobile && !!localStorage.getItem("mw-tv-draft:" + row.id);
+      !mobile && !!workspaceDraft(row.id);
     setActive(row);
     setFrameKey((key) => key + 1);
     setError(
@@ -296,7 +303,7 @@ export default function AdvancedWorkspace() {
       shouldBlock: pathname => pathname !== `/advanced-charts/${current.current?.id}`,
       save: flush,
       discard: () => {
-        if (current.current) localStorage.removeItem("mw-tv-draft:" + current.current.id);
+        if (current.current) {const draft=workspaceDraftEntries(current.current.id).find(row=>row.storageKey===workspaceDraftKey(current.current!.id));if(draft)dropWorkspaceDraft(draft);}
         unsaved.current = false; blocked.current = false; post({ type: "discard-changes" });
       },
       preserve: () => {
@@ -398,7 +405,21 @@ export default function AdvancedWorkspace() {
       (error) => setError(String(error)),
       {subscribe: '/charts/stream/subscribe', unsubscribe: '/charts/stream/unsubscribe'},
       observeSubscription,
+      async args => {
+        const query = args.query as {series_kind?: string; instrument?: string};
+        if (query?.series_kind !== 'composite') return true;
+        const metadata = await api<any>('/market-data/resolve', {instrument: query.instrument, series_kind: 'composite', timeframe: 'M1'});
+        return metadata.created === true;
+      },
     );
+    const establishedChannel = typeof BroadcastChannel === 'undefined' ? null : new BroadcastChannel('mw-composite-established-v1');
+    establishedChannel?.addEventListener('message', event => {
+      if (typeof event.data === 'string' && /^[a-f0-9]{64}$/.test(event.data)) void provider.established(event.data);
+    });
+    const compositeEstablished = (instrument: string) => {
+      void provider.established(instrument);
+      establishedChannel?.postMessage(instrument);
+    };
     const legacyProvider = providerSubscriptions(api,
       client => new EventSource('/api/charts/provider/events?client=' + encodeURIComponent(client)),
       event => frame.current?.contentWindow?.postMessage({channel, type:'provider-event', event}, origin),
@@ -462,7 +483,7 @@ export default function AdvancedWorkspace() {
         if (!waiter) return;
         try {
           if (m.workspace_id !== current.current?.id || m.document?.engine !== "tv31" || m.document?.schemaVersion !== 1 || JSON.stringify(m.document).length > 4_000_000) throw Error("草稿响应无效");
-          localStorage.setItem("mw-tv-draft:" + m.workspace_id, JSON.stringify(m.document)); waiter.resolve();
+          putWorkspaceDraft(m.workspace_id, JSON.stringify(m.document), current.current?.revision); waiter.resolve();
         } catch (e) { waiter.reject(new Error(String(e))); }
         return;
       }
@@ -696,6 +717,12 @@ export default function AdvancedWorkspace() {
         } catch (error) {
           setError(String(error));
         }
+        return;
+      }
+      if (m.type === 'preference-draft-result') {
+        if(!m.error)setPreferenceReopenRequired(true);
+        const waiter=preferenceRecovery.current.get(m.request);
+        if(waiter){preferenceRecovery.current.delete(m.request);m.error?waiter.reject(Error(m.error)):waiter.resolve();refreshPreferenceDrafts();}
         return;
       }
       if (m.type === "history-progress") {
@@ -1007,6 +1034,7 @@ export default function AdvancedWorkspace() {
             workspace: current.current,
             readonly: mobile,
             catalog,
+            preference_draft_keys: preferenceDrafts().map(draft=>draft.key),
             preferences: localStorage.getItem("mw.app-theme") ? [
               ...preferences.filter((p:any)=>!(p.kind === "setting" && p.name === "mw.theme")),
               {...preferences.find((p:any)=>p.kind === "setting" && p.name === "mw.theme"),kind:"setting",name:"mw.theme",tool:"",content:{value:appRef.current.theme}},
@@ -1119,9 +1147,10 @@ export default function AdvancedWorkspace() {
                 interval: q.args.resolution,
               })
             : null;
+          let savedDraft: ReturnType<typeof putWorkspaceDraft> | undefined;
           if (draftId && draft) {
             try {
-              localStorage.setItem("mw-tv-draft:" + draftId, draft);
+              savedDraft = putWorkspaceDraft(draftId, draft, current.current?.revision);
             } catch {
               setError("本地草稿空间不足，请勿关闭页面，等待服务器保存完成");
               void notices.report({source_kind:'workspace',attempt_id:crypto.randomUUID(),code:'LOCAL_DRAFT_FAILED',title:'图表草稿未能保存到本机',message:'本机存储写入失败，请勿关闭页面',context:{workspace_id:draftId}});
@@ -1164,11 +1193,7 @@ export default function AdvancedWorkspace() {
               setFeedError("");
               setStatus("已另存为独立工作区");
             }
-            if (
-              draftId &&
-              localStorage.getItem("mw-tv-draft:" + draftId) === draft
-            )
-              localStorage.removeItem("mw-tv-draft:" + draftId);
+            if (savedDraft) dropWorkspaceDraft(savedDraft);
             const previousWorkspace = current.current?.id;
             current.current = {
               id: result.id,
@@ -1220,7 +1245,7 @@ export default function AdvancedWorkspace() {
           if (
             q.op === "save" &&
             q.args?.id &&
-            localStorage.getItem("mw-tv-draft:" + q.args.id)
+            workspaceDraft(q.args.id)
           ) {
             blocked.current = true;
             setStatus("保存已暂停 · 草稿已保留，请复制恢复");
@@ -1284,7 +1309,7 @@ export default function AdvancedWorkspace() {
         if (
           (mobile && q?.op !== "read") ||
           !q ||
-          !["read", "save", "delete"].includes(q.op) ||
+          !["read", "save", "delete", "draftWrite", "draftDrop", "draftCheck"].includes(q.op) ||
           JSON.stringify(q).length > 1_100_000
         ) {
           reply({ type: "result", id: m.id, error: "设置请求不允许" });
@@ -1295,6 +1320,13 @@ export default function AdvancedWorkspace() {
           return;
         }
         try {
+          if (q.op === 'draftCheck') {
+            reply({type:'result',id:m.id,result:preferenceDrafts().some(draft=>draft.storageKey===q.args.storageKey && draft.version===q.args.version && draft.key===q.args.key)});return;
+          }
+          if (q.op === 'draftWrite' || q.op === 'draftDrop') {
+            if(q.op === 'draftWrite')putPreferenceDraft(q.args);else dropPreferenceDraft(q.args);
+            refreshPreferenceDrafts();reply({type:'result',id:m.id,result:{ok:true}});return;
+          }
           if (q.op === "read") {
             reply({type: "result", id: m.id, result: await api("/advanced-charts/preferences")});
             return;
@@ -1643,6 +1675,7 @@ export default function AdvancedWorkspace() {
               controller.signal,
             ),
           });
+          if (q.series_kind === "composite" && q.client && !controller.signal.aborted && source === frame.current?.contentWindow) compositeEstablished(q.instrument);
         } catch (e) {
           reply({
             type: "result",
@@ -1678,8 +1711,9 @@ export default function AdvancedWorkspace() {
           setStatus("已保存");
           return;
         }
+        let savedDraft: ReturnType<typeof putWorkspaceDraft> | undefined;
         try {
-          localStorage.setItem("mw-tv-draft:" + id, JSON.stringify(document));
+          savedDraft = putWorkspaceDraft(id, JSON.stringify(document), current.current?.revision);
         } catch (e) {
           setError("本地草稿空间不足，将继续尝试服务器保存");
           void notices.report({source_kind:'workspace',attempt_id:crypto.randomUUID(),code:'LOCAL_DRAFT_FAILED',title:'图表草稿未能保存到本机',message:String(e),context:{workspace_id:id},evidence:{server_save:'继续尝试；请勿关闭页面'}});
@@ -1706,11 +1740,7 @@ export default function AdvancedWorkspace() {
               setRows((prev) => prev.map((x) => (x.id === id ? row : x)));
               setStatus("已自动保存");
               setError("");
-              if (
-                localStorage.getItem("mw-tv-draft:" + id) ===
-                JSON.stringify(document)
-              )
-                localStorage.removeItem("mw-tv-draft:" + id);
+              if (savedDraft) dropWorkspaceDraft(savedDraft);
             }
             waiters.forEach((w) => w.resolve());
           } catch (e) {
@@ -1725,12 +1755,14 @@ export default function AdvancedWorkspace() {
     addEventListener("message", listener);
     return () => {
       removeEventListener("message", listener);
+      establishedChannel?.close();
       void provider.dispose();
       void legacyProvider.dispose();
       for (const requests of marketRequests.values())
         for (const controller of requests.values()) controller.abort();
     };
   }, [origin]);
+  useEffect(()=>{const update=()=>refreshPreferenceDrafts();addEventListener('storage',update);return()=>removeEventListener('storage',update);},[]);
   async function create() {
     const name = prompt("工作区名称", "我的图表");
     if (!name?.trim()) return;
@@ -1750,7 +1782,16 @@ export default function AdvancedWorkspace() {
       if (!blocked.current) await flush();
       const old = current.current;
       if (!old) return;
-      const draft = localStorage.getItem("mw-tv-draft:" + old.id);
+      const entries=workspaceDraftEntries(old.id);
+      let selectedDraft=entries[0];
+      if(entries.length>1) {
+        const choice=prompt('发现多个独立工作区草稿，请选择要复制恢复的编号：\n'+entries.map((entry,index)=>`${index+1}. ${entry.at?new Date(entry.at).toLocaleString():'旧版本草稿'} · 基线版本 ${entry.baseRevision ?? '未知'}`).join('\n'),'1');
+        if(choice===null)return;
+        const index=Number(choice)-1;
+        if(!Number.isInteger(index)||index<0||index>=entries.length)throw Error('请选择有效的草稿编号');
+        selectedDraft=entries[index];
+      }
+      const draft = selectedDraft?.raw || null;
       const document = draft ? JSON.parse(draft) : old.document;
       const row = await api<Workspace>("/advanced-charts/workspaces", {
         name: old.name + " 副本",
@@ -1759,7 +1800,7 @@ export default function AdvancedWorkspace() {
         `/advanced-charts/workspaces/${row.id}/save`,
         { name: row.name, revision: row.revision, document },
       );
-      localStorage.removeItem("mw-tv-draft:" + old.id);
+      if(selectedDraft)dropWorkspaceDraft(selectedDraft);
       setRows((p) => [saved, ...p]);
       select(saved);
     } catch (e) {
@@ -1802,6 +1843,16 @@ export default function AdvancedWorkspace() {
       {!Object.keys(nativeLoads).length && !Object.keys(capacityNotices).length && !chartFailures.length && <p>当前没有进行中的加载任务。</p>}
         </div>
       )}
+      {!mobile && (savedPreferenceDrafts.length>0 || preferenceReopenRequired) && <div className="preference-draft-banner" role="status">
+        {savedPreferenceDrafts.length>0 && <><span>有 {savedPreferenceDrafts.length} 项设置草稿未保存</span><button onClick={()=>setPreferenceDraftsOpen(true)}>处理设置草稿</button></>}
+        {preferenceReopenRequired && <><span>设置已暂停自动保存；草稿处理后请重新打开图表继续修改。</span><button onClick={()=>location.reload()}>重新打开图表</button></>}
+      </div>}
+      {preferenceDraftsOpen && <PreferenceDraftDialog drafts={savedPreferenceDrafts} onClose={()=>setPreferenceDraftsOpen(false)} onResolve={(draft,action,revision)=>new Promise<void>((resolve,reject)=>{
+        const request=crypto.randomUUID();
+        const timer=setTimeout(()=>{preferenceRecovery.current.delete(request);reject(Error('处理尚未确认，草稿仍保留；请重新核对服务器设置'));},30000);
+        preferenceRecovery.current.set(request,{resolve:()=>{clearTimeout(timer);resolve();},reject:error=>{clearTimeout(timer);reject(error);}});
+        post({type:'preference-draft-resolve',request,draft,action,revision});
+      })}/>}
       {capacityDialog && (
         <HistoryCapacityDialog
           request={api}

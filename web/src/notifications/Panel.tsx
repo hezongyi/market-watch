@@ -839,6 +839,7 @@ export function NoticeBubble({
       </div>
       <div role="status" aria-live="polite" aria-atomic="true">
         <h3>{notice.title}</h3>
+        {system(notice) && notice.instrument && <p>{noticeInstrument(notice)}</p>}
         <p>
           {system(notice)
             ? notice.message

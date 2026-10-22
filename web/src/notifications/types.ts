@@ -19,6 +19,7 @@ export type Notice = {
   backfill: boolean;
   workspace: string;
   instrument: string;
+  instrument_display?: {series_kind: string; symbol: string; label?: string; provenance: string};
   context: Record<string, unknown>;
   evidence: Record<string, unknown>;
   original_evidence?: Record<string, unknown>;
@@ -127,14 +128,18 @@ export const sourceLabels: Record<string, string> = {
   chart_shell: "图表启动",
 };
 
+export const seriesKindLabels: Record<string, string> = {
+  composite: "组合行情", history: "固定历史", managed: "自建行情", provider: "平台行情",
+};
 /** Presentation only; opaque storage IDs stay in the expandable diagnostics. */
 export function noticeInstrument(notice: Notice): string {
   const raw = notice.instrument || "";
-  if (/^[a-f0-9]{8}-[a-f0-9-]{27}$/i.test(raw))
-    return sourceLabels[notice.source_kind] || "系统消息";
-  return (
-    raw.replace(/^MW[PCI]:/, "") ||
-    sourceLabels[notice.source_kind] ||
-    "系统消息"
-  );
+  const display = notice.instrument_display;
+  if (display?.symbol && seriesKindLabels[display.series_kind])
+    return display.symbol + " · " + seriesKindLabels[display.series_kind] + (display.series_kind === 'composite' ? ' · ' + raw.replace(/^MWC:/i, '').slice(0,8) : '');
+  const kind = raw.startsWith("MWC:") ? "composite" : raw.startsWith("MWH:") ? "history" : String(notice.context?.series_kind || "");
+  const identity = raw.replace(/^MW[PCHI]:/, "");
+  if (/^[a-f0-9]{32,64}$/i.test(identity) || /^[a-f0-9]{8}-[a-f0-9-]{27}$/i.test(identity) || /^(?:DUKA|NATIVE|YAHOO|MD):/i.test(identity))
+    return (seriesKindLabels[kind] || "行情") + "（名称不可用）· " + identity.slice(0, 8);
+  return identity || sourceLabels[notice.source_kind] || "系统消息";
 }

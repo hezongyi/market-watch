@@ -146,12 +146,12 @@ def test_recovery_and_confirmation_restore_source_state_without_historical_notif
         create_watch(db, instrument, "closed crossing", {"kind": "price", "timeframe": "M1",
             "direction": "buy", "level": "1.105"}, armed_at=0, use_history=False)
     live.publish_event(ownership, epoch, quote(identity, epoch), identities, now=125000)
-    assert live.confirmation_window(ownership, epoch, identity, now=125000) == (0, 120000)
+    assert live.confirmation_window(ownership, epoch, identity, now=135000) == (0, 120000)
     live.commit_confirmation(ownership, epoch, candles(identity), now=125000)
     with db_factory.begin() as db:
         state = db.get(LiveState, identity.key)
         assert state.ready and state.confirmed_end == 120000 and state.connection == "connected"
-        assert state.next_confirm_at == 185000
+        assert state.next_confirm_at == 195000
         assert db.scalar(select(SignalRow)) is None
         assert db.scalar(select(Watch)).state["last_event"] == 120000
         assert db.scalar(select(Audit).where(Audit.kind == "pricing_recovered")) is not None

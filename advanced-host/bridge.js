@@ -1,3 +1,4 @@
+let activePreferences;
 /* All authenticated work is performed by the trusted parent, never this origin. */
 const parentOrigin = new URLSearchParams(location.search).get("parent");
 if (!parentOrigin || new URL(parentOrigin).origin !== parentOrigin)
@@ -172,6 +173,7 @@ function presentQuote(row) {
       .replace(/ · (?:最后更新于|最后行情时间|历史数据时间) .*?(?= · |$)/g, "")
       .replace(/ · 来源 M1 分钟数据/g, "");
     value.description = base;
+    if (value.confirmation_error) value.description += " · 实时样本可用，分钟确认延迟";
     if (["pending", "stale"].includes(value.fetch_status))
       value.description += value.lp == null ? " · 等待首次报价" : " · 报价暂未更新，保留上次数据";
   }
@@ -324,7 +326,7 @@ function reportPreferenceOutcome(error, context = {}, scope = capturePreferenceS
     title:error ? '设置未保存' : '设置已保存',message:error ? String(error) : '偏好操作已成功',
     context:{source_id:JSON.stringify([context.kind || '',context.name || '',context.tool || '',context.operation || 'save']),
       consumer:'preferences-adapter',endpoint:'/advanced-charts/preferences'},
-    evidence:{operation:context.operation || 'save'}}, !error);
+    evidence:{operation:context.operation || 'save',attempt_revision:context.revision ?? null,code:error?.code || null,http_status:error?.status || null}}, !error);
 }
 // Each live request owner carries at most one outage per instrument/period.
 // Callers fence cancellation/generation before recording a transition.
@@ -2400,13 +2402,19 @@ function boot(
       throw e;
     }
   };
-  const prefs = nativePreferences(
+  const prefs = activePreferences = nativePreferences(
     preferences,
     (op, args) => request({ op, args }, "preferences"),
     readonly,
     reportPreferenceOutcome,
     (context, scope) => reportPreferenceOutcome(null, context, scope),
     capturePreferenceScope,
+    {blocked:globalThis.MWPreferenceDraftKeys || [], put: draft => request({op:'draftWrite',args:draft},'preferences'),
+     current: draft => request({op:'draftCheck',args:draft},'preferences'),
+     abandoned: context => emitNotice({source_kind:'preferences',attempt_id:crypto.randomUUID(),code:'PREFERENCE_SAVE_FAILED',
+       title:'设置草稿已放弃',message:'已明确采用服务器设置；原写入未成功',observation_ended:true,
+       context:{source_id:JSON.stringify([context.kind,context.name,context.tool || '',context.operation]),consumer:'preferences-adapter',endpoint:'/advanced-charts/preferences'}},true),
+     drop: draft => request({op:'draftDrop',args:draft},'preferences')},
   );
   autoSave?.dispose();
   autoSave = chartAutoSave(preferences,
@@ -3061,9 +3069,15 @@ addEventListener("message", async (e) => {
     alertUIWorkspace = String(m.workspace?.id);
     MWNativeNavigation.setCapabilities(m.history_capabilities);
     globalThis.MW_HISTORY_CAPABILITIES=m.history_capabilities;
+    globalThis.MWPreferenceDraftKeys = Array.isArray(m.preference_draft_keys) ? m.preference_draft_keys : [];
     boot(m.document, m.readonly, m.catalog, m.preferences, m.workspace, m.initial_symbol, m.watchlist_metadata);
   }
   else if (m.type === 'refresh-managed') await refreshManagedHistory(m.instrument);
+  else if (m.type === 'preference-draft-resolve' && activePreferences) {
+    activePreferences.resolveDraft(m.draft,m.action,m.revision).then(
+      () => send({type:'preference-draft-result',request:m.request}),
+      error => send({type:'preference-draft-result',request:m.request,error:String(error)}));
+  }
   else if (m.type === "capture-draft" && ready && widget) {
     try {
       const state = await captureWorkspaceState();
