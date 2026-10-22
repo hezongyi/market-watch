@@ -3,7 +3,7 @@
     {
       "name": "SWING_SR_V1",
       "version": "d644ab5f-e39b-43f2-99a0-fd003548dc14",
-      "id": "xJ4p5R",
+      "id": "kVCcHS",
       "symbol": "MWH:D644AB5F-E39B-43F2-99A0-FD003548DC14",
       "rows": 25,
       "finite": 12,
@@ -21,7 +21,7 @@
     {
       "name": "EMA",
       "version": "d644ab5f-e39b-43f2-99a0-fd003548dc14",
-      "id": "w4rkMA",
+      "id": "wGk17k",
       "symbol": "MWH:D644AB5F-E39B-43F2-99A0-FD003548DC14",
       "rows": 25,
       "finite": 4,
@@ -36,7 +36,7 @@
     {
       "name": "RSI",
       "version": "d644ab5f-e39b-43f2-99a0-fd003548dc14",
-      "id": "gyy1MI",
+      "id": "QwfvIE",
       "symbol": "MWH:D644AB5F-E39B-43F2-99A0-FD003548DC14",
       "rows": 25,
       "finite": 9,
@@ -51,7 +51,7 @@
     {
       "name": "SWING_SR_V1",
       "version": "db8542be-59ed-47b5-8916-a6b92443c433",
-      "id": "wMMLgh",
+      "id": "AtO9CF",
       "symbol": "MWH:DB8542BE-59ED-47B5-8916-A6B92443C433",
       "rows": 25,
       "finite": 12,
@@ -69,7 +69,7 @@
     {
       "name": "EMA",
       "version": "db8542be-59ed-47b5-8916-a6b92443c433",
-      "id": "6Pcp0N",
+      "id": "lE5tZd",
       "symbol": "MWH:DB8542BE-59ED-47B5-8916-A6B92443C433",
       "rows": 25,
       "finite": 4,
@@ -84,7 +84,7 @@
     {
       "name": "RSI",
       "version": "db8542be-59ed-47b5-8916-a6b92443c433",
-      "id": "e3Iu55",
+      "id": "S7KMnX",
       "symbol": "MWH:DB8542BE-59ED-47B5-8916-A6B92443C433",
       "rows": 25,
       "finite": 9,
@@ -106,10 +106,10 @@
         "published": true,
         "indicator_input_policy": "observed_display_v1",
         "provisional": true,
-        "client": "6aa83794-7ec5-42d7-b988-745a62e977dc",
+        "client": "274c9136-ddd7-4f57-9d5a-5db3e7daac03",
         "indicator_consumers": [
           {
-            "id": "1|xJ4p5R",
+            "id": "1|kVCcHS",
             "generation": 1,
             "spec": {
               "name": "SWING_SR_V1",
@@ -178,8 +178,8 @@
             "result_cache": "miss",
             "input_rows": 25,
             "calculation_steps": 25,
-            "input_accepted_at_ms": 1792670282498,
-            "calculation_ms": 2.64
+            "input_accepted_at_ms": 1792671945085,
+            "calculation_ms": 3.69
           },
           "input_policy": "observed_display_v1",
           "value_status": "ready",
@@ -205,10 +205,10 @@
         "published": true,
         "indicator_input_policy": "observed_display_v1",
         "provisional": true,
-        "client": "6aa83794-7ec5-42d7-b988-745a62e977dc",
+        "client": "274c9136-ddd7-4f57-9d5a-5db3e7daac03",
         "indicator_consumers": [
           {
-            "id": "1|w4rkMA",
+            "id": "1|wGk17k",
             "generation": 2,
             "spec": {
               "name": "EMA",
@@ -275,8 +275,8 @@
             "result_cache": "miss",
             "input_rows": 25,
             "calculation_steps": 25,
-            "input_accepted_at_ms": 1792670283376,
-            "calculation_ms": 0.64
+            "input_accepted_at_ms": 1792671945819,
+            "calculation_ms": 0.7
           },
           "input_policy": "observed_display_v1",
           "value_status": "ready",
@@ -302,10 +302,10 @@
         "published": true,
         "indicator_input_policy": "observed_display_v1",
         "provisional": true,
-        "client": "6aa83794-7ec5-42d7-b988-745a62e977dc",
+        "client": "274c9136-ddd7-4f57-9d5a-5db3e7daac03",
         "indicator_consumers": [
           {
-            "id": "1|gyy1MI",
+            "id": "1|QwfvIE",
             "generation": 3,
             "spec": {
               "name": "RSI",
@@ -372,8 +372,8 @@
             "result_cache": "miss",
             "input_rows": 25,
             "calculation_steps": 25,
-            "input_accepted_at_ms": 1792670284183,
-            "calculation_ms": 3.73
+            "input_accepted_at_ms": 1792671946284,
+            "calculation_ms": 0.69
           },
           "input_policy": "observed_display_v1",
           "value_status": "ready",
@@ -399,10 +399,10 @@
         "published": true,
         "indicator_input_policy": "observed_display_v1",
         "provisional": true,
-        "client": "6aa83794-7ec5-42d7-b988-745a62e977dc",
+        "client": "274c9136-ddd7-4f57-9d5a-5db3e7daac03",
         "indicator_consumers": [
           {
-            "id": "1|wMMLgh",
+            "id": "1|AtO9CF",
             "generation": 6,
             "spec": {
               "name": "SWING_SR_V1",
@@ -471,8 +471,8 @@
             "result_cache": "miss",
             "input_rows": 25,
             "calculation_steps": 25,
-            "input_accepted_at_ms": 1792670285658,
-            "calculation_ms": 6.38
+            "input_accepted_at_ms": 1792671948278,
+            "calculation_ms": 14.16
           },
           "input_policy": "observed_display_v1",
           "value_status": "ready",
@@ -498,10 +498,10 @@
         "published": true,
         "indicator_input_policy": "observed_display_v1",
         "provisional": true,
-        "client": "6aa83794-7ec5-42d7-b988-745a62e977dc",
+        "client": "274c9136-ddd7-4f57-9d5a-5db3e7daac03",
         "indicator_consumers": [
           {
-            "id": "1|6Pcp0N",
+            "id": "1|lE5tZd",
             "generation": 7,
             "spec": {
               "name": "EMA",
@@ -568,8 +568,8 @@
             "result_cache": "miss",
             "input_rows": 25,
             "calculation_steps": 25,
-            "input_accepted_at_ms": 1792670286279,
-            "calculation_ms": 0.66
+            "input_accepted_at_ms": 1792671949008,
+            "calculation_ms": 0.64
           },
           "input_policy": "observed_display_v1",
           "value_status": "ready",
@@ -595,10 +595,10 @@
         "published": true,
         "indicator_input_policy": "observed_display_v1",
         "provisional": true,
-        "client": "6aa83794-7ec5-42d7-b988-745a62e977dc",
+        "client": "274c9136-ddd7-4f57-9d5a-5db3e7daac03",
         "indicator_consumers": [
           {
-            "id": "1|e3Iu55",
+            "id": "1|S7KMnX",
             "generation": 8,
             "spec": {
               "name": "RSI",
@@ -665,8 +665,8 @@
             "result_cache": "miss",
             "input_rows": 25,
             "calculation_steps": 25,
-            "input_accepted_at_ms": 1792670286738,
-            "calculation_ms": 0.62
+            "input_accepted_at_ms": 1792671949633,
+            "calculation_ms": 0.73
           },
           "input_policy": "observed_display_v1",
           "value_status": "ready",

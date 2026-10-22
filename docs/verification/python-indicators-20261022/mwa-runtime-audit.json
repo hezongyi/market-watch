@@ -1,8 +1,8 @@
 [
   {
-    "service": "web",
-    "id": "1c69cc1139f02fb9b38013cc36c8da0c3ae61cf1aa95e1a5841b5e6c9f1649ac",
-    "image": "sha256:e01d201185092bff9822921888548c57e7a926de3cf2b6d379d6403ea9267555",
+    "service": "market-stream-worker",
+    "id": "6cd2c6131d077f6e2a3f9a7b4cc94ae9bceb7453fb1ceda83e23e04f1ce5ec96",
+    "image": "sha256:4616b771401f945b36de824747ee6a9ef7c28fa48ff5f6aba1ebfe60cfab3ae7",
     "status": "running",
     "health": null,
     "restarts": 0,
@@ -14,8 +14,8 @@
   },
   {
     "service": "history-worker",
-    "id": "b9b40589abaf561a3f0b750ab5487e7b670aacf0bd75afc6fa84e648cf38afec",
-    "image": "sha256:48fe76e7d94b3036bf4ca3facc910139728f5f5f7b398824e7cee1112b2b9a67",
+    "id": "0f4cd9239db2516c8a14753709bf62dfc594f00edc8ea33731664a30be964a0b",
+    "image": "sha256:4616b771401f945b36de824747ee6a9ef7c28fa48ff5f6aba1ebfe60cfab3ae7",
     "status": "running",
     "health": null,
     "restarts": 0,
@@ -26,9 +26,22 @@
     "networksUnchanged": true
   },
   {
-    "service": "market-stream-worker",
-    "id": "839002f96522912d40ce38846b71d660484fd04a07925dbb28bd1bf060a7cea9",
-    "image": "sha256:48fe76e7d94b3036bf4ca3facc910139728f5f5f7b398824e7cee1112b2b9a67",
+    "service": "api",
+    "id": "57e1744c913eca0039d4473c0c98fd72166d76b507a001c44a2cfffd9b02db5d",
+    "image": "sha256:4616b771401f945b36de824747ee6a9ef7c28fa48ff5f6aba1ebfe60cfab3ae7",
+    "status": "running",
+    "health": "healthy",
+    "restarts": 0,
+    "replaced": true,
+    "environmentUnchanged": true,
+    "mountsUnchanged": true,
+    "portsUnchanged": true,
+    "networksUnchanged": true
+  },
+  {
+    "service": "web",
+    "id": "1c69cc1139f02fb9b38013cc36c8da0c3ae61cf1aa95e1a5841b5e6c9f1649ac",
+    "image": "sha256:e01d201185092bff9822921888548c57e7a926de3cf2b6d379d6403ea9267555",
     "status": "running",
     "health": null,
     "restarts": 0,
@@ -44,19 +57,6 @@
     "image": "sha256:a61563ca309cddc4853c8bff3ff57f88c035981a8271d89b9f108f5a7e2409f2",
     "status": "running",
     "health": null,
-    "restarts": 0,
-    "replaced": true,
-    "environmentUnchanged": true,
-    "mountsUnchanged": true,
-    "portsUnchanged": true,
-    "networksUnchanged": true
-  },
-  {
-    "service": "api",
-    "id": "2ab4d5853e7d9dab2781033cb4a8b861187c620b5625f2a589276543a507be14",
-    "image": "sha256:48fe76e7d94b3036bf4ca3facc910139728f5f5f7b398824e7cee1112b2b9a67",
-    "status": "running",
-    "health": "healthy",
     "restarts": 0,
     "replaced": true,
     "environmentUnchanged": true,
