@@ -137,6 +137,14 @@ export async function api<T = any>(path: string, body?: unknown, signal?: AbortS
   }
   if (!response.ok)
     throw responseError(result.detail, response.status, response.headers.get("Retry-After"));
+  // Both standalone data center and embedded RPC use this authenticated path.
+  // Broadcast only an explicit successful establishment, never a list read.
+  if (path === '/market-data/composites/use' && body !== undefined &&
+      !signal?.aborted && /^[a-f0-9]{64}$/.test(result?.id) && typeof BroadcastChannel !== 'undefined') {
+    const channel = new BroadcastChannel('mw-composite-established-v1');
+    channel.postMessage(result.id);
+    channel.close();
+  }
   return result;
 }
 export type Bar = {

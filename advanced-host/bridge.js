@@ -2402,6 +2402,7 @@ function boot(
       throw e;
     }
   };
+  activePreferences?.dispose();
   const prefs = activePreferences = nativePreferences(
     preferences,
     (op, args) => request({ op, args }, "preferences"),
@@ -3099,6 +3100,7 @@ send({ type: "loaded" });
 addEventListener("pagehide", () => {
   resolveDisposed=true; chartResolves.clear();
   compositeDisplayBatches.dispose();
+  activePreferences?.dispose();
   indicatorCoordinator?.dispose();
   ordinaryNotices?.dispose();
   noticeUI?.destroy();

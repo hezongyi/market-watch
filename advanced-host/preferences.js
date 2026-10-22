@@ -19,6 +19,25 @@ function nativePreferences(
   const activeWrites = new Map(), resolving = new Set(), resolved = new Set();
   const restored = new Set(durability?.blocked || []);
   const reported = new Map();
+  const touched = new Set();
+  let disposed = false;
+  const revisionChannel = typeof BroadcastChannel === "undefined" ? null : new BroadcastChannel("mw-preference-revisions-v1");
+  // Revision messages are hints only; content always comes from authenticated
+  // reads. Never advance the baseline of settings already loaded by the widget.
+  if (revisionChannel) revisionChannel.onmessage = ({data}) => {
+    if (disposed || !data || typeof data.key !== 'string' || data.key.length > 1000 || !Number.isSafeInteger(data.revision) || data.revision < 0 || touched.has(data.key)) return;
+    const apply = async () => {
+      if (disposed || touched.has(data.key)) return;
+      const latest = await rpc('read', {});
+      if (disposed || touched.has(data.key)) return;
+      const row = latest.find(row => key(row.kind, row.name, row.tool) === data.key);
+      if (row) rows.set(data.key, row); else rows.delete(data.key);
+    };
+    writes = writes.then(apply).catch(() => {});
+  };
+  const changed = (k, revision) => {
+    if (!disposed) revisionChannel?.postMessage({key:k, revision});
+  };
   const key = (kind, name, tool = "") => JSON.stringify([kind, name, tool]);
   const mergeable = new Set([
     "widgetbar.layout-settings",
@@ -95,15 +114,25 @@ function nativePreferences(
     const k = key(kind, name, tool);
     if (!recoveryDraft && (resolving.has(k) || resolved.has(k))) return Promise.reject(unsaved(Error("设置草稿正在处理或已处理；重新打开图表后继续修改")));
     if (!recoveryDraft && restored.has(k)) return Promise.reject(unsaved(Error("此设置有尚未处理的本地草稿")));
+    touched.add(k);
     const active = activeWrites.get(k);
     if (active && same(active.value, value)) return active.task;
     const version = globalThis.crypto?.randomUUID?.() || String(Date.now()) + Math.random();
-    const draft = recoveryDraft || {key:k, version, kind, name, tool, value, base:baseline.get(k), operation:'save'};
+    let draft = recoveryDraft || {key:k, version, kind, name, tool, value, base:baseline.get(k), operation:'save'};
     // Persist at enqueue time, before waiting for earlier network operations.
-    const durable = durability && !recoveryDraft ? durability.put(draft) : Promise.resolve();
+    let durable = durability && !recoveryDraft ? durability.put(draft) : Promise.resolve();
     durable.catch(() => {});
     pending.set(k, value);
+    // Collapse a burst while this key is still queued; persist every latest
+    // value immediately, and never merge across an intervening delete.
+    if (!recoveryDraft && active && !active.started) {
+      Object.assign(active, {value, draft, durable});
+      return active.task;
+    }
+    const entry = {value, draft, durable, started:false, task:null};
     const run = async () => {
+      entry.started = true;
+      ({value, draft, durable} = entry);
       const base = baseline.get(k);
       try { await durable; } catch { throw unsaved(Error("本机草稿写入失败，请勿关闭页面")); }
       try {
@@ -142,6 +171,7 @@ function nativePreferences(
               revision: old?.revision || 0,
             });
             rows.set(k, row);
+            changed(k, row.revision);
             // A successful merge does not update the chart's in-memory settings.
             // Its next callback still includes untouched fields from `value`.
             // Keep that observed content as the local baseline so it cannot
@@ -159,7 +189,8 @@ function nativePreferences(
       }
     };
     const task = recoveryDraft ? run() : writes.then(run);
-    activeWrites.set(k, {value, task});
+    entry.task = task;
+    activeWrites.set(k, entry);
     const clear = () => { if (activeWrites.get(k)?.task === task) activeWrites.delete(k); };
     task.then(clear, clear);
     if (!recoveryDraft) writes = task.catch(() => {});
@@ -170,6 +201,8 @@ function nativePreferences(
     const k = key(kind,name,tool);
     if (!recoveryDraft && (resolving.has(k) || resolved.has(k))) return Promise.reject(unsaved(Error("设置草稿正在处理或已处理；重新打开图表后继续修改")));
     if (!recoveryDraft && restored.has(k)) return Promise.reject(unsaved(Error("此设置有尚未处理的本地草稿")));
+    touched.add(k);
+    activeWrites.delete(k);
     const draft = recoveryDraft || {key:k,version:globalThis.crypto?.randomUUID?.() || String(Date.now()) + Math.random(),kind,name,tool,base:baseline.get(k),operation:'delete'};
     const durable = durability && !recoveryDraft ? durability.put(draft) : Promise.resolve();
     durable.catch(() => {});
@@ -188,6 +221,7 @@ function nativePreferences(
           throw Error("该设置或模板已在其他窗口修改");
         await rpc("delete", { id: old.id, revision: old.revision });
         rows.delete(k);
+        changed(k, 0);
         baseline.delete(k);
         pending.delete(k);
         if (durability) await durability.drop(draft);
@@ -219,6 +253,7 @@ function nativePreferences(
       });
   };
   return {
+    dispose() { disposed = true; revisionChannel?.close(); },
     resolveDraft(draft, action, revision) {
       const k = key(draft.kind, draft.name, draft.tool);
       if (resolving.has(k)) return Promise.reject(Error("此草稿正在处理"));

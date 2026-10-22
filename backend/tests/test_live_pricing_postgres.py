@@ -100,7 +100,9 @@ def test_controlled_rest_fault_uses_real_commit_fence_and_shared_budget(provider
             assert failure is None
     with factory.begin() as db:
         observations = list(db.scalars(select(LiveMinute)))
-        assert len(observations) == 2
+        # At 125s the 15s maturity margin admits only [0, 60s).
+        assert len(observations) == 1
+        assert observations[0].start == 0
         assert len({m.dataset_id for m in observations}) == 1
         assert all(m.failures == 1 and m.confirmed_at is None for m in observations)
         assert db.scalar(select(SourceMinuteRevision)) is None

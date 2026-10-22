@@ -4,6 +4,26 @@ const sandbox={Map,Set,Promise,JSON,Error,crypto:require('node:crypto').webcrypt
 vm.runInNewContext(fs.readFileSync('../advanced-host/preferences.js','utf8'),sandbox);
 const key=JSON.stringify(['setting','widgetbar.layout-settings','']);
 const row=value=>({id:'one',kind:'setting',name:'widgetbar.layout-settings',tool:'',revision:1,content:{value:JSON.stringify({width:value})}});
+// Queued callbacks collapse to the latest durable value; revision hints never
+// authorize stale chart content to overwrite a field saved in another tab.
+(async()=>{
+ const channels=[];class Channel {constructor(){channels.push(this)}postMessage(value){for(const c of channels)if(c!==this && !c.closed) c.onmessage?.({data:clone(value)})}close(){this.closed=true}}
+ const env={Map,Set,Promise,JSON,Error,crypto:require('node:crypto').webcrypto,BroadcastChannel:Channel};
+ vm.runInNewContext(fs.readFileSync('../advanced-host/preferences.js','utf8'),env);
+ let remote=row(300),writes=0,reads=0;const drafts=new Map();
+ const rpc=async(op,args)=>{if(op==='read'){reads++;return remote?[clone(remote)]:[];}writes++;remote={...args,id:'one',revision:(remote?.revision||0)+1};return clone(remote)};
+ const durability={put:async d=>drafts.set(d.key,clone(d)),drop:async d=>{if(drafts.get(d.key)?.version===d.version)drafts.delete(d.key)}};
+ const a=env.nativePreferences([clone(remote)],rpc,false,()=>{},()=>{},()=>{},durability),b=env.nativePreferences([clone(remote)],rpc,false,()=>{});
+ const burst=[400,500,600].map(width=>a.savePreference('setting',remote.name,JSON.stringify({width})));
+ await Promise.all(burst);await new Promise(r=>setImmediate(r));
+ assert.equal(writes,1);assert.equal(drafts.size,0);assert.equal(JSON.parse(remote.content.value).width,600);assert.ok(reads>=2,'untouched tab re-reads the successful revision');
+ await assert.rejects(b.savePreference('setting',remote.name,'{"width":700}'),/其他窗口/);
+ assert.equal(JSON.parse(remote.content.value).width,600,'revision hint preserves the widget observed baseline');
+ const before=reads;await a.savePreference('setting',remote.name,'{"width":800}');await new Promise(r=>setImmediate(r));
+ assert.equal(reads,before+1,'touched keys never automatically accept a broadcast');
+ a.dispose();b.dispose();assert.ok(channels.every(c=>c.closed));
+ console.log('PASS per-key queued burst; cross-tab revision hints preserve conflicts and dispose');
+})().catch(e=>{console.error(e);process.exitCode=1});
 (async()=>{
  let remote=row(300),saved=new Map(),writes=0,reports=[];
  const durability={current:async d=>saved.get(d.key)?.version===d.version,put:async d=>saved.set(d.key,clone(d)),drop:async d=>{if(saved.get(d.key)?.version===d.version)saved.delete(d.key)}};

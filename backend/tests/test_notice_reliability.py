@@ -36,6 +36,31 @@ def test_safe_request_reason_is_specific_and_never_contains_supplier_text(code, 
         assert result.retry_at == 130000 and not result.successful
 
 
+@pytest.mark.parametrize('method', ['page', 'latest'])
+@pytest.mark.parametrize('failure', [httpx.ConnectTimeout, httpx.ConnectError])
+def test_real_adapter_retains_tls_failure_phase_without_secret_text(method, failure, monkeypatch):
+    from contextlib import nullcontext
+    from alerts import oanda_rest_batch
+    from test_oanda_rest_batch import spec
+    from test_oanda_stream import oanda_identity
+    monkeypatch.setattr(oanda_rest_batch, 'request_slot', lambda *a, **kw: nullcontext())
+
+    def respond(request):
+        request.extensions['trace']('connection.start_tls.failed', {})
+        raise failure('private proxy token', request=request)
+
+    with httpx.Client(transport=httpx.MockTransport(respond)) as client:
+        adapter = oanda_rest_batch.OandaRestBatch(token='private token', account_id='test-account',
+            rest_client=client, stream_client=client, clock=lambda: 125000)
+        if method == 'page':
+            result = adapter.page(oanda_identity(), 0, 120000).result
+            assert (result.window_start, result.window_end) == (0, 120000)
+        else:
+            result = adapter.latest([spec()], generation=1, sequence=1, demand_revision='d').result
+        assert result.phase == 'tls' and result.operation == ('candles' if method == 'page' else 'candles_latest')
+        assert 'private' not in result.model_dump_json() and not result.successful
+
+
 def test_confirmation_and_sampling_recover_only_their_own_operation(running, monkeypatch):
     factory, ownership, epoch, identities = running
     identity = identities['EUR_USD']
