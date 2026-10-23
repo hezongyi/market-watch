@@ -1,0 +1,352 @@
+{
+  "baselineCommit": "983b40246d8d80e5f903fee7fb980e4ae516d03a",
+  "candidateCommit": "defdcf93ef9482a25af83c09ad0f8c80d5f3519a",
+  "baselineMeasuredAt": "2026-10-22T22:03:54.530Z",
+  "candidateMeasuredAt": "2026-10-22T23:51:18.847Z",
+  "workspaceHash": "b4c31ec78ee3ae6cb59f7ac03458f55d620a69643fb4db6257567812a66e7480",
+  "workspaceRevision": 78,
+  "viewport": {
+    "width": 1600,
+    "height": 1000
+  },
+  "timeframes": [
+    "H1",
+    "M5",
+    "W1",
+    "D1",
+    "H4"
+  ],
+  "originalStudyCounts": [
+    0,
+    3,
+    0,
+    0,
+    1
+  ],
+  "comparison": [
+    {
+      "scenario": "MWP:EURUSD",
+      "before": {
+        "activeMs": 5102,
+        "allMs": 7695,
+        "H1QueueMs": 536
+      },
+      "after": {
+        "activeMs": 8951,
+        "allMs": 13225,
+        "H1QueueMs": 0
+      }
+    },
+    {
+      "scenario": "MWH:2a673b63-2922-497e-bec9-d0231be55934",
+      "before": {
+        "activeMs": 2551,
+        "allMs": 4005,
+        "H1QueueMs": 455
+      },
+      "after": {
+        "activeMs": 720,
+        "allMs": 3187,
+        "H1QueueMs": 0
+      }
+    },
+    {
+      "scenario": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+      "before": {
+        "activeMs": 3174,
+        "allMs": 18105,
+        "H1QueueMs": 499
+      },
+      "after": {
+        "activeMs": 1341,
+        "allMs": 5327,
+        "H1QueueMs": 0
+      }
+    },
+    {
+      "scenario": "MWP:EURUSD",
+      "before": {
+        "activeMs": 6499,
+        "allMs": 12638,
+        "H1QueueMs": 238
+      },
+      "after": {
+        "activeMs": 2636,
+        "allMs": 6438,
+        "H1QueueMs": 0
+      }
+    }
+  ],
+  "afterQueueObservation": {
+    "startedAt": "2026-10-22T23:51:18.847Z",
+    "trials": [
+      {
+        "ticker": "MWP:EURUSD",
+        "activeMs": 8951,
+        "allMs": 13225,
+        "quietBefore": false,
+        "diagnosticSlow": true,
+        "firstScreen": [
+          {
+            "timeframe": "H1",
+            "queueMs": 0,
+            "serviceMs": 8560,
+            "cacheHit": true,
+            "readMs": 223.79,
+            "bars": 149,
+            "error": null
+          },
+          {
+            "timeframe": "M5",
+            "queueMs": 1,
+            "serviceMs": 10200,
+            "cacheHit": true,
+            "readMs": 241.35,
+            "bars": 104,
+            "error": null
+          },
+          {
+            "timeframe": "W1",
+            "queueMs": 181,
+            "serviceMs": 9541,
+            "cacheHit": true,
+            "readMs": 69.96,
+            "bars": 28,
+            "error": null
+          },
+          {
+            "timeframe": "D1",
+            "queueMs": 2429,
+            "serviceMs": 9619,
+            "cacheHit": true,
+            "readMs": 243.78,
+            "bars": 50,
+            "error": null
+          },
+          {
+            "timeframe": "H4",
+            "queueMs": 8747,
+            "serviceMs": 4077,
+            "cacheHit": true,
+            "readMs": 291.03,
+            "bars": 52,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ticker": "MWH:2a673b63-2922-497e-bec9-d0231be55934",
+        "activeMs": 720,
+        "allMs": 3187,
+        "quietBefore": true,
+        "diagnosticSlow": true,
+        "firstScreen": [
+          {
+            "timeframe": "H1",
+            "queueMs": 0,
+            "serviceMs": 468,
+            "cacheHit": null,
+            "readMs": null,
+            "bars": 77,
+            "error": null
+          },
+          {
+            "timeframe": "M5",
+            "queueMs": 0,
+            "serviceMs": 709,
+            "cacheHit": null,
+            "readMs": null,
+            "bars": 104,
+            "error": null
+          },
+          {
+            "timeframe": "W1",
+            "queueMs": 240,
+            "serviceMs": 2223,
+            "cacheHit": null,
+            "readMs": null,
+            "bars": 28,
+            "error": null
+          },
+          {
+            "timeframe": "D1",
+            "queueMs": 230,
+            "serviceMs": 1900,
+            "cacheHit": null,
+            "readMs": null,
+            "bars": 50,
+            "error": null
+          },
+          {
+            "timeframe": "H4",
+            "queueMs": 699,
+            "serviceMs": 2220,
+            "cacheHit": null,
+            "readMs": null,
+            "bars": 46,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ticker": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+        "activeMs": 1341,
+        "allMs": 5327,
+        "quietBefore": true,
+        "diagnosticSlow": true,
+        "firstScreen": [
+          {
+            "timeframe": "H1",
+            "queueMs": 0,
+            "serviceMs": 1064,
+            "cacheHit": null,
+            "readMs": null,
+            "bars": 77,
+            "error": null
+          },
+          {
+            "timeframe": "M5",
+            "queueMs": 0,
+            "serviceMs": 1589,
+            "cacheHit": null,
+            "readMs": null,
+            "bars": 104,
+            "error": null
+          },
+          {
+            "timeframe": "W1",
+            "queueMs": 161,
+            "serviceMs": 3815,
+            "cacheHit": null,
+            "readMs": null,
+            "bars": 28,
+            "error": null
+          },
+          {
+            "timeframe": "D1",
+            "queueMs": 204,
+            "serviceMs": 2679,
+            "cacheHit": null,
+            "readMs": null,
+            "bars": 50,
+            "error": null
+          },
+          {
+            "timeframe": "H4",
+            "queueMs": 1578,
+            "serviceMs": 2800,
+            "cacheHit": null,
+            "readMs": null,
+            "bars": 46,
+            "error": null
+          },
+          {
+            "timeframe": "D1",
+            "queueMs": 1093,
+            "serviceMs": 1072,
+            "cacheHit": null,
+            "readMs": null,
+            "bars": 1,
+            "error": null
+          }
+        ]
+      },
+      {
+        "ticker": "MWP:EURUSD",
+        "activeMs": 2636,
+        "allMs": 6438,
+        "quietBefore": true,
+        "diagnosticSlow": true,
+        "firstScreen": [
+          {
+            "timeframe": "H1",
+            "queueMs": 0,
+            "serviceMs": 2311,
+            "cacheHit": true,
+            "readMs": 38.5,
+            "bars": 149,
+            "error": null
+          },
+          {
+            "timeframe": "M5",
+            "queueMs": 0,
+            "serviceMs": 3057,
+            "cacheHit": true,
+            "readMs": 109.61,
+            "bars": 104,
+            "error": null
+          },
+          {
+            "timeframe": "W1",
+            "queueMs": 49,
+            "serviceMs": 3962,
+            "cacheHit": true,
+            "readMs": 123.52,
+            "bars": 28,
+            "error": null
+          },
+          {
+            "timeframe": "D1",
+            "queueMs": 1848,
+            "serviceMs": 3521,
+            "cacheHit": true,
+            "readMs": 344.63,
+            "bars": 50,
+            "error": null
+          },
+          {
+            "timeframe": "H4",
+            "queueMs": 2736,
+            "serviceMs": 3414,
+            "cacheHit": true,
+            "readMs": 182.52,
+            "bars": 52,
+            "error": null
+          }
+        ]
+      }
+    ],
+    "workspaceBefore": {
+      "id": "7d72eead-6be5-41a4-b3d5-bfdfff98b2bb",
+      "revision": 78,
+      "hash": "b4c31ec78ee3ae6cb59f7ac03458f55d620a69643fb4db6257567812a66e7480",
+      "documentHash": "acef66da98efb511629b36a0a2194ba28cfc97c6b2f275b19d9af4dbf2dffe3f"
+    },
+    "workspaceAfter": {
+      "id": "7d72eead-6be5-41a4-b3d5-bfdfff98b2bb",
+      "revision": 78,
+      "hash": "b4c31ec78ee3ae6cb59f7ac03458f55d620a69643fb4db6257567812a66e7480",
+      "documentHash": "acef66da98efb511629b36a0a2194ba28cfc97c6b2f275b19d9af4dbf2dffe3f"
+    },
+    "workspaceUnchanged": true,
+    "historyLoads": {
+      "admitted": 0,
+      "cleaning": 0,
+      "queued": 0,
+      "cleanupFailures": 0
+    },
+    "afterSettle": {
+      "quiet": true,
+      "wait_ms": 1186
+    },
+    "queueRemaining": 0,
+    "pendingRemaining": 0,
+    "pageErrors": [],
+    "bridgeSHA256": "e24bd2d3477ee7a5c8952a16ad6e0f5d3d9999774eff56a983360cea86afc1c1",
+    "hostAssetSHA256": "7aef134a6f287cf02086cd96d7910502826ed03a77c894950c4cf57dfde7b165",
+    "diagnosticThresholdMs": 3000,
+    "thresholdIsApprovedSLA": false,
+    "perScenarioSampleCount": 1,
+    "unexpectedHttpErrors": [],
+    "expectedHttpResponseCounts": {
+      "anonymous-session-before-login": 1,
+      "intentionally-blocked-persistent-write": 9
+    }
+  },
+  "limitations": [
+    "One sample per scene in this paired diagnostic sequence; no p95 or speed-up percentage.",
+    "First scene did not reach a fully quiet precondition on either version.",
+    "Same workspace, layout and viewport; cache, supplier freshness and shared host load were not controlled.",
+    "3000 ms is a diagnostic alarm line, not an approved SLA."
+  ]
+}

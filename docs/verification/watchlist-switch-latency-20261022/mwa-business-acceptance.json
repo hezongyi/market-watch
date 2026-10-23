@@ -1,0 +1,1315 @@
+{
+  "overallVerdict": "NOT_ACCEPTED_RAPID_SWITCH_TIMEOUT",
+  "candidateCommit": "defdcf93ef9482a25af83c09ad0f8c80d5f3519a",
+  "runs": [
+    {
+      "run": "business-acceptance",
+      "started": "2026-10-22T23:56:13.832Z",
+      "ended": "2026-10-22T23:57:38.765Z",
+      "passed": false,
+      "checks": [
+        {
+          "name": "original-five-chart-layout",
+          "passed": true,
+          "studyFiniteCounts": [
+            {
+              "index": 0,
+              "resolution": "60",
+              "studies": []
+            },
+            {
+              "index": 1,
+              "resolution": "5",
+              "studies": [
+                {
+                  "name": "Moving Average Exponential",
+                  "finite": 93
+                },
+                {
+                  "name": "守望 Python SUPERTREND_PINE_V1",
+                  "finite": 0
+                },
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 0
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "resolution": "1W",
+              "studies": []
+            },
+            {
+              "index": 3,
+              "resolution": "1D",
+              "studies": []
+            },
+            {
+              "index": 4,
+              "resolution": "240",
+              "studies": [
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "provider-prices-and-original-indicators",
+          "ticker": "MWP:EURUSD",
+          "activeMs": 7137,
+          "allMs": 12235,
+          "allOriginalPlotsFiniteMs": 13324,
+          "passed": true,
+          "studyFiniteCounts": [
+            {
+              "index": 0,
+              "resolution": "60",
+              "studies": []
+            },
+            {
+              "index": 1,
+              "resolution": "5",
+              "studies": [
+                {
+                  "name": "Moving Average Exponential",
+                  "finite": 93
+                },
+                {
+                  "name": "守望 Python SUPERTREND_PINE_V1",
+                  "finite": 93
+                },
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 93
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "resolution": "1W",
+              "studies": []
+            },
+            {
+              "index": 3,
+              "resolution": "1D",
+              "studies": []
+            },
+            {
+              "index": 4,
+              "resolution": "240",
+              "studies": [
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 52
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "fixed-history-prices-and-original-indicators",
+          "ticker": "MWH:2a673b63-2922-497e-bec9-d0231be55934",
+          "activeMs": 1306,
+          "allMs": 3558,
+          "allOriginalPlotsFiniteMs": 7225,
+          "passed": true,
+          "studyFiniteCounts": [
+            {
+              "index": 0,
+              "resolution": "60",
+              "studies": []
+            },
+            {
+              "index": 1,
+              "resolution": "5",
+              "studies": [
+                {
+                  "name": "Moving Average Exponential",
+                  "finite": 93
+                },
+                {
+                  "name": "守望 Python SUPERTREND_PINE_V1",
+                  "finite": 92
+                },
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 92
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "resolution": "1W",
+              "studies": []
+            },
+            {
+              "index": 3,
+              "resolution": "1D",
+              "studies": []
+            },
+            {
+              "index": 4,
+              "resolution": "240",
+              "studies": [
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 45
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "composite-prices-and-original-indicators",
+          "ticker": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+          "activeMs": 1500,
+          "allMs": 6516,
+          "allOriginalPlotsFiniteMs": 11103,
+          "passed": true,
+          "studyFiniteCounts": [
+            {
+              "index": 0,
+              "resolution": "60",
+              "studies": []
+            },
+            {
+              "index": 1,
+              "resolution": "5",
+              "studies": [
+                {
+                  "name": "Moving Average Exponential",
+                  "finite": 93
+                },
+                {
+                  "name": "守望 Python SUPERTREND_PINE_V1",
+                  "finite": 93
+                },
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 93
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "resolution": "1W",
+              "studies": []
+            },
+            {
+              "index": 3,
+              "resolution": "1D",
+              "studies": []
+            },
+            {
+              "index": 4,
+              "resolution": "240",
+              "studies": [
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 45
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "fixed-history-left-navigation",
+          "ticker": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+          "ms": 1631,
+          "target": {
+            "from": 1791468000,
+            "to": 1791723600
+          },
+          "actualRange": {
+            "from": 1791468000,
+            "to": 1791576000
+          },
+          "passed": true
+        },
+        {
+          "name": "provider-cache-return",
+          "ticker": "MWP:EURUSD",
+          "activeMs": 6192,
+          "allMs": 9732,
+          "allOriginalPlotsFiniteMs": 12369,
+          "passed": true,
+          "studyFiniteCounts": [
+            {
+              "index": 0,
+              "resolution": "60",
+              "studies": []
+            },
+            {
+              "index": 1,
+              "resolution": "5",
+              "studies": [
+                {
+                  "name": "Moving Average Exponential",
+                  "finite": 93
+                },
+                {
+                  "name": "守望 Python SUPERTREND_PINE_V1",
+                  "finite": 93
+                },
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 93
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "resolution": "1W",
+              "studies": []
+            },
+            {
+              "index": 3,
+              "resolution": "1D",
+              "studies": []
+            },
+            {
+              "index": 4,
+              "resolution": "240",
+              "studies": [
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 52
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "provider-left-navigation",
+          "ticker": "MWP:EURUSD",
+          "ms": 559,
+          "target": {
+            "from": 1791468000,
+            "to": 1791723600
+          },
+          "actualRange": {
+            "from": 1791468000,
+            "to": 1791576000
+          },
+          "passed": true
+        },
+        {
+          "name": "rapid-switches-final-symbol-and-indicators",
+          "ms": 16508,
+          "finalActiveMs": 11419,
+          "finalAllMs": 12311,
+          "passed": true,
+          "clickCount": 5
+        },
+        {
+          "name": "bounded-admission-and-resource-return",
+          "resources": {
+            "current": {
+              "admitted": 0,
+              "cleaning": 0,
+              "queued": 0,
+              "cleanupFailures": 0
+            },
+            "peaks": {
+              "admitted": 4,
+              "cleaning": 3,
+              "queued": 0
+            },
+            "samples": 749
+          },
+          "queue": {
+            "peaks": {
+              "ordinary": 4,
+              "background": 2,
+              "quote": 1
+            },
+            "samples": 748,
+            "queued": 0,
+            "pending": 1
+          },
+          "passed": true
+        },
+        {
+          "name": "quote-freshness-contract",
+          "quote": {
+            "ticker": "MWP:EURUSD",
+            "status": "ok",
+            "fetchStatus": "ok",
+            "readAt": 1792713451095,
+            "fetchedAt": 1792713451095,
+            "dataStart": 1792713420000,
+            "dataEnd": 1792713480000,
+            "marketSession": "unknown",
+            "hasPrice": true
+          },
+          "readAgeMs": 6915,
+          "dataEndAgeMs": -21989,
+          "passed": true
+        }
+      ],
+      "failure": [
+        "AssertionError [ERR_ASSERTION]: No unexpected HTTP failure",
+        "+ actual - expected"
+      ],
+      "pageErrors": [],
+      "unexpectedHttpErrors": [
+        {
+          "path": "/api/session",
+          "status": 401,
+          "at": 1792713374254
+        },
+        {
+          "path": "/api/notification-center/events/b%3A1d3aefed-1a16-03a9-355f-22fff54b77da",
+          "status": 404,
+          "at": 1792713448118
+        },
+        {
+          "path": "/api/notification-center/events/b%3Aa7e327ce-6f30-b6c0-42fb-4fb53b7456de",
+          "status": 404,
+          "at": 1792713448990
+        },
+        {
+          "path": "/api/notification-center/events/b%3Ab822dc6f-2dfd-a02a-a827-31941d9d505c",
+          "status": 404,
+          "at": 1792713449885
+        },
+        {
+          "path": "/api/notification-center/events/b%3Ad7ee109a-3d17-8c9b-15db-9eb72497fa2c",
+          "status": 404,
+          "at": 1792713450341
+        },
+        {
+          "path": "/api/notification-center/events/b%3Ae8a4a9dc-20e1-6870-e515-f94280701fa1",
+          "status": 404,
+          "at": 1792713450425
+        },
+        {
+          "path": "/api/notification-center/events/b%3Af827fce5-652c-036f-b3d6-c36c19cddd93",
+          "status": 404,
+          "at": 1792713450532
+        },
+        {
+          "path": "/api/notification-center/events/b%3A3ca1419b-da4a-7412-625c-7a7fdef005f6",
+          "status": 404,
+          "at": 1792713453506
+        },
+        {
+          "path": "/api/notification-center/events/b%3Ad745e5d4-d371-fff7-643e-dd466a64f456",
+          "status": 404,
+          "at": 1792713453619
+        },
+        {
+          "path": "/api/notification-center/events/b%3Ada95debf-f305-bfe5-b380-80af913fec8a",
+          "status": 404,
+          "at": 1792713453874
+        },
+        {
+          "path": "/api/notification-center/events/b%3Af9605d81-e13b-5eb3-3c4c-e3b0506ca9e4",
+          "status": 404,
+          "at": 1792713454277
+        }
+      ],
+      "before": {
+        "workspaceHash": "b4c31ec78ee3ae6cb59f7ac03458f55d620a69643fb4db6257567812a66e7480",
+        "revision": 78,
+        "preferencesHash": "bb4c1258e3914d4f8ca15ce74be46c6f7a1a17ed3578548a54a32a2b9d52e9bf"
+      },
+      "after": {
+        "workspaceHash": "b4c31ec78ee3ae6cb59f7ac03458f55d620a69643fb4db6257567812a66e7480",
+        "revision": 78,
+        "preferencesHash": "bb4c1258e3914d4f8ca15ce74be46c6f7a1a17ed3578548a54a32a2b9d52e9bf"
+      },
+      "failureCharts": [
+        {
+          "index": 0,
+          "symbol": "MWP:EURUSD",
+          "resolution": "60",
+          "ready": true,
+          "range": {
+            "from": 1792490400,
+            "to": 1792746000
+          },
+          "studies": []
+        },
+        {
+          "index": 1,
+          "symbol": "MWP:EURUSD",
+          "resolution": "5",
+          "ready": true,
+          "range": {
+            "from": 1792697700,
+            "to": 1792718400
+          },
+          "studies": [
+            {
+              "name": "Moving Average Exponential",
+              "rows": 405,
+              "finite": 390,
+              "first": 1792596600,
+              "last": 1792713300
+            },
+            {
+              "name": "守望 Python SUPERTREND_PINE_V1",
+              "rows": 405,
+              "finite": 405,
+              "first": 1792592100,
+              "last": 1792713300
+            },
+            {
+              "name": "守望 Python SWING_SR_V1",
+              "rows": 405,
+              "finite": 405,
+              "first": 1792592100,
+              "last": 1792713300
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "symbol": "MWP:EURUSD",
+          "resolution": "1W",
+          "ready": true,
+          "range": {
+            "from": 1783296000,
+            "to": 1798408800
+          },
+          "studies": []
+        },
+        {
+          "index": 3,
+          "symbol": "MWP:EURUSD",
+          "resolution": "1D",
+          "ready": true,
+          "range": {
+            "from": 1788393600,
+            "to": 1793829600
+          },
+          "studies": []
+        },
+        {
+          "index": 4,
+          "symbol": "MWP:EURUSD",
+          "resolution": "240",
+          "ready": true,
+          "range": {
+            "from": 1792083600,
+            "to": 1793019600
+          },
+          "studies": [
+            {
+              "name": "守望 Python SWING_SR_V1",
+              "rows": 215,
+              "finite": 215,
+              "first": 1788411600,
+              "last": 1792702800
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run": "business-acceptance-final",
+      "started": "2026-10-23T00:00:05.914Z",
+      "ended": "2026-10-23T00:01:16.323Z",
+      "passed": false,
+      "checks": [
+        {
+          "name": "original-five-chart-layout",
+          "passed": true,
+          "studyFiniteCounts": [
+            {
+              "index": 0,
+              "resolution": "60",
+              "studies": []
+            },
+            {
+              "index": 1,
+              "resolution": "5",
+              "studies": [
+                {
+                  "name": "Moving Average Exponential",
+                  "finite": 75
+                },
+                {
+                  "name": "守望 Python SUPERTREND_PINE_V1",
+                  "finite": 0
+                },
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 0
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "resolution": "1W",
+              "studies": []
+            },
+            {
+              "index": 3,
+              "resolution": "1D",
+              "studies": []
+            },
+            {
+              "index": 4,
+              "resolution": "240",
+              "studies": [
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "provider-prices-and-original-indicators",
+          "ticker": "MWP:EURUSD",
+          "activeMs": 3687,
+          "allMs": 11142,
+          "allOriginalPlotsFiniteMs": 12255,
+          "firstFiniteIndicatorResponseMs": 8216,
+          "passed": true,
+          "studyFiniteCounts": [
+            {
+              "index": 0,
+              "resolution": "60",
+              "studies": []
+            },
+            {
+              "index": 1,
+              "resolution": "5",
+              "studies": [
+                {
+                  "name": "Moving Average Exponential",
+                  "finite": 93
+                },
+                {
+                  "name": "守望 Python SUPERTREND_PINE_V1",
+                  "finite": 93
+                },
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 93
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "resolution": "1W",
+              "studies": []
+            },
+            {
+              "index": 3,
+              "resolution": "1D",
+              "studies": []
+            },
+            {
+              "index": 4,
+              "resolution": "240",
+              "studies": [
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 52
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "fixed-history-prices-and-original-indicators",
+          "ticker": "MWH:2a673b63-2922-497e-bec9-d0231be55934",
+          "activeMs": 1347,
+          "allMs": 3722,
+          "allOriginalPlotsFiniteMs": 7633,
+          "firstFiniteIndicatorResponseMs": 6151,
+          "passed": true,
+          "studyFiniteCounts": [
+            {
+              "index": 0,
+              "resolution": "60",
+              "studies": []
+            },
+            {
+              "index": 1,
+              "resolution": "5",
+              "studies": [
+                {
+                  "name": "Moving Average Exponential",
+                  "finite": 93
+                },
+                {
+                  "name": "守望 Python SUPERTREND_PINE_V1",
+                  "finite": 92
+                },
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 92
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "resolution": "1W",
+              "studies": []
+            },
+            {
+              "index": 3,
+              "resolution": "1D",
+              "studies": []
+            },
+            {
+              "index": 4,
+              "resolution": "240",
+              "studies": [
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 45
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "composite-prices-and-original-indicators",
+          "ticker": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+          "activeMs": 2762,
+          "allMs": 5360,
+          "allOriginalPlotsFiniteMs": 11182,
+          "firstFiniteIndicatorResponseMs": 8245,
+          "passed": true,
+          "studyFiniteCounts": [
+            {
+              "index": 0,
+              "resolution": "60",
+              "studies": []
+            },
+            {
+              "index": 1,
+              "resolution": "5",
+              "studies": [
+                {
+                  "name": "Moving Average Exponential",
+                  "finite": 93
+                },
+                {
+                  "name": "守望 Python SUPERTREND_PINE_V1",
+                  "finite": 93
+                },
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 93
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "resolution": "1W",
+              "studies": []
+            },
+            {
+              "index": 3,
+              "resolution": "1D",
+              "studies": []
+            },
+            {
+              "index": 4,
+              "resolution": "240",
+              "studies": [
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 45
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "fixed-history-left-navigation",
+          "ticker": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+          "ms": 1354,
+          "target": {
+            "from": 1791471600,
+            "to": 1791727200
+          },
+          "actualRange": {
+            "from": 1791471600,
+            "to": 1791576000
+          },
+          "passed": true
+        },
+        {
+          "name": "provider-cache-return",
+          "ticker": "MWP:EURUSD",
+          "activeMs": 4888,
+          "allMs": 19526,
+          "allOriginalPlotsFiniteMs": 20055,
+          "firstFiniteIndicatorResponseMs": 13147,
+          "passed": true,
+          "studyFiniteCounts": [
+            {
+              "index": 0,
+              "resolution": "60",
+              "studies": []
+            },
+            {
+              "index": 1,
+              "resolution": "5",
+              "studies": [
+                {
+                  "name": "Moving Average Exponential",
+                  "finite": 93
+                },
+                {
+                  "name": "守望 Python SUPERTREND_PINE_V1",
+                  "finite": 93
+                },
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 93
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "resolution": "1W",
+              "studies": []
+            },
+            {
+              "index": 3,
+              "resolution": "1D",
+              "studies": []
+            },
+            {
+              "index": 4,
+              "resolution": "240",
+              "studies": [
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 52
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "failure": [
+        "AssertionError [ERR_ASSERTION]: Left navigation delivers an actual historical page",
+        "    at pageLeft (/home/quant/repos/market-watch-watchlist-latency-20261022/docs/verification/watchlist-switch-latency-20261022/mwa-business-acceptance.cjs:197:14)"
+      ],
+      "pageErrors": [],
+      "unexpectedHttpErrors": [],
+      "before": {
+        "workspaceHash": "b4c31ec78ee3ae6cb59f7ac03458f55d620a69643fb4db6257567812a66e7480",
+        "revision": 78,
+        "preferencesHash": "bb4c1258e3914d4f8ca15ce74be46c6f7a1a17ed3578548a54a32a2b9d52e9bf"
+      },
+      "after": null,
+      "failureCharts": [
+        {
+          "index": 0,
+          "symbol": "MWP:EURUSD",
+          "resolution": "60",
+          "ready": true,
+          "range": {
+            "from": 1791471600,
+            "to": 1791576000
+          },
+          "studies": []
+        },
+        {
+          "index": 1,
+          "symbol": "MWP:EURUSD",
+          "resolution": "5",
+          "ready": true,
+          "range": {
+            "from": 1792698000,
+            "to": 1792718700
+          },
+          "studies": [
+            {
+              "name": "Moving Average Exponential",
+              "rows": 93,
+              "finite": 93,
+              "first": 1792686000,
+              "last": 1792713600
+            },
+            {
+              "name": "守望 Python SUPERTREND_PINE_V1",
+              "rows": 93,
+              "finite": 93,
+              "first": 1792686000,
+              "last": 1792713600
+            },
+            {
+              "name": "守望 Python SWING_SR_V1",
+              "rows": 93,
+              "finite": 93,
+              "first": 1792686000,
+              "last": 1792713600
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "symbol": "MWP:EURUSD",
+          "resolution": "1W",
+          "ready": true,
+          "range": {
+            "from": 1783296000,
+            "to": 1798408800
+          },
+          "studies": []
+        },
+        {
+          "index": 3,
+          "symbol": "MWP:EURUSD",
+          "resolution": "1D",
+          "ready": true,
+          "range": {
+            "from": 1788393600,
+            "to": 1793829600
+          },
+          "studies": []
+        },
+        {
+          "index": 4,
+          "symbol": "MWP:EURUSD",
+          "resolution": "240",
+          "ready": true,
+          "range": {
+            "from": 1792083600,
+            "to": 1793019600
+          },
+          "studies": [
+            {
+              "name": "守望 Python SWING_SR_V1",
+              "rows": 52,
+              "finite": 52,
+              "first": 1791795600,
+              "last": 1792702800
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run": "business-acceptance-verified",
+      "started": "2026-10-23T00:02:40.817Z",
+      "ended": "2026-10-23T00:05:27.349Z",
+      "passed": false,
+      "checks": [
+        {
+          "name": "original-five-chart-layout",
+          "passed": true,
+          "studyFiniteCounts": [
+            {
+              "index": 0,
+              "resolution": "60",
+              "studies": []
+            },
+            {
+              "index": 1,
+              "resolution": "5",
+              "studies": [
+                {
+                  "name": "Moving Average Exponential",
+                  "finite": 75
+                },
+                {
+                  "name": "守望 Python SUPERTREND_PINE_V1",
+                  "finite": 0
+                },
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 0
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "resolution": "1W",
+              "studies": []
+            },
+            {
+              "index": 3,
+              "resolution": "1D",
+              "studies": []
+            },
+            {
+              "index": 4,
+              "resolution": "240",
+              "studies": [
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "provider-prices-and-original-indicators",
+          "ticker": "MWP:EURUSD",
+          "activeMs": 6987,
+          "allMs": 8844,
+          "allOriginalPlotsFiniteMs": 9404,
+          "firstFiniteIndicatorResponseMs": 8566,
+          "passed": true,
+          "studyFiniteCounts": [
+            {
+              "index": 0,
+              "resolution": "60",
+              "studies": []
+            },
+            {
+              "index": 1,
+              "resolution": "5",
+              "studies": [
+                {
+                  "name": "Moving Average Exponential",
+                  "finite": 93
+                },
+                {
+                  "name": "守望 Python SUPERTREND_PINE_V1",
+                  "finite": 93
+                },
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 93
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "resolution": "1W",
+              "studies": []
+            },
+            {
+              "index": 3,
+              "resolution": "1D",
+              "studies": []
+            },
+            {
+              "index": 4,
+              "resolution": "240",
+              "studies": [
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 52
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "fixed-history-prices-and-original-indicators",
+          "ticker": "MWH:2a673b63-2922-497e-bec9-d0231be55934",
+          "activeMs": 852,
+          "allMs": 1792,
+          "allOriginalPlotsFiniteMs": 3463,
+          "firstFiniteIndicatorResponseMs": 3096,
+          "passed": true,
+          "studyFiniteCounts": [
+            {
+              "index": 0,
+              "resolution": "60",
+              "studies": []
+            },
+            {
+              "index": 1,
+              "resolution": "5",
+              "studies": [
+                {
+                  "name": "Moving Average Exponential",
+                  "finite": 93
+                },
+                {
+                  "name": "守望 Python SUPERTREND_PINE_V1",
+                  "finite": 92
+                },
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 92
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "resolution": "1W",
+              "studies": []
+            },
+            {
+              "index": 3,
+              "resolution": "1D",
+              "studies": []
+            },
+            {
+              "index": 4,
+              "resolution": "240",
+              "studies": [
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 45
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "composite-prices-and-original-indicators",
+          "ticker": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+          "activeMs": 1713,
+          "allMs": 6447,
+          "allOriginalPlotsFiniteMs": 22212,
+          "firstFiniteIndicatorResponseMs": 10120,
+          "passed": true,
+          "studyFiniteCounts": [
+            {
+              "index": 0,
+              "resolution": "60",
+              "studies": []
+            },
+            {
+              "index": 1,
+              "resolution": "5",
+              "studies": [
+                {
+                  "name": "Moving Average Exponential",
+                  "finite": 93
+                },
+                {
+                  "name": "守望 Python SUPERTREND_PINE_V1",
+                  "finite": 93
+                },
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 93
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "resolution": "1W",
+              "studies": []
+            },
+            {
+              "index": 3,
+              "resolution": "1D",
+              "studies": []
+            },
+            {
+              "index": 4,
+              "resolution": "240",
+              "studies": [
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 45
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "fixed-history-left-navigation",
+          "ticker": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+          "ms": 2094,
+          "target": {
+            "from": 1791471600,
+            "to": 1791727200
+          },
+          "actualRange": {
+            "from": 1791471600,
+            "to": 1791576000
+          },
+          "finiteVisibleBars": 30,
+          "delivery": "datafeed-page",
+          "passed": true
+        },
+        {
+          "name": "provider-cache-return",
+          "ticker": "MWP:EURUSD",
+          "activeMs": 7099,
+          "allMs": 10900,
+          "allOriginalPlotsFiniteMs": 11952,
+          "firstFiniteIndicatorResponseMs": 11296,
+          "passed": true,
+          "studyFiniteCounts": [
+            {
+              "index": 0,
+              "resolution": "60",
+              "studies": []
+            },
+            {
+              "index": 1,
+              "resolution": "5",
+              "studies": [
+                {
+                  "name": "Moving Average Exponential",
+                  "finite": 93
+                },
+                {
+                  "name": "守望 Python SUPERTREND_PINE_V1",
+                  "finite": 93
+                },
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 93
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "resolution": "1W",
+              "studies": []
+            },
+            {
+              "index": 3,
+              "resolution": "1D",
+              "studies": []
+            },
+            {
+              "index": 4,
+              "resolution": "240",
+              "studies": [
+                {
+                  "name": "守望 Python SWING_SR_V1",
+                  "finite": 52
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "provider-left-navigation",
+          "ticker": "MWP:EURUSD",
+          "ms": 1796,
+          "target": {
+            "from": 1791471600,
+            "to": 1791727200
+          },
+          "actualRange": {
+            "from": 1791471600,
+            "to": 1791576000
+          },
+          "finiteVisibleBars": 30,
+          "delivery": "datafeed-page",
+          "passed": true
+        }
+      ],
+      "failure": [
+        "frame.waitForFunction: Timeout 90000ms exceeded.",
+        "    at waitCharts (/home/quant/repos/market-watch-watchlist-latency-20261022/docs/verification/watchlist-switch-latency-20261022/mwa-business-acceptance.cjs:156:18)"
+      ],
+      "pageErrors": [],
+      "unexpectedHttpErrors": [],
+      "before": {
+        "workspaceHash": "b4c31ec78ee3ae6cb59f7ac03458f55d620a69643fb4db6257567812a66e7480",
+        "revision": 78,
+        "preferencesHash": "bb4c1258e3914d4f8ca15ce74be46c6f7a1a17ed3578548a54a32a2b9d52e9bf"
+      },
+      "after": null,
+      "failureCharts": [
+        {
+          "index": 0,
+          "symbol": "MWP:EURUSD",
+          "resolution": "60",
+          "ready": false,
+          "range": {
+            "from": 0,
+            "to": 0
+          },
+          "studies": []
+        },
+        {
+          "index": 1,
+          "symbol": "MWP:EURUSD",
+          "resolution": "5",
+          "ready": true,
+          "range": {
+            "from": 1792698000,
+            "to": 1792718700
+          },
+          "studies": [
+            {
+              "name": "Moving Average Exponential",
+              "rows": 352,
+              "finite": 333,
+              "first": 1792614000,
+              "last": 1792713600
+            },
+            {
+              "name": "守望 Python SUPERTREND_PINE_V1",
+              "rows": 0,
+              "finite": 0
+            },
+            {
+              "name": "守望 Python SWING_SR_V1",
+              "rows": 0,
+              "finite": 0
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "symbol": "MWP:EURUSD",
+          "resolution": "1W",
+          "ready": true,
+          "range": {
+            "from": 1783296000,
+            "to": 1798408800
+          },
+          "studies": []
+        },
+        {
+          "index": 3,
+          "symbol": "MWP:EURUSD",
+          "resolution": "1D",
+          "ready": true,
+          "range": {
+            "from": 1788393600,
+            "to": 1793829600
+          },
+          "studies": []
+        },
+        {
+          "index": 4,
+          "symbol": "MWP:EURUSD",
+          "resolution": "240",
+          "ready": true,
+          "range": {
+            "from": 1792083600,
+            "to": 1793019600
+          },
+          "studies": [
+            {
+              "name": "守望 Python SWING_SR_V1",
+              "rows": 224,
+              "finite": 224,
+              "first": 1788282000,
+              "last": 1792702800
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "harnessCorrections": [
+    "First run incorrectly treated pre-login 401 and lookups of deliberately unpersisted notices as product HTTP failures. Its successful individual assertions remain evidence, not a complete pass.",
+    "Second run incorrectly required a datafeed callback even when native cache satisfied left navigation. Corrected check requires valid older OHLC bars in the actual visible range.",
+    "Third run includes both corrections and reaches an actual 90000 ms active H1 readiness timeout after rapid switching. Root cause and whether introduced by this patch remain unproven."
+  ],
+  "statePreservation": {
+    "observedAt": "2026-10-23T00:09:04.418Z",
+    "revision": 78,
+    "workspaceHash": "b4c31ec78ee3ae6cb59f7ac03458f55d620a69643fb4db6257567812a66e7480",
+    "preferencesHash": "bb4c1258e3914d4f8ca15ce74be46c6f7a1a17ed3578548a54a32a2b9d52e9bf",
+    "workspaceUnchanged": true,
+    "preferencesUnchanged": true
+  },
+  "pendingUserDecision": "User requested outcome comparison before deciding stage closeout or further scheduling work."
+}
