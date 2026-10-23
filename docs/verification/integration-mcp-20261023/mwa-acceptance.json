@@ -1,0 +1,424 @@
+{
+  "observedAt": "2026-10-23T14:29:38.324565+00:00",
+  "verdict": "blocked",
+  "deployment": "API updated; whole acceptance NOT passed",
+  "sourceCommit": "545ecefaa794c065a0d88a96b9b07c93db5e1091",
+  "branch": "market-watch-integration-20261023",
+  "apiImage": "sha256:e5c73b1aa22e30e93178ec71029fd7e6b5446a1119f34b99d9b37631f80944bb",
+  "imageTag": "market-watch-api:integration-20261023-545ecef",
+  "dirty": false,
+  "host": "quant-server",
+  "project": "mw-issue75-v2-20261018",
+  "runtime": {
+    "observedAt": "2026-10-23T14:27:58.858000+00:00",
+    "host": "quant-server",
+    "project": "mw-issue75-v2-20261018",
+    "apiCommit": "545ecefaa794c065a0d88a96b9b07c93db5e1091",
+    "services": [
+      {
+        "service": "api",
+        "id": "67fe66cd96e650313ac365c966dc7e43a078b6c08c428648253f42b92bd71f6b",
+        "image": "sha256:e5c73b1aa22e30e93178ec71029fd7e6b5446a1119f34b99d9b37631f80944bb",
+        "status": "running",
+        "health": "healthy",
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": true
+      },
+      {
+        "service": "chart",
+        "id": "e49a72fdeb18ea55a20bf71088f559db3bbe761e6c0e3b932ed9ad34fde4bd41",
+        "image": "sha256:41707f26ad94eedd85655366d73a77153364c8af48b7f3bee6c652916e78b64d",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": false
+      },
+      {
+        "service": "chart-aggregation-worker",
+        "id": "2dfb947dba15a888adf7099a2fffc85343c43029510f91b2ff6998cdcac4f094",
+        "image": "sha256:a7c395db8e4ce6355d60085f5ee6f33c47fccab44837e6a58581fac1a48472e4",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": false
+      },
+      {
+        "service": "chart-history-worker",
+        "id": "fadeb01b6d8f75671acc9eb6a48a66e3ffa6e1e694fd9b3c9ad94799ae513c1b",
+        "image": "sha256:a7c395db8e4ce6355d60085f5ee6f33c47fccab44837e6a58581fac1a48472e4",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": false
+      },
+      {
+        "service": "composite-aggregate-worker",
+        "id": "0a5b4909e745dc8d7d7988e230e01d233aa42035f696ac2eae8cbbc74a3ff062",
+        "image": "sha256:a7c395db8e4ce6355d60085f5ee6f33c47fccab44837e6a58581fac1a48472e4",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": false
+      },
+      {
+        "service": "gateway",
+        "id": "9492f307fdf9bfdbec7641c4e0b3554bed39340bc73a57448fdbd39e34d79ca9",
+        "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": false
+      },
+      {
+        "service": "history-worker",
+        "id": "3e9b4ad990db226cc5c00fcce01204fb5603e33091ba3f1f6782c3747be8dc02",
+        "image": "sha256:a7c395db8e4ce6355d60085f5ee6f33c47fccab44837e6a58581fac1a48472e4",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": false
+      },
+      {
+        "service": "market-stream-worker",
+        "id": "e2c67b9d55fd16b0db0d3ecf1a35c63f6c0a379b9fe27e2875b2643a63ded87a",
+        "image": "sha256:a7c395db8e4ce6355d60085f5ee6f33c47fccab44837e6a58581fac1a48472e4",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": false
+      },
+      {
+        "service": "native-history-worker",
+        "id": "ccf1a0a4f374dbb268e8660ae7a36354f055c36073a8cdacf11ecdbea5db26d7",
+        "image": "sha256:a7c395db8e4ce6355d60085f5ee6f33c47fccab44837e6a58581fac1a48472e4",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": false
+      },
+      {
+        "service": "notify-worker",
+        "id": "12ab22bce1d26d97b068a39583ae6df31abe0e2bfd4c5957f5921208412fa440",
+        "image": "sha256:a7c395db8e4ce6355d60085f5ee6f33c47fccab44837e6a58581fac1a48472e4",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": false
+      },
+      {
+        "service": "postgres",
+        "id": "3de49cbde9a20c6640092181c04d35df41677566795cfecae18c0ab284b0aba8",
+        "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+        "status": "running",
+        "health": "healthy",
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": false
+      },
+      {
+        "service": "pricing-worker",
+        "id": "32943510ecffb1d9717535461ffc7e017c250fa6f3ae4275dfe4f07c079b618d",
+        "image": "sha256:a7c395db8e4ce6355d60085f5ee6f33c47fccab44837e6a58581fac1a48472e4",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": false
+      },
+      {
+        "service": "projector",
+        "id": "15bc250f139bc3d5051f8f98b01f65578b410a8f1f18bd5b23d6e14af0623895",
+        "image": "sha256:a7c395db8e4ce6355d60085f5ee6f33c47fccab44837e6a58581fac1a48472e4",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": false
+      },
+      {
+        "service": "realtime-worker",
+        "id": "45c7805eb2c855f9e11879f14807f6d2155f6e728aa645353bccf0e6415dabc4",
+        "image": "sha256:a7c395db8e4ce6355d60085f5ee6f33c47fccab44837e6a58581fac1a48472e4",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": false
+      },
+      {
+        "service": "web",
+        "id": "5c70c419c61107c5c2429c9b10e0140e718eeb93c6490d4b1eddaf8797b0b8d3",
+        "image": "sha256:1ec604df54f2923798e478489326e74b6684bbdfd2a7fdb39f468fb9d710526e",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": false
+      }
+    ],
+    "protectedBrowsersUnchanged": true,
+    "durableOverlaySynced": true
+  },
+  "sourceAudit": {
+    "trackedRuntimeFilesMatched": 418,
+    "sourceCommit": "545ecefaa794c065a0d88a96b9b07c93db5e1091",
+    "packageVersion": "1.27.0",
+    "allSHA256Matched": true
+  },
+  "business": {
+    "historyInputChecks": "passed: UUID/MWH, explicit old version, checksum, UTC pagination/same run, 5 negative inputs, warmup null",
+    "historyOracle": {
+      "pages": [
+        {
+          "before": null,
+          "count": 2000,
+          "next_before": 1782363600000
+        },
+        {
+          "before": 1782363600000,
+          "count": 2000,
+          "next_before": 1772402400000
+        },
+        {
+          "before": 1772402400000,
+          "count": 984,
+          "next_before": null
+        }
+      ],
+      "bars": 4984,
+      "comparisons": [
+        {
+          "name": "EMA",
+          "period": 19,
+          "origin": 1767218400000,
+          "rows": 4984,
+          "nonnullValues": 766,
+          "nullValues": 4218,
+          "maxAbsoluteError": 0.0
+        },
+        {
+          "name": "RSI",
+          "period": 17,
+          "origin": 1767218400000,
+          "rows": 4984,
+          "nonnullValues": 931,
+          "nullValues": 4053,
+          "maxAbsoluteError": 0.0
+        }
+      ]
+    },
+    "historyAndCompositeChartParity": {
+      "historyOracle": [
+        {
+          "name": "EMA",
+          "period": 19,
+          "origin": 1767218400000,
+          "rows": 4984,
+          "nonnullValues": 766,
+          "nullValues": 4218,
+          "maxAbsoluteError": 0.0
+        },
+        {
+          "name": "RSI",
+          "period": 17,
+          "origin": 1767218400000,
+          "rows": 4984,
+          "nonnullValues": 931,
+          "nullValues": 4053,
+          "maxAbsoluteError": 0.0
+        }
+      ],
+      "historyBarCount": 4984,
+      "historyNumericChartParity": true,
+      "historyNumericPageAllNonNull": true,
+      "compositeConfirmedBarsAndIndicators": true,
+      "compositeChartParity": true,
+      "compositeRevision": "4c239291-470a-4554-90b1-ba13b2c7d331",
+      "compositeInputRevision": 1899,
+      "compositeMwcNormalized": true
+    },
+    "compositeNumeric": {
+      "all14ValuesNonNull": true,
+      "realChartParity": true,
+      "bars": 7,
+      "revision": "4c239291-470a-4554-90b1-ba13b2c7d331",
+      "inputRevision": 1899,
+      "observedProgress": [
+        [
+          {
+            "status": "complete",
+            "visible": true
+          },
+          {
+            "status": "complete",
+            "visible": true
+          }
+        ]
+      ]
+    },
+    "compatibility": "failed twice: initial HTTP 500, then system_get_status DEADLINE_EXCEEDED",
+    "additionalCompositeProtocol": "not run after blocking failure; do not imply this candidate passed the complete suite",
+    "preservedFacts": {
+      "chart_workspaces": true,
+      "advanced_chart_workspaces": true,
+      "advanced_chart_preferences": true,
+      "market_datasets": true,
+      "workspaces": true,
+      "preferences": true,
+      "versions": true,
+      "artifacts": true
+    },
+    "countsBefore": {
+      "market_source_fetches": 219,
+      "market_fixed_indicator_runs": 4971,
+      "market_history_versions": 12,
+      "market_history_artifacts": 108,
+      "market_history_runs": 12
+    },
+    "countsAfter": {
+      "market_source_fetches": 219,
+      "market_fixed_indicator_runs": 5011,
+      "market_history_versions": 12,
+      "market_history_artifacts": 108,
+      "market_history_runs": 12
+    }
+  },
+  "incident": {
+    "symptom": "HTTP 500 and MCP DEADLINE_EXCEEDED",
+    "log": "QueuePool size 2, overflow 0, timeout 15 seconds",
+    "independentInitializeFailed": true,
+    "isolatedNegativeRetry": {
+      "returned": "INVALID_ARGUMENT",
+      "seconds": 25.64
+    },
+    "last60SecondsObservation": {
+      "poolTimeouts": 14,
+      "http500": 4,
+      "mcp200": 3,
+      "mcp500": 0
+    },
+    "postgresReadOnlyObservation": "No long-running blocked query in sampled pg_stat_activity; insufficient to establish root cause",
+    "dependencyDiff": {
+      "market-watch": [
+        "1.26.0",
+        "1.27.0"
+      ]
+    },
+    "rootCauseConfirmed": false,
+    "configChanged": false,
+    "extraRestart": false
+  },
+  "rollback": {
+    "prepared": true,
+    "executed": false,
+    "previousApiImage": "sha256:9ca7a217ecf1b12a7de53d0dfb764019191e11ffddf4eeeeb7a62151595fc67f",
+    "previousApiCommit": "2a943eec6717e25e7a5c9b5cf236c19a0f2a6b91",
+    "scope": "API only; use exact private rollback override; preserve workers/Web/Chart/DB/browser; decision required"
+  },
+  "candidateCI": {
+    "commit": "545ecefaa794c065a0d88a96b9b07c93db5e1091",
+    "checks": [
+      {
+        "name": "Web checks",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/hezongyi/market-watch/actions/runs/39967132375/job/120459958828"
+      },
+      {
+        "name": "Backend checks",
+        "status": "in_progress",
+        "conclusion": null,
+        "html_url": "https://github.com/hezongyi/market-watch/actions/runs/39967132375/job/120459958470"
+      },
+      {
+        "name": "Compose checks",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/hezongyi/market-watch/actions/runs/39967132375/job/120459958386"
+      },
+      {
+        "name": "Classify changes",
+        "status": "completed",
+        "conclusion": "success",
+        "html_url": "https://github.com/hezongyi/market-watch/actions/runs/39967132375/job/120459821995"
+      }
+    ]
+  },
+  "localTargetedTests": 55,
+  "limits": [
+    "This run used cached fixed inputs; no new cold-start transition claimed.",
+    "Browser and workers continued normally; demands/task counts may change.",
+    "Application healthchecks do not establish business availability.",
+    "No production release or main merge."
+  ]
+}
