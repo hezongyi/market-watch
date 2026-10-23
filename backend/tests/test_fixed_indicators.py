@@ -31,6 +31,50 @@ from test_market_contracts import batch, identity, minute
 SPEC = {"id": "ema", "name": "EMA", "params": {"period": 19}}
 
 
+@pytest.mark.parametrize("operation", ["lineage", "outputs", "checkpoint"])
+def test_long_inherited_prefix_uses_bounded_database_round_trips(database, monkeypatch, operation):
+    """Live appends must not monopolize a connection while reading old values."""
+    from sqlalchemy import event, insert
+
+    version = history(database, monkeypatch, count=70)
+    page = data_sync(DataQuery(instrument=version, series_kind="history", timeframe="M1",
+                              limit=7, indicators=[SPEC]))
+    root_id = page["indicator_progress"][0]["run_id"]
+    drain(root_id)
+    with database.begin() as db:
+        root = db.get(FixedIndicatorRun, root_id)
+        expected = jobs.outputs(db, root, 0, root.cursor)
+        expected_checkpoint = jobs.checkpoint_before(db, root, root.cursor)
+        template = {column.name: getattr(root, column.name)
+                    for column in FixedIndicatorRun.__table__.columns}
+        parent = root.id
+        for index in range(128):
+            ident = f"inherited-{index}"
+            db.execute(insert(FixedIndicatorRun).values(**{
+                **template, "id": ident, "parent_id": parent,
+                "input_revision": index + 1, "prefix_end": root.cursor,
+            }))
+            parent = ident
+    with database.begin() as db:
+        run = db.get(FixedIndicatorRun, parent)
+        statements = []
+
+        def record(*args):
+            statements.append(args[2])
+
+        event.listen(db.bind, "before_cursor_execute", record)
+        try:
+            if operation == "outputs":
+                assert jobs.outputs(db, run, 0, root.cursor) == expected
+            elif operation == "checkpoint":
+                assert jobs.checkpoint_before(db, run, root.cursor) == expected_checkpoint
+            else:
+                assert list(jobs.lineage(db, run, 0, root.cursor)) == [(root_id, 0, root.cursor)]
+        finally:
+            event.remove(db.bind, "before_cursor_execute", record)
+        assert len(statements) <= 2, f"{operation} used {len(statements)} SQL round trips"
+
+
 def history(database, monkeypatch, count=2107):
     prepare(database, monkeypatch)
     with database.begin() as db:
