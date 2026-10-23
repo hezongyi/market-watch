@@ -1,0 +1,962 @@
+{
+  "verdict": "passed",
+  "cases": [
+    {
+      "symbol": "EURUSD",
+      "kind": "history",
+      "timeframe": "H4",
+      "bars": 300,
+      "latestClosedBar": 1792602000000,
+      "incompleteBars": 71,
+      "metrics": [
+        {
+          "name": "EMA",
+          "nonnull": 300,
+          "latest": [
+            {
+              "time": 1792602000000,
+              "value": 1.1224207135265833
+            }
+          ]
+        },
+        {
+          "name": "ATR",
+          "nonnull": 300,
+          "latest": [
+            {
+              "time": 1792602000000,
+              "value": 0.002305326695635184
+            }
+          ]
+        },
+        {
+          "name": "RSI",
+          "nonnull": 300,
+          "latest": [
+            {
+              "time": 1792602000000,
+              "value": 54.17956963365275
+            }
+          ]
+        },
+        {
+          "name": "SMA",
+          "nonnull": 300,
+          "latest": [
+            {
+              "time": 1792602000000,
+              "value": 1.1225414999999983
+            }
+          ]
+        },
+        {
+          "name": "MACD",
+          "nonnull": 900,
+          "latest": [
+            {
+              "time": 1792602000000,
+              "value": 0.0005439879796500513
+            },
+            {
+              "time": 1792602000000,
+              "value": 0.0005797497255623271
+            },
+            {
+              "time": 1792602000000,
+              "value": -3.576174591227578e-05
+            }
+          ]
+        }
+      ],
+      "strictNonNull": {
+        "EMA": 0,
+        "ATR": 3,
+        "RSI": 3,
+        "SMA": 0,
+        "MACD": 0
+      },
+      "chartIdentical": true,
+      "paginationChecked": true
+    },
+    {
+      "symbol": "EURUSD",
+      "kind": "history",
+      "timeframe": "D1",
+      "bars": 209,
+      "latestClosedBar": 1792530000000,
+      "incompleteBars": 196,
+      "metrics": [
+        {
+          "name": "EMA",
+          "nonnull": 190,
+          "latest": [
+            {
+              "time": 1792530000000,
+              "value": 1.1269437761505179
+            }
+          ]
+        },
+        {
+          "name": "ATR",
+          "nonnull": 195,
+          "latest": [
+            {
+              "time": 1792530000000,
+              "value": 0.006151102720481109
+            }
+          ]
+        },
+        {
+          "name": "RSI",
+          "nonnull": 195,
+          "latest": [
+            {
+              "time": 1792530000000,
+              "value": 40.528846840893564
+            }
+          ]
+        },
+        {
+          "name": "SMA",
+          "nonnull": 190,
+          "latest": [
+            {
+              "time": 1792530000000,
+              "value": 1.1251774999999995
+            }
+          ]
+        },
+        {
+          "name": "MACD",
+          "nonnull": 528,
+          "latest": [
+            {
+              "time": 1792530000000,
+              "value": -0.006584587215446636
+            },
+            {
+              "time": 1792530000000,
+              "value": -0.0077735269236389945
+            },
+            {
+              "time": 1792530000000,
+              "value": 0.0011889397081923589
+            }
+          ]
+        }
+      ],
+      "strictNonNull": {
+        "EMA": 0,
+        "ATR": 0,
+        "RSI": 0,
+        "SMA": 0,
+        "MACD": 0
+      },
+      "chartIdentical": true,
+      "paginationChecked": false
+    },
+    {
+      "symbol": "EURUSD",
+      "kind": "composite",
+      "timeframe": "H4",
+      "bars": 300,
+      "latestClosedBar": 1792746000000,
+      "incompleteBars": 70,
+      "metrics": [
+        {
+          "name": "EMA",
+          "nonnull": 300,
+          "latest": [
+            {
+              "time": 1792746000000,
+              "value": 1.1217933779269746
+            }
+          ]
+        },
+        {
+          "name": "ATR",
+          "nonnull": 300,
+          "latest": [
+            {
+              "time": 1792746000000,
+              "value": 0.0023963804536374484
+            }
+          ]
+        },
+        {
+          "name": "RSI",
+          "nonnull": 300,
+          "latest": [
+            {
+              "time": 1792746000000,
+              "value": 45.738826108433926
+            }
+          ]
+        },
+        {
+          "name": "SMA",
+          "nonnull": 300,
+          "latest": [
+            {
+              "time": 1792746000000,
+              "value": 1.1223024999999986
+            }
+          ]
+        },
+        {
+          "name": "MACD",
+          "nonnull": 900,
+          "latest": [
+            {
+              "time": 1792746000000,
+              "value": -0.00032126998642545423
+            },
+            {
+              "time": 1792746000000,
+              "value": 8.543288834694648e-05
+            },
+            {
+              "time": 1792746000000,
+              "value": -0.0004067028747724007
+            }
+          ]
+        }
+      ],
+      "strictNonNull": {
+        "EMA": 0,
+        "ATR": 3,
+        "RSI": 3,
+        "SMA": 0,
+        "MACD": 0
+      },
+      "chartIdentical": true,
+      "paginationChecked": true
+    },
+    {
+      "symbol": "EURUSD",
+      "kind": "composite",
+      "timeframe": "D1",
+      "bars": 210,
+      "latestClosedBar": 1792616400000,
+      "incompleteBars": 197,
+      "metrics": [
+        {
+          "name": "EMA",
+          "nonnull": 191,
+          "latest": [
+            {
+              "time": 1792616400000,
+              "value": 1.1264357974695163
+            }
+          ]
+        },
+        {
+          "name": "ATR",
+          "nonnull": 196,
+          "latest": [
+            {
+              "time": 1792616400000,
+              "value": 0.006193881097589603
+            }
+          ]
+        },
+        {
+          "name": "RSI",
+          "nonnull": 196,
+          "latest": [
+            {
+              "time": 1792616400000,
+              "value": 38.975858500922946
+            }
+          ]
+        },
+        {
+          "name": "SMA",
+          "nonnull": 191,
+          "latest": [
+            {
+              "time": 1792616400000,
+              "value": 1.1243589999999997
+            }
+          ]
+        },
+        {
+          "name": "MACD",
+          "nonnull": 531,
+          "latest": [
+            {
+              "time": 1792616400000,
+              "value": -0.006224848827275586
+            },
+            {
+              "time": 1792616400000,
+              "value": -0.0074637913043663125
+            },
+            {
+              "time": 1792616400000,
+              "value": 0.0012389424770907261
+            }
+          ]
+        }
+      ],
+      "strictNonNull": {
+        "EMA": 0,
+        "ATR": 0,
+        "RSI": 0,
+        "SMA": 0,
+        "MACD": 0
+      },
+      "chartIdentical": true,
+      "paginationChecked": false
+    },
+    {
+      "symbol": "USDCAD",
+      "kind": "history",
+      "timeframe": "H4",
+      "bars": 300,
+      "latestClosedBar": 1792602000000,
+      "incompleteBars": 90,
+      "metrics": [
+        {
+          "name": "EMA",
+          "nonnull": 300,
+          "latest": [
+            {
+              "time": 1792602000000,
+              "value": 1.408719630818524
+            }
+          ]
+        },
+        {
+          "name": "ATR",
+          "nonnull": 300,
+          "latest": [
+            {
+              "time": 1792602000000,
+              "value": 0.0022903113654384353
+            }
+          ]
+        },
+        {
+          "name": "RSI",
+          "nonnull": 300,
+          "latest": [
+            {
+              "time": 1792602000000,
+              "value": 26.88148066046236
+            }
+          ]
+        },
+        {
+          "name": "SMA",
+          "nonnull": 300,
+          "latest": [
+            {
+              "time": 1792602000000,
+              "value": 1.4083345000000016
+            }
+          ]
+        },
+        {
+          "name": "MACD",
+          "nonnull": 900,
+          "latest": [
+            {
+              "time": 1792602000000,
+              "value": -0.003533698955171971
+            },
+            {
+              "time": 1792602000000,
+              "value": -0.0036932805807450503
+            },
+            {
+              "time": 1792602000000,
+              "value": 0.00015958162557307923
+            }
+          ]
+        }
+      ],
+      "strictNonNull": {
+        "EMA": 0,
+        "ATR": 0,
+        "RSI": 0,
+        "SMA": 0,
+        "MACD": 0
+      },
+      "chartIdentical": true,
+      "paginationChecked": true
+    },
+    {
+      "symbol": "USDCAD",
+      "kind": "history",
+      "timeframe": "D1",
+      "bars": 209,
+      "latestClosedBar": 1792530000000,
+      "incompleteBars": 205,
+      "metrics": [
+        {
+          "name": "EMA",
+          "nonnull": 190,
+          "latest": [
+            {
+              "time": 1792530000000,
+              "value": 1.4139559896412324
+            }
+          ]
+        },
+        {
+          "name": "ATR",
+          "nonnull": 195,
+          "latest": [
+            {
+              "time": 1792530000000,
+              "value": 0.006465019747650734
+            }
+          ]
+        },
+        {
+          "name": "RSI",
+          "nonnull": 195,
+          "latest": [
+            {
+              "time": 1792530000000,
+              "value": 41.30966112968233
+            }
+          ]
+        },
+        {
+          "name": "SMA",
+          "nonnull": 190,
+          "latest": [
+            {
+              "time": 1792530000000,
+              "value": 1.4190185
+            }
+          ]
+        },
+        {
+          "name": "MACD",
+          "nonnull": 528,
+          "latest": [
+            {
+              "time": 1792530000000,
+              "value": 0.0022184578793313925
+            },
+            {
+              "time": 1792530000000,
+              "value": 0.005411501728631177
+            },
+            {
+              "time": 1792530000000,
+              "value": -0.0031930438492997846
+            }
+          ]
+        }
+      ],
+      "strictNonNull": {
+        "EMA": 0,
+        "ATR": 0,
+        "RSI": 0,
+        "SMA": 0,
+        "MACD": 0
+      },
+      "chartIdentical": true,
+      "paginationChecked": false
+    },
+    {
+      "symbol": "USDCAD",
+      "kind": "composite",
+      "timeframe": "H4",
+      "bars": 300,
+      "latestClosedBar": 1792746000000,
+      "incompleteBars": 89,
+      "metrics": [
+        {
+          "name": "EMA",
+          "nonnull": 300,
+          "latest": [
+            {
+              "time": 1792746000000,
+              "value": 1.403884590215663
+            }
+          ]
+        },
+        {
+          "name": "ATR",
+          "nonnull": 300,
+          "latest": [
+            {
+              "time": 1792746000000,
+              "value": 0.0021838075442092647
+            }
+          ]
+        },
+        {
+          "name": "RSI",
+          "nonnull": 300,
+          "latest": [
+            {
+              "time": 1792746000000,
+              "value": 23.797100164756664
+            }
+          ]
+        },
+        {
+          "name": "SMA",
+          "nonnull": 300,
+          "latest": [
+            {
+              "time": 1792746000000,
+              "value": 1.4035225000000016
+            }
+          ]
+        },
+        {
+          "name": "MACD",
+          "nonnull": 900,
+          "latest": [
+            {
+              "time": 1792746000000,
+              "value": -0.0034486596705542993
+            },
+            {
+              "time": 1792746000000,
+              "value": -0.0034432306554527787
+            },
+            {
+              "time": 1792746000000,
+              "value": -5.429015101520666e-06
+            }
+          ]
+        }
+      ],
+      "strictNonNull": {
+        "EMA": 0,
+        "ATR": 0,
+        "RSI": 0,
+        "SMA": 0,
+        "MACD": 0
+      },
+      "chartIdentical": true,
+      "paginationChecked": true
+    },
+    {
+      "symbol": "USDCAD",
+      "kind": "composite",
+      "timeframe": "D1",
+      "bars": 210,
+      "latestClosedBar": 1792616400000,
+      "incompleteBars": 206,
+      "metrics": [
+        {
+          "name": "EMA",
+          "nonnull": 191,
+          "latest": [
+            {
+              "time": 1792616400000,
+              "value": 1.412704943008734
+            }
+          ]
+        },
+        {
+          "name": "ATR",
+          "nonnull": 196,
+          "latest": [
+            {
+              "time": 1792616400000,
+              "value": 0.006328946908532816
+            }
+          ]
+        },
+        {
+          "name": "RSI",
+          "nonnull": 196,
+          "latest": [
+            {
+              "time": 1792616400000,
+              "value": 38.05837696078162
+            }
+          ]
+        },
+        {
+          "name": "SMA",
+          "nonnull": 191,
+          "latest": [
+            {
+              "time": 1792616400000,
+              "value": 1.4183865
+            }
+          ]
+        },
+        {
+          "name": "MACD",
+          "nonnull": 531,
+          "latest": [
+            {
+              "time": 1792616400000,
+              "value": 0.0009508549903782804
+            },
+            {
+              "time": 1792616400000,
+              "value": 0.0045193723809805976
+            },
+            {
+              "time": 1792616400000,
+              "value": -0.003568517390602317
+            }
+          ]
+        }
+      ],
+      "strictNonNull": {
+        "EMA": 0,
+        "ATR": 0,
+        "RSI": 0,
+        "SMA": 0,
+        "MACD": 0
+      },
+      "chartIdentical": true,
+      "paginationChecked": false
+    },
+    {
+      "symbol": "XAUUSD",
+      "kind": "history",
+      "timeframe": "H4",
+      "bars": 300,
+      "latestClosedBar": 1792357200000,
+      "incompleteBars": 51,
+      "metrics": [
+        {
+          "name": "EMA",
+          "nonnull": 300,
+          "latest": [
+            {
+              "time": 1792357200000,
+              "value": 4160.094816881923
+            }
+          ]
+        },
+        {
+          "name": "ATR",
+          "nonnull": 300,
+          "latest": [
+            {
+              "time": 1792357200000,
+              "value": 29.114173088864764
+            }
+          ]
+        },
+        {
+          "name": "RSI",
+          "nonnull": 300,
+          "latest": [
+            {
+              "time": 1792357200000,
+              "value": 56.05110710609562
+            }
+          ]
+        },
+        {
+          "name": "SMA",
+          "nonnull": 300,
+          "latest": [
+            {
+              "time": 1792357200000,
+              "value": 4150.527400000002
+            }
+          ]
+        },
+        {
+          "name": "MACD",
+          "nonnull": 900,
+          "latest": [
+            {
+              "time": 1792357200000,
+              "value": 4.90415150368608
+            },
+            {
+              "time": 1792357200000,
+              "value": 1.3205233228402846
+            },
+            {
+              "time": 1792357200000,
+              "value": 3.5836281808457953
+            }
+          ]
+        }
+      ],
+      "strictNonNull": {
+        "EMA": 0,
+        "ATR": 0,
+        "RSI": 0,
+        "SMA": 0,
+        "MACD": 0
+      },
+      "chartIdentical": true,
+      "paginationChecked": true
+    },
+    {
+      "symbol": "XAUUSD",
+      "kind": "history",
+      "timeframe": "D1",
+      "bars": 206,
+      "latestClosedBar": 1792357200000,
+      "incompleteBars": 206,
+      "metrics": [
+        {
+          "name": "EMA",
+          "nonnull": 187,
+          "latest": [
+            {
+              "time": 1792357200000,
+              "value": 4193.807349517914
+            }
+          ]
+        },
+        {
+          "name": "ATR",
+          "nonnull": 192,
+          "latest": [
+            {
+              "time": 1792357200000,
+              "value": 76.93753183289923
+            }
+          ]
+        },
+        {
+          "name": "RSI",
+          "nonnull": 192,
+          "latest": [
+            {
+              "time": 1792357200000,
+              "value": 46.80762781560247
+            }
+          ]
+        },
+        {
+          "name": "SMA",
+          "nonnull": 187,
+          "latest": [
+            {
+              "time": 1792357200000,
+              "value": 4182.956099999999
+            }
+          ]
+        },
+        {
+          "name": "MACD",
+          "nonnull": 519,
+          "latest": [
+            {
+              "time": 1792357200000,
+              "value": -41.22061623142963
+            },
+            {
+              "time": 1792357200000,
+              "value": -48.48958506680025
+            },
+            {
+              "time": 1792357200000,
+              "value": 7.268968835370622
+            }
+          ]
+        }
+      ],
+      "strictNonNull": {
+        "EMA": 0,
+        "ATR": 0,
+        "RSI": 0,
+        "SMA": 0,
+        "MACD": 0
+      },
+      "chartIdentical": true,
+      "paginationChecked": false
+    },
+    {
+      "symbol": "XAUUSD",
+      "kind": "composite",
+      "timeframe": "H4",
+      "bars": 300,
+      "latestClosedBar": 1792746000000,
+      "incompleteBars": 51,
+      "metrics": [
+        {
+          "name": "EMA",
+          "nonnull": 300,
+          "latest": [
+            {
+              "time": 1792746000000,
+              "value": 4077.5426093088754
+            }
+          ]
+        },
+        {
+          "name": "ATR",
+          "nonnull": 300,
+          "latest": [
+            {
+              "time": 1792746000000,
+              "value": 27.675239847332538
+            }
+          ]
+        },
+        {
+          "name": "RSI",
+          "nonnull": 300,
+          "latest": [
+            {
+              "time": 1792746000000,
+              "value": 31.74190316727638
+            }
+          ]
+        },
+        {
+          "name": "SMA",
+          "nonnull": 300,
+          "latest": [
+            {
+              "time": 1792746000000,
+              "value": 4088.0100000000007
+            }
+          ]
+        },
+        {
+          "name": "MACD",
+          "nonnull": 900,
+          "latest": [
+            {
+              "time": 1792746000000,
+              "value": -32.76779038209588
+            },
+            {
+              "time": 1792746000000,
+              "value": -24.42435596890107
+            },
+            {
+              "time": 1792746000000,
+              "value": -8.34343441319481
+            }
+          ]
+        }
+      ],
+      "strictNonNull": {
+        "EMA": 0,
+        "ATR": 0,
+        "RSI": 0,
+        "SMA": 0,
+        "MACD": 0
+      },
+      "chartIdentical": true,
+      "paginationChecked": true
+    },
+    {
+      "symbol": "XAUUSD",
+      "kind": "composite",
+      "timeframe": "D1",
+      "bars": 209,
+      "latestClosedBar": 1792616400000,
+      "incompleteBars": 209,
+      "metrics": [
+        {
+          "name": "EMA",
+          "nonnull": 190,
+          "latest": [
+            {
+              "time": 1792616400000,
+              "value": 4164.854525630837
+            }
+          ]
+        },
+        {
+          "name": "ATR",
+          "nonnull": 195,
+          "latest": [
+            {
+              "time": 1792616400000,
+              "value": 76.56659288099523
+            }
+          ]
+        },
+        {
+          "name": "RSI",
+          "nonnull": 195,
+          "latest": [
+            {
+              "time": 1792616400000,
+              "value": 34.96014056465615
+            }
+          ]
+        },
+        {
+          "name": "SMA",
+          "nonnull": 190,
+          "latest": [
+            {
+              "time": 1792616400000,
+              "value": 4149.506299999999
+            }
+          ]
+        },
+        {
+          "name": "MACD",
+          "nonnull": 528,
+          "latest": [
+            {
+              "time": 1792616400000,
+              "value": -49.59798912282895
+            },
+            {
+              "time": 1792616400000,
+              "value": -47.50975987646333
+            },
+            {
+              "time": 1792616400000,
+              "value": -2.0882292463656213
+            }
+          ]
+        }
+      ],
+      "strictNonNull": {
+        "EMA": 0,
+        "ATR": 0,
+        "RSI": 0,
+        "SMA": 0,
+        "MACD": 0
+      },
+      "chartIdentical": true,
+      "paginationChecked": false
+    }
+  ],
+  "warmupNullPreserved": true,
+  "providerAndManagedCompatible": true,
+  "invalidPolicyRejected": true,
+  "host": "quant-server",
+  "project": "mw-issue75-v2-20261018",
+  "commit": "807688018ba55461862a81127f0ba0350288661c",
+  "image": "sha256:9e5d85fa488ee7a842e3336b94567dc18bf9fc2c1f42186823a1c0d8a529852c",
+  "checkedAt": "2026-10-23T16:51:22.457881+00:00",
+  "localTests": 82,
+  "preservation": {
+    "chart_workspaces": true,
+    "advanced_chart_workspaces": false,
+    "advanced_chart_preferences": false,
+    "market_datasets": true,
+    "workspaces": false,
+    "preferences": true,
+    "versions": true,
+    "artifacts": true
+  },
+  "changedServices": [
+    "api"
+  ],
+  "logs": {
+    "QueuePool limit": 0,
+    " 500 Internal Server Error": 0,
+    "Traceback (most recent call last)": 1
+  },
+  "limitations": [
+    "One existing workspace changed revision 2 to 3 and advanced preferences changed during acceptance; this task did not issue workspace/preference writes or overwrite them.",
+    "One concurrent chart request raised CancelledError; all acceptance MCP/chart requests passed.",
+    "Real chart HTTP parity verified; full browser UI matrix not repeated.",
+    "No push, PR update, main merge, tag or production release."
+  ]
+}
