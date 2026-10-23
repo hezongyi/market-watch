@@ -19,6 +19,7 @@ from .composite_definitions import baseline, definition, first_use
 from .market_names import code_search, display_code, pair_query
 from .storage import (
     CompositeMinuteInput,
+    CompositePreparation,
     CompositeRevision,
     DatasetMaintenance,
     HistoryArtifact,
@@ -30,6 +31,10 @@ from .storage import (
     RealtimeMapping,
     now_ms,
 )
+
+
+class SeriesUnavailable(ValueError):
+    code = "DATA_UNAVAILABLE"
 
 
 def composite_definition(db, ident):
@@ -48,37 +53,38 @@ def composite_definition(db, ident):
     raise ValueError("组合身份不存在或映射已不属于当前账户")
 
 
-def metadata(db, ident, kind):
-    return _metadata(db, ident, kind)
+def metadata(db, ident, kind, *, composite_context=None, selected_revision=None):
+    return _metadata(db, ident, kind, composite_context=composite_context,
+                     selected_revision=selected_revision)
 
 
-def _metadata(db, ident, kind, *, composite_context=None):
+def _metadata(db, ident, kind, *, composite_context=None, selected_revision=None):
     if kind == "history":
         version = db.get(HistoryVersion, ident)
         if not version or version.status != "published" or db.get(HistoryReclamation, ident):
-            raise ValueError("固定历史版本不存在、尚未发布或已回收")
+            raise SeriesUnavailable("固定历史版本不存在、尚未发布或已回收")
         dataset = db.get(MarketDataset, version.dataset_id)
         inst = db.get(Instrument, dataset.instrument_id)
         frames = list(db.scalars(select(HistoryArtifact.timeframe).where(
             HistoryArtifact.version_id == version.id, HistoryArtifact.status == "published",
             HistoryArtifact.count > 0)))
         if not frames:
-            raise ValueError("固定历史周期产物尚未发布")
+            raise SeriesUnavailable("固定历史周期产物尚未发布")
         binding = {"version_id": version.id, "history_version_id": version.id,
                    "dataset_id": dataset.id, "history_checksum": version.manifest["checksum"]}
         volume_kind, volume_unit = dataset.volume_kind, dataset.volume_unit
     elif kind == "composite":
         dataset_id, mapping_id, composite = composite_context or composite_definition(db, ident)
-        dataset = db.get(MarketDataset, dataset_id)
-        inst = db.get(Instrument, dataset.instrument_id)
         if composite:
-            revision = db.get(CompositeRevision, composite.active_revision_id)
+            revision = selected_revision or db.get(CompositeRevision, composite.active_revision_id)
             version = db.get(HistoryVersion, revision.history_version_id)
             dataset = db.get(MarketDataset, version.dataset_id)
             inst = db.get(Instrument, dataset.instrument_id)
             mapping_id = revision.mapping_id
             seam = revision.seam
         else:
+            dataset = db.get(MarketDataset, dataset_id)
+            inst = db.get(Instrument, dataset.instrument_id)
             version, seam = baseline(db, dataset.id, inst.calendar)
         mapping = db.get(RealtimeMapping, mapping_id)
         target = db.get(Instrument, db.get(MarketDataset, mapping.target_dataset_id).instrument_id)
@@ -95,6 +101,7 @@ def _metadata(db, ident, kind, *, composite_context=None):
         "historical_source": dataset.identity["source"], "basis": inst.basis,
         "calendar": revision.rules["aggregation_calendar"] if kind == "composite" and composite else inst.calendar,
         "precision": max(inst.precision, target.precision) if kind == "composite" else inst.precision,
+        "calendar_profile": target.calendar_profile if kind == "composite" else inst.calendar_profile,
         "frames": [frame for frame in FRAMES if frame in frames], "volume_kind": volume_kind,
         "volume_unit": volume_unit, **binding}
 
@@ -104,79 +111,88 @@ def chart_data(db, body, *, realtime=None):
     from .history_artifacts import chart_page as history_page
     from .market_data import renew_demand
 
-    meta = metadata(db, body.instrument, body.series_kind)
-    demand_renewed = False
+    selected = None
+    selected_input = body.input_revision
     if body.series_kind == "composite":
-        from .config import settings
-        from .live_pricing import account_key
-        from .storage import LiveState, PricingOwner
-
         composite = db.get(MarketComposite, body.instrument)
-        if composite:
-            selected = db.get(CompositeRevision, body.composite_revision_id or composite.active_revision_id)
-            if not selected or selected.composite_id != composite.id:
-                raise ValueError("组合修订不属于当前组合")
+        if not composite and body.client:
+            dataset, mapping, _ = composite_definition(db, body.instrument)
+            composite = first_use(db, dataset, mapping)
+            if composite.id != body.instrument:
+                raise ValueError("首次使用身份与候选不一致")
+        if not composite or composite.permission_scope != "workspace:default":
+            raise SeriesUnavailable("组合尚未建立或不属于当前权限范围")
+        selected = db.get(CompositeRevision, body.composite_revision_id or composite.active_revision_id)
+        if not selected or selected.composite_id != composite.id:
+            raise ValueError("组合修订不属于当前组合")
+        parent = db.get(HistoryVersion, selected.history_version_id)
+        if not parent or parent.status != "published" or db.get(HistoryReclamation, parent.id):
+            raise SeriesUnavailable("固定历史版本不存在、尚未发布或已回收")
+        prep = db.get(CompositePreparation, selected.id)
+        if not prep:
+            raise SeriesUnavailable("组合输入尚未准备")
+        if selected_input is None and not body.provisional:
+            selected_input = prep.input_revision
+        if selected_input is not None and not 0 <= selected_input <= prep.input_revision:
+            raise ValueError("无效的组合输入修订")
+        meta = metadata(db, body.instrument, body.series_kind,
+            composite_context=(parent.dataset_id, selected.mapping_id, composite), selected_revision=selected)
+        if body.client:
+            renew_demand(db, body.client, db.get(Instrument, composite.instrument_id),
+                         composite_revision_id=selected.id)
+        if body.provisional and body.input_revision is None:
+            from .config import settings
+            from .display_observations import handover_legacy
+            from .live_pricing import account_key
+            from .storage import LiveState, PricingOwner
+
             mapping = db.get(RealtimeMapping, selected.mapping_id)
-            # Register the browser lease before taking the live-state read lock
-            # or doing the bounded chart read.  Two first readers can then
-            # rendezvous at the atomic demand upsert instead of one holding
-            # the live-state lock while the other waits behind it.
-            if body.client:
-                renew_demand(db, body.client, db.get(Instrument, composite.instrument_id),
-                             composite_revision_id=selected.id)
-                demand_renewed = True
-            # Strong references keep SQLAlchemy's weak identity map on this
-            # source observation throughout the history/aggregation read.
+            # Preserve the browser's observation fence and lock order. Keep
+            # strong references across capture; confirmed reads use immutable
+            # input filters and need no mutable live-state observation.
             _live_observation = (db.get(LiveState, mapping.target_dataset_id),
                                  db.get(PricingOwner, account_key(settings.oanda_account_id)))
-            # First-use adoption needs a write lock. Take it before a shared
-            # read lock; two first readers cannot safely upgrade together.
             if _live_observation[0]:
-                from .display_observations import handover_legacy
-
                 handover_legacy(db, _live_observation[0])
             db.scalar(select(LiveState).where(LiveState.dataset_id == mapping.target_dataset_id)
                 .with_for_update(read=True).execution_options(populate_existing=True))
+    else:
+        meta = metadata(db, body.instrument, body.series_kind)
     # Evaluate freshness after the source snapshot, never before IO that can
     # read a newly received quote and mistake it for future data.
     stamp = now_ms()
     if body.series_kind == "history":
         parent = db.get(HistoryVersion, body.instrument)
+        if body.timeframe not in meta["frames"]:
+            raise SeriesUnavailable(f"{body.timeframe} 该周期产物尚未发布，请在数据中心准备该版本周期")
         page = history_page(db, parent.id, body.timeframe, before=body.before, count=body.limit)
         page.update(has_more=page["next_before"] is not None, origin=parent.start,
             history_revision=hashlib.sha256(json.dumps([parent.manifest["checksum"], body.timeframe]).encode()).hexdigest(),
-            pending=[], input_manifest={"version_id": parent.id, "checksum": parent.manifest["checksum"]})
+            pending=[], history_version_id=parent.id, history_checksum=parent.manifest["checksum"],
+            input_manifest={"version_id": parent.id, "checksum": parent.manifest["checksum"]})
         inst = db.get(Instrument, db.get(MarketDataset, parent.dataset_id).instrument_id)
     else:
-        dataset, mapping, composite = composite_definition(db, body.instrument)
-        if body.client and not composite:
-            composite = first_use(db, dataset, mapping)
-            if composite.id != body.instrument:
-                raise ValueError("首次使用身份与候选不一致")
-        if not composite:
-            raise ValueError("组合尚未建立；请从图表实际使用入口打开")
         snapshot = None
         if body.display_snapshot_id:
             from .display_snapshots import resolve
 
             if not body.provisional or body.input_revision is not None:
                 raise ValueError('展示快照必须按展示模式读取；固定确认输入请使用 input_revision')
-            selected = db.get(CompositeRevision, body.composite_revision_id or composite.active_revision_id)
             snapshot = resolve(db, body.display_snapshot_id, selected, body.timeframe, stamp)
+        elif body.provisional and body.input_revision is None:
+            from .display_snapshots import capture
+
+            snapshot = capture(db, selected, body.timeframe, stamp)
         page = composite_page(db, composite.id, body.timeframe, before=body.before, count=body.limit,
-            revision_id=body.composite_revision_id, input_revision=body.input_revision,
+            revision_id=selected.id,
+            input_revision=None if snapshot else selected_input,
             provisional=body.provisional and body.input_revision is None, now=stamp, realtime=realtime,
             display_snapshot=snapshot)
-        selected = db.get(CompositeRevision, page["revision_id"])
         parent = db.get(HistoryVersion, selected.history_version_id)
-        meta["calendar"] = selected.rules["aggregation_calendar"]
-        meta["history_version_id"], meta["mapping_id"] = parent.id, selected.mapping_id
-        meta["dataset_id"], meta["seam"] = parent.dataset_id, selected.seam
+        page["history_checksum"] = parent.manifest["checksum"]
+        page.update({key: meta[key] for key in ("dataset_id", "mapping_id", "historical_source")})
         target_inst = db.get(Instrument, db.get(MarketDataset, db.get(RealtimeMapping, selected.mapping_id).target_dataset_id).instrument_id)
         inst = SimpleNamespace(id=composite.instrument_id, calendar=meta["calendar"], calendar_profile=target_inst.calendar_profile)
-        if body.client and not demand_renewed:
-            renew_demand(db, body.client, db.get(Instrument, composite.instrument_id),
-                         composite_revision_id=selected.id)
     for bar in page["bars"]:
         if body.timeframe in ("D1", "W1", "MN"):
             bar["chart_time"] = fixed_label(bar, body.timeframe, meta["calendar"])
@@ -202,7 +218,8 @@ def chart_data(db, body, *, realtime=None):
     dependency = history_check(db, page, body.model_copy(update={"indicators": [],
         "track_history": True, "revision_before": body.dependency_before,
         "revision_after": page["origin"]}), meta) if body.dependency_before else None
-    return {**page, "history_check": check, "basis": meta["basis"], "calendar": meta["calendar"], "precision": meta["precision"],
+    return {**page, "history_check": check, "source": meta["source"],
+        "basis": meta["basis"], "calendar": meta["calendar"], "calendar_profile": meta["calendar_profile"], "precision": meta["precision"],
         "volume_kind": meta["volume_kind"], "volume_unit": meta["volume_unit"],
         "indicators": indicators, "indicator_progress": indicator_progress,
         "dependency_before": body.dependency_before,

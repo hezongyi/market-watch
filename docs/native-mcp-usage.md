@@ -46,10 +46,10 @@ python -m alerts.mcp.credentials revoke --hash HASH_FROM_LIST
 | `alerts:write` | `alerts_create`、`alerts_cancel`、`notifications_ack` |
 | `market:read` + `market:write` | `history_create_dataset`、`history_configure_maintenance`、`history_control_maintenance`、`history_submit_task`、`history_control_task`、`history_change_aggregation`、`history_request_artifacts`、`history_reclaim_dataset` |
 
-- 行情输入使用基础品种 ID，`series_kind` 明确选择 `managed` 或 `provider`。先发现品种；不能把来源 ID 当成券商可交易映射。管理系列的品种发现沿用网页启用品种目录，平台系列沿用网页市场目录。
+- 报价和通用 K 线输入使用基础品种 ID，`series_kind` 明确选择 `managed` 或 `provider`。指标另外支持 `history` 和 `composite`，见下文。先发现品种；不能把来源 ID 当成券商可交易映射。管理系列的品种发现沿用网页启用品种目录，平台系列沿用网页市场目录。
 - 价格、OHLC 是十进制字符串，时间为毫秒。报价保留网页的 bid/last trade/M1 close 标签；OANDA/Binance 平台报价首期取有限 M1 数据并明确标为 `M1 close`。Yahoo 使用网页共用的市场报价快照，并返回延迟字段。来源不可用返回错误。
 - `market_open`（已知时）与 `is_stale` 分开表达休市和陈旧。报价年龄不等于交易可用性。平台报价未获得休市状态时不推断市场正在交易。
-- K 线默认 300，最多 2000；批量指标 1–12。`before` 是排他的毫秒游标；`next_before` 可继续分页。`cursor_coordinate` 明确管理系列的 UTC start 与平台系列的 native chart time，日/周/月不可混用。所有 bars 与 indicators 来自 `chart_api.query_chart/data_sync`；网页仍使用同一入口。指标保留完整历史前缀、预热、缺口重置和 null 语义。
+- K 线默认 300，最多 2000；批量指标 1–12。`before` 是排他的毫秒游标；`next_before` 可继续分页。`cursor_coordinate` 明确管理系列的 UTC start 与平台系列的 native chart time，日/周/月不可混用。所有 bars 与 indicators 来自 `chart_api.query_chart/data_sync`；网页仍使用同一入口。指标保留完整历史前缀与预热；自建历史和组合默认按实际有效 K 线连续计算，严格模式才因缺口重置。
 - 返回页面保留原有 coverage、cache revision、history revalidation、原始历史起点等字段。管理系列使用 `history_revision`，平台系列使用 `cache_revision`；未知起点不伪造。`gaps`、`incomplete_count` 和 `coverage_scope=returned_page` 仅描述当前页面；Yahoo 的 exchange calendar 不由 NY17/UTC0 判断，返回 `gap_assessment=unknown_calendar`、原始 `interval_breaks` 和 `quality=calendar_unverified`，不把休市间隔冒称缺失数据。这些字段不承诺完整历史覆盖。原生图表时间坐标和 K 线 UTC 起止时间可能因 D/W/M 标签不同。
 - 旧管理系列指标历史超过 200000 根时拒绝计算（已发布查询统计 `chart_published_bars`，普通管理查询统计实际源周期 candles），避免截短历史后产生不同数值。Provider 保持项目既有缓存填充、超时和取消策略；不创建持久历史维护订阅。三层固定历史/组合采用后台完整初始化和检查点；自建维护通过单独授权的八个写工具管理。
 - 默认单请求体 64 KiB、每凭据每分钟 60 次协议请求（包括发现/初始化）、最多 4 个业务调用并行、最多 8 个待处理调用、20 秒调用等待预算。数据库配额跨进程；计算并行额度按 API 进程。同步工作未退出时占用业务 slot，客户端断连设置取消标记。当前部署使用一个 API 进程。
@@ -146,8 +146,108 @@ docker compose --env-file /tmp/mw-native-mcp-acceptance/compose.env \
 
 ### 图表告警集成后的指标合同
 
+自建历史（`history`）和组合（`composite`）默认使用
+`indicator_input_policy="observed_display_v1"`，与图表实际行情计算口径一致。
+外汇每天少十几根 M1 属于常态：按已有 M1 聚合 OHLC，不要求分钟数齐全，
+不补造价格，也不因此重置 EMA/RSI。整根周期没有数据时留空，下一根有效 K 线继续计算；
+周期数按实际存在的 K 线计数。原始 `complete`、`coverage_complete` 等证据仍保留，
+不影响默认数值可用性；指标的 `calculation.input_policy` 和 `value_status` 表明计算口径与状态。
+例如一天收到 1,425 根 M1，仍正常生成 D1 并参与 EMA20、RSI14 和 MACD。
+需要完整覆盖检查时，显式传 `indicator_input_policy="strict_confirmed_v1"`；
+两种口径使用独立计算状态。旧 `managed` 和供应商原生 `provider` 查询保持既有严格口径。
+
 `indicators_calculate` 默认 `provisional=false`，未收盘最后根的指标值为 null。明确传 `provisional=true` 可计算当前临时 K 线；对应数值点含 `provisional:true`，收盘前可能改变。网页图表仍默认实时显示临时最后根。
 
 provider 查询可传 `calculation_origin` 固定递归历史起点；从响应 `page.calculation_origin` 读取并在后续分页/轮询复用，避免更早缓存回填改变EMA/RSI等的起点。managed published仍使用 `dataset_start` 对齐其已发布历史。
 
 共用信号查询现在同时返回旧策略与图表告警事件：旧策略的 `watch_id` 有值、`chart_alert_id` 为空；图表事件相反。逐事件通知确认不改变告警次数、规则版本或运行轮次。MCP `alerts_create`/`alerts_cancel` 保持原有旧策略接口，不推断它们可以创建或编辑新版图表规则。
+
+## 已发布历史版本的指标
+
+`indicators_calculate` 接受 `series_kind="history"`，`instrument` 为数据中心已发布的
+历史版本 UUID，或 `MWH:<版本UUID>`。必须显式指定类型；不能用数据集 ID、品种代码或
+“最新版本”代替版本 UUID。可从 `history_get_dataset` 的各周期发布信息取得版本，
+再用 `history_get_version` 检查其清单和可用性。仍需 `market:read` 与 `analysis:read`。
+
+```json
+{
+  "instrument": "<已发布的历史版本UUID>",
+  "series_kind": "history",
+  "timeframe": "H1",
+  "limit": 300,
+  "indicators": [
+    {"name": "EMA", "version": "1", "params": {"period": 20}},
+    {"name": "RSI", "version": "1", "params": {"period": 14}}
+  ]
+}
+```
+
+返回该版本的 `page.bars`、`page.indicators`、`page.version_id`、`history_version_id`、
+`history_checksum` 和 `input_manifest={version_id,checksum}`。指标的
+`calculation.input_evidence.history_version_id` 与价格版本一致，算法、参数、完整起点、
+覆盖和依赖由同一图表后端返回。数据中心发布新版本不会改变这次指定的版本。
+这里接通已有版本输入，不新增复算快照或跨调用回放协议。
+
+冷启动使用现有固定指标任务，响应成功返回 K 线、已有指标值、`pending` 和
+`indicator_progress`。继续以相同版本查询可取得进度和结果；不要求全部历史任务结束才读取
+已算完的可见区间。逐指标检查 `calculation.visible_complete` 与覆盖；计算完成后仍可因
+预热不足、无效输入或稀疏信号返回 null；严格模式还可能因缺口重置而返回 null。不要将 null 当零。
+
+版本不存在、未发布、已回收或请求周期产物尚未发布时返回 `DATA_UNAVAILABLE`，
+不切换版本、不下载、不补建周期产物、不续订行情。单次限制仍为 1–12 个指标、最多 2000 根
+可见 K 线。`before`/`next_before` 是排他的 UTC 毫秒 `start`；D/W/M 的 `chart_time`
+只是图表标签，指标 `time` 对应 K 线的真实 `start`。
+
+默认 `provisional=false`，指标使用已收盘的有效观测，不要求分钟覆盖完整；K 线保留闭合、确认和覆盖标记。
+`provisional=true` 沿用网页对版本末尾不完整周期的临时计算，临时值带有标记。
+不接受 `published=true`、`dataset_start`、`calculation_origin`、`composite_revision_id`
+或 `input_revision`；固定历史的计算起点与输入已由版本确定。
+
+## 已建立组合的指标
+
+`indicators_calculate` 继续要求 `analysis:read` 和 `market:read`，支持显式
+`series_kind="composite"`。`instrument` 是已保存的组合 ID，也接受 `MWC:<ID>`。
+搜索候选不等于已经建立组合；此工具不创建组合、不续订行情、不调用供应商补数。
+
+```json
+{
+  "instrument": "<已建立的64位组合ID>",
+  "series_kind": "composite",
+  "composite_revision_id": "<可选的组合修订ID>",
+  "timeframe": "H1",
+  "limit": 300,
+  "indicators": [
+    {"name": "EMA", "version": "1", "params": {"period": 20}},
+    {"name": "RSI", "version": "1", "params": {"period": 14}}
+  ]
+}
+```
+
+省略组合修订时，共享读取只解析一次活动修订。`page.revision_id`、
+`page.input_revision`、`page.history_version_id`、`page.history_checksum`、`seam` 和
+`rule_version` 描述本次价格依据；每个指标 `calculation.input_evidence` 与页面对应。
+指定非活动修订时，来源、精度、日历和历史基线也取自所选修订。
+
+可用 `input_revision` 选择现有保留的非负确认输入修订，但必须同时指定
+`composite_revision_id`。组合拒绝 `published=true`、`dataset_start` 和
+`calculation_origin`；这些组合字段也不能用于 managed/provider。单次仍限 1–12 个指标、
+最多 2000 根可见 K 线，`before` 为排他的 UTC 毫秒游标。日/周/月 `chart_time` 是图表标签，
+指标点的 `time` 对应真实 K 线 `start`。
+
+默认 `provisional=false`，指标采用已收盘的有效输入，不因常见分钟缺口拒绝计算。K 线仍保留
+`time_closed`、`source_confirmed`、`coverage_complete` 和来源 `segments`。
+`provisional=true` 绑定本次展示快照，临时指标和依赖带有标记；不能同时指定
+`input_revision`，临时值不推进已确认的指标状态。
+
+冷启动可登记现有固定指标后台任务；响应仍成功返回价格、已完成结果、`pending` 和
+`indicator_progress`。逐个检查指标的 `calculation.visible_complete`、`coverage`、
+`required_coverage`、`status`、`cursor`、`target_end`、`error`、`next_at`。
+可见覆盖完成不要求完整历史任务已结束，也不保证每个点有信号。
+预热不足、无效输入、严格模式缺口后重新初始化或稀疏信号产生的 null/空事件保留原样，结合
+`dependencies.initialized`、缺口和 K 线状态判断；不得将 null 当零或仅凭全 null 推断任务未完成。
+
+每次响应内部保证同源、同版本。再次调用（含重试和分页）重新选择输入，不保证跨次快照一致；
+`run_id`、`display_snapshot_id` 是解释与诊断字段，不开放为该 MCP 工具输入。
+`history_revision` 可能包括计算进度，并非可重放的数据版本。
+允许的业务写入仅为共享计算任务、结果及审计；临时模式还复用现有展示快照缓存。
+没有网页 client 或消费者租约，不建立实时市场需求。

@@ -1,0 +1,4440 @@
+{
+  "observed_at": "2026-10-23T13:41:11.033812+00:00",
+  "host": "quant-server",
+  "project": "mw-issue75-v2-20261018",
+  "logical_instance": "mw-acceptance",
+  "web_url": "https://192.168.7.232:18280",
+  "mcp_url": "http://127.0.0.1:18275/mcp",
+  "task_source_commit": "9770d5db890d81cf7a415f55d4de8a2ed1a32059",
+  "runtime": {
+    "runtime_commit": "2a943eec6717e25e7a5c9b5cf236c19a0f2a6b91",
+    "api_image": "sha256:9ca7a217ecf1b12a7de53d0dfb764019191e11ffddf4eeeeb7a62151595fc67f",
+    "runtime_source_matches_commit": true,
+    "source_sha256": {
+      "backend/alerts/capabilities/actions.py": "14027e768427d97f1977cb4057845e0475f0491fcaaa5e4428b336206768f8be",
+      "backend/alerts/capabilities/models.py": "7e37a35540be17e4b1d55b012d7ac0d8dfe0de846415fb20d6a94c69abaa87dc",
+      "backend/alerts/series_access.py": "f84ac4b606b11ac9c402b19c09bd4d93d6734df017da28bcc31499fe4b70d7af",
+      "backend/tests/test_series_access_postgres.py": "b20a750bdb2673981639f3ad5d2f23a545762353bd2e090a1f815edc27ef5963",
+      "backend/tests/test_series_access.py": "cd9f0e6dfd479d8aa92a1237f60d9cf5d44dc0748180d596302183ae6c78f744",
+      "backend/tests/test_composite_chart_postgres.py": "14923b21256c7088625568db837bf05cd1f0e21807ad0ed99d101fb44c347d89",
+      "backend/tests/test_fixed_indicators_postgres.py": "8cf9e24bdb5e1a3ad3e16fae9fff1aee31a9620fc0a55112037fb4d9d9e8e91f",
+      "backend/tests/test_chart_reload_postgres.py": "a450c456990ad5a7b6d72c8b1cffb0dab51deb57f8bc53d7ca051b69a0339650"
+    },
+    "pg_tests_identical_to_task_branch": {
+      "backend/tests/test_series_access_postgres.py": true,
+      "backend/tests/test_series_access.py": true,
+      "backend/tests/test_composite_chart_postgres.py": true,
+      "backend/tests/test_fixed_indicators_postgres.py": true,
+      "backend/tests/test_chart_reload_postgres.py": true
+    },
+    "services": [
+      {
+        "service": "api",
+        "id": "7443e15dccc68ab73f1e5fe3a5df3f983f42216eff85604502de65ed38177a03",
+        "image": "sha256:9ca7a217ecf1b12a7de53d0dfb764019191e11ffddf4eeeeb7a62151595fc67f",
+        "status": "running",
+        "health": "healthy",
+        "restarts": 0,
+        "config_sha256": "2ee24f7a3a68e5f38624f450574bd84b851d1bbc0fd6f1bc2412d259e0e0d1d2",
+        "mounts_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "ports_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "networks": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "chart-aggregation-worker",
+        "id": "2dfb947dba15a888adf7099a2fffc85343c43029510f91b2ff6998cdcac4f094",
+        "image": "sha256:a7c395db8e4ce6355d60085f5ee6f33c47fccab44837e6a58581fac1a48472e4",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "config_sha256": "50bc7ca500c65619cd031a80b25478b3b31e7c3b7e583855035f64a8282f91e7",
+        "mounts_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "ports_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "networks": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "pricing-worker",
+        "id": "32943510ecffb1d9717535461ffc7e017c250fa6f3ae4275dfe4f07c079b618d",
+        "image": "sha256:a7c395db8e4ce6355d60085f5ee6f33c47fccab44837e6a58581fac1a48472e4",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "config_sha256": "d22932ed8b0752e71fefe768627a64b50fdfda6c13b476954a07d06fc96eade8",
+        "mounts_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "ports_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "networks": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "composite-aggregate-worker",
+        "id": "0a5b4909e745dc8d7d7988e230e01d233aa42035f696ac2eae8cbbc74a3ff062",
+        "image": "sha256:a7c395db8e4ce6355d60085f5ee6f33c47fccab44837e6a58581fac1a48472e4",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "config_sha256": "0858a46bbd6fcf1c9b7c2b3de67342a9a6bb9e95200d2b9acbcbfbd2adc09a8b",
+        "mounts_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "ports_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "networks": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "market-stream-worker",
+        "id": "e2c67b9d55fd16b0db0d3ecf1a35c63f6c0a379b9fe27e2875b2643a63ded87a",
+        "image": "sha256:a7c395db8e4ce6355d60085f5ee6f33c47fccab44837e6a58581fac1a48472e4",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "config_sha256": "54c08f99d5fcb6fe0937edf5157932e199ef63da2d31d63a578efa9747faf25f",
+        "mounts_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "ports_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "networks": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "chart-history-worker",
+        "id": "fadeb01b6d8f75671acc9eb6a48a66e3ffa6e1e694fd9b3c9ad94799ae513c1b",
+        "image": "sha256:a7c395db8e4ce6355d60085f5ee6f33c47fccab44837e6a58581fac1a48472e4",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "config_sha256": "e3c92a34bbe65a727367a56369b9a3996ac88c83e71184f1eea0c025d60ff954",
+        "mounts_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "ports_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "networks": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "native-history-worker",
+        "id": "ccf1a0a4f374dbb268e8660ae7a36354f055c36073a8cdacf11ecdbea5db26d7",
+        "image": "sha256:a7c395db8e4ce6355d60085f5ee6f33c47fccab44837e6a58581fac1a48472e4",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "config_sha256": "6fe786766bb6edeb59a196429f42687a6e909d23b75d0d84d85203fea5c1df0e",
+        "mounts_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "ports_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "networks": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "web",
+        "id": "5c70c419c61107c5c2429c9b10e0140e718eeb93c6490d4b1eddaf8797b0b8d3",
+        "image": "sha256:1ec604df54f2923798e478489326e74b6684bbdfd2a7fdb39f468fb9d710526e",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "config_sha256": "04feb457b67c37d255f0c446ea47fdd3b965f14db9d4bac731129c11d5afceee",
+        "mounts_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "ports_sha256": "1260bcb10bbceda280a622a1f1ed7366b2679675629e834011596d971018793d",
+        "networks": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "notify-worker",
+        "id": "12ab22bce1d26d97b068a39583ae6df31abe0e2bfd4c5957f5921208412fa440",
+        "image": "sha256:a7c395db8e4ce6355d60085f5ee6f33c47fccab44837e6a58581fac1a48472e4",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "config_sha256": "e31e39846792cdfcf7dee94f7b51562f756de85be83e16b5faa3a2824f4866af",
+        "mounts_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "ports_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "networks": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "realtime-worker",
+        "id": "45c7805eb2c855f9e11879f14807f6d2155f6e728aa645353bccf0e6415dabc4",
+        "image": "sha256:a7c395db8e4ce6355d60085f5ee6f33c47fccab44837e6a58581fac1a48472e4",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "config_sha256": "88ddd2807aec6283550f5e473738291238bf2ab577dc166aae0efca95318a78d",
+        "mounts_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "ports_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "networks": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "projector",
+        "id": "15bc250f139bc3d5051f8f98b01f65578b410a8f1f18bd5b23d6e14af0623895",
+        "image": "sha256:a7c395db8e4ce6355d60085f5ee6f33c47fccab44837e6a58581fac1a48472e4",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "config_sha256": "285c4d338ac394cc65af27e5b16234999aa79725e56d7622f7c6f311f3b85ff6",
+        "mounts_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "ports_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "networks": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "history-worker",
+        "id": "3e9b4ad990db226cc5c00fcce01204fb5603e33091ba3f1f6782c3747be8dc02",
+        "image": "sha256:a7c395db8e4ce6355d60085f5ee6f33c47fccab44837e6a58581fac1a48472e4",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "config_sha256": "b19677441ed7539b0618a577292bffae57a70f1d0ee9349b0fcd790805a3c840",
+        "mounts_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "ports_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "networks": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "chart",
+        "id": "e49a72fdeb18ea55a20bf71088f559db3bbe761e6c0e3b932ed9ad34fde4bd41",
+        "image": "sha256:41707f26ad94eedd85655366d73a77153364c8af48b7f3bee6c652916e78b64d",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "config_sha256": "9016d7d7fbe58189b8acf316abfe016ee8d46c1f91d3c2dd981d4789f2fd3b10",
+        "mounts_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "ports_sha256": "0b6b57472d6b919840bda203f101ea9783f8b1b1f9970fc25f51ebe48bd94d8f",
+        "networks": [
+          "mw-issue75-v2-20261018_browser"
+        ]
+      },
+      {
+        "service": "gateway",
+        "id": "9492f307fdf9bfdbec7641c4e0b3554bed39340bc73a57448fdbd39e34d79ca9",
+        "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "config_sha256": "65eda2e91425fd5b379fba621db5ff5ce861ebda8ebe2cc7a3c8f7fa7434c7cb",
+        "mounts_sha256": "a37507788fe83eb8433135385388c6a35ed18e6283730b1488fb4e078fb40d68",
+        "ports_sha256": "b5f28385d91d9d4a76d80ebda4432579b360ed9456c459f16c5c48e90a4fc207",
+        "networks": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "postgres",
+        "id": "3de49cbde9a20c6640092181c04d35df41677566795cfecae18c0ab284b0aba8",
+        "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+        "status": "running",
+        "health": "healthy",
+        "restarts": 0,
+        "config_sha256": "55083ae974e5f317083bde05a3c1c5e95eeee66c8f3f6eb103c3efbb6001b40a",
+        "mounts_sha256": "642d2d89ebf15d7f095747dcd3f0ff7494275f35fb382320362366753f62a769",
+        "ports_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "networks": [
+          "mw-issue75-v2-20261018_task"
+        ]
+      }
+    ]
+  },
+  "checks": {
+    "verdict": "passed",
+    "readonly_tools": 28,
+    "bars": 7,
+    "numeric_values": 14,
+    "revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+    "input_revision": 1899,
+    "history_version_id": "ecf9bcf1-2814-4587-ba9c-757460230551",
+    "history_checksum": "cb85105cb6f6090c143358433191f098786f62ff49797f1b7f9e35acf072bda6",
+    "progress": [
+      {
+        "elapsed": 0.56,
+        "state": [
+          {
+            "status": "pending",
+            "visible_complete": false,
+            "cursor": 1767218400000,
+            "run_id": "542edc3574f8bdb6020d3c95d05ab3a4720d34528d5c1315582b2dd99449d6f2"
+          },
+          {
+            "status": "pending",
+            "visible_complete": false,
+            "cursor": 1767218400000,
+            "run_id": "95425ab50dd055f0d7060f8da8759ceed96fda9c1db810caee89f41d7f406e60"
+          }
+        ]
+      },
+      {
+        "elapsed": 4.61,
+        "state": [
+          {
+            "status": "complete",
+            "visible_complete": true,
+            "cursor": 1792760400000,
+            "run_id": "542edc3574f8bdb6020d3c95d05ab3a4720d34528d5c1315582b2dd99449d6f2"
+          },
+          {
+            "status": "complete",
+            "visible_complete": true,
+            "cursor": 1792760400000,
+            "run_id": "95425ab50dd055f0d7060f8da8759ceed96fda9c1db810caee89f41d7f406e60"
+          }
+        ]
+      }
+    ],
+    "same_input_evidence": true,
+    "web_parity": true,
+    "utc_pagination": true,
+    "mwc_normalization": true,
+    "default_selection": true,
+    "provisional_snapshot_bound": true,
+    "negative_checks": 8,
+    "preserved": {
+      "market_datasets": true,
+      "market_history_versions": true,
+      "market_history_artifacts": true,
+      "advanced_chart_workspaces": true,
+      "advanced_chart_preferences": true,
+      "chart_workspaces": true,
+      "composites": true,
+      "preferences": true,
+      "demands": true
+    },
+    "counts_before": {
+      "market_source_fetches": 219,
+      "market_history_runs": 12,
+      "market_fixed_indicator_runs": 4833
+    },
+    "counts_after": {
+      "market_source_fetches": 219,
+      "market_history_runs": 12,
+      "market_fixed_indicator_runs": 4837
+    }
+  },
+  "tool": {
+    "annotations": {
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": true,
+      "readOnlyHint": true
+    },
+    "description": "Calculate 1–12 indicators from the shared chart snapshot with original warmup, gaps and revisions. History requires an immutable version ID or MWH ticker with series_kind=history. Returns bars, input evidence and pending/partial progress. Null is unavailable. Max 2000 visible bars.",
+    "inputSchema": {
+      "properties": {
+        "instrument": {
+          "description": "Base instrument/composite ID; history requires an immutable version ID or MWH:<version_id>",
+          "maxLength": 80,
+          "minLength": 1,
+          "title": "Instrument",
+          "type": "string"
+        },
+        "series_kind": {
+          "default": "managed",
+          "enum": [
+            "managed",
+            "provider",
+            "composite",
+            "history"
+          ],
+          "title": "Series Kind",
+          "type": "string"
+        },
+        "timeframe": {
+          "default": "H1",
+          "enum": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ],
+          "title": "Timeframe",
+          "type": "string"
+        },
+        "before": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Exclusive millisecond cursor: managed UTC start, provider native chart time",
+          "title": "Before"
+        },
+        "limit": {
+          "default": 300,
+          "maximum": 2000,
+          "minimum": 1,
+          "title": "Limit",
+          "type": "integer"
+        },
+        "published": {
+          "default": false,
+          "title": "Published",
+          "type": "boolean"
+        },
+        "dataset_start": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dataset Start"
+        },
+        "provisional": {
+          "default": false,
+          "description": "Opt in to recomputed last incomplete candle; values are marked provisional",
+          "title": "Provisional",
+          "type": "boolean"
+        },
+        "calculation_origin": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Reuse the returned provider calculation_origin to pin recursive history",
+          "title": "Calculation Origin"
+        },
+        "composite_revision_id": {
+          "anyOf": [
+            {
+              "maxLength": 36,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Composite Revision Id"
+        },
+        "input_revision": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Input Revision"
+        },
+        "indicators": {
+          "items": {
+            "$ref": "#/$defs/IndicatorSpec"
+          },
+          "maxItems": 12,
+          "minItems": 1,
+          "title": "Indicators",
+          "type": "array"
+        }
+      },
+      "required": [
+        "instrument",
+        "indicators"
+      ],
+      "type": "object",
+      "$defs": {
+        "IndicatorSpec": {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "maxLength": 80,
+              "minLength": 1,
+              "title": "Name",
+              "type": "string"
+            },
+            "version": {
+              "default": "1",
+              "title": "Version",
+              "type": "string"
+            },
+            "params": {
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "title": "Params",
+              "type": "object"
+            }
+          },
+          "required": [
+            "name"
+          ],
+          "title": "IndicatorSpec",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "title": "IndicatorsQuery"
+    },
+    "name": "indicators_calculate",
+    "outputSchema": {
+      "properties": {
+        "instrument": {
+          "title": "Instrument",
+          "type": "string"
+        },
+        "source": {
+          "title": "Source",
+          "type": "string"
+        },
+        "series_kind": {
+          "title": "Series Kind",
+          "type": "string"
+        },
+        "timeframe": {
+          "title": "Timeframe",
+          "type": "string"
+        },
+        "price_type": {
+          "title": "Price Type",
+          "type": "string"
+        },
+        "queried_at": {
+          "title": "Queried At",
+          "type": "integer"
+        },
+        "quality": {
+          "title": "Quality",
+          "type": "string"
+        },
+        "next_before": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Next Before"
+        },
+        "cursor_coordinate": {
+          "default": "utc_ms",
+          "enum": [
+            "utc_ms",
+            "native_chart_time_ms"
+          ],
+          "title": "Cursor Coordinate",
+          "type": "string"
+        },
+        "coverage_scope": {
+          "default": "returned_page",
+          "title": "Coverage Scope",
+          "type": "string"
+        },
+        "incomplete_count": {
+          "default": 0,
+          "title": "Incomplete Count",
+          "type": "integer"
+        },
+        "gaps": {
+          "items": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object"
+          },
+          "title": "Gaps",
+          "type": "array"
+        },
+        "interval_breaks": {
+          "items": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object"
+          },
+          "title": "Interval Breaks",
+          "type": "array"
+        },
+        "gap_assessment": {
+          "default": "trading_calendar",
+          "enum": [
+            "trading_calendar",
+            "unknown_calendar"
+          ],
+          "title": "Gap Assessment",
+          "type": "string"
+        },
+        "page": {
+          "$ref": "#/$defs/IndicatorsPage"
+        }
+      },
+      "required": [
+        "instrument",
+        "source",
+        "series_kind",
+        "timeframe",
+        "price_type",
+        "queried_at",
+        "quality",
+        "next_before",
+        "page"
+      ],
+      "type": "object",
+      "$defs": {
+        "Calculation": {
+          "additionalProperties": true,
+          "properties": {
+            "run_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Run Id"
+            },
+            "status": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Status"
+            },
+            "visible_complete": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Visible Complete"
+            },
+            "calculation_origin": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Calculation Origin"
+            },
+            "algorithm": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Algorithm"
+            },
+            "coverage": {
+              "items": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "title": "Coverage",
+              "type": "array"
+            },
+            "required_coverage": {
+              "items": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "title": "Required Coverage",
+              "type": "array"
+            },
+            "cursor": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Cursor"
+            },
+            "target_end": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Target End"
+            },
+            "error": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Error"
+            },
+            "next_at": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Next At"
+            },
+            "input_evidence": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/InputEvidence"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            }
+          },
+          "title": "Calculation",
+          "type": "object"
+        },
+        "Dependency": {
+          "additionalProperties": true,
+          "properties": {
+            "start": {
+              "title": "Start",
+              "type": "integer"
+            },
+            "dependency_origin": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Dependency Origin"
+            },
+            "seam_dependency": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Seam Dependency"
+            },
+            "initialized": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Initialized"
+            },
+            "provisional": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Provisional"
+            }
+          },
+          "required": [
+            "start"
+          ],
+          "title": "Dependency",
+          "type": "object"
+        },
+        "HistoryInputManifest": {
+          "additionalProperties": true,
+          "properties": {
+            "version_id": {
+              "title": "Version Id",
+              "type": "string"
+            },
+            "checksum": {
+              "title": "Checksum",
+              "type": "string"
+            }
+          },
+          "required": [
+            "version_id",
+            "checksum"
+          ],
+          "title": "HistoryInputManifest",
+          "type": "object"
+        },
+        "IndicatorBar": {
+          "additionalProperties": true,
+          "properties": {
+            "start": {
+              "title": "Start",
+              "type": "integer"
+            },
+            "end": {
+              "title": "End",
+              "type": "integer"
+            },
+            "open": {
+              "title": "Open",
+              "type": "string"
+            },
+            "high": {
+              "title": "High",
+              "type": "string"
+            },
+            "low": {
+              "title": "Low",
+              "type": "string"
+            },
+            "close": {
+              "title": "Close",
+              "type": "string"
+            },
+            "complete": {
+              "title": "Complete",
+              "type": "boolean"
+            },
+            "revision": {
+              "default": 0,
+              "title": "Revision",
+              "type": "integer"
+            },
+            "time_closed": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Time Closed"
+            },
+            "source_confirmed": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Source Confirmed"
+            },
+            "coverage_complete": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Coverage Complete"
+            },
+            "chart_time": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Chart Time"
+            },
+            "segments": {
+              "items": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "title": "Segments",
+              "type": "array"
+            }
+          },
+          "required": [
+            "start",
+            "end",
+            "open",
+            "high",
+            "low",
+            "close",
+            "complete"
+          ],
+          "title": "IndicatorBar",
+          "type": "object"
+        },
+        "IndicatorResult": {
+          "additionalProperties": true,
+          "properties": {
+            "name": {
+              "title": "Name",
+              "type": "string"
+            },
+            "version": {
+              "title": "Version",
+              "type": "string"
+            },
+            "params": {
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "title": "Params",
+              "type": "object"
+            },
+            "series": {
+              "items": {
+                "$ref": "#/$defs/IndicatorSeries"
+              },
+              "title": "Series",
+              "type": "array"
+            },
+            "calculation": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Calculation"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "dependencies": {
+              "items": {
+                "$ref": "#/$defs/Dependency"
+              },
+              "title": "Dependencies",
+              "type": "array"
+            }
+          },
+          "required": [
+            "name",
+            "version",
+            "params",
+            "series"
+          ],
+          "title": "IndicatorResult",
+          "type": "object"
+        },
+        "IndicatorSeries": {
+          "additionalProperties": true,
+          "properties": {
+            "key": {
+              "title": "Key",
+              "type": "string"
+            },
+            "type": {
+              "title": "Type",
+              "type": "string"
+            },
+            "values": {
+              "items": {
+                "$ref": "#/$defs/ValuePoint"
+              },
+              "title": "Values",
+              "type": "array"
+            }
+          },
+          "required": [
+            "key",
+            "type",
+            "values"
+          ],
+          "title": "IndicatorSeries",
+          "type": "object"
+        },
+        "IndicatorsPage": {
+          "additionalProperties": true,
+          "properties": {
+            "bars": {
+              "items": {
+                "$ref": "#/$defs/IndicatorBar"
+              },
+              "title": "Bars",
+              "type": "array"
+            },
+            "indicators": {
+              "items": {
+                "$ref": "#/$defs/IndicatorResult"
+              },
+              "title": "Indicators",
+              "type": "array"
+            },
+            "has_more": {
+              "title": "Has More",
+              "type": "boolean"
+            },
+            "origin": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Origin"
+            },
+            "history_revision": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "History Revision"
+            },
+            "cache_revision": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Cache Revision"
+            },
+            "basis": {
+              "title": "Basis",
+              "type": "string"
+            },
+            "calendar": {
+              "title": "Calendar",
+              "type": "string"
+            },
+            "as_of": {
+              "title": "As Of",
+              "type": "integer"
+            },
+            "version_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Version Id"
+            },
+            "input_manifest": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/HistoryInputManifest"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "source": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Source"
+            },
+            "composite_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Composite Id"
+            },
+            "revision_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Revision Id"
+            },
+            "input_revision": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Input Revision"
+            },
+            "history_version_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "History Version Id"
+            },
+            "history_checksum": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "History Checksum"
+            },
+            "seam": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Seam"
+            },
+            "rule_version": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Rule Version"
+            },
+            "display_snapshot_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Display Snapshot Id"
+            },
+            "provider_snapshot_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Provider Snapshot Id"
+            },
+            "calculation_origin": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Calculation Origin"
+            },
+            "calculation": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Calculation"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "indicator_progress": {
+              "items": {
+                "$ref": "#/$defs/Calculation"
+              },
+              "title": "Indicator Progress",
+              "type": "array"
+            },
+            "pending": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Pending",
+              "type": "array"
+            }
+          },
+          "required": [
+            "bars",
+            "indicators",
+            "has_more",
+            "basis",
+            "calendar",
+            "as_of"
+          ],
+          "title": "IndicatorsPage",
+          "type": "object"
+        },
+        "InputEvidence": {
+          "additionalProperties": true,
+          "properties": {
+            "revision_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Revision Id"
+            },
+            "input_revision": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Input Revision"
+            },
+            "history_version_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "History Version Id"
+            },
+            "display_snapshot_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Display Snapshot Id"
+            },
+            "provider_snapshot_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Provider Snapshot Id"
+            },
+            "cache_revision": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Cache Revision"
+            },
+            "calculation_origin": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Calculation Origin"
+            }
+          },
+          "title": "InputEvidence",
+          "type": "object"
+        },
+        "ValuePoint": {
+          "additionalProperties": true,
+          "properties": {
+            "time": {
+              "title": "Time",
+              "type": "integer"
+            },
+            "value": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Value"
+            },
+            "provisional": {
+              "default": false,
+              "title": "Provisional",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "time",
+            "value"
+          ],
+          "title": "ValuePoint",
+          "type": "object"
+        }
+      },
+      "title": "IndicatorsResult"
+    }
+  },
+  "responses": {
+    "cold": {
+      "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+      "source": "composite",
+      "series_kind": "composite",
+      "timeframe": "H1",
+      "price_type": "bid OHLC",
+      "queried_at": 1792762662126,
+      "quality": "complete",
+      "next_before": 1792735200000,
+      "cursor_coordinate": "utc_ms",
+      "incomplete_count": 0,
+      "gaps": [],
+      "interval_breaks": [],
+      "gap_assessment": "trading_calendar",
+      "page": {
+        "bars": [
+          {
+            "start": 1792735200000,
+            "end": 1792738800000,
+            "open": "1.12103",
+            "high": "1.12158",
+            "low": "1.1208",
+            "close": "1.12097",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792735200000,
+                "end": 1792738800000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "4565",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1899
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "4565",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1899
+          },
+          {
+            "start": 1792738800000,
+            "end": 1792742400000,
+            "open": "1.12096",
+            "high": "1.12117",
+            "low": "1.11906",
+            "close": "1.11978",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792738800000,
+                "end": 1792742400000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "7787",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1899
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "7787",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1899
+          },
+          {
+            "start": 1792742400000,
+            "end": 1792746000000,
+            "open": "1.11976",
+            "high": "1.12034",
+            "low": "1.11842",
+            "close": "1.11895",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792742400000,
+                "end": 1792746000000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "7982",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1899
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "7982",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1899
+          },
+          {
+            "start": 1792746000000,
+            "end": 1792749600000,
+            "open": "1.11895",
+            "high": "1.12006",
+            "low": "1.11892",
+            "close": "1.11992",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792746000000,
+                "end": 1792749600000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "5981",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1899
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "5981",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1899
+          },
+          {
+            "start": 1792749600000,
+            "end": 1792753200000,
+            "open": "1.11994",
+            "high": "1.12043",
+            "low": "1.11931",
+            "close": "1.11949",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792749600000,
+                "end": 1792753200000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "5007",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1899
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "5007",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1899
+          },
+          {
+            "start": 1792753200000,
+            "end": 1792756800000,
+            "open": "1.1195",
+            "high": "1.11984",
+            "low": "1.11873",
+            "close": "1.11897",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792753200000,
+                "end": 1792756800000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "6070",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1899
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "6070",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1899
+          },
+          {
+            "start": 1792756800000,
+            "end": 1792760400000,
+            "open": "1.11897",
+            "high": "1.12113",
+            "low": "1.11878",
+            "close": "1.12061",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792756800000,
+                "end": 1792760400000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "7368",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1899
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "7368",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1899
+          }
+        ],
+        "indicators": [
+          {
+            "name": "EMA",
+            "version": "1",
+            "params": {
+              "period": 3
+            },
+            "series": [
+              {
+                "key": "value",
+                "type": "line",
+                "values": [],
+                "label": "指标值"
+              }
+            ],
+            "calculation": {
+              "run_id": "542edc3574f8bdb6020d3c95d05ab3a4720d34528d5c1315582b2dd99449d6f2",
+              "status": "pending",
+              "visible_complete": false,
+              "calculation_origin": 1767218400000,
+              "algorithm": "fixed-indicator-state-v3",
+              "coverage": [],
+              "required_coverage": [
+                {
+                  "start": 1792735200000,
+                  "end": 1792760400000
+                }
+              ],
+              "cursor": 1767218400000,
+              "target_end": 1792760400000,
+              "error": null,
+              "next_at": 0,
+              "input_evidence": {
+                "revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                "input_revision": 1899,
+                "history_version_id": "ecf9bcf1-2814-4587-ba9c-757460230551",
+                "display_snapshot_id": null
+              },
+              "id": "EMA",
+              "input_revision": 1899,
+              "parent_run_id": null,
+              "reused_prefix_end": 1767218400000,
+              "producer": "backend",
+              "accuracy": "oracle_equivalent",
+              "canonical_verified": true,
+              "display_task_ids": []
+            },
+            "dependencies": [],
+            "pane": "main",
+            "levels": [],
+            "id": "EMA"
+          },
+          {
+            "name": "RSI",
+            "version": "1",
+            "params": {
+              "period": 3
+            },
+            "series": [
+              {
+                "key": "value",
+                "type": "line",
+                "values": [],
+                "label": "指标值"
+              }
+            ],
+            "calculation": {
+              "run_id": "95425ab50dd055f0d7060f8da8759ceed96fda9c1db810caee89f41d7f406e60",
+              "status": "pending",
+              "visible_complete": false,
+              "calculation_origin": 1767218400000,
+              "algorithm": "fixed-indicator-state-v3",
+              "coverage": [],
+              "required_coverage": [
+                {
+                  "start": 1792735200000,
+                  "end": 1792760400000
+                }
+              ],
+              "cursor": 1767218400000,
+              "target_end": 1792760400000,
+              "error": null,
+              "next_at": 0,
+              "input_evidence": {
+                "revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                "input_revision": 1899,
+                "history_version_id": "ecf9bcf1-2814-4587-ba9c-757460230551",
+                "display_snapshot_id": null
+              },
+              "id": "RSI",
+              "input_revision": 1899,
+              "parent_run_id": null,
+              "reused_prefix_end": 1767218400000,
+              "producer": "backend",
+              "accuracy": "oracle_equivalent",
+              "canonical_verified": true,
+              "display_task_ids": []
+            },
+            "dependencies": [],
+            "pane": "sub",
+            "levels": [
+              30,
+              70
+            ],
+            "id": "RSI"
+          }
+        ],
+        "has_more": true,
+        "origin": 1767218400000,
+        "history_revision": "5144f938bae544dedd0db7764da62813c57088b7c303aacba4f2f84e80b00a33",
+        "basis": "bid",
+        "calendar": "ny17",
+        "as_of": 1792762661652,
+        "composite_id": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+        "revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+        "input_revision": 1899,
+        "history_version_id": "ecf9bcf1-2814-4587-ba9c-757460230551",
+        "history_checksum": "cb85105cb6f6090c143358433191f098786f62ff49797f1b7f9e35acf072bda6",
+        "seam": 1792616400000,
+        "rule_version": "configured-phase-m1-v1",
+        "indicator_progress": [
+          {
+            "run_id": "542edc3574f8bdb6020d3c95d05ab3a4720d34528d5c1315582b2dd99449d6f2",
+            "status": "pending",
+            "visible_complete": false,
+            "calculation_origin": 1767218400000,
+            "algorithm": "fixed-indicator-state-v3",
+            "coverage": [],
+            "required_coverage": [
+              {
+                "start": 1792735200000,
+                "end": 1792760400000
+              }
+            ],
+            "cursor": 1767218400000,
+            "target_end": 1792760400000,
+            "error": null,
+            "next_at": 0,
+            "input_evidence": {
+              "revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+              "input_revision": 1899,
+              "history_version_id": "ecf9bcf1-2814-4587-ba9c-757460230551",
+              "display_snapshot_id": null
+            },
+            "id": "EMA",
+            "input_revision": 1899,
+            "parent_run_id": null,
+            "reused_prefix_end": 1767218400000,
+            "producer": "backend",
+            "accuracy": "oracle_equivalent",
+            "canonical_verified": true,
+            "display_task_ids": []
+          },
+          {
+            "run_id": "95425ab50dd055f0d7060f8da8759ceed96fda9c1db810caee89f41d7f406e60",
+            "status": "pending",
+            "visible_complete": false,
+            "calculation_origin": 1767218400000,
+            "algorithm": "fixed-indicator-state-v3",
+            "coverage": [],
+            "required_coverage": [
+              {
+                "start": 1792735200000,
+                "end": 1792760400000
+              }
+            ],
+            "cursor": 1767218400000,
+            "target_end": 1792760400000,
+            "error": null,
+            "next_at": 0,
+            "input_evidence": {
+              "revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+              "input_revision": 1899,
+              "history_version_id": "ecf9bcf1-2814-4587-ba9c-757460230551",
+              "display_snapshot_id": null
+            },
+            "id": "RSI",
+            "input_revision": 1899,
+            "parent_run_id": null,
+            "reused_prefix_end": 1767218400000,
+            "producer": "backend",
+            "accuracy": "oracle_equivalent",
+            "canonical_verified": true,
+            "display_task_ids": []
+          }
+        ],
+        "pending": [
+          "指标正在从固定输入起点初始化或修复；已计算区间可读，未完成区间不截断预热"
+        ],
+        "precision": 5
+      }
+    },
+    "ready": {
+      "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+      "source": "composite",
+      "series_kind": "composite",
+      "timeframe": "H1",
+      "price_type": "bid OHLC",
+      "queried_at": 1792762666193,
+      "quality": "complete",
+      "next_before": 1792735200000,
+      "cursor_coordinate": "utc_ms",
+      "incomplete_count": 0,
+      "gaps": [],
+      "interval_breaks": [],
+      "gap_assessment": "trading_calendar",
+      "page": {
+        "bars": [
+          {
+            "start": 1792735200000,
+            "end": 1792738800000,
+            "open": "1.12103",
+            "high": "1.12158",
+            "low": "1.1208",
+            "close": "1.12097",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792735200000,
+                "end": 1792738800000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "4565",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1899
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "4565",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1899
+          },
+          {
+            "start": 1792738800000,
+            "end": 1792742400000,
+            "open": "1.12096",
+            "high": "1.12117",
+            "low": "1.11906",
+            "close": "1.11978",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792738800000,
+                "end": 1792742400000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "7787",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1899
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "7787",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1899
+          },
+          {
+            "start": 1792742400000,
+            "end": 1792746000000,
+            "open": "1.11976",
+            "high": "1.12034",
+            "low": "1.11842",
+            "close": "1.11895",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792742400000,
+                "end": 1792746000000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "7982",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1899
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "7982",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1899
+          },
+          {
+            "start": 1792746000000,
+            "end": 1792749600000,
+            "open": "1.11895",
+            "high": "1.12006",
+            "low": "1.11892",
+            "close": "1.11992",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792746000000,
+                "end": 1792749600000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "5981",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1899
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "5981",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1899
+          },
+          {
+            "start": 1792749600000,
+            "end": 1792753200000,
+            "open": "1.11994",
+            "high": "1.12043",
+            "low": "1.11931",
+            "close": "1.11949",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792749600000,
+                "end": 1792753200000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "5007",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1899
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "5007",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1899
+          },
+          {
+            "start": 1792753200000,
+            "end": 1792756800000,
+            "open": "1.1195",
+            "high": "1.11984",
+            "low": "1.11873",
+            "close": "1.11897",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792753200000,
+                "end": 1792756800000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "6070",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1899
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "6070",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1899
+          },
+          {
+            "start": 1792756800000,
+            "end": 1792760400000,
+            "open": "1.11897",
+            "high": "1.12113",
+            "low": "1.11878",
+            "close": "1.12061",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792756800000,
+                "end": 1792760400000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "7368",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1899
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "7368",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1899
+          }
+        ],
+        "indicators": [
+          {
+            "name": "EMA",
+            "version": "1",
+            "params": {
+              "period": 3
+            },
+            "series": [
+              {
+                "key": "value",
+                "type": "line",
+                "values": [
+                  {
+                    "time": 1792735200000,
+                    "value": 1.1210277604166667
+                  },
+                  {
+                    "time": 1792738800000,
+                    "value": 1.1204038802083334
+                  },
+                  {
+                    "time": 1792742400000,
+                    "value": 1.1196769401041666
+                  },
+                  {
+                    "time": 1792746000000,
+                    "value": 1.1197984700520833
+                  },
+                  {
+                    "time": 1792749600000,
+                    "value": 1.1196442350260418
+                  },
+                  {
+                    "time": 1792753200000,
+                    "value": 1.119307117513021
+                  },
+                  {
+                    "time": 1792756800000,
+                    "value": 1.1199585587565104
+                  }
+                ],
+                "label": "指标值"
+              }
+            ],
+            "calculation": {
+              "run_id": "542edc3574f8bdb6020d3c95d05ab3a4720d34528d5c1315582b2dd99449d6f2",
+              "status": "complete",
+              "visible_complete": true,
+              "calculation_origin": 1767218400000,
+              "algorithm": "fixed-indicator-state-v3",
+              "coverage": [
+                {
+                  "start": 1792735200000,
+                  "end": 1792760400000
+                }
+              ],
+              "required_coverage": [
+                {
+                  "start": 1792735200000,
+                  "end": 1792760400000
+                }
+              ],
+              "cursor": 1792760400000,
+              "target_end": 1792760400000,
+              "error": null,
+              "next_at": 0,
+              "input_evidence": {
+                "revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                "input_revision": 1899,
+                "history_version_id": "ecf9bcf1-2814-4587-ba9c-757460230551",
+                "display_snapshot_id": null
+              },
+              "id": "EMA",
+              "input_revision": 1899,
+              "parent_run_id": null,
+              "reused_prefix_end": 1767218400000,
+              "producer": "backend",
+              "accuracy": "oracle_equivalent",
+              "canonical_verified": true,
+              "display_task_ids": []
+            },
+            "dependencies": [
+              {
+                "start": 1792735200000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792738800000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792742400000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792746000000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792749600000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792753200000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792756800000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              }
+            ],
+            "pane": "main",
+            "levels": [],
+            "id": "EMA"
+          },
+          {
+            "name": "RSI",
+            "version": "1",
+            "params": {
+              "period": 3
+            },
+            "series": [
+              {
+                "key": "value",
+                "type": "line",
+                "values": [
+                  {
+                    "time": 1792735200000,
+                    "value": 35.22614724331701
+                  },
+                  {
+                    "time": 1792738800000,
+                    "value": 10.40138425170166
+                  },
+                  {
+                    "time": 1792742400000,
+                    "value": 5.9871083585259814
+                  },
+                  {
+                    "time": 1792746000000,
+                    "value": 46.0924821782294
+                  },
+                  {
+                    "time": 1792749600000,
+                    "value": 35.90698781931475
+                  },
+                  {
+                    "time": 1792753200000,
+                    "value": 25.632348887390922
+                  },
+                  {
+                    "time": 1792756800000,
+                    "value": 68.40380951475989
+                  }
+                ],
+                "label": "指标值"
+              }
+            ],
+            "calculation": {
+              "run_id": "95425ab50dd055f0d7060f8da8759ceed96fda9c1db810caee89f41d7f406e60",
+              "status": "complete",
+              "visible_complete": true,
+              "calculation_origin": 1767218400000,
+              "algorithm": "fixed-indicator-state-v3",
+              "coverage": [
+                {
+                  "start": 1792735200000,
+                  "end": 1792760400000
+                }
+              ],
+              "required_coverage": [
+                {
+                  "start": 1792735200000,
+                  "end": 1792760400000
+                }
+              ],
+              "cursor": 1792760400000,
+              "target_end": 1792760400000,
+              "error": null,
+              "next_at": 0,
+              "input_evidence": {
+                "revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                "input_revision": 1899,
+                "history_version_id": "ecf9bcf1-2814-4587-ba9c-757460230551",
+                "display_snapshot_id": null
+              },
+              "id": "RSI",
+              "input_revision": 1899,
+              "parent_run_id": null,
+              "reused_prefix_end": 1767218400000,
+              "producer": "backend",
+              "accuracy": "oracle_equivalent",
+              "canonical_verified": true,
+              "display_task_ids": []
+            },
+            "dependencies": [
+              {
+                "start": 1792735200000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792738800000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792742400000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792746000000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792749600000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792753200000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792756800000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              }
+            ],
+            "pane": "sub",
+            "levels": [
+              30,
+              70
+            ],
+            "id": "RSI"
+          }
+        ],
+        "has_more": true,
+        "origin": 1767218400000,
+        "history_revision": "f91ebc23d3ce4687a16dfed18bd429731370b1395d57682cb1028803ea3d2fea",
+        "basis": "bid",
+        "calendar": "ny17",
+        "as_of": 1792762666161,
+        "composite_id": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+        "revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+        "input_revision": 1899,
+        "history_version_id": "ecf9bcf1-2814-4587-ba9c-757460230551",
+        "history_checksum": "cb85105cb6f6090c143358433191f098786f62ff49797f1b7f9e35acf072bda6",
+        "seam": 1792616400000,
+        "rule_version": "configured-phase-m1-v1",
+        "indicator_progress": [
+          {
+            "run_id": "542edc3574f8bdb6020d3c95d05ab3a4720d34528d5c1315582b2dd99449d6f2",
+            "status": "complete",
+            "visible_complete": true,
+            "calculation_origin": 1767218400000,
+            "algorithm": "fixed-indicator-state-v3",
+            "coverage": [
+              {
+                "start": 1792735200000,
+                "end": 1792760400000
+              }
+            ],
+            "required_coverage": [
+              {
+                "start": 1792735200000,
+                "end": 1792760400000
+              }
+            ],
+            "cursor": 1792760400000,
+            "target_end": 1792760400000,
+            "error": null,
+            "next_at": 0,
+            "input_evidence": {
+              "revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+              "input_revision": 1899,
+              "history_version_id": "ecf9bcf1-2814-4587-ba9c-757460230551",
+              "display_snapshot_id": null
+            },
+            "id": "EMA",
+            "input_revision": 1899,
+            "parent_run_id": null,
+            "reused_prefix_end": 1767218400000,
+            "producer": "backend",
+            "accuracy": "oracle_equivalent",
+            "canonical_verified": true,
+            "display_task_ids": []
+          },
+          {
+            "run_id": "95425ab50dd055f0d7060f8da8759ceed96fda9c1db810caee89f41d7f406e60",
+            "status": "complete",
+            "visible_complete": true,
+            "calculation_origin": 1767218400000,
+            "algorithm": "fixed-indicator-state-v3",
+            "coverage": [
+              {
+                "start": 1792735200000,
+                "end": 1792760400000
+              }
+            ],
+            "required_coverage": [
+              {
+                "start": 1792735200000,
+                "end": 1792760400000
+              }
+            ],
+            "cursor": 1792760400000,
+            "target_end": 1792760400000,
+            "error": null,
+            "next_at": 0,
+            "input_evidence": {
+              "revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+              "input_revision": 1899,
+              "history_version_id": "ecf9bcf1-2814-4587-ba9c-757460230551",
+              "display_snapshot_id": null
+            },
+            "id": "RSI",
+            "input_revision": 1899,
+            "parent_run_id": null,
+            "reused_prefix_end": 1767218400000,
+            "producer": "backend",
+            "accuracy": "oracle_equivalent",
+            "canonical_verified": true,
+            "display_task_ids": []
+          }
+        ],
+        "pending": [],
+        "precision": 5
+      }
+    },
+    "default": {
+      "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+      "source": "composite",
+      "series_kind": "composite",
+      "timeframe": "H1",
+      "price_type": "bid OHLC",
+      "queried_at": 1792762666532,
+      "quality": "complete",
+      "next_before": 1792735200000,
+      "cursor_coordinate": "utc_ms",
+      "incomplete_count": 0,
+      "gaps": [],
+      "interval_breaks": [],
+      "gap_assessment": "trading_calendar",
+      "page": {
+        "bars": [
+          {
+            "start": 1792735200000,
+            "end": 1792738800000,
+            "open": "1.12103",
+            "high": "1.12158",
+            "low": "1.1208",
+            "close": "1.12097",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792735200000,
+                "end": 1792738800000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "4565",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1936
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "4565",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1936
+          },
+          {
+            "start": 1792738800000,
+            "end": 1792742400000,
+            "open": "1.12096",
+            "high": "1.12117",
+            "low": "1.11906",
+            "close": "1.11978",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792738800000,
+                "end": 1792742400000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "7787",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1936
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "7787",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1936
+          },
+          {
+            "start": 1792742400000,
+            "end": 1792746000000,
+            "open": "1.11976",
+            "high": "1.12034",
+            "low": "1.11842",
+            "close": "1.11895",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792742400000,
+                "end": 1792746000000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "7982",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1936
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "7982",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1936
+          },
+          {
+            "start": 1792746000000,
+            "end": 1792749600000,
+            "open": "1.11895",
+            "high": "1.12006",
+            "low": "1.11892",
+            "close": "1.11992",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792746000000,
+                "end": 1792749600000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "5981",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1936
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "5981",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1936
+          },
+          {
+            "start": 1792749600000,
+            "end": 1792753200000,
+            "open": "1.11994",
+            "high": "1.12043",
+            "low": "1.11931",
+            "close": "1.11949",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792749600000,
+                "end": 1792753200000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "5007",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1936
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "5007",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1936
+          },
+          {
+            "start": 1792753200000,
+            "end": 1792756800000,
+            "open": "1.1195",
+            "high": "1.11984",
+            "low": "1.11873",
+            "close": "1.11897",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792753200000,
+                "end": 1792756800000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "6070",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1936
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "6070",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1936
+          },
+          {
+            "start": 1792756800000,
+            "end": 1792760400000,
+            "open": "1.11897",
+            "high": "1.12113",
+            "low": "1.11878",
+            "close": "1.12061",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792756800000,
+                "end": 1792760400000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "7368",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1936
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "7368",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1936
+          }
+        ],
+        "indicators": [
+          {
+            "name": "EMA",
+            "version": "1",
+            "params": {
+              "period": 3
+            },
+            "series": [
+              {
+                "key": "value",
+                "type": "line",
+                "values": [
+                  {
+                    "time": 1792735200000,
+                    "value": 1.1210277604166667
+                  },
+                  {
+                    "time": 1792738800000,
+                    "value": 1.1204038802083334
+                  },
+                  {
+                    "time": 1792742400000,
+                    "value": 1.1196769401041666
+                  },
+                  {
+                    "time": 1792746000000,
+                    "value": 1.1197984700520833
+                  },
+                  {
+                    "time": 1792749600000,
+                    "value": 1.1196442350260418
+                  },
+                  {
+                    "time": 1792753200000,
+                    "value": 1.119307117513021
+                  },
+                  {
+                    "time": 1792756800000,
+                    "value": 1.1199585587565104
+                  }
+                ],
+                "label": "指标值"
+              }
+            ],
+            "calculation": {
+              "run_id": "451c26fe62f0a7f04930ef0931171ce68269733a732f35e99c24deaa019d6b09",
+              "status": "partial",
+              "visible_complete": true,
+              "calculation_origin": 1767218400000,
+              "algorithm": "fixed-indicator-state-v3",
+              "coverage": [
+                {
+                  "start": 1792735200000,
+                  "end": 1792760400000
+                }
+              ],
+              "required_coverage": [
+                {
+                  "start": 1792735200000,
+                  "end": 1792760400000
+                }
+              ],
+              "cursor": 1792760400000,
+              "target_end": 1792760400000,
+              "error": null,
+              "next_at": 0,
+              "input_evidence": {
+                "revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                "input_revision": 1936,
+                "history_version_id": "ecf9bcf1-2814-4587-ba9c-757460230551",
+                "display_snapshot_id": null
+              },
+              "id": "EMA",
+              "input_revision": 1936,
+              "parent_run_id": "542edc3574f8bdb6020d3c95d05ab3a4720d34528d5c1315582b2dd99449d6f2",
+              "reused_prefix_end": 1792760400000,
+              "producer": "backend",
+              "accuracy": "oracle_equivalent",
+              "canonical_verified": true,
+              "display_task_ids": []
+            },
+            "dependencies": [
+              {
+                "start": 1792735200000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792738800000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792742400000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792746000000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792749600000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792753200000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792756800000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              }
+            ],
+            "pane": "main",
+            "levels": [],
+            "id": "EMA"
+          },
+          {
+            "name": "RSI",
+            "version": "1",
+            "params": {
+              "period": 3
+            },
+            "series": [
+              {
+                "key": "value",
+                "type": "line",
+                "values": [
+                  {
+                    "time": 1792735200000,
+                    "value": 35.22614724331701
+                  },
+                  {
+                    "time": 1792738800000,
+                    "value": 10.40138425170166
+                  },
+                  {
+                    "time": 1792742400000,
+                    "value": 5.9871083585259814
+                  },
+                  {
+                    "time": 1792746000000,
+                    "value": 46.0924821782294
+                  },
+                  {
+                    "time": 1792749600000,
+                    "value": 35.90698781931475
+                  },
+                  {
+                    "time": 1792753200000,
+                    "value": 25.632348887390922
+                  },
+                  {
+                    "time": 1792756800000,
+                    "value": 68.40380951475989
+                  }
+                ],
+                "label": "指标值"
+              }
+            ],
+            "calculation": {
+              "run_id": "0bc71fd21dd22dc533e5f74fd98aa2564c4b52b70fd1e9a3a03bf36f2e84c300",
+              "status": "partial",
+              "visible_complete": true,
+              "calculation_origin": 1767218400000,
+              "algorithm": "fixed-indicator-state-v3",
+              "coverage": [
+                {
+                  "start": 1792735200000,
+                  "end": 1792760400000
+                }
+              ],
+              "required_coverage": [
+                {
+                  "start": 1792735200000,
+                  "end": 1792760400000
+                }
+              ],
+              "cursor": 1792760400000,
+              "target_end": 1792760400000,
+              "error": null,
+              "next_at": 0,
+              "input_evidence": {
+                "revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                "input_revision": 1936,
+                "history_version_id": "ecf9bcf1-2814-4587-ba9c-757460230551",
+                "display_snapshot_id": null
+              },
+              "id": "RSI",
+              "input_revision": 1936,
+              "parent_run_id": "95425ab50dd055f0d7060f8da8759ceed96fda9c1db810caee89f41d7f406e60",
+              "reused_prefix_end": 1792760400000,
+              "producer": "backend",
+              "accuracy": "oracle_equivalent",
+              "canonical_verified": true,
+              "display_task_ids": []
+            },
+            "dependencies": [
+              {
+                "start": 1792735200000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792738800000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792742400000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792746000000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792749600000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792753200000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792756800000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              }
+            ],
+            "pane": "sub",
+            "levels": [
+              30,
+              70
+            ],
+            "id": "RSI"
+          }
+        ],
+        "has_more": true,
+        "origin": 1767218400000,
+        "history_revision": "85f6bd0ac938154901bf5bfea86907d076768bc79aa33d9c840d755eb561771c",
+        "basis": "bid",
+        "calendar": "ny17",
+        "as_of": 1792762666484,
+        "composite_id": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+        "revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+        "input_revision": 1936,
+        "history_version_id": "ecf9bcf1-2814-4587-ba9c-757460230551",
+        "history_checksum": "cb85105cb6f6090c143358433191f098786f62ff49797f1b7f9e35acf072bda6",
+        "seam": 1792616400000,
+        "rule_version": "configured-phase-m1-v1",
+        "indicator_progress": [
+          {
+            "run_id": "451c26fe62f0a7f04930ef0931171ce68269733a732f35e99c24deaa019d6b09",
+            "status": "partial",
+            "visible_complete": true,
+            "calculation_origin": 1767218400000,
+            "algorithm": "fixed-indicator-state-v3",
+            "coverage": [
+              {
+                "start": 1792735200000,
+                "end": 1792760400000
+              }
+            ],
+            "required_coverage": [
+              {
+                "start": 1792735200000,
+                "end": 1792760400000
+              }
+            ],
+            "cursor": 1792760400000,
+            "target_end": 1792760400000,
+            "error": null,
+            "next_at": 0,
+            "input_evidence": {
+              "revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+              "input_revision": 1936,
+              "history_version_id": "ecf9bcf1-2814-4587-ba9c-757460230551",
+              "display_snapshot_id": null
+            },
+            "id": "EMA",
+            "input_revision": 1936,
+            "parent_run_id": "542edc3574f8bdb6020d3c95d05ab3a4720d34528d5c1315582b2dd99449d6f2",
+            "reused_prefix_end": 1792760400000,
+            "producer": "backend",
+            "accuracy": "oracle_equivalent",
+            "canonical_verified": true,
+            "display_task_ids": []
+          },
+          {
+            "run_id": "0bc71fd21dd22dc533e5f74fd98aa2564c4b52b70fd1e9a3a03bf36f2e84c300",
+            "status": "partial",
+            "visible_complete": true,
+            "calculation_origin": 1767218400000,
+            "algorithm": "fixed-indicator-state-v3",
+            "coverage": [
+              {
+                "start": 1792735200000,
+                "end": 1792760400000
+              }
+            ],
+            "required_coverage": [
+              {
+                "start": 1792735200000,
+                "end": 1792760400000
+              }
+            ],
+            "cursor": 1792760400000,
+            "target_end": 1792760400000,
+            "error": null,
+            "next_at": 0,
+            "input_evidence": {
+              "revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+              "input_revision": 1936,
+              "history_version_id": "ecf9bcf1-2814-4587-ba9c-757460230551",
+              "display_snapshot_id": null
+            },
+            "id": "RSI",
+            "input_revision": 1936,
+            "parent_run_id": "95425ab50dd055f0d7060f8da8759ceed96fda9c1db810caee89f41d7f406e60",
+            "reused_prefix_end": 1792760400000,
+            "producer": "backend",
+            "accuracy": "oracle_equivalent",
+            "canonical_verified": true,
+            "display_task_ids": []
+          }
+        ],
+        "pending": [
+          "指标正在从固定输入起点初始化或修复；已计算区间可读，未完成区间不截断预热"
+        ],
+        "precision": 5
+      }
+    },
+    "provisional": {
+      "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+      "source": "composite",
+      "series_kind": "composite",
+      "timeframe": "H1",
+      "price_type": "bid OHLC",
+      "queried_at": 1792762667417,
+      "quality": "complete",
+      "next_before": 1792735200000,
+      "cursor_coordinate": "utc_ms",
+      "incomplete_count": 0,
+      "gaps": [],
+      "interval_breaks": [],
+      "gap_assessment": "trading_calendar",
+      "page": {
+        "bars": [
+          {
+            "start": 1792735200000,
+            "end": 1792738800000,
+            "open": "1.12103",
+            "high": "1.12158",
+            "low": "1.1208",
+            "close": "1.12097",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792735200000,
+                "end": 1792738800000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "4565",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1936
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "4565",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1936
+          },
+          {
+            "start": 1792738800000,
+            "end": 1792742400000,
+            "open": "1.12096",
+            "high": "1.12117",
+            "low": "1.11906",
+            "close": "1.11978",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792738800000,
+                "end": 1792742400000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "7787",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1936
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "7787",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1936
+          },
+          {
+            "start": 1792742400000,
+            "end": 1792746000000,
+            "open": "1.11976",
+            "high": "1.12034",
+            "low": "1.11842",
+            "close": "1.11895",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792742400000,
+                "end": 1792746000000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "7982",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1936
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "7982",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1936
+          },
+          {
+            "start": 1792746000000,
+            "end": 1792749600000,
+            "open": "1.11895",
+            "high": "1.12006",
+            "low": "1.11892",
+            "close": "1.11992",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792746000000,
+                "end": 1792749600000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "5981",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1936
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "5981",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1936
+          },
+          {
+            "start": 1792749600000,
+            "end": 1792753200000,
+            "open": "1.11994",
+            "high": "1.12043",
+            "low": "1.11931",
+            "close": "1.11949",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792749600000,
+                "end": 1792753200000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "5007",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1936
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "5007",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1936
+          },
+          {
+            "start": 1792753200000,
+            "end": 1792756800000,
+            "open": "1.1195",
+            "high": "1.11984",
+            "low": "1.11873",
+            "close": "1.11897",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792753200000,
+                "end": 1792756800000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "6070",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1936
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "6070",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1936
+          },
+          {
+            "start": 1792756800000,
+            "end": 1792760400000,
+            "open": "1.11897",
+            "high": "1.12113",
+            "low": "1.11878",
+            "close": "1.12061",
+            "complete": true,
+            "time_closed": true,
+            "source_confirmed": true,
+            "coverage_complete": true,
+            "segments": [
+              {
+                "segment": "target",
+                "source_id": "f9119778f34a5753ca2f157f9bcb5a9c3459bb8f9d4b234db4254869cac672ec",
+                "start": 1792756800000,
+                "end": 1792760400000,
+                "observed_minutes": 60,
+                "volume_kind": "price_count",
+                "volume_unit": "quotes",
+                "observed_volume": "7368",
+                "input": {
+                  "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                  "input_revision": 1936
+                },
+                "provisional_minutes": []
+              }
+            ],
+            "volume": "7368",
+            "volume_kind": "price_count",
+            "volume_unit": "quotes",
+            "volume_complete": true,
+            "observed_minutes": 60,
+            "unknown_minutes": 0,
+            "display_coverage_complete": true,
+            "confirmed_closed_minutes": 0,
+            "session_conflict": false,
+            "conflict_minutes": 0,
+            "seam_crossing": false,
+            "seam_at_start": false,
+            "mixed_source": false,
+            "composite_revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+            "input_revision": 1936
+          }
+        ],
+        "indicators": [
+          {
+            "name": "EMA",
+            "version": "1",
+            "params": {
+              "period": 3
+            },
+            "series": [
+              {
+                "key": "value",
+                "type": "line",
+                "values": [
+                  {
+                    "time": 1792735200000,
+                    "value": 1.1210277604166667
+                  },
+                  {
+                    "time": 1792738800000,
+                    "value": 1.1204038802083334
+                  },
+                  {
+                    "time": 1792742400000,
+                    "value": 1.1196769401041666
+                  },
+                  {
+                    "time": 1792746000000,
+                    "value": 1.1197984700520833
+                  },
+                  {
+                    "time": 1792749600000,
+                    "value": 1.1196442350260418
+                  },
+                  {
+                    "time": 1792753200000,
+                    "value": 1.119307117513021
+                  },
+                  {
+                    "time": 1792756800000,
+                    "value": 1.1199585587565104
+                  }
+                ],
+                "label": "指标值"
+              }
+            ],
+            "calculation": {
+              "run_id": "451c26fe62f0a7f04930ef0931171ce68269733a732f35e99c24deaa019d6b09",
+              "status": "complete",
+              "visible_complete": true,
+              "calculation_origin": 1767218400000,
+              "algorithm": "fixed-indicator-state-v3",
+              "coverage": [
+                {
+                  "start": 1792735200000,
+                  "end": 1792760400000
+                }
+              ],
+              "required_coverage": [
+                {
+                  "start": 1792735200000,
+                  "end": 1792760400000
+                }
+              ],
+              "cursor": 1792760400000,
+              "target_end": 1792760400000,
+              "error": null,
+              "next_at": 0,
+              "input_evidence": {
+                "revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                "input_revision": 1936,
+                "history_version_id": "ecf9bcf1-2814-4587-ba9c-757460230551",
+                "display_snapshot_id": "ba4d52286366933bc198c3029f00128acdd2674a2f6c6f6cff4b584e0ad35790"
+              },
+              "id": "EMA",
+              "input_revision": 1936,
+              "parent_run_id": "542edc3574f8bdb6020d3c95d05ab3a4720d34528d5c1315582b2dd99449d6f2",
+              "reused_prefix_end": 1792760400000,
+              "display_status": "complete",
+              "affected_start": 1792760400000,
+              "producer": "backend",
+              "accuracy": "oracle_equivalent",
+              "canonical_verified": true,
+              "display_task_ids": []
+            },
+            "dependencies": [
+              {
+                "start": 1792735200000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792738800000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792742400000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792746000000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792749600000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792753200000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792756800000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              }
+            ],
+            "pane": "main",
+            "levels": [],
+            "id": "EMA"
+          },
+          {
+            "name": "RSI",
+            "version": "1",
+            "params": {
+              "period": 3
+            },
+            "series": [
+              {
+                "key": "value",
+                "type": "line",
+                "values": [
+                  {
+                    "time": 1792735200000,
+                    "value": 35.22614724331701
+                  },
+                  {
+                    "time": 1792738800000,
+                    "value": 10.40138425170166
+                  },
+                  {
+                    "time": 1792742400000,
+                    "value": 5.9871083585259814
+                  },
+                  {
+                    "time": 1792746000000,
+                    "value": 46.0924821782294
+                  },
+                  {
+                    "time": 1792749600000,
+                    "value": 35.90698781931475
+                  },
+                  {
+                    "time": 1792753200000,
+                    "value": 25.632348887390922
+                  },
+                  {
+                    "time": 1792756800000,
+                    "value": 68.40380951475989
+                  }
+                ],
+                "label": "指标值"
+              }
+            ],
+            "calculation": {
+              "run_id": "0bc71fd21dd22dc533e5f74fd98aa2564c4b52b70fd1e9a3a03bf36f2e84c300",
+              "status": "complete",
+              "visible_complete": true,
+              "calculation_origin": 1767218400000,
+              "algorithm": "fixed-indicator-state-v3",
+              "coverage": [
+                {
+                  "start": 1792735200000,
+                  "end": 1792760400000
+                }
+              ],
+              "required_coverage": [
+                {
+                  "start": 1792735200000,
+                  "end": 1792760400000
+                }
+              ],
+              "cursor": 1792760400000,
+              "target_end": 1792760400000,
+              "error": null,
+              "next_at": 0,
+              "input_evidence": {
+                "revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+                "input_revision": 1936,
+                "history_version_id": "ecf9bcf1-2814-4587-ba9c-757460230551",
+                "display_snapshot_id": "ba4d52286366933bc198c3029f00128acdd2674a2f6c6f6cff4b584e0ad35790"
+              },
+              "id": "RSI",
+              "input_revision": 1936,
+              "parent_run_id": "95425ab50dd055f0d7060f8da8759ceed96fda9c1db810caee89f41d7f406e60",
+              "reused_prefix_end": 1792760400000,
+              "display_status": "complete",
+              "affected_start": 1792760400000,
+              "producer": "backend",
+              "accuracy": "oracle_equivalent",
+              "canonical_verified": true,
+              "display_task_ids": []
+            },
+            "dependencies": [
+              {
+                "start": 1792735200000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792738800000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792742400000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792746000000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792749600000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792753200000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              },
+              {
+                "start": 1792756800000,
+                "dependency_origin": 1792706400000,
+                "seam_dependency": false,
+                "initialized": true,
+                "provisional": null
+              }
+            ],
+            "pane": "sub",
+            "levels": [
+              30,
+              70
+            ],
+            "id": "RSI"
+          }
+        ],
+        "has_more": true,
+        "origin": 1767218400000,
+        "history_revision": "85f6bd0ac938154901bf5bfea86907d076768bc79aa33d9c840d755eb561771c",
+        "basis": "bid",
+        "calendar": "ny17",
+        "as_of": 1792762666589,
+        "composite_id": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+        "revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+        "input_revision": 1936,
+        "history_version_id": "ecf9bcf1-2814-4587-ba9c-757460230551",
+        "history_checksum": "cb85105cb6f6090c143358433191f098786f62ff49797f1b7f9e35acf072bda6",
+        "seam": 1792616400000,
+        "rule_version": "configured-phase-m1-v1",
+        "indicator_progress": [
+          {
+            "run_id": "451c26fe62f0a7f04930ef0931171ce68269733a732f35e99c24deaa019d6b09",
+            "status": "complete",
+            "visible_complete": true,
+            "calculation_origin": 1767218400000,
+            "algorithm": "fixed-indicator-state-v3",
+            "coverage": [
+              {
+                "start": 1792735200000,
+                "end": 1792760400000
+              }
+            ],
+            "required_coverage": [
+              {
+                "start": 1792735200000,
+                "end": 1792760400000
+              }
+            ],
+            "cursor": 1792760400000,
+            "target_end": 1792760400000,
+            "error": null,
+            "next_at": 0,
+            "input_evidence": {
+              "revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+              "input_revision": 1936,
+              "history_version_id": "ecf9bcf1-2814-4587-ba9c-757460230551",
+              "display_snapshot_id": "ba4d52286366933bc198c3029f00128acdd2674a2f6c6f6cff4b584e0ad35790"
+            },
+            "id": "EMA",
+            "input_revision": 1936,
+            "parent_run_id": "542edc3574f8bdb6020d3c95d05ab3a4720d34528d5c1315582b2dd99449d6f2",
+            "reused_prefix_end": 1792760400000,
+            "display_status": "complete",
+            "affected_start": 1792760400000,
+            "producer": "backend",
+            "accuracy": "oracle_equivalent",
+            "canonical_verified": true,
+            "display_task_ids": []
+          },
+          {
+            "run_id": "0bc71fd21dd22dc533e5f74fd98aa2564c4b52b70fd1e9a3a03bf36f2e84c300",
+            "status": "complete",
+            "visible_complete": true,
+            "calculation_origin": 1767218400000,
+            "algorithm": "fixed-indicator-state-v3",
+            "coverage": [
+              {
+                "start": 1792735200000,
+                "end": 1792760400000
+              }
+            ],
+            "required_coverage": [
+              {
+                "start": 1792735200000,
+                "end": 1792760400000
+              }
+            ],
+            "cursor": 1792760400000,
+            "target_end": 1792760400000,
+            "error": null,
+            "next_at": 0,
+            "input_evidence": {
+              "revision_id": "4c239291-470a-4554-90b1-ba13b2c7d331",
+              "input_revision": 1936,
+              "history_version_id": "ecf9bcf1-2814-4587-ba9c-757460230551",
+              "display_snapshot_id": "ba4d52286366933bc198c3029f00128acdd2674a2f6c6f6cff4b584e0ad35790"
+            },
+            "id": "RSI",
+            "input_revision": 1936,
+            "parent_run_id": "95425ab50dd055f0d7060f8da8759ceed96fda9c1db810caee89f41d7f406e60",
+            "reused_prefix_end": 1792760400000,
+            "display_status": "complete",
+            "affected_start": 1792760400000,
+            "producer": "backend",
+            "accuracy": "oracle_equivalent",
+            "canonical_verified": true,
+            "display_task_ids": []
+          }
+        ],
+        "pending": [],
+        "display_snapshot_id": "ba4d52286366933bc198c3029f00128acdd2674a2f6c6f6cff4b584e0ad35790",
+        "precision": 5
+      }
+    }
+  },
+  "negative": [
+    {
+      "changes": {
+        "published": true
+      },
+      "error": {
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "Invalid capability input or output",
+          "retryable": false,
+          "context": {
+            "fields": [
+              ""
+            ]
+          }
+        }
+      }
+    },
+    {
+      "changes": {
+        "input_revision": true
+      },
+      "error": {
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "Invalid capability input or output",
+          "retryable": false,
+          "context": {
+            "fields": [
+              "input_revision"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "changes": {
+        "input_revision": 1899,
+        "provisional": true
+      },
+      "error": {
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "Invalid capability input or output",
+          "retryable": false,
+          "context": {
+            "fields": [
+              ""
+            ]
+          }
+        }
+      }
+    },
+    {
+      "changes": {
+        "series_kind": "managed"
+      },
+      "error": {
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "Invalid capability input or output",
+          "retryable": false,
+          "context": {
+            "fields": [
+              ""
+            ]
+          }
+        }
+      }
+    },
+    {
+      "changes": {
+        "composite_revision_id": "unknown"
+      },
+      "error": {
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "组合修订不属于当前组合",
+          "retryable": false,
+          "context": {}
+        }
+      }
+    },
+    {
+      "changes": {
+        "input_revision": 1000000000000
+      },
+      "error": {
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "无效的组合输入修订",
+          "retryable": false,
+          "context": {}
+        }
+      }
+    },
+    {
+      "changes": {
+        "instrument": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "error": {
+        "error": {
+          "code": "DATA_UNAVAILABLE",
+          "message": "组合尚未建立或不属于当前权限范围",
+          "retryable": true,
+          "context": {}
+        }
+      }
+    },
+    {
+      "changes": {
+        "indicators": [
+          {
+            "name": "EMA",
+            "params": {
+              "period": 3
+            }
+          },
+          {
+            "name": "RSI",
+            "params": {
+              "period": 0
+            }
+          }
+        ]
+      },
+      "error": {
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "RSI: period 应为2至500的整数",
+          "retryable": false,
+          "context": {}
+        }
+      }
+    }
+  ],
+  "before_facts": {
+    "market_datasets": {
+      "count": 130,
+      "sha256": "a3dee0eef277dd1e8bd473a52bc5f1349aa2319094f5cc10c88c8a88a7a61b7f"
+    },
+    "market_history_versions": {
+      "count": 12,
+      "sha256": "4f9ad382785bf59073625f9ebf5f41ed39b81fabec7ee6a725113adb6fd57e3a"
+    },
+    "market_history_artifacts": {
+      "count": 108,
+      "sha256": "ae20f9b522a9e3d39f18522b47ed06fdbdd184db58799527204d297838dce324"
+    },
+    "advanced_chart_workspaces": {
+      "count": 8,
+      "sha256": "5188d862357ed663b96467d080a672d6a23f80cd894c6dcafd11b19b3a28a710"
+    },
+    "advanced_chart_preferences": {
+      "count": 30,
+      "sha256": "a77a37f0a4aa8525ee9331c40554e4d5b3a78ee80845d3d4dcc897a28bf2b7af"
+    },
+    "chart_workspaces": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "composites": [
+      [
+        "4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6",
+        "8c85fff4-40db-40dc-8ad8-122606bd7030"
+      ],
+      [
+        "54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982",
+        "673c13cc-f62c-4b69-a0df-db3326b5e5d7"
+      ],
+      [
+        "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+        "4c239291-470a-4554-90b1-ba13b2c7d331"
+      ]
+    ],
+    "preferences": {},
+    "demands": {
+      "count": 131,
+      "identities_targets_sha256": "8dbd99a7bd755ca47ab5eb58a6dcef51a970f62e3b7dd75eafaa6c64504dec4a"
+    },
+    "counts": {
+      "market_source_fetches": 219,
+      "market_history_runs": 12,
+      "market_fixed_indicator_runs": 4833
+    }
+  },
+  "after_facts": {
+    "market_datasets": {
+      "count": 130,
+      "sha256": "a3dee0eef277dd1e8bd473a52bc5f1349aa2319094f5cc10c88c8a88a7a61b7f"
+    },
+    "market_history_versions": {
+      "count": 12,
+      "sha256": "4f9ad382785bf59073625f9ebf5f41ed39b81fabec7ee6a725113adb6fd57e3a"
+    },
+    "market_history_artifacts": {
+      "count": 108,
+      "sha256": "ae20f9b522a9e3d39f18522b47ed06fdbdd184db58799527204d297838dce324"
+    },
+    "advanced_chart_workspaces": {
+      "count": 8,
+      "sha256": "5188d862357ed663b96467d080a672d6a23f80cd894c6dcafd11b19b3a28a710"
+    },
+    "advanced_chart_preferences": {
+      "count": 30,
+      "sha256": "a77a37f0a4aa8525ee9331c40554e4d5b3a78ee80845d3d4dcc897a28bf2b7af"
+    },
+    "chart_workspaces": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "composites": [
+      [
+        "4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6",
+        "8c85fff4-40db-40dc-8ad8-122606bd7030"
+      ],
+      [
+        "54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982",
+        "673c13cc-f62c-4b69-a0df-db3326b5e5d7"
+      ],
+      [
+        "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+        "4c239291-470a-4554-90b1-ba13b2c7d331"
+      ]
+    ],
+    "preferences": {},
+    "demands": {
+      "count": 131,
+      "identities_targets_sha256": "8dbd99a7bd755ca47ab5eb58a6dcef51a970f62e3b7dd75eafaa6c64504dec4a"
+    },
+    "counts": {
+      "market_source_fetches": 219,
+      "market_history_runs": 12,
+      "market_fixed_indicator_runs": 4837
+    }
+  },
+  "final_audit": {
+    "services": [
+      {
+        "service": "api",
+        "identity_image_and_restarts_unchanged": true,
+        "running": true,
+        "config_unchanged": true,
+        "mounts_unchanged": true,
+        "ports_unchanged": true,
+        "networks_unchanged": true,
+        "health": "healthy"
+      },
+      {
+        "service": "chart-aggregation-worker",
+        "identity_image_and_restarts_unchanged": true,
+        "running": true,
+        "config_unchanged": true,
+        "mounts_unchanged": true,
+        "ports_unchanged": true,
+        "networks_unchanged": true,
+        "health": null
+      },
+      {
+        "service": "pricing-worker",
+        "identity_image_and_restarts_unchanged": true,
+        "running": true,
+        "config_unchanged": true,
+        "mounts_unchanged": true,
+        "ports_unchanged": true,
+        "networks_unchanged": true,
+        "health": null
+      },
+      {
+        "service": "composite-aggregate-worker",
+        "identity_image_and_restarts_unchanged": true,
+        "running": true,
+        "config_unchanged": true,
+        "mounts_unchanged": true,
+        "ports_unchanged": true,
+        "networks_unchanged": true,
+        "health": null
+      },
+      {
+        "service": "market-stream-worker",
+        "identity_image_and_restarts_unchanged": true,
+        "running": true,
+        "config_unchanged": true,
+        "mounts_unchanged": true,
+        "ports_unchanged": true,
+        "networks_unchanged": true,
+        "health": null
+      },
+      {
+        "service": "chart-history-worker",
+        "identity_image_and_restarts_unchanged": true,
+        "running": true,
+        "config_unchanged": true,
+        "mounts_unchanged": true,
+        "ports_unchanged": true,
+        "networks_unchanged": true,
+        "health": null
+      },
+      {
+        "service": "native-history-worker",
+        "identity_image_and_restarts_unchanged": true,
+        "running": true,
+        "config_unchanged": true,
+        "mounts_unchanged": true,
+        "ports_unchanged": true,
+        "networks_unchanged": true,
+        "health": null
+      },
+      {
+        "service": "web",
+        "identity_image_and_restarts_unchanged": true,
+        "running": true,
+        "config_unchanged": true,
+        "mounts_unchanged": true,
+        "ports_unchanged": true,
+        "networks_unchanged": true,
+        "health": null
+      },
+      {
+        "service": "notify-worker",
+        "identity_image_and_restarts_unchanged": true,
+        "running": true,
+        "config_unchanged": true,
+        "mounts_unchanged": true,
+        "ports_unchanged": true,
+        "networks_unchanged": true,
+        "health": null
+      },
+      {
+        "service": "realtime-worker",
+        "identity_image_and_restarts_unchanged": true,
+        "running": true,
+        "config_unchanged": true,
+        "mounts_unchanged": true,
+        "ports_unchanged": true,
+        "networks_unchanged": true,
+        "health": null
+      },
+      {
+        "service": "projector",
+        "identity_image_and_restarts_unchanged": true,
+        "running": true,
+        "config_unchanged": true,
+        "mounts_unchanged": true,
+        "ports_unchanged": true,
+        "networks_unchanged": true,
+        "health": null
+      },
+      {
+        "service": "history-worker",
+        "identity_image_and_restarts_unchanged": true,
+        "running": true,
+        "config_unchanged": true,
+        "mounts_unchanged": true,
+        "ports_unchanged": true,
+        "networks_unchanged": true,
+        "health": null
+      },
+      {
+        "service": "chart",
+        "identity_image_and_restarts_unchanged": true,
+        "running": true,
+        "config_unchanged": true,
+        "mounts_unchanged": true,
+        "ports_unchanged": true,
+        "networks_unchanged": true,
+        "health": null
+      },
+      {
+        "service": "gateway",
+        "identity_image_and_restarts_unchanged": true,
+        "running": true,
+        "config_unchanged": true,
+        "mounts_unchanged": true,
+        "ports_unchanged": true,
+        "networks_unchanged": true,
+        "health": null
+      },
+      {
+        "service": "postgres",
+        "identity_image_and_restarts_unchanged": true,
+        "running": true,
+        "config_unchanged": true,
+        "mounts_unchanged": true,
+        "ports_unchanged": true,
+        "networks_unchanged": true,
+        "health": "healthy"
+      }
+    ],
+    "postgresql": {
+      "version": "140024",
+      "test_database": "mw_mcp_composite_validation_20261023",
+      "remaining_test_schemas": [],
+      "public_table_count": 0,
+      "tests_passed": 70,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "elapsed_seconds": 611.06,
+      "warning": "Pytest cache directory under /app is not writable; no test skipped or failed"
+    }
+  }
+}

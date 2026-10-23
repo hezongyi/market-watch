@@ -1,0 +1,9 @@
+{"test_database": "mw_mcp_composite_validation_20261023", "live_database_not_used_for_tests": true}
+......................................................................   [100%]
+=============================== warnings summary ===============================
+../usr/local/lib/python3.11/site-packages/_pytest/cacheprovider.py:469
+  /usr/local/lib/python3.11/site-packages/_pytest/cacheprovider.py:469: PytestCacheWarning: could not create cache path /app/.pytest_cache/v/cache/nodeids: [Errno 13] Permission denied: '/app/pytest-cache-files-q78g2jtq'
+    config.cache.set("cache/nodeids", sorted(self.cached_nodeids))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+70 passed, 1 warning in 611.06s (0:10:11)

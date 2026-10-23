@@ -925,3 +925,25 @@ def test_mcp_provider_fixed_origin_matches_browser_after_earlier_backfill(mcp, m
     assert page['calculation_origin']==600000
     assert stable_indicators(page)==stable_indicators(web)
     assert page['bars']==web['bars']
+
+
+def test_provider_calculation_evidence_and_quality_survive_output_model(mcp, monkeypatch):
+    from alerts import provider_chart
+
+    client, token, _ = mcp
+    meta = {'source': 'binance', 'basis': 'last', 'calendar': 'utc0'}
+    monkeypatch.setattr(provider_chart, 'metadata', lambda *args, **kwargs: meta)
+    page = {'bars': [{'start': 60000, 'end': 120000, 'open': '1', 'high': '1', 'low': '1',
+                     'close': '1', 'complete': True}], 'has_more': False, 'basis': 'last',
+            'calendar': 'utc0', 'as_of': 180000, 'provider_snapshot_id': 'a' * 64,
+            'cache_revision': 7, 'calculation_origin': 0,
+            'indicators': [{'name': 'EMA', 'version': '1', 'params': {'period': 2},
+                'series': [{'key': 'value', 'type': 'line', 'values': [
+                    {'time': 60000, 'value': 1.0, 'break_before': True, 'provisional': True}]}],
+                'calculation': {'status': 'complete', 'visible_complete': True, 'algorithm': 'fixed-indicator-state-v3',
+                    'calculation_origin': 0, 'input_evidence': {'provider_snapshot_id': 'a' * 64, 'input_revision': 7}}}]}
+    monkeypatch.setattr(provider_chart, 'data', lambda body: page)
+    result = call(client, token, 'indicators_calculate', {'instrument': 'BTCUSDT', 'series_kind': 'provider',
+        'timeframe': 'M1', 'indicators': [{'name': 'EMA', 'params': {'period': 2}}]})
+    assert not result['isError'], result
+    assert result['structuredContent']['page'] == page

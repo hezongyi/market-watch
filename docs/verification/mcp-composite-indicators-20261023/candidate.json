@@ -1,0 +1,30 @@
+{
+  "host": "quant-server",
+  "commit": "9770d5db890d81cf7a415f55d4de8a2ed1a32059",
+  "image_id": "sha256:de3047606126512686c9428bb0a822599c5fcfee2eb5147c73738fc15811b324",
+  "image_labels": {
+    "io.market-watch.built-at": "2026-10-23T09:45:31.660225+00:00",
+    "io.market-watch.commit": "9770d5db890d81cf7a415f55d4de8a2ed1a32059",
+    "io.market-watch.dirty": "false",
+    "io.market-watch.expires-at": "2026-10-30T09:45:31.660225+00:00",
+    "io.market-watch.managed": "true",
+    "io.market-watch.project": "mw-mcp-composite-indicators-20261023",
+    "io.market-watch.purpose": "acceptance",
+    "io.market-watch.task": "mw-mcp-composite-indicators-20261023"
+  },
+  "project": "mw-mcp-composite-indicators-20261023",
+  "url": "http://127.0.0.1:18623",
+  "runtime_started": false,
+  "reason": "Standalone synthetic project was not started; user selected existing mw-acceptance for real-data validation",
+  "acceptance": {
+    "logical_instance": "mw-acceptance",
+    "project": "mw-issue75-v2-20261018",
+    "runtime_commit": "2a943eec6717e25e7a5c9b5cf236c19a0f2a6b91",
+    "image_id": "sha256:9ca7a217ecf1b12a7de53d0dfb764019191e11ffddf4eeeeb7a62151595fc67f",
+    "inherits_product_commit": "9770d5db890d81cf7a415f55d4de8a2ed1a32059",
+    "web_url": "https://192.168.7.232:18280",
+    "mcp_url": "http://127.0.0.1:18275/mcp",
+    "redeployed_by_this_task": false,
+    "evidence": "mwa-acceptance.json"
+  }
+}

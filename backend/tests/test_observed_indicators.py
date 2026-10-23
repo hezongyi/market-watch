@@ -42,15 +42,12 @@ def test_display_and_strict_runs_have_separate_identities(database, monkeypatch)
         assert db.get(FixedIndicatorRun, strict_id).state == old_state
 
 
-def test_observed_policy_rejects_fixed_confirmed_revision():
-    with pytest.raises(ValueError, match="input_revision"):
-        DataQuery(
-            instrument="example",
-            series_kind="composite",
-            timeframe="M1",
-            input_revision=1,
-            indicator_input_policy=OBSERVED,
-        )
+def test_observed_policy_accepts_fixed_confirmed_revision():
+    query = DataQuery(
+        instrument="example", series_kind="composite", timeframe="M1",
+        input_revision=1, indicator_input_policy=OBSERVED,
+    )
+    assert query.input_revision == 1 and query.indicator_input_policy == OBSERVED
 
 
 SWING = {"name": "SWING_SR_V1", "params": {"high_strength": 5, "low_strength": 5}}

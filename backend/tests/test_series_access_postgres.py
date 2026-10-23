@@ -12,6 +12,8 @@ pytestmark = pytest.mark.skipif(not os.getenv("TEST_POSTGRES_URL"), reason="Requ
 
 
 @pytest.mark.parametrize("contract", [
+    contracts.test_selected_nonactive_revision_supplies_all_metadata,
+    contracts.test_revision_and_input_are_selected_before_metadata,
     contracts.test_search_resolve_watchlist_are_pure_and_first_data_read_is_idempotent,
     contracts.test_fixed_history_stays_on_version_after_daily_head_and_retains_workspace_reference,
     contracts.test_fixed_chart_never_silently_computes_indicator_on_page_prefix,

@@ -2,6 +2,7 @@
 
 import asyncio
 
+from fastapi import HTTPException
 from sqlalchemy import func, select
 
 from .. import business
@@ -23,6 +24,7 @@ from .models import (
     DrawingsResult,
     Empty,
     IndicatorsQuery,
+    IndicatorsResult,
     InstrumentQuery,
     InstrumentsResult,
     NotificationResult,
@@ -112,26 +114,48 @@ async def bars(ctx, query):
 
         if await asyncio.to_thread(history_size) > 200000:
             raise CapabilityError("RESOURCE_LIMIT", "Managed indicator history exceeds 200000 bars")
-    meta = await asyncio.to_thread(identity, query, ctx.deadline)
-    page = await query_chart(
-        DataQuery(**query.model_dump(exclude={"indicators"}), indicators=specs, track_history=True),
-        disconnected=disconnected,
-        deadline=ctx.deadline,
-        retain_work=True,
-    )
+    fixed = query.series_kind in {"composite", "history"}
+    if fixed:
+        # Validate every spec before the shared reader can register any job.
+        from ..indicator_state import IndicatorState
+
+        try:
+            for spec in specs:
+                IndicatorState(spec)
+        except ValueError as error:
+            raise CapabilityError("INVALID_ARGUMENT", str(error)) from error
+    meta = None if fixed else await asyncio.to_thread(identity, query, ctx.deadline)
+    try:
+        page = await query_chart(
+            DataQuery(**query.model_dump(exclude={"indicators"}), indicators=specs, track_history=True),
+            disconnected=disconnected,
+            deadline=ctx.deadline,
+            retain_work=True,
+        )
+    except HTTPException as error:
+        if fixed and isinstance(error.detail, dict):
+            code = error.detail.get("code")
+            if code in ("DATA_UNAVAILABLE", "INDICATOR_DEMAND_CAPACITY", "DISPLAY_SNAPSHOT_CAPACITY"):
+                raise CapabilityError("DATA_UNAVAILABLE" if code == "DATA_UNAVAILABLE" else "RESOURCE_LIMIT",
+                                      error.detail["message"], True) from error
+        raise
+    if fixed:
+        meta = {"source": page["source"], "basis": page["basis"], "calendar": page["calendar"],
+                "calendar_profile": page["calendar_profile"]}
     if not page["bars"]:
         raise CapabilityError(
             "DATA_UNAVAILABLE",
             "No candles available",
             True,
-            {"instrument": query.instrument, "series_kind": query.series_kind},
+            {"instrument": query.instrument, "series_kind": query.series_kind,
+             **({key: page.get(key) for key in ("version_id", "revision_id", "input_revision", "preparation_status", "pending")} if fixed else {})},
         )
     unavailable = [
         item["name"]
         for item in page["indicators"]
         if all(v["value"] is None for s in item["series"] for v in s["values"])
     ]
-    if unavailable:
+    if unavailable and not fixed:
         raise CapabilityError(
             "INSUFFICIENT_HISTORY",
             "No valid values for requested indicators",
@@ -140,6 +164,7 @@ async def bars(ctx, query):
         )
     from ..calendar_profile import closures_from
     from ..chart_history_plan import bucket_has_trading
+    from ..chart_series import is_gold
     from ..domain import Calendar
     from ..storage import instant
 
@@ -159,7 +184,7 @@ async def bars(ctx, query):
                 instant(gap["start"]),
                 instant(gap["end"]),
                 Calendar(meta["calendar"]),
-                gold=query.instrument == "XAUUSD",
+                gold=is_gold(page["symbol"]) if fixed else query.instrument == "XAUUSD",
                 closures=closures_from(meta.get("calendar_profile", {})),
             )
         ]
@@ -274,8 +299,10 @@ async def quote(ctx, query):
 def indicators(ctx, query):
     return {
         "indicators": public_catalog(),
-        "policy": "Python version 1; complete candles by default; opt in with provisional=true for the last incomplete candle, whose values are marked provisional. Gaps reset state; null is unavailable. "
-        "Managed full persisted prefix; provider warmup as returned by shared chart query.",
+        "policy": "Python version 1; history/composite default to observed_display_v1: calculate over actual closed OHLC, tolerating missing minutes and skipping absent periods without resetting state or inventing prices. "
+        "Select indicator_input_policy=strict_confirmed_v1 for complete-coverage calculations that reset on gaps. "
+        "provisional=true includes the forming candle as a marked preview. Null means warmup or unavailable input; pending calculations must finish first. "
+        "Managed/provider retain their existing strict policy and shared chart warmup.",
     }
 
 
@@ -368,9 +395,9 @@ def build_registry():
         ),
         (
             "indicators_calculate",
-            "Calculate 1–12 indicators from the shared chart snapshot with original warmup, gaps and revisions. Null is unavailable. Max 2000 visible bars.",
+            "Calculate 1–12 indicators from the shared chart snapshot. History/composite default to observed_display_v1 over actual closed bars: missing minutes/periods do not reset indicators. Optional strict_confirmed_v1 requires complete coverage. History requires an immutable version ID or MWH ticker with series_kind=history. Returns bars, input evidence and pending/partial progress. Max 2000 visible bars.",
             IndicatorsQuery,
-            BarsResult,
+            IndicatorsResult,
             "analysis:read",
             bars,
         ),

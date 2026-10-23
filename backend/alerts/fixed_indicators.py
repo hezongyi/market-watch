@@ -9,7 +9,7 @@ import gzip
 import hashlib
 import json
 
-from sqlalchemy import func, select
+from sqlalchemy import BigInteger, case, func, literal, select
 
 from .calendar_profile import closures_from
 from .chart_history_plan import bucket_has_trading
@@ -56,24 +56,63 @@ def digest(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
 
 
+def _lineage_intervals(run, start, end):
+    """Resolve immutable ancestry in SQL without loading every parent's state.
+
+    Live appends can leave hundreds of ancestors even for a small viewport.
+    Walking them through Session.get held the request's connection (and often
+    the demand lock) for one round trip per ancestor, starving other API work.
+    """
+    ancestors = select(
+        literal(run.id, type_=FixedIndicatorRun.id.type).label("id"),
+        literal(run.parent_id, type_=FixedIndicatorRun.parent_id.type).label("parent_id"),
+        literal(run.prefix_end, type_=BigInteger).label("prefix_end"),
+        literal(end, type_=BigInteger).label("right"),
+        literal(0).label("depth"),
+    ).cte("indicator_ancestors", recursive=True)
+    parent = FixedIndicatorRun.__table__
+    inherited_end = case((ancestors.c.right < ancestors.c.prefix_end, ancestors.c.right),
+                         else_=ancestors.c.prefix_end)
+    ancestors = ancestors.union_all(select(
+        parent.c.id, parent.c.parent_id, parent.c.prefix_end, inherited_end,
+        ancestors.c.depth + 1,
+    ).join(ancestors, parent.c.id == ancestors.c.parent_id).where(inherited_end > start))
+    left = case((ancestors.c.prefix_end > start, ancestors.c.prefix_end), else_=start)
+    return select(ancestors.c.id, left.label("left"), ancestors.c.right,
+                  ancestors.c.depth).where(left < ancestors.c.right).cte("indicator_intervals")
+
+
 def lineage(db, run, start, end):
-    """Disjoint inherited intervals, iterative even after thousands of appends."""
-    while run and start < end:
-        left = max(start, run.prefix_end)
-        if left < end:
-            yield run.id, left, end
-        end = min(end, run.prefix_end)
-        run = db.get(FixedIndicatorRun, run.parent_id) if run.parent_id and start < end else None
+    """Disjoint inherited intervals, with one round trip even after many appends."""
+    if run and start < end:
+        intervals = _lineage_intervals(run, start, end)
+        for ident, left, right in db.execute(select(
+                intervals.c.id, intervals.c.left, intervals.c.right).order_by(intervals.c.depth)):
+            yield ident, left, right
 
 
 def checkpoint_before(db, run, boundary):
-    for ident, left, right in lineage(db, run, -2**63, boundary):
-        block = db.scalar(select(FixedIndicatorBlock).where(FixedIndicatorBlock.run_id == ident,
-            FixedIndicatorBlock.end <= right, FixedIndicatorBlock.start >= left)
-            .order_by(FixedIndicatorBlock.end.desc()).limit(1))
+    if not run or boundary <= -2**63:
+        return None
+    # Most appends resume from this run's own latest block. Keep that indexed
+    # lookup fast; only resolve the full ancestry when the prefix is inherited.
+    if run.prefix_end < boundary:
+        block = db.execute(select(FixedIndicatorBlock.end, FixedIndicatorBlock.checkpoint)
+            .where(FixedIndicatorBlock.run_id == run.id,
+                   FixedIndicatorBlock.end <= boundary,
+                   FixedIndicatorBlock.start >= max(-2**63, run.prefix_end))
+            .order_by(FixedIndicatorBlock.end.desc()).limit(1)).first()
         if block:
-            return block.end, block.checkpoint
-    return None
+            return tuple(block)
+    if not run.parent_id:
+        return None
+    intervals = _lineage_intervals(run, -2**63, boundary)
+    block = db.execute(select(FixedIndicatorBlock.end, FixedIndicatorBlock.checkpoint)
+        .join(intervals, FixedIndicatorBlock.run_id == intervals.c.id)
+        .where(FixedIndicatorBlock.end <= intervals.c.right,
+               FixedIndicatorBlock.start >= intervals.c.left)
+        .order_by(intervals.c.depth, FixedIndicatorBlock.end.desc()).limit(1)).first()
+    return tuple(block) if block else None
 
 
 def request(db, page, spec, *, stamp=None, input_policy=STRICT):
@@ -327,14 +366,20 @@ def indicator_tick(run_id=None):
 
 
 def outputs(db, run, start, end):
+    if not run or start >= end:
+        return []
     rows = []
-    for ident, left, right in lineage(db, run, start, end):
-        for block in db.scalars(select(FixedIndicatorBlock).where(FixedIndicatorBlock.run_id == ident,
-            FixedIndicatorBlock.start < right, FixedIndicatorBlock.end > left).order_by(FixedIndicatorBlock.start)):
-            raw = gzip.decompress(block.content)
-            if hashlib.sha256(raw).hexdigest() != block.checksum:
-                raise ValueError("Fixed indicator output checksum mismatch")
-            rows += [row for row in json.loads(raw) if left <= row["start"] < right]
+    intervals = _lineage_intervals(run, start, end)
+    blocks = db.execute(select(FixedIndicatorBlock.content, FixedIndicatorBlock.checksum,
+        intervals.c.left, intervals.c.right)
+        .join(intervals, FixedIndicatorBlock.run_id == intervals.c.id)
+        .where(FixedIndicatorBlock.start < intervals.c.right,
+               FixedIndicatorBlock.end > intervals.c.left))
+    for content, checksum, left, right in blocks:
+        raw = gzip.decompress(content)
+        if hashlib.sha256(raw).hexdigest() != checksum:
+            raise ValueError("Fixed indicator output checksum mismatch")
+        rows += [row for row in json.loads(raw) if left <= row["start"] < right]
     return sorted(rows, key=lambda row: row["start"])
 
 

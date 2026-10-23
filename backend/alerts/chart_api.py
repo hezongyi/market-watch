@@ -177,8 +177,6 @@ class DataQuery(BaseModel):
     @model_validator(mode="after")
     def validate_managed_limit(self):
         if self.indicator_input_policy == "observed_display_v1":
-            if self.input_revision is not None:
-                raise ValueError("observed_display_v1 cannot read fixed confirmed input_revision")
             kind = decode(self.instrument)[1] if self.instrument.startswith(("MWH:", "MWC:")) else self.series_kind
             if kind not in ("history", "composite"):
                 raise ValueError("observed_display_v1 requires history or composite chart inputs")
