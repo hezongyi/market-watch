@@ -10,8 +10,8 @@ for(const file of ['series.js','price-format.js','composite-display-batches.js',
 const run=code=>vm.runInContext(code,ctx);
 const quotes=()=>messages.filter(m=>m.query?.op==='quotes');
 const flush=async()=>{for(let i=0;i<8;i++)await new Promise(r=>setImmediate(r));};
-const finish=async(message,rows)=>{
-  await handlers[0]({source:ctx.parent,origin:'http://localhost',data:{channel:'mw-chart-v1',type:'result',id:message.id,result:rows}});
+const finish=async(message,rows,error)=>{
+  await handlers[0]({source:ctx.parent,origin:'http://localhost',data:{channel:'mw-chart-v1',type:'result',id:message.id,result:rows,error}});
   await flush();
 };
 (async()=>{
@@ -51,7 +51,32 @@ const finish=async(message,rows)=>{
     assert.equal(run("quoteSnapshotRows.get('MWP:EURUSD').v.lp"),20);
     assert.equal(run('errors.length'),0);
     assert.equal(run('quoteRequests.size'),0);
-    console.log('Quote snapshots: shared consumer cancellation, symbol order, fresh reads and object reset generations passed');
+
+    for(const outcome of ['failure','same-time-result','untimed-result']) {
+      run(`
+        rememberQuoteRows([{n:'MWP:EURUSD',s:'ok',v:{lp:30,read_at:100,fetch_status:'ok'}}]);
+        feed.getQuotes(['MWP:EURUSD'],rows=>received.push({owner:'first',rows}),e=>errors.push(e),()=>true,true);
+      `);
+      const started=quotes().at(-1),count=quotes().length;
+      run(`
+        rememberQuoteRows([{n:'MWP:EURUSD',s:'ok',v:{lp:31,read_at:200,fetch_status:'ok'}}]);
+        feed.getQuotes(['MWP:EURUSD'],rows=>received.push({owner:'late',rows}),e=>errors.push(e),()=>true,true);
+      `);
+      assert.equal(quotes().length,count,'a late consumer joins the outstanding snapshot');
+      await finish(started,outcome==='failure' ? undefined :
+        [{n:'MWP:EURUSD',s:'ok',v:{lp:29,fetch_status:'ok',...(outcome==='same-time-result' ? {read_at:200} : {})}}],
+        outcome==='failure' ? 'transport failed' : undefined);
+      assert.equal(run("quoteSnapshotRows.get('MWP:EURUSD').v.fetch_status"),'ok',
+        'a shared HTTP failure cannot invalidate a stream observation received after the request started');
+      assert.equal(run("quoteSnapshotRows.get('MWP:EURUSD').v.lp"),31,
+        'a late consumer cannot let a shared HTTP result overwrite a subsequent stream observation');
+    }
+    run(`feed.getQuotes(['MWP:EURUSD'],rows=>received.push({owner:'new-failure',rows}),e=>errors.push(e),()=>true,true);`);
+    await finish(quotes().at(-1),undefined,'new transport failure');
+    assert.equal(run("quoteSnapshotRows.get('MWP:EURUSD').v.fetch_status"),'fetch_failed',
+      'a genuinely new failed read still marks the current observation as failed');
+    assert.equal(run('quoteRequests.size'),0);
+    console.log('Quote snapshots: independent cancellation, order, fresh reads, reset generations and shared observation fences passed');
   } finally {
     run('for(const e of pending.values()){clearTimeout(e.timer);clearTimeout(e.cancellationTimer);}');
   }

@@ -1200,7 +1200,8 @@ function readQuoteSnapshot(symbols, isCurrent) {
   if(!entry || !entry.current() || !batch.every(ticker=>
     entry.tokens.get(ticker)===quoteResetTokens.get(ticker))) {
     const consumers=new Set([isCurrent]);
-    entry={consumers,tokens:new Map(batch.map(ticker=>[ticker,quoteResetTokens.get(ticker)])),
+    entry={consumers,initialRows:new Map(batch.map(ticker=>[ticker,quoteSnapshotRows.get(ticker)])),
+      tokens:new Map(batch.map(ticker=>[ticker,quoteResetTokens.get(ticker)])),
       current:()=>epoch===workspaceEpoch && [...consumers].some(current=>current())};
     const shared=entry;
     shared.promise=request({op:'quotes',args:{symbols:batch}},'market',shared.current)
@@ -1208,7 +1209,10 @@ function readQuoteSnapshot(symbols, isCurrent) {
     quoteRequests.set(key,shared);
   } else entry.consumers.add(isCurrent);
   const shared=entry;
-  return shared.promise.finally(()=>shared.consumers.delete(isCurrent));
+  // A later consumer must not make this earlier HTTP operation own a newer
+  // stream observation, even when the response has no distinct read time.
+  return {initialRows:shared.initialRows,
+    promise:shared.promise.finally(()=>shared.consumers.delete(isCurrent))};
 }
 
 const feed = {
@@ -1243,21 +1247,22 @@ const feed = {
     // Quotes are independent of chart history. The request queue still keeps
     // a bounded quote lane, while cancellation and epoch checks fence stale
     // callbacks when a workspace or list changes.
-    readQuoteSnapshot(symbols, () => epoch === workspaceEpoch && isCurrent() && currentSymbols().length>0)
+    const snapshot=readQuoteSnapshot(symbols, () => epoch === workspaceEpoch && isCurrent() && currentSymbols().length>0);
+    snapshot.promise
       .then((rows) => {
         if (epoch !== workspaceEpoch || !isCurrent()) return;
         // A stream/reset received while this request was outstanding owns the
         // current selection, including its composite revision and identity.
         const active = currentSymbols();
         if (!active.length) return;
-        rememberQuoteRows(rows.filter(row => active.includes(row.n) && quoteSnapshotRows.get(row.n) === initialRows.get(row.n)));
+        rememberQuoteRows(rows.filter(row => active.includes(row.n) && quoteSnapshotRows.get(row.n) === snapshot.initialRows.get(row.n)));
         cb(active.map(ticker => quoteSnapshotRows.get(ticker)).filter(Boolean).map(presentQuote));
       })
       .catch((e) => {
         if (epoch !== workspaceEpoch || !isCurrent()) return;
         const active = currentSymbols();
         if (!active.length) return;
-        const rows = quoteFailureRows(active, initialRows);
+        const rows = quoteFailureRows(active, snapshot.initialRows);
         if (rows.length) cb(rows);
         err(String(e));
       });

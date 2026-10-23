@@ -156,16 +156,23 @@ const hooks = probeSource.match(/const hooks=String.raw`([\s\S]*?)`;\n/)[1];
     report.passed = true;
   } catch (e) {
     report.failure = e.stack; process.exitCode = 1;
-    await snapshot('failure-before-browser-close');
+    await snapshot('failure-before-browser-close').catch(error => { report.captureFailure = error.message; });
     await page.screenshot({ path: path.join(out, 'failure.png') }).catch(() => {});
   } finally {
-    report.after = { workspace: hash(await get('/api/advanced-charts/workspaces/' + workspace)),
-      preferences: hash(await get('/api/advanced-charts/preferences')) };
-    report.stateUnchanged = JSON.stringify(report.before) === JSON.stringify(report.after);
-    if (!report.stateUnchanged) { report.passed = false; process.exitCode = 1; }
-    await Promise.race([Promise.allSettled([...responses]), new Promise(r => setTimeout(r, 3000))]);
-    report.ended = new Date().toISOString(); save(); await browser.close();
+    try {
+      try {
+        report.after = { workspace: hash(await get('/api/advanced-charts/workspaces/' + workspace)),
+          preferences: hash(await get('/api/advanced-charts/preferences')) };
+        report.stateUnchanged = JSON.stringify(report.before) === JSON.stringify(report.after);
+        if (!report.stateUnchanged) { report.passed = false; process.exitCode = 1; }
+      } catch (error) {
+        report.stateCheckFailure = error.message;
+        report.passed = false; process.exitCode = 1;
+      }
+      await Promise.race([Promise.allSettled([...responses]), new Promise(r => setTimeout(r, 3000))]);
+      report.ended = new Date().toISOString(); save();
+    } finally { await browser.close(); }
     console.log(JSON.stringify({ passed: report.passed === true, rounds: report.rounds.length,
-      stateUnchanged: report.stateUnchanged, failure: report.failure }));
+      stateUnchanged: report.stateUnchanged, failure: report.failure, stateCheckFailure: report.stateCheckFailure }));
   }
 })().catch(e => { console.error(e.message); process.exitCode = 1; });
