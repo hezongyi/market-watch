@@ -29,7 +29,8 @@ SPEC = {"name": "EMA", "params": {"period": 19}}
 
 def query(version, **changes):
     return {"instrument": version, "series_kind": "history", "timeframe": "M1",
-            "limit": 7, "indicators": [SPEC], **changes}
+            "limit": 7, "indicators": [SPEC],
+            "indicator_input_policy": "strict_confirmed_v1", **changes}
 
 
 def page(client, token, arguments):

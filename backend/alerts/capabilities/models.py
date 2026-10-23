@@ -100,11 +100,22 @@ class IndicatorsQuery(BarsQuery):
         description="Base instrument/composite ID; history requires an immutable version ID or MWH:<version_id>",
     )
     series_kind: Literal["managed", "provider", "composite", "history"] = "managed"
+    indicator_input_policy: Literal["observed_display_v1", "strict_confirmed_v1"] = Field(
+        default="observed_display_v1",
+        description="History/composite default to actual observed bars, tolerating missing M1 and whole periods. Select strict_confirmed_v1 to require complete coverage. Managed/provider retain their existing strict policy.",
+    )
     provisional: bool = Field(default=False, description="Opt in to recomputed last incomplete candle; values are marked provisional")
     calculation_origin: int | None = Field(default=None, ge=0, description="Reuse the returned provider calculation_origin to pin recursive history")
     composite_revision_id: str | None = Field(default=None, min_length=1, max_length=36)
     input_revision: int | None = Field(default=None, ge=0, strict=True)
     indicators: list[IndicatorSpec] = Field(min_length=1, max_length=12)
+
+    @model_validator(mode="before")
+    @classmethod
+    def default_input_policy(cls, value):
+        if isinstance(value, dict) and value.get("series_kind", "managed") in ("managed", "provider"):
+            return {"indicator_input_policy": "strict_confirmed_v1", **value}
+        return value
 
     @model_validator(mode="after")
     def validate_composite_options(self):

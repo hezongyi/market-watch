@@ -58,6 +58,7 @@ def indicator_fixture(factory, monkeypatch):
 
 def indicator_query(ident, **changes):
     return {'instrument': ident, 'series_kind': 'composite', 'timeframe': 'M1', 'limit': 20,
+            'indicator_input_policy': 'strict_confirmed_v1',
             'indicators': [{'name': 'EMA', 'params': {'period': 2}},
                            {'name': 'RSI', 'params': {'period': 2}}], **changes}
 

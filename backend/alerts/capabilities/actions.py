@@ -299,8 +299,10 @@ async def quote(ctx, query):
 def indicators(ctx, query):
     return {
         "indicators": public_catalog(),
-        "policy": "Python version 1; complete candles by default; opt in with provisional=true for the last incomplete candle, whose values are marked provisional. Gaps reset state; null is unavailable. "
-        "Managed full persisted prefix; provider warmup as returned by shared chart query.",
+        "policy": "Python version 1; history/composite default to observed_display_v1: calculate over actual closed OHLC, tolerating missing minutes and skipping absent periods without resetting state or inventing prices. "
+        "Select indicator_input_policy=strict_confirmed_v1 for complete-coverage calculations that reset on gaps. "
+        "provisional=true includes the forming candle as a marked preview. Null means warmup or unavailable input; pending calculations must finish first. "
+        "Managed/provider retain their existing strict policy and shared chart warmup.",
     }
 
 
@@ -393,7 +395,7 @@ def build_registry():
         ),
         (
             "indicators_calculate",
-            "Calculate 1–12 indicators from the shared chart snapshot with original warmup, gaps and revisions. History requires an immutable version ID or MWH ticker with series_kind=history. Returns bars, input evidence and pending/partial progress. Null is unavailable. Max 2000 visible bars.",
+            "Calculate 1–12 indicators from the shared chart snapshot. History/composite default to observed_display_v1 over actual closed bars: missing minutes/periods do not reset indicators. Optional strict_confirmed_v1 requires complete coverage. History requires an immutable version ID or MWH ticker with series_kind=history. Returns bars, input evidence and pending/partial progress. Max 2000 visible bars.",
             IndicatorsQuery,
             IndicatorsResult,
             "analysis:read",
