@@ -335,3 +335,58 @@ def test_high_period_chart_labels_do_not_replace_source_point_times(mcp, monkeyp
     page = ready['structuredContent']['page']
     assert any(b['chart_time'] != b['start'] for b in page['bars'])
     assert {v['time'] for s in page['indicators'][0]['series'] for v in s['values']} <= {b['start'] for b in page['bars']}
+
+
+def test_r1_script_cold_to_ready_and_redacts_token(mcp, monkeypatch, tmp_path):
+    import importlib.util
+    import json
+    from pathlib import Path
+
+    client, _, factory = mcp
+    path = Path(__file__).resolve().parents[2] / 'scripts/verify_composite_indicators_mcp.py'
+    spec = importlib.util.spec_from_file_location('verify_composite_r1', path)
+    verifier = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(verifier)
+    verifier.seed(tmp_path)
+    credentials = json.loads((tmp_path / 'credentials.json').read_text())
+    before = verifier.facts()
+    # Exercise the actual protocol through TestClient using the same request
+    # shape as the standalone HTTP verifier; no fake capability results.
+    class LocalClient:
+        def __init__(self, **kwargs):
+            pass
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+        def post(self, *args, **kwargs):
+            return client.post(*args, **kwargs)
+    monkeypatch.setattr('httpx.Client', LocalClient)
+    verifier.verify(tmp_path, 'http://127.0.0.1:8000', 'cold', tmp_path / 'cold.json')
+    verifier.drain(tmp_path)
+    verifier.verify(tmp_path, 'http://127.0.0.1:8000', 'ready', tmp_path / 'ready.json')
+    assert verifier.facts() == before
+    for name in ('cold.json', 'ready.json'):
+        assert credentials['token'] not in (tmp_path / name).read_text()
+
+
+def test_mcp_explicit_nonactive_revision_uses_selected_price_metadata(mcp, monkeypatch):
+    from alerts.storage import CompositeRevision, HistoryVersion, MarketComposite
+    from test_series_access import alternate_revision
+
+    client, token, factory = mcp
+    ident, revision, _ = indicator_fixture(factory, monkeypatch)
+    other = alternate_revision(factory, ident, revision)
+    with factory.begin() as db:
+        db.get(MarketComposite, ident).active_revision_id = other
+        parent = db.get(HistoryVersion, db.get(CompositeRevision, revision).history_version_id)
+    result = call(client, token, 'indicators_calculate', indicator_query(ident,
+        composite_revision_id=revision, input_revision=1))
+    assert not result['isError'], result
+    output = result['structuredContent']
+    page = output['page']
+    assert page['revision_id'] == revision and page['input_revision'] == 1
+    assert page['history_version_id'] == parent.id and page['history_checksum'] == parent.manifest['checksum']
+    assert page['calendar'] == 'ny17' and page['precision'] == 5 and output['price_type'] == 'bid OHLC'
+    assert page['historical_source'] == parent.manifest['identity']['source']
+    assert all(i['calculation']['input_evidence']['revision_id'] == revision for i in page['indicators'])

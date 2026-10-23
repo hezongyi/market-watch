@@ -1,6 +1,6 @@
 # MCP 组合行情指标取数实施方案
 
-状态：可进入开发。本文交付方案，尚未实现功能或启动验收实例。
+状态：原始方案已转入实施，进度与实际证据见 [实施任务](verification/mcp-composite-indicators-20261023/task.md) 和 [R1 runbook](verification/mcp-composite-indicators-20261023/README.md)。以下保留原方案约定；不以方案文本宣称验收完成。
 
 基线：`main` / `6f74951ce3b9b3158e0cd0e80bfeb40f961a17ac`，2026-10-23。
 

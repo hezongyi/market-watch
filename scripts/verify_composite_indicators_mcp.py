@@ -94,7 +94,9 @@ def verify(private, base_url, phase, output):
         rpc('initialize', {'protocolVersion': '2025-11-25', 'capabilities': {},
                           'clientInfo': {'name': 'composite-r1', 'version': '1'}})
         tools = rpc('tools/list')['tools']
-        assert len(tools) == 31
+        # This token has only market:read + analysis:read; full registry is 31.
+        assert len(tools) == 24
+        assert all(t['annotations']['readOnlyHint'] for t in tools)
         tool = next(t for t in tools if t['name'] == 'indicators_calculate')
         assert 'composite' in tool['inputSchema']['properties']['series_kind']['enum']
         def call(**changes):

@@ -2,7 +2,9 @@
 
 分类：F0。扩展兼容的读取接口；不增加 schema、持久格式、数值算法或后台调度。
 
-基线：main 6f74951（与方案一致）。独立分支 feat/mcp-composite-indicators-20261023。
+方案基线：main 6f74951；实施已 rebase 至 main ffc8149（PR #93）。
+保留新增 observed_display_v1 网页策略，MCP 默认继续 strict_confirmed_v1。
+独立分支 feat/mcp-composite-indicators-20261023；Draft PR #94。
 
 验收：定向协议/共享读取测试、PostgreSQL 并发与既有固定指标回归、完整 CI、自审、Ubuntu R1。
 
