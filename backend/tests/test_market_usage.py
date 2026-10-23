@@ -92,7 +92,8 @@ def test_empty_residents_and_account_catalog_other_assets_idle_cleanly(database,
 
 
 def switched_targets(database, monkeypatch):
-    """Legal activation of a synthetic index mapping; no supplier coverage claim."""
+    """Test revision-pinned demand independently from the production product allowlist."""
+    from alerts import composite_matching
     from alerts.aggregation_policy import register_history_dataset
     from alerts.composite_revisions import activate, create
     from alerts.history_artifacts import artifact_tick
@@ -106,6 +107,24 @@ def switched_targets(database, monkeypatch):
     monkeypatch.setattr(settings, "oanda_account_id", "synthetic-index-account")
     monkeypatch.setattr(settings, "oanda_token", "test-token")
     monkeypatch.setattr(settings, "oanda_resident_symbols", "")
+    # These synthetic NASDAQ rows intentionally model an unlisted source pair.
+    # Keep this lease/migration test focused on demand ownership; product-pair
+    # admission has its own tests and must remain blocked in production.
+    product_rule = composite_matching.product_rule
+
+    def fixture_product_rule(historical, entry):
+        if (historical.source == "dukascopy" and historical.provider_symbol == "USATECH.IDX/USD"
+                and entry.symbol in ("NAS100_USD", "NAS100F_USD") and entry.asset_type == "INDEX"):
+            return (
+                {"underlying": "NASDAQ100", "quote_currency": "USD", "historical_product": "index",
+                 "live_product": "cfd" if entry.symbol == "NAS100_USD" else "future",
+                 "relationship": "same_underlying_different_product"},
+                [{"url": "https://example.com/synthetic-index", "scope": "isolated test fixture only"}],
+                None,
+            )
+        return product_rule(historical, entry)
+
+    monkeypatch.setattr(composite_matching, "product_rule", fixture_product_rule)
     monkeypatch.setattr("alerts.composite_definitions.now_ms", lambda: 200010000)
     monkeypatch.setattr("alerts.composite_revisions.now_ms", lambda: 200010000)
     with database.begin() as db:
