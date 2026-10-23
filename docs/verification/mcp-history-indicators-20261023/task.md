@@ -16,7 +16,9 @@
 - [x] 输出 schema 和调用说明。
 - [x] 定向协议与共享读取回归：首轮 71 项通过；最终定向 30 项通过，见 results.md。
 - [x] 使用说明、R1 脚本及本人自审。
-- [ ] Ubuntu R1 真实 HTTP MCP 冷启动/部分完成/完成。
-- [ ] 最终 CI 和 Draft PR。
+- [x] 用户指定长期 mwa 更新并验收：真实 HTTP MCP 历史 pending→complete，组合进度及有效值、全历史数值 oracle 和真实网页接口等价；partial 另有自动化验证。
+- [x] 最终产品提交 CI 全部通过，Draft PR #95；依赖 PR #94。
+
+实际仅更新 mwa API，保留原数据库、配置、其他服务及保护浏览器。入口和证据见 results.md。
 
 不涉及 main 合并、生产发布或永久数据删除。

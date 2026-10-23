@@ -1,4 +1,14 @@
-# Ubuntu R1：MCP 固定历史版本指标
+# MCP 固定历史版本指标：验收入口
+
+2026-10-23：用户已指定更新长期 mwa，实际仅替换该实例 API 并完成真实 MCP/网页接口验收。
+入口 `https://192.168.7.232:18280`；MCP `http://127.0.0.1:18275/mcp`（`mw-a`）。
+运行提交 `2a943ee`，完整结果、组件版本和启停方式见 [results.md](results.md)，脱敏证据见
+[mwa-acceptance.json](mwa-acceptance.json)。本轮不再受“尚未启动独立 R1”的旧状态限制。
+
+以下为保留的可选离线合成 R1 方案。它不是本轮 mwa 的配置或执行记录，**不得对 mwa
+执行下述 migrate/seed/step/drain，也不得用它覆盖 mwa 的私有配置**。
+
+## 可选独立合成 R1
 
 独立 task/project：`mw-mcp-history-indicators-20261023`。只在 Ubuntu 本机运行。
 PG14.24、API、Nginx 共用任务专用 internal 网络；数据库、volume、密码和端口独立。
