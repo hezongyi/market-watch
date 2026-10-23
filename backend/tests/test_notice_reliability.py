@@ -1,15 +1,17 @@
 """Regress the real ownership/projection seams without upstream network IO."""
 import httpx
 import pytest
-from sqlalchemy import event, select
-
-from alerts import live_pricing as live, notification_center as center
-from alerts.config import settings
+from alerts import live_pricing as live
+from alerts import notification_center as center
 from alerts.live_confirmation import health
 from alerts.market_contracts import RequestResult, failed_request
-from alerts.storage import LiveState, MarketComposite, NoticeEvent, NoticeIncident, now_ms
-from test_live_pricing import running, candles, quote
+from alerts.storage import LiveState, MarketComposite, NoticeEvent, now_ms
+from sqlalchemy import event, select
+from test_live_pricing import candles, quote
+from test_live_pricing import running as _running
 from test_series_access import fixture
+
+running = _running
 
 
 @pytest.mark.parametrize('lead', [0, 5000, 7000, 15000])
@@ -40,6 +42,7 @@ def test_safe_request_reason_is_specific_and_never_contains_supplier_text(code, 
 @pytest.mark.parametrize('failure', [httpx.ConnectTimeout, httpx.ConnectError])
 def test_real_adapter_retains_tls_failure_phase_without_secret_text(method, failure, monkeypatch):
     from contextlib import nullcontext
+
     from alerts import oanda_rest_batch
     from test_oanda_rest_batch import spec
     from test_oanda_stream import oanda_identity
@@ -105,8 +108,8 @@ def test_future_rejection_retains_cursor_and_bounded_retry(running):
 
 def test_legacy_names_batch_search_changes_and_snapshot_survive_registry_loss(database,monkeypatch):
     from alerts.composite_definitions import first_use
-    from alerts.series_access import composite_definition,search
-    from alerts.notice_instruments import capture,enrich
+    from alerts.notice_instruments import capture, enrich
+    from alerts.series_access import composite_definition, search
     fixture(database,monkeypatch)
     with database.begin() as db:
         candidate=search(db,'EURUSD',kind='composite')[0]
@@ -116,7 +119,8 @@ def test_legacy_names_batch_search_changes_and_snapshot_survive_registry_loss(da
         original_cursor=center._cursor(state,{'kind':'changes','seq':state.seq})
         for n in range(3):
             body={'title':'共享行情读取失败','context':{'instrument':composite.id,'series_kind':'composite','timeframe':'quotes'}}
-            if n==2:body['instrument_display']=capture(db,body)
+            if n==2:
+                body['instrument_display']=capture(db,body)
             center._new_event(db,state,ident='legacy:'+str(n),source_kind='market',source_id='source:'+str(n),
                 occurred_at=now_ms()+n,body=body,dedupe=str(n))
     with database() as db:
@@ -150,19 +154,23 @@ def test_legacy_names_batch_search_changes_and_snapshot_survive_registry_loss(da
 
 
 def test_full_100_record_name_page_is_batched(database,monkeypatch):
-    from alerts.notice_instruments import enrich
-    from alerts.series_access import search,composite_definition
     from alerts.composite_definitions import first_use
+    from alerts.notice_instruments import enrich
+    from alerts.series_access import composite_definition, search
     fixture(database,monkeypatch)
     with database.begin() as db:
         candidate=search(db,'EURUSD',kind='composite')[0]
-        dataset,mapping,_=composite_definition(db,candidate['id']);composite=first_use(db,dataset,mapping)
+        dataset,mapping,_=composite_definition(db,candidate['id'])
+        composite=first_use(db,dataset,mapping)
     statements=[]
     with database() as db:
-        def count(*args):statements.append(args[2])
+        def count(*args):
+            statements.append(args[2])
         event.listen(db.bind,'before_cursor_execute',count)
-        try:rows=enrich(db,[{'instrument':composite.id,'context':{'series_kind':'composite'}} for _ in range(100)])
-        finally:event.remove(db.bind,'before_cursor_execute',count)
+        try:
+            rows=enrich(db,[{'instrument':composite.id,'context':{'series_kind':'composite'}} for _ in range(100)])
+        finally:
+            event.remove(db.bind,'before_cursor_execute',count)
         assert len(rows)==100 and all(row['instrument_display']['symbol']=='EURUSD' for row in rows)
         assert len(statements)==1
 
@@ -189,7 +197,7 @@ def test_sampling_evidence_is_safe_epoch_fenced_and_independent(running):
 def test_unestablished_subscription_returns_specific_code_without_creating_composite(database,monkeypatch):
     from alerts import api
     from alerts.series_access import search
-    from alerts.storage import LoginSession,MarketStreamSubscription
+    from alerts.storage import LoginSession, MarketStreamSubscription
     from fastapi.testclient import TestClient
     from sqlalchemy import func
     fixture(database,monkeypatch)

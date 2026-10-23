@@ -8,8 +8,15 @@ import re
 from sqlalchemy import and_, exists, func, or_, select
 
 from .market_names import code_search, display_code
-from .storage import (CompositeRevision, HistoryReclamation, HistoryVersion, Instrument,
-                      MarketCatalog, MarketComposite, MarketDataset)
+from .storage import (
+    CompositeRevision,
+    HistoryReclamation,
+    HistoryVersion,
+    Instrument,
+    MarketCatalog,
+    MarketComposite,
+    MarketDataset,
+)
 
 KINDS = {'provider', 'history', 'composite', 'managed'}
 KIND_LABELS = {'provider':'平台行情', 'history':'固定历史', 'composite':'组合行情', 'managed':'自建行情'}

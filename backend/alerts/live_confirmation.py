@@ -28,8 +28,8 @@ def sampling_evidence(db, state, *, result=None):
 
 def outcome(db, state, *, error=None, evidence=None, stamp, reset=False):
     from .config import settings
-    from .notification_sources import _append
     from .notice_instruments import snapshot
+    from .notification_sources import _append
 
     key = 'live_confirmation:v1:' + state.dataset_id
     row = db.get(Preference, key)

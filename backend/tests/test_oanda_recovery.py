@@ -16,7 +16,7 @@ from alerts.market_contracts import (
 from alerts.oanda_stream import OandaPractice
 from alerts.storage import Instrument, LiveState, MarketDataset, PricingOwner, SignalRow
 from sqlalchemy import select
-from test_live_pricing import minute, candles, quote
+from test_live_pricing import candles, minute, quote
 from test_live_pricing import running as _running
 
 running = _running
