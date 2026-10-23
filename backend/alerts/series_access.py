@@ -53,8 +53,9 @@ def composite_definition(db, ident):
     raise ValueError("组合身份不存在或映射已不属于当前账户")
 
 
-def metadata(db, ident, kind):
-    return _metadata(db, ident, kind)
+def metadata(db, ident, kind, *, composite_context=None, selected_revision=None):
+    return _metadata(db, ident, kind, composite_context=composite_context,
+                     selected_revision=selected_revision)
 
 
 def _metadata(db, ident, kind, *, composite_context=None, selected_revision=None):
@@ -133,7 +134,7 @@ def chart_data(db, body, *, realtime=None):
             selected_input = prep.input_revision
         if selected_input is not None and not 0 <= selected_input <= prep.input_revision:
             raise ValueError("无效的组合输入修订")
-        meta = _metadata(db, body.instrument, body.series_kind,
+        meta = metadata(db, body.instrument, body.series_kind,
             composite_context=(parent.dataset_id, selected.mapping_id, composite), selected_revision=selected)
         if body.client:
             renew_demand(db, body.client, db.get(Instrument, composite.instrument_id),
