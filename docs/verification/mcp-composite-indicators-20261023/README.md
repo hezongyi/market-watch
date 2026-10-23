@@ -1,5 +1,10 @@
 # Ubuntu R1：MCP 组合指标
 
+2026-10-23 用户指定在 `$mw-acceptance` 验收后，实际复验使用已运行且包含本功能的长期实例，
+未启动下述备用合成数据 project。真实版本、HTTP 响应、数据保留和独立测试数据库的 PG 结果见
+[results.md](results.md) 与 [mwa-acceptance.json](mwa-acceptance.json)。
+长期实例的运维/复验命令也记在 results.md；不要对其执行下面的 seed、migrate 或独立实例启停命令。
+
 F0：兼容读取扩展；无新增 schema、持久格式、指标算法、后台调度。
 任务/project：`mw-mcp-composite-indicators-20261023`。主机只允许 Ubuntu 本机。
 `compose.yaml` 使用独立 internal 网络、PG14.24 volume/数据库/密码、API、网关。
@@ -12,6 +17,8 @@ API 显式启用 MCP、限定 Host/Origin，禁用 Yahoo、stream、投递和历
 以下 `docker`/`mw-docker` 在需要 docker 补充组的 shell 中用 `sg docker` 执行。
 
 ```bash
+# 任务 .venv 必须已按 requirements.lock 安装；不要使用缺少 MCP SDK 的系统环境。
+source .venv/bin/activate
 mw-docker build --repo . --component api \
   --tag market-watch-api:mcp-composite-indicators-20261023 \
   --task mw-mcp-composite-indicators-20261023 \
@@ -19,12 +26,14 @@ mw-docker build --repo . --component api \
 
 # 私有目录可更换；密码/登录 hash 和 MCP token 不提交仓库、不打印。
 export MW_COMPOSITE_PRIVATE=/tmp/mw-mcp-composite-indicators-20261023-private
-mkdir -m 700 "$MW_COMPOSITE_PRIVATE"
+mkdir -p -m 700 "$MW_COMPOSITE_PRIVATE"
 python - <<'PY'
 import os, secrets, subprocess
 from pathlib import Path
 from argon2 import PasswordHasher
 p = Path(os.environ['MW_COMPOSITE_PRIVATE'])
+if (p/'compose.env').exists():
+    raise SystemExit('Reuse existing private configuration; do not regenerate passwords')
 image = subprocess.check_output(['docker','image','inspect',
     'market-watch-api:mcp-composite-indicators-20261023','--format','{{.Id}}'], text=True).strip()
 # Compose env-file preserves single-quoted literal argon2 dollar signs.
@@ -40,7 +49,7 @@ c() { docker compose --env-file "$MW_COMPOSITE_PRIVATE/compose.env" \
   -p mw-mcp-composite-indicators-20261023 \
   -f docs/verification/mcp-composite-indicators-20261023/compose.yaml "$@"; }
 c config --quiet
-c up -d --no-build postgres
+c up -d --no-build --wait postgres
 c run --rm --no-deps migrate
 c up -d --no-build api gateway
 c exec -T --user "$(id -u):$(id -g)" api python /fixtures/verify.py seed
@@ -66,4 +75,4 @@ c up -d --no-build postgres api gateway
 固定本地合成价格、映射和周期聚合复用现有测试 fixture/离线构建入口。
 新增/更新镜像后先更新私有 env 中的 image ID，再 `up --no-build`；不得依赖旧 tag 证明新源码通过。
 
-证据与用例映射见 `results.md`（完成实际执行后填写）。合并前仍需 PR CI 和自审；不涉及生产发布。
+实际长期实例的证据与用例映射见 `results.md`。合并前仍需对应 PR CI 和自审；不涉及生产发布。

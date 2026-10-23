@@ -24,5 +24,20 @@
 
 4. 完整回归发现公共元数据入口的时钟推进契约被绕过，已让该入口接受固定选择并继续复用；原有实时报价到达用例与组合专项 21 项通过，未修改原断言。
 
-待补证据：PostgreSQL 本机隔离检查、真实 Ubuntu R1、完整本地/远端 CI。
-这些未完成项不会用现有 SQLite/TestClient 通过或镜像构建代替。
+源码 `9770d5d` 的完整远端 CI 39933990391 已通过：后端 2846 passed、18 skipped，
+额外 PostgreSQL 映射迁移 1 passed、observed 策略兼容 8 passed，Web 与 Compose 检查通过。
+完整本地运行未配置 PG 的 38 项设置错误按实际结果保留在 `results.md`，不写成通过。
+
+2026-10-23 用户明确选择 `$mw-acceptance`。只读核对发现当前 API `2a943ee` 直接继承本任务 `9770d5d`；
+运行文件 SHA256 与提交一致，因此无需重新换版。当前版本额外包含另一任务的 history 输入，不回退到旧候选。
+
+真实 HTTP MCP 已证明新参数 EMA3/RSI3 pending→complete、7 根价格/14 个有效指标与网页同源，
+默认/固定输入、MWC、UTC 分页、临时快照和 8 组错误均通过。数据集/版本/产物/工作区/偏好及组合/活动修订不变，
+市场需求身份与目标不变，供应商取数和历史任务未增加。没有 seed/migrate/换版/重启或触碰保护浏览器。
+
+本机 PG 验证在既有 PG 服务的任务专用数据库内执行，测试进程的所有数据库 URL 在应用导入前切换；
+真实业务库不用于造样/迁移/修订切换。每项 fixture 又使用独立 schema，执行文件与本任务分支相同。
+
+本机 PostgreSQL 四个文件最终 **70 passed、0 skipped、0 failed**，611.06 秒；临时 schema 清理后 public 无业务表。
+15 服务的身份/镜像/重启次数、环境哈希、挂载、端口和网络保持。真实 HTTP 与 PG 证据见 results.md、mwa-acceptance.json、postgres-checks.txt。
+无剩余实现或本机验收阻断；提交最后证据后核对对应 PR CI，不进行合并或生产操作。
