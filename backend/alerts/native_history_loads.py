@@ -176,6 +176,7 @@ def result(owner, ident):
 def once():
     from .chart_api import DataQuery
     from .market_resources import lane
+    claim_started = time.monotonic()
     with transaction() as db:
         now = now_ms()
         db.execute(update(NativeHistoryLoad).where(NativeHistoryLoad.state.in_(ACTIVE),
@@ -193,7 +194,10 @@ def once():
         row.generation += 1
         row.lease_until = now + int(settings.provider_request_seconds*1000) + 5000
         ident, generation, query = row.id, row.generation, row.query_json
+        created_at = row.created_at
         pages, stalls = row.pages, row.stalls
+    claimed_at = now_ms()
+    claim_ms = (time.monotonic() - claim_started) * 1000
     def valid():
         with transaction() as db:
             return bool(db.scalar(select(NativeHistoryLoad.id).where(
@@ -203,6 +207,7 @@ def once():
     progress = {"attempts": 0, "pages": 0, "advanced": False}
     state, failure = "waiting", None
     waiting_latest = False
+    fill_started = time.monotonic()
     try:
         if pages >= settings.native_history_task_pages:
             try:
@@ -232,6 +237,8 @@ def once():
     except Exception as exc:
         log.warning("History page failed type=%s", type(exc).__name__)
         state, failure = "failed", error("HISTORY_PROVIDER_FAILED", "平台历史暂不可用，请重试")
+    fill_ms = (time.monotonic() - fill_started) * 1000
+    persist_started = time.monotonic()
     with transaction() as db:
         result = db.execute(update(NativeHistoryLoad).where(
             NativeHistoryLoad.id == ident, NativeHistoryLoad.generation == generation,
@@ -243,6 +250,14 @@ def once():
         if result.rowcount and state in ('failed', 'ready'):
             from .notification_sources import native_result
             native_result(db, ident)
+    log.info("native-history-turn %s", json.dumps({
+        "id": ident, "generation": generation, "timeframe": query.get("timeframe"),
+        "created_at": created_at, "claimed_at": claimed_at, "finished_at": now_ms(),
+        "claim_ms": round(claim_ms, 2), "fill_ms": round(fill_ms, 2),
+        "persist_ms": round((time.monotonic() - persist_started) * 1000, 2),
+        "state": state, "committed": bool(result.rowcount), "waiting_latest": waiting_latest,
+        "pages": progress["pages"], "timings_ms": progress.get("timings_ms", {}),
+    }, sort_keys=True))
     return True
 
 
@@ -258,7 +273,14 @@ def main():
     while True:
         try:
             pulse.start()
+            confirmation_at, confirmation_started = now_ms(), time.monotonic()
             confirmed = confirm_price()
+            confirmation_ms = (time.monotonic() - confirmation_started) * 1000
+            if confirmed or confirmation_ms >= 250:
+                log.info("native-history-confirmation %s", json.dumps({
+                    "started_at": confirmation_at, "duration_ms": round(confirmation_ms, 2),
+                    "worked": bool(confirmed),
+                }, sort_keys=True))
             worked = once()
             worked = worked or confirmed
             pulse.finish(worked=worked)

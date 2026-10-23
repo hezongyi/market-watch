@@ -17,7 +17,7 @@ globalThis.__MWLAT={records:[],next:0,byId:new Map(),byResolve:new WeakMap()};
   series_kind:q.series_kind,timeframe:q.timeframe||q.args?.timeframe,
   indicators:q.indicators?.length||0,native:!!q.native_history,reserve:!!q.native_reserve,
   first:q.firstDataRequest,focused:q.native_history?.focused,countBack:q.countBack,limit:q.limit,
-  before:q.before,from:q.from,background:q.background});
+  before:q.before,from:q.from,background:q.background,progress_id:q.history_progress_id});
  const occupancy=()=>[...pending.entries()].map(([id,e])=>({id,qid:d.byId.get(id)?.qid,
   quote:!!e.quote,reserve:!!e.reserve,management:!!e.management,
   background:!!e.background,purpose:e.purpose,nativeHistory:!!e.nativeHistory}));
@@ -130,6 +130,12 @@ globalThis.__MWLAT={records:[],next:0,byId:new Map(),byResolve:new WeakMap()};
   if(!report.initial.hooks)throw Error('Queue observation was not installed');
   await host.evaluate(()=>{
    window.__MWLAT.feed=[];
+   window.__MWLAT.chartEvents=[];
+   for(let index=0;index<widget.chartsCount();index++) {
+    const chart=widget.chart(index);
+    chart.onDataLoaded().subscribe(null,()=>window.__MWLAT.chartEvents.push({
+     index,at:Date.now(),symbol:chart.symbol(),resolution:chart.resolution(),ready:chart.dataReady(),range:chart.getVisibleRange()}));
+   }
    for(const method of ['resolveSymbol','getBars']){
     const original=feed[method];
     feed[method]=function(...args){
@@ -137,7 +143,10 @@ globalThis.__MWLAT={records:[],next:0,byId:new Map(),byResolve:new WeakMap()};
      if(method==='getBars')row.period={from:args[2]?.from,to:args[2]?.to,countBack:args[2]?.countBack,first:args[2]?.firstDataRequest};
      window.__MWLAT.feed.push(row);
      const position=method==='getBars'?3:1,callback=args[position],fail=args[position+1];
-     args[position]=function(...values){row.completed=Date.now();row.bars=Array.isArray(values[0])?values[0].length:undefined;return callback(...values);};
+     args[position]=function(...values){
+      row.completed=Date.now();row.bars=Array.isArray(values[0])?values[0].length:undefined;
+      try{return callback(...values);}finally{row.callbackReturned=Date.now();}
+     };
      if(typeof fail==='function')args[position+1]=function(error){row.failed=Date.now();row.error_code=error?.code||String(error).slice(0,100);return fail(error);};
      return original.apply(this,args);
     };
@@ -172,7 +181,7 @@ globalThis.__MWLAT={records:[],next:0,byId:new Map(),byResolve:new WeakMap()};
    trial.slow=!!(trial.active_timeout||trial.all_timeout||(trial.active_ready-trial.start)>3000||(trial.all_ready-trial.start)>3000);
    trial.historyLoads=await page.evaluate(()=>window.MWHistoryLoadDiagnostics?.()||null);
    console.log(JSON.stringify({ticker,quiet:precondition.quiet,active_ms:trial.active_ready-trial.start,all_ms:trial.all_ready-trial.start,slow:trial.slow}));
-   report.queue=await host.evaluate(()=>({records:__MWLAT.records,feed:__MWLAT.feed}));save();
+   report.queue=await host.evaluate(()=>({records:__MWLAT.records,feed:__MWLAT.feed,chartEvents:__MWLAT.chartEvents}));save();
   }
   report.afterSettle=await waitQuiet();
   try {
@@ -182,10 +191,15 @@ globalThis.__MWLAT={records:[],next:0,byId:new Map(),byResolve:new WeakMap()};
    },null,{timeout:15000});
   } catch { report.historyLoadsDidNotSettle=true; }
   report.historyLoads=await page.evaluate(()=>window.MWHistoryLoadDiagnostics?.()||null);
-  report.queue=await host.evaluate(()=>({records:__MWLAT.records,feed:__MWLAT.feed,remaining:requests.length,pending:pending.size}));
+  report.queue=await host.evaluate(()=>({records:__MWLAT.records,feed:__MWLAT.feed,chartEvents:__MWLAT.chartEvents,remaining:requests.length,pending:pending.size}));
   report.workspaceAfter=summary(await(await context.request.get(base+'/api/advanced-charts/workspaces/'+workspace)).json());
   report.workspaceUnchanged=report.workspaceBefore.hash===report.workspaceAfter.hash;
- }catch(error){report.error=error.message;console.log('PROBE_ERROR',error.message);}
+ }catch(error){
+  report.error=error.message;console.log('PROBE_ERROR',error.message);
+  report.failureHistoryLoads=await page?.evaluate(()=>window.MWHistoryLoadDiagnostics?.()).catch(()=>null);
+  report.failureQueue=await host?.evaluate(()=>({records:__MWLAT.records,feed:__MWLAT.feed,chartEvents:__MWLAT.chartEvents,
+   queued:requests.length,pending:pending.size})).catch(()=>null);
+ }
  finally{
   await Promise.allSettled([...responses]);
   save();await browser.close();

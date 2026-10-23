@@ -211,6 +211,7 @@ const save = () => fs.writeFileSync(path.join(out, 'report.json'), JSON.stringif
     await switchOnce('MWP:EURUSD', 'provider-cache-return');
     await pageLeft('MWP:EURUSD', 'provider-left-navigation');
 
+    for(let round=0;round<Number(process.env.MW_ACCEPTANCE_RAPID_ROUNDS || 1);round++) {
     const rapidStart = Date.now(), clicks = [];
     for (const ticker of [history, composite, 'MWP:EURUSD', history, 'MWP:EURUSD']) {
       await ui.locator('[data-symbol-full="' + ticker + '"]').first().click();
@@ -219,8 +220,9 @@ const save = () => fs.writeFileSync(path.join(out, 'report.json'), JSON.stringif
     }
     const rapidTiming = await waitCharts('MWP:EURUSD'); await waitPlots();
     assert.ok(clicks.some(c => c.state.ordinary > 0 || c.state.loading || c.state.queued > 0), 'Rapid switches overlap unfinished work');
-    record({ name: 'rapid-switches-final-symbol-and-indicators', ms: Date.now() - rapidStart,
+    record({ name: 'rapid-switches-final-symbol-and-indicators', round, ms: Date.now() - rapidStart,
       finalActiveMs: rapidTiming.activeAt - rapidStart, finalAllMs: rapidTiming.allAt - rapidStart, clicks, passed: true });
+    }
     await page.waitForFunction(() => {
       const d = window.MWHistoryLoadDiagnostics?.();
       return d && d.admitted === 0 && d.cleaning === 0 && d.queued === 0;
@@ -254,8 +256,22 @@ const save = () => fs.writeFileSync(path.join(out, 'report.json'), JSON.stringif
     report.failure = error.stack;
     process.exitCode = 1;
     if (host) report.failureState = await host.evaluate(() => typeof __MWACCSnapshot === 'function' ? __MWACCSnapshot() : null).catch(() => null);
+    report.failureResources = await page.evaluate(() => window.MWHistoryLoadDiagnostics?.()).catch(() => null);
+    if(host) report.failureQueue = await host.evaluate(() => ({
+      queued:requests.map(e=>({type:e.type,query:e.query,current:e.isCurrent ? e.isCurrent() : true})),
+      pending:[...pending].map(([id,e])=>({id,purpose:e.purpose,native:e.nativeHistory,background:e.background})),
+      feed:globalThis.__MWACCEPT?.feed,
+    })).catch(() => null);
     await page.screenshot({ path: path.join(out, 'failure.png') }).catch(() => {});
   } finally {
+    if(report.before && !report.after) {
+      try {
+        report.after={workspaceHash:hash(await get('/api/advanced-charts/workspaces/'+workspace)),
+          preferencesHash:hash(await get('/api/advanced-charts/preferences'))};
+        report.persistentStateUnchanged=report.before.workspaceHash===report.after.workspaceHash &&
+          report.before.preferencesHash===report.after.preferencesHash;
+      } catch(e) {report.stateCheckError=String(e);}
+    }
     await Promise.race([Promise.allSettled([...responseWork]), new Promise(resolve => setTimeout(resolve, 5000))]);
     report.ended = new Date().toISOString(); save();
     console.log(JSON.stringify({ passed: report.passed === true, checks: report.checks.length, failure: report.failure, pageErrors: report.errors, httpErrors: report.httpErrors }));

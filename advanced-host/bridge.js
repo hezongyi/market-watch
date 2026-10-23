@@ -360,6 +360,31 @@ function indicatorFault(consumer,error,attempt_id){
       input_revision:binding.inputRevision,visible_from:scope?.first,visible_to:scope?.last,
       calculation_origin:binding.calculationStart,accepted_scope:consumer.acceptedScope||null}};
 }
+function releaseIndicatorConsumers(consumers) {
+  // Cancellation fences are cumulative. Merge only unsent releases for this
+  // client; never mutate an in-flight request or omit a newer generation.
+  const references=new Map();
+  for(const consumer of consumers) {
+    const old=references.get(consumer.id);
+    if(!old || old.generation<consumer.generation)references.set(consumer.id,consumer);
+  }
+  const rows=[...references.values()];
+  for(let offset=0;offset<rows.length;offset+=64) {
+    const batch=rows.slice(offset,offset+64);
+    const queued=requests.find(entry=>{
+      if(entry.type!=='indicator-demand-release' || entry.query.client!==clientId)return false;
+      const merged=new Map(entry.query.consumers.map(consumer=>[consumer.id,consumer]));
+      for(const consumer of batch) {
+        const old=merged.get(consumer.id);
+        if(!old || old.generation<consumer.generation)merged.set(consumer.id,consumer);
+      }
+      if(merged.size>64)return false;
+      entry.query.consumers=[...merged.values()];
+      return true;
+    });
+    if(!queued)void request({client:clientId,consumers:batch},'indicator-demand-release').catch(()=>{});
+  }
+}
 function startIndicatorCoordinator(catalog) {
   indicatorCoordinator=chartIndicatorCoordinator(widget,catalog,{
     read:(symbol,res,args,current)=>query(symbol,res,args,Date.now()+30000,current),
@@ -397,7 +422,7 @@ function startIndicatorCoordinator(catalog) {
     report:error=>{if(error.code!=='HISTORY_CANCELLED')send({type:'error',error:'指标读取失败：'+String(error)});},
     presentation:(ticker,res,page)=>{swingStore().publish(ticker,res,page,swingStore().ticket());swingDisplay?.refresh();},
     leases:leases=>{if(leases.length)void request({client:clientId,leases},'indicator-demand-update').catch(error=>send({type:'error',error:String(error)}));},
-    release:consumers=>{void request({client:clientId,consumers},'indicator-demand-release').catch(()=>{});},
+    release:releaseIndicatorConsumers,
     demand:rows=>{
       const next=new Map(rows.map(row=>[indicatorKey(row.ticker,row.resolution),row.origin]));
       const changed=new Set([...indicatorDependencyOrigins.keys(),...next.keys()].filter(key=>indicatorDependencyOrigins.get(key)!==next.get(key)));
@@ -808,7 +833,19 @@ const requestPolicy = (() => {
   }
   return {describe,next,capacity,dispatched,completed:id=>nativeDispatches.delete(id)};
 })();
+function discardObsoleteRequests() {
+  // A stale quote/indicator request must release its queued place even while
+  // its execution lane is busy. Admission cannot wait for it to be selected.
+  for(let index=requests.length-1;index>=0;index--) {
+    const entry=requests[index];
+    if(entry.isCurrent && !entry.isCurrent()) {
+      requests.splice(index,1);
+      entry.reject(Object.assign(Error("已取消旧图表的历史加载"),{code:"HISTORY_CANCELLED"}));
+    }
+  }
+}
 function drain() {
+  discardObsoleteRequests();
   while (requests.length) {
     const selectedIndex=requestPolicy.next(requests,pending);
     if (selectedIndex < 0) break;
@@ -852,6 +889,7 @@ function drain() {
 }
 function request(query, type = "data", isCurrent, scheduling) {
   return new Promise((resolve, reject) => {
+    if (requests.length >= 64) discardObsoleteRequests();
     if (requests.length >= 64) return reject(Error("图表请求过多，请减少指标"));
     requests.push({query,type,resolve,reject,isCurrent,scheduling});
     drain();
@@ -1152,6 +1190,27 @@ async function searchNativeSymbols(options) {
     type:s.type || "other"})),remaining:position != null ? 1 : 0};
 }
 
+// Share outstanding snapshots, not completed quote data. Each consumer keeps
+// its own callback/reset fence and cannot cancel another live consumer.
+const quoteRequests = new Map();
+function readQuoteSnapshot(symbols, isCurrent) {
+  const epoch=workspaceEpoch, batch=[...new Set(symbols)].sort();
+  const key=JSON.stringify([epoch,batch]);
+  let entry=quoteRequests.get(key);
+  if(!entry || !entry.current() || !batch.every(ticker=>
+    entry.tokens.get(ticker)===quoteResetTokens.get(ticker))) {
+    const consumers=new Set([isCurrent]);
+    entry={consumers,tokens:new Map(batch.map(ticker=>[ticker,quoteResetTokens.get(ticker)])),
+      current:()=>epoch===workspaceEpoch && [...consumers].some(current=>current())};
+    const shared=entry;
+    shared.promise=request({op:'quotes',args:{symbols:batch}},'market',shared.current)
+      .finally(()=>{if(quoteRequests.get(key)===shared)quoteRequests.delete(key);});
+    quoteRequests.set(key,shared);
+  } else entry.consumers.add(isCurrent);
+  const shared=entry;
+  return shared.promise.finally(()=>shared.consumers.delete(isCurrent));
+}
+
 const feed = {
   // The native price-axis countdown requires server time in UNIX seconds.
   // Authenticated/network access stays in the trusted parent origin.
@@ -1184,8 +1243,7 @@ const feed = {
     // Quotes are independent of chart history. The request queue still keeps
     // a bounded quote lane, while cancellation and epoch checks fence stale
     // callbacks when a workspace or list changes.
-    request({ op: "quotes", args: { symbols } }, "market",
-        () => epoch === workspaceEpoch && isCurrent())
+    readQuoteSnapshot(symbols, () => epoch === workspaceEpoch && isCurrent() && currentSymbols().length>0)
       .then((rows) => {
         if (epoch !== workspaceEpoch || !isCurrent()) return;
         // A stream/reset received while this request was outstanding owns the
