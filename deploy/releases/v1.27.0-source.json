@@ -1,0 +1,28 @@
+{
+  "version": "1.27.0",
+  "release_tag": "v1.27.0",
+  "previous_source_tag": "v1.26.5",
+  "candidate_tag": "v1.27.0-rc.4",
+  "application_main_merge_commit": "ffc814977086dd01b10240333c92079fb89ec53c",
+  "tested_pr_head": "cef01979d0d52f4cc3019406765dce17df4649e1",
+  "pull_requests": ["https://github.com/hezongyi/market-watch/pull/93"],
+  "source_commit_resolution": "Resolve annotated v1.27.0^{commit}; create at the checked version-packaging main commit, preserving all existing tags.",
+  "source_delivery_record": "docs/integration-v1.27.0-source-delivery.md",
+  "risk_class": "F1",
+  "packaging_risk_class": "P0",
+  "verification": {
+    "application_pr_ci": "https://github.com/hezongyi/market-watch/actions/runs/39922933737",
+    "application_main_ci": "https://github.com/hezongyi/market-watch/actions/runs/39928555061",
+    "application_python_passed": 2830,
+    "application_python_skipped": 18,
+    "independent_standards_findings": 0,
+    "independent_spec_findings": 0,
+    "packaging_ci": "Require successful version-packaging PR CI before merge and formal tag push; application CI does not replace packaging CI."
+  },
+  "new_migrations_since_previous_source_tag": ["ax51_mapping_notes"],
+  "packaging_application_dependencies_changed": false,
+  "packaging_runtime_sources_changed": false,
+  "rollback": "Preserve additive mapping notes table and existing mapping/composite identities; old-reader verification is not an old-image write compatibility claim.",
+  "production_images": "No images built, retagged or transferred by this source publication; existing acceptance images retain their original provenance.",
+  "production_deployment": "Not performed; Git tag authorization does not authorize production migration, switching or permanent data deletion."
+}
