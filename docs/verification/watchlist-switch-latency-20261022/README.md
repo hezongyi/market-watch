@@ -1,6 +1,6 @@
 # 自选切换延迟诊断
 
-修复候选、验证结果与未完成验收见 [RESULTS.md](RESULTS.md)。下文及原始测量保留修复前的历史事实，不能作为候选版本的性能成绩。`deep/probe-cleanup.cjs` 断言旧缺陷，修复后预期失败；修复回归使用 `web/tests/advanced-history-loading.cjs` 与 `advanced-history-admission.cjs`。
+当前结果见 [RESULTS.md](RESULTS.md)：连切修复、回归、分段测量及局部结果轮询已部署，最终 13/13 业务复验通过。前后对照、反例与建议见 [CLOSEOUT-20261023.md](CLOSEOUT-20261023.md)。下文及原始测量保留修复前历史事实，不能作为当前版本成绩。`deep/probe-cleanup.cjs` 断言旧缺陷，修复后预期失败；修复回归使用真实 bridge／TS loader 测试。
 
 后续深入分析见 [DEEP-ANALYSIS.md](DEEP-ANALYSIS.md)：补齐真实队列阻塞者、默认预热／快照锁分段，以及成功读取后等待 cancel 的证据。本文保留首轮诊断与原始测量，不将后续观察回写为首轮结论。
 

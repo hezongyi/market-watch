@@ -54,4 +54,16 @@ Spec 发现共享报价的晚加入消费者用较晚观察边界处理较早 HT
 
 真实 TS loader 的新轮询回归先红后绿，覆盖最终页数、重新等待、错误和轮询中取消，并保留旧协议测试。后端新增结果进度合同及真实 PG 测试。补跑中曾因主机默认解释器／editable 安装指向其他 worktree、以及误写测试文件名未执行目标测试；已固定共享 venv 加本 worktree `PYTHONPATH` 并核对真实模块路径，最终 18 项 native／capacity 测试、2 项真实 PG 测试通过。两个未纳入 CI 的旧 VM 脚本因缺少 document／composite bootstrap 在加载阶段失败，未进入断言；不混入 CI 已通过计数，不扩展为本轮产品修复。
 
-本增量完整复跑 CI 的 Watchlist bridge 组 20 条命令均通过；TypeScript／Vite／data-center 构建、Ruff 与 diff check 通过。Vite 保留既有大 chunk 提示。任务 PG 已停止，数据卷保留。局部轮询候选尚待独立复核、固定构建与实际部署复测。
+本增量完整复跑 CI 的 Watchlist bridge 组 20 条命令均通过；TypeScript／Vite／data-center 构建、Ruff 与 diff check 通过。Vite 保留既有大 chunk 提示。任务 PG 已停止，数据卷保留。
+
+## 最终复核、部署与复验
+
+局部轮询固定为 `914525a`。Standards 无硬性违规／具体缺陷，Spec 无新增 P1/P2，并独立复跑 history-loading、history-admission 通过。API／Web 标准 Ubuntu builder 干净构建，检查来源与 chart origin；Chart 保留 b7ef7be，不冒充三组件同提交。
+
+保存紧邻前版实际环境和精确回退后，部署 12 应用服务，持久 candidate 同步。15 服务运行、API／PG healthy，Chart／PG／gateway 与保护浏览器未替换，环境键值、挂载、网络、端口、命令、资源上限、Yahoo／MCP 保持。长期登记同步真实镜像和标签，清除前轮登记中矛盾的旧 ID／labels。
+
+新分段测量四场景完成，关联 10 个任务，普通 status 轮询 0、ready 后额外结果往返 0/10。活动 H1 两次 bridge 排队均 0 ms；创建至认领 559–2606 ms，填充 416.86–1493.68 ms，ready 至结果头 462–1289 ms；回调本体 2–24 ms、至原生 data-loaded 3–25 ms。末尾生命周期及 bridge 归零、工作区保持、无浏览器错误；因超过 3 秒诊断线 exit 1，不当作正式 SLA 失败。
+
+2026-10-23T01:41:43.595Z–01:43:20.616Z 业务复验 13/13，三轮 15 次连切恢复最终价格／原指标；两类翻页、报价、容量、工作区及偏好通过，无 pageerror 或意外 HTTP 失败。原生 admitted／cleaning／queued／cleanupFailures 全 0；业务末次 bridge 采样 pending=2、queued=0，独立测量最终 pending=0，不把前者称为全空闲。
+
+脱敏数据与变慢反例见 [业务验收](continuation-business-acceptance.json)、[分段测量](continuation-stage-measurements.json)、[最终建议](CLOSEOUT-20261023.md)。建议按本轮批准范围收口；剩余平台／指标数秒等待，由代表性重复窗口和目标决定是否继续改造。未合并、打正式 tag 或发布生产。
