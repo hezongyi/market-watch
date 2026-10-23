@@ -62,14 +62,14 @@ def _metadata(db, ident, kind, *, composite_context=None, selected_revision=None
     if kind == "history":
         version = db.get(HistoryVersion, ident)
         if not version or version.status != "published" or db.get(HistoryReclamation, ident):
-            raise ValueError("固定历史版本不存在、尚未发布或已回收")
+            raise SeriesUnavailable("固定历史版本不存在、尚未发布或已回收")
         dataset = db.get(MarketDataset, version.dataset_id)
         inst = db.get(Instrument, dataset.instrument_id)
         frames = list(db.scalars(select(HistoryArtifact.timeframe).where(
             HistoryArtifact.version_id == version.id, HistoryArtifact.status == "published",
             HistoryArtifact.count > 0)))
         if not frames:
-            raise ValueError("固定历史周期产物尚未发布")
+            raise SeriesUnavailable("固定历史周期产物尚未发布")
         binding = {"version_id": version.id, "history_version_id": version.id,
                    "dataset_id": dataset.id, "history_checksum": version.manifest["checksum"]}
         volume_kind, volume_unit = dataset.volume_kind, dataset.volume_unit
@@ -101,6 +101,7 @@ def _metadata(db, ident, kind, *, composite_context=None, selected_revision=None
         "historical_source": dataset.identity["source"], "basis": inst.basis,
         "calendar": revision.rules["aggregation_calendar"] if kind == "composite" and composite else inst.calendar,
         "precision": max(inst.precision, target.precision) if kind == "composite" else inst.precision,
+        "calendar_profile": target.calendar_profile if kind == "composite" else inst.calendar_profile,
         "frames": [frame for frame in FRAMES if frame in frames], "volume_kind": volume_kind,
         "volume_unit": volume_unit, **binding}
 
@@ -162,10 +163,13 @@ def chart_data(db, body, *, realtime=None):
     stamp = now_ms()
     if body.series_kind == "history":
         parent = db.get(HistoryVersion, body.instrument)
+        if body.timeframe not in meta["frames"]:
+            raise SeriesUnavailable(f"{body.timeframe} 该周期产物尚未发布，请在数据中心准备该版本周期")
         page = history_page(db, parent.id, body.timeframe, before=body.before, count=body.limit)
         page.update(has_more=page["next_before"] is not None, origin=parent.start,
             history_revision=hashlib.sha256(json.dumps([parent.manifest["checksum"], body.timeframe]).encode()).hexdigest(),
-            pending=[], input_manifest={"version_id": parent.id, "checksum": parent.manifest["checksum"]})
+            pending=[], history_version_id=parent.id, history_checksum=parent.manifest["checksum"],
+            input_manifest={"version_id": parent.id, "checksum": parent.manifest["checksum"]})
         inst = db.get(Instrument, db.get(MarketDataset, parent.dataset_id).instrument_id)
     else:
         snapshot = None
@@ -214,7 +218,8 @@ def chart_data(db, body, *, realtime=None):
     dependency = history_check(db, page, body.model_copy(update={"indicators": [],
         "track_history": True, "revision_before": body.dependency_before,
         "revision_after": page["origin"]}), meta) if body.dependency_before else None
-    return {**page, "history_check": check, "basis": meta["basis"], "calendar": meta["calendar"], "precision": meta["precision"],
+    return {**page, "history_check": check, "source": meta["source"],
+        "basis": meta["basis"], "calendar": meta["calendar"], "calendar_profile": meta["calendar_profile"], "precision": meta["precision"],
         "volume_kind": meta["volume_kind"], "volume_unit": meta["volume_unit"],
         "indicators": indicators, "indicator_progress": indicator_progress,
         "dependency_before": body.dependency_before,

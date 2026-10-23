@@ -46,7 +46,7 @@ python -m alerts.mcp.credentials revoke --hash HASH_FROM_LIST
 | `alerts:write` | `alerts_create`、`alerts_cancel`、`notifications_ack` |
 | `market:read` + `market:write` | `history_create_dataset`、`history_configure_maintenance`、`history_control_maintenance`、`history_submit_task`、`history_control_task`、`history_change_aggregation`、`history_request_artifacts`、`history_reclaim_dataset` |
 
-- 行情输入使用基础品种 ID，`series_kind` 明确选择 `managed` 或 `provider`。先发现品种；不能把来源 ID 当成券商可交易映射。管理系列的品种发现沿用网页启用品种目录，平台系列沿用网页市场目录。
+- 报价和通用 K 线输入使用基础品种 ID，`series_kind` 明确选择 `managed` 或 `provider`。指标另外支持 `history` 和 `composite`，见下文。先发现品种；不能把来源 ID 当成券商可交易映射。管理系列的品种发现沿用网页启用品种目录，平台系列沿用网页市场目录。
 - 价格、OHLC 是十进制字符串，时间为毫秒。报价保留网页的 bid/last trade/M1 close 标签；OANDA/Binance 平台报价首期取有限 M1 数据并明确标为 `M1 close`。Yahoo 使用网页共用的市场报价快照，并返回延迟字段。来源不可用返回错误。
 - `market_open`（已知时）与 `is_stale` 分开表达休市和陈旧。报价年龄不等于交易可用性。平台报价未获得休市状态时不推断市场正在交易。
 - K 线默认 300，最多 2000；批量指标 1–12。`before` 是排他的毫秒游标；`next_before` 可继续分页。`cursor_coordinate` 明确管理系列的 UTC start 与平台系列的 native chart time，日/周/月不可混用。所有 bars 与 indicators 来自 `chart_api.query_chart/data_sync`；网页仍使用同一入口。指标保留完整历史前缀、预热、缺口重置和 null 语义。
@@ -151,6 +151,47 @@ docker compose --env-file /tmp/mw-native-mcp-acceptance/compose.env \
 provider 查询可传 `calculation_origin` 固定递归历史起点；从响应 `page.calculation_origin` 读取并在后续分页/轮询复用，避免更早缓存回填改变EMA/RSI等的起点。managed published仍使用 `dataset_start` 对齐其已发布历史。
 
 共用信号查询现在同时返回旧策略与图表告警事件：旧策略的 `watch_id` 有值、`chart_alert_id` 为空；图表事件相反。逐事件通知确认不改变告警次数、规则版本或运行轮次。MCP `alerts_create`/`alerts_cancel` 保持原有旧策略接口，不推断它们可以创建或编辑新版图表规则。
+
+## 已发布历史版本的指标
+
+`indicators_calculate` 接受 `series_kind="history"`，`instrument` 为数据中心已发布的
+历史版本 UUID，或 `MWH:<版本UUID>`。必须显式指定类型；不能用数据集 ID、品种代码或
+“最新版本”代替版本 UUID。可从 `history_get_dataset` 的各周期发布信息取得版本，
+再用 `history_get_version` 检查其清单和可用性。仍需 `market:read` 与 `analysis:read`。
+
+```json
+{
+  "instrument": "<已发布的历史版本UUID>",
+  "series_kind": "history",
+  "timeframe": "H1",
+  "limit": 300,
+  "indicators": [
+    {"name": "EMA", "version": "1", "params": {"period": 20}},
+    {"name": "RSI", "version": "1", "params": {"period": 14}}
+  ]
+}
+```
+
+返回该版本的 `page.bars`、`page.indicators`、`page.version_id`、`history_version_id`、
+`history_checksum` 和 `input_manifest={version_id,checksum}`。指标的
+`calculation.input_evidence.history_version_id` 与价格版本一致，算法、参数、完整起点、
+覆盖和依赖由同一图表后端返回。数据中心发布新版本不会改变这次指定的版本。
+这里接通已有版本输入，不新增复算快照或跨调用回放协议。
+
+冷启动使用现有固定指标任务，响应成功返回 K 线、已有指标值、`pending` 和
+`indicator_progress`。继续以相同版本查询可取得进度和结果；不要求全部历史任务结束才读取
+已算完的可见区间。逐指标检查 `calculation.visible_complete` 与覆盖；计算完成后仍可因
+预热不足、缺口或稀疏信号返回 null。不要将 null 当零。
+
+版本不存在、未发布、已回收或请求周期产物尚未发布时返回 `DATA_UNAVAILABLE`，
+不切换版本、不下载、不补建周期产物、不续订行情。单次限制仍为 1–12 个指标、最多 2000 根
+可见 K 线。`before`/`next_before` 是排他的 UTC 毫秒 `start`；D/W/M 的 `chart_time`
+只是图表标签，指标 `time` 对应 K 线的真实 `start`。
+
+默认 `provisional=false`，指标只使用已确认、已收盘输入；K 线保留闭合、确认和覆盖标记。
+`provisional=true` 沿用网页对版本末尾不完整周期的临时计算，临时值带有标记。
+不接受 `published=true`、`dataset_start`、`calculation_origin`、`composite_revision_id`
+或 `input_revision`；固定历史的计算起点与输入已由版本确定。
 
 ## 已建立组合的指标
 

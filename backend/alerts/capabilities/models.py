@@ -95,7 +95,11 @@ class BarsQuery(QuoteQuery):
 
 
 class IndicatorsQuery(BarsQuery):
-    series_kind: Literal["managed", "provider", "composite"] = "managed"
+    instrument: str = Field(
+        min_length=1, max_length=80,
+        description="Base instrument/composite ID; history requires an immutable version ID or MWH:<version_id>",
+    )
+    series_kind: Literal["managed", "provider", "composite", "history"] = "managed"
     provisional: bool = Field(default=False, description="Opt in to recomputed last incomplete candle; values are marked provisional")
     calculation_origin: int | None = Field(default=None, ge=0, description="Reuse the returned provider calculation_origin to pin recursive history")
     composite_revision_id: str | None = Field(default=None, min_length=1, max_length=36)
@@ -119,6 +123,19 @@ class IndicatorsQuery(BarsQuery):
                 raise ValueError("provisional 与 input_revision 不能同时使用")
         elif self.composite_revision_id is not None or self.input_revision is not None:
             raise ValueError("组合修订参数只适用于 series_kind=composite")
+        return self
+
+    @model_validator(mode="after")
+    def validate_history_options(self):
+        if self.instrument.startswith("MWH:") and self.series_kind != "history":
+            raise ValueError("MWH 标识须显式指定 series_kind=history")
+        if self.series_kind == "history":
+            from ..chart_series import decode
+
+            ticker = self.instrument if self.instrument.startswith("MWH:") else "MWH:" + self.instrument
+            self.instrument = decode(ticker)[0]
+            if self.published or self.dataset_start is not None or self.calculation_origin is not None:
+                raise ValueError("固定历史指标不支持 published、dataset_start 或 calculation_origin")
         return self
 
 
@@ -298,8 +315,16 @@ class IndicatorBar(BarResult):
     segments: list[dict] = Field(default_factory=list)
 
 
+class HistoryInputManifest(Record):
+    version_id: str
+    checksum: str
+
+
 class IndicatorsPage(ChartPage):
     bars: list[IndicatorBar]
+    version_id: str | None = None
+    input_manifest: HistoryInputManifest | None = None
+    source: str | None = None
     composite_id: str | None = None
     revision_id: str | None = None
     input_revision: int | None = None
