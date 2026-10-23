@@ -250,3 +250,88 @@ def test_composite_capacity_maps_to_resource_limit(mcp, monkeypatch):
     monkeypatch.setattr('alerts.indicator_demands.MAX_PENDING_RUNS', 0)
     result = call(client, token, 'indicators_calculate', indicator_query(ident))
     assert result['isError'] and result['structuredContent']['error']['code'] == 'RESOURCE_LIMIT', result
+
+
+def test_composite_foreign_revision_unavailable_history_and_empty_preparation(mcp, monkeypatch):
+    from alerts.storage import (
+        CompositePreparation,
+        CompositeRevision,
+        HistoryReclamation,
+        HistoryVersion,
+        Instrument,
+        MarketComposite,
+    )
+
+    client, token, factory = mcp
+    ident, revision, _ = indicator_fixture(factory, monkeypatch)
+    with factory.begin() as db:
+        old = db.get(CompositeRevision, revision)
+        parent_id = old.history_version_id
+        composite = db.get(MarketComposite, ident)
+        db.add(Instrument(id='foreign-composite', label='Foreign', source='composite', symbol='EURUSD',
+            basis='bid', calendar='ny17', precision=5, calendar_profile={}))
+        db.flush()
+        db.add(MarketComposite(id='b' * 64, instrument_id='foreign-composite', dataset_id=composite.dataset_id,
+            mapping_id=old.mapping_id, permission_scope='workspace:default', rules=old.rules))
+        db.flush()
+        foreign = CompositeRevision(composite_id='b' * 64, history_version_id=parent_id,
+            mapping_id=old.mapping_id, seam=old.seam, rules=old.rules, request_id='foreign')
+        db.add(foreign)
+        db.flush()
+        foreign_id = foreign.id
+    result = call(client, token, 'indicators_calculate', indicator_query(ident, composite_revision_id=foreign_id))
+    assert result['structuredContent']['error']['code'] == 'INVALID_ARGUMENT'
+    with factory.begin() as db:
+        parent = db.get(HistoryVersion, parent_id)
+        empty = HistoryVersion(dataset_id=parent.dataset_id, start=0, end=60000,
+                               cursor=60000, status='published', manifest=parent.manifest)
+        db.add(empty)
+        db.flush()
+        selected = CompositeRevision(composite_id=ident, history_version_id=empty.id,
+            mapping_id=old.mapping_id, seam=60000, rules=old.rules, request_id='empty-preparation')
+        db.add(selected)
+        db.flush()
+        db.add(CompositePreparation(revision_id=selected.id, cursor=60000, cutoff=120000))
+        db.get(MarketComposite, ident).active_revision_id = selected.id
+        selected_id = selected.id
+    empty = call(client, token, 'indicators_calculate', indicator_query(ident))
+    error = empty['structuredContent']['error']
+    assert error['code'] == 'DATA_UNAVAILABLE'
+    assert error['context']['preparation_status'] == 'pending'
+    assert error['context']['revision_id'] == selected_id and error['context']['pending']
+    with factory.begin() as db:
+        db.add(HistoryReclamation(version_id=parent_id, request_id='synthetic-retention'))
+    result = call(client, token, 'indicators_calculate', indicator_query(ident, composite_revision_id=revision))
+    assert result['structuredContent']['error']['code'] == 'DATA_UNAVAILABLE'
+
+
+def test_all_fixed_specs_are_validated_before_job_registration(mcp, monkeypatch):
+    from alerts import indicator_state
+    from alerts.storage import FixedIndicatorRun
+
+    client, token, factory = mcp
+    ident, _, _ = indicator_fixture(factory, monkeypatch)
+    monkeypatch.setattr(indicator_state, 'SUPPORTED', indicator_state.SUPPORTED - {'RSI'})
+    response = call(client, token, 'indicators_calculate', indicator_query(ident))
+    assert response['structuredContent']['error']['code'] == 'INVALID_ARGUMENT'
+    with factory.begin() as db:
+        assert db.scalar(select(FixedIndicatorRun)) is None
+
+
+def test_high_period_chart_labels_do_not_replace_source_point_times(mcp, monkeypatch):
+    from test_composite_aggregates import drain as aggregate
+    from test_fixed_indicators import drain
+
+    client, token, factory = mcp
+    ident, revision, _ = indicator_fixture(factory, monkeypatch)
+    aggregate(revision, 'W1')
+    query = indicator_query(ident, timeframe='W1', indicators=[{'name': 'EMA', 'params': {'period': 2}}])
+    cold = call(client, token, 'indicators_calculate', query)
+    assert not cold['isError'], cold
+    run_id = cold['structuredContent']['page']['indicators'][0]['calculation']['run_id']
+    drain(run_id)
+    ready = call(client, token, 'indicators_calculate', query)
+    assert not ready['isError'], ready
+    page = ready['structuredContent']['page']
+    assert any(b['chart_time'] != b['start'] for b in page['bars'])
+    assert {v['time'] for s in page['indicators'][0]['series'] for v in s['values']} <= {b['start'] for b in page['bars']}

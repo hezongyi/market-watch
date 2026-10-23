@@ -129,15 +129,31 @@ def chart_data(db, body, *, realtime=None):
         prep = db.get(CompositePreparation, selected.id)
         if not prep:
             raise SeriesUnavailable("组合输入尚未准备")
-        if selected_input is None:
+        if selected_input is None and not body.provisional:
             selected_input = prep.input_revision
-        if not 0 <= selected_input <= prep.input_revision:
+        if selected_input is not None and not 0 <= selected_input <= prep.input_revision:
             raise ValueError("无效的组合输入修订")
         meta = _metadata(db, body.instrument, body.series_kind,
             composite_context=(parent.dataset_id, selected.mapping_id, composite), selected_revision=selected)
         if body.client:
             renew_demand(db, body.client, db.get(Instrument, composite.instrument_id),
                          composite_revision_id=selected.id)
+        if body.provisional and body.input_revision is None:
+            from .config import settings
+            from .display_observations import handover_legacy
+            from .live_pricing import account_key
+            from .storage import LiveState, PricingOwner
+
+            mapping = db.get(RealtimeMapping, selected.mapping_id)
+            # Preserve the browser's observation fence and lock order. Keep
+            # strong references across capture; confirmed reads use immutable
+            # input filters and need no mutable live-state observation.
+            _live_observation = (db.get(LiveState, mapping.target_dataset_id),
+                                 db.get(PricingOwner, account_key(settings.oanda_account_id)))
+            if _live_observation[0]:
+                handover_legacy(db, _live_observation[0])
+            db.scalar(select(LiveState).where(LiveState.dataset_id == mapping.target_dataset_id)
+                .with_for_update(read=True).execution_options(populate_existing=True))
     else:
         meta = metadata(db, body.instrument, body.series_kind)
     # Evaluate freshness after the source snapshot, never before IO that can
@@ -169,9 +185,7 @@ def chart_data(db, body, *, realtime=None):
             display_snapshot=snapshot)
         parent = db.get(HistoryVersion, selected.history_version_id)
         page["history_checksum"] = parent.manifest["checksum"]
-        meta["calendar"] = selected.rules["aggregation_calendar"]
-        meta["history_version_id"], meta["mapping_id"] = parent.id, selected.mapping_id
-        meta["dataset_id"], meta["seam"] = parent.dataset_id, selected.seam
+        page.update({key: meta[key] for key in ("dataset_id", "mapping_id", "historical_source")})
         target_inst = db.get(Instrument, db.get(MarketDataset, db.get(RealtimeMapping, selected.mapping_id).target_dataset_id).instrument_id)
         inst = SimpleNamespace(id=composite.instrument_id, calendar=meta["calendar"], calendar_profile=target_inst.calendar_profile)
     for bar in page["bars"]:
