@@ -2,6 +2,7 @@
 
 import asyncio
 
+from fastapi import HTTPException
 from sqlalchemy import func, select
 
 from .. import business
@@ -23,6 +24,7 @@ from .models import (
     DrawingsResult,
     Empty,
     IndicatorsQuery,
+    IndicatorsResult,
     InstrumentQuery,
     InstrumentsResult,
     NotificationResult,
@@ -112,26 +114,47 @@ async def bars(ctx, query):
 
         if await asyncio.to_thread(history_size) > 200000:
             raise CapabilityError("RESOURCE_LIMIT", "Managed indicator history exceeds 200000 bars")
-    meta = await asyncio.to_thread(identity, query, ctx.deadline)
-    page = await query_chart(
-        DataQuery(**query.model_dump(exclude={"indicators"}), indicators=specs, track_history=True),
-        disconnected=disconnected,
-        deadline=ctx.deadline,
-        retain_work=True,
-    )
+    composite = query.series_kind == "composite"
+    if composite:
+        # Validate every spec before the shared reader can register any job.
+        from ..indicator_state import IndicatorState
+
+        try:
+            for spec in specs:
+                IndicatorState(spec)
+        except ValueError as error:
+            raise CapabilityError("INVALID_ARGUMENT", str(error)) from error
+    meta = None if composite else await asyncio.to_thread(identity, query, ctx.deadline)
+    try:
+        page = await query_chart(
+            DataQuery(**query.model_dump(exclude={"indicators"}), indicators=specs, track_history=True),
+            disconnected=disconnected,
+            deadline=ctx.deadline,
+            retain_work=True,
+        )
+    except HTTPException as error:
+        if composite and isinstance(error.detail, dict):
+            code = error.detail.get("code")
+            if code in ("DATA_UNAVAILABLE", "INDICATOR_DEMAND_CAPACITY", "DISPLAY_SNAPSHOT_CAPACITY"):
+                raise CapabilityError("DATA_UNAVAILABLE" if code == "DATA_UNAVAILABLE" else "RESOURCE_LIMIT",
+                                      error.detail["message"], True) from error
+        raise
+    if composite:
+        meta = {"source": "composite", "basis": page["basis"], "calendar": page["calendar"]}
     if not page["bars"]:
         raise CapabilityError(
             "DATA_UNAVAILABLE",
             "No candles available",
             True,
-            {"instrument": query.instrument, "series_kind": query.series_kind},
+            {"instrument": query.instrument, "series_kind": query.series_kind,
+             **({key: page.get(key) for key in ("revision_id", "input_revision", "preparation_status", "pending")} if composite else {})},
         )
     unavailable = [
         item["name"]
         for item in page["indicators"]
         if all(v["value"] is None for s in item["series"] for v in s["values"])
     ]
-    if unavailable:
+    if unavailable and not composite:
         raise CapabilityError(
             "INSUFFICIENT_HISTORY",
             "No valid values for requested indicators",
@@ -370,7 +393,7 @@ def build_registry():
             "indicators_calculate",
             "Calculate 1–12 indicators from the shared chart snapshot with original warmup, gaps and revisions. Null is unavailable. Max 2000 visible bars.",
             IndicatorsQuery,
-            BarsResult,
+            IndicatorsResult,
             "analysis:read",
             bars,
         ),

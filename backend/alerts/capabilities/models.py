@@ -2,7 +2,7 @@
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from ..business import WatchInput
 
@@ -95,9 +95,31 @@ class BarsQuery(QuoteQuery):
 
 
 class IndicatorsQuery(BarsQuery):
+    series_kind: Literal["managed", "provider", "composite"] = "managed"
     provisional: bool = Field(default=False, description="Opt in to recomputed last incomplete candle; values are marked provisional")
     calculation_origin: int | None = Field(default=None, ge=0, description="Reuse the returned provider calculation_origin to pin recursive history")
+    composite_revision_id: str | None = Field(default=None, min_length=1, max_length=36)
+    input_revision: int | None = Field(default=None, ge=0, strict=True)
     indicators: list[IndicatorSpec] = Field(min_length=1, max_length=12)
+
+    @model_validator(mode="after")
+    def validate_composite_options(self):
+        if self.instrument.startswith("MWC:"):
+            if self.series_kind != "composite":
+                raise ValueError("MWC 标识须显式指定 series_kind=composite")
+            from ..chart_series import decode
+
+            self.instrument = decode(self.instrument)[0]
+        if self.series_kind == "composite":
+            if self.published or self.dataset_start is not None or self.calculation_origin is not None:
+                raise ValueError("组合指标不支持 published、dataset_start 或 calculation_origin")
+            if self.input_revision is not None and not self.composite_revision_id:
+                raise ValueError("指定 input_revision 时必须指定 composite_revision_id")
+            if self.provisional and self.input_revision is not None:
+                raise ValueError("provisional 与 input_revision 不能同时使用")
+        elif self.composite_revision_id is not None or self.input_revision is not None:
+            raise ValueError("组合修订参数只适用于 series_kind=composite")
+        return self
 
 
 class AlertQuery(PageQuery):
@@ -184,7 +206,7 @@ class BarResult(Record):
     revision: int = 0
 
 
-class ValuePoint(BaseModel):
+class ValuePoint(Record):
     time: int
     value: float | None
     provisional: bool = False
@@ -196,11 +218,46 @@ class IndicatorSeries(Record):
     values: list[ValuePoint]
 
 
+class InputEvidence(Record):
+    revision_id: str | None = None
+    input_revision: int | None = None
+    history_version_id: str | None = None
+    display_snapshot_id: str | None = None
+    provider_snapshot_id: str | None = None
+    cache_revision: int | None = None
+    calculation_origin: int | None = None
+
+
+class Calculation(Record):
+    run_id: str | None = None
+    status: str | None = None
+    visible_complete: bool | None = None
+    calculation_origin: int | None = None
+    algorithm: str | None = None
+    coverage: list[dict] = Field(default_factory=list)
+    required_coverage: list[dict] = Field(default_factory=list)
+    cursor: int | None = None
+    target_end: int | None = None
+    error: str | None = None
+    next_at: int | None = None
+    input_evidence: InputEvidence | None = None
+
+
+class Dependency(Record):
+    start: int
+    dependency_origin: int | None = None
+    seam_dependency: bool | None = None
+    initialized: bool | None = None
+    provisional: bool | None = None
+
+
 class IndicatorResult(Record):
     name: str
     version: str
     params: dict[str, int | float | str]
     series: list[IndicatorSeries]
+    calculation: Calculation | None = None
+    dependencies: list[Dependency] = Field(default_factory=list)
 
 
 class ChartPage(Record):
@@ -231,6 +288,35 @@ class BarsResult(BaseModel):
     interval_breaks: list[dict[str, int]] = Field(default_factory=list)
     gap_assessment: Literal["trading_calendar", "unknown_calendar"] = "trading_calendar"
     page: ChartPage
+
+
+class IndicatorBar(BarResult):
+    time_closed: bool | None = None
+    source_confirmed: bool | None = None
+    coverage_complete: bool | None = None
+    chart_time: int | None = None
+    segments: list[dict] = Field(default_factory=list)
+
+
+class IndicatorsPage(ChartPage):
+    bars: list[IndicatorBar]
+    composite_id: str | None = None
+    revision_id: str | None = None
+    input_revision: int | None = None
+    history_version_id: str | None = None
+    history_checksum: str | None = None
+    seam: int | None = None
+    rule_version: str | None = None
+    display_snapshot_id: str | None = None
+    provider_snapshot_id: str | None = None
+    calculation_origin: int | None = None
+    calculation: Calculation | None = None
+    indicator_progress: list[Calculation] = Field(default_factory=list)
+    pending: list[str] = Field(default_factory=list)
+
+
+class IndicatorsResult(BarsResult):
+    page: IndicatorsPage
 
 
 class CatalogResult(BaseModel):
