@@ -181,3 +181,93 @@ def test_fixed_export_rejects_actual_row_overflow_without_import_jobs(database, 
                 assert db.scalar(select(ImportJob)) is None and db.scalar(select(MarketDemand)) is None
     finally:
         api.app.dependency_overrides.clear()
+
+
+def alternate_revision(factory, ident, old_id):
+    """A deliberately different calendar, baseline, mapping and precision."""
+    from alerts.storage import (
+        CompositePreparation,
+        HistoryVersion,
+        Instrument,
+        MarketDataset,
+        RealtimeMapping,
+    )
+
+    with factory.begin() as db:
+        old = db.get(CompositeRevision, old_id)
+        original = db.get(HistoryVersion, old.history_version_id)
+        dataset = db.get(MarketDataset, original.dataset_id)
+        instrument = db.get(Instrument, dataset.instrument_id)
+        new_inst = Instrument(id='alternate-history', label='Alternate', source=instrument.source,
+            symbol=instrument.symbol, basis='mid', calendar='utc0', precision=8, calendar_profile={})
+        db.add(new_inst)
+        db.flush()
+        new_dataset = MarketDataset(id='f' * 64, instrument_id=new_inst.id, logical_symbol=dataset.logical_symbol,
+            identity=dataset.identity, volume_kind=dataset.volume_kind, volume_unit=dataset.volume_unit)
+        db.add(new_dataset)
+        db.flush()
+        new_version = HistoryVersion(**{c.name: getattr(original, c.name) for c in HistoryVersion.__table__.columns
+                                       if c.name not in ('id', 'dataset_id')}, dataset_id=new_dataset.id)
+        db.add(new_version)
+        db.flush()
+        mapping = db.get(RealtimeMapping, old.mapping_id)
+        other_mapping = RealtimeMapping(id='e' * 64, dataset_id=new_dataset.id,
+            target_dataset_id=mapping.target_dataset_id, permission_scope=mapping.permission_scope, match=mapping.match)
+        db.add(other_mapping)
+        db.flush()
+        new = CompositeRevision(composite_id=ident, history_version_id=new_version.id, mapping_id=other_mapping.id,
+            parent_revision_id=old.id, seam=old.seam, rules=old.rules | {'aggregation_calendar': 'utc0'},
+            request_id='alternate-test')
+        db.add(new)
+        db.flush()
+        db.add(CompositePreparation(revision_id=new.id, cursor=old.seam, cutoff=old.seam))
+        return new.id
+
+
+def test_selected_nonactive_revision_supplies_all_metadata(database, monkeypatch):
+    from alerts.storage import HistoryVersion
+    from test_composite_chart import populated
+
+    ident, old_id, _ = populated(database, monkeypatch)
+    other = alternate_revision(database, ident, old_id)
+    with database.begin() as db:
+        db.get(MarketComposite, ident).active_revision_id = other
+        old = db.get(CompositeRevision, old_id)
+        parent = db.get(HistoryVersion, old.history_version_id)
+        expected = metadata(db, ident, 'composite')
+        assert expected['basis'] == 'mid' and expected['precision'] == 8 and expected['calendar'] == 'utc0'
+    result = data_sync(DataQuery(instrument=ident, series_kind='composite', timeframe='M1', limit=2,
+        composite_revision_id=old_id, input_revision=1, provisional=False,
+        indicators=[{'name': 'EMA', 'params': {'period': 2}}]))
+    assert result['revision_id'] == old_id and result['input_revision'] == 1
+    assert result['basis'] == 'bid' and result['precision'] == 5 and result['calendar'] == 'ny17'
+    assert result['history_version_id'] == parent.id and result['history_checksum'] == parent.manifest['checksum']
+    evidence = result['indicators'][0]['calculation']['input_evidence']
+    assert evidence['revision_id'] == old_id and evidence['history_version_id'] == parent.id
+
+
+def test_revision_and_input_are_selected_before_metadata(database, monkeypatch):
+    from alerts import series_access
+    from test_composite_chart import populated
+    from test_fixed_indicators import add_tail
+    from test_market_contracts import minute
+
+    ident, old_id, seam = populated(database, monkeypatch)
+    other = alternate_revision(database, ident, old_id)
+    original = series_access._metadata
+    called = []
+    def concurrent_change(db, *args, **kwargs):
+        called.append(True)
+        with database.begin() as writer:
+            writer.get(MarketComposite, ident).active_revision_id = other
+        add_tail(database, old_id, [minute(seam + 600000, volume='3', close='1.115')])
+        db.expire_all()  # Force any accidental default re-read to see the new head.
+        return original(db, *args, **kwargs)
+    monkeypatch.setattr(series_access, '_metadata', concurrent_change)
+    result = data_sync(DataQuery(instrument=ident, series_kind='composite', timeframe='M1', limit=20,
+        provisional=False, indicators=[{'name': 'EMA', 'params': {'period': 2}}]))
+    assert called == [True]
+    assert result['revision_id'] == old_id and result['input_revision'] == 1
+    assert result['basis'] == 'bid' and result['precision'] == 5 and result['calendar'] == 'ny17'
+    assert result['bars'][-1]['start'] == seam + 540000
+    assert result['indicators'][0]['calculation']['input_evidence']['input_revision'] == 1
