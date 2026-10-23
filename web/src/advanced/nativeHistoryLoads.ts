@@ -11,6 +11,7 @@ export type HistoryCapabilities = {
   min_bars: number;
   hard_max_bars: number;
   default_bars: number;
+  result_polling?: boolean;
 };
 
 export type HistoryProgress = {
@@ -210,20 +211,24 @@ export async function loadNativeHistory(
           signal.addEventListener("abort", abort, { once: true });
           if (signal.aborted) abort();
         });
-        reply = {
-          load: await api(`/charts/history-loads/${handle}`, undefined, signal),
-        };
+        // This endpoint already returns progress while unfinished. Capable
+        // servers include final page counts beside data, so readiness does
+        // not require a second HTTP round trip after readiness is observed.
+        reply = capabilities.result_polling
+          ? await api(`/charts/history-loads/${handle}/result`, undefined, signal)
+          : {load: await api(`/charts/history-loads/${handle}`, undefined, signal)};
         delay = Math.min(1500, delay * 1.4);
       }
       if (reply.result) {
+        const pages = reply.load?.pages ?? state?.pages ?? 0;
         progress({
           phase: "delivering",
-          pages: state?.pages || 0,
-          estimatedPages: state?.pages || 0,
+          pages,
+          estimatedPages: pages,
           received: reply.result.bars?.length || 0,
         });
         delivered = true;
-        return {...reply.result,history_pages:state?.pages || 0};
+        return {...reply.result,history_pages:pages};
       }
     }
   } finally {

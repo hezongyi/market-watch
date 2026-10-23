@@ -170,7 +170,7 @@ def result(owner, ident):
     status_now = status(owner, ident)
     if status_now["state"] != "ready":
         return {"load": status_now}
-    return {"result": value}
+    return {"result": value, "load": status_now}
 
 
 def once():

@@ -44,6 +44,21 @@ def test_cold_task_progress_final_snapshot_hot_reuse_and_idempotency(history):
     assert exc.value.status_code == 404
 
 
+def test_result_poll_preserves_progress_and_final_page_count(history):
+    from alerts.provider_history_policy import capabilities
+
+    assert capabilities()['result_polling'] is True
+    ident = loads.submit('owner', 'result-poll', body(8000))['load']['id']
+    assert loads.result('owner', ident)['load']['state'] == 'waiting'
+    loads.once()
+    pending = loads.result('owner', ident)
+    assert pending['load']['pages'] == 1 and 'result' not in pending
+    loads.once()
+    ready = loads.result('owner', ident)
+    assert ready['load']['id'] == ident and ready['load']['state'] == 'ready'
+    assert ready['load']['pages'] == 2 and len(ready['result']['bars']) == 8000
+
+
 def test_pending_turn_retains_fill_timings_and_final_result_contract(history, caplog, monkeypatch):
     original = upstream.native_page
 

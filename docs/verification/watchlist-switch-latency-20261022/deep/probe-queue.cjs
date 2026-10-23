@@ -94,6 +94,10 @@ globalThis.__MWLAT={records:[],next:0,byId:new Map(),byResolve:new WeakMap()};
   requestRows.set(request,row);report.requests.push(row);
  });
  page.on('requestfailed',request=>{const row=requestRows.get(request);if(row){row.ended=Date.now();row.failure=request.failure()?.errorText;}});
+ page.on('requestfinished',request=>{
+  const row=requestRows.get(request);
+  if(row){row.networkFinished=Date.now();row.networkTiming=request.timing();}
+ });
  page.on('response',response=>{
   const row=requestRows.get(response.request());if(!row)return;
   const promise=(async()=>{

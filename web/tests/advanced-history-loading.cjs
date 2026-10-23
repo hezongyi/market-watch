@@ -81,6 +81,62 @@ function loader(api, clock = Date) {
   assert.equal(coldProgress.at(-1).estimatedPages, 3);
   assert.equal(coldProgress.at(-1).received, 3);
   assert.ok(paths.at(-1).endsWith("/cancel"));
+
+  const resultPaths = [], resultProgress = [];
+  const resultReplies = [
+    { load: { id: "combined", state: "waiting", pages: 0 } },
+    { load: { id: "combined", state: "filling", pages: 1 } },
+    { load: { id: "combined", state: "ready", pages: 3 }, result: { bars: [1, 2, 3] } },
+  ];
+  const combined = loader(async path => {
+    resultPaths.push(path);
+    if (path.endsWith("/cancel")) return {};
+    assert.ok(path === "/charts/history-loads" || path.endsWith("/result"),
+      "capable servers deliver readiness and data in the same result poll");
+    return resultReplies.shift();
+  });
+  const combinedResult = await combined(body, new AbortController().signal,
+    {...cap, result_polling: true}, p => resultProgress.push(p));
+  assert.equal(combinedResult.bars.length, 3);
+  assert.equal(combinedResult.history_pages, 3,
+    "the final result poll owns the actual page count, rather than the previous incomplete poll");
+  assert.equal(resultProgress.at(-1).pages, 3);
+  assert.equal(resultProgress.at(-1).estimatedPages, 3);
+  assert.equal(resultPaths.length, 4, "no separate ready-status round trip precedes the final result");
+
+  const resumedProgress = [];
+  const resumedReplies = [
+    { load: { id: "resumed", state: "waiting", pages: 0 } },
+    { load: { id: "resumed", state: "filling", pages: 1 } },
+    { load: { id: "resumed", state: "waiting", pages: 1 } },
+    { load: { id: "resumed", state: "ready", pages: 2 }, result: { bars: [1] } },
+  ];
+  const resumed = loader(async path => path.endsWith("/cancel") ? {} : resumedReplies.shift());
+  const resumedResult = await resumed(body, new AbortController().signal,
+    {...cap, result_polling: true}, p => resumedProgress.push(p));
+  assert.equal(resumedResult.history_pages, 2);
+  assert.deepEqual(resumedProgress.map(p => p.phase), ["checking", "waiting", "filling", "filling", "delivering"],
+    "cache invalidation can return to waiting without delivering an incomplete result");
+
+  let failedPollCleaned = false;
+  const failedPoll = loader(async path => {
+    if (path.endsWith("/cancel")) { failedPollCleaned = true; return {}; }
+    return {load:{id:"failed-poll",state:path.endsWith("/result") ? "failed" : "waiting",
+      error:{code:"HISTORY_PROVIDER_FAILED",message:"failed"}}};
+  });
+  await assert.rejects(failedPoll(body, new AbortController().signal,
+    {...cap, result_polling:true}, () => {}), error => error.code === "HISTORY_PROVIDER_FAILED");
+  assert.equal(failedPollCleaned, true, "an error returned by a result poll still releases its handle");
+  const pollingAbort = new AbortController();
+  let abortedPollCleaned = false;
+  const abortPoll = loader(async path => {
+    if (path.endsWith("/cancel")) { abortedPollCleaned = true; return {}; }
+    if (path.endsWith("/result")) { pollingAbort.abort(); throw new DOMException("cancelled", "AbortError"); }
+    return {load:{id:"aborted-poll",state:"waiting"}};
+  });
+  await assert.rejects(abortPoll(body, pollingAbort.signal,
+    {...cap, result_polling:true}, () => {}), {name:"AbortError"});
+  assert.equal(abortedPollCleaned, true, "aborting an in-flight result poll cannot leak a handle");
   let finishCleanup, cleanupStarted;
   const cleanupPending = new Promise(resolve => { finishCleanup = resolve; });
   const cleanupEntered = new Promise(resolve => { cleanupStarted = resolve; });
