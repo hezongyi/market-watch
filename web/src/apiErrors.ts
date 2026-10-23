@@ -103,7 +103,7 @@ export function responseError(
       : {};
   const fallback =
     status === 409
-      ? "告警已在其他窗口改变，请保留草稿并重新读取"
+      ? "内容已在其他窗口修改，请保留草稿并重新读取"
       : status === 422
         ? "输入不合法，请检查条件和到期时间"
         : "服务暂不可用，请稍后重试";

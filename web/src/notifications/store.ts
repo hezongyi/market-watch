@@ -212,7 +212,7 @@ export class NoticeStore {
         key: subject + ":progress",
         subject,
         at: Date.now(),
-        value: { after, epoch, unread },
+        value: { presentationVersion: 1, after, epoch, unread },
       });
       // Persist eligible live alerts before advancing the cursor. Keep the v1
       // schema readable by older clients; queue records use separate cache keys.

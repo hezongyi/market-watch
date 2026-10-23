@@ -1,3 +1,6 @@
+import json
+import logging
+
 import pytest
 from alerts import native_history_loads as loads
 from alerts import provider_cache as cache
@@ -39,6 +42,47 @@ def test_cold_task_progress_final_snapshot_hot_reuse_and_idempotency(history):
     with pytest.raises(Exception) as exc:
         loads.status('another-owner', ident)
     assert exc.value.status_code == 404
+
+
+def test_result_poll_preserves_progress_and_final_page_count(history):
+    from alerts.provider_history_policy import capabilities
+
+    assert capabilities()['result_polling'] is True
+    ident = loads.submit('owner', 'result-poll', body(8000))['load']['id']
+    assert loads.result('owner', ident)['load']['state'] == 'waiting'
+    loads.once()
+    pending = loads.result('owner', ident)
+    assert pending['load']['pages'] == 1 and 'result' not in pending
+    loads.once()
+    ready = loads.result('owner', ident)
+    assert ready['load']['id'] == ident and ready['load']['state'] == 'ready'
+    assert ready['load']['pages'] == 2 and len(ready['result']['bars']) == 8000
+
+
+def test_pending_turn_retains_fill_timings_and_final_result_contract(history, caplog, monkeypatch):
+    original = upstream.native_page
+
+    def timed_page(*args, **kwargs):
+        started = cache.time.monotonic()
+        value = original(*args, **kwargs)
+        upstream.record_timing('upstream_http', started)
+        return value
+
+    monkeypatch.setattr(upstream, 'native_page', timed_page)
+    caplog.set_level(logging.INFO, logger=loads.__name__)
+    ident = loads.submit('owner', 'timed-pages', body(8000))['load']['id']
+    loads.once()
+    turn = json.loads(next(record.message.split('native-history-turn ', 1)[1]
+                           for record in caplog.records if record.message.startswith('native-history-turn ')))
+    assert turn['id'] == ident and turn['state'] == 'waiting' and turn['committed']
+    assert turn['pages'] == 1 and turn['finished_at'] >= turn['claimed_at'] >= turn['created_at']
+    assert all(turn[key] >= 0 for key in ('claim_ms', 'fill_ms', 'persist_ms'))
+    assert all(turn['timings_ms'][key] >= 0 for key in ('read_total', 'upstream_http', 'lease_wait', 'database_commit'))
+    assert 'owner' not in turn and 'query' not in turn
+    loads.once()
+    result = loads.result('owner', ident)['result']
+    assert len(result['bars']) == 8000 and result['cache_hit']
+    assert 'timings_ms' in result and 'history_trace' not in result
 
 
 def test_cancel_one_consumer_preserves_other_and_committed_pages(history):

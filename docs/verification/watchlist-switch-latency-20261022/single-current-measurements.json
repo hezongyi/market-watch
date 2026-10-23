@@ -1,0 +1,352 @@
+{
+  "runtime": {
+    "apiWebCommit": "914525a0b3f6603cb5d851c2941556ff4321a38c",
+    "chartCommit": "b7ef7be30736b2ad8f1b187430122ae7b5ee3e23",
+    "all15ContainersAndImagesUnchanged": true,
+    "apiAndDatabaseHealthy": true
+  },
+  "runs": [
+    {
+      "run": "single-914525a-01",
+      "started": "2026-10-23T02:04:41.410Z",
+      "ended": "2026-10-23T02:05:24.092Z",
+      "initialKind": "composite",
+      "passed": true,
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "initialChartCount": 1,
+      "resolution": "60",
+      "studyCount": 0,
+      "loginToInitialSingleReadyMs": 5046,
+      "trials": [
+        {
+          "round": 0,
+          "scenario": "provider-entry",
+          "quietBefore": false,
+          "quietWaitMs": 15606,
+          "priceReadyMs": 5543,
+          "clickMs": 395,
+          "pricePath": "datafeed",
+          "chart": {
+            "count": 1,
+            "resolution": "60",
+            "studies": 0,
+            "finiteBars": 198
+          },
+          "includedAsActualSwitch": true,
+          "getBars": [
+            {
+              "resolution": "60",
+              "countBack": 199,
+              "first": true,
+              "bars": 410
+            }
+          ],
+          "observedPriceRequestCount": 1
+        },
+        {
+          "round": 0,
+          "scenario": "fixed",
+          "quietBefore": true,
+          "quietWaitMs": 711,
+          "priceReadyMs": 939,
+          "clickMs": 303,
+          "pricePath": "datafeed",
+          "chart": {
+            "count": 1,
+            "resolution": "60",
+            "studies": 0,
+            "finiteBars": 198
+          },
+          "includedAsActualSwitch": true,
+          "getBars": [
+            {
+              "resolution": "60",
+              "countBack": 198,
+              "first": true,
+              "bars": 198
+            }
+          ],
+          "observedPriceRequestCount": 2
+        },
+        {
+          "round": 0,
+          "scenario": "composite",
+          "quietBefore": true,
+          "quietWaitMs": 1781,
+          "priceReadyMs": 391,
+          "clickMs": 337,
+          "pricePath": "native-cache",
+          "chart": {
+            "count": 1,
+            "resolution": "60",
+            "studies": 0,
+            "finiteBars": 744
+          },
+          "includedAsActualSwitch": true,
+          "getBars": [],
+          "observedPriceRequestCount": 0
+        },
+        {
+          "round": 0,
+          "scenario": "provider-return",
+          "quietBefore": true,
+          "quietWaitMs": 2821,
+          "priceReadyMs": 496,
+          "clickMs": 358,
+          "pricePath": "native-cache",
+          "chart": {
+            "count": 1,
+            "resolution": "60",
+            "studies": 0,
+            "finiteBars": 744
+          },
+          "includedAsActualSwitch": true,
+          "getBars": [],
+          "observedPriceRequestCount": 0
+        },
+        {
+          "round": 1,
+          "scenario": "provider-entry",
+          "quietBefore": true,
+          "quietWaitMs": 629,
+          "priceReadyMs": 374,
+          "clickMs": 346,
+          "pricePath": "native-cache",
+          "chart": {
+            "count": 1,
+            "resolution": "60",
+            "studies": 0,
+            "finiteBars": 592
+          },
+          "includedAsActualSwitch": false,
+          "excludedReason": "Repeated click on the already selected provider; not a switch. Excluded from all loading/cache ranges. The final harness prevents this.",
+          "getBars": [],
+          "observedPriceRequestCount": 0
+        },
+        {
+          "round": 1,
+          "scenario": "fixed",
+          "quietBefore": true,
+          "quietWaitMs": 737,
+          "priceReadyMs": 475,
+          "clickMs": 359,
+          "pricePath": "native-cache",
+          "chart": {
+            "count": 1,
+            "resolution": "60",
+            "studies": 0,
+            "finiteBars": 744
+          },
+          "includedAsActualSwitch": true,
+          "getBars": [],
+          "observedPriceRequestCount": 0
+        },
+        {
+          "round": 1,
+          "scenario": "composite",
+          "quietBefore": true,
+          "quietWaitMs": 1610,
+          "priceReadyMs": 339,
+          "clickMs": 318,
+          "pricePath": "native-cache",
+          "chart": {
+            "count": 1,
+            "resolution": "60",
+            "studies": 0,
+            "finiteBars": 376
+          },
+          "includedAsActualSwitch": true,
+          "getBars": [],
+          "observedPriceRequestCount": 0
+        },
+        {
+          "round": 1,
+          "scenario": "provider-return",
+          "quietBefore": true,
+          "quietWaitMs": 2209,
+          "priceReadyMs": 379,
+          "clickMs": 293,
+          "pricePath": "native-cache",
+          "chart": {
+            "count": 1,
+            "resolution": "60",
+            "studies": 0,
+            "finiteBars": 592
+          },
+          "includedAsActualSwitch": true,
+          "getBars": [],
+          "observedPriceRequestCount": 0
+        }
+      ],
+      "before": {
+        "revision": 78,
+        "workspaceHash": "b4c31ec78ee3ae6cb59f7ac03458f55d620a69643fb4db6257567812a66e7480",
+        "preferencesHash": "bb4c1258e3914d4f8ca15ce74be46c6f7a1a17ed3578548a54a32a2b9d52e9bf"
+      },
+      "after": {
+        "revision": 78,
+        "workspaceHash": "b4c31ec78ee3ae6cb59f7ac03458f55d620a69643fb4db6257567812a66e7480",
+        "preferencesHash": "bb4c1258e3914d4f8ca15ce74be46c6f7a1a17ed3578548a54a32a2b9d52e9bf"
+      },
+      "resources": {
+        "admitted": 0,
+        "cleaning": 0,
+        "queued": 0,
+        "cleanupFailures": 0
+      },
+      "bridge": {
+        "queued": 0,
+        "pending": 0
+      },
+      "browserErrors": [],
+      "chartHttpErrors": []
+    },
+    {
+      "run": "single-914525a-02",
+      "started": "2026-10-23T02:06:29.334Z",
+      "ended": "2026-10-23T02:07:04.075Z",
+      "initialKind": "provider-XAUUSD",
+      "passed": true,
+      "viewport": {
+        "width": 1600,
+        "height": 1000
+      },
+      "initialChartCount": 1,
+      "resolution": "60",
+      "studyCount": 0,
+      "loginToInitialSingleReadyMs": 5856,
+      "trials": [
+        {
+          "round": 0,
+          "scenario": "provider-entry",
+          "quietBefore": true,
+          "quietWaitMs": 15492,
+          "priceReadyMs": 2690,
+          "clickMs": 249,
+          "pricePath": "datafeed",
+          "chart": {
+            "count": 1,
+            "resolution": "60",
+            "studies": 0,
+            "finiteBars": 198
+          },
+          "includedAsActualSwitch": true,
+          "getBars": [
+            {
+              "resolution": "60",
+              "countBack": 199,
+              "first": true,
+              "bars": 408
+            }
+          ],
+          "observedPriceRequestCount": 1
+        },
+        {
+          "round": 0,
+          "scenario": "fixed",
+          "quietBefore": true,
+          "quietWaitMs": 733,
+          "priceReadyMs": 688,
+          "clickMs": 320,
+          "pricePath": "datafeed",
+          "chart": {
+            "count": 1,
+            "resolution": "60",
+            "studies": 0,
+            "finiteBars": 198
+          },
+          "includedAsActualSwitch": true,
+          "getBars": [
+            {
+              "resolution": "60",
+              "countBack": 198,
+              "first": true,
+              "bars": 198
+            }
+          ],
+          "observedPriceRequestCount": 2
+        },
+        {
+          "round": 0,
+          "scenario": "composite",
+          "quietBefore": true,
+          "quietWaitMs": 2187,
+          "priceReadyMs": 1475,
+          "clickMs": 276,
+          "pricePath": "datafeed",
+          "chart": {
+            "count": 1,
+            "resolution": "60",
+            "studies": 0,
+            "finiteBars": 198
+          },
+          "includedAsActualSwitch": true,
+          "getBars": [
+            {
+              "resolution": "60",
+              "countBack": 199,
+              "first": true,
+              "bars": 199
+            }
+          ],
+          "observedPriceRequestCount": 2
+        },
+        {
+          "round": 0,
+          "scenario": "provider-return",
+          "quietBefore": true,
+          "quietWaitMs": 2819,
+          "priceReadyMs": 351,
+          "clickMs": 307,
+          "pricePath": "native-cache",
+          "chart": {
+            "count": 1,
+            "resolution": "60",
+            "studies": 0,
+            "finiteBars": 744
+          },
+          "includedAsActualSwitch": true,
+          "getBars": [],
+          "observedPriceRequestCount": 0
+        }
+      ],
+      "before": {
+        "revision": 78,
+        "workspaceHash": "b4c31ec78ee3ae6cb59f7ac03458f55d620a69643fb4db6257567812a66e7480",
+        "preferencesHash": "bb4c1258e3914d4f8ca15ce74be46c6f7a1a17ed3578548a54a32a2b9d52e9bf"
+      },
+      "after": {
+        "revision": 78,
+        "workspaceHash": "b4c31ec78ee3ae6cb59f7ac03458f55d620a69643fb4db6257567812a66e7480",
+        "preferencesHash": "bb4c1258e3914d4f8ca15ce74be46c6f7a1a17ed3578548a54a32a2b9d52e9bf"
+      },
+      "resources": {
+        "admitted": 0,
+        "cleaning": 0,
+        "queued": 0,
+        "cleanupFailures": 0
+      },
+      "bridge": {
+        "queued": 0,
+        "pending": 0
+      },
+      "browserErrors": [],
+      "chartHttpErrors": []
+    }
+  ],
+  "cacheRangeMs": {
+    "n": 6,
+    "min": 339,
+    "max": 496
+  },
+  "caveats": [
+    "H1 single chart, zero studies; not full-page startup or Python-indicator completion.",
+    "First means first target switch in this temporary native chart, not an empty server cache.",
+    "Primary window starts from XAUUSD; first preliminary window starts from composite and one no-op is excluded.",
+    "Measured from before automated click through price dataReady/loading; includes click overhead.",
+    "Small shared-host samples, no controlled A/B, stable percentiles or guaranteed zero regression."
+  ]
+}

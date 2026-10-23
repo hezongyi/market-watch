@@ -1,0 +1,74 @@
+{
+  "at": "2026-10-22T08:48:53.079Z",
+  "target": "https://192.168.7.232:18280",
+  "checks": [
+    "real mwa UI login and native chart startup",
+    "EURUSD: real OANDA two-step selection, server rules, optional note/evidence, native controls, themes, mobile and discard",
+    "XAUUSD: real OANDA two-step selection, server rules, optional note/evidence, native controls, themes, mobile and discard",
+    "discard leaves complete workspace and mapping lists unchanged; no mapping/composite writes"
+  ],
+  "errors": [],
+  "blockedWrites": [
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    }
+  ],
+  "passed": true,
+  "availableStandardFx": true,
+  "symbols": [
+    "EURUSD",
+    "XAUUSD"
+  ],
+  "workspaceUnchanged": true,
+  "mappingsUnchanged": true,
+  "revision": 43
+}

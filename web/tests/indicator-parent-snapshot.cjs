@@ -32,5 +32,8 @@ const token='a'.repeat(64),query={instrument:'test-composite',series_kind:'compo
  }
  const {display_snapshot_id,...ordinary}=query;
  await context.handle({id:3,query:ordinary});assert.equal(requests.length,3);
+ await context.handle({id:6,query:{...query,provisional:true,indicator_input_policy:'observed_display_v1'}});
+ assert.equal(requests.at(-1).body.indicator_input_policy,'observed_display_v1');
+ assert.equal(requests.at(-1).body.provisional,true);
  console.log('PASS actual parent snapshot forwarding and identity validation');
 })().catch(e=>{console.error(e);process.exitCode=1;});

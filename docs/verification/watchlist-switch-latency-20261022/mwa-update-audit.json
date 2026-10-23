@@ -1,0 +1,691 @@
+{
+  "host": "quant-server",
+  "project": "mw-issue75-v2-20261018",
+  "before": {
+    "observedAt": "2026-10-22T23:48:27.616608+00:00",
+    "host": "quant-server",
+    "project": "mw-issue75-v2-20261018",
+    "previousDurableSHA256": "fe15d3fcca3a3ee9925277e899ff53797ba978e4f97c284cbb5b1f2023d56db7",
+    "services": [
+      {
+        "service": "api",
+        "id": "cce304aedb799519500b9a6611eb4db5583eed1df9d0274a6aefd782bcd13046",
+        "image": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+        "status": "running",
+        "health": "healthy",
+        "configFiles": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime/integrated-compose.json,/home/quant/repos/.mwa-v1264-chart-init-20261021/candidate-override.json,/home/quant/repos/.mw-mcp-setup-20261022/acceptance-override.private.json",
+        "workingDir": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime",
+        "envCount": 30,
+        "mountCount": 0,
+        "networkNames": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "chart",
+        "id": "d934073c00d4cdb698bf6d03a74a4f6d94e18a528d8c88e8ce7d501aaf0a7e5f",
+        "image": "sha256:c7dfff56aa5cb9f9baaff314700a77bd0cd76ad92ebbb8d40defd0bfbbeccb0a",
+        "status": "running",
+        "health": null,
+        "configFiles": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime/integrated-compose.json,/home/quant/repos/.mwa-notice-reliability-20261022/c4/candidate-override.json",
+        "workingDir": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime",
+        "envCount": 7,
+        "mountCount": 0,
+        "networkNames": [
+          "mw-issue75-v2-20261018_browser"
+        ]
+      },
+      {
+        "service": "chart-aggregation-worker",
+        "id": "c7a278bbc1eaf68a910111d891b4d1a76542746e32e9740c1e70da0d4818ac25",
+        "image": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+        "status": "running",
+        "health": null,
+        "configFiles": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime/integrated-compose.json,/home/quant/repos/.mwa-notice-reliability-20261022/c3/candidate-override.json",
+        "workingDir": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime",
+        "envCount": 27,
+        "mountCount": 0,
+        "networkNames": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "chart-history-worker",
+        "id": "43e0304c6b99c61e5ac43fe282fd5970e98cce77d2a003a2ad8571388d498583",
+        "image": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+        "status": "running",
+        "health": null,
+        "configFiles": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime/integrated-compose.json,/home/quant/repos/.mwa-notice-reliability-20261022/c3/candidate-override.json",
+        "workingDir": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime",
+        "envCount": 27,
+        "mountCount": 0,
+        "networkNames": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "composite-aggregate-worker",
+        "id": "32a4c3e8d65f802c8447d3a824dfea62a592bef253177b758b8ffaef8a0b5b20",
+        "image": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+        "status": "running",
+        "health": null,
+        "configFiles": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime/integrated-compose.json,/home/quant/repos/.mwa-notice-reliability-20261022/c3/candidate-override.json",
+        "workingDir": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime",
+        "envCount": 27,
+        "mountCount": 0,
+        "networkNames": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "gateway",
+        "id": "9492f307fdf9bfdbec7641c4e0b3554bed39340bc73a57448fdbd39e34d79ca9",
+        "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+        "status": "running",
+        "health": null,
+        "configFiles": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime/compose.json,/home/quant/repos/.mw-issue75-v2-tool-state/runtime/final-override.json,/home/quant/repos/.mw-issue75-v2-tool-state/runtime/ui-override.json",
+        "workingDir": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime",
+        "envCount": 7,
+        "mountCount": 2,
+        "networkNames": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "history-worker",
+        "id": "65382cf76a71d405fdb588913c15b35d723f1fbc19029cc4a906124bb8fd7054",
+        "image": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+        "status": "running",
+        "health": null,
+        "configFiles": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime/integrated-compose.json,/home/quant/repos/.mwa-notice-reliability-20261022/c3/candidate-override.json",
+        "workingDir": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime",
+        "envCount": 27,
+        "mountCount": 0,
+        "networkNames": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "market-stream-worker",
+        "id": "cd621ad832cb00df972582df203bb98966bc11d7c571ce5dd5421291e4a1c1e6",
+        "image": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+        "status": "running",
+        "health": null,
+        "configFiles": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime/integrated-compose.json,/home/quant/repos/.mwa-notice-reliability-20261022/c3/candidate-override.json",
+        "workingDir": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime",
+        "envCount": 27,
+        "mountCount": 0,
+        "networkNames": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "native-history-worker",
+        "id": "32147aa1e8368e6a9342bb404c60d8b36fb3597388681ea9f29b96d76053f0d9",
+        "image": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+        "status": "running",
+        "health": null,
+        "configFiles": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime/integrated-compose.json,/home/quant/repos/.mwa-notice-reliability-20261022/c3/candidate-override.json",
+        "workingDir": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime",
+        "envCount": 27,
+        "mountCount": 0,
+        "networkNames": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "notify-worker",
+        "id": "91dd49cee398a82e73779feb9b062de2e45a83dc73c2c20b8fb92fe9199a5d89",
+        "image": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+        "status": "running",
+        "health": null,
+        "configFiles": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime/integrated-compose.json,/home/quant/repos/.mwa-notice-reliability-20261022/c3/candidate-override.json",
+        "workingDir": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime",
+        "envCount": 27,
+        "mountCount": 0,
+        "networkNames": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "postgres",
+        "id": "3de49cbde9a20c6640092181c04d35df41677566795cfecae18c0ab284b0aba8",
+        "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+        "status": "running",
+        "health": "healthy",
+        "configFiles": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime/compose.json",
+        "workingDir": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime",
+        "envCount": 9,
+        "mountCount": 1,
+        "networkNames": [
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "pricing-worker",
+        "id": "b7e88dad2330df9c12631f24729225d023467d6a32888c770832ce80d549c37e",
+        "image": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+        "status": "running",
+        "health": null,
+        "configFiles": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime/integrated-compose.json,/home/quant/repos/.mwa-notice-reliability-20261022/c3/candidate-override.json",
+        "workingDir": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime",
+        "envCount": 27,
+        "mountCount": 0,
+        "networkNames": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "projector",
+        "id": "32987a563ff5777346f3100a5a3ed9900ef646f9b7d91e44da239d0a368864ff",
+        "image": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+        "status": "running",
+        "health": null,
+        "configFiles": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime/integrated-compose.json,/home/quant/repos/.mwa-notice-reliability-20261022/c3/candidate-override.json",
+        "workingDir": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime",
+        "envCount": 27,
+        "mountCount": 0,
+        "networkNames": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "realtime-worker",
+        "id": "639da09f2ccbce469c9eb37c3394560ce9072e4ff1b7d7c8392eec9e2a3eb9b0",
+        "image": "sha256:69eca14f0022ccc6a2f5e9cb0eb6dba421e02bfe38de9c4b4b94cd608e62c897",
+        "status": "running",
+        "health": null,
+        "configFiles": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime/integrated-compose.json,/home/quant/repos/.mwa-notice-reliability-20261022/c3/candidate-override.json",
+        "workingDir": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime",
+        "envCount": 27,
+        "mountCount": 0,
+        "networkNames": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      },
+      {
+        "service": "web",
+        "id": "89de765a30e34be869d9dc7646e2b12fa7901a1f431859ad6060ba45b5563d2c",
+        "image": "sha256:86ed4a885afaee93db9d7d9a368c4a01dac72e30fab626e550a6126103f30342",
+        "status": "running",
+        "health": null,
+        "configFiles": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime/integrated-compose.json,/home/quant/repos/.mwa-notice-reliability-20261022/c3/candidate-override.json",
+        "workingDir": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime",
+        "envCount": 7,
+        "mountCount": 0,
+        "networkNames": [
+          "mw-issue75-v2-20261018_browser",
+          "mw-issue75-v2-20261018_task"
+        ]
+      }
+    ]
+  },
+  "applied": {
+    "startedAt": "2026-10-22T23:49:42.702551+00:00",
+    "endedAt": "2026-10-22T23:50:10.943324+00:00",
+    "returncode": 0,
+    "targets": [
+      "api",
+      "chart",
+      "chart-aggregation-worker",
+      "chart-history-worker",
+      "composite-aggregate-worker",
+      "history-worker",
+      "market-stream-worker",
+      "native-history-worker",
+      "notify-worker",
+      "pricing-worker",
+      "projector",
+      "realtime-worker",
+      "web"
+    ],
+    "durableCandidateSHA256": "fd38f9ec72e4ad77bf0161666c8383a1ac00e4a6e10507c1014553569851871b",
+    "commandFlags": [
+      "up",
+      "-d",
+      "--no-deps",
+      "--no-build",
+      "--pull",
+      "never"
+    ],
+    "databaseGatewayNotSelected": true
+  },
+  "after": {
+    "observedAt": "2026-10-22T23:50:43.180483+00:00",
+    "host": "quant-server",
+    "project": "mw-issue75-v2-20261018",
+    "productCommit": "defdcf93ef9482a25af83c09ad0f8c80d5f3519a",
+    "baselineCommit": "983b40246d8d80e5f903fee7fb980e4ae516d03a",
+    "services": [
+      {
+        "service": "api",
+        "id": "49b65db02987316d3437cc5c4868435ed07b9f29665bc52759930dc0279ee1b4",
+        "image": "sha256:e99db5faa570c779780da31bec004413ff278c0e10add18f3a0685a9114a2eaa",
+        "status": "running",
+        "health": "healthy",
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": true
+      },
+      {
+        "service": "chart",
+        "id": "c3c4f2489bc3a6c8e20f5b572a2c68b862835a32516fed82a5d4a89bc7a762e4",
+        "image": "sha256:e5d7a70f2896effdc96e3f9a861d26292ccd41b0e085c2a575abb1fbee6e29e0",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": true
+      },
+      {
+        "service": "chart-aggregation-worker",
+        "id": "cbf2df710b2f0ee08db86f7153cb034aa3e662b672c19d07ae22e82fd7739afd",
+        "image": "sha256:e99db5faa570c779780da31bec004413ff278c0e10add18f3a0685a9114a2eaa",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": true
+      },
+      {
+        "service": "chart-history-worker",
+        "id": "b5eadffd79803ae828e9c0b138ecc56792dd58b2827e6bbf39bd78dde6a5ea2f",
+        "image": "sha256:e99db5faa570c779780da31bec004413ff278c0e10add18f3a0685a9114a2eaa",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": true
+      },
+      {
+        "service": "composite-aggregate-worker",
+        "id": "8131941542e14def42ec946eeb353258625ffb4430b46e971a074e4b477c9961",
+        "image": "sha256:e99db5faa570c779780da31bec004413ff278c0e10add18f3a0685a9114a2eaa",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": true
+      },
+      {
+        "service": "gateway",
+        "id": "9492f307fdf9bfdbec7641c4e0b3554bed39340bc73a57448fdbd39e34d79ca9",
+        "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": false
+      },
+      {
+        "service": "history-worker",
+        "id": "137e8ea7bc8bff2421e7bc3461b46afff76246ec92935805ea2e5033016989f8",
+        "image": "sha256:e99db5faa570c779780da31bec004413ff278c0e10add18f3a0685a9114a2eaa",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": true
+      },
+      {
+        "service": "market-stream-worker",
+        "id": "4e7d46fc5002c39e3db39f50619d318ef90eadf439756bdad5ae72fcbe683808",
+        "image": "sha256:e99db5faa570c779780da31bec004413ff278c0e10add18f3a0685a9114a2eaa",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": true
+      },
+      {
+        "service": "native-history-worker",
+        "id": "c5978a2d62cb91aae403b229166d010e86a93acca046252b68fa0a8a18465e69",
+        "image": "sha256:e99db5faa570c779780da31bec004413ff278c0e10add18f3a0685a9114a2eaa",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": true
+      },
+      {
+        "service": "notify-worker",
+        "id": "1ec0fc74fb9763495bd4cad51fdd81cb8d4def2cae86fe9ef6cf46a0a33e50f3",
+        "image": "sha256:e99db5faa570c779780da31bec004413ff278c0e10add18f3a0685a9114a2eaa",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": true
+      },
+      {
+        "service": "postgres",
+        "id": "3de49cbde9a20c6640092181c04d35df41677566795cfecae18c0ab284b0aba8",
+        "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+        "status": "running",
+        "health": "healthy",
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": false
+      },
+      {
+        "service": "pricing-worker",
+        "id": "f511d7c7dcafa7e9fe521c1667eb709bea2aa4e0ac04b6184a0dc6d989603f3b",
+        "image": "sha256:e99db5faa570c779780da31bec004413ff278c0e10add18f3a0685a9114a2eaa",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": true
+      },
+      {
+        "service": "projector",
+        "id": "b9924bb42f5000e6a46eb5a02e1bbc7e5cc024b0c3a5b6f8354c499c28876a75",
+        "image": "sha256:e99db5faa570c779780da31bec004413ff278c0e10add18f3a0685a9114a2eaa",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": true
+      },
+      {
+        "service": "realtime-worker",
+        "id": "95f62dd9faa80e8ca43c951e66d9912eec1085a6ed8b69bfc42cdd48fad1ff82",
+        "image": "sha256:e99db5faa570c779780da31bec004413ff278c0e10add18f3a0685a9114a2eaa",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": true
+      },
+      {
+        "service": "web",
+        "id": "03d27620430b201e15b6e8e6a8a336a5df8254cba2128f46e1efaadb0c8edb42",
+        "image": "sha256:2ec2306beeba6373cd3cb6f319cdd36e6333c277c6c902e0c2e911789069b6d9",
+        "status": "running",
+        "health": null,
+        "restarts": 0,
+        "environmentUnchanged": true,
+        "mountsUnchanged": true,
+        "portsUnchanged": true,
+        "networkNamesUnchanged": true,
+        "commandUnchanged": true,
+        "containerReplaced": true
+      }
+    ],
+    "protectedBrowsers": [
+      {
+        "name": "mw-issue75-v2-browser",
+        "idUnchanged": true,
+        "startedAtUnchanged": true
+      }
+    ],
+    "endpoints": [
+      {
+        "url": "https://192.168.7.232:18280",
+        "status": 200
+      },
+      {
+        "url": "https://192.168.7.232:18281",
+        "status": 200
+      }
+    ],
+    "backendYahooEnabled": true,
+    "apiMcpEnvironmentUnchanged": true
+  },
+  "finalObservedAt": "2026-10-23T00:10:07.942200+00:00",
+  "final": [
+    {
+      "service": "api",
+      "id": "49b65db02987316d3437cc5c4868435ed07b9f29665bc52759930dc0279ee1b4",
+      "image": "sha256:e99db5faa570c779780da31bec004413ff278c0e10add18f3a0685a9114a2eaa",
+      "status": "running",
+      "health": "healthy",
+      "restarts": 0,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "portsUnchanged": true,
+      "networkNamesUnchanged": true
+    },
+    {
+      "service": "chart",
+      "id": "c3c4f2489bc3a6c8e20f5b572a2c68b862835a32516fed82a5d4a89bc7a762e4",
+      "image": "sha256:e5d7a70f2896effdc96e3f9a861d26292ccd41b0e085c2a575abb1fbee6e29e0",
+      "status": "running",
+      "health": null,
+      "restarts": 0,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "portsUnchanged": true,
+      "networkNamesUnchanged": true
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "id": "cbf2df710b2f0ee08db86f7153cb034aa3e662b672c19d07ae22e82fd7739afd",
+      "image": "sha256:e99db5faa570c779780da31bec004413ff278c0e10add18f3a0685a9114a2eaa",
+      "status": "running",
+      "health": null,
+      "restarts": 0,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "portsUnchanged": true,
+      "networkNamesUnchanged": true
+    },
+    {
+      "service": "chart-history-worker",
+      "id": "b5eadffd79803ae828e9c0b138ecc56792dd58b2827e6bbf39bd78dde6a5ea2f",
+      "image": "sha256:e99db5faa570c779780da31bec004413ff278c0e10add18f3a0685a9114a2eaa",
+      "status": "running",
+      "health": null,
+      "restarts": 0,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "portsUnchanged": true,
+      "networkNamesUnchanged": true
+    },
+    {
+      "service": "composite-aggregate-worker",
+      "id": "8131941542e14def42ec946eeb353258625ffb4430b46e971a074e4b477c9961",
+      "image": "sha256:e99db5faa570c779780da31bec004413ff278c0e10add18f3a0685a9114a2eaa",
+      "status": "running",
+      "health": null,
+      "restarts": 0,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "portsUnchanged": true,
+      "networkNamesUnchanged": true
+    },
+    {
+      "service": "gateway",
+      "id": "9492f307fdf9bfdbec7641c4e0b3554bed39340bc73a57448fdbd39e34d79ca9",
+      "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "status": "running",
+      "health": null,
+      "restarts": 0,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "portsUnchanged": true,
+      "networkNamesUnchanged": true
+    },
+    {
+      "service": "history-worker",
+      "id": "137e8ea7bc8bff2421e7bc3461b46afff76246ec92935805ea2e5033016989f8",
+      "image": "sha256:e99db5faa570c779780da31bec004413ff278c0e10add18f3a0685a9114a2eaa",
+      "status": "running",
+      "health": null,
+      "restarts": 0,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "portsUnchanged": true,
+      "networkNamesUnchanged": true
+    },
+    {
+      "service": "market-stream-worker",
+      "id": "4e7d46fc5002c39e3db39f50619d318ef90eadf439756bdad5ae72fcbe683808",
+      "image": "sha256:e99db5faa570c779780da31bec004413ff278c0e10add18f3a0685a9114a2eaa",
+      "status": "running",
+      "health": null,
+      "restarts": 0,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "portsUnchanged": true,
+      "networkNamesUnchanged": true
+    },
+    {
+      "service": "native-history-worker",
+      "id": "c5978a2d62cb91aae403b229166d010e86a93acca046252b68fa0a8a18465e69",
+      "image": "sha256:e99db5faa570c779780da31bec004413ff278c0e10add18f3a0685a9114a2eaa",
+      "status": "running",
+      "health": null,
+      "restarts": 0,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "portsUnchanged": true,
+      "networkNamesUnchanged": true
+    },
+    {
+      "service": "notify-worker",
+      "id": "1ec0fc74fb9763495bd4cad51fdd81cb8d4def2cae86fe9ef6cf46a0a33e50f3",
+      "image": "sha256:e99db5faa570c779780da31bec004413ff278c0e10add18f3a0685a9114a2eaa",
+      "status": "running",
+      "health": null,
+      "restarts": 0,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "portsUnchanged": true,
+      "networkNamesUnchanged": true
+    },
+    {
+      "service": "postgres",
+      "id": "3de49cbde9a20c6640092181c04d35df41677566795cfecae18c0ab284b0aba8",
+      "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "status": "running",
+      "health": "healthy",
+      "restarts": 0,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "portsUnchanged": true,
+      "networkNamesUnchanged": true
+    },
+    {
+      "service": "pricing-worker",
+      "id": "f511d7c7dcafa7e9fe521c1667eb709bea2aa4e0ac04b6184a0dc6d989603f3b",
+      "image": "sha256:e99db5faa570c779780da31bec004413ff278c0e10add18f3a0685a9114a2eaa",
+      "status": "running",
+      "health": null,
+      "restarts": 0,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "portsUnchanged": true,
+      "networkNamesUnchanged": true
+    },
+    {
+      "service": "projector",
+      "id": "b9924bb42f5000e6a46eb5a02e1bbc7e5cc024b0c3a5b6f8354c499c28876a75",
+      "image": "sha256:e99db5faa570c779780da31bec004413ff278c0e10add18f3a0685a9114a2eaa",
+      "status": "running",
+      "health": null,
+      "restarts": 0,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "portsUnchanged": true,
+      "networkNamesUnchanged": true
+    },
+    {
+      "service": "realtime-worker",
+      "id": "95f62dd9faa80e8ca43c951e66d9912eec1085a6ed8b69bfc42cdd48fad1ff82",
+      "image": "sha256:e99db5faa570c779780da31bec004413ff278c0e10add18f3a0685a9114a2eaa",
+      "status": "running",
+      "health": null,
+      "restarts": 0,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "portsUnchanged": true,
+      "networkNamesUnchanged": true
+    },
+    {
+      "service": "web",
+      "id": "03d27620430b201e15b6e8e6a8a336a5df8254cba2128f46e1efaadb0c8edb42",
+      "image": "sha256:2ec2306beeba6373cd3cb6f319cdd36e6333c277c6c902e0c2e911789069b6d9",
+      "status": "running",
+      "health": null,
+      "restarts": 0,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "portsUnchanged": true,
+      "networkNamesUnchanged": true
+    }
+  ],
+  "businessVerdict": "NOT_ACCEPTED_RAPID_SWITCH_TIMEOUT",
+  "noAutomaticRollback": true,
+  "noMigrationsSeedOrReset": true,
+  "privateRollbackDirectory": "/home/quant/repos/.mwa-watchlist-latency-20261022",
+  "durableManager": "/home/quant/repos/.mwa-v1264-chart-init-20261021/manage.py"
+}

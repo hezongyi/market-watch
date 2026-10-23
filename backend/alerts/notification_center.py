@@ -15,6 +15,8 @@ from fastapi import HTTPException
 from sqlalchemy import BigInteger, String, and_, cast, delete, exists, func, or_, select
 
 from .chart_alert_message import condition_label
+from .market_names import code_search
+from .notice_instruments import capture, enrich, search_clause
 from .notification_sources import safe_text
 from .storage import (
     Audit,
@@ -253,7 +255,8 @@ def _server_source(db, state, audit):
             source_id=source['source_id'], occurred_at=audit.at, source_version=audit.id,
             dedupe=facts['dedupe_key'], backfill=audit.at < state.started_at,
             body={'title': facts['title'], 'message': facts['code'], 'notify_web': facts.get('notify_web', True),
-                  'context': facts.get('context', {}), 'evidence': facts.get('evidence', {})})
+                  'context': facts.get('context', {}), 'evidence': facts.get('evidence', {}),
+                  'instrument_display': facts.get('instrument_display')})
         return row.id
     if kind in ('recovery', 'observation_end'):
         dedupe = intent_hash([state.subject, facts.get('source_kind', 'data_center'), facts['dedupe_key']])
@@ -320,7 +323,8 @@ def project(db, *, limit=100, fail_after=None):
                 intake=intake.intent_hash, body={'title': value['title'], 'message': value['message'],
                     'context': value['context'], 'evidence': value['evidence'],
                     'notify_web': True, 'client_reported_time': True,
-                    'profile': intake.profile, 'code': value['code']})
+                    'profile': intake.profile, 'code': value['code'],
+                    'instrument_display': value.get('_instrument_display')})
         db.add(NoticeSourceReceipt(source_key='browser:' + intake.id, event_id=event_id))
         count += 1
         if fail_after == count:
@@ -371,6 +375,7 @@ def accept_browser(db, subject, value):
     order_key = 'notice_intake_order:' + subject
     previous_order = db.get(Preference, order_key, populate_existing=True)
     order = max(at * 1000 + 1, (previous_order.value['last'] if previous_order else 0) + 1)
+    raw['_instrument_display'] = capture(db, raw)
     raw['_accepted_order'] = order
     if previous_order:
         previous_order.value = {'last': order}
@@ -459,7 +464,7 @@ def list_events(db, subject, filters, *, before=None, limit=100):
         # JSON text may contain escaped Unicode. Search decoded user-facing values too.
         searchable = [NoticeEvent.body[key].as_string() for key in ('title', 'message', 'code')]
         searchable.extend([NoticeEvent.instrument, NoticeEvent.workspace, cast(NoticeEvent.body, String)])
-        clauses.append(or_(*(column.contains(filters['q'], autoescape=True) for column in searchable)))
+        clauses.append(or_(code_search(filters['q'], *searchable), search_clause(NoticeEvent, filters['q'], subject=subject)))
     if anchor:
         next_time = NoticeEvent.occurred_at > anchor[0] if oldest else NoticeEvent.occurred_at < anchor[0]
         next_id = NoticeEvent.id > anchor[1] if oldest else NoticeEvent.id < anchor[1]
@@ -475,7 +480,7 @@ def list_events(db, subject, filters, *, before=None, limit=100):
     incidents = {group.id: group for group in db.scalars(select(NoticeIncident).where(
         NoticeIncident.subject == subject,
         NoticeIncident.id.in_({row.incident_id for row in page}))) } if page else {}
-    events = [summary(db, row, incidents=incidents) for row in page]
+    events = enrich(db, [summary(db, row, incidents=incidents) for row in page], subject=subject)
     if filters.get('audience') == 'system' and filters.get('grouped', True):
         unread_groups = set(db.scalars(unread_system_incidents(subject).where(
             NoticeEvent.incident_id.in_([event['incident_id'] for event in events]))))
@@ -534,7 +539,9 @@ def changes(db, subject, after, *, limit=100):
     rows = list(db.scalars(select(NoticeChange).where(NoticeChange.subject == subject,
         NoticeChange.seq > seq, NoticeChange.seq <= state.seq).order_by(NoticeChange.seq).limit(limit)))
     last = rows[-1].seq if rows else seq
-    return {'changes': [{'seq': r.seq, 'kind': r.kind, 'event_id': r.event_id, 'body': r.body} for r in rows],
+    bodies = iter(enrich(db, [r.body for r in rows if r.kind in ('created', 'updated')], subject=subject))
+    return {'changes': [{'seq': r.seq, 'kind': r.kind, 'event_id': r.event_id,
+        'body': next(bodies) if r.kind in ('created', 'updated') else r.body} for r in rows],
         'after': _cursor(state, {'kind': 'changes', 'seq': last}), 'epoch': state.epoch,
         'highwater': state.seq, 'more': last < state.seq, 'server_time': now_ms(),
         'system_unread': system_unread(db, subject),
@@ -551,7 +558,7 @@ def detail(db, subject, ident):
         return {'id': ident, 'projection_status': 'shared_source',
                 'task_id': intake.body['_server_task']}
     row = event_for(db, subject, ident)
-    result = summary(db, row)
+    result = enrich(db, [summary(db, row)], subject=subject)[0]
     reference = row.body.get('evidence_ref', {})
     if reference.get('signal_id'):
         signal = db.get(SignalRow, reference['signal_id'])

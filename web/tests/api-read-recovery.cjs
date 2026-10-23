@@ -1,7 +1,8 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict'),ts=require('typescript');
 const code=require('esbuild').buildSync({entryPoints:['src/api.ts'],bundle:true,write:false,platform:'browser',format:'cjs',target:'es2022'}).outputFiles[0].text;
-let calls=0,mode='network';const scheduled=[];
+let calls=0,mode='network';const scheduled=[],established=[];
  const apiModule={exports:{}}; const context={module:apiModule,exports:apiModule.exports,Response,ReadableStream,DOMException,AbortController,performance,Date,Map,Set,Promise,TypeError,
+ BroadcastChannel:class {constructor(name){assert.equal(name,'mw-composite-established-v1')}postMessage(id){established.push(id)}close(){}},
  setTimeout:(fn,ms)=>{scheduled.push(ms);return setTimeout(fn,ms>=30000?(mode==='timeout'?1:1000000):0);},clearTimeout,Math,fetch:async(url,init)=>{
   calls++;
   if(mode==='supplier' && calls<2 || mode==='sustained' || mode==='source-auth')return new Response(JSON.stringify({detail:{code:mode==='source-auth'?'authentication':'request_failed',message:'行情来源暂不可用',retryable:mode!=='source-auth'}}),{status:503});
@@ -12,6 +13,7 @@ let calls=0,mode='network';const scheduled=[];
   if(mode==='auth')return new Response('{"detail":"denied"}',{status:401,headers:{'content-type':'application/json'}});
   if(mode==='post')throw new TypeError('Load failed');
   if(mode==='busy')return new Response('{"detail":"busy"}',{status:503,headers:{'Retry-After':'30'}});
+  if(mode==='established')return new Response(JSON.stringify({id:'a'.repeat(64)}));
   return new Response('{"bars":[1]}',{headers:{'content-type':'application/json'}});
  }};
 vm.runInNewContext(code,context);const {api,apiErrorDetails,apiRequestDiagnostics}=apiModule.exports;
@@ -53,5 +55,8 @@ const {responseError,rpcError}=errorModule.exports;
  const diagnostics=apiRequestDiagnostics();
  assert.equal(JSON.stringify(diagnostics).includes('secret'),false);assert.equal(JSON.stringify(diagnostics).includes('private'),false);
  assert.deepEqual(Array.from(diagnostics.slice(0,3),r=>r.outcome),['network','network','ok']);
+ mode='established';await api('/market-data/center/composites');assert.equal(established.length,0);
+ await api('/market-data/composites/use',{dataset_id:'chosen',mapping_id:'chosen'});assert.deepEqual(established,['a'.repeat(64)]);
+ mode='busy';await assert.rejects(api('/market-data/composites/use',{}));assert.equal(established.length,1,'failed explicit use cannot announce establishment');
  console.log('PASS read recovery: shared bounded retry, HTTP/auth/cooldown, writes, cancellation, timeout classification and redacted diagnostics');
 })().catch(e=>{console.error(e);process.exitCode=1});

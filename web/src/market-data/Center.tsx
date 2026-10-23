@@ -1,5 +1,5 @@
 import { Tasks } from "./Tasks";
-import { useLocation, useSearchParams } from "./router";
+import { useCenter, useLocation, useSearchParams } from "./router";
 import { DatasetDetail } from "./DatasetDetail";
 import { DatasetCreate } from "./DatasetCreate";
 import { CompositeDetail, CompositeList, MappingForm } from "./Composites";
@@ -54,12 +54,13 @@ export function Pager({
 }
 export { TaskActions } from "./Tasks";
 function CenterPage() {
+  const { workspace, target } = useCenter();
   const { pathname } = useLocation(),
     [params] = useSearchParams();
   if (pathname === "/market-data/platform/configure")
     return <NativeConfigure key={params.get("instrument")} />;
   if (pathname === "/market-data/datasets/new") return <DatasetCreate />;
-  if (pathname.endsWith("/mapping")) return <MappingForm key={pathname} />;
+  if (pathname.endsWith("/mapping")) return <MappingForm key={`${workspace}:${target}:${pathname}`} />;
   if (pathname.includes("/datasets/"))
     return <DatasetDetail key={pathname + ":" + params.get("section")} />;
   if (pathname.includes("/composites/"))

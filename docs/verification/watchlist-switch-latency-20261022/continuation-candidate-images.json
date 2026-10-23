@@ -1,0 +1,54 @@
+{
+  "commit": "914525a0b3f6603cb5d851c2941556ff4321a38c",
+  "images": [
+    {
+      "component": "api",
+      "tag": "market-watch-api:watchlist-latency-20261023-914525a",
+      "image_id": "sha256:a7c395db8e4ce6355d60085f5ee6f33c47fccab44837e6a58581fac1a48472e4",
+      "labels": {
+        "io.market-watch.built-at": "2026-10-23T01:25:25.201788+00:00",
+        "io.market-watch.commit": "914525a0b3f6603cb5d851c2941556ff4321a38c",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "2026-10-30T01:25:25.201788+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-watchlist-latency-20261022",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-watchlist-latency-20261022"
+      }
+    },
+    {
+      "component": "web",
+      "tag": "market-watch-web:watchlist-latency-20261023-914525a",
+      "image_id": "sha256:1ec604df54f2923798e478489326e74b6684bbdfd2a7fdb39f468fb9d710526e",
+      "labels": {
+        "io.market-watch.built-at": "2026-10-23T01:25:54.155811+00:00",
+        "io.market-watch.commit": "914525a0b3f6603cb5d851c2941556ff4321a38c",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "2026-10-30T01:25:54.155811+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-watchlist-latency-20261022",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-watchlist-latency-20261022",
+        "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+      }
+    },
+    {
+      "component": "chart",
+      "tag": "market-watch-chart-origin:watchlist-latency-20261023-b7ef7be",
+      "image_id": "sha256:41707f26ad94eedd85655366d73a77153364c8af48b7f3bee6c652916e78b64d",
+      "labels": {
+        "io.market-watch.built-at": "2026-10-23T01:01:36.546225+00:00",
+        "io.market-watch.commit": "b7ef7be30736b2ad8f1b187430122ae7b5ee3e23",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "2026-10-30T01:01:36.546225+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-watchlist-latency-20261022",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-watchlist-latency-20261022",
+        "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+      },
+      "retained": true
+    }
+  ],
+  "note": "API/Web built from 914525a; Chart retained from b7ef7be. Documentation commits after image construction do not change product artifacts."
+}

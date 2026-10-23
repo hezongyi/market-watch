@@ -55,6 +55,52 @@ async function nativeNotificationSurface(widget, report) {
     style.href = `${globalThis.MW_CHART_LIBRARY_PATH || "/charting_library/"}bundles/2371.3fc94a1aa7a1e03d91e4.css`;
     doc.head.append(style);
     const roots = new Set();
+    const entryCleanups = new Set();
+    function alignEntry(node) {
+      const win = doc.defaultView;
+      let frame = 0, watchlist = null, offset = 0;
+      const resize = new win.ResizeObserver(schedule);
+      const mutations = new win.MutationObserver(schedule);
+      function schedule() {
+        if (!frame) frame = win.requestAnimationFrame(update);
+      }
+      function update() {
+        frame = 0;
+        // The sidebar's bookmark icon is `base`; watchlists-button is the
+        // text/dropdown inside the open panel and is not the alignment target.
+        const target = doc.querySelector('button[data-name="base"][aria-pressed]');
+        if (target !== watchlist) {
+          if (watchlist) resize.unobserve(watchlist);
+          watchlist = target;
+          if (watchlist) resize.observe(watchlist);
+        }
+        const icon = watchlist?.getBoundingClientRect();
+        const visible = icon?.width > 0 && icon.height > 0 &&
+          icon.right > 0 && icon.left < win.innerWidth;
+        // Reserve real toolbar space on both sides of the 38px native button.
+        // The right edge stays anchored; no translated hit area overlaps peers.
+        const rect = node.getBoundingClientRect();
+        const delta = visible
+          ? offset + icon.left + icon.width / 2 - (rect.left + rect.width / 2)
+          : 0;
+        offset = delta;
+        node.style.transform = visible ? `translateX(${delta}px)` : "";
+      }
+      node.style.justifyContent = "center";
+      resize.observe(doc.documentElement);
+      resize.observe(node);
+      mutations.observe(doc.body, { childList: true, subtree: true });
+      win.addEventListener("resize", schedule);
+      schedule();
+      const cleanup = () => {
+        resize.disconnect();
+        mutations.disconnect();
+        win.removeEventListener("resize", schedule);
+        if (frame) win.cancelAnimationFrame(frame);
+        entryCleanups.delete(cleanup);
+      };
+      entryCleanups.add(cleanup);
+    }
     function managed(element, target) {
       const root = createRoot(element, target, "modern");
       roots.add(root);
@@ -84,7 +130,10 @@ async function nativeNotificationSurface(widget, report) {
             // prop; the owning controller installs the business click handler.
             onClick: () => {},
             ref: (button) => {
-              if (button) resolve(button);
+              if (button) {
+                alignEntry(node);
+                resolve(button);
+              }
             },
           }), node);
         });
@@ -148,6 +197,7 @@ async function nativeNotificationSurface(widget, report) {
         };
       },
       destroy() {
+        for (const cleanup of entryCleanups) cleanup();
         style.remove();
         for (const root of roots) root.unmount();
         roots.clear();

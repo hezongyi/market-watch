@@ -11,7 +11,7 @@ function harness({binding={revision:'fixed-1',inputRevision:7,calculationStart:1
   attach:(chart,id,identity)=>({generation:1,identity,id}),detach:handle=>coverage.delete(handle.id),invalidate:async(handle,range,revision)=>Number(revision)>=Number(revisions.get(handle.id) || 0),
   applyBatch:async(handle,batch)=>{revisions.set(handle.id,batch.inputRevision);batches.push({id:handle.id,...batch});coverage.set(handle.id,{...batch.coverage,generation:1});return true;}};
  class Clock extends Date{static now(){return clock;}}
- const context={MWNativeIndicatorResults:adapter,queueMicrotask,Date:Clock,setTimeout,clearTimeout,setInterval:()=>1,clearInterval(){},
+ const context={MWNativeIndicatorResults:adapter,queueMicrotask,crypto:require("node:crypto"),Date:Clock,setTimeout,clearTimeout,setInterval:()=>1,clearInterval(){},
   indicatorKey:(ticker,res)=>ticker+'|'+res,indicatorBindings:new Map(),indicatorCoordinator:undefined,decode:()=>({series_kind:'composite'})};
  const bridge=fs.readFileSync(root+'/advanced-host/bridge.js','utf8');
  const bindingSource=bridge.slice(bridge.indexOf('function rememberIndicatorBinding('),bridge.indexOf('function startIndicatorCoordinator('));
@@ -20,7 +20,7 @@ function harness({binding={revision:'fixed-1',inputRevision:7,calculationStart:1
  const coordinator=context.chartIndicatorCoordinator({chartsCount:()=>1,chart:()=>chart},
   {LWMA:{params:{period:5},series:[{key:'value'}]}},{
    identity:{binding:()=>context.indicatorBindings.get(chart.symbol()+'|5'),chartTime:bar=>bar.start},
-   status:(consumer,state)=>states.push({id:consumer.id,state}),report:error=>reports.push(error),read,demand});
+   status:(consumer,state,error,quality)=>states.push({id:consumer.id,state,quality}),report:error=>reports.push(error),read,demand});
  return {coordinator,context,chart,batches,states,reports,advance:ms=>{clock+=ms;}};
 }
 const bars=[{start:1000,open:'1',high:'2',low:'1',close:'2'},
@@ -35,7 +35,7 @@ function page(specs,pendingPeriod=null,value=10){
 (async()=>{
  const bridge=fs.readFileSync(root+'/advanced-host/bridge.js','utf8');
  const canonicalContext={atob:s=>Buffer.from(s,'base64').toString('utf8')};
- vm.runInNewContext(fs.readFileSync(root+'/advanced-host/series.js','utf8')+';const decode=MWSeries.decode;'+bridge.slice(bridge.indexOf('function indicatorKey('),bridge.indexOf('let studyTemplates;')),
+ vm.runInNewContext(fs.readFileSync(root+'/advanced-host/series.js','utf8')+';const decode=MWSeries.decode;'+bridge.slice(bridge.indexOf('function indicatorKey('),bridge.indexOf('let studyTemplates,')),
   canonicalContext);
  const fixed='MWH:D2302701-1248-453A-804F-3422D4DAD6DD';
  assert.equal(canonicalContext.indicatorKey(fixed,'1'),fixed.toLowerCase().replace('mwh:','MWH:')+'|1',
@@ -109,5 +109,18 @@ function page(specs,pendingPeriod=null,value=10){
  studies.forEach(s=>s.hidden=true);await deps.coordinator.sync();assert.deepEqual(demands.at(-1),[],'hiding all studies releases dependency demand');
  studies[0].hidden=false;await deps.coordinator.sync();assert.equal(demands.at(-1).length,1);
  deps.coordinator.dispose();assert.deepEqual(demands.at(-1),[],'workspace disposal releases dependency demand');
+ const quality=harness({binding:{revision:'fixed-1',inputRevision:7,calculationStart:1000,inputPolicy:'observed_display_v1'},read:async(t,r,args)=>{
+  const result=page(args.indicators);result.indicators[0].calculation.value_status='insufficient_input';
+  result.indicators[0].calculation.input_quality={coverage:'unverified',provisional:false};
+  return result;
+ }});
+ await quality.coordinator.sync();
+ assert.equal(quality.states.at(-1).state,'insufficient_input','valid warmup must finish without timeout/retry');
+ assert.equal(quality.states.at(-1).quality.coverage,'unverified');
+ assert.equal(quality.batches.at(-1).identity.inputPolicy,'observed_display_v1');
+ const bound=quality.context.indicatorBindings.get(quality.chart.symbol()+'|5');
+ bound.inputPolicy='strict_confirmed_v1';await quality.coordinator.sync();
+ assert.equal(quality.batches.at(-1).identity.inputPolicy,'strict_confirmed_v1','policy changes fence accepted coverage');
+ quality.coordinator.dispose();
  console.log('PASS runtime contracts: per-run pending/completion, same-time tail updates and visible dependency lifetime');
 })().catch(error=>{console.error(error);process.exitCode=1;});

@@ -109,8 +109,8 @@ def test_av49_to_aw50_is_additive_repeatable_and_retains_demands(postgres_alerts
     command.upgrade(config, 'head')
     after = set(inspect(postgres_alerts).get_table_names())
     assert before <= after
-    assert len(after-before) == 8
-    assert {'notice_streams', 'notice_events', 'notice_source_receipts', 'notice_intakes'} <= after
+    assert len(after-before) == 9
+    assert {'notice_streams', 'notice_events', 'notice_source_receipts', 'notice_intakes', 'market_realtime_mapping_notes'} <= after
     factory = sessionmaker(postgres_alerts)
     with factory.begin() as db:
         assert center.stream(db).epoch

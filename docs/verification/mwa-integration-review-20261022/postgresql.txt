@@ -1,0 +1,5 @@
+Ubuntu quant-server / mw-integration-20261022 / PostgreSQL 14.24
+Command inside task API: set CHART_ALERT_TEST_DATABASE_URL from ALERTS_DATABASE_URL without printing credentials; python -m pytest -q -p no:cacheprovider backend/tests/test_composite_mapping_postgres.py
+Result: 1 passed, 3 Alembic path_separator deprecation warnings in 4.79s.
+Covers populated aw50 -> ax51 upgrade, repeated upgrade, unchanged mapping/composite/revision/history/seam references, independent notes, and old-column reads.
+The first execution identified a test fixture Session/schema mismatch; fixed by binding storage.Session to the scoped factory before history publication. This was confined to the new synthetic task project, not mwa.

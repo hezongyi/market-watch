@@ -9,7 +9,7 @@ from alerts import fixed_indicators as jobs
 from alerts import indicator_demands as demands
 from alerts.chart_api import DataQuery, data_sync
 from alerts.publication_wakeup import PublicationWakeup
-from alerts.storage import FixedIndicatorRun
+from alerts.storage import FixedIndicatorRun, IndicatorDemand
 from sqlalchemy import func, select
 from test_fixed_indicators import history
 from test_indicator_demands import (
@@ -76,3 +76,29 @@ def test_new_run_wakes_worker_only_after_committed_enqueue(provider_pg, monkeypa
             jobs.request(db, page, {"name": "EMA", "params": {"period": 24}})
             db.rollback()
         assert wake.wait(.05) == "timer"
+
+
+def test_price_defaults_skip_busy_capacity_lock_and_can_warm_on_next_read(provider_pg, monkeypatch):
+    factory, _ = provider_pg
+    version = history(factory, monkeypatch, count=100)
+    body = DataQuery(instrument=version, series_kind="history", timeframe="M1", limit=7,
+                     client="visible-price")
+    with factory.begin() as holder:
+        demands.guard(holder)
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            pending = pool.submit(data_sync, body)
+            try:
+                # The holder stays locked throughout the assertion. This is
+                # a lock independence check, not a shared-host latency SLA.
+                page = pending.result(timeout=1)
+            finally:
+                holder.rollback()
+    assert len(page["bars"]) == 7
+    assert page["indicators"] == []
+    with factory.begin() as db:
+        assert db.scalar(select(func.count()).select_from(FixedIndicatorRun)) == 0
+        assert db.scalar(select(func.count()).select_from(IndicatorDemand)) == 0
+    assert len(data_sync(body)["bars"]) == 7
+    with factory.begin() as db:
+        assert db.scalar(select(func.count()).select_from(FixedIndicatorRun)) == 2
+        assert db.scalar(select(func.count()).select_from(IndicatorDemand)) == 2

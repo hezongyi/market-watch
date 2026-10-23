@@ -6,6 +6,7 @@ function nativePreferences(
   report,
   recovered = () => {},
   captureScope = () => undefined,
+  durability = null,
 ) {
   const rows = new Map(
     initial.map((row) => [JSON.stringify([row.kind, row.name, row.tool]), row]),
@@ -15,6 +16,28 @@ function nativePreferences(
   const baseline = new Map(rows),
     pending = new Map();
   let writes = Promise.resolve();
+  const activeWrites = new Map(), resolving = new Set(), resolved = new Set();
+  const restored = new Set(durability?.blocked || []);
+  const reported = new Map();
+  const touched = new Set();
+  let disposed = false;
+  const revisionChannel = typeof BroadcastChannel === "undefined" ? null : new BroadcastChannel("mw-preference-revisions-v1");
+  // Revision messages are hints only; content always comes from authenticated
+  // reads. Never advance the baseline of settings already loaded by the widget.
+  if (revisionChannel) revisionChannel.onmessage = ({data}) => {
+    if (disposed || !data || typeof data.key !== 'string' || data.key.length > 1000 || !Number.isSafeInteger(data.revision) || data.revision < 0 || touched.has(data.key)) return;
+    const apply = async () => {
+      if (disposed || touched.has(data.key)) return;
+      const latest = await rpc('read', {});
+      if (disposed || touched.has(data.key)) return;
+      const row = latest.find(row => key(row.kind, row.name, row.tool) === data.key);
+      if (row) rows.set(data.key, row); else rows.delete(data.key);
+    };
+    writes = writes.then(apply).catch(() => {});
+  };
+  const changed = (k, revision) => {
+    if (!disposed) revisionChannel?.postMessage({key:k, revision});
+  };
   const key = (kind, name, tool = "") => JSON.stringify([kind, name, tool]);
   const mergeable = new Set([
     "widgetbar.layout-settings",
@@ -74,9 +97,9 @@ function nativePreferences(
       Error(
         "设置未保存：" +
           String(error?.message || error) +
-          "；请保留当前修改，重新加载后核对。",
+          "；请在“处理设置草稿”中核对并选择保留的设置。",
       ),
-      { status: error?.status, code: error?.code },
+      { status: error?.status || (/其他窗口/.test(String(error)) ? 409 : undefined), code: error?.code || (/其他窗口/.test(String(error)) ? "PREFERENCE_REVISION_CONFLICT" : "PREFERENCE_SAVE_FAILED") },
     );
   }
   const list = (kind, tool = "") =>
@@ -86,19 +109,40 @@ function nativePreferences(
     if (!row) throw Error("模板不存在或已被删除");
     return row.content.value;
   };
-  function save(kind, name, value, tool = "") {
+  function save(kind, name, value, tool = "", recoveryDraft = null) {
     if (readonly) return Promise.reject(unsaved(Error("手机只读，不保存修改")));
-    const task = writes.then(async () => {
-      const k = key(kind, name, tool),
-        base = baseline.get(k);
-      pending.set(k, value);
+    const k = key(kind, name, tool);
+    if (!recoveryDraft && (resolving.has(k) || resolved.has(k))) return Promise.reject(unsaved(Error("设置草稿正在处理或已处理；重新打开图表后继续修改")));
+    if (!recoveryDraft && restored.has(k)) return Promise.reject(unsaved(Error("此设置有尚未处理的本地草稿")));
+    touched.add(k);
+    const active = activeWrites.get(k);
+    if (active && same(active.value, value)) return active.task;
+    const version = globalThis.crypto?.randomUUID?.() || String(Date.now()) + Math.random();
+    let draft = recoveryDraft || {key:k, version, kind, name, tool, value, base:baseline.get(k), operation:'save'};
+    // Persist at enqueue time, before waiting for earlier network operations.
+    let durable = durability && !recoveryDraft ? durability.put(draft) : Promise.resolve();
+    durable.catch(() => {});
+    pending.set(k, value);
+    // Collapse a burst while this key is still queued; persist every latest
+    // value immediately, and never merge across an intervening delete.
+    if (!recoveryDraft && active && !active.started) {
+      Object.assign(active, {value, draft, durable});
+      return active.task;
+    }
+    const entry = {value, draft, durable, started:false, task:null};
+    const run = async () => {
+      entry.started = true;
+      ({value, draft, durable} = entry);
+      const base = baseline.get(k);
+      try { await durable; } catch { throw unsaved(Error("本机草稿写入失败，请勿关闭页面")); }
       try {
         for (let attempt = 0; attempt < 2; attempt++) {
           await refresh();
           const old = rows.get(k);
           if (old && same(old.content.value, value)) {
             baseline.set(k, old);
-            pending.delete(k);
+            if (same(pending.get(k), value)) pending.delete(k);
+            if (durability) await durability.drop(draft);
             return;
           }
           if ((base && !old) || (!base && old))
@@ -127,12 +171,14 @@ function nativePreferences(
               revision: old?.revision || 0,
             });
             rows.set(k, row);
+            changed(k, row.revision);
             // A successful merge does not update the chart's in-memory settings.
             // Its next callback still includes untouched fields from `value`.
             // Keep that observed content as the local baseline so it cannot
             // undo fields contributed by another window on the next save.
             baseline.set(k, { ...row, content: { ...row.content, value } });
-            pending.delete(k);
+            if (same(pending.get(k), value)) pending.delete(k);
+            if (durability) await durability.drop(draft);
             return;
           } catch (error) {
             if (error?.status !== 409 || attempt === 1) throw error;
@@ -141,33 +187,50 @@ function nativePreferences(
       } catch (error) {
         throw unsaved(error);
       }
-    });
-    writes = task.catch(() => {});
+    };
+    const task = recoveryDraft ? run() : writes.then(run);
+    entry.task = task;
+    activeWrites.set(k, entry);
+    const clear = () => { if (activeWrites.get(k)?.task === task) activeWrites.delete(k); };
+    task.then(clear, clear);
+    if (!recoveryDraft) writes = task.catch(() => {});
     return task;
   }
-  function remove(kind, name, tool = "") {
+  function remove(kind, name, tool = "", recoveryDraft = null) {
     if (readonly) return Promise.reject(unsaved(Error("手机只读，不保存修改")));
-    const task = writes.then(async () => {
-      const k = key(kind, name, tool),
-        base = baseline.get(k);
+    const k = key(kind,name,tool);
+    if (!recoveryDraft && (resolving.has(k) || resolved.has(k))) return Promise.reject(unsaved(Error("设置草稿正在处理或已处理；重新打开图表后继续修改")));
+    if (!recoveryDraft && restored.has(k)) return Promise.reject(unsaved(Error("此设置有尚未处理的本地草稿")));
+    touched.add(k);
+    activeWrites.delete(k);
+    const draft = recoveryDraft || {key:k,version:globalThis.crypto?.randomUUID?.() || String(Date.now()) + Math.random(),kind,name,tool,base:baseline.get(k),operation:'delete'};
+    const durable = durability && !recoveryDraft ? durability.put(draft) : Promise.resolve();
+    durable.catch(() => {});
+    const run = async () => {
+      const k = key(kind, name, tool), base = baseline.get(k);
       try {
+        await durable;
         await refresh();
         const old = rows.get(k);
         if (!old) {
           baseline.delete(k);
+          if (durability) await durability.drop(draft);
           return;
         }
         if (!base || !same(base.content.value, old.content.value))
           throw Error("该设置或模板已在其他窗口修改");
         await rpc("delete", { id: old.id, revision: old.revision });
         rows.delete(k);
+        changed(k, 0);
         baseline.delete(k);
         pending.delete(k);
+        if (durability) await durability.drop(draft);
       } catch (error) {
         throw unsaved(error);
       }
-    });
-    writes = task.catch(() => {});
+    };
+    const task = recoveryDraft ? run() : writes.then(run);
+    if (!recoveryDraft) writes = task.catch(() => {});
     return task;
   }
   // The pinned library converts adapter rejections into fulfilled error objects
@@ -176,15 +239,50 @@ function nativePreferences(
     const scope = captureScope();
     return promise
       .then((result) => {
+        reported.delete(JSON.stringify(context));
         recovered(context, scope);
         return result;
       })
       .catch((error) => {
-        report(error, context, scope);
+        const k = JSON.stringify(context), signature = String(error);
+        if (reported.get(k) !== signature) {
+          reported.set(k, signature);
+          report(error, {...context, revision:baseline.get(key(context.kind,context.name,context.tool || ""))?.revision}, scope);
+        }
         throw error;
       });
   };
   return {
+    dispose() { disposed = true; revisionChannel?.close(); },
+    resolveDraft(draft, action, revision) {
+      const k = key(draft.kind, draft.name, draft.tool);
+      if (resolving.has(k)) return Promise.reject(Error("此草稿正在处理"));
+      // Freeze callbacks synchronously, before yielding to the queue/network.
+      // The old widget must stay frozen until reopening applies the choice.
+      resolving.add(k);
+      const task = writes.then(async () => {
+        await refresh();
+        if (durability?.current && !await durability.current(draft)) throw unsaved(Error("本地草稿再次变化，请重新选择草稿"));
+        const remote = rows.get(k);
+        if ((remote?.revision || 0) !== revision) throw unsaved(Error("服务器设置再次变化，请重新查看差异"));
+        if (!['local','remote'].includes(action)) throw Error("无效草稿操作");
+        if (remote) baseline.set(k, remote); else baseline.delete(k);
+        if (action === 'local') {
+          const context = {kind:draft.kind,name:draft.name,tool:draft.tool,operation:draft.operation};
+          if (draft.operation === 'delete') await templateWrite(remove(draft.kind,draft.name,draft.tool,draft), context);
+          else await templateWrite(save(draft.kind,draft.name,draft.value,draft.tool,draft), context);
+        } else {
+          pending.delete(k);
+          await durability?.drop(draft);
+          durability?.abandoned?.({kind:draft.kind,name:draft.name,tool:draft.tool,operation:draft.operation});
+        }
+        restored.delete(k);
+        resolved.add(k);
+      });
+      writes = task.catch(() => {});
+      task.then(()=>resolving.delete(k),()=>resolving.delete(k));
+      return task;
+    },
     savePreference: (kind, name, value, tool = "") =>
       templateWrite(save(kind, name, value, tool), {
         kind,
@@ -199,7 +297,7 @@ function nativePreferences(
           .map((r) => [r.name, r.content.value]),
       ),
       setValue: (name, value) => {
-        if (!readonly)
+        if (!readonly && !restored.has(key("setting", name)) && !resolving.has(key("setting", name)) && !resolved.has(key("setting", name)))
           templateWrite(save("setting", name, value), {
             kind: "setting",
             name,
@@ -207,7 +305,7 @@ function nativePreferences(
           }).catch(() => {});
       },
       removeValue: (name) => {
-        if (!readonly)
+        if (!readonly && !restored.has(key("setting", name)) && !resolving.has(key("setting", name)) && !resolved.has(key("setting", name)))
           templateWrite(remove("setting", name), {
             kind: "setting",
             name,

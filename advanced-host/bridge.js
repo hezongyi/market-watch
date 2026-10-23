@@ -1,3 +1,4 @@
+let activePreferences;
 /* All authenticated work is performed by the trusted parent, never this origin. */
 const parentOrigin = new URLSearchParams(location.search).get("parent");
 if (!parentOrigin || new URL(parentOrigin).origin !== parentOrigin)
@@ -172,6 +173,7 @@ function presentQuote(row) {
       .replace(/ · (?:最后更新于|最后行情时间|历史数据时间) .*?(?= · |$)/g, "")
       .replace(/ · 来源 M1 分钟数据/g, "");
     value.description = base;
+    if (value.confirmation_error) value.description += " · 实时样本可用，分钟确认延迟";
     if (["pending", "stale"].includes(value.fetch_status))
       value.description += value.lp == null ? " · 等待首次报价" : " · 报价暂未更新，保留上次数据";
   }
@@ -324,7 +326,7 @@ function reportPreferenceOutcome(error, context = {}, scope = capturePreferenceS
     title:error ? '设置未保存' : '设置已保存',message:error ? String(error) : '偏好操作已成功',
     context:{source_id:JSON.stringify([context.kind || '',context.name || '',context.tool || '',context.operation || 'save']),
       consumer:'preferences-adapter',endpoint:'/advanced-charts/preferences'},
-    evidence:{operation:context.operation || 'save'}}, !error);
+    evidence:{operation:context.operation || 'save',attempt_revision:context.revision ?? null,code:error?.code || null,http_status:error?.status || null}}, !error);
 }
 // Each live request owner carries at most one outage per instrument/period.
 // Callers fence cancellation/generation before recording a transition.
@@ -358,6 +360,31 @@ function indicatorFault(consumer,error,attempt_id){
       input_revision:binding.inputRevision,visible_from:scope?.first,visible_to:scope?.last,
       calculation_origin:binding.calculationStart,accepted_scope:consumer.acceptedScope||null}};
 }
+function releaseIndicatorConsumers(consumers) {
+  // Cancellation fences are cumulative. Merge only unsent releases for this
+  // client; never mutate an in-flight request or omit a newer generation.
+  const references=new Map();
+  for(const consumer of consumers) {
+    const old=references.get(consumer.id);
+    if(!old || old.generation<consumer.generation)references.set(consumer.id,consumer);
+  }
+  const rows=[...references.values()];
+  for(let offset=0;offset<rows.length;offset+=64) {
+    const batch=rows.slice(offset,offset+64);
+    const queued=requests.find(entry=>{
+      if(entry.type!=='indicator-demand-release' || entry.query.client!==clientId)return false;
+      const merged=new Map(entry.query.consumers.map(consumer=>[consumer.id,consumer]));
+      for(const consumer of batch) {
+        const old=merged.get(consumer.id);
+        if(!old || old.generation<consumer.generation)merged.set(consumer.id,consumer);
+      }
+      if(merged.size>64)return false;
+      entry.query.consumers=[...merged.values()];
+      return true;
+    });
+    if(!queued)void request({client:clientId,consumers:batch},'indicator-demand-release').catch(()=>{});
+  }
+}
 function startIndicatorCoordinator(catalog) {
   indicatorCoordinator=chartIndicatorCoordinator(widget,catalog,{
     read:(symbol,res,args,current)=>query(symbol,res,args,Date.now()+30000,current),
@@ -370,8 +397,10 @@ function startIndicatorCoordinator(catalog) {
         return {...base,revision:base.revision || (id.series_kind==='history'?id.symbol:
           id.series_kind==='managed'?'published:'+String(session?.revision):'provider:'+id.symbol),
           calculationStart:base.calculationStart ?? session?.start ?? 0,
+          inputPolicy:['history','composite'].includes(id.series_kind) ? 'observed_display_v1' : 'strict_confirmed_v1',
           before:Number.isFinite(base.lastChartTime ?? base.lastStart) ? (base.lastChartTime ?? base.lastStart)+1 : undefined,
           query:{...(base.revision && id.series_kind==='composite'?{composite_revision_id:base.revision}:{}),
+            ...(['history','composite'].includes(id.series_kind)?{indicator_input_policy:'observed_display_v1'}:{}),
             ...(base.displaySnapshot && id.series_kind==='composite'?{display_snapshot_id:base.displaySnapshot}:{}),
             ...(base.providerSnapshot && id.series_kind==='provider'?{provider_snapshot_id:base.providerSnapshot}:{}),
             ...(id.series_kind==='provider' && base.calculationStart?{calculation_origin:base.calculationStart}:{}),
@@ -384,15 +413,16 @@ function startIndicatorCoordinator(catalog) {
           dependencyBefore:page.dependency_before ?? old.dependencyBefore,
           dependencyRevision:page.dependency_revision ?? old.dependencyRevision});},
     },
-    status:(consumer,state,error)=>send({type:'chart-indicator-state',epoch:workspaceEpoch,index:consumer.index,
+    status:(consumer,state,error,quality)=>send({type:'chart-indicator-state',epoch:workspaceEpoch,index:consumer.index,
       id:consumer.id,name:consumer.meta.label || consumer.id,state,error:error?.message || '',
+      quality,
       previousParams:MWNativeIndicatorResults.scope(consumer.chart,consumer.id)?.transition?.params || null}),
     occurrence:(error,consumer,attempt)=>{if(!['HISTORY_CANCELLED','DISPLAY_SNAPSHOT_EXPIRED'].includes(error.code))emitNotice(indicatorFault(consumer,error,attempt));},
     recovered:consumer=>emitNotice(indicatorFault(consumer),true),
     report:error=>{if(error.code!=='HISTORY_CANCELLED')send({type:'error',error:'指标读取失败：'+String(error)});},
     presentation:(ticker,res,page)=>{swingStore().publish(ticker,res,page,swingStore().ticket());swingDisplay?.refresh();},
     leases:leases=>{if(leases.length)void request({client:clientId,leases},'indicator-demand-update').catch(error=>send({type:'error',error:String(error)}));},
-    release:consumers=>{void request({client:clientId,consumers},'indicator-demand-release').catch(()=>{});},
+    release:releaseIndicatorConsumers,
     demand:rows=>{
       const next=new Map(rows.map(row=>[indicatorKey(row.ticker,row.resolution),row.origin]));
       const changed=new Set([...indicatorDependencyOrigins.keys(),...next.keys()].filter(key=>indicatorDependencyOrigins.get(key)!==next.get(key)));
@@ -742,27 +772,85 @@ function offerHistoryRetry() {
 const clientId = crypto.randomUUID();
 const requests = [];
 let initialHistoryGate;
+const managementRequest = type => type === 'data-center-api' || type === 'preferences';
+// Local scheduling purpose is independent of transport/body/cache identity.
+// Keep admission and fairness here rather than adding exceptions at callers.
+const requestPolicy = (() => {
+  let turn = 0;
+  let nativeAvailable = 4;
+  const nativeDispatches = new Set();
+  function describe(entry) {
+    const query=entry.query;
+    const management=managementRequest(entry.type);
+    const reserve=!!query.native_reserve || entry.scheduling?.purpose==='reserve';
+    const purpose=management ? 'management' : reserve ? 'reserve' :
+      query.indicators?.length ? 'indicator' : entry.scheduling?.purpose ||
+      (entry.type==='indicator-demand-release' ? 'release' : entry.type==='indicator-demand-update' ? 'renewal' : query.op==='quotes' ? 'quote' :
+        query.op==='viewport' || query.op==='historyCache' && !query.background || entry.type==='workspace' ? 'interaction' :
+        query.op==='historyCache' && query.background ? 'auxiliary' :
+        query.firstDataRequest ? 'first-screen' : 'read');
+    return {management,reserve,quote:query.op==='quotes',
+      nativeHistory:entry.type==='data' && query.series_kind==='provider' && !!query.native_history && !query.native_reserve,
+      background:['reserve','release','renewal','quote','auxiliary'].includes(purpose),purpose};
+  }
+  function priority(entry) {
+    const {purpose,background}=describe(entry);
+    if(purpose==='interaction') return 0;
+    if(['first-screen','navigation'].includes(purpose))
+      return entry.scheduling?.focused?.() ? 1 : 2;
+    return background ? 4 : 3;
+  }
+  function next(queued, running) {
+    const entries=[...running.values()];
+    const managementBusy=entries.filter(entry=>entry.management).length;
+    const management=queued.findIndex(entry=>managementRequest(entry.type));
+    if(management>=0 && managementBusy<2) return management;
+    if(entries.length-managementBusy>=4) return -1;
+    const backgroundBusy=entries.filter(entry=>entry.background).length;
+    const quoteBusy=entries.some(entry=>entry.quote);
+    const eligible=[];
+    for(let index=0;index<queued.length;index++) {
+      const entry=describe(queued[index]);
+      if(!entry.management && (!entry.background || backgroundBusy<2) && (!entry.quote || !quoteBusy) &&
+        (!entry.nativeHistory || nativeAvailable>nativeDispatches.size))
+        eligible.push(index);
+    }
+    if(!eligible.length) return -1;
+    // One FIFO turn in four prevents a stream of focused reads from starving
+    // peers, indicators or background work. Eligibility preserves hard caps.
+    const selected=turn===3 ? eligible[0] : eligible.reduce((best,index)=>
+      priority(queued[index])<priority(queued[best]) ? index : best);
+    turn=(turn+1)%4;
+    return selected;
+  }
+  function capacity(available, id) {
+    if(!Number.isInteger(available) || available<0 || available>4) return;
+    if(id!==undefined) nativeDispatches.delete(id);
+    nativeAvailable=available;
+  }
+  function dispatched(id, entry) {
+    if(describe(entry).nativeHistory) nativeDispatches.add(id);
+  }
+  return {describe,next,capacity,dispatched,completed:id=>nativeDispatches.delete(id)};
+})();
+function discardObsoleteRequests() {
+  // A stale quote/indicator request must release its queued place even while
+  // its execution lane is busy. Admission cannot wait for it to be selected.
+  for(let index=requests.length-1;index>=0;index--) {
+    const entry=requests[index];
+    if(entry.isCurrent && !entry.isCurrent()) {
+      requests.splice(index,1);
+      entry.reject(Object.assign(Error("已取消旧图表的历史加载"),{code:"HISTORY_CANCELLED"}));
+    }
+  }
+}
 function drain() {
+  discardObsoleteRequests();
   while (requests.length) {
-    const managementBusy=[...pending.values()].filter(entry=>entry.management).length;
-    const management=requests.findIndex(entry=>entry.type === "data-center-api");
-    const managementSlot=management>=0 && managementBusy<2;
-    if(!managementSlot && pending.size-managementBusy>=4) break;
-    // Pointer-driven viewport checks must not sit behind queued prewarming.
-    // Keep the same four in-flight limit and leave ongoing reads untouched.
-    const quoteBusy = [...pending.values()].some(entry => entry.quote);
-    const reserveBusy = [...pending.values()].filter(entry => entry.reserve).length;
-    const eligible = entry => entry.type !== 'data-center-api' && (entry.query.op !== 'quotes' || !quoteBusy) &&
-      (!entry.query.native_reserve || reserveBusy < 2);
-    let interaction = managementSlot ? management : requests.findIndex(entry => entry.query.op === "viewport");
-    if (interaction < 0) interaction = requests.findIndex(entry =>
-      entry.query.op === "historyCache" && !entry.query.background);
-    if (interaction < 0) interaction = requests.findIndex(entry => eligible(entry) && !entry.query.op && !entry.query.native_reserve);
-    if (interaction < 0) interaction = requests.findIndex(entry => entry.type === 'workspace');
-    if (interaction < 0) interaction = requests.findIndex(eligible);
-    if (interaction < 0) break;
-    const { query, type, resolve, reject, isCurrent } =
-      requests.splice(interaction, 1)[0];
+    const selectedIndex=requestPolicy.next(requests,pending);
+    if (selectedIndex < 0) break;
+    const selected=requests.splice(selectedIndex,1)[0];
+    const {query,type,resolve,reject,isCurrent}=selected;
     if (isCurrent && !isCurrent()) {
       const error = Error("已取消旧图表的历史加载");
       error.code = "HISTORY_CANCELLED";
@@ -776,8 +864,7 @@ function drain() {
       reject(Object.assign(Error("行情请求超时"),{code:"HISTORY_TIMEOUT"}));
       drain();
     }, query.native_history && !query.native_reserve ? ((globalThis.MW_HISTORY_CAPABILITIES?.task_seconds || 600)+10)*1000 : 30000);
-    const entry = { resolve, reject, timer, cancellationTimer: null, quote: query.op === 'quotes',
-      reserve: !!query.native_reserve, management:type === "data-center-api" };
+    const entry = {resolve,reject,timer,cancellationTimer:null,...requestPolicy.describe(selected)};
     pending.set(id, entry);
     if (isCurrent) {
       const check = () => {
@@ -796,13 +883,15 @@ function drain() {
       };
       entry.cancellationTimer = setTimeout(check, 100);
     }
-    send({ type, id, query });
+    requestPolicy.dispatched(id,selected);
+    send({ type, id, query, ...(entry.nativeHistory ? {history_client:clientId} : {}) });
   }
 }
-function request(query, type = "data", isCurrent) {
+function request(query, type = "data", isCurrent, scheduling) {
   return new Promise((resolve, reject) => {
+    if (requests.length >= 64) discardObsoleteRequests();
     if (requests.length >= 64) return reject(Error("图表请求过多，请减少指标"));
-    requests.push({ query, type, resolve, reject, isCurrent });
+    requests.push({query,type,resolve,reject,isCurrent,scheduling});
     drain();
   });
 }
@@ -928,7 +1017,7 @@ globalThis.MWNativeReserve?.configure(async ({symbol, resolution, before, screen
     const binding=acceptedState?.binding;
     const inputRevision=acceptedState?.input_revision;
     const page=await query(symbol,resolution,{before,limit:Math.min(2000,screen_bars*batch_screens),
-      ...(binding ? {composite_revision_id:binding,input_revision:inputRevision} : {})},Date.now()+30000,current);
+      ...(binding ? {composite_revision_id:binding,input_revision:inputRevision} : {})},Date.now()+30000,current,{purpose:'reserve'});
     const latest=marketHistoryState.get(stateKey);
     if(!current() || binding && (latest?.binding!==binding || latest?.input_revision!==inputRevision))
       throw Object.assign(Error('已取消旧图表的历史加载'),{code:'HISTORY_CANCELLED'});
@@ -978,7 +1067,7 @@ function reportHistoryFailures() {
 }
 globalThis.addEventListener('mw-history-state',()=>setTimeout(reportHistoryFailures,0));
 
-function query(ticker, res, args, expires = Infinity, current = () => true) {
+function query(ticker, res, args, expires = Infinity, current = () => true, scheduling = {}) {
   const { symbol, spec, series_kind } = decode(ticker);
   const q = {
     instrument: symbol,
@@ -992,6 +1081,7 @@ function query(ticker, res, args, expires = Infinity, current = () => true) {
         ? {dataset_start:managedSessions.get(symbol+'|'+res).start} : {})} : {}),
     ...args,
     ...(spec ? { indicators: [spec] } : {}),
+    ...(spec && ['history','composite'].includes(series_kind) ? {indicator_input_policy:'observed_display_v1'} : {}),
   };
   const key = JSON.stringify(q);
   const old = cache.get(key);
@@ -1002,7 +1092,12 @@ function query(ticker, res, args, expires = Infinity, current = () => true) {
   // does not cancel a getBars callback that it can reuse when switching back.
   const currentRead = () => epoch === workspaceEpoch && current() && Date.now() < expires &&
     (series_kind !== 'managed' || hasHistoryViewer({instrument:MWSeries.encode(symbol,series_kind),timeframe:frames[res]}));
-  const promise = request(q, "data", currentRead)
+  const promise = request(q, "data", currentRead, {purpose:scheduling.purpose,focused:()=>{
+    try {
+      const active=widget?.activeChart?.();
+      return !!active && MWSeries.same(active.symbol(),ticker) && active.resolution()===res;
+    } catch { return false; }
+  }})
     .then(page=>{
       if (!currentRead()) throw Object.assign(Error('已取消旧图表的历史加载'), {code:'HISTORY_CANCELLED'});
       if(epoch===workspaceEpoch && series_kind==='composite' && page.revision_id)
@@ -1095,6 +1190,31 @@ async function searchNativeSymbols(options) {
     type:s.type || "other"})),remaining:position != null ? 1 : 0};
 }
 
+// Share outstanding snapshots, not completed quote data. Each consumer keeps
+// its own callback/reset fence and cannot cancel another live consumer.
+const quoteRequests = new Map();
+function readQuoteSnapshot(symbols, isCurrent) {
+  const epoch=workspaceEpoch, batch=[...new Set(symbols)].sort();
+  const key=JSON.stringify([epoch,batch]);
+  let entry=quoteRequests.get(key);
+  if(!entry || !entry.current() || !batch.every(ticker=>
+    entry.tokens.get(ticker)===quoteResetTokens.get(ticker))) {
+    const consumers=new Set([isCurrent]);
+    entry={consumers,initialRows:new Map(batch.map(ticker=>[ticker,quoteSnapshotRows.get(ticker)])),
+      tokens:new Map(batch.map(ticker=>[ticker,quoteResetTokens.get(ticker)])),
+      current:()=>epoch===workspaceEpoch && [...consumers].some(current=>current())};
+    const shared=entry;
+    shared.promise=request({op:'quotes',args:{symbols:batch}},'market',shared.current)
+      .finally(()=>{if(quoteRequests.get(key)===shared)quoteRequests.delete(key);});
+    quoteRequests.set(key,shared);
+  } else entry.consumers.add(isCurrent);
+  const shared=entry;
+  // A later consumer must not make this earlier HTTP operation own a newer
+  // stream observation, even when the response has no distinct read time.
+  return {initialRows:shared.initialRows,
+    promise:shared.promise.finally(()=>shared.consumers.delete(isCurrent))};
+}
+
 const feed = {
   // The native price-axis countdown requires server time in UNIX seconds.
   // Authenticated/network access stays in the trusted parent origin.
@@ -1127,22 +1247,22 @@ const feed = {
     // Quotes are independent of chart history. The request queue still keeps
     // a bounded quote lane, while cancellation and epoch checks fence stale
     // callbacks when a workspace or list changes.
-    request({ op: "quotes", args: { symbols } }, "market",
-        () => epoch === workspaceEpoch && isCurrent())
+    const snapshot=readQuoteSnapshot(symbols, () => epoch === workspaceEpoch && isCurrent() && currentSymbols().length>0);
+    snapshot.promise
       .then((rows) => {
         if (epoch !== workspaceEpoch || !isCurrent()) return;
         // A stream/reset received while this request was outstanding owns the
         // current selection, including its composite revision and identity.
         const active = currentSymbols();
         if (!active.length) return;
-        rememberQuoteRows(rows.filter(row => active.includes(row.n) && quoteSnapshotRows.get(row.n) === initialRows.get(row.n)));
+        rememberQuoteRows(rows.filter(row => active.includes(row.n) && quoteSnapshotRows.get(row.n) === snapshot.initialRows.get(row.n)));
         cb(active.map(ticker => quoteSnapshotRows.get(ticker)).filter(Boolean).map(presentQuote));
       })
       .catch((e) => {
         if (epoch !== workspaceEpoch || !isCurrent()) return;
         const active = currentSymbols();
         if (!active.length) return;
-        const rows = quoteFailureRows(active, initialRows);
+        const rows = quoteFailureRows(active, snapshot.initialRows);
         if (rows.length) cb(rows);
         err(String(e));
       });
@@ -1356,7 +1476,8 @@ const feed = {
           firstDataRequest:p.firstDataRequest, client:clientId,
           native_history:nativeHistoryContext(s.ticker,res)};
         let page = globalThis.MWNativeNavigation?.takeSeed(s, res, p) ||
-          await query(s.ticker, res, args, Infinity, () => (!s.mw_current || s.mw_current()) && (!s.mw_window || MWNativeNavigation.hasWindow(s.mw_window)));
+          await query(s.ticker, res, args, Infinity, () => (!s.mw_current || s.mw_current()) && (!s.mw_window || MWNativeNavigation.hasWindow(s.mw_window)),
+            {purpose:p.firstDataRequest ? 'first-screen' : 'navigation'});
         if (epoch !== workspaceEpoch) {
           const error = Error("已取消旧图表的历史加载");
           error.code = "HISTORY_CANCELLED"; throw error;
@@ -1445,7 +1566,8 @@ const feed = {
           {composite_revision_id:acceptedSnapshot.revision,display_snapshot_id:acceptedSnapshot.displaySnapshot} : {};
         for (let partition=0; rows.length<requested; partition++) {
           if(partition>=pageBudget) throw Object.assign(Error('固定历史分页预算已耗尽，请缩小范围后重试'),{code:'HISTORY_PAGE_BUDGET'});
-          const page=await query(s.ticker,res,{before,limit:Math.min(2000,requested-rows.length),...fixed},deadline,current);
+          const page=await query(s.ticker,res,{before,limit:Math.min(2000,requested-rows.length),...fixed},deadline,current,
+            {purpose:p.firstDataRequest ? 'first-screen' : 'navigation'});
           if (!current()) throw Object.assign(Error('已取消旧图表的历史加载'), {code:'HISTORY_CANCELLED'});
           marketHistoryPage ||= page;
           if (identity.spec) fixedIndicatorPending.set(historyKey,
@@ -1508,7 +1630,8 @@ const feed = {
       let before=p.to*1000 + (['1D','1W','1M'].includes(res) ? 2*86400000 : 0);
       let rows=[], rawRows=[], boundary=false;
       while(rows.length < requested) {
-        const page=await query(s.ticker,res,{before,limit:Math.min(2000,requested-rows.length)});
+        const page=await query(s.ticker,res,{before,limit:Math.min(2000,requested-rows.length)},Infinity,undefined,
+          {purpose:p.firstDataRequest ? 'first-screen' : 'navigation'});
         marketHistoryPage ||= page;
         if(epoch!==workspaceEpoch || !hasHistoryViewer({instrument:symbol,timeframe:frames[res]})) {
           const error=Error('已取消旧图表的历史加载');error.code='HISTORY_CANCELLED';throw error;
@@ -2396,13 +2519,20 @@ function boot(
       throw e;
     }
   };
-  const prefs = nativePreferences(
+  activePreferences?.dispose();
+  const prefs = activePreferences = nativePreferences(
     preferences,
     (op, args) => request({ op, args }, "preferences"),
     readonly,
     reportPreferenceOutcome,
     (context, scope) => reportPreferenceOutcome(null, context, scope),
     capturePreferenceScope,
+    {blocked:globalThis.MWPreferenceDraftKeys || [], put: draft => request({op:'draftWrite',args:draft},'preferences'),
+     current: draft => request({op:'draftCheck',args:draft},'preferences'),
+     abandoned: context => emitNotice({source_kind:'preferences',attempt_id:crypto.randomUUID(),code:'PREFERENCE_SAVE_FAILED',
+       title:'设置草稿已放弃',message:'已明确采用服务器设置；原写入未成功',observation_ended:true,
+       context:{source_id:JSON.stringify([context.kind,context.name,context.tool || '',context.operation]),consumer:'preferences-adapter',endpoint:'/advanced-charts/preferences'}},true),
+     drop: draft => request({op:'draftDrop',args:draft},'preferences')},
   );
   autoSave?.dispose();
   autoSave = chartAutoSave(preferences,
@@ -2828,6 +2958,12 @@ addEventListener("message", async (e) => {
   )
     return;
   const m = e.data;
+  if(m.type==='history-load-capacity' || m.type==='history-load-admitted') {
+    if(m.type==='history-load-admitted' && m.history_client!==clientId) return;
+    requestPolicy.capacity(m.available,m.type==='history-load-admitted' ? m.id : undefined);
+    drain();
+    return;
+  }
   if(m.type==='notice-center-state' && m.session===alertUISession && m.workspace_id===alertUIWorkspace){noticeState=m.state;noticeUI?.update(m.state);return;}
   if(m.type==='notice-center-open'){noticeOpenEvent=typeof m.event_id==='string'?m.event_id:'';if(noticeUI){noticeUI.open(noticeOpenEvent || undefined);noticeOpenEvent=undefined;}return;}
   if(m.type==='chart-alert-event-open' && typeof m.signal_id==='string' && /^[a-f0-9-]{36}$/.test(m.signal_id)) {
@@ -2986,8 +3122,10 @@ addEventListener("message", async (e) => {
     return;
   }
   if (m.type === "result") {
+    if(m.history_client!==undefined && m.history_client!==clientId) return;
+    requestPolicy.completed(m.id);
     const p = pending.get(m.id);
-    if (!p) return;
+    if (!p) {drain();return;}
     pending.delete(m.id);
     clearTimeout(p.timer);
     clearTimeout(p.cancellationTimer);
@@ -3051,15 +3189,22 @@ addEventListener("message", async (e) => {
     const chart=widget.chart(m.index);
     if(chart.symbol()===m.symbol && chart.resolution()===m.resolution) MWNativeNavigation.recoverInitial(chart,true);
   } else if (m.type === "init" && !widget) {
+    requestPolicy.capacity(m.history_load_available);
     alertUISession = m.alert_ui_session;
     noticeState = m.notice_state;
     alertUIDraft = m.alert_ui_draft;
     alertUIWorkspace = String(m.workspace?.id);
     MWNativeNavigation.setCapabilities(m.history_capabilities);
     globalThis.MW_HISTORY_CAPABILITIES=m.history_capabilities;
+    globalThis.MWPreferenceDraftKeys = Array.isArray(m.preference_draft_keys) ? m.preference_draft_keys : [];
     boot(m.document, m.readonly, m.catalog, m.preferences, m.workspace, m.initial_symbol, m.watchlist_metadata);
   }
   else if (m.type === 'refresh-managed') await refreshManagedHistory(m.instrument);
+  else if (m.type === 'preference-draft-resolve' && activePreferences) {
+    activePreferences.resolveDraft(m.draft,m.action,m.revision).then(
+      () => send({type:'preference-draft-result',request:m.request}),
+      error => send({type:'preference-draft-result',request:m.request,error:String(error)}));
+  }
   else if (m.type === "capture-draft" && ready && widget) {
     try {
       const state = await captureWorkspaceState();
@@ -3081,6 +3226,7 @@ send({ type: "loaded" });
 addEventListener("pagehide", () => {
   resolveDisposed=true; chartResolves.clear();
   compositeDisplayBatches.dispose();
+  activePreferences?.dispose();
   indicatorCoordinator?.dispose();
   ordinaryNotices?.dispose();
   noticeUI?.destroy();

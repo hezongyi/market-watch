@@ -1,0 +1,455 @@
+{
+  "runs": [
+    {
+      "run": "continuation-acceptance-b7ef7be-01",
+      "started": "2026-10-23T01:08:35.946Z",
+      "ended": "2026-10-23T01:10:12.805Z",
+      "passed": true,
+      "checkCount": 13,
+      "checks": [
+        {
+          "name": "original-five-chart-layout",
+          "passed": true,
+          "chartCount": 5,
+          "resolutions": [
+            "60",
+            "5",
+            "1W",
+            "1D",
+            "240"
+          ],
+          "studyCounts": [
+            0,
+            3,
+            0,
+            0,
+            1
+          ],
+          "allStudiesHaveFiniteValues": null
+        },
+        {
+          "name": "provider-prices-and-original-indicators",
+          "passed": true,
+          "activeMs": 6023,
+          "allMs": 8323,
+          "allOriginalPlotsFiniteMs": 9183,
+          "firstFiniteIndicatorResponseMs": 8888,
+          "chartCount": 5,
+          "resolutions": [
+            "60",
+            "5",
+            "1W",
+            "1D",
+            "240"
+          ],
+          "studyCounts": [
+            0,
+            3,
+            0,
+            0,
+            1
+          ],
+          "allStudiesHaveFiniteValues": true
+        },
+        {
+          "name": "fixed-history-prices-and-original-indicators",
+          "passed": true,
+          "activeMs": 1393,
+          "allMs": 2613,
+          "allOriginalPlotsFiniteMs": 4000,
+          "firstFiniteIndicatorResponseMs": 3715,
+          "chartCount": 5,
+          "resolutions": [
+            "60",
+            "5",
+            "1W",
+            "1D",
+            "240"
+          ],
+          "studyCounts": [
+            0,
+            3,
+            0,
+            0,
+            1
+          ],
+          "allStudiesHaveFiniteValues": true
+        },
+        {
+          "name": "composite-prices-and-original-indicators",
+          "passed": true,
+          "activeMs": 2860,
+          "allMs": 6248,
+          "allOriginalPlotsFiniteMs": 13460,
+          "firstFiniteIndicatorResponseMs": 8337,
+          "chartCount": 5,
+          "resolutions": [
+            "60",
+            "5",
+            "1W",
+            "1D",
+            "240"
+          ],
+          "studyCounts": [
+            0,
+            3,
+            0,
+            0,
+            1
+          ],
+          "allStudiesHaveFiniteValues": true
+        },
+        {
+          "name": "fixed-history-left-navigation",
+          "passed": true,
+          "ms": 3579,
+          "finiteVisibleBars": 29,
+          "delivery": "datafeed-page"
+        },
+        {
+          "name": "provider-cache-return",
+          "passed": true,
+          "activeMs": 5882,
+          "allMs": 9082,
+          "allOriginalPlotsFiniteMs": 9894,
+          "firstFiniteIndicatorResponseMs": 9519,
+          "chartCount": 5,
+          "resolutions": [
+            "60",
+            "5",
+            "1W",
+            "1D",
+            "240"
+          ],
+          "studyCounts": [
+            0,
+            3,
+            0,
+            0,
+            1
+          ],
+          "allStudiesHaveFiniteValues": true
+        },
+        {
+          "name": "provider-left-navigation",
+          "passed": true,
+          "ms": 719,
+          "finiteVisibleBars": 29,
+          "delivery": "datafeed-page"
+        },
+        {
+          "name": "rapid-switches-final-symbol-and-indicators",
+          "passed": true,
+          "round": 0,
+          "ms": 14169,
+          "finalActiveMs": 4154,
+          "finalAllMs": 12226,
+          "clickCount": 5,
+          "overlappedUnfinishedWork": true
+        },
+        {
+          "name": "rapid-switches-final-symbol-and-indicators",
+          "passed": true,
+          "round": 1,
+          "ms": 13830,
+          "finalActiveMs": 9093,
+          "finalAllMs": 9173,
+          "clickCount": 5,
+          "overlappedUnfinishedWork": true
+        },
+        {
+          "name": "rapid-switches-final-symbol-and-indicators",
+          "passed": true,
+          "round": 2,
+          "ms": 11968,
+          "finalActiveMs": 4756,
+          "finalAllMs": 4940,
+          "clickCount": 5,
+          "overlappedUnfinishedWork": true
+        },
+        {
+          "name": "bounded-admission-and-resource-return",
+          "passed": true,
+          "resources": {
+            "current": {
+              "admitted": 0,
+              "cleaning": 0,
+              "queued": 0,
+              "cleanupFailures": 0
+            },
+            "peaks": {
+              "admitted": 4,
+              "cleaning": 1,
+              "queued": 0
+            },
+            "samples": 821
+          },
+          "queue": {
+            "peaks": {
+              "ordinary": 4,
+              "background": 2,
+              "quote": 1
+            },
+            "samples": 816,
+            "queued": 0,
+            "pending": 0
+          }
+        },
+        {
+          "name": "quote-freshness-contract",
+          "passed": true,
+          "readAgeMs": 17766,
+          "dataEndAgeMs": 12538,
+          "waitForNaturalRefreshMs": 41
+        },
+        {
+          "name": "persistent-state-and-browser-errors",
+          "passed": true,
+          "workspaceUnchanged": true,
+          "preferencesUnchanged": true
+        }
+      ],
+      "pageErrors": [],
+      "unexpectedHttpErrors": [],
+      "workspaceAndPreferences": {
+        "before": {
+          "workspaceHash": "b4c31ec78ee3ae6cb59f7ac03458f55d620a69643fb4db6257567812a66e7480",
+          "revision": 78,
+          "preferencesHash": "bb4c1258e3914d4f8ca15ce74be46c6f7a1a17ed3578548a54a32a2b9d52e9bf"
+        },
+        "after": {
+          "workspaceHash": "b4c31ec78ee3ae6cb59f7ac03458f55d620a69643fb4db6257567812a66e7480",
+          "revision": 78,
+          "preferencesHash": "bb4c1258e3914d4f8ca15ce74be46c6f7a1a17ed3578548a54a32a2b9d52e9bf"
+        }
+      },
+      "privateRawReportsOmitted": true
+    },
+    {
+      "run": "continuation-acceptance-914525a-01",
+      "started": "2026-10-23T01:41:43.595Z",
+      "ended": "2026-10-23T01:43:20.616Z",
+      "passed": true,
+      "checkCount": 13,
+      "checks": [
+        {
+          "name": "original-five-chart-layout",
+          "passed": true,
+          "chartCount": 5,
+          "resolutions": [
+            "60",
+            "5",
+            "1W",
+            "1D",
+            "240"
+          ],
+          "studyCounts": [
+            0,
+            3,
+            0,
+            0,
+            1
+          ],
+          "allStudiesHaveFiniteValues": null
+        },
+        {
+          "name": "provider-prices-and-original-indicators",
+          "passed": true,
+          "activeMs": 5595,
+          "allMs": 6421,
+          "allOriginalPlotsFiniteMs": 7454,
+          "firstFiniteIndicatorResponseMs": 7256,
+          "chartCount": 5,
+          "resolutions": [
+            "60",
+            "5",
+            "1W",
+            "1D",
+            "240"
+          ],
+          "studyCounts": [
+            0,
+            3,
+            0,
+            0,
+            1
+          ],
+          "allStudiesHaveFiniteValues": true
+        },
+        {
+          "name": "fixed-history-prices-and-original-indicators",
+          "passed": true,
+          "activeMs": 1109,
+          "allMs": 3054,
+          "allOriginalPlotsFiniteMs": 5672,
+          "firstFiniteIndicatorResponseMs": 4907,
+          "chartCount": 5,
+          "resolutions": [
+            "60",
+            "5",
+            "1W",
+            "1D",
+            "240"
+          ],
+          "studyCounts": [
+            0,
+            3,
+            0,
+            0,
+            1
+          ],
+          "allStudiesHaveFiniteValues": true
+        },
+        {
+          "name": "composite-prices-and-original-indicators",
+          "passed": true,
+          "activeMs": 1458,
+          "allMs": 4220,
+          "allOriginalPlotsFiniteMs": 12595,
+          "firstFiniteIndicatorResponseMs": 6539,
+          "chartCount": 5,
+          "resolutions": [
+            "60",
+            "5",
+            "1W",
+            "1D",
+            "240"
+          ],
+          "studyCounts": [
+            0,
+            3,
+            0,
+            0,
+            1
+          ],
+          "allStudiesHaveFiniteValues": true
+        },
+        {
+          "name": "fixed-history-left-navigation",
+          "passed": true,
+          "ms": 2775,
+          "finiteVisibleBars": 29,
+          "delivery": "datafeed-page"
+        },
+        {
+          "name": "provider-cache-return",
+          "passed": true,
+          "activeMs": 4322,
+          "allMs": 8039,
+          "allOriginalPlotsFiniteMs": 9874,
+          "firstFiniteIndicatorResponseMs": 8420,
+          "chartCount": 5,
+          "resolutions": [
+            "60",
+            "5",
+            "1W",
+            "1D",
+            "240"
+          ],
+          "studyCounts": [
+            0,
+            3,
+            0,
+            0,
+            1
+          ],
+          "allStudiesHaveFiniteValues": true
+        },
+        {
+          "name": "provider-left-navigation",
+          "passed": true,
+          "ms": 1202,
+          "finiteVisibleBars": 29,
+          "delivery": "datafeed-page"
+        },
+        {
+          "name": "rapid-switches-final-symbol-and-indicators",
+          "passed": true,
+          "round": 0,
+          "ms": 14495,
+          "finalActiveMs": 6395,
+          "finalAllMs": 10381,
+          "clickCount": 5,
+          "overlappedUnfinishedWork": true
+        },
+        {
+          "name": "rapid-switches-final-symbol-and-indicators",
+          "passed": true,
+          "round": 1,
+          "ms": 9808,
+          "finalActiveMs": 5897,
+          "finalAllMs": 5968,
+          "clickCount": 5,
+          "overlappedUnfinishedWork": true
+        },
+        {
+          "name": "rapid-switches-final-symbol-and-indicators",
+          "passed": true,
+          "round": 2,
+          "ms": 8491,
+          "finalActiveMs": 8384,
+          "finalAllMs": 8457,
+          "clickCount": 5,
+          "overlappedUnfinishedWork": true
+        },
+        {
+          "name": "bounded-admission-and-resource-return",
+          "passed": true,
+          "resources": {
+            "current": {
+              "admitted": 0,
+              "cleaning": 0,
+              "queued": 0,
+              "cleanupFailures": 0
+            },
+            "peaks": {
+              "admitted": 4,
+              "cleaning": 3,
+              "queued": 0
+            },
+            "samples": 813
+          },
+          "queue": {
+            "peaks": {
+              "ordinary": 4,
+              "background": 2,
+              "quote": 1
+            },
+            "samples": 812,
+            "queued": 0,
+            "pending": 2
+          }
+        },
+        {
+          "name": "quote-freshness-contract",
+          "passed": true,
+          "readAgeMs": 3441,
+          "dataEndAgeMs": -39712,
+          "waitForNaturalRefreshMs": 1038
+        },
+        {
+          "name": "persistent-state-and-browser-errors",
+          "passed": true,
+          "workspaceUnchanged": true,
+          "preferencesUnchanged": true
+        }
+      ],
+      "pageErrors": [],
+      "unexpectedHttpErrors": [],
+      "workspaceAndPreferences": {
+        "before": {
+          "workspaceHash": "b4c31ec78ee3ae6cb59f7ac03458f55d620a69643fb4db6257567812a66e7480",
+          "revision": 78,
+          "preferencesHash": "bb4c1258e3914d4f8ca15ce74be46c6f7a1a17ed3578548a54a32a2b9d52e9bf"
+        },
+        "after": {
+          "workspaceHash": "b4c31ec78ee3ae6cb59f7ac03458f55d620a69643fb4db6257567812a66e7480",
+          "revision": 78,
+          "preferencesHash": "bb4c1258e3914d4f8ca15ce74be46c6f7a1a17ed3578548a54a32a2b9d52e9bf"
+        }
+      },
+      "privateRawReportsOmitted": true
+    }
+  ],
+  "caveat": "Short deployed business acceptance on a shared host; diagnostic timings are not a controlled A/B, stable percentiles, or a zero-regression guarantee."
+}

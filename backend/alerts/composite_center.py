@@ -2,7 +2,7 @@
 
 from sqlalchemy import func, or_, select
 
-from .composite_definitions import baseline
+from .composite_definitions import baseline, latest_note
 from .history_catalog import account_scope
 from .market_names import code_search, display_code
 from .market_usage import wanted_instruments
@@ -29,8 +29,26 @@ SCOPE = "workspace:default"
 def mapping_report(db, row):
     target = db.get(MarketDataset, row.target_dataset_id)
     identity = target.identity
+    note = latest_note(db, row.id)
+    from .composite_matching import PRODUCT_FIELDS, check_match, live_identity
+
+    valid = False
+    try:
+        from .history_catalog import catalog
+        entries = catalog(db, source="oanda", query=identity["provider_symbol"], page_size=100)["items"]
+        entry = next((item for item in entries if item["provider_symbol"] == identity["provider_symbol"]), None)
+        if entry and target.id == live_identity(entry["provider_symbol"]).key:
+            check = check_match(db, row.dataset_id, entry["catalog_id"])
+            valid = check["status"] == "ready" and all(
+                row.match.get(field) == check["suggestion"][field] for field in PRODUCT_FIELDS) and (
+                row.match.get("target_catalog", {}).get("precision") == check["snapshot"]["precision"] and
+                row.match.get("target_catalog", {}).get("type") == check["snapshot"]["asset_type"])
+    except ValueError:
+        pass
     return {"id": row.id, "dataset_id": row.dataset_id, "created_at": row.created_at,
         "target_dataset_id": target.id, "target_identity": identity, "match": row.match,
+        "note": {"version": note.version, **note.content} if note else None,
+        "valid_for_selection": valid,
         "target_display_symbol": display_code(identity["provider_symbol"], identity["source"], target.asset_class),
         "current_account": identity["account_scope"] == account_scope()}
 
@@ -154,11 +172,11 @@ def candidates(db, *, query="", page=1, page_size=25, permission_scope=SCOPE, so
         except ValueError as error:
             reason = str(error)
         matches = mappings(db, dataset["id"], permission_scope=permission_scope)["items"]
-        valid = [item for item in matches if item["current_account"]]
+        valid = [item for item in matches if item["current_account"] and item["valid_for_selection"]]
         output.append({"dataset": dataset, "mappings": matches,
             "status": "needs_maintenance" if reason else "needs_mapping" if not valid else "ready_to_open",
             "reason": reason,
-            "recommended_mapping_id": valid[0]["id"] if valid else None})
+            "recommended_mapping_id": valid[0]["id"] if len(valid) == 1 else None})
     return {**result, "items": output}
 
 

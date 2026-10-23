@@ -85,7 +85,7 @@ function progress(mode,id){
    await p.ui.getByRole('option').filter({hasText:/NY17/}).first().click();await p.center.getByRole('button',{name:'实时映射版本',exact:true}).click();await capture(p,prefix+'-13-mapping-dropdown','DC1');await p.page.keyboard.press('Escape');
    const data=JSON.parse(fs.readFileSync('docs/verification/pro-charts-20261011/browser-data-center.json','utf8'));
    await openCenter(p,'/market-data/datasets/'+data.mapping.dataset_id+'/mapping');
-   await p.expect(p.center.getByRole('button',{name:'目标准确品种（OANDA Practice）',exact:true})).toBeVisible();await p.center.getByRole('button',{name:'目标准确品种（OANDA Practice）',exact:true}).click();await capture(p,prefix+'-14-target-dropdown','DC1');await p.page.keyboard.press('Escape');
+   await p.expect(p.center.getByRole('button',{name:/^(选择品种|更换)$/})).toBeVisible();await p.center.getByRole('button',{name:/^(选择品种|更换)$/}).click();await capture(p,prefix+'-14-native-symbol-picker','DC1');await p.page.keyboard.press('Escape');
    progress('advance',seeded.version);
    await openCenter(p,'/market-data?tab=tasks&status=all&dataset_id='+seeded.dataset);
    const row=p.center.locator('#task-'+seeded.version);await p.expect(row).toBeVisible();await row.getByRole('button',{name:'查看任务详情',exact:true}).click();await capture(p,prefix+'-15-task-progress','F4','Real committed progress from a new task-only synthetic AUDUSD import.');

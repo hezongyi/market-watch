@@ -1,4 +1,4 @@
-// Actual app HTTP, parent labels and pinned native display under delayed edits.
+// Actual app HTTP and pinned native display under delayed edits.
 const assert=require('assert').strict,fs=require('node:fs');
 console.log(await snapshot({page:state.app}));
 await state.chart.evaluate(()=>new Promise(resolve=>widget.activeChart().setSymbol('PARITY',resolve)));
@@ -22,7 +22,7 @@ state.appRoute=async route=>{
 await state.app.route('**/api/charts/data',state.appRoute);
 try {
   await state.chart.evaluate(id=>widget.activeChart().getStudyById(id).setInputValues([{id:'period',value:13}]),state.appStudy);
-  await state.app.getByRole('complementary',{name:'图格指标状态'}).getByText(/暂显旧参数：period=5/).waitFor({timeout:5000});
+  await state.chart.waitForFunction(id=>MWNativeIndicatorResults.scope(widget.activeChart(),id)?.transition?.params.period===5,state.appStudy,{timeout:5000});
   const delayed=await sample();
   assert.equal(delayed.rows,before.rows);assert.deepEqual(delayed.last,before.last);
   assert.equal(delayed.scope.transition.params.period,5);
@@ -35,7 +35,7 @@ try {
   },state.appStudy,{timeout:10000});
   const after=await sample();assert.notDeepEqual(after.last,before.last);
   const evidence={source:'actual app / Playwriter / real delayed HTTP',synthetic:true,before,delayed,after,heldRequests:state.appHeld,
-    label:'暂显旧参数：period=5',passed:true};
+    retainedParameter:5,passed:true};
   fs.writeFileSync('/tmp/mw-issue74-20261017/app-transition.json',JSON.stringify(evidence,null,2));
   console.log(evidence);console.log(await getLatestLogs({page:state.app,sinceLastCall:true,count:6}));
 }finally{state.appRelease();await state.app.unroute('**/api/charts/data',state.appRoute);}

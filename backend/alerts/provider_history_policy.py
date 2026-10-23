@@ -47,7 +47,7 @@ def capabilities():
         "response_bytes": settings.native_history_response_bytes,
         "task_seconds": settings.native_history_task_seconds,
         "max_pages": settings.native_history_task_pages, "max_inflight": 8,
-        "mode": "continuous", "protocol": 1,
+        "mode": "continuous", "protocol": 1, "result_polling": True,
     }
     return {**values, "version": hashlib.sha256(json.dumps(values, sort_keys=True).encode()).hexdigest()[:16]}
 

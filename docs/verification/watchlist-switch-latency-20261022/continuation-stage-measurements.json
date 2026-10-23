@@ -1,0 +1,1410 @@
+{
+  "runs": [
+    {
+      "started": "2026-10-23T01:05:45.327Z",
+      "error": null,
+      "browserErrors": [],
+      "workspaceUnchanged": true,
+      "trials": [
+        {
+          "kind": "MWP",
+          "quietBefore": false,
+          "activeMs": 7241,
+          "allMs": 13258
+        },
+        {
+          "kind": "MWH",
+          "quietBefore": true,
+          "activeMs": 1458,
+          "allMs": 3724
+        },
+        {
+          "kind": "MWC",
+          "quietBefore": true,
+          "activeMs": 1220,
+          "allMs": 4552
+        },
+        {
+          "kind": "MWP",
+          "quietBefore": false,
+          "activeMs": 4460,
+          "allMs": 8643
+        }
+      ],
+      "historyResources": {
+        "admitted": 0,
+        "cleaning": 0,
+        "queued": 0,
+        "cleanupFailures": 0
+      },
+      "network": {
+        "n": 0,
+        "beforeSendMs": {
+          "n": 0
+        },
+        "sendToHeadersMs": {
+          "n": 0
+        }
+      },
+      "tasks": [
+        {
+          "trial": 0,
+          "timeframe": "H1",
+          "focused": true,
+          "bridgeQueueMs": 80,
+          "submitHttpMs": 1917,
+          "createdToClaimedMs": 1076,
+          "claimTransactionMs": 3.8,
+          "fillMs": 544.29,
+          "persistMs": 7.22,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 1080,
+          "readyToResultHeadersMs": 3141,
+          "resultHttpMs": 2095,
+          "resultReadMs": 211.96,
+          "extraResultRoundTrip": true,
+          "plainStatusPolls": 1,
+          "resultPolls": 1,
+          "responseHeadersToBridgeMs": 1,
+          "callbackMs": 2,
+          "callbackStartToNativeLoadedMs": 4,
+          "workerTimingsMs": [
+            {
+              "database_commit": 14.8,
+              "lease_wait": 3.55,
+              "network_http11_receive_response_body": 1.93,
+              "network_http11_receive_response_headers": 378.63,
+              "network_http11_response_closed": 0.02,
+              "network_http11_send_request_body": 0.03,
+              "network_http11_send_request_headers": 0.21,
+              "read_total": 531.21,
+              "upstream_decode": 0.04,
+              "upstream_http": 381.6,
+              "upstream_slot": 4.35
+            }
+          ]
+        },
+        {
+          "trial": 0,
+          "timeframe": "M5",
+          "focused": false,
+          "bridgeQueueMs": 461,
+          "submitHttpMs": 1050,
+          "createdToClaimedMs": 53,
+          "claimTransactionMs": 28.01,
+          "fillMs": 1452.79,
+          "persistMs": 32.2,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 1509,
+          "readyToResultHeadersMs": 3989,
+          "resultHttpMs": 2488,
+          "resultReadMs": 473.96,
+          "extraResultRoundTrip": true,
+          "plainStatusPolls": 1,
+          "resultPolls": 1,
+          "responseHeadersToBridgeMs": 10,
+          "callbackMs": 4,
+          "callbackStartToNativeLoadedMs": 12,
+          "workerTimingsMs": [
+            {
+              "database_commit": 22.92,
+              "lease_wait": 8.84,
+              "network_connection_connect_tcp": 1.35,
+              "network_http11_receive_response_body": 0.08,
+              "network_http11_receive_response_headers": 370.88,
+              "network_http11_response_closed": 0.02,
+              "network_http11_send_request_body": 0.11,
+              "network_http11_send_request_headers": 2.54,
+              "network_proxy_start_tls": 651.71,
+              "read_total": 1345.67,
+              "upstream_decode": 0.05,
+              "upstream_http": 1028.76,
+              "upstream_slot": 8.46
+            }
+          ]
+        },
+        {
+          "trial": 0,
+          "timeframe": "W1",
+          "focused": false,
+          "bridgeQueueMs": 634,
+          "submitHttpMs": 3367,
+          "createdToClaimedMs": 729,
+          "claimTransactionMs": 8.23,
+          "fillMs": 582.73,
+          "persistMs": 12.77,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 726,
+          "readyToResultHeadersMs": 2024,
+          "resultHttpMs": 1329,
+          "resultReadMs": 159.77,
+          "extraResultRoundTrip": true,
+          "plainStatusPolls": 1,
+          "resultPolls": 1,
+          "responseHeadersToBridgeMs": 42,
+          "callbackMs": 1,
+          "callbackStartToNativeLoadedMs": 2,
+          "workerTimingsMs": [
+            {
+              "database_commit": 9.8,
+              "lease_wait": 19.76,
+              "network_http11_receive_response_body": 0.14,
+              "network_http11_receive_response_headers": 307.84,
+              "network_http11_response_closed": 0.03,
+              "network_http11_send_request_body": 0.03,
+              "network_http11_send_request_headers": 0.19,
+              "read_total": 552.23,
+              "upstream_decode": 0.04,
+              "upstream_http": 309.32,
+              "upstream_slot": 4.57
+            }
+          ]
+        },
+        {
+          "trial": 0,
+          "timeframe": "D1",
+          "focused": false,
+          "bridgeQueueMs": 4498,
+          "submitHttpMs": 1911,
+          "createdToClaimedMs": 2021,
+          "claimTransactionMs": 6.26,
+          "fillMs": 548.57,
+          "persistMs": 20.81,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 1671,
+          "readyToResultHeadersMs": 2741,
+          "resultHttpMs": 1083,
+          "resultReadMs": 125.55,
+          "extraResultRoundTrip": true,
+          "plainStatusPolls": 4,
+          "resultPolls": 1,
+          "responseHeadersToBridgeMs": 1,
+          "callbackMs": 2,
+          "callbackStartToNativeLoadedMs": 3,
+          "workerTimingsMs": [
+            {
+              "database_commit": 54.14,
+              "lease_wait": 3.93,
+              "network_http11_receive_response_body": 0.15,
+              "network_http11_receive_response_headers": 356.1,
+              "network_http11_response_closed": 0.02,
+              "network_http11_send_request_body": 0.03,
+              "network_http11_send_request_headers": 0.18,
+              "read_total": 527.69,
+              "upstream_decode": 0.04,
+              "upstream_http": 357.2,
+              "upstream_slot": 2.94
+            }
+          ]
+        },
+        {
+          "trial": 0,
+          "timeframe": "H4",
+          "focused": false,
+          "bridgeQueueMs": 7732,
+          "submitHttpMs": 474,
+          "createdToClaimedMs": 1925,
+          "claimTransactionMs": 21.1,
+          "fillMs": 662.59,
+          "persistMs": 5.53,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 1150,
+          "readyToResultHeadersMs": 2009,
+          "resultHttpMs": 925,
+          "resultReadMs": 232.08,
+          "extraResultRoundTrip": true,
+          "plainStatusPolls": 4,
+          "resultPolls": 1,
+          "responseHeadersToBridgeMs": 7,
+          "callbackMs": 2,
+          "callbackStartToNativeLoadedMs": 4,
+          "workerTimingsMs": [
+            {
+              "database_commit": 11.89,
+              "lease_wait": 6.53,
+              "network_http11_receive_response_body": 0.8,
+              "network_http11_receive_response_headers": 290.97,
+              "network_http11_response_closed": 0.01,
+              "network_http11_send_request_body": 0.03,
+              "network_http11_send_request_headers": 0.2,
+              "read_total": 644.32,
+              "upstream_decode": 0.05,
+              "upstream_http": 292.67,
+              "upstream_slot": 99.06
+            }
+          ]
+        },
+        {
+          "trial": 3,
+          "timeframe": "H1",
+          "focused": true,
+          "bridgeQueueMs": 42,
+          "submitHttpMs": 2094,
+          "createdToClaimedMs": 674,
+          "claimTransactionMs": 18.03,
+          "fillMs": 801.23,
+          "persistMs": 71.64,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 129,
+          "readyToResultHeadersMs": 471,
+          "resultHttpMs": 353,
+          "resultReadMs": 206.08,
+          "extraResultRoundTrip": true,
+          "plainStatusPolls": 3,
+          "resultPolls": 1,
+          "responseHeadersToBridgeMs": 10,
+          "callbackMs": 4,
+          "callbackStartToNativeLoadedMs": 7,
+          "workerTimingsMs": [
+            {
+              "database_commit": 29.1,
+              "lease_wait": 18.15,
+              "network_http11_receive_response_body": 0.11,
+              "network_http11_receive_response_headers": 315.45,
+              "network_http11_response_closed": 0.01,
+              "network_http11_send_request_body": 0.03,
+              "network_http11_send_request_headers": 0.19,
+              "read_total": 770.27,
+              "upstream_decode": 0.03,
+              "upstream_http": 316.5,
+              "upstream_slot": 3.36
+            }
+          ]
+        },
+        {
+          "trial": 3,
+          "timeframe": "M5",
+          "focused": false,
+          "bridgeQueueMs": 1229,
+          "submitHttpMs": 1425,
+          "createdToClaimedMs": 1915,
+          "claimTransactionMs": 11.53,
+          "fillMs": 1156.64,
+          "persistMs": 10.61,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 101,
+          "readyToResultHeadersMs": 272,
+          "resultHttpMs": 141,
+          "resultReadMs": 59.25,
+          "extraResultRoundTrip": true,
+          "plainStatusPolls": 5,
+          "resultPolls": 1,
+          "responseHeadersToBridgeMs": 4,
+          "callbackMs": 5,
+          "callbackStartToNativeLoadedMs": 7,
+          "workerTimingsMs": [
+            {
+              "database_commit": 16.75,
+              "lease_wait": 10.22,
+              "network_http11_receive_response_body": 0.17,
+              "network_http11_receive_response_headers": 858.87,
+              "network_http11_response_closed": 0.01,
+              "network_http11_send_request_body": 0.04,
+              "network_http11_send_request_headers": 0.43,
+              "read_total": 1129.53,
+              "upstream_decode": 0.04,
+              "upstream_http": 860.21,
+              "upstream_slot": 4.13
+            }
+          ]
+        },
+        {
+          "trial": 3,
+          "timeframe": "W1",
+          "focused": false,
+          "bridgeQueueMs": 1431,
+          "submitHttpMs": 946,
+          "createdToClaimedMs": 1494,
+          "claimTransactionMs": 12.97,
+          "fillMs": 646.63,
+          "persistMs": 11.54,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 378,
+          "readyToResultHeadersMs": 435,
+          "resultHttpMs": 79,
+          "resultReadMs": 23.89,
+          "extraResultRoundTrip": true,
+          "plainStatusPolls": 4,
+          "resultPolls": 1,
+          "responseHeadersToBridgeMs": 1,
+          "callbackMs": 8,
+          "callbackStartToNativeLoadedMs": 9,
+          "workerTimingsMs": [
+            {
+              "database_commit": 19.8,
+              "lease_wait": 122.71,
+              "network_http11_receive_response_body": 0.12,
+              "network_http11_receive_response_headers": 270.75,
+              "network_http11_response_closed": 0.01,
+              "network_http11_send_request_body": 0.04,
+              "network_http11_send_request_headers": 0.44,
+              "read_total": 613.44,
+              "upstream_decode": 0.04,
+              "upstream_http": 272.02,
+              "upstream_slot": 4.15
+            }
+          ]
+        },
+        {
+          "trial": 3,
+          "timeframe": "D1",
+          "focused": false,
+          "bridgeQueueMs": 2505,
+          "submitHttpMs": 609,
+          "createdToClaimedMs": 2709,
+          "claimTransactionMs": 15.46,
+          "fillMs": 898.94,
+          "persistMs": 7.7,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 322,
+          "readyToResultHeadersMs": 1009,
+          "resultHttpMs": 699,
+          "resultReadMs": 390.6,
+          "extraResultRoundTrip": true,
+          "plainStatusPolls": 5,
+          "resultPolls": 1,
+          "responseHeadersToBridgeMs": 11,
+          "callbackMs": 2,
+          "callbackStartToNativeLoadedMs": 3,
+          "workerTimingsMs": [
+            {
+              "database_commit": 68.53,
+              "lease_wait": 19.57,
+              "network_http11_receive_response_body": 0.13,
+              "network_http11_receive_response_headers": 299.48,
+              "network_http11_response_closed": 0.01,
+              "network_http11_send_request_body": 0.03,
+              "network_http11_send_request_headers": 0.24,
+              "read_total": 875.22,
+              "upstream_decode": 0.04,
+              "upstream_http": 300.53,
+              "upstream_slot": 7.81
+            }
+          ]
+        },
+        {
+          "trial": 3,
+          "timeframe": "H4",
+          "focused": false,
+          "bridgeQueueMs": 4388,
+          "submitHttpMs": 134,
+          "createdToClaimedMs": 2281,
+          "claimTransactionMs": 32.03,
+          "fillMs": 511.04,
+          "persistMs": 8.57,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 744,
+          "readyToResultHeadersMs": 1038,
+          "resultHttpMs": 317,
+          "resultReadMs": 76.79,
+          "extraResultRoundTrip": true,
+          "plainStatusPolls": 5,
+          "resultPolls": 1,
+          "responseHeadersToBridgeMs": 3,
+          "callbackMs": 11,
+          "callbackStartToNativeLoadedMs": 13,
+          "workerTimingsMs": [
+            {
+              "database_commit": 8.36,
+              "lease_wait": 4.69,
+              "network_http11_receive_response_body": 0.12,
+              "network_http11_receive_response_headers": 290.13,
+              "network_http11_response_closed": 0.01,
+              "network_http11_send_request_body": 0.03,
+              "network_http11_send_request_headers": 0.21,
+              "read_total": 495.44,
+              "upstream_decode": 0.03,
+              "upstream_http": 291.59,
+              "upstream_slot": 36.3
+            }
+          ]
+        }
+      ],
+      "rangesMs": {
+        "bridgeQueueMs": {
+          "n": 10,
+          "min": 42,
+          "median": 1330.0,
+          "max": 7732
+        },
+        "submitHttpMs": {
+          "n": 10,
+          "min": 134,
+          "median": 1237.5,
+          "max": 3367
+        },
+        "createdToClaimedMs": {
+          "n": 10,
+          "min": 53,
+          "median": 1704.5,
+          "max": 2709
+        },
+        "claimTransactionMs": {
+          "n": 10,
+          "min": 3.8,
+          "median": 14.215,
+          "max": 32.03
+        },
+        "fillMs": {
+          "n": 10,
+          "min": 511.04,
+          "median": 654.61,
+          "max": 1452.79
+        },
+        "persistMs": {
+          "n": 10,
+          "min": 5.53,
+          "median": 11.075,
+          "max": 71.64
+        },
+        "readyToObservedMs": {
+          "n": 10,
+          "min": 101,
+          "median": 735.0,
+          "max": 1671
+        },
+        "readyToResultHeadersMs": {
+          "n": 10,
+          "min": 272,
+          "median": 1523.5,
+          "max": 3989
+        },
+        "resultHttpMs": {
+          "n": 10,
+          "min": 79,
+          "median": 812.0,
+          "max": 2488
+        },
+        "resultReadMs": {
+          "n": 10,
+          "min": 23.89,
+          "median": 182.925,
+          "max": 473.96
+        },
+        "callbackMs": {
+          "n": 10,
+          "min": 1,
+          "median": 3.0,
+          "max": 11
+        },
+        "callbackStartToNativeLoadedMs": {
+          "n": 10,
+          "min": 2,
+          "median": 5.5,
+          "max": 13
+        }
+      },
+      "caveat": "Diagnostic samples on a shared host, with read-only routing and observation hooks; not a controlled A/B or stable percentiles. Nested timings overlap; created-to-claimed includes the claim transaction. Do not sum the ranges as a critical path.",
+      "run": "continuation-measure-b7ef7be-01",
+      "extraResultTrips": 10,
+      "plainStatusPolls": 33,
+      "resultPolls": 10,
+      "confirmationSampleCount": 0,
+      "finalBridgeQueue": {
+        "remaining": 0,
+        "pending": 0
+      }
+    },
+    {
+      "started": "2026-10-23T01:10:47.709Z",
+      "error": null,
+      "browserErrors": [],
+      "workspaceUnchanged": true,
+      "trials": [
+        {
+          "kind": "MWP",
+          "quietBefore": false,
+          "activeMs": 6386,
+          "allMs": 9024
+        },
+        {
+          "kind": "MWH",
+          "quietBefore": true,
+          "activeMs": 1343,
+          "allMs": 4029
+        },
+        {
+          "kind": "MWC",
+          "quietBefore": true,
+          "activeMs": 864,
+          "allMs": 4470
+        },
+        {
+          "kind": "MWP",
+          "quietBefore": true,
+          "activeMs": 4162,
+          "allMs": 6634
+        }
+      ],
+      "historyResources": {
+        "admitted": 0,
+        "cleaning": 0,
+        "queued": 0,
+        "cleanupFailures": 0
+      },
+      "network": {
+        "n": 45,
+        "beforeSendMs": {
+          "n": 45,
+          "min": 0.411,
+          "median": 0.975,
+          "max": 2210.742
+        },
+        "sendToHeadersMs": {
+          "n": 45,
+          "min": 25.435,
+          "median": 336.002,
+          "max": 945.62
+        }
+      },
+      "tasks": [
+        {
+          "trial": 0,
+          "timeframe": "H1",
+          "focused": true,
+          "bridgeQueueMs": 62,
+          "submitHttpMs": 2461,
+          "createdToClaimedMs": 537,
+          "claimTransactionMs": 8.31,
+          "fillMs": 1405.58,
+          "persistMs": 10.51,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 324,
+          "readyToResultHeadersMs": 607,
+          "resultHttpMs": 343,
+          "resultReadMs": 103.62,
+          "extraResultRoundTrip": true,
+          "plainStatusPolls": 3,
+          "resultPolls": 1,
+          "responseHeadersToBridgeMs": 0,
+          "callbackMs": 16,
+          "callbackStartToNativeLoadedMs": 29,
+          "workerTimingsMs": [
+            {
+              "database_commit": 8.87,
+              "lease_wait": 13.21,
+              "network_connection_connect_tcp": 0.4,
+              "network_http11_receive_response_body": 0.12,
+              "network_http11_receive_response_headers": 520.87,
+              "network_http11_response_closed": 0.01,
+              "network_http11_send_request_body": 0.07,
+              "network_http11_send_request_headers": 0.31,
+              "network_proxy_start_tls": 631.82,
+              "read_total": 1391.81,
+              "upstream_decode": 0.03,
+              "upstream_http": 1154.81,
+              "upstream_slot": 17.86
+            }
+          ]
+        },
+        {
+          "trial": 0,
+          "timeframe": "D1",
+          "focused": false,
+          "bridgeQueueMs": 2957,
+          "submitHttpMs": 1181,
+          "createdToClaimedMs": 755,
+          "claimTransactionMs": 4.52,
+          "fillMs": 1155.72,
+          "persistMs": 11.6,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 518,
+          "readyToResultHeadersMs": 1381,
+          "resultHttpMs": 883,
+          "resultReadMs": 312.56,
+          "extraResultRoundTrip": true,
+          "plainStatusPolls": 3,
+          "resultPolls": 1,
+          "responseHeadersToBridgeMs": 78,
+          "callbackMs": 7,
+          "callbackStartToNativeLoadedMs": 7,
+          "workerTimingsMs": [
+            {
+              "database_commit": 85.58,
+              "lease_wait": 5.54,
+              "network_http11_receive_response_body": 0.11,
+              "network_http11_receive_response_headers": 753.84,
+              "network_http11_response_closed": 0.01,
+              "network_http11_send_request_body": 0.03,
+              "network_http11_send_request_headers": 0.24,
+              "read_total": 1053.03,
+              "upstream_decode": 0.04,
+              "upstream_http": 754.92,
+              "upstream_slot": 24.36
+            }
+          ]
+        },
+        {
+          "trial": 0,
+          "timeframe": "H4",
+          "focused": false,
+          "bridgeQueueMs": 3454,
+          "submitHttpMs": 811,
+          "createdToClaimedMs": 1799,
+          "claimTransactionMs": 222.86,
+          "fillMs": 817.01,
+          "persistMs": 17.29,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 341,
+          "readyToResultHeadersMs": 930,
+          "resultHttpMs": 593,
+          "resultReadMs": 193.3,
+          "extraResultRoundTrip": true,
+          "plainStatusPolls": 4,
+          "resultPolls": 1,
+          "responseHeadersToBridgeMs": 6,
+          "callbackMs": 5,
+          "callbackStartToNativeLoadedMs": 8,
+          "workerTimingsMs": [
+            {
+              "database_commit": 105.45,
+              "lease_wait": 22.79,
+              "network_http11_receive_response_body": 3.02,
+              "network_http11_receive_response_headers": 287.56,
+              "network_http11_response_closed": 0.01,
+              "network_http11_send_request_body": 0.03,
+              "network_http11_send_request_headers": 0.2,
+              "read_total": 801.97,
+              "upstream_decode": 0.1,
+              "upstream_http": 291.52,
+              "upstream_slot": 10.98
+            }
+          ]
+        },
+        {
+          "trial": 3,
+          "timeframe": "H1",
+          "focused": true,
+          "bridgeQueueMs": 0,
+          "submitHttpMs": 731,
+          "createdToClaimedMs": 661,
+          "claimTransactionMs": 19.73,
+          "fillMs": 1319.28,
+          "persistMs": 12.21,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 434,
+          "readyToResultHeadersMs": 1211,
+          "resultHttpMs": 797,
+          "resultReadMs": 399.53,
+          "extraResultRoundTrip": true,
+          "plainStatusPolls": 3,
+          "resultPolls": 1,
+          "responseHeadersToBridgeMs": 5,
+          "callbackMs": 2,
+          "callbackStartToNativeLoadedMs": 4,
+          "workerTimingsMs": [
+            {
+              "database_commit": 16.92,
+              "lease_wait": 14.09,
+              "network_http11_receive_response_body": 0.15,
+              "network_http11_receive_response_headers": 850.14,
+              "network_http11_response_closed": 0.01,
+              "network_http11_send_request_body": 0.03,
+              "network_http11_send_request_headers": 0.23,
+              "read_total": 1278.38,
+              "upstream_decode": 0.03,
+              "upstream_http": 851.29,
+              "upstream_slot": 9.81
+            }
+          ]
+        },
+        {
+          "trial": 3,
+          "timeframe": "D1",
+          "focused": false,
+          "bridgeQueueMs": 438,
+          "submitHttpMs": 1051,
+          "createdToClaimedMs": 1283,
+          "claimTransactionMs": 4.95,
+          "fillMs": 665.13,
+          "persistMs": 22.86,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 946,
+          "readyToResultHeadersMs": 2083,
+          "resultHttpMs": 1147,
+          "resultReadMs": 119.25,
+          "extraResultRoundTrip": true,
+          "plainStatusPolls": 3,
+          "resultPolls": 1,
+          "responseHeadersToBridgeMs": 5,
+          "callbackMs": 1,
+          "callbackStartToNativeLoadedMs": 4,
+          "workerTimingsMs": [
+            {
+              "database_commit": 29.02,
+              "lease_wait": 67.05,
+              "network_http11_receive_response_body": 0.12,
+              "network_http11_receive_response_headers": 286.88,
+              "network_http11_response_closed": 0.01,
+              "network_http11_send_request_body": 0.03,
+              "network_http11_send_request_headers": 0.2,
+              "read_total": 635.51,
+              "upstream_decode": 0.04,
+              "upstream_http": 287.9,
+              "upstream_slot": 19.98
+            }
+          ]
+        },
+        {
+          "trial": 3,
+          "timeframe": "H4",
+          "focused": false,
+          "bridgeQueueMs": 726,
+          "submitHttpMs": 1136,
+          "createdToClaimedMs": 1653,
+          "claimTransactionMs": 20.23,
+          "fillMs": 1128.52,
+          "persistMs": 20.79,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 527,
+          "readyToResultHeadersMs": 1699,
+          "resultHttpMs": 1197,
+          "resultReadMs": 262.9,
+          "extraResultRoundTrip": true,
+          "plainStatusPolls": 4,
+          "resultPolls": 1,
+          "responseHeadersToBridgeMs": 8,
+          "callbackMs": 4,
+          "callbackStartToNativeLoadedMs": 6,
+          "workerTimingsMs": [
+            {
+              "database_commit": 246.88,
+              "lease_wait": 30.06,
+              "network_http11_receive_response_body": 3.42,
+              "network_http11_receive_response_headers": 356.85,
+              "network_http11_response_closed": 0.01,
+              "network_http11_send_request_body": 0.03,
+              "network_http11_send_request_headers": 0.21,
+              "read_total": 1063.35,
+              "upstream_decode": 0.1,
+              "upstream_http": 361.2,
+              "upstream_slot": 28.25
+            }
+          ]
+        }
+      ],
+      "rangesMs": {
+        "bridgeQueueMs": {
+          "n": 6,
+          "min": 0,
+          "median": 582.0,
+          "max": 3454
+        },
+        "submitHttpMs": {
+          "n": 6,
+          "min": 731,
+          "median": 1093.5,
+          "max": 2461
+        },
+        "createdToClaimedMs": {
+          "n": 6,
+          "min": 537,
+          "median": 1019.0,
+          "max": 1799
+        },
+        "claimTransactionMs": {
+          "n": 6,
+          "min": 4.52,
+          "median": 14.02,
+          "max": 222.86
+        },
+        "fillMs": {
+          "n": 6,
+          "min": 665.13,
+          "median": 1142.12,
+          "max": 1405.58
+        },
+        "persistMs": {
+          "n": 6,
+          "min": 10.51,
+          "median": 14.75,
+          "max": 22.86
+        },
+        "readyToObservedMs": {
+          "n": 6,
+          "min": 324,
+          "median": 476.0,
+          "max": 946
+        },
+        "readyToResultHeadersMs": {
+          "n": 6,
+          "min": 607,
+          "median": 1296.0,
+          "max": 2083
+        },
+        "resultHttpMs": {
+          "n": 6,
+          "min": 343,
+          "median": 840.0,
+          "max": 1197
+        },
+        "resultReadMs": {
+          "n": 6,
+          "min": 103.62,
+          "median": 228.1,
+          "max": 399.53
+        },
+        "callbackMs": {
+          "n": 6,
+          "min": 1,
+          "median": 4.5,
+          "max": 16
+        },
+        "callbackStartToNativeLoadedMs": {
+          "n": 6,
+          "min": 4,
+          "median": 6.5,
+          "max": 29
+        }
+      },
+      "caveat": "Diagnostic samples on a shared host, with read-only routing and observation hooks; not a controlled A/B or stable percentiles. Nested timings overlap; created-to-claimed includes the claim transaction. Do not sum the ranges as a critical path.",
+      "run": "continuation-measure-b7ef7be-02",
+      "extraResultTrips": 6,
+      "plainStatusPolls": 20,
+      "resultPolls": 6,
+      "confirmationSampleCount": 0,
+      "finalBridgeQueue": {
+        "remaining": 0,
+        "pending": 0
+      }
+    },
+    {
+      "started": "2026-10-23T01:38:18.107Z",
+      "error": null,
+      "browserErrors": [],
+      "workspaceUnchanged": true,
+      "trials": [
+        {
+          "kind": "MWP",
+          "quietBefore": false,
+          "activeMs": 4913,
+          "allMs": 8618
+        },
+        {
+          "kind": "MWH",
+          "quietBefore": true,
+          "activeMs": 849,
+          "allMs": 3562
+        },
+        {
+          "kind": "MWC",
+          "quietBefore": true,
+          "activeMs": 1282,
+          "allMs": 5300
+        },
+        {
+          "kind": "MWP",
+          "quietBefore": false,
+          "activeMs": 4102,
+          "allMs": 7222
+        }
+      ],
+      "historyResources": {
+        "admitted": 0,
+        "cleaning": 0,
+        "queued": 0,
+        "cleanupFailures": 0
+      },
+      "network": {
+        "n": 68,
+        "beforeSendMs": {
+          "n": 68,
+          "min": 0.37,
+          "median": 0.482,
+          "max": 2003.64
+        },
+        "sendToHeadersMs": {
+          "n": 68,
+          "min": 8.753,
+          "median": 97.691,
+          "max": 1129.044
+        }
+      },
+      "tasks": [
+        {
+          "trial": 0,
+          "timeframe": "H1",
+          "focused": true,
+          "bridgeQueueMs": 0,
+          "submitHttpMs": 1830,
+          "createdToClaimedMs": 559,
+          "claimTransactionMs": 6.65,
+          "fillMs": 1493.68,
+          "persistMs": 63.96,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 550,
+          "readyToResultHeadersMs": 535,
+          "resultHttpMs": 173,
+          "resultReadMs": 110.77,
+          "extraResultRoundTrip": false,
+          "plainStatusPolls": 0,
+          "resultPolls": 4,
+          "responseHeadersToBridgeMs": 2,
+          "callbackMs": 4,
+          "callbackStartToNativeLoadedMs": 7,
+          "workerTimingsMs": [
+            {
+              "database_commit": 84.88,
+              "lease_wait": 16.46,
+              "network_connection_connect_tcp": 5.31,
+              "network_http11_receive_response_body": 0.15,
+              "network_http11_receive_response_headers": 284.91,
+              "network_http11_response_closed": 0.01,
+              "network_http11_send_request_body": 0.08,
+              "network_http11_send_request_headers": 0.36,
+              "network_proxy_start_tls": 626.56,
+              "read_total": 1444.22,
+              "upstream_decode": 0.03,
+              "upstream_http": 919.11,
+              "upstream_slot": 18.14
+            }
+          ]
+        },
+        {
+          "trial": 0,
+          "timeframe": "M5",
+          "focused": false,
+          "bridgeQueueMs": 61,
+          "submitHttpMs": 2588,
+          "createdToClaimedMs": 1476,
+          "claimTransactionMs": 5.55,
+          "fillMs": 1205.72,
+          "persistMs": 7.85,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 1315,
+          "readyToResultHeadersMs": 1289,
+          "resultHttpMs": 198,
+          "resultReadMs": 66.88,
+          "extraResultRoundTrip": false,
+          "plainStatusPolls": 0,
+          "resultPolls": 6,
+          "responseHeadersToBridgeMs": -5,
+          "callbackMs": 3,
+          "callbackStartToNativeLoadedMs": 10,
+          "workerTimingsMs": [
+            {
+              "database_commit": 38.09,
+              "lease_wait": 11.17,
+              "network_http11_receive_response_body": 1.5,
+              "network_http11_receive_response_headers": 285.17,
+              "network_http11_response_closed": 0.02,
+              "network_http11_send_request_body": 0.03,
+              "network_http11_send_request_headers": 0.2,
+              "read_total": 1175.38,
+              "upstream_decode": 0.03,
+              "upstream_http": 287.74,
+              "upstream_slot": 16.83
+            }
+          ]
+        },
+        {
+          "trial": 0,
+          "timeframe": "W1",
+          "focused": false,
+          "bridgeQueueMs": 1435,
+          "submitHttpMs": 1597,
+          "createdToClaimedMs": 2404,
+          "claimTransactionMs": 10.48,
+          "fillMs": 416.86,
+          "persistMs": 11.89,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 1211,
+          "readyToResultHeadersMs": 1192,
+          "resultHttpMs": 166,
+          "resultReadMs": 37.91,
+          "extraResultRoundTrip": false,
+          "plainStatusPolls": 0,
+          "resultPolls": 6,
+          "responseHeadersToBridgeMs": 2,
+          "callbackMs": 2,
+          "callbackStartToNativeLoadedMs": 3,
+          "workerTimingsMs": [
+            {
+              "database_commit": 6.2,
+              "lease_wait": 5.24,
+              "network_http11_receive_response_body": 1.24,
+              "network_http11_receive_response_headers": 261.99,
+              "network_http11_response_closed": 0.02,
+              "network_http11_send_request_body": 0.03,
+              "network_http11_send_request_headers": 0.21,
+              "read_total": 389.38,
+              "upstream_decode": 0.04,
+              "upstream_http": 264.28,
+              "upstream_slot": 14.77
+            }
+          ]
+        },
+        {
+          "trial": 0,
+          "timeframe": "D1",
+          "focused": false,
+          "bridgeQueueMs": 1488,
+          "submitHttpMs": 1802,
+          "createdToClaimedMs": 2606,
+          "claimTransactionMs": 5.3,
+          "fillMs": 473.19,
+          "persistMs": 9.8,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 1119,
+          "readyToResultHeadersMs": 1087,
+          "resultHttpMs": 472,
+          "resultReadMs": 114.14,
+          "extraResultRoundTrip": false,
+          "plainStatusPolls": 0,
+          "resultPolls": 6,
+          "responseHeadersToBridgeMs": 2,
+          "callbackMs": 24,
+          "callbackStartToNativeLoadedMs": 24,
+          "workerTimingsMs": [
+            {
+              "database_commit": 8.74,
+              "lease_wait": 5.75,
+              "network_http11_receive_response_body": 1.34,
+              "network_http11_receive_response_headers": 285.54,
+              "network_http11_response_closed": 0.02,
+              "network_http11_send_request_body": 0.04,
+              "network_http11_send_request_headers": 0.23,
+              "read_total": 451.68,
+              "upstream_decode": 0.03,
+              "upstream_http": 289.53,
+              "upstream_slot": 3.26
+            }
+          ]
+        },
+        {
+          "trial": 0,
+          "timeframe": "H4",
+          "focused": false,
+          "bridgeQueueMs": 5320,
+          "submitHttpMs": 202,
+          "createdToClaimedMs": 913,
+          "claimTransactionMs": 12.72,
+          "fillMs": 683.87,
+          "persistMs": 8.06,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 1149,
+          "readyToResultHeadersMs": 1111,
+          "resultHttpMs": 1132,
+          "resultReadMs": 126,
+          "extraResultRoundTrip": false,
+          "plainStatusPolls": 0,
+          "resultPolls": 4,
+          "responseHeadersToBridgeMs": 24,
+          "callbackMs": 3,
+          "callbackStartToNativeLoadedMs": 8,
+          "workerTimingsMs": [
+            {
+              "database_commit": 17.0,
+              "lease_wait": 19.95,
+              "network_http11_receive_response_body": 0.12,
+              "network_http11_receive_response_headers": 423.44,
+              "network_http11_response_closed": 0.02,
+              "network_http11_send_request_body": 0.03,
+              "network_http11_send_request_headers": 0.2,
+              "read_total": 636.19,
+              "upstream_decode": 0.04,
+              "upstream_http": 424.55,
+              "upstream_slot": 27.7
+            }
+          ]
+        },
+        {
+          "trial": 3,
+          "timeframe": "H1",
+          "focused": true,
+          "bridgeQueueMs": 0,
+          "submitHttpMs": 1892,
+          "createdToClaimedMs": 747,
+          "claimTransactionMs": 57.25,
+          "fillMs": 661.23,
+          "persistMs": 7.36,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 557,
+          "readyToResultHeadersMs": 506,
+          "resultHttpMs": 209,
+          "resultReadMs": 84.41,
+          "extraResultRoundTrip": false,
+          "plainStatusPolls": 0,
+          "resultPolls": 3,
+          "responseHeadersToBridgeMs": 2,
+          "callbackMs": 3,
+          "callbackStartToNativeLoadedMs": 14,
+          "workerTimingsMs": [
+            {
+              "database_commit": 12.03,
+              "lease_wait": 5.7,
+              "network_http11_receive_response_body": 1.79,
+              "network_http11_receive_response_headers": 329.41,
+              "network_http11_response_closed": 0.03,
+              "network_http11_send_request_body": 0.05,
+              "network_http11_send_request_headers": 0.21,
+              "read_total": 633.87,
+              "upstream_decode": 0.03,
+              "upstream_http": 332.22,
+              "upstream_slot": 33.83
+            }
+          ]
+        },
+        {
+          "trial": 3,
+          "timeframe": "M5",
+          "focused": false,
+          "bridgeQueueMs": 15,
+          "submitHttpMs": 2127,
+          "createdToClaimedMs": 1198,
+          "claimTransactionMs": 8.0,
+          "fillMs": 556.96,
+          "persistMs": 20.75,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 505,
+          "readyToResultHeadersMs": 462,
+          "resultHttpMs": 121,
+          "resultReadMs": 43.68,
+          "extraResultRoundTrip": false,
+          "plainStatusPolls": 0,
+          "resultPolls": 4,
+          "responseHeadersToBridgeMs": 1,
+          "callbackMs": 13,
+          "callbackStartToNativeLoadedMs": 25,
+          "workerTimingsMs": [
+            {
+              "database_commit": 30.55,
+              "lease_wait": 137.46,
+              "network_http11_receive_response_body": 0.81,
+              "network_http11_receive_response_headers": 267.02,
+              "network_http11_response_closed": 0.01,
+              "network_http11_send_request_body": 0.03,
+              "network_http11_send_request_headers": 0.21,
+              "read_total": 539.62,
+              "upstream_decode": 0.04,
+              "upstream_http": 268.79,
+              "upstream_slot": 3.5
+            }
+          ]
+        },
+        {
+          "trial": 3,
+          "timeframe": "W1",
+          "focused": false,
+          "bridgeQueueMs": 43,
+          "submitHttpMs": 2591,
+          "createdToClaimedMs": 1588,
+          "claimTransactionMs": 6.53,
+          "fillMs": 671.18,
+          "persistMs": 13.37,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 929,
+          "readyToResultHeadersMs": 918,
+          "resultHttpMs": 495,
+          "resultReadMs": 124.67,
+          "extraResultRoundTrip": false,
+          "plainStatusPolls": 0,
+          "resultPolls": 5,
+          "responseHeadersToBridgeMs": 25,
+          "callbackMs": 17,
+          "callbackStartToNativeLoadedMs": 18,
+          "workerTimingsMs": [
+            {
+              "database_commit": 9.89,
+              "lease_wait": 11.45,
+              "network_http11_receive_response_body": 1.03,
+              "network_http11_receive_response_headers": 298.55,
+              "network_http11_response_closed": 0.01,
+              "network_http11_send_request_body": 0.04,
+              "network_http11_send_request_headers": 0.22,
+              "read_total": 628.91,
+              "upstream_decode": 0.03,
+              "upstream_http": 300.73,
+              "upstream_slot": 13.99
+            }
+          ]
+        },
+        {
+          "trial": 3,
+          "timeframe": "D1",
+          "focused": false,
+          "bridgeQueueMs": 2796,
+          "submitHttpMs": 376,
+          "createdToClaimedMs": 1594,
+          "claimTransactionMs": 4.76,
+          "fillMs": 439.59,
+          "persistMs": 4.35,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 582,
+          "readyToResultHeadersMs": 535,
+          "resultHttpMs": 590,
+          "resultReadMs": 114.42,
+          "extraResultRoundTrip": false,
+          "plainStatusPolls": 0,
+          "resultPolls": 4,
+          "responseHeadersToBridgeMs": 66,
+          "callbackMs": 3,
+          "callbackStartToNativeLoadedMs": 4,
+          "workerTimingsMs": [
+            {
+              "database_commit": 11.3,
+              "lease_wait": 3.14,
+              "network_http11_receive_response_body": 0.11,
+              "network_http11_receive_response_headers": 280.45,
+              "network_http11_response_closed": 0.01,
+              "network_http11_send_request_body": 0.03,
+              "network_http11_send_request_headers": 0.2,
+              "read_total": 429.59,
+              "upstream_decode": 0.04,
+              "upstream_http": 281.45,
+              "upstream_slot": 26.65
+            }
+          ]
+        },
+        {
+          "trial": 3,
+          "timeframe": "H4",
+          "focused": false,
+          "bridgeQueueMs": 4039,
+          "submitHttpMs": 124,
+          "createdToClaimedMs": 1106,
+          "claimTransactionMs": 11.06,
+          "fillMs": 876.8,
+          "persistMs": 47.04,
+          "workerTurns": 1,
+          "pages": 1,
+          "readyToObservedMs": 649,
+          "readyToResultHeadersMs": 592,
+          "resultHttpMs": 210,
+          "resultReadMs": 73.13,
+          "extraResultRoundTrip": false,
+          "plainStatusPolls": 0,
+          "resultPolls": 4,
+          "responseHeadersToBridgeMs": 140,
+          "callbackMs": 4,
+          "callbackStartToNativeLoadedMs": 12,
+          "workerTimingsMs": [
+            {
+              "database_commit": 87.81,
+              "lease_wait": 32.34,
+              "network_http11_receive_response_body": 0.14,
+              "network_http11_receive_response_headers": 286.17,
+              "network_http11_response_closed": 0.01,
+              "network_http11_send_request_body": 0.05,
+              "network_http11_send_request_headers": 0.45,
+              "read_total": 781.2,
+              "upstream_decode": 0.04,
+              "upstream_http": 288.18,
+              "upstream_slot": 66.5
+            }
+          ]
+        }
+      ],
+      "rangesMs": {
+        "bridgeQueueMs": {
+          "n": 10,
+          "min": 0,
+          "median": 748.0,
+          "max": 5320
+        },
+        "submitHttpMs": {
+          "n": 10,
+          "min": 124,
+          "median": 1816.0,
+          "max": 2591
+        },
+        "createdToClaimedMs": {
+          "n": 10,
+          "min": 559,
+          "median": 1337.0,
+          "max": 2606
+        },
+        "claimTransactionMs": {
+          "n": 10,
+          "min": 4.76,
+          "median": 7.325,
+          "max": 57.25
+        },
+        "fillMs": {
+          "n": 10,
+          "min": 416.86,
+          "median": 666.205,
+          "max": 1493.68
+        },
+        "persistMs": {
+          "n": 10,
+          "min": 4.35,
+          "median": 10.845,
+          "max": 63.96
+        },
+        "readyToObservedMs": {
+          "n": 10,
+          "min": 505,
+          "median": 789.0,
+          "max": 1315
+        },
+        "readyToResultHeadersMs": {
+          "n": 10,
+          "min": 462,
+          "median": 755.0,
+          "max": 1289
+        },
+        "resultHttpMs": {
+          "n": 10,
+          "min": 121,
+          "median": 209.5,
+          "max": 1132
+        },
+        "resultReadMs": {
+          "n": 10,
+          "min": 37.91,
+          "median": 97.59,
+          "max": 126
+        },
+        "callbackMs": {
+          "n": 10,
+          "min": 2,
+          "median": 3.5,
+          "max": 24
+        },
+        "callbackStartToNativeLoadedMs": {
+          "n": 10,
+          "min": 3,
+          "median": 11.0,
+          "max": 25
+        }
+      },
+      "caveat": "Diagnostic samples on a shared host, with read-only routing and observation hooks; not a controlled A/B or stable percentiles. Nested timings overlap; created-to-claimed includes the claim transaction. Do not sum the ranges as a critical path.",
+      "run": "continuation-measure-914525a-01",
+      "extraResultTrips": 0,
+      "plainStatusPolls": 0,
+      "resultPolls": 46,
+      "confirmationSampleCount": 0,
+      "finalBridgeQueue": {
+        "remaining": 0,
+        "pending": 0
+      }
+    }
+  ],
+  "privateRawRequestsTaskIdsAndWorkerLogsOmitted": true
+}

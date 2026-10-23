@@ -47,6 +47,15 @@ class RequestResult(BaseModel):
     status: RequestStatus
     retry_at: StrictInt | None = Field(default=None, ge=0)
 
+    # Optional safe transport evidence; old persisted results remain valid.
+    operation: Literal["candles", "candles_latest"] | None = None
+    http_status: int | None = Field(default=None, ge=100, le=599)
+    reason_code: Literal["TIME_BOUNDARY", "TIMEOUT", "GATEWAY", "AUTH", "RATE_LIMIT", "UNKNOWN"] | None = None
+    phase: Literal["response", "connect", "read", "tls", "request"] | None = None
+    observed_at: StrictInt | None = Field(default=None, ge=0)
+    window_start: StrictInt | None = Field(default=None, ge=0)
+    window_end: StrictInt | None = Field(default=None, ge=0)
+
     @property
     def successful(self):
         return self.status in (RequestStatus.DATA, RequestStatus.EMPTY_SUCCESS)
@@ -150,7 +159,20 @@ def failed_request(error, *, observed_at):
         status = RequestStatus.TIMEOUT
     elif isinstance(error, (ValueError, KeyError, TypeError)):
         status = RequestStatus.INVALID_PAYLOAD
-    return RequestResult(status=status, retry_at=retry_at)
+    code = error.response.status_code if isinstance(error, httpx.HTTPStatusError) else None
+    reason = ('AUTH' if status == RequestStatus.UNAUTHORIZED else 'RATE_LIMIT' if code == 429 else
+              'GATEWAY' if code in (502, 504) else 'TIMEOUT' if status == RequestStatus.TIMEOUT else 'UNKNOWN')
+    # Exact provider assertion only. Never retain arbitrary error text or URLs.
+    if code == 400 and error.response.is_stream_consumed and len(error.response.content) <= 8192:
+        try:
+            body = error.response.json()
+            if isinstance(body, dict) and body.get('errorMessage') == "Invalid value specified for 'to'. Time is in the future":
+                reason, retry_at = 'TIME_BOUNDARY', observed_at + 5000
+        except ValueError:
+            pass
+    phase = 'response' if code else 'connect' if isinstance(error, httpx.ConnectTimeout) else 'read' if isinstance(error, httpx.ReadTimeout) else 'request'
+    return RequestResult(status=status, retry_at=retry_at, http_status=code,
+                         reason_code=reason, phase=phase, observed_at=observed_at)
 
 
 class MinuteRow(BaseModel):

@@ -1,0 +1,7 @@
+mwa real EURUSD composite MN, EMA + Swing + RSI, accepted display snapshot.
+cProfile data_sync: 26.752 seconds, 19,543,069 calls.
+composite_chart.chart_page: 7 calls, 26.487 seconds cumulative.
+observed_indicators.suffix: 3 calls, 22.889 seconds cumulative.
+All three results were insufficient_input, so computation correctness alone did not prevent HTTP budget failures.
+Concurrent browser then encountered QueuePool(size=2, max_overflow=0, timeout=15s) exhaustion.
+Remedy: reuse accepted snapshot OHLC and request-local fallback page reads; retain all snapshot/seed/4000-row fences.

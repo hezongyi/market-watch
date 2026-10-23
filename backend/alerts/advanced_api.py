@@ -147,7 +147,7 @@ def router(authenticated):
             row = db.get(AdvancedPreference, ident)
             if row is None:
                 if body.revision != 0:
-                    raise HTTPException(409, "模板已删除，请重新加载")
+                    raise HTTPException(409, {"code": "PREFERENCE_REVISION_CONFLICT", "message": "模板已删除，请重新加载"})
                 row = AdvancedPreference(
                     id=ident, kind=body.kind, name=body.name, tool=body.tool, content=body.content
                 )
@@ -161,7 +161,7 @@ def router(authenticated):
                     .values(content=body.content, revision=body.revision + 1, updated_at=now_ms())
                 )
                 if result.rowcount != 1:
-                    raise HTTPException(409, "模板或偏好已在其他窗口修改，请重新加载")
+                    raise HTTPException(409, {"code": "PREFERENCE_REVISION_CONFLICT", "message": "模板或偏好已在其他窗口修改，请重新加载"})
                 db.expire(row)
             db.flush()
             return preference_json(row)
@@ -175,7 +175,7 @@ def router(authenticated):
                 )
             )
             if result.rowcount != 1:
-                raise HTTPException(409, "模板或偏好已变更，请重新加载")
+                raise HTTPException(409, {"code": "PREFERENCE_REVISION_CONFLICT", "message": "模板或偏好已变更，请重新加载"})
         return {"ok": True}
 
     @r.get("/catalog")
@@ -217,7 +217,7 @@ def router(authenticated):
         with transaction() as db:
             if body.id is None:
                 if body.revision != 0:
-                    raise HTTPException(409, "新工作区版本无效")
+                    raise HTTPException(409, {"code": "WORKSPACE_REVISION_CONFLICT", "message": "新工作区版本无效"})
                 row = AdvancedWorkspace(
                     name=body.name,
                     document={
@@ -261,7 +261,7 @@ def router(authenticated):
                     )
                 )
                 if result.rowcount != 1:
-                    raise HTTPException(409, "工作区已在其他窗口修改，未覆盖；请另存副本")
+                    raise HTTPException(409, {"code": "WORKSPACE_REVISION_CONFLICT", "message": "工作区已在其他窗口修改，未覆盖；请另存副本"})
                 db.expire(row)
             return {**native_metadata(row), "document": row.document}
 
@@ -344,7 +344,7 @@ def router(authenticated):
                 .values(name=body.name, document=d, revision=body.revision + 1, updated_at=now_ms())
             )
             if res.rowcount != 1:
-                raise HTTPException(409, "工作区已变更，请重新加载；当前页面内容尚未保存")
+                raise HTTPException(409, {"code": "WORKSPACE_REVISION_CONFLICT", "message": "工作区已变更，请重新加载；当前页面内容尚未保存"})
             db.expire_all()
             return serialized(db.get(AdvancedWorkspace, id))
 
@@ -357,7 +357,7 @@ def router(authenticated):
                 )
             )
             if res.rowcount != 1:
-                raise HTTPException(409, "工作区已变更，请重新加载")
+                raise HTTPException(409, {"code": "WORKSPACE_REVISION_CONFLICT", "message": "工作区已变更，请重新加载"})
         return {"ok": True}
 
     return r

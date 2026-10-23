@@ -92,12 +92,17 @@ def test_controlled_rest_fault_uses_real_commit_fence_and_shared_budget(provider
     with httpx.Client(transport=httpx.MockTransport(respond)) as client:
         adapter = OandaPractice(token="injected-fault-contract", account_id="fault-contract-account",
             rest_client=client, stream_client=client, clock=lambda: 125000)
-        assert oanda_worker.confirm_pages(adapter, ownership, epoch, selected, lambda: False) == (
-            result if status == "unauthorized" else None
-        )
+        failure = oanda_worker.confirm_pages(adapter, ownership, epoch, selected, lambda: False)
+        if status == 'unauthorized':
+            assert failure.status == result.status and failure.retry_at == result.retry_at
+            assert failure.operation == 'candles' and failure.http_status == 401
+        else:
+            assert failure is None
     with factory.begin() as db:
         observations = list(db.scalars(select(LiveMinute)))
-        assert len(observations) == 2
+        # At 125s the 15s maturity margin admits only [0, 60s).
+        assert len(observations) == 1
+        assert observations[0].start == 0
         assert len({m.dataset_id for m in observations}) == 1
         assert all(m.failures == 1 and m.confirmed_at is None for m in observations)
         assert db.scalar(select(SourceMinuteRevision)) is None

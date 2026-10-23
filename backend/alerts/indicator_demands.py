@@ -32,6 +32,13 @@ def guard(db):
         db.execute(text("SELECT pg_advisory_xact_lock(8675313)"))
 
 
+def try_guard(db):
+    """Optional admission never waits while a price reader holds its locks."""
+    if db.bind.dialect.name == "postgresql":
+        return bool(db.scalar(text("SELECT pg_try_advisory_xact_lock(8675313)")))
+    return True
+
+
 def renew(db, client, consumers, run, *, snapshot_id, start, end, stamp):
     from .chart_indicators import validate
     from .fixed_indicators import digest
@@ -213,6 +220,11 @@ def warm_defaults(db, page, client, *, stamp):
     """At most two explicit specs per series; a full warm queue cannot block prices."""
     from .fixed_indicators import digest, request
 
+    # Acquire before request() as well as renew(): both use the capacity guard.
+    # Once admitted, their transaction-lock acquisitions are reentrant. A busy
+    # guard skips only these optional defaults, never a foreground consumer.
+    if not try_guard(db):
+        return
     for name in ("SMA", "EMA"):
         try:
             with db.begin_nested():

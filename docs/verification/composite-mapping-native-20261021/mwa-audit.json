@@ -1,0 +1,157 @@
+{
+  "at": "2026-10-21T23:11:30.984214+00:00",
+  "host": "quant-server",
+  "project": "mw-issue75-v2-20261018",
+  "services": [
+    {
+      "service": "chart",
+      "id": "3860570e15a2dbe421a8b782e7b0d0b7ef26bbbb08f8295eee0217dfc275d973",
+      "image": "sha256:14ccf7866aae37e2cdd4ff4a4f41ae28832de12847861025ae9cfc264310be09",
+      "status": "running",
+      "health": null,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "containerUnchanged": false
+    },
+    {
+      "service": "web",
+      "id": "6726349a9cc3c0c030210be164fc2700447d85b746911bf36a798cdfe7b4f058",
+      "image": "sha256:13f17497f655f44e1d82cf7ddfcd72041346cc2e0b03a6e0ded5a877f0d32215",
+      "status": "running",
+      "health": null,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "containerUnchanged": false
+    },
+    {
+      "service": "history-worker",
+      "id": "c3404eca4aed5abac4190e59c96368a4a0813240bd6f8ee6b0e8387cc052a925",
+      "image": "sha256:b4c4147bdb7d4c5708929528d00b44f5435560c8d36b0b8c75f2e8a0c16fccad",
+      "status": "running",
+      "health": null,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "containerUnchanged": true
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "id": "16af8d24891539776ffff4d1c7a306783b942be943e5b28903401fd7174ed1a7",
+      "image": "sha256:b4c4147bdb7d4c5708929528d00b44f5435560c8d36b0b8c75f2e8a0c16fccad",
+      "status": "running",
+      "health": null,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "containerUnchanged": true
+    },
+    {
+      "service": "chart-history-worker",
+      "id": "6cbf45681994e44eee9a38dbd7a5a0fe4b26399a240bc8b2991ef63a72c11183",
+      "image": "sha256:b4c4147bdb7d4c5708929528d00b44f5435560c8d36b0b8c75f2e8a0c16fccad",
+      "status": "running",
+      "health": null,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "containerUnchanged": true
+    },
+    {
+      "service": "composite-aggregate-worker",
+      "id": "b1af73ec9e89c783861a579260237a316d161e0fd3b95aa6caa9374a083cadc4",
+      "image": "sha256:b4c4147bdb7d4c5708929528d00b44f5435560c8d36b0b8c75f2e8a0c16fccad",
+      "status": "running",
+      "health": null,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "containerUnchanged": true
+    },
+    {
+      "service": "projector",
+      "id": "3a359140556ad9f97e69a96c737739229da82cb67a9f5a4090fc6e75b2c4a80e",
+      "image": "sha256:b4c4147bdb7d4c5708929528d00b44f5435560c8d36b0b8c75f2e8a0c16fccad",
+      "status": "running",
+      "health": null,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "containerUnchanged": true
+    },
+    {
+      "service": "native-history-worker",
+      "id": "dbc49cf4c53ac0a80a41876ebd9e77307a868f3c4bee5e4b1400ee292146d554",
+      "image": "sha256:b4c4147bdb7d4c5708929528d00b44f5435560c8d36b0b8c75f2e8a0c16fccad",
+      "status": "running",
+      "health": null,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "containerUnchanged": true
+    },
+    {
+      "service": "pricing-worker",
+      "id": "72c4d2bda135f57d8c11226e04cabdea51aabe612b6c117658da375179a021fd",
+      "image": "sha256:b4c4147bdb7d4c5708929528d00b44f5435560c8d36b0b8c75f2e8a0c16fccad",
+      "status": "running",
+      "health": null,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "containerUnchanged": true
+    },
+    {
+      "service": "market-stream-worker",
+      "id": "ee4f80bf90896fc42e7ee8351eb742a7ffece099efb5fb3c51c9b8043ef858fd",
+      "image": "sha256:b4c4147bdb7d4c5708929528d00b44f5435560c8d36b0b8c75f2e8a0c16fccad",
+      "status": "running",
+      "health": null,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "containerUnchanged": true
+    },
+    {
+      "service": "notify-worker",
+      "id": "9d95cbbef8cf82a946a16a6ad1ee051d78e69b6c2017a5c19cfee9684228b114",
+      "image": "sha256:b4c4147bdb7d4c5708929528d00b44f5435560c8d36b0b8c75f2e8a0c16fccad",
+      "status": "running",
+      "health": null,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "containerUnchanged": true
+    },
+    {
+      "service": "realtime-worker",
+      "id": "338bcf2a93cf9ac4fe64496b9b6f7f35c4c6f99c3edbd907f86da08aad832f57",
+      "image": "sha256:b4c4147bdb7d4c5708929528d00b44f5435560c8d36b0b8c75f2e8a0c16fccad",
+      "status": "running",
+      "health": null,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "containerUnchanged": true
+    },
+    {
+      "service": "api",
+      "id": "ebcfc30124b20b731ab647ead32b0cb931e4e8875ec1d368bb85116127861cc7",
+      "image": "sha256:b4c4147bdb7d4c5708929528d00b44f5435560c8d36b0b8c75f2e8a0c16fccad",
+      "status": "running",
+      "health": "healthy",
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "containerUnchanged": true
+    },
+    {
+      "service": "gateway",
+      "id": "9492f307fdf9bfdbec7641c4e0b3554bed39340bc73a57448fdbd39e34d79ca9",
+      "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "status": "running",
+      "health": null,
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "containerUnchanged": true
+    },
+    {
+      "service": "postgres",
+      "id": "3de49cbde9a20c6640092181c04d35df41677566795cfecae18c0ab284b0aba8",
+      "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "status": "running",
+      "health": "healthy",
+      "environmentUnchanged": true,
+      "mountsUnchanged": true,
+      "containerUnchanged": true
+    }
+  ]
+}

@@ -4,6 +4,7 @@ import type { ReturnContexts } from "./returnContext";
 
 export type CenterNavigation = {
   workspace?: string;
+  target?: string;
   timezone?: string;
   returns?: ReturnContexts;
   location: string;

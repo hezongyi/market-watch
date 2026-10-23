@@ -79,7 +79,7 @@ const MWNativeIndicatorResultsAdapter = (() => {
       // A new calculation origin/identity fences all queued handles. The engine
       // itself is already in external mode, so no second writer is introduced.
       const old=binding.displayIdentity || binding.identity;
-      const sameInput=['main','fixedRevision','algorithmVersion','calculationStart','period'].every(key=>old[key]===identity[key]);
+      const sameInput=['main','fixedRevision','algorithmVersion','calculationStart','period','inputPolicy'].every(key=>old[key]===identity[key]);
       binding.generation=++generation;binding.sequence=0;
       if(sameInput && binding.rows.size){
         binding.transition={identity:old,params:JSON.parse(old.paramsFingerprint)};

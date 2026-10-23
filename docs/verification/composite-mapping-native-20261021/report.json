@@ -1,0 +1,16 @@
+{
+  "checks": [
+    "native single picker, FX/metal defaults and fresh manual confirmation",
+    "native buttons/textarea semantics, dirty guard and real save-only without composite use",
+    "saved mapping hydrates, re-review required; exact composite loads and other pane remains unchanged",
+    "empty directory hides the form; refresh failure has an explicit retry",
+    "uncertain save reconciles; failed open retains mapping ID and reads before idempotent retry",
+    "multiple mappings require explicit choice and fresh confirmation",
+    "old-account mappings cannot restore a current selection",
+    "refresh revalidates the selected exact code and clears invalid selection",
+    "late use response after navigation cannot apply or navigate a later form",
+    "real metal products, light/dark theme and narrow viewport with visible actions"
+  ],
+  "errors": [],
+  "passed": true
+}

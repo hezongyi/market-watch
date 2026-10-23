@@ -11,16 +11,11 @@ const report={environment:'Ubuntu isolated real APIs/supplier/workers',passed:fa
  try {
   await p.goto(base+`/market-data/datasets/${dataset}/mapping`);await fixture.login(p);await expect.poll(()=>!!dc(),{timeout:30000}).toBeTruthy();
   await expect(dc().getByRole('heading',{name:'配置实时来源'})).toBeVisible();
-  await dc().getByLabel('查找目标准确品种').fill('EUR_USD');
-  await expect.poll(()=>dc().getByLabel('目标准确品种（OANDA Practice）').locator('option').count()).toBeGreaterThan(1);
-  const option=await dc().getByLabel('目标准确品种（OANDA Practice）').locator('option').allTextContents();
-  const values=await dc().getByLabel('目标准确品种（OANDA Practice）').locator('option').evaluateAll(items=>items.map(e=>({value:e.value,text:e.textContent})));
-  await dc().getByLabel('目标准确品种（OANDA Practice）').selectOption(values.find(v=>v.text.includes('EUR_USD')).value);
-  await dc().getByLabel('标的代码').fill('EUR');await dc().getByLabel('历史产品官方依据').fill('https://developer.oanda.com/rest-live-v20/instrument-ep/');
-  await dc().getByLabel('匹配复核说明').fill('Ubuntu isolated UI acceptance: exact EUR_USD Practice bid and underlying currency reviewed.');
-  await dc().getByLabel('已核对标的、币种、产品类型及Bid口径，接受两来源原价差异。').check();
+  await dc().getByRole('button',{name:/^(选择品种|更换)$/}).click();await dc().getByLabel('搜索来源品种').fill('EUR_USD');await dc().locator('.dc-catalog-fallback').getByRole('button').filter({hasText:/EUR/}).first().click();
+  await dc().getByRole('button',{name:/补充说明|查看 \/ 修改/}).click();await dc().getByLabel('产品关系',{exact:true}).selectOption('same_product');
+  await dc().getByLabel('历史产品官方依据').fill('https://example.test/history');await dc().getByLabel('实时产品官方依据').fill('https://example.test/live');await dc().getByLabel('核对说明').fill('Ubuntu isolated UI acceptance: exact EUR_USD Practice bid and underlying currency reviewed.');await dc().getByRole('checkbox').check();
   await dc().getByRole('button',{name:'关闭数据中心'}).click();await expect(dc().getByRole('alertdialog')).toBeVisible();await dc().getByRole('button',{name:'继续编辑'}).click();
-  await dc().getByRole('button',{name:'保存映射版本'}).click();await expect(dc().getByRole('heading',{name:'组合行情',exact:true})).toBeVisible();
+  await dc().getByRole('button',{name:'仅保存'}).click();await expect(dc().getByRole('heading',{name:'组合行情',exact:true})).toBeVisible();
   record('mapping deep link, unsaved guard and reviewed mapping submission');
   await dc().getByRole('button',{name:'打开组合行情',exact:true}).first().click();await expect.poll(()=>!!dc(),{timeout:35000}).toBeFalsy();
   const ticker=await host().evaluate(()=>widget.activeChart().symbol());expect(ticker).toMatch(/^MWC:[a-f0-9]{64}$/i);

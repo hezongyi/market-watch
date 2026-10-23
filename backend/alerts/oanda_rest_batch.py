@@ -22,7 +22,7 @@ from pydantic import (
     model_validator,
 )
 
-from .market_contracts import CandleBatch, DatasetIdentity, MinuteRow, RequestResult, failed_request
+from .market_contracts import CandleBatch, DatasetIdentity, MinuteRow, RequestResult
 from .market_resources import cooldown, request_slot
 from .native_series import BASES, OandaParameters, interval_end
 from .oanda_stream import OandaPractice, TransportTrace, timestamp
@@ -402,7 +402,7 @@ class OandaRestBatch(OandaPractice):
         except (httpx.HTTPError, TimeoutError, ValueError, KeyError, TypeError, OverflowError) as error:
             trace.rest_failed("candles_latest", error, response)
             received_at = self.clock()
-            result = failed_request(error, observed_at=received_at)
+            result = trace.request_result(error, response, observed_at=received_at, operation="candles_latest")
             if result.status == "rate_limited":
                 cooldown("oanda", retry_seconds=max(1, (result.retry_at - received_at) / 1000)
                          if result.retry_at else None)
@@ -482,7 +482,8 @@ class OandaRestBatch(OandaPractice):
         except (httpx.HTTPError, TimeoutError, ValueError, KeyError, TypeError, OverflowError) as error:
             trace.rest_failed("candles", error, response)
             observed = self.clock()
-            result = failed_request(error, observed_at=observed)
+            result = trace.request_result(error, response, observed_at=observed,
+                operation="candles", window_start=start, window_end=end)
             if result.status == "rate_limited":
                 cooldown("oanda", retry_seconds=max(1, (result.retry_at - observed) / 1000)
                          if result.retry_at else None)

@@ -4,7 +4,7 @@ const ctx=vm.createContext({document:{createElement:()=>({}),head:{append:()=>{}
  location:{search:'?parent=http://localhost'},parent:{postMessage:m=>messages.push(m)},
  crypto:{randomUUID:()=> 'test'},addEventListener:(name,fn)=>{if(name==='message')handlers.push(fn)},setTimeout,clearTimeout,
  requestAnimationFrame:callback=>setImmediate(callback)});
-for(const f of ['series.js','bridge.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+f,'utf8'),ctx);
+for(const f of ['series.js','composite-display-batches.js','bridge.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+f,'utf8'),ctx);
 (async()=>{
  vm.runInContext(`globalThis.delivered=[];globalThis.failures=[];
   let resolution='1W';ready=true;

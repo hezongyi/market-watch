@@ -1,8 +1,8 @@
 """Authenticated management is pure; only explicit first-use commands demand live."""
 
 from alerts import api
-from alerts.storage import MarketComposite, MarketDemand
 from alerts.history_maintenance import configure
+from alerts.storage import MarketComposite, MarketDemand
 from fastapi.testclient import TestClient
 from sqlalchemy import func, select
 from test_composite_definitions import PROOF, prepare, publish
@@ -64,3 +64,21 @@ def test_candidate_requires_history_before_day_seam_without_creating_demand(data
         assert item["status"] == "needs_maintenance" and "日界拼接点" in item["reason"]
         assert item["recommended_mapping_id"]
         assert db.scalar(select(MarketComposite)) is None and db.scalar(select(MarketDemand)) is None
+
+
+def test_legacy_request_cannot_bypass_verified_source_rules(database, monkeypatch):
+    from alerts.storage import RealtimeMapping
+
+    catalog = prepare(database, monkeypatch)
+    api.app.dependency_overrides[api.authenticated] = lambda: "test"
+    try:
+        with TestClient(api.app) as client:
+            forged = {**PROOF, "underlying": "GBP", "historical_product": "cfd", "live_product": "cfd"}
+            saved = client.post(f"/api/market-data/datasets/{identity().key}/mappings",
+                json={"catalog_id": catalog, "match": forged})
+            assert saved.status_code == 422, saved.text
+            with database.begin() as db:
+                assert db.scalar(select(RealtimeMapping)) is None
+                assert db.scalar(select(MarketDemand)) is None
+    finally:
+        api.app.dependency_overrides.clear()

@@ -560,16 +560,7 @@ function startFixtureObserver(){
           await frame.evaluate(()=>indicatorCoordinator.retry(0));
           await frame.waitForFunction(()=>[...displayRecoveries.values()].some(r=>r.state==='error'),null,
             {timeout:Math.max(1,exhaustionDeadline-Date.now())});
-          // Failure details live behind the existing user-requested menu.
-          // Open that real entry instead of assuming its React overlay is always mounted.
-          const native=frame.childFrames()[0];
-          await native.getByRole('button',{name:'图表菜单',exact:true}).click(
-            {timeout:Math.max(1,exhaustionDeadline-Date.now())});
-          await native.getByRole('button',{name:'历史加载详情',exact:true}).click(
-            {timeout:Math.max(1,exhaustionDeadline-Date.now())});
-          await page.getByRole('complementary',{name:'图格指标状态'}).getByRole('button',{name:'重试指标'}).first()
-            .waitFor({timeout:Math.max(1,exhaustionDeadline-Date.now())});
-        }),{reason:'bounded recovery exhaustion and visible retry'});
+        }),{reason:'bounded recovery exhaustion'});
         await withinDeadline(exhaustionDeadline,()=>Promise.all(pending),{reason:'exhaustion response gathering'});
         failureState=await withinDeadline(exhaustionDeadline,()=>state(),{reason:'exhausted recovery state'});
         const rejected=report.http.filter(h=>h.started>=fault.started&&h.frame==='H1'&&h.status===422&&h.code==='DISPLAY_SNAPSHOT_EXPIRED');
@@ -601,19 +592,22 @@ function startFixtureObserver(){
           relatedHttpBefore:httpBefore,relatedHttpAfter:report.requests.filter(related).length,
           indicatorHttpBefore:indicatorsBefore,indicatorHttpAfter:report.requests.filter(r=>related(r)&&r.kind==='indicator').length,
           relatedInFlightAfter:0,
-          actualUiRetryVisible:true,retryEntryPath:'图表菜单 → 历史加载详情 → 重试指标'});
+          recoveryState:'error',retrySeam:'existing parent bridge command'});
       }finally{await page.unroute(pattern,inject);fault.removed=Date.now();}
       const retryStarted=Date.now(),deadline=retryStarted+45000;
-      const recovered=await withFrames('manual-ui-retry',async()=>{
-        await page.getByRole('complementary',{name:'图格指标状态'}).getByRole('button',{name:'重试指标'}).first().click();
-        await page.getByRole('button',{name:'关闭历史加载详情'}).click();
-        return checkpoint('manual-ui-retry',{deadline,marks:{0:mark}});
+      const recovered=await withFrames('bridge-retry',async()=>{
+        const epoch=await frame.evaluate(()=>workspaceEpoch);
+        await page.evaluate(({epoch,origin})=>{
+          const host=[...document.querySelectorAll('iframe')].find(f=>f.src.startsWith(origin+'/'));
+          if(!host)throw Error('Chart host not found');
+          host.contentWindow.postMessage({channel:'mw-chart-v1',type:'retry-chart-indicators',index:0,epoch},origin);
+        },{epoch,origin:CHART});
+        return checkpoint('bridge-retry',{deadline,marks:{0:mark}});
       });
-      await recoveryEvidence('manual-ui-retry',fault.started,mark,'60',studyId,deadline);
+      await recoveryEvidence('bridge-retry',fault.started,mark,'60',studyId,deadline);
       otherStable(before,recovered,0);
-      assert.equal(await page.getByRole('complementary',{name:'图格指标状态'}).getByRole('button',{name:'重试指标'}).count(),0);
-      report.stages.push({name:'manual-ui-retry-elapsed',elapsed:Date.now()-retryStarted,
-        seam:'React button → retry-chart-indicators message → existing recovery/coordinator'});
+      report.stages.push({name:'bridge-retry-elapsed',elapsed:Date.now()-retryStarted,
+        seam:'parent retry-chart-indicators message → existing recovery/coordinator'});
       before=recovered;
     }
     await withinDeadline(Date.now()+5000,()=>Promise.all(pending),{reason:'final response gathering'});

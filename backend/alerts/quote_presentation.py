@@ -1,6 +1,9 @@
 """Quote text over one stored observation; never obtains prices or creates demand."""
 
 from datetime import UTC, datetime
+from decimal import Decimal, InvalidOperation
+
+from .quote_close import confirmed_daily_close
 
 SESSION_LABELS = {"closed": "休市", "scheduled_open": "交易时段内", "unknown": "时段未核实"}
 
@@ -40,7 +43,9 @@ def describe(value):
 
 
 def fixed_snapshot(db, ident, metadata):
+    from .domain import Calendar, bucket_bounds
     from .history_artifacts import chart_page
+    from .storage import instant
 
     frame = metadata["frames"][0]
     page = chart_page(db, ident, frame, count=1)
@@ -50,4 +55,26 @@ def fixed_snapshot(db, ident, metadata):
               "data_end": last["end"] if last else None}
     if last:
         result["lp"] = float(last["close"])
+        session_start, _ = bucket_bounds(instant(last["start"]), "D1", Calendar(metadata["calendar"]))
+        before = int(session_start.timestamp() * 1000)
+        try:
+            previous_page = chart_page(db, ident, "D1", before=before, count=1)
+        except ValueError:
+            previous_page = {"bars": []}
+        previous_bars = [bar for bar in previous_page.get("bars", [])
+            if bar.get("end", 0) <= before and bar.get("time_closed") is True
+            and bar.get("source_confirmed") is True]
+        if previous_bars:
+            daily = previous_bars[-1]
+            closing_page = chart_page(db, ident, "M1", before=daily["end"], count=1)
+            closing = closing_page.get("bars", [])
+            previous = confirmed_daily_close(daily, closing[-1]) if closing else None
+            try:
+                price = Decimal(str(last["close"]))
+            except (InvalidOperation, TypeError, ValueError):
+                price = None
+            if previous is not None and price is not None and price.is_finite():
+                change = price - previous
+                result.update(ch=float(change), chp=float(change / previous * 100),
+                    prev_close_price=float(previous))
     return result

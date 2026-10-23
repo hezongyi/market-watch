@@ -1,0 +1,4102 @@
+{
+  "at": "2026-10-22T22:03:54.530Z",
+  "source_head": "983b40246d8d80e5f903fee7fb980e4ae516d03a",
+  "host": "quant-server",
+  "project": "mw-issue75-v2-20261018",
+  "bridge_sha256": "f8ee68492e938cc8736cdca6d059d94c3125e1624e6cbde6d1547b2182dfe825",
+  "host_asset_sha256": "f4381e42d758a5b1b9532233caea37cc62bbd1bb5f373ea8203c2775c4249039",
+  "method": {
+    "scheduler": "unchanged; queue entries, dispatch and completion observed",
+    "db_sampling_ms": 500,
+    "db_sampling_read_only": true,
+    "fixed_profile": "real functions in a separate API-container process; every outer transaction rolled back",
+    "diagnostic_threshold_ms": 3000,
+    "threshold_is_approved_sla": false
+  },
+  "original_repro": {
+    "at": "2026-10-22T21:53:54.237Z",
+    "workspaceUnchanged": false,
+    "before_revision": 77,
+    "after_revision": 78,
+    "trials": [
+      {
+        "ticker": "MWP:EURUSD",
+        "ready_ms": 7558,
+        "all_ready_ms": 17112,
+        "slow": true,
+        "error": null,
+        "all_ready_error": null
+      },
+      {
+        "ticker": "MWH:2a673b63-2922-497e-bec9-d0231be55934",
+        "ready_ms": 1888,
+        "all_ready_ms": 2686,
+        "slow": false,
+        "error": null,
+        "all_ready_error": null
+      },
+      {
+        "ticker": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+        "ready_ms": 3102,
+        "all_ready_ms": 9591,
+        "slow": true,
+        "error": null,
+        "all_ready_error": null
+      },
+      {
+        "ticker": "MWP:EURUSD",
+        "ready_ms": 17615,
+        "all_ready_ms": 17723,
+        "slow": true,
+        "error": null,
+        "all_ready_error": null
+      }
+    ]
+  },
+  "observed_workspace_before": {
+    "id": "7d72eead-6be5-41a4-b3d5-bfdfff98b2bb",
+    "revision": 78,
+    "hash": "b4c31ec78ee3ae6cb59f7ac03458f55d620a69643fb4db6257567812a66e7480",
+    "documentHash": "acef66da98efb511629b36a0a2194ba28cfc97c6b2f275b19d9af4dbf2dffe3f"
+  },
+  "observed_workspace_after": {
+    "id": "7d72eead-6be5-41a4-b3d5-bfdfff98b2bb",
+    "revision": 78,
+    "hash": "b4c31ec78ee3ae6cb59f7ac03458f55d620a69643fb4db6257567812a66e7480",
+    "documentHash": "acef66da98efb511629b36a0a2194ba28cfc97c6b2f275b19d9af4dbf2dffe3f"
+  },
+  "workspaceUnchanged": true,
+  "pageerrors": [],
+  "trials": [
+    {
+      "index": 1,
+      "ticker": "MWP:EURUSD",
+      "precondition": {
+        "quiet": false,
+        "wait_ms": 25004
+      },
+      "active_ready_ms": 5102,
+      "all_ready_ms": 7695,
+      "first_screen": [
+        {
+          "qid": 81,
+          "id": 68,
+          "query": {
+            "type": "data",
+            "op": "data",
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "timeframe": "H1",
+            "indicators": 0,
+            "native": true,
+            "reserve": false,
+            "first": true,
+            "focused": true,
+            "countBack": 77,
+            "limit": 77,
+            "before": 1792706732000,
+            "from": 1792429532000
+          },
+          "result": {
+            "bars": 149,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 78.78,
+              "metadata": 21.84
+            },
+            "history_pages": 1
+          },
+          "error_code": null,
+          "enqueued_ms": 295,
+          "dispatched_ms": 831,
+          "completed_ms": 5073,
+          "queue_ms": 536,
+          "service_ms": 4242
+        },
+        {
+          "qid": 82,
+          "id": 69,
+          "query": {
+            "type": "data",
+            "op": "data",
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "timeframe": "M5",
+            "indicators": 0,
+            "native": true,
+            "reserve": false,
+            "first": true,
+            "focused": false,
+            "countBack": 105,
+            "limit": 105,
+            "before": 1792706732000,
+            "from": 1792675532000
+          },
+          "result": {
+            "bars": 105,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 361.12,
+              "metadata": 2.28
+            },
+            "history_pages": 1
+          },
+          "error_code": null,
+          "enqueued_ms": 299,
+          "dispatched_ms": 861,
+          "completed_ms": 4804,
+          "queue_ms": 562,
+          "service_ms": 3943
+        },
+        {
+          "qid": 83,
+          "id": 70,
+          "query": {
+            "type": "data",
+            "op": "data",
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "timeframe": "W1",
+            "indicators": 0,
+            "native": true,
+            "reserve": false,
+            "first": true,
+            "focused": false,
+            "countBack": 28,
+            "limit": 28,
+            "before": 1792706732000,
+            "from": 1775772332000
+          },
+          "result": {
+            "bars": 28,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 164.9,
+              "metadata": 9.81
+            },
+            "history_pages": 1
+          },
+          "error_code": null,
+          "enqueued_ms": 300,
+          "dispatched_ms": 1088,
+          "completed_ms": 6548,
+          "queue_ms": 788,
+          "service_ms": 5460
+        },
+        {
+          "qid": 84,
+          "id": 71,
+          "query": {
+            "type": "data",
+            "op": "data",
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "timeframe": "D1",
+            "indicators": 0,
+            "native": true,
+            "reserve": false,
+            "first": true,
+            "focused": false,
+            "countBack": 50,
+            "limit": 50,
+            "before": 1792706732000,
+            "from": 1786658732000
+          },
+          "result": {
+            "bars": 50,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 135.61,
+              "metadata": 2.68
+            },
+            "history_pages": 1
+          },
+          "error_code": null,
+          "enqueued_ms": 301,
+          "dispatched_ms": 1848,
+          "completed_ms": 6635,
+          "queue_ms": 1547,
+          "service_ms": 4787
+        },
+        {
+          "qid": 85,
+          "id": 72,
+          "query": {
+            "type": "data",
+            "op": "data",
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "timeframe": "H4",
+            "indicators": 0,
+            "native": true,
+            "reserve": false,
+            "first": true,
+            "focused": false,
+            "countBack": 46,
+            "limit": 46,
+            "before": 1792706732000,
+            "from": 1791779372000
+          },
+          "result": {
+            "bars": 53,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 152.59,
+              "metadata": 2.61
+            },
+            "history_pages": 1
+          },
+          "error_code": null,
+          "enqueued_ms": 302,
+          "dispatched_ms": 4804,
+          "completed_ms": 7673,
+          "queue_ms": 4502,
+          "service_ms": 2869
+        }
+      ],
+      "active_enqueue_blockers": [
+        {
+          "qid": 32,
+          "id": 61,
+          "query": {
+            "type": "market",
+            "op": "quotes",
+            "indicators": 0,
+            "native": false,
+            "reserve": false
+          },
+          "result": {},
+          "error_code": null,
+          "enqueued_ms": -25600,
+          "dispatched_ms": -813,
+          "completed_ms": 453,
+          "queue_ms": 24787,
+          "service_ms": 1266
+        },
+        {
+          "qid": 74,
+          "id": 62,
+          "query": {
+            "type": "chart-alert-ui-rpc",
+            "op": "data",
+            "indicators": 0,
+            "native": false,
+            "reserve": false
+          },
+          "result": {},
+          "error_code": null,
+          "enqueued_ms": -447,
+          "dispatched_ms": -447,
+          "completed_ms": 861,
+          "queue_ms": 0,
+          "service_ms": 1308
+        },
+        {
+          "qid": 75,
+          "id": 63,
+          "query": {
+            "type": "chart-alert-ui-rpc",
+            "op": "data",
+            "indicators": 0,
+            "native": false,
+            "reserve": false
+          },
+          "result": {},
+          "error_code": null,
+          "enqueued_ms": -447,
+          "dispatched_ms": -447,
+          "completed_ms": 545,
+          "queue_ms": 0,
+          "service_ms": 992
+        },
+        {
+          "qid": 77,
+          "id": 65,
+          "query": {
+            "type": "indicator-demand-release",
+            "op": "data",
+            "indicators": 0,
+            "native": false,
+            "reserve": false
+          },
+          "result": {},
+          "error_code": null,
+          "enqueued_ms": 189,
+          "dispatched_ms": 189,
+          "completed_ms": 831,
+          "queue_ms": 0,
+          "service_ms": 642
+        }
+      ],
+      "native_tasks": [
+        {
+          "request_id": "8cab5616-b1c9-48c1-98df-7532dc881b2e",
+          "load_id": "e9178820-a64b-4e37-8ed5-353367c88caa",
+          "timeframe": "H1",
+          "submit_at_ms": 835,
+          "submit_ms": 1460,
+          "sampled_states": [
+            {
+              "at_ms": 2697,
+              "state": "waiting",
+              "pages": 0,
+              "generation": 0
+            },
+            {
+              "at_ms": 4198,
+              "state": "filling",
+              "pages": 0,
+              "generation": 1
+            },
+            {
+              "at_ms": 4701,
+              "state": "ready",
+              "pages": 1,
+              "generation": 1
+            },
+            {
+              "at_ms": 5231,
+              "state": "cancelled",
+              "pages": 1,
+              "generation": 2
+            }
+          ],
+          "result": {
+            "at_ms": 4751,
+            "ended_ms": 4998,
+            "elapsed_ms": 247,
+            "status": 200,
+            "result": {
+              "bars": 149,
+              "cache_hit": true,
+              "timings_ms": {
+                "read_total": 78.78,
+                "metadata": 21.84
+              },
+              "mandatory_count": 77,
+              "optional_count": 72,
+              "display_snapshot": false,
+              "provider_snapshot": true
+            }
+          },
+          "cleanup": {
+            "at_ms": 4997,
+            "ended_ms": 5087,
+            "elapsed_ms": 90,
+            "status": 200,
+            "result": {
+              "display_snapshot": false,
+              "provider_snapshot": false
+            }
+          }
+        },
+        {
+          "request_id": "f3d02127-8f75-4b0b-a7da-66b4563b3ff3",
+          "load_id": "674965fe-ecd1-407f-b15d-b3efb3f9af4c",
+          "timeframe": "M5",
+          "submit_at_ms": 866,
+          "submit_ms": 1310,
+          "sampled_states": [
+            {
+              "at_ms": 2182,
+              "state": "waiting",
+              "pages": 0,
+              "generation": 0
+            },
+            {
+              "at_ms": 2697,
+              "state": "filling",
+              "pages": 0,
+              "generation": 1
+            },
+            {
+              "at_ms": 4198,
+              "state": "ready",
+              "pages": 1,
+              "generation": 1
+            },
+            {
+              "at_ms": 5231,
+              "state": "cancelled",
+              "pages": 1,
+              "generation": 2
+            }
+          ],
+          "result": {
+            "at_ms": 4172,
+            "ended_ms": 4713,
+            "elapsed_ms": 541,
+            "status": 200,
+            "result": {
+              "bars": 105,
+              "cache_hit": true,
+              "timings_ms": {
+                "read_total": 361.12,
+                "metadata": 2.28
+              },
+              "mandatory_count": 105,
+              "optional_count": 0,
+              "display_snapshot": false,
+              "provider_snapshot": true
+            }
+          },
+          "cleanup": {
+            "at_ms": 4709,
+            "ended_ms": 4853,
+            "elapsed_ms": 144,
+            "status": 200,
+            "result": {
+              "display_snapshot": false,
+              "provider_snapshot": false
+            }
+          }
+        },
+        {
+          "request_id": "0979967e-d7e2-4cd9-867d-001e354d9f47",
+          "load_id": "1087b6bc-e179-45a7-b990-c39a5889b959",
+          "timeframe": "W1",
+          "submit_at_ms": 1098,
+          "submit_ms": 1456,
+          "sampled_states": [
+            {
+              "at_ms": 2697,
+              "state": "waiting",
+              "pages": 0,
+              "generation": 0
+            },
+            {
+              "at_ms": 4701,
+              "state": "filling",
+              "pages": 0,
+              "generation": 1
+            },
+            {
+              "at_ms": 5231,
+              "state": "ready",
+              "pages": 1,
+              "generation": 1
+            },
+            {
+              "at_ms": 6778,
+              "state": "cancelled",
+              "pages": 1,
+              "generation": 2
+            }
+          ],
+          "result": {
+            "at_ms": 5730,
+            "ended_ms": 6130,
+            "elapsed_ms": 400,
+            "status": 200,
+            "result": {
+              "bars": 28,
+              "cache_hit": true,
+              "timings_ms": {
+                "read_total": 164.9,
+                "metadata": 9.81
+              },
+              "mandatory_count": 28,
+              "optional_count": 0,
+              "display_snapshot": false,
+              "provider_snapshot": true
+            }
+          },
+          "cleanup": {
+            "at_ms": 6123,
+            "ended_ms": 6565,
+            "elapsed_ms": 442,
+            "status": 200,
+            "result": {
+              "display_snapshot": false,
+              "provider_snapshot": false
+            }
+          }
+        },
+        {
+          "request_id": "5a42518c-ea3e-4b0b-bafc-218dce4f30e5",
+          "load_id": "f5ccff5a-fde0-4b28-b4e8-786ce3a93c98",
+          "timeframe": "D1",
+          "submit_at_ms": 1853,
+          "submit_ms": 1138,
+          "sampled_states": [
+            {
+              "at_ms": 3196,
+              "state": "waiting",
+              "pages": 0,
+              "generation": 0
+            },
+            {
+              "at_ms": 5231,
+              "state": "filling",
+              "pages": 0,
+              "generation": 1
+            },
+            {
+              "at_ms": 5705,
+              "state": "ready",
+              "pages": 1,
+              "generation": 1
+            },
+            {
+              "at_ms": 6778,
+              "state": "cancelled",
+              "pages": 1,
+              "generation": 2
+            }
+          ],
+          "result": {
+            "at_ms": 5849,
+            "ended_ms": 6515,
+            "elapsed_ms": 666,
+            "status": 200,
+            "result": {
+              "bars": 50,
+              "cache_hit": true,
+              "timings_ms": {
+                "read_total": 135.61,
+                "metadata": 2.68
+              },
+              "mandatory_count": 50,
+              "optional_count": 0,
+              "display_snapshot": false,
+              "provider_snapshot": true
+            }
+          },
+          "cleanup": {
+            "at_ms": 6519,
+            "ended_ms": 6685,
+            "elapsed_ms": 166,
+            "status": 200,
+            "result": {
+              "display_snapshot": false,
+              "provider_snapshot": false
+            }
+          }
+        },
+        {
+          "request_id": "f00f3478-6a16-422f-af59-6be7f4305469",
+          "load_id": "08499413-468d-464b-8448-d403c273e563",
+          "timeframe": "H4",
+          "submit_at_ms": 4848,
+          "submit_ms": 365,
+          "sampled_states": [
+            {
+              "at_ms": 5231,
+              "state": "waiting",
+              "pages": 0,
+              "generation": 0
+            },
+            {
+              "at_ms": 6222,
+              "state": "filling",
+              "pages": 0,
+              "generation": 1
+            },
+            {
+              "at_ms": 6778,
+              "state": "ready",
+              "pages": 1,
+              "generation": 1
+            },
+            {
+              "at_ms": 7717,
+              "state": "cancelled",
+              "pages": 1,
+              "generation": 2
+            }
+          ],
+          "result": {
+            "at_ms": 6531,
+            "ended_ms": 6912,
+            "elapsed_ms": 381,
+            "status": 200,
+            "result": {
+              "bars": 53,
+              "cache_hit": true,
+              "timings_ms": {
+                "read_total": 152.59,
+                "metadata": 2.61
+              },
+              "mandatory_count": 53,
+              "optional_count": 0,
+              "display_snapshot": false,
+              "provider_snapshot": true
+            }
+          },
+          "cleanup": {
+            "at_ms": 6911,
+            "ended_ms": 7685,
+            "elapsed_ms": 774,
+            "status": 200,
+            "result": {
+              "display_snapshot": false,
+              "provider_snapshot": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "ticker": "MWH:2a673b63-2922-497e-bec9-d0231be55934",
+      "precondition": {
+        "quiet": true,
+        "wait_ms": 8984
+      },
+      "active_ready_ms": 2551,
+      "all_ready_ms": 4005,
+      "first_screen": [
+        {
+          "qid": 118,
+          "id": 100,
+          "query": {
+            "type": "data",
+            "op": "data",
+            "instrument": "2a673b63-2922-497e-bec9-d0231be55934",
+            "series_kind": "history",
+            "timeframe": "H1",
+            "indicators": 0,
+            "native": false,
+            "reserve": false,
+            "limit": 77,
+            "before": 1792706749000
+          },
+          "result": {
+            "bars": 77,
+            "timings_ms": {
+              "fixed_read_freeze": 309.07
+            }
+          },
+          "error_code": null,
+          "enqueued_ms": 399,
+          "dispatched_ms": 854,
+          "completed_ms": 2536,
+          "queue_ms": 455,
+          "service_ms": 1682
+        },
+        {
+          "qid": 119,
+          "id": 101,
+          "query": {
+            "type": "data",
+            "op": "data",
+            "instrument": "2a673b63-2922-497e-bec9-d0231be55934",
+            "series_kind": "history",
+            "timeframe": "M5",
+            "indicators": 0,
+            "native": false,
+            "reserve": false,
+            "limit": 104,
+            "before": 1792706749000
+          },
+          "result": {
+            "bars": 104,
+            "timings_ms": {
+              "fixed_read_freeze": 631.53
+            }
+          },
+          "error_code": null,
+          "enqueued_ms": 400,
+          "dispatched_ms": 855,
+          "completed_ms": 2957,
+          "queue_ms": 455,
+          "service_ms": 2102
+        },
+        {
+          "qid": 120,
+          "id": 102,
+          "query": {
+            "type": "data",
+            "op": "data",
+            "instrument": "2a673b63-2922-497e-bec9-d0231be55934",
+            "series_kind": "history",
+            "timeframe": "W1",
+            "indicators": 0,
+            "native": false,
+            "reserve": false,
+            "limit": 28,
+            "before": 1792879549000
+          },
+          "result": {
+            "bars": 28,
+            "timings_ms": {
+              "fixed_read_freeze": 713.33
+            }
+          },
+          "error_code": null,
+          "enqueued_ms": 400,
+          "dispatched_ms": 855,
+          "completed_ms": 3038,
+          "queue_ms": 455,
+          "service_ms": 2183
+        },
+        {
+          "qid": 121,
+          "id": 103,
+          "query": {
+            "type": "data",
+            "op": "data",
+            "instrument": "2a673b63-2922-497e-bec9-d0231be55934",
+            "series_kind": "history",
+            "timeframe": "D1",
+            "indicators": 0,
+            "native": false,
+            "reserve": false,
+            "limit": 50,
+            "before": 1792879549000
+          },
+          "result": {
+            "bars": 50,
+            "timings_ms": {
+              "fixed_read_freeze": 161.84
+            }
+          },
+          "error_code": null,
+          "enqueued_ms": 400,
+          "dispatched_ms": 1525,
+          "completed_ms": 3206,
+          "queue_ms": 1125,
+          "service_ms": 1681
+        },
+        {
+          "qid": 122,
+          "id": 104,
+          "query": {
+            "type": "data",
+            "op": "data",
+            "instrument": "2a673b63-2922-497e-bec9-d0231be55934",
+            "series_kind": "history",
+            "timeframe": "H4",
+            "indicators": 0,
+            "native": false,
+            "reserve": false,
+            "limit": 46,
+            "before": 1792706749000
+          },
+          "result": {
+            "bars": 46,
+            "timings_ms": {
+              "fixed_read_freeze": 109.27
+            }
+          },
+          "error_code": null,
+          "enqueued_ms": 400,
+          "dispatched_ms": 2536,
+          "completed_ms": 3996,
+          "queue_ms": 2136,
+          "service_ms": 1460
+        }
+      ],
+      "active_enqueue_blockers": [
+        {
+          "qid": 114,
+          "id": 96,
+          "query": {
+            "type": "indicator-demand-release",
+            "op": "data",
+            "indicators": 0,
+            "native": false,
+            "reserve": false
+          },
+          "result": {},
+          "error_code": null,
+          "enqueued_ms": 217,
+          "dispatched_ms": 217,
+          "completed_ms": 855,
+          "queue_ms": 0,
+          "service_ms": 638
+        },
+        {
+          "qid": 115,
+          "id": 97,
+          "query": {
+            "type": "indicator-demand-release",
+            "op": "data",
+            "indicators": 0,
+            "native": false,
+            "reserve": false
+          },
+          "result": {},
+          "error_code": null,
+          "enqueued_ms": 217,
+          "dispatched_ms": 217,
+          "completed_ms": 854,
+          "queue_ms": 0,
+          "service_ms": 637
+        },
+        {
+          "qid": 116,
+          "id": 98,
+          "query": {
+            "type": "indicator-demand-release",
+            "op": "data",
+            "indicators": 0,
+            "native": false,
+            "reserve": false
+          },
+          "result": {},
+          "error_code": null,
+          "enqueued_ms": 217,
+          "dispatched_ms": 217,
+          "completed_ms": 855,
+          "queue_ms": 0,
+          "service_ms": 638
+        },
+        {
+          "qid": 117,
+          "id": 99,
+          "query": {
+            "type": "market",
+            "op": "quotes",
+            "indicators": 0,
+            "native": false,
+            "reserve": false
+          },
+          "result": {},
+          "error_code": null,
+          "enqueued_ms": 220,
+          "dispatched_ms": 220,
+          "completed_ms": 1525,
+          "queue_ms": 0,
+          "service_ms": 1305
+        }
+      ],
+      "native_tasks": []
+    },
+    {
+      "index": 3,
+      "ticker": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+      "precondition": {
+        "quiet": true,
+        "wait_ms": 10294
+      },
+      "active_ready_ms": 3174,
+      "all_ready_ms": 18105,
+      "first_screen": [
+        {
+          "qid": 163,
+          "id": 138,
+          "query": {
+            "type": "data",
+            "op": "data",
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "series_kind": "composite",
+            "timeframe": "H1",
+            "indicators": 0,
+            "native": false,
+            "reserve": false,
+            "limit": 77,
+            "before": 1792706764000
+          },
+          "result": {
+            "bars": 77,
+            "timings_ms": {
+              "fixed_read_freeze": 1136.82
+            }
+          },
+          "error_code": null,
+          "enqueued_ms": 383,
+          "dispatched_ms": 882,
+          "completed_ms": 3155,
+          "queue_ms": 499,
+          "service_ms": 2273
+        },
+        {
+          "qid": 164,
+          "id": 139,
+          "query": {
+            "type": "data",
+            "op": "data",
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "series_kind": "composite",
+            "timeframe": "M5",
+            "indicators": 0,
+            "native": false,
+            "reserve": false,
+            "limit": 104,
+            "before": 1792706764000
+          },
+          "result": {
+            "bars": 104,
+            "timings_ms": {
+              "fixed_read_freeze": 1536.96
+            }
+          },
+          "error_code": null,
+          "enqueued_ms": 383,
+          "dispatched_ms": 953,
+          "completed_ms": 3570,
+          "queue_ms": 570,
+          "service_ms": 2617
+        },
+        {
+          "qid": 165,
+          "id": 140,
+          "query": {
+            "type": "data",
+            "op": "data",
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "series_kind": "composite",
+            "timeframe": "W1",
+            "indicators": 0,
+            "native": false,
+            "reserve": false,
+            "limit": 28,
+            "before": 1792879564000
+          },
+          "result": {
+            "bars": 28,
+            "timings_ms": {
+              "fixed_read_freeze": 2101.92
+            }
+          },
+          "error_code": null,
+          "enqueued_ms": 391,
+          "dispatched_ms": 975,
+          "completed_ms": 5323,
+          "queue_ms": 584,
+          "service_ms": 4348
+        },
+        {
+          "qid": 166,
+          "id": 141,
+          "query": {
+            "type": "data",
+            "op": "data",
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "series_kind": "composite",
+            "timeframe": "D1",
+            "indicators": 0,
+            "native": false,
+            "reserve": false,
+            "limit": 50,
+            "before": 1792879564000
+          },
+          "result": {
+            "bars": 50,
+            "timings_ms": {
+              "fixed_read_freeze": 1156.86
+            }
+          },
+          "error_code": null,
+          "enqueued_ms": 399,
+          "dispatched_ms": 1686,
+          "completed_ms": 6080,
+          "queue_ms": 1287,
+          "service_ms": 4394
+        },
+        {
+          "qid": 167,
+          "id": 142,
+          "query": {
+            "type": "data",
+            "op": "data",
+            "instrument": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+            "series_kind": "composite",
+            "timeframe": "H4",
+            "indicators": 0,
+            "native": false,
+            "reserve": false,
+            "limit": 46,
+            "before": 1792706764000
+          },
+          "result": {
+            "bars": 46,
+            "timings_ms": {
+              "fixed_read_freeze": 4105.36
+            }
+          },
+          "error_code": null,
+          "enqueued_ms": 400,
+          "dispatched_ms": 3155,
+          "completed_ms": 9884,
+          "queue_ms": 2755,
+          "service_ms": 6729
+        }
+      ],
+      "active_enqueue_blockers": [
+        {
+          "qid": 159,
+          "id": 134,
+          "query": {
+            "type": "indicator-demand-release",
+            "op": "data",
+            "indicators": 0,
+            "native": false,
+            "reserve": false
+          },
+          "result": {},
+          "error_code": null,
+          "enqueued_ms": 183,
+          "dispatched_ms": 183,
+          "completed_ms": 953,
+          "queue_ms": 0,
+          "service_ms": 770
+        },
+        {
+          "qid": 160,
+          "id": 135,
+          "query": {
+            "type": "indicator-demand-release",
+            "op": "data",
+            "indicators": 0,
+            "native": false,
+            "reserve": false
+          },
+          "result": {},
+          "error_code": null,
+          "enqueued_ms": 183,
+          "dispatched_ms": 184,
+          "completed_ms": 975,
+          "queue_ms": 1,
+          "service_ms": 791
+        },
+        {
+          "qid": 161,
+          "id": 136,
+          "query": {
+            "type": "indicator-demand-release",
+            "op": "data",
+            "indicators": 0,
+            "native": false,
+            "reserve": false
+          },
+          "result": {},
+          "error_code": null,
+          "enqueued_ms": 184,
+          "dispatched_ms": 184,
+          "completed_ms": 882,
+          "queue_ms": 0,
+          "service_ms": 698
+        },
+        {
+          "qid": 162,
+          "id": 137,
+          "query": {
+            "type": "market",
+            "op": "quotes",
+            "indicators": 0,
+            "native": false,
+            "reserve": false
+          },
+          "result": {},
+          "error_code": null,
+          "enqueued_ms": 194,
+          "dispatched_ms": 194,
+          "completed_ms": 1686,
+          "queue_ms": 0,
+          "service_ms": 1492
+        }
+      ],
+      "native_tasks": []
+    },
+    {
+      "index": 4,
+      "ticker": "MWP:EURUSD",
+      "precondition": {
+        "quiet": true,
+        "wait_ms": 17329
+      },
+      "active_ready_ms": 6499,
+      "all_ready_ms": 12638,
+      "first_screen": [
+        {
+          "qid": 218,
+          "id": 186,
+          "query": {
+            "type": "data",
+            "op": "data",
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "timeframe": "H1",
+            "indicators": 0,
+            "native": true,
+            "reserve": false,
+            "first": true,
+            "focused": true,
+            "countBack": 77,
+            "limit": 77,
+            "before": 1792706799000,
+            "from": 1792429599000
+          },
+          "result": {
+            "bars": 149,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 300.15,
+              "metadata": 74.74
+            },
+            "history_pages": 1
+          },
+          "error_code": null,
+          "enqueued_ms": 324,
+          "dispatched_ms": 562,
+          "completed_ms": 6475,
+          "queue_ms": 238,
+          "service_ms": 5913
+        },
+        {
+          "qid": 219,
+          "id": 187,
+          "query": {
+            "type": "data",
+            "op": "data",
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "timeframe": "M5",
+            "indicators": 0,
+            "native": true,
+            "reserve": false,
+            "first": true,
+            "focused": false,
+            "countBack": 104,
+            "limit": 104,
+            "before": 1792706799000,
+            "from": 1792675599000
+          },
+          "result": {
+            "bars": 104,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 142.87,
+              "metadata": 8.38
+            },
+            "history_pages": 1
+          },
+          "error_code": null,
+          "enqueued_ms": 325,
+          "dispatched_ms": 571,
+          "completed_ms": 6047,
+          "queue_ms": 246,
+          "service_ms": 5476
+        },
+        {
+          "qid": 220,
+          "id": 188,
+          "query": {
+            "type": "data",
+            "op": "data",
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "timeframe": "W1",
+            "indicators": 0,
+            "native": true,
+            "reserve": false,
+            "first": true,
+            "focused": false,
+            "countBack": 28,
+            "limit": 28,
+            "before": 1792706799000,
+            "from": 1775772399000
+          },
+          "result": {
+            "bars": 28,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 55.63,
+              "metadata": 6.4
+            },
+            "history_pages": 1
+          },
+          "error_code": null,
+          "enqueued_ms": 343,
+          "dispatched_ms": 800,
+          "completed_ms": 6930,
+          "queue_ms": 457,
+          "service_ms": 6130
+        },
+        {
+          "qid": 221,
+          "id": 189,
+          "query": {
+            "type": "data",
+            "op": "data",
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "timeframe": "D1",
+            "indicators": 0,
+            "native": true,
+            "reserve": false,
+            "first": true,
+            "focused": false,
+            "countBack": 50,
+            "limit": 50,
+            "before": 1792706799000,
+            "from": 1786658799000
+          },
+          "result": {
+            "bars": 50,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 45.66,
+              "metadata": 3.63
+            },
+            "history_pages": 1
+          },
+          "error_code": null,
+          "enqueued_ms": 343,
+          "dispatched_ms": 854,
+          "completed_ms": 6948,
+          "queue_ms": 511,
+          "service_ms": 6094
+        },
+        {
+          "qid": 222,
+          "id": 190,
+          "query": {
+            "type": "data",
+            "op": "data",
+            "instrument": "EURUSD",
+            "series_kind": "provider",
+            "timeframe": "H4",
+            "indicators": 0,
+            "native": true,
+            "reserve": false,
+            "first": true,
+            "focused": false,
+            "countBack": 46,
+            "limit": 46,
+            "before": 1792706799000,
+            "from": 1791779439000
+          },
+          "result": {
+            "bars": 53,
+            "cache_hit": true,
+            "timings_ms": {
+              "read_total": 470.69,
+              "metadata": 49.1
+            },
+            "history_pages": 1
+          },
+          "error_code": null,
+          "enqueued_ms": 344,
+          "dispatched_ms": 6047,
+          "completed_ms": 12625,
+          "queue_ms": 5703,
+          "service_ms": 6578
+        }
+      ],
+      "active_enqueue_blockers": [
+        {
+          "qid": 214,
+          "id": 182,
+          "query": {
+            "type": "indicator-demand-release",
+            "op": "data",
+            "indicators": 0,
+            "native": false,
+            "reserve": false
+          },
+          "result": {},
+          "error_code": null,
+          "enqueued_ms": 167,
+          "dispatched_ms": 168,
+          "completed_ms": 562,
+          "queue_ms": 1,
+          "service_ms": 394
+        },
+        {
+          "qid": 215,
+          "id": 183,
+          "query": {
+            "type": "indicator-demand-release",
+            "op": "data",
+            "indicators": 0,
+            "native": false,
+            "reserve": false
+          },
+          "result": {},
+          "error_code": null,
+          "enqueued_ms": 168,
+          "dispatched_ms": 168,
+          "completed_ms": 854,
+          "queue_ms": 0,
+          "service_ms": 686
+        },
+        {
+          "qid": 216,
+          "id": 184,
+          "query": {
+            "type": "indicator-demand-release",
+            "op": "data",
+            "indicators": 0,
+            "native": false,
+            "reserve": false
+          },
+          "result": {},
+          "error_code": null,
+          "enqueued_ms": 168,
+          "dispatched_ms": 168,
+          "completed_ms": 571,
+          "queue_ms": 0,
+          "service_ms": 403
+        },
+        {
+          "qid": 217,
+          "id": 185,
+          "query": {
+            "type": "market",
+            "op": "quotes",
+            "indicators": 0,
+            "native": false,
+            "reserve": false
+          },
+          "result": {},
+          "error_code": null,
+          "enqueued_ms": 173,
+          "dispatched_ms": 174,
+          "completed_ms": 800,
+          "queue_ms": 1,
+          "service_ms": 626
+        }
+      ],
+      "native_tasks": [
+        {
+          "request_id": "3aa8c928-ee16-4f51-8668-7290472c0b0e",
+          "load_id": "82dc6021-1c9a-4d4d-87b3-ef20a04a31e8",
+          "timeframe": "H1",
+          "submit_at_ms": 584,
+          "submit_ms": 891,
+          "sampled_states": [
+            {
+              "at_ms": 1593,
+              "state": "waiting",
+              "pages": 0,
+              "generation": 0
+            },
+            {
+              "at_ms": 2118,
+              "state": "filling",
+              "pages": 0,
+              "generation": 1
+            },
+            {
+              "at_ms": 3097,
+              "state": "ready",
+              "pages": 1,
+              "generation": 1
+            },
+            {
+              "at_ms": 6617,
+              "state": "cancelled",
+              "pages": 1,
+              "generation": 2
+            }
+          ],
+          "result": {
+            "at_ms": 3627,
+            "ended_ms": 5063,
+            "elapsed_ms": 1436,
+            "status": 200,
+            "result": {
+              "bars": 149,
+              "cache_hit": true,
+              "timings_ms": {
+                "read_total": 300.15,
+                "metadata": 74.74
+              },
+              "mandatory_count": 77,
+              "optional_count": 72,
+              "display_snapshot": false,
+              "provider_snapshot": true
+            }
+          },
+          "cleanup": {
+            "at_ms": 5052,
+            "ended_ms": 6494,
+            "elapsed_ms": 1442,
+            "status": 200,
+            "result": {
+              "display_snapshot": false,
+              "provider_snapshot": false
+            }
+          }
+        },
+        {
+          "request_id": "935fe418-84bb-4023-938f-126e7c8acc7a",
+          "load_id": "aac3fe5c-c48e-49b6-a331-610688d21eb2",
+          "timeframe": "M5",
+          "submit_at_ms": 614,
+          "submit_ms": 1078,
+          "sampled_states": [
+            {
+              "at_ms": 2118,
+              "state": "waiting",
+              "pages": 0,
+              "generation": 0
+            },
+            {
+              "at_ms": 3097,
+              "state": "filling",
+              "pages": 0,
+              "generation": 1
+            },
+            {
+              "at_ms": 3637,
+              "state": "ready",
+              "pages": 1,
+              "generation": 1
+            },
+            {
+              "at_ms": 6106,
+              "state": "cancelled",
+              "pages": 1,
+              "generation": 2
+            }
+          ],
+          "result": {
+            "at_ms": 3631,
+            "ended_ms": 4438,
+            "elapsed_ms": 807,
+            "status": 200,
+            "result": {
+              "bars": 104,
+              "cache_hit": true,
+              "timings_ms": {
+                "read_total": 142.87,
+                "metadata": 8.38
+              },
+              "mandatory_count": 104,
+              "optional_count": 0,
+              "display_snapshot": false,
+              "provider_snapshot": true
+            }
+          },
+          "cleanup": {
+            "at_ms": 4429,
+            "ended_ms": 6046,
+            "elapsed_ms": 1617,
+            "status": 200,
+            "result": {
+              "display_snapshot": false,
+              "provider_snapshot": false
+            }
+          }
+        },
+        {
+          "request_id": "aee1d203-c637-4d8e-a115-709a2fc2b744",
+          "load_id": "44f9206b-59ef-464d-b639-28df8d363885",
+          "timeframe": "W1",
+          "submit_at_ms": 830,
+          "submit_ms": 1052,
+          "sampled_states": [
+            {
+              "at_ms": 2118,
+              "state": "waiting",
+              "pages": 0,
+              "generation": 0
+            },
+            {
+              "at_ms": 4619,
+              "state": "filling",
+              "pages": 0,
+              "generation": 1
+            },
+            {
+              "at_ms": 5618,
+              "state": "ready",
+              "pages": 1,
+              "generation": 1
+            },
+            {
+              "at_ms": 7117,
+              "state": "cancelled",
+              "pages": 1,
+              "generation": 2
+            }
+          ],
+          "result": {
+            "at_ms": 5630,
+            "ended_ms": 6338,
+            "elapsed_ms": 708,
+            "status": 200,
+            "result": {
+              "bars": 28,
+              "cache_hit": true,
+              "timings_ms": {
+                "read_total": 55.63,
+                "metadata": 6.4
+              },
+              "mandatory_count": 28,
+              "optional_count": 0,
+              "display_snapshot": false,
+              "provider_snapshot": true
+            }
+          },
+          "cleanup": {
+            "at_ms": 6339,
+            "ended_ms": 6912,
+            "elapsed_ms": 573,
+            "status": 200,
+            "result": {
+              "display_snapshot": false,
+              "provider_snapshot": false
+            }
+          }
+        },
+        {
+          "request_id": "00b0d7d8-9415-4429-9874-38138b55cc40",
+          "load_id": "178551fa-6d56-4e84-b58b-f9222c8360c5",
+          "timeframe": "D1",
+          "submit_at_ms": 879,
+          "submit_ms": 910,
+          "sampled_states": [
+            {
+              "at_ms": 2118,
+              "state": "waiting",
+              "pages": 0,
+              "generation": 0
+            },
+            {
+              "at_ms": 3637,
+              "state": "filling",
+              "pages": 0,
+              "generation": 1
+            },
+            {
+              "at_ms": 4619,
+              "state": "ready",
+              "pages": 1,
+              "generation": 1
+            },
+            {
+              "at_ms": 7117,
+              "state": "cancelled",
+              "pages": 1,
+              "generation": 2
+            }
+          ],
+          "result": {
+            "at_ms": 5637,
+            "ended_ms": 6463,
+            "elapsed_ms": 826,
+            "status": 200,
+            "result": {
+              "bars": 50,
+              "cache_hit": true,
+              "timings_ms": {
+                "read_total": 45.66,
+                "metadata": 3.63
+              },
+              "mandatory_count": 50,
+              "optional_count": 0,
+              "display_snapshot": false,
+              "provider_snapshot": true
+            }
+          },
+          "cleanup": {
+            "at_ms": 6463,
+            "ended_ms": 6913,
+            "elapsed_ms": 450,
+            "status": 200,
+            "result": {
+              "display_snapshot": false,
+              "provider_snapshot": false
+            }
+          }
+        },
+        {
+          "request_id": "97f9f8f7-3eb1-4147-8031-08a4b55a9f63",
+          "load_id": "f4352266-9ea6-4624-a089-1a30e2ce8e38",
+          "timeframe": "H4",
+          "submit_at_ms": 6072,
+          "submit_ms": 838,
+          "sampled_states": [
+            {
+              "at_ms": 7117,
+              "state": "waiting",
+              "pages": 0,
+              "generation": 0
+            },
+            {
+              "at_ms": 7640,
+              "state": "filling",
+              "pages": 0,
+              "generation": 1
+            },
+            {
+              "at_ms": 8117,
+              "state": "ready",
+              "pages": 1,
+              "generation": 1
+            },
+            {
+              "at_ms": 12618,
+              "state": "cancelled",
+              "pages": 1,
+              "generation": 2
+            }
+          ],
+          "result": {
+            "at_ms": 10424,
+            "ended_ms": 11960,
+            "elapsed_ms": 1536,
+            "status": 200,
+            "result": {
+              "bars": 53,
+              "cache_hit": true,
+              "timings_ms": {
+                "read_total": 470.69,
+                "metadata": 49.1
+              },
+              "mandatory_count": 53,
+              "optional_count": 0,
+              "display_snapshot": false,
+              "provider_snapshot": true
+            }
+          },
+          "cleanup": {
+            "at_ms": 11955,
+            "ended_ms": 12591,
+            "elapsed_ms": 636,
+            "status": 200,
+            "result": {
+              "display_snapshot": false,
+              "provider_snapshot": false
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "db_summary": {
+    "samples": 319,
+    "error_samples": 0,
+    "any_advisory_wait_samples": 62,
+    "snapshot_holder_waits_on_warmup_samples": 6,
+    "chain_examples": [
+      {
+        "at": 1792706642994,
+        "activity": [
+          {
+            "pid": 977104,
+            "state": "idle in transaction",
+            "wait_event_type": "Client",
+            "wait_event": "ClientRead",
+            "query_ms": 0.405,
+            "transaction_ms": 747.199,
+            "blockers": [],
+            "query_class": "indicator"
+          },
+          {
+            "pid": 977113,
+            "state": "active",
+            "wait_event_type": "Lock",
+            "wait_event": "advisory",
+            "query_ms": 211.247,
+            "transaction_ms": 876.963,
+            "blockers": [
+              977104
+            ],
+            "query_class": "advisory"
+          },
+          {
+            "pid": 977132,
+            "state": "idle in transaction",
+            "wait_event_type": "Client",
+            "wait_event": "ClientRead",
+            "query_ms": 124.17,
+            "transaction_ms": 760.189,
+            "blockers": [],
+            "query_class": "other"
+          },
+          {
+            "pid": 977142,
+            "state": "active",
+            "wait_event_type": "Lock",
+            "wait_event": "transactionid",
+            "query_ms": 171.938,
+            "transaction_ms": 172.093,
+            "blockers": [
+              977169
+            ],
+            "query_class": "other"
+          },
+          {
+            "pid": 977147,
+            "state": "active",
+            "wait_event_type": "Lock",
+            "wait_event": "advisory",
+            "query_ms": 312.744,
+            "transaction_ms": 598.986,
+            "blockers": [
+              977113
+            ],
+            "query_class": "advisory"
+          },
+          {
+            "pid": 977149,
+            "state": "idle in transaction",
+            "wait_event_type": "Client",
+            "wait_event": "ClientRead",
+            "query_ms": 52.811,
+            "transaction_ms": 199.157,
+            "blockers": [],
+            "query_class": "other"
+          },
+          {
+            "pid": 977169,
+            "state": "active",
+            "wait_event_type": "Lock",
+            "wait_event": "transactionid",
+            "query_ms": 991.341,
+            "transaction_ms": 995.858,
+            "blockers": [
+              977113
+            ],
+            "query_class": "other"
+          }
+        ],
+        "locks": [
+          {
+            "pid": 977104,
+            "locktype": "advisory",
+            "mode": "ExclusiveLock",
+            "granted": true,
+            "key": 8675313
+          },
+          {
+            "pid": 977113,
+            "locktype": "advisory",
+            "mode": "ExclusiveLock",
+            "granted": false,
+            "key": 8675313
+          },
+          {
+            "pid": 977147,
+            "locktype": "advisory",
+            "mode": "ExclusiveLock",
+            "granted": false,
+            "key": 8675310
+          },
+          {
+            "pid": 977113,
+            "locktype": "advisory",
+            "mode": "ExclusiveLock",
+            "granted": true,
+            "key": 8675310
+          }
+        ],
+        "tasks": []
+      },
+      {
+        "at": 1792706643500,
+        "activity": [
+          {
+            "pid": 977104,
+            "state": "idle in transaction",
+            "wait_event_type": "Client",
+            "wait_event": "ClientRead",
+            "query_ms": 0.787,
+            "transaction_ms": 1250.799,
+            "blockers": [],
+            "query_class": "indicator"
+          },
+          {
+            "pid": 977113,
+            "state": "active",
+            "wait_event_type": "Lock",
+            "wait_event": "advisory",
+            "query_ms": 714.865,
+            "transaction_ms": 1380.58,
+            "blockers": [
+              977104
+            ],
+            "query_class": "advisory"
+          },
+          {
+            "pid": 977132,
+            "state": "idle in transaction",
+            "wait_event_type": "Client",
+            "wait_event": "ClientRead",
+            "query_ms": 149.241,
+            "transaction_ms": 160.338,
+            "blockers": [],
+            "query_class": "other"
+          },
+          {
+            "pid": 977142,
+            "state": "active",
+            "wait_event_type": "Lock",
+            "wait_event": "transactionid",
+            "query_ms": 675.582,
+            "transaction_ms": 675.737,
+            "blockers": [
+              977169
+            ],
+            "query_class": "other"
+          },
+          {
+            "pid": 977147,
+            "state": "active",
+            "wait_event_type": "Lock",
+            "wait_event": "advisory",
+            "query_ms": 816.388,
+            "transaction_ms": 1102.63,
+            "blockers": [
+              977113
+            ],
+            "query_class": "advisory"
+          },
+          {
+            "pid": 977149,
+            "state": "idle in transaction",
+            "wait_event_type": "Client",
+            "wait_event": "ClientRead",
+            "query_ms": 402.828,
+            "transaction_ms": 702.84,
+            "blockers": [],
+            "query_class": "other"
+          },
+          {
+            "pid": 977169,
+            "state": "active",
+            "wait_event_type": "Lock",
+            "wait_event": "transactionid",
+            "query_ms": 1495.055,
+            "transaction_ms": 1499.572,
+            "blockers": [
+              977113
+            ],
+            "query_class": "other"
+          }
+        ],
+        "locks": [
+          {
+            "pid": 977104,
+            "locktype": "advisory",
+            "mode": "ExclusiveLock",
+            "granted": true,
+            "key": 8675313
+          },
+          {
+            "pid": 977113,
+            "locktype": "advisory",
+            "mode": "ExclusiveLock",
+            "granted": false,
+            "key": 8675313
+          },
+          {
+            "pid": 977147,
+            "locktype": "advisory",
+            "mode": "ExclusiveLock",
+            "granted": false,
+            "key": 8675310
+          },
+          {
+            "pid": 977113,
+            "locktype": "advisory",
+            "mode": "ExclusiveLock",
+            "granted": true,
+            "key": 8675310
+          }
+        ],
+        "tasks": []
+      },
+      {
+        "at": 1792706644001,
+        "activity": [
+          {
+            "pid": 977104,
+            "state": "idle in transaction",
+            "wait_event_type": "Client",
+            "wait_event": "ClientRead",
+            "query_ms": 0.425,
+            "transaction_ms": 1750.963,
+            "blockers": [],
+            "query_class": "indicator"
+          },
+          {
+            "pid": 977113,
+            "state": "active",
+            "wait_event_type": "Lock",
+            "wait_event": "advisory",
+            "query_ms": 1215.018,
+            "transaction_ms": 1880.734,
+            "blockers": [
+              977104
+            ],
+            "query_class": "advisory"
+          },
+          {
+            "pid": 977142,
+            "state": "active",
+            "wait_event_type": "Lock",
+            "wait_event": "transactionid",
+            "query_ms": 1175.695,
+            "transaction_ms": 1175.85,
+            "blockers": [
+              977169
+            ],
+            "query_class": "other"
+          },
+          {
+            "pid": 977144,
+            "state": "idle in transaction",
+            "wait_event_type": "Client",
+            "wait_event": "ClientRead",
+            "query_ms": 52.818,
+            "transaction_ms": 108.047,
+            "blockers": [],
+            "query_class": "other"
+          },
+          {
+            "pid": 977147,
+            "state": "active",
+            "wait_event_type": "Lock",
+            "wait_event": "advisory",
+            "query_ms": 1316.554,
+            "transaction_ms": 1602.795,
+            "blockers": [
+              977113
+            ],
+            "query_class": "advisory"
+          },
+          {
+            "pid": 977149,
+            "state": "active",
+            "wait_event_type": null,
+            "wait_event": null,
+            "query_ms": 6.848,
+            "transaction_ms": 192.432,
+            "blockers": [],
+            "query_class": "other"
+          },
+          {
+            "pid": 977169,
+            "state": "active",
+            "wait_event_type": "Lock",
+            "wait_event": "transactionid",
+            "query_ms": 1995.137,
+            "transaction_ms": 1999.653,
+            "blockers": [
+              977113
+            ],
+            "query_class": "other"
+          }
+        ],
+        "locks": [
+          {
+            "pid": 977104,
+            "locktype": "advisory",
+            "mode": "ExclusiveLock",
+            "granted": true,
+            "key": 8675313
+          },
+          {
+            "pid": 977113,
+            "locktype": "advisory",
+            "mode": "ExclusiveLock",
+            "granted": false,
+            "key": 8675313
+          },
+          {
+            "pid": 977147,
+            "locktype": "advisory",
+            "mode": "ExclusiveLock",
+            "granted": false,
+            "key": 8675310
+          },
+          {
+            "pid": 977113,
+            "locktype": "advisory",
+            "mode": "ExclusiveLock",
+            "granted": true,
+            "key": 8675310
+          }
+        ],
+        "tasks": []
+      }
+    ]
+  },
+  "profiles": [
+    {
+      "at": 1792706861265,
+      "repeat": 0,
+      "kind": "history",
+      "frame": "H1",
+      "count": 77,
+      "transaction": "rolled_back",
+      "bars": 77,
+      "display_snapshot": false,
+      "input_revision": null,
+      "pending": [],
+      "elapsed_ms": 631.512,
+      "spans": [
+        {
+          "name": "series_access.metadata",
+          "parent": "series_access.chart_data",
+          "ms": 220.476
+        },
+        {
+          "name": "history_artifacts.read_artifact",
+          "parent": "history_artifacts.chart_page",
+          "ms": 90.249
+        },
+        {
+          "name": "history_artifacts.chart_page",
+          "parent": "series_access.chart_data",
+          "ms": 90.271
+        },
+        {
+          "name": "fixed_indicators.request",
+          "parent": "indicator_demands.warm_defaults",
+          "ms": 5.582
+        },
+        {
+          "name": "indicator_demands.guard",
+          "parent": "indicator_demands.renew",
+          "ms": 36.431
+        },
+        {
+          "name": "indicator_demands.renew",
+          "parent": "indicator_demands.warm_defaults",
+          "ms": 137.124
+        },
+        {
+          "name": "fixed_indicators.request",
+          "parent": "indicator_demands.warm_defaults",
+          "ms": 7.479
+        },
+        {
+          "name": "indicator_demands.guard",
+          "parent": "indicator_demands.renew",
+          "ms": 2.538
+        },
+        {
+          "name": "indicator_demands.renew",
+          "parent": "indicator_demands.warm_defaults",
+          "ms": 11.597
+        },
+        {
+          "name": "indicator_demands.warm_defaults",
+          "parent": "series_access.chart_data",
+          "ms": 166.793
+        },
+        {
+          "name": "series_access.history_check",
+          "parent": "series_access.chart_data",
+          "ms": 0.003
+        },
+        {
+          "name": "series_access.chart_data",
+          "parent": null,
+          "ms": 512.181
+        },
+        {
+          "name": "fixed_indicator_display.prepare",
+          "parent": null,
+          "ms": 0.004
+        }
+      ],
+      "queries": [
+        {
+          "label": "SET,market_indicator_demands",
+          "parent": "indicator_demands.renew",
+          "count": 2,
+          "ms": 48.492
+        },
+        {
+          "label": "advisory:8675313",
+          "parent": "indicator_demands.guard",
+          "count": 2,
+          "ms": 38.316
+        },
+        {
+          "label": "market_indicator_demands",
+          "parent": "indicator_demands.renew",
+          "count": 10,
+          "ms": 21.784
+        },
+        {
+          "label": "market_datasets",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 21.573
+        },
+        {
+          "label": "market_history_artifact_blocks",
+          "parent": "history_artifacts.read_artifact",
+          "count": 1,
+          "ms": 15.066
+        },
+        {
+          "label": "market_history_artifacts",
+          "parent": "series_access.metadata",
+          "count": 1,
+          "ms": 5.836
+        },
+        {
+          "label": "instruments",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 5.367
+        },
+        {
+          "label": "market_fixed_indicator_runs",
+          "parent": "fixed_indicators.request",
+          "count": 2,
+          "ms": 5.308
+        },
+        {
+          "label": "market_history_versions",
+          "parent": "series_access.metadata",
+          "count": 1,
+          "ms": 5.227
+        },
+        {
+          "label": "RELEASE",
+          "parent": "indicator_demands.warm_defaults",
+          "count": 2,
+          "ms": 4.157
+        },
+        {
+          "label": "instruments",
+          "parent": "series_access.metadata",
+          "count": 1,
+          "ms": 3.388
+        },
+        {
+          "label": "market_history_reclamations",
+          "parent": "series_access.metadata",
+          "count": 1,
+          "ms": 2.805
+        },
+        {
+          "label": "market_datasets",
+          "parent": "fixed_indicators.request",
+          "count": 2,
+          "ms": 2.261
+        },
+        {
+          "label": "market_datasets",
+          "parent": "series_access.metadata",
+          "count": 1,
+          "ms": 2.218
+        },
+        {
+          "label": "market_history_versions",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 1.532
+        },
+        {
+          "label": "SAVEPOINT",
+          "parent": "fixed_indicators.request",
+          "count": 2,
+          "ms": 1.373
+        },
+        {
+          "label": "SET",
+          "parent": null,
+          "count": 2,
+          "ms": 1.188
+        },
+        {
+          "label": "market_indicator_schedule",
+          "parent": "indicator_demands.renew",
+          "count": 2,
+          "ms": 0.897
+        },
+        {
+          "label": "market_history_artifacts",
+          "parent": "history_artifacts.read_artifact",
+          "count": 1,
+          "ms": 0.863
+        },
+        {
+          "label": "market_datasets",
+          "parent": "history_artifacts.read_artifact",
+          "count": 1,
+          "ms": 0.415
+        },
+        {
+          "label": "market_history_reclamations",
+          "parent": "history_artifacts.read_artifact",
+          "count": 1,
+          "ms": 0.235
+        }
+      ]
+    },
+    {
+      "at": 1792706862097,
+      "repeat": 0,
+      "kind": "composite",
+      "frame": "H1",
+      "count": 77,
+      "transaction": "rolled_back",
+      "bars": 77,
+      "display_snapshot": true,
+      "input_revision": 1012,
+      "pending": [],
+      "elapsed_ms": 2410.213,
+      "spans": [
+        {
+          "name": "series_access.metadata",
+          "parent": "series_access.chart_data",
+          "ms": 84.745
+        },
+        {
+          "name": "market_data.renew_demand",
+          "parent": "series_access.chart_data",
+          "ms": 12.984
+        },
+        {
+          "name": "display_snapshots.capture",
+          "parent": "composite_chart.chart_page",
+          "ms": 723.421
+        },
+        {
+          "name": "composite_chart.chart_page",
+          "parent": "series_access.chart_data",
+          "ms": 795.589
+        },
+        {
+          "name": "indicator_demands.guard",
+          "parent": "fixed_indicators.request",
+          "ms": 1234.403
+        },
+        {
+          "name": "fixed_indicators.checkpoint_before",
+          "parent": "fixed_indicators.request",
+          "ms": 2.917
+        },
+        {
+          "name": "fixed_indicators.request",
+          "parent": "indicator_demands.warm_defaults",
+          "ms": 1302.599
+        },
+        {
+          "name": "indicator_demands.guard",
+          "parent": "indicator_demands.renew",
+          "ms": 0.432
+        },
+        {
+          "name": "indicator_demands.renew",
+          "parent": "indicator_demands.warm_defaults",
+          "ms": 7.035
+        },
+        {
+          "name": "indicator_demands.guard",
+          "parent": "fixed_indicators.request",
+          "ms": 0.315
+        },
+        {
+          "name": "fixed_indicators.checkpoint_before",
+          "parent": "fixed_indicators.request",
+          "ms": 1.236
+        },
+        {
+          "name": "fixed_indicators.request",
+          "parent": "indicator_demands.warm_defaults",
+          "ms": 88.62
+        },
+        {
+          "name": "indicator_demands.guard",
+          "parent": "indicator_demands.renew",
+          "ms": 0.288
+        },
+        {
+          "name": "indicator_demands.renew",
+          "parent": "indicator_demands.warm_defaults",
+          "ms": 6.126
+        },
+        {
+          "name": "indicator_demands.warm_defaults",
+          "parent": "series_access.chart_data",
+          "ms": 1405.3
+        },
+        {
+          "name": "series_access.history_check",
+          "parent": "series_access.chart_data",
+          "ms": 0.003
+        },
+        {
+          "name": "series_access.chart_data",
+          "parent": null,
+          "ms": 2399.7
+        },
+        {
+          "name": "fixed_indicator_display.prepare",
+          "parent": null,
+          "ms": 0.005
+        }
+      ],
+      "queries": [
+        {
+          "label": "advisory:8675313",
+          "parent": "indicator_demands.guard",
+          "count": 4,
+          "ms": 1234.765
+        },
+        {
+          "label": "advisory:8675310",
+          "parent": "display_snapshots.capture",
+          "count": 1,
+          "ms": 623.739
+        },
+        {
+          "label": "market_history_reclamations",
+          "parent": "fixed_indicators.request",
+          "count": 2,
+          "ms": 62.972
+        },
+        {
+          "label": "market_composite_revisions",
+          "parent": "series_access.metadata",
+          "count": 2,
+          "ms": 57.322
+        },
+        {
+          "label": "market_fixed_indicator_runs",
+          "parent": "fixed_indicators.request",
+          "count": 12,
+          "ms": 50.45
+        },
+        {
+          "label": "market_pricing_owners",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 47.005
+        },
+        {
+          "label": "market_composite_aggregate_bars",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 12.267
+        },
+        {
+          "label": "market_display_snapshots",
+          "parent": "display_snapshots.capture",
+          "count": 7,
+          "ms": 8.416
+        },
+        {
+          "label": "market_realtime_mappings",
+          "parent": "series_access.metadata",
+          "count": 1,
+          "ms": 6.111
+        },
+        {
+          "label": "market_history_versions",
+          "parent": "series_access.metadata",
+          "count": 2,
+          "ms": 3.648
+        },
+        {
+          "label": "market_composite_minute_inputs",
+          "parent": "fixed_indicators.request",
+          "count": 4,
+          "ms": 3.454
+        },
+        {
+          "label": "instruments",
+          "parent": "series_access.chart_data",
+          "count": 2,
+          "ms": 3.307
+        },
+        {
+          "label": "market_composites",
+          "parent": "series_access.metadata",
+          "count": 1,
+          "ms": 2.934
+        },
+        {
+          "label": "market_live_states",
+          "parent": "series_access.chart_data",
+          "count": 2,
+          "ms": 2.848
+        },
+        {
+          "label": "market_indicator_demands",
+          "parent": "indicator_demands.renew",
+          "count": 10,
+          "ms": 2.756
+        },
+        {
+          "label": "SAVEPOINT",
+          "parent": "fixed_indicators.request",
+          "count": 2,
+          "ms": 2.702
+        },
+        {
+          "label": "market_composite_minute_inputs,market_source_minute_revisions",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 2.549
+        },
+        {
+          "label": "market_composite_minute_inputs,market_observed_minutes",
+          "parent": "display_snapshots.capture",
+          "count": 1,
+          "ms": 2.477
+        },
+        {
+          "label": "market_realtime_mappings",
+          "parent": "series_access.chart_data",
+          "count": 2,
+          "ms": 2.152
+        },
+        {
+          "label": "market_fixed_indicator_blocks",
+          "parent": "fixed_indicators.checkpoint_before",
+          "count": 2,
+          "ms": 1.712
+        },
+        {
+          "label": "market_datasets",
+          "parent": "series_access.metadata",
+          "count": 2,
+          "ms": 1.592
+        },
+        {
+          "label": "market_datasets",
+          "parent": "fixed_indicators.request",
+          "count": 4,
+          "ms": 1.558
+        },
+        {
+          "label": "instruments",
+          "parent": "series_access.metadata",
+          "count": 2,
+          "ms": 1.514
+        },
+        {
+          "label": "chart_history_plans",
+          "parent": "market_data.renew_demand",
+          "count": 1,
+          "ms": 1.312
+        },
+        {
+          "label": "market_composite_revisions",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 1.208
+        },
+        {
+          "label": "SET,market_indicator_demands",
+          "parent": "indicator_demands.renew",
+          "count": 2,
+          "ms": 1.044
+        },
+        {
+          "label": "market_realtime_mappings",
+          "parent": "display_snapshots.capture",
+          "count": 1,
+          "ms": 1.014
+        },
+        {
+          "label": "SELECT",
+          "parent": "fixed_indicators.request",
+          "count": 2,
+          "ms": 0.993
+        },
+        {
+          "label": "market_history_versions",
+          "parent": "series_access.chart_data",
+          "count": 2,
+          "ms": 0.989
+        },
+        {
+          "label": "SET,excluded,market_data_demand",
+          "parent": "market_data.renew_demand",
+          "count": 1,
+          "ms": 0.964
+        },
+        {
+          "label": "market_composite_aggregate_tasks",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.875
+        },
+        {
+          "label": "market_composite_preparations",
+          "parent": "display_snapshots.capture",
+          "count": 1,
+          "ms": 0.861
+        },
+        {
+          "label": "instruments",
+          "parent": "fixed_indicators.request",
+          "count": 2,
+          "ms": 0.704
+        },
+        {
+          "label": "preferences",
+          "parent": "display_snapshots.capture",
+          "count": 2,
+          "ms": 0.673
+        },
+        {
+          "label": "market_datasets",
+          "parent": "composite_chart.chart_page",
+          "count": 2,
+          "ms": 0.653
+        },
+        {
+          "label": "preferences",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 0.604
+        },
+        {
+          "label": "market_realtime_mappings",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.588
+        },
+        {
+          "label": "market_composite_preparations",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.574
+        },
+        {
+          "label": "market_indicator_schedule",
+          "parent": "indicator_demands.renew",
+          "count": 2,
+          "ms": 0.554
+        },
+        {
+          "label": "market_composites",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 0.55
+        },
+        {
+          "label": "market_history_versions",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.435
+        },
+        {
+          "label": "market_history_artifact_blocks",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.434
+        },
+        {
+          "label": "instruments",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.429
+        },
+        {
+          "label": "market_history_artifacts",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.411
+        },
+        {
+          "label": "market_history_reclamations",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.347
+        },
+        {
+          "label": "SET",
+          "parent": null,
+          "count": 2,
+          "ms": 0.342
+        },
+        {
+          "label": "market_live_states",
+          "parent": "display_snapshots.capture",
+          "count": 1,
+          "ms": 0.331
+        },
+        {
+          "label": "market_datasets",
+          "parent": "market_data.renew_demand",
+          "count": 1,
+          "ms": 0.324
+        },
+        {
+          "label": "RELEASE",
+          "parent": "indicator_demands.warm_defaults",
+          "count": 2,
+          "ms": 0.311
+        },
+        {
+          "label": "market_composites",
+          "parent": "market_data.renew_demand",
+          "count": 1,
+          "ms": 0.296
+        },
+        {
+          "label": "market_datasets",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 0.235
+        }
+      ]
+    },
+    {
+      "at": 1792706864708,
+      "repeat": 0,
+      "kind": "composite",
+      "frame": "H4",
+      "count": 46,
+      "transaction": "rolled_back",
+      "bars": 46,
+      "display_snapshot": true,
+      "input_revision": 1012,
+      "pending": [],
+      "elapsed_ms": 1373.951,
+      "spans": [
+        {
+          "name": "series_access.metadata",
+          "parent": "series_access.chart_data",
+          "ms": 7.382
+        },
+        {
+          "name": "market_data.renew_demand",
+          "parent": "series_access.chart_data",
+          "ms": 13.7
+        },
+        {
+          "name": "display_snapshots.renew",
+          "parent": "display_snapshots.capture",
+          "ms": 6.265
+        },
+        {
+          "name": "display_snapshots.capture",
+          "parent": "composite_chart.chart_page",
+          "ms": 101.825
+        },
+        {
+          "name": "composite_chart.chart_page",
+          "parent": "series_access.chart_data",
+          "ms": 171.12
+        },
+        {
+          "name": "indicator_demands.guard",
+          "parent": "fixed_indicators.request",
+          "ms": 891.915
+        },
+        {
+          "name": "fixed_indicators.checkpoint_before",
+          "parent": "fixed_indicators.request",
+          "ms": 0.975
+        },
+        {
+          "name": "fixed_indicators.request",
+          "parent": "indicator_demands.warm_defaults",
+          "ms": 915.282
+        },
+        {
+          "name": "indicator_demands.guard",
+          "parent": "indicator_demands.renew",
+          "ms": 0.556
+        },
+        {
+          "name": "indicator_demands.renew",
+          "parent": "indicator_demands.warm_defaults",
+          "ms": 12.214
+        },
+        {
+          "name": "indicator_demands.guard",
+          "parent": "fixed_indicators.request",
+          "ms": 0.495
+        },
+        {
+          "name": "fixed_indicators.checkpoint_before",
+          "parent": "fixed_indicators.request",
+          "ms": 1.652
+        },
+        {
+          "name": "fixed_indicators.request",
+          "parent": "indicator_demands.warm_defaults",
+          "ms": 23.335
+        },
+        {
+          "name": "indicator_demands.guard",
+          "parent": "indicator_demands.renew",
+          "ms": 0.524
+        },
+        {
+          "name": "indicator_demands.renew",
+          "parent": "indicator_demands.warm_defaults",
+          "ms": 57.637
+        },
+        {
+          "name": "indicator_demands.warm_defaults",
+          "parent": "series_access.chart_data",
+          "ms": 1012.79
+        },
+        {
+          "name": "series_access.history_check",
+          "parent": "series_access.chart_data",
+          "ms": 0.003
+        },
+        {
+          "name": "series_access.chart_data",
+          "parent": null,
+          "ms": 1367.341
+        },
+        {
+          "name": "fixed_indicator_display.prepare",
+          "parent": null,
+          "ms": 0.005
+        }
+      ],
+      "queries": [
+        {
+          "label": "advisory:8675313",
+          "parent": "indicator_demands.guard",
+          "count": 4,
+          "ms": 892.501
+        },
+        {
+          "label": "market_composite_preparations",
+          "parent": "display_snapshots.capture",
+          "count": 1,
+          "ms": 59.267
+        },
+        {
+          "label": "market_composite_revisions",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 46.306
+        },
+        {
+          "label": "market_indicator_demands",
+          "parent": "indicator_demands.renew",
+          "count": 10,
+          "ms": 17.671
+        },
+        {
+          "label": "market_fixed_indicator_runs",
+          "parent": "fixed_indicators.request",
+          "count": 12,
+          "ms": 15.225
+        },
+        {
+          "label": "market_live_states",
+          "parent": "series_access.chart_data",
+          "count": 2,
+          "ms": 9.916
+        },
+        {
+          "label": "market_composites",
+          "parent": "market_data.renew_demand",
+          "count": 1,
+          "ms": 9.823
+        },
+        {
+          "label": "market_display_snapshots",
+          "parent": "display_snapshots.capture",
+          "count": 1,
+          "ms": 8.41
+        },
+        {
+          "label": "market_pricing_owners",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 5.758
+        },
+        {
+          "label": "market_display_snapshots",
+          "parent": "display_snapshots.renew",
+          "count": 1,
+          "ms": 4.42
+        },
+        {
+          "label": "market_realtime_mappings",
+          "parent": "series_access.chart_data",
+          "count": 2,
+          "ms": 4.036
+        },
+        {
+          "label": "RELEASE",
+          "parent": "indicator_demands.warm_defaults",
+          "count": 2,
+          "ms": 3.602
+        },
+        {
+          "label": "preferences",
+          "parent": "display_snapshots.capture",
+          "count": 2,
+          "ms": 3.509
+        },
+        {
+          "label": "market_composite_aggregate_bars",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 3.423
+        },
+        {
+          "label": "market_composite_minute_inputs",
+          "parent": "fixed_indicators.request",
+          "count": 4,
+          "ms": 3.062
+        },
+        {
+          "label": "market_composite_minute_inputs,market_observed_minutes",
+          "parent": "display_snapshots.capture",
+          "count": 1,
+          "ms": 1.951
+        },
+        {
+          "label": "market_datasets",
+          "parent": "fixed_indicators.request",
+          "count": 4,
+          "ms": 1.81
+        },
+        {
+          "label": "SET,market_indicator_demands",
+          "parent": "indicator_demands.renew",
+          "count": 2,
+          "ms": 1.305
+        },
+        {
+          "label": "market_history_versions",
+          "parent": "series_access.chart_data",
+          "count": 2,
+          "ms": 1.296
+        },
+        {
+          "label": "market_indicator_schedule",
+          "parent": "indicator_demands.renew",
+          "count": 2,
+          "ms": 1.276
+        },
+        {
+          "label": "market_composite_minute_inputs,market_source_minute_revisions",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.979
+        },
+        {
+          "label": "market_history_versions",
+          "parent": "series_access.metadata",
+          "count": 2,
+          "ms": 0.893
+        },
+        {
+          "label": "market_fixed_indicator_blocks",
+          "parent": "fixed_indicators.checkpoint_before",
+          "count": 2,
+          "ms": 0.893
+        },
+        {
+          "label": "instruments",
+          "parent": "fixed_indicators.request",
+          "count": 2,
+          "ms": 0.89
+        },
+        {
+          "label": "instruments",
+          "parent": "series_access.chart_data",
+          "count": 2,
+          "ms": 0.888
+        },
+        {
+          "label": "SELECT",
+          "parent": "fixed_indicators.request",
+          "count": 2,
+          "ms": 0.776
+        },
+        {
+          "label": "market_datasets",
+          "parent": "composite_chart.chart_page",
+          "count": 2,
+          "ms": 0.77
+        },
+        {
+          "label": "market_live_states",
+          "parent": "display_snapshots.capture",
+          "count": 1,
+          "ms": 0.725
+        },
+        {
+          "label": "market_composite_revisions",
+          "parent": "series_access.metadata",
+          "count": 2,
+          "ms": 0.662
+        },
+        {
+          "label": "market_datasets",
+          "parent": "series_access.metadata",
+          "count": 2,
+          "ms": 0.66
+        },
+        {
+          "label": "instruments",
+          "parent": "series_access.metadata",
+          "count": 2,
+          "ms": 0.66
+        },
+        {
+          "label": "market_history_versions",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.64
+        },
+        {
+          "label": "market_realtime_mappings",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.601
+        },
+        {
+          "label": "market_history_artifact_blocks",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.588
+        },
+        {
+          "label": "SET,excluded,market_data_demand",
+          "parent": "market_data.renew_demand",
+          "count": 1,
+          "ms": 0.576
+        },
+        {
+          "label": "market_composite_preparations",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.573
+        },
+        {
+          "label": "market_composite_aggregate_tasks",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.559
+        },
+        {
+          "label": "instruments",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.503
+        },
+        {
+          "label": "market_history_reclamations",
+          "parent": "fixed_indicators.request",
+          "count": 2,
+          "ms": 0.49
+        },
+        {
+          "label": "SET",
+          "parent": null,
+          "count": 2,
+          "ms": 0.469
+        },
+        {
+          "label": "market_history_artifacts",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.422
+        },
+        {
+          "label": "preferences",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 0.394
+        },
+        {
+          "label": "market_datasets",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 0.352
+        },
+        {
+          "label": "market_composites",
+          "parent": "series_access.metadata",
+          "count": 1,
+          "ms": 0.307
+        },
+        {
+          "label": "market_composites",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 0.307
+        },
+        {
+          "label": "SAVEPOINT",
+          "parent": "fixed_indicators.request",
+          "count": 2,
+          "ms": 0.306
+        },
+        {
+          "label": "market_realtime_mappings",
+          "parent": "display_snapshots.capture",
+          "count": 1,
+          "ms": 0.292
+        },
+        {
+          "label": "market_realtime_mappings",
+          "parent": "series_access.metadata",
+          "count": 1,
+          "ms": 0.282
+        },
+        {
+          "label": "chart_history_plans",
+          "parent": "market_data.renew_demand",
+          "count": 1,
+          "ms": 0.278
+        },
+        {
+          "label": "market_history_reclamations",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.255
+        },
+        {
+          "label": "market_datasets",
+          "parent": "market_data.renew_demand",
+          "count": 1,
+          "ms": 0.249
+        }
+      ]
+    },
+    {
+      "at": 1792706866283,
+      "repeat": 1,
+      "kind": "history",
+      "frame": "H1",
+      "count": 77,
+      "transaction": "rolled_back",
+      "bars": 77,
+      "display_snapshot": false,
+      "input_revision": null,
+      "pending": [],
+      "elapsed_ms": 29.82,
+      "spans": [
+        {
+          "name": "series_access.metadata",
+          "parent": "series_access.chart_data",
+          "ms": 4.17
+        },
+        {
+          "name": "history_artifacts.read_artifact",
+          "parent": "history_artifacts.chart_page",
+          "ms": 5.434
+        },
+        {
+          "name": "history_artifacts.chart_page",
+          "parent": "series_access.chart_data",
+          "ms": 5.451
+        },
+        {
+          "name": "fixed_indicators.request",
+          "parent": "indicator_demands.warm_defaults",
+          "ms": 1.784
+        },
+        {
+          "name": "indicator_demands.guard",
+          "parent": "indicator_demands.renew",
+          "ms": 0.321
+        },
+        {
+          "name": "indicator_demands.renew",
+          "parent": "indicator_demands.warm_defaults",
+          "ms": 6.656
+        },
+        {
+          "name": "fixed_indicators.request",
+          "parent": "indicator_demands.warm_defaults",
+          "ms": 1.641
+        },
+        {
+          "name": "indicator_demands.guard",
+          "parent": "indicator_demands.renew",
+          "ms": 0.33
+        },
+        {
+          "name": "indicator_demands.renew",
+          "parent": "indicator_demands.warm_defaults",
+          "ms": 4.919
+        },
+        {
+          "name": "indicator_demands.warm_defaults",
+          "parent": "series_access.chart_data",
+          "ms": 15.889
+        },
+        {
+          "name": "series_access.history_check",
+          "parent": "series_access.chart_data",
+          "ms": 0.003
+        },
+        {
+          "name": "series_access.chart_data",
+          "parent": null,
+          "ms": 28.209
+        },
+        {
+          "name": "fixed_indicator_display.prepare",
+          "parent": null,
+          "ms": 0.004
+        }
+      ],
+      "queries": [
+        {
+          "label": "market_indicator_demands",
+          "parent": "indicator_demands.renew",
+          "count": 10,
+          "ms": 2.97
+        },
+        {
+          "label": "SET,market_indicator_demands",
+          "parent": "indicator_demands.renew",
+          "count": 2,
+          "ms": 0.93
+        },
+        {
+          "label": "market_fixed_indicator_runs",
+          "parent": "fixed_indicators.request",
+          "count": 2,
+          "ms": 0.717
+        },
+        {
+          "label": "market_history_artifact_blocks",
+          "parent": "history_artifacts.read_artifact",
+          "count": 1,
+          "ms": 0.697
+        },
+        {
+          "label": "market_datasets",
+          "parent": "fixed_indicators.request",
+          "count": 2,
+          "ms": 0.602
+        },
+        {
+          "label": "market_indicator_schedule",
+          "parent": "indicator_demands.renew",
+          "count": 2,
+          "ms": 0.569
+        },
+        {
+          "label": "market_history_versions",
+          "parent": "series_access.metadata",
+          "count": 1,
+          "ms": 0.542
+        },
+        {
+          "label": "market_datasets",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 0.524
+        },
+        {
+          "label": "SAVEPOINT",
+          "parent": "fixed_indicators.request",
+          "count": 2,
+          "ms": 0.414
+        },
+        {
+          "label": "RELEASE",
+          "parent": "indicator_demands.warm_defaults",
+          "count": 2,
+          "ms": 0.413
+        },
+        {
+          "label": "market_history_versions",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 0.407
+        },
+        {
+          "label": "market_history_reclamations",
+          "parent": "series_access.metadata",
+          "count": 1,
+          "ms": 0.402
+        },
+        {
+          "label": "advisory:8675313",
+          "parent": "indicator_demands.guard",
+          "count": 2,
+          "ms": 0.391
+        },
+        {
+          "label": "market_history_artifacts",
+          "parent": "history_artifacts.read_artifact",
+          "count": 1,
+          "ms": 0.384
+        },
+        {
+          "label": "instruments",
+          "parent": "series_access.metadata",
+          "count": 1,
+          "ms": 0.38
+        },
+        {
+          "label": "market_datasets",
+          "parent": "series_access.metadata",
+          "count": 1,
+          "ms": 0.379
+        },
+        {
+          "label": "instruments",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 0.371
+        },
+        {
+          "label": "SET",
+          "parent": null,
+          "count": 2,
+          "ms": 0.361
+        },
+        {
+          "label": "market_history_artifacts",
+          "parent": "series_access.metadata",
+          "count": 1,
+          "ms": 0.353
+        },
+        {
+          "label": "market_datasets",
+          "parent": "history_artifacts.read_artifact",
+          "count": 1,
+          "ms": 0.322
+        },
+        {
+          "label": "market_history_reclamations",
+          "parent": "history_artifacts.read_artifact",
+          "count": 1,
+          "ms": 0.225
+        }
+      ]
+    },
+    {
+      "at": 1792706866513,
+      "repeat": 1,
+      "kind": "composite",
+      "frame": "H1",
+      "count": 77,
+      "transaction": "rolled_back",
+      "bars": 77,
+      "display_snapshot": true,
+      "input_revision": 1012,
+      "pending": [],
+      "elapsed_ms": 102.491,
+      "spans": [
+        {
+          "name": "series_access.metadata",
+          "parent": "series_access.chart_data",
+          "ms": 8.267
+        },
+        {
+          "name": "market_data.renew_demand",
+          "parent": "series_access.chart_data",
+          "ms": 3.739
+        },
+        {
+          "name": "display_snapshots.capture",
+          "parent": "composite_chart.chart_page",
+          "ms": 9.337
+        },
+        {
+          "name": "composite_chart.chart_page",
+          "parent": "series_access.chart_data",
+          "ms": 27.349
+        },
+        {
+          "name": "indicator_demands.guard",
+          "parent": "fixed_indicators.request",
+          "ms": 0.319
+        },
+        {
+          "name": "fixed_indicators.checkpoint_before",
+          "parent": "fixed_indicators.request",
+          "ms": 0.936
+        },
+        {
+          "name": "fixed_indicators.request",
+          "parent": "indicator_demands.warm_defaults",
+          "ms": 15.126
+        },
+        {
+          "name": "indicator_demands.guard",
+          "parent": "indicator_demands.renew",
+          "ms": 0.389
+        },
+        {
+          "name": "indicator_demands.renew",
+          "parent": "indicator_demands.warm_defaults",
+          "ms": 11.857
+        },
+        {
+          "name": "indicator_demands.guard",
+          "parent": "fixed_indicators.request",
+          "ms": 0.368
+        },
+        {
+          "name": "fixed_indicators.checkpoint_before",
+          "parent": "fixed_indicators.request",
+          "ms": 0.947
+        },
+        {
+          "name": "fixed_indicators.request",
+          "parent": "indicator_demands.warm_defaults",
+          "ms": 19.566
+        },
+        {
+          "name": "indicator_demands.guard",
+          "parent": "indicator_demands.renew",
+          "ms": 0.29
+        },
+        {
+          "name": "indicator_demands.renew",
+          "parent": "indicator_demands.warm_defaults",
+          "ms": 4.727
+        },
+        {
+          "name": "indicator_demands.warm_defaults",
+          "parent": "series_access.chart_data",
+          "ms": 52.285
+        },
+        {
+          "name": "series_access.history_check",
+          "parent": "series_access.chart_data",
+          "ms": 0.002
+        },
+        {
+          "name": "series_access.chart_data",
+          "parent": null,
+          "ms": 100.404
+        },
+        {
+          "name": "fixed_indicator_display.prepare",
+          "parent": null,
+          "ms": 0.003
+        }
+      ],
+      "queries": [
+        {
+          "label": "market_indicator_demands",
+          "parent": "indicator_demands.renew",
+          "count": 10,
+          "ms": 8.079
+        },
+        {
+          "label": "market_fixed_indicator_runs",
+          "parent": "fixed_indicators.request",
+          "count": 12,
+          "ms": 7.87
+        },
+        {
+          "label": "market_composite_aggregate_bars",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 2.832
+        },
+        {
+          "label": "market_display_snapshots",
+          "parent": "display_snapshots.capture",
+          "count": 7,
+          "ms": 2.405
+        },
+        {
+          "label": "market_composite_minute_inputs",
+          "parent": "fixed_indicators.request",
+          "count": 4,
+          "ms": 1.78
+        },
+        {
+          "label": "market_datasets",
+          "parent": "fixed_indicators.request",
+          "count": 4,
+          "ms": 1.278
+        },
+        {
+          "label": "market_datasets",
+          "parent": "series_access.metadata",
+          "count": 2,
+          "ms": 1.243
+        },
+        {
+          "label": "market_composite_minute_inputs,market_source_minute_revisions",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 1.025
+        },
+        {
+          "label": "SET,market_indicator_demands",
+          "parent": "indicator_demands.renew",
+          "count": 2,
+          "ms": 0.997
+        },
+        {
+          "label": "market_history_versions",
+          "parent": "series_access.chart_data",
+          "count": 2,
+          "ms": 0.881
+        },
+        {
+          "label": "market_history_versions",
+          "parent": "series_access.metadata",
+          "count": 2,
+          "ms": 0.863
+        },
+        {
+          "label": "market_fixed_indicator_blocks",
+          "parent": "fixed_indicators.checkpoint_before",
+          "count": 2,
+          "ms": 0.783
+        },
+        {
+          "label": "advisory:8675313",
+          "parent": "indicator_demands.guard",
+          "count": 4,
+          "ms": 0.745
+        },
+        {
+          "label": "instruments",
+          "parent": "series_access.metadata",
+          "count": 2,
+          "ms": 0.66
+        },
+        {
+          "label": "market_datasets",
+          "parent": "composite_chart.chart_page",
+          "count": 2,
+          "ms": 0.659
+        },
+        {
+          "label": "instruments",
+          "parent": "fixed_indicators.request",
+          "count": 2,
+          "ms": 0.64
+        },
+        {
+          "label": "market_live_states",
+          "parent": "series_access.chart_data",
+          "count": 2,
+          "ms": 0.624
+        },
+        {
+          "label": "market_realtime_mappings",
+          "parent": "series_access.chart_data",
+          "count": 2,
+          "ms": 0.605
+        },
+        {
+          "label": "market_history_artifact_blocks",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.599
+        },
+        {
+          "label": "market_composite_revisions",
+          "parent": "series_access.metadata",
+          "count": 2,
+          "ms": 0.584
+        },
+        {
+          "label": "preferences",
+          "parent": "display_snapshots.capture",
+          "count": 2,
+          "ms": 0.577
+        },
+        {
+          "label": "instruments",
+          "parent": "series_access.chart_data",
+          "count": 2,
+          "ms": 0.575
+        },
+        {
+          "label": "SET,excluded,market_data_demand",
+          "parent": "market_data.renew_demand",
+          "count": 1,
+          "ms": 0.533
+        },
+        {
+          "label": "market_composite_minute_inputs,market_observed_minutes",
+          "parent": "display_snapshots.capture",
+          "count": 1,
+          "ms": 0.527
+        },
+        {
+          "label": "market_indicator_schedule",
+          "parent": "indicator_demands.renew",
+          "count": 2,
+          "ms": 0.501
+        },
+        {
+          "label": "market_history_reclamations",
+          "parent": "fixed_indicators.request",
+          "count": 2,
+          "ms": 0.498
+        },
+        {
+          "label": "market_realtime_mappings",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.496
+        },
+        {
+          "label": "RELEASE",
+          "parent": "indicator_demands.warm_defaults",
+          "count": 2,
+          "ms": 0.459
+        },
+        {
+          "label": "market_realtime_mappings",
+          "parent": "series_access.metadata",
+          "count": 1,
+          "ms": 0.452
+        },
+        {
+          "label": "instruments",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.451
+        },
+        {
+          "label": "market_history_artifacts",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.416
+        },
+        {
+          "label": "market_history_versions",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.406
+        },
+        {
+          "label": "SET",
+          "parent": null,
+          "count": 2,
+          "ms": 0.387
+        },
+        {
+          "label": "SELECT",
+          "parent": "fixed_indicators.request",
+          "count": 2,
+          "ms": 0.377
+        },
+        {
+          "label": "market_composites",
+          "parent": "series_access.metadata",
+          "count": 1,
+          "ms": 0.371
+        },
+        {
+          "label": "market_live_states",
+          "parent": "display_snapshots.capture",
+          "count": 1,
+          "ms": 0.366
+        },
+        {
+          "label": "market_composites",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 0.348
+        },
+        {
+          "label": "chart_history_plans",
+          "parent": "market_data.renew_demand",
+          "count": 1,
+          "ms": 0.345
+        },
+        {
+          "label": "market_composite_aggregate_tasks",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.339
+        },
+        {
+          "label": "market_composite_preparations",
+          "parent": "display_snapshots.capture",
+          "count": 1,
+          "ms": 0.336
+        },
+        {
+          "label": "market_composites",
+          "parent": "market_data.renew_demand",
+          "count": 1,
+          "ms": 0.328
+        },
+        {
+          "label": "market_composite_preparations",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.319
+        },
+        {
+          "label": "market_history_reclamations",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.312
+        },
+        {
+          "label": "market_realtime_mappings",
+          "parent": "display_snapshots.capture",
+          "count": 1,
+          "ms": 0.307
+        },
+        {
+          "label": "SAVEPOINT",
+          "parent": "fixed_indicators.request",
+          "count": 2,
+          "ms": 0.307
+        },
+        {
+          "label": "market_datasets",
+          "parent": "market_data.renew_demand",
+          "count": 1,
+          "ms": 0.304
+        },
+        {
+          "label": "market_datasets",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 0.296
+        },
+        {
+          "label": "market_composite_revisions",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 0.294
+        },
+        {
+          "label": "advisory:8675310",
+          "parent": "display_snapshots.capture",
+          "count": 1,
+          "ms": 0.257
+        },
+        {
+          "label": "market_pricing_owners",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 0.242
+        },
+        {
+          "label": "preferences",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 0.219
+        }
+      ]
+    },
+    {
+      "at": 1792706866816,
+      "repeat": 1,
+      "kind": "composite",
+      "frame": "H4",
+      "count": 46,
+      "transaction": "rolled_back",
+      "bars": 46,
+      "display_snapshot": true,
+      "input_revision": 1012,
+      "pending": [],
+      "elapsed_ms": 132.793,
+      "spans": [
+        {
+          "name": "series_access.metadata",
+          "parent": "series_access.chart_data",
+          "ms": 10.393
+        },
+        {
+          "name": "market_data.renew_demand",
+          "parent": "series_access.chart_data",
+          "ms": 4.027
+        },
+        {
+          "name": "display_snapshots.capture",
+          "parent": "composite_chart.chart_page",
+          "ms": 10.959
+        },
+        {
+          "name": "composite_chart.chart_page",
+          "parent": "series_access.chart_data",
+          "ms": 30.986
+        },
+        {
+          "name": "indicator_demands.guard",
+          "parent": "fixed_indicators.request",
+          "ms": 0.318
+        },
+        {
+          "name": "fixed_indicators.checkpoint_before",
+          "parent": "fixed_indicators.request",
+          "ms": 1.249
+        },
+        {
+          "name": "fixed_indicators.request",
+          "parent": "indicator_demands.warm_defaults",
+          "ms": 20.981
+        },
+        {
+          "name": "indicator_demands.guard",
+          "parent": "indicator_demands.renew",
+          "ms": 0.6
+        },
+        {
+          "name": "indicator_demands.renew",
+          "parent": "indicator_demands.warm_defaults",
+          "ms": 12.676
+        },
+        {
+          "name": "indicator_demands.guard",
+          "parent": "fixed_indicators.request",
+          "ms": 0.541
+        },
+        {
+          "name": "fixed_indicators.checkpoint_before",
+          "parent": "fixed_indicators.request",
+          "ms": 2.47
+        },
+        {
+          "name": "fixed_indicators.request",
+          "parent": "indicator_demands.warm_defaults",
+          "ms": 22.665
+        },
+        {
+          "name": "indicator_demands.guard",
+          "parent": "indicator_demands.renew",
+          "ms": 0.406
+        },
+        {
+          "name": "indicator_demands.renew",
+          "parent": "indicator_demands.warm_defaults",
+          "ms": 16.133
+        },
+        {
+          "name": "indicator_demands.warm_defaults",
+          "parent": "series_access.chart_data",
+          "ms": 73.59
+        },
+        {
+          "name": "series_access.history_check",
+          "parent": "series_access.chart_data",
+          "ms": 0.003
+        },
+        {
+          "name": "series_access.chart_data",
+          "parent": null,
+          "ms": 127.968
+        },
+        {
+          "name": "fixed_indicator_display.prepare",
+          "parent": null,
+          "ms": 0.004
+        }
+      ],
+      "queries": [
+        {
+          "label": "market_fixed_indicator_runs",
+          "parent": "fixed_indicators.request",
+          "count": 12,
+          "ms": 13.036
+        },
+        {
+          "label": "market_indicator_demands",
+          "parent": "indicator_demands.renew",
+          "count": 10,
+          "ms": 10.043
+        },
+        {
+          "label": "market_display_snapshots",
+          "parent": "display_snapshots.capture",
+          "count": 7,
+          "ms": 3.305
+        },
+        {
+          "label": "market_composite_minute_inputs",
+          "parent": "fixed_indicators.request",
+          "count": 4,
+          "ms": 2.626
+        },
+        {
+          "label": "market_composite_aggregate_bars",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 2.106
+        },
+        {
+          "label": "market_history_versions",
+          "parent": "series_access.metadata",
+          "count": 2,
+          "ms": 2.065
+        },
+        {
+          "label": "market_history_artifacts",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 1.898
+        },
+        {
+          "label": "market_composite_revisions",
+          "parent": "series_access.metadata",
+          "count": 2,
+          "ms": 1.561
+        },
+        {
+          "label": "market_datasets",
+          "parent": "fixed_indicators.request",
+          "count": 4,
+          "ms": 1.276
+        },
+        {
+          "label": "market_fixed_indicator_blocks",
+          "parent": "fixed_indicators.checkpoint_before",
+          "count": 2,
+          "ms": 1.118
+        },
+        {
+          "label": "SET",
+          "parent": null,
+          "count": 2,
+          "ms": 1.101
+        },
+        {
+          "label": "market_composites",
+          "parent": "series_access.metadata",
+          "count": 1,
+          "ms": 1.096
+        },
+        {
+          "label": "SET,market_indicator_demands",
+          "parent": "indicator_demands.renew",
+          "count": 2,
+          "ms": 1.089
+        },
+        {
+          "label": "market_datasets",
+          "parent": "series_access.metadata",
+          "count": 2,
+          "ms": 0.992
+        },
+        {
+          "label": "market_datasets",
+          "parent": "composite_chart.chart_page",
+          "count": 2,
+          "ms": 0.987
+        },
+        {
+          "label": "advisory:8675313",
+          "parent": "indicator_demands.guard",
+          "count": 4,
+          "ms": 0.939
+        },
+        {
+          "label": "market_history_versions",
+          "parent": "series_access.chart_data",
+          "count": 2,
+          "ms": 0.838
+        },
+        {
+          "label": "market_indicator_schedule",
+          "parent": "indicator_demands.renew",
+          "count": 2,
+          "ms": 0.789
+        },
+        {
+          "label": "market_composite_minute_inputs,market_source_minute_revisions",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.721
+        },
+        {
+          "label": "SET,excluded,market_data_demand",
+          "parent": "market_data.renew_demand",
+          "count": 1,
+          "ms": 0.702
+        },
+        {
+          "label": "market_live_states",
+          "parent": "series_access.chart_data",
+          "count": 2,
+          "ms": 0.682
+        },
+        {
+          "label": "preferences",
+          "parent": "display_snapshots.capture",
+          "count": 2,
+          "ms": 0.651
+        },
+        {
+          "label": "instruments",
+          "parent": "series_access.chart_data",
+          "count": 2,
+          "ms": 0.631
+        },
+        {
+          "label": "instruments",
+          "parent": "fixed_indicators.request",
+          "count": 2,
+          "ms": 0.62
+        },
+        {
+          "label": "SELECT",
+          "parent": "fixed_indicators.request",
+          "count": 2,
+          "ms": 0.594
+        },
+        {
+          "label": "market_composite_minute_inputs,market_observed_minutes",
+          "parent": "display_snapshots.capture",
+          "count": 1,
+          "ms": 0.569
+        },
+        {
+          "label": "market_realtime_mappings",
+          "parent": "series_access.chart_data",
+          "count": 2,
+          "ms": 0.561
+        },
+        {
+          "label": "market_history_artifact_blocks",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.524
+        },
+        {
+          "label": "instruments",
+          "parent": "series_access.metadata",
+          "count": 2,
+          "ms": 0.515
+        },
+        {
+          "label": "market_history_reclamations",
+          "parent": "fixed_indicators.request",
+          "count": 2,
+          "ms": 0.493
+        },
+        {
+          "label": "RELEASE",
+          "parent": "indicator_demands.warm_defaults",
+          "count": 2,
+          "ms": 0.422
+        },
+        {
+          "label": "market_realtime_mappings",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.359
+        },
+        {
+          "label": "market_history_versions",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.339
+        },
+        {
+          "label": "market_datasets",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 0.317
+        },
+        {
+          "label": "market_realtime_mappings",
+          "parent": "display_snapshots.capture",
+          "count": 1,
+          "ms": 0.308
+        },
+        {
+          "label": "SAVEPOINT",
+          "parent": "fixed_indicators.request",
+          "count": 2,
+          "ms": 0.305
+        },
+        {
+          "label": "market_live_states",
+          "parent": "display_snapshots.capture",
+          "count": 1,
+          "ms": 0.297
+        },
+        {
+          "label": "market_composite_preparations",
+          "parent": "display_snapshots.capture",
+          "count": 1,
+          "ms": 0.288
+        },
+        {
+          "label": "market_composites",
+          "parent": "market_data.renew_demand",
+          "count": 1,
+          "ms": 0.284
+        },
+        {
+          "label": "market_pricing_owners",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 0.276
+        },
+        {
+          "label": "market_history_reclamations",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.272
+        },
+        {
+          "label": "market_composite_aggregate_tasks",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.266
+        },
+        {
+          "label": "market_datasets",
+          "parent": "market_data.renew_demand",
+          "count": 1,
+          "ms": 0.257
+        },
+        {
+          "label": "instruments",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.25
+        },
+        {
+          "label": "chart_history_plans",
+          "parent": "market_data.renew_demand",
+          "count": 1,
+          "ms": 0.248
+        },
+        {
+          "label": "market_realtime_mappings",
+          "parent": "series_access.metadata",
+          "count": 1,
+          "ms": 0.244
+        },
+        {
+          "label": "market_composite_preparations",
+          "parent": "composite_chart.chart_page",
+          "count": 1,
+          "ms": 0.24
+        },
+        {
+          "label": "preferences",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 0.228
+        },
+        {
+          "label": "market_composites",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 0.224
+        },
+        {
+          "label": "market_composite_revisions",
+          "parent": "series_access.chart_data",
+          "count": 1,
+          "ms": 0.224
+        },
+        {
+          "label": "advisory:8675310",
+          "parent": "display_snapshots.capture",
+          "count": 1,
+          "ms": 0.182
+        }
+      ]
+    }
+  ],
+  "raw_hashes": {
+    "observed-3/report.json": "d7238d858ac8be2aa84ae2f9d536097eef7072eb03cdf500e7d76d0441ed3270",
+    "db-observed-3.jsonl": "6d9d52361e4f9214c56cee29f909ebeeaf7ad391fdbfb621ba9048c88c914b84",
+    "fixed-profile.jsonl": "ac47e76c034710f9139ec39f0101e439555c6a98b711e02b971ea54eef33e9ab"
+  },
+  "discarded_runs": [
+    {
+      "name": "observed",
+      "reason": "watchlist DOM sampled before initialization; zero trials"
+    },
+    {
+      "name": "observed-2",
+      "reason": "deployed asset is host.<hash>.js; bridge-only route did not install hooks; zero trials"
+    }
+  ]
+}

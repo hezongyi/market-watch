@@ -256,7 +256,7 @@ export class NoticeRuntime {
       );
       if (!this.current(generation)) return;
       this.ready = true;
-      this.after = progress?.after || "";
+      this.after = progress?.presentationVersion === 1 ? progress?.after || "" : "";
       this.epoch = progress?.epoch || "";
       this.patch({
         epoch: this.epoch,

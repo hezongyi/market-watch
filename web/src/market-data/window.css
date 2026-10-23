@@ -16,7 +16,7 @@
   color-scheme: dark;
 }
 .dc-window *:not([data-native-component] *), .dc-window *:not([data-native-component] *)::before, .dc-window *:not([data-native-component] *)::after { box-sizing: border-box; }
-.dc-window button:not([data-native-component] *), .dc-window input:not([data-native-component] *), .dc-window select:not([data-native-component] *), .dc-window textarea {
+.dc-window button:not([data-native-component] *), .dc-window input:not([data-native-component] *), .dc-window select:not([data-native-component] *), .dc-window textarea:not([data-native-component] *) {
   font: inherit; color: var(--ink); background: var(--surface);
   border: 1px solid var(--control-line); border-radius: 6px;
   padding: 6px 10px; min-height: 34px; max-width: 100%;
@@ -51,13 +51,13 @@
   color: var(--on-primary); background: var(--primary); border-color: var(--primary);
 }
 .dc-window .primary:hover:not(:disabled) { background: var(--primary); opacity: .85; }
-.dc-window input:not([data-native-component] *):focus, .dc-window select:not([data-native-component] *):focus, .dc-window textarea:focus {
+.dc-window input:not([data-native-component] *):focus, .dc-window select:not([data-native-component] *):focus, .dc-window textarea:not([data-native-component] *):focus {
   border-color: var(--green);
 }
 .dc-window input:not([data-native-component] *)[type="checkbox"], .dc-window input:not([data-native-component] *)[type="radio"] {
   min-height: 18px; width: 18px; height: 18px; accent-color: var(--primary);
 }
-.dc-window input:not([data-native-component] *)::placeholder, .dc-window textarea::placeholder { color: var(--muted); }
+.dc-window input:not([data-native-component] *)::placeholder, .dc-window textarea:not([data-native-component] *)::placeholder { color: var(--muted); }
 .dc-window-header {
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
   flex: 0 0 68px; padding: 0 20px; border-bottom: 1px solid var(--line);
@@ -452,13 +452,13 @@
 @media(max-height:650px){.dc-create-title,.dc-create-steps,.dc-create-selection,.dc-create-actionbar {padding-block:4px;}.dc-create-catalog-tools {padding-block:0;}}
 
 /* Source status shares the available height with independently scrolling pages. */
-.dc-window-content:has(> .dc-market-page, > .dc-platform, > .dc-create-page) {
+.dc-window-content:has(> .dc-market-page, > .dc-platform, > .dc-create-page, > .dc-mapping-page) {
   display:flex;flex-direction:column;overflow:hidden;
 }
-.dc-window-content:has(> .dc-market-page, > .dc-platform, > .dc-create-page) > .panel {
+.dc-window-content:has(> .dc-market-page, > .dc-platform, > .dc-create-page, > .dc-mapping-page) > .panel {
   flex:0 0 auto;max-height:25%;overflow:auto;overscroll-behavior:contain;
 }
-.dc-window .dc-window-content > .data-center:is(.dc-market-page,.dc-platform,.dc-create-page) {
+.dc-window .dc-window-content > .data-center:is(.dc-market-page,.dc-platform,.dc-create-page,.dc-mapping-page) {
   flex:1;height:auto;min-height:0;
 }
 

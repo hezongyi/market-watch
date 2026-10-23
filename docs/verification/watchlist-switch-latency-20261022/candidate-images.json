@@ -1,0 +1,66 @@
+{
+  "commit": "defdcf93ef9482a25af83c09ad0f8c80d5f3519a",
+  "repo": "/home/quant/repos/market-watch-watchlist-latency-20261022",
+  "task": "mw-watchlist-latency-20261022",
+  "project": "mw-watchlist-latency-20261022",
+  "purpose": "acceptance",
+  "images": [
+    {
+      "component": "api",
+      "tag": "market-watch-api:watchlist-latency-20261022-defdcf9",
+      "image_id": "sha256:e99db5faa570c779780da31bec004413ff278c0e10add18f3a0685a9114a2eaa",
+      "created": "2026-10-22T23:26:39.709574676Z",
+      "os": "linux",
+      "architecture": "amd64",
+      "labels": {
+        "io.market-watch.built-at": "2026-10-22T23:26:17.752292+00:00",
+        "io.market-watch.commit": "defdcf93ef9482a25af83c09ad0f8c80d5f3519a",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "2026-10-29T23:26:17.752292+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-watchlist-latency-20261022",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-watchlist-latency-20261022"
+      },
+      "build_seconds": 36.49
+    },
+    {
+      "component": "web",
+      "tag": "market-watch-web:watchlist-latency-20261022-defdcf9",
+      "image_id": "sha256:2ec2306beeba6373cd3cb6f319cdd36e6333c277c6c902e0c2e911789069b6d9",
+      "created": "2026-10-22T23:27:25.225400903Z",
+      "os": "linux",
+      "architecture": "amd64",
+      "labels": {
+        "io.market-watch.built-at": "2026-10-22T23:26:54.198568+00:00",
+        "io.market-watch.commit": "defdcf93ef9482a25af83c09ad0f8c80d5f3519a",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "2026-10-29T23:26:54.198568+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-watchlist-latency-20261022",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-watchlist-latency-20261022"
+      },
+      "build_seconds": 34.91
+    },
+    {
+      "component": "chart",
+      "tag": "market-watch-chart-origin:watchlist-latency-20261022-defdcf9",
+      "image_id": "sha256:e5d7a70f2896effdc96e3f9a861d26292ccd41b0e085c2a575abb1fbee6e29e0",
+      "created": "2026-10-22T23:27:41.904304064Z",
+      "os": "linux",
+      "architecture": "amd64",
+      "labels": {
+        "io.market-watch.built-at": "2026-10-22T23:27:29.091043+00:00",
+        "io.market-watch.commit": "defdcf93ef9482a25af83c09ad0f8c80d5f3519a",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "2026-10-29T23:27:29.091043+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-watchlist-latency-20261022",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-watchlist-latency-20261022"
+      },
+      "build_seconds": 30.11
+    }
+  ]
+}

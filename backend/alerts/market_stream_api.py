@@ -62,6 +62,10 @@ class Subscription(Consumer):
     provider_acceptance: list[ProviderReceipt] = Field(default_factory=list, max_length=2048)
 
 
+class CompositeNotEstablished(ValueError):
+    pass
+
+
 def resolve(body):
     """Resolve full series identity before sharing; display symbols are insufficient."""
     query = body.query.model_copy(update={"client": None, "before": None, "limit": 2000,
@@ -96,7 +100,7 @@ def resolve(body):
             if query.series_kind == "composite":
                 _, _, composite = composite_definition(db, query.instrument)
                 if not composite:
-                    raise ValueError("组合尚未建立；订阅不能隐式创建组合")
+                    raise CompositeNotEstablished("组合尚未建立；订阅不能隐式创建组合")
                 selected = db.get(CompositeRevision, query.composite_revision_id or composite.active_revision_id)
                 if not selected or selected.composite_id != composite.id:
                     raise ValueError("组合修订不属于所选系列")
@@ -131,6 +135,8 @@ def router(authenticated):
             state = body.model_dump(exclude={"query", "client", "listener", "generation", "kind"})
             return stream.register(session_hash(request), body.client, body.listener,
                                    body.generation, identity, query, state)
+        except CompositeNotEstablished as error:
+            raise HTTPException(422, {"code": "COMPOSITE_NOT_ESTABLISHED", "message": str(error), "retryable": False}) from None
         except (ValueError, TypeError, KeyError) as error:
             raise HTTPException(422, str(error)) from None
 

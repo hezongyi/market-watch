@@ -48,7 +48,7 @@ function chartNativeUi(widget, doc, searchSymbols) {
       // Load the same dependency chunks as this build's settings UI, without
       // opening settings, changing a property, or creating an undo transaction.
       const chunks = [50591,83159,82593,43946,34663,74219,1355,52485,50160,85997,17039,10162,16651,70221,18566,55578,50779,85715,15043,67351,69437,96868,84551,34853,10627,4500,43296,16687,97839,39983,8117,15211,88090,75856,23819,32327,38729,47649,29520,1644,9876,60451,55921,5840,87829,16468,19937,39047,57818,13885,31049,72414,39919,93041,30714,79086,8318,99224,84277,26703,70814,20774,29365,50254,91947,36145,83520,32171,50225,3854,36702,34540,39218,56595,50625];
-      await Promise.all([req(114063).loadNewSymbolSearch(), ...chunks.map(id => req.e(id))]);
+      await Promise.all([req(114063).loadNewSymbolSearch(), ...[...chunks,21981,42706,91676].map(id => req.e(id))]);
       const R = req(779474), createRoot = req(590263).createReactRoot;
       const Search = req(154676).SymbolSearchItemsDialog;
       const SearchContext = req(886925).SymbolSearchItemsDialogContext;
@@ -86,7 +86,8 @@ function chartNativeUi(widget, doc, searchSymbols) {
         const ctx = R.useContext(SearchContext), platform = R.useContext(PlatformContext);
         const container=R.useRef(null);
         const [sourceHeader,setSourceHeader]=R.useState(null);
-        const [source, setSource] = R.useState(platform.latest.current.source || "");
+        const [sourceState, setSource] = R.useState(platform.latest.current.source || "");
+        const source=platform.latest.current.fixedSource || sourceState;
         const selected = ctx.searchSources.find(item => item.value().toLowerCase() === source) || ctx.searchSources.find(item => item.value() === "");
         // The native controller normally persists its source to the main
         // symbol-search settings. Give this embedded search its own source.
@@ -116,7 +117,7 @@ function chartNativeUi(widget, doc, searchSymbols) {
         const items=ctx.searchSources.filter(item=>!platform.latest.current.allowedSources || !item.value() || platform.latest.current.allowedSources.includes(item.value().toLowerCase())).map(item=>({value:item.value().toLowerCase(),content:item.value() ? item.name() : "全部来源"}));
         return R.createElement(SearchContext.Provider,{value:scoped},R.createElement("div",{
           ref:container,className:"mw-platform-inline",onKeyDown:keyboard,"aria-label":"平台行情搜索",
-        },platform.latest.current.mode !== "select" && R.createElement("small",{className:"mw-platform-status"},"打开将关闭品种和周期同步，保留其他图格。"),props.render(),sourceHeader && createPortal(R.createElement("div",{className:"dc-select-control mw-platform-source"},
+        },platform.latest.current.mode !== "select" && R.createElement("small",{className:"mw-platform-status"},"打开将关闭品种和周期同步，保留其他图格。"),props.render(),sourceHeader && createPortal(platform.latest.current.fixedSource ? R.createElement("span",{className:"mw-platform-source"},"OANDA Practice · 当前账户") : R.createElement("div",{className:"dc-select-control mw-platform-source"},
           R.createElement("div",{className:"dc-native-slot","data-native-component":"select"},
             R.createElement(Select,{value:source,items,onChange:value=>{setSource(value);ctx.setSelectedIndex(-1);},
               "aria-label":"来源",size:"small",className:"dc-native-select"}))),sourceHeader)));
@@ -295,6 +296,8 @@ function chartNativeUi(widget, doc, searchSymbols) {
         sidebarItem: req(649867).DialogSidebarItem,
         search: req(357723).DialogSearch,
         input: req(909536).InputControl,
+        button: req(536605).Button,
+        textarea: req(165770).Textarea,
         checkbox: req(343577).Checkbox,
         select: req(221339).Select,
         operationHint: req(989231).SymbolSearchDialogFooter,

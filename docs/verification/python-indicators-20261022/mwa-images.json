@@ -1,0 +1,47 @@
+{
+  "api": {
+    "tag": "market-watch-api:python-indicators-mwa-c2-20261022",
+    "id": "sha256:4616b771401f945b36de824747ee6a9ef7c28fa48ff5f6aba1ebfe60cfab3ae7",
+    "labels": {
+      "io.market-watch.built-at": "2026-10-22T12:21:42.741311+00:00",
+      "io.market-watch.commit": "b051f2c5d14a35bd66d10a912994bf97ab9474f4",
+      "io.market-watch.dirty": "false",
+      "io.market-watch.expires-at": "2026-10-29T12:21:42.741311+00:00",
+      "io.market-watch.managed": "true",
+      "io.market-watch.project": "mw-python-indicators-20261022",
+      "io.market-watch.purpose": "acceptance",
+      "io.market-watch.task": "mw-python-indicators-20261022"
+    }
+  },
+  "chart": {
+    "tag": "market-watch-chart-origin:python-indicators-20261022",
+    "id": "sha256:a61563ca309cddc4853c8bff3ff57f88c035981a8271d89b9f108f5a7e2409f2",
+    "labels": {
+      "io.market-watch.built-at": "2026-10-22T12:01:15.261199+00:00",
+      "io.market-watch.commit": "25ec0dcabcd293fc2c79ed6a2d7fa83274090313",
+      "io.market-watch.dirty": "false",
+      "io.market-watch.expires-at": "2026-10-29T12:01:15.261199+00:00",
+      "io.market-watch.managed": "true",
+      "io.market-watch.project": "mw-python-indicators-20261022",
+      "io.market-watch.purpose": "acceptance",
+      "io.market-watch.task": "mw-python-indicators-20261022",
+      "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+    }
+  },
+  "web": {
+    "tag": "market-watch-web:python-indicators-mwa-c3-20261022",
+    "id": "sha256:645d50c9081a0f45301d6e646fd55f15499d152216d29a12149e949d3f8527d9",
+    "labels": {
+      "io.market-watch.built-at": "2026-10-22T12:33:57.298258+00:00",
+      "io.market-watch.chart-origin": "https://192.168.7.232:18281",
+      "io.market-watch.commit": "366fa441003782bfb784bb43c9c34e5622e71592",
+      "io.market-watch.dirty": "false",
+      "io.market-watch.expires-at": "2026-10-29T12:33:57.298258+00:00",
+      "io.market-watch.managed": "true",
+      "io.market-watch.project": "mw-python-indicators-20261022",
+      "io.market-watch.purpose": "acceptance",
+      "io.market-watch.task": "mw-python-indicators-20261022",
+      "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+    }
+  }
+}

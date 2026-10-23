@@ -101,7 +101,7 @@ const bridgeContext=vm.createContext({document:{createElement:()=>({}),head:{app
   parent:bridgeParent,crypto:{randomUUID:()=> 'fixture'},
   addEventListener:(name,handler)=>{handlers[name]=handler},setTimeout,clearTimeout,
   btoa:value=>Buffer.from(value).toString('base64'),atob:value=>Buffer.from(value,'base64').toString()});
-for(const file of ['series.js','swing-sr-display.js','bridge.js'])
+for(const file of ['series.js','composite-display-batches.js','swing-sr-display.js','bridge.js'])
   vm.runInContext(fs.readFileSync(path.join(root,'advanced-host',file),'utf8'),bridgeContext);
 bridgeContext.testRequests=[];
 bridgeContext.page=page(params,p);
@@ -110,7 +110,7 @@ bridgeContext.tickers=['high','high_left','low','low_left'].map(key=>'MWPY_'+Buf
 vm.runInContext('request=(q)=>{testRequests.push(q);return Promise.resolve(page)}',bridgeContext);
 (async()=>{
  await vm.runInContext("Promise.all(tickers.map(t=>query(t,'240',{limit:175})))",bridgeContext);
- assert.equal(bridgeContext.testRequests.length,1,'four plots share one in-flight calculation request');
+ assert.equal(bridgeContext.testRequests.length,4,'legacy plot reads stay fresh; native coordinator owns batching');
  assert.equal(bridgeContext.testRequests[0].indicators.length,1);
  // An accepted HTTP response registers a fresh generation against an existing
  // worker task. That task can replay a retained snapshot from before the HTTP
@@ -137,6 +137,6 @@ vm.runInContext('request=(q)=>{testRequests.push(q);return Promise.resolve(page)
  assert.equal(vm.runInContext("swingStore().get('MWP:EURUSD','240',decode(tickers[0]).spec.params).presentation.history_revision",bridgeContext),'12');
  assert.equal(bridgeContext.received.at(-1).close,1.14,'new authoritative revision still reaches native plots');
  vm.runInContext("feed.unsubscribeBars('swing-live')",bridgeContext);
- console.log('Swing four-plot datafeed request coalescing passed');
+ console.log('Swing legacy plot reads and stale revision fencing passed');
 })().catch(error=>{console.error(error);process.exitCode=1});
 console.log('Swing adapter: 4 circles, independent offsets, display-only inputs, old 8 studies and snapshot fences passed');

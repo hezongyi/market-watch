@@ -1132,7 +1132,7 @@ def quote_snapshot(body: QuoteQuery):
                                 confirmed_tail_ready=facts["confirmed_tail_ready"], quality=facts["quality"],
                                 **{key: facts.get(key) for key in ("market_session", "session_reason", "calendar_verified",
                                     "calendar_version", "read_at", "revision_id", "input_revision", "source_identity",
-                                    "session_conflict", "session_conflict_reason", "fetch_status")})
+                                    "session_conflict", "session_conflict_reason", "fetch_status", "confirmation_error", "confirmation_status", "error_evidence")})
                             values["description"] += " · " + (
                                 "抽样Bid" if precise else
                                 "当前未闭合M1收盘采样" if candle_sample else

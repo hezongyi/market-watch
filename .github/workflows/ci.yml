@@ -134,6 +134,15 @@ jobs:
         if: needs.changes.outputs.backend_changed == 'true'
         run: python -m pytest -q
 
+      - name: Mapping PostgreSQL migration compatibility
+        if: needs.changes.outputs.backend_changed == 'true'
+        env:
+          CHART_ALERT_TEST_DATABASE_URL: ${{ env.TEST_POSTGRES_URL }}
+        run: python -m pytest -q backend/tests/test_composite_mapping_postgres.py
+
+      - name: Observed indicator PostgreSQL policy compatibility
+        run: python -m pytest -q backend/tests/test_observed_indicators_postgres.py
+
       - name: Backend checks skipped
         if: needs.changes.outputs.backend_changed != 'true'
         run: echo "No backend runtime or dependency changes; full backend tests skipped."
@@ -164,6 +173,7 @@ jobs:
       - name: Indicator runtime regressions
         working-directory: web
         run: |
+          node tests/swing-fixed-identity.cjs
           node tests/indicator-high-rate.cjs
           node tests/indicator-high-rate.cjs --provider
           node tests/indicator-shared-read.cjs
@@ -185,6 +195,16 @@ jobs:
       - name: Watchlist bridge regressions
         working-directory: web
         run: |
+          node tests/advanced-history-loading.cjs
+          node tests/advanced-market-request-scheduling.cjs
+          node tests/advanced-history-admission.cjs
+          node tests/advanced-watchlist-quote-pressure.cjs
+          node tests/advanced-quote-snapshot-sharing.cjs
+          node tests/advanced-indicator-release-batches.cjs
+          node tests/advanced-native-reserve-scheduler.cjs
+          node tests/advanced-inflight-cancellation.cjs
+          node tests/advanced-provider-request-lifetime.cjs
+          node tests/preference-request-queue.cjs
           node tests/advanced-watchlist-prewarm.cjs
           node tests/advanced-watchlist-metadata.cjs
           node tests/advanced-startup-metadata.cjs
@@ -199,8 +219,10 @@ jobs:
       - name: Single application regressions
         working-directory: web
         run: |
+          node tests/composite-mapping.cjs
           node tests/single-app-routing.cjs
           node tests/chart-tab.cjs
+          node tests/chart-tab-title.cjs
           TZ=Asia/Shanghai node tests/chart-time.cjs
           TZ=America/Los_Angeles node tests/chart-time.cjs
           node tests/symbol-flags.cjs

@@ -73,6 +73,13 @@ class TransportTrace:
         log.warning("oanda_rest_failed operation=%s phase=%s route=%s type=%s http_status=%s "
                     "body_kind=%s elapsed_ms=%s", operation, *self.failure(error, response))
 
+    def request_result(self, error, response, *, observed_at, **evidence):
+        result = failed_request(error, observed_at=observed_at)
+        phase = self.failure(error, response)[0]
+        safe_phase = {"tls": "tls", "connect": "connect", "http_status": "response",
+                      "receive_headers": "read", "receive_body": "read"}.get(phase)
+        return result.model_copy(update={**evidence, **({"phase": safe_phase} if safe_phase else {})})
+
 
 def timestamp(value):
     if not isinstance(value, str):
@@ -297,7 +304,8 @@ class OandaPractice:
         except (httpx.HTTPError, TimeoutError, ValueError, KeyError, TypeError) as error:
             trace.rest_failed("candles", error, response)
             observed = self.clock()
-            result = failed_request(error, observed_at=observed)
+            result = trace.request_result(error, response, observed_at=observed,
+                operation="candles", window_start=start, window_end=end)
             if result.status == "rate_limited":
                 seconds = max(1, (result.retry_at - observed) / 1000) if result.retry_at else None
                 cooldown("oanda", retry_seconds=seconds)

@@ -9,6 +9,7 @@ import re
 import threading
 import time
 from collections import OrderedDict
+from typing import Literal
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -134,6 +135,7 @@ class DataQuery(BaseModel):
     client: str | None = Field(default=None, max_length=64)
     indicator_consumers: list[IndicatorConsumer] = Field(default_factory=list,max_length=64)
     indicators: list[dict] = Field(default_factory=list, max_length=12)
+    indicator_input_policy: Literal["strict_confirmed_v1", "observed_display_v1"] = "strict_confirmed_v1"
     track_history: bool = False
     revision_before: int | None = Field(default=None, gt=0)
     revision_after: int | None = Field(default=None, ge=0)
@@ -174,6 +176,12 @@ class DataQuery(BaseModel):
 
     @model_validator(mode="after")
     def validate_managed_limit(self):
+        if self.indicator_input_policy == "observed_display_v1":
+            if self.input_revision is not None:
+                raise ValueError("observed_display_v1 cannot read fixed confirmed input_revision")
+            kind = decode(self.instrument)[1] if self.instrument.startswith(("MWH:", "MWC:")) else self.series_kind
+            if kind not in ("history", "composite"):
+                raise ValueError("observed_display_v1 requires history or composite chart inputs")
         if self.provider_snapshot_id is not None and (self.series_kind != "provider" or self.native_history is not None):
             raise ValueError("平台展示快照只适用于普通平台指标读取")
         if self.native_reserve is not None:

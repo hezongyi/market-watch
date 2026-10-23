@@ -17,8 +17,10 @@ export function providerSubscriptions(
   failure: (error: unknown) => void,
   paths = {subscribe: '/charts/provider/subscribe', unsubscribe: '/charts/provider/unsubscribe'},
   observe: (args: Subscription, kind: FailureKind, error: unknown | null, attempt: string, lifecycle?: 'ended') => void = () => {},
+  established: (args: Subscription) => Promise<boolean> = async () => true,
 ) {
   let disposed = false;
+  const waiting = new Set<string>();
   const desired = new Map<string, Subscription>();
   const queues = new Map<string, Promise<void>>();
   const streams = new Map<string, Stream>();
@@ -73,6 +75,13 @@ export function providerSubscriptions(
   }
   async function register(args: Subscription) {
     if (disposed || desired.get(keyOf(args)) !== args) return;
+    waiting.add(keyOf(args));
+    if (!(await established(args))) {
+      if (!disposed && desired.get(keyOf(args)) === args) waiting.add(keyOf(args));
+      return;
+    }
+    if (disposed || desired.get(keyOf(args)) !== args) return;
+    waiting.delete(keyOf(args));
     await request(paths.subscribe, args);
     if (disposed || desired.get(keyOf(args)) !== args) return;
     const key = keyOf(args);
@@ -84,6 +93,10 @@ export function providerSubscriptions(
     const key = keyOf(args);
     const next = (queues.get(key) || Promise.resolve()).then(action).catch(error => {
       if (!disposed && desired.get(keyOf(args)) === args) {
+        if ((error as {code?: string})?.code === 'COMPOSITE_NOT_ESTABLISHED') {
+          waiting.add(key);
+          return;
+        }
         status(args, 'subscription', error);
         const statusCode = (error as {status?: number})?.status || 0;
         if (statusCode >= 400 && statusCode < 500 && ![408, 429].includes(statusCode)) invalid.add(keyOf(args));
@@ -108,6 +121,7 @@ export function providerSubscriptions(
         Number(args.generation) < Number(current.generation)) return Promise.resolve();
     if (current) end(current);
     desired.delete(keyOf(args));
+    waiting.delete(keyOf(args));
     invalid.delete(keyOf(args));
     clearTimeout(registrationRetries.get(keyOf(args))); registrationRetries.delete(keyOf(args)); registrationDelays.delete(keyOf(args));
     closeUnused(args.client);
@@ -123,7 +137,7 @@ export function providerSubscriptions(
     stream.onopen = () => {
       if (disposed || streams.get(client) !== stream) return;
       connection(client, null);
-      for (const current of desired.values()) if (current.client === client && !invalid.has(keyOf(current)))
+      for (const current of desired.values()) if (current.client === client && !invalid.has(keyOf(current)) && !waiting.has(keyOf(current)))
         void enqueue(current, async () => {
           await register(current);
         });
@@ -179,6 +193,13 @@ export function providerSubscriptions(
     };
   }
   return {
+    established(instrument: string) {
+      // Cross-tab hints always re-check authoritative metadata, never create.
+      return Promise.all([...desired.values()].filter(args => {
+        const query = args.query as {series_kind?: string; instrument?: string};
+        return query?.series_kind === 'composite' && query.instrument === instrument && waiting.has(keyOf(args));
+      }).map(args => enqueue(args, async () => { if(waiting.has(keyOf(args)))await register(args); })));
+    },
     accept(args: Subscription) {
       const current = desired.get(keyOf(args));
       if (disposed || !current || current.generation !== args.generation ||

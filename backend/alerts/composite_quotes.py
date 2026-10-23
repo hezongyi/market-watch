@@ -8,6 +8,7 @@ from .config import settings
 from .history_catalog import account_scope
 from .live_pricing import account_key
 from .live_session import session_status
+from .quote_close import confirmed_daily_close
 from .storage import (
     CompositePreparation,
     CompositeRevision,
@@ -65,17 +66,22 @@ def live_snapshot(db, revision, *, now=None):
         and quote.get("connection_epoch") == state.epoch
         and age is not None and 0 <= age <= 15000
         and received_age is not None and 0 <= received_age <= 15000)
+    from .live_confirmation import health, sampling_evidence
+
+    confirmation = health(db, state) if state else {}
     candle_ready = bool(available and owned and state and state.ready and not state.error
         and rest_sample and forming.get("close")
         and received_age is not None and 0 <= received_age <= 15000)
     return {"current_account": current, "owned": owned,
         **session, 'authentication_hold': held, 'connection_error': error,
+        "confirmation_error": confirmation.get("error"), "confirmation_health": confirmation,
+        "error_evidence": {'sampling': sampling_evidence(db, state) if state else {}, 'confirmation': confirmation.get('evidence', {})},
         'next_probe_at': owner.next_at or None if current and owner else None,
         "connection": state.connection if state else "inactive",
         "quote_ready": quote_ready, "candle_ready": candle_ready,
         "sample_ready": bool(quote_ready or candle_ready),
         "observation_mode": "candle_close_sample" if rest_sample else "stream_quote",
-        "confirmed_tail_ready": bool(available and owned and state.ready and not state.error),
+        "confirmed_tail_ready": bool(available and owned and state.ready and not state.error and not confirmation.get("error")),
         "quote_age_ms": age, "received_age_ms": received_age,
         "source_confirmed_end": state.confirmed_end if state else 0,
         "quote": dict(quote) if quote else {}, "forming": dict(forming) if forming else {},
@@ -163,7 +169,7 @@ def observation_evidence(sample):
 
 
 def previous_close(db, composite, *, revision, input_revision, observed_at):
-    """Return the last confirmed NY17 daily close before ``observed_at``.
+    """Return the prior closed, source-confirmed NY17 daily close.
 
     Composite quotes can be sampled from a live bid, a forming REST candle, or
     a stored M1 tail.  Their observation clocks differ, but the change shown in
@@ -196,20 +202,16 @@ def previous_close(db, composite, *, revision, input_revision, observed_at):
         if row.get("end", 0) <= session_start
         and row.get("source_confirmed") is True
         and row.get("time_closed") is True
-        and row.get("complete") is True
-        and row.get("coverage_complete") is True
     ]
     if not bars:
         # An artifact can publish later without changing the pinned minute
         # input revision. Never retain a missing/unverified baseline.
         return None
-    value = bars[-1].get("close")
-    try:
-        value = Decimal(str(value))
-    except (InvalidOperation, TypeError, ValueError):
-        value = None
-    else:
-        value = value if value.is_finite() and value != 0 else None
+    daily = bars[-1]
+    closing = chart_page(db, composite.id, "M1", before=daily["end"], count=1,
+        revision_id=revision.id, input_revision=input_revision, provisional=False, now=observed_at)
+    minutes = closing.get("bars", [])
+    value = confirmed_daily_close(daily, minutes[-1]) if minutes else None
     if value is None:
         return None
     _previous_close_cache[key] = value
@@ -247,7 +249,10 @@ def snapshot(db, composite, *, now=None, revision_id=None, input_revision=None):
         "previous_close": None,
         "quality": "pending", "price_type": None, "provenance": None,
         **session, "read_at": stamp, "source_identity": target.identity,
-        "fetch_status": live["connection_error"] or "ok"}
+        "fetch_status": live["connection_error"] or "ok",
+        "error_evidence": live["error_evidence"],
+        "confirmation_error": live.get("confirmation_error"),
+        "confirmation_status": "分钟确认延迟" if live.get("confirmation_error") else "ok"}
     def presented():
         # Compare only observations from the selected continuation source;
         # historical-side bars carry their own immutable source identity.

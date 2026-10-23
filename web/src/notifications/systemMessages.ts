@@ -1,4 +1,4 @@
-import type { Notice } from "./types";
+import { noticeInstrument, type Notice } from "./types";
 
 /** Stable newest-first order, independent of severity or IndexedDB key order. */
 export const newestFirst = (
@@ -26,8 +26,8 @@ export function matchesSystemFilters(row: Notice, filters: SystemFilters) {
     (!filters.source || row.source_kind === filters.source) &&
     (filters.state !== "unread" || !row.viewed_at) &&
     (!filters.q ||
-      JSON.stringify([row.title, row.message, row.context, row.evidence])
-        .toLowerCase()
-        .includes(filters.q.toLowerCase()))
+      JSON.stringify([row.title, row.message, row.instrument, row.instrument_display, noticeInstrument(row), row.context, row.evidence])
+        .toLowerCase().replace(/[/_-]/g, "")
+        .includes(filters.q.toLowerCase().replace(/[/_-]/g, "")))
   );
 }

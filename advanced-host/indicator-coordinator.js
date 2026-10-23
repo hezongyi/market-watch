@@ -70,6 +70,7 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
   function scopeIdentity(chart,scope,params,version,binding){
     return {main:chart.symbol(),fixedRevision:binding.revision || 'provider:'+chart.symbol(),
       paramsFingerprint:canonical(params),algorithmVersion:scope.name+':'+(version || '1'),
+      inputPolicy:binding.inputPolicy || 'strict_confirmed_v1',
       calculationStart:binding.calculationStart ?? 0,period:scope.resolution};
   }
   async function prepare(consumer,scope){
@@ -126,7 +127,7 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
     const requestBefore=prepend ? previous.sourceFirst ?? previous.first : binding.before ?? scope.last+1;
     const unchangedBinding=()=>{
       const latest=identity.binding(chart.symbol(),scope.resolution);
-      return latest && ['revision','inputRevision','tailVersion','correctionVersion','before','displaySnapshot','providerSnapshot'].every(key=>latest[key]===binding[key]) &&
+      return latest && ['revision','inputRevision','tailVersion','correctionVersion','before','displaySnapshot','providerSnapshot','inputPolicy'].every(key=>latest[key]===binding[key]) &&
         (!binding.calculationStart || latest.calculationStart===binding.calculationStart);
     };
     const current=()=>!disposed && chart.symbol()===ticker && chart.resolution()===scope.resolution && consumers.get(consumer.key)===consumer &&
@@ -222,7 +223,14 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
       if(accepted){consumer.acceptedScope={...coverage,generation:consumer.handle.generation};
         consumer.accepted=JSON.stringify([consumer.handle.generation,nextIdentity,binding.inputRevision,scope.first,scope.last,scope.count,binding.tailVersion,binding.correctionVersion,binding.displaySnapshot,binding.providerSnapshot,inputs.showsignals,inputs.highlighting]);
         consumer.requested=consumer.accepted;
-        consumer.failures=0;consumer.retryAt=0;consumer.waitSignature=null;consumer.displayRetry=null;consumer.failedRetry=null;status(consumer,'ready');recovered(consumer);
+        const evidence=batch.pages.map(item=>item.calculation).filter(Boolean);
+        const quality={coverage:evidence.some(item=>item.input_quality?.coverage==='unverified')?'unverified':'verified',
+          provisional:evidence.some(item=>item.input_quality?.provisional),
+          reason:evidence[0]?.reason_code || '',
+          sampleSize:evidence[0]?.input_quality?.sample_size,requiredSamples:evidence[0]?.input_quality?.required_samples};
+        const state=evidence.some(item=>item.value_status==='unavailable') ? 'unavailable' :
+          evidence.length && evidence.every(item=>item.value_status==='insufficient_input') ? 'insufficient_input' : 'ready';
+        consumer.failures=0;consumer.retryAt=0;consumer.waitSignature=null;consumer.displayRetry=null;consumer.failedRetry=null;status(consumer,state,null,quality);recovered(consumer);
         for(const {page} of batch.pages)presentation(chart.symbol(),scope.resolution,{...page,indicators:[{name:scope.name,params,presentation:page.presentation}]});}
     }catch(error){if(current()){
       consumer.failedSignature=signature;

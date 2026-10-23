@@ -686,6 +686,15 @@ def _observed_read(meta, frame, count, operation):
         )
         raise
     finally:
+        progress = PAGE_PROGRESS.get()
+        if progress is not None:
+            # A leased page commonly ends in HistoryPending. Keep its actual
+            # work timings even when no final JSON result can be returned yet.
+            progress["timings_ms"] = {
+                name: round(value, 2) for name, value in timings.items()
+                if isinstance(value, (int, float))
+            }
+            progress["timings_ms"]["read_total"] = round((time.monotonic() - started) * 1000, 2)
         upstream.TIMINGS.reset(token)
         SOURCE_BEFORE.reset(source_token)
         with _ACTIVE_LOCK:
