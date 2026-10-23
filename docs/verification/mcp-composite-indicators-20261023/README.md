@@ -1,5 +1,10 @@
 # Ubuntu R1：MCP 组合指标
 
+2026-10-23 用户指定在 `$mw-acceptance` 验收后，实际复验使用已运行且包含本功能的长期实例，
+未启动下述备用合成数据 project。真实版本、HTTP 响应、数据保留和独立测试数据库的 PG 结果见
+[results.md](results.md) 与 [mwa-acceptance.json](mwa-acceptance.json)。
+长期实例的运维/复验命令也记在 results.md；不要对其执行下面的 seed、migrate 或独立实例启停命令。
+
 F0：兼容读取扩展；无新增 schema、持久格式、指标算法、后台调度。
 任务/project：`mw-mcp-composite-indicators-20261023`。主机只允许 Ubuntu 本机。
 `compose.yaml` 使用独立 internal 网络、PG14.24 volume/数据库/密码、API、网关。
@@ -70,4 +75,4 @@ c up -d --no-build postgres api gateway
 固定本地合成价格、映射和周期聚合复用现有测试 fixture/离线构建入口。
 新增/更新镜像后先更新私有 env 中的 image ID，再 `up --no-build`；不得依赖旧 tag 证明新源码通过。
 
-证据与用例映射见 `results.md`（完成实际执行后填写）。合并前仍需 PR CI 和自审；不涉及生产发布。
+实际长期实例的证据与用例映射见 `results.md`。合并前仍需对应 PR CI 和自审；不涉及生产发布。
