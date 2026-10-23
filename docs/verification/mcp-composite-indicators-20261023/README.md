@@ -12,6 +12,8 @@ API 显式启用 MCP、限定 Host/Origin，禁用 Yahoo、stream、投递和历
 以下 `docker`/`mw-docker` 在需要 docker 补充组的 shell 中用 `sg docker` 执行。
 
 ```bash
+# 任务 .venv 必须已按 requirements.lock 安装；不要使用缺少 MCP SDK 的系统环境。
+source .venv/bin/activate
 mw-docker build --repo . --component api \
   --tag market-watch-api:mcp-composite-indicators-20261023 \
   --task mw-mcp-composite-indicators-20261023 \
@@ -19,12 +21,14 @@ mw-docker build --repo . --component api \
 
 # 私有目录可更换；密码/登录 hash 和 MCP token 不提交仓库、不打印。
 export MW_COMPOSITE_PRIVATE=/tmp/mw-mcp-composite-indicators-20261023-private
-mkdir -m 700 "$MW_COMPOSITE_PRIVATE"
+mkdir -p -m 700 "$MW_COMPOSITE_PRIVATE"
 python - <<'PY'
 import os, secrets, subprocess
 from pathlib import Path
 from argon2 import PasswordHasher
 p = Path(os.environ['MW_COMPOSITE_PRIVATE'])
+if (p/'compose.env').exists():
+    raise SystemExit('Reuse existing private configuration; do not regenerate passwords')
 image = subprocess.check_output(['docker','image','inspect',
     'market-watch-api:mcp-composite-indicators-20261023','--format','{{.Id}}'], text=True).strip()
 # Compose env-file preserves single-quoted literal argon2 dollar signs.
@@ -40,7 +44,7 @@ c() { docker compose --env-file "$MW_COMPOSITE_PRIVATE/compose.env" \
   -p mw-mcp-composite-indicators-20261023 \
   -f docs/verification/mcp-composite-indicators-20261023/compose.yaml "$@"; }
 c config --quiet
-c up -d --no-build postgres
+c up -d --no-build --wait postgres
 c run --rm --no-deps migrate
 c up -d --no-build api gateway
 c exec -T --user "$(id -u):$(id -g)" api python /fixtures/verify.py seed

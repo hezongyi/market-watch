@@ -24,5 +24,9 @@
 
 4. 完整回归发现公共元数据入口的时钟推进契约被绕过，已让该入口接受固定选择并继续复用；原有实时报价到达用例与组合专项 21 项通过，未修改原断言。
 
-待补证据：PostgreSQL 本机隔离检查、真实 Ubuntu R1、完整本地/远端 CI。
+源码 `9770d5d` 的完整远端 CI 39933990391 已通过：后端 2846 passed、18 skipped，
+额外 PostgreSQL 映射迁移 1 passed、observed 策略兼容 8 passed，Web 与 Compose 检查通过。
+完整本地运行未配置 PG 的 38 项设置错误按实际结果保留在 `results.md`，不写成通过。
+
+待补证据：PostgreSQL 本机隔离检查、真实 Ubuntu R1 和最终证据提交。
 这些未完成项不会用现有 SQLite/TestClient 通过或镜像构建代替。
