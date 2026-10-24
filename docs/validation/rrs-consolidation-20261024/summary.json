@@ -1,0 +1,217 @@
+{
+  "status": "complete",
+  "recorded_at_utc": "2026-10-24T16:51:27.264910+00:00",
+  "risk": "F0: integrate already accepted RRS fixes; archive/retire four task-specific branches and worktrees; no new runtime behavior",
+  "canonical_branch": "market-watch-integration-20261024",
+  "canonical_worktree": "/home/quant/repos/market-watch-integration-20261024",
+  "integration_commit": "1ebdbb7087829df1dc0ae46b2a2fadf13ef60230",
+  "accepted_product_commit": "bacbcd7d9ea0eea7beab82252bb2f32b925aef96",
+  "accepted_closure_commit": "1aab85500cb334abe540658e02bf1d92c7a7626b",
+  "previous_integration_commit": "6bcce51fdbddcdf85134822540f79f044a709287",
+  "regressions": {
+    "backend": {
+      "command": "PYTHONPATH=backend ALERTS_DATABASE_URL=sqlite:///:memory: /home/quant/repos/market-watch/.venv/bin/python -m pytest backend/tests/test_rolling_range_squeeze.py backend/tests/test_provider_squeeze_history.py -q",
+      "passed": 24,
+      "warnings": [
+        "Existing Starlette httpx testclient deprecation"
+      ],
+      "note": "Initial system Python lacked SQLAlchemy; corrected to the repository virtual environment. Existing SQLite in-memory test fixture only; no new runtime database."
+    },
+    "node": {
+      "passed": [
+        "squeeze-history-display",
+        "squeeze-contract",
+        "indicator-runtime-contracts",
+        "nr-breakout-display",
+        "nr-breakout-restart",
+        "advanced-preferences",
+        "advanced-preferences-conflict"
+      ],
+      "note": "Preference tests require web/ working directory; corrected invocation passed."
+    },
+    "licensed_native": {
+      "passed": true,
+      "evidence": "local-native-probe.json"
+    },
+    "web_build": {
+      "passed": true,
+      "log": "web-build.log"
+    },
+    "integration_product_matches_accepted_rrs": true,
+    "existing_integration_confirmation_and_preference_files_preserved": true,
+    "early_rrs_acceptance_records_match_original": true
+  },
+  "browser": {
+    "passed": true,
+    "page_errors": [],
+    "cases": [
+      {
+        "name": "d1-initial",
+        "resolution": "1D",
+        "geometry_matches": true,
+        "boxes": 27,
+        "labels": 16
+      },
+      {
+        "name": "d1-july-2023",
+        "resolution": "1D",
+        "geometry_matches": true,
+        "boxes": 62,
+        "labels": 37
+      },
+      {
+        "name": "d1-2021",
+        "resolution": "1D",
+        "geometry_matches": true,
+        "boxes": 81,
+        "labels": 49
+      },
+      {
+        "name": "d1-2019",
+        "resolution": "1D",
+        "geometry_matches": true,
+        "boxes": 131,
+        "labels": 77
+      },
+      {
+        "name": "d1-return-recent",
+        "resolution": "1D",
+        "geometry_matches": true,
+        "boxes": 131,
+        "labels": 77
+      },
+      {
+        "name": "d1-restored",
+        "resolution": "1D",
+        "geometry_matches": true,
+        "boxes": 131,
+        "labels": 77
+      },
+      {
+        "name": "control-60",
+        "resolution": "60",
+        "geometry_matches": true,
+        "boxes": 13,
+        "labels": 8
+      },
+      {
+        "name": "control-240",
+        "resolution": "240",
+        "geometry_matches": true,
+        "boxes": 2,
+        "labels": 1
+      }
+    ],
+    "navigation_warnings": [
+      {
+        "name": "d1-2021",
+        "error": "Error: frame.evaluate: Error: Rejected by timeout\n    at https://192.168.7.232:18281/charting_library_91bf3b2668480f58/bundles/library.e2f8b3a016c9e1a0b7a5.js:779:808"
+      }
+    ],
+    "initial_native_navigation_timeout_retained": true
+  },
+  "cleanup": [
+    {
+      "branch": "feat/rolling-range-squeeze-20261024",
+      "commit": "ecd55b85d56060bee2ac9786b25be6e34bd97c86",
+      "removed_worktree": "/home/quant/repos/market-watch-rolling-range-squeeze-20261024",
+      "branch_deleted": true,
+      "archive_verified": true,
+      "included_as_ancestor": false
+    },
+    {
+      "branch": "integration/rolling-range-squeeze-mwa-20261024",
+      "commit": "1881951db8bc6e709ff06f189599d74e0ff06b49",
+      "removed_worktree": "/home/quant/repos/market-watch-rolling-range-squeeze-mwa-20261024",
+      "branch_deleted": true,
+      "archive_verified": true,
+      "included_as_ancestor": false
+    },
+    {
+      "branch": "fix/rrs-provider-d1-20261024",
+      "commit": "11ead46e7a3b43f0e7b2ea1bd2155df6a9523cc6",
+      "removed_worktree": "/home/quant/repos/market-watch-rrs-provider-d1-20261024",
+      "branch_deleted": true,
+      "archive_verified": true,
+      "included_as_ancestor": true
+    },
+    {
+      "branch": "fix/rrs-drawing-history-20261024",
+      "commit": "1aab85500cb334abe540658e02bf1d92c7a7626b",
+      "removed_worktree": "/home/quant/repos/market-watch-rrs-drawing-history-20261024",
+      "branch_deleted": true,
+      "archive_verified": true,
+      "included_as_ancestor": true
+    }
+  ],
+  "archives": [
+    {
+      "branch": "feat/rolling-range-squeeze-20261024",
+      "commit": "ecd55b85d56060bee2ac9786b25be6e34bd97c86",
+      "worktree": "/home/quant/repos/market-watch-rolling-range-squeeze-20261024",
+      "archive": "/home/quant/repos/.archives/market-watch/rrs-consolidation-20261024/market-watch-rolling-range-squeeze-20261024.tar.gz",
+      "sha256": "c2fd37a09399179676a7b2290fe70c9e4444d4077f0bc604e27a3349fb9816e3",
+      "bytes": 249602199,
+      "files_verified": 14922,
+      "symlinks_verified": 2,
+      "verified": true
+    },
+    {
+      "branch": "integration/rolling-range-squeeze-mwa-20261024",
+      "commit": "1881951db8bc6e709ff06f189599d74e0ff06b49",
+      "worktree": "/home/quant/repos/market-watch-rolling-range-squeeze-mwa-20261024",
+      "archive": "/home/quant/repos/.archives/market-watch/rrs-consolidation-20261024/market-watch-rolling-range-squeeze-mwa-20261024.tar.gz",
+      "sha256": "634b87412edb5db213072d52ba65372e1da9dbdc064fd49db4626c70d5b60915",
+      "bytes": 204280434,
+      "files_verified": 9790,
+      "symlinks_verified": 1,
+      "verified": true
+    },
+    {
+      "branch": "fix/rrs-provider-d1-20261024",
+      "commit": "11ead46e7a3b43f0e7b2ea1bd2155df6a9523cc6",
+      "worktree": "/home/quant/repos/market-watch-rrs-provider-d1-20261024",
+      "archive": "/home/quant/repos/.archives/market-watch/rrs-consolidation-20261024/market-watch-rrs-provider-d1-20261024.tar.gz",
+      "sha256": "3ad562885f96c153eb7ed60d1163d7c700e7184b79ecd4e36a81b26c48ba59fa",
+      "bytes": 177299303,
+      "files_verified": 6837,
+      "symlinks_verified": 0,
+      "verified": true
+    },
+    {
+      "branch": "fix/rrs-drawing-history-20261024",
+      "commit": "1aab85500cb334abe540658e02bf1d92c7a7626b",
+      "worktree": "/home/quant/repos/market-watch-rrs-drawing-history-20261024",
+      "archive": "/home/quant/repos/.archives/market-watch/rrs-consolidation-20261024/market-watch-rrs-drawing-history-20261024.tar.gz",
+      "sha256": "571d92e7345d1272bc02dda663114e7c12afe917882c4a6335b52fb3d4ae6b2d",
+      "bytes": 202257923,
+      "files_verified": 9630,
+      "symlinks_verified": 1,
+      "verified": true
+    }
+  ],
+  "bundle": {
+    "path": "/home/quant/repos/.archives/market-watch/rrs-consolidation-20261024/rrs-branches.bundle",
+    "sha256": "db92c170dca03948322d30f72aa34770f275627423233a3c90bff0dce2a23114",
+    "independent_restore_verified": true,
+    "full_object_integrity_verified": true
+  },
+  "preservation": {
+    "all_existing_instance_container_ids_images_start_times_status_and_health_unchanged": true,
+    "services_running": 15,
+    "api_postgres_healthy": true,
+    "effective_config_and_protected_browser_identity_audit_passed": true,
+    "rollback_materials_retained": true,
+    "original_reports_retained": true
+  },
+  "deployment_changed": false,
+  "main_merged": false,
+  "pushed": false,
+  "production_changed": false,
+  "limitations": [
+    "No full backend suite rerun; targeted RRS/native integration and existing regressions only.",
+    "Initial exploratory native setVisibleRange timed out; recorded, later exact loaded-range geometry and lifecycle checks passed.",
+    "Native provider cache can gain historical observations through ordinary reads; drawing count grows with loaded history.",
+    "Retired absolute worktree paths are no longer live source locations. Historical scripts referencing them require the documented canonical probe or explicit archive restoration."
+  ]
+}
