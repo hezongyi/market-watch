@@ -52,7 +52,7 @@ print(json.dumps(dict(catalog={name:public_catalog()[name]},bars=bars,result=cal
    const api=widget.activeChart().getShapeById(s.id);return {name:s.name,points:api.getPoints(),properties:api.getProperties()};})}));
   assert.deepEqual(initial.errors,[]);
   const styles=await page.evaluate(()=>widget.activeChart().getStudyById(ids[0]).getStyleValues());
-  assert.equal(styles.styles.range_anchor.display,8,'anchor is only a data-window carrier');
+  assert.equal(styles.styles.range_anchor.display,8,'anchor is a transparent status-line carrier');
   assert.ok(initial.shapes.some(s=>s.name==='rectangle'));
   assert.ok(initial.shapes.some(s=>s.properties.linestyle===2));
   const text=initial.shapes.filter(s=>s.name==='text');assert.ok(text.length>0);

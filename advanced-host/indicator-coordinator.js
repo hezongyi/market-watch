@@ -122,7 +122,10 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
     // The adapter knows whether native restart retained these results. A
     // consumer's previous scope alone cannot prove that its cache still exists.
     const previous=scope.coverage;
-    const same=previous && previous.identity===JSON.stringify(nextIdentity) &&
+    // Native restarts can retain plot coverage after the drawing consumer was
+    // retired. Its empty local projection needs a full snapshot, not just the
+    // prefix/tail that the native plot cache is missing.
+    const same=!drawings?.needsSnapshot?.(consumer) && previous && previous.identity===JSON.stringify(nextIdentity) &&
       previous.correctionVersion===binding.correctionVersion && previous.inputRevision===binding.inputRevision;
     const prepend=same && previous.first>scope.first && previous.last===scope.last &&
       previous.tailVersion===binding.tailVersion;

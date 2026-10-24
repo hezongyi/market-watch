@@ -61,16 +61,6 @@ function chartNRBreakoutDisplay({report=()=>{},centerText=globalThis.MWNativeInd
     shape.setProperties({...object.properties,...(object.text!==undefined?{text:object.text}:{})});
     record.applied=record.signature;
   }
-  function order(binding) {
-    // Native creation order can place an owner-bound group behind the price
-    // series, even when individual create calls request "top". Once the batch
-    // has settled, reapply the full Python drawing order: boxes, lines, labels.
-    if([...binding.objects.values()].some(record=>record.id==null))return;
-    for(const key of binding.order) {
-      const record=binding.objects.get(key);
-      if(record)binding.chart.getShapeById(record.id).bringToFront();
-    }
-  }
   function refresh(consumer) {
     if(consumer.meta.render_profile!=='nr_breakout_v1')return;
     const binding=bindings.get(consumer.key);
@@ -82,7 +72,6 @@ function chartNRBreakoutDisplay({report=()=>{},centerText=globalThis.MWNativeInd
     if(!binding.dirty && inputSignature===binding.inputSignature)return;
     binding.dirty=false;binding.inputSignature=inputSignature;
     const desired=nrBreakoutObjects([...binding.rows.values()].sort((a,b)=>a.time-b.time),consumer.inputs);
-    binding.order=[...desired.keys()];
     for(const [key,record] of binding.objects)if(!desired.has(key))drop(binding,key,record);
     for(const [key,object] of desired) {
       const signature=JSON.stringify(object);
@@ -107,14 +96,13 @@ function chartNRBreakoutDisplay({report=()=>{},centerText=globalThis.MWNativeInd
         }
         record.id=id;
         apply(binding,record); // A newer accepted batch/style may have arrived.
-        order(binding);
       }).catch(error=>{
         if(binding.alive && binding.objects.get(key)===record){drop(binding,key,record);binding.dirty=true;report(error,consumer);}
       });
     }
-    order(binding);
   }
   return {
+    needsSnapshot:consumer=>consumer.meta.render_profile==='nr_breakout_v1' && !bindings.has(consumer.key),
     update(consumer,{rows,kind,identity}) {
       if(consumer.meta.render_profile!=='nr_breakout_v1')return;
       const fingerprint=JSON.stringify(identity);
