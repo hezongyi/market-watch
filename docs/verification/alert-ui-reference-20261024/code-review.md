@@ -53,3 +53,10 @@ node scripts/build-alert-ui.mjs /tmp/mw-alert-ui-20261024-code-bundle
 | `web/tests/alert-reference-ui.browser.cjs` | `8a3a6bd156a8d6ff1cd9ba4ba1bd284d7ea1443f363182794ad98fa25ebe809e` |
 
 真实六态视觉、许可图表坐标矩阵、独立 PostgreSQL 与 `$mw-acceptance` R1 仍未执行，继续遵守用户“验收前向我申请”的检查点。完整 CI 等效检查也未宣称完成。
+
+
+## 验收增量复核（最终）
+
+用户已批准后执行真实验收。原生倒置属性订阅、480×475紧凑编辑窗、真实PG fixture和16种价格坐标矩阵补齐；Standards复核至9ea4d5bd无新增具体问题。Spec指出“圆点未配对到r2且无位置断言”的证据缺口，已在8f1bb148修复：按alert-id取对应dot，全部场景断言其中心与原生坐标≤1px。
+
+200%文字实测发现副行height18裁字，de35993f改min-height18；两轴只读增量复核均无新增具体问题。59f07cdd补上列表真实last_triggered_at、按图表时区格式化并允许省略；Spec只读复核无新增具体缺陷。真实fixture和六态截图保留明确窄屏/视觉差异，没有把侧栏隐藏或不同语义称为100%通过。最终53项镜像内后端检查、原生集成13组、几何16种及真实实例R1详见外部acceptance/results.md。
