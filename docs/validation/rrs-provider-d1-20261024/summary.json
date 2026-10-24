@@ -1,0 +1,109 @@
+{
+  "status": "passed",
+  "recorded_at_utc": "2026-10-24T16:03:17.666065+00:00",
+  "risk": "F0: compatible provider RRS input segmentation; no schema or persistent-format changes",
+  "product_commit": "b4e1326adb779a0b5c53e389681ac008dc75ea13",
+  "changed_services": [
+    "api"
+  ],
+  "oracle": {
+    "passed": true,
+    "source": "OANDA EURUSD bid NY17",
+    "timeframe": "D1",
+    "rows": 1957,
+    "first": 1554930000000,
+    "last": 1792702800000,
+    "null_pattern_equal": true,
+    "max_abs_error": 0,
+    "threshold_non_null": 1696,
+    "boxes": 81,
+    "labels": 49,
+    "independent_literal_oracle": true,
+    "geometry_equal": true
+  },
+  "browser": {
+    "passed": true,
+    "daily_boxes": 81,
+    "daily_labels": 49,
+    "recent_visible_daily_boxes": 17,
+    "recent_daily_outputs": {
+      "sma": {
+        "count": 357,
+        "nonNull": 357,
+        "positive": 357
+      },
+      "ratio": {
+        "count": 357,
+        "nonNull": 357,
+        "positive": 357
+      },
+      "threshold": {
+        "count": 357,
+        "nonNull": 357,
+        "positive": 357
+      },
+      "pct_rank": {
+        "count": 357,
+        "nonNull": 357,
+        "positive": 351
+      },
+      "signal": {
+        "count": 357,
+        "nonNull": 357,
+        "positive": 51
+      }
+    },
+    "timeframe_controls": [
+      {
+        "resolution": "60",
+        "bars": 246,
+        "boxes": 17,
+        "labels": 11
+      },
+      {
+        "resolution": "240",
+        "bars": 239,
+        "boxes": 61,
+        "labels": 36
+      }
+    ],
+    "page_errors": []
+  },
+  "data_preservation": {
+    "all_protected_tables_unchanged": true,
+    "table_counts": {
+      "chart_workspaces": 0,
+      "advanced_chart_workspaces": 10,
+      "advanced_chart_preferences": 30,
+      "market_datasets": 130,
+      "market_history_versions": 15,
+      "market_history_artifacts": 135
+    },
+    "prior_notice_states_unchanged": true,
+    "prior_phone_acks_unchanged": true,
+    "prior_notice_count": 23891,
+    "added_notices": 3,
+    "prior_phone_ack_count": 7
+  },
+  "logs": {
+    "window_start": "2026-10-24T15:58:27.967376943Z",
+    "cancelled_error_occurrences": 12,
+    "traceback_occurrences": 6,
+    "http500_occurrences": 0,
+    "pool_timeout_occurrences": 0
+  },
+  "images": {
+    "source": "b4e1326adb779a0b5c53e389681ac008dc75ea13",
+    "images": {
+      "api": "sha256:62a8b6b533367630043061ea9529b3f874c4479f5f75b6ed4c1f04f31a136ee8"
+    },
+    "services": [
+      "api"
+    ]
+  },
+  "limitations": [
+    "Independent literal Pine oracle, not an execution of TradingView Pine.",
+    "Targeted regressions and existing-instance browser smoke; no full backend suite rerun.",
+    "Only native-provider RRS inference changes; explicit invalid/gap input retains resets."
+  ]
+}
