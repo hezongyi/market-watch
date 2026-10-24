@@ -51,7 +51,7 @@ widget.onChartReady(async()=>{
    const l=label?.getBoundingClientRect();return {expectedY:b.top+y,label:l?.toJSON(),canvas:b.toJSON(),mode:s.priceScale().mode(),notes,entries:bridge.diagnostics().priceLines,delta:l?Math.abs(l.y+l.height/2-b.top-y):null,dot:dot?.getBoundingClientRect().toJSON()};
   });report.geometry.push({name,...result});assert.ok(result.dot&&Math.abs(result.dot.y+result.dot.height/2-result.expectedY)<=1,name+': paired dot follows the native price coordinate');assert.ok(result.label&&result.delta<=1,name+': label tracks actual main-series priceToCoordinate: '+JSON.stringify(result));
  }
- async function capture(name,selector){await raf();await chart.locator(selector).screenshot({path:path.join(output,name+'.png')});}
+ async function capture(name,selector){await page.mouse.move(10,20);await raf();await chart.locator(selector).screenshot({path:path.join(output,name+'.png')});}
  try{
   await page.goto('https://alert-reference.invalid/');await page.waitForFunction(()=>globalThis.testReady&&widget.activeChart().dataReady());
   chart=page.frames().find(f=>f!==page.mainFrame());
@@ -66,8 +66,8 @@ widget.onChartReady(async()=>{
   await chart.getByRole('tooltip').screenshot({path:path.join(output,'state-3-tooltip.png')});
   report.tooltip=await chart.getByRole('tooltip').boundingBox();await page.keyboard.press('Escape');
   await chart.getByRole('tab',{name:/日志/}).click();await chart.locator('[data-signal-id]').first().waitFor();
-  await capture('state-4-logs','.chart-alert-panel');
   await chart.locator('[data-signal-id]').first().locator('.alert-row-summary').click();
+  await capture('state-4-logs','.chart-alert-panel');
   await chart.locator('[data-signal-id]').first().locator('.alert-row-summary').hover();await chart.getByRole('tooltip').waitFor();
   await page.screenshot({path:path.join(output,'state-4-log-tooltip.png')});await page.keyboard.press('Escape');
   await chart.getByRole('tab',{name:'警报',exact:true}).click();
