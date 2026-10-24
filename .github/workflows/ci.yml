@@ -176,6 +176,7 @@ jobs:
           node tests/swing-fixed-identity.cjs
           node tests/squeeze-contract.cjs
           node tests/nr-breakout-display.cjs
+          node tests/nr-breakout-restart.cjs
           node tests/indicator-high-rate.cjs
           node tests/indicator-high-rate.cjs --provider
           node tests/indicator-shared-read.cjs
