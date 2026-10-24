@@ -244,6 +244,8 @@ jobs:
           node tests/symbol-flags.browser.cjs
           node tests/system-history.browser.cjs
           node tests/alert-editing.browser.cjs
+          node tests/alert-reference-ui.browser.cjs
+          node tests/native-alert-price-lines.browser.cjs
           node tests/notice-page-exit.browser.cjs
 
   compose_checks:

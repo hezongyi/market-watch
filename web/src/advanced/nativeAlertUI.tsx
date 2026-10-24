@@ -1,5 +1,5 @@
 import "../notifications/native";
-import type { NoticeTransport } from "../notifications/types";
+import type { NoticeState, NoticeTransport } from "../notifications/types";
 import { createRoot } from "react-dom/client";
 import { useState } from "react";
 import { ChartAlertsPanel, type AlertDraft } from "./ChartAlertsPanel";
@@ -18,11 +18,12 @@ export type NativeAlertDialogHandle = {
   onEscape: (() => void) | null;
   close: () => void;
   setBusy: (busy: boolean) => void;
-  setTitle: (title: string) => void;
+  setTitle: (title: string, symbol?: string) => void;
   recenter: () => void;
 };
 export type NativeAlertDialog = (options: {
   title: string;
+  symbol?: string;
   onClose: () => void;
 }) => Promise<NativeAlertDialogHandle>;
 type Shell = {
@@ -31,6 +32,7 @@ type Shell = {
   close: () => void;
   destroy: () => void;
   openDialog: NativeAlertDialog;
+  setBadge?: (count?: number) => void;
   control: NativeControlFactory;
   overlayBounds: (anchor?: HTMLElement) => {
     width: number;
@@ -70,6 +72,7 @@ type Options = {
   initialDraft?: AlertDraft | null;
   persistDraft?: (draft: AlertDraft | null) => void;
   noticeRequest?: NoticeTransport;
+  noticeState?: NoticeState;
   panelChanged?: (open: boolean, signalId?: string) => void;
 };
 async function attach({
@@ -83,6 +86,7 @@ async function attach({
   persistDraft,
   panelChanged,
   noticeRequest,
+  noticeState,
 }: Options) {
   let target: HTMLElement | null = null,
     disposed = false;
@@ -125,6 +129,7 @@ async function attach({
     context: AlertContext | null;
     focusEvent?: { id: string; revision: number };
     theme: string;
+    alertUnread?: number;
     creationReason: string;
     notices: Record<string, string>;
     instrument: { instrument: string; series_kind: string } | null;
@@ -132,6 +137,7 @@ async function attach({
   function App() {
     const [state, setState] = useState<State>({
       target,
+      alertUnread: noticeState?.alertUnread,
       context: null,
       theme: "dark",
       creationReason: bridge.creationReason?.() || "",
@@ -149,6 +155,7 @@ async function attach({
           context={state.context}
           focusEvent={state.focusEvent}
           noticeRequest={noticeRequest}
+          alertUnread={state.alertUnread}
           open
           theme={state.theme}
           readonly={readonly}
@@ -192,6 +199,7 @@ async function attach({
   }, 250);
   return {
     open: shell.open,
+    noticeState: (state: NoticeState) => {update({alertUnread: state.alertUnread}); shell.setBadge?.(state.alertUnread);},
     event: (id: string) => {
       update({ focusEvent: { id, revision: Date.now() } });
       shell.open();

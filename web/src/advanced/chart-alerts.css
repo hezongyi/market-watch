@@ -2,15 +2,15 @@
 .chart-alert-panel,
 .chart-alert-dialog,
 .alert-menu {
-  --alert-bg: #1e1e1e;
-  --alert-surface: #2b2b2b;
+  --alert-bg: #000000;
+  --alert-surface: #1a1a1a;
   --alert-text: #dbdbdb;
   --alert-muted: #a6a6a6;
   --alert-border: #434343;
-  --alert-divider: #303030;
+  --alert-divider: #252525;
   --alert-accent: #6ca8ee;
   --alert-error: #ffaaa4;
-  --alert-hover: #343434;
+  --alert-hover: #1a1a1a;
   color: var(--alert-text);
   background: var(--alert-bg);
   font:
@@ -39,7 +39,7 @@ html:not(.theme-dark) .alert-menu {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  background: var(--tv-color-pane-background, var(--alert-bg));
+  background: var(--alert-bg);
 }
 .chart-alert-panel button,
 .chart-alert-dialog button,
@@ -81,7 +81,7 @@ html:not(.theme-dark) .alert-menu {
 }
 .alert-panel-tabs {
   display: flex;
-  margin: 12px 12px 4px;
+  margin: 8px 17px 4px;
   background: var(--alert-surface);
   padding: 2px;
   border-radius: 5px;
@@ -92,7 +92,7 @@ html:not(.theme-dark) .alert-menu {
   border-radius: 4px;
 }
 .alert-panel-tabs [aria-selected="true"] {
-  background: #4a4a4a;
+  background: #464646;
   color: #fff;
   box-shadow: 0 1px 4px #0004;
 }
@@ -132,7 +132,7 @@ html:not(.theme-dark) .alert-menu {
   flex-direction: column;
   gap: 2px;
   border-radius: 0;
-  min-height: 54px;
+  min-height: 55px;
   padding: 8px 12px;
 }
 .alert-row-title {
@@ -143,11 +143,11 @@ html:not(.theme-dark) .alert-menu {
 }
 .alert-row-subtitle {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 4px;
   color: var(--alert-muted);
-  font-size: 11px;
+  font-size: 12px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -158,7 +158,7 @@ html:not(.theme-dark) .alert-menu {
   flex-shrink: 0;
 }
 .alert-row-identity {
-  flex: 1;
+  flex: 0 1 auto;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -194,7 +194,7 @@ html:not(.theme-dark) .alert-menu {
   top: 2px;
   display: flex;
   opacity: 0;
-  background: var(--alert-bg);
+  background: var(--alert-hover);
   border-radius: 4px;
 }
 .alert-row-actions button {
@@ -669,30 +669,165 @@ html:not(.theme-dark) .alert-menu {
   border-color: var(--alert-error);
 }
 
-/* Pinned widgetbar tokens, verified against the native watchlist. Dialog
-   surfaces intentionally keep their own native palette. */
-.chart-alert-panel,
-.chart-alert-panel[data-theme="light"] {
-  --alert-bg: var(--color-pane-bg);
-  --alert-surface: var(--color-pane-secondary-bg);
-  --alert-text: var(--color-text-primary);
-  --alert-muted: var(--color-text-secondary);
-  --alert-divider: var(--color-divider-line-primary);
-  --alert-border: var(--color-divider-line-primary);
-  --alert-hover: var(--color-item-hover-bg);
-  background: var(--alert-bg);
+/* Reference surfaces stay scoped to the alert UI, independent of watchlist tokens. */
+.chart-alert-dialog {
+  --alert-bg: #131313;
 }
-.chart-alert-panel .alert-panel-tabs {
-  background: transparent;
-  border-radius: 0;
-  border-bottom: 1px solid var(--alert-divider);
-  padding: 0;
+.chart-alert-dialog[data-theme="light"] {
+  --alert-bg: #fff;
 }
-.chart-alert-panel .alert-panel-tabs [aria-selected="true"] {
+.alert-summary-anchor {
+  min-width: 0;
+}
+.alert-symbol-icon {
+  flex: 0 0 18px;
+  vertical-align: middle;
+}
+.chart-alert-card:has(.alert-row-summary:hover),
+.chart-alert-card:focus-within,
+.chart-alert-card.alert-selected {
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 2px #8a8a8a;
   background: var(--alert-hover);
-  color: var(--alert-text);
-  box-shadow: none;
 }
-.chart-alert-panel .alert-row-actions {
+.chart-alert-panel .alert-row-summary:hover {
+  background: transparent;
+}
+.chart-alert-panel .alert-row-subtitle {
+  height: 18px;
+}
+.alert-row-actions {
+  z-index: 1;
+}
+.chart-alert-card:hover .alert-row-title,
+.chart-alert-card:focus-within .alert-row-title {
+  padding-right: 106px;
+}
+.chart-alert-card.alert-selected .alert-row-title {
+  padding-right: 106px;
+}
+.alert-row-actions > .alert-menu-anchor {
+  display: inline-flex;
+}
+.alert-state-unhealthy {
+  color: #e3ae56;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+[data-theme="light"] .alert-state-unhealthy {
+  color: #865508;
+}
+.alert-unread-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f23645;
+  color: #fff;
+  min-width: 14px;
+  height: 14px;
+  border-radius: 8px;
+  padding: 0 3px;
+  font-size: 10px;
+  line-height: 14px;
+}
+.alert-summary-tooltip {
+  position: fixed;
+  z-index: 10020;
+  box-sizing: border-box;
+  width: 250px;
+  max-width: calc(100vw - 16px);
+  max-height: calc(100vh - 16px);
+  overflow: auto;
+  pointer-events: none;
+  background: #2b2b2b;
+  color: #e2e2e2;
+  border-radius: 3px;
+  padding: 12px 16px;
+  font:
+    12px/1.6 -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Microsoft YaHei",
+    sans-serif;
+  box-shadow: 0 4px 12px #0004;
+  overflow-wrap: anywhere;
+}
+.alert-summary-tooltip strong {
+  font-weight: 600;
+}
+.alert-summary-tooltip p {
+  margin: 0;
+}
+.alert-summary-tooltip[data-theme="light"] {
+  background: #f2f2f2;
+  color: #202124;
+  border: 1px solid #c5c5c5;
+}
+.alert-add-condition {
+  margin: -4px 0 12px 132px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  color: var(--alert-muted);
+}
+.chart-alert-dialog .alert-add-condition button {
+  padding-left: 0;
+  color: var(--alert-accent);
+}
+.chart-alert-dialog .alert-add-condition [aria-disabled="true"] {
+  cursor: help;
+}
+.alert-atr-active {
+  border-left: 2px solid var(--alert-accent);
+  padding-left: 8px;
+}
+.chart-alert-dialog h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mw-native-alert-shell [class^="main-"] > [class^="title-"] {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.alert-summary-fields .mw-native-select [class*="container-"] {
+  border-color: transparent;
+  background: transparent;
+}
+.chart-alert-dialog footer .alert-delete {
+  border: 0;
+}
+.chart-alert-dialog.alert-cleanup-dialog {
+  padding: 16px;
+  width: 440px;
+  max-width: calc(100vw - 32px);
+  overflow: auto;
+}
+.alert-cleanup-dialog h2 {
+  font-size: 16px;
+}
+.alert-cleanup-dialog footer {
+  padding: 12px 0 0;
+}
+@media (max-width: 500px) {
+  .alert-add-condition {
+    margin-left: 84px;
+  }
+}
+
+.chart-alert-panel {
+  position: relative;
+}
+.alert-detail-drawer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
   background: var(--alert-bg);
+  overflow: auto;
+  padding: 12px 0;
+}
+.alert-detail-drawer > button {
+  margin-left: 12px;
 }

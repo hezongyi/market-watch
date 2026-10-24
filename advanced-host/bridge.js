@@ -2337,14 +2337,14 @@ function boot(
     try {
       refreshNotificationTimezone();
       const instance = await MWNativeAlerts.attach({widget, scope: {workspace_id: workspaceId, session}, readonly,
-        initialDraft: alertUIDraft,
+        initialDraft: alertUIDraft, noticeState,
         noticeRequest: query => request({workspace_id:workspaceId,session,...query}, 'notice-center-rpc', () => attempt === attachingAlerts && session === alertUISession),
         persistDraft: draft => send({type:'chart-alert-ui-draft', workspace_id: workspaceId, session, draft}),
         panelChanged: (open,signal_id) => {restoreAlertsPanel = open; send({type:'alerts-panel-state',workspace_id:workspaceId,open,signal_id});},
         bridge: alertBridge, request: query => request(query, 'chart-alert-ui-rpc', () => attempt === attachingAlerts && session === alertUISession),
         report: error => send({type:'error', error:String(error)})});
       if (attempt !== attachingAlerts || session !== alertUISession || alertUIStopped) {instance.destroy();return;}
-      alertUI = instance; instance.theme(widget.getTheme());
+      alertUI = instance; instance.theme(widget.getTheme()); if(noticeState)instance.noticeState(noticeState);
       if (restoreAlertsPanel) instance.open();
       if (alertOpenSignal) {instance.event(alertOpenSignal);alertOpenSignal=undefined;}
       try {
@@ -2964,7 +2964,7 @@ addEventListener("message", async (e) => {
     drain();
     return;
   }
-  if(m.type==='notice-center-state' && m.session===alertUISession && m.workspace_id===alertUIWorkspace){noticeState=m.state;noticeUI?.update(m.state);return;}
+  if(m.type==='notice-center-state' && m.session===alertUISession && m.workspace_id===alertUIWorkspace){noticeState=m.state;noticeUI?.update(m.state);alertUI?.noticeState(m.state);return;}
   if(m.type==='notice-center-open'){noticeOpenEvent=typeof m.event_id==='string'?m.event_id:'';if(noticeUI){noticeUI.open(noticeOpenEvent || undefined);noticeOpenEvent=undefined;}return;}
   if(m.type==='chart-alert-event-open' && typeof m.signal_id==='string' && /^[a-f0-9-]{36}$/.test(m.signal_id)) {
     if(alertUI)alertUI.event(m.signal_id);else {alertOpenSignal=m.signal_id;restoreAlertsPanel=true;}

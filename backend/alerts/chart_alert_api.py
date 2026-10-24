@@ -4,7 +4,7 @@ from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import Field
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 
 from .chart_alert_domain import Contract
@@ -23,7 +23,7 @@ from .storage import (
     ChartAlertVersion,
     CompositeJudgment,
     Instrument,
-    MarketDataset,
+    NoticeEvent,
     Notification,
     Outbox,
     SignalRow,
@@ -111,22 +111,27 @@ def dataset_for(config):
     return ensure(meta, config.timeframe)
 
 
-def display_label(db, config, identity):
+def display_identity(db, config, identity):
     """Readable identity from the saved binding, without resolving a live revision."""
     from .market_names import display_code
 
     identity = identity or {}
-    dataset = db.get(MarketDataset, identity["dataset_id"]) if identity.get("dataset_id") else None
-    symbol = dataset.logical_symbol if dataset else identity.get("symbol")
+    symbol = identity.get("symbol")
     if not symbol:
         symbol = config["instrument"] if config["series_kind"] != "composite" else "组合行情身份已归档"
     code = display_code(symbol, identity.get("source"))
-    kind = {"provider": "平台行情", "managed": "自建行情", "composite": "组合行情"}[config["series_kind"]]
-    return " · ".join(str(value) for value in (
-        code, kind, identity.get("basis"), config["timeframe"], config["source"].upper()) if value)
+    return {"code": code, "series_kind": config["series_kind"],
+            "basis": identity.get("basis"), "timeframe": config["timeframe"], "source": config["source"]}
 
 
-def alert_dict(db, alert):
+def display_label(db, config, identity):
+    value = display_identity(db, config, identity)
+    kind = {"provider": "平台行情", "managed": "自建行情", "composite": "组合行情"}[value["series_kind"]]
+    return " · ".join(str(part) for part in (
+        value["code"], kind, value["basis"], value["timeframe"], value["source"].upper()) if part)
+
+
+def alert_dict(db, alert, *, last_triggered_at=None):
     version = current_version(db, alert)
     return {"id": alert.id, "name": alert.name, "version": alert.version,
             "run": alert.run, "control_revision": alert.control_revision,
@@ -136,6 +141,8 @@ def alert_dict(db, alert):
             "expires_at": alert.expires_at, "created_at": alert.created_at,
             "updated_at": alert.updated_at, "config": version.config,
             "market_identity": version.market_identity,
+            "display_identity": display_identity(db, version.config, version.market_identity),
+            "last_triggered_at": last_triggered_at,
             "display_label": display_label(db, version.config, version.market_identity),
             "condition_summary": condition_label(version.config["condition"]),
             "runtime": alert.runtime}
@@ -185,8 +192,11 @@ def router(authenticated):
                 query = query.where(ChartAlert.name.contains(search, autoescape=True))
             if instrument:
                 query = query.where(ChartAlertVersion.config["instrument"].as_string() == instrument)
-            rows = db.scalars(query.order_by(ChartAlert.created_at.desc()).limit(500))
-            result = [alert_dict(db, row) for row in rows]
+            rows = list(db.scalars(query.order_by(ChartAlert.created_at.desc()).limit(500)))
+            last = dict(db.execute(select(SignalRow.chart_alert_id, func.max(SignalRow.occurred_at))
+                .where(SignalRow.chart_alert_id.in_([row.id for row in rows]))
+                .group_by(SignalRow.chart_alert_id)).all()) if rows else {}
+            result = [alert_dict(db, row, last_triggered_at=last.get(row.id)) for row in rows]
             return result
 
     @api.get("/events")
@@ -199,16 +209,27 @@ def router(authenticated):
             ).where(SignalRow.chart_alert_id.is_not(None))
             if alert_id:
                 query = query.where(SignalRow.chart_alert_id == alert_id)
+            records = list(db.execute(query.order_by(
+                SignalRow.occurred_at.desc(), SignalRow.created_at.desc()).limit(limit)))
+            from .notification_center import SUBJECT
+
+            notices = {notice.source_id: notice for notice in db.scalars(select(NoticeEvent).where(
+                NoticeEvent.subject == SUBJECT, NoticeEvent.source_domain == "pro_chart",
+                NoticeEvent.source_kind == "chart_alert",
+                NoticeEvent.source_id.in_([record.id for record, _, _ in records])))} if records else {}
             return [{"id": record.id, "alert_id": record.chart_alert_id,
+                     "display_identity": display_identity(db, record.evidence["config"], record.evidence.get("market_identity")),
                      "display_label": display_label(db, record.evidence["config"], record.evidence.get("market_identity")),
+                     "notice": ({"id": notice.id, "first_seq": notice.first_seq,
+                                 "viewed_at": notice.viewed_at, "handled_at": notice.handled_at}
+                                if (notice := notices.get(record.id)) else None),
                      "occurred_at": record.occurred_at, "detected_at": record.created_at,
                      "direction": record.direction, "price": record.evidence.get("price", str(record.price)),
                      "threshold": record.evidence.get("threshold", str(record.threshold)), "evidence": record.evidence,
                      "message": signal_message(record), "notification_id": notification.id,
                      "notification_status": notification.status, "ack_at": notification.ack_at,
                      "delivery_status": task.status if task else "web_only"}
-                    for record, notification, task in db.execute(query.order_by(
-                        SignalRow.occurred_at.desc(), SignalRow.created_at.desc()).limit(limit))]
+                    for record, notification, task in records]
 
     @api.get("/{alert_id}")
     def read(alert_id: str):

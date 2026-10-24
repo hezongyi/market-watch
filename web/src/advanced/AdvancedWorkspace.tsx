@@ -672,6 +672,12 @@ export default function AdvancedWorkspace() {
                   request_id: q.request_id,
                   action: "drawing_deleted",
                 });
+              else if (q.op === "lifecycle" && q.action === "archive" && !a.object_kind &&
+                row.config.condition.left.kind === "price" && row.config.condition.right?.kind === "constant")
+                result = await api(`/chart-alerts/${q.alert_id}/lifecycle`, {
+                  version: q.version, control_revision: q.control_revision,
+                  request_id: q.request_id, action: "archive",
+                });
               else if (q.op === "edit" && q.line && a.object_kind === "drawing")
                 result = await api(`/chart-alerts/${q.alert_id}/edit`, {
                   version: q.version,
