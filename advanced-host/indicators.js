@@ -78,11 +78,18 @@ function pythonStudies(PineJS, catalog) {
         isCustomIndicator: true,
         format: swing ? { type: "inherit" } : { type: "price", precision: 5 },
         plots: series.map((s, i) => ({ id: "plot" + i, type: "line" })),
+        ...(name === "BBANDS" ? {filledAreas: [
+          {id: "band_fill", objAId: "plot0", objBId: "plot2", type: "plot_plot",
+            title: "Bands Background", fillgaps: false},
+        ]} : {}),
         bands: (meta.levels || []).map((value, i) => ({
           id: "level" + i,
           name: String(value),
         })),
         defaults: {
+          ...(name === "BBANDS" ? {filledAreasStyle: {
+            band_fill: {color: "#2196F3", transparency: 95, visible: true},
+          }} : {}),
           bands: (meta.levels || []).map((value) => ({
             color: "#787b86",
             linestyle: 2,
