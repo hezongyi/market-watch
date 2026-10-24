@@ -304,7 +304,7 @@ def calculate_inputs(run, rows, phase, profiles, *, seam=None, initial_state=Non
     output = []
     for source in rows:
         row = dict(source)
-        if run.spec["name"] == "SWING_SR_V1":
+        if run.spec["name"] in ("SWING_SR_V1", "ROLLING_RANGE_SQUEEZE"):
             from .series_access import fixed_label
 
             row["chart_time"] = fixed_label(row, run.timeframe, phase)
@@ -421,10 +421,12 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='di
                     'checkpoint' if run.cursor > page['origin'] or run.parent_id else 'miss',
                 'calculation_steps': 0}
         display = None
-        if run.spec["name"] == "SWING_SR_V1":
+        if run.spec["name"] in ("SWING_SR_V1", "ROLLING_RANGE_SQUEEZE"):
+            from .rolling_range_squeeze import SqueezeState
             from .swing_sr import SwingState
 
-            display = SwingState(run.spec["params"], run.state["state"] or None).presentation()
+            display_engine = SqueezeState if run.spec["name"] == "ROLLING_RANGE_SQUEEZE" else SwingState
+            display = display_engine(run.spec["params"], run.state["state"] or None).presentation()
             display["history_complete"] = run.status == "complete"
             display["history_revision"] = run.id
         tail = page["bars"]

@@ -67,7 +67,7 @@ def freeze(db, page, body, maximum, *, evaluation_end=None, telemetry=None):
     stats.update(input_cache='miss', sql_payload_rows=0)
     dataset = db.get(ProviderDataset, page["dataset_id"])
     origin = body.calculation_origin or 0
-    swing = any(s["name"] == "SWING_SR_V1" for s in body.indicators)
+    swing = any(s["name"] in ("SWING_SR_V1", "ROLLING_RANGE_SQUEEZE") for s in body.indicators)
     ceiling = page["bars"][-1]["start"]
     if swing:
         tail = page.get("_snapshot_tail")
@@ -146,7 +146,7 @@ def compute(inputs, meta, instrument, spec, *, first, provisional, telemetry=Non
                  input_accepted_at_ms=now_ms())
     key = (inputs.identity, name, json.dumps(params, sort_keys=True),
            json.dumps(meta.get("calendar_profile"), sort_keys=True), meta["calendar"], instrument)
-    if name == "SWING_SR_V1" or name not in SUPPORTED:
+    if name in ("SWING_SR_V1", "ROLLING_RANGE_SQUEEZE") or name not in SUPPORTED:
         key = ("batch", key, inputs.epoch, inputs.revision, provisional,
                json.dumps(rows[-1], sort_keys=True) if rows else "")
         entry = _entry(_RESULTS, key, MAX_VALUES)

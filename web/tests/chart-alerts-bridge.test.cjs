@@ -102,6 +102,7 @@ function fixture() {
     isLoading: () => loading,
     readonly: false,
     metadata: () => ({ source }),
+    calculationOrigin: () => 60000,
     frames: { 60: "H1", 5: "M5" },
     send: (m) => messages.push(structuredClone(m)),
     fail: (e) => failures.push(String(e)),
@@ -386,4 +387,18 @@ test('visible create paths explain loading and unresolved metadata', async () =>
   const g=fixture();g.switchSource(null);await g.api.create();
   assert.ok(g.failures.length,'metadata missing creates visible feedback');
   assert.equal(g.messages.filter(m=>m.type==='chart-alert-context').length,0);
+});
+
+test('squeeze alert captures calculation parameters and boolean, excluding display colors', async () => {
+  const f=fixture();
+  f.chart.getAllStudies=()=>[{id:'squeeze',name:'守望 Python ROLLING_RANGE_SQUEEZE'}];
+  f.chart.getStudyById=()=>({getInputValues:()=>Object.entries({
+    k:3,lookback:20,low_pct:0.1,confirm_on_close:false,first_fill_color:'#ff0000',sma_color:'#00ff00',
+  }).map(([id,value])=>({id,value}))});
+  await f.api.create({object:{type:'study',id:'squeeze'}});
+  assert.deepEqual(f.failures,[]);
+  const context=f.messages.find(m=>m.type==='chart-alert-context').context;
+  assert.deepEqual(context.indicator,{name:'ROLLING_RANGE_SQUEEZE',version:'1',
+    params:{k:3,lookback:20,low_pct:0.1,confirm_on_close:false},output:'signal'});
+  assert.equal(context.calculation_origin,60000);
 });

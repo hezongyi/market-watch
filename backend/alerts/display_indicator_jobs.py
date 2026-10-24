@@ -155,7 +155,7 @@ def tick():
                 if row['gap_before']:
                     dependent = False
                 dependent |= not bar['complete']
-                if run.spec['name'] == 'SWING_SR_V1':
+                if run.spec['name'] in ('SWING_SR_V1', 'ROLLING_RANGE_SQUEEZE'):
                     from .series_access import fixed_label
 
                     row['chart_time'] = fixed_label(row, run.timeframe, phase)

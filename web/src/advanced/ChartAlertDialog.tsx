@@ -22,6 +22,7 @@ import type {
 import {
   normalizeCondition,
   indicatorDefaults,
+  indicatorUnit,
   relations,
   type AlertConfig,
   type AlertRow,
@@ -56,7 +57,7 @@ function IndicatorFields({
               name,
               version: "1",
               params: { ...indicatorDefaults[name] },
-              output: name === "MACD" ? "macd" : "value",
+              output: name === "ROLLING_RANGE_SQUEEZE" ? "signal" : name === "MACD" ? "macd" : "value",
             });
           }}
         >
@@ -66,14 +67,20 @@ function IndicatorFields({
         </AlertSelect>
       </label>
       {Object.entries(value.params).map(([key, n]) => (
-        <label key={key}>
+        typeof n === "boolean" ? <AlertCheckbox
+            key={key}
+            label={metadata?.[value.name]?.parameter_schema[key]?.label || key}
+            data-alert-field={`condition.${side}.indicator.params.${key}`}
+            checked={n}
+            onChange={(checked)=>onChange({...value, params:{...value.params,[key]:checked}})}
+          /> : <label key={key}>
           {metadata?.[value.name]?.parameter_schema[key]?.label || key}
           <AlertInput
             data-alert-field={`condition.${side}.indicator.params.${key}`}
             type="number"
             min={metadata?.[value.name]?.parameter_schema[key]?.min ?? 2}
             max={metadata?.[value.name]?.parameter_schema[key]?.max ?? 500}
-            step={1}
+            step={key === "low_pct" ? 0.1 : 1}
             required
             value={n}
             onChange={(e) =>
@@ -92,7 +99,7 @@ function IndicatorFields({
           value={value.output}
           onChange={(e) => onChange({ ...value, output: e.target.value })}
         >
-          {(value.name === "MACD"
+          {(value.name === "ROLLING_RANGE_SQUEEZE" ? ["signal", "sma", "ratio", "threshold", "pct_rank"] : value.name === "MACD"
             ? ["macd", "signal", "histogram"]
             : ["value"]
           ).map((key) => (
@@ -238,7 +245,7 @@ export function ChartAlertDialog({
     draft.condition.relation,
   );
   const offset = draft.condition.offset;
-  const priceUnit = (value?: Operand | null) => !value?.indicator || ["SMA", "EMA"].includes(value.indicator.name);
+  const priceUnit = (value?: Operand | null) => !value?.indicator || indicatorUnit(value.indicator) === "price";
   const offsetSupported = ["cross_up", "cross_down", "above", "below"].includes(draft.condition.relation)
     && priceUnit(draft.condition.left) && priceUnit(draft.condition.right)
     && ["constant", "line", "indicator"].includes(draft.condition.right?.kind || "");

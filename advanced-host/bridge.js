@@ -21,7 +21,11 @@ let invalidateAlertUI = () => {};
 // Lazy loading keeps ordinary datafeed consumers independent of the renderer.
 let swingSnapshots;
 function swingStore() {return swingSnapshots ||= swingSnapshotStore();}
-let swingDisplay, indicatorCoordinator;
+let swingDisplay, indicatorCoordinator, squeezeSnapshots, squeezeDisplay;
+function squeezeStore() {return squeezeSnapshots ||= squeezeSnapshotStore();}
+function publishSqueeze(ticker,res,page,ticket) {
+  squeezeStore().publish(ticker,res,page,ticket ?? squeezeStore().ticket());squeezeDisplay?.refresh();
+}
 const indicatorBindings=new Map();
 const indicatorDependencyOrigins=new Map();
 function indicatorKey(ticker,res){
@@ -110,6 +114,7 @@ function acceptMarketBars(sub,event) {
   if(event.as_of!=null && event.as_of<(sub.displayAsOf ?? -Infinity))return;
   sub.displayAsOf=event.as_of ?? sub.displayAsOf;
   const identity=decode(sub.symbol);
+  if(identity.spec?.name==='ROLLING_RANGE_SQUEEZE') publishSqueeze(MWSeries.encode(identity.symbol,identity.series_kind),sub.res,event);
   if(identity.spec?.name==='SWING_SR_V1') {
     if(!swingStore().publish(MWSeries.encode(identity.symbol,identity.series_kind),sub.res,event,swingStore().ticket()))return;
     swingDisplay?.refresh();
@@ -421,7 +426,7 @@ function startIndicatorCoordinator(catalog) {
     occurrence:(error,consumer,attempt)=>{if(!['HISTORY_CANCELLED','DISPLAY_SNAPSHOT_EXPIRED'].includes(error.code))emitNotice(indicatorFault(consumer,error,attempt));},
     recovered:consumer=>emitNotice(indicatorFault(consumer),true),
     report:error=>{if(error.code!=='HISTORY_CANCELLED')send({type:'error',error:'指标读取失败：'+String(error)});},
-    presentation:(ticker,res,page)=>{swingStore().publish(ticker,res,page,swingStore().ticket());swingDisplay?.refresh();},
+    presentation:(ticker,res,page)=>{publishSqueeze(ticker,res,page);swingStore().publish(ticker,res,page,swingStore().ticket());swingDisplay?.refresh();},
     leases:leases=>{if(leases.length)void request({client:clientId,leases},'indicator-demand-update').catch(error=>send({type:'error',error:String(error)}));},
     release:releaseIndicatorConsumers,
     demand:rows=>{
@@ -1125,6 +1130,7 @@ function query(ticker, res, args, expires = Infinity, current = () => true, sche
   const old = cache.get(key);
   if (!q.indicators?.length && (series_kind === 'managed' || spec) && old && Date.now() - old.time < 1000) return old.promise;
   const epoch = workspaceEpoch;
+  const squeezeTicket = spec?.name==='ROLLING_RANGE_SQUEEZE' ? squeezeStore().ticket() : null;
   const swingTicket = spec?.name==='SWING_SR_V1' ? swingStore().ticket() : null;
   // Native owns the lifetime of its period caches. A temporary period switch
   // does not cancel a getBars callback that it can reuse when switching back.
@@ -1142,6 +1148,7 @@ function query(ticker, res, args, expires = Infinity, current = () => true, sche
         alertCompositeRevisions.set(MWSeries.encode(symbol,series_kind)+'|'+res,page.revision_id);
       if (epoch===workspaceEpoch && spec && Number.isSafeInteger(page.calculation_origin ?? page.origin))
         alertCalculationOrigins.set(MWSeries.encode(symbol,series_kind)+'|'+res,page.calculation_origin ?? page.origin);
+      if(epoch===workspaceEpoch && spec?.name==='ROLLING_RANGE_SQUEEZE') publishSqueeze(MWSeries.encode(symbol,series_kind),res,page,squeezeTicket);
       if(epoch===workspaceEpoch && spec?.name==='SWING_SR_V1') {
         swingStore().publish(MWSeries.encode(symbol,series_kind),res,page,swingTicket);
         swingDisplay?.refresh();
@@ -2601,6 +2608,7 @@ function boot(
   maintenanceAsked.clear();
   dataCenter?.dispose();
   swingDisplay?.dispose();
+  squeezeDisplay?.dispose();
   studyTemplates?.dispose();
   indicatorPicker?.dispose();
   barRangeMapping?.dispose();
@@ -2763,6 +2771,9 @@ function boot(
           identity:symbol=>{const id=decode(symbol);return MWSeries.encode(id.symbol,id.series_kind);},
           chartTime:(time,chart)=>stamp({start:time,end:time+86400000},chart.resolution(),decode(chart.symbol()).symbol),
           report:error=>send({type:'error',error:'Swing 显示失败：'+String(error)})});
+        squeezeDisplay = chartSqueezeDisplay(widget,squeezeStore(),{
+          identity:symbol=>{const id=decode(symbol);return MWSeries.encode(id.symbol,id.series_kind);},
+          report:error=>send({type:'error',error:'Rolling Range Squeeze 显示失败：'+String(error)})});
         alertBridge.attach();
         chartMenu = chartThemeMenu(widget, (e) =>
           send({ type: "error", error: String(e) }),
@@ -3159,6 +3170,7 @@ addEventListener("message", async (e) => {
             !sub.needsHistoryReload && !sub.historical);
         return;
       }
+      if(identity.spec?.name==='ROLLING_RANGE_SQUEEZE') publishSqueeze(MWSeries.encode(identity.symbol,identity.series_kind),sub.res,event);
       if(identity.spec?.name==='SWING_SR_V1') {
         swingStore().publish(MWSeries.encode(identity.symbol,identity.series_kind),sub.res,event,swingStore().ticket());
         swingDisplay?.refresh();

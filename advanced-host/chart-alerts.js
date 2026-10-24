@@ -175,20 +175,21 @@ function chartAlertBridge({
       .getAllStudies()
       .find((item) => String(item.id) === String(nativeId));
     const name = String(entry?.name || "").match(
-      /(?:MWPython|守望 Python |PY )(SMA|EMA|RSI|MACD)(?:@|$)/,
+      /(?:MWPython|守望 Python |PY )(SMA|EMA|RSI|MACD|ROLLING_RANGE_SQUEEZE)(?:@|$)/,
     )?.[1];
-    if (!name) throw Error("仅支持已映射的守望 Python SMA、EMA、RSI、MACD");
+    if (!name) throw Error("仅支持已映射的守望 Python SMA、EMA、RSI、MACD、ROLLING_RANGE_SQUEEZE");
     const params = Object.fromEntries(
       chart
         .getStudyById(nativeId)
         .getInputValues()
+        .filter(input=>name!=='ROLLING_RANGE_SQUEEZE' || ['k','lookback','low_pct','confirm_on_close'].includes(input.id))
         .map((input) => [input.id, input.value]),
     );
     return {
       name,
       version: "1",
       params,
-      output: name === "MACD" ? "macd" : "value",
+      output: name === "ROLLING_RANGE_SQUEEZE" ? "signal" : name === "MACD" ? "macd" : "value",
     };
   }
   async function create({

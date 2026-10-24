@@ -60,6 +60,7 @@ function supertrendPineProfile() {
 function pythonStudies(PineJS, catalog) {
   return Object.entries(catalog).map(([name, meta]) => {
     const supertrend = meta.render_profile === "supertrend_pine_v1";
+    const squeeze = meta.render_profile === "rolling_range_squeeze_v1";
     const profile = supertrend ? supertrendPineProfile() : null;
     const keys = Object.keys(meta.params),
       series = supertrend ? meta.series.filter(s => s.key !== "direction") : meta.series;
@@ -72,11 +73,11 @@ function pythonStudies(PineJS, catalog) {
         _metainfoVersion: 53,
         id: "MWPython" + name + "@market-watch-1",
         description: "守望 Python " + name,
-        shortDescription: swing ? "Swing" : "PY " + name,
+        shortDescription: swing ? "Swing" : squeeze ? "Rolling Range Squeeze" : "PY " + name,
         is_hidden_study: false,
         is_price_study: meta.pane === "main",
         isCustomIndicator: true,
-        format: swing ? { type: "inherit" } : { type: "price", precision: 5 },
+        format: swing || squeeze ? { type: "inherit" } : { type: "price", precision: 5 },
         plots: series.map((s, i) => ({ id: "plot" + i, type: "line" })),
         ...(name === "BBANDS" ? {filledAreas: [
           {id: "band_fill", objAId: "plot0", objBId: "plot2", type: "plot_plot",
@@ -108,8 +109,9 @@ function pythonStudies(PineJS, catalog) {
                 ...(swing ? {display: i === 0 || i === 2 ? 4294967295 : 4294967283} : {}),
                 trackPrice: false,
                 transparency: 0,
-                visible: true,
-                color: swing ? (i < 2 ? "#f23645" : "#00bcd4") : name === "LWMA" ? "#FFFFFF" : colors[i % colors.length],
+                visible: !squeeze || s.key === 'sma',
+                ...(squeeze && s.key !== 'sma' ? {display:0} : {}),
+                color: squeeze ? '#2196f3' : swing ? (i < 2 ? "#f23645" : "#00bcd4") : name === "LWMA" ? "#FFFFFF" : colors[i % colors.length],
               },
             ]),
           ),
@@ -134,6 +136,8 @@ function pythonStudies(PineJS, catalog) {
             defval: meta.params[key],
             min: rule.min,
             max: rule.max,
+            ...(rule.step ? {step:rule.step} : {}),
+            ...(rule.type === 'enum' ? {type:'text',options:rule.options} : {}),
           };
         }), ...displayInputs.map(item=>({id:item.id,name:item.name,type:item.type,defval:item.default,
           ...(item.options ? {options:item.options} : {}),

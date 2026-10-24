@@ -671,7 +671,7 @@ def data(body):
         before = body.before or now_ms() + 1
         # Recursive algorithms use only the selected published dataset prefix;
         # backfill never extends the user's approved start as an indicator side effect.
-        swing = any(spec.get("name") == "SWING_SR_V1" for spec in body.indicators)
+        swing = any(spec.get("name") in ("SWING_SR_V1", "ROLLING_RANGE_SQUEEZE") for spec in body.indicators)
         frozen, input_stats = None, {}
         if body.indicators and pub:
             frozen, input_stats = freeze(db, inst, pub, body, ceiling=now_ms() if swing else before-1)

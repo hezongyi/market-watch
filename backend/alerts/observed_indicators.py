@@ -66,6 +66,11 @@ class ObservedState:
 
             self.last_presentation = SwingState(self.params, self.state or None).presentation()
             self._presentation_quality()
+        elif self.name == "ROLLING_RANGE_SQUEEZE":
+            from .rolling_range_squeeze import SqueezeState
+
+            self.last_presentation = SqueezeState(self.params, self.state or None).presentation()
+            self._presentation_quality()
 
     def _presentation_quality(self):
         self.last_presentation.update(
@@ -170,7 +175,7 @@ class ObservedState:
         # This is an isolated algorithm input. The source bar and strict run
         # retain their original complete/coverage flags and checksum.
         effective = {**row, "complete": admitted, "gap_before": not admitted}
-        if forming and self.name == "SWING_SR_V1" and admitted:
+        if forming and self.name in ("SWING_SR_V1", "ROLLING_RANGE_SQUEEZE") and admitted:
             values = self.engine.display_step(effective, provisional_dependency=True)
         else:
             values = self.engine.step(effective)
@@ -180,7 +185,7 @@ class ObservedState:
         m["last_quality"] = self.last_quality
         if hasattr(self.engine, "last_presentation"):
             self.last_presentation = copy.deepcopy(self.engine.last_presentation)
-            for side, event in self.last_presentation["current"].items():
+            for side, event in self.last_presentation.get("current", {}).items():
                 if (
                     event
                     and m["event_quality"].get(side, {}).get("pivot_time") != event["pivot_time"]

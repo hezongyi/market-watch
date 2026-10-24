@@ -9,14 +9,17 @@ import copy
 import math
 
 from .chart_indicators import CATALOG, validate
+from .rolling_range_squeeze import ALGORITHM as SQUEEZE_ALGORITHM
+from .rolling_range_squeeze import NAME as SQUEEZE_NAME
+from .rolling_range_squeeze import SqueezeState
 from .supertrend_pine import ALGORITHM as SUPERTREND_ALGORITHM
 from .supertrend_pine import NAME as SUPERTREND_NAME
 from .supertrend_pine import step as supertrend_step
 
 ALGORITHM = "fixed-indicator-state-v3"
 SUPPORTED = frozenset(("SMA", "EMA", "LWMA", "BBANDS", "RSI", "MACD", "ATR", "STOCH",
-                       "SWING_SR_V1", SUPERTREND_NAME))
-ALGORITHMS = (ALGORITHM, SUPERTREND_ALGORITHM)
+                       "SWING_SR_V1", SUPERTREND_NAME, SQUEEZE_NAME))
+ALGORITHMS = (ALGORITHM, SUPERTREND_ALGORITHM, SQUEEZE_ALGORITHM)
 
 
 def advance_dependencies(state, name, params, row):
@@ -50,6 +53,8 @@ class IndicatorState:
             raise ValueError("该指标尚未声明完整初始化与检查点算法")
         self.spec = {"name": self.name, "version": "1", "params": self.params}
         self.algorithm = SUPERTREND_ALGORITHM if self.name == SUPERTREND_NAME else ALGORITHM
+        if self.name == SQUEEZE_NAME:
+            self.algorithm = SQUEEZE_ALGORITHM
         self.state = {}
         if checkpoint is not None:
             if (checkpoint.get("algorithm") != self.algorithm or checkpoint.get("spec") != self.spec):
@@ -64,6 +69,8 @@ class IndicatorState:
         # Event/alternating plots intentionally contain null after warmup.
         if self.name == SUPERTREND_NAME:
             return self.state.get("atr") is not None
+        if self.name == SQUEEZE_NAME:
+            return values["threshold"] is not None and values["ratio"] is not None
         return all(value is not None for value in values.values())
 
     def display_step(self, row, *, provisional_dependency=False):
@@ -72,6 +79,13 @@ class IndicatorState:
         Callers own the copied state. This is deliberately separate from the
         one-row provisional trial used by alert evaluation.
         """
+        if self.name == SQUEEZE_NAME:
+            admitted = row.get('display_coverage_complete', not row.get('source_confirmed', row['complete']) or row['complete'])
+            engine = SqueezeState(self.params, self.state or None, copy_state=False)
+            values = engine.step({**row, 'complete': admitted},
+                                 provisional=admitted and (provisional_dependency or not row['complete']))
+            self.state, self.last_presentation = engine.state, engine.presentation()
+            return values
         if self.name == 'SWING_SR_V1':
             from .swing_sr import SwingState
 
@@ -88,6 +102,13 @@ class IndicatorState:
         return self.step({**row, 'complete': admitted})
 
     def step(self, row, *, provisional=False):
+        if self.name == SQUEEZE_NAME:
+            engine = SqueezeState(self.params, self.state or None, copy_state=provisional)
+            values = engine.step(row, provisional=provisional)
+            self.last_presentation = engine.presentation()
+            if not provisional:
+                self.state = engine.state
+            return values
         if self.name == "SWING_SR_V1":
             from .swing_sr import SwingState
 

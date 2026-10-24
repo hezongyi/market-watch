@@ -12,7 +12,7 @@ COPY advanced-host/index.html advanced-host/build-assets.mjs advanced-host/patch
 COPY advanced-host/charting_library/ ./charting_library/
 COPY advanced-host/chart-maximize.js advanced-host/data-center.js advanced-host/price-format.js ./
 COPY advanced-host/chart-theme.js ./
-COPY advanced-host/swing-sr-display.js advanced-host/study-templates.js ./
+COPY advanced-host/rolling-range-squeeze-display.js advanced-host/swing-sr-display.js advanced-host/study-templates.js ./
 COPY advanced-host/native-ui.js advanced-host/native-indicator-dialog.js ./
 COPY advanced-host/patch-native-toolset.mjs ./
 COPY advanced-host/native-alert-shell.js advanced-host/native-notification-surface.js ./

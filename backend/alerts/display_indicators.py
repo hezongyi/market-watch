@@ -27,7 +27,7 @@ def suffix(db, run, page, *, stamp, retry=None):
     affected = min(pending)
     end = max(page['bars'][-1]['end'], max((row['end'] for row in observed), default=0))
     # A paginated Swing presentation follows the same current snapshot cutoff.
-    if run.spec['name'] == 'SWING_SR_V1':
+    if run.spec['name'] in ('SWING_SR_V1', 'ROLLING_RANGE_SQUEEZE'):
         latest = chart_page(db, page['composite_id'], run.timeframe, count=1,
             revision_id=run.revision_id, provisional=True, now=stamp, display_snapshot=snapshot)
         end = max(end, latest['bars'][-1]['end'] if latest['bars'] else end)
@@ -68,7 +68,7 @@ def suffix(db, run, page, *, stamp, retry=None):
         if row['gap_before']:
             dependent = False
         dependent |= not bar.get('complete', False)
-        if run.spec['name'] == 'SWING_SR_V1':
+        if run.spec['name'] in ('SWING_SR_V1', 'ROLLING_RANGE_SQUEEZE'):
             from .series_access import fixed_label
 
             row['chart_time'] = fixed_label(row, run.timeframe, phase)
