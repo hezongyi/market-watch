@@ -32,19 +32,23 @@ export async function attachNativeInstantNotice({
   let disposed = false,
     surface: ReturnType<Surface["mount"]> | null = null;
   let render: (state: NoticeState) => void = () => {};
+  let geometry = "";
   const position = () => {
     if (!surface) return;
-    const b = native.overlayBounds();
-    const clear =
-      b.panelLeft > b.width / 2
-        ? 2 * (b.panelLeft - b.width / 2 - 8)
-        : b.width - 24;
-    surface.update({
-      width: Math.max(120, Math.min(355, b.width - 24, clear)),
+    const { innerWidth: width, innerHeight: height } = doc.defaultView!;
+    const inset = width < 480 ? 12 : 16;
+    const next = {
+      width: Math.max(0, Math.min(355, width - 2 * inset)),
       height: 0,
-      top: b.top,
-      right: 0,
-    });
+      bottom: inset,
+      right: inset,
+      maxHeight: Math.max(0, height - 2 * inset),
+    };
+    const signature = JSON.stringify(next);
+    if (signature !== geometry) {
+      geometry = signature;
+      surface.update(next);
+    }
   };
   function View() {
     const [state, setState] = useState(initial),
@@ -89,6 +93,7 @@ export async function attachNativeInstantNotice({
     useLayoutEffect(() => {
       if (!showing) return;
       surface = native.mount(host, setTarget, true);
+      geometry = "";
       position();
       return () => {
         surface?.destroy();
@@ -121,9 +126,16 @@ export async function attachNativeInstantNotice({
       : null;
   }
   flushSync(() => root.render(<View />));
-  const observer = new MutationObserver(position);
-  observer.observe(doc.body, { childList: true, subtree: true });
-  doc.defaultView!.addEventListener("resize", position);
+  let frame = 0;
+  const schedule = () => {
+    if (!frame) frame = doc.defaultView!.requestAnimationFrame(() => {
+      frame = 0;
+      position();
+    });
+  };
+  const resize = new doc.defaultView!.ResizeObserver(schedule);
+  resize.observe(doc.documentElement);
+  doc.defaultView!.addEventListener("resize", schedule);
   return {
     update(state: NoticeState) {
       if (!disposed) {
@@ -134,8 +146,9 @@ export async function attachNativeInstantNotice({
     destroy() {
       if (disposed) return;
       disposed = true;
-      observer.disconnect();
-      doc.defaultView!.removeEventListener("resize", position);
+      resize.disconnect();
+      if (frame) doc.defaultView!.cancelAnimationFrame(frame);
+      doc.defaultView!.removeEventListener("resize", schedule);
       root.unmount();
       native.destroy();
       host.remove();

@@ -82,3 +82,21 @@ def test_explicit_closure_edges_and_split_week_continuity():
         status = session_status(identity, profile, at(stamp))
         assert status['market_session'] == 'closed'
         assert status['next_session_at'] == at('2026-10-12T06:00:00+00:00')
+
+
+def test_gbp_is_reviewed_fx_only_and_profile_window_stays_finite():
+    import pytest
+
+    scope = 'sha256:' + hashlib.sha256(b'test-account').hexdigest()
+    generate = generator()
+    start, end = map(datetime.fromisoformat, ['2026-10-24T00:00:00+00:00', '2026-10-31T00:00:00+00:00'])
+    profiles = generate(scope, start, end, ['EUR_USD', 'GBP_USD', 'XAU_USD'])
+    assert profiles['GBP_USD']['source_session']['weekly_closures'] == profiles['EUR_USD']['source_session']['weekly_closures']
+    identity = DatasetIdentity(source='oanda', channel='v20', environment='practice', account_scope=scope,
+        provider_symbol='GBP_USD', basis='bid', calendar_version='candidate').model_dump()
+    assert session_status(identity, profiles['GBP_USD'], at('2026-10-25T21:05:00+00:00'))['market_session'] == 'scheduled_open'
+    assert session_status(identity | {'account_scope': 'public'}, profiles['GBP_USD'], at('2026-10-24T06:00:00+00:00'))['market_session'] == 'unknown'
+    with pytest.raises(ValueError, match='only'):
+        generate(scope, start, end, ['USD_TRY'])
+    with pytest.raises(ValueError, match='weekly'):
+        generate(scope, start, datetime.fromisoformat('2026-11-02T00:00:00+00:00'), ['GBP_USD'])

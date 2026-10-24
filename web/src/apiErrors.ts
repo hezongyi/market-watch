@@ -9,6 +9,7 @@ export type ErrorDetails = {
 };
 export class ApiError extends Error {
   notice_source_id?: string;
+  snapshot_evidence?: SnapshotEvidence;
   fieldErrors: FieldError[] = [];
   retryable: boolean;
   retryAfter?: number;
@@ -22,6 +23,13 @@ export class ApiError extends Error {
     this.name = "ApiError";
     this.retryable = [408, 429, 502, 503, 504].includes(status);
   }
+}
+type SnapshotEvidence = {reason: string; attempt_ref: string; credential_ref: string};
+function snapshotEvidence(value: unknown): SnapshotEvidence | undefined {
+  const v=value as Partial<SnapshotEvidence> | null;
+  if(!v || !['missing','ttl','identity','epoch','calendar','legacy'].includes(v.reason || '') ||
+    !/^[a-f0-9]{32}$/.test(v.attempt_ref || '') || !/^[a-f0-9]{16}$/.test(v.credential_ref || ''))return;
+  return {reason:v.reason!,attempt_ref:v.attempt_ref!,credential_ref:v.credential_ref!};
 }
 export function errorMessage(error: unknown): string {
   return error instanceof Error
@@ -123,6 +131,7 @@ export function responseError(
     d.display_retry as Record<string, string> | undefined,
   );
   error.fieldErrors = fieldErrors;
+  error.snapshot_evidence = snapshotEvidence(d.snapshot_evidence);
   if (typeof d.notice_source_id === "string")
     error.notice_source_id = d.notice_source_id;
   if (typeof d.retryable === "boolean") error.retryable = d.retryable;
@@ -134,6 +143,7 @@ export function rpcError(error: unknown): ApiError {
   const value = error as Partial<ErrorDetails> & {
     display_retry?: Record<string, string>;
     notice_source_id?: string;
+    snapshot_evidence?: SnapshotEvidence;
   };
   const result = new ApiError(
     publicMessage(
@@ -145,6 +155,7 @@ export function rpcError(error: unknown): ApiError {
     value?.display_retry,
   );
   result.notice_source_id = value?.notice_source_id;
+  result.snapshot_evidence = snapshotEvidence(value?.snapshot_evidence);
   result.fieldErrors = Array.isArray(value?.fieldErrors)
     ? value.fieldErrors
     : [];

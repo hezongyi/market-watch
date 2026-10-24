@@ -239,7 +239,7 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
         // indicator by silently substituting a newer snapshot under old prices.
         consumer.retryAt=Infinity;
         try {
-          await recover(chart.symbol(),scope.resolution,binding.displaySnapshot ?? binding.providerSnapshot);
+          await recover(chart.symbol(),scope.resolution,binding.displaySnapshot ?? binding.providerSnapshot,error);
           consumer.retryAt=0;
         } catch(recoveryError) {
           if(current()){status(consumer,'error',recoveryError);report(recoveryError,consumer);occurrence(recoveryError,consumer,attemptId);}

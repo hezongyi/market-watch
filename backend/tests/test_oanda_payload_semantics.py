@@ -159,7 +159,7 @@ def test_unproven_defaults_are_not_equated(store, source, complete):
 
 
 @pytest.mark.parametrize('reason', ['missing', 'ttl', 'epoch', 'calendar', 'legacy', 'identity'])
-def test_rejection_reason_is_internal_and_redacted(store, monkeypatch, caplog, reason):
+def test_rejection_reason_is_bounded_and_redacted(store, monkeypatch, caplog, reason):
     monkeypatch.setattr(upstream, 'metadata', lambda _: META)
     key = seed(META, 'M1', 1000000, page(0, 1000000, boundary=True))
     token = read()['provider_snapshot_id']
@@ -189,6 +189,9 @@ def test_rejection_reason_is_internal_and_redacted(store, monkeypatch, caplog, r
     assert len(entry['attempt_ref']) == 32
     assert token not in caplog.text and META['id'] not in caplog.text
     assert error.value.attempt_ref == entry['attempt_ref']
+    assert error.value.snapshot_evidence == {key: entry[key] for key in (
+        'reason', 'attempt_ref', 'credential_ref')}
+    assert token not in str(error.value.snapshot_evidence)
 
 
 def test_rejection_attempt_matches_http_diagnostic_header(store, monkeypatch, caplog):
@@ -206,7 +209,8 @@ def test_rejection_attempt_matches_http_diagnostic_header(store, monkeypatch, ca
     assert error.value.headers == {'X-MW-Attempt-Ref': entry['attempt_ref']}
     assert error.value.status_code == 422
     assert error.value.detail == {'code': 'DISPLAY_SNAPSHOT_EXPIRED',
-                                'message': '平台展示快照已过期或历史已修订，请重新读取价格快照'}
+        'message': '平台展示快照已过期或历史已修订，请重新读取价格快照',
+        'snapshot_evidence': {key: entry[key] for key in ('reason', 'attempt_ref', 'credential_ref')}}
 
 
 def test_missing_volume_preserves_legacy_decimal_observation(store, monkeypatch):

@@ -54,8 +54,12 @@ def test_snapshot_expiry_and_capacity_are_bounded(database, monkeypatch):
     with database.begin() as db:
         assert db.scalar(select(func.count()).select_from(Preference).where(
             Preference.key.startswith(snapshots.PREFIX))) == 3
-    with pytest.raises(DisplaySnapshotError):
+    with pytest.raises(DisplaySnapshotError) as expired:
         read(indicators=[SPEC], provider_snapshot_id=first)
+    assert expired.value.snapshot_evidence['reason'] == 'missing'
+    assert len(expired.value.snapshot_evidence['attempt_ref']) == 32
+    assert len(expired.value.snapshot_evidence['credential_ref']) == 16
+    assert first not in str(expired.value.snapshot_evidence)
 
 
 @pytest.mark.parametrize('frame', ['D1', 'W1', 'MN'])

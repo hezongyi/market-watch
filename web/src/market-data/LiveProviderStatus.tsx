@@ -14,6 +14,7 @@ type Live = {
   error: string | null; connection: string; quote_ready: boolean; candle_ready: boolean; recovery_ready: boolean;
   quote: { source_time?: number } | null; received_at: number | null; heartbeat_at: number | null;
   last_confirmed_m1: number | null; next_probe_at: number | null;
+  session_configuration?: {profile_reason?: string | null; reviewed_start?: string | null; reviewed_end?: string | null};
 };
 type Status = { provider: Provider; datasets: Live[] };
 const errors: Record<string, string> = {
@@ -33,9 +34,17 @@ function ScheduledCheck({ at }: { at?: number | null }) {
   return <span>{at ? `${at <= Date.now() ? "原计划检查时间（已过期）" : "下次计划检查"}：${statusTime(at)}` : "计划检查时间未提供"}</span>;
 }
 function Session({ row }: { row: Live }) {
+  const reasons: Record<string,string> = {
+    missing_profile:'尚未配置已审核时段，请核对来源会话配置',
+    outside_reviewed_window:'时段审核窗已失效，请复核并更新配置',
+    identity_mismatch:'时段配置与当前来源身份不一致，请核对配置',
+    boundary_minute:'当前处于开闭市边界，等待来源确认',
+  };
+  const reason=row.session_configuration?.profile_reason;
   return <>
     <span className="dc-source-session">{row.market_session === "closed" ? "闭市" : row.market_session === "scheduled_open" && row.calendar_verified ? "已核实交易时段" : "时段尚未核实"}</span>
     {row.market_session === "closed" && row.next_session_at ? <small>{row.next_session_at <= Date.now() ? "记录的下一时段时间（已过期）" : "已核实下一时段"}：{statusTime(row.next_session_at)}</small> : null}
+    {reason && reasons[reason] ? <small>{reasons[reason]}</small> : null}
   </>;
 }
 function overview(provider: Provider, rows: Live[]) {

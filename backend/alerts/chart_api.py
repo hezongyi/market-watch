@@ -1062,6 +1062,8 @@ def data_sync(body: DataQuery):
         detail = {"code": e.code, "message": str(e)} if hasattr(e, "code") else str(e)
         if hasattr(e, "display_retry"):
             detail["display_retry"] = e.display_retry
+        if hasattr(e, 'snapshot_evidence'):
+            detail['snapshot_evidence'] = e.snapshot_evidence
         headers = {'X-MW-Attempt-Ref': e.attempt_ref} if hasattr(e, 'attempt_ref') else None
         raise HTTPException(422, detail, headers=headers) from e
 

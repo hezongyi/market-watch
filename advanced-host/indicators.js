@@ -35,7 +35,7 @@ function supertrendPineProfile() {
     };
   }
   return {
-    format: {type: "price", precision: 2}, plots, styles,
+    format: {type: "inherit"}, plots, styles,
     filledAreas: [
       {id: "long_fill", objAId: "fill_reference", objBId: "up_fill", type: "plot_plot", title: "UpTrend Highlighter", fillgaps: false},
       {id: "short_fill", objAId: "fill_reference", objBId: "down_fill", type: "plot_plot", title: "DownTrend Highlighter", fillgaps: false},
@@ -76,13 +76,20 @@ function pythonStudies(PineJS, catalog) {
         is_hidden_study: false,
         is_price_study: meta.pane === "main",
         isCustomIndicator: true,
-        format: { type: "price", precision: 5 },
+        format: swing ? { type: "inherit" } : { type: "price", precision: 5 },
         plots: series.map((s, i) => ({ id: "plot" + i, type: "line" })),
+        ...(name === "BBANDS" ? {filledAreas: [
+          {id: "band_fill", objAId: "plot0", objBId: "plot2", type: "plot_plot",
+            title: "Bands Background", fillgaps: false},
+        ]} : {}),
         bands: (meta.levels || []).map((value, i) => ({
           id: "level" + i,
           name: String(value),
         })),
         defaults: {
+          ...(name === "BBANDS" ? {filledAreasStyle: {
+            band_fill: {color: "#2196F3", transparency: 95, visible: true},
+          }} : {}),
           bands: (meta.levels || []).map((value) => ({
             color: "#787b86",
             linestyle: 2,
@@ -98,6 +105,7 @@ function pythonStudies(PineJS, catalog) {
                 linewidth: 2,
                 plottype: swing ? 6 : s.type === "histogram" ? 1 : 0,
                 ...(swing ? {joinPoints:false} : {}),
+                ...(swing ? {display: i === 0 || i === 2 ? 4294967295 : 4294967283} : {}),
                 trackPrice: false,
                 transparency: 0,
                 visible: true,

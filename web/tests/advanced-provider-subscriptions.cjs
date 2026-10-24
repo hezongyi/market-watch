@@ -166,5 +166,20 @@ const watchdog=setTimeout(()=>{console.error('Provider subscription test timed o
   const pendingOld=late.subscribe({client:'late',listener:'old',generation:1});await flush();
   const clearOld=late.clear();releaseOld();await pendingOld;await clearOld;
   assert.equal(facts.length,count,'late registration errors after release cannot produce facts');
+  const evidenceRows=[],evidenceStreams=[];
+  const evidenced=factory(async()=>{},()=>{const s={readyState:0,onmessage:null,close(){}};evidenceStreams.push(s);return s;},
+    ()=>{},()=>{},undefined,(args,kind,error,attempt,lifecycle,evidence)=>evidenceRows.push({error,attempt,lifecycle,evidence}));
+  await evidenced.subscribe({client:'evidence',listener:'one'});
+  const active=evidenceStreams[0];active.onerror({});active.onerror({});
+  assert.equal(evidenceRows.length,1);assert.equal(evidenceRows[0].evidence.ready_state,0);
+  assert.equal(evidenceRows[0].evidence.reconnect_count,0);
+  assert.equal(timers.size,0,'CONNECTING stays with native retry');
+  active.readyState=1;active.onopen({});await flush();
+  assert.equal(evidenceRows.length,2);assert.equal(evidenceRows[1].attempt,evidenceRows[0].attempt);
+  assert.equal(evidenceRows[1].evidence.reconnect_count,1);
+  assert(evidenceRows[1].evidence.recovered_at>=evidenceRows[0].evidence.occurred_at);
+  active.readyState=2;active.onerror({});await evidenced.clear();
+  assert.equal(evidenceRows.at(-1).lifecycle,'ended');assert.equal(evidenceRows.at(-1).evidence.recovered_at,undefined);
+  assert.equal(timers.size,0);active.onopen({});assert.equal(evidenceRows.length,4);
   console.log('Provider subscription transport: ordered cancellation, shared stream, stale events and unmount passed');
 })().catch(error=>{console.error(error);process.exitCode=1}).finally(()=>clearTimeout(watchdog));

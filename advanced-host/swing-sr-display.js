@@ -73,6 +73,27 @@ function swingDisplayInputs(study) {
   return {params,show:input.show_average_spacing,position:input.statistics_position};
 }
 
+// Display is an unsigned native bit mask. Preserve Pane, DataWindow and any
+// additional flags, including the high bits of All; only own the two labels.
+function swingLabelStyles(study) {
+  const values = study.getStyleValues();
+  const styles = values.styles || values;
+  const overrides = {};
+  const names = ['high', 'high_left', 'low', 'low_left'];
+  for (const pair of [[0, 1], [2, 3]]) {
+    const owner = pair.find(index => styles['plot' + index]?.visible !== false);
+    for (const index of pair) {
+      const plot = styles['plot' + index];
+      if (!plot) continue;
+      const current = plot.display ?? 4294967295;
+      const display = (index === owner ? current | 12 : current & ~12) >>> 0;
+      if (display !== current) overrides[names[index] + '.display'] = display;
+    }
+  }
+  if (Object.keys(overrides).length) study.applyOverrides(overrides);
+  return Object.keys(overrides).length ? study.getStyleValues().styles : styles;
+}
+
 // Use the existing native pane adapter's canvas bounds, including resized and
 // maximized layouts. No private DOM class names or native legend edits.
 function swingPaneBounds(chart, root) {
@@ -92,9 +113,15 @@ function swingPaneBounds(chart, root) {
   return {left:left-host.left,top:top-host.top,width:rect.width,height:rect.height};
 }
 
+function swingDisplayDocument(widget) {
+  return widget.chart(0)._chartWidget.paneWidgets().find(pane=>pane.containsMainSeries())
+    .canvasElement().ownerDocument;
+}
+
 function chartSwingDisplay(widget, store, {root, identity, chartTime = time=>time, report = () => {}}) {
   const doc = root.ownerDocument;
   const bindings = new Map();
+  const formatted = new Set();
   const infoGroups = new Map(), cardGroups = new Map();
   let disposed = false, timer;
   const info = doc.createElement('div');
@@ -103,7 +130,10 @@ function chartSwingDisplay(widget, store, {root, identity, chartTime = time=>tim
   root.before(info);
   const cards = doc.createElement('div');
   cards.className = 'mw-swing-cards';
-  root.append(cards);
+  // Native dialogs live inside the chart iframe. Place pane cards in the same
+  // stacking context so a narrow notification or menu can cover them.
+  const paneDoc = swingDisplayDocument(widget);
+  paneDoc.body.append(cards);
   const style = doc.createElement('style');
   style.textContent = `
     #chart {position:relative;flex:1;min-height:0}
@@ -124,6 +154,9 @@ function chartSwingDisplay(widget, store, {root, identity, chartTime = time=>tim
     .mw-swing-details {font-size:11px;max-width:32em}
   `;
   doc.head.append(style);
+  const paneStyle = paneDoc.createElement('style');
+  paneStyle.textContent = style.textContent;
+  paneDoc.head.append(paneStyle);
 
   function removeShape(binding, side) {
     const id = binding.shapes[side];
@@ -138,6 +171,7 @@ function chartSwingDisplay(widget, store, {root, identity, chartTime = time=>tim
   function reset() {
     for (const binding of bindings.values()) remove(binding);
     bindings.clear();
+    formatted.clear();
     store.clear();
     info.replaceChildren();
     cards.replaceChildren();
@@ -231,6 +265,14 @@ function chartSwingDisplay(widget, store, {root, identity, chartTime = time=>tim
         const key = index + ':' + item.id;
         active.add(key);
         const study = chart.getStudyById(item.id), input = swingDisplayInputs(study);
+        // Native inherit follows automatic, manual and custom main-series
+        // formatters. Public precision=default clears old saved overrides once
+        // per loaded study without replacing it or changing its other styles.
+        if (!formatted.has(key)) {
+          formatted.add(key);
+          study.applyOverrides({precision:'default'});
+        }
+        const styles = swingLabelStyles(study);
         const fingerprint = JSON.stringify([chart.symbol(),chart.resolution(),input?.params]);
         let binding = bindings.get(key);
         if (binding && (binding.chart!==chart || binding.fingerprint!==fingerprint || !study.isVisible())) {
@@ -248,12 +290,12 @@ function chartSwingDisplay(widget, store, {root, identity, chartTime = time=>tim
         const chartTimes = new Map(record.bars.map(bar=>[bar.start,bar.chart_time ?? bar.start]));
         binding.time = time=>time===p.as_of_bar_time && p.as_of_chart_time!=null ?
           p.as_of_chart_time : chartTimes.get(time) ?? chartTime(time,chart);
-        const styles = study.getStyleValues()?.styles || study.getStyleValues();
         for(const side of ['high','low']) void bridge(binding,side,p.current[side],p.as_of_bar_time,input,styles);
         statisticsRow(binding,input,p);
       }
     }
     for(const [key,binding] of bindings) if(!active.has(key)) {remove(binding);bindings.delete(key);}
+    for(const key of formatted) if(!active.has(key)) formatted.delete(key);
     layout();
   }
   function layout() {
@@ -275,7 +317,7 @@ function chartSwingDisplay(widget, store, {root, identity, chartTime = time=>tim
     }
     for(const [index,group] of cardGroups) {
       if(!group.childElementCount || index>=widget.chartsCount()) {group.remove();cardGroups.delete(index);continue;}
-      const bounds=swingPaneBounds(widget.chart(index),root);
+      const bounds=swingPaneBounds(widget.chart(index),cards);
       if(!bounds || !bounds.width || !bounds.height) {group.style.display='none';continue;}
       group.style.display='';
       group.style.left=(bounds.left+8)+'px';
@@ -295,6 +337,6 @@ function chartSwingDisplay(widget, store, {root, identity, chartTime = time=>tim
   return {refresh:refreshSafe,reset,dispose() {
     disposed=true;clearInterval(timer);observer.disconnect();reset();
     widget.unsubscribe('chart_load_requested',reset);widget.unsubscribe('study_event',refreshSafe);
-    widget.unsubscribe('layout_changed',refreshSafe);info.remove();cards.remove();style.remove();
+    widget.unsubscribe('layout_changed',refreshSafe);info.remove();cards.remove();style.remove();paneStyle.remove();
   }};
 }

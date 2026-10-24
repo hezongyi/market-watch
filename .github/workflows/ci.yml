@@ -181,6 +181,8 @@ jobs:
           node tests/indicator-display-snapshot.cjs
           node tests/indicator-snapshot-recovery.cjs
           node tests/display-recovery-lifecycle.cjs
+          node tests/display-recovery-deferred.cjs
+          node tests/snapshot-error-evidence.cjs
           node tests/provider-credential-recovery.cjs
           node tests/issue89-sampling.cjs
           node tests/issue89-native-lifecycle.cjs
