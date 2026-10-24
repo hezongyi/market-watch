@@ -15,4 +15,10 @@
 
 执行Supertrend既有映射合同、相关格式与身份合同、新原生浏览器回归和mwa真实EURUSD验收。只构建/替换Chart；Web、API、workers及其他服务保持当前身份。使用现有mwa，保留真实数据、完整私有配置和受保护浏览器，不PR/push/合并/生产发布或操作Unraid。
 
-证据目录：`/home/quant/repos/.reports/market-watch/20261024-supertrend-precision/`。实际候选、制品身份、检查结果、数据核对与Chart-only回退将在同目录results.md收口。
+已完成：产品提交`90699b2d128e39d3706800be924df01d7b15eb07`；Chart镜像`sha256:371675c27dada9b282ebdeb2ae0710e05bedce1caba793eddc9cadb402d218c0`，dirty=false。11组本地原生浏览器场景及实际mwa EURUSD检查通过，实际标签`1.12170`，主图示例`1.12346`，均五位；价格格式、Supertrend既有映射和指标身份3项Node合同通过。
+
+15容器运行/API与PG healthy/restart=0，只有Chart替换，其余14容器身份及全部配置保持。6张持久表数量及完整行哈希均不变，保护浏览器ID与启动时间不变。运行实例继续保留，长期manager已同步固定Chart引用；没有重跑全套CI、Swing/通知矩阵或长期稳定性测试。
+
+入口：<https://192.168.7.232:18280/advanced-charts/mw75-real>。Chart-only运维：`python3 /home/quant/repos/.mwa-supertrend-precision-20261024/operate.py start|status|stop|audit`。实际未stop/rollback。
+
+完整结果、截图与精确回退：[results.md](/home/quant/repos/.reports/market-watch/20261024-supertrend-precision/results.md)。
