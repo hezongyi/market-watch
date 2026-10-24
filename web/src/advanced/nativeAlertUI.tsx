@@ -1,5 +1,6 @@
 import "../notifications/native";
 import type { NoticeTransport } from "../notifications/types";
+import type { OverlayBounds } from "../notifications/NativeSystemMessages";
 import { createRoot } from "react-dom/client";
 import { useState } from "react";
 import { ChartAlertsPanel, type AlertDraft } from "./ChartAlertsPanel";
@@ -32,12 +33,7 @@ type Shell = {
   destroy: () => void;
   openDialog: NativeAlertDialog;
   control: NativeControlFactory;
-  overlayBounds: (anchor?: HTMLElement) => {
-    width: number;
-    height: number;
-    top: number;
-    panelLeft: number;
-  };
+  overlayBounds: (anchor?: HTMLElement) => OverlayBounds;
 };
 declare global {
   var nativeAlertShell: (

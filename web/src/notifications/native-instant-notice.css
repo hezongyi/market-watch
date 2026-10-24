@@ -3,6 +3,15 @@
   margin: 0 !important;
   min-width: 0 !important;
   max-width: calc(100vw - 24px) !important;
+  min-height: 0 !important;
+  display: flex;
+  flex-direction: column;
+}
+.nc-native-instant-content {
+  min-height: 0;
+  max-height: inherit;
+  overflow: auto;
+  overscroll-behavior: contain;
 }
 .nc-native-instant .nc-bubble.nc-native-bubble {
   position: relative;
@@ -50,7 +59,7 @@
 }
 .nc-native-instant .nc-bubble.nc-native-bubble p {
   margin: 0;
-  max-height: 110px;
+  max-height: none;
   font-size: 14px;
   line-height: 22px;
   color: inherit;
@@ -108,8 +117,8 @@ html:not(.theme-dark) .nc-native-instant .nc-timestamp-clock {
   margin-top: 12px;
   flex-wrap: wrap;
 }
-/* Individual translate preserves native horizontal centering. Clip the travel
-   at the notice's top edge so it cannot sweep across the toolbar. */
+/* The native surface owns bottom/right. Only motion and opacity animate;
+   leave shadow and scroll content unclipped during the short travel. */
 .nc-native-instant:has([data-notice-phase="enter"]) {
   animation: nc-notice-in 220ms ease-out both;
 }
@@ -119,26 +128,22 @@ html:not(.theme-dark) .nc-native-instant .nc-timestamp-clock {
 }
 @keyframes nc-notice-in {
   from {
-    translate: 0 -16px;
+    translate: 0 16px;
     opacity: 0;
-    clip-path: inset(16px -16px -16px);
   }
   to {
     translate: 0 0;
     opacity: 1;
-    clip-path: inset(0 -16px -16px);
   }
 }
 @keyframes nc-notice-out {
   from {
     translate: 0 0;
     opacity: 1;
-    clip-path: inset(0 -16px -16px);
   }
   to {
-    translate: 0 -16px;
+    translate: 0 16px;
     opacity: 0;
-    clip-path: inset(16px -16px -16px);
   }
 }
 @media (prefers-reduced-motion: reduce) {

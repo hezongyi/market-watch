@@ -68,3 +68,15 @@
 - 系统消息列表与统一即时浮窗都直接展示三行：日期、秒级时间、紧凑 UTC 偏移。列表固定右侧时间列，12/13/12px，全部正常文字色；浮窗正文下独立时间块，12/14/12px，仅时分秒橙色。窄屏可整块换行，数字等宽，不叠加低透明度。现有日期分隔保留，不新增今天/昨天或吸顶分组。
 
 本轮 F0/R1：兼容查询排序及现有 meta 偏好扩展，无 schema/UTC/确认协议变化。[实施与 Playwriter 证据](verification/notification-refinements-20261019/README.md)。
+
+## 2026-10-24 即时通知定位与动效更新
+
+本节取代此前顶部居中的即时浮窗位置，消息中心仍为 top/right。
+
+- 桌面：原生图表可用区域右下角，右/下16px，最大宽355px。固定v31适配器 `native-alert-shell.js` 的 `overlayBounds.chartBounds` 封装原生布局边界，避让侧栏及底部区域。
+- 宽度小于480px：视口右/下12px，宽不超过 `min(355px, 视口宽−24px)`。
+- 内容高度限制在可用区域内，内部滚动，长内容的关闭、查看、确定按钮可达；覆盖式非模态，不调整画布尺寸。
+- 共享 Surface 几何互斥使用 top/right 或 bottom/right。即时通知清除旧 top/left/居中 transform，resize及原生布局开合后重新定位。
+- 入场 translateY(+16px)→0、opacity0→1、220ms ease-out；退场0→+16px、opacity1→0、160ms ease-in。不再使用顶部专用 clip-path，仅动画位移和透明度，保留阴影。
+- 保留 enter/shown/exit、先退后进、同事件更新不重播、退场快照 inert；reduced-motion 无位移或动画等待。
+- 系统消息完全呈现后开始计时，悬停/焦点暂停；交易告警未确认不消失，新告警排队；动画不提交确认。

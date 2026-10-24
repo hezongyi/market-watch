@@ -76,7 +76,7 @@ function pythonStudies(PineJS, catalog) {
         is_hidden_study: false,
         is_price_study: meta.pane === "main",
         isCustomIndicator: true,
-        format: { type: "price", precision: 5 },
+        format: swing ? { type: "inherit" } : { type: "price", precision: 5 },
         plots: series.map((s, i) => ({ id: "plot" + i, type: "line" })),
         bands: (meta.levels || []).map((value, i) => ({
           id: "level" + i,
@@ -98,6 +98,7 @@ function pythonStudies(PineJS, catalog) {
                 linewidth: 2,
                 plottype: swing ? 6 : s.type === "histogram" ? 1 : 0,
                 ...(swing ? {joinPoints:false} : {}),
+                ...(swing ? {display: i === 0 || i === 2 ? 4294967295 : 4294967283} : {}),
                 trackPrice: false,
                 transparency: 0,
                 visible: true,

@@ -280,3 +280,11 @@ cd /home/quant/repos/market-watch-hammer-plan-20261012
 python3 docs/research/patternsmart-evidence-20261012/long_statistics.py \
   --output /tmp/market-watch-swing-sr-statistics-20261012.json
 ```
+
+## 2026-10-24 当前展示约定
+
+此节更新早期“每侧两个标签”的约定，历史验收记录保留。
+
+Swing 的价格格式继承所在主图的实际 formatter，包含自动精度、手动精度及应用自定义 formatter；其他 Python study 保持原格式。旧 workspace/template 恢复时，通过公开 `applyOverrides({precision: 'default'})` 清除 Swing 的旧展示精度覆盖，不重建 study，不舍入原始计算数据。
+
+每实例、每侧仅一个绘图承担价格轴及图例标签：high/low 可见时优先；否则转交可见的 high_left/low_left；两者都隐藏则无标签。仅修改 display 的 PriceScale=4 和 StatusLine=8，保留 Pane、DataWindow、All 的其余位及用户颜色、线宽、可见性。四条绘图、独立强度偏移和最新有限值水平桥接线保持。规范化复用已有 study 事件和250ms刷新，不依赖统计开启或 snapshot 就绪。

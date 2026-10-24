@@ -15,18 +15,21 @@ import { messageIcons } from "./icons";
 import "./native-system-messages.css";
 import { SystemHistoryCache } from "./useSystemHistory";
 
-type Geometry = { width: number; height: number; top: number; right: number };
+type Geometry = { width: number; height: number; right: number; maxHeight?: number } &
+  ({ top: number; bottom?: never } | { bottom: number; top?: never });
+export type OverlayBounds = {
+  top: number;
+  width: number;
+  height: number;
+  panelLeft: number;
+  chartBounds: { left: number; top: number; right: number; bottom: number };
+};
 export type Surface = {
   document: Document;
   scrollClass: string;
   createEntry: (slot: HTMLElement, icon: string) => Promise<HTMLElement>;
   control: NativeControlFactory;
-  overlayBounds: (anchor?: HTMLElement) => {
-    top: number;
-    width: number;
-    height: number;
-    panelLeft: number;
-  };
+  overlayBounds: (anchor?: HTMLElement) => OverlayBounds;
   mount: (
     target: HTMLElement,
     content: (node: HTMLElement | null) => void,
