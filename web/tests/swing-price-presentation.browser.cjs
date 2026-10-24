@@ -26,6 +26,7 @@ const assert = require('node:assert/strict');
       return {legend,styles:s.getStyleValues().styles, main:[c.priceFormatter().format(raw.high.price),c.priceFormatter().format(raw.low.price)], text, inputs:s.getInputValues(),shapes:c.getAllShapes().map(x=>c.getShapeById(x.id).getPoints())};
     });
     const checkLabels = async () => {
+      await expect.poll(async()=>{const s=await inspect(),names=['high','high_left','low','low_left'];const expected=[[0,1],[2,3]].map(pair=>pair.find(i=>s.styles['plot'+i].visible!==false)).filter(i=>i!==undefined).map(i=>names[i]);return JSON.stringify(s.legend.map(x=>x.plot))===JSON.stringify(expected);}).toBe(true);
       const state=await inspect();
       for(const pair of [[0,1],[2,3]]) {
         const owner=pair.find(i=>state.styles['plot'+i].visible!==false);
@@ -54,8 +55,12 @@ const assert = require('node:assert/strict');
         }
         await page.evaluate(()=>{const s=widget.activeChart().getStudyById(studyId);s.applyOverrides({'high.visible':false,'high_left.visible':false});display.refresh();});
         state=await checkLabels();assert.equal(state.styles.plot0.visible,false);assert.equal(state.styles.plot1.visible,false);
+        await page.evaluate(()=>{widget.activeChart().getStudyById(studyId).applyOverrides({'high.visible':true,'high_left.visible':true,'low.visible':false,'low_left.visible':false});display.refresh();});
+        state=await checkLabels();assert.equal(state.styles.plot2.visible,false);assert.equal(state.styles.plot3.visible,false);
+        await page.evaluate(()=>{widget.activeChart().getStudyById(studyId).applyOverrides({'high.visible':false,'high_left.visible':false});display.refresh();});
+        assert.deepEqual((await checkLabels()).legend,[]);
         record('each plot hidden / both plots hidden preserve visibility and transfer labels');
-        await page.evaluate(()=>{snapshots.clear();const s=widget.activeChart().getStudyById(studyId);s.setInputValues([{id:'show_average_spacing',value:false}]);s.applyOverrides({'low.visible':false});display.refresh();});
+        await page.evaluate(()=>{snapshots.clear();const s=widget.activeChart().getStudyById(studyId);s.setInputValues([{id:'show_average_spacing',value:false}]);s.applyOverrides({'high.visible':true,'high_left.visible':true,'low.visible':false,'low_left.visible':true});display.refresh();});
         await checkLabels();record('normalization with statistics off and no snapshot');
         for(const kind of ['workspace','template']) {
           await page.evaluate(({kind,value})=>{if(kind==='workspace')widget.load(value);else widget.activeChart().applyStudyTemplate(value);},{kind,value:legacy[kind]});
@@ -65,7 +70,9 @@ const assert = require('node:assert/strict');
           const saved=await page.evaluate(()=>new Promise(r=>widget.save(r)));
           assert.equal(savedStudy(saved).state.precision,'default');
           await page.evaluate(s=>widget.load(s),saved);await page.waitForTimeout(500);
-          assert.equal((await inspect()).styles.plot0.color,'#123456');
+          const twice=await checkLabels();
+          assert.equal(twice.styles.plot0.color,'#123456');assert.equal(twice.styles.plot0.linewidth,4);
+          assert.equal(twice.styles.plot1.visible,false);assert.deepEqual(twice.inputs,legacy.inputs);
           record('legacy '+kind+' restore and second save/reload preserve settings');
         }
         await page.evaluate(async()=>{await widget.activeChart().createStudy('守望 Python SWING_SR_V1',false,false);widget.setLayout('2h');});
@@ -77,7 +84,26 @@ const assert = require('node:assert/strict');
         for(const chart of independent) for(const styles of chart) {
           assert.equal(Object.values(styles).filter(s=>s.visible!==false&&(s.display&12)===12).length,2);
         }
-        record('multiple study instances and two native charts independent');
+        await page.evaluate(async()=>{widget.symbolSync().setValue(false);await new Promise(r=>widget.chart(1).setSymbol('XAUUSD_THREE',r));});
+        await expect.poll(()=>page.evaluate(()=>[widget.chart(0).priceFormatter().format(2700.12345),widget.chart(1).priceFormatter().format(2700.12345)]),{timeout:15000}).toEqual(['2,700.12','2,700.123']);
+        await expect.poll(async()=>{
+          result.independentCharts=await page.evaluate(()=>{
+          return Array.from({length:widget.chartsCount()},(_,i)=>{
+            const chart=widget.chart(i);
+            const container=chart._chartWidget.paneWidgets().find(pane=>pane.containsMainSeries()).canvasElement().closest('.chart-container');
+            return chart.getAllStudies().map(study=>{
+              const inputs=Object.fromEntries(chart.getStudyById(study.id).getInputValues().map(item=>[item.id,item.value]));
+              const params={high_strength:inputs.high_strength,low_strength:inputs.low_strength};
+              const result=fixture.variants[JSON.stringify(params)]||fixture.result;
+              const expected=['high','low'].map(side=>chart.priceFormatter().format(result.presentation.current[side].price));
+              const values=Array.from(container.querySelectorAll('[data-entity-id="'+study.id+'"] [data-test-id-value-title]')).filter(n=>n.getClientRects().length).map(n=>n.textContent);
+              return {chart:i,study:study.id,expected,values};
+            });
+          }).flat();
+          });
+          return result.independentCharts.every(row=>JSON.stringify(row.values)===JSON.stringify(row.expected));
+        },{timeout:15000}).toBe(true);
+        record('multiple study instances and two native charts with independent precision');
       }
       await page.close();
     }
@@ -93,7 +119,16 @@ const assert = require('node:assert/strict');
     await expect.poll(async()=> (await rendered.allTextContents()).every(text=>/[0-9]/.test(text)),{timeout:90000}).toBe(true);
     result.liveSwing={values:await rendered.allTextContents(),styles:await app.host.evaluate(id=>widget.activeChart().getStudyById(id).getStyleValues(),id)};
     const actual=await app.host.evaluate(()=>({charts:widget.chartsCount(),studies:Array.from({length:widget.chartsCount()},(_,i)=>widget.chart(i).getAllStudies().map(x=>({name:x.name,styles:widget.chart(i).getStudyById(x.id).getStyleValues().styles}))),format:widget.activeChart().priceFormatter().format(2700.12345)}));
-    result.application=actual;record('mw-acceptance authenticated native application and exact candidate Swing assets');
+    result.application=actual;
+    // Keep the actual workspace's provider series identity when changing the
+    // instrument. Bare XAUUSD selects the separate managed dataset.
+    await app.host.evaluate(()=>new Promise(r=>widget.activeChart().setSymbol('MWP:XAUUSD',r)));
+    await expect.poll(async()=>{const values=await rendered.allTextContents();return values.length===2 && values.every(text=>Number(text.replaceAll(',',''))>100);},{timeout:120000}).toBe(true);
+    const goldValues=await rendered.allTextContents();
+    const goldFormatted=await app.host.evaluate(values=>values.map(text=>widget.activeChart().priceFormatter().format(Number(text.replaceAll(',','')))),goldValues);
+    assert.deepEqual(goldValues,goldFormatted,'actual XAUUSD Swing text uses the current main formatter');
+    result.liveXAUUSD={values:goldValues,mainFormatted:goldFormatted};
+    record('mw-acceptance actual EURUSD/XAUUSD Swing rendering and exact candidate assets');
     await app.page.screenshot({path:path.join(config.output,'swing-mwa.png')});await app.context.close();
     result.passed=true;
   } catch(error) {result.failure=error.stack;throw error;}
