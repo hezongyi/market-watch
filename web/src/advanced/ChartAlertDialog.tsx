@@ -2,7 +2,8 @@ import { useChartTime } from "../time/ChartTimeContext";
 import { formatTimestamp } from "../time/chartTime";
 import { ZonedDateTimeInput } from "../time/ZonedDateTimeInput";
 import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, SlidersHorizontal, Trash2 } from "lucide-react";
+import { AlertSymbolIcon } from "./alertPresentation";
 import { AlertMenu } from "./AlertMenu";
 import {
   AlertSelect,
@@ -103,13 +104,29 @@ function IndicatorFields({
             ? ["macd", "signal", "histogram"]
             : ["value"]
           ).map((key) => (
-            <option key={key} value={key}>{metadata?.[value.name]?.series.find(item=>item.key===key)?.label || key}</option>
+            <option key={key} value={key}>
+              {metadata?.[value.name]?.series.find((item) => item.key === key)
+                ?.label || key}
+            </option>
           ))}
         </AlertSelect>
       </label>
-      <p>手动选择指标时使用告警默认参数，需要自行核对图表。通过已映射的 Python 指标创建时，初始值读取该指标当时的实际参数；同名内置指标不自动同步。</p>
-      <p>以上可编辑值是告警判定的参数快照；保存后独立于图表参数，修改图表不会同步已保存告警。</p>
-      <details><summary>参数技术键与实际值</summary><p>{Object.entries(value.params).map(([key,n])=>`${key}=${n}`).join(" · ")} · output={value.output}</p></details>
+      <p>
+        手动选择指标时使用告警默认参数，需要自行核对图表。通过已映射的 Python
+        指标创建时，初始值读取该指标当时的实际参数；同名内置指标不自动同步。
+      </p>
+      <p>
+        以上可编辑值是告警判定的参数快照；保存后独立于图表参数，修改图表不会同步已保存告警。
+      </p>
+      <details>
+        <summary>参数技术键与实际值</summary>
+        <p>
+          {Object.entries(value.params)
+            .map(([key, n]) => `${key}=${n}`)
+            .join(" · ")}{" "}
+          · output={value.output}
+        </p>
+      </details>
     </fieldset>
   );
 }
@@ -123,6 +140,9 @@ const defaultIndicator = (): IndicatorSpec => ({
 export function ChartAlertDialog({
   initial,
   displayLabel,
+  displayCode,
+  automaticName = false,
+  onAutomaticName,
   requestId,
   editing,
   theme,
@@ -137,6 +157,9 @@ export function ChartAlertDialog({
 }: {
   initial: AlertConfig;
   displayLabel?: string;
+  displayCode?: string;
+  automaticName?: boolean;
+  onAutomaticName?: (automatic: boolean) => void;
   requestId: string;
   editing: { id: string; version: number } | null;
   theme: string;
@@ -155,13 +178,18 @@ export function ChartAlertDialog({
   const [expiryInputRevision, setExpiryInputRevision] = useState(0);
   const dialog = useRef<HTMLDialogElement>(null),
     errorBox = useRef<HTMLParagraphElement>(null);
-  const [draft, setDraft] = useState(() => ({...initial, condition: normalizeCondition(initial.condition)})),
+  const [draft, setDraft] = useState(() => ({
+      ...initial,
+      condition: normalizeCondition(initial.condition),
+    })),
     [capabilities, setCapabilities] = useState<Capabilities | null>(null);
   const [page, setPage] = useState<"condition" | "message" | "notifications">(
       "condition",
     ),
     [error, setError] = useState("");
-  const [fieldErrors, setFieldErrors] = useState<{field:string;message:string}[]>([]);
+  const [fieldErrors, setFieldErrors] = useState<
+    { field: string; message: string }[]
+  >([]);
   const [editVersion, setEditVersion] = useState(editing?.version);
   const [conflict, setConflict] = useState(false);
   const [busy, setBusy] = useState(false),
@@ -181,7 +209,8 @@ export function ChartAlertDialog({
     mounted.current = true;
     if (nativeDialog) {
       nativeDialog({
-        title: `${editing ? "编辑警报" : "创建警报"} · ${displayLabel || initial.name}`,
+        title: `${editing ? "编辑警报" : "创建警报"} · ${displayCode || displayLabel || initial.name}`,
+        symbol: displayCode,
         onClose: () => {
           if (mounted.current) onClose();
         },
@@ -251,7 +280,11 @@ export function ChartAlertDialog({
     && ["constant", "line", "indicator"].includes(draft.condition.right?.kind || "");
   const atrFrames = source?.atr_frames || [];
   function change(value: Partial<AlertConfig>) {
-    setDraft((p) => ({ ...p, ...value, condition: normalizeCondition(value.condition ?? p.condition) }));
+    setDraft((p) => ({
+      ...p,
+      ...value,
+      condition: normalizeCondition(value.condition ?? p.condition),
+    }));
   }
   function expirationPreset(expires_at: number | null) {
     change({ expires_at });
@@ -268,7 +301,9 @@ export function ChartAlertDialog({
       return;
     }
     if (offset && (!offsetSupported || !atrFrames.includes(offset.timeframe))) {
-      setError("ATR 阈值需要价格单位的有向比较，并选择此来源支持的 ATR K线周期");
+      setError(
+        "ATR 阈值需要价格单位的有向比较，并选择此来源支持的 ATR K线周期",
+      );
       errorBox.current?.focus();
       return;
     }
@@ -285,7 +320,7 @@ export function ChartAlertDialog({
     setFieldErrors([]);
     setConflict(false);
     try {
-      let config = {...draft, condition: normalizeCondition(draft.condition)};
+      let config = { ...draft, condition: normalizeCondition(draft.condition) };
       const line = draft.condition.right?.line;
       if (draft.condition.right?.kind === "line" && line) {
         // Bar indices belong to a market/period. Recompute them from timestamps
@@ -350,34 +385,77 @@ export function ChartAlertDialog({
         ? "编辑消息"
         : page === "notifications"
           ? "通知"
-          : `${editing ? "编辑警报" : "创建警报"} · ${displayLabel || draft.name}`,
+          : `${editing ? "编辑警报" : "创建警报"} · ${displayCode || displayLabel || draft.name}`,
+      page === "condition" ? displayCode : undefined,
     );
+    native.shell.title = displayLabel || draft.name;
     native.recenter();
   }, [native, page, busy]);
+  useEffect(() => {
+    if (
+      !automaticName ||
+      editing ||
+      !displayCode ||
+      draft.condition.left.kind !== "price" ||
+      draft.condition.right?.kind !== "constant"
+    )
+      return;
+    const next = `${displayCode} ${relations[draft.condition.relation] || draft.condition.relation} ${draft.condition.right.value || ""}`;
+    if (draft.name !== next) {
+      setDraft((previous) => ({ ...previous, name: next }));
+      setName(next);
+    }
+  }, [automaticName, editing?.id, displayCode, draft.condition]);
   const formRef = useRef<HTMLFormElement>(null);
   useEffect(() => {
     if (!error) return;
     const timer = setTimeout(() => {
-      const controls = [...(formRef.current?.querySelectorAll<HTMLElement>("[data-alert-field]") || [])];
-      const affected = controls.filter(control => fieldErrors.some(issue => {
-        const field = control.dataset.alertField!;
-        return field === issue.field || field.startsWith(issue.field + ".");
-      }));
-      const inputs = affected.map(control => control.matches("input,select,textarea,button") ? control : control.querySelector<HTMLElement>("input,select,textarea,button")).filter((control):control is HTMLElement=>!!control);
+      const controls = [
+        ...(formRef.current?.querySelectorAll<HTMLElement>(
+          "[data-alert-field]",
+        ) || []),
+      ];
+      const affected = controls.filter((control) =>
+        fieldErrors.some((issue) => {
+          const field = control.dataset.alertField!;
+          return field === issue.field || field.startsWith(issue.field + ".");
+        }),
+      );
+      const inputs = affected
+        .map((control) =>
+          control.matches("input,select,textarea,button")
+            ? control
+            : control.querySelector<HTMLElement>(
+                "input,select,textarea,button",
+              ),
+        )
+        .filter((control): control is HTMLElement => !!control);
       for (const control of inputs) {
         control.setAttribute("aria-invalid", "true");
-        control.setAttribute("aria-describedby", [control.getAttribute("aria-describedby"), "alert-validation-error"].filter(Boolean).join(" "));
+        control.setAttribute(
+          "aria-describedby",
+          [control.getAttribute("aria-describedby"), "alert-validation-error"]
+            .filter(Boolean)
+            .join(" "),
+        );
         control.dataset.serverInvalid = "true";
       }
       const target = inputs[0];
       target?.closest("details")?.setAttribute("open", "");
       (target || errorBox.current)?.focus();
     }, 0);
-    return () => { clearTimeout(timer);
-      for (const control of formRef.current?.querySelectorAll<HTMLElement>("[data-server-invalid]") || []) {
+    return () => {
+      clearTimeout(timer);
+      for (const control of formRef.current?.querySelectorAll<HTMLElement>(
+        "[data-server-invalid]",
+      ) || []) {
         control.removeAttribute("aria-invalid");
-        const description = (control.getAttribute("aria-describedby") || "").split(" ").filter(id => id !== "alert-validation-error").join(" ");
-        if (description) control.setAttribute("aria-describedby", description); else control.removeAttribute("aria-describedby");
+        const description = (control.getAttribute("aria-describedby") || "")
+          .split(" ")
+          .filter((id) => id !== "alert-validation-error")
+          .join(" ");
+        if (description) control.setAttribute("aria-describedby", description);
+        else control.removeAttribute("aria-describedby");
         delete control.dataset.serverInvalid;
       }
     };
@@ -477,12 +555,15 @@ export function ChartAlertDialog({
       >
         {!nativeDialog && (
           <header>
-            <h2 id="chart-alert-title">
+            <h2 id="chart-alert-title" title={displayLabel || draft.name}>
+              {page === "condition" && displayCode && (
+                <AlertSymbolIcon code={displayCode} />
+              )}
               {page === "message"
                 ? "编辑消息"
                 : page === "notifications"
                   ? "通知"
-                  : `${editing ? "编辑警报" : "创建警报"} · ${displayLabel || draft.name}`}
+                  : `${editing ? "编辑警报" : "创建警报"} · ${displayCode || displayLabel || draft.name}`}
             </h2>
             <button
               type="button"
@@ -513,7 +594,9 @@ export function ChartAlertDialog({
                   required
                   maxLength={100}
                   value={name}
-                  onChange={(event) => setName(event.target.value)}
+                  onChange={(event) => {
+                    setName(event.target.value);
+                  }}
                 />
               </label>
               <label>
@@ -612,11 +695,28 @@ export function ChartAlertDialog({
                     aria-label="关系"
                     value={draft.condition.relation}
                     onChange={(event) => {
-                      change({ condition: normalizeCondition(draft.condition, event.target.value) });
+                      change({
+                        condition: normalizeCondition(
+                          draft.condition,
+                          event.target.value,
+                        ),
+                      });
                     }}
                   >
                     {Object.entries(relations).map(([value, label]) => (
-                      <option key={value} value={value} disabled={!!offset && !["cross_up", "cross_down", "above", "below"].includes(value)}>
+                      <option
+                        key={value}
+                        value={value}
+                        disabled={
+                          !!offset &&
+                          ![
+                            "cross_up",
+                            "cross_down",
+                            "above",
+                            "below",
+                          ].includes(value)
+                        }
+                      >
                         {label}
                       </option>
                     ))}
@@ -704,40 +804,29 @@ export function ChartAlertDialog({
                   </>
                 )}
               </fieldset>
-              <fieldset className="alert-indicator-fields" disabled={busy}>
-                <legend className="sr-only">突破阈值参数</legend>
-                <label>
-                  突破阈值
-                  <AlertSelect aria-label="突破阈值" value={offset ? "atr" : "none"}
-                    onChange={(event) => change({condition: {...draft.condition, offset: event.target.value === "atr"
-                      ? {kind: "atr", version: "1", timeframe: atrFrames.includes("D1") ? "D1" : atrFrames[0],
-                         period: 14, multiplier: "0.2", reference: "closed_at_evaluation_bar_open"} : null}})}>
-                    <option value="none">无</option>
-                    <option value="atr" disabled={!offsetSupported || !atrFrames.length}>ATR</option>
-                  </AlertSelect>
-                </label>
-                {!offsetSupported && <p>ATR 仅支持价格单位的上穿、下穿、高于或低于比较。</p>}
-                {offset && <>
-                  <label>ATR K线周期
-                    <AlertSelect aria-label="ATR K线周期" value={offset.timeframe}
-                      onChange={(event) => change({condition: {...draft.condition, offset: {...offset, timeframe: event.target.value}}})}>
-                      {!atrFrames.includes(offset.timeframe) && <option value={offset.timeframe} disabled>{offset.timeframe}（来源不支持）</option>}
-                      {atrFrames.map((frame) => <option key={frame}>{frame}</option>)}
-                    </AlertSelect>
-                  </label>
-                  <label>ATR 计算长度
-                    <AlertInput aria-label="ATR 计算长度" type="number" required min={2} max={500} step={1} value={offset.period}
-                      onChange={(event) => change({condition: {...draft.condition, offset: {...offset, period: Number(event.target.value)}}})} />
-                  </label>
-                  <label>ATR 乘数
-                    <AlertInput aria-label="ATR 乘数" type="number" required min="0.01" max="100" step="0.01" value={offset.multiplier}
-                      onChange={(event) => change({condition: {...draft.condition, offset: {...offset, multiplier: event.target.value}}})} />
-                  </label>
-                  <p>{draft.timeframe} {draft.mode === "close" ? "收盘确认" : "盘中观察"} · {relations[draft.condition.relation]}
-                    {draft.condition.relation === "cross_up" || draft.condition.relation === "above" ? " + " : " − "}
-                    {offset.multiplier} × {offset.timeframe} ATR({offset.period})。ATR 取判定柱开盘前最近已收盘值。</p>
-                </>}
-              </fieldset>
+              <div className="alert-add-condition">
+                <button
+                  type="button"
+                  aria-disabled="true"
+                  aria-describedby="alert-single-condition-help"
+                  onClick={() => setError("当前版本仅支持单条件")}
+                >
+                  ＋ 添加条件
+                </button>
+                <span
+                  id="alert-single-condition-help"
+                  title="当前版本仅支持单条件"
+                  aria-label="当前版本仅支持单条件"
+                >
+                  ⓘ
+                </span>
+              </div>
+              {offset && (
+                <p className="alert-atr-active">
+                  已启用 ATR · {offset.multiplier} × {offset.timeframe} ATR(
+                  {offset.period})；实际边界以运行详情为准
+                </p>
+              )}
               <div className="alert-summary-fields">
                 <label>
                   <span>触发</span>
@@ -772,7 +861,9 @@ export function ChartAlertDialog({
                       ].map(([label, days]) => ({
                         label: String(label),
                         run: () =>
-                          expirationPreset(Date.now() + Number(days) * 86400000),
+                          expirationPreset(
+                            Date.now() + Number(days) * 86400000,
+                          ),
                       })),
                       {
                         label: "自定义日期",
@@ -833,11 +924,143 @@ export function ChartAlertDialog({
                 </div>
               </div>
               <details className="alert-advanced-options">
-                <summary>
+                <summary aria-label="行情与高级选项" title={`行情与高级选项 · ${draft.source} · ${draft.timeframe}`}>
+                  <SlidersHorizontal size={18} aria-hidden />
+                  <span className="alert-advanced-label">
                   行情与高级选项 · {draft.source || "查询中"} ·{" "}
                   {draft.timeframe} ·{" "}
                   {draft.mode === "close" ? "收盘确认" : "盘中观察"}
+                  </span>
                 </summary>
+                <fieldset className="alert-indicator-fields" disabled={busy}>
+                  <legend className="sr-only">突破阈值参数</legend>
+                  <label>
+                    突破阈值
+                    <AlertSelect
+                      aria-label="突破阈值"
+                      value={offset ? "atr" : "none"}
+                      onChange={(event) =>
+                        change({
+                          condition: {
+                            ...draft.condition,
+                            offset:
+                              event.target.value === "atr"
+                                ? {
+                                    kind: "atr",
+                                    version: "1",
+                                    timeframe: atrFrames.includes("D1")
+                                      ? "D1"
+                                      : atrFrames[0],
+                                    period: 14,
+                                    multiplier: "0.2",
+                                    reference: "closed_at_evaluation_bar_open",
+                                  }
+                                : null,
+                          },
+                        })
+                      }
+                    >
+                      <option value="none">无</option>
+                      <option
+                        value="atr"
+                        disabled={!offsetSupported || !atrFrames.length}
+                      >
+                        ATR
+                      </option>
+                    </AlertSelect>
+                  </label>
+                  {!offsetSupported && (
+                    <p>ATR 仅支持价格单位的上穿、下穿、高于或低于比较。</p>
+                  )}
+                  {offset && (
+                    <>
+                      <label>
+                        ATR K线周期
+                        <AlertSelect
+                          aria-label="ATR K线周期"
+                          value={offset.timeframe}
+                          onChange={(event) =>
+                            change({
+                              condition: {
+                                ...draft.condition,
+                                offset: {
+                                  ...offset,
+                                  timeframe: event.target.value,
+                                },
+                              },
+                            })
+                          }
+                        >
+                          {!atrFrames.includes(offset.timeframe) && (
+                            <option value={offset.timeframe} disabled>
+                              {offset.timeframe}（来源不支持）
+                            </option>
+                          )}
+                          {atrFrames.map((frame) => (
+                            <option key={frame}>{frame}</option>
+                          ))}
+                        </AlertSelect>
+                      </label>
+                      <label>
+                        ATR 计算长度
+                        <AlertInput
+                          aria-label="ATR 计算长度"
+                          type="number"
+                          required
+                          min={2}
+                          max={500}
+                          step={1}
+                          value={offset.period}
+                          onChange={(event) =>
+                            change({
+                              condition: {
+                                ...draft.condition,
+                                offset: {
+                                  ...offset,
+                                  period: Number(event.target.value),
+                                },
+                              },
+                            })
+                          }
+                        />
+                      </label>
+                      <label>
+                        ATR 乘数
+                        <AlertInput
+                          aria-label="ATR 乘数"
+                          type="number"
+                          required
+                          min="0.01"
+                          max="100"
+                          step="0.01"
+                          value={offset.multiplier}
+                          onChange={(event) =>
+                            change({
+                              condition: {
+                                ...draft.condition,
+                                offset: {
+                                  ...offset,
+                                  multiplier: event.target.value,
+                                },
+                              },
+                            })
+                          }
+                        />
+                      </label>
+                      <p>
+                        {draft.timeframe}{" "}
+                        {draft.mode === "close" ? "收盘确认" : "盘中观察"} ·{" "}
+                        {relations[draft.condition.relation]}
+                        {draft.condition.relation === "cross_up" ||
+                        draft.condition.relation === "above"
+                          ? " + "
+                          : " − "}
+                        {offset.multiplier} × {offset.timeframe} ATR(
+                        {offset.period})。ATR 取判定柱开盘前最近已收盘值。
+                      </p>
+                    </>
+                  )}
+                </fieldset>
                 <label>
                   行情来源
                   <AlertSelect
@@ -977,19 +1200,34 @@ export function ChartAlertDialog({
               {source?.reason && <p role="status">{source.reason}</p>}
             </>
           )}
-          {conflict && editing && <AlertButton disabled={busy} onClick={async () => {
-            setBusy(true);
-            try {
-              const latest = await request<AlertRow>(`/chart-alerts/${editing.id}`);
-              if (!mounted.current) return;
-              if (latest.status === "archived") throw Error("告警已归档，请复制草稿创建新告警");
-              setEditVersion(latest.version);
-              onReload?.(latest);
-              setConflict(false);
-              setError(`已读取版本 ${latest.version}，草稿已保留；请核对后再次保存`);
-            } catch (e) { if (mounted.current) setError(errorMessage(e)); }
-            finally { if (mounted.current) setBusy(false); }
-          }}>保留草稿并重新读取</AlertButton>}
+          {conflict && editing && (
+            <AlertButton
+              disabled={busy}
+              onClick={async () => {
+                setBusy(true);
+                try {
+                  const latest = await request<AlertRow>(
+                    `/chart-alerts/${editing.id}`,
+                  );
+                  if (!mounted.current) return;
+                  if (latest.status === "archived")
+                    throw Error("告警已归档，请复制草稿创建新告警");
+                  setEditVersion(latest.version);
+                  onReload?.(latest);
+                  setConflict(false);
+                  setError(
+                    `已读取版本 ${latest.version}，草稿已保留；请核对后再次保存`,
+                  );
+                } catch (e) {
+                  if (mounted.current) setError(errorMessage(e));
+                } finally {
+                  if (mounted.current) setBusy(false);
+                }
+              }}
+            >
+              保留草稿并重新读取
+            </AlertButton>
+          )}
           {error && (
             <p
               id="alert-validation-error"
@@ -1029,17 +1267,22 @@ export function ChartAlertDialog({
                   <Trash2 size={18} aria-hidden />
                 </button>
               )}
-              <AlertButton disabled={busy} onClick={onClose}>
-                取消（保留草稿）
+              <AlertButton
+                title="取消并保留草稿"
+                disabled={busy}
+                onClick={onClose}
+              >
+                取消
               </AlertButton>
               <AlertButton
                 primary
+                title={editing ? "保存为新的规则版本" : "创建告警"}
                 disabled={busy || !source?.available || !expiryValid}
                 onClick={() => {
                   if (formRef.current?.reportValidity()) void submit();
                 }}
               >
-                {busy ? "正在提交…" : editing ? "保存新版本" : "创建告警"}
+                {busy ? "正在提交…" : editing ? "保存" : "创建"}
               </AlertButton>
             </>
           ) : (
@@ -1053,6 +1296,7 @@ export function ChartAlertDialog({
                       setError("请填写警报名称");
                       return;
                     }
+                    if (name !== draft.name) onAutomaticName?.(false);
                     change({ name, message });
                   } else
                     change({

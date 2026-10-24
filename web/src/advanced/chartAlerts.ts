@@ -63,7 +63,9 @@ export type AlertConfig = {
   composite_revision_id?: string | null;
   seam_policy?: "reject" | "accept_raw";
 };
+export type DisplayIdentity = { code: string; series_kind: string; source: string; basis?: string | null; timeframe: string };
 export type AlertContext = {
+  display_identity?: DisplayIdentity;
   request_id: string;
   instrument: string;
   series_kind: "managed" | "provider" | "composite";
@@ -80,6 +82,8 @@ export type AlertContext = {
   composite_revision_id?: string | null;
 };
 export type AlertRow = {
+  display_identity?: DisplayIdentity;
+  last_triggered_at?: number | null;
   display_label?: string;
   id: string;
   name: string;
@@ -105,6 +109,8 @@ export function offsetSnapshot(value: unknown): string | null {
     ? `原目标 ${v.base_target} · ATR ${v.atr} · 偏移 ${v.signed_offset} · 实际边界 ${v.threshold}` : null;
 }
 export type AlertEvent = {
+  display_identity?: DisplayIdentity;
+  notice?: { id: string; first_seq: number; viewed_at: number | null; handled_at: number | null } | null;
   display_label?: string;
   id: string;
   alert_id: string;
@@ -115,6 +121,7 @@ export type AlertEvent = {
   threshold: string;
   evidence: {
     rule_version: number;
+    alert_created_at?: number;
     ordinal: number;
     left: string;
     late: boolean;
@@ -214,6 +221,11 @@ export function validAlertContext(
     ["M1", "M5", "M15", "M30", "H1", "H4", "D1", "W1", "MN"].includes(
       v.timeframe,
     ) &&
+    (v.display_identity === undefined ||
+      (!!v.display_identity && typeof v.display_identity === "object" &&
+        typeof v.display_identity.code === "string" && v.display_identity.code.length > 0 && v.display_identity.code.length <= 128 &&
+        v.display_identity.series_kind === v.series_kind && v.display_identity.timeframe === v.timeframe &&
+        typeof v.display_identity.source === "string" && v.display_identity.source.length <= 100)) &&
     !!a &&
     a.workspace_id === workspace &&
     [a.chart_id, a.generation].every(
@@ -228,7 +240,9 @@ export function validAlertContext(
 export function freshDraft(context: AlertContext): AlertConfig {
   const squeeze = context.indicator?.name === "ROLLING_RANGE_SQUEEZE" && context.indicator.output === "signal";
   return {
-    name: squeeze ? "Rolling Range Squeeze" : (context.display_label || context.instrument) + " 告警",
+    name: squeeze ? "Rolling Range Squeeze" : context.display_identity?.code && !context.line && !context.indicator
+      ? `${context.display_identity.code} ${relations.cross_up} ${context.price_presentation?.text || context.price || ""}`
+      : (context.display_label || context.instrument) + " 告警",
     instrument: context.instrument,
     series_kind: context.series_kind,
     source: context.source || "",

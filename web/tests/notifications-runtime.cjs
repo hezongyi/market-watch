@@ -538,9 +538,24 @@ const assert = require("node:assert/strict"),
   await unified.runtime.action({action:"history",filters:{audience:"alerts"}});
   const counts=fixture();
   const unscoped=sandbox.testAPI;
-  sandbox.testAPI=async(path,...args)=>({...await unscoped(path,...args),unread:42,system_unread:2});
+  sandbox.testAPI=async(path,...args)=>({...await unscoped(path,...args),unread:42,system_unread:2,alert_unread:7});
   await counts.runtime.cycle(0);
   assert.equal(counts.runtime.state.unread,2,"trading alerts never increase the system-message badge");
+  assert.equal(counts.runtime.state.alertUnread,7,"alert log badge is independent of both system unread and popup pending");
+  sandbox.testAPI=async(path,...args)=>({...await unscoped(path,...args),unread:42,system_unread:2});
+  await counts.runtime.cycle(0);
+  assert.equal(counts.runtime.state.alertUnread,7,"old servers omitting the count do not replace it with an unrelated count");
+  const sync=fixture().runtime;
+  let releaseObservation, observationStarted;
+  const started=new Promise(resolve=>observationStarted=resolve);
+  sandbox.testAPI=async(path,body)=>{assert.equal(path,"/notification-center/observations");assert.equal(body.kind,"handled");observationStarted();return new Promise(resolve=>releaseObservation=resolve);};
+  let finished=false;
+  const cleaning=sync.action({action:"observe",event_id:"s:log",kind:"handled",wait_for_sync:true}).then(()=>finished=true);
+  await started;
+  assert.equal(finished,false,"log cleanup cannot report success while its server observation is in flight");
+  releaseObservation({ok:true});await cleaning;assert.equal(finished,true);
+  sandbox.testAPI=async()=>{throw Error("server unavailable");};
+  await assert.rejects(sync.action({action:"observe",event_id:"s:log",kind:"handled",wait_for_sync:true}),/server unavailable/);
   console.log(
     "PASS notification intake isolation, permanent rejection, accepted projection gap and business outcome",
   );

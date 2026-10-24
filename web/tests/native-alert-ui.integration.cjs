@@ -247,7 +247,7 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
       .waitFor({ state: "visible" });
     await chart
       .locator('[data-name="mw-native-alert-dialog"]')
-      .getByRole("button", { name: "创建告警", exact: true })
+      .getByRole("button", { name: "创建", exact: true })
       .waitFor();
     await page.screenshot({ path: path.join(output, "create-initial.png") });
     const dialog = chart.locator('[data-name="mw-native-alert-dialog"]');
@@ -346,7 +346,7 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
     );
     await chart
       .locator('[data-name="mw-native-alert-dialog"]')
-      .getByRole("button", { name: "创建告警", exact: true })
+      .getByRole("button", { name: "创建", exact: true })
       .click();
     await chart.waitForFunction(
       () =>
@@ -366,7 +366,7 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
     );
     await chart
       .locator('[data-name="mw-native-alert-dialog"]')
-      .getByRole("button", { name: "创建告警", exact: true })
+      .getByRole("button", { name: "创建", exact: true })
       .click();
     await chart
       .locator('[data-name="mw-native-alert-dialog"]')
@@ -391,7 +391,7 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
     await dialog.getByRole("button", { name: "消息", exact: true }).click();
     await dialog.getByLabel("警报名称").fill("已编辑");
     await dialog.getByRole("button", { name: "应用到草稿" }).click();
-    await dialog.getByRole("button", { name: "保存新版本" }).click();
+    await dialog.getByRole("button", { name: "保存" }).click();
     await dialog.waitFor({ state: "detached" });
     assert.equal(rows[0].version, 2);
     report.cases.push(
@@ -495,13 +495,14 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
     await chart.getByRole("button", { name: "更多选项", exact: true }).click();
     await page.screenshot({ path: path.join(output, "log-native-menu.png") });
     await page.keyboard.press("Escape");
-    await chart.locator(".alert-event-day .alert-row-summary").click();
+    await chart.locator(".alert-event-day .alert-row-summary").dblclick();
     await chart.getByRole("button", { name: "停止后续手机提醒" }).click();
     await chart.getByRole("button", { name: "已停止后续提醒", exact: true }).waitFor();
     await page.screenshot({ path: path.join(output, "log-dark.png") });
     report.cases.push(
       "Date-grouped log retains late evidence, rule version, delivery status and independent acknowledgement",
     );
+    await chart.getByRole("button", { name: "关闭详情", exact: true }).click();
     await chart.getByRole("tab", { name: "警报", exact: true }).click();
     await chart.getByRole("button", { name: "编辑", exact: true }).click();
     await dialog.waitFor();
@@ -536,7 +537,7 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
     await chart.getByRole("button", { name: "编辑", exact: true }).click();
     await dialog.waitFor();
     await page.screenshot({ path: path.join(output, "edit-light.png") });
-    await dialog.getByRole("button", { name: "取消（保留草稿）" }).click();
+    await dialog.getByRole("button", { name: "取消" }).click();
     await dialog.waitFor({ state: "detached" });
     report.cases.push(
       "Escape returns from subpage, modal focus stays inside native shell, final Escape closes; light theme applies",
@@ -579,7 +580,7 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
     const box = await dialog.boundingBox();
     assert.ok(box.x >= 0 && box.x + box.width <= 760);
     await page.screenshot({ path: path.join(output, "edit-narrow.png") });
-    await dialog.getByRole("button", { name: "取消（保留草稿）" }).click();
+    await dialog.getByRole("button", { name: "取消" }).click();
     await page.setViewportSize({ width: 2744, height: 890 });
     await host.evaluate(async () => {
       await widget.changeTheme("Dark");
@@ -600,7 +601,7 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
     await choose("关系", "进入价格区间");
     await dialog.getByLabel("下限", { exact: true }).fill("1.115");
     await dialog.getByLabel("上限", { exact: true }).fill("1.125");
-    await dialog.getByRole("button", { name: "创建告警", exact: true }).click();
+    await dialog.getByRole("button", { name: "创建", exact: true }).click();
     await dialog.waitFor({ state: "detached" });
     assert.equal(rows.at(-1).config.condition.relation, "enter");
     assert.equal(rows.at(-1).config.condition.lower, "1.115");
@@ -616,7 +617,7 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
       .getByRole("button", { name: "指标", exact: true })
       .click();
     await chart.getByRole("option", { name: "EMA", exact: true }).click();
-    await dialog.getByRole("button", { name: "创建告警", exact: true }).click();
+    await dialog.getByRole("button", { name: "创建", exact: true }).click();
     await dialog.waitFor({ state: "detached" });
     assert.equal(rows.at(-1).config.condition.left.indicator.name, "SMA");
     assert.equal(rows.at(-1).config.condition.right.indicator.name, "EMA");
@@ -629,7 +630,7 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
       await bridge.create({ chart, object: { type: "shape", id } });
     });
     await dialog.waitFor();
-    await dialog.getByRole("button", { name: "创建告警", exact: true }).click();
+    await dialog.getByRole("button", { name: "创建", exact: true }).click();
     await dialog.waitFor({ state: "detached" });
     assert.equal(
       rows.at(-1).config.condition.right.line.kind,
@@ -674,7 +675,7 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
     await choose("判定周期", "H4");
     rejectGeometry = true;
     const beforeLineSave = rows.length;
-    await dialog.getByRole("button", { name: "创建告警", exact: true }).click();
+    await dialog.getByRole("button", { name: "创建", exact: true }).click();
     await dialog.getByText(/画线端点未匹配实际 K 线/).waitFor();
     assert.equal(
       rows.length,
@@ -688,7 +689,7 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
       "H4",
     );
     rejectCreate = true;
-    await dialog.getByRole("button", { name: "创建告警", exact: true }).click();
+    await dialog.getByRole("button", { name: "创建", exact: true }).click();
     await dialog.getByText(/保存失败，请重试/).waitFor();
     const geometryCalls = writes.filter(
       (write) => write.path === "/api/chart-alerts/geometry",
@@ -696,7 +697,7 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
     const uncertainWrite = writes
       .filter((write) => write.path === "/api/chart-alerts")
       .at(-1).body;
-    await dialog.getByRole("button", { name: "创建告警", exact: true }).click();
+    await dialog.getByRole("button", { name: "创建", exact: true }).click();
     await dialog.waitFor({ state: "detached" });
     assert.equal(
       writes.filter((write) => write.path === "/api/chart-alerts/geometry")
@@ -732,7 +733,7 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
     assert.match(await dialog.getByLabel("警报名称").inputValue(), /副本$/);
     assert.equal(rows.length, beforeCopy);
     await page.keyboard.press("Escape");
-    await dialog.getByRole("button", { name: "取消（保留草稿）" }).click();
+    await dialog.getByRole("button", { name: "取消" }).click();
     await host.evaluate(async () => {
       widget.setLayout("2h");
     });
@@ -758,7 +759,7 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
     await dialog.waitFor();
     await host.evaluate(() => widget.setActiveChart(1));
     assert.match(await dialog.getAttribute("aria-label"), /EURUSD/);
-    await dialog.getByRole("button", { name: "取消（保留草稿）" }).click();
+    await dialog.getByRole("button", { name: "取消" }).click();
     await host.evaluate(() => widget.setActiveChart(0));
     await primary.waitFor();
     await primary.getByRole("button", { name: "编辑", exact: true }).click();
@@ -774,7 +775,7 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
     assert.equal(await host.locator('[data-name="mw-alert-state"]').count(), 1);
     await host.evaluate(() => bridge.create());
     await dialog.waitFor();
-    await dialog.getByRole("button", { name: "取消（保留草稿）" }).click();
+    await dialog.getByRole("button", { name: "取消" }).click();
     await dialog.waitFor({ state: "detached" });
     await page.evaluate(() => document.exitFullscreen());
     await chart

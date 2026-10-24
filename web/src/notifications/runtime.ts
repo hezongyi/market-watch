@@ -932,6 +932,7 @@ export class NoticeRuntime {
         this.patch({
           events: page.events,
           unread: page.system_unread ?? page.unread,
+          alertUnread: page.alert_unread ?? this.state.alertUnread,
           epoch: page.epoch,
         });
       }
@@ -1008,6 +1009,7 @@ export class NoticeRuntime {
           epoch: result.epoch,
           events,
           unread,
+          alertUnread: result.alert_unread ?? this.state.alertUnread,
           revision: this.state.revision + (result.changes.length ? 1 : 0),
         });
         await this.restoreAlerts(generation);
@@ -1413,8 +1415,16 @@ export class NoticeRuntime {
       id &&
       ["viewed", "handled"].includes(action.kind || "")
     ) {
-      await this.observation(id, action.kind!, {}, true);
-      result = { ok: true };
+      if (action.wait_for_sync) {
+        if (!this.ready) throw Error("通知会话尚未就绪，请重试");
+        result = await api(base + "/observations", {observation_id: crypto.randomUUID(),
+          event_id: id, profile: this.profile, kind: action.kind, reported_at: Date.now(), details: {}});
+        if (!this.current(generation)) throw Error("通知会话已失效");
+        this.schedule(generation, 0);
+      } else {
+        await this.observation(id, action.kind!, {}, true);
+        result = { ok: true };
+      }
     } else if (action.action === "rendered" && id) {
       await this.rendered(id);
       result = { ok: true };

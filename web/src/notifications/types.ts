@@ -84,6 +84,7 @@ export type NoticeState = {
   bubble: Notice | null;
   overflow: number;
   alertPending?: number;
+  alertUnread?: number;
   serverTime: number;
 };
 export type NoticeAction = {
@@ -92,6 +93,7 @@ export type NoticeAction = {
   before?: string | null;
   filters?: Record<string, string>;
   kind?: "viewed" | "handled";
+  wait_for_sync?: boolean;
   enabled?: boolean;
   seconds?: number;
   through?: number;
@@ -107,6 +109,7 @@ export type HistoryPage = {
   epoch: string;
   unread: number;
   system_unread?: number;
+  alert_unread?: number;
   server_time: number;
 };
 export const severityLabels: Record<string, string> = {
