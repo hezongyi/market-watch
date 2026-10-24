@@ -1,6 +1,6 @@
 # 告警条目与价格线交互补丁（2026-10-24）
 
-状态：前版 Chart/Web 已更新长期实例；本次按用户补充要求修正加号菜单，代码检查通过，等待批准更新实例。前版部署详见 [实例验收记录](alert-interactions-acceptance-20261024.md)。
+状态：用户已批准，本次加号菜单修正已更新长期实例，自动验收通过，等待人工验收。最新部署详见 [加号菜单验收记录](alert-axis-menu-acceptance-20261024.md)；前版部署详见 [实例验收记录](alert-interactions-acceptance-20261024.md)。
 
 ## 范围与风险
 
@@ -57,14 +57,14 @@ node scripts/build-alert-ui.mjs /tmp/mw-alert-interactions-bundle-20261024
 先只读盘点长期实例及当前镜像／源码，保留实例数据、配置、浏览器现场和后来修复；构建使用 `mw-docker`。完成 Ubuntu R1 smoke 后，在真实图表核对价格线拖动、SVG 比例、加号创建、明暗主题以及面板与自选表底色一致，并交付人工验收地址。无需迁移或重置数据库。
 
 
-## 加号菜单补充修正（待更新实例）
+## 加号菜单补充修正（已更新实例）
 
 本次 F0 兼容 UI 修正只调整 `chart-alerts.js`：`onPlusClick` 捕获价格和图表上下文，`CrosshairMenuView` 中的告警选项执行后才触发现有快速创建路径。普通右键菜单仍打开编辑器；切换品种、周期或布局后拒绝旧菜单请求。无 API/schema 变更。
 
 - `node --test tests/chart-alerts-bridge.test.cjs`：13 项通过，覆盖加号／菜单不创建、选择后创建、原生报价精度、取消菜单、普通菜单隔离及过期上下文。
 - `node tests/alert-reference-ui.browser.cjs`：面板回归通过。
 - `MW_PROBE_LIBRARY=<许可库目录> MW_PROBE_OUTPUT=<输出目录> node tests/alert-axis-menu.browser.cjs`：真实许可图表、当前源码及合成行情／接口通过。实际指针点击加号弹原生菜单，Escape 取消后无创建请求，选中告警后只创建一次且无编辑器。
-- 截图及结构化结果：`/home/quant/repos/.reports/market-watch/20261024-alert-panel-ui/axis-menu/`。未向真实实例写入；部署和 Ubuntu R1 smoke 等待用户批准。
+- 源码截图及结构化结果：`/home/quant/repos/.reports/market-watch/20261024-alert-panel-ui/axis-menu/`。批准后的固定镜像及 Ubuntu R1 证据：`/home/quant/repos/.reports/market-watch/20261024-alert-axis-menu-acceptance/`。未向真实实例创建测试告警。
 
 ## 原生验收发现的焦点修正
 
