@@ -78,7 +78,7 @@ widget.onChartReady(async()=>{
   for(const mode of [1,2,3,0]){
    await page.evaluate(mode=>widget.activeChart().getPanes()[0].getMainSourcePriceScale().setMode(mode),mode);await raf();await metric('scale-mode-'+mode);
   }
-  await page.evaluate(()=>widget.activeChart().getPanes()[0].getMainSourcePriceScale().setInverted(true));await raf();await metric('inverted');
+  await page.evaluate(()=>widget.activeChart().getPanes()[0].getMainSourcePriceScale().setInverted(true));await raf();await page.waitForTimeout(200);await metric('inverted');
   await page.evaluate(()=>widget.activeChart().getPanes()[0].getMainSourcePriceScale().setInverted(false));
   for(const width of [320,480,380]){await setWidth(width);await metric('panel-width-'+width);const p=await chart.locator('.chart-alert-panel').boundingBox();assert.ok(Math.abs(p.width-width)<3);}
   for(const width of [1440,1920,1600]){await page.setViewportSize({width,height:900});await raf();await metric('viewport-'+width);}
