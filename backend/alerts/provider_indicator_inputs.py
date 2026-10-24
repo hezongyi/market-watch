@@ -156,7 +156,9 @@ def compute(inputs, meta, instrument, spec, *, first, provisional, telemetry=Non
         try:
             if entry.value is None:
                 check_cancelled()
-                result = calculate(calculation_rows(rows, meta, instrument, timeframe), spec, provisional=provisional)
+                prepared = calculation_rows(rows, meta, instrument, timeframe,
+                                            infer_gaps=name != "ROLLING_RANGE_SQUEEZE")
+                result = calculate(prepared, spec, provisional=provisional)
                 check_cancelled()
                 entry.value, entry.weight = result, len(rows) * max(6, len(CATALOG[name]["series"]))
                 stats['calculation_steps'] = len(rows)
