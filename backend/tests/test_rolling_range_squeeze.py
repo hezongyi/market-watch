@@ -180,6 +180,9 @@ def test_catalog_and_boolean_color_contract():
     from alerts.chart_indicators import validate_display
 
     meta = public_catalog()[NAME]
+    # Both persisted modes share the existing varchar(40) algorithm column.
+    assert len(IndicatorState(SPEC).algorithm) <= 40
+    assert len(ObservedState(SPEC).algorithm) <= 40
     assert meta['params'] == {'k':10,'lookback':252,'low_pct':5.0,'confirm_on_close':True}
     assert history_requirement(SPEC) == 261
     assert len(meta['display_inputs']) == 7

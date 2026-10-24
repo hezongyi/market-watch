@@ -14,7 +14,7 @@ import numpy as np
 
 NAME = "ROLLING_RANGE_SQUEEZE"
 PROFILE = "rolling_range_squeeze_v1"
-ALGORITHM = "rolling-range-squeeze-pine-v6-v1"
+ALGORITHM = "rrs-pine-v6-v1"
 KEYS = ("sma", "ratio", "threshold", "pct_rank", "signal")
 
 
