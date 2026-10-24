@@ -60,7 +60,7 @@ const fixture=JSON.parse(generated.stdout);
   const sample=await samples(id,time),key=phase===1?'up':'down';
   const value=Number(get(sample,key));
   const expected=fixture.phases[phase].indicator.series.find(s=>s.key===key).values.at(-1).value;
-  assert.ok(Math.abs(value-expected)<=0.0051, 'Native precision=2 matches the Python value');
+  assert.ok(Math.abs(value-expected)<=0.0051, 'Inherited two-decimal chart precision matches the Python value');
   assert.ok(!Number.isFinite(Number(get(sample,phase===1?'down':'up'))));
   await page.mouse.move(1390,10);await page.screenshot({path:path.join(out,'intrabar-'+phase+'.png')});
   report.phases.push({phase,key,value,time});

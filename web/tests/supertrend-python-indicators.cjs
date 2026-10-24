@@ -19,7 +19,8 @@ vm.runInContext(fs.readFileSync('../advanced-host/indicators.js','utf8'), contex
 const study = vm.runInContext('pythonStudies(PineJS,catalog)[0]', context);
 const meta = study.metainfo;
 assert.equal(meta.id, 'MWPythonSUPERTREND_PINE_V1@market-watch-1');
-assert.equal(meta.format.precision, 2);
+assert.equal(meta.format.type, 'inherit', 'Supertrend price labels inherit the chart symbol formatter');
+assert.equal(meta.format.precision, undefined, 'do not pin forex labels to two decimal places');
 assert.equal(meta.defaults.styles.up.plottype, 7);
 assert.equal(meta.defaults.styles.down.plottype, 7);
 assert.equal(meta.styles.buy_label.text, 'Buy');

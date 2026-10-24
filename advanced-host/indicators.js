@@ -35,7 +35,7 @@ function supertrendPineProfile() {
     };
   }
   return {
-    format: {type: "price", precision: 2}, plots, styles,
+    format: {type: "inherit"}, plots, styles,
     filledAreas: [
       {id: "long_fill", objAId: "fill_reference", objBId: "up_fill", type: "plot_plot", title: "UpTrend Highlighter", fillgaps: false},
       {id: "short_fill", objAId: "fill_reference", objBId: "down_fill", type: "plot_plot", title: "DownTrend Highlighter", fillgaps: false},

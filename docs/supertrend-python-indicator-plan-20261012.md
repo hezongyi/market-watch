@@ -2,6 +2,8 @@
 
 日期：2026-10-12。以下为冻结的实施前契约；实际实现与验收状态见 [验收记录](verification/supertrend-20261012/README.md)。
 
+2026-10-24显示规则更新：用户要求Supertrend价格标签跟随图表品种精度，原文默认两位的展示规则已由原生`inherit`替代；计算仍不舍入。见[精度修复记录](supertrend-symbol-precision-20261024.md)。
+
 ## 1. 目标、来源与范围
 
 以用户提供的 Pine v4 `study("Supertrend", overlay=true, format=format.price, precision=2, resolution="")` 源码作为算法基准，在 Market Watch 新增独立 Python 指标，复现上下趋势线、断线、圆点、Buy/Sell 标签与半透明区域。用户已认可移植路径，并要求形成方案。
