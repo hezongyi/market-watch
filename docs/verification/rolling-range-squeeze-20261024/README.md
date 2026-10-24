@@ -27,7 +27,8 @@
 | 实际 React 告警对话框 | 新增浏览器检查通过：勾选/取消 bool 与最小数值保存，原文标题/消息及 signal > 0 默认条件。 |
 | 构建 | 完整 Web Vite/TypeScript 构建、独立 alert-ui 构建、隔离 scratch 原生 host 资源打包通过；Vite 有既有大 chunk 提示。 |
 | 静态检查 | 修改的 Python 文件及 fixture Ruff 通过；git diff --check 通过。 |
-| 全量后端 | 运行中；结果待补。PostgreSQL 专项尚未运行，不将 skipped 视为通过。 |
+| 全量后端 | 首次完成：2247 passed、618 skipped、1 failed、38 errors、35 warnings，1015.26 秒。唯一 failure 为 end 可选兼容性问题，已修复并在后续 39 项重跑中通过；38 errors 均为两个既有 PG 测试模块未配置 TEST_POSTGRES_URL，尚未验证，不称全量通过。 |
+| 原生 MCP 排查 | 同宿主机依赖环境单独重跑 25 passed；不是上述初始化错误来源。 |
 
 原生探针使用仓库已有许可 Charting Library，本报告不包含许可库。400 根合成 H4 数据由 `scripts/rolling_range_squeeze_native_fixture.py` 生成，参数 K=3/lookback=20/low_pct=50/confirm=false。证据：[probe JSON](squeeze-native-probe.json)、[深色截图](squeeze-native-dark.png)、[窄屏浅色截图](squeeze-native-narrow-light.png)。合成数据用于稳定复现，不冒充真实行情验收。
 
@@ -42,7 +43,7 @@ PLAYWRIGHT_CHROMIUM_EXECUTABLE=/home/quant/.cache/ms-playwright/chromium-1243/ch
 node web/tests/squeeze-contract.cjs
 ```
 
-全量宿主机回归为补齐缺失的 mcp/mcp_types，将 mcp 2.3.0 及依赖安装在 ignored `artifacts/python-deps`，使用 `PYTHONPATH=backend:artifacts/python-deps`；未改写共享 Python 环境。临时依赖并非精确锁定的镜像环境，不能代替候选镜像检查。fake-indexeddb 6.2.4 同样只安装在 task 的 ignored `artifacts/node-deps`。
+全量宿主机回归为补齐缺失的 mcp/mcp_types，将 mcp 2.3.0 及依赖安装在 ignored `artifacts/python-deps`，使用 `PYTHONPATH=backend:artifacts/python-deps`；未改写共享 Python 环境。临时依赖并非精确锁定的镜像环境，不能代替候选镜像检查。fake-indexeddb 6.2.4 同样只安装在 task 的 ignored `artifacts/node-deps`。全量运行开始于 end 修复前，进程已导入旧模块；失败用例已在修复后的独立进程重测，未声称重复全量。38 个 PG 初始化错误位于既有 `test_native_update_diagnosis.py`（15 项）与 `test_provider_stream_acceptance.py`（23 项），共同原因是 fixture 读取不存在的 `TEST_POSTGRES_URL`；未连接真实验收数据库来绕过隔离。
 
 ## 忠实度边界
 
@@ -64,4 +65,12 @@ python3 /home/quant/repos/.mwa-v1264-chart-init-20261021/manage.py stop
 
 本任务尚未执行这些 start/stop 或任何更新。2026-10-24 只读登记显示，前一项分钟确认/快照恢复已收口，13 应用服务源码统一为 `3e674dd752de366c334702b2673a4c1be9cd0443`，保留此前 Swing、通知、Supertrend 精度和 BBands 底色。不得直接用 tag 基线覆盖这些修复；验收候选应在独立集成 worktree 上以当前运行产品提交为底叠加本 feature，固定提交与镜像。
 
-只读主机检查：约 29 GiB 磁盘可用、7.6 GiB 内存可用，5 分钟负载约 8.6。负载高于仓库启动门槛 4，本任务未启动新 PostgreSQL 或验收应用服务。待条件满足后按 `mw-docker` 带 task/project/purpose 构建，更新 API/10 workers、Chart、Web；无需 schema migration/seed/reset。固定候选、资源与回退清单后，依据用户明确的“验收前要向我申请”取得批准，再做 mwa 业务/原生图表验收。无 push、PR、合并、正式 tag 或生产发布。
+09:32 UTC 最新只读主机检查：约 29 GiB 磁盘可用、7.8 GiB 内存可用，5 分钟负载 9.73。负载高于仓库启动门槛 4，本任务未启动新 PostgreSQL 或验收应用服务。待条件满足后按 `mw-docker` 带 task/project/purpose 构建，更新 API/10 workers、Chart、Web；无需 schema migration/seed/reset。固定候选、资源与回退清单后，依据用户明确的“验收前要向我申请”取得批准，再做 mwa 业务/原生图表验收。无 push、PR、合并、正式 tag 或生产发布。
+
+## 已固定的集成候选
+
+- 功能提交：`9bb9cab7105c660d7e24a9db332ee440812a24a8`，继续基于用户指定 tag。
+- mwa 产品候选：`8570e5d3ad6c1d2f314d095410e4a2926212690c`，branch `integration/rolling-range-squeeze-mwa-20261024`，worktree `/home/quant/repos/market-watch-rolling-range-squeeze-mwa-20261024`。
+- 候选以当前 mwa 产品 `3e674dd7` 为底 cherry-pick 功能；唯一冲突是 indicators.js 的 format，解析为 Swing 与 Squeeze 均 inherit，保留独立 Supertrend profile、Swing display 标签、BBANDS 原生底色及分钟恢复逻辑。两边意图均保留。
+- 集成后实际重跑：88 passed（squeeze、chart_workspace、reload diagnosis/matrix、composite price confirmation），新指标 10 组原生检查 errors=[]，Web 完整构建通过。快照恢复、恢复生命周期、新指标合同、Swing identity 与 9 项告警桥接通过。Ruff 与 git diff --check 通过。
+- 尚无本候选 Docker 镜像；未执行 PostgreSQL 专项；未在 mwa 实际业务数据上验证，不把本地成功冒充验收通过。
