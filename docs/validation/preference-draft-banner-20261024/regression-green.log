@@ -1,0 +1,11 @@
+PASS preference banner: durable pending writes stay quiet; failures/conflicts/reload remain recoverable; cross-tab and stale-version fencing
+native adapters: queued writes, namespaces, reload, conflict and readonly passed
+PASS multi-window preference merge, idempotence, conflict retention, bounded retries, deletion and opaque templates
+PASS native preference adapter → actual bridge → visible notice, network failure and readonly, one final report
+PASS preference draft RPCs remain available behind slow market reads, bounded to two management slots
+PASS in-flight establishment hint; cloned tabs/restart and workspace version fencing
+PASS preference durable conflicts/reload/CAS/quota/queued versions; first-use/cancellation; name fallback
+PASS serialized recovery; stale widget blocked after local/remote choice; replaced draft preserved
+PASS per-key queued burst; cross-tab revision hints preserve conflicts and dispose
+PASS NR drawings survive retained native coverage across history restart, prepend and tail
+PASS runtime contracts: per-run pending/completion, same-time tail updates and visible dependency lifetime
