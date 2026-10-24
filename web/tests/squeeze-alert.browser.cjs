@@ -24,7 +24,7 @@ const assert=require('node:assert/strict'),{build}=require('esbuild'),{chromium}
   await page.getByLabel('Only confirm on bar close',{exact:true}).uncheck();
   await page.getByLabel('K',{exact:true}).fill('1');
   await page.getByLabel('Lowest Percentile (%)',{exact:true}).fill('0.1');
-  await page.getByRole('button',{name:'创建告警',exact:true}).click();
+  await page.getByRole('button',{name:'创建',exact:true}).click();
   await page.waitForFunction(()=>writes.length===1);
   const config=await page.evaluate(()=>writes[0].config);
   assert.equal(config.condition.left.indicator.params.confirm_on_close,false);
