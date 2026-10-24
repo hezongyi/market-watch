@@ -24,3 +24,12 @@
 - Swing 标签规范化在snapshot读取之前，复用study事件和既有250ms刷新；没有新增轮询。
 - 本地 npm run build、独立 alert-ui build、价格格式、通知runtime/persistence、Swing固定身份/适配器检查通过；新原生浏览器矩阵正在运行。
 - 新原生 fixture 为确定性合成800根行情，由真实Python算法生成；不会改共享D1或真实库。
+
+## 自审与回归补充
+
+- 窄屏截图发现旧 host 统计卡片盖住原生通知：统计卡片改挂在原生图表文档，保持pane坐标和样式，通知/菜单通过同一stacking context正确覆盖。新增真实elementFromPoint覆盖断言；未隐藏统计或改动其开关。
+- 现有Swing原生回归整套通过：四绘图、桥接、统计、隐藏、参数、候选撤回/确认、多实例、双图、375px浅色和原生模板。旧测试硬编码8个study，而当前catalog已扩展；改为比较实际保存前的catalog数量及完整输入，不跳过旧study兼容性。
+- 本地CI等效：53条Node命令、6条CI浏览器命令、97项工具链/66 subtests、14项分类测试、4份Compose展开、构建和Ruff均通过。
+- CI固定PostgreSQL14.24 policy测试8项通过（76.78s），使用独立Compose project `mw-swing-notice-ci-20261024`、回环18789、tmpfs、384MiB/0.25CPU；与长期实例数据库完全隔离。测试结束已停止，只保留已停止容器及配置，不触碰长期数据。backend_changed=false，按CI分类跳过后端全量。
+- 用户要求不提交PR：不push、不创建PR、不触发远程GitHub CI；以上明确为本地CI等效检查。
+- 第一轮Chart构建为01b9d93d，尚未部署；统计层级修正提交后必须重建Chart，最终验收不得使用旧镜像。

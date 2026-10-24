@@ -113,6 +113,11 @@ function swingPaneBounds(chart, root) {
   return {left:left-host.left,top:top-host.top,width:rect.width,height:rect.height};
 }
 
+function swingDisplayDocument(widget) {
+  return widget.chart(0)._chartWidget.paneWidgets().find(pane=>pane.containsMainSeries())
+    .canvasElement().ownerDocument;
+}
+
 function chartSwingDisplay(widget, store, {root, identity, chartTime = time=>time, report = () => {}}) {
   const doc = root.ownerDocument;
   const bindings = new Map();
@@ -125,7 +130,10 @@ function chartSwingDisplay(widget, store, {root, identity, chartTime = time=>tim
   root.before(info);
   const cards = doc.createElement('div');
   cards.className = 'mw-swing-cards';
-  root.append(cards);
+  // Native dialogs live inside the chart iframe. Place pane cards in the same
+  // stacking context so a narrow notification or menu can cover them.
+  const paneDoc = swingDisplayDocument(widget);
+  paneDoc.body.append(cards);
   const style = doc.createElement('style');
   style.textContent = `
     #chart {position:relative;flex:1;min-height:0}
@@ -146,6 +154,9 @@ function chartSwingDisplay(widget, store, {root, identity, chartTime = time=>tim
     .mw-swing-details {font-size:11px;max-width:32em}
   `;
   doc.head.append(style);
+  const paneStyle = paneDoc.createElement('style');
+  paneStyle.textContent = style.textContent;
+  paneDoc.head.append(paneStyle);
 
   function removeShape(binding, side) {
     const id = binding.shapes[side];
@@ -306,7 +317,7 @@ function chartSwingDisplay(widget, store, {root, identity, chartTime = time=>tim
     }
     for(const [index,group] of cardGroups) {
       if(!group.childElementCount || index>=widget.chartsCount()) {group.remove();cardGroups.delete(index);continue;}
-      const bounds=swingPaneBounds(widget.chart(index),root);
+      const bounds=swingPaneBounds(widget.chart(index),cards);
       if(!bounds || !bounds.width || !bounds.height) {group.style.display='none';continue;}
       group.style.display='';
       group.style.left=(bounds.left+8)+'px';
@@ -326,6 +337,6 @@ function chartSwingDisplay(widget, store, {root, identity, chartTime = time=>tim
   return {refresh:refreshSafe,reset,dispose() {
     disposed=true;clearInterval(timer);observer.disconnect();reset();
     widget.unsubscribe('chart_load_requested',reset);widget.unsubscribe('study_event',refreshSafe);
-    widget.unsubscribe('layout_changed',refreshSafe);info.remove();cards.remove();style.remove();
+    widget.unsubscribe('layout_changed',refreshSafe);info.remove();cards.remove();style.remove();paneStyle.remove();
   }};
 }

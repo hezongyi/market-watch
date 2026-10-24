@@ -64,6 +64,8 @@ const assert = require('node:assert/strict');
   await hide();await page.evaluate(()=>show(notice('long-alert',true,'长内容用于滚动验证。'.repeat(300))));await shown();
   await page.setViewportSize({width:375,height:320});await page.waitForTimeout(250);
   const content=native().locator('.nc-native-instant-content');
+  const overlap=await page.evaluate(()=>{const doc=surfaceProbe.document,card=doc.querySelector('.mw-swing-card'),notice=doc.querySelector('.nc-native-instant');const r=card.getBoundingClientRect(),n=notice.getBoundingClientRect(),x=Math.max(r.left,n.left)+3,y=Math.max(r.top,n.top)+3;return {sameDocument:card.ownerDocument===notice.ownerDocument,covered:!!doc.elementFromPoint(x,y)?.closest('.nc-native-instant')};});
+  assert.deepEqual(overlap,{sameDocument:true,covered:true},'native notice covers Swing card in narrow layout');
   const scroll=await content.evaluate(n=>({client:n.clientHeight,scroll:n.scrollHeight}));assert.ok(scroll.scroll>scroll.client);
   await native().getByRole('button',{name:'确定',exact:true}).scrollIntoViewIfNeeded();
   const confirmBox=await native().getByRole('button',{name:'确定',exact:true}).boundingBox();assert.ok(confirmBox.y>=0&&confirmBox.y+confirmBox.height<=320);
