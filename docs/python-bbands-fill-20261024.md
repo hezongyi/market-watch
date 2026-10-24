@@ -20,3 +20,7 @@
 15容器运行/API与PG healthy/restart=0；其余14服务身份及全部配置保持。6张持久表数量与完整行哈希相同，保护浏览器ID及启动时间相同。长期manager固定Chart引用已同步，实例继续运行。
 
 仅本轮Chart运维：`python3 /home/quant/repos/.mwa-bbands-fill-20261024/operate.py start|status|stop|audit`；实际未stop/rollback。完整证据及精确回退：[results.md](/home/quant/repos/.reports/market-watch/20261024-bbands-fill/results.md)。未重跑全套CI、全部指标数值或Swing/通知浏览器矩阵；不PR/push/合并/生产发布或操作Unraid。
+
+## 人工验收与收口
+
+2026-10-24，用户明确确认“人工验收通过，可以收口了吗”。人工验收已通过，本轮工作完成，无剩余阻塞。收口时只读审计再次通过，运行产品仍为上述09b8ba14及固定镜像；mwa继续运行，真实数据、配置、保护浏览器及精确回退材料保留。仅提交验收记录，不重建镜像、不合并、不发布生产或删除资源。
