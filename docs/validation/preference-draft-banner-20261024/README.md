@@ -36,3 +36,7 @@
 - 本轮回退 overlay `/home/quant/repos/.mwa-preference-draft-banner-20261024/rollback-override.json` 与旧 durable overlay 均私有保留；未执行回退。旧 NR 任务记录是历史证据，当前运行版本以本轮记录和实例 registry 为准。
 
 原始证据：`/home/quant/repos/.reports/market-watch/20261024-preference-draft-banner`；结构化结果见 [summary.json](summary.json)。此前用户已认可的 NR 闪动修复保留于本候选基线，回归通过。没有 push、PR、main 合并、正式 tag、生产／Unraid 操作或永久数据删除。
+
+## 用户确认与收口
+
+2026-10-24T14:55:42.353908+00:00：用户确认“正常了”，本轮修复收口。最后运行配置与保护浏览器审计通过，保留 mwa 运行、原数据及回退材料。没有合并或生产发布授权。
