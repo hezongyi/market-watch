@@ -97,9 +97,19 @@ widget.onChartReady(async()=>{
   await page.evaluate(()=>failArchive=true);await chart.locator('[data-name="mw-alert-price-label"][data-alert-id="r2"] button').click();await page.waitForFunction(()=>notes.some(x=>x.includes('failure'))||writes.some(x=>x.op==='lifecycle'));assert.equal(await chart.locator('[data-name="mw-alert-price-label"][data-alert-id="r2"]').count(),1);
   await page.evaluate(()=>failArchive=false);await chart.locator('[data-name="mw-alert-price-label"][data-alert-id="r2"] button').click();await chart.locator('[data-name="mw-alert-price-label"][data-alert-id="r2"]').waitFor({state:'detached'});
   report.cases.push('Six reference states, real shell/editor/SVG, exact input precision, real mode 0/1/2/3 and inversion coordinates, resize/scroll/zoom/multiple panes/multiple charts, wrong timeframe, archive failure retention and success');
-  await page.evaluate(async()=>{await widget.changeTheme('Light');ui.theme('light')});await raf();await capture('light-list','.chart-alert-panel');
-  await page.setViewportSize({width:375,height:650});await raf();await page.screenshot({path:path.join(output,'mobile-375.png')});
-  await chart.locator('.chart-alert-panel').evaluate(n=>n.style.fontSize='26px');await page.screenshot({path:path.join(output,'text-200.png')});
+  await page.evaluate(()=>widget.setLayout('s'));await page.waitForFunction(()=>widget.chartsCount()===1&&widget.activeChart().dataReady());
+  await page.evaluate(async()=>{await widget.changeTheme('Light');ui.theme('light');ui.open()});await raf();await capture('light-list','.chart-alert-panel');
+  const mobilePanel=chart.locator('.chart-alert-panel');
+  await mobilePanel.locator('.chart-alert-card').first().getByRole('button',{name:'编辑',exact:true}).click();await dialog.waitFor();
+  await page.setViewportSize({width:375,height:650});await raf();const mobileDialog=await dialog.boundingBox();assert.ok(mobileDialog.x>=0&&mobileDialog.x+mobileDialog.width<=375,'375px editor remains inside viewport');
+  report.mobile={dialog:mobileDialog,nativePanelHidden:!await mobilePanel.isVisible(),limitation:'Native library hides the sidebar at 375px; an already opened editor remains usable. Mobile sidebar entry is not proven.'};
+  await page.screenshot({path:path.join(output,'mobile-375.png')});await page.keyboard.press('Escape');await dialog.waitFor({state:'detached'});
+  await page.setViewportSize({width:1600,height:900});await page.evaluate(()=>ui.open());await mobilePanel.waitFor({state:'visible'});
+  await chart.evaluate(()=>{const root=document.querySelector('.chart-alert-panel');const nodes=[root,...root.querySelectorAll('*')];const sizes=nodes.map(n=>parseFloat(getComputedStyle(n).fontSize));nodes.forEach((n,i)=>{if(sizes[i])n.style.setProperty('font-size',sizes[i]*2+'px','important')});});
+  report.text200=await mobilePanel.evaluate(n=>({box:n.getBoundingClientRect().toJSON(),scrollWidth:n.scrollWidth,clientWidth:n.clientWidth,subtitleLineHeight:getComputedStyle(n.querySelector('.alert-row-subtitle')).lineHeight,subtitleHeight:n.querySelector('.alert-row-subtitle').getBoundingClientRect().height}));assert.ok(report.text200.scrollWidth<=report.text200.clientWidth+1,'200% text has no panel horizontal overflow');
+  assert.ok(report.text200.subtitleHeight+0.05>=parseFloat(report.text200.subtitleLineHeight),'200% secondary text is not clipped by a fixed row height');
+  await page.screenshot({path:path.join(output,'text-200.png')});
+  report.cases.push('375px editor bounded; native sidebar hidden at that width. True 200% computed text sizes: no panel horizontal overflow and secondary text has room to grow.');
   await page.evaluate(()=>{bridge.destroy();ui.destroy()});assert.equal(await chart.locator('[data-name="mw-alert-price-label"]').count(),0);assert.equal(await chart.locator('[data-name="mw-alert-price-dot"]').count(),0);
   assert.deepEqual(report.errors,[]);report.passed=true;
  }catch(e){report.failure=String(e);await page.screenshot({path:path.join(output,'failure.png')});process.exitCode=1;}
