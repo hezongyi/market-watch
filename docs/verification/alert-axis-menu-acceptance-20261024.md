@@ -1,6 +1,6 @@
 # 价格轴加号菜单修正验收
 
-用户明确批准更新；自动验收通过，实例保持运行，等待人工验收。F0：兼容 UI 触发流程修正，无 API/schema 变更。
+用户明确批准更新；自动验收及用户人工验收均通过，任务已收口，实例保持运行。F0：兼容 UI 触发流程修正，无 API/schema 变更。
 
 实际主机 Ubuntu `quant-server`，Compose project `mw-issue75-v2-20261018`。入口 https://192.168.7.232:18280/advanced-charts/mw75-real ，Chart origin https://192.168.7.232:18281 。
 
@@ -27,3 +27,7 @@
 - 本次私有配置与回退：`/home/quant/repos/.mwa-alert-axis-menu-20261024/`。`rollback-override.json` 精确保留更新前 Chart 镜像 `6946f86b25a3`；仅可结合原 base 对 Chart 执行局部回退，不整栈 recreate。未执行回退。
 
 保留长期实例、数据库、凭据、TLS、真实数据及浏览器现场。无 seed/migrate/reset、PR、push、main 合并或生产发布。
+
+## 人工验收与收口
+
+2026-10-24T23:25:43Z，用户明确确认“人工验收通过，可以收口了吗”。人工验收完成，无剩余阻断。只读收口审计再次确认 Chart 固定镜像、全部有效配置、其他容器及保护浏览器身份保持，15 服务运行、API/PG healthy。未再次换版、重启或执行资源清理；保留代码、验收证据和回退材料。未扩大为合并 main 或生产发布授权。

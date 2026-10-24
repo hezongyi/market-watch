@@ -1,6 +1,6 @@
 # 告警交互更新验收记录
 
-自动验收通过，等待用户人工验收。F0：兼容 UI 交互，无 API/schema 变更。
+自动验收及用户人工验收均通过，任务已收口。F0：兼容 UI 交互，无 API/schema 变更。最新收口记录见 [加号菜单验收记录](alert-axis-menu-acceptance-20261024.md#人工验收与收口)。
 
 用户随后补充要求“加号先弹菜单，选创建告警才创建”。该修正已获批准并更新实例，自动验收通过；最新版本见 [加号菜单验收记录](alert-axis-menu-acceptance-20261024.md)。下文保留此前部署版本的历史结果，其中“加号直接创建”已被新流程替代。
 
@@ -28,4 +28,4 @@ Chart 产品源码 `17b276dc9b167b562f4387c52698b8635bb89885`，Web `19cc026afa8
 - 原始日志、镜像身份、快照、数据指纹及截图：`/home/quant/repos/.reports/market-watch/20261024-alert-panel-ui/interactions/acceptance`，结构化摘要 `summary.json`。
 - 真实页面截图 `runtime/real-hover.png`；原生拖动 `native-interactions-final/native-drag-saved.png`；直接创建 `native-interactions-final/native-plus-created.png` 已目视检查。
 
-未迁移/seed/reset/清库；未 push、创建 PR、合并 main 或发布生产。人工验收尚待用户确认。
+未迁移/seed/reset/清库；未 push、创建 PR、合并 main 或发布生产。用户已于 2026-10-24 明确确认人工验收通过。
