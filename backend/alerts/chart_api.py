@@ -1012,7 +1012,10 @@ def data_sync(body: DataQuery):
             if cached_result and time.monotonic() - cached_result[0] < 15:
                 result = cached_result[1]
             else:
-                result = calculate(all_rows, spec, provisional=body.provisional)
+                from .chart_calculation_history import calculation_rows
+
+                result = calculate(calculation_rows(all_rows, {"calendar": inst.calendar},
+                    inst.id, body.timeframe), spec, provisional=body.provisional)
                 if "presentation" in result:
                     result["presentation"] = result["presentation"] | {
                         "history_revision": revision, "history_complete": True}

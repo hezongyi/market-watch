@@ -335,6 +335,7 @@ def events(client, cursors):
                         "indicators": [],
                         "dataset_id": dataset.id,
                         "_calculation": (frozen, dict(dataset.metadata_json)),
+                        "_indicator_timeframe": dataset.timeframe,
                         "revision": dataset.revision,
                         "cursor": new_last,
                         "as_of": dataset.updated_at,
@@ -350,9 +351,10 @@ def events(client, cursors):
     for event in result:
         publish(event)
         frozen, meta = event.pop("_calculation", ([], {}))
+        timeframe = event.pop("_indicator_timeframe", None)
         for spec, inputs in frozen:
             calculated = compute(inputs, meta, meta["id"], spec,
-                first=event["bars"][0]["start"], provisional=True)
+                first=event["bars"][0]["start"], provisional=True, timeframe=timeframe)
             if "presentation" in calculated:
                 calculated["presentation"] = calculated["presentation"] | {
                     "history_revision": str(event["revision"]), "history_complete": True}

@@ -23,7 +23,7 @@ log = logging.getLogger(__name__)
 
 
 def _calendar(meta):
-    return {k: meta.get(k) for k in ('calendar', 'calendar_profile')}
+    return {k: meta.get(k) for k in ('calendar', 'calendar_profile', 'timezone', 'session')}
 
 
 def capture(db, page, *, full_series=True):

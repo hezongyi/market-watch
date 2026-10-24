@@ -9,6 +9,9 @@ import copy
 import math
 
 from .chart_indicators import CATALOG, validate
+from .nr_breakout import ALGORITHM as NR_ALGORITHM
+from .nr_breakout import NAME as NR_NAME
+from .nr_breakout import step as nr_step
 from .rolling_range_squeeze import ALGORITHM as SQUEEZE_ALGORITHM
 from .rolling_range_squeeze import NAME as SQUEEZE_NAME
 from .rolling_range_squeeze import SqueezeState
@@ -18,8 +21,8 @@ from .supertrend_pine import step as supertrend_step
 
 ALGORITHM = "fixed-indicator-state-v3"
 SUPPORTED = frozenset(("SMA", "EMA", "LWMA", "BBANDS", "RSI", "MACD", "ATR", "STOCH",
-                       "SWING_SR_V1", SUPERTREND_NAME, SQUEEZE_NAME))
-ALGORITHMS = (ALGORITHM, SUPERTREND_ALGORITHM, SQUEEZE_ALGORITHM)
+                       "SWING_SR_V1", SUPERTREND_NAME, SQUEEZE_NAME, NR_NAME))
+ALGORITHMS = (ALGORITHM, SUPERTREND_ALGORITHM, SQUEEZE_ALGORITHM, NR_ALGORITHM)
 
 
 def advance_dependencies(state, name, params, row):
@@ -55,6 +58,8 @@ class IndicatorState:
         self.algorithm = SUPERTREND_ALGORITHM if self.name == SUPERTREND_NAME else ALGORITHM
         if self.name == SQUEEZE_NAME:
             self.algorithm = SQUEEZE_ALGORITHM
+        if self.name == NR_NAME:
+            self.algorithm = NR_ALGORITHM
         self.state = {}
         if checkpoint is not None:
             if (checkpoint.get("algorithm") != self.algorithm or checkpoint.get("spec") != self.spec):
@@ -71,6 +76,8 @@ class IndicatorState:
             return self.state.get("atr") is not None
         if self.name == SQUEEZE_NAME:
             return values["threshold"] is not None and values["ratio"] is not None
+        if self.name == NR_NAME:
+            return bool(self.state.get("ranges"))
         return all(value is not None for value in values.values())
 
     def display_step(self, row, *, provisional_dependency=False):
@@ -143,7 +150,9 @@ class IndicatorState:
         s, p = self.state, self.params
         advance_dependencies(s, self.name, p, row)
         n = s["n"]
-        if self.name == SUPERTREND_NAME:
+        if self.name == NR_NAME:
+            result = nr_step(s, row, p)
+        elif self.name == SUPERTREND_NAME:
             result = supertrend_step(s, open_, high, low, close, p)
         elif self.name in ("SMA", "LWMA", "BBANDS", "EMA"):
             period = p["period"]

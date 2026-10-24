@@ -212,7 +212,7 @@ def _validate_metadata(name, meta):
     if meta.get("result_format") not in (None, "series_presentation_v1"):
         raise ValueError(f"{name}: unknown result format")
     profile = meta.get("render_profile")
-    if profile not in (None, "swing_sr_v1", "supertrend_pine_v1", "rolling_range_squeeze_v1"):
+    if profile not in (None, "swing_sr_v1", "supertrend_pine_v1", "rolling_range_squeeze_v1", "nr_breakout_v1"):
         raise ValueError(f"{name}: invalid render_profile")
     if (profile == "swing_sr_v1") != bool(meta.get("result_format")):
         raise ValueError(f"{name}: Swing render profile requires the extended result contract")
@@ -456,7 +456,13 @@ def calculate(rows, spec, *, provisional=False):
     for start, end in spans:
         start, end = int(start), int(end)
         span = {key: values[start:end] for key, values in arrays.items()}
-        values, display = _run(name, span, p)
+        if name == "NR4_NR7_BREAKOUT_V1":
+            from .nr_breakout import calculate as nr_calculate
+
+            values = nr_calculate(rows[start:end], p)
+            display = None
+        else:
+            values, display = _run(name, span, p)
         for key, output in values.items():
             outputs[key][start:end] = output
         if extended:
@@ -535,3 +541,9 @@ from .rolling_range_squeeze import NAME as _SQUEEZE_NAME  # noqa: E402
 from .rolling_range_squeeze import calculate_vectors as _squeeze_calculate  # noqa: E402
 
 register(_SQUEEZE_NAME, _SQUEEZE_METADATA, _squeeze_calculate)
+
+from .nr_breakout import METADATA as _NR_METADATA  # noqa: E402
+from .nr_breakout import NAME as _NR_NAME  # noqa: E402
+from .nr_breakout import calculate as _nr_calculate  # noqa: E402
+
+register(_NR_NAME, _NR_METADATA, _nr_calculate)

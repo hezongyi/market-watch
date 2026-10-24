@@ -222,7 +222,7 @@ class Calculator:
             page["indicators"] = []
             for spec, inputs in frozen:
                 result = compute(inputs, meta, query.instrument, spec,
-                    first=page["bars"][0]["start"], provisional=query.provisional)
+                    first=page["bars"][0]["start"], provisional=query.provisional, timeframe=query.timeframe)
                 if "presentation" in result:
                     result["presentation"] = result["presentation"] | {
                         "history_revision": str(page["cache_revision"]), "history_complete": True}

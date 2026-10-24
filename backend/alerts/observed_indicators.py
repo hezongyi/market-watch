@@ -210,6 +210,7 @@ def calculate(run, rows, phase, profiles, *, seam=None, initial_state=None):
         previous = engine.meta["last_end"]
         row = {
             **source,
+            "indicator_calendar": phase,
             "gap_before": gap_before(previous, source["start"], phase, profiles),
             "chart_time": fixed_label(source, run.timeframe, phase),
         }
@@ -428,6 +429,7 @@ def suffix(db, run, page, *, stamp, replay_pages=None):
             **bar,
             "gap_before": jobs.gap_before(engine.meta["last_end"], bar["start"], phase, profiles),
             "chart_time": fixed_label(bar, run.timeframe, phase),
+            "indicator_calendar": phase,
         }
         forming = bar["end"] > (snapshot.content["now"] if snapshot else stamp)
         values = engine.step(row, provisional=forming)

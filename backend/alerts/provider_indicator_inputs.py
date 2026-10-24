@@ -133,7 +133,7 @@ def freeze(db, page, body, maximum, *, evaluation_end=None, telemetry=None):
         _prune(_INPUTS, MAX_ROWS)
 
 
-def compute(inputs, meta, instrument, spec, *, first, provisional, telemetry=None):
+def compute(inputs, meta, instrument, spec, *, first, provisional, telemetry=None, timeframe=None):
     """Share one immutable input calculation, including its confirmed checkpoints."""
     from .provider_cache import check_cancelled
 
@@ -145,7 +145,8 @@ def compute(inputs, meta, instrument, spec, *, first, provisional, telemetry=Non
     stats.update(result_cache='miss', input_rows=len(rows), calculation_steps=0, checkpoint_index=0,
                  input_accepted_at_ms=now_ms())
     key = (inputs.identity, name, json.dumps(params, sort_keys=True),
-           json.dumps(meta.get("calendar_profile"), sort_keys=True), meta["calendar"], instrument)
+           json.dumps(meta.get("calendar_profile"), sort_keys=True), meta["calendar"], instrument,
+           meta.get("timezone"), meta.get("session"), timeframe)
     if name in ("SWING_SR_V1", "ROLLING_RANGE_SQUEEZE") or name not in SUPPORTED:
         key = ("batch", key, inputs.epoch, inputs.revision, provisional,
                json.dumps(rows[-1], sort_keys=True) if rows else "")
@@ -155,7 +156,7 @@ def compute(inputs, meta, instrument, spec, *, first, provisional, telemetry=Non
         try:
             if entry.value is None:
                 check_cancelled()
-                result = calculate(calculation_rows(rows, meta, instrument), spec, provisional=provisional)
+                result = calculate(calculation_rows(rows, meta, instrument, timeframe), spec, provisional=provisional)
                 check_cancelled()
                 entry.value, entry.weight = result, len(rows) * max(6, len(CATALOG[name]["series"]))
                 stats['calculation_steps'] = len(rows)
@@ -187,7 +188,7 @@ def compute(inputs, meta, instrument, spec, *, first, provisional, telemetry=Non
             state = IndicatorState(spec, checkpoints.get(index))
             values = list(previous[1][:index]) if reusable else []
             checkpoints = {i: value for i, value in checkpoints.items() if i <= index}
-            prepared = calculation_rows(rows[max(0, index-1):], meta, instrument)
+            prepared = calculation_rows(rows[max(0, index-1):], meta, instrument, timeframe)
             if index:
                 prepared = prepared[1:]
             for offset, row in enumerate(prepared, index):
@@ -208,7 +209,7 @@ def compute(inputs, meta, instrument, spec, *, first, provisional, telemetry=Non
                     for i, row in enumerate(rows[start:], start)]
         # The calculated segmentation can add a trading-gap break absent from
         # the raw provider row. Preserve that presentation contract too.
-        prepared_visible = calculation_rows(rows[max(0, start-1):], meta, instrument)
+        prepared_visible = calculation_rows(rows[max(0, start-1):], meta, instrument, timeframe)
         if start:
             prepared_visible = prepared_visible[1:]
         for target, source in zip(rendered, prepared_visible):
@@ -217,7 +218,7 @@ def compute(inputs, meta, instrument, spec, *, first, provisional, telemetry=Non
         if provisional and rows and not rows[-1]["complete"] and rendered:
             index = max((i for i in checkpoints if i <= len(rows)-1), default=0)
             state = IndicatorState(spec, checkpoints.get(index))
-            tail = calculation_rows(rows[max(0, index-1):], meta, instrument)
+            tail = calculation_rows(rows[max(0, index-1):], meta, instrument, timeframe)
             if index:
                 tail = tail[1:]
             for row in tail[:-1]:

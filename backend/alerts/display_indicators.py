@@ -64,11 +64,11 @@ def suffix(db, run, page, *, stamp, retry=None):
         profiles[-1] = (left, end, profile)
     rows, dependent = [], False
     for bar in sorted(inputs.values(), key=lambda row: row['start']):
-        row = {**bar, 'gap_before': jobs.gap_before(engine.state.get('last_end'), bar['start'], phase, profiles)}
+        row = {**bar, 'indicator_calendar': phase, 'gap_before': jobs.gap_before(engine.state.get('last_end'), bar['start'], phase, profiles)}
         if row['gap_before']:
             dependent = False
         dependent |= not bar.get('complete', False)
-        if run.spec['name'] in ('SWING_SR_V1', 'ROLLING_RANGE_SQUEEZE'):
+        if run.spec['name'] in ('SWING_SR_V1', 'ROLLING_RANGE_SQUEEZE', 'NR4_NR7_BREAKOUT_V1'):
             from .series_access import fixed_label
 
             row['chart_time'] = fixed_label(row, run.timeframe, phase)

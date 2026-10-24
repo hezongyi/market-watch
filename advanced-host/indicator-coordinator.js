@@ -1,6 +1,6 @@
 /* Main-chart ranges drive Python demand. One read includes all plots; shared
  * results stay time-keyed until the native adapter maps them to current indexes. */
-function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=()=>{},occurrence=()=>{},recovered=()=>{},status=()=>{},presentation=()=>{},demand=()=>{},leases=()=>{},release=()=>{}}) {
+function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=()=>{},occurrence=()=>{},recovered=()=>{},status=()=>{},presentation=()=>{},demand=()=>{},leases=()=>{},release=()=>{},drawings}={}) {
   const results=globalThis.MWNativeIndicatorResults;
   read=chartIndicatorReadBatch(read);
   const consumers=new Map(),shared=new Map(),charts=new WeakMap(),rangeEvents=new Map(),operations=new Set();
@@ -43,12 +43,14 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
       shared.delete(key);total-=record.rows.length;values-=record.values || 0;
     }
   }
-  function detach(consumer){if(consumer.retryTimer)clearTimeout(consumer.retryTimer);status(consumer,'removed');release([{id:consumer.key,generation:consumer.generation || 0}]);if(consumer.handle)results.detach(consumer.handle);consumers.delete(consumer.key);}
+  function detach(consumer){drawings?.clear(consumer);if(consumer.retryTimer)clearTimeout(consumer.retryTimer);status(consumer,'removed');release([{id:consumer.key,generation:consumer.generation || 0}]);if(consumer.handle)results.detach(consumer.handle);consumers.delete(consumer.key);}
   function rowsFor(result,page,meta,params,inputs,resolution,ticker){
     const source=new Map(result.series.map(series=>[series.key,new Map(series.values.map(point=>[point.time,point]))]));
     const supertrend=meta.render_profile==='supertrend_pine_v1';
     const swing=meta.render_profile==='swing_sr_v1';
-    const series=supertrend ? meta.series.filter(series=>series.key!=='direction') : meta.series;
+    const nrBreakout=meta.render_profile==='nr_breakout_v1';
+    const series=supertrend ? meta.series.filter(series=>series.key!=='direction') :
+      nrBreakout ? meta.series.filter(series=>series.key==='range_high') : meta.series;
     const offsets=swing ? {plot1:-params.high_strength,plot3:-params.low_strength} : {};
     const rows=page.bars.map(bar=>{
       const values=series.map(series=>{
@@ -63,7 +65,9 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
       // The backend owns exchange trading-date labels. Never infer indexes or
       // regenerate D/W/M chart dates here.
       const time=bar.chart_time ?? identity.chartTime(bar,resolution,ticker);
-      return {time,sourceTime:bar.start,values,valid:values.map(Number.isFinite)};
+      return {time,sourceTime:bar.start,values,valid:values.map(Number.isFinite),
+        ...(nrBreakout?{drawing:Object.fromEntries(meta.series.map(series=>
+          [series.key,source.get(series.key)?.get(bar.start)?.value ?? null]))}:{})};
     });
     return {rows,offsets};
   }
@@ -75,6 +79,7 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
   }
   async function prepare(consumer,scope){
     const {chart,meta,params,inputs}=consumer;
+    drawings?.refresh(consumer);
     const ticker=chart.symbol();
     const binding=identity.binding(chart.symbol(),scope.resolution);
     if(!binding)return;
@@ -86,10 +91,12 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
     const corrected=(binding.correctionVersion || 0)!==(consumer.correctionVersion || 0);
     if(!consumer.handle || consumer.generation!==scope.generation ||
       JSON.stringify(consumer.handle.identity)!==JSON.stringify(nextIdentity)){
+      if(consumer.handle && JSON.stringify(consumer.handle.identity)!==JSON.stringify(nextIdentity))drawings?.clear(consumer);
       consumer.handle=results.attach(chart,consumer.id,nextIdentity);consumer.sequence=0;
       consumer.generation=scope.generation;
     }
     if(corrected){
+      drawings?.clear(consumer);
       const withdrawn=await results.invalidate(consumer.handle,[binding.correctionStart ?? -Number.MAX_VALUE,Number.MAX_VALUE],String(binding.inputRevision ?? binding.tailVersion ?? 0));
       // A native reset can replace the binding while its withdrawal is queued.
       // Do not acknowledge that correction until the current generation really
@@ -179,7 +186,7 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
         return {rows:unique,pages,lease};
       })();
       cached={promise,rows:[]};shared.set(key,cached);
-      promise.then(value=>{cached.settled=true;if(value && !value.pending){cached.rows=value.rows;cached.values=value.rows.reduce((n,row)=>n+row.values.length,0);}else shared.delete(key);},()=>{cached.settled=true;shared.delete(key);});
+      promise.then(value=>{cached.settled=true;if(value && !value.pending){cached.rows=value.rows;cached.values=value.rows.reduce((n,row)=>n+row.values.length+Object.keys(row.drawing || {}).length,0);}else shared.delete(key);},()=>{cached.settled=true;shared.delete(key);});
     }
     status(consumer,'preparing');
     try {
@@ -221,6 +228,7 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
         generation:consumer.handle.generation,sequence:++consumer.sequence,inputRevision:revision,
         kind:prepend?'prepend':tail?'append':'snapshot',rows:batch.rows,offsets,coverage});
       if(accepted){consumer.acceptedScope={...coverage,generation:consumer.handle.generation};
+        drawings?.update(consumer,{kind:prepend?'prepend':tail?'append':'snapshot',rows:batch.rows,identity:nextIdentity});
         consumer.accepted=JSON.stringify([consumer.handle.generation,nextIdentity,binding.inputRevision,scope.first,scope.last,scope.count,binding.tailVersion,binding.correctionVersion,binding.displaySnapshot,binding.providerSnapshot,inputs.showsignals,inputs.highlighting]);
         consumer.requested=consumer.accepted;
         const evidence=batch.pages.map(item=>item.calculation).filter(Boolean);

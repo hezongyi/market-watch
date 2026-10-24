@@ -303,8 +303,8 @@ def calculate_inputs(run, rows, phase, profiles, *, seam=None, initial_state=Non
     engine = IndicatorState(run.spec, run.state if initial_state is None else initial_state)
     output = []
     for source in rows:
-        row = dict(source)
-        if run.spec["name"] in ("SWING_SR_V1", "ROLLING_RANGE_SQUEEZE"):
+        row = {**source, "indicator_calendar": phase}
+        if run.spec["name"] in ("SWING_SR_V1", "ROLLING_RANGE_SQUEEZE", "NR4_NR7_BREAKOUT_V1"):
             from .series_access import fixed_label
 
             row["chart_time"] = fixed_label(row, run.timeframe, phase)
@@ -480,8 +480,9 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='di
                     break
                 if rows and bar["start"] <= rows[-1]["start"]:
                     raise ValueError("Indicator tail overlaps fixed output")
-                row = {**bar, "gap_before": gap_before(engine.state.get("last_end"), bar["start"], phase, profiles)}
-                if display is not None:
+                row = {**bar, "indicator_calendar": phase,
+                       "gap_before": gap_before(engine.state.get("last_end"), bar["start"], phase, profiles)}
+                if display is not None or run.spec["name"] == "NR4_NR7_BREAKOUT_V1":
                     from .series_access import fixed_label
 
                     row["chart_time"] = fixed_label(row, run.timeframe, phase)

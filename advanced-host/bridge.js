@@ -392,7 +392,11 @@ function releaseIndicatorConsumers(consumers) {
   }
 }
 function startIndicatorCoordinator(catalog) {
+  const nrDrawings=typeof chartNRBreakoutDisplay==='function' ? chartNRBreakoutDisplay({
+    report:error=>send({type:'error',error:'NR4/NR7 绘制失败：'+String(error)}),
+  }) : undefined;
   indicatorCoordinator=chartIndicatorCoordinator(widget,catalog,{
+    drawings:nrDrawings,
     read:(symbol,res,args,current)=>query(symbol,res,args,Date.now()+30000,current),
     recover:(ticker,res,token,error)=>recoverDisplaySnapshot(ticker,res,token,false,error?.snapshot_evidence),
     identity:{

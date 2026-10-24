@@ -701,7 +701,7 @@ def data(body):
         start = visible[0]["start"] if visible else before
         result = compute(frozen or Inputs([], ('empty-managed',body.instrument),None,0),
                          calculation_meta, body.instrument, spec, first=start,
-                         provisional=body.provisional, telemetry=execution)
+                         provisional=body.provisional, telemetry=execution, timeframe=body.timeframe)
         result['calculation'] = dict(status='complete', calculation_origin=left,
             input_revision=revision, algorithm=IndicatorState(spec).algorithm,
             producer='backend', accuracy='oracle_equivalent', canonical_verified=True,

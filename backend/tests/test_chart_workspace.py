@@ -74,6 +74,7 @@ def test_indicators_and_warmup():
     rows = [
         {
             "start": i * 60000,
+            "end": (i + 1) * 60000,
             "open": str(i + 1),
             "high": str(i + 3),
             "low": str(i + 0.5),

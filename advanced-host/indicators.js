@@ -57,13 +57,32 @@ function supertrendPineProfile() {
   };
 }
 
+function nrBreakoutPineProfile(meta) {
+  // The public drawing API renders Python's coordinates. This hidden plot
+  // gives the native study a price scale without plotting timestamp fields.
+  return {
+    format: {type: 'inherit'},
+    plots: [{id:'range_anchor',type:'line'}],
+    styles: {range_anchor:{title:'Range',isHidden:true}},
+    defaults: {
+      // Keep a transparent plot enabled: disabling every plot makes the
+      // native engine omit the study entirely, including its result binding.
+      styles:{range_anchor:{linestyle:0,linewidth:1,plottype:0,trackPrice:false,
+        transparency:100,visible:true,display:8,color:'rgba(0,0,0,0)'}},
+      inputs:{...meta.params,...Object.fromEntries(meta.display_inputs.map(item=>[item.id,item.default]))},
+    },
+  };
+}
+
 function pythonStudies(PineJS, catalog) {
   return Object.entries(catalog).map(([name, meta]) => {
     const supertrend = meta.render_profile === "supertrend_pine_v1";
     const squeeze = meta.render_profile === "rolling_range_squeeze_v1";
-    const profile = supertrend ? supertrendPineProfile() : null;
+    const nrBreakout = meta.render_profile === 'nr_breakout_v1';
+    const profile = supertrend ? supertrendPineProfile() : nrBreakout ? nrBreakoutPineProfile(meta) : null;
     const keys = Object.keys(meta.params),
-      series = supertrend ? meta.series.filter(s => s.key !== "direction") : meta.series;
+      series = supertrend ? meta.series.filter(s => s.key !== "direction") :
+        nrBreakout ? meta.series.filter(s=>s.key==='range_high') : meta.series;
     const swing = meta.render_profile === "swing_sr_v1";
     const displayInputs = Array.isArray(meta.display_inputs) ? meta.display_inputs : [];
     const colors = ["#42a5f5", "#ffb74d", "#ab47bc"];
@@ -73,7 +92,7 @@ function pythonStudies(PineJS, catalog) {
         _metainfoVersion: 53,
         id: "MWPython" + name + "@market-watch-1",
         description: "守望 Python " + name,
-        shortDescription: swing ? "Swing" : squeeze ? "Rolling Range Squeeze" : "PY " + name,
+        shortDescription: swing ? "Swing" : squeeze ? "Rolling Range Squeeze" : nrBreakout ? "LuxAlgo · NR4/NR7" : "PY " + name,
         is_hidden_study: false,
         is_price_study: meta.pane === "main",
         isCustomIndicator: true,
@@ -132,7 +151,7 @@ function pythonStudies(PineJS, catalog) {
           return {
             id: key,
             name: rule.label || (swing ? (key === "high_strength" ? "High strength" : "Low strength") : key),
-            type: rule.type,
+            type: rule.type === 'enum' ? 'text' : rule.type,
             defval: meta.params[key],
             min: rule.min,
             max: rule.max,
