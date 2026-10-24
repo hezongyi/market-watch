@@ -57,7 +57,8 @@ widget.onChartReady(async()=>{
  display=chartSqueezeDisplay(widget,snapshots,{identity:s=>s,
   report:e=>console.error('DISPLAY',e.message)});
  studyId=await widget.activeChart().createStudy('守望 Python ROLLING_RANGE_SQUEEZE',false,false,fixture.params);
- await widget.activeChart().setVisibleRange({from:fixture.bars.at(-100).start/1000,to:fixture.bars.at(-1).start/1000});
+ // Geometry assertions cover the full snapshot, so load its price history too.
+ await widget.activeChart().setVisibleRange({from:fixture.bars[0].start/1000,to:fixture.bars.at(-1).start/1000});
  ready=true;
 });
 </script></body></html>
