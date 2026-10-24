@@ -15,4 +15,8 @@
 
 继续使用现有mwa，仅构建/替换Chart，保留其余14服务、真实数据、完整私有配置和保护浏览器。入口：<https://192.168.7.232:18280/advanced-charts/mw75-real>。
 
-证据目录：`/home/quant/repos/.reports/market-watch/20261024-bbands-fill/`。最终候选、制品身份、mwa检查和Chart-only回退说明记录在同目录results.md。不PR/push/合并/生产发布或操作Unraid。
+已更新并验收通过：产品提交`09b8ba141804377252183aa84fc96eebe6ea0d0c`，Chart镜像`sha256:a46ca3bd8edaa704cdffc9a5f334467752f90e49ca03d1621f61ce97bc173117`，dirty=false。实际mwa EURUSD上下轨间底色可见，原生样式页Bands Background控件可见，三轨仍显示五位价格，pageerror=0。
+
+15容器运行/API与PG healthy/restart=0；其余14服务身份及全部配置保持。6张持久表数量与完整行哈希相同，保护浏览器ID及启动时间相同。长期manager固定Chart引用已同步，实例继续运行。
+
+仅本轮Chart运维：`python3 /home/quant/repos/.mwa-bbands-fill-20261024/operate.py start|status|stop|audit`；实际未stop/rollback。完整证据及精确回退：[results.md](/home/quant/repos/.reports/market-watch/20261024-bbands-fill/results.md)。未重跑全套CI、全部指标数值或Swing/通知浏览器矩阵；不PR/push/合并/生产发布或操作Unraid。
