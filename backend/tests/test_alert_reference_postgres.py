@@ -9,6 +9,8 @@ from test_chart_alert_api import (
     test_reference_identity_and_log_cleanup_preserve_frozen_evidence_and_phone_state as cleanup_contract,
 )
 
+pytest_plugins = ["test_provider_postgres"]
+
 pytestmark = pytest.mark.skipif(
     not os.getenv("TEST_POSTGRES_URL"), reason="Requires isolated PostgreSQL"
 )
