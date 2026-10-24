@@ -74,3 +74,12 @@ python3 /home/quant/repos/.mwa-v1264-chart-init-20261021/manage.py stop
 - 候选以当前 mwa 产品 `3e674dd7` 为底 cherry-pick 功能；唯一冲突是 indicators.js 的 format，解析为 Swing 与 Squeeze 均 inherit，保留独立 Supertrend profile、Swing display 标签、BBANDS 原生底色及分钟恢复逻辑。两边意图均保留。
 - 集成后实际重跑：88 passed（squeeze、chart_workspace、reload diagnosis/matrix、composite price confirmation），新指标 10 组原生检查 errors=[]，Web 完整构建通过。快照恢复、恢复生命周期、新指标合同、Swing identity 与 9 项告警桥接通过。Ruff 与 git diff --check 通过。
 - 尚无本候选 Docker 镜像；未执行 PostgreSQL 专项；未在 mwa 实际业务数据上验证，不把本地成功冒充验收通过。
+
+## PostgreSQL 专项入口已准备，等待资源
+
+`backend/tests/test_rolling_range_squeeze_postgres.py` 复用仓库隔离 schema fixture：
+严格/observed 固定历史分页各一项、供源快照一项、组合盘中预览不落盘一项，以及真实并发请求/worker 归属与 bool 检查点一项。共 5 项收集成功，Ruff 与 diff 检查通过；无 TEST_POSTGRES_URL 时实际为 5 skipped，不能视为通过。
+
+待主机满足启动门槛后，创建本任务独立 Compose project/network/volume/端口和 PG14.24，私有设置 TEST_POSTGRES_URL，再运行此文件及前述 38 项缺失数据库的既有测试。不使用现有 mwa 或其他任务的可写数据库，测试 URL 与凭据不进入仓库或报告。
+
+09:34 UTC 复核：代码工作树干净；mwa 15 服务仍运行，API/PG healthy，尚未更新。5 分钟负载 9.37，仍不能启动新服务；验收授权尚未收到。
