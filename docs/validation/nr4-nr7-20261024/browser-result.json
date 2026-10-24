@@ -1,0 +1,121 @@
+{
+  "passed": true,
+  "cases": [
+    "daily: actual Python API coordinates match native boxes/lines/labels; labels center on price/time",
+    "Hide removes owned drawings; show reconstructs them",
+    "Real study settings update range color and Huge 24px Pine label size",
+    "weekly: actual Python API coordinates match native boxes/lines/labels; labels center on price/time",
+    "Existing RSI native alert draft still opens and cancels without rule creation; NR correctly reports the platform mapping limitation",
+    "Remove cleans all NR derived shapes"
+  ],
+  "errors": [],
+  "blockedAlertWrites": [],
+  "scope": "Actual mwa Python API and licensed chart with real data; disposable browser and blocked user persistence",
+  "blockedWrites": [
+    {
+      "path": "/api/advanced-charts/preferences/migrate",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    }
+  ],
+  "chart": {
+    "symbol": "MWP:XAUUSD",
+    "resolution": "60",
+    "library": "TT v31.1.0 (internal id 6b804c486857f27920cf761aa7eb6e29d9bb6362 @ 2026-04-08T18:21:25.992Z)"
+  },
+  "daily": {
+    "rows": 252,
+    "expected": 21,
+    "rectangles": 4,
+    "lines": 12,
+    "signals": 5,
+    "missing": [],
+    "centered": true,
+    "scope": {
+      "generation": 20,
+      "name": "NR4_NR7_BREAKOUT_V1",
+      "resolution": "60",
+      "first": 1791500400000,
+      "last": 1792785600000,
+      "count": 252,
+      "coverage": {
+        "first": 1791500400000,
+        "last": 1792785600000,
+        "count": 252,
+        "identity": "{\"main\":\"MWP:XAUUSD\",\"fixedRevision\":\"provider:XAUUSD\",\"paramsFingerprint\":\"{\\\"pattern_type\\\":\\\"NR4/NR7\\\",\\\"timeframe\\\":\\\"D\\\"}\",\"algorithmVersion\":\"NR4_NR7_BREAKOUT_V1:1\",\"inputPolicy\":\"strict_confirmed_v1\",\"calculationStart\":1786330800000,\"period\":\"60\"}",
+        "sourceFirst": 1791500400000,
+        "correctionVersion": 0,
+        "tailVersion": 16996,
+        "generation": 20
+      },
+      "transition": null
+    },
+    "inputs": {
+      "timeframe": "D",
+      "pattern_type": "NR4/NR7",
+      "show_signals": true,
+      "signal_size": "Small",
+      "up_color": "#089981",
+      "down_color": "#f23645",
+      "nr4_color": "rgba(102, 187, 106, 0.3)",
+      "nr7_color": "rgba(255, 238, 88, 0.3)",
+      "range_color": "#787b86"
+    }
+  },
+  "weekly": {
+    "rows": 252,
+    "expected": 3,
+    "rectangles": 0,
+    "lines": 3,
+    "signals": 0,
+    "missing": [],
+    "centered": true,
+    "scope": {
+      "generation": 29,
+      "name": "NR4_NR7_BREAKOUT_V1",
+      "resolution": "60",
+      "first": 1791500400000,
+      "last": 1792785600000,
+      "count": 252,
+      "coverage": {
+        "first": 1791500400000,
+        "last": 1792785600000,
+        "count": 252,
+        "identity": "{\"main\":\"MWP:XAUUSD\",\"fixedRevision\":\"provider:XAUUSD\",\"paramsFingerprint\":\"{\\\"pattern_type\\\":\\\"NR4/NR7\\\",\\\"timeframe\\\":\\\"W\\\"}\",\"algorithmVersion\":\"NR4_NR7_BREAKOUT_V1:1\",\"inputPolicy\":\"strict_confirmed_v1\",\"calculationStart\":1786330800000,\"period\":\"60\"}",
+        "sourceFirst": 1791500400000,
+        "correctionVersion": 0,
+        "tailVersion": 16998,
+        "generation": 29
+      },
+      "transition": null
+    },
+    "inputs": {
+      "timeframe": "W",
+      "pattern_type": "NR4/NR7",
+      "show_signals": true,
+      "signal_size": "Small",
+      "up_color": "#089981",
+      "down_color": "#f23645",
+      "nr4_color": "rgba(102, 187, 106, 0.3)",
+      "nr7_color": "rgba(255, 238, 88, 0.3)",
+      "range_color": "#aa00ff"
+    }
+  },
+  "nrAlertLimitation": "Existing native alert capture maps SMA/EMA/RSI/MACD/Squeeze only; supplied NR Pine has no alertcondition. NR alert creation is not part of this port.",
+  "alertDraft": "创建警报 ·\nXAUUSD\n条件\n条件\n指标输出\n指标参数快照\n指标\nRSI\nperiod\n输出\n\n手动选择指标时使用告警默认参数，需要自行核对图表。通过已映射的 Python 指标创建时，初始值读取该指标当时的实际参数；同名内置指标不自动同步。\n\n以上可编辑值是告警判定的参数快照；保存后独立于图表参数，修改图表不会同步已保存告警。\n\n参数技术键与实际值\n关系\n比较值\n＋ 添加条件\nⓘ\n触发\n到期时间\n不限\n消息\nXAUUSD · 平台行情 · bid · H1 告警\n通知\n网页\n行情与高级选项 · oanda · H1 · 收盘确认\nclose",
+  "frozenPrefixStatus": 200,
+  "hostErrors": [
+    "Error: 仅支持已映射的守望 Python SMA、EMA、RSI、MACD、ROLLING_RANGE_SQUEEZE"
+  ]
+}

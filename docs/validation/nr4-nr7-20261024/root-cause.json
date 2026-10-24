@@ -1,0 +1,102 @@
+{
+  "status": "reproduced-and-fixed",
+  "baseline_commit": "8dc8a24e",
+  "baseline_screenshot_pixels": 0,
+  "baseline_lifecycle": [
+    {
+      "clear": true,
+      "at": 1792848019363
+    },
+    {
+      "clear": true,
+      "at": 1792848019722
+    },
+    {
+      "at": 1792848021012,
+      "kind": "snapshot",
+      "rows": 252,
+      "first": 1791500400000,
+      "last": 1792785600000,
+      "patterns": [
+        1791410400000,
+        1792101600000,
+        1792447200000,
+        1792533600000
+      ]
+    },
+    {
+      "at": 1792848022397,
+      "kind": "append",
+      "rows": 1,
+      "first": 1792785600000,
+      "last": 1792785600000,
+      "patterns": []
+    },
+    {
+      "clear": true,
+      "at": 1792848022636
+    },
+    {
+      "at": 1792848023348,
+      "kind": "prepend",
+      "rows": 199,
+      "first": 1790578800000,
+      "last": 1791496800000,
+      "patterns": [
+        1790805600000,
+        1791151200000,
+        1791410400000
+      ]
+    },
+    {
+      "at": 1792848024543,
+      "kind": "append",
+      "rows": 1,
+      "first": 1792785600000,
+      "last": 1792785600000,
+      "patterns": []
+    },
+    {
+      "at": 1792848026525,
+      "kind": "append",
+      "rows": 1,
+      "first": 1792785600000,
+      "last": 1792785600000,
+      "patterns": []
+    }
+  ],
+  "cause": "Native history restart retains plot rows and coverage but retires the NR drawing consumer. Its replacement accepted only prepend/tail rows into an empty drawing cache, losing recent shapes.",
+  "fix": "A missing NR drawing binding requires a complete scope snapshot before native incremental coverage can be reused. Preserve ownerStudyId and normal cleanup.",
+  "discarded_patch": "Removed repeated public bringToFront ordering: it did not fix the missing cache and created undo commands.",
+  "independent_agents": [
+    "nr_native_root_cause: native library and source lifecycle, read-only",
+    "nr_lifecycle_review: coordinator/renderer joint VM reproduction and isolation, read-only"
+  ],
+  "regression": "web/tests/nr-breakout-restart.cjs: old source fails latest-box assertion, fixed source passes restart+prepend, ordinary incremental prepend, and restart+tail",
+  "deployed_pixel_samples": [
+    [
+      {
+        "label": "settling",
+        "count": 35003,
+        "at": "2026-10-24T13:27:39.661Z"
+      },
+      {
+        "label": "stable",
+        "count": 34967,
+        "at": "2026-10-24T13:27:44.467Z"
+      }
+    ],
+    [
+      {
+        "label": "settling",
+        "count": 35003,
+        "at": "2026-10-24T13:28:23.746Z"
+      },
+      {
+        "label": "stable",
+        "count": 34967,
+        "at": "2026-10-24T13:28:28.536Z"
+      }
+    ]
+  ]
+}

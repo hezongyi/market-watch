@@ -1,0 +1,27 @@
+{
+  "source": "b1a479a7cda8a98a2968239abd390c310267c0b0",
+  "images": {
+    "api": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+    "chart": "sha256:34dd43689ce32c132e7a5c62b07ad06bc86afa04f0d05b08d8926daa1ccf321f"
+  },
+  "services": [
+    "api",
+    "chart",
+    "chart-aggregation-worker",
+    "chart-history-worker",
+    "composite-aggregate-worker",
+    "history-worker",
+    "market-stream-worker",
+    "native-history-worker",
+    "notify-worker",
+    "pricing-worker",
+    "projector",
+    "realtime-worker"
+  ],
+  "component_sources": {
+    "api": "8b7ee3eea8467866da89c0f3fc53989da5cc94e1",
+    "chart": "b1a479a7cda8a98a2968239abd390c310267c0b0",
+    "workers": "8b7ee3eea8467866da89c0f3fc53989da5cc94e1",
+    "web": "3ac6f743f947a1ae33bcdf55bb15efa031a7f760"
+  }
+}

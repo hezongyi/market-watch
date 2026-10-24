@@ -1,0 +1,95 @@
+{
+  "status": "accepted-after-visual-root-cause-fix",
+  "recorded_at_utc": "2026-10-24T13:34:20.993238+00:00",
+  "original_baseline": "v1.28.0 / 59ed3a3f3fc727da76d13149934d999ebee04218",
+  "integration_base": "4e5351cfd40b59914174119222e2f1786cba2abc",
+  "product_commit": "b1a479a7cda8a98a2968239abd390c310267c0b0",
+  "validation_ci_commit": "9e0c03c400e19ad56d8b0445ce455cd96e216634",
+  "worktree": "/home/quant/repos/market-watch-nr4-nr7-mwa-v3-20261024",
+  "branch": "integration/nr4-nr7-mwa-v3-20261024",
+  "runtime": {
+    "source": "b1a479a7cda8a98a2968239abd390c310267c0b0",
+    "images": {
+      "api": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+      "chart": "sha256:34dd43689ce32c132e7a5c62b07ad06bc86afa04f0d05b08d8926daa1ccf321f"
+    },
+    "services": [
+      "api",
+      "chart",
+      "chart-aggregation-worker",
+      "chart-history-worker",
+      "composite-aggregate-worker",
+      "history-worker",
+      "market-stream-worker",
+      "native-history-worker",
+      "notify-worker",
+      "pricing-worker",
+      "projector",
+      "realtime-worker"
+    ],
+    "component_sources": {
+      "api": "8b7ee3eea8467866da89c0f3fc53989da5cc94e1",
+      "chart": "b1a479a7cda8a98a2968239abd390c310267c0b0",
+      "workers": "8b7ee3eea8467866da89c0f3fc53989da5cc94e1",
+      "web": "3ac6f743f947a1ae33bcdf55bb15efa031a7f760"
+    }
+  },
+  "runtime_components": [
+    {
+      "service": "chart",
+      "image": "sha256:34dd43689ce32c132e7a5c62b07ad06bc86afa04f0d05b08d8926daa1ccf321f",
+      "source": "b1a479a7cda8a98a2968239abd390c310267c0b0",
+      "dirty": "false"
+    },
+    {
+      "service": "web",
+      "image": "sha256:af3de39e8cab597c70837df98ebd95aada4b0d0534c0620ecab268c02de5a0de",
+      "source": "3ac6f743f947a1ae33bcdf55bb15efa031a7f760",
+      "dirty": "false"
+    },
+    {
+      "service": "api",
+      "image": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+      "source": "8b7ee3eea8467866da89c0f3fc53989da5cc94e1",
+      "dirty": "false"
+    }
+  ],
+  "file_sha256": {
+    ".github/workflows/ci.yml": "c4f34873554ea4915e13f73d18508d3e6c80d42d039c1d44640027f0e83921db",
+    "advanced-host/Dockerfile": "a081e485e30336d571750ae868737339411f258f80f7699a8628e60a5ae9b70b",
+    "advanced-host/bridge.js": "a145a566293dca80b2a0c6d4e306ef78e1408e9ffe7ef654214749b231b1addf",
+    "advanced-host/build-assets.mjs": "06830e9fca892fe735771c7cb7fd0f5b5539b3f02477317c95ea4ed5e1ccc7c2",
+    "advanced-host/index.html": "e44050b7970652c99d6b1d8c0fbf2ccbe79811fafa8dfa9e096fa21a08fdf6e4",
+    "advanced-host/indicator-coordinator.js": "d78310fdf8fee09ec03a8c58580b27259c9694ac06cc7965da48b7902c52e3d6",
+    "advanced-host/indicators.js": "b32035817c8f6d69c7e8032db89405e250fd6d3fd22a39eecd758344bcd318ca",
+    "advanced-host/native-indicator-results.js": "28d01d9f1d1211e1da4059591202673f6d781b0e238b9b29065891af2096b33f",
+    "advanced-host/nr-breakout-display.js": "aea3bc93e1c5d088870e0560ca8a21fe7a5b5f271e9b095b91f319cf928b07da",
+    "backend/alerts/chart_api.py": "5a11ad2f647fdb831f77a478cb7268f833f120b8cfb0a6241058ec7f3a3b687d",
+    "backend/alerts/chart_calculation_history.py": "7cac5ec830d5d187786231457f57c6c10db00a6af0e5523707024673576a74a2",
+    "backend/alerts/chart_indicators.py": "29ce4505355664a5f67674feaf03911654d743de0d99d09637bdc72d7c7ef8ab",
+    "backend/alerts/display_indicator_jobs.py": "ced1d1fa30e520f3eb636be9a0b55ba7f3b069a1c89648ff554d2bba7514e4a0",
+    "backend/alerts/display_indicators.py": "e5ec3dcf6e57893c875929cf0265dee8bfe49fdab65e6e2bc68f04056188c366",
+    "backend/alerts/fixed_indicators.py": "4ce84611c0671b6487e718b299e09d13ec26e4adbf265d533bce02a0d4258851",
+    "backend/alerts/indicator_state.py": "ec57be810c0e1397528543fc8386dbee29facd53e4e933927e5278eca9a36bfe",
+    "backend/alerts/managed_dataset.py": "321b88f5848b7b8bea566f9071bb0e5406652650c3f25ad387dfa5594fe117e3",
+    "backend/alerts/market_stream_worker.py": "14c57c2bd514f27e1fb8ab54d85fc927989b8e6ab953af8b4816c8af06a5462f",
+    "backend/alerts/nr_breakout.py": "491500e9017519ece2d4c46970815e06a1bbddb76e3aca3140c9c4ff4c3efe32",
+    "backend/alerts/observed_indicators.py": "eb84c4365756ad95d3a9c15c509f315a83752038149ed919d73791c80d5ab2bf",
+    "backend/alerts/provider_cache.py": "f2f20b68b58aabba4d5870e1c9e059dd88d2ef874c1110303254538974ad3413",
+    "backend/alerts/provider_display_snapshots.py": "8b6c7612735c675f2c481401a79ec7f976db86bbde4a1cdea5e97c3623ddaadb",
+    "backend/alerts/provider_indicator_inputs.py": "72274f14c23b16bcf81ba067bb39d715629fdc15ef4e23c0d1b6272cf5c50bba",
+    "backend/alerts/provider_service.py": "ee7286f1abc473785151a051b7bd657caf97fd205cad6067509788c836b54869",
+    "backend/tests/test_chart_workspace.py": "7b15a0fdbbbc2db2428cfb2d421a3e040f574ae06ecc46edfaaed46ec977e240",
+    "backend/tests/test_managed_indicator_inputs.py": "b88bd3e20182e6e973dfff8c90d100d9cb38ae6f83af034a8823847b735c7e06",
+    "backend/tests/test_nr_breakout.py": "5c65d78d3eea2bd0009cc83a3ece6837d9d393ff952812a0909f29a7549137e2",
+    "backend/tests/test_nr_breakout_postgres.py": "d4f2a6f2816a168e68a88f990bf5e9cf207d6f3bfe7300336c47be9dbc415269",
+    "backend/tests/test_observed_indicators.py": "3c0025cca512f5ee0a10a968a9f4ee309cdb85bfbbe96c323cb332783fa36bc6",
+    "backend/tests/test_provider_display_snapshots.py": "af31d5b5548b99d4894d12ee68747e198a54dd3920afe528bf7d59359b0dd1a1",
+    "backend/tests/test_provider_indicator_inputs.py": "2db2872487af12918a7ad746eb28075a8c48074b4adffe402a7c2283494edab6",
+    "docs/references/nr4-nr7-luxalgo.pine": "84e15423015effdd055f77210800fadbfc94f9970e86931db22d2ecced684917",
+    "web/tests/nr-breakout-display.cjs": "4ba80e23eeb530293aa59f95940648f6709e95161b7afaff29f4d025e81502d6",
+    "web/tests/nr-breakout-native.browser.cjs": "6d5834aa65fb562ad7458ed59f69a273c44e10b230db842cd0e193bd0b63cfed",
+    "web/tests/nr-breakout-restart.cjs": "e8969c0b34db82b971da12284ca833cbd198fc3dbcfde6022f5a0f216568a5ea"
+  },
+  "manifest_scope": "Exact committed files from product_commit, excluding validation documentation; API/workers and Web retain the separate component commits shown above"
+}
