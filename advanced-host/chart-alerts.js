@@ -51,7 +51,7 @@ function chartAlertBridge({
   const recoveredSlots = new Map();
   let pointerDown = false;
   let pointerChart = null;
-  let menuPoint = null;
+  let menuPoint = null, plusMenuPoint = null;
   const generation = (chart) => `${getEpoch()}:${generations.get(chart) || 0}`;
   const chartList = () =>
     Array.from({ length: getWidget()?.chartsCount() || 0 }, (_, i) =>
@@ -259,10 +259,13 @@ function chartAlertBridge({
   }
   async function menu(items, actionsFactory, params) {
     if (readonly || disposed) return items;
-    const chart =
-      params.detail?.type === "priceScale"
+    const plus = params.menuName === "CrosshairMenuView" ? plusMenuPoint : null;
+    plusMenuPoint = null;
+    if (params.menuName === "CrosshairMenuView" && !plus) return items;
+    const chart = plus?.chart ||
+      (params.detail?.type === "priceScale"
         ? chartList()[params.detail.chartIndex]
-        : getWidget().activeChart();
+        : getWidget().activeChart());
     const object = params.detail;
     if (!chart || (object?.type === "priceScale" && object.paneIndex !== 0))
       return items;
@@ -273,20 +276,20 @@ function chartAlertBridge({
       return items;
     let context;
     try {
-      context = snapshot(chart);
+      context = plus ? structuredClone(plus.context) : snapshot(chart);
     } catch (error) {
       return [actionsFactory.createAction({actionId:"mw-chart-alert-unavailable",label:`创建告警不可用：${error.message}`,
         disabled:true,onExecute:()=>fail(error)}),...items];
     }
     // Capture the initiating chart now; executing a menu item never re-reads
     // whichever pane became active during an asynchronous native operation.
-    const price =
+    const price = plus ? plus.price :
       (!object || object.type === "series") && menuPoint?.chart === chart
         ? menuPoint.price
         : undefined;
     menuPoint = null;
     if (Number.isFinite(price)) {
-      try {context.price_presentation = chartAlertPricePresentation(chart, price);}
+      try {context.price_presentation ||= chartAlertPricePresentation(chart, price);}
       catch (error) {fail(error);return items;}
     }
     const item = actionsFactory.createAction({
@@ -297,9 +300,11 @@ function chartAlertBridge({
           : object?.type === "study"
             ? "在此指标上创建告警…"
             : Number.isFinite(price)
-              ? `在 ${context.price_presentation.text} 创建价格告警…`
+              ? plus
+                ? `在 ${context.price_presentation.text} 创建告警`
+                : `在 ${context.price_presentation.text} 创建价格告警…`
               : "创建主价格系列告警…",
-      onExecute: () => create({ chart, object, price, context }),
+      onExecute: () => create({ chart, object, price, context, quick: !!plus }),
     });
     return [item, ...items];
   }
@@ -308,6 +313,7 @@ function chartAlertBridge({
     return state;
   }
   function reset(state = {}) {
+    menuPoint = plusMenuPoint = null;
     ids = new Map();
     storedIds = Array.isArray(state._mwAlertCharts)
       ? state._mwAlertCharts.slice(0, 8)
@@ -537,11 +543,16 @@ function chartAlertBridge({
       pointerChart = null;
     });
     getWidget().subscribe("onPlusClick", (p) => {
-      if (
-        p.symbol &&
-        MWSeries.same(p.symbol, getWidget().activeChart().symbol())
-      )
-        create({ price: p.price, quick: true });
+      plusMenuPoint = menuPoint = null;
+      const chart = getWidget().activeChart();
+      if (readonly || disposed || !p.symbol || !MWSeries.same(p.symbol, chart.symbol())) return;
+      try {
+        if (!Number.isFinite(p.price) || p.price <= 0) throw Error("价格轴未提供有效价格");
+        const context = snapshot(chart);
+        context.price_presentation = chartAlertPricePresentation(chart, p.price);
+        // The native plus opens CrosshairMenuView; only its alert action creates.
+        plusMenuPoint = { chart, price: p.price, context };
+      } catch (error) { fail(error); }
     });
     refresh();
   }

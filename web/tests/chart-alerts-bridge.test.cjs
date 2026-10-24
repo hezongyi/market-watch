@@ -407,10 +407,15 @@ test('squeeze alert captures calculation parameters and boolean, excluding displ
 });
 
 
-test('price-axis plus captures native display price and requests immediate creation', async () => {
+test('price-axis plus opens selection; only its alert action creates at captured display price', async () => {
   const f = fixture();
   f.subscriptions.onPlusClick({symbol: 'BTCUSDT', price: 1.1195149});
   await tick();
+  assert.equal(f.messages.filter(m => m.type === 'chart-alert-context').length, 0, 'plus itself never creates');
+  const items = await f.api.menu([], {createAction: value => value}, {menuName:'CrosshairMenuView'});
+  assert.equal(items.length, 1);assert.match(items[0].label, /1\.11951.*创建告警/);
+  assert.equal(f.messages.filter(m => m.type === 'chart-alert-context').length, 0, 'opening menu never creates');
+  await items[0].onExecute();
   const contexts = f.messages.filter(m => m.type === 'chart-alert-context');
   assert.equal(contexts.length, 1);
   assert.equal(contexts[0].context.quick_create, true);
@@ -436,4 +441,30 @@ test('price-axis plus rejects invalid price, loading, missing metadata and reado
   assert.equal(f.messages.filter(m => m.type === 'chart-alert-context').length, 0);
   const other = fixture(); other.subscriptions.onPlusClick({symbol: 'ETHUSDT', price: 100});
   assert.equal(other.messages.filter(m => m.type === 'chart-alert-context').length, 0);
+});
+
+
+test('dismissed plus menus never create or affect an ordinary menu', async () => {
+  const f=fixture(); f.subscriptions.onPlusClick({symbol:'BTCUSDT',price:120});
+  await f.api.menu([], {createAction:v=>v}, {menuName:'CrosshairMenuView'});
+  assert.equal(f.messages.filter(m=>m.type==='chart-alert-context').length,0);
+  const normal=await f.api.menu([], {createAction:v=>v}, {menuName:'MainSeriesContextMenu',detail:{type:'series'}});
+  await normal[0].onExecute();
+  const c=f.messages.find(m=>m.type==='chart-alert-context').context;
+  assert.equal(c.quick_create,undefined);assert.equal(c.price,undefined);
+});
+
+test('plus selection rejects changed chart and missing/invalid captured price', async () => {
+  for(const change of ['switchSymbol','switchInterval','layoutLoad']){
+    const f=fixture();f.subscriptions.onPlusClick({symbol:'BTCUSDT',price:120});
+    const items=await f.api.menu([], {createAction:v=>v}, {menuName:'CrosshairMenuView'});
+    f[change]();await items[0].onExecute();
+    assert.equal(f.messages.filter(m=>m.type==='chart-alert-context').length,0,change);
+    assert.ok(f.failures.length,change);
+  }
+  for(const p of [undefined,0,NaN]){
+    const f=fixture();if(p!==undefined)f.subscriptions.onPlusClick({symbol:'BTCUSDT',price:p});
+    const native={native:true};const items=await f.api.menu([native], {createAction:v=>v}, {menuName:'CrosshairMenuView'});
+    assert.deepEqual(items,[native]);
+  }
 });

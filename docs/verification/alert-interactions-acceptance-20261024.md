@@ -2,6 +2,8 @@
 
 自动验收通过，等待用户人工验收。F0：兼容 UI 交互，无 API/schema 变更。
 
+用户随后补充要求“加号先弹菜单，选创建告警才创建”。该修正已在当前分支实现并完成源码原生图表检查，尚未更新实例；下文记录仍对应此前部署版本。补充验证见 [交互补丁记录](alert-interactions-20261024.md#加号菜单补充修正待更新实例)。
+
 实际主机 Ubuntu `quant-server`，现有 Compose project `mw-issue75-v2-20261018`，入口 https://192.168.7.232:18280/advanced-charts/mw75-real ，Chart origin https://192.168.7.232:18281 。实例保持运行，刷新页面即可加载新资源。
 
 Chart 产品源码 `17b276dc9b167b562f4387c52698b8635bb89885`，Web `19cc026afa8583238ba83917498d03783f6cf7a2`。Chart 镜像 `sha256:6946f86b25a3bd84f9849ca9fe8e5de1a8fa572fb455cf51edcd54a119facb31`，Web `sha256:5c5ad462b8427bdb31832db3b05cab4585e42b0036edf882c39be0db0d97fdaa`。只更新 Chart/Web；保留 API b4e1326a、workers 8b7ee3ee 以及先前 NR、D1 和偏好修复。实际服务返回的 `/host.d080292e95049b2a.js` SHA256 与镜像内制品逐字节一致。
