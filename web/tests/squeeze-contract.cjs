@@ -31,4 +31,19 @@ assert.equal(indicatorUnit(indicator),'boolean');
 assert.equal(indicatorUnit({...indicator,output:'sma'}),'price');
 const incompatible=normalizeCondition({...draft.condition,right:{kind:'price'},offset:{kind:'atr'}});
 assert.equal(incompatible.right.kind,'constant');assert.equal(incompatible.offset,undefined);
+// Exercise the shipped host callback with an actual coordinator-only origin.
+const originExpression=fs.readFileSync(path.join(root,'advanced-host/bridge.js'),'utf8')
+ .match(/calculationOrigin:\(ticker,res\)=>([\s\S]*?),\n\s*compositeRevision:/)[1];
+const origins=new Map(),bindings=new Map(),sessions=new Map();
+const series={decode:t=>({symbol:t.split(':')[1],series_kind:t.split(':')[0]}),encode:(s,k)=>k+':'+s};
+const origin=vm.runInNewContext('(ticker,res)=>'+originExpression,{
+ alertCalculationOrigins:origins,indicatorBindings:bindings,managedSessions:sessions,MWSeries:series,
+ indicatorKey:(t,r)=>t+'|'+r});
+bindings.set('provider:XAUUSD|60',{calculationStart:1786330800000});
+assert.equal(origin('provider:XAUUSD','60'),1786330800000,'completed coordinator input is available to alerts');
+assert.equal(origin('provider:EURUSD','60'),null,'no invented origin before calculation');
+origins.set('provider:EURUSD|60',60000);
+assert.equal(origin('provider:EURUSD','60'),60000,'legacy origin remains supported');
+sessions.set('EURUSD|60',{start:120000});
+assert.equal(origin('managed:EURUSD','60'),120000,'managed publication fallback remains supported');
 console.log('PASS squeeze snapshot isolation, revision/origin fences and source alert defaults');

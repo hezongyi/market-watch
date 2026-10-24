@@ -2430,6 +2430,7 @@ function boot(
       return target && resolveCurrent(target) && target.state!=='ready' ? target.message : null;
     },
     calculationOrigin:(ticker,res)=>alertCalculationOrigins.get(MWSeries.encode(MWSeries.decode(ticker).symbol,MWSeries.decode(ticker).series_kind)+'|'+res) ??
+      indicatorBindings.get(indicatorKey(ticker,res))?.calculationStart ??
       (MWSeries.decode(ticker).series_kind === "managed" ? managedSessions.get(MWSeries.decode(ticker).symbol+'|'+res)?.start : null),
     compositeRevision:(ticker,res)=>alertCompositeRevisions.get(MWSeries.encode(MWSeries.decode(ticker).symbol,'composite')+'|'+res) ?? null,
     rpc:query=>request(query,"chart-alert-rpc"),send: message => {
