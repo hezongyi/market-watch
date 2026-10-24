@@ -35,17 +35,14 @@ export async function attachNativeInstantNotice({
   let geometry = "";
   const position = () => {
     if (!surface) return;
-    const b = native.overlayBounds();
-    const narrow = b.width < 480, inset = narrow ? 12 : 16;
-    const area = narrow
-      ? { left: 0, top: 0, right: b.width, bottom: b.height }
-      : b.chartBounds;
+    const { innerWidth: width, innerHeight: height } = doc.defaultView!;
+    const inset = width < 480 ? 12 : 16;
     const next = {
-      width: Math.max(0, Math.min(355, area.right - area.left - 2 * inset)),
+      width: Math.max(0, Math.min(355, width - 2 * inset)),
       height: 0,
-      bottom: b.height - area.bottom + inset,
-      right: b.width - area.right + inset,
-      maxHeight: Math.max(0, area.bottom - area.top - 2 * inset),
+      bottom: inset,
+      right: inset,
+      maxHeight: Math.max(0, height - 2 * inset),
     };
     const signature = JSON.stringify(next);
     if (signature !== geometry) {
@@ -136,9 +133,6 @@ export async function attachNativeInstantNotice({
       position();
     });
   };
-  const observer = new MutationObserver(schedule);
-  observer.observe(doc.body, { childList: true, subtree: true,
-    attributes: true, attributeFilter: ["class", "style"] });
   const resize = new doc.defaultView!.ResizeObserver(schedule);
   resize.observe(doc.documentElement);
   doc.defaultView!.addEventListener("resize", schedule);
@@ -152,7 +146,6 @@ export async function attachNativeInstantNotice({
     destroy() {
       if (disposed) return;
       disposed = true;
-      observer.disconnect();
       resize.disconnect();
       if (frame) doc.defaultView!.cancelAnimationFrame(frame);
       doc.defaultView!.removeEventListener("resize", schedule);
