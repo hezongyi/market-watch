@@ -78,6 +78,7 @@ def query(name="EMA", period=None):
         "STOCH",
         "SWING_SR_V1",
         "SUPERTREND_PINE_V1",
+        "NR4_NR7_BREAKOUT_V1",
     ],
 )
 def test_every_catalog_item_matches_full_origin_and_shares_repeated_inputs(database, name):

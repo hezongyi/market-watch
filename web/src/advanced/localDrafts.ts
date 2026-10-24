@@ -3,13 +3,14 @@
  */
 export type PreferenceDraft = {
   key: string; version: string; kind: string; name: string; tool: string;
-  value: unknown; base?: any; operation: 'save' | 'delete'; at?: number; storageKey?: string;
+  value: unknown; base?: any; operation: 'save' | 'delete'; at?: number; storageKey?: string; failed?: boolean;
 };
 const prefix = 'mw-preference-draft:v1:admin:';
 // A document gets a fresh writer ID. sessionStorage is deliberately not used:
 // browsers clone it when opening/duplicating tabs. Persisted drafts are enumerated
 // across writers for explicit recovery after reload or browser restart.
 const writerId = crypto.randomUUID();
+let restoredDrafts: Set<string> | undefined;
 export function sessionId() { return writerId; }
 export function preferenceDrafts() {
   const all: PreferenceDraft[] = [];
@@ -23,12 +24,27 @@ export function preferenceDrafts() {
   }
   return all.sort((a,b) => (b.at || 0) - (a.at || 0));
 }
+export function recoverablePreferenceDrafts() {
+  const drafts = preferenceDrafts();
+  // Capture unfinished versions on first render. New writes stay durable but
+  // need no user action until the adapter reports their terminal failure.
+  restoredDrafts ??= new Set(drafts.map(draft => JSON.stringify([draft.storageKey, draft.version])));
+  return drafts.filter(draft => draft.failed || restoredDrafts!.has(JSON.stringify([draft.storageKey, draft.version])));
+}
 export function putPreferenceDraft(draft: PreferenceDraft) {
   if (!draft || typeof draft.key !== 'string' || draft.key.length > 500 || typeof draft.version !== 'string' ||
       !['save','delete'].includes(draft.operation) || JSON.stringify(draft).length > 1_100_000) throw Error('设置草稿无效或过大');
   const storageKey = prefix + sessionId() + ':' + encodeURIComponent(draft.key);
-  localStorage.setItem(storageKey, JSON.stringify({...draft, at: Date.now()}));
+  localStorage.setItem(storageKey, JSON.stringify({...draft, failed: false, at: Date.now()}));
   return storageKey;
+}
+export function failPreferenceDraft(draft: Pick<PreferenceDraft,'key'|'version'|'storageKey'>) {
+  const storageKey = draft.storageKey || prefix + sessionId() + ':' + encodeURIComponent(draft.key);
+  if (!storageKey.startsWith(prefix)) throw Error('草稿作用域不匹配');
+  const current = localStorage.getItem(storageKey);
+  if (!current) return;
+  const saved = JSON.parse(current);
+  if (saved.version === draft.version) localStorage.setItem(storageKey, JSON.stringify({...saved, failed: true}));
 }
 export function dropPreferenceDraft(draft: Pick<PreferenceDraft,'key'|'version'|'storageKey'>) {
   const storageKey = draft.storageKey || prefix + sessionId() + ':' + encodeURIComponent(draft.key);

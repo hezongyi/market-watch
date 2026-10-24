@@ -1,0 +1,231 @@
+{
+  "status": "passed-loading-continuity-fix",
+  "recorded_at_utc": "2026-10-24T14:14:41.785541+00:00",
+  "runtime": {
+    "changedServices": [
+      "chart"
+    ],
+    "chartImage": "sha256:74e9683e487e53c9a44e1ce7639936767e75852c981572b072e5e72731933b8d",
+    "chartCommit": "c68fd817e192b880d28790cb51f2fab5c7a134f5",
+    "apiImage": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+    "webImage": "sha256:af3de39e8cab597c70837df98ebd95aada4b0d0534c0620ecab268c02de5a0de",
+    "allRunning": true,
+    "restarts": {
+      "chart": 0,
+      "realtime-worker": 0,
+      "projector": 0,
+      "notify-worker": 0,
+      "native-history-worker": 0,
+      "pricing-worker": 0,
+      "chart-aggregation-worker": 0,
+      "composite-aggregate-worker": 0,
+      "market-stream-worker": 0,
+      "history-worker": 0,
+      "chart-history-worker": 0,
+      "api": 0,
+      "web": 0,
+      "gateway": 0,
+      "postgres": 0
+    }
+  },
+  "baseline_commit": "b1a479a7cda8a98a2968239abd390c310267c0b0",
+  "baseline_zero_frames": 346,
+  "baseline_lifecycle": [
+    {
+      "event": "update",
+      "at": 10286,
+      "kind": "snapshot",
+      "rows": 34,
+      "key": "1|apDVaO"
+    },
+    {
+      "event": "clear",
+      "at": 13264.200000047684,
+      "key": "1|apDVaO"
+    },
+    {
+      "event": "update",
+      "at": 16416.600000023842,
+      "kind": "snapshot",
+      "rows": 141,
+      "key": "1|apDVaO"
+    },
+    {
+      "event": "clear",
+      "at": 18488.800000071526,
+      "key": "1|apDVaO"
+    },
+    {
+      "event": "update",
+      "at": 20230.5,
+      "kind": "snapshot",
+      "rows": 401,
+      "key": "1|apDVaO"
+    },
+    {
+      "event": "clear",
+      "at": 33809,
+      "key": "1|apDVaO"
+    },
+    {
+      "event": "update",
+      "at": 35127,
+      "kind": "snapshot",
+      "rows": 661,
+      "key": "1|apDVaO"
+    }
+  ],
+  "deployed_temporal_runs": [
+    {
+      "run": "history-fixed-m15",
+      "resolution": "15",
+      "passed": true,
+      "frames": 1824,
+      "scopeGapFramesWithDrawings": 219,
+      "zeroFrames": 0,
+      "originalIdLossFrames": 0,
+      "firstPixelSample": 0,
+      "minPixelsAfterFirstPaint": 13301,
+      "zeroPixelSamplesAfterFirstPaint": 0,
+      "assets": [
+        "https://192.168.7.232:18281/host.ddb9d1cd0b96e97e.js"
+      ],
+      "pageErrors": [],
+      "visualPassed": true
+    },
+    {
+      "run": "history-fixed-h1",
+      "resolution": "60",
+      "passed": true,
+      "frames": 1564,
+      "scopeGapFramesWithDrawings": 151,
+      "zeroFrames": 0,
+      "originalIdLossFrames": 0,
+      "firstPixelSample": 0,
+      "minPixelsAfterFirstPaint": 13316,
+      "zeroPixelSamplesAfterFirstPaint": 0,
+      "assets": [
+        "https://192.168.7.232:18281/host.ddb9d1cd0b96e97e.js"
+      ],
+      "pageErrors": [],
+      "visualPassed": true
+    },
+    {
+      "run": "history-fixed-h4",
+      "resolution": "240",
+      "passed": true,
+      "frames": 1290,
+      "scopeGapFramesWithDrawings": 0,
+      "zeroFrames": 0,
+      "originalIdLossFrames": 0,
+      "firstPixelSample": 0,
+      "minPixelsAfterFirstPaint": 23358,
+      "zeroPixelSamplesAfterFirstPaint": 0,
+      "assets": [
+        "https://192.168.7.232:18281/host.ddb9d1cd0b96e97e.js"
+      ],
+      "pageErrors": [],
+      "visualPassed": true
+    },
+    {
+      "run": "history-fixed-d1",
+      "resolution": "1D",
+      "passed": true,
+      "frames": 1531,
+      "scopeGapFramesWithDrawings": 0,
+      "zeroFrames": 0,
+      "originalIdLossFrames": 0,
+      "firstPixelSample": 0,
+      "minPixelsAfterFirstPaint": 15756,
+      "zeroPixelSamplesAfterFirstPaint": 0,
+      "assets": [
+        "https://192.168.7.232:18281/host.ddb9d1cd0b96e97e.js"
+      ],
+      "pageErrors": [],
+      "visualPassed": true
+    }
+  ],
+  "total_sampled_frames": 6209,
+  "lifecycle_regression_periods": [
+    "1",
+    "5",
+    "15",
+    "30",
+    "60",
+    "240",
+    "1D",
+    "1W",
+    "1M"
+  ],
+  "restarts_per_period": 3,
+  "data_preservation": {
+    "tables": {
+      "chart_workspaces": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "unchanged": true
+      },
+      "advanced_chart_workspaces": {
+        "count": 10,
+        "sha256": "710307aeb3a9e684feb4accf08aa1e2b626f1f662d658d8418781688f3734ad7",
+        "unchanged": true
+      },
+      "advanced_chart_preferences": {
+        "count": 30,
+        "sha256": "dd8ab607ecefc3ac6ee64f9141fb32af6a4edd52a7add3b95a1235bc4ca3653c",
+        "unchanged": true
+      },
+      "market_datasets": {
+        "count": 130,
+        "sha256": "43f261a8109e859d59d245ac0278f4c40866074d0d6e9e501f3973d66020081f",
+        "unchanged": true
+      },
+      "market_history_versions": {
+        "count": 15,
+        "sha256": "a0a1f66c76d40682df4ed18e78539903e4a440efbeebc287f7657c8187d8817b",
+        "unchanged": true
+      },
+      "market_history_artifacts": {
+        "count": 135,
+        "sha256": "01d1ee1636d5598ffe1033a844a0685572dadad6ce91b91a86d2391f94ee4d2f",
+        "unchanged": true
+      }
+    },
+    "prior_notice_states_unchanged": true,
+    "prior_notice_count": 23888,
+    "added_notices": 0,
+    "prior_phone_acks_unchanged": true,
+    "prior_phone_ack_count": 7,
+    "all_persistent_table_hashes_unchanged": true
+  },
+  "logs": {
+    "since": "2026-10-24T14:07:49.549545639Z",
+    "observed_at": "2026-10-24T14:14:41.785541+00:00",
+    "services": [
+      {
+        "service": "api",
+        "cancelledErrorOccurrences": 8,
+        "tracebackOccurrences": 4,
+        "poolTimeoutOccurrences": 0,
+        "http500Occurrences": 0,
+        "restarts": 0
+      },
+      {
+        "service": "chart",
+        "cancelledErrorOccurrences": 0,
+        "tracebackOccurrences": 0,
+        "poolTimeoutOccurrences": 0,
+        "http500Occurrences": 0,
+        "restarts": 0
+      }
+    ]
+  },
+  "source_sha256": {
+    "advanced-host/indicator-coordinator.js": "8f7c6c8f12cc4a1879f759055e7b2365e828256e985325f3976e6381be050c3c",
+    "web/tests/nr-breakout-restart.cjs": "4fa38a27179077062af3bb53c0906fc51535c959d7aca56d0779a0e2280cb093"
+  },
+  "limitations": [
+    "Browser temporal checks cover M15/H1/H4/D1; all nine supported periods use a joint coordinator/renderer lifecycle regression.",
+    "Financial calculation is unchanged; no new Pine engine execution or full backend-suite claim."
+  ]
+}

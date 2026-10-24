@@ -84,7 +84,7 @@ def test_revision_and_preview_cannot_reuse_an_obsolete_checkpoint(database, monk
 
 
 @pytest.mark.parametrize('name', ['SMA', 'EMA', 'LWMA', 'BBANDS', 'RSI', 'MACD', 'ATR', 'STOCH',
-                                  'SUPERTREND_PINE_V1'])
+                                  'SUPERTREND_PINE_V1', 'NR4_NR7_BREAKOUT_V1'])
 def test_all_checkpoint_engines_match_batch_across_window_changes(name):
     import math
 
@@ -98,7 +98,7 @@ def test_all_checkpoint_engines_match_batch_across_window_changes(name):
                      'low': str(close - .2), 'close': str(close),
                      **({'gap_before': True} if i == 700 else {})})
     rows[-1] = {**rows[-1], 'complete': False}
-    spec = {'name': name, 'params': {}}
+    spec = {'name': name, 'params': {'timeframe': '60'} if name == 'NR4_NR7_BREAKOUT_V1' else {}}
     for size, revision in [(1200, 1), (2400, 2), (1600, 1), (2400, 2)]:
         for preview in (False, True):
             inputs = Inputs(rows[:size], ('differential', name), 'epoch', revision)

@@ -671,7 +671,7 @@ def data(body):
         before = body.before or now_ms() + 1
         # Recursive algorithms use only the selected published dataset prefix;
         # backfill never extends the user's approved start as an indicator side effect.
-        swing = any(spec.get("name") == "SWING_SR_V1" for spec in body.indicators)
+        swing = any(spec.get("name") in ("SWING_SR_V1", "ROLLING_RANGE_SQUEEZE") for spec in body.indicators)
         frozen, input_stats = None, {}
         if body.indicators and pub:
             frozen, input_stats = freeze(db, inst, pub, body, ceiling=now_ms() if swing else before-1)
@@ -701,7 +701,7 @@ def data(body):
         start = visible[0]["start"] if visible else before
         result = compute(frozen or Inputs([], ('empty-managed',body.instrument),None,0),
                          calculation_meta, body.instrument, spec, first=start,
-                         provisional=body.provisional, telemetry=execution)
+                         provisional=body.provisional, telemetry=execution, timeframe=body.timeframe)
         result['calculation'] = dict(status='complete', calculation_origin=left,
             input_revision=revision, algorithm=IndicatorState(spec).algorithm,
             producer='backend', accuracy='oracle_equivalent', canonical_verified=True,

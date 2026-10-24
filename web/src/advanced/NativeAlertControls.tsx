@@ -245,11 +245,13 @@ export function AlertButton({
   disabled,
   onClick,
   primary = false,
+  title,
 }: {
   children: string;
   disabled?: boolean;
   onClick: () => void;
   primary?: boolean;
+  title?: string;
 }) {
   const factory = useContext(NativeControls);
   return factory ? (
@@ -257,6 +259,7 @@ export function AlertButton({
       kind="button"
       properties={{
         children,
+        title,
         disabled,
         type: "button",
         size: "s",
@@ -266,7 +269,7 @@ export function AlertButton({
       }}
     />
   ) : (
-    <button type="button" disabled={disabled} onClick={onClick}>
+    <button type="button" title={title} disabled={disabled} onClick={onClick}>
       {children}
     </button>
   );

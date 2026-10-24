@@ -1,0 +1,239 @@
+{
+  "status": "passed",
+  "recorded_at_utc": "2026-10-24T14:53:41.691685+00:00",
+  "risk": "F0: compatible Web/Chart preference recovery presentation and optional local draft metadata; no backend or DB schema change",
+  "product_commit": "970a2550f0b93678f55f8c4e2bc075be2d965698",
+  "branch": "fix/preference-draft-banner-20261024",
+  "worktree": "/home/quant/repos/market-watch-preference-draft-banner-20261024",
+  "runtime": {
+    "changed_services": [
+      "chart",
+      "web"
+    ],
+    "services": {
+      "chart": {
+        "image_id": "sha256:35caa82add5234177f8a9f2bcf5a62eb47969d3499f4c5b8842e079a48c83d2d",
+        "container_id": "0357255704fa17faede1f2e0e63df29f1be5c1d24e56a366f496a28a03c9c497",
+        "unchanged": false
+      },
+      "web": {
+        "image_id": "sha256:f0cdc23874d832e0c6a53d78fb5ac540167bc3b91708a11df822452e8e8cfd1c",
+        "container_id": "ec63f196107409d488666b8c0817c1e0f923b6ad8766fc4fdd79375001710d94",
+        "unchanged": false
+      },
+      "realtime-worker": {
+        "image_id": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+        "container_id": "cbc6c856eeca14d197da544d0b39afbb1e9ff10252effb613a28f8183a187f2d",
+        "unchanged": true
+      },
+      "projector": {
+        "image_id": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+        "container_id": "239346a00d9288efab59733d3a6ddd8501137a8af5a60a3c328f7abfe3750ab4",
+        "unchanged": true
+      },
+      "notify-worker": {
+        "image_id": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+        "container_id": "7d3b5f24ef602de384caaa6a3b3715bf3f6f4db6402a6685fcce2d2d2e9f1d21",
+        "unchanged": true
+      },
+      "native-history-worker": {
+        "image_id": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+        "container_id": "5c46dc5e8af2e1514fd3aba6f8a700206a6fa53a6282140d1f66dad00406b82d",
+        "unchanged": true
+      },
+      "pricing-worker": {
+        "image_id": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+        "container_id": "1ca32d184cdf49c312f8fbe42039651fb939707c3309c3cdadd9053715b4790b",
+        "unchanged": true
+      },
+      "chart-aggregation-worker": {
+        "image_id": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+        "container_id": "b4ff3870f22f09ae41e22b1195741b5cade6d919f4249b9258ab0b708f41f474",
+        "unchanged": true
+      },
+      "composite-aggregate-worker": {
+        "image_id": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+        "container_id": "0cdf45ef1b1d2285ca2ce1ad40de1f9d3635ffcb8e649ff20dd9ec7f766c00c7",
+        "unchanged": true
+      },
+      "market-stream-worker": {
+        "image_id": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+        "container_id": "f07fd7f0dacf5a1c08eb2cb7bf1fb7cd369ea55a572a436464e929ea52da9dd0",
+        "unchanged": true
+      },
+      "history-worker": {
+        "image_id": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+        "container_id": "9e286aed495c9c632d1b15b36fbd172165f7e4220ccfb399e72125b8a4407b78",
+        "unchanged": true
+      },
+      "chart-history-worker": {
+        "image_id": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+        "container_id": "a7f91e5341f6de87399fc329ce10189b995ec3b746ba6b51b858dedb3a851aff",
+        "unchanged": true
+      },
+      "api": {
+        "image_id": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+        "container_id": "834fa62c033fac2b8675ec0bf4b432376aebd027de9e17959fcc4ceb200b3455",
+        "unchanged": true
+      },
+      "gateway": {
+        "image_id": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+        "container_id": "9492f307fdf9bfdbec7641c4e0b3554bed39340bc73a57448fdbd39e34d79ca9",
+        "unchanged": true
+      },
+      "postgres": {
+        "image_id": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+        "container_id": "3de49cbde9a20c6640092181c04d35df41677566795cfecae18c0ab284b0aba8",
+        "unchanged": true
+      }
+    },
+    "all_running": true,
+    "all_restarts_zero": true
+  },
+  "candidate_images": {
+    "source": "970a2550f0b93678f55f8c4e2bc075be2d965698",
+    "images": {
+      "chart": "sha256:35caa82add5234177f8a9f2bcf5a62eb47969d3499f4c5b8842e079a48c83d2d",
+      "web": "sha256:f0cdc23874d832e0c6a53d78fb5ac540167bc3b91708a11df822452e8e8cfd1c"
+    },
+    "services": [
+      "chart",
+      "web"
+    ]
+  },
+  "web_artifact_origin": {
+    "image_id": "sha256:f0cdc23874d832e0c6a53d78fb5ac540167bc3b91708a11df822452e8e8cfd1c",
+    "chart_origin": "https://192.168.7.232:18281",
+    "verified_from_image_artifact": true,
+    "matching_bundles": [
+      "index-HmjF6z1w.js"
+    ]
+  },
+  "browser": {
+    "passed": true,
+    "normal_resolutions": [
+      "60",
+      "240",
+      "1D",
+      "60"
+    ],
+    "normal_and_slow_recovery_prompts": 0,
+    "cases": [
+      "H1/H4/D1/H1 and gated slow save: durable pending drafts; no recovery banner",
+      "503: banner appears, failed draft survives reload, explicit remote choice and reopen clear it",
+      "409: bounded two attempts, actionable failed draft, recovery stays available",
+      "Legacy interrupted draft: restored on reload and recoverable without data migration"
+    ],
+    "injected_faults": [
+      {
+        "phase": "network-failure",
+        "status": 503
+      },
+      {
+        "phase": "conflict",
+        "status": 409
+      },
+      {
+        "phase": "conflict",
+        "status": 409
+      }
+    ],
+    "host_assets": [
+      "https://192.168.7.232:18281/host.cb6e3450bb4e723d.js"
+    ],
+    "web_assets": [
+      "https://192.168.7.232:18280/assets/index-HmjF6z1w.js"
+    ],
+    "page_errors": [],
+    "scope": "Disposable browser, real deployed assets/data; user persistence and notification writes intercepted"
+  },
+  "regressions": [
+    "Normal pending writes are durable and quiet; terminal failures and conflicts become recoverable",
+    "Queued bursts, stale versions, failed deletes, repeated identical errors, other writers, legacy/reloaded pending drafts",
+    "Existing preference merge/CAS/recovery/readonly/management-queue/notification contracts",
+    "NR retained-history continuity and generic indicator runtime; licensed native NR drawings/settings/hide/remove"
+  ],
+  "data_preservation": {
+    "tables": {
+      "chart_workspaces": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "unchanged": true
+      },
+      "advanced_chart_workspaces": {
+        "count": 10,
+        "sha256": "a2541a3b1ccb0e632eb7d1f4d4c4e8de69d3033fa02320f9ab9d1b5173003ad6",
+        "unchanged": true
+      },
+      "advanced_chart_preferences": {
+        "count": 30,
+        "sha256": "a5d86c80f5709cf9c388f58275ec6ef1a884630d1ca81df2e3ac637e583016f9",
+        "unchanged": true
+      },
+      "market_datasets": {
+        "count": 130,
+        "sha256": "43f261a8109e859d59d245ac0278f4c40866074d0d6e9e501f3973d66020081f",
+        "unchanged": true
+      },
+      "market_history_versions": {
+        "count": 15,
+        "sha256": "a0a1f66c76d40682df4ed18e78539903e4a440efbeebc287f7657c8187d8817b",
+        "unchanged": true
+      },
+      "market_history_artifacts": {
+        "count": 135,
+        "sha256": "01d1ee1636d5598ffe1033a844a0685572dadad6ce91b91a86d2391f94ee4d2f",
+        "unchanged": true
+      }
+    },
+    "prior_notice_states_unchanged": true,
+    "prior_notice_count": 23888,
+    "added_notices": 1,
+    "prior_phone_acks_unchanged": true,
+    "prior_phone_ack_count": 7,
+    "all_persistent_table_hashes_unchanged": true
+  },
+  "logs": {
+    "recorded_at_utc": "2026-10-24T14:50:35.137249+00:00",
+    "since": "2026-10-24T14:46:24.122520314Z",
+    "services": [
+      {
+        "service": "api",
+        "cancelledErrorOccurrences": 16,
+        "tracebackOccurrences": 8,
+        "http500Occurrences": 0,
+        "poolTimeoutOccurrences": 0,
+        "restarts": 0
+      },
+      {
+        "service": "chart",
+        "cancelledErrorOccurrences": 0,
+        "tracebackOccurrences": 0,
+        "http500Occurrences": 0,
+        "poolTimeoutOccurrences": 0,
+        "restarts": 0
+      },
+      {
+        "service": "web",
+        "cancelledErrorOccurrences": 0,
+        "tracebackOccurrences": 0,
+        "http500Occurrences": 0,
+        "poolTimeoutOccurrences": 0,
+        "restarts": 0
+      }
+    ]
+  },
+  "file_sha256": {
+    ".github/workflows/ci.yml": "bdf1528b70b29211c556dac2b6220ea6b412f3df17939c8a88811ab4a2e315a1",
+    "advanced-host/bridge.js": "ccb10b2b3fa7a96fbdb91c2a8b4f724317694b5b5fefb40ceef184ed21637dd0",
+    "advanced-host/preferences.js": "2e30db8b82168d34796d9fe7dca79cc3803f921f956a268b9e5a1b67fdbcb612",
+    "web/src/advanced/AdvancedWorkspace.tsx": "9423852915f22202775000d727be82a63e063fae8c3a095feef2cad5ab5f7796",
+    "web/src/advanced/localDrafts.ts": "f974fee58baea769351311f7046ad65b05762c3a636c52c88def12abd487839c",
+    "web/tests/preference-draft-banner.cjs": "defcab78e92faa37dff2b30294313f30abe3d3ec4f5349f9997690e4ad10fb1f",
+    "web/tests/preference-request-queue.cjs": "1087242ecf652b20066987c8fcd6588e217b032eab9556ea1efa5624773a85c9"
+  },
+  "limitations": [
+    "Preference successes/failures/conflicts are served by an isolated browser shadow store; no user preference writes were sent to the persistent API.",
+    "No full backend-suite or new numerical/Pine parity claim; financial logic is unchanged."
+  ]
+}

@@ -17,19 +17,20 @@ function swingRevisionOrder(next, previous) {
   return a < b ? -1 : a > b ? 1 : 0;
 }
 
-function swingSnapshotStore() {
+function swingSnapshotStore({name='SWING_SR_V1',profile='swing_sr_v1',keyOf=swingSnapshotKey,
+  origin='statistics_origin'}={}) {
   const records = new Map();
   let sequence = 0;
   return {
     ticket: () => ++sequence,
     clear: () => records.clear(),
-    get: (symbol, resolution, params) => records.get(swingSnapshotKey(symbol, resolution, params)),
+    get: (symbol, resolution, params) => records.get(keyOf(symbol, resolution, params)),
     publish(symbol, resolution, page, ticket) {
       let accepted=false;
       for (const result of page.indicators || []) {
         const p = result.presentation;
-        if (result.name !== 'SWING_SR_V1' || p?.render_profile !== 'swing_sr_v1') continue;
-        const key = swingSnapshotKey(symbol, resolution, result.params);
+        if (result.name !== name || p?.render_profile !== profile) continue;
+        const key = keyOf(symbol, resolution, result.params);
         const previous = records.get(key);
         const revision=p.history_revision ?? page.history_revision ?? page.revision ?? null;
         const sameRevision=previous?.presentation.history_revision===revision;
@@ -39,7 +40,7 @@ function swingSnapshotStore() {
         if (previous && (order===-1 || (order!==1 && ticket < previous.ticket) || sameRevision &&
           p.as_of_bar_time < previous.presentation.as_of_bar_time)) continue;
         // Never replace a complete range by a warmup/page-local statistic.
-        if (previous && sameRevision && p.statistics_origin > previous.presentation.statistics_origin) continue;
+        if (previous && sameRevision && p[origin] > previous.presentation[origin]) continue;
         records.set(key, {ticket, presentation:{...p,
           history_revision:revision,
           history_complete:p.history_complete ?? !(page.indicator_progress || []).some(s=>s.status!=='complete'),

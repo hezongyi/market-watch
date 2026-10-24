@@ -8,11 +8,14 @@ vm.runInContext(`
  request({op:'draftWrite'},'preferences');
  request({op:'read'},'preferences');
  request({op:'draftCheck'},'preferences');
+ request({op:'draftFailed'},'preferences');
 `,ctx);
 assert.equal(vm.runInContext('pending.size',ctx),6,'four slow market reads cannot block preference durability/recovery');
 assert.equal(vm.runInContext('[...pending.values()].filter(e=>e.management).length',ctx),2,'preferences share the existing two management slots');
-assert.equal(vm.runInContext('requests.length',ctx),1,'third management RPC remains queued');
+assert.equal(vm.runInContext('requests.length',ctx),2,'remaining management RPCs stay queued');
 vm.runInContext(`pending.delete([...pending].find(([,entry])=>entry.management)[0]);drain();`,ctx);
 assert.equal(sent.at(-1).query.op,'draftCheck');
+vm.runInContext(`pending.delete([...pending].find(([,entry])=>entry.management)[0]);drain();`,ctx);
+assert.equal(sent.at(-1).query.op,'draftFailed');
 assert.equal(vm.runInContext('pending.size',ctx),6);
 console.log('PASS preference draft RPCs remain available behind slow market reads, bounded to two management slots');

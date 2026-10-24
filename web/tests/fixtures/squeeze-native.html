@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><style>
+html,body{height:100%;margin:0;background:#0f0f0f}#chart{height:100%}
+</style></head><body><div id="chart"></div>
+<script src="../../../advanced-host/charting_library/charting_library.js"></script>
+<script src="../../../advanced-host/indicators.js"></script>
+<script src="../../../advanced-host/swing-sr-display.js"></script>
+<script src="../../../advanced-host/rolling-range-squeeze-display.js"></script>
+<script src="../../../advanced-host/drawing-projection.js"></script>
+<script src="../../../artifacts/squeeze-native-data.js"></script>
+<script>
+const fixture=squeezeFixture;
+const bars=fixture.bars.map(b=>({time:b.start,open:+b.open,high:+b.high,low:+b.low,close:+b.close,volume:1}));
+const snapshots=squeezeSnapshotStore();
+const callbacks=new Map();
+const synthetic=ticker=>ticker.startsWith('MWPY_')?JSON.parse(atob(ticker.slice(5))):null;
+const datafeed={
+ onReady(cb){setTimeout(()=>cb({supported_resolutions:['240'],supports_time:false}),0)},
+ resolveSymbol(ticker,cb){setTimeout(()=>cb({name:ticker,ticker,description:'EURUSD',type:'forex',session:'24x7',
+  timezone:'Etc/UTC',pricescale:100000,minmov:1,has_intraday:true,intraday_multipliers:['240'],
+  supported_resolutions:['240'],format:'price',data_status:'streaming'}),0)},
+ getBars(info,res,period,cb){
+  const identity=synthetic(info.ticker);
+  const params=identity?.spec.params;
+  const result=fixture.result;
+  if(identity) snapshots.publish(identity.symbol,res,{bars:fixture.bars,indicators:[result]},snapshots.ticket());
+  const values=identity?new Map(result.series.find(s=>s.key===identity.key).values.map(v=>[v.time,v.value])):null;
+  const selected=bars.filter(b=>b.time>=period.from*1000 && b.time<period.to*1000);
+  setTimeout(()=>cb(selected.map(b=>values?{...b,open:values.get(b.time)??0,high:values.get(b.time)??0,
+   low:values.get(b.time)??0,close:values.get(b.time)??0,volume:values.get(b.time)!=null?1:0}:b),{noData:!selected.length}),0);
+ },
+ subscribeBars(info,res,cb,id){callbacks.set(id,{ticker:info.ticker,cb})},
+ unsubscribeBars(id){callbacks.delete(id)},
+};
+let widget=new TradingView.widget({container:'chart',library_path:'../../../advanced-host/charting_library/',
+ symbol:'EURUSD',interval:'240',timezone:'Etc/UTC',theme:'Dark',locale:'zh',autosize:true,
+ datafeed,custom_indicators_getter:PineJS=>Promise.resolve(pythonStudies(PineJS,fixture.catalog)),
+ disabled_features:['header_symbol_search','header_compare','use_localstorage_for_settings','create_volume_indicator_by_default','trading_account_manager'],
+ enabled_features:['study_templates'],
+ save_load_adapter:{getAllStudyTemplates:async()=>[],getStudyTemplateContent:async()=>'',
+  saveStudyTemplate:async()=>{},removeStudyTemplate:async()=>{}},
+ time_frames:[],
+});
+let display,studyId,ready=false;
+function preview(result) {
+ snapshots.publish('EURUSD','240',{bars:fixture.bars,indicators:[result]},snapshots.ticket());
+ for(const sub of callbacks.values()) {
+  const identity=synthetic(sub.ticker),bar=bars.at(-1);
+  if(!identity) {sub.cb(bar);continue;}
+  const value=result.series.find(s=>s.key===identity.key).values.at(-1).value;
+  sub.cb({...bar,open:value??0,high:value??0,low:value??0,close:value??0,volume:value!=null?1:0});
+ }
+ display.refresh();
+}
+widget.onChartReady(async()=>{
+ await widget.headerReady();
+ display=chartSqueezeDisplay(widget,snapshots,{identity:s=>s,
+  report:e=>console.error('DISPLAY',e.message)});
+ studyId=await widget.activeChart().createStudy('守望 Python ROLLING_RANGE_SQUEEZE',false,false,fixture.params);
+ await widget.activeChart().setVisibleRange({from:fixture.bars.at(-100).start/1000,to:fixture.bars.at(-1).start/1000});
+ ready=true;
+});
+</script></body></html>

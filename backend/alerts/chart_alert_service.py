@@ -356,6 +356,7 @@ def consume(db, alert_id, observation: Observation, *, detected_at=None, baselin
                        price=observation.market_price if observation.market_price is not None else observation.left,
                        threshold=trigger.threshold, reason=config.name,
                        evidence={"chart_alert": True, "alert_id": alert.id, "rule_version": alert.version,
+                                 "alert_created_at": alert.created_at,
                                  "run": alert.run, "ordinal": trigger.ordinal,
                                  "observation_id": observation.identity, "left": str(observation.left),
                                  "right": str(observation.right) if observation.right is not None else None,

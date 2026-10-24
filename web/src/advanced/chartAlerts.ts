@@ -1,7 +1,7 @@
 export type IndicatorSpec = {
-  name: "SMA" | "EMA" | "RSI" | "MACD";
+  name: "SMA" | "EMA" | "RSI" | "MACD" | "ROLLING_RANGE_SQUEEZE";
   version: "1";
-  params: Record<string, number>;
+  params: Record<string, number | boolean>;
   output: string;
 };
 export type LineGeometry = {
@@ -63,7 +63,9 @@ export type AlertConfig = {
   composite_revision_id?: string | null;
   seam_policy?: "reject" | "accept_raw";
 };
+export type DisplayIdentity = { code: string; series_kind: string; source: string; basis?: string | null; timeframe: string };
 export type AlertContext = {
+  display_identity?: DisplayIdentity;
   request_id: string;
   instrument: string;
   series_kind: "managed" | "provider" | "composite";
@@ -80,6 +82,8 @@ export type AlertContext = {
   composite_revision_id?: string | null;
 };
 export type AlertRow = {
+  display_identity?: DisplayIdentity;
+  last_triggered_at?: number | null;
   display_label?: string;
   id: string;
   name: string;
@@ -105,6 +109,8 @@ export function offsetSnapshot(value: unknown): string | null {
     ? `原目标 ${v.base_target} · ATR ${v.atr} · 偏移 ${v.signed_offset} · 实际边界 ${v.threshold}` : null;
 }
 export type AlertEvent = {
+  display_identity?: DisplayIdentity;
+  notice?: { id: string; first_seq: number; viewed_at: number | null; handled_at: number | null } | null;
   display_label?: string;
   id: string;
   alert_id: string;
@@ -115,6 +121,7 @@ export type AlertEvent = {
   threshold: string;
   evidence: {
     rule_version: number;
+    alert_created_at?: number;
     ordinal: number;
     left: string;
     late: boolean;
@@ -180,12 +187,19 @@ export const deliveryNames: Record<string, string> = {
   blocked: "投递受阻",
   cancelled: "已停止此事件投递",
 };
-export const indicatorDefaults: Record<string, Record<string, number>> = {
+export const indicatorDefaults: Record<string, Record<string, number | boolean>> = {
   SMA: { period: 20 },
   EMA: { period: 20 },
   RSI: { period: 14 },
   MACD: { fast: 12, slow: 26, signal: 9 },
+  ROLLING_RANGE_SQUEEZE: { k: 10, lookback: 252, low_pct: 5, confirm_on_close: true },
 };
+
+export function indicatorUnit(value: IndicatorSpec): string {
+  if (value.name === "ROLLING_RANGE_SQUEEZE")
+    return ({sma:"price", signal:"boolean", pct_rank:"percent"} as Record<string,string>)[value.output] || "ratio";
+  return value.name === "RSI" ? "RSI" : value.name === "MACD" ? "MACD" : "price";
+}
 export function validAlertContext(
   value: unknown,
   workspace: string | undefined,
@@ -207,6 +221,11 @@ export function validAlertContext(
     ["M1", "M5", "M15", "M30", "H1", "H4", "D1", "W1", "MN"].includes(
       v.timeframe,
     ) &&
+    (v.display_identity === undefined ||
+      (!!v.display_identity && typeof v.display_identity === "object" &&
+        typeof v.display_identity.code === "string" && v.display_identity.code.length > 0 && v.display_identity.code.length <= 128 &&
+        v.display_identity.series_kind === v.series_kind && v.display_identity.timeframe === v.timeframe &&
+        typeof v.display_identity.source === "string" && v.display_identity.source.length <= 100)) &&
     !!a &&
     a.workspace_id === workspace &&
     [a.chart_id, a.generation].every(
@@ -219,25 +238,28 @@ export function validAlertContext(
   );
 }
 export function freshDraft(context: AlertContext): AlertConfig {
+  const squeeze = context.indicator?.name === "ROLLING_RANGE_SQUEEZE" && context.indicator.output === "signal";
   return {
-    name: (context.display_label || context.instrument) + " 告警",
+    name: squeeze ? "Rolling Range Squeeze" : context.display_identity?.code && !context.line && !context.indicator
+      ? `${context.display_identity.code} ${relations.cross_up} ${context.price_presentation?.text || context.price || ""}`
+      : (context.display_label || context.instrument) + " 告警",
     instrument: context.instrument,
     series_kind: context.series_kind,
     source: context.source || "",
     timeframe: context.timeframe,
     mode: "close",
     condition: {
-      relation: "cross_up",
+      relation: squeeze ? "above" : "cross_up",
       left: context.indicator
         ? { kind: "indicator", indicator: context.indicator }
         : { kind: "price" },
       right: context.line
         ? { kind: "line", line: context.line }
-        : { kind: "constant", value: context.price || "" },
+        : { kind: "constant", value: squeeze ? "0" : context.price || "" },
     },
     max_triggers: 1,
     expires_at: null,
-    message: "",
+    message: squeeze ? "Rolling Range Squeeze triggered" : "",
     notify_web: true,
     notify_ntfy: false,
     late_delivery: "log_only",
@@ -256,7 +278,7 @@ export function normalizeCondition(value: Condition, relation = value.relation):
     return { relation, left: { kind: "price" }, lower: value.lower ?? "", upper: value.upper ?? "" };
   const left = value.left;
   const unit = (operand: Operand) => operand.kind === "constant" ? "constant" :
-    operand.indicator && ["RSI", "MACD"].includes(operand.indicator.name) ? operand.indicator.name : "price";
+    operand.indicator ? indicatorUnit(operand.indicator) : "price";
   let right = value.right ?? { kind: "constant" as const, value: "" };
   if (unit(right) !== "constant" && unit(left) !== unit(right)) right = { kind: "constant", value: "" };
   const offset = value.offset && ["cross_up", "cross_down", "above", "below"].includes(relation) &&

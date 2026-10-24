@@ -490,7 +490,15 @@ def list_events(db, subject, filters, *, before=None, limit=100):
     return {'events': events, 'before': next_cursor,
         'epoch': state.epoch, 'highwater': high, 'after': _cursor(state, {'kind': 'changes', 'seq': high}),
         'unread': unread, 'system_unread': system_unread(db, subject),
+        'alert_unread': alert_unread(db, subject),
         'server_time': now_ms(), 'retention_days': 30}
+
+
+def alert_unread(db, subject):
+    return db.scalar(select(func.count()).select_from(NoticeEvent).where(
+        NoticeEvent.subject == subject, NoticeEvent.source_domain == 'pro_chart',
+        NoticeEvent.source_kind == 'chart_alert', NoticeEvent.viewed_at.is_(None),
+        NoticeEvent.handled_at.is_(None)))
 
 
 def unread_system_incidents(subject):
@@ -545,6 +553,7 @@ def changes(db, subject, after, *, limit=100):
         'after': _cursor(state, {'kind': 'changes', 'seq': last}), 'epoch': state.epoch,
         'highwater': state.seq, 'more': last < state.seq, 'server_time': now_ms(),
         'system_unread': system_unread(db, subject),
+        'alert_unread': alert_unread(db, subject),
         'unread': db.scalar(select(func.count()).select_from(NoticeEvent).where(
             NoticeEvent.subject == subject, NoticeEvent.viewed_at.is_(None)))}
 

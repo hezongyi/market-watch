@@ -94,7 +94,7 @@ const { chromium } = require("playwright");
             await page.getByLabel("关系", { exact: true }).selectOption(single);
             await page.getByLabel("比较值", { exact: true }).fill("0");
             await page
-              .getByRole("button", { name: "创建告警", exact: true })
+              .getByRole("button", { name: "创建", exact: true })
               .click();
             await page.waitForFunction(() => test.writes.length);
             let c = await page.evaluate(
@@ -107,7 +107,7 @@ const { chromium } = require("playwright");
             await page.getByLabel("下限", { exact: true }).fill("1.12345");
             await page.getByLabel("上限", { exact: true }).fill("2.123");
             await page
-              .getByRole("button", { name: "创建告警", exact: true })
+              .getByRole("button", { name: "创建", exact: true })
               .click();
             await page.waitForFunction(() => test.writes.length === 2);
             c = await page.evaluate(
@@ -133,7 +133,7 @@ const { chromium } = require("playwright");
           }),
         );
         await page
-          .getByRole("button", { name: "创建告警", exact: true })
+          .getByRole("button", { name: "创建", exact: true })
           .click();
         await page.waitForFunction(() => test.writes.length);
         assert.equal(
@@ -155,12 +155,12 @@ const { chromium } = require("playwright");
         });
         await page.getByRole("button", { name: "编辑", exact: true }).click();
         await page
-          .getByRole("button", { name: "保存新版本", exact: true })
+          .getByRole("button", { name: "保存", exact: true })
           .click();
         await page.locator("dialog").waitFor({ state: "detached" });
         await page.getByRole("button", { name: "编辑", exact: true }).click();
         await page
-          .getByRole("button", { name: "保存新版本", exact: true })
+          .getByRole("button", { name: "保存", exact: true })
           .click();
         await page.waitForFunction(() => test.writes.length === 2);
         assert.deepEqual(
@@ -176,7 +176,7 @@ const { chromium } = require("playwright");
       await page.evaluate(() => test.mount("panel", { slowEvents: true }));
       await page.getByRole("button", { name: "编辑", exact: true }).click();
       await page
-        .getByRole("button", { name: "保存新版本", exact: true })
+        .getByRole("button", { name: "保存", exact: true })
         .click();
       await page.waitForFunction(() => test.bridgeRows[0]?.version === 3);
     });
@@ -200,7 +200,7 @@ const { chromium } = require("playwright");
         );
         await page.getByLabel("比较值", { exact: true }).fill("abc");
         await page
-          .getByRole("button", { name: "创建告警", exact: true })
+          .getByRole("button", { name: "创建", exact: true })
           .click();
         await page.waitForFunction(
           () =>
@@ -232,7 +232,7 @@ const { chromium } = require("playwright");
         await page.getByLabel("比较值", { exact: true }).fill("123.12345");
         await page.evaluate(() => test.external());
         await page
-          .getByRole("button", { name: "保存新版本", exact: true })
+          .getByRole("button", { name: "保存", exact: true })
           .click();
         await page
           .getByRole("button", { name: "保留草稿并重新读取", exact: true })
@@ -243,7 +243,7 @@ const { chromium } = require("playwright");
         );
         assert.equal(await page.evaluate(() => test.writes.length), 1);
         await page
-          .getByRole("button", { name: "保存新版本", exact: true })
+          .getByRole("button", { name: "保存", exact: true })
           .click();
         await page.waitForFunction(() => test.writes.length === 2);
         assert.deepEqual(
@@ -418,7 +418,7 @@ const { chromium } = require("playwright");
             item,
           );
           await page
-            .getByRole("button", { name: "创建告警", exact: true })
+            .getByRole("button", { name: "创建", exact: true })
             .click();
           await page.waitForFunction(
             (field) =>

@@ -27,6 +27,19 @@ function chartAlertBridge({
     generations = new Map(),
     previewChanges = new Map(),
     reconciliations = new Map();
+  const priceLines = typeof nativeAlertPriceLines === "function" ? nativeAlertPriceLines({
+    readonly,
+    current: (row, chart, epoch) => !disposed && !isLoading() && epoch === generation(chart) && matches(chart,row) && associatedChart(row.config.association,row) === chart,
+    archive: async row => {
+      if (readonly || disposed) throw Error("告警当前不可编辑");
+      const saved = await rpc({op:"lifecycle",alert_id:row.id,version:row.version,
+        control_revision:row.control_revision,request_id:crypto.randomUUID(),action:"archive",
+        object_id:row.config.association?.object_id,chart_id:row.config.association?.chart_id,
+        workspace_id:row.config.association?.workspace_id});
+      replace(saved);
+    },
+    report: (row,text) => associationNotice(row,text),
+  }) : null;
   const failedEdits = new Set();
   const recoveredSlots = new Map();
   let pointerDown = false;
@@ -85,6 +98,8 @@ function chartAlertBridge({
       series_kind: identity.series_kind,
       timeframe: frames[chart.resolution()],
       source: meta.source,
+      display_identity: {code: meta.display_symbol || meta.logical_symbol || meta.symbol || meta.name || identity.symbol,
+        series_kind: identity.series_kind, source: meta.source, basis: meta.basis, timeframe: frames[chart.resolution()]},
       display_label: [meta.display_symbol || meta.symbol || meta.logical_symbol || meta.name || identity.symbol,
         ({provider:'平台行情',managed:'自建行情',composite:'组合行情',history:'固定历史'})[identity.series_kind],
         meta.price_description || meta.basis, frames[chart.resolution()]].filter(Boolean).join(' · '),
@@ -175,20 +190,21 @@ function chartAlertBridge({
       .getAllStudies()
       .find((item) => String(item.id) === String(nativeId));
     const name = String(entry?.name || "").match(
-      /(?:MWPython|守望 Python |PY )(SMA|EMA|RSI|MACD)(?:@|$)/,
+      /(?:MWPython|守望 Python |PY )(SMA|EMA|RSI|MACD|ROLLING_RANGE_SQUEEZE)(?:@|$)/,
     )?.[1];
-    if (!name) throw Error("仅支持已映射的守望 Python SMA、EMA、RSI、MACD");
+    if (!name) throw Error("仅支持已映射的守望 Python SMA、EMA、RSI、MACD、ROLLING_RANGE_SQUEEZE");
     const params = Object.fromEntries(
       chart
         .getStudyById(nativeId)
         .getInputValues()
+        .filter(input=>name!=='ROLLING_RANGE_SQUEEZE' || ['k','lookback','low_pct','confirm_on_close'].includes(input.id))
         .map((input) => [input.id, input.value]),
     );
     return {
       name,
       version: "1",
       params,
-      output: name === "MACD" ? "macd" : "value",
+      output: name === "ROLLING_RANGE_SQUEEZE" ? "signal" : name === "MACD" ? "macd" : "value",
     };
   }
   async function create({
@@ -289,6 +305,7 @@ function chartAlertBridge({
     markers.clear();
     failedEdits.clear();
     recoveredSlots.clear();
+    priceLines?.clear();
   }
   function matches(chart, row) {
     return (
@@ -724,6 +741,7 @@ function chartAlertBridge({
           ? previous
           : row;
       });
+    priceLines?.sync(rows.map(row => {const chart=associatedChart(row.config.association,row);return {row,chart,epoch:generation(chart)};}));
     for (const row of rows)
       if (!reconciliations.has(row.id)) {
         const task = reconcile(row);
@@ -738,6 +756,7 @@ function chartAlertBridge({
   }
   function destroy() {
     disposed = true;
+    priceLines?.destroy();
     for (const [chart, fn] of bindings) {
       chart.onSymbolChanged().unsubscribe(null, fn);
       chart.onIntervalChanged().unsubscribe(null, fn);
@@ -772,6 +791,7 @@ function chartAlertBridge({
       return {instrument: identity.symbol, series_kind: identity.series_kind};
     },
     diagnostics: () => ({
+      priceLines: priceLines?.diagnostics(),
       charts: chartList().map((chart) => chartIdentity(chart)),
       rows: rows.map((row) => ({ id: row.id, version: row.version })),
     }),

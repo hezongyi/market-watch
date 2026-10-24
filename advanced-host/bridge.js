@@ -21,7 +21,11 @@ let invalidateAlertUI = () => {};
 // Lazy loading keeps ordinary datafeed consumers independent of the renderer.
 let swingSnapshots;
 function swingStore() {return swingSnapshots ||= swingSnapshotStore();}
-let swingDisplay, indicatorCoordinator;
+let swingDisplay, indicatorCoordinator, squeezeSnapshots, squeezeDisplay;
+function squeezeStore() {return squeezeSnapshots ||= squeezeSnapshotStore();}
+function publishSqueeze(ticker,res,page,ticket) {
+  squeezeStore().publish(ticker,res,page,ticket ?? squeezeStore().ticket());squeezeDisplay?.refresh();
+}
 const indicatorBindings=new Map();
 const indicatorDependencyOrigins=new Map();
 function indicatorKey(ticker,res){
@@ -110,6 +114,7 @@ function acceptMarketBars(sub,event) {
   if(event.as_of!=null && event.as_of<(sub.displayAsOf ?? -Infinity))return;
   sub.displayAsOf=event.as_of ?? sub.displayAsOf;
   const identity=decode(sub.symbol);
+  if(identity.spec?.name==='ROLLING_RANGE_SQUEEZE') publishSqueeze(MWSeries.encode(identity.symbol,identity.series_kind),sub.res,event);
   if(identity.spec?.name==='SWING_SR_V1') {
     if(!swingStore().publish(MWSeries.encode(identity.symbol,identity.series_kind),sub.res,event,swingStore().ticket()))return;
     swingDisplay?.refresh();
@@ -387,7 +392,11 @@ function releaseIndicatorConsumers(consumers) {
   }
 }
 function startIndicatorCoordinator(catalog) {
+  const nrDrawings=typeof chartNRBreakoutDisplay==='function' ? chartNRBreakoutDisplay({
+    report:error=>send({type:'error',error:'NR4/NR7 绘制失败：'+String(error)}),
+  }) : undefined;
   indicatorCoordinator=chartIndicatorCoordinator(widget,catalog,{
+    drawings:nrDrawings,
     read:(symbol,res,args,current)=>query(symbol,res,args,Date.now()+30000,current),
     recover:(ticker,res,token,error)=>recoverDisplaySnapshot(ticker,res,token,false,error?.snapshot_evidence),
     identity:{
@@ -421,7 +430,7 @@ function startIndicatorCoordinator(catalog) {
     occurrence:(error,consumer,attempt)=>{if(!['HISTORY_CANCELLED','DISPLAY_SNAPSHOT_EXPIRED'].includes(error.code))emitNotice(indicatorFault(consumer,error,attempt));},
     recovered:consumer=>emitNotice(indicatorFault(consumer),true),
     report:error=>{if(error.code!=='HISTORY_CANCELLED')send({type:'error',error:'指标读取失败：'+String(error)});},
-    presentation:(ticker,res,page)=>{swingStore().publish(ticker,res,page,swingStore().ticket());swingDisplay?.refresh();},
+    presentation:(ticker,res,page)=>{publishSqueeze(ticker,res,page);swingStore().publish(ticker,res,page,swingStore().ticket());swingDisplay?.refresh();},
     leases:leases=>{if(leases.length)void request({client:clientId,leases},'indicator-demand-update').catch(error=>send({type:'error',error:String(error)}));},
     release:releaseIndicatorConsumers,
     demand:rows=>{
@@ -1125,6 +1134,7 @@ function query(ticker, res, args, expires = Infinity, current = () => true, sche
   const old = cache.get(key);
   if (!q.indicators?.length && (series_kind === 'managed' || spec) && old && Date.now() - old.time < 1000) return old.promise;
   const epoch = workspaceEpoch;
+  const squeezeTicket = spec?.name==='ROLLING_RANGE_SQUEEZE' ? squeezeStore().ticket() : null;
   const swingTicket = spec?.name==='SWING_SR_V1' ? swingStore().ticket() : null;
   // Native owns the lifetime of its period caches. A temporary period switch
   // does not cancel a getBars callback that it can reuse when switching back.
@@ -1142,6 +1152,7 @@ function query(ticker, res, args, expires = Infinity, current = () => true, sche
         alertCompositeRevisions.set(MWSeries.encode(symbol,series_kind)+'|'+res,page.revision_id);
       if (epoch===workspaceEpoch && spec && Number.isSafeInteger(page.calculation_origin ?? page.origin))
         alertCalculationOrigins.set(MWSeries.encode(symbol,series_kind)+'|'+res,page.calculation_origin ?? page.origin);
+      if(epoch===workspaceEpoch && spec?.name==='ROLLING_RANGE_SQUEEZE') publishSqueeze(MWSeries.encode(symbol,series_kind),res,page,squeezeTicket);
       if(epoch===workspaceEpoch && spec?.name==='SWING_SR_V1') {
         swingStore().publish(MWSeries.encode(symbol,series_kind),res,page,swingTicket);
         swingDisplay?.refresh();
@@ -2386,14 +2397,14 @@ function boot(
     try {
       refreshNotificationTimezone();
       const instance = await MWNativeAlerts.attach({widget, scope: {workspace_id: workspaceId, session}, readonly,
-        initialDraft: alertUIDraft,
+        initialDraft: alertUIDraft, noticeState,
         noticeRequest: query => request({workspace_id:workspaceId,session,...query}, 'notice-center-rpc', () => attempt === attachingAlerts && session === alertUISession),
         persistDraft: draft => send({type:'chart-alert-ui-draft', workspace_id: workspaceId, session, draft}),
         panelChanged: (open,signal_id) => {restoreAlertsPanel = open; send({type:'alerts-panel-state',workspace_id:workspaceId,open,signal_id});},
         bridge: alertBridge, request: query => request(query, 'chart-alert-ui-rpc', () => attempt === attachingAlerts && session === alertUISession),
         report: error => send({type:'error', error:String(error)})});
       if (attempt !== attachingAlerts || session !== alertUISession || alertUIStopped) {instance.destroy();return;}
-      alertUI = instance; instance.theme(widget.getTheme());
+      alertUI = instance; instance.theme(widget.getTheme()); if(noticeState)instance.noticeState(noticeState);
       if (restoreAlertsPanel) instance.open();
       if (alertOpenSignal) {instance.event(alertOpenSignal);alertOpenSignal=undefined;}
       try {
@@ -2423,6 +2434,7 @@ function boot(
       return target && resolveCurrent(target) && target.state!=='ready' ? target.message : null;
     },
     calculationOrigin:(ticker,res)=>alertCalculationOrigins.get(MWSeries.encode(MWSeries.decode(ticker).symbol,MWSeries.decode(ticker).series_kind)+'|'+res) ??
+      indicatorBindings.get(indicatorKey(ticker,res))?.calculationStart ??
       (MWSeries.decode(ticker).series_kind === "managed" ? managedSessions.get(MWSeries.decode(ticker).symbol+'|'+res)?.start : null),
     compositeRevision:(ticker,res)=>alertCompositeRevisions.get(MWSeries.encode(MWSeries.decode(ticker).symbol,'composite')+'|'+res) ?? null,
     rpc:query=>request(query,"chart-alert-rpc"),send: message => {
@@ -2577,6 +2589,7 @@ function boot(
     (context, scope) => reportPreferenceOutcome(null, context, scope),
     capturePreferenceScope,
     {blocked:globalThis.MWPreferenceDraftKeys || [], put: draft => request({op:'draftWrite',args:draft},'preferences'),
+     failed: draft => request({op:'draftFailed',args:{key:draft.key,version:draft.version,storageKey:draft.storageKey}},'preferences'),
      current: draft => request({op:'draftCheck',args:draft},'preferences'),
      abandoned: context => emitNotice({source_kind:'preferences',attempt_id:crypto.randomUUID(),code:'PREFERENCE_SAVE_FAILED',
        title:'设置草稿已放弃',message:'已明确采用服务器设置；原写入未成功',observation_ended:true,
@@ -2601,6 +2614,7 @@ function boot(
   maintenanceAsked.clear();
   dataCenter?.dispose();
   swingDisplay?.dispose();
+  squeezeDisplay?.dispose();
   studyTemplates?.dispose();
   indicatorPicker?.dispose();
   barRangeMapping?.dispose();
@@ -2763,6 +2777,9 @@ function boot(
           identity:symbol=>{const id=decode(symbol);return MWSeries.encode(id.symbol,id.series_kind);},
           chartTime:(time,chart)=>stamp({start:time,end:time+86400000},chart.resolution(),decode(chart.symbol()).symbol),
           report:error=>send({type:'error',error:'Swing 显示失败：'+String(error)})});
+        squeezeDisplay = chartSqueezeDisplay(widget,squeezeStore(),{
+          identity:symbol=>{const id=decode(symbol);return MWSeries.encode(id.symbol,id.series_kind);},
+          report:error=>send({type:'error',error:'Rolling Range Squeeze 显示失败：'+String(error)})});
         alertBridge.attach();
         chartMenu = chartThemeMenu(widget, (e) =>
           send({ type: "error", error: String(e) }),
@@ -3013,7 +3030,7 @@ addEventListener("message", async (e) => {
     drain();
     return;
   }
-  if(m.type==='notice-center-state' && m.session===alertUISession && m.workspace_id===alertUIWorkspace){noticeState=m.state;noticeUI?.update(m.state);return;}
+  if(m.type==='notice-center-state' && m.session===alertUISession && m.workspace_id===alertUIWorkspace){noticeState=m.state;noticeUI?.update(m.state);alertUI?.noticeState(m.state);return;}
   if(m.type==='notice-center-open'){noticeOpenEvent=typeof m.event_id==='string'?m.event_id:'';if(noticeUI){noticeUI.open(noticeOpenEvent || undefined);noticeOpenEvent=undefined;}return;}
   if(m.type==='chart-alert-event-open' && typeof m.signal_id==='string' && /^[a-f0-9-]{36}$/.test(m.signal_id)) {
     if(alertUI)alertUI.event(m.signal_id);else {alertOpenSignal=m.signal_id;restoreAlertsPanel=true;}
@@ -3159,6 +3176,7 @@ addEventListener("message", async (e) => {
             !sub.needsHistoryReload && !sub.historical);
         return;
       }
+      if(identity.spec?.name==='ROLLING_RANGE_SQUEEZE') publishSqueeze(MWSeries.encode(identity.symbol,identity.series_kind),sub.res,event);
       if(identity.spec?.name==='SWING_SR_V1') {
         swingStore().publish(MWSeries.encode(identity.symbol,identity.series_kind),sub.res,event,swingStore().ticket());
         swingDisplay?.refresh();
