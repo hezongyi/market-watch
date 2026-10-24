@@ -298,7 +298,7 @@ export function NoticePanel({
             }
           />
           <p className="nc-muted">
-            首次异常或严重程度升级时，使用顶部居中浮窗。重复异常合并计数；普通状态变化只保留记录，恢复后更新原记录。
+            首次异常或严重程度升级时，使用右下角浮窗。重复异常合并计数；普通状态变化只保留记录，恢复后更新原记录。
           </p>
           <label className="nc-popup-duration">
             浮窗显示时长
@@ -327,7 +327,7 @@ export function NoticePanel({
           </p>
           <h3>交易告警</h3>
           <p className="nc-muted">
-            在右侧告警模块中查询和管理，触发时共用顶部居中的即时浮窗。此处的开关只控制系统消息。
+            在右侧告警模块中查询和管理，触发时共用右下角的即时浮窗。此处的开关只控制系统消息。
           </p>
         </div>
       ) : selection ? (

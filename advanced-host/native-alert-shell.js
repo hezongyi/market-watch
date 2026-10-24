@@ -522,6 +522,12 @@ async function nativeAlertShell(
       const toolbar = doc
         .querySelector(".innerWrap-OhqNVIYA")
         ?.getBoundingClientRect();
+      // Pinned v31 layout: the center area ends above the bottom tools and
+      // before the widgetbar. Keep native DOM knowledge in this adapter.
+      const center = doc.querySelector(".layout__area--center")?.getBoundingClientRect();
+      const charts = Array.from(doc.querySelectorAll(".chart-container"),
+        node => node.getBoundingClientRect()).filter(rect => rect.width && rect.height);
+      const chartBottom = charts.length ? Math.max(...charts.map(rect => rect.bottom)) : height;
       return {
         width,
         height,
@@ -529,6 +535,13 @@ async function nativeAlertShell(
           (toolbar?.bottom || anchor?.getBoundingClientRect().bottom || 40) + 8,
         panelLeft:
           !bar.layout.minimized && panel?.width > 60 ? panel.left : width,
+        chartBounds: {
+          left: Math.max(0, center?.left || 0),
+          top: Math.max(0, center?.top ?? toolbar?.bottom ?? 40),
+          right: Math.min(width, center?.right ?? width,
+            !bar.layout.minimized && panel?.width > 60 ? panel.left : width),
+          bottom: Math.min(height, center?.bottom ?? height, chartBottom),
+        },
       };
     },
     control: (kind, container, props) => {
