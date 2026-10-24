@@ -2,7 +2,7 @@ import { useChartTime } from "../time/ChartTimeContext";
 import { formatTimestamp } from "../time/chartTime";
 import { ZonedDateTimeInput } from "../time/ZonedDateTimeInput";
 import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, SlidersHorizontal, Trash2 } from "lucide-react";
 import { AlertSymbolIcon } from "./alertPresentation";
 import { AlertMenu } from "./AlertMenu";
 import {
@@ -924,10 +924,13 @@ export function ChartAlertDialog({
                 </div>
               </div>
               <details className="alert-advanced-options">
-                <summary>
+                <summary aria-label="行情与高级选项" title={`行情与高级选项 · ${draft.source} · ${draft.timeframe}`}>
+                  <SlidersHorizontal size={18} aria-hidden />
+                  <span className="alert-advanced-label">
                   行情与高级选项 · {draft.source || "查询中"} ·{" "}
                   {draft.timeframe} ·{" "}
                   {draft.mode === "close" ? "收盘确认" : "盘中观察"}
+                  </span>
                 </summary>
                 <fieldset className="alert-indicator-fields" disabled={busy}>
                   <legend className="sr-only">突破阈值参数</legend>

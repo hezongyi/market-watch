@@ -39,6 +39,7 @@ const { chromium } = require("@playwright/test"),
       });
       const range = event(),
         mode = event(),
+        inverted = event(),
         height = event(),
         data = event(),
         changed = event(),
@@ -62,6 +63,7 @@ const { chromium } = require("@playwright/test"),
         },
         priceRangeChanged: () => range,
         modeChanged: () => mode,
+        properties: () => ({ childs: () => ({ isInverted: inverted }) }),
         internalHeightChanged: () => height,
       };
       const series = {
@@ -147,7 +149,7 @@ const { chromium } = require("@playwright/test"),
         "uses pane + native price coordinate",
       );
       y = 260;
-      mode.fire();
+      inverted.fire();
       await frame();
       expect(
         parseFloat(label.style.top) === 280,

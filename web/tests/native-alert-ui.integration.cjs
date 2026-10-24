@@ -502,6 +502,7 @@ widget.onChartReady(async()=>{bridge.attach();globalThis.ui=await MWNativeAlerts
     report.cases.push(
       "Date-grouped log retains late evidence, rule version, delivery status and independent acknowledgement",
     );
+    await chart.getByRole("button", { name: "关闭详情", exact: true }).click();
     await chart.getByRole("tab", { name: "警报", exact: true }).click();
     await chart.getByRole("button", { name: "编辑", exact: true }).click();
     await dialog.waitFor();

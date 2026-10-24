@@ -199,6 +199,7 @@ function nativeAlertPriceLines({
       for (const event of [
         scale.priceRangeChanged(),
         scale.modeChanged(),
+        scale.properties().childs().isInverted,
         scale.internalHeightChanged(),
         series.dataEvents().dataUpdated(),
         chart.onVisibleRangeChanged(),
