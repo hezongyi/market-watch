@@ -315,13 +315,23 @@ function ScopedChartAlertsPanel({
     void refresh();
   }
   useEffect(() => {
-    if (tab !== "events" || !noticeRequest || !contentRef.current) return;
+    if (
+      !open ||
+      tab !== "events" ||
+      detail ||
+      formOpen ||
+      cleanup ||
+      !noticeRequest ||
+      !contentRef.current
+    )
+      return;
     const root = contentRef.current,
       view = root.ownerDocument.defaultView!;
     if (!view.IntersectionObserver) return;
     let active = true;
     const observer = new view.IntersectionObserver(
       (entries) => {
+        if (!active) return;
         for (const entry of entries) {
           const id = (entry.target as HTMLElement).dataset.noticeId;
           if (
@@ -366,7 +376,18 @@ function ScopedChartAlertsPanel({
         observeVisible,
       );
     };
-  }, [tab, events, showHandled, cleared, mountTarget, noticeRequest]);
+  }, [
+    open,
+    tab,
+    detail,
+    formOpen,
+    cleanup,
+    events,
+    showHandled,
+    cleared,
+    mountTarget,
+    noticeRequest,
+  ]);
   const searchInput = useRef<HTMLInputElement>(null);
   const visible = rows.filter(
     (row) =>
@@ -542,6 +563,7 @@ function ScopedChartAlertsPanel({
               if (["ArrowLeft", "ArrowRight"].includes(event.key)) {
                 event.preventDefault();
                 setTab(value === "alerts" ? "events" : "alerts");
+                setDetail(null);
                 (
                   event.currentTarget.parentElement!.children[
                     1 - index

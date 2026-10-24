@@ -10,6 +10,7 @@ import { createPortal } from "react-dom";
 import { formatTimestamp } from "../time/chartTime";
 import {
   healthNames,
+  eventPresentation,
   statuses,
   type AlertEvent,
   type AlertRow,
@@ -193,7 +194,9 @@ export function AlertSummary({
                   ? "停止 — 已触发"
                   : "已触发"}
             </p>
-            {row && <p>{row.condition_summary}</p>}
+            <p>
+              {row ? row.condition_summary : eventPresentation(event!).summary}
+            </p>
             {row?.health_reason && <p>{row.health_reason}</p>}
             {(row || event?.evidence.alert_created_at) && (
               <p>

@@ -596,7 +596,6 @@ export function ChartAlertDialog({
                   value={name}
                   onChange={(event) => {
                     setName(event.target.value);
-                    onAutomaticName?.(false);
                   }}
                 />
               </label>
@@ -1294,6 +1293,7 @@ export function ChartAlertDialog({
                       setError("请填写警报名称");
                       return;
                     }
+                    if (name !== draft.name) onAutomaticName?.(false);
                     change({ name, message });
                   } else
                     change({
