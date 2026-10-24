@@ -358,7 +358,8 @@ function indicatorFault(consumer,error,attempt_id){
     context:{chart_index:consumer.index,consumer:consumer.id,instrument:consumer.chart.symbol(),timeframe:consumer.chart.resolution()},
     evidence:{reason_code:error?.code||'INDICATOR_FAILED',params:consumer.params,algorithm_version:consumer.meta.version,
       input_revision:binding.inputRevision,visible_from:scope?.first,visible_to:scope?.last,
-      calculation_origin:binding.calculationStart,accepted_scope:consumer.acceptedScope||null}};
+      calculation_origin:binding.calculationStart,accepted_scope:consumer.acceptedScope||null,
+      ...(error?.dependency ? {dependency:error.dependency} : {})}};
 }
 function releaseIndicatorConsumers(consumers) {
   // Cancellation fences are cumulative. Merge only unsent releases for this
@@ -388,7 +389,7 @@ function releaseIndicatorConsumers(consumers) {
 function startIndicatorCoordinator(catalog) {
   indicatorCoordinator=chartIndicatorCoordinator(widget,catalog,{
     read:(symbol,res,args,current)=>query(symbol,res,args,Date.now()+30000,current),
-    recover:(ticker,res,token)=>recoverDisplaySnapshot(ticker,res,token),
+    recover:(ticker,res,token,error)=>recoverDisplaySnapshot(ticker,res,token,false,error?.snapshot_evidence),
     identity:{
       binding:(ticker,res)=>{
         const id=decode(ticker),key=indicatorKey(ticker,res),base=indicatorBindings.get(key);
@@ -442,38 +443,45 @@ function providerRecoveryRows(chart) {
   data.each((_,row)=>{rows.push(row.slice(0,6));});
   return rows.length===data.size() ? rows : null;
 }
-async function refreshProviderDisplayCredential(ticker,res,token,charts,current) {
+async function refreshProviderDisplayCredential(ticker,res,token,charts,current,evidence={}) {
   const key=indicatorKey(ticker,res),binding=indicatorBindings.get(key);
-  if(!binding || binding.providerSnapshot!==token)return false;
+  if(!binding || binding.providerSnapshot!==token){evidence.refresh_reason='binding_superseded';return false;}
   const accepted=charts.map(({chart})=>({chart,rows:providerRecoveryRows(chart)}));
-  if(accepted.some(item=>!item.rows))return false;
+  if(accepted.some(item=>!item.rows)){evidence.refresh_reason='native_rows_unavailable';return false;}
   let refreshed;
   for(const {rows} of accepted) {
     const page=await query(ticker,res,{before:rows.at(-1)[0]*1000+1,
       limit:rows.length,indicators:[]},Date.now()+10000,current);
     if(!current())return false;
     // A stream update can already have replaced the rejected credential.
-    if(indicatorBindings.get(key)?.providerSnapshot!==token)return true;
+    if(indicatorBindings.get(key)?.providerSnapshot!==token){evidence.refresh_reason='credential_superseded';return true;}
     if(!page.provider_snapshot_id || !Number.isSafeInteger(page.cache_revision) ||
-      page.cache_revision!==binding.tailVersion)return false;
+      page.cache_revision!==binding.tailVersion){evidence.refresh_reason='credential_or_revision_changed';return false;}
     const prices=barsOf(page,res,ticker);
     if(prices.length!==rows.length || prices.some((bar,index)=>{
       const row=rows[index];
       return bar.time!==row[0]*1000 || ['open','high','low','close'].some((name,i)=>bar[name]!==row[i+1]) ||
         (bar.volume ?? 0)!==(row[5] ?? 0);
-    }))return false;
+    })){evidence.refresh_reason='price_rows_changed';return false;}
     if(!refreshed || prices.at(-1).time>=barsOf(refreshed,res,ticker).at(-1).time)refreshed=page;
   }
   if(!current())return false;
-  if(indicatorBindings.get(key)?.providerSnapshot!==token)return true;
+  if(indicatorBindings.get(key)?.providerSnapshot!==token){evidence.refresh_reason='credential_superseded';return true;}
   // Pagination, navigation or a native restart during the read invalidates the
   // comparison. No credential may be rebound under a different accepted page.
-  if(accepted.some(({chart,rows})=>JSON.stringify(providerRecoveryRows(chart))!==JSON.stringify(rows)))return false;
+  if(accepted.some(({chart,rows})=>JSON.stringify(providerRecoveryRows(chart))!==JSON.stringify(rows))){evidence.refresh_reason='native_rows_changed';return false;}
   rememberIndicatorBinding(ticker,res,refreshed);
+  evidence.refresh_reason='compared_equal';
   return true;
 }
 const displayRecoveries=new Map();
-async function recoverDisplaySnapshot(ticker,res,token,retry=false){
+function resumeDeferredDisplayRecoveries(){
+  for(const entry of displayRecoveries.values()){
+    entry.prune();
+    if(entry.state==='deferred')entry.resume?.();
+  }
+}
+async function recoverDisplaySnapshot(ticker,res,token,retry=false,failureEvidence={}){
   const key=indicatorKey(ticker,res),previous=displayRecoveries.get(key);
   const binding=indicatorBindings.get(key);
   const boundToken=binding?.displaySnapshot ?? binding?.providerSnapshot;
@@ -485,7 +493,12 @@ async function recoverDisplaySnapshot(ticker,res,token,retry=false){
   const epoch=workspaceEpoch;
   const charts=ready ? Array.from({length:widget.chartsCount()},(_,index)=>({index,chart:widget.chart(index)}))
     .filter(({chart})=>chartUsesSymbol(chart,ticker,res)) : [];
-  const entry={token,attempt_id:crypto.randomUUID(),state:'preparing',prune(){
+  const trace=(phase,reason)=>{
+    entry.evidence={...entry.evidence,reload_phase:phase,reload_reason:reason,reload_starts:entry.attempts};
+    if(phase==='cancelled')entry.evidence.cancel_reason=reason;
+    console.info('display-snapshot-recovery',JSON.stringify(entry.evidence));
+  };
+  const entry={token,attempt_id:crypto.randomUUID(),state:'preparing',attempts:0,evidence:{},prune(){
     for(let offset=charts.length-1;offset>=0;offset--){
       const {index,chart}=charts[offset];
       if(epoch===workspaceEpoch && index<widget.chartsCount() &&
@@ -494,6 +507,7 @@ async function recoverDisplaySnapshot(ticker,res,token,retry=false){
       if(epoch===workspaceEpoch)send({type:'chart-indicator-state',epoch,index,id:'display-snapshot:'+key,name:'行情快照',state:'removed',error:''});
     }
     if(!charts.length && displayRecoveries.get(key)===entry){
+      entry.state='cancelled';trace('cancelled',epoch===workspaceEpoch ? 'viewer_removed' : 'stale_native_generation');entry.resume?.();
       displayRecoveries.delete(key);send({type:'feed-poll-state',key:'display:'+key,error:''});
     }
   }};
@@ -502,15 +516,23 @@ async function recoverDisplaySnapshot(ticker,res,token,retry=false){
   const notify=(state,error='')=>{for(const {index,chart} of charts)
     if(index<widget.chartsCount() && (widget.chart(index)._chartWidget || widget.chart(index))===(chart._chartWidget || chart) && (state==='removed' || chartUsesSymbol(chart,ticker,res)))
       send({type:'chart-indicator-state',epoch,index,id:'display-snapshot:'+key,name:'行情快照',state,error});};
+  previous?.resume?.();
   displayRecoveries.set(key,entry);
+  entry.evidence={attempt_ref:entry.attempt_id,native_generation:epoch,refresh_reason:'not_attempted',reload_starts:0};
   entry.promise=(async()=>{
+    if(!current())return;
+    const hash=await crypto.subtle.digest('SHA-256',Uint8Array.from(token,character=>character.charCodeAt(0)));
+    entry.evidence={...entry.evidence,credential_ref:Array.from(new Uint8Array(hash)).slice(0,8).map(n=>n.toString(16).padStart(2,'0')).join(''),
+      snapshot_reason:failureEvidence?.reason || 'unknown',rejected_attempt_ref:failureEvidence?.attempt_ref || null,
+      native_generation:epoch,refresh_reason:'not_attempted',reload_starts:0};
     if(!current())return;
     notify('preparing');
     // Failed native resets can leave old model rows after detaching the source.
     // Explicit retry must restart it; unchanged prices alone cannot restore it.
     if(ticker.startsWith('MWP:') && !(retry && previous?.state==='error')) {
       try {
-        if(await refreshProviderDisplayCredential(ticker,res,token,charts,current)) {
+        if(await refreshProviderDisplayCredential(ticker,res,token,charts,current,entry.evidence)) {
+          trace('restored',entry.evidence.refresh_reason);
           if(current()) {
             entry.state='ready';notify('ready');emitNotice({source_kind:'indicator',attempt_id:entry.attempt_id,code:'SNAPSHOT_RECOVERY_FAILED',title:'图表快照已恢复',message:'当前有效图格已成功恢复',context:{instrument:ticker,timeframe:res,consumer:'snapshot'}},true);send({type:'feed-poll-state',key:'display:'+key,error:''});
           }
@@ -518,6 +540,7 @@ async function recoverDisplaySnapshot(ticker,res,token,retry=false){
         }
       } catch(error) {
         if(!current())return;
+        entry.evidence.refresh_reason='comparison_request_failed';
         // A failed comparison read cannot certify unchanged prices. Retain
         // the existing bounded full recovery and its visible retry state.
       }
@@ -529,11 +552,21 @@ async function recoverDisplaySnapshot(ticker,res,token,retry=false){
       sub.marketGeneration=++marketGeneration;sub.marketSequence=0;
     }
     cache.clear();
-    for(let attempt=0;attempt<3 && current();attempt++){
+    while(entry.attempts<3 && current()){
       try{
-        const restored=await reloadHistory(ticker,res,chart=>current() && charts.some(item=>(item.chart._chartWidget || item.chart)===(chart._chartWidget || chart)));
+        const result=await reloadHistory(ticker,res,chart=>current() && charts.some(item=>(item.chart._chartWidget || item.chart)===(chart._chartWidget || chart)),true);
         if(!current())return;
-        if(restored){
+        if(result.status==='deferred'){
+          entry.state='deferred';trace('deferred',result.reason);
+          await new Promise(resolve=>{entry.resume=()=>{entry.resume=null;resolve();};});
+          if(!current())return;
+          const active=indicatorBindings.get(key),activeToken=active?.displaySnapshot ?? active?.providerSnapshot;
+          if(activeToken!=null && activeToken!==token){entry.state='cancelled';trace('cancelled','credential_superseded');return;}
+          entry.state='preparing';continue;
+        }
+        if(result.status==='cancelled'){entry.state='cancelled';trace('cancelled',result.reason);return;}
+        entry.attempts++;trace(result.status,result.reason);
+        if(result.status==='restored'){
           for(const sub of subscriptions.values())if(indicatorKey(sub.symbol,sub.res)===key){
             sub.needsHistoryReload=false;registerMarketBar(sub);
           }
@@ -542,21 +575,26 @@ async function recoverDisplaySnapshot(ticker,res,token,retry=false){
         }
       }catch(error){
         if(!current())return;
-        if(attempt===2)throw error;
+        entry.attempts++;trace('failed','reload_exception');
+        if(entry.attempts===3)throw error;
       }
-      if(attempt<2)await new Promise(resolve=>setTimeout(resolve,1000*2**attempt));
+      if(entry.attempts<3)await new Promise(resolve=>setTimeout(resolve,1000*2**(entry.attempts-1)));
     }
     if(current())throw Error('展示快照恢复失败，请重试指标');
   })();
-  const cancel=()=>{if(!current() && displayRecoveries.get(key)===entry){
-    displayRecoveries.delete(key);if(epoch===workspaceEpoch)notify('removed');
+  const cancel=()=>{if(!current()){
+    if(entry.state!=='cancelled'){entry.state='cancelled';trace('cancelled',epoch!==workspaceEpoch ? 'stale_native_generation' : displayRecoveries.get(key)!==entry ? 'recovery_superseded' : 'viewer_removed');}
+    if(displayRecoveries.get(key)===entry){displayRecoveries.delete(key);if(epoch===workspaceEpoch)notify('removed');}
   }};
   entry.promise.then(cancel,error=>{if(current()){
+    error.code='SNAPSHOT_RECOVERY_FAILED';error.dependency={code:'SNAPSHOT_RECOVERY_FAILED',attempt_ref:entry.attempt_id,...entry.evidence};
     entry.state='error';notify('error',String(error));
-    emitNotice({source_kind:'indicator',attempt_id:entry.attempt_id,code:'SNAPSHOT_RECOVERY_FAILED',title:'图表快照恢复失败',message:String(error),context:{instrument:ticker,timeframe:res,consumer:'snapshot'},evidence:{input_revision:binding?.inputRevision,calculation_origin:binding?.calculationStart}});
+    emitNotice({source_kind:'indicator',attempt_id:entry.attempt_id,code:'SNAPSHOT_RECOVERY_FAILED',title:'图表快照恢复失败',message:String(error),context:{instrument:ticker,timeframe:res,consumer:'snapshot'},evidence:{...entry.evidence,input_revision:binding?.inputRevision,calculation_origin:binding?.calculationStart}});
     send({type:'feed-poll-state',key:'display:'+key,error:String(error)});
   }else cancel();});
-  if(displayRecoveries.size>64)displayRecoveries.delete(displayRecoveries.keys().next().value);
+  if(displayRecoveries.size>64){
+    const oldest=displayRecoveries.keys().next().value;displayRecoveries.get(oldest).resume?.();displayRecoveries.delete(oldest);
+  }
   return entry.promise;
 }
 function acceptMarketHistory(ticker,res,page,window = '', acceptedRows) {
@@ -603,7 +641,7 @@ async function recoverMarketBar(sub) {
   } finally {sub.marketRecovering=false;}
 }
 function synchronizeMarketVisibility() {
-  for(const recovery of displayRecoveries.values())recovery.prune();
+  resumeDeferredDisplayRecoveries();
   if(marketPollingFallback || !ready || loading) return;
   for(const sub of subscriptions.values()) {
     if(!sub.marketListener) continue;
@@ -1065,7 +1103,7 @@ function reportHistoryFailures() {
   }
   send({type:'chart-history-failures',epoch:workspaceEpoch,failures});
 }
-globalThis.addEventListener('mw-history-state',()=>setTimeout(reportHistoryFailures,0));
+globalThis.addEventListener('mw-history-state',()=>{setTimeout(reportHistoryFailures,0);resumeDeferredDisplayRecoveries();});
 
 function query(ticker, res, args, expires = Infinity, current = () => true, scheduling = {}) {
   const { symbol, spec, series_kind } = decode(ticker);
@@ -1752,6 +1790,7 @@ function hasProviderWindowViewer(work) {
 }
 let historyReloading = false;
 globalThis.setInterval?.(()=>{
+  resumeDeferredDisplayRecoveries();
   for(const sub of subscriptions.values())if(sub.reviewPending && !sub.resetReview &&
      Date.now()>=(sub.reviewRetryAt||0)) {
     sub.reviewRetryAt=Date.now()+30000;
@@ -1880,10 +1919,17 @@ async function flushProviderCorrections() {
     finally {work.reloading=false;}
   }
 }
-async function reloadHistory(symbol, res, relevant = () => true) {
-  if (!ready || loading || historyReloading || globalThis.MWNativeNavigation?.busy() || rangeGuard?.busy() || edgeGuard?.busy()) return false;
+async function reloadHistory(symbol, res, relevant = () => true, detailed = false) {
+  // Existing callers need a success flag; snapshot recovery also needs to know
+  // whether native work actually started before spending its failure budget.
+  const result=(status,reason)=>detailed ? {status,reason} : status==='restored';
+  if(!ready)return result('cancelled','workspace_not_ready');
+  const blocked=loading ? 'workspace_loading' : historyReloading ? 'history_reload_busy' :
+    globalThis.MWNativeNavigation?.busy() ? 'navigation_busy' : rangeGuard?.busy() ? 'range_busy' : edgeGuard?.busy() ? 'edge_busy' : null;
+  if(blocked)return result('deferred',blocked);
   if (Array.from({length:widget.chartsCount()},(_,i)=>widget.chart(i)).some(chart=>
-      chartUsesSymbol(chart,symbol,res) && relevant(chart) && globalThis.MWNativeNavigation?.interacting(chart))) return false;
+      chartUsesSymbol(chart,symbol,res) && relevant(chart) && globalThis.MWNativeNavigation?.interacting(chart))) return result('deferred','user_interacting');
+  if(!Array.from({length:widget.chartsCount()},(_,i)=>widget.chart(i)).some(chart=>chartUsesSymbol(chart,symbol,res) && relevant(chart)))return result('cancelled','viewer_removed');
   historyReloading = true;
   edgeGuard?.retry();
   const epoch = workspaceEpoch;
@@ -1899,7 +1945,9 @@ async function reloadHistory(symbol, res, relevant = () => true) {
       if (window) {
         // Native resetCache and resetData both mutate the same source. Rebuild
         // an isolated historical source once, with a fresh validated seed.
-        if (!await MWNativeNavigation.refreshChartWindow(chart)) return false;
+        const restored=await MWNativeNavigation.refreshChartWindow(chart);
+        if(epoch!==workspaceEpoch || !relevant(chart) || !chartUsesSymbol(chart,symbol,res))return result('cancelled','stale_native_generation');
+        if (!restored) return result('failed','window_refresh_failed');
         continue;
       }
       const rangeKey=symbol+'|'+res+'|'+window;
@@ -1918,10 +1966,11 @@ async function reloadHistory(symbol, res, relevant = () => true) {
         if (!notified && !window) widget.resetCache();
       },()=>epoch===workspaceEpoch && chartUsesSymbol(chart,symbol,res));
       } finally { refreshingHistoryRanges.delete(rangeKey); }
-      if (!restored) return false;
+      if(epoch!==workspaceEpoch || !relevant(chart) || !chartUsesSymbol(chart,symbol,res))return result('cancelled','stale_native_generation');
+      if (!restored) return result('failed','native_reset_failed');
     }
-    return true;
-  } finally { historyReloading=false; }
+    return result('restored','native_reset_complete');
+  } finally { historyReloading=false;Promise.resolve().then(resumeDeferredDisplayRecoveries); }
 }
 async function refreshManagedHistory(instrument) {
   if(!ready || loading) return;

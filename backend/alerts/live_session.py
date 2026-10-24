@@ -18,6 +18,27 @@ def session_status(identity, profile, stamp):
     return dict(_status(json.dumps(identity, sort_keys=True), json.dumps(profile, sort_keys=True), stamp // 60000))
 
 
+def session_evidence(identity, profile, stamp):
+    """Bounded configuration health; one current source state across epochs."""
+    profile = effective_profile(identity, profile)
+    session = session_from(profile)
+    status = session_status(identity, profile, stamp)
+    reason = None
+    if not session:
+        reason = 'missing_profile'
+    elif any(getattr(session, key) != identity.get(key) for key in (
+            'source', 'channel', 'environment', 'provider_symbol', 'account_scope')):
+        reason = 'identity_mismatch'
+    elif not (int(session.reviewed_start.timestamp()*1000) <= stamp
+              and stamp + 60000 <= int(session.reviewed_end.timestamp()*1000)):
+        reason = 'outside_reviewed_window'
+    elif not status['calendar_verified']:
+        reason = 'boundary_minute'
+    return {**status, 'profile_revision': profile.get('revision'), 'profile_reason': reason,
+        'reviewed_start': session.reviewed_start.isoformat() if session else None,
+        'reviewed_end': session.reviewed_end.isoformat() if session else None}
+
+
 @lru_cache(maxsize=512)
 def _status(encoded_identity, encoded_profile, minute):
     identity, profile = json.loads(encoded_identity), json.loads(encoded_profile)

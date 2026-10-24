@@ -7,6 +7,7 @@ type Stream = { close(): void; onmessage: ((event: MessageEvent) => void) | null
   onopen?: ((event: Event) => void) | null; onerror?: ((event: Event) => void) | null;
   readonly readyState?: number };
 type FailureKind = 'market' | 'connection' | 'subscription';
+type TransportEvidence = Record<string, string | number | boolean | null>;
 
 // Transport ordering only. Bar acquisition, freshness and recovery belong to
 // the backend. A cancellation must follow its in-flight registration.
@@ -16,7 +17,7 @@ export function providerSubscriptions(
   receive: (event: any) => void,
   failure: (error: unknown) => void,
   paths = {subscribe: '/charts/provider/subscribe', unsubscribe: '/charts/provider/unsubscribe'},
-  observe: (args: Subscription, kind: FailureKind, error: unknown | null, attempt: string, lifecycle?: 'ended') => void = () => {},
+  observe: (args: Subscription, kind: FailureKind, error: unknown | null, attempt: string, lifecycle?: 'ended', evidence?: TransportEvidence) => void = () => {},
   established: (args: Subscription) => Promise<boolean> = async () => true,
 ) {
   let disposed = false;
@@ -26,7 +27,8 @@ export function providerSubscriptions(
   const streams = new Map<string, Stream>();
   const retries = new Map<string, ReturnType<typeof setTimeout>>();
   const outages = new Map<string, string>();
-  const connections = new Map<string, {args: Subscription; attempt: string}>();
+  const connections = new Map<string, {args: Subscription; attempt: string; evidence: TransportEvidence}>();
+  const reconnects = new Map<string, number>();
   const invalid = new Set<string>();
   const registrationRetries = new Map<string, ReturnType<typeof setTimeout>>();
   const registrationDelays = new Map<string, number>();
@@ -45,17 +47,18 @@ export function providerSubscriptions(
     }
   }
   const keyOf = (args: Subscription) => args.client + "|" + args.listener;
-  function connection(client: string, error: unknown | null, ended = false) {
+  function connection(client: string, error: unknown | null, ended = false, evidence: TransportEvidence = {}) {
     const old = connections.get(client);
     if (error && !old) {
       const args = [...desired.values()].find(value => value.client === client);
       if (!args) return;
       const id = String(++attempt);
-      connections.set(client, {args, attempt: id});
-      observe(args, 'connection', error, id);
+      connections.set(client, {args, attempt: id, evidence});
+      observe(args, 'connection', error, id, undefined, evidence);
     } else if (!error && old) {
       connections.delete(client);
-      observe(old.args, 'connection', null, old.attempt, ended ? 'ended' : undefined);
+      observe(old.args, 'connection', null, old.attempt, ended ? 'ended' : undefined,
+        {...old.evidence, ...evidence, [ended ? 'ended_at' : 'recovered_at']: Date.now()});
     }
   }
   function end(args: Subscription, kind?: FailureKind) {
@@ -72,6 +75,7 @@ export function providerSubscriptions(
     retries.delete(client);
     streams.get(client)?.close();
     streams.delete(client);
+    reconnects.delete(client);
   }
   async function register(args: Subscription) {
     if (disposed || desired.get(keyOf(args)) !== args) return;
@@ -134,9 +138,14 @@ export function providerSubscriptions(
     if (disposed || streams.has(client) || ![...desired.values()].some(args => args.client === client)) return;
     const stream = connect(client);
     streams.set(client, stream);
+    const evidence = (): TransportEvidence => ({ready_state: stream.readyState ?? null,
+      online: typeof navigator === 'undefined' ? null : navigator.onLine,
+      visibility: typeof document === 'undefined' ? null : document.visibilityState,
+      observed_at: Date.now(), reconnect_count: reconnects.get(client) || 0});
     stream.onopen = () => {
       if (disposed || streams.get(client) !== stream) return;
-      connection(client, null);
+      if (connections.has(client)) reconnects.set(client, Math.min(1_000_000, (reconnects.get(client) || 0)+1));
+      connection(client, null, false, evidence());
       for (const current of desired.values()) if (current.client === client && !invalid.has(keyOf(current)) && !waiting.has(keyOf(current)))
         void enqueue(current, async () => {
           await register(current);
@@ -146,7 +155,8 @@ export function providerSubscriptions(
       // Native EventSource retries CONNECTING itself. An HTTP error may leave
       // it CLOSED permanently, so recreate only that terminal transport.
       if (disposed || streams.get(client) !== stream) return;
-      connection(client, Error('行情事件连接中断，正在重连'));
+      connection(client, Error('行情事件连接中断，正在重连'), false,
+        {...evidence(), occurred_at: Date.now()});
       if (stream.readyState !== 2) return;
       stream.close();
       streams.delete(client);

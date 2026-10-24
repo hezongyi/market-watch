@@ -22,7 +22,7 @@ function harness(change=()=>{}){
   cache:new Map(),marketGeneration:1,send:e=>events.push(e),setTimeout:fn=>{queueMicrotask(fn);return 1;},
   query:async(_,__,args)=>{reads++;assert.equal(args.indicators?.length||0,0);assert.equal(args.provider_snapshot_id,undefined);change({page,rows,ctx,setSymbol:s=>symbol=s});return page;},
   barsOf:p=>p.bars.map(b=>({time:b.start,open:+b.open,high:+b.high,low:+b.low,close:+b.close,volume:+b.volume})),
-  reloadHistory:async()=>{reloads++;return true;},registerMarketBar:()=>registered++};
+  reloadHistory:async()=>{reloads++;return {status:'restored',reason:'fixture_restored'};},registerMarketBar:()=>registered++};
  vm.runInNewContext(source.slice(source.indexOf('function rememberIndicatorBinding('),source.indexOf('function startIndicatorCoordinator('))+
   source.slice(recoveryStart,end)+'\nglobalThis.recover=recoverDisplaySnapshot;',ctx);
  return {ctx,get binding(){return ctx.indicatorBindings.get(key);},events,rows,run:(retry=false)=>ctx.recover(symbol,'1','expired',retry),counts:()=>({reloads,reads,registered})};
@@ -47,7 +47,7 @@ function harness(change=()=>{}){
  let offline=true;
  h=harness(()=>{if(offline)throw Error('offline comparison');});
  const reload=h.ctx.reloadHistory;
- h.ctx.reloadHistory=async()=>{await reload();if(offline)throw Error('offline history');return true;};
+ h.ctx.reloadHistory=async()=>{await reload();if(offline)throw Error('offline history');return {status:'restored',reason:'fixture_restored'};};
  await assert.rejects(h.run(),/offline history/);
  assert.equal(h.counts().reloads,3);
  assert.equal(h.ctx.subscriptions.get('sub').needsHistoryReload,true);
