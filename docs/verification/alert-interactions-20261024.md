@@ -55,3 +55,8 @@ node scripts/build-alert-ui.mjs /tmp/mw-alert-interactions-bundle-20261024
 ## 批准后收口
 
 先只读盘点长期实例及当前镜像／源码，保留实例数据、配置、浏览器现场和后来修复；构建使用 `mw-docker`。完成 Ubuntu R1 smoke 后，在真实图表核对价格线拖动、SVG 比例、加号创建、明暗主题以及面板与自选表底色一致，并交付人工验收地址。无需迁移或重置数据库。
+
+
+## 原生验收发现的焦点修正
+
+长期实例首轮 UI smoke 和许可图表兼容性通过。新增真实图表拖动检查发现：标签 pointerdown 阻止默认动作后，焦点可能停在外层 document，Escape 没有进入图表内层取消监听。标签现在可编程聚焦，拖动开始显式 `focus({preventScroll:true})`。受控拖动测试移入 iframe，修复前稳定失败（Escape 后多提交一次），修复后通过；真实许可图表同样验证只提交一次及 Escape 恢复。此为本次交互验收内修正，无 API/schema 变更。

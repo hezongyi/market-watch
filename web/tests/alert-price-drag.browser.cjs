@@ -12,20 +12,25 @@ const { chromium } = require("@playwright/test"),
   });
   const errors = [];
   page.on("pageerror", (e) => errors.push(String(e)));
+  let frame;
   try {
     await page.setContent(
+      '<iframe style="position:fixed;inset:0;width:100%;height:100%;border:0" srcdoc="<!doctype html><canvas style=&quot;position:absolute;left:30px;top:20px;width:600px;height:400px&quot;></canvas>"></iframe>',
+    );
+    frame = page.frames().find((f) => f !== page.mainFrame());
+    await frame.setContent(
       '<canvas style="position:absolute;left:30px;top:20px;width:600px;height:400px"></canvas>',
     );
-    await page.addScriptTag({
+    await frame.addScriptTag({
       content: fs.readFileSync("../advanced-host/price-format.js", "utf8"),
     });
-    await page.addScriptTag({
+    await frame.addScriptTag({
       content: fs.readFileSync(
         "../advanced-host/native-alert-price-lines.js",
         "utf8",
       ),
     });
-    await page.evaluate(() => {
+    await frame.evaluate(() => {
       globalThis.TradingView = {
         version: () => "v31.1.0 6b804c486857f27920cf761aa7eb6e29d9bb6362",
       };
@@ -173,7 +178,7 @@ const { chromium } = require("@playwright/test"),
       };
       t.start();
     });
-    const label = page.locator('[data-name="mw-alert-price-label"]');
+    const label = frame.locator('[data-name="mw-alert-price-label"]');
     async function down() {
       await label.waitFor();
       const b = await label.boundingBox();
@@ -188,15 +193,15 @@ const { chromium } = require("@playwright/test"),
     }
     await moveBy(-40, false);
     assert.equal(
-      await page.evaluate(() => t.writes.length),
+      await frame.evaluate(() => t.writes.length),
       0,
       "preview does not save",
     );
-    await page.evaluate(() => t.sync());
+    await frame.evaluate(() => t.sync());
     assert.equal(await label.count(), 1, "polling retains active drag");
     await page.mouse.up();
-    await page.waitForFunction(() => t.row.version === 2);
-    assert.deepEqual(await page.evaluate(() => t.writes), [
+    await frame.waitForFunction(() => t.row.version === 2);
+    assert.deepEqual(await frame.evaluate(() => t.writes), [
       { version: 1, price: "84.00" },
     ]);
     let y = await down();
@@ -204,93 +209,93 @@ const { chromium } = require("@playwright/test"),
     await page.keyboard.press("Escape");
     await page.mouse.up();
     assert.equal(
-      await page.evaluate(() => t.writes.length),
+      await frame.evaluate(() => t.writes.length),
       1,
       "Escape cancels without save",
     );
-    assert.equal(await page.evaluate(() => t.lines.at(-1).getPrice()), 84);
-    await page.evaluate(() => (t.mode = "fail"));
+    assert.equal(await frame.evaluate(() => t.lines.at(-1).getPrice()), 84);
+    await frame.evaluate(() => (t.mode = "fail"));
     await moveBy(-20);
-    await page.waitForFunction(() =>
+    await frame.waitForFunction(() =>
       t.notes.some((n) => n.includes("改价未确认")),
     );
     assert.equal(
-      await page.evaluate(() => t.lines.at(-1).getPrice()),
+      await frame.evaluate(() => t.lines.at(-1).getPrice()),
       84,
       "failed save restores last confirmed price",
     );
-    await page.evaluate(() => (t.mode = "hold"));
+    await frame.evaluate(() => (t.mode = "hold"));
     await moveBy(-20);
-    await page.waitForFunction(() => t.writes.length === 3);
+    await frame.waitForFunction(() => t.writes.length === 3);
     assert.equal(await label.getAttribute("aria-busy"), "true");
     assert.equal(await label.locator("button").isDisabled(), true);
-    assert.equal(await page.evaluate(() => t.lines.at(-1).editable), false);
+    assert.equal(await frame.evaluate(() => t.lines.at(-1).editable), false);
     await moveBy(-10);
     assert.equal(
-      await page.evaluate(() => t.writes.length),
+      await frame.evaluate(() => t.writes.length),
       3,
       "busy drag cannot create another write",
     );
-    await page.evaluate(() => t.resolve());
-    await page.waitForFunction(() => t.row.version === 3);
-    await page.evaluate(() => t.native(90));
-    assert.equal(await page.evaluate(() => t.writes.length), 3);
-    await page.evaluate(() => t.native(90, true));
-    await page.waitForFunction(() => t.row.version === 4);
+    await frame.evaluate(() => t.resolve());
+    await frame.waitForFunction(() => t.row.version === 3);
+    await frame.evaluate(() => t.native(90));
+    assert.equal(await frame.evaluate(() => t.writes.length), 3);
+    await frame.evaluate(() => t.native(90, true));
+    await frame.waitForFunction(() => t.row.version === 4);
     assert.equal(
-      await page.evaluate(() => t.writes.at(-1).price),
+      await frame.evaluate(() => t.writes.at(-1).price),
       "90.00",
       "native line dragging uses same commit",
     );
-    await page.evaluate(() => {
+    await frame.evaluate(() => {
       t.native(91);
     });
     await page.keyboard.press("Escape");
-    await page.evaluate(() => {
+    await frame.evaluate(() => {
       t.native(92);
       t.native(92, true);
     });
     assert.equal(
-      await page.evaluate(() => t.writes.length),
+      await frame.evaluate(() => t.writes.length),
       4,
       "Escape suppresses native drag completion",
     );
     for (const options of [{ readonly: true }, { offset: true }]) {
-      await page.evaluate((o) => t.start(o), options);
+      await frame.evaluate((o) => t.start(o), options);
       await label.waitFor();
       await moveBy(-30);
-      assert.equal(await page.evaluate(() => t.writes.length), 0);
-      assert.equal(await page.evaluate(() => t.lines.at(-1).editable), false);
+      assert.equal(await frame.evaluate(() => t.writes.length), 0);
+      assert.equal(await frame.evaluate(() => t.lines.at(-1).editable), false);
     }
-    await page.evaluate(() => t.start({ inverted: true }));
+    await frame.evaluate(() => t.start({ inverted: true }));
     await label.waitFor();
     await moveBy(30);
-    await page.waitForFunction(() => t.row.version === 2);
+    await frame.waitForFunction(() => t.row.version === 2);
     assert.equal(
-      await page.evaluate(() => t.writes[0].price),
+      await frame.evaluate(() => t.writes[0].price),
       "83.00",
       "native inverse coordinate mapping is used",
     );
-    await page.evaluate(() => (t.mode = "hold"));
+    await frame.evaluate(() => (t.mode = "hold"));
     await moveBy(20);
-    await page.waitForFunction(() => t.writes.length === 2);
-    await page.evaluate(() => {
+    await frame.waitForFunction(() => t.writes.length === 2);
+    await frame.evaluate(() => {
       t.clear();
       t.resolve();
     });
     await label.waitFor({ state: "detached" });
     assert.equal(
-      await page.locator('[data-name="mw-alert-price-dot"]').count(),
+      await frame.locator('[data-name="mw-alert-price-dot"]').count(),
       0,
     );
-    assert.ok(await page.evaluate(() => t.lines.every((x) => x.removed)));
+    assert.ok(await frame.evaluate(() => t.lines.every((x) => x.removed)));
     assert.deepEqual(errors, []);
     console.log(
       "PASS alert price drag: real pointer preview/drop/Escape, failed/busy/versioned saves, native onMove, inverted scale, readonly/ATR and disposal",
     );
   } catch (e) {
     console.error(
-      await page.evaluate(() => ({
+      await frame.evaluate(() => ({
         notes: t.notes,
         body: document.body.innerHTML,
       })),

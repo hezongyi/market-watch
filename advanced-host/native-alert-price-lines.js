@@ -139,6 +139,7 @@ function nativeAlertPriceLines({
       const bounds = entry.label.getBoundingClientRect();
       pointer = { id: event.pointerId, y: event.clientY, offsetY: event.clientY - (bounds.top + bounds.height / 2), moved: false };
       entry.gestureRow = entry.row;
+      entry.label.focus({ preventScroll: true });
       entry.label.setPointerCapture(event.pointerId);
     };
     const moving = (event) => {
@@ -296,6 +297,7 @@ function nativeAlertPriceLines({
       entry.remove = remove;
       label.dataset.name = "mw-alert-price-label";
       label.dataset.alertId = row.id;
+      label.tabIndex = -1;
       label.style.cssText =
         "position:fixed;z-index:12;display:none;align-items:center;gap:4px;transform:translateY(-50%);height:20px;border:1px solid currentColor;border-radius:3px;padding:0 2px 0 4px;font:12px/18px Arial,sans-serif;box-sizing:border-box;pointer-events:auto;user-select:none;touch-action:none";
       text.textContent = row.name;
