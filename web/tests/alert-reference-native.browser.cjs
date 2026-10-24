@@ -47,9 +47,9 @@ widget.onChartReady(async()=>{
  async function metric(name){
   const result=await page.evaluate(()=>{
    const chart=widget.activeChart(),w=chart._chartWidget,m=w.model().model(),s=m.mainSeries(),pane=w.paneWidgets().find(p=>p.containsMainSeries()),canvas=pane.canvasElement(),b=canvas.getBoundingClientRect(),doc=canvas.ownerDocument;
-   const p=Number(rows[1].config.condition.right.value),y=s.priceScale().priceToCoordinate(p,s.firstValue()),label=doc.querySelector('[data-alert-id="r2"]'),dot=doc.querySelector('[data-name="mw-alert-price-dot"]');
+   const p=Number(rows[1].config.condition.right.value),y=s.priceScale().priceToCoordinate(p,s.firstValue()),label=doc.querySelector('[data-name="mw-alert-price-label"][data-alert-id="r2"]'),dot=doc.querySelector('[data-name="mw-alert-price-dot"][data-alert-id="r2"]');
    const l=label?.getBoundingClientRect();return {expectedY:b.top+y,label:l?.toJSON(),canvas:b.toJSON(),mode:s.priceScale().mode(),notes,entries:bridge.diagnostics().priceLines,delta:l?Math.abs(l.y+l.height/2-b.top-y):null,dot:dot?.getBoundingClientRect().toJSON()};
-  });report.geometry.push({name,...result});assert.ok(result.label&&result.delta<=1,name+': label tracks actual main-series priceToCoordinate: '+JSON.stringify(result));
+  });report.geometry.push({name,...result});assert.ok(result.dot&&Math.abs(result.dot.y+result.dot.height/2-result.expectedY)<=1,name+': paired dot follows the native price coordinate');assert.ok(result.label&&result.delta<=1,name+': label tracks actual main-series priceToCoordinate: '+JSON.stringify(result));
  }
  async function capture(name,selector){await raf();await chart.locator(selector).screenshot({path:path.join(output,name+'.png')});}
  try{
@@ -75,7 +75,7 @@ widget.onChartReady(async()=>{
   await dialog.getByLabel('比较值',{exact:true}).click();await dialog.getByLabel('比较值',{exact:true}).fill('1.123456789012345678');await chart.waitForFunction(()=>document.querySelector('[aria-label="比较值"]')?.value==='1.123456789012345678');assert.equal(await dialog.getByLabel('比较值',{exact:true}).inputValue(),'1.123456789012345678');
   await page.keyboard.press('Escape');await dialog.waitFor({state:'detached'});
   await metric('linear');
-  await page.setViewportSize({width:1707,height:900});await page.evaluate(()=>bridge.setRows([rows[1]]));await chart.locator('[data-alert-id="r1"]').waitFor({state:'detached'});await raf();await page.mouse.move(1650,15);
+  await page.setViewportSize({width:1707,height:900});await page.evaluate(()=>bridge.setRows([rows[1]]));await chart.locator('[data-name="mw-alert-price-label"][data-alert-id="r1"]').waitFor({state:'detached'});await raf();await page.mouse.move(1650,15);
   report.priceStrip=await page.evaluate(()=>{const c=widget.activeChart(),s=c._chartWidget.model().model().mainSeries(),b=c._chartWidget.paneWidgets().find(p=>p.containsMainSeries()).canvasElement().getBoundingClientRect();return {x:b.left,y:b.top+s.priceScale().priceToCoordinate(1.11951,s.firstValue())-15,width:1221,height:30}});
   await page.screenshot({path:path.join(output,'state-6-price-line.png')});await page.screenshot({path:path.join(output,'state-6-line-strip.png'),clip:report.priceStrip});
   await page.setViewportSize({width:1600,height:900});await page.evaluate(()=>bridge.setRows(rows));await raf();
@@ -92,10 +92,10 @@ widget.onChartReady(async()=>{
   await page.evaluate(()=>widget.setLayout('2h'));await page.waitForFunction(()=>widget.chartsCount()===2&&widget.chart(0).dataReady()&&widget.chart(1).dataReady());
   await page.evaluate(()=>bridge.setRows(rows));await raf();await metric('two-charts');
   const count=await chart.locator('[data-name="mw-alert-price-label"]').count();assert.equal(count,2,'only active associated rules appear, no duplicate on second chart');
-  await page.evaluate(()=>{rows[1].config.timeframe='H4';bridge.setRows(rows)});await raf();assert.equal(await chart.locator('[data-alert-id="r2"]').count(),0,'wrong timeframe hidden');
-  await page.evaluate(()=>{rows[1].config.timeframe='H1';bridge.setRows(rows)});await chart.locator('[data-alert-id="r2"]').waitFor();
-  await page.evaluate(()=>failArchive=true);await chart.locator('[data-alert-id="r2"] button').click();await page.waitForFunction(()=>notes.some(x=>x.includes('failure'))||writes.some(x=>x.op==='lifecycle'));assert.equal(await chart.locator('[data-alert-id="r2"]').count(),1);
-  await page.evaluate(()=>failArchive=false);await chart.locator('[data-alert-id="r2"] button').click();await chart.locator('[data-alert-id="r2"]').waitFor({state:'detached'});
+  await page.evaluate(()=>{rows[1].config.timeframe='H4';bridge.setRows(rows)});await raf();assert.equal(await chart.locator('[data-name="mw-alert-price-label"][data-alert-id="r2"]').count(),0,'wrong timeframe hidden');
+  await page.evaluate(()=>{rows[1].config.timeframe='H1';bridge.setRows(rows)});await chart.locator('[data-name="mw-alert-price-label"][data-alert-id="r2"]').waitFor();
+  await page.evaluate(()=>failArchive=true);await chart.locator('[data-name="mw-alert-price-label"][data-alert-id="r2"] button').click();await page.waitForFunction(()=>notes.some(x=>x.includes('failure'))||writes.some(x=>x.op==='lifecycle'));assert.equal(await chart.locator('[data-name="mw-alert-price-label"][data-alert-id="r2"]').count(),1);
+  await page.evaluate(()=>failArchive=false);await chart.locator('[data-name="mw-alert-price-label"][data-alert-id="r2"] button').click();await chart.locator('[data-name="mw-alert-price-label"][data-alert-id="r2"]').waitFor({state:'detached'});
   report.cases.push('Six reference states, real shell/editor/SVG, exact input precision, real mode 0/1/2/3 and inversion coordinates, resize/scroll/zoom/multiple panes/multiple charts, wrong timeframe, archive failure retention and success');
   await page.evaluate(async()=>{await widget.changeTheme('Light');ui.theme('light')});await raf();await capture('light-list','.chart-alert-panel');
   await page.setViewportSize({width:375,height:650});await raf();await page.screenshot({path:path.join(output,'mobile-375.png')});

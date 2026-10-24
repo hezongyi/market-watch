@@ -160,7 +160,7 @@ function nativeAlertPriceLines({
       label.dataset.name = "mw-alert-price-label";
       label.dataset.alertId = row.id;
       label.style.cssText =
-        "position:fixed;z-index:12;display:none;align-items:center;gap:4px;transform:translateY(-50%);height:16px;border:1px solid currentColor;border-radius:3px;padding:0 2px 0 4px;font:10px/14px Arial,sans-serif;box-sizing:border-box;pointer-events:auto";
+        "position:fixed;z-index:12;display:none;align-items:center;gap:4px;transform:translateY(-50%);height:20px;border:1px solid currentColor;border-radius:3px;padding:0 2px 0 4px;font:12px/18px Arial,sans-serif;box-sizing:border-box;pointer-events:auto";
       text.textContent = row.name;
       text.style.cssText =
         "overflow:hidden;text-overflow:ellipsis;white-space:nowrap";
@@ -192,6 +192,7 @@ function nativeAlertPriceLines({
       const dot = entry.doc.createElement("span");
       entry.dot = dot;
       dot.dataset.name = "mw-alert-price-dot";
+      dot.dataset.alertId = row.id;
       dot.style.cssText =
         "position:fixed;z-index:12;width:4px;height:4px;border:1px solid #2962ff;background:#0f0f0f;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none";
       entry.doc.body.append(dot);
