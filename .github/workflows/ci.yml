@@ -210,6 +210,7 @@ jobs:
           node tests/advanced-inflight-cancellation.cjs
           node tests/advanced-provider-request-lifetime.cjs
           node tests/preference-request-queue.cjs
+          node tests/preference-draft-banner.cjs
           node tests/advanced-watchlist-prewarm.cjs
           node tests/advanced-watchlist-metadata.cjs
           node tests/advanced-startup-metadata.cjs

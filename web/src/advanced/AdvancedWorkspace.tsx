@@ -1,4 +1,4 @@
-import {preferenceDrafts,putPreferenceDraft,dropPreferenceDraft,workspaceDraftKey,workspaceDraft,putWorkspaceDraft,workspaceDraftEntries,dropWorkspaceDraft,type PreferenceDraft} from "./localDrafts";
+import {preferenceDrafts,recoverablePreferenceDrafts,putPreferenceDraft,failPreferenceDraft,dropPreferenceDraft,workspaceDraftKey,workspaceDraft,putWorkspaceDraft,workspaceDraftEntries,dropWorkspaceDraft,type PreferenceDraft} from "./localDrafts";
 import {PreferenceDraftDialog} from "./PreferenceDraftDialog";
 import {useNotices,useNoticeState} from "../notifications/context";
 import {setChartTime} from "../time/ChartTimeContext";
@@ -67,11 +67,11 @@ export default function AdvancedWorkspace() {
   const openNotices=(event?:string)=>{const url=new URL(location.href);url.searchParams.set('panel','notifications');if(event)url.searchParams.set('event',event);else url.searchParams.delete('event');navigate(url.pathname+url.search+url.hash,{replace:true});};
   const app = useApp(), appRef = useRef(app); appRef.current = app;
   const urlRef = useRef(appLocation); urlRef.current = appLocation;
-  const [savedPreferenceDrafts,setSavedPreferenceDrafts]=useState<PreferenceDraft[]>(()=>{try{return preferenceDrafts();}catch{return [];}});
+  const [savedPreferenceDrafts,setSavedPreferenceDrafts]=useState<PreferenceDraft[]>(()=>{try{return recoverablePreferenceDrafts();}catch{return [];}});
   const [preferenceDraftsOpen,setPreferenceDraftsOpen]=useState(false);
   const [preferenceReopenRequired,setPreferenceReopenRequired]=useState(()=>savedPreferenceDrafts.length>0);
   const preferenceRecovery=useRef(new Map<string,{resolve:()=>void;reject:(error:Error)=>void}>());
-  const refreshPreferenceDrafts=()=>{try{setSavedPreferenceDrafts(preferenceDrafts());}catch{setError("无法读取本机设置草稿，请勿关闭页面");}};
+  const refreshPreferenceDrafts=()=>{try{setSavedPreferenceDrafts(recoverablePreferenceDrafts());}catch{setError("无法读取本机设置草稿，请勿关闭页面");}};
   const capturing = useRef<{resolve: () => void; reject: (error: Error) => void} | null>(null);
   const titleTimer = useRef<ReturnType<typeof setTimeout> | null>(null), titleText = useRef(""), titleQuote = useRef(""), titleLast = useRef(0), titleIdentity = useRef("");
   const titleHistorical = useRef(false);
@@ -1325,7 +1325,7 @@ export default function AdvancedWorkspace() {
         if (
           (mobile && q?.op !== "read") ||
           !q ||
-          !["read", "save", "delete", "draftWrite", "draftDrop", "draftCheck"].includes(q.op) ||
+          !["read", "save", "delete", "draftWrite", "draftDrop", "draftCheck", "draftFailed"].includes(q.op) ||
           JSON.stringify(q).length > 1_100_000
         ) {
           reply({ type: "result", id: m.id, error: "设置请求不允许" });
@@ -1339,8 +1339,10 @@ export default function AdvancedWorkspace() {
           if (q.op === 'draftCheck') {
             reply({type:'result',id:m.id,result:preferenceDrafts().some(draft=>draft.storageKey===q.args.storageKey && draft.version===q.args.version && draft.key===q.args.key)});return;
           }
-          if (q.op === 'draftWrite' || q.op === 'draftDrop') {
-            if(q.op === 'draftWrite')putPreferenceDraft(q.args);else dropPreferenceDraft(q.args);
+          if (q.op === 'draftWrite' || q.op === 'draftDrop' || q.op === 'draftFailed') {
+            if(q.op === 'draftWrite')putPreferenceDraft(q.args);
+            else if(q.op === 'draftFailed')failPreferenceDraft(q.args);
+            else dropPreferenceDraft(q.args);
             refreshPreferenceDrafts();reply({type:'result',id:m.id,result:{ok:true}});return;
           }
           if (q.op === "read") {

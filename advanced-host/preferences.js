@@ -185,6 +185,7 @@ function nativePreferences(
           }
         }
       } catch (error) {
+        try { await durability?.failed?.(draft); } catch { /* Preserve the original failure and recover the durable draft on reload. */ }
         throw unsaved(error);
       }
     };
@@ -226,6 +227,7 @@ function nativePreferences(
         pending.delete(k);
         if (durability) await durability.drop(draft);
       } catch (error) {
+        try { await durability?.failed?.(draft); } catch { /* Preserve the original failure and recover the durable draft on reload. */ }
         throw unsaved(error);
       }
     };

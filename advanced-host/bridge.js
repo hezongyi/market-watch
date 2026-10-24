@@ -2589,6 +2589,7 @@ function boot(
     (context, scope) => reportPreferenceOutcome(null, context, scope),
     capturePreferenceScope,
     {blocked:globalThis.MWPreferenceDraftKeys || [], put: draft => request({op:'draftWrite',args:draft},'preferences'),
+     failed: draft => request({op:'draftFailed',args:{key:draft.key,version:draft.version,storageKey:draft.storageKey}},'preferences'),
      current: draft => request({op:'draftCheck',args:draft},'preferences'),
      abandoned: context => emitNotice({source_kind:'preferences',attempt_id:crypto.randomUUID(),code:'PREFERENCE_SAVE_FAILED',
        title:'设置草稿已放弃',message:'已明确采用服务器设置；原写入未成功',observation_ended:true,
