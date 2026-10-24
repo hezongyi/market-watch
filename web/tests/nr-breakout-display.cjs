@@ -23,22 +23,25 @@ const limited=objects(many,inputs),count=prefix=>[...limited.keys()].filter(k=>k
 assert.equal(count('line:'),500);assert.equal(count('signal:'),500);assert.equal(count('box:'),499);
 
 (async()=>{
-  let serial=0,symbol='TEST';const shapes=new Map(),pending=[],errors=[];
+  let serial=0,symbol='TEST';const shapes=new Map(),pending=[],errors=[],layers=[];
   const chart={symbol:()=>symbol,resolution:()=>'1D',
     createMultipointShape:(points,options)=>create(points,options),createShape:(point,options)=>create([point],options),
     getShapeById:id=>({setPoints:points=>{shapes.get(id).points=points;},
-      setProperties:properties=>{shapes.get(id).properties=properties;}}),removeEntity:id=>shapes.delete(id)};
+      setProperties:properties=>{shapes.get(id).properties=properties;},
+      bringToFront:()=>{const i=layers.indexOf(id);if(i>=0)layers.splice(i,1);layers.push(id);}}),removeEntity:id=>{shapes.delete(id);const i=layers.indexOf(id);if(i>=0)layers.splice(i,1);}};
   function create(points,options){const id=++serial;shapes.set(id,{points,options});return new Promise(resolve=>pending.push(()=>resolve(id)));}
   const display=renderer({report:e=>errors.push(e),centerText:(_chart,id)=>{shapes.get(id).centered=true;}}),consumer={key:'pane1|id1',id:'id1',chart,inputs,
     meta:{render_profile:'nr_breakout_v1'}};
   const flush=async()=>{await Promise.resolve();pending.splice(0).forEach(done=>done());await new Promise(resolve=>setImmediate(resolve));};
   const update=(rows,kind='snapshot',identity={revision:1})=>display.update(consumer,{rows,kind,identity});
   update(rows);await flush();assert.equal(shapes.size,6);
+  assert.deepEqual(layers.map(id=>shapes.get(id).options.shape),['rectangle','trend_line','trend_line','trend_line','text','text']);
   assert.ok([...shapes.values()].filter(s=>s.options.shape==='text').every(s=>s.centered));
   assert.ok([...shapes.values()].every(s=>s.options.ownerStudyId==='id1'&&s.options.disableSave&&s.options.disableUndo));
   update([row(6000,2000,6000)],'append');await flush();
   assert.ok([...shapes.values()].some(s=>s.options.shape==='trend_line'&&s.points[1].time===6));
   update([row(1000,1000,2000)],'prepend');await flush();assert.equal(shapes.size,10);
+  assert.deepEqual(layers.slice(0,2).map(id=>shapes.get(id).options.shape),['rectangle','rectangle'],'prepended boxes remain below all range lines and signals');
   update(rows.slice(0,1));await flush();assert.equal(shapes.size,1,'short snapshot retracts lines and signals');
   update(rows);await Promise.resolve();update([]);await flush();assert.equal(shapes.size,0,'late promises cannot revive a removed correction');
   update(rows);await flush();consumer.inputs={...inputs,signal_size:'Huge',range_color:'#ff0000'};display.refresh(consumer);
