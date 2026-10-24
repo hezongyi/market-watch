@@ -1,0 +1,151 @@
+{
+  "status": "passed",
+  "recorded_at_utc": "2026-10-24T16:33:07.961475+00:00",
+  "risk": "F0: compatible native drawing projection; no schema/calculation changes",
+  "product_commit": "bacbcd7d9ea0eea7beab82252bb2f32b925aef96",
+  "changed_services": [
+    "chart"
+  ],
+  "image": "sha256:d43f9949bc8ed2b4df8cad7bad4ae26df026605d43d0caff3982f16196b7d8cc",
+  "assets": [
+    "https://192.168.7.232:18281/host.14debb603cf6b434.js"
+  ],
+  "cases": [
+    {
+      "name": "d1-initial",
+      "resolution": "1D",
+      "loaded_range": {
+        "from": 1761609600000,
+        "to": 1792713600000
+      },
+      "boxes": 27,
+      "labels": 16,
+      "exact_native_geometry": true
+    },
+    {
+      "name": "d1-july-2023",
+      "resolution": "1D",
+      "loaded_range": {
+        "from": 1652745600000,
+        "to": 1792713600000
+      },
+      "boxes": 62,
+      "labels": 37,
+      "exact_native_geometry": true
+    },
+    {
+      "name": "d1-2021",
+      "resolution": "1D",
+      "loaded_range": {
+        "from": 1582761600000,
+        "to": 1792713600000
+      },
+      "boxes": 81,
+      "labels": 49,
+      "exact_native_geometry": true
+    },
+    {
+      "name": "d1-2019",
+      "resolution": "1D",
+      "loaded_range": {
+        "from": 1505952000000,
+        "to": 1792713600000
+      },
+      "boxes": 105,
+      "labels": 62,
+      "exact_native_geometry": true
+    },
+    {
+      "name": "d1-return-recent",
+      "resolution": "1D",
+      "loaded_range": {
+        "from": 1505952000000,
+        "to": 1792713600000
+      },
+      "boxes": 105,
+      "labels": 62,
+      "exact_native_geometry": true
+    },
+    {
+      "name": "d1-restored",
+      "resolution": "1D",
+      "loaded_range": {
+        "from": 1505952000000,
+        "to": 1792713600000
+      },
+      "boxes": 105,
+      "labels": 62,
+      "exact_native_geometry": true
+    },
+    {
+      "name": "control-60",
+      "resolution": "60",
+      "loaded_range": {
+        "from": 1791856800000,
+        "to": 1792785600000
+      },
+      "boxes": 12,
+      "labels": 7,
+      "exact_native_geometry": true
+    },
+    {
+      "name": "control-240",
+      "resolution": "240",
+      "loaded_range": {
+        "from": 1788541200000,
+        "to": 1792774800000
+      },
+      "boxes": 2,
+      "labels": 1,
+      "exact_native_geometry": true
+    }
+  ],
+  "page_errors": [],
+  "data_preservation": {
+    "all_protected_tables_unchanged": true,
+    "tables": {
+      "chart_workspaces": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "advanced_chart_workspaces": {
+        "count": 10,
+        "sha256": "28d8fed4d9c4e8f8ca30e1bed9ff4b39e87def677a58a2d4ae73604ca76f65e2"
+      },
+      "advanced_chart_preferences": {
+        "count": 30,
+        "sha256": "e663ecca0eefbe0c6eb810ea3204cd3b9f3c7c04b2bde0b93f669edf4f604139"
+      },
+      "market_datasets": {
+        "count": 130,
+        "sha256": "43f261a8109e859d59d245ac0278f4c40866074d0d6e9e501f3973d66020081f"
+      },
+      "market_history_versions": {
+        "count": 15,
+        "sha256": "a0a1f66c76d40682df4ed18e78539903e4a440efbeebc287f7657c8187d8817b"
+      },
+      "market_history_artifacts": {
+        "count": 135,
+        "sha256": "01d1ee1636d5598ffe1033a844a0685572dadad6ce91b91a86d2391f94ee4d2f"
+      }
+    },
+    "prior_notice_count": 23970,
+    "added_notices": 1,
+    "prior_notice_states_unchanged": true,
+    "prior_phone_ack_count": 7,
+    "prior_phone_acks_unchanged": true
+  },
+  "logs": {
+    "since": "2026-10-24T16:28:20.446244993Z",
+    "traceback_occurrences": 13,
+    "cancelled_error_occurrences": 26,
+    "http500_occurrences": 0,
+    "pool_timeout_occurrences": 0
+  },
+  "limitations": [
+    "Targeted tests and native R1; no full backend rerun.",
+    "Loaded main-series history governs drawing eligibility; full backend presentation remains intact.",
+    "An exploratory viewport request starting 2019-04-10 timed out; retained separately. Subsequent supported viewports including 2019 and exact eligible geometry passed.",
+    "Exploratory provider history loading expanded the calculation snapshot; drawing counts can increase as history grows. An obsolete fixed full-count assertion was replaced with exact loaded-range geometry checks."
+  ]
+}
