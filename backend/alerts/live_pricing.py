@@ -15,7 +15,7 @@ from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 
 from .calendar_profile import session_from
 from .config import settings
-from .live_session import effective_profile, session_status
+from .live_session import effective_profile, session_evidence, session_status
 from .market_contracts import DatasetIdentity, MarketRequestError, QuoteEvent, RequestResult
 from .market_datasets import register_dataset
 from .storage import (
@@ -707,26 +707,25 @@ def confirmation_window(ownership, epoch, identity, *, now=None):
 def _minute_observation(db, identity, state, start, stamp, cache=None):
     metric = (cache.get(start) if cache is not None else db.scalar(select(LiveMinute).where(
         LiveMinute.dataset_id == identity.key, LiveMinute.start == start)))
-    if metric:
+    if metric and (metric.expected is True or metric.confirmed_at is not None):
         return metric
     quote = state.quote
     # A fresh source assertion is evidence of an open market; old assertions
     # cannot certify an entire disconnect or historical maintenance window.
-    fresh = bool(quote) and start <= quote["source_time"] < start + 90000
+    fresh = bool(quote) and start <= quote["source_time"] < start + 60000
     # A tradeable source observation proves this minute has data. One
     # nontradeable quote proves only that instant, never a whole-minute closure.
     expected = True if fresh and quote["tradeable"] and quote.get("bid") is not None else None
     expectation = "fresh_source_tradeable" if expected else "unknown_session"
     if expected is None:
-        from .calendar_profile import closures_from
-        from .domain import calendar_for, scheduled_open
-        from .storage import instant
-
         dataset = db.get(MarketDataset, identity.key)
         inst = db.get(Instrument, dataset.instrument_id)
-        if not scheduled_open(instant(start), calendar_for(inst), closures=closures_from(inst.calendar_profile)):
+        if session_status(identity.model_dump(), inst.calendar_profile, start)['market_session'] == 'closed':
             expected = False
             expectation = "reviewed_source_closure"
+    if metric:
+        metric.expected, metric.expectation = expected, expectation
+        return metric
     metric = LiveMinute(dataset_id=identity.key, start=start, expected=expected,
         expectation=expectation, first_attempt=0,
         last_attempt=0, attempts=0, failures=0, last_result="pending")
@@ -750,6 +749,11 @@ def commit_confirmation(ownership, epoch, batch, *, now=None, operation="candles
         observations = {row.start: row for row in db.scalars(select(LiveMinute).where(
             LiveMinute.dataset_id == batch.identity.key,
             LiveMinute.start >= batch.window_start, LiveMinute.start < batch.window_end))}
+        from .storage import ObservedMinute
+
+        observed_starts = set(db.scalars(select(ObservedMinute.start).where(
+            ObservedMinute.dataset_id == batch.identity.key,
+            ObservedMinute.start >= batch.window_start, ObservedMinute.start < batch.window_end)))
         target = batch.window_end - 60000
         metric = _minute_observation(db, batch.identity, state, target, stamp, observations)
         for start in range(batch.window_start, batch.window_end, 60000):
@@ -759,6 +763,8 @@ def commit_confirmation(ownership, epoch, batch, *, now=None, operation="candles
                 observation.first_attempt = stamp
             observation.last_attempt = stamp
             observation.last_result = batch.result.status
+            if start in observed_starts and observation.expected is not True:
+                observation.expected, observation.expectation = True, 'observed_source_pending'
         state.revision += 1
         if not batch.result.successful:
             for observation in observations.values():
@@ -767,7 +773,10 @@ def commit_confirmation(ownership, epoch, batch, *, now=None, operation="candles
             from .live_confirmation import outcome
 
             outcome(db, state, error=batch.result.status,
-                    evidence={**batch.result.model_dump(mode="json", exclude_none=True),
+                    evidence={**session_evidence(batch.identity.model_dump(),
+                        db.get(Instrument, db.get(MarketDataset, batch.identity.key).instrument_id).calendar_profile, target),
+                        **batch.result.model_dump(mode="json", exclude_none=True),
+                        'expected': metric.expected, 'expectation': metric.expectation, 'observed_at': stamp,
                         "window_start": batch.window_start, "window_end": batch.window_end}, stamp=stamp)
             state.next_confirm_at = max(stamp + min(60000, 1000 * 2 ** min(state.attempts, 6)),
                                          batch.result.retry_at or 0)
@@ -832,14 +841,29 @@ def commit_confirmation(ownership, epoch, batch, *, now=None, operation="candles
         from .live_confirmation import health, outcome
 
         confirmation = health(db, state)
-        pending_start = confirmation.get('window_start', batch.window_start)
-        pending_end = confirmation.get('window_end', batch.window_end)
+        pending_start = min(confirmation.get('window_start', batch.window_start), batch.window_start)
+        pending_end = max(confirmation.get('window_end', batch.window_end), batch.window_end)
+        # Sparse source data is normal. A query alone does not certify missing
+        # minutes, but unknown empty minutes must not hold real later data hostage.
+        # Previously observed minutes still require their actual backfill.
+        pending_observations = list(db.scalars(select(LiveMinute).where(
+            LiveMinute.dataset_id == batch.identity.key, LiveMinute.start >= pending_start,
+            LiveMinute.start < pending_end, LiveMinute.expected.is_(True),
+            LiveMinute.confirmed_at.is_(None))))
         fully_confirmed = (operation == 'candles' and batch.window_start <= pending_start
-            and batch.window_end >= pending_end and all(
-                at in confirmed or (observations.get(at) and (observations[at].confirmed_at is not None or observations[at].expected is False))
-                for at in range(pending_start, pending_end, 60000)))
+            and batch.window_end >= pending_end and not pending_observations
+            and (bool(confirmed) or all(observations[at].expected is False
+                for at in range(pending_start, pending_end, 60000))))
         if fully_confirmed:
             outcome(db, state, stamp=stamp)
+        late = next((row for row in pending_observations if stamp >= row.start+90000), None)
+        if operation == 'candles' and late:
+            late.failures += 1
+            outcome(db, state, error='m1_late', evidence={
+                **session_evidence(batch.identity.model_dump(), inst.calendar_profile, late.start),
+                'expected': True, 'expectation': late.expectation,
+                'reason_code': 'EXPECTED_MINUTE_MISSING', 'observed_at': stamp,
+                'window_start': late.start, 'window_end': late.start+60000}, stamp=stamp)
         if not state.ready and batch.window_end >= confirmation_cutoff(stamp):
             if current_confirmed or metric.expected is False:
                 from .service import rewarm_watch
@@ -888,10 +912,6 @@ def commit_confirmation(ownership, epoch, batch, *, now=None, operation="candles
             state.next_confirm_at = stamp
         else:
             state.attempts += 1
-            if stamp >= batch.window_end + 30000:
-                from .live_confirmation import outcome
-
-                outcome(db, state, error="m1_late", evidence={"window_start": batch.window_start, "window_end": batch.window_end}, stamp=stamp)
             retry = (15000, 25000)[state.attempts - 1] if state.attempts <= 2 else 30000 + min(
                 60000, 1000 * 2 ** min(state.attempts, 6))
             state.next_confirm_at = max(stamp + 1000, batch.window_end + retry)
@@ -962,6 +982,7 @@ def snapshots(*, now=None):
                 "recovery_ready": state.ready, "error": state.error,
                 "confirmation_error": confirmation.get("error"), "confirmation_health": confirmation,
                 "sampling_evidence": sampling_evidence(db, state),
+                'session_configuration': session_evidence(dataset.identity, inst.calendar_profile, stamp // 60000 * 60000),
                 **session_view, 'authentication_hold': authentication_hold,
                 'connection_error': connection_error,
                 'next_probe_at': scoped_owner.next_at or None if scoped_owner else None,

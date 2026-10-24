@@ -2,7 +2,7 @@ let csrf = "";
 import { ApiError, responseError, errorMessage } from "./apiErrors";
 export { ApiError, errorMessage, rpcError } from "./apiErrors";
 export function apiErrorDetails(error: unknown) {
-  return error instanceof ApiError ? {code:error.code, status:error.status, message:error.message, fieldErrors:error.fieldErrors, retryable:error.retryable, retryAfter:error.retryAfter, ...(error.notice_source_id?{notice_source_id:error.notice_source_id}:{}), ...(error.display_retry ? {display_retry:error.display_retry} : {})} :
+  return error instanceof ApiError ? {code:error.code, status:error.status, message:error.message, fieldErrors:error.fieldErrors, retryable:error.retryable, retryAfter:error.retryAfter, ...(error.notice_source_id?{notice_source_id:error.notice_source_id}:{}), ...(error.display_retry ? {display_retry:error.display_retry} : {}), ...(error.snapshot_evidence ? {snapshot_evidence:error.snapshot_evidence} : {})} :
     {message:errorMessage(error), code:error instanceof DOMException && error.name === 'AbortError' ? 'HISTORY_CANCELLED' :
       error instanceof DOMException && error.name === 'TimeoutError' ? 'HISTORY_TIMEOUT' :
       error instanceof TypeError ? 'NETWORK_FAILED' : 'HISTORY_UNAVAILABLE'};

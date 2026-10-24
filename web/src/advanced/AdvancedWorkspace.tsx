@@ -379,7 +379,7 @@ export default function AdvancedWorkspace() {
       post({type:'history-load-capacity',available});
     });
     const subscriptionScopes = new WeakMap<object, {workspace: string; session: string; epoch: number}>();
-    const observeSubscription = (args: any, kind: 'market' | 'connection' | 'subscription', error: unknown | null, attempt: string, lifecycle?: 'ended') => {
+    const observeSubscription = (args: any, kind: 'market' | 'connection' | 'subscription', error: unknown | null, attempt: string, lifecycle?: 'ended', transportEvidence?: Record<string, string | number | boolean | null>) => {
       const scope = subscriptionScopes.get(args);
       if (!scope || (!lifecycle && (scope.workspace !== current.current?.id || scope.session !== alertUiSession.current || scope.epoch !== nativeLoadEpoch.current))) return;
       const query = args.query || args;
@@ -394,7 +394,8 @@ export default function AdvancedWorkspace() {
           generation: shared ? 0 : args.generation ?? 0, instrument: shared ? '' : query.instrument || '',
           timeframe: shared ? '' : query.timeframe || '', consumer: shared ? 'stream' : args.kind || 'bars'},
         evidence: {operation: shared ? 'sse_transport' : kind === 'subscription' ? 'subscription_register' : 'market_read',
-          error_type: failed?.name || '', code: failed?.code || '', http_status: failed?.status || null}};
+          error_type: failed?.name || '', code: failed?.code || '', http_status: failed?.status || null,
+          ...(shared ? transportEvidence : {})}};
       if (error == null) void notices.resolve(fault); else void notices.report(fault);
     };
     const provider = providerSubscriptions(
