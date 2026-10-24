@@ -1,0 +1,162 @@
+{
+  "observed_at_utc": "2026-10-24T11:41:17.888489+00:00",
+  "host": "quant-server",
+  "compose_project": "mw-issue75-v2-20261018",
+  "entry": "https://192.168.7.232:18280",
+  "components": {
+    "api": {
+      "tag": "market-watch-api:mw-rolling-range-squeeze-mwa-20261024",
+      "id": "sha256:e50ba849d6d9d52417a4192c0193df2ca573bf46546860da891360523a58211f",
+      "image_id": "sha256:e50ba849d6d9d52417a4192c0193df2ca573bf46546860da891360523a58211f",
+      "labels": {
+        "io.market-watch.built-at": "2026-10-24T11:08:09.934780+00:00",
+        "io.market-watch.commit": "3ac6f743f947a1ae33bcdf55bb15efa031a7f760",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "2026-10-31T11:08:09.934780+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-issue75-v2-20261018",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-rolling-range-squeeze-mwa-20261024"
+      }
+    },
+    "chart": {
+      "tag": "market-watch-chart-origin:mw-rolling-range-squeeze-mwa-20261024",
+      "id": "sha256:30f03f89d5089697b552482be6d2420c994e8bea4c28e143a294664bedea0c71",
+      "image_id": "sha256:30f03f89d5089697b552482be6d2420c994e8bea4c28e143a294664bedea0c71",
+      "labels": {
+        "io.market-watch.built-at": "2026-10-24T11:27:18.760240+00:00",
+        "io.market-watch.commit": "4e5351cfd40b59914174119222e2f1786cba2abc",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "2026-10-31T11:27:18.760240+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-issue75-v2-20261018",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-rolling-range-squeeze-mwa-20261024",
+        "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+      }
+    },
+    "web": {
+      "tag": "market-watch-web:mw-rolling-range-squeeze-mwa-20261024",
+      "id": "sha256:af3de39e8cab597c70837df98ebd95aada4b0d0534c0620ecab268c02de5a0de",
+      "image_id": "sha256:af3de39e8cab597c70837df98ebd95aada4b0d0534c0620ecab268c02de5a0de",
+      "labels": {
+        "io.market-watch.built-at": "2026-10-24T11:15:33.693823+00:00",
+        "io.market-watch.chart-origin": "https://192.168.7.232:18281",
+        "io.market-watch.commit": "3ac6f743f947a1ae33bcdf55bb15efa031a7f760",
+        "io.market-watch.dirty": "false",
+        "io.market-watch.expires-at": "2026-10-31T11:15:33.693823+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-issue75-v2-20261018",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-rolling-range-squeeze-mwa-20261024",
+        "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+      }
+    }
+  },
+  "native": {
+    "passed": true,
+    "chart": {
+      "symbol": "MWP:XAUUSD",
+      "resolution": "60",
+      "library": "TT v31.1.0 (internal id 6b804c486857f27920cf761aa7eb6e29d9bb6362 @ 2026-04-08T18:21:25.992Z)"
+    },
+    "shapeCounts": {
+      "boxes": 279,
+      "labels": 162
+    },
+    "cases": [
+      "Actual API Python presentation matches native rectangle coordinates and PctRank labels",
+      "Actual native SMA default color and width",
+      "Hide removes derived shapes and show restores them",
+      "Native indicator capture opens real alert draft; canceled without creating rule",
+      "Remove study cleans its derived shapes"
+    ],
+    "errors": []
+  },
+  "numerical": {
+    "passed": true,
+    "instrument": "XAUUSD",
+    "timeframe": "H1",
+    "origin": 1786330800000,
+    "basis": "Frozen real HTTP OHLC and independent literal Python oracle within platform input segments; no TradingView Pine execution/export or cross-gap equivalence claim",
+    "checks": [
+      {
+        "params": {
+          "k": 3,
+          "lookback": 20,
+          "low_pct": 50,
+          "confirm_on_close": true
+        },
+        "bars": 1258,
+        "numeric_values": 6194,
+        "nulls": 96,
+        "max_absolute_error": 0.0,
+        "platform_gap_resets": 1,
+        "boxes": 279,
+        "labels": 162
+      },
+      {
+        "params": {
+          "k": 10,
+          "lookback": 252,
+          "low_pct": 5,
+          "confirm_on_close": true
+        },
+        "bars": 1258,
+        "numeric_values": 5210,
+        "nulls": 1080,
+        "max_absolute_error": 0.0,
+        "platform_gap_resets": 1,
+        "boxes": 31,
+        "labels": 18
+      }
+    ]
+  },
+  "preservation": {
+    "tables": {
+      "chart_workspaces": {
+        "before_count": 0,
+        "after_count": 0,
+        "unchanged": true
+      },
+      "advanced_chart_workspaces": {
+        "before_count": 10,
+        "after_count": 10,
+        "unchanged": true
+      },
+      "advanced_chart_preferences": {
+        "before_count": 30,
+        "after_count": 30,
+        "unchanged": true
+      },
+      "market_datasets": {
+        "before_count": 130,
+        "after_count": 130,
+        "unchanged": true
+      },
+      "market_history_versions": {
+        "before_count": 15,
+        "after_count": 15,
+        "unchanged": true
+      },
+      "market_history_artifacts": {
+        "before_count": 135,
+        "after_count": 135,
+        "unchanged": true
+      }
+    },
+    "notice_states_unchanged": false,
+    "phone_acks_unchanged": true,
+    "notice_state_changes": {
+      "added": 1,
+      "removed": 0,
+      "existing_state_changed": 0
+    }
+  },
+  "checks": "Targeted automated and actual mwa business checks; not a new full-suite run",
+  "limits": [
+    "Independent literal Python oracle, not TradingView Pine execution",
+    "Existing platform trading-gap input segmentation retained",
+    "Balloon label is not pixel-identical to Pine label_down"
+  ]
+}

@@ -22,24 +22,38 @@ function chartSqueezeDisplay(widget,store,{identity,report=()=>{}}) {
     binding.shapes.clear();
   }
   function reset() {for(const b of bindings.values())remove(b);bindings.clear();store.clear();}
-  async function render(binding,p,input,signature) {
+  function loadedRange(chart) {
+    const bars=chart._chartWidget.model().model().mainSeries().bars();
+    const first=bars.firstIndex(),last=bars.lastIndex();
+    if(first==null || last==null)return null;
+    const from=chart._convertIndexToPublicTime(first)*1000;
+    const to=chart._convertIndexToPublicTime(last)*1000;
+    return Number.isFinite(from) && Number.isFinite(to)?{from,to}:null;
+  }
+  async function render(binding,p,input,signature,range) {
     if(binding.pending)return;
     binding.pending=true;
     try {
       const requested=new Map();
       for(const box of p.boxes) {
+        // The native tool snaps unloaded dates to the first/last price bar.
+        // Keep the full snapshot and project only onto currently loaded bars.
+        if(box.right_chart_time<range.from || box.left_chart_time>range.to)continue;
         const first=box.kind==='first';
         requested.set('box:'+box.id,{points:[
-          {time:box.left_chart_time/1000,price:box.top},
-          {time:box.right_chart_time/1000,price:box.bottom}],
+          {time:Math.max(box.left_chart_time,range.from)/1000,price:box.top},
+          {time:Math.min(box.right_chart_time,range.to)/1000,price:box.bottom}],
           shape:'rectangle',overrides:{color:input[first?'first_border_color':'next_border_color'],
             backgroundColor:input[first?'first_fill_color':'next_fill_color'],
             linewidth:2,fillBackground:true,transparency:0,extendLeft:false,extendRight:false}});
       }
-      for(const label of p.labels) requested.set('label:'+label.time,{
+      for(const label of p.labels) {
+        if(label.chart_time<range.from || label.chart_time>range.to)continue;
+        requested.set('label:'+label.time,{
         points:[{time:label.chart_time/1000,price:label.price}],shape:'balloon',text:label.text,
         overrides:{color:input.label_text_color,backgroundColor:input.label_bg_color,
           borderColor:'rgba(0,0,0,0)',fontsize:12,transparency:0}});
+      }
       for(const [key,id] of binding.shapes) if(!requested.has(key)) {
         binding.chart.removeEntity(id,{disableUndo:true});binding.shapes.delete(key);
       }
@@ -95,8 +109,10 @@ function chartSqueezeDisplay(widget,store,{identity,report=()=>{}}) {
         }
         const record=store.get(identity(chart.symbol()),chart.resolution(),params);
         if(!record)continue;
-        const p=record.presentation,signature=JSON.stringify([p.boxes,p.labels,input]);
-        if(signature!==binding.signature)void render(binding,p,input,signature);
+        const range=loadedRange(chart);
+        if(!range)continue;
+        const p=record.presentation,signature=JSON.stringify([p.boxes,p.labels,input,range]);
+        if(signature!==binding.signature)void render(binding,p,input,signature,range);
       }
     }
     for(const [key,b] of bindings)if(!live.has(key)){remove(b);bindings.delete(key);}

@@ -1,4 +1,36 @@
-# Rolling Range Squeeze：本地验证与待验收清单
+# Rolling Range Squeeze：移植与验收记录
+
+## 最终状态（2026-10-24）
+
+用户已明确回复“同意进行验收”。候选已更新至原 mwa，真实业务专项通过；下文“尚未更新／等待授权”等段落保留为历史过程，本节取代其当前状态。
+
+- 功能分支最终产品提交：`92e18405`，仍从指定 `v1.28.0` 基线开发。
+- mwa 集成分支：`integration/rolling-range-squeeze-mwa-20261024`。API/10 workers 和 Web 产品源码为 `3ac6f743f947a1ae33bcdf55bb15efa031a7f760`；Chart 产品源码为 `4e5351cfd40b59914174119222e2f1786cba2abc`，额外只有原生指标告警计算起点接线修复。完整实际镜像身份见本目录 `mwa-summary.json`。
+- 已合入当前 mwa 的 `59f07cdd` 告警 UI，并保留其分钟确认/快照恢复、Swing、Supertrend 精度、BBANDS 填充和通知行为；未使用旧 tag 直接覆盖现有实例。
+- 15 服务 running，API/PG healthy；数据库/gateway 容器身份、完整环境/挂载/端口/网络/命令/资源/重启策略，以及保护浏览器身份和启动时间保持。
+- 统一启停仍为 `/home/quant/repos/.mwa-v1264-chart-init-20261021/manage.py start|status|stop`。实际主机 Ubuntu `quant-server`，主入口 `https://192.168.7.232:18280`，chart origin 18281。任务私有操作与精确回退位于 `/home/quant/repos/.mwa-rolling-range-squeeze-20261024/`。
+
+### 本轮最终检查
+
+| 检查 | 实际结果 |
+| --- | --- |
+| PostgreSQL 14.24 与指标核心 | 修复后 24 passed（19 指标/5 PG）。另将此前缺少数据库的两个既有模块与 5 项新 PG 合同一起重跑，43 passed，0 skipped/failed；两批重叠，不相加。独立 task project/数据库/schema，不使用 mwa 可写数据库。 |
+| PostgreSQL 暴露的兼容性问题 | observed 前缀与原算法标识拼接超过既有 varchar(40)；改为 `rrs-pine-v6-v1`，补 strict/observed 长度断言，无 schema 变更。SQLite 不约束该长度，不能替代此检查。 |
+| 接入与告警 | 后端定向 41 passed，Web 构建和 squeeze dialog 通过；既有 alert reference 与 native price-line 浏览器检查通过。真实原生告警曾因新 coordinator 起点未接入旧告警入口而失败；现复用 `indicatorBindings.calculationStart`，红灯后修复，squeeze 合同和既有 9 项桥接测试通过，真实草稿打开并取消通过。 |
+| 实际 mwa 原生图表 | XAUUSD H1，K=3/lookback=20/low_pct=50/confirm=true。279 个框和 162 个 PctRank 标签全部与 Python 坐标/文本对应；SMA 默认样式、隐藏/恢复、自定义首框颜色、告警入口、删除清理通过，pageerror 为空。临时 context，未创建真实告警。 |
+| 实际冻结行情独立数值对照 | 完整相同起点 1,258 根。K=3/lookback=20/50%：6,194 个数值、96 个 null，279 框/162 标签；默认 K=10/lookback=252/5%：5,210 个数值、1,080 个 null，31 框/18 标签。两组最大绝对误差 0，框边界及标签排名亦一致。 |
+| 数据与现场 | 六张持久表数量及完整行哈希保持：工作区 0/10、偏好 30、数据集 130、历史版本 15、产物 135。已有 23,887 条通知的状态均保持，新增 1 条，未删除；手机 ack 保持。不宣称通知整表未变化。工作区/偏好/通知写入在临时验收 context 中拦截，未恢复覆盖真实内容。 |
+| 测试资源 | task-owned PG 已停止，原容器及卷保留；没有清库、seed、迁移或删除永久资源。没有 push、PR、main 合并、正式 tag、生产发布或 Unraid 操作。 |
+
+冻结行情含一个平台标记的交易缺口：独立逐语句 oracle 在同一输入分段内比较，保留既有 provider 输入策略。不能把该结果说成 TradingView Pine 实际执行/导出对照，也不能声称跨缺口语义与 TradingView 无差异。原生标签仍使用 balloon，非 Pine label_down 像素级复刻；详细边界见下文。
+
+实际业务证据位于 `/home/quant/repos/.reports/market-watch/20261024-rolling-range-squeeze/acceptance/`，包含真实截图、原生结果、冻结行情数值对照和数据保留记录。仓库仅保留脱敏摘要，不包含凭据、许可库或受保护浏览器状态。未在最终提交重跑整套后端/全部浏览器矩阵，早期全量失败/跳过记录不改称为全量通过。
+
+### 默认接入与 SQLite 的说明
+
+本次沿用既有 `chart_indicators.register()`、catalog、Python series、`IndicatorState` 及图表适配器。图表库负责原生 SMA、矩形和 balloon 绘制；新增的是 Python 几何/段状态与原生接口的绑定，没有重写图形引擎。内置指标的渲染能力与公开自定义指标/绘图契约应分开核实，不能以自定义指标为由推断缺少原生绘图能力。
+
+SQLite 是 v1.28.0 已有的内存测试夹具与本地默认配置，本次没有引入第二个运行数据库；mwa 实际连接 PostgreSQL。计算模块及独立数值 oracle 不依赖 SQLite。SQLite 快速测试可用，但 PostgreSQL 的长度、并发和检查点语义必须在 PG 验证。
 
 日期：2026-10-24。用户要求：隔离 worktree/branch，以 `v1.28.0` 为基线，将附件 Pine v6 复刻为 Python 指标；使用 mwa，验收前申请；不提交 PR。
 
