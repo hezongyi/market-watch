@@ -43,7 +43,6 @@ import {
 import { AlertLogCleanup } from "./AlertLogCleanup";
 import {
   AlertSummary,
-  AlertSymbolIcon,
   alertCode,
   alertState,
 } from "./alertPresentation";
@@ -91,7 +90,9 @@ function ScopedChartAlertsPanel({
   noticeRequest,
   creationUnavailable,
   alertUnread,
+  updatedRow,
 }: {
+  updatedRow?: AlertRow;
   alertUnread?: number;
   creationUnavailable?: string;
   focusEvent?: { id: string; revision: number };
@@ -121,6 +122,7 @@ function ScopedChartAlertsPanel({
     request,
     onRows,
   );
+  useEffect(() => { if (updatedRow) commit(updatedRow); }, [updatedRow, commit]);
   const [tab, setTab] = useState("alerts"),
     [search, setSearch] = useState(""),
     [status, setStatus] = useState(""),
@@ -138,6 +140,33 @@ function ScopedChartAlertsPanel({
       }
     });
   const mounted = useRef(true);
+  const quickStarted = useRef(new Set<string>());
+  const quickFlights = useRef(new Set<string>());
+  const [quickFailure, setQuickFailure] = useState<{ context: AlertContext; error: string } | null>(null);
+  const [quickBusy, setQuickBusy] = useState(false);
+  async function quickCreate(value: AlertContext) {
+    if (readonly || quickFlights.current.has(value.request_id)) return;
+    quickFlights.current.add(value.request_id);
+    setQuickBusy(true);
+    setQuickFailure(null);
+    try {
+      if (!value.price || value.line || value.indicator || !Number.isFinite(Number(value.price)) || Number(value.price) <= 0)
+        throw Error("价格轴未提供有效价格，请重新点击加号");
+      const saved = await request<AlertRow>("/chart-alerts", {
+        request_id: value.request_id, config: freshDraft(value),
+      });
+      if (mounted.current) {
+        commit(saved);
+        setTab("alerts");
+        setFeedback(`已创建：${saved.name}`);
+      }
+    } catch (e) {
+      if (mounted.current) setQuickFailure({ context: value, error: errorMessage(e) });
+    } finally {
+      quickFlights.current.delete(value.request_id);
+      if (mounted.current) setQuickBusy(quickFlights.current.size > 0);
+    }
+  }
   const pendingActions = useRef(
     new Map<
       string,
@@ -168,6 +197,13 @@ function ScopedChartAlertsPanel({
   }, [refresh]);
   useEffect(() => {
     if (!context || readonly) return;
+    if (context.quick_create) {
+      if (!quickStarted.current.has(context.request_id)) {
+        quickStarted.current.add(context.request_id);
+        void quickCreate(context);
+      }
+      return;
+    }
     setDraft({
       config: freshDraft(context),
       requestId: context.request_id,
@@ -761,6 +797,11 @@ function ScopedChartAlertsPanel({
           {feedback}
         </p>
       )}
+      {quickBusy && <p className="alert-feedback" role="status">正在创建价格告警…</p>}
+      {quickFailure && <p className="alert-error" role="alert">
+        创建未确认：{quickFailure.error}{" "}
+        <button disabled={quickBusy} onClick={() => void quickCreate(quickFailure.context)}>重试创建</button>
+      </p>}
       {(error || cleanupError) && (
         <p className="alert-error" role="alert">
           {cleanupError || error}
@@ -805,16 +846,13 @@ function ScopedChartAlertsPanel({
                       {row.name || row.condition_summary}
                     </span>
                     <span className="alert-row-subtitle">
-                      <AlertSymbolIcon
-                        code={alertCode(row, row.config.instrument)}
-                      />
                       <span
                         className="alert-row-identity"
                         title={row.display_label || row.name}
                       >
                         {alertCode(row, row.name)}
                       </span>
-                      <span aria-hidden>·</span>
+                      <span className="alert-row-separator" aria-hidden>•</span>
                       <span
                         className={`alert-state alert-state-${row.status} ${row.status === "active" && row.health !== "ready" ? "alert-state-unhealthy" : ""}`}
                       >
@@ -822,7 +860,7 @@ function ScopedChartAlertsPanel({
                       </span>
                       {row.last_triggered_at != null && (
                         <>
-                          <span aria-hidden>·</span>
+                          <span className="alert-row-separator" aria-hidden>•</span>
                           <span className="alert-row-time alert-rule-time">
                             {dayKey(row.last_triggered_at, zone)} {clockTime(row.last_triggered_at, zone)}
                           </span>
@@ -981,19 +1019,13 @@ function ScopedChartAlertsPanel({
                           {eventPresentation(event).name}
                         </span>
                         <span className="alert-row-subtitle">
-                          <AlertSymbolIcon
-                            code={alertCode(
-                              event,
-                              event.evidence.config.instrument,
-                            )}
-                          />
                           <span
                             className="alert-row-identity"
                             title={event.display_label}
                           >
                             {alertCode(event, event.evidence.config.name)}
                           </span>
-                          <span aria-hidden>·</span>
+                          <span className="alert-row-separator" aria-hidden>•</span>
                           <span className="alert-row-time">
                             {clockTime(event.occurred_at, zone)}
                             {event.evidence.late ? " · 迟到" : ""}

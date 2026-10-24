@@ -3,6 +3,7 @@
 function nativeAlertPriceLines({
   current,
   archive,
+  move,
   readonly = false,
   report = () => {},
 }) {
@@ -59,6 +60,140 @@ function nativeAlertPriceLines({
   function visibility(entry, visible) {
     entry.label.style.display = visible ? "flex" : "none";
     entry.dot.style.display = visible ? "block" : "none";
+  }
+  function canMove(entry) {
+    return !readonly && typeof move === "function" && !entry.busy &&
+      !entry.row.config.condition.offset && !entry.row.config.association?.object_kind &&
+      !entry.dead && current(entry.row, entry.chart, entry.epoch);
+  }
+  function controls(entry) {
+    const enabled = canMove(entry);
+    entry.line.setEditable(enabled);
+    entry.label.style.cursor = enabled ? "ns-resize" : "default";
+    entry.label.setAttribute("aria-busy", String(!!entry.busy));
+    entry.label.title = entry.row.name + (enabled ? "；上下拖动调整价格，Escape取消" : "");
+    entry.remove.disabled = readonly || !!entry.busy;
+  }
+  function restore(entry) {
+    entry.preview = null;
+    entry.gestureRow = null;
+    entry.price = threshold(entry.row);
+    if (entry.price === null || !["active", "paused"].includes(entry.row.status)) {
+      destroyEntry(entry.row.id);
+      return;
+    }
+    entry.line.setPrice(entry.price);
+    entry.text.textContent = entry.row.name;
+    schedule(entry);
+  }
+  function preview(entry, price) {
+    if (!canMove(entry) || !Number.isFinite(price) || price <= 0) return;
+    const presented = chartAlertPricePresentation(entry.chart, price);
+    entry.gestureRow ||= entry.row;
+    entry.preview = presented;
+    entry.price = Number(presented.value);
+    entry.line.setPrice(entry.price);
+    entry.text.textContent = `${entry.row.name} → ${presented.text}`;
+    schedule(entry);
+  }
+  async function finish(entry) {
+    if (!canMove(entry) || !entry.preview) return;
+    const presented = entry.preview, row = entry.gestureRow || entry.row;
+    if (Number(presented.value) === threshold(row)) { restore(entry); return; }
+    entry.preview = null;
+    entry.gestureRow = null;
+    entry.busy = true;
+    controls(entry);
+    try {
+      const saved = await move(row, presented.value, {
+        previousText: chartAlertPricePresentation(entry.chart, threshold(row)).text,
+        text: presented.text,
+      });
+      if (entry.dead || disposed || !current(entry.row, entry.chart, entry.epoch)) return;
+      entry.row = saved;
+      restore(entry);
+      report(saved, "");
+    } catch (error) {
+      if (!entry.dead && !disposed && current(entry.row, entry.chart, entry.epoch)) {
+        if (error?.currentRow) entry.row = error.currentRow;
+        restore(entry);
+        report(entry.row, "改价未确认，已恢复最后确认价格；请核对后重试：" + String(error));
+      }
+    } finally {
+      if (!entry.dead) { entry.busy = false; controls(entry); }
+    }
+  }
+  function bindDragging(entry) {
+    let pointer = null;
+    const end = () => {
+      if (!pointer) return;
+      const id = pointer.id;
+      pointer = null;
+      try { entry.label.releasePointerCapture(id); } catch { /* Node may have been removed. */ }
+    };
+    const down = (event) => {
+      if (event.button !== 0 || event.target.closest("button") || !canMove(entry)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      entry.cancelledMove = false;
+      const bounds = entry.label.getBoundingClientRect();
+      pointer = { id: event.pointerId, y: event.clientY, offsetY: event.clientY - (bounds.top + bounds.height / 2), moved: false };
+      entry.gestureRow = entry.row;
+      entry.label.setPointerCapture(event.pointerId);
+    };
+    const moving = (event) => {
+      if (!pointer || pointer.id !== event.pointerId) return;
+      if (!canMove(entry)) { end(); restore(entry); return; }
+      event.preventDefault();
+      event.stopPropagation();
+      if (!pointer.moved && Math.abs(event.clientY - pointer.y) < 3) return;
+      pointer.moved = true;
+      try {
+        const widget = entry.chart._chartWidget, series = widget.model().model().mainSeries();
+        const canvas = widget.paneWidgets().find(pane => pane.containsMainSeries()).canvasElement();
+        const bounds = canvas.getBoundingClientRect(), y = Math.max(0, Math.min(bounds.height, event.clientY - pointer.offsetY - bounds.top));
+        preview(entry, series.priceScale().coordinateToPrice(y, series.firstValue()));
+      } catch (error) { end(); restore(entry); report(entry.row, "无法调整告警价格：" + String(error)); }
+    };
+    const up = (event) => {
+      if (!pointer || pointer.id !== event.pointerId) return;
+      event.stopPropagation();
+      const moved = pointer.moved;
+      end();
+      if (moved) void finish(entry); else restore(entry);
+    };
+    const cancel = () => { if (pointer || entry.preview) { entry.cancelledMove = true; end(); restore(entry); } };
+    const escape = (event) => {
+      if (event.key === "Escape" && (pointer || entry.preview)) {
+        event.preventDefault(); event.stopPropagation(); cancel();
+      }
+    };
+    entry.label.addEventListener("pointerdown", down);
+    entry.doc.addEventListener("pointermove", moving, true);
+    entry.doc.addEventListener("pointerup", up, true);
+    entry.label.addEventListener("pointercancel", cancel);
+    entry.label.addEventListener("lostpointercapture", cancel);
+    entry.doc.addEventListener("keydown", escape, true);
+    entry.view.addEventListener("blur", cancel);
+    entry.cleanups.push(() => {
+      end();
+      entry.label.removeEventListener("pointerdown", down);
+      entry.doc.removeEventListener("pointermove", moving, true);
+      entry.doc.removeEventListener("pointerup", up, true);
+      entry.label.removeEventListener("pointercancel", cancel);
+      entry.label.removeEventListener("lostpointercapture", cancel);
+      entry.doc.removeEventListener("keydown", escape, true);
+      entry.view.removeEventListener("blur", cancel);
+    });
+    entry.line.onMoving(() => {
+      if (entry.cancelledMove) { restore(entry); return; }
+      try { preview(entry, entry.line.getPrice()); }
+      catch (error) { restore(entry); report(entry.row, "无法调整告警价格：" + String(error)); }
+    });
+    entry.line.onMove(() => {
+      if (entry.cancelledMove) { entry.cancelledMove = false; restore(entry); }
+      else void finish(entry);
+    });
   }
   function position(entry) {
     if (entry.dead || disposed) return;
@@ -157,10 +292,12 @@ function nativeAlertPriceLines({
         text = entry.doc.createElement("span"),
         remove = entry.doc.createElement("button");
       entry.label = label;
+      entry.text = text;
+      entry.remove = remove;
       label.dataset.name = "mw-alert-price-label";
       label.dataset.alertId = row.id;
       label.style.cssText =
-        "position:fixed;z-index:12;display:none;align-items:center;gap:4px;transform:translateY(-50%);height:20px;border:1px solid currentColor;border-radius:3px;padding:0 2px 0 4px;font:12px/18px Arial,sans-serif;box-sizing:border-box;pointer-events:auto";
+        "position:fixed;z-index:12;display:none;align-items:center;gap:4px;transform:translateY(-50%);height:20px;border:1px solid currentColor;border-radius:3px;padding:0 2px 0 4px;font:12px/18px Arial,sans-serif;box-sizing:border-box;pointer-events:auto;user-select:none;touch-action:none";
       text.textContent = row.name;
       text.style.cssText =
         "overflow:hidden;text-overflow:ellipsis;white-space:nowrap";
@@ -171,7 +308,7 @@ function nativeAlertPriceLines({
       remove.style.cssText =
         "border:0;border-left:1px solid currentColor;background:transparent;color:inherit;padding:4px;margin:-4px -4px -4px 0;min-width:24px;min-height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center";
       remove.innerHTML =
-        '<svg width="10" height="12" viewBox="0 0 16 18" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M2 4h12M6 4V2h4v2M4 4l1 12h6l1-12M7 7v6M9 7v6"/></svg>';
+        '<svg data-name="mw-alert-trash" width="12" height="14" viewBox="0 0 12 14" fill="none" stroke="currentColor" stroke-width="1" stroke-linejoin="round" aria-hidden="true"><path d="M1 3.5h10M4 3.5V1.5h4v2M2 3.5l1 9h6l1-9"/></svg>';
       remove.onpointerdown = (e) => e.stopPropagation();
       remove.onclick = async (e) => {
         e.stopPropagation();
@@ -196,6 +333,8 @@ function nativeAlertPriceLines({
       dot.style.cssText =
         "position:fixed;z-index:12;width:4px;height:4px;border:1px solid #2962ff;background:#0f0f0f;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none";
       entry.doc.body.append(dot);
+      bindDragging(entry);
+      controls(entry);
       const scale = series.priceScale();
       for (const event of [
         scale.priceRangeChanged(),
@@ -253,12 +392,12 @@ function nativeAlertPriceLines({
           previous &&
           previous.chart === chart &&
           previous.epoch === epoch &&
-          previous.price === price
+          threshold(previous.row) === price
         ) {
           previous.row = row;
           if (previous.label) {
-            previous.label.firstChild.textContent = row.name;
-            previous.label.title = row.name;
+            if (!previous.preview && !previous.busy) previous.text.textContent = row.name;
+            controls(previous);
             previous.label
               .querySelector("button")
               .setAttribute("aria-label", "删除告警：" + row.name);

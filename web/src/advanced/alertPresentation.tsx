@@ -10,6 +10,7 @@ import { createPortal } from "react-dom";
 import { formatTimestamp } from "../time/chartTime";
 import {
   healthNames,
+  relations,
   eventPresentation,
   statuses,
   type AlertEvent,
@@ -29,6 +30,13 @@ export function alertState(row: AlertRow) {
   return row.status === "completed"
     ? "停止 — 已触发"
     : statuses[row.status] || row.status;
+}
+function ConditionText({ text, relation }: { text: string; relation: string }) {
+  const action = relations[relation];
+  if (!action) return <>{text}</>;
+  return <>{text.split(action).map((part, index) => (
+    <span key={index}>{index > 0 && <span className="alert-condition-action">{action}</span>}{part}</span>
+  ))}</>;
 }
 /** Local vector identity: no remote symbol service, no platform-dependent emoji. */
 export function AlertSymbolIcon({ code }: { code: string }) {
@@ -185,17 +193,17 @@ export function AlertSummary({
             data-theme={theme}
             style={position}
           >
-            <strong>{config.name}</strong>
+            <strong><ConditionText text={config.name} relation={config.condition.relation} /></strong>
             <p>
               {event ? event.display_label : row?.display_label} ·{" "}
-              {row
+              <span className={`alert-state alert-state-${row?.status || (event!.evidence.ordinal >= config.max_triggers ? "completed" : "active")} ${row?.status === "active" && row.health !== "ready" ? "alert-state-unhealthy" : ""}`}>{row
                 ? alertState(row)
                 : event!.evidence.ordinal >= config.max_triggers
                   ? "停止 — 已触发"
-                  : "已触发"}
+                  : "已触发"}</span>
             </p>
             <p>
-              {row ? row.condition_summary : eventPresentation(event!).summary}
+              <ConditionText text={row ? row.condition_summary : eventPresentation(event!).summary} relation={config.condition.relation} />
             </p>
             {row?.health_reason && <p>{row.health_reason}</p>}
             {(row || event?.evidence.alert_created_at) && (

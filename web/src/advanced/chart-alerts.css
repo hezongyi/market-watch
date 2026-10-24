@@ -1,6 +1,7 @@
 /* Business controls inside genuine v31.1.0 widgetbar / notice shells. */
 .chart-alert-panel,
 .chart-alert-dialog,
+.alert-summary-tooltip,
 .alert-menu {
   --alert-bg: #000000;
   --alert-surface: #1a1a1a;
@@ -10,6 +11,7 @@
   --alert-divider: #252525;
   --alert-accent: #6ca8ee;
   --alert-error: #ffaaa4;
+  --alert-action: #ff9800;
   --alert-hover: #1a1a1a;
   color: var(--alert-text);
   background: var(--alert-bg);
@@ -23,6 +25,7 @@
 }
 .chart-alert-panel[data-theme="light"],
 .chart-alert-dialog[data-theme="light"],
+.alert-summary-tooltip[data-theme="light"],
 html:not(.theme-dark) .alert-menu {
   --alert-bg: #fff;
   --alert-surface: #f5f5f5;
@@ -32,9 +35,14 @@ html:not(.theme-dark) .alert-menu {
   --alert-divider: #e0e3eb;
   --alert-accent: #2962ff;
   --alert-error: #b52828;
+  --alert-action: #a65c00;
   --alert-hover: #f0f3fa;
 }
+.chart-alert-panel[data-theme="light"] {
+  --alert-bg: var(--tv-color-pane-background, var(--color-pane-bg, #fff));
+}
 .chart-alert-panel {
+  --alert-bg: var(--tv-color-pane-background, var(--color-pane-bg, #0f0f0f));
   height: 100%;
   min-height: 0;
   display: flex;
@@ -180,7 +188,7 @@ html:not(.theme-dark) .alert-menu {
 .alert-state-paused,
 .alert-state-completed,
 .alert-state-expired {
-  color: #d4a148;
+  color: var(--alert-action);
 }
 [data-theme="light"] .alert-state-active {
   color: #147d70;
@@ -188,7 +196,7 @@ html:not(.theme-dark) .alert-menu {
 [data-theme="light"] .alert-state-paused,
 [data-theme="light"] .alert-state-completed,
 [data-theme="light"] .alert-state-expired {
-  color: #946414;
+  color: var(--alert-action);
 }
 .alert-row-actions {
   position: absolute;
@@ -701,7 +709,7 @@ html.theme-dark .mw-native-alert-shell {
   border-color: var(--alert-error);
 }
 
-/* Reference surfaces stay scoped to the alert UI, independent of watchlist tokens. */
+/* Editor surface is separate from the native widgetbar panel. */
 .chart-alert-dialog {
   --alert-bg: #131313;
 }
@@ -870,4 +878,25 @@ html.theme-dark .mw-native-alert-shell {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.alert-condition-action {
+  color: var(--alert-action);
+}
+.alert-row-separator {
+  font-size: 12px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+.chart-alert-panel .alert-row-actions > button,
+.chart-alert-panel .alert-row-actions > .alert-menu-wrap > button {
+  color: var(--alert-muted);
+  background: transparent;
+}
+.chart-alert-panel .alert-row-actions > button:hover:not(:disabled),
+.chart-alert-panel .alert-row-actions > .alert-menu-wrap > button:hover:not(:disabled),
+.chart-alert-panel .alert-row-actions > button:focus-visible,
+.chart-alert-panel .alert-row-actions > .alert-menu-wrap > button:focus-visible {
+  color: var(--alert-text);
+  background: var(--alert-border);
 }

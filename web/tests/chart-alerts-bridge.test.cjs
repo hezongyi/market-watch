@@ -6,7 +6,7 @@ const { test } = require("node:test"),
   path = require("node:path");
 const root = path.resolve(__dirname, "../..");
 const tick = () => new Promise((r) => setTimeout(r, 5));
-function fixture() {
+function fixture({ readonly = false } = {}) {
   const subscriptions = {},
     shapes = new Map(),
     messages = [],
@@ -52,6 +52,8 @@ function fixture() {
   }
   const chart = {
     symbol: () => symbol,
+    priceFormatter: () => ({format: price => price.toFixed(5)}),
+    symbolExt: () => ({}),
     resolution: () => resolution,
     chartType: () => 1,
     dataReady: () => true,
@@ -88,6 +90,7 @@ function fixture() {
       same: (a, b) => a === b,
     },
   });
+  vm.runInContext(fs.readFileSync(path.join(root, "advanced-host/price-format.js"), "utf8"), ctx);
   vm.runInContext(
     fs.readFileSync(path.join(root, "advanced-host/chart-alerts.js"), "utf8"),
     ctx,
@@ -100,7 +103,7 @@ function fixture() {
     getWorkspace: () => ({ id: "fixture" }),
     getEpoch: () => epoch,
     isLoading: () => loading,
-    readonly: false,
+    readonly,
     metadata: () => ({ source }),
     calculationOrigin: () => 60000,
     frames: { 60: "H1", 5: "M5" },
@@ -401,4 +404,36 @@ test('squeeze alert captures calculation parameters and boolean, excluding displ
   assert.deepEqual(context.indicator,{name:'ROLLING_RANGE_SQUEEZE',version:'1',
     params:{k:3,lookback:20,low_pct:0.1,confirm_on_close:false},output:'signal'});
   assert.equal(context.calculation_origin,60000);
+});
+
+
+test('price-axis plus captures native display price and requests immediate creation', async () => {
+  const f = fixture();
+  f.subscriptions.onPlusClick({symbol: 'BTCUSDT', price: 1.1195149});
+  await tick();
+  const contexts = f.messages.filter(m => m.type === 'chart-alert-context');
+  assert.equal(contexts.length, 1);
+  assert.equal(contexts[0].context.quick_create, true);
+  assert.equal(contexts[0].context.price, '1.11951');
+  assert.equal(contexts[0].context.price_presentation.text, '1.11951');
+  assert.equal(contexts[0].context.association.workspace_id, 'fixture');
+  assert.equal(f.calls.filter(q => ['edit', 'lifecycle'].includes(q.op)).length, 0);
+});
+
+test('price-axis plus rejects invalid price, loading, missing metadata and readonly charts', async () => {
+  for (const change of [f => {}, f => f.layoutLoad(), f => f.switchSource(null)]) {
+    const f = fixture(); change(f);
+    for (const price of [0, -1, NaN, Infinity]) f.subscriptions.onPlusClick({symbol: 'BTCUSDT', price});
+    if (f.failures.length === 0) assert.fail('invalid plus click must explain failure');
+    assert.equal(f.messages.filter(m => m.type === 'chart-alert-context').length, 0);
+  }
+  for (const change of [f => f.layoutLoad(), f => f.switchSource(null)]) {
+    const f = fixture(); change(f); f.subscriptions.onPlusClick({symbol: 'BTCUSDT', price: 100});
+    assert.equal(f.messages.filter(m => m.type === 'chart-alert-context').length, 0);
+    assert.ok(f.failures.length);
+  }
+  const f = fixture({readonly: true}); f.subscriptions.onPlusClick?.({symbol: 'BTCUSDT', price: 100});
+  assert.equal(f.messages.filter(m => m.type === 'chart-alert-context').length, 0);
+  const other = fixture(); other.subscriptions.onPlusClick({symbol: 'ETHUSDT', price: 100});
+  assert.equal(other.messages.filter(m => m.type === 'chart-alert-context').length, 0);
 });

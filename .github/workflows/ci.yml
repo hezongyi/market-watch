@@ -253,6 +253,8 @@ jobs:
           node tests/squeeze-alert.browser.cjs
           node tests/alert-reference-ui.browser.cjs
           node tests/native-alert-price-lines.browser.cjs
+          node --test tests/alert-price-edit.test.cjs
+          node tests/alert-price-drag.browser.cjs
           node tests/notice-page-exit.browser.cjs
 
   compose_checks:

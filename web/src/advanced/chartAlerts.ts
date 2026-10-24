@@ -71,6 +71,7 @@ export type AlertContext = {
   series_kind: "managed" | "provider" | "composite";
   timeframe: string;
   price?: string;
+  quick_create?: boolean;
   display_label?: string;
   price_presentation?: {text: string; value: string};
   source?: string;
@@ -214,6 +215,7 @@ export function validAlertContext(
     a = v.association;
   return (
     typeof v.request_id === "string" &&
+    (v.quick_create === undefined || typeof v.quick_create === "boolean") &&
     v.request_id.length <= 100 &&
     typeof v.instrument === "string" &&
     (v.series_kind === "composite" ? /^[a-f0-9]{64}$/.test(v.instrument) : /^[A-Za-z0-9:_-]{1,40}$/.test(v.instrument)) &&

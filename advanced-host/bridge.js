@@ -2437,6 +2437,10 @@ function boot(
       indicatorBindings.get(indicatorKey(ticker,res))?.calculationStart ??
       (MWSeries.decode(ticker).series_kind === "managed" ? managedSessions.get(MWSeries.decode(ticker).symbol+'|'+res)?.start : null),
     compositeRevision:(ticker,res)=>alertCompositeRevisions.get(MWSeries.encode(MWSeries.decode(ticker).symbol,'composite')+'|'+res) ?? null,
+    movePrice:(row,price,presentation)=>{
+      if (!alertUI) throw Error("请等待告警界面就绪后改价");
+      return alertUI.movePrice(row,price,presentation);
+    },
     rpc:query=>request(query,"chart-alert-rpc"),send: message => {
       if (message.type === 'chart-alert-association') alertUI?.association(message.alert_id, message.text);
       else send(message);

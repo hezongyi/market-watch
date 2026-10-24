@@ -6,7 +6,8 @@ import { useState } from "react";
 import { ChartAlertsPanel, type AlertDraft } from "./ChartAlertsPanel";
 import { rpcError } from "../api";
 import type { AlertApi, AlertUiScope } from "./chartAlertUiApi";
-import type { AlertContext } from "./chartAlerts";
+import type { AlertContext, AlertRow } from "./chartAlerts";
+import { editAlertPrice, type PricePresentation } from "./alertPriceEdit";
 import {
   NativeControls,
   type NativeControlFactory,
@@ -127,6 +128,7 @@ async function attach({
     theme: string;
     alertUnread?: number;
     creationReason: string;
+    updatedRow?: AlertRow;
     notices: Record<string, string>;
     instrument: { instrument: string; series_kind: string } | null;
   };
@@ -149,6 +151,7 @@ async function attach({
         <ChartAlertsPanel
           workspaceId={scope.workspace_id}
           context={state.context}
+          updatedRow={state.updatedRow}
           focusEvent={state.focusEvent}
           noticeRequest={noticeRequest}
           alertUnread={state.alertUnread}
@@ -195,6 +198,18 @@ async function attach({
   }, 250);
   return {
     open: shell.open,
+    movePrice: async (row: AlertRow, price: string, presentation?: PricePresentation) => {
+      if (disposed || readonly || row.config.association?.workspace_id !== scope.workspace_id)
+        throw Error("告警当前不可编辑");
+      try {
+        const saved = await editAlertPrice(row, price, call, presentation);
+        if (!disposed) update({ updatedRow: saved });
+        return saved;
+      } catch (error: any) {
+        if (!disposed && error.currentRow) update({ updatedRow: error.currentRow });
+        throw error;
+      }
+    },
     noticeState: (state: NoticeState) => {update({alertUnread: state.alertUnread}); shell.setBadge?.(state.alertUnread);},
     event: (id: string) => {
       update({ focusEvent: { id, revision: Date.now() } });

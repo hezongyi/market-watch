@@ -11,6 +11,7 @@ function chartAlertBridge({
   calculationOrigin = () => null,
   compositeRevision = () => null,
   rpc,
+  movePrice,
   send,
   fail,
 }) {
@@ -29,6 +30,12 @@ function chartAlertBridge({
     reconciliations = new Map();
   const priceLines = typeof nativeAlertPriceLines === "function" ? nativeAlertPriceLines({
     readonly,
+    move: typeof movePrice === "function" ? async (row, price, presentation) => {
+      if (readonly || disposed || isLoading()) throw Error("告警当前不可编辑");
+      const saved = await movePrice(row, price, presentation);
+      if (!disposed) replace(saved);
+      return saved;
+    } : undefined,
     current: (row, chart, epoch) => !disposed && !isLoading() && epoch === generation(chart) && matches(chart,row) && associatedChart(row.config.association,row) === chart,
     archive: async row => {
       if (readonly || disposed) throw Error("告警当前不可编辑");
@@ -212,6 +219,7 @@ function chartAlertBridge({
     price,
     object,
     context: initialContext,
+    quick = false,
   } = {}) {
     if (disposed) return;
     if (readonly) {fail(Error("只读图表不能创建告警"));return;}
@@ -225,6 +233,10 @@ function chartAlertBridge({
         const presented = context.price_presentation || chartAlertPricePresentation(chart, price);
         context.price = presented.value;
         context.price_presentation = presented;
+      }
+      if (quick) {
+        if (!context.price) throw Error("价格轴未提供有效价格");
+        context.quick_create = true;
       }
       if (object?.type === "shape") {
         context.association.object_id = crypto.randomUUID();
@@ -529,7 +541,7 @@ function chartAlertBridge({
         p.symbol &&
         MWSeries.same(p.symbol, getWidget().activeChart().symbol())
       )
-        create({ price: p.price });
+        create({ price: p.price, quick: true });
     });
     refresh();
   }
