@@ -278,17 +278,30 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
           rangeEvents.set(owner,()=>event.unsubscribe(null,scheduleSync));
         }
         for(const study of chart.getAllStudies()){
-          const scope=results.scope(chart,study.id);if(!scope)continue;
-          const meta=catalog[scope.name];if(!meta)continue;
+          if(!charts.has(owner))charts.set(owner,++chartSequence);
+          const key=charts.get(owner)+'|'+study.id;
+          let consumer=consumers.get(key);
+          const scope=results.scope(chart,study.id);
+          const meta=scope ? catalog[scope.name] : consumer?.meta;if(!meta)continue;
           const api=chart.getStudyById(study.id);if(api.isVisible && !api.isVisible())continue;
           const inputs=Object.fromEntries(api.getInputValues().map(item=>[item.id,item.value]));
           const params=meta.render_profile==='supertrend_pine_v1' ? {period:inputs.period,source:inputs.source,
             multiplier:inputs.multiplier,atr_method:inputs.changeATR ? 'wilder' : 'sma'} :
             Object.fromEntries(Object.keys(meta.params).map(key=>[key,inputs[key]]));
-          if(!charts.has(owner))charts.set(owner,++chartSequence);
-          const key=charts.get(owner)+'|'+study.id;live.add(key);
-          let consumer=consumers.get(key);
-          if(!consumer){consumer={key,id:study.id,chart,index,meta,params,inputs,sequence:0};consumers.set(key,consumer);}
+          if(!scope){
+            // Historical pagination briefly withdraws native readiness, not
+            // the visible study. Keep its accepted projection until the next
+            // generation can merge the prefix/tail, without a clear/redraw.
+            const binding=identity.binding(chart.symbol(),chart.resolution());
+            if(!binding || !consumer?.handle ||
+              JSON.stringify(consumer.handle.identity)!==JSON.stringify(scopeIdentity(chart,
+                {name:consumer.name,resolution:chart.resolution()},params,meta.version,binding)) ||
+              (consumer.correctionVersion || 0)!==(binding.correctionVersion || 0))continue;
+            Object.assign(consumer,{chart,index,params,inputs});
+            drawings?.refresh(consumer);live.add(key);continue;
+          }
+          live.add(key);
+          if(!consumer){consumer={key,id:study.id,name:scope.name,chart,index,meta,params,inputs,sequence:0};consumers.set(key,consumer);}
           else Object.assign(consumer,{chart,index,meta,params,inputs});
           const operation={ticker:chart.symbol(),resolution:chart.resolution()};
           operation.promise=prepare(consumer,scope).catch(error=>report(error,consumer));
