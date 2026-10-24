@@ -1,0 +1,233 @@
+{
+  "status": "complete",
+  "recorded_at_utc": "2026-10-24T17:11:47.533450+00:00",
+  "risk": "P0: merge missing alert UI acceptance documentation and synthetic browser test correction; archive and remove six redundant task worktrees; no business-code or deployment change",
+  "canonical_branch": "market-watch-integration-20261024",
+  "canonical_worktree": "/home/quant/repos/market-watch-integration-20261024",
+  "integration_merge_commit": "f9df29c93271d8fef6a1f83322ea80c3b20bf20b",
+  "previous_integration_commit": "d91ed4790a70491e41d4683c05d30b6d799925ed",
+  "missing_alert_ui_commit_integrated": "1e66040edcc88499e6557d5f01d0d71bcb780c2a",
+  "business_source_unchanged": true,
+  "archives": [
+    {
+      "branch": "feat/nr4-nr7-breakouts-20261024",
+      "tip": "59ed3a3f3fc727da76d13149934d999ebee04218",
+      "worktree": "/home/quant/repos/market-watch-nr4-nr7-20261024",
+      "archive": "/home/quant/repos/.archives/market-watch/nr-consolidation-20261024/market-watch-nr4-nr7-20261024.tar.gz",
+      "sha256": "40a6e374608f45ec2398647db1a7a21d1a05e741ffca85790a6c8088e7839078",
+      "archive_bytes": 181526137,
+      "staged_tree": "7a6d06222459bde8306fa5a0b1b2132b480ec6b8",
+      "files": 7166,
+      "symlinks": 3,
+      "archive_extraction_verified": true,
+      "staged_and_unstaged_restore_verified": true,
+      "source_unchanged": true,
+      "fully_contained_in_integration": true
+    },
+    {
+      "branch": "integration/nr4-nr7-mwa-20261024",
+      "tip": "3e674dd752de366c334702b2673a4c1be9cd0443",
+      "worktree": "/home/quant/repos/market-watch-nr4-nr7-mwa-20261024",
+      "archive": "/home/quant/repos/.archives/market-watch/nr-consolidation-20261024/market-watch-nr4-nr7-mwa-20261024.tar.gz",
+      "sha256": "8a517405e7cc49d98c770856bec68b3f7bcec0fd3e37cdd3d780f267f5ce56fc",
+      "archive_bytes": 176736526,
+      "staged_tree": "bfe42820294c3289c2cbf9fee3f370ed57300e41",
+      "files": 6793,
+      "symlinks": 3,
+      "archive_extraction_verified": true,
+      "staged_and_unstaged_restore_verified": true,
+      "source_unchanged": true,
+      "fully_contained_in_integration": true
+    },
+    {
+      "branch": "integration/nr4-nr7-mwa-v2-20261024",
+      "tip": "59f07cddcab83b8753689809f150562ed7709b14",
+      "worktree": "/home/quant/repos/market-watch-nr4-nr7-mwa-v2-20261024",
+      "archive": "/home/quant/repos/.archives/market-watch/nr-consolidation-20261024/market-watch-nr4-nr7-mwa-v2-20261024.tar.gz",
+      "sha256": "997354d8779ad4b49e5db4836c30803dc9fa976064342b3b29fd43fa044fcde4",
+      "archive_bytes": 178502579,
+      "staged_tree": "1879f79ae6b66dcde8f5c6f3e5ebf81343922cf5",
+      "files": 6850,
+      "symlinks": 3,
+      "archive_extraction_verified": true,
+      "staged_and_unstaged_restore_verified": true,
+      "source_unchanged": true,
+      "fully_contained_in_integration": true
+    },
+    {
+      "branch": "integration/nr4-nr7-mwa-v3-20261024",
+      "tip": "2b3c8da9e3c8f479599912c56939febbb482fa8b",
+      "worktree": "/home/quant/repos/market-watch-nr4-nr7-mwa-v3-20261024",
+      "archive": "/home/quant/repos/.archives/market-watch/nr-consolidation-20261024/market-watch-nr4-nr7-mwa-v3-20261024.tar.gz",
+      "sha256": "2b6dee31d79527b3fdd6e1aa0b162dac304ff7186845bf76d9753dd1c702daad",
+      "archive_bytes": 203891589,
+      "staged_tree": "1e5a0038bdcfc3998794c1c7d47da1aa2b760536",
+      "files": 9788,
+      "symlinks": 2,
+      "archive_extraction_verified": true,
+      "staged_and_unstaged_restore_verified": true,
+      "source_unchanged": true,
+      "fully_contained_in_integration": true
+    },
+    {
+      "branch": "fix/preference-draft-banner-20261024",
+      "tip": "54b66bb3c0b549a1bd1a1f312c23d090af3ffe01",
+      "worktree": "/home/quant/repos/market-watch-preference-draft-banner-20261024",
+      "archive": "/home/quant/repos/.archives/market-watch/nr-consolidation-20261024/market-watch-preference-draft-banner-20261024.tar.gz",
+      "sha256": "514818e9520e7732fec2f92293979fa0b8065868a22e0417b2601e356b62af33",
+      "archive_bytes": 202303744,
+      "staged_tree": "b18279b6e547bc82473fac8c24c7b83e26c07e9f",
+      "files": 9649,
+      "symlinks": 2,
+      "archive_extraction_verified": true,
+      "staged_and_unstaged_restore_verified": true,
+      "source_unchanged": true,
+      "fully_contained_in_integration": true
+    },
+    {
+      "branch": "feat/alert-ui-reference-20261024",
+      "tip": "1e66040edcc88499e6557d5f01d0d71bcb780c2a",
+      "worktree": "/home/quant/repos/market-watch-alert-ui-20261024",
+      "archive": "/home/quant/repos/.archives/market-watch/nr-consolidation-20261024/market-watch-alert-ui-20261024.tar.gz",
+      "sha256": "2f602817248d87d639b0af356290a4bc6e38d35ef978e9050695e36ea835d113",
+      "archive_bytes": 237431139,
+      "staged_tree": "78b68cfc7c7cc35c9c02ae223301c8f96f479a6d",
+      "files": 16222,
+      "symlinks": 16,
+      "archive_extraction_verified": true,
+      "staged_and_unstaged_restore_verified": true,
+      "source_unchanged": true,
+      "fully_contained_in_integration": true
+    }
+  ],
+  "files_verified": 56468,
+  "symlinks_verified": 29,
+  "archive_bytes": 1180391714,
+  "bundle": {
+    "path": "/home/quant/repos/.archives/market-watch/nr-consolidation-20261024/branches.bundle",
+    "sha256": "7a88c612af79766e7fe2c2bf4cb7a25587433eec11ef315e15c7fa21a96b80cb",
+    "self_contained": true,
+    "all_six_tips_restored": true,
+    "full_git_object_integrity_verified": true
+  },
+  "cleanup": [
+    {
+      "branch": "feat/nr4-nr7-breakouts-20261024",
+      "tip": "59ed3a3f3fc727da76d13149934d999ebee04218",
+      "worktree": "/home/quant/repos/market-watch-nr4-nr7-20261024",
+      "branch_deleted": true,
+      "worktree_removed": true,
+      "archive_verified": true,
+      "fully_contained_in_integration": true
+    },
+    {
+      "branch": "integration/nr4-nr7-mwa-20261024",
+      "tip": "3e674dd752de366c334702b2673a4c1be9cd0443",
+      "worktree": "/home/quant/repos/market-watch-nr4-nr7-mwa-20261024",
+      "branch_deleted": true,
+      "worktree_removed": true,
+      "archive_verified": true,
+      "fully_contained_in_integration": true
+    },
+    {
+      "branch": "integration/nr4-nr7-mwa-v2-20261024",
+      "tip": "59f07cddcab83b8753689809f150562ed7709b14",
+      "worktree": "/home/quant/repos/market-watch-nr4-nr7-mwa-v2-20261024",
+      "branch_deleted": true,
+      "worktree_removed": true,
+      "archive_verified": true,
+      "fully_contained_in_integration": true
+    },
+    {
+      "branch": "integration/nr4-nr7-mwa-v3-20261024",
+      "tip": "2b3c8da9e3c8f479599912c56939febbb482fa8b",
+      "worktree": "/home/quant/repos/market-watch-nr4-nr7-mwa-v3-20261024",
+      "branch_deleted": true,
+      "worktree_removed": true,
+      "archive_verified": true,
+      "fully_contained_in_integration": true
+    },
+    {
+      "branch": "fix/preference-draft-banner-20261024",
+      "tip": "54b66bb3c0b549a1bd1a1f312c23d090af3ffe01",
+      "worktree": "/home/quant/repos/market-watch-preference-draft-banner-20261024",
+      "branch_deleted": true,
+      "worktree_removed": true,
+      "archive_verified": true,
+      "fully_contained_in_integration": true
+    },
+    {
+      "branch": "feat/alert-ui-reference-20261024",
+      "tip": "1e66040edcc88499e6557d5f01d0d71bcb780c2a",
+      "worktree": "/home/quant/repos/market-watch-alert-ui-20261024",
+      "branch_deleted": true,
+      "worktree_removed": true,
+      "archive_verified": true,
+      "fully_contained_in_integration": true
+    }
+  ],
+  "preservation": {
+    "runtime_unchanged": true,
+    "containers": 22,
+    "other_worktrees": [
+      {
+        "branch": "main",
+        "head_unchanged": true,
+        "status_unchanged": true,
+        "staged_unchanged": true,
+        "unstaged_unchanged": true
+      },
+      {
+        "branch": "feat/fxcm-platform-managed-20261024",
+        "head_unchanged": true,
+        "status_unchanged": true,
+        "staged_unchanged": true,
+        "unstaged_unchanged": true
+      },
+      {
+        "branch": "feat/managed-history-modes-20261024",
+        "head_unchanged": true,
+        "status_unchanged": true,
+        "staged_unchanged": true,
+        "unstaged_unchanged": true
+      },
+      {
+        "branch": "integration/history-modes-mwa-20261024",
+        "head_unchanged": true,
+        "status_unchanged": true,
+        "staged_unchanged": true,
+        "unstaged_unchanged": true
+      },
+      {
+        "branch": "docs/history-maintenance-modes-20261024",
+        "head_unchanged": true,
+        "status_unchanged": true,
+        "staged_unchanged": true,
+        "unstaged_unchanged": true
+      }
+    ]
+  },
+  "checks": {
+    "merge_diff_whitespace": "passed",
+    "alert_native_browser_syntax": "passed",
+    "preference_banner": "passed",
+    "preference_request_queue": "passed",
+    "nr_display": "passed",
+    "nr_restart": "passed",
+    "chart_alerts_bridge_tests": 9,
+    "native_alert_browser_passed": true,
+    "native_alert_geometry_cases": 16,
+    "native_alert_page_errors": 0,
+    "canonical_nr_probe_syntax": "passed"
+  },
+  "deployment_changed": false,
+  "production_changed": false,
+  "pushed": false,
+  "main_merged": false,
+  "limitations": [
+    "No full backend suite, Web rebuild, remote CI or deployment was performed for this documentation/test-only integration.",
+    "Canonical NR runtime probe was relocated and syntax checked; no fresh full NR runtime acceptance was performed in this cleanup.",
+    "Historical probe scripts keep old worktree paths as evidence; use the new canonical probe or restore an archived worktree.",
+    "Task PostgreSQL volumes, runtime configuration, private rollback material and images were retained."
+  ]
+}
