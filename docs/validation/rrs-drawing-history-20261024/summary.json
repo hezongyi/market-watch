@@ -147,5 +147,17 @@
     "Loaded main-series history governs drawing eligibility; full backend presentation remains intact.",
     "An exploratory viewport request starting 2019-04-10 timed out; retained separately. Subsequent supported viewports including 2019 and exact eligible geometry passed.",
     "Exploratory provider history loading expanded the calculation snapshot; drawing counts can increase as history grows. An obsolete fixed full-count assertion was replaced with exact loaded-range geometry checks."
-  ]
+  ],
+  "human_acceptance": {
+    "status": "passed",
+    "recorded_at_utc": "2026-10-24T16:36:06.687480+00:00",
+    "confirmation": "认可  人工验收 通过  可收口了吗？",
+    "task_status": "complete",
+    "remaining_task_blockers": [],
+    "runtime_product_commit": "bacbcd7d9ea0eea7beab82252bb2f32b925aef96",
+    "final_service_audit": "15 services running; effective configuration and protected browser identities unchanged; API/PostgreSQL healthy",
+    "instance_retained": true,
+    "merge_or_production_authorized": false
+  },
+  "task_status": "complete"
 }

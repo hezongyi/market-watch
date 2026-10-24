@@ -37,3 +37,9 @@ API 窗口 13 个 traceback、26 处 CancelledError，HTTP500/连接池超时 0�
 统一运维：`python3 /home/quant/repos/.mwa-v1264-chart-init-20261021/manage.py start|status|stop`。本次审计：`python3 /home/quant/repos/.mwa-rrs-drawing-history-20261024/operate.py audit`；精确旧 Chart 镜像及配置回退在 `/home/quant/repos/.mwa-rrs-drawing-history-20261024/rollback-override.json`，未执行。durable overlay 已同步。
 
 原始证据 `/home/quant/repos/.reports/market-watch/20261024-rrs-drawing-history`，结构化结果见 [summary.json](summary.json)。
+
+## 人工验收与收口
+
+2026-10-24T16:36:06.687480+00:00：用户明确确认“认可，人工验收通过”，本次 D1 历史绘图修复任务完成，无剩余任务阻断。收口前再次审计：15 服务运行、API/PG healthy，有效配置、非目标服务及保护浏览器身份保持；Chart 产品仍为 bacbcd7d，未重新换版。
+
+mwa 保持运行，真实数据、配置、浏览器现场、证据和精确回退材料保留。本次仅登记验收完成，不新增测试、重启、资源删除、push、PR、main 合并或生产发布；合并/生产仍需另行明确授权。
