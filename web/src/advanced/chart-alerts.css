@@ -864,3 +864,10 @@ html.theme-dark .mw-native-alert-shell {
 .alert-detail-drawer > button {
   margin-left: 12px;
 }
+
+.alert-rule-time {
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

@@ -820,6 +820,14 @@ function ScopedChartAlertsPanel({
                       >
                         {alertState(row)}
                       </span>
+                      {row.last_triggered_at != null && (
+                        <>
+                          <span aria-hidden>·</span>
+                          <span className="alert-row-time alert-rule-time">
+                            {dayKey(row.last_triggered_at, zone)} {clockTime(row.last_triggered_at, zone)}
+                          </span>
+                        </>
+                      )}
                     </span>
                   </button>
                 </AlertSummary>
