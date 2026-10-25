@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "synthetic_browser_fault": "HTTP 500 only on this test page",
+  "checks": [
+    "HTTP 500 ends loading and exposes an explicit retry",
+    "Retry uses the actual endpoint and restores selectable native rows"
+  ],
+  "failureUI": "- dialog \"商品代码搜索\":\n  - text: 商品代码搜索\n  - button \"关闭商品代码搜索\"\n  - searchbox \"搜索\": EURUSD\n  - tablist:\n    - tab \"全部\" [selected]\n    - tab \"外汇\"\n    - tab \"股票\"\n    - tab \"加密\"\n    - tab \"指数\"\n    - tab \"基金\"\n    - tab \"期货\"\n    - tab \"金属\"\n    - tab \"其他\"\n  - text: 商品代码 描述\n  - button \"行情类型\": 全部行情\n  - button \"来源\": 全部来源\n  - text: 只需在图表上开始输入，即可拉出此搜索框\n  - alert:\n    - text: 商品搜索失败，请重试。\n    - button \"重试搜索\"",
+  "errors": [],
+  "dialog": "- dialog \"商品代码搜索\":\n  - text: 商品代码搜索\n  - button \"关闭商品代码搜索\"\n  - searchbox \"搜索\": EURUSD\n  - tablist:\n    - tab \"全部\" [selected]\n    - tab \"外汇\"\n    - tab \"股票\"\n    - tab \"加密\"\n    - tab \"指数\"\n    - tab \"基金\"\n    - tab \"期货\"\n    - tab \"金属\"\n    - tab \"其他\"\n  - text: 商品代码 描述\n  - button \"行情类型\": 全部行情\n  - button \"来源\": 全部来源\n  - text: EURUSD 欧元／美元 · 平台 · yahoo · 原生周期 forex YAHOO EURUSD EURUSD · 自建 · dukascopy · bid · ny17 forex DUKASCOPY EURUSD EURUSD · 组合 · dukascopy→OANDA Practice · bid · ny17 forex DUKASCOPY EURUSD 欧元 / 美元 · 平台 · oanda · 原生周期 forex OANDA EURUSD EURUSD · 自建 · fxcm · bid · utc0 forex FXCM EURUSD EUR/USD · 平台 · dukascopy · 原生周期 forex DUKASCOPY EURUSD EUR/USD · 平台 · FXCM · Bid · 原生周期 forex FXCM EURUSD EUR/USD · 平台 · OANDA Practice · Bid · 原生周期 forex OANDA 只需在图表上开始输入，即可拉出此搜索框",
+  "logs": [
+    "[error] Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+  ]
+}

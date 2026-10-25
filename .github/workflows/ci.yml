@@ -218,6 +218,7 @@ jobs:
           node tests/multi-chart-resolve-init.cjs
           node tests/api-read-recovery.cjs
           node --test tests/chart-alerts-bridge.test.cjs
+          node --test tests/mobile-chart-view.test.cjs tests/mobile-workspace-policy.test.cjs
           node tests/advanced-market-stream.cjs
           node tests/advanced-provider-subscriptions.cjs
           node tests/advanced-watchlists.cjs
@@ -245,6 +246,7 @@ jobs:
         working-directory: web
         run: |
           npx playwright install --with-deps chromium
+          node tests/mobile-workspace-shell.browser.cjs
           node tests/advanced-watchlist-layout.browser.cjs
           node tests/advanced-watchlist-names.browser.cjs
           node tests/symbol-flags.browser.cjs

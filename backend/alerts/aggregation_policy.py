@@ -10,7 +10,7 @@ from .market_datasets import register_dataset
 from .storage import Bar, HistoryVersion, Instrument, MarketDataset
 
 AssetClass = Literal["forex", "metal", "crypto", "index", "equity", "etf", "future", "other", "unspecified"]
-AggregationCalendar = Literal["ny17", "utc0"]
+AggregationCalendar = Literal["ny17", "utc0", "source_date"]
 ASSET_CLASSES = ("forex", "metal", "crypto", "index", "equity", "etf", "future", "other", "unspecified")
 DEFAULTS = {"forex": "ny17", "metal": "ny17", "crypto": "utc0"}
 
@@ -27,8 +27,17 @@ def resolve_calendar(asset_class, calendar=None):
     return DEFAULTS[asset_class]
 
 
-def history_dataset_identity(*, provider_symbol, asset_class, aggregation_calendar=None, source="dukascopy"):
+def history_dataset_identity(*, provider_symbol, asset_class, aggregation_calendar=None, source="dukascopy",
+                             mode="base_m1", adjustment="none"):
     """Resolve immutable registration identity without consulting mutable catalogues."""
+    if mode != "base_m1":
+        from .history_mode_sources import dataset_identity
+
+        if aggregation_calendar not in (None, "source_date"):
+            raise ValueError("D1 与原生模式使用来源交易日规则")
+        return dataset_identity(source, provider_symbol, mode, adjustment)
+    if adjustment != "none":
+        raise ValueError("旧 M1 模式不接受新的价格口径")
     calendar = resolve_calendar(asset_class, aggregation_calendar)
     if source == "dukascopy":
         channel, environment, scope = "python", "historical", "public"
@@ -43,6 +52,11 @@ def history_dataset_identity(*, provider_symbol, asset_class, aggregation_calend
             raise ValueError("请选择准确的OANDA品种代码")
         channel, environment = "v20", "practice"
         scope = "sha256:" + hashlib.sha256(settings.oanda_account_id.encode()).hexdigest()
+    elif source == "fxcm":
+        from .fxcm_history import account_scope, configured
+        if not configured():
+            raise ValueError("请先配置FXCM历史连接")
+        channel, environment, scope = "forexconnect", "demo", account_scope()
     else:
         raise ValueError("此来源尚未支持自建历史版本")
     return DatasetIdentity(source=source, channel=channel, environment=environment,
@@ -51,9 +65,15 @@ def history_dataset_identity(*, provider_symbol, asset_class, aggregation_calend
 
 
 def register_history_dataset(db, *, logical_symbol, provider_symbol, asset_class, precision,
-                             aggregation_calendar=None, source="dukascopy", catalog_id=None):
+                             aggregation_calendar=None, source="dukascopy", catalog_id=None,
+                             mode="base_m1", adjustment="none", timeframes=None):
     identity = history_dataset_identity(provider_symbol=provider_symbol, asset_class=asset_class,
-        aggregation_calendar=aggregation_calendar, source=source)
+        aggregation_calendar=aggregation_calendar, source=source, mode=mode, adjustment=adjustment)
+    if identity.identity_version == 2:
+        from .history_mode_sources import register
+
+        return register(db, identity, logical_symbol=logical_symbol, precision=precision,
+            asset_class=asset_class, timeframes=timeframes, catalog_id=catalog_id)
     if catalog_id:
         from .history_catalog import validate_selection
 
@@ -61,6 +81,8 @@ def register_history_dataset(db, *, logical_symbol, provider_symbol, asset_class
             logical_symbol=logical_symbol, asset_class=asset_class, precision=precision)
     calendar = resolve_calendar(asset_class, aggregation_calendar)
     volume_kind, volume_unit = ("price_count", "quotes") if source == "oanda" else ("quantity", "source_quantity")
+    if source == "fxcm":
+        volume_kind, volume_unit = "tick_count", "price_changes"
     inst = register_dataset(db, identity, logical_symbol=logical_symbol, label=logical_symbol,
         calendar=calendar, precision=precision, volume_kind=volume_kind,
         volume_unit=volume_unit, asset_class=asset_class)

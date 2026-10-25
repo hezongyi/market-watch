@@ -56,7 +56,8 @@ def test_review_due_is_a_reminder_not_an_applicability_boundary():
 def test_unmapped_source_stays_unknown_and_calendar_page_lists_all_sources():
     assert session_status("yahoo", "AAPL", stamp("2026-10-12T12:00:00+00:00"))["market_session"] == "unknown"
     rows = calendar_rows()
-    assert {row["source"] for row in rows} == {"dukascopy", "oanda", "binance", "yahoo"}
+    assert {row["source"] for row in rows} == {"dukascopy", "oanda", "binance", "yahoo", "akshare"}
+    assert session_status("akshare", "SHFE:RB0", stamp("2026-10-12T12:00:00+00:00"))["market_session"] == "unknown"
 
 
 def test_oanda_account_profile_is_identity_bound_and_keeps_boundary_unknown(monkeypatch):

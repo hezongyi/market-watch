@@ -31,10 +31,11 @@ def report(db, version_id, previous_version_id=None):
     output = {"current": summary(version), "previous": summary(previous) if previous else None,
         "meaning": "发布清单与周期状态差异；根数或校验和变化不等于逐分钟价格修订数量。已回收版本仅比较保留清单。"}
     if previous:
-        old_chunks = {(c["start"], c["end"]): c for c in previous.manifest.get("chunks", [])}
+        old_chunks = {(c.get("timeframe", "M1"), c["start"], c["end"]): c
+                      for c in previous.manifest.get("chunks", [])}
         comparable = shared = changed = 0
         for chunk in version.manifest.get("chunks", []):
-            old = old_chunks.get((chunk["start"], chunk["end"]))
+            old = old_chunks.get((chunk.get("timeframe", "M1"), chunk["start"], chunk["end"]))
             if old:
                 comparable += 1
                 same = old["checksum"] == chunk["checksum"]

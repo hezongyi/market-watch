@@ -1,0 +1,1241 @@
+{
+  "label": "configured-idle-five-minutes",
+  "duration_seconds": 300,
+  "snapshots": [
+    {
+      "slot": null,
+      "source_fetches": 0,
+      "provider_bars": 0,
+      "provider_interests": 0,
+      "versions": 0,
+      "db_writes": {
+        "tup_inserted": 5854,
+        "tup_updated": 500,
+        "tup_deleted": 14
+      },
+      "helpers": 0,
+      "stats": [
+        {
+          "BlockIO": "360kB / 8.19kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-tls-1",
+          "ID": "c3aa40fbd13e",
+          "MemPerc": "7.82%",
+          "MemUsage": "5.004MiB / 64MiB",
+          "Name": "mw-fxcm-history-20261024-tls-1",
+          "NetIO": "2.68kB / 3.6kB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "319kB / 16.4kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-chart-1",
+          "ID": "cc948d0f0db6",
+          "MemPerc": "3.60%",
+          "MemUsage": "4.609MiB / 128MiB",
+          "Name": "mw-fxcm-history-20261024-chart-1",
+          "NetIO": "798B / 126B",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "9.47MB / 16.4kB",
+          "CPUPerc": "0.01%",
+          "Container": "mw-fxcm-history-20261024-web-1",
+          "ID": "da23a82aec14",
+          "MemPerc": "11.35%",
+          "MemUsage": "7.266MiB / 64MiB",
+          "Name": "mw-fxcm-history-20261024-web-1",
+          "NetIO": "2.22kB / 1.35kB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "115kB / 0B",
+          "CPUPerc": "1.27%",
+          "Container": "mw-fxcm-history-20261024-chart-history-worker-1",
+          "ID": "ed391d0b75da",
+          "MemPerc": "13.66%",
+          "MemUsage": "104.9MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-chart-history-worker-1",
+          "NetIO": "388kB / 348kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "188kB / 0B",
+          "CPUPerc": "2.78%",
+          "Container": "mw-fxcm-history-20261024-history-worker-1",
+          "ID": "83f907501976",
+          "MemPerc": "12.66%",
+          "MemUsage": "97.22MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-history-worker-1",
+          "NetIO": "125kB / 218kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "156kB / 0B",
+          "CPUPerc": "0.36%",
+          "Container": "mw-fxcm-history-20261024-native-history-worker-1",
+          "ID": "54c72ab88b38",
+          "MemPerc": "13.72%",
+          "MemUsage": "105.4MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-native-history-worker-1",
+          "NetIO": "96.8kB / 97.5kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "147kB / 0B",
+          "CPUPerc": "2.06%",
+          "Container": "mw-fxcm-history-20261024-market-stream-worker-1",
+          "ID": "a5007d6e2396",
+          "MemPerc": "13.33%",
+          "MemUsage": "102.4MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-market-stream-worker-1",
+          "NetIO": "580kB / 480kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "22.5MB / 0B",
+          "CPUPerc": "2.12%",
+          "Container": "mw-fxcm-history-20261024-api-1",
+          "ID": "5174dae25ed9",
+          "MemPerc": "16.51%",
+          "MemUsage": "126.8MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-api-1",
+          "NetIO": "1.54MB / 698kB",
+          "PIDs": "19"
+        },
+        {
+          "BlockIO": "56.7MB / 136MB",
+          "CPUPerc": "11.37%",
+          "Container": "mw-fxcm-history-20261024-postgres-1",
+          "ID": "c83a168b6c87",
+          "MemPerc": "21.75%",
+          "MemUsage": "111.3MiB / 512MiB",
+          "Name": "mw-fxcm-history-20261024-postgres-1",
+          "NetIO": "1.95MB / 2.7MB",
+          "PIDs": "17"
+        }
+      ],
+      "host": {
+        "disk_available": 15632420864,
+        "load": [
+          5.3095703125,
+          5.6708984375,
+          4.3173828125
+        ]
+      },
+      "at": "2026-10-25T02:46:08.038479+00:00"
+    },
+    {
+      "slot": null,
+      "source_fetches": 0,
+      "provider_bars": 0,
+      "provider_interests": 0,
+      "versions": 0,
+      "db_writes": {
+        "tup_inserted": 5877,
+        "tup_updated": 747,
+        "tup_deleted": 15
+      },
+      "helpers": 0,
+      "stats": [
+        {
+          "BlockIO": "360kB / 8.19kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-tls-1",
+          "ID": "c3aa40fbd13e",
+          "MemPerc": "7.82%",
+          "MemUsage": "5.004MiB / 64MiB",
+          "Name": "mw-fxcm-history-20261024-tls-1",
+          "NetIO": "2.68kB / 3.6kB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "319kB / 16.4kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-chart-1",
+          "ID": "cc948d0f0db6",
+          "MemPerc": "3.60%",
+          "MemUsage": "4.609MiB / 128MiB",
+          "Name": "mw-fxcm-history-20261024-chart-1",
+          "NetIO": "798B / 126B",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "9.47MB / 16.4kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-web-1",
+          "ID": "da23a82aec14",
+          "MemPerc": "11.35%",
+          "MemUsage": "7.266MiB / 64MiB",
+          "Name": "mw-fxcm-history-20261024-web-1",
+          "NetIO": "2.22kB / 1.35kB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "115kB / 0B",
+          "CPUPerc": "1.01%",
+          "Container": "mw-fxcm-history-20261024-chart-history-worker-1",
+          "ID": "ed391d0b75da",
+          "MemPerc": "13.66%",
+          "MemUsage": "104.9MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-chart-history-worker-1",
+          "NetIO": "558kB / 491kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "188kB / 0B",
+          "CPUPerc": "2.45%",
+          "Container": "mw-fxcm-history-20261024-history-worker-1",
+          "ID": "83f907501976",
+          "MemPerc": "12.66%",
+          "MemUsage": "97.23MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-history-worker-1",
+          "NetIO": "171kB / 270kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "156kB / 0B",
+          "CPUPerc": "0.31%",
+          "Container": "mw-fxcm-history-20261024-native-history-worker-1",
+          "ID": "54c72ab88b38",
+          "MemPerc": "13.73%",
+          "MemUsage": "105.4MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-native-history-worker-1",
+          "NetIO": "129kB / 134kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "147kB / 0B",
+          "CPUPerc": "1.94%",
+          "Container": "mw-fxcm-history-20261024-market-stream-worker-1",
+          "ID": "a5007d6e2396",
+          "MemPerc": "13.33%",
+          "MemUsage": "102.4MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-market-stream-worker-1",
+          "NetIO": "837kB / 689kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "22.7MB / 0B",
+          "CPUPerc": "1.95%",
+          "Container": "mw-fxcm-history-20261024-api-1",
+          "ID": "5174dae25ed9",
+          "MemPerc": "16.54%",
+          "MemUsage": "127MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-api-1",
+          "NetIO": "2.15MB / 947kB",
+          "PIDs": "19"
+        },
+        {
+          "BlockIO": "56.8MB / 141MB",
+          "CPUPerc": "13.23%",
+          "Container": "mw-fxcm-history-20261024-postgres-1",
+          "ID": "c83a168b6c87",
+          "MemPerc": "20.99%",
+          "MemUsage": "107.5MiB / 512MiB",
+          "Name": "mw-fxcm-history-20261024-postgres-1",
+          "NetIO": "2.63MB / 3.8MB",
+          "PIDs": "14"
+        }
+      ],
+      "host": {
+        "disk_available": 15664635904,
+        "load": [
+          5.8994140625,
+          5.78515625,
+          4.4072265625
+        ]
+      },
+      "at": "2026-10-25T02:46:43.824955+00:00"
+    },
+    {
+      "slot": null,
+      "source_fetches": 0,
+      "provider_bars": 0,
+      "provider_interests": 0,
+      "versions": 0,
+      "db_writes": {
+        "tup_inserted": 5877,
+        "tup_updated": 851,
+        "tup_deleted": 15
+      },
+      "helpers": 0,
+      "stats": [
+        {
+          "BlockIO": "360kB / 8.19kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-tls-1",
+          "ID": "c3aa40fbd13e",
+          "MemPerc": "7.82%",
+          "MemUsage": "5.004MiB / 64MiB",
+          "Name": "mw-fxcm-history-20261024-tls-1",
+          "NetIO": "2.68kB / 3.6kB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "319kB / 16.4kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-chart-1",
+          "ID": "cc948d0f0db6",
+          "MemPerc": "3.60%",
+          "MemUsage": "4.609MiB / 128MiB",
+          "Name": "mw-fxcm-history-20261024-chart-1",
+          "NetIO": "798B / 126B",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "9.47MB / 16.4kB",
+          "CPUPerc": "0.01%",
+          "Container": "mw-fxcm-history-20261024-web-1",
+          "ID": "da23a82aec14",
+          "MemPerc": "11.35%",
+          "MemUsage": "7.266MiB / 64MiB",
+          "Name": "mw-fxcm-history-20261024-web-1",
+          "NetIO": "2.22kB / 1.35kB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "115kB / 0B",
+          "CPUPerc": "2.59%",
+          "Container": "mw-fxcm-history-20261024-chart-history-worker-1",
+          "ID": "ed391d0b75da",
+          "MemPerc": "13.66%",
+          "MemUsage": "104.9MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-chart-history-worker-1",
+          "NetIO": "734kB / 638kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "188kB / 0B",
+          "CPUPerc": "0.89%",
+          "Container": "mw-fxcm-history-20261024-history-worker-1",
+          "ID": "83f907501976",
+          "MemPerc": "12.66%",
+          "MemUsage": "97.25MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-history-worker-1",
+          "NetIO": "218kB / 307kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "156kB / 0B",
+          "CPUPerc": "0.46%",
+          "Container": "mw-fxcm-history-20261024-native-history-worker-1",
+          "ID": "54c72ab88b38",
+          "MemPerc": "13.73%",
+          "MemUsage": "105.4MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-native-history-worker-1",
+          "NetIO": "163kB / 172kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "147kB / 0B",
+          "CPUPerc": "2.34%",
+          "Container": "mw-fxcm-history-20261024-market-stream-worker-1",
+          "ID": "a5007d6e2396",
+          "MemPerc": "13.34%",
+          "MemUsage": "102.4MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-market-stream-worker-1",
+          "NetIO": "1.1MB / 906kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "22.7MB / 0B",
+          "CPUPerc": "2.82%",
+          "Container": "mw-fxcm-history-20261024-api-1",
+          "ID": "5174dae25ed9",
+          "MemPerc": "16.55%",
+          "MemUsage": "127.1MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-api-1",
+          "NetIO": "2.79MB / 1.22MB",
+          "PIDs": "19"
+        },
+        {
+          "BlockIO": "56.8MB / 144MB",
+          "CPUPerc": "1.16%",
+          "Container": "mw-fxcm-history-20261024-postgres-1",
+          "ID": "c83a168b6c87",
+          "MemPerc": "21.01%",
+          "MemUsage": "107.6MiB / 512MiB",
+          "Name": "mw-fxcm-history-20261024-postgres-1",
+          "NetIO": "3.35MB / 4.96MB",
+          "PIDs": "14"
+        }
+      ],
+      "host": {
+        "disk_available": 15664222208,
+        "load": [
+          4.20654296875,
+          5.40478515625,
+          4.33203125
+        ]
+      },
+      "at": "2026-10-25T02:47:20.465218+00:00"
+    },
+    {
+      "slot": null,
+      "source_fetches": 0,
+      "provider_bars": 0,
+      "provider_interests": 0,
+      "versions": 0,
+      "db_writes": {
+        "tup_inserted": 5879,
+        "tup_updated": 961,
+        "tup_deleted": 15
+      },
+      "helpers": 0,
+      "stats": [
+        {
+          "BlockIO": "360kB / 8.19kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-tls-1",
+          "ID": "c3aa40fbd13e",
+          "MemPerc": "7.82%",
+          "MemUsage": "5.004MiB / 64MiB",
+          "Name": "mw-fxcm-history-20261024-tls-1",
+          "NetIO": "2.68kB / 3.6kB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "319kB / 16.4kB",
+          "CPUPerc": "0.01%",
+          "Container": "mw-fxcm-history-20261024-chart-1",
+          "ID": "cc948d0f0db6",
+          "MemPerc": "3.60%",
+          "MemUsage": "4.609MiB / 128MiB",
+          "Name": "mw-fxcm-history-20261024-chart-1",
+          "NetIO": "798B / 126B",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "9.47MB / 16.4kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-web-1",
+          "ID": "da23a82aec14",
+          "MemPerc": "11.35%",
+          "MemUsage": "7.266MiB / 64MiB",
+          "Name": "mw-fxcm-history-20261024-web-1",
+          "NetIO": "2.22kB / 1.35kB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "115kB / 0B",
+          "CPUPerc": "1.55%",
+          "Container": "mw-fxcm-history-20261024-chart-history-worker-1",
+          "ID": "ed391d0b75da",
+          "MemPerc": "13.67%",
+          "MemUsage": "105MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-chart-history-worker-1",
+          "NetIO": "904kB / 781kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "188kB / 0B",
+          "CPUPerc": "1.09%",
+          "Container": "mw-fxcm-history-20261024-history-worker-1",
+          "ID": "83f907501976",
+          "MemPerc": "12.67%",
+          "MemUsage": "97.27MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-history-worker-1",
+          "NetIO": "264kB / 342kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "156kB / 0B",
+          "CPUPerc": "0.35%",
+          "Container": "mw-fxcm-history-20261024-native-history-worker-1",
+          "ID": "54c72ab88b38",
+          "MemPerc": "13.73%",
+          "MemUsage": "105.4MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-native-history-worker-1",
+          "NetIO": "198kB / 211kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "147kB / 0B",
+          "CPUPerc": "2.93%",
+          "Container": "mw-fxcm-history-20261024-market-stream-worker-1",
+          "ID": "a5007d6e2396",
+          "MemPerc": "13.34%",
+          "MemUsage": "102.4MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-market-stream-worker-1",
+          "NetIO": "1.36MB / 1.11MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "22.7MB / 0B",
+          "CPUPerc": "3.10%",
+          "Container": "mw-fxcm-history-20261024-api-1",
+          "ID": "5174dae25ed9",
+          "MemPerc": "16.57%",
+          "MemUsage": "127.3MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-api-1",
+          "NetIO": "3.43MB / 1.48MB",
+          "PIDs": "19"
+        },
+        {
+          "BlockIO": "56.8MB / 147MB",
+          "CPUPerc": "3.65%",
+          "Container": "mw-fxcm-history-20261024-postgres-1",
+          "ID": "c83a168b6c87",
+          "MemPerc": "21.43%",
+          "MemUsage": "109.7MiB / 512MiB",
+          "Name": "mw-fxcm-history-20261024-postgres-1",
+          "NetIO": "4.03MB / 6.11MB",
+          "PIDs": "20"
+        }
+      ],
+      "host": {
+        "disk_available": 15662481408,
+        "load": [
+          5.13232421875,
+          5.40625,
+          4.373046875
+        ]
+      },
+      "at": "2026-10-25T02:47:57.141130+00:00"
+    },
+    {
+      "slot": null,
+      "source_fetches": 0,
+      "provider_bars": 0,
+      "provider_interests": 0,
+      "versions": 0,
+      "db_writes": {
+        "tup_inserted": 5879,
+        "tup_updated": 1063,
+        "tup_deleted": 15
+      },
+      "helpers": 0,
+      "stats": [
+        {
+          "BlockIO": "360kB / 8.19kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-tls-1",
+          "ID": "c3aa40fbd13e",
+          "MemPerc": "7.82%",
+          "MemUsage": "5.004MiB / 64MiB",
+          "Name": "mw-fxcm-history-20261024-tls-1",
+          "NetIO": "2.68kB / 3.6kB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "319kB / 16.4kB",
+          "CPUPerc": "0.01%",
+          "Container": "mw-fxcm-history-20261024-chart-1",
+          "ID": "cc948d0f0db6",
+          "MemPerc": "3.60%",
+          "MemUsage": "4.609MiB / 128MiB",
+          "Name": "mw-fxcm-history-20261024-chart-1",
+          "NetIO": "798B / 126B",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "9.47MB / 16.4kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-web-1",
+          "ID": "da23a82aec14",
+          "MemPerc": "11.35%",
+          "MemUsage": "7.266MiB / 64MiB",
+          "Name": "mw-fxcm-history-20261024-web-1",
+          "NetIO": "2.22kB / 1.35kB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "115kB / 0B",
+          "CPUPerc": "1.28%",
+          "Container": "mw-fxcm-history-20261024-chart-history-worker-1",
+          "ID": "ed391d0b75da",
+          "MemPerc": "13.67%",
+          "MemUsage": "105MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-chart-history-worker-1",
+          "NetIO": "1.08MB / 928kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "188kB / 0B",
+          "CPUPerc": "1.00%",
+          "Container": "mw-fxcm-history-20261024-history-worker-1",
+          "ID": "83f907501976",
+          "MemPerc": "12.67%",
+          "MemUsage": "97.28MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-history-worker-1",
+          "NetIO": "309kB / 377kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "156kB / 0B",
+          "CPUPerc": "0.41%",
+          "Container": "mw-fxcm-history-20261024-native-history-worker-1",
+          "ID": "54c72ab88b38",
+          "MemPerc": "13.73%",
+          "MemUsage": "105.5MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-native-history-worker-1",
+          "NetIO": "230kB / 247kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "147kB / 0B",
+          "CPUPerc": "2.19%",
+          "Container": "mw-fxcm-history-20261024-market-stream-worker-1",
+          "ID": "a5007d6e2396",
+          "MemPerc": "13.34%",
+          "MemUsage": "102.4MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-market-stream-worker-1",
+          "NetIO": "1.62MB / 1.32MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "22.7MB / 0B",
+          "CPUPerc": "10.62%",
+          "Container": "mw-fxcm-history-20261024-api-1",
+          "ID": "5174dae25ed9",
+          "MemPerc": "16.58%",
+          "MemUsage": "127.3MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-api-1",
+          "NetIO": "4.03MB / 1.73MB",
+          "PIDs": "19"
+        },
+        {
+          "BlockIO": "56.9MB / 150MB",
+          "CPUPerc": "1.12%",
+          "Container": "mw-fxcm-history-20261024-postgres-1",
+          "ID": "c83a168b6c87",
+          "MemPerc": "21.19%",
+          "MemUsage": "108.5MiB / 512MiB",
+          "Name": "mw-fxcm-history-20261024-postgres-1",
+          "NetIO": "4.72MB / 7.26MB",
+          "PIDs": "14"
+        }
+      ],
+      "host": {
+        "disk_available": 15657476096,
+        "load": [
+          5.380859375,
+          5.46533203125,
+          4.43310546875
+        ]
+      },
+      "at": "2026-10-25T02:48:33.258671+00:00"
+    },
+    {
+      "slot": null,
+      "source_fetches": 0,
+      "provider_bars": 0,
+      "provider_interests": 0,
+      "versions": 0,
+      "db_writes": {
+        "tup_inserted": 5879,
+        "tup_updated": 1169,
+        "tup_deleted": 15
+      },
+      "helpers": 0,
+      "stats": [
+        {
+          "BlockIO": "360kB / 8.19kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-tls-1",
+          "ID": "c3aa40fbd13e",
+          "MemPerc": "7.82%",
+          "MemUsage": "5.004MiB / 64MiB",
+          "Name": "mw-fxcm-history-20261024-tls-1",
+          "NetIO": "2.68kB / 3.6kB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "319kB / 16.4kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-chart-1",
+          "ID": "cc948d0f0db6",
+          "MemPerc": "3.60%",
+          "MemUsage": "4.609MiB / 128MiB",
+          "Name": "mw-fxcm-history-20261024-chart-1",
+          "NetIO": "798B / 126B",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "9.47MB / 16.4kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-web-1",
+          "ID": "da23a82aec14",
+          "MemPerc": "11.35%",
+          "MemUsage": "7.266MiB / 64MiB",
+          "Name": "mw-fxcm-history-20261024-web-1",
+          "NetIO": "2.22kB / 1.35kB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "115kB / 0B",
+          "CPUPerc": "1.75%",
+          "Container": "mw-fxcm-history-20261024-chart-history-worker-1",
+          "ID": "ed391d0b75da",
+          "MemPerc": "13.68%",
+          "MemUsage": "105MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-chart-history-worker-1",
+          "NetIO": "1.25MB / 1.07MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "188kB / 0B",
+          "CPUPerc": "2.71%",
+          "Container": "mw-fxcm-history-20261024-history-worker-1",
+          "ID": "83f907501976",
+          "MemPerc": "12.67%",
+          "MemUsage": "97.31MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-history-worker-1",
+          "NetIO": "361kB / 417kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "156kB / 0B",
+          "CPUPerc": "0.35%",
+          "Container": "mw-fxcm-history-20261024-native-history-worker-1",
+          "ID": "54c72ab88b38",
+          "MemPerc": "13.73%",
+          "MemUsage": "105.5MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-native-history-worker-1",
+          "NetIO": "265kB / 286kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "147kB / 0B",
+          "CPUPerc": "2.10%",
+          "Container": "mw-fxcm-history-20261024-market-stream-worker-1",
+          "ID": "a5007d6e2396",
+          "MemPerc": "13.34%",
+          "MemUsage": "102.4MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-market-stream-worker-1",
+          "NetIO": "1.88MB / 1.53MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "22.7MB / 0B",
+          "CPUPerc": "2.45%",
+          "Container": "mw-fxcm-history-20261024-api-1",
+          "ID": "5174dae25ed9",
+          "MemPerc": "16.59%",
+          "MemUsage": "127.4MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-api-1",
+          "NetIO": "4.68MB / 2MB",
+          "PIDs": "19"
+        },
+        {
+          "BlockIO": "56.9MB / 152MB",
+          "CPUPerc": "1.25%",
+          "Container": "mw-fxcm-history-20261024-postgres-1",
+          "ID": "c83a168b6c87",
+          "MemPerc": "21.19%",
+          "MemUsage": "108.5MiB / 512MiB",
+          "Name": "mw-fxcm-history-20261024-postgres-1",
+          "NetIO": "5.4MB / 8.38MB",
+          "PIDs": "14"
+        }
+      ],
+      "host": {
+        "disk_available": 15660777472,
+        "load": [
+          6.10302734375,
+          5.59765625,
+          4.513671875
+        ]
+      },
+      "at": "2026-10-25T02:49:10.121142+00:00"
+    },
+    {
+      "slot": null,
+      "source_fetches": 0,
+      "provider_bars": 0,
+      "provider_interests": 0,
+      "versions": 0,
+      "db_writes": {
+        "tup_inserted": 5879,
+        "tup_updated": 1275,
+        "tup_deleted": 15
+      },
+      "helpers": 0,
+      "stats": [
+        {
+          "BlockIO": "360kB / 8.19kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-tls-1",
+          "ID": "c3aa40fbd13e",
+          "MemPerc": "7.82%",
+          "MemUsage": "5.004MiB / 64MiB",
+          "Name": "mw-fxcm-history-20261024-tls-1",
+          "NetIO": "2.68kB / 3.6kB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "319kB / 16.4kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-chart-1",
+          "ID": "cc948d0f0db6",
+          "MemPerc": "3.60%",
+          "MemUsage": "4.609MiB / 128MiB",
+          "Name": "mw-fxcm-history-20261024-chart-1",
+          "NetIO": "798B / 126B",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "9.47MB / 16.4kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-web-1",
+          "ID": "da23a82aec14",
+          "MemPerc": "11.35%",
+          "MemUsage": "7.266MiB / 64MiB",
+          "Name": "mw-fxcm-history-20261024-web-1",
+          "NetIO": "2.22kB / 1.35kB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "115kB / 0B",
+          "CPUPerc": "1.23%",
+          "Container": "mw-fxcm-history-20261024-chart-history-worker-1",
+          "ID": "ed391d0b75da",
+          "MemPerc": "13.68%",
+          "MemUsage": "105.1MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-chart-history-worker-1",
+          "NetIO": "1.42MB / 1.21MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "188kB / 0B",
+          "CPUPerc": "0.91%",
+          "Container": "mw-fxcm-history-20261024-history-worker-1",
+          "ID": "83f907501976",
+          "MemPerc": "12.67%",
+          "MemUsage": "97.32MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-history-worker-1",
+          "NetIO": "406kB / 452kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "156kB / 0B",
+          "CPUPerc": "0.31%",
+          "Container": "mw-fxcm-history-20261024-native-history-worker-1",
+          "ID": "54c72ab88b38",
+          "MemPerc": "13.74%",
+          "MemUsage": "105.5MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-native-history-worker-1",
+          "NetIO": "299kB / 323kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "147kB / 0B",
+          "CPUPerc": "1.79%",
+          "Container": "mw-fxcm-history-20261024-market-stream-worker-1",
+          "ID": "a5007d6e2396",
+          "MemPerc": "13.34%",
+          "MemUsage": "102.4MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-market-stream-worker-1",
+          "NetIO": "2.14MB / 1.74MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "25.5MB / 0B",
+          "CPUPerc": "2.02%",
+          "Container": "mw-fxcm-history-20261024-api-1",
+          "ID": "5174dae25ed9",
+          "MemPerc": "16.77%",
+          "MemUsage": "128.8MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-api-1",
+          "NetIO": "5.3MB / 2.27MB",
+          "PIDs": "19"
+        },
+        {
+          "BlockIO": "56.9MB / 158MB",
+          "CPUPerc": "1.53%",
+          "Container": "mw-fxcm-history-20261024-postgres-1",
+          "ID": "c83a168b6c87",
+          "MemPerc": "21.23%",
+          "MemUsage": "108.7MiB / 512MiB",
+          "Name": "mw-fxcm-history-20261024-postgres-1",
+          "NetIO": "6.09MB / 9.51MB",
+          "PIDs": "14"
+        }
+      ],
+      "host": {
+        "disk_available": 15656988672,
+        "load": [
+          4.1796875,
+          5.19287109375,
+          4.4189453125
+        ]
+      },
+      "at": "2026-10-25T02:49:45.953814+00:00"
+    },
+    {
+      "slot": null,
+      "source_fetches": 0,
+      "provider_bars": 0,
+      "provider_interests": 0,
+      "versions": 0,
+      "db_writes": {
+        "tup_inserted": 5879,
+        "tup_updated": 1371,
+        "tup_deleted": 15
+      },
+      "helpers": 0,
+      "stats": [
+        {
+          "BlockIO": "360kB / 8.19kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-tls-1",
+          "ID": "c3aa40fbd13e",
+          "MemPerc": "7.82%",
+          "MemUsage": "5.004MiB / 64MiB",
+          "Name": "mw-fxcm-history-20261024-tls-1",
+          "NetIO": "2.68kB / 3.6kB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "319kB / 16.4kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-chart-1",
+          "ID": "cc948d0f0db6",
+          "MemPerc": "3.60%",
+          "MemUsage": "4.609MiB / 128MiB",
+          "Name": "mw-fxcm-history-20261024-chart-1",
+          "NetIO": "798B / 126B",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "9.47MB / 16.4kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-web-1",
+          "ID": "da23a82aec14",
+          "MemPerc": "11.35%",
+          "MemUsage": "7.266MiB / 64MiB",
+          "Name": "mw-fxcm-history-20261024-web-1",
+          "NetIO": "2.22kB / 1.35kB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "115kB / 0B",
+          "CPUPerc": "1.37%",
+          "Container": "mw-fxcm-history-20261024-chart-history-worker-1",
+          "ID": "ed391d0b75da",
+          "MemPerc": "13.71%",
+          "MemUsage": "105.3MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-chart-history-worker-1",
+          "NetIO": "1.59MB / 1.35MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "188kB / 0B",
+          "CPUPerc": "0.73%",
+          "Container": "mw-fxcm-history-20261024-history-worker-1",
+          "ID": "83f907501976",
+          "MemPerc": "12.67%",
+          "MemUsage": "97.33MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-history-worker-1",
+          "NetIO": "453kB / 488kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "156kB / 0B",
+          "CPUPerc": "0.33%",
+          "Container": "mw-fxcm-history-20261024-native-history-worker-1",
+          "ID": "54c72ab88b38",
+          "MemPerc": "13.74%",
+          "MemUsage": "105.5MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-native-history-worker-1",
+          "NetIO": "331kB / 359kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "147kB / 0B",
+          "CPUPerc": "2.04%",
+          "Container": "mw-fxcm-history-20261024-market-stream-worker-1",
+          "ID": "a5007d6e2396",
+          "MemPerc": "13.34%",
+          "MemUsage": "102.4MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-market-stream-worker-1",
+          "NetIO": "2.4MB / 1.95MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "25.5MB / 0B",
+          "CPUPerc": "15.56%",
+          "Container": "mw-fxcm-history-20261024-api-1",
+          "ID": "5174dae25ed9",
+          "MemPerc": "16.78%",
+          "MemUsage": "128.9MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-api-1",
+          "NetIO": "5.93MB / 2.53MB",
+          "PIDs": "19"
+        },
+        {
+          "BlockIO": "56.9MB / 163MB",
+          "CPUPerc": "12.10%",
+          "Container": "mw-fxcm-history-20261024-postgres-1",
+          "ID": "c83a168b6c87",
+          "MemPerc": "21.24%",
+          "MemUsage": "108.8MiB / 512MiB",
+          "Name": "mw-fxcm-history-20261024-postgres-1",
+          "NetIO": "6.8MB / 10.7MB",
+          "PIDs": "14"
+        }
+      ],
+      "host": {
+        "disk_available": 15659958272,
+        "load": [
+          5.3408203125,
+          5.35009765625,
+          4.50048828125
+        ]
+      },
+      "at": "2026-10-25T02:50:21.843431+00:00"
+    },
+    {
+      "slot": null,
+      "source_fetches": 0,
+      "provider_bars": 0,
+      "provider_interests": 0,
+      "versions": 0,
+      "db_writes": {
+        "tup_inserted": 5879,
+        "tup_updated": 1481,
+        "tup_deleted": 15
+      },
+      "helpers": 0,
+      "stats": [
+        {
+          "BlockIO": "360kB / 8.19kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-tls-1",
+          "ID": "c3aa40fbd13e",
+          "MemPerc": "7.82%",
+          "MemUsage": "5.004MiB / 64MiB",
+          "Name": "mw-fxcm-history-20261024-tls-1",
+          "NetIO": "2.68kB / 3.6kB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "319kB / 16.4kB",
+          "CPUPerc": "0.01%",
+          "Container": "mw-fxcm-history-20261024-chart-1",
+          "ID": "cc948d0f0db6",
+          "MemPerc": "3.60%",
+          "MemUsage": "4.609MiB / 128MiB",
+          "Name": "mw-fxcm-history-20261024-chart-1",
+          "NetIO": "798B / 126B",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "9.47MB / 16.4kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-web-1",
+          "ID": "da23a82aec14",
+          "MemPerc": "11.35%",
+          "MemUsage": "7.266MiB / 64MiB",
+          "Name": "mw-fxcm-history-20261024-web-1",
+          "NetIO": "2.22kB / 1.35kB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "115kB / 0B",
+          "CPUPerc": "1.19%",
+          "Container": "mw-fxcm-history-20261024-chart-history-worker-1",
+          "ID": "ed391d0b75da",
+          "MemPerc": "13.71%",
+          "MemUsage": "105.3MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-chart-history-worker-1",
+          "NetIO": "1.76MB / 1.5MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "188kB / 0B",
+          "CPUPerc": "0.77%",
+          "Container": "mw-fxcm-history-20261024-history-worker-1",
+          "ID": "83f907501976",
+          "MemPerc": "12.67%",
+          "MemUsage": "97.34MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-history-worker-1",
+          "NetIO": "498kB / 523kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "156kB / 0B",
+          "CPUPerc": "0.32%",
+          "Container": "mw-fxcm-history-20261024-native-history-worker-1",
+          "ID": "54c72ab88b38",
+          "MemPerc": "13.74%",
+          "MemUsage": "105.5MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-native-history-worker-1",
+          "NetIO": "365kB / 398kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "147kB / 0B",
+          "CPUPerc": "2.31%",
+          "Container": "mw-fxcm-history-20261024-market-stream-worker-1",
+          "ID": "a5007d6e2396",
+          "MemPerc": "13.34%",
+          "MemUsage": "102.4MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-market-stream-worker-1",
+          "NetIO": "2.65MB / 2.15MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "25.5MB / 0B",
+          "CPUPerc": "2.33%",
+          "Container": "mw-fxcm-history-20261024-api-1",
+          "ID": "5174dae25ed9",
+          "MemPerc": "16.79%",
+          "MemUsage": "128.9MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-api-1",
+          "NetIO": "6.53MB / 2.77MB",
+          "PIDs": "19"
+        },
+        {
+          "BlockIO": "56.9MB / 166MB",
+          "CPUPerc": "1.09%",
+          "Container": "mw-fxcm-history-20261024-postgres-1",
+          "ID": "c83a168b6c87",
+          "MemPerc": "21.25%",
+          "MemUsage": "108.8MiB / 512MiB",
+          "Name": "mw-fxcm-history-20261024-postgres-1",
+          "NetIO": "7.46MB / 11.8MB",
+          "PIDs": "14"
+        }
+      ],
+      "host": {
+        "disk_available": 15659507712,
+        "load": [
+          4.05712890625,
+          5.021484375,
+          4.4248046875
+        ]
+      },
+      "at": "2026-10-25T02:50:57.663679+00:00"
+    },
+    {
+      "slot": null,
+      "source_fetches": 0,
+      "provider_bars": 0,
+      "provider_interests": 0,
+      "versions": 0,
+      "db_writes": {
+        "tup_inserted": 5879,
+        "tup_updated": 1514,
+        "tup_deleted": 15
+      },
+      "helpers": 0,
+      "stats": [
+        {
+          "BlockIO": "360kB / 8.19kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-tls-1",
+          "ID": "c3aa40fbd13e",
+          "MemPerc": "7.82%",
+          "MemUsage": "5.004MiB / 64MiB",
+          "Name": "mw-fxcm-history-20261024-tls-1",
+          "NetIO": "2.68kB / 3.6kB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "319kB / 16.4kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-chart-1",
+          "ID": "cc948d0f0db6",
+          "MemPerc": "3.60%",
+          "MemUsage": "4.609MiB / 128MiB",
+          "Name": "mw-fxcm-history-20261024-chart-1",
+          "NetIO": "798B / 126B",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "9.47MB / 16.4kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-web-1",
+          "ID": "da23a82aec14",
+          "MemPerc": "11.35%",
+          "MemUsage": "7.266MiB / 64MiB",
+          "Name": "mw-fxcm-history-20261024-web-1",
+          "NetIO": "2.22kB / 1.35kB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "115kB / 0B",
+          "CPUPerc": "1.14%",
+          "Container": "mw-fxcm-history-20261024-chart-history-worker-1",
+          "ID": "ed391d0b75da",
+          "MemPerc": "13.71%",
+          "MemUsage": "105.3MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-chart-history-worker-1",
+          "NetIO": "1.81MB / 1.54MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "188kB / 0B",
+          "CPUPerc": "0.88%",
+          "Container": "mw-fxcm-history-20261024-history-worker-1",
+          "ID": "83f907501976",
+          "MemPerc": "12.67%",
+          "MemUsage": "97.34MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-history-worker-1",
+          "NetIO": "511kB / 533kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "156kB / 0B",
+          "CPUPerc": "0.27%",
+          "Container": "mw-fxcm-history-20261024-native-history-worker-1",
+          "ID": "54c72ab88b38",
+          "MemPerc": "13.74%",
+          "MemUsage": "105.5MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-native-history-worker-1",
+          "NetIO": "374kB / 408kB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "147kB / 0B",
+          "CPUPerc": "2.01%",
+          "Container": "mw-fxcm-history-20261024-market-stream-worker-1",
+          "ID": "a5007d6e2396",
+          "MemPerc": "13.34%",
+          "MemUsage": "102.4MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-market-stream-worker-1",
+          "NetIO": "2.73MB / 2.21MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "25.5MB / 0B",
+          "CPUPerc": "2.13%",
+          "Container": "mw-fxcm-history-20261024-api-1",
+          "ID": "5174dae25ed9",
+          "MemPerc": "16.80%",
+          "MemUsage": "129MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-api-1",
+          "NetIO": "6.73MB / 2.86MB",
+          "PIDs": "19"
+        },
+        {
+          "BlockIO": "56.9MB / 167MB",
+          "CPUPerc": "1.08%",
+          "Container": "mw-fxcm-history-20261024-postgres-1",
+          "ID": "c83a168b6c87",
+          "MemPerc": "21.25%",
+          "MemUsage": "108.8MiB / 512MiB",
+          "Name": "mw-fxcm-history-20261024-postgres-1",
+          "NetIO": "7.66MB / 12.1MB",
+          "PIDs": "14"
+        }
+      ],
+      "host": {
+        "disk_available": 15659278336,
+        "load": [
+          4.03564453125,
+          4.9873046875,
+          4.42041015625
+        ]
+      },
+      "at": "2026-10-25T02:51:08.023133+00:00"
+    }
+  ],
+  "no_new_upstream_admissions": true,
+  "helpers_absent_all_samples": true,
+  "source_fetch_count_unchanged": true,
+  "provider_bar_count_unchanged": true,
+  "elapsed_seconds": 306.15
+}

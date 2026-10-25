@@ -16,7 +16,7 @@ const pending = new Map();
 const acknowledgedNotices = new Set();
 let ordinaryNotices;
 let noticeUI, noticeState, noticeOpenEvent, alertOpenSignal;
-let activeNotices = [], noticeDialogOpen = false, chartMenu, indicatorPicker, alertBridge, alertUI, alertUISession, alertUIDraft, alertUIWorkspace, alertUIAttach, dataCenter;
+let activeNotices = [], noticeDialogOpen = false, chartMenu, indicatorPicker, alertBridge, alertUI, alertUISession, alertUIDraft, alertUIWorkspace, alertUIAttach, dataCenter, mobileWorkspaceId;
 let invalidateAlertUI = () => {};
 // Lazy loading keeps ordinary datafeed consumers independent of the renderer.
 let swingSnapshots;
@@ -61,6 +61,9 @@ let seq = 0,
   nativeReadonly = false;
 let barRangeMapping, syncCoordinator;
 let watchlistLayout, symbolFlags, activeTab;
+let mobileChartView;
+let mobileChartDocument;
+let mobileChartDirty=false, mobileReturnDirty=false, mobileEditRevision=0, mobileSaving=false, saveMobileChartView;
 let captureWorkspaceState, discardWorkspaceChanges;
 const watchlistMetadata = new Map();
 let rangeGuard, edgeGuard, demandReporter, progressivePages, progressivePoll, beforeInitialHistory, initialSymbol;
@@ -70,6 +73,12 @@ let autoSave, editRevision = 0, manualSavePending = false;
 // adapter completes, so saving A cannot acknowledge a later edit B.
 globalThis.MWNativeSave = { hasUnsavedChanges: () => dirty };
 function markWorkspaceDirty() {
+  if (nativeReadonly && mobileChartView) {
+    if (!ready || loading || mobileChartView.state().exploring || !mobileChartView.state().selected) return;
+    mobileChartDirty=true;mobileEditRevision++;
+    send({type:'mobile-chart-state',state:{...mobileChartView.state(),dirty:true}});
+    return;
+  }
   if (nativeReadonly || !ready || loading) return;
   dirty = true;
   editRevision++;
@@ -910,7 +919,7 @@ function drain() {
       send({type:"cancel-request",id});
       reject(Object.assign(Error("行情请求超时"),{code:"HISTORY_TIMEOUT"}));
       drain();
-    }, query.native_history && !query.native_reserve ? ((globalThis.MW_HISTORY_CAPABILITIES?.task_seconds || 600)+10)*1000 : 30000);
+    }, query.native_history && !query.native_reserve ? ((globalThis.MW_HISTORY_CAPABILITIES?.task_seconds || 600)+10)*1000 : (query.series_kind === "provider" && /^(MWP:)?FXCM:/i.test(query.instrument || "")) || (type === "data-center-api" && query.path === "/market-data/history-catalog/refresh" && query.body?.source === "fxcm") ? 70000 : 30000);
     const entry = {resolve,reject,timer,cancellationTimer:null,...requestPolicy.describe(selected)};
     pending.set(id, entry);
     if (isCurrent) {
@@ -1214,17 +1223,36 @@ function seriesPresentationRows(symbols) {
 // Vendor start counts returned rows; backend cursors count qualified candidates.
 // Keep that translation local to each immutable query, with bounded memory.
 const nativeSearchPages = new Map();
+const nativeSearchResults = new Map();
+const nativeSearchWarming = new Map();
+const nativeSearchTTL = 300000;
+function clearNativeSearchCache() {
+  nativeSearchResults.clear();
+  nativeSearchWarming.clear();
+}
+function warmNativeSearch(query) {
+  const key=JSON.stringify([workspaceEpoch,query]);
+  if(Date.now()-(nativeSearchWarming.get(key) || 0)<nativeSearchTTL)return;
+  nativeSearchWarming.set(key,Date.now());
+  while(nativeSearchWarming.size>20)nativeSearchWarming.delete(nativeSearchWarming.keys().next().value);
+  // Only the maintained directory is searched. Candle demand remains on use.
+  searchNativeSymbols({userInput:query,start:0}).catch(()=>{});
+}
 async function searchNativeSymbols(options) {
   const epoch = workspaceEpoch;
   const kind = options.kind || "all";
-  const key = JSON.stringify([kind,options.userInput,options.exchange,options.symbolType,epoch]);
+  const key = JSON.stringify([kind,options.userInput || "",options.exchange || "",options.symbolType || "",epoch]);
   const start = options.start || 0;
   let pages = nativeSearchPages.get(key);
   if (!pages || start === 0) {pages=new Map([[0,null]]);nativeSearchPages.set(key,pages);}
   while(nativeSearchPages.size>20) nativeSearchPages.delete(nativeSearchPages.keys().next().value);
   if (!pages.has(start)) throw Error("搜索分页已失效，请重新搜索");
+  if(options.signal?.aborted)throw Object.assign(Error("搜索已取消"),{name:"AbortError"});
   let position=pages.get(start),page;
-  for(let scan=0;scan<5;scan++) {
+  const cached=start===0 ? nativeSearchResults.get(key) : null;
+  if(cached && cached.expires>Date.now()) {
+    page=cached.page;position=cached.position;
+  } else for(let scan=0;scan<5;scan++) {
     page=await request({op:"searchPage",args:{kind,query:options.userInput || "",page_size:50,
       source:options.exchange ? options.exchange.toLowerCase() : undefined,
       symbol_type:options.symbolType || "",...(kind === "all" ? {cursor:position || undefined} : {offset:position || 0})}},"market",()=>epoch===workspaceEpoch && !options.signal?.aborted);
@@ -1232,6 +1260,13 @@ async function searchNativeSymbols(options) {
     if(page.items.length || position == null) break;
   }
   if(epoch!==workspaceEpoch) throw Error("工作区已切换");
+  if(options.signal?.aborted)throw Object.assign(Error("搜索已取消"),{name:"AbortError"});
+  if(start===0 && !cached) {
+    nativeSearchResults.set(key,{page,position,expires:Date.now()+nativeSearchTTL});
+    while(nativeSearchResults.size>20)nativeSearchResults.delete(nativeSearchResults.keys().next().value);
+  } else if(start===0 && cached && cached.expires<=Date.now()) {
+    nativeSearchResults.set(key,{page,position,expires:Date.now()+nativeSearchTTL});
+  }
   if(position != null) pages.set(start+page.items.length,position);
   while(pages.size>256) pages.delete(pages.keys().next().value);
   return {items:page.items.map(s=>({symbol:s.display_symbol || s.symbol,ticker:s.ticker,
@@ -1375,7 +1410,7 @@ const feed = {
       () =>
         cb({
           exchanges: [{value:"",name:"全部来源",desc:"全部行情来源"},
-            ...["Dukascopy","OANDA","Binance","Yahoo"].map(name=>({value:name.toUpperCase(),name,desc:name+" 行情来源"}))],
+            ...["Dukascopy","OANDA","Binance","Yahoo","FXCM"].map(name=>({value:name.toUpperCase(),name,desc:name+" 行情来源"}))],
           symbols_types: [{name:"全部",value:""},{name:"外汇",value:"forex"},{name:"股票",value:"stock"},
             {name:"加密",value:"crypto"},{name:"指数",value:"index"},{name:"基金",value:"fund"},
             {name:"期货",value:"futures"},{name:"金属",value:"commodity"},{name:"其他",value:"other"}],
@@ -1430,7 +1465,7 @@ const feed = {
         ticker,
         // Informational estimate only; actual pagination remains backend-owned.
         mw_historyPageBars: meta.native_page_capacity || (meta.source === "binance" ? 1000 : 4000),
-        description: (meta.source === "yahoo" ? meta.name + " · " + (meta.display_symbol || meta.symbol) : meta.display_symbol || meta.symbol || MWSeries.display(symbol)) + (series_kind === "provider" ? " · 平台行情 · " : series_kind === "composite" ? " · 组合行情 · " : " · 自建行情 · ") + (meta.price_description || meta.basis) + (meta.volume_kind === "tick" ? " · OANDA 报价量" : meta.volume_kind === "base" ? " · 成交量 / " + meta.volume_unit : meta.volume_kind === "quantity" ? " · 来源量" : " · 量不可用"),
+        description: (meta.source === "yahoo" ? meta.name + " · " + (meta.display_symbol || meta.symbol) : meta.display_symbol || meta.symbol || MWSeries.display(symbol)) + (series_kind === "provider" ? " · 平台行情 · " : series_kind === "composite" ? " · 组合行情 · " : " · 自建行情 · ") + (meta.price_description || meta.basis) + (meta.volume_kind === "tick" ? " · OANDA 报价量" : meta.volume_kind === "tick_count" ? " · 价格变动次数" : meta.volume_kind === "base" ? " · 成交量 / " + meta.volume_unit : meta.volume_kind === "quantity" ? " · 来源量" : " · 量不可用"),
         exchange: meta.exchange || meta.source.toUpperCase(),
         listed_exchange: meta.exchange || meta.source.toUpperCase(),
         mw_range_source: meta.source,
@@ -1450,19 +1485,26 @@ const feed = {
         supported_resolutions: meta.frames ? resolutions.filter(r=>meta.frames.includes(frames[r])) : resolutions,
         // Synthetic study feeds always carry the null/gap marker in volume.
         visible_plots_set: decode(ticker).spec || meta.volume_kind && meta.volume_kind !== "unavailable" ? "ohlcv" : "ohlc",
-        volume_precision: meta.volume_kind === "tick" ? 0 : 8,
+        volume_precision: ["tick", "tick_count"].includes(meta.volume_kind) ? 0 : 8,
         format: "price",
         data_status: meta.delay_seconds > 0 ? "delayed_streaming" : "streaming",
         ...(meta.delay_seconds > 0 ? {delay:meta.delay_seconds} : {}),
         ...(meta.currency ? {currency_code:meta.currency} : {}),
         has_empty_bars: false,
       });
+      setTimeout(()=>{
+        if(operation.current()) {
+          warmNativeSearch(meta.display_symbol || meta.symbol || MWSeries.display(symbol));
+          warmNativeSearch("");
+        }
+      },0);
       // The library keeps the old interval on a source switch even if the
       // newly resolved symbol excludes it. Use its public chart method.
-      if(meta.source === "yahoo") setTimeout(()=>{
+      if(meta.frames?.length) setTimeout(()=>{
+        const fallback = meta.frames.includes("H1") ? "60" : resolutions.find(r=>meta.frames.includes(frames[r]));
         for(const target of operation.targets) {
           if(resolveCurrent(target) && !meta.frames.includes(frames[target.resolution]))
-            target.chart.setResolution("60",{doNotActivateChart:true});
+            target.chart.setResolution(fallback,{doNotActivateChart:true});
         }
       },0);
     } catch (e) {
@@ -2258,7 +2300,10 @@ function boot(
   workspace = null,
   symbolMetadata = null,
   initialWatchlistMetadata = {},
+  mobileOriginalIndex = 0,
 ) {
+  let restoreLoadedCharts = async () => {};
+  mobileWorkspaceId = String(workspace?.id || "");
   initialSymbol = symbolMetadata;
   watchlistMetadata.clear();
   for (const [ticker, metadata] of Object.entries(initialWatchlistMetadata || {}))
@@ -2271,7 +2316,7 @@ function boot(
     if (!symbolPresentations.has(symbol)) symbolPresentations.set(symbol,symbolMetadata.metadata);
   }
   // save_load_adapter content is a layout envelope; saved_data expects its chart state.
-  const storedViewports = doc.state?._mwViewports;
+  let storedViewports = doc.state?._mwViewports;
   let chartState = doc.state;
   if (
     chartState &&
@@ -2284,6 +2329,13 @@ function boot(
       send({ type: "error", error: "工作区内容无法解析：" + String(e) });
       return;
     }
+  }
+  mobileChartDocument = readonly && chartState ? structuredClone(chartState) : null;
+  if (readonly && chartState?.charts?.length) {
+    const directory = MWMobileChartDocument.directory(chartState);
+    mobileOriginalIndex = directory.some(row=>row.original_index===mobileOriginalIndex) ? mobileOriginalIndex : 0;
+    chartState = MWMobileChartDocument.project(chartState,mobileOriginalIndex);
+    storedViewports = chartState._mwViewports;
   }
   let grid;
   let selectedTheme = chartInitialTheme(preferences, doc, chartState);
@@ -2299,7 +2351,7 @@ function boot(
   const pendingGridStyle = chartState?._mwGridStyle;
   let pendingBarRange = doc.state?._mwBarRangeMapping || chartState?._mwBarRangeMapping;
   let pendingViewports = storedViewports || chartState?._mwViewports;
-  let pendingSync = doc.state?._mwSync || chartSynchronizationState(chartState);
+  let pendingSync = readonly ? chartSynchronizationState(chartState) : doc.state?._mwSync || chartSynchronizationState(chartState);
   const ensureSync = () => {
     if (!widget._mwSyncCoordinator) {
       syncCoordinator?.dispose();
@@ -2321,7 +2373,7 @@ function boot(
       pendingSync = deferLegacyChartSynchronization(widget);
     } : undefined;
   };
-  prepareLegacyViewports(chartState, doc.state?._mwSync || chartState?._mwSync);
+  prepareLegacyViewports(chartState, readonly ? chartState?._mwSync : doc.state?._mwSync || chartState?._mwSync);
   if (chartState) {
     chartState = { ...chartState };
     delete chartState._mwViewports;
@@ -2349,29 +2401,6 @@ function boot(
     } finally {
       if (epoch === workspaceEpoch) viewportRestoring = false;
     }
-  };
-  // Rebuild via public APIs: merely hiding extra panes leaves the vendor's
-  // period-switch series metadata unresolved. This snapshot never leaves memory.
-  const rebuildMobileSingleChart = async () => {
-    if (!readonly || widget.chartsCount() <= 1) return false;
-    const epoch = workspaceEpoch;
-    widget.setLayout("s");
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    if (epoch !== workspaceEpoch) return true;
-    const single = await new Promise((resolve) => widget.save(resolve));
-    if (epoch !== workspaceEpoch) return true;
-    const current = currentNativeWorkspace;
-    await widget.load(
-      single,
-      current
-        ? {
-            uid: current.id,
-            name: current.name,
-            description: current.name,
-          }
-        : undefined,
-    );
-    return true;
   };
   savedDoc = doc;
   savedDoc.nativeName = workspace?.name || "我的图表";
@@ -2424,9 +2453,29 @@ function boot(
     });
     return alertAttachQueue;
   };
-  addEventListener('pagehide', () => {alertUIStopped = true; invalidateAlertUI();}, {once:true});
+  addEventListener('pagehide', () => {alertUIStopped = true; invalidateAlertUI();}, {once:true,capture:true});
   alertBridge?.destroy();
   alertBridge = chartAlertBridge({getWidget:()=>widget,getWorkspace:()=>currentNativeWorkspace,
+    originalAssociation:()=>mobileChartView?.state().selected,
+    associationEnabled:()=>!mobileChartView?.state().exploring,
+    prepareLocate: async (row,event) => {
+      if (!mobileChartView) return true;
+      const config = event ? event.evidence?.config : row.config;
+      if (!config) throw Error('缺少触发时行情快照，无法定位');
+      const resolution = Object.keys(frames).find(key=>frames[key]===config.timeframe);
+      if (!resolution || !config.source) throw Error('告警行情身份或周期不完整，无法定位');
+      const symbol = MWSeries.encode(config.instrument,config.series_kind);
+      if(!mobileChartView.state().temporary)mobileReturnDirty=mobileChartDirty;
+      send({type:'mobile-alert-location-start',workspace_id:alertUIWorkspace,session:alertUISession});
+      alertUI?.close();
+      const target = await mobileChartView.openTemporary({symbol,resolution});
+      return target && {...target, config, temporary:true};
+    },
+    located: () => {
+      if (!mobileChartView) return;
+      alertUI?.close();
+      send({type:'mobile-alert-location-complete',workspace_id:alertUIWorkspace,session:alertUISession});
+    },
     getEpoch:()=>workspaceEpoch,isLoading:()=>loading||!ready,readonly,
     metadata:ticker=>alertSourceMetadata.get(MWSeries.encode(MWSeries.decode(ticker).symbol,MWSeries.decode(ticker).series_kind)),frames,
     unavailable:chart=>{
@@ -2592,13 +2641,17 @@ function boot(
     reportPreferenceOutcome,
     (context, scope) => reportPreferenceOutcome(null, context, scope),
     capturePreferenceScope,
-    {blocked:globalThis.MWPreferenceDraftKeys || [], put: draft => request({op:'draftWrite',args:draft},'preferences'),
+    {blocked:globalThis.MWPreferenceDraftKeys || [], put: async draft => {
+       const saved = await request({op:'draftWrite',args:draft},'preferences');
+       draft.storageKey=saved.storageKey;
+     },
      failed: draft => request({op:'draftFailed',args:{key:draft.key,version:draft.version,storageKey:draft.storageKey}},'preferences'),
      current: draft => request({op:'draftCheck',args:draft},'preferences'),
      abandoned: context => emitNotice({source_kind:'preferences',attempt_id:crypto.randomUUID(),code:'PREFERENCE_SAVE_FAILED',
        title:'设置草稿已放弃',message:'已明确采用服务器设置；原写入未成功',observation_ended:true,
        context:{source_id:JSON.stringify([context.kind,context.name,context.tool || '',context.operation]),consumer:'preferences-adapter',endpoint:'/advanced-charts/preferences'}},true),
-     drop: draft => request({op:'draftDrop',args:draft},'preferences')},
+     drop: draft => request({op:'draftDrop',args:draft},'preferences'),
+     allowSave: (kind,name,tool,operation) => readonly && operation === 'save' && kind === 'setting' && tool === '' && ['mw.watchlists.v1','mw.symbol-flags.v1'].includes(name)},
   );
   autoSave?.dispose();
   autoSave = chartAutoSave(preferences,
@@ -2689,7 +2742,7 @@ function boot(
     enabled_features: [
       "support_multicharts",
       "determine_first_data_request_size_using_visible_range",
-      "header_layouttoggle",
+      ...(!readonly ? ["header_layouttoggle"] : []),
       "header_in_fullscreen_mode",
       "disable_resolution_rebuild",
       "prefer_quote_short_name",
@@ -2705,16 +2758,56 @@ function boot(
       "create_volume_indicator_by_default",
       ...(readonly
         ? [
-            "left_toolbar",
+            "header_saveload",
             "trading_account_manager",
             "order_panel",
             "broker_button",
             "context_menus",
-            "header_settings",
           ]
         : []),
     ],
   });
+  mobileChartView?.dispose();
+  mobileChartView = readonly && mobileChartDocument ? globalThis.createMobileChartView({
+    widget,
+    workspace,
+    document: mobileChartDocument,
+    capture: () => captureChartLayout(widget),
+    selecting: single => {
+      if (single) {
+        pendingViewports=single._mwViewports;
+        pendingSync=chartSynchronizationState(single);
+      }
+      indicatorCoordinator?.dispose();indicatorCoordinator=undefined;indicatorBindings.clear();
+      alertBridge?.reset(mobileChartDocument);
+    },
+    changed: async (state, {loaded=false,returned=false}={}) => {
+      if(ready && loaded)await restoreLoadedCharts();
+      mobileChartDirty=returned ? mobileReturnDirty : false;
+      alertBridge?.refresh(); send({type: "mobile-chart-state", state:{...state,dirty:state.temporary ? mobileReturnDirty : mobileChartDirty}});
+    },
+  }) : undefined;
+  saveMobileChartView = async () => {
+    if(mobileSaving)return;
+    mobileSaving=true;
+    let state=mobileChartView.state();
+    try{
+      if(state.temporary){await mobileChartView.restoreTemporary();state=mobileChartView.state();}
+      if(!ready || loading || state.exploring || !state.selected)throw Error('当前图格尚未就绪，无法保存');
+      const revision=mobileEditRevision;
+      const single=await captureChartLayout(widget);
+      single._mwDrawingProjection=captureDrawingProjection(widget);
+      const result=await request({workspace_id:state.workspace_id,revision:state.revision,
+        original_index:state.selected.original_index,chart_id:state.selected.original_chart_id,single},'mobile-chart-save');
+      mobileChartView.acceptSaved(result.document.state,result.revision);
+      mobileChartDocument=structuredClone(result.document.state);
+      currentNativeWorkspace=result;savedDoc={...result.document,nativeName:result.name};
+      if(mobileEditRevision===revision)mobileChartDirty=false;
+      send({type:'mobile-chart-state',state:{...mobileChartView.state(),dirty:mobileChartDirty}});
+      send({type:'mobile-chart-save-complete',workspace_id:state.workspace_id});
+    }catch(error){send({type:'mobile-chart-save-complete',workspace_id:state.workspace_id,error:String(error)});}
+    finally{mobileSaving=false;}
+  };
   widget
     .headerReady()
     .then(async () => {
@@ -2727,20 +2820,25 @@ function boot(
       if (!readonly) indicatorPicker = chartIndicatorPicker(widget, catalog, (e) =>
         send({type: "error", error: String(e)}), () => dataCenter?.nativeUi);
       // Public left-aligned buttons retain their creation order in the header.
-      if (!readonly) dataCenter = chartDataCenter({occurrence:emitNotice,widget, appOrigin: parentOrigin,
+      dataCenter = chartDataCenter({occurrence:emitNotice,widget, appOrigin: parentOrigin,
         workspace: () => currentNativeWorkspace, epoch: () => workspaceEpoch, send, searchSymbols: searchNativeSymbols,
         timezone: () => {const chart=widget.activeChart(),zone=chart.getTimezoneApi().getTimezone().id;
           return zone === "exchange" ? presentationFor(chart.symbol())?.timezone || "UTC" : zone;},
         suspendIndicators: () => indicatorPicker?.close(),
-        managementRequest: (args, signal) => request(args, "data-center-api", () => !signal.aborted),
-        resolve: args => request({op:"resolve",args},"market")});
+        managementRequest: async (args, signal) => {
+          const result=await request(args, "data-center-api", () => !signal.aborted);
+          if(args.body || args.method && args.method !== "GET")clearNativeSearchCache();
+          return result;
+        },
+        resolve: args => request({op:"resolve",args},"market"), readonly});
     })
     .catch((e) => send({ type: "error", error: String(e) }));
   widget.onChartReady(async () => {
+    if (readonly) widget.drawOnAllChartsEnabled().setValue(false);
     await restoreTheme();
     activeTab?.dispose();
     activeTab = chartTab({widget,feed,send,workspace:()=>currentNativeWorkspace,epoch:()=>workspaceEpoch,metadata:presentationFor});
-    startIndicatorCoordinator(catalog);
+    if (!mobileChartView) startIndicatorCoordinator(catalog);
     globalThis.MWChartMaximize = chartBlankDoubleClick(widget, { readonly });
     ensureSync();
     syncCoordinator.refreshCharts();
@@ -2819,10 +2917,13 @@ function boot(
 
       })
       .catch((e) => send({ type: "error", error: String(e) }));
-    // Mobile is a temporary single-chart view of the saved desktop workspace.
-    // Read-only adapters keep the original multi-chart document untouched.
     await restoreViewports();
-    await rebuildMobileSingleChart();
+    if (mobileChartView) {
+      const directory=mobileChartView.buildDirectory(mobileChartDocument);
+      send({type: "mobile-chart-directory", directory});
+      await mobileChartView.initialize(mobileOriginalIndex);
+      if (!indicatorCoordinator) startIndicatorCoordinator(catalog);
+    }
     restoreChartSynchronization(widget, pendingSync);
     beforeInitialHistory = undefined;
     pendingSync = undefined;
@@ -2854,6 +2955,7 @@ function boot(
           send({ type: "error", error: "主题保存失败：" + String(e) }),
         );
     });
+    await widget.headerReady();
     symbolFlags?.dispose();
     try {
       symbolFlags = MWSymbolFlags.attach(widget, preferences.find(p=>p.kind==="setting" && p.name===MWSymbolFlags.name), readonly,
@@ -2944,15 +3046,12 @@ function boot(
       loading = true;
       dirty = false;
     });
-    widget.subscribe("chart_loaded", async () => {
+    restoreLoadedCharts = async () => {
       const epoch = workspaceEpoch;
       await restoreTheme();
       if (epoch !== workspaceEpoch) return;
       await restoreViewports();
       if (epoch !== workspaceEpoch) return;
-      // load() emits chart_loaded again for the rebuilt single chart. Only that
-      // final event may rebind guards and release the loading state.
-      if (await rebuildMobileSingleChart()) return;
       if (epoch !== workspaceEpoch) return;
       syncCoordinator.refreshCharts();
       restoreChartSynchronization(widget, pendingSync);
@@ -2961,7 +3060,7 @@ function boot(
       workspaceLoadPause?.release();
       workspaceLoadPause = undefined;
       loading = false;
-      if(!indicatorCoordinator)startIndicatorCoordinator(catalog);
+      if(!indicatorCoordinator && !mobileChartView?.state().temporary)startIndicatorCoordinator(catalog);
       barRangeMapping.configure(pendingBarRange || {version:1,enabled:false,style:"background"}, true);
       synchronizeMarketVisibility();
       barRangeMapping.refreshCharts();
@@ -2975,6 +3074,9 @@ function boot(
       for(let index=0;index<widget.chartsCount();index++) MWNativeNavigation.recoverInitial(widget.chart(index));
       reportHistoryFailures();
       if (!alertUI) await alertUIAttach();
+    };
+    widget.subscribe("chart_loaded", () => {
+      if (!mobileChartView) void restoreLoadedCharts().catch(error=>send({type:'error',error:String(error)}));
     });
     rangeGuard = rangeSyncLoadingGuard(widget);
     bindEdgeSync();
@@ -2982,6 +3084,7 @@ function boot(
     bindTimezoneEvents();
     bindActiveChartEvent();
     widget.subscribe("layout_changed", () => {
+      if(mobileChartView && !mobileChartView.state().selected)return;
       synchronizeMarketVisibility();
       syncCoordinator.refreshCharts();
       if (!loading) barRangeMapping.refreshCharts();
@@ -2992,7 +3095,7 @@ function boot(
       bindTimezoneEvents();
       alertBridge.refresh();
     });
-    widget.drawOnAllChartsEnabled().setValue(true);
+    widget.drawOnAllChartsEnabled().setValue(!readonly);
     // Native onAutoSaveNeeded is debounced by five seconds. Reading that late
     // notification as a new edit can dirty a layout already saved after the
     // actual Undo command. Observe the same stack immediately so editRevision
@@ -3000,7 +3103,7 @@ function boot(
     const undoStack = widget._innerAPI()._chartWidgetCollection.undoHistory.undoStack();
     const undoChanged = command => {if(command?.affectsState()) markWorkspaceDirty();};
     undoStack.onChange().subscribe(null,undoChanged);
-    addEventListener('pagehide',()=>undoStack.onChange().unsubscribe(null,undoChanged),{once:true});
+    addEventListener('pagehide',()=>undoStack.onChange().unsubscribe(null,undoChanged),{once:true,capture:true});
     await alertUIAttach();
     send({ type: "ready" });
     clearInterval(progressivePoll);
@@ -3028,6 +3131,55 @@ addEventListener("message", async (e) => {
   )
     return;
   const m = e.data;
+  if (m.type === "mobile-chart-directory-request" && mobileChartView) {
+    send({type: "mobile-chart-directory", directory: mobileChartView.buildDirectory(mobileChartDocument)});
+    send({type: "mobile-chart-state", state: {...mobileChartView.state(),dirty:mobileChartDirty}});
+    return;
+  }
+  if(m.type==='mobile-chart-discard' && mobileChartView){
+    mobileChartDirty=false;mobileReturnDirty=false;
+    send({type:'mobile-chart-state',state:{...mobileChartView.state(),dirty:false}});return;
+  }
+  if(m.type==='mobile-chart-save' && mobileChartView){await saveMobileChartView();return;}
+  if (m.type === "mobile-preference-save" && nativeReadonly && typeof m.request === "string" && /^[a-f0-9-]{36}$/.test(m.request) && m.workspace_id === mobileWorkspaceId && ['mw.watchlists.v1','mw.symbol-flags.v1'].includes(m.name) && JSON.stringify(m.value).length <= 1_100_000) {
+    try { await activePreferences.savePreference('setting', m.name, m.value); send({type:'mobile-preference-save-result',request:m.request,workspace_id:m.workspace_id,name:m.name,result:'saved'}); }
+    catch(error) { send({type:'mobile-preference-save-result',request:m.request,workspace_id:m.workspace_id,name:m.name,error:String(error)}); }
+    return;
+  }
+  if (m.type === "mobile-chart-select" && mobileChartView && Number.isSafeInteger(m.original_index)) {
+    if(mobileSaving)return;
+    try { await mobileChartView.select(m.original_index); }
+    catch (error) { send({type: "error", error: String(error)}); }
+    return;
+  }
+  if (m.type === 'mobile-alert-return' && mobileChartView && m.workspace_id === alertUIWorkspace && m.session === alertUISession) {
+    try {
+      if (await mobileChartView.restoreTemporary()) {
+        alertUI?.open();
+        send({type:'mobile-alert-return-complete',workspace_id:alertUIWorkspace,session:alertUISession});
+      }
+    } catch(error) {send({type:'error',error:String(error)});}
+    return;
+  }
+  if (m.type === "mobile-chart-explore" && mobileChartView && typeof m.symbol === "string" && m.symbol.length <= 150) {
+    if(mobileSaving)return;
+    try {
+      const chart = widget.activeChart();
+      const epoch = workspaceEpoch;
+      mobileChartView.explore();
+      if (!(await chart.setSymbol(m.symbol)) || epoch !== workspaceEpoch) throw Error("无法打开临时品种");
+      if (typeof m.resolution === "string" && m.resolution.length <= 8 && !(await chart.setResolution(m.resolution))) throw Error("无法切换临时时间周期");
+      send({type: "mobile-chart-state", state: mobileChartView.state()});
+    } catch (error) { send({type: "error", error: String(error)}); }
+    return;
+  }
+  if (m.type === "mobile-chart-fullscreen" && mobileChartView) {
+    try {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else await document.documentElement.requestFullscreen();
+    } catch (error) { send({type: "error", error: String(error)}); }
+    return;
+  }
   if(m.type==='history-load-capacity' || m.type==='history-load-admitted') {
     if(m.type==='history-load-admitted' && m.history_client!==clientId) return;
     requestPolicy.capacity(m.available,m.type==='history-load-admitted' ? m.id : undefined);
@@ -3055,7 +3207,12 @@ addEventListener("message", async (e) => {
   if (m.type === "chart-alert-create" && ready && !loading) {void alertBridge?.create(); return;}
   if (m.type === "chart-alert-drawing-action" && typeof m.alert_id === "string" && ["retry","restore"].includes(m.action) && ready && !loading) {void alertBridge?.drawingAction(m.alert_id,m.action); return;}
   if (m.type === "chart-alert-rows" && Array.isArray(m.rows)) {alertBridge?.setRows(m.rows); return;}
-  if (m.type === "chart-alert-locate" && m.row && JSON.stringify(m.row).length < 20_000 && ready && !loading) {void alertBridge?.locate(m.row,m.event); return;}
+  if (m.type === "chart-alert-locate" && m.row && JSON.stringify(m.row).length < 20_000 && ready && !loading) {
+    try {
+      await alertBridge?.locate(m.row,m.event);
+    } catch (error) { send({type: "error", error: String(error)}); }
+    return;
+  }
   if (m.type === "notifications" && Array.isArray(m.notices) && ready) {
     activeNotices = m.notices.slice(0, 24).filter(entry =>
       typeof entry.id === "string" && entry.id.length <= 2100 &&
@@ -3268,7 +3425,7 @@ addEventListener("message", async (e) => {
     MWNativeNavigation.setCapabilities(m.history_capabilities);
     globalThis.MW_HISTORY_CAPABILITIES=m.history_capabilities;
     globalThis.MWPreferenceDraftKeys = Array.isArray(m.preference_draft_keys) ? m.preference_draft_keys : [];
-    boot(m.document, m.readonly, m.catalog, m.preferences, m.workspace, m.initial_symbol, m.watchlist_metadata);
+    boot(m.document, m.readonly, m.catalog, m.preferences, m.workspace, m.initial_symbol, m.watchlist_metadata, m.mobile_original_index);
   }
   else if (m.type === 'refresh-managed') await refreshManagedHistory(m.instrument);
   else if (m.type === 'preference-draft-resolve' && activePreferences) {
@@ -3285,6 +3442,7 @@ addEventListener("message", async (e) => {
   else if (m.type === "discard-changes") { discardWorkspaceChanges?.(); }
   else if (m.type === "app-state") chartMenu?.setPending?.(m.pending);
   else if (m.type === "open-alerts") { restoreAlertsPanel = true; alertUI?.open?.(); }
+  else if (m.type === "mobile-alert-close" && nativeReadonly) {restoreAlertsPanel=false;alertUI?.close();}
   else if (m.type === "save") snapshot();
   else if (m.type === "theme" && ready) {
     savedDoc.theme = m.theme;
@@ -3294,21 +3452,31 @@ addEventListener("message", async (e) => {
 });
 send({ type: "loaded" });
 
-addEventListener("pagehide", () => {
+let chartRuntimeDisposed=false;
+function disposeChartRuntime() {
+  if(chartRuntimeDisposed)return;
+  chartRuntimeDisposed=true;
+  ready=false;
+  // A removed mobile host can outlive its native iframe. Finish every local
+  // disposer even when the vendor has already cleared its window/API.
+  const nativeDetached=nativeReadonly && !document.querySelector('iframe')?.contentDocument?.defaultView;
+  const dispose=fn=>{try{fn();}catch(error){if(!nativeDetached || error?.name!=='TypeError')throw error;}};
+  mobileChartView?.dispose();
   resolveDisposed=true; chartResolves.clear();
   compositeDisplayBatches.dispose();
   activePreferences?.dispose();
-  indicatorCoordinator?.dispose();
+  dispose(()=>indicatorCoordinator?.dispose());
   ordinaryNotices?.dispose();
-  noticeUI?.destroy();
-  alertUI?.destroy();
-  alertBridge?.destroy();
-  watchlistLayout?.dispose();
-  symbolFlags?.dispose(); activeTab?.dispose();
-  unbindActiveChartEvent();
-  for (const [api, changed] of timezoneBindings) api.onTimezoneChanged().unsubscribe(null, changed);
+  dispose(()=>noticeUI?.destroy());noticeUI=undefined;
+  dispose(()=>alertUI?.destroy());alertUI=undefined;
+  dispose(()=>alertBridge?.destroy({unloading:true}));
+  dispose(()=>watchlistLayout?.dispose());
+  dispose(()=>symbolFlags?.dispose()); dispose(()=>activeTab?.dispose());
+  dispose(()=>unbindActiveChartEvent());
+  for (const [api, changed] of timezoneBindings) dispose(()=>api.onTimezoneChanged().unsubscribe(null, changed));
   timezoneBindings.clear();
-  for (const [chart, changed] of timezoneSymbolBindings) chart.onSymbolChanged().unsubscribe(null, changed);
+  for (const [chart, changed] of timezoneSymbolBindings) dispose(()=>chart.onSymbolChanged().unsubscribe(null, changed));
   timezoneSymbolBindings.clear();
-  globalThis.MWChartMaximize?.dispose();barRangeMapping?.dispose();syncCoordinator?.dispose();
-}, {once:true});
+  dispose(()=>globalThis.MWChartMaximize?.dispose());dispose(()=>barRangeMapping?.dispose());dispose(()=>syncCoordinator?.dispose());
+}
+addEventListener("pagehide",disposeChartRuntime, {once:true,capture:true});

@@ -6,7 +6,7 @@
   const versionHash = "6b804c486857f27920cf761aa7eb6e29d9bb6362";
   const moreLabel = /(更多|菜单|列|more|menu|options)/i;
   const addLabel = /(添加|加入|add|plus|\+)/i;
-  const internalName = /^(?:MW[CPH]:|(?:DUKA|YAHOO|NATIVE|MD|OANDA|BINANCE):)|^[a-f0-9]{32,64}$|^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i;
+  const internalName = /^(?:MW[CPH]:|(?:DUKA|YAHOO|NATIVE|FXCM|MD|OANDA|BINANCE):)|^[a-f0-9]{32,64}$|^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i;
 
   function versionSupported() {
     try {

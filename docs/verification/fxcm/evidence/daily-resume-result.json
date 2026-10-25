@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "started_at": "2026-10-25T03:51:22.796Z",
+  "recovery": {
+    "version": "4b087aeb-6c44-43dd-b549-a3b298b3ae61",
+    "paused_after_restart": true,
+    "resumed_published": true,
+    "mode": "orderly_stop_durable_queued_task_not_mid_request_kill"
+  },
+  "prior_failure": "Natural due daily task did not publish",
+  "clock": "natural_UTC_minute",
+  "original_daily": "4c954b35-8f58-4adc-a05f-1befd9f38e11",
+  "stage": "schedule-complete",
+  "original_daily_published": true,
+  "due_at": 1792900380000,
+  "parent_version": "4c954b35-8f58-4adc-a05f-1befd9f38e11",
+  "fresh_daily": "5fedd8d0-4e99-4c71-bbd2-490f472eb548",
+  "automatic_publish": true,
+  "left_paused": true,
+  "finished_at": "2026-10-25T03:53:16.714Z"
+}

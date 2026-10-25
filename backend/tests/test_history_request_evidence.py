@@ -1,5 +1,6 @@
 """Failures survive successful retries and never alter final coverage denominators."""
 
+import hashlib
 import json
 
 import pytest
@@ -87,3 +88,18 @@ def test_read_evidence_survives_price_reclamation_and_does_not_block_it(database
     with pytest.raises(ValueError, match="cannot be deleted"):
         with database.begin() as db:
             db.delete(db.get(HistoryReadAttempt, before["items"][0]["id"]))
+
+
+def test_legacy_snapshot_retains_original_canonical_audit_fields(database):
+    from alerts.history_request_evidence import FIELDS
+
+    ident, _ = create(database)
+    history.import_page(Adapter([batch(checkpoint=120000)]), version_id=ident)
+    with database.begin() as db:
+        attempts = list(db.scalars(select(HistoryReadAttempt).where(HistoryReadAttempt.version_id == ident)
+                        .order_by(HistoryReadAttempt.started_at, HistoryReadAttempt.id)))
+        legacy = [{key: getattr(row, key) for key in FIELDS} for row in attempts]
+        checksum = hashlib.sha256(json.dumps(legacy, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+        assert snapshot(db, ident)["checksum"] == checksum
+        assert snapshot(db, ident)["schema"] == "bounded-m1-read-v1"
+        assert set(report(db, ident)["items"][0]) == set(FIELDS)

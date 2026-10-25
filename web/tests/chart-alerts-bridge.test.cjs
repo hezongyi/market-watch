@@ -6,7 +6,7 @@ const { test } = require("node:test"),
   path = require("node:path");
 const root = path.resolve(__dirname, "../..");
 const tick = () => new Promise((r) => setTimeout(r, 5));
-function fixture({ readonly = false } = {}) {
+function fixture({ readonly = false, prepareLocate } = {}) {
   const subscriptions = {},
     shapes = new Map(),
     messages = [],
@@ -19,6 +19,7 @@ function fixture({ readonly = false } = {}) {
     loading = false,
     nextId = 0,
     priceScaleMode = 0;
+  let history = {from:0,to:120}, rangeRelease;
   const event = () => {
     let fn;
     return {
@@ -57,6 +58,10 @@ function fixture({ readonly = false } = {}) {
     resolution: () => resolution,
     chartType: () => 1,
     dataReady: () => true,
+    setVisibleRange: async () => {if(rangeRelease) await rangeRelease;},
+    getVisibleBarsRange: () => history,
+    barTimeToEndOfPeriod: time => time+60,
+    getVisibleRange: () => ({from:0,to:120}),
     getAllShapes: () => [...shapes].map(([id, s]) => ({ id, name: s.name })),
     getShapeById: (id) => shapes.get(id),
     getAllStudies: () => [],
@@ -65,9 +70,10 @@ function fixture({ readonly = false } = {}) {
     ],
     onSymbolChanged: () => symbolEvent,
     onIntervalChanged: () => intervalEvent,
-    createShape: async (point) => {
+    createShape: async (point, options) => {
       const id = "restored-" + ++nextId;
       shape(id, [point]);
+      shapes.get(id).options=options;
       return id;
     },
   };
@@ -104,6 +110,7 @@ function fixture({ readonly = false } = {}) {
     getEpoch: () => epoch,
     isLoading: () => loading,
     readonly,
+    prepareLocate,
     metadata: () => ({ source }),
     calculationOrigin: () => 60000,
     frames: { 60: "H1", 5: "M5" },
@@ -179,6 +186,8 @@ function fixture({ readonly = false } = {}) {
   return {
     api,
     chart,
+    history: value => {history=value;},
+    holdRange: promise => {rangeRelease=promise;},
     shapes,
     messages,
     calls,
@@ -210,6 +219,46 @@ function fixture({ readonly = false } = {}) {
     },
   };
 }
+test('native locate awaits original-chart preparation and stops after failed or superseded selection', async () => {
+  let release, seen;
+  const f=fixture({readonly:true,prepareLocate:async (row,event)=>{seen={id:row.id,event};return new Promise(resolve=>{release=resolve;});}});
+  const locating=f.api.locate(f.row,{id:'event-one'});
+  await Promise.resolve();assert.equal(seen.id,f.row.id);assert.equal(seen.event.id,'event-one');
+  release(false);await locating;assert.deepEqual(f.failures,[]);
+  const missing=fixture({readonly:true,prepareLocate:async()=>{throw Error('原图格不存在');}});
+  await missing.api.locate(missing.row);
+  assert.match(missing.failures[0],/原图格不存在/);assert.deepEqual(missing.calls,[]);
+});
+test('temporary event location uses the event snapshot independently of the original association and changed rule', async () => {
+  let f;
+  f=fixture({readonly:true,prepareLocate:async (_row,event)=>({chart:f.chart,config:event.evidence.config,temporary:true,current:()=>true})});
+  const config=structuredClone(f.row.config);
+  f.row.config.instrument='ETHUSDT';f.row.config.association.workspace_id='deleted-workspace';
+  await f.api.locate(f.row,{id:'event',occurred_at:60000,price:'101.25',threshold:'100',evidence:{config,ordinal:1}});
+  assert.deepEqual(f.failures,[]);assert.deepEqual(f.calls,[]);
+  const marker=[...f.shapes.values()].find(s=>s.options?.shape==='arrow_down');
+  assert.deepEqual(JSON.parse(JSON.stringify(marker.points)),[{time:60,price:101.25}]);
+  assert.equal(marker.options.disableSave,true);assert.equal(marker.options.disableUndo,true);assert.equal(marker.options.lock,true);
+  assert.equal([...f.shapes.values()].find(s=>s.options?.shape==='horizontal_line').points[0].price,100);
+  assert.equal(f.shapes.get('native-one').points[0].price,100);
+});
+test('temporary location refuses a different source and unavailable event history without a marker', async () => {
+  let f;
+  f=fixture({readonly:true,prepareLocate:async row=>({chart:f.chart,config:row.config,temporary:true,current:()=>true})});
+  f.switchSource();await f.api.locate(f.row);
+  assert.match(f.failures[0],/来源、系列或周期不匹配/);assert.equal(f.shapes.size,1);
+  f.switchSource('binance');f.history(null);
+  await f.api.locate(f.row,{id:'event',occurred_at:60000,price:'101.25',evidence:{ordinal:1}});
+  assert.match(f.failures[1],/历史行情不可用/);assert.equal(f.shapes.size,1);assert.deepEqual(f.calls,[]);
+});
+test('returning or selecting another alert fences a pending event location', async () => {
+  let f,current=true,release;
+  f=fixture({readonly:true,prepareLocate:async row=>({chart:f.chart,config:row.config,temporary:true,current:()=>current})});
+  f.holdRange(new Promise(resolve=>{release=resolve;}));
+  const pending=f.api.locate(f.row,{id:'event',occurred_at:60000,price:'101.25',evidence:{ordinal:1}});
+  await tick();current=false;release();await pending;
+  assert.equal(f.shapes.size,1);assert.deepEqual(f.failures,[]);
+});
 test("drag previews do not write; mouse up serializes successive versions", async () => {
   const f = fixture();
   await tick();

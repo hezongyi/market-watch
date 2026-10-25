@@ -1073,12 +1073,13 @@ def data_sync(body: DataQuery):
 
 async def query_chart(body: DataQuery, disconnected=None, deadline=None, retain_work=False):
     """One cancellable query path shared by browser and MCP adapters."""
-    from .config import settings
     from .provider_cache import CANCELLED, DEADLINE
+    from .provider_capabilities import request_seconds
 
     cancelled = threading.Event()
     token = CANCELLED.set(cancelled)
-    deadline = min(deadline or float("inf"), time.monotonic() + settings.provider_request_seconds)
+    source = "fxcm" if body.series_kind == "provider" and body.instrument.upper().startswith(("FXCM:", "MWP:FXCM:")) else None
+    deadline = min(deadline or float("inf"), time.monotonic() + request_seconds(source))
     deadline_token = DEADLINE.set(deadline)
     task = asyncio.create_task(asyncio.to_thread(data_sync, body))
     try:

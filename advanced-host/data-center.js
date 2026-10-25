@@ -1,8 +1,8 @@
 /* Native dialog host. Authenticated operations remain in the trusted app. */
-function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, suspendIndicators, managementRequest, searchSymbols, occurrence=()=>{}, timezone = () => widget.activeChart().getTimezoneApi().getTimezone().id }) {
-  const probe = widget.createButton({ align: "left", useTradingViewStyle: false });
-  const doc = probe.ownerDocument;
-  widget.removeButton(probe);
+function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, suspendIndicators, managementRequest, searchSymbols, occurrence=()=>{}, timezone = () => widget.activeChart().getTimezoneApi().getTimezone().id, readonly=false }) {
+  const probe = readonly ? null : widget.createButton({ align: "left", useTradingViewStyle: false });
+  const doc = probe?.ownerDocument || globalThis.document.querySelector('iframe[title="Financial Chart"]').contentDocument;
+  if (probe) widget.removeButton(probe);
   const session = crypto.randomUUID(), channel = "mw-data-center-v1";
   const resolutions = {M1:"1",M5:"5",M15:"15",M30:"30",H1:"60",H4:"240",D1:"1D",W1:"1W",MN:"1M"};
   const dialog = { open: false };
@@ -65,7 +65,7 @@ function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, s
     if (!notice.isConnected) doc.body.append(notice);
   }
   dismiss.onclick = () => notice.remove();
-  const buttonId = widget.createButton({ align: "left", useTradingViewStyle: true, text: "数据中心", title: "数据中心", onClick: () => open() });
+  const buttonId = readonly ? null : widget.createButton({ align: "left", useTradingViewStyle: true, text: "数据中心", title: "数据中心", onClick: () => open() });
   const icon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg>`;
   function decorate() {
     for (const button of doc.querySelectorAll('button[data-name="custom-tradingview-styled-button"][aria-label="数据中心"]')) {
@@ -283,5 +283,5 @@ function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, s
   const invalidate = () => { if (dialog.open && target) target.invalid = true; clearOperation(); };
   const events = ["layout_changed", "chart_load_requested", "activeChartChanged"];
   for (const name of events) widget.subscribe(name, invalidate);
-  return { open, nativeUi, refreshTimezone() { if(dialog.open) childPost({type:"timezone",timezone:timezone()}); }, dispose() { disposed = true; close(); clearOperation(); observer.disconnect();removeEventListener("message",fallbackMessage);doc.removeEventListener("keydown",modalKeys,true); style.remove(); noticeStyle.remove(); widget.removeButton(buttonId); widget.unsubscribe("chart_theme_changed",theme); for (const name of events) widget.unsubscribe(name,invalidate); } };
+  return { open, nativeUi, refreshTimezone() { if(dialog.open) childPost({type:"timezone",timezone:timezone()}); }, dispose() { disposed = true; close(); clearOperation(); observer.disconnect();removeEventListener("message",fallbackMessage);doc.removeEventListener("keydown",modalKeys,true); style.remove(); noticeStyle.remove(); if (buttonId) widget.removeButton(buttonId); widget.unsubscribe("chart_theme_changed",theme); for (const name of events) widget.unsubscribe(name,invalidate); } };
 }

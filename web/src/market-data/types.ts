@@ -13,6 +13,7 @@ export const names: Record<string, string> = {
   needs_maintenance: "待维护",
   dukascopy: "Dukascopy",
   oanda: "OANDA Practice",
+  fxcm: "FXCM Demo",
   binance: "Binance",
   yahoo: "Yahoo",
 };

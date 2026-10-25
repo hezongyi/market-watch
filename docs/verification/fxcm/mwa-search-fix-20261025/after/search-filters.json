@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "name": "FXCM source",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/market-data/series/page?query=EURUSD&kind=all&source=fxcm&calendar=&symbol_type=&cursor=&page_size=50&offset=0",
+      "snapshot": "- dialog \"商品代码搜索\":\n  - text: 商品代码搜索\n  - button \"关闭商品代码搜索\"\n  - searchbox \"搜索\": EURUSD\n  - tablist:\n    - tab \"全部\" [selected]\n    - tab \"外汇\"\n    - tab \"股票\"\n    - tab \"加密\"\n    - tab \"指数\"\n    - tab \"基金\"\n    - tab \"期货\"\n    - tab \"金属\"\n    - tab \"其他\"\n  - text: 商品代码 描述\n  - button \"行情类型\": 全部行情\n  - button \"来源\": FXCM\n  - text: EURUSD EUR/USD · 平台 · FXCM · Bid · 原生周期 forex FXCM EURUSD EURUSD · 自建 · fxcm · bid · utc0 forex FXCM 只需在图表上开始输入，即可拉出此搜索框"
+    },
+    {
+      "name": "FXCM platform",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/market-data/series/page?query=EURUSD&kind=provider&source=fxcm&calendar=&symbol_type=&cursor=&page_size=50&offset=0",
+      "snapshot": "- dialog \"商品代码搜索\":\n  - text: 商品代码搜索\n  - button \"关闭商品代码搜索\"\n  - searchbox \"搜索\": EURUSD\n  - tablist:\n    - tab \"全部\" [selected]\n    - tab \"外汇\"\n    - tab \"股票\"\n    - tab \"加密\"\n    - tab \"指数\"\n    - tab \"基金\"\n    - tab \"期货\"\n    - tab \"金属\"\n    - tab \"其他\"\n  - text: 商品代码 描述\n  - button \"行情类型\": 平台行情\n  - button \"来源\": FXCM\n  - text: EURUSD EUR/USD · 平台 · FXCM · Bid · 原生周期 forex FXCM 只需在图表上开始输入，即可拉出此搜索框"
+    },
+    {
+      "name": "FXCM gold",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/market-data/series/page?query=XAUUSD&kind=provider&source=fxcm&calendar=&symbol_type=&cursor=&page_size=50&offset=0",
+      "snapshot": "- dialog \"商品代码搜索\":\n  - text: 商品代码搜索\n  - button \"关闭商品代码搜索\"\n  - searchbox \"搜索\": XAUUSD\n  - tablist:\n    - tab \"全部\" [selected]\n    - tab \"外汇\"\n    - tab \"股票\"\n    - tab \"加密\"\n    - tab \"指数\"\n    - tab \"基金\"\n    - tab \"期货\"\n    - tab \"金属\"\n    - tab \"其他\"\n  - text: 商品代码 描述\n  - button \"行情类型\": 平台行情\n  - button \"来源\": FXCM\n  - text: XAUUSD XAU/USD · 平台 · FXCM · Bid · 原生周期 commodity FXCM 只需在图表上开始输入，即可拉出此搜索框"
+    },
+    {
+      "name": "No match finishes",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/market-data/series/page?query=MW_NO_SUCH_SYMBOL_93711&kind=provider&source=fxcm&calendar=&symbol_type=&cursor=&page_size=50&offset=0",
+      "snapshot": "- dialog \"商品代码搜索\":\n  - text: 商品代码搜索\n  - button \"关闭商品代码搜索\"\n  - searchbox \"搜索\": MW_NO_SUCH_SYMBOL_93711\n  - tablist:\n    - tab \"全部\" [selected]\n    - tab \"外汇\"\n    - tab \"股票\"\n    - tab \"加密\"\n    - tab \"指数\"\n    - tab \"基金\"\n    - tab \"期货\"\n    - tab \"金属\"\n    - tab \"其他\"\n  - text: 商品代码 描述\n  - button \"行情类型\": 平台行情\n  - button \"来源\": FXCM\n  - text: 没有代码符合您的条件 只需在图表上开始输入，即可拉出此搜索框"
+    },
+    {
+      "name": "Empty query lists FXCM",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/market-data/series/page?query=&kind=provider&source=fxcm&calendar=&symbol_type=&cursor=&page_size=50&offset=0",
+      "snapshot": "- dialog \"商品代码搜索\":\n  - text: 商品代码搜索\n  - button \"关闭商品代码搜索\"\n  - searchbox \"搜索\"\n  - tablist:\n    - tab \"全部\" [selected]\n    - tab \"外汇\"\n    - tab \"股票\"\n    - tab \"加密\"\n    - tab \"指数\"\n    - tab \"基金\"\n    - tab \"期货\"\n    - tab \"金属\"\n    - tab \"其他\"\n  - text: 商品代码 描述\n  - button \"行情类型\": 平台行情\n  - button \"来源\": FXCM\n  - text: 10USNOTE 10USNote · 平台 · FXCM · Bid · 原生周期 other FXCM 2USNOTE 2USNote · 平台 · FXCM · Bid · 原生周期 other FXCM 4063.JP 4063.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 4188.JP 4188.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 4385.JP 4385.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 4502.JP 4502.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 4503.JP 4503.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 4568.JP 4568.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 4661.JP 4661.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 5401.JP 5401.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 5411.JP 5411.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 5USNOTE 5USNote · 平台 · FXCM · Bid · 原生周期 other FXCM 6098.JP 6098.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 6146.JP 6146.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 6367.JP 6367.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 6501.JP 6501.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 6594.JP 6594.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 6753.JP 6753.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 6758.JP 6758.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 6857.JP 6857.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 6861.JP 6861.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 6954.JP 6954.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 6981.JP 6981.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 7011.JP 7011.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 7203.JP 7203.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 7267.JP 7267.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 7269.JP 7269.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 7832.JP 7832.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 7974.JP 7974.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 8002.JP 8002.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 8031.JP 8031.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 8035.JP 8035.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 8053.JP 8053.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 8058.JP 8058.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 8306.JP 8306.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 8316.JP 8316.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 8411.JP 8411.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 8473.JP 8473.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 9101.JP 9101.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 9104.JP 9104.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 9107.JP 9107.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 9432.JP 9432.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 9433.JP 9433.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 9983.JP 9983.jp · 平台 · FXCM · Bid · 原生周期 other FXCM 9984.JP 9984.jp · 平台 · FXCM · Bid · 原生周期 other FXCM AAPL.EXT AAPL.ext · 平台 · FXCM · Bid · 原生周期 other FXCM AAPL.US AAPL.us · 平台 · FXCM · Bid · 原生周期 other FXCM ABN.NL ABN.nl · 平台 · FXCM · Bid · 原生周期 other FXCM ABNB.EXT ABNB.ext · 平台 · FXCM · Bid · 原生周期 other FXCM ABNB.US ABNB.us · 平台 · FXCM · Bid · 原生周期 other FXCM\n  - progressbar\n  - text: 只需在图表上开始输入，即可拉出此搜索框"
+    }
+  ],
+  "pageErrors": [],
+  "gold_native_rows": [
+    "MWP:FXCM:044d651dad2554fb2eeb040e1e7a43bb"
+  ],
+  "logs": []
+}

@@ -15,7 +15,7 @@ type CalendarRow = {
   exceptions?: { date?: string; reason?: string; hours?: string; start?: string; end?: string; source?: string }[];
 };
 type CalendarResponse = { items: CalendarRow[]; sources: string[]; checked_at: string; review_due: number };
-const names: Record<string, string> = { dukascopy: "Dukascopy", oanda: "OANDA", binance: "Binance", yahoo: "Yahoo" };
+const names: Record<string, string> = { dukascopy: "Dukascopy", oanda: "OANDA", fxcm: "FXCM Demo", binance: "Binance", yahoo: "Yahoo" };
 const statusNames: Record<string, string> = {
   verified: "已核实", review_due: "待复核", expired: "已过期",
   not_yet_valid: "尚未生效", unverified: "未核实",
@@ -45,7 +45,7 @@ export function CalendarView() {
       <label>品种搜索<NativeInput aria-label="品种搜索" type="search" value={query} onChange={event => update("query", event.target.value)} placeholder="来源或商品代码" /></label>
     </div>
     <div className="dc-calendar-table-head"><span>品种、规则与适用身份</span><div className="dc-market-head-filters">
-      <label>来源<NativeSelect aria-label="来源筛选" value={source} onChange={event => update("source", event.target.value)}><option value="">全部来源</option>{(snapshot.data?.sources || ["dukascopy", "oanda", "binance", "yahoo"]).map(item => <option key={item} value={item}>{names[item] || item}</option>)}</NativeSelect></label>
+      <label>来源<NativeSelect aria-label="来源筛选" value={source} onChange={event => update("source", event.target.value)}><option value="">全部来源</option>{(snapshot.data?.sources || ["dukascopy", "oanda", "fxcm", "binance", "yahoo"]).map(item => <option key={item} value={item}>{names[item] || item}</option>)}</NativeSelect></label>
     </div></div>
     {snapshot.loading && !snapshot.data && <p role="status">正在读取交易日历…</p>}
     {snapshot.error && <p role="alert" className="error">交易日历暂时无法读取；稍后重试。</p>}

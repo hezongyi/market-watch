@@ -4,29 +4,40 @@ from sqlalchemy import select
 
 from .config import settings
 from .history_catalog import account_scope, asset_class
+from .history_mode_sources import logical_symbol
 from .market_names import display_code, matches_code
 from .provider_dukascopy import catalog as dukascopy_catalog
 from .source_registry import capabilities
 from .storage import Instrument, MarketCatalog, MarketDataset
 
 
-def catalog(db, *, query="", source=None, page=1, page_size=25, asset=None):
+def entries(db, *, query="", source=None, asset=None):
     if asset not in (None,"forex","metal","crypto","index","equity","etf","future","other"):
         raise ValueError("未知资产类别")
-    if page < 1 or not 1 <= page_size <= 100:
-        raise ValueError("无效的目录分页")
-    if source and source not in ("dukascopy", "oanda", "binance", "yahoo"):
+    if source and source not in ("dukascopy", "oanda", "binance", "yahoo", "akshare", "fxcm"):
         raise ValueError("未知平台来源")
     items = {}
+    fxcm_scope_value = None
+    if source in (None, "fxcm"):
+        from .fxcm_history import account_scope as fxcm_scope
+        from .fxcm_history import configured
+        if configured():
+            fxcm_scope_value = fxcm_scope()
+    statement = select(MarketCatalog).order_by(MarketCatalog.id.startswith("HC:"))
+    if source:
+        statement = statement.where(MarketCatalog.source == source)
     # Scoped account entries resolve through the explicit OANDA native ID.
     # Legacy entries retain their existing identity when they cover that symbol.
-    for row in db.scalars(select(MarketCatalog).order_by(MarketCatalog.id.startswith("HC:"))):
+    for row in db.scalars(statement):
         scoped = row.id.startswith("HC:")
         if source and row.source != source or row.source == "dukascopy":
             continue
         if scoped and (row.source != "oanda" or
                        (row.metadata_json or {}).get("history_account_scope") != account_scope()):
             continue
+        if row.source == "fxcm":
+            if not row.available or fxcm_scope_value is None or row.metadata_json.get("history_account_scope") != fxcm_scope_value:
+                continue
         key = (row.source, row.symbol)
         if key in items:
             continue
@@ -34,12 +45,17 @@ def catalog(db, *, query="", source=None, page=1, page_size=25, asset=None):
             "source": row.source, "provider_symbol": row.symbol, "label": row.label, "asset_type": row.asset_type,
             "asset_class": {"EQUITY":"equity","STOCK":"equity","ETF":"etf","FUND":"etf","FUTURE":"future","FUTURES":"future","CRYPTO":"crypto"}.get(row.asset_type,asset_class(row.asset_type, row.symbol)), "precision": row.precision,
             "history_precision": row.precision, "precision_status": "source_catalog",
-            "available": row.available and (row.source != "yahoo" or settings.yahoo_enabled),
+            "available": row.available and (row.source != "yahoo" or settings.yahoo_enabled)
+                and (row.source != "akshare" or settings.akshare_enabled),
             "updated_at": row.updated_at or None,
-            "capabilities": capabilities(row.source)}
+            "capabilities": {**capabilities(row.source), **({"native_periods": row.metadata_json.get("verified_frames", {}).get("none", [])} if row.source == "akshare" else {"native_periods": row.metadata_json.get("native_frames", ["M1", "H1", "D1"])} if row.source == "fxcm" else {})},
+            "history_catalog_id": row.id,
+            "verified_frames": row.metadata_json.get("verified_frames", row.metadata_json.get("archive_verified_frames", {})),
+            "logical_symbol": (None if row.source not in ("akshare", "yahoo") else
+                logical_symbol(row.source, row.symbol))}
     # Bootstrap/legacy native identities live in instruments, before a source
     # catalog refresh. Retain those IDs so listing and chart resolution agree.
-    for row in db.scalars(select(Instrument).where(Instrument.source.in_(("oanda", "binance")),
+    for row in db.scalars(select(Instrument).where(Instrument.source.in_(("oanda", "binance") if not source else (source,) if source in ("oanda", "binance") else ()),
             Instrument.id.not_in(select(MarketDataset.instrument_id)))):
         if source and row.source != source:
             continue
@@ -57,8 +73,15 @@ def catalog(db, *, query="", source=None, page=1, page_size=25, asset=None):
     for row in items.values():
         row["display_symbol"] = display_code(row["provider_symbol"], row["source"], row.get("asset_type", row.get("asset_class")))
     rows = sorted((row for row in items.values() if matches_code(query, row["provider_symbol"],
-        row["source"], row.get("asset_type", row.get("asset_class")), row["label"], row.get("logical_symbol", "")) and (not asset or row["asset_class"] == asset)),
+        row["source"], row.get("asset_type", row.get("asset_class")), row["label"], row.get("logical_symbol") or "") and (not asset or row["asset_class"] == asset)),
         key=lambda row: (row["provider_symbol"], row["source"], row["id"]))
+    return rows
+
+
+def catalog(db, *, query="", source=None, page=1, page_size=25, asset=None):
+    if page < 1 or not 1 <= page_size <= 100:
+        raise ValueError("无效的目录分页")
+    rows = entries(db, query=query, source=source, asset=asset)
     start = (page - 1) * page_size
     return {"items": rows[start:start + page_size], "total": len(rows),
             "page": page, "page_size": page_size}

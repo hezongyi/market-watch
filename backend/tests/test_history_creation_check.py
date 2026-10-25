@@ -175,7 +175,7 @@ def test_preflight_race_cannot_overwrite_plan_and_idempotency_still_works(databa
                 == "ready"
             )
             assert (
-                client.get("/api/market-data/history-catalog/search?source=yahoo").status_code
+                    client.get("/api/market-data/history-catalog/search?source=unknown").status_code
                 == 422
             )
             with database.begin() as db:

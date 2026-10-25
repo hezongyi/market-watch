@@ -93,7 +93,7 @@ export function PlatformMarket() {
       {detail.capabilities.native_confirmation === "not_supplied" && <p>来源未提供确认标记；按周期结束时间显示。</p>}
       <div className="dc-actions">
         {detail.available && detail.source === "oanda" && <Link to={centerLink(`/market-data/platform/configure?instrument=${encodeURIComponent(detail.id)}`, params, rowId(detail.id))}>配置原生参数</Link>}
-        {["dukascopy", "oanda"].includes(detail.source) && detail.capabilities.history_m1 && (!detail.logical_symbol || detail.logical_symbol.length <= 10) &&
+        {["dukascopy", "oanda", "fxcm"].includes(detail.source) && detail.capabilities.history_m1 && (!detail.logical_symbol || detail.logical_symbol.length <= 10) &&
           <Link to={centerLink(`/market-data/datasets/new?source=${detail.source}&symbol=${encodeURIComponent(detail.provider_symbol)}${detail.history_precision == null ? "" : `&precision=${detail.history_precision}`}`, params, rowId(detail.id))}>添加为自建行情</Link>}
         <button onClick={() => { setDetail(null); panel.close(); setRefresh(value => value + 1); }}>刷新目录</button>
       </div>

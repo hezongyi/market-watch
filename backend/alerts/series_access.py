@@ -103,7 +103,16 @@ def _metadata(db, ident, kind, *, composite_context=None, selected_revision=None
         "precision": max(inst.precision, target.precision) if kind == "composite" else inst.precision,
         "calendar_profile": target.calendar_profile if kind == "composite" else inst.calendar_profile,
         "frames": [frame for frame in FRAMES if frame in frames], "volume_kind": volume_kind,
-        "volume_unit": volume_unit, **binding}
+        "volume_unit": volume_unit,
+        **({"mode": dataset.identity.get("mode", "base_m1"),
+            "frame_ranges": version.manifest.get("frames", {})} if kind == "history" else {}),
+        **({"timezone": inst.calendar_profile["trading_date"]["timezone"],
+            "session": "24x7", "session_verified": False,
+            "display_symbol": dataset.identity["provider_symbol"],
+            "asset_type": {"equity": "EQUITY", "etf": "ETF", "future": "FUTURE",
+                           "index": "INDEX", "crypto": "CRYPTO"}.get(dataset.asset_class, "OTHER")}
+           if kind == "history" and inst.calendar == "source_date" else {}),
+        **binding}
 
 
 def chart_data(db, body, *, realtime=None):
@@ -224,11 +233,14 @@ def chart_data(db, body, *, realtime=None):
         "indicators": indicators, "indicator_progress": indicator_progress,
         "dependency_before": body.dependency_before,
         "dependency_revision": dependency["revision"] if dependency else None,
-        "future": future_grid(inst, body.timeframe, page["bars"][-1]["end"]) if page["bars"] else [],
+        "future": future_grid(inst, body.timeframe, page["bars"][-1]["end"])
+            if page["bars"] and meta["calendar"] != "source_date" else [],
         "bounded_history": True, "as_of": stamp, "series_kind": body.series_kind, "symbol": meta["symbol"]}
 
 
 def fixed_label(bar, frame, phase):
+    if phase == "source_date":
+        return bar["start"]
     if frame not in ("D1", "W1", "MN"):
         return bar["start"]
     at = bar["end"] - 1 if frame == "D1" else bar["start"] + (86400000 if phase == "ny17" else 0)
@@ -326,7 +338,8 @@ def search_page(db, query="", *, kind="history", page_size=25, offset=0, source=
     """
     from .search_types import TYPES
     if (symbol_type not in TYPES or kind not in ("history", "composite") or not 1 <= page_size <= 250 or not 0 <= offset <= 1000000
-            or source not in (None, "dukascopy", "oanda", "binance") or calendar not in (None, "ny17", "utc0")):
+            or source not in (None, "dukascopy", "oanda", "binance", "yahoo", "akshare", "fxcm")
+            or calendar not in (None, "ny17", "utc0", "source_date")):
         raise ValueError("无效行情搜索范围或筛选")
     eligible_period = select(HistoryArtifact.id).where(HistoryArtifact.version_id == HistoryVersion.id,
         HistoryArtifact.status == "published", HistoryArtifact.count > 0)

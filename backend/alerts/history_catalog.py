@@ -2,6 +2,7 @@
 
 import hashlib
 import re
+from datetime import UTC, datetime
 
 from sqlalchemy import select
 
@@ -52,8 +53,9 @@ def product_metadata(kind, asset):
 
 
 def catalog(db, *, source, query="", page=1, page_size=25, symbol_type=""):
-    from .search_types import TYPES, symbol_type as search_type
-    if symbol_type not in TYPES or source not in ("dukascopy", "oanda") or page < 1 or not 1 <= page_size <= 100:
+    from .search_types import TYPES
+    from .search_types import symbol_type as search_type
+    if symbol_type not in TYPES or source not in ("dukascopy", "oanda", "yahoo", "akshare", "fxcm") or page < 1 or not 1 <= page_size <= 100:
         raise ValueError("无效的自建来源目录查询")
     requires_refresh = False
     if source == "dukascopy":
@@ -75,8 +77,10 @@ def catalog(db, *, source, query="", page=1, page_size=25, symbol_type=""):
                 "precision_status": "manual_required", "availability": "sdk_symbol; coverage_not_verified",
                 "metadata_origin": "dukascopy-python instruments", "updated_at": None})
             items[-1].update(product_metadata(name, items[-1]["asset_class"]))
-    else:
-        scope = account_scope()
+    elif source in ("oanda", "fxcm"):
+        from .fxcm_history import account_scope as fxcm_scope
+        from .fxcm_history import configured
+        scope = fxcm_scope() if source == "fxcm" and configured() else "disabled" if source == "fxcm" else account_scope()
         rows = [row for row in db.scalars(select(MarketCatalog).where(MarketCatalog.source == source,
                 MarketCatalog.available.is_(True)))
                 if row.metadata_json.get("history_account_scope") == scope]
@@ -88,10 +92,39 @@ def catalog(db, *, source, query="", page=1, page_size=25, symbol_type=""):
             "label": row.label, "asset_class": asset_class(row.asset_type, row.symbol),
             "precision": row.precision, "precision_status": "source_catalog",
             "availability": "account_catalog; coverage_not_verified", "updated_at": row.updated_at,
-            "metadata_origin": "OANDA Practice account instruments"}
+            "metadata_origin": "FXCM Demo ForexConnect Offers" if source == "fxcm" else "OANDA Practice account instruments"}
             for row in rows
             if matches_code(query, row.symbol, source, row.asset_type, row.label) and
             len(re.sub(r"[^A-Z0-9]", "", row.symbol)) <= 10]
+    else:
+        from .history_mode_sources import logical_symbol
+
+        enabled = settings.akshare_enabled if source == "akshare" else settings.yahoo_enabled
+        rows = list(db.scalars(select(MarketCatalog).where(MarketCatalog.source == source,
+            MarketCatalog.available.is_(True)))) if enabled else []
+        requires_refresh = not rows
+        items = []
+        for row in rows:
+            if not matches_code(query, row.symbol, source, row.asset_type, row.label):
+                continue
+            info = row.metadata_json
+            verified = info.get("verified_frames" if source == "akshare" else "archive_verified_frames", {})
+            default_start = "2000-01-01"
+            if source == "akshare" and row.symbol.startswith("HKEX:"):
+                evidence = info.get("probes", {}).get("none", {}).get("D1", {})
+                observed_start = evidence.get("requested_start")
+                default_start = (datetime.fromtimestamp(observed_start / 1000, UTC).date().isoformat()
+                    if evidence.get("status") == "verified" and type(observed_start) is int else None)
+            items.append({"source": source, "provider_symbol": row.symbol, "catalog_id": row.id,
+                "logical_symbol": logical_symbol(source, row.symbol), "label": row.label,
+                "display_symbol": row.symbol, "asset_class": asset_class(row.asset_type, row.symbol),
+                "precision": row.precision, "precision_status": "source_catalog",
+                "availability": "verified_periods" if any(verified.values()) else "probe_required",
+                "updated_at": row.updated_at, "metadata_origin": source + " local catalog",
+                "supported_modes": ["base_d1", "native_periods"], "verified_frames": verified,
+                "default_mode": "base_d1" if row.asset_type in ("EQUITY", "ETF") else "native_periods",
+                "aggregation_calendar": "source_date", "timezone": info.get("timezone"),
+                "default_start_date": default_start})
     if symbol_type:
         items = [row for row in items if search_type(row["asset_class"]) == symbol_type]
     items.sort(key=lambda row: row["provider_symbol"])
@@ -136,3 +169,41 @@ def refresh_oanda():
             row.calendar = "ny17" if asset_class(row.asset_type, symbol) in ("forex", "metal") else None
             row.metadata_json = {"history_account_scope": scope, "origin": "oanda_practice_account_catalog"}
     return {"source": "oanda", "count": len(items), "updated_at": stamp}
+
+
+def refresh_fxcm():
+    from .fxcm_history import FxcmHistory, configured
+    from .fxcm_history import account_scope as fxcm_scope
+
+    if not configured():
+        raise ValueError("请先启用并配置FXCM历史连接")
+    scope = fxcm_scope()
+    adapter = FxcmHistory()
+    try:
+        items = adapter.catalog()  # All network I/O before the transaction.
+        depths = adapter.timeframes()
+        if not depths:
+            raise ValueError("FXCM未提供系统支持的原生周期")
+    finally:
+        adapter.close()
+    stamp = now_ms()
+    with transaction() as db:
+        for row in db.scalars(select(MarketCatalog).where(MarketCatalog.source == "fxcm")):
+            if row.metadata_json.get("history_account_scope") == scope:
+                row.available = False
+        for item in items:
+            symbol = item["symbol"]
+            ident = "FXCM:" + hashlib.sha256((scope + "|" + symbol).encode()).hexdigest()[:32]
+            row = db.get(MarketCatalog, ident)
+            if row is None:
+                row = MarketCatalog(id=ident, source="fxcm", symbol=symbol)
+                db.add(row)
+            row.label, row.precision = symbol, item["digits"]
+            # Official O2GInstrumentType: Forex=1, Index=2, Commodity=3,
+            # Treasury=4, Bullion=5, Shares=6, FXIndex=7, CFD=8.
+            row.asset_type = {1: "CURRENCY", 2: "INDEX", 5: "METAL", 6: "EQUITY"}.get(item["instrument_type"], "OTHER")
+            row.updated_at, row.available, row.calendar = stamp, True, None
+            row.metadata_json = {"history_account_scope": scope,
+                "origin": "fxcm_demo_forexconnect_offers", "instrument_type": item["instrument_type"],
+                "native_frames": list(depths), "native_query_depths": depths}
+    return {"source": "fxcm", "count": len(items), "updated_at": stamp}

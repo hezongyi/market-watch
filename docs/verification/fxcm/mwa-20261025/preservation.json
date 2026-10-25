@@ -1,0 +1,46 @@
+{
+  "passed": true,
+  "protected_table_hashes": {
+    "advanced_chart_workspaces": {
+      "count": 17,
+      "sha256": "d3277680c039d2822ced96f33b927b070bfb5579ed6d728d9c9530ff4b29b954"
+    },
+    "chart_workspaces": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "advanced_chart_preferences": {
+      "count": 30,
+      "sha256": "959d581c8bba8531fdd2d1067ecbdb54dfa261d5af5963a6513e53015bbe4c34"
+    },
+    "chart_alerts": {
+      "count": 19,
+      "sha256": "9677c4cb1e35697b491d923bfccc89d59006bc447172cd23ec57a73d2841af8c"
+    },
+    "chart_indicator_templates": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "alembic_version": [
+      "ay52_history_modes"
+    ]
+  },
+  "generic_preferences_boundary": {
+    "before": {
+      "count": 154,
+      "sha256": "9c6ff6789ba09023f02ed29ee1ee7c0946acbbe2b1b3a4b8e67c3a7158ae966a"
+    },
+    "after": {
+      "count": 172,
+      "sha256": "54cb1039e2a28dddeeca2fcbff7b3803450f21bf39cac80058f27c4ac6892d14"
+    },
+    "full_table_unchanged": false,
+    "note": "Generic preferences mix operational heartbeats, notices and upstream slot state with settings; full-table fingerprint changed. Per-key pre-update digests were not captured, so generic user-setting byte equality is not claimed. Application login and effective environment verified separately."
+  },
+  "original_notification_states_kept": 8,
+  "new_notifications": 0,
+  "protected_browsers_unchanged": true,
+  "existing_configuration_preserved": true,
+  "postgres_gateway_initializers_unchanged": true,
+  "schema_unchanged": true
+}

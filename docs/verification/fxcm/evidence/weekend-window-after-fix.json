@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "probes": [
+    {
+      "label": "weekday_full_capacity",
+      "result": "data",
+      "rows": 300,
+      "checkpoint": 1792789200000,
+      "start": 1792771200000,
+      "end": 1792789200000,
+      "seconds": 13.35
+    },
+    {
+      "label": "weekend_empty",
+      "result": "empty_success",
+      "rows": 0,
+      "checkpoint": 1792819800000,
+      "start": 1792801800000,
+      "end": 1792819800000,
+      "seconds": 2.19
+    }
+  ],
+  "seconds": 16.21
+}

@@ -1,0 +1,390 @@
+{
+  "observed_at": "2026-10-25T11:00:47.157Z",
+  "cases": [
+    {
+      "button": "商品代码搜索",
+      "opened_ms": 777,
+      "first_result_ms": 5680,
+      "result": "rows",
+      "network": [
+        {
+          "event": "request",
+          "method": "GET",
+          "url": "https://test.kookvv.com:8443/api/market-data/series/page?query=EURUSD&kind=all&source=&calendar=&symbol_type=&cursor=&page_size=50&offset=0",
+          "at": 1792926047930
+        },
+        {
+          "event": "response",
+          "status": 200,
+          "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+          "at": 1792926048078,
+          "timing": {
+            "startTime": 1792926045685.771,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.621,
+            "responseStart": 2387.196,
+            "responseEnd": 2390.134
+          }
+        },
+        {
+          "event": "response",
+          "status": 200,
+          "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODAwMn3AOlgAlqcfNS8yahWQzfKRsmR5mQ4Xn5yg_salwkKLjA",
+          "at": 1792926048386,
+          "timing": {
+            "startTime": 1792926045943.0938,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.495,
+            "responseStart": 2439.814,
+            "responseEnd": 2443.845
+          }
+        },
+        {
+          "event": "request",
+          "method": "GET",
+          "url": "https://test.kookvv.com:8443/api/chart-alerts",
+          "at": 1792926050141
+        },
+        {
+          "event": "request",
+          "method": "GET",
+          "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+          "at": 1792926050142
+        },
+        {
+          "event": "request",
+          "method": "GET",
+          "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODAwMn3AOlgAlqcfNS8yahWQzfKRsmR5mQ4Xn5yg_salwkKLjA",
+          "at": 1792926050449
+        },
+        {
+          "event": "response",
+          "status": 200,
+          "url": "https://test.kookvv.com:8443/api/market-data/series/page?query=EURUSD&kind=all&source=&calendar=&symbol_type=&cursor=&page_size=50&offset=0",
+          "at": 1792926052806,
+          "timing": {
+            "startTime": 1792926047931.75,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 1.104,
+            "responseStart": 4872.363,
+            "responseEnd": 4882.217
+          }
+        }
+      ],
+      "snapshot": "- dialog \"商品代码搜索\":\n  - text: 商品代码搜索\n  - button \"关闭商品代码搜索\"\n  - searchbox \"搜索\": EURUSD\n  - tablist:\n    - tab \"全部\" [selected]\n    - tab \"外汇\"\n    - tab \"股票\"\n    - tab \"加密\"\n    - tab \"指数\"\n    - tab \"基金\"\n    - tab \"期货\"\n    - tab \"金属\"\n    - tab \"其他\"\n  - text: 商品代码 描述\n  - button \"行情类型\": 全部行情\n  - button \"来源\": 全部来源\n  - text: EURUSD 欧元／美元 · 平台 · yahoo · 原生周期 forex YAHOO EURUSD EURUSD · 自建 · dukascopy · bid · ny17 forex DUKASCOPY EURUSD EURUSD · 组合 · dukascopy→OANDA Practice · bid · ny17 forex DUKASCOPY EURUSD 欧元 / 美元 · 平台 · oanda · 原生周期 forex OANDA EURUSD EURUSD · 自建 · fxcm · bid · utc0 forex FXCM EURUSD EUR/USD · 平台 · dukascopy · 原生周期 forex DUKASCOPY EURUSD EUR/USD · 平台 · FXCM · Bid · 原生周期 forex FXCM EURUSD EUR/USD · 平台 · OANDA Practice · Bid · 原生周期 forex OANDA 只需在图表上开始输入，即可拉出此搜索框"
+    },
+    {
+      "button": "添加商品代码",
+      "opened_ms": 290,
+      "first_result_ms": 8230,
+      "result": "rows",
+      "network": [
+        {
+          "event": "request",
+          "method": "GET",
+          "url": "https://test.kookvv.com:8443/api/market-data/series/page?query=&kind=all&source=&calendar=&symbol_type=&cursor=&page_size=50&offset=0",
+          "at": 1792926053273
+        },
+        {
+          "event": "response",
+          "status": 200,
+          "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODAwMn3AOlgAlqcfNS8yahWQzfKRsmR5mQ4Xn5yg_salwkKLjA",
+          "at": 1792926053888,
+          "timing": {
+            "startTime": 1792926050450.0278,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.417,
+            "responseStart": 3435.61,
+            "responseEnd": 3438.53
+          }
+        },
+        {
+          "event": "response",
+          "status": 200,
+          "url": "https://test.kookvv.com:8443/api/chart-alerts",
+          "at": 1792926054570,
+          "timing": {
+            "startTime": 1792926050143.829,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.608,
+            "responseStart": 4411.446,
+            "responseEnd": 4423.165
+          }
+        },
+        {
+          "event": "request",
+          "method": "GET",
+          "url": "https://test.kookvv.com:8443/api/chart-alerts",
+          "at": 1792926055144
+        },
+        {
+          "event": "request",
+          "method": "GET",
+          "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+          "at": 1792926055145
+        },
+        {
+          "event": "request",
+          "method": "GET",
+          "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+          "at": 1792926055685
+        },
+        {
+          "event": "request",
+          "method": "GET",
+          "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODAwMn3AOlgAlqcfNS8yahWQzfKRsmR5mQ4Xn5yg_salwkKLjA",
+          "at": 1792926055976
+        },
+        {
+          "event": "response",
+          "status": 200,
+          "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+          "at": 1792926057108,
+          "timing": {
+            "startTime": 1792926055146.6401,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.655,
+            "responseStart": 1959.343,
+            "responseEnd": 1971.656
+          }
+        },
+        {
+          "event": "response",
+          "status": 200,
+          "url": "https://test.kookvv.com:8443/api/chart-alerts",
+          "at": 1792926057301,
+          "timing": {
+            "startTime": 1792926055146.0168,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.42,
+            "responseStart": 2153.024,
+            "responseEnd": 2163.228
+          }
+        },
+        {
+          "event": "response",
+          "status": 200,
+          "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+          "at": 1792926057481,
+          "timing": {
+            "startTime": 1792926055686.368,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.422,
+            "responseStart": 1792.019,
+            "responseEnd": 1795.57
+          }
+        },
+        {
+          "event": "response",
+          "status": 200,
+          "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODAwMn3AOlgAlqcfNS8yahWQzfKRsmR5mQ4Xn5yg_salwkKLjA",
+          "at": 1792926057890,
+          "timing": {
+            "startTime": 1792926055977.27,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.57,
+            "responseStart": 1909.705,
+            "responseEnd": 1913.117
+          }
+        },
+        {
+          "event": "request",
+          "method": "GET",
+          "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODAwMn3AOlgAlqcfNS8yahWQzfKRsmR5mQ4Xn5yg_salwkKLjA",
+          "at": 1792926059945
+        },
+        {
+          "event": "request",
+          "method": "GET",
+          "url": "https://test.kookvv.com:8443/api/chart-alerts",
+          "at": 1792926060141
+        },
+        {
+          "event": "request",
+          "method": "GET",
+          "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+          "at": 1792926060142
+        },
+        {
+          "event": "response",
+          "status": 200,
+          "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODAwMn3AOlgAlqcfNS8yahWQzfKRsmR5mQ4Xn5yg_salwkKLjA",
+          "at": 1792926060777,
+          "timing": {
+            "startTime": 1792926059946.2332,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.473,
+            "responseStart": 828.871,
+            "responseEnd": 831.78
+          }
+        },
+        {
+          "event": "request",
+          "method": "GET",
+          "url": "https://test.kookvv.com:8443/api/notification-center/health",
+          "at": 1792926060833
+        },
+        {
+          "event": "response",
+          "status": 200,
+          "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+          "at": 1792926060891,
+          "timing": {
+            "startTime": 1792926060143.908,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.358,
+            "responseStart": 744.763,
+            "responseEnd": 756.981
+          }
+        },
+        {
+          "event": "response",
+          "status": 200,
+          "url": "https://test.kookvv.com:8443/api/chart-alerts",
+          "at": 1792926061012,
+          "timing": {
+            "startTime": 1792926060142.4202,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.413,
+            "responseStart": 863.378,
+            "responseEnd": 867.637
+          }
+        },
+        {
+          "event": "response",
+          "status": 200,
+          "url": "https://test.kookvv.com:8443/api/market-data/series/page?query=&kind=all&source=&calendar=&symbol_type=&cursor=&page_size=50&offset=0",
+          "at": 1792926061192,
+          "timing": {
+            "startTime": 1792926053275.2148,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.471,
+            "responseStart": 7905.164,
+            "responseEnd": 7925.586
+          }
+        }
+      ],
+      "snapshot": "- dialog \"添加商品代码\":\n  - text: 添加商品代码\n  - button \"关闭菜单\"\n  - searchbox \"搜索\"\n  - tablist:\n    - tab \"全部\" [selected]\n    - tab \"外汇\"\n    - tab \"股票\"\n    - tab \"加密\"\n    - tab \"指数\"\n    - tab \"基金\"\n    - tab \"期货\"\n    - tab \"金属\"\n    - tab \"其他\"\n  - text: 商品代码 描述\n  - button \"行情类型\": 全部行情\n  - button \"来源\": 全部来源\n  - text: GC=F 黄金期货 · COMEX · 平台 · yahoo · 原生周期 futures YAHOO\n  - img \"添加到自选表\":\n    - img\n  - text: SHFE:RB0 螺纹钢连续（新浪 RB0） · 自建 · akshare · last · source_date futures AKSHARE\n  - img \"添加到自选表\":\n    - img\n  - text: EURUSD EURUSD · 组合 · dukascopy→OANDA Practice · bid · ny17 forex DUKASCOPY\n  - img \"從觀察清單中刪除\":\n    - img\n  - img \"前往商品\":\n    - img\n  - text: HKEX:00700 腾讯控股 · 平台 · akshare · 原生周期 stock AKSHARE\n  - img \"添加到自选表\":\n    - img\n  - text: EURUSD EURUSD · 自建 · dukascopy · bid · ny17 forex DUKASCOPY\n  - img \"添加到自选表\":\n    - img\n  - text: USDCAD USDCAD · 组合 · dukascopy→OANDA Practice · bid · ny17 forex DUKASCOPY\n  - img \"從觀察清單中刪除\":\n    - img\n  - img \"前往商品\":\n    - img\n  - text: EURUSD 欧元 / 美元 · 平台 · oanda · 原生周期 forex OANDA\n  - img \"從觀察清單中刪除\":\n    - img\n  - img \"前往商品\":\n    - img\n  - text: EURUSD EURUSD · 自建 · fxcm · bid · utc0 forex FXCM\n  - img \"添加到自选表\":\n    - img\n  - text: XAUUSD XAUUSD · 组合 · dukascopy→OANDA Practice · bid · ny17 commodity DUKASCOPY\n  - img \"從觀察清單中刪除\":\n    - img\n  - img \"前往商品\":\n    - img\n  - text: BTCUSDT 比特币 / USDT · 平台 · binance · 原生周期 crypto BINANCE\n  - img \"從觀察清單中刪除\":\n    - img\n  - img \"前往商品\":\n    - img\n  - text: USDCAD USDCAD · 自建 · dukascopy · bid · ny17 forex DUKASCOPY\n  - img \"添加到自选表\":\n    - img\n  - text: 0005.HK/HKD 0005.HK/HKD · 股票类来源行情（具体合约类型待核实） · 平台 · dukascopy · 原生周期 stock DUKASCOPY\n  - img \"添加到自选表\":\n    - img\n  - text: XAUUSD XAUUSD · 自建 · dukascopy · bid · ny17 commodity DUKASCOPY\n  - img \"添加到自选表\":\n    - img\n  - text: 10USNOTE 10USNote · 平台 · FXCM · Bid · 原生周期 other FXCM\n  - img \"添加到自选表\":\n    - img\n  - text: CL=F WTI 原油期货 · NYMEX · 平台 · yahoo · 原生周期 futures YAHOO\n  - img \"添加到自选表\":\n    - img\n  - text: SZSE:000001 平安银行 · 平台 · akshare · 原生周期 stock AKSHARE\n  - img \"添加到自选表\":\n    - img\n  - text: AU200AUD 澳大利亚 200 指数 · 平台 · oanda · 原生周期 other OANDA\n  - img \"添加到自选表\":\n    - img\n  - text: 0027.HK/HKD 0027.HK/HKD · 股票类来源行情（具体合约类型待核实） · 平台 · dukascopy · 原生周期 stock DUKASCOPY\n  - img \"添加到自选表\":\n    - img\n  - text: 2USNOTE 2USNote · 平台 · FXCM · Bid · 原生周期 other FXCM\n  - img \"添加到自选表\":\n    - img\n  - text: SI=F 白银期货 · COMEX · 平台 · yahoo · 原生周期 futures YAHOO\n  - img \"添加到自选表\":\n    - img\n  - text: SHFE:RB0 螺纹钢连续（新浪 RB0） · 平台 · akshare · 原生周期 futures AKSHARE\n  - img \"添加到自选表\":\n    - img\n  - text: AUDCAD 澳元 / 加元 · 平台 · oanda · 原生周期 forex OANDA\n  - img \"添加到自选表\":\n    - img\n  - text: 0175.HK/HKD 0175.HK/HKD · 股票类来源行情（具体合约类型待核实） · 平台 · dukascopy · 原生周期 stock DUKASCOPY\n  - img \"添加到自选表\":\n    - img\n  - text: 4063.JP 4063.jp · 平台 · FXCM · Bid · 原生周期 other FXCM\n  - img \"添加到自选表\":\n    - img\n  - text: ^GSPC 标普 500 指数 · 平台 · yahoo · 原生周期 index YAHOO\n  - img \"添加到自选表\":\n    - img\n  - text: AUDCHF 澳元 / 瑞郎 · 平台 · oanda · 原生周期 forex OANDA\n  - img \"添加到自选表\":\n    - img\n  - text: 0291.HK/HKD 0291.HK/HKD · 股票类来源行情（具体合约类型待核实） · 平台 · dukascopy · 原生周期 stock DUKASCOPY\n  - img \"添加到自选表\":\n    - img\n  - text: 4188.JP 4188.jp · 平台 · FXCM · Bid · 原生周期 other FXCM\n  - img \"添加到自选表\":\n    - img\n  - text: ^DJI 道琼斯工业平均指数 · 平台 · yahoo · 原生周期 index YAHOO\n  - img \"添加到自选表\":\n    - img\n  - text: AUDHKD 澳元 / 港元 · 平台 · oanda · 原生周期 forex OANDA\n  - img \"添加到自选表\":\n    - img\n  - text: 0386.HK/HKD 0386.HK/HKD · 股票类来源行情（具体合约类型待核实） · 平台 · dukascopy · 原生周期 stock DUKASCOPY\n  - img \"添加到自选表\":\n    - img\n  - text: 4385.JP 4385.jp · 平台 · FXCM · Bid · 原生周期 other FXCM\n  - img \"添加到自选表\":\n    - img\n  - text: ^IXIC 纳斯达克综合指数 · 平台 · yahoo · 原生周期 index YAHOO\n  - img \"添加到自选表\":\n    - img\n  - text: AUDJPY 澳元 / 日元 · 平台 · oanda · 原生周期 forex OANDA\n  - img \"添加到自选表\":\n    - img\n  - text: 0388.HK/HKD 0388.HK/HKD · 股票类来源行情（具体合约类型待核实） · 平台 · dukascopy · 原生周期 stock DUKASCOPY\n  - img \"添加到自选表\":\n    - img\n  - text: 4502.JP 4502.jp · 平台 · FXCM · Bid · 原生周期 other FXCM\n  - img \"添加到自选表\":\n    - img\n  - text: SPY SPDR 标普 500 ETF · 平台 · yahoo · 原生周期 fund YAHOO\n  - img \"添加到自选表\":\n    - img\n  - text: AUDNZD 澳元 / 新西兰元 · 平台 · oanda · 原生周期 forex OANDA\n  - img \"添加到自选表\":\n    - img\n  - text: 0700.HK/HKD 0700.HK/HKD · 股票类来源行情（具体合约类型待核实） · 平台 · dukascopy · 原生周期 stock DUKASCOPY\n  - img \"添加到自选表\":\n    - img\n  - text: 4503.JP 4503.jp · 平台 · FXCM · Bid · 原生周期 other FXCM\n  - img \"添加到自选表\":\n    - img\n  - text: QQQ Invesco 纳斯达克 100 ETF · 平台 · yahoo · 原生周期 fund YAHOO\n  - img \"添加到自选表\":\n    - img\n  - text: AUDSGD 澳元 / 新加坡元 · 平台 · oanda · 原生周期 forex OANDA\n  - img \"添加到自选表\":\n    - img\n  - text: 0857.HK/HKD 0857.HK/HKD · 股票类来源行情（具体合约类型待核实） · 平台 · dukascopy · 原生周期 stock DUKASCOPY\n  - img \"添加到自选表\":\n    - img\n  - text: 4568.JP 4568.jp · 平台 · FXCM · Bid · 原生周期 other FXCM\n  - img \"添加到自选表\":\n    - img\n  - text: MSFT 微软公司 · 平台 · yahoo · 原生周期 stock YAHOO\n  - img \"添加到自选表\":\n    - img\n  - text: AUDUSD 澳元 / 美元 · 平台 · oanda · 原生周期 forex OANDA\n  - img \"添加到自选表\":\n    - img\n  - text: 0883.HK/HKD 0883.HK/HKD · 股票类来源行情（具体合约类型待核实） · 平台 · dukascopy · 原生周期 stock DUKASCOPY\n  - img \"添加到自选表\":\n    - img\n  - text: 4661.JP 4661.jp · 平台 · FXCM · Bid · 原生周期 other FXCM\n  - img \"添加到自选表\":\n    - img\n  - text: NVDA 英伟达 · 平台 · yahoo · 原生周期 stock YAHOO\n  - img \"添加到自选表\":\n    - img\n  - text: BCHUSD Bitcoin Cash · 平台 · oanda · 原生周期 other OANDA\n  - img \"添加到自选表\":\n    - img\n  - progressbar\n  - text: Shift + 点击 或者 Shift + Enter 添加商品并关闭对话框"
+    },
+    {
+      "button": "商品代码搜索",
+      "opened_ms": 218,
+      "first_result_ms": 5633,
+      "result": "rows",
+      "network": [
+        {
+          "event": "request",
+          "method": "GET",
+          "url": "https://test.kookvv.com:8443/api/market-data/series/page?query=EURUSD&kind=all&source=&calendar=&symbol_type=&cursor=&page_size=50&offset=0",
+          "at": 1792926061691
+        },
+        {
+          "event": "request",
+          "method": "GET",
+          "url": "https://test.kookvv.com:8443/api/chart-alerts",
+          "at": 1792926065141
+        },
+        {
+          "event": "request",
+          "method": "GET",
+          "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+          "at": 1792926065142
+        },
+        {
+          "event": "request",
+          "method": "GET",
+          "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+          "at": 1792926065697
+        },
+        {
+          "event": "response",
+          "status": 200,
+          "url": "https://test.kookvv.com:8443/api/notification-center/health",
+          "at": 1792926066194,
+          "timing": {
+            "startTime": 1792926060834.4019,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.492,
+            "responseStart": 5356.517,
+            "responseEnd": 5360.112
+          }
+        },
+        {
+          "event": "response",
+          "status": 200,
+          "url": "https://test.kookvv.com:8443/api/market-data/series/page?query=EURUSD&kind=all&source=&calendar=&symbol_type=&cursor=&page_size=50&offset=0",
+          "at": 1792926066892,
+          "timing": {
+            "startTime": 1792926061692.8352,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 3.237,
+            "responseStart": 5196.328,
+            "responseEnd": 5201.592
+          }
+        }
+      ],
+      "snapshot": "- dialog \"商品代码搜索\":\n  - text: 商品代码搜索\n  - button \"关闭商品代码搜索\"\n  - searchbox \"搜索\": EURUSD\n  - tablist:\n    - tab \"全部\" [selected]\n    - tab \"外汇\"\n    - tab \"股票\"\n    - tab \"加密\"\n    - tab \"指数\"\n    - tab \"基金\"\n    - tab \"期货\"\n    - tab \"金属\"\n    - tab \"其他\"\n  - text: 商品代码 描述\n  - button \"行情类型\": 全部行情\n  - button \"来源\": 全部来源\n  - text: EURUSD 欧元／美元 · 平台 · yahoo · 原生周期 forex YAHOO EURUSD EURUSD · 自建 · dukascopy · bid · ny17 forex DUKASCOPY EURUSD EURUSD · 组合 · dukascopy→OANDA Practice · bid · ny17 forex DUKASCOPY EURUSD 欧元 / 美元 · 平台 · oanda · 原生周期 forex OANDA EURUSD EURUSD · 自建 · fxcm · bid · utc0 forex FXCM EURUSD EUR/USD · 平台 · dukascopy · 原生周期 forex DUKASCOPY EURUSD EUR/USD · 平台 · FXCM · Bid · 原生周期 forex FXCM EURUSD EUR/USD · 平台 · OANDA Practice · Bid · 原生周期 forex OANDA 只需在图表上开始输入，即可拉出此搜索框"
+    }
+  ],
+  "logs": []
+}

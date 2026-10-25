@@ -88,6 +88,7 @@ def derive_page(ident):
         if parent.cursor != proof["original_cursor"] or parent.status not in ("published", "configuration_error"):
             raise ValueError("The original derivation partition changed")
         source = db.scalar(select(HistoryChunk).where(HistoryChunk.version_id == parent.id,
+            HistoryChunk.timeframe == "M1",
                                                      HistoryChunk.start == version.cursor))
         if not source:
             if version.cursor != proof["original_cursor"]:
@@ -136,7 +137,8 @@ def derive_page(ident):
         version.cursor = source.end
         db.flush()
         digest = hashlib.sha256()
-        for checksum in db.scalars(select(HistoryChunk.checksum).where(HistoryChunk.version_id == version.id)
+        for checksum in db.scalars(select(HistoryChunk.checksum).where(HistoryChunk.version_id == version.id,
+                HistoryChunk.timeframe == "M1")
                                    .order_by(HistoryChunk.start)):
             digest.update(checksum.encode())
         version.manifest = {**(version.manifest or {}), "provenance": {**proof,
@@ -168,6 +170,7 @@ def restore_derivation_coverage_page(ident, after):
         if not version or not version.manifest.get("provenance"):
             raise ValueError("Coverage restoration requires original derivation provenance")
         chunk = db.scalar(select(HistoryChunk).where(HistoryChunk.version_id == ident,
+            HistoryChunk.timeframe == "M1",
             HistoryChunk.start >= after).order_by(HistoryChunk.start).limit(1))
         if not chunk:
             return None

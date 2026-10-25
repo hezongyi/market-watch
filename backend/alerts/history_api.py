@@ -13,6 +13,7 @@ from .aggregation_policy import (
     register_history_dataset,
 )
 from .history_versions import create_version, version_report
+from .market_contracts import HistoryMode, HistoryTimeframe
 from .market_datasets import legacy_inventory
 from .market_names import display_code
 from .storage import (
@@ -23,6 +24,11 @@ from .storage import (
 )
 
 
+class CatalogRefreshRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    source: Literal["oanda", "fxcm"] = "oanda"
+
+
 class VersionRequest(BaseModel):
     dataset_id: str = Field(min_length=64, max_length=64)
     start: int = Field(ge=0)
@@ -31,13 +37,16 @@ class VersionRequest(BaseModel):
 
 class DatasetRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    source: Literal["dukascopy", "oanda"] = "dukascopy"
+    source: Literal["dukascopy", "oanda", "akshare", "fxcm", "yahoo"] = "dukascopy"
     logical_symbol: str = Field(pattern=r"^[A-Z0-9]{1,10}$")
-    provider_symbol: str = Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9/_.-]+$")
+    provider_symbol: str = Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9/_.:^=-]+$")
     asset_class: AssetClass
     precision: int = Field(ge=0, le=10, strict=True)
     aggregation_calendar: AggregationCalendar | None = None
     catalog_id: str | None = Field(default=None, max_length=64)
+    mode: HistoryMode = "base_m1"
+    adjustment: Literal["none", "qfq", "hfq", "supplier"] = "none"
+    timeframes: list[HistoryTimeframe] | None = Field(default=None, min_length=1, max_length=9)
 
 
 class AggregationRequest(BaseModel):
@@ -55,6 +64,7 @@ class MaintenanceRequest(BaseModel):
     timezone: str = Field(default="UTC", min_length=1, max_length=64)
     daily_minute: int = Field(default=15, ge=0, lt=1440, strict=True)
     overlap_minutes: int = Field(default=2880, ge=0, le=44640, strict=True)
+    frame_plan: dict[str, dict] = Field(default_factory=dict)
 
 
 class RunRequest(BaseModel):
@@ -97,6 +107,15 @@ class ManagedRequest(BaseModel):
 class CreationCheckRequest(DatasetRequest):
     precision: int | None = Field(default=None, ge=0, le=10, strict=True)
     start_date: str | None = Field(default=None, max_length=10)
+
+
+class SourceProbeRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    source: Literal["akshare", "yahoo"]
+    provider_symbol: str = Field(min_length=1, max_length=64)
+    timeframes: list[HistoryTimeframe] = Field(min_length=1, max_length=9)
+    adjustment: Literal["none", "qfq", "hfq", "supplier"] = "none"
+    start: int = Field(default=1262304000000, ge=0)
 
 
 def dataset_report(row, inst):
@@ -214,15 +233,16 @@ def router(authenticated):
             raise HTTPException(409, str(error)) from None
 
     @routes.get("/center/creations/{request_id}")
-    def creation_result(request_id: str, source: Literal["dukascopy", "oanda"],
+    def creation_result(request_id: str, source: Literal["dukascopy", "oanda", "akshare", "fxcm", "yahoo"],
                         provider_symbol: str = Query(min_length=1, max_length=64),
-                        asset_class: AssetClass = "forex", aggregation_calendar: AggregationCalendar | None = None):
+                        asset_class: AssetClass = "forex", aggregation_calendar: AggregationCalendar | None = None,
+                        mode: HistoryMode = "base_m1", adjustment: str = "none"):
         from .history_commands import lookup_creation
 
         try:
             with transaction() as db:
                 return lookup_creation(db, request_id, source=source, provider_symbol=provider_symbol,
-                    asset_class=asset_class, aggregation_calendar=aggregation_calendar)
+                    asset_class=asset_class, aggregation_calendar=aggregation_calendar, mode=mode, adjustment=adjustment)
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
 
@@ -268,7 +288,7 @@ def router(authenticated):
     def sources():
         from .source_registry import capabilities
 
-        return [capabilities(source) for source in ("dukascopy", "oanda", "binance", "yahoo")]
+        return [capabilities(source) for source in ("dukascopy", "oanda", "binance", "yahoo", "akshare", "fxcm")]
 
     @routes.get("/history-catalog")
     def history_catalog(source: str, query: str = "", page: int = 1, page_size: int = 25, symbol_type: str = ""):
@@ -301,15 +321,38 @@ def router(authenticated):
             raise HTTPException(422, str(error)) from None
 
     @routes.post("/history-catalog/refresh")
-    def refresh_history_catalog():
-        from .history_catalog import refresh_oanda
+    def refresh_history_catalog(body: CatalogRefreshRequest | None = None,
+                                source: Literal["oanda", "akshare", "fxcm"] = "oanda", market: str = "a"):
+        from .history_catalog import refresh_fxcm, refresh_oanda
 
         try:
+            selected = body.source if body else source
+            if selected == "fxcm":
+                return refresh_fxcm()
+            if selected == "akshare":
+                from .akshare_catalog import refresh
+
+                return refresh(market)
             return refresh_oanda()
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
         except Exception:
-            raise HTTPException(502, "OANDA来源目录刷新失败；原目录保留，请检查连接") from None
+            raise HTTPException(502, "来源目录刷新失败；原目录保留，请检查连接") from None
+
+    @routes.post("/history-catalog/probe")
+    def probe_history_source(body: SourceProbeRequest):
+        try:
+            if body.source == "akshare":
+                from .akshare_catalog import probe
+
+                return probe(body.provider_symbol, body.timeframes, adjustment=body.adjustment, start=body.start)
+            from .history_mode_sources import probe_yahoo
+
+            return probe_yahoo(body.provider_symbol, body.timeframes, body.adjustment)
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
+        except Exception:
+            raise HTTPException(502, "来源能力验证失败；原目录保留") from None
 
     @routes.get("/datasets/{dataset_id}/source")
     def collection(dataset_id: str):

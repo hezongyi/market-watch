@@ -47,7 +47,7 @@ def acquire(source, kind, now):
             .where(ImportJob.priority == 0, ImportJob.status.in_(["pending", "running"]))
             .limit(1)
         )
-        if source in ("yahoo", "dukascopy"):
+        if source in ("yahoo", "dukascopy", "akshare", "fxcm"):
             allowed = (not active and not requests and values.get("cooldown_until", 0) <= now)
         else:
             allowed = (
@@ -85,15 +85,23 @@ def release(source, token):
             select(Preference).where(Preference.key == "upstream_slots:" + source).with_for_update()
         )
         if row:
+            values = row.value
+            active = values.get("active", [])
+            owned = next((entry for entry in active if entry["token"] == token), None)
+            # FXCM login may outlast the admission window. Pace the next helper
+            # from completion so snapshots in different processes stay apart.
+            requests = ([dict(kind=owned["kind"], at=now_ms())]
+                        if source == "fxcm" and owned else values.get("requests", []))
             row.value = {
-                **row.value,
-                "active": [e for e in row.value.get("active", []) if e["token"] != token],
+                **values,
+                "active": [e for e in active if e["token"] != token],
+                "requests": requests,
             }
 
 
 @contextmanager
 def request_slot(source, *, deadline=None, cancelled=None):
-    kind = LANE.get()
+    kind = LANE.get() or ("history" if source == "fxcm" else None)
     # Native adapters remain independently testable. Runtime owners set a lane
     # before entering an upstream fetch, including provider chart cache misses.
     if kind is None:

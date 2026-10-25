@@ -84,6 +84,13 @@ class DatasetSource(Base):
     source_id: Mapped[str] = mapped_column(ForeignKey("market_source_series.id"), index=True)
 
 
+class DatasetFrameSource(Base):
+    __tablename__ = "market_dataset_frame_sources"
+    dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), primary_key=True)
+    timeframe: Mapped[str] = mapped_column(String(4), primary_key=True)
+    source_id: Mapped[str] = mapped_column(ForeignKey("market_source_series.id"), index=True)
+
+
 class SourceBlob(Base):
     __tablename__ = "market_source_blobs"
     id: Mapped[str] = mapped_column(String(64), primary_key=True)
@@ -147,9 +154,11 @@ class HistoryVersion(Base):
 
 class HistoryChunk(Base):
     __tablename__ = "market_history_chunks"
-    __table_args__ = (UniqueConstraint("version_id", "start"),)
+    __table_args__ = (UniqueConstraint("version_id", "timeframe", "start",
+                                       name="uq_history_chunk_version_frame_start"),)
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
     version_id: Mapped[str] = mapped_column(ForeignKey("market_history_versions.id"), index=True)
+    timeframe: Mapped[str] = mapped_column(String(4), default="M1", server_default="M1")
     start: Mapped[int] = mapped_column(BigInteger)
     end: Mapped[int] = mapped_column(BigInteger)
     observed_at: Mapped[int] = mapped_column(BigInteger)
@@ -168,6 +177,7 @@ class HistoryReadAttempt(Base):
     __tablename__ = "market_history_read_attempts"
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     version_id: Mapped[str] = mapped_column(ForeignKey("market_history_versions.id"), index=True)
+    timeframe: Mapped[str] = mapped_column(String(4), default="M1", server_default="M1")
     start: Mapped[int] = mapped_column(BigInteger)
     end: Mapped[int] = mapped_column(BigInteger)
     started_at: Mapped[int] = mapped_column(BigInteger)
@@ -185,6 +195,7 @@ class DatasetMaintenance(Base):
     dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), primary_key=True)
     target_start: Mapped[int] = mapped_column(BigInteger)
     timeframes: Mapped[list] = mapped_column(JSON)
+    frame_plan: Mapped[dict] = mapped_column(JSON, default=dict, server_default="{}")
     timezone: Mapped[str] = mapped_column(String(64), default="UTC")
     daily_minute: Mapped[int] = mapped_column(default=15)
     overlap_minutes: Mapped[int] = mapped_column(default=2880)
@@ -214,6 +225,26 @@ class HistoryRun(Base):
     refresh_end: Mapped[int] = mapped_column(BigInteger)
     desired_state: Mapped[str] = mapped_column(String(16), default="running")
     completed_at: Mapped[int | None] = mapped_column(BigInteger)
+
+
+class HistoryFrameRun(Base):
+    """Per-input checkpoints under the existing version lease; no extra queue."""
+
+    __tablename__ = "market_history_frame_runs"
+    version_id: Mapped[str] = mapped_column(ForeignKey("market_history_versions.id"), primary_key=True)
+    timeframe: Mapped[str] = mapped_column(String(4), primary_key=True)
+    source_id: Mapped[str] = mapped_column(ForeignKey("market_source_series.id"))
+    start: Mapped[int] = mapped_column(BigInteger)
+    end: Mapped[int] = mapped_column(BigInteger)
+    cursor: Mapped[int] = mapped_column(BigInteger)
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    attempts: Mapped[int] = mapped_column(default=0)
+    retry_at: Mapped[int] = mapped_column(BigInteger, default=0)
+    observed_at: Mapped[int | None] = mapped_column(BigInteger)
+    last_success: Mapped[int | None] = mapped_column(BigInteger)
+    inherited_version_id: Mapped[str | None] = mapped_column(ForeignKey("market_history_versions.id"))
+    error: Mapped[str | None] = mapped_column(String(40))
+    facts: Mapped[dict] = mapped_column(JSON, default=dict)
 
 
 class HistoryArtifact(Base):
@@ -582,9 +613,9 @@ def immutable_dataset_identity(db, flush_context, instances):
                             FixedIndicatorRun, FixedIndicatorBlock)):
             raise ValueError("Confirmed minute inputs and audit cannot be deleted by runtime writers")
         if isinstance(row, (HistoryChunk, HistoryVersion, SourceBlob, HistoryArtifactBlock, HistoryArtifact,
-                            HistoryReclamation, DatasetReclamation, HistoryReadAttempt)):
+                            HistoryReclamation, DatasetReclamation, HistoryReadAttempt, HistoryFrameRun)):
             raise ValueError("Historical snapshots cannot be deleted by runtime writers")
-        if isinstance(row, (MarketDataset, SourceSeries, DatasetSource)):
+        if isinstance(row, (MarketDataset, SourceSeries, DatasetSource, DatasetFrameSource)):
             raise ValueError("Explicit dataset/source bindings cannot be removed by runtime writers")
         if isinstance(row, (RealtimeMapping, RealtimeMappingNote, MarketComposite, CompositeRevision)):
             raise ValueError("Composite identities and revisions cannot be removed by runtime writers")
@@ -593,6 +624,16 @@ def immutable_dataset_identity(db, flush_context, instances):
             raise ValueError("Bound dataset instruments cannot be removed by runtime writers")
     for row in db.dirty:
         state = inspect(row)
+        if isinstance(row, HistoryFrameRun):
+            parent = db.get(HistoryVersion, row.version_id)
+            status = inspect(parent).attrs.status.history if parent else None
+            frozen = parent and ("published" in status.deleted or
+                parent.status == "published" and not status.has_changes())
+            if frozen and any(attr.history.has_changes() for attr in state.attrs):
+                raise ValueError("Published period checkpoints are immutable")
+            if any(state.attrs[key].history.has_changes() for key in (
+                    "version_id", "timeframe", "source_id", "start", "end", "inherited_version_id")):
+                raise ValueError("Historical period input identity is immutable")
         if isinstance(row, (SourceMinuteRevision, CompositeInputEvent, CompositeMinuteInput, CompositeAggregateBar, FixedIndicatorBlock)) and any(
                 attr.history.has_changes() for attr in state.attrs):
             raise ValueError("Confirmed minute revisions and input audit are immutable")
@@ -628,7 +669,8 @@ def immutable_dataset_identity(db, flush_context, instances):
                 raise ValueError("Completed historical request evidence is immutable")
             parent_key = "version_id" if isinstance(row, HistoryReadAttempt) else "revision_id"
             if any(state.attrs[key].history.has_changes() for key in (
-                    "id", parent_key, "start", "end", "started_at")):
+                    "id", parent_key, "start", "end", "started_at",
+                    *(("timeframe",) if isinstance(row, HistoryReadAttempt) else ()))):
                 raise ValueError("Historical request identity is immutable")
         if isinstance(row, (HistoryChunk, SourceBlob, HistoryArtifactBlock, HistoryReclamation, DatasetReclamation)) and any(attr.history.has_changes() for attr in state.attrs):
             raise ValueError("Historical snapshot chunks are immutable")
@@ -638,7 +680,7 @@ def immutable_dataset_identity(db, flush_context, instances):
                     or "published" in old):
                 if any(attr.history.has_changes() for attr in state.attrs):
                     raise ValueError("Published historical versions are immutable")
-        if isinstance(row, (MarketDataset, SourceSeries, DatasetSource)) and any(
+        if isinstance(row, (MarketDataset, SourceSeries, DatasetSource, DatasetFrameSource)) and any(
             attr.history.has_changes() for attr in state.attrs
         ):
             raise ValueError("Dataset identity is immutable")
@@ -1051,6 +1093,8 @@ def bootstrap(db_engine=engine):
         if db_engine.dialect.name == "postgresql":
             connection.execute(text("SELECT pg_advisory_xact_lock(8675309)"))
         Base.metadata.create_all(connection)
+        if db_engine.dialect.name == "sqlite":
+            _bootstrap_history_modes(connection)
         with sessionmaker(bind=connection).begin() as db:
             if not db.get(Preference, "auth.admin"):
                 db.add(Preference(key="auth.admin", value={}))
@@ -1082,6 +1126,30 @@ def bootstrap(db_engine=engine):
                             precision=precision,
                         )
                     )
+
+
+def _bootstrap_history_modes(connection):
+    """Upgrade local SQLite stores; PostgreSQL uses the Alembic revision."""
+    from alembic.migration import MigrationContext
+    from alembic.operations import Operations
+    from sqlalchemy import Column, inspect
+
+    operations = Operations(MigrationContext.configure(connection))
+    for table in ("market_history_chunks", "market_history_read_attempts"):
+        if "timeframe" not in {c["name"] for c in inspect(connection).get_columns(table)}:
+            operations.add_column(table, Column("timeframe", String(4), nullable=False,
+                                                 server_default="M1"))
+    if "frame_plan" not in {c["name"] for c in inspect(connection).get_columns("market_dataset_maintenance")}:
+        operations.add_column("market_dataset_maintenance",
+                              Column("frame_plan", JSON(), nullable=False, server_default="{}"))
+    constraints = inspect(connection).get_unique_constraints("market_history_chunks")
+    old = next((c for c in constraints if c["column_names"] == ["version_id", "start"]), None)
+    if old:
+        with operations.batch_alter_table("market_history_chunks", naming_convention={
+                "uq": "uq_%(table_name)s_%(column_0_name)s_%(column_1_name)s"}) as batch:
+            batch.drop_constraint(old["name"] or "uq_market_history_chunks_version_id_start", type_="unique")
+            batch.create_unique_constraint("uq_history_chunk_version_frame_start",
+                                           ["version_id", "timeframe", "start"])
 
 
 def candle_dict(c):

@@ -15,10 +15,11 @@ class CreationCheckError(ValueError):
 
 
 def search_catalog(db, *, source="", query="", symbol_type="", offset=0, limit=50):
-    if source not in ("", "dukascopy", "oanda") or offset < 0 or not 1 <= limit <= 100:
+    if source not in ("", "dukascopy", "oanda", "akshare", "fxcm", "yahoo") or offset < 0 or not 1 <= limit <= 100:
         raise ValueError("请选择支持自建历史的来源")
+    from .fxcm_history import configured as fxcm_configured
     items, sources = [], []
-    for name in [source] if source else ["dukascopy", "oanda"]:
+    for name in [source] if source else ["dukascopy", "oanda", "akshare", "fxcm", "yahoo"]:
         page = 1
         while True:
             result = catalog(
@@ -30,7 +31,7 @@ def search_catalog(db, *, source="", query="", symbol_type="", offset=0, limit=5
                     {
                         "source": name,
                         "requires_refresh": result["requires_refresh"],
-                        "connection_configured": name != "oanda"
+                        "connection_configured": fxcm_configured() if name == "fxcm" else name != "oanda"
                         or bool(settings.oanda_account_id and settings.oanda_token),
                     }
                 )
@@ -55,12 +56,21 @@ def check_creation(db, body):
     body = CreationCheckRequest.model_validate(body)
     if body.source == "oanda" and not (settings.oanda_account_id and settings.oanda_token):
         return {"status": "connection_required", "start": None, "existing": None}
+    from .fxcm_history import configured as fxcm_configured
+    if body.source == "fxcm" and not fxcm_configured():
+        return {"status": "connection_required", "start": None, "existing": None}
     identity = history_dataset_identity(
         source=body.source,
         provider_symbol=body.provider_symbol,
         asset_class=body.asset_class,
         aggregation_calendar=body.aggregation_calendar,
+        mode=body.mode, adjustment=body.adjustment,
     )
+    if identity.identity_version == 2:
+        from .history_mode_sources import local_details, validate_frames
+
+        info, _ = local_details(db, body.source, body.provider_symbol)
+        validate_frames(identity, info, body.timeframes)
     if body.catalog_id:
         entries = catalog(db, source=body.source, query=body.provider_symbol, page_size=100)[
             "items"
@@ -94,7 +104,7 @@ def check_creation(db, body):
         try:
             start = date_start(
                 SimpleNamespace(
-                    calendar=resolve_calendar(body.asset_class, body.aggregation_calendar)
+                    calendar="source_date" if identity.identity_version == 2 else resolve_calendar(body.asset_class, body.aggregation_calendar)
                 ),
                 body.start_date,
             )

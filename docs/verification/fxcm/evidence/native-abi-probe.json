@@ -1,0 +1,33 @@
+{
+  "checked_at_utc": "2026-10-24T08:45:32.583564+00:00",
+  "kind": "offline_native_abi_session_probe",
+  "image": "market-watch-fxcm-probe:20261024",
+  "image_digest": "sha256:007d97452df0814bfa11b63944b6309b1daf0212bcfefcab17db9cf5298c6bf5",
+  "image_labels": {
+    "io.market-watch.task": "mw-fxcm-history-20261024",
+    "io.market-watch.project": "mw-fxcm-history-20261024",
+    "io.market-watch.purpose": "development"
+  },
+  "runtime": {
+    "python_base": "python:3.11-slim-bookworm",
+    "compiler": "g++ 12.2",
+    "network": "none",
+    "root_filesystem": "read-only",
+    "sdk_mount": "read-only",
+    "credentials_mounted": false
+  },
+  "command": "g++ -std=c++17 -O2 -I/opt/fxcm/include -L/opt/fxcm/lib /src/fxcm_native_abi_probe.cpp -Wl,-rpath,/opt/fxcm/lib -lForexConnect -o /tmp/fxcm_native_abi_probe && LD_LIBRARY_PATH=/opt/fxcm/lib /tmp/fxcm_native_abi_probe",
+  "result": {
+    "session_created": true,
+    "session_released": true,
+    "price_update_mode": 1,
+    "session_status": 0,
+    "table_manager_absent": true,
+    "request_timeout_ms": 1000,
+    "login_attempted": false,
+    "listener_registered": false,
+    "market_data_verified": false,
+    "passed": true
+  },
+  "scope": "ABI/object lifecycle only; no network, login, catalog, history, quote, account, or trading operation"
+}

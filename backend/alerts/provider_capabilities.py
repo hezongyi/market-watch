@@ -6,7 +6,7 @@ import json
 from .chart_data import FRAMES
 from .config import settings
 
-SOURCES = ("oanda", "binance", "yahoo", "dukascopy")
+SOURCES = ("oanda", "binance", "yahoo", "dukascopy", "akshare", "fxcm")
 YAHOO_INTERVALS = {
     "M1": "1m",
     "M5": "5m",
@@ -25,7 +25,9 @@ def enabled_sources():
     # instrument candle requests outside the shared lease.
     return tuple(s for s in SOURCES
                  if (s != "oanda" or settings.oanda_acquisition_mode == "stream")
-                 and (s != "yahoo" or settings.yahoo_enabled))
+                 and (s != "yahoo" or settings.yahoo_enabled)
+                 and (s != "akshare" or settings.akshare_enabled)
+                 and (s != "fxcm" or settings.fxcm_enabled))
 
 
 def frames(source):
@@ -35,15 +37,26 @@ def frames(source):
 
 
 def page_capacity(source):
+    if source == "fxcm":
+        return 300
     return 4000 if source in ("oanda", "yahoo", "dukascopy") else 1000
 
 
+def request_seconds(source):
+    # A cold ForexConnect session needs login plus one finite snapshot.
+    return 65 if source == "fxcm" else settings.provider_request_seconds
+
+
 def fresh_seconds(source):
+    if source == "fxcm":
+        # FXCM finite snapshots are polled at most once a minute. Reuse that
+        # observation through its polling interval, including cold-login time.
+        return poll_seconds(source)
     return settings.yahoo_poll_seconds if source == "yahoo" else settings.provider_fresh_seconds
 
 
 def poll_seconds(source):
-    return settings.yahoo_poll_seconds if source == "yahoo" else settings.market_poll_seconds
+    return max(60, settings.market_poll_seconds) if source == "fxcm" else settings.yahoo_poll_seconds if source == "yahoo" else settings.market_poll_seconds
 
 
 def versions(meta):
@@ -54,11 +67,17 @@ def versions(meta):
         # Both history and latest now use this configured account with units=1.
         # Preserve legacy caches; their instrument-only prices are not reusable.
         return ("oanda-account-candles-units1-v2:" + rules, "volume-v1")
+    if meta["source"] == "fxcm":
+        return ("fxcm-demo-bid-native-v1:" + meta["account_scope"], "fxcm-tick-count-v1")
     if meta["source"] == "dukascopy":
         return ("dukascopy-json3-bid-utc-splits-stocks-v1", "dukascopy-native-quantity-v1")
     if meta["source"] == "yahoo":
         rules = hashlib.sha256(json.dumps([meta.get("timezone"), meta.get("session")]).encode()).hexdigest()[:16]
         return ("yahoo-exchange-label-v1:" + meta["adjustment"] + ":" + rules, "yahoo-volume-v1")
+    if meta["source"] == "akshare":
+        from .provider_akshare import RULES
+
+        return (RULES + ":" + meta["source_family"] + ":" + meta["adjustment"], "akshare-quantity-v1")
     return ("native-bid-ny17-sunday-v1", "volume-v1")
 
 

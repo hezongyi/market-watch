@@ -1,0 +1,11 @@
+{
+  "source": "CDP events inspected during the 2026-10-25T09:10:23.430Z diagnostic run; this is a selected observation, not a complete network trace",
+  "url": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/1644.ec13e683352881af5b51.css",
+  "sequence": [
+    {"event": "request", "id": "3981596.144"},
+    {"event": "failed", "requestId": "3981596.144", "type": "Stylesheet", "errorText": "net::ERR_FAILED", "canceled": false},
+    {"event": "request", "id": "3981596.170"},
+    {"event": "response", "id": "3981596.170", "status": 200}
+  ],
+  "scope": "Both request IDs refer to the exact URL above. This demonstrates a recovered resource request, not the internal reason the first attempt failed. The final login-and-refresh regression is recorded separately in regression.json."
+}

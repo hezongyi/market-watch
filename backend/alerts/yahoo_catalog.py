@@ -110,7 +110,8 @@ def _store(details):
         row.precision = 8  # preserve fractional market values; no priceHint rounding
         row.calendar = "yahoo"
         row.available = True
-        row.metadata_json = details
+        row.metadata_json = {**{key: previous[key] for key in (
+            "archive_verified_frames", "archive_probes") if key in previous}, **details}
         row.updated_at = details["updated_at"]
     return ident
 

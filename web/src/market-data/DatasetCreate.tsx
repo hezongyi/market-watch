@@ -41,7 +41,7 @@ const defaults: Record<string, string> = {
 };
 export function DatasetCreate() {
   const [params] = useSearchParams();
-  const initialSource = ["dukascopy", "oanda"].includes(
+  const initialSource = ["dukascopy", "oanda", "fxcm"].includes(
     params.get("source") || "",
   )
     ? params.get("source")!
@@ -492,7 +492,7 @@ export function DatasetCreate() {
                           }}
                         >
                           <option value="dukascopy">Dukascopy</option>
-                          <option value="oanda">OANDA Practice</option>
+                          <option value="oanda">OANDA Practice</option><option value="fxcm">FXCM Demo</option>
                         </NativeSelect>
                       </label>
                       <label>

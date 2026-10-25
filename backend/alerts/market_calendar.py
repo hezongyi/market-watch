@@ -82,6 +82,13 @@ CALENDAR_RULES = (
         "mappings": (),
         "exceptions": (),
     },
+    {
+        "source": "akshare", "version": "akshare-source-date-pending-v1",
+        "scope": "按具体市场、上游和品种保留来源交易日；市场会话尚未核实",
+        "timezone": "exchange", "regular_hours": "未核实；不推断夜盘交易日或节假日闭市",
+        "status": "unverified", "checked_at": None, "review_due_at": None,
+        "valid_from": None, "valid_until": None, "evidence": [], "mappings": (), "exceptions": (),
+    },
 )
 
 _RULE_BY_SOURCE = {item["source"]: item for item in CALENDAR_RULES}
@@ -99,9 +106,13 @@ def observation_identity(source: str, symbol: str, metadata: dict | None = None)
 
         return {"source": source, "channel": "v20", "environment": "practice",
                 "provider_symbol": symbol, "account_scope": account_scope()}
+    if source == "fxcm":
+        from .fxcm_history import account_scope, configured
+        return {"source": source, "channel": "forexconnect", "environment": "demo",
+                "provider_symbol": symbol, "account_scope": account_scope() if configured() else "unconfigured"}
     channel, environment = {
         "dukascopy": ("json3", "historical"), "binance": ("rest", "public"),
-        "yahoo": ("yfinance", "public"),
+        "yahoo": ("yfinance", "public"), "akshare": ("python", "public"),
     }.get(source, (None, None))
     return {"source": source, "channel": channel, "environment": environment,
             "provider_symbol": symbol, "account_scope": "public"}
@@ -309,7 +320,7 @@ def _runtime_rules(db, moment):
     from .live_session import effective_profile
     from .storage import Audit, Instrument, MarketCatalog, MarketDataset, ProviderDataset
 
-    enabled = {"dukascopy": True, "binance": True, "yahoo": settings.yahoo_enabled,
+    enabled = {"dukascopy": True, "binance": True, "yahoo": settings.yahoo_enabled, "akshare": settings.akshare_enabled,
                "oanda": bool(settings.oanda_account_id and settings.oanda_token)}
     stamp = int(moment.timestamp() * 1000)
     rules = []
@@ -438,6 +449,10 @@ def _runtime_rules(db, moment):
                        valid_from=source_session.get("reviewed_start"), valid_until=source_session.get("reviewed_end"),
                        evidence=[source_session["evidence_url"]] if source_session.get("evidence_url") else [],
                        regular_hours="有限审核范围内的来源会话；开闭边界分钟保留未核实。")
+        if isinstance(profile, dict) and profile.get("trading_date"):
+            row.update(timezone=profile["trading_date"]["timezone"],
+                       regular_hours="按来源交易日标注；市场开闭时段未核实。",
+                       coverage_note="已保存来源日期规则；不据此认证节假日、停牌或期货夜盘会话。")
         row["exceptions"] = tuple({"start": c.start.isoformat(), "end": c.end.isoformat(),
             "reason": c.reason, "source": c.source} for c in closures)
         if invalid_profile:
@@ -469,5 +484,5 @@ def _runtime_rules(db, moment):
         for generic in rules[:-1]:
             if generic["source"] == source and not generic.get("row_id"):
                 generic["mappings"] = tuple(item for item in generic["mappings"] if canonical_symbol(source, item) != normalized)
-    rules = [row for row in rules if row.get("row_id") or row["mappings"] or row["source"] == "yahoo"]
+    rules = [row for row in rules if row.get("row_id") or row["mappings"] or row["source"] in ("yahoo", "akshare")]
     return rules

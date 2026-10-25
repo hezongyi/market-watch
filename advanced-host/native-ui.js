@@ -185,6 +185,19 @@ function chartNativeUi(widget, doc, searchSymbols) {
       }
       // Symbol search and watchlist add keep their native dialogs, category
       // tabs, rows and actions. Both use the same table-header controls.
+      function SymbolSearchFailure({scope}) {
+        const ctx=R.useContext(SearchContext),body=R.useContext(BodyContext);
+        const [failure,setFailure]=R.useState(scope.failure);
+        R.useLayoutEffect(()=>{
+          scope.setFailure=setFailure;setFailure(scope.failure);
+          return()=>{scope.setFailure=null;};
+        },[scope]);
+        if(!failure) return null;
+        return R.createElement(R.Fragment,null,
+          R.createElement("style",null,`.mw-symbol-search-body .${body.emptyTextClassName}{display:none}`),
+          R.createElement("div",{className:"mw-platform-status",role:"alert"},"商品搜索失败，请重试。 ",
+            R.createElement(req(536605).Button,{onClick:()=>body.updateRecommends(failure.request.text,failure.request.type,ctx.selectedSearchSource,failure.request.start)},"重试搜索")));
+      }
       function SymbolFiltersBody({render,controls}) {
         const node=R.useRef(null),[header,setHeader]=R.useState(null);
         R.useLayoutEffect(()=>{
@@ -274,10 +287,13 @@ function chartNativeUi(widget, doc, searchSymbols) {
           // own filters. Only the pinned native watchlist picker shares ours.
           const watchlist=options.searchInitiationPoint === "watchlist";
           if(options.customSearchSymbols || (options.dialog && !watchlist)) return options;
-          const scope={kind:"all"};
+          const scope={kind:"all",failure:null};
+          const setFailure=value=>{scope.failure=value;scope.setFailure?.(value);};
           const Dialog=props=>R.createElement(SymbolFiltersDialog,{...props,scope,nativeDialog:watchlist?options.dialog:undefined});
           return {...options,dialog:Dialog,disableRecents:true,showRecents:false,
+            footer:R.createElement(R.Fragment,null,options.footer,R.createElement(SymbolSearchFailure,{scope})),
             customSearchSymbols:async request=>{
+              setFailure(null);
               try {
                 const page=await searchSymbols({kind:scope.kind,userInput:request.text,exchange:request.exchange,
                   symbolType:request.type,start:request.start,signal:request.signal});
@@ -285,7 +301,9 @@ function chartNativeUi(widget, doc, searchSymbols) {
                 return {symbols:page.items,symbols_remaining:page.remaining};
               } catch(error) {
                 if(request.signal?.aborted) throw new win.DOMException("查询已取消","AbortError");
-                throw error;
+                // Finish the native loading state; surface retry in our adapter.
+                setFailure({request});
+                return {symbols:[],symbols_remaining:0};
               }
             }};
         };

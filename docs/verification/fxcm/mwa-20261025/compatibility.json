@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "response_fields": [
+    "volume_kind",
+    "volume_unit",
+    "window_limit",
+    "history_window",
+    "availability",
+    "bars",
+    "history_boundary",
+    "has_more",
+    "as_of",
+    "latest_at",
+    "cache_revision",
+    "series_kind",
+    "basis",
+    "calendar",
+    "precision",
+    "dataset_id",
+    "cache_hit",
+    "indicators",
+    "provider_snapshot_id",
+    "candles_http_attempts",
+    "timings_ms",
+    "native_parameters",
+    "provider_acceptance",
+    "history_dependency_first",
+    "calculation_origin"
+  ],
+  "oanda": {
+    "instrument": "EURUSD",
+    "timeframe": "H1",
+    "bars": 20
+  }
+}

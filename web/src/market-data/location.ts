@@ -27,7 +27,7 @@ export function centerLocation(value: string, base = "/market-data"): string {
     if (key === "frame" && !["M1","M5","M15","M30","H1","H4","D1","W1","MN"].includes(item)) continue;
     if (key === "tab" && !["managed","platform","composite","tasks","sources","calendar"].includes(item)) continue;
     if (key === "section" && !["overview","coverage","versions","maintenance","references","chart","seam","usage"].includes(item)) continue;
-    if (key === "source" && !["", "dukascopy","oanda","binance","yahoo"].includes(item)) continue;
+    if (key === "source" && !["", "dukascopy","oanda","fxcm","binance","yahoo"].includes(item)) continue;
     if (key === "calendar" && !["", "ny17", "utc0"].includes(item)) continue;
     query.set(key, item);
   }

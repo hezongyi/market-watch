@@ -22,6 +22,10 @@ import { ExportDialog, type ExportSelection } from "./ExportDialog";
 import { providerSubscriptions } from "./providerSubscriptions";
 import { validAlertContext } from "./chartAlerts";
 import { chartAlertUiRequest } from "./chartAlertUiApi";
+import {initialMobileSession, mobileAlertRequestAllowed, mobileDataRequestAllowed, mobilePreferenceRequestAllowed, mobileRecoverablePreferenceDrafts} from "./mobileWorkspacePolicy";
+import { Bell, BarChart3, Bookmark, Ellipsis, List, Maximize2, RotateCw } from "lucide-react";
+import { MobileWorkspaceShell } from "./MobileWorkspaceShell";
+import {mobileChartDocument} from "./mobileChartDocument";
 import { HistoryCapacityDialog } from "./HistoryCapacityDialog";
 import {
   HistoryLoadingNotice,
@@ -67,9 +71,12 @@ export default function AdvancedWorkspace() {
   const openNotices=(event?:string)=>{const url=new URL(location.href);url.searchParams.set('panel','notifications');if(event)url.searchParams.set('event',event);else url.searchParams.delete('event');navigate(url.pathname+url.search+url.hash,{replace:true});};
   const app = useApp(), appRef = useRef(app); appRef.current = app;
   const urlRef = useRef(appLocation); urlRef.current = appLocation;
+  // Choose once so resize and rotation preserve the session's editing policy.
+  const [mobile] = useState(() => initialMobileSession(matchMedia("(pointer:coarse)").matches, window.innerWidth));
   const [savedPreferenceDrafts,setSavedPreferenceDrafts]=useState<PreferenceDraft[]>(()=>{try{return recoverablePreferenceDrafts();}catch{return [];}});
+  const visiblePreferenceDrafts = mobile ? mobileRecoverablePreferenceDrafts(savedPreferenceDrafts) : savedPreferenceDrafts;
   const [preferenceDraftsOpen,setPreferenceDraftsOpen]=useState(false);
-  const [preferenceReopenRequired,setPreferenceReopenRequired]=useState(()=>savedPreferenceDrafts.length>0);
+  const [preferenceReopenRequired,setPreferenceReopenRequired]=useState(()=>visiblePreferenceDrafts.length>0);
   const preferenceRecovery=useRef(new Map<string,{resolve:()=>void;reject:(error:Error)=>void}>());
   const refreshPreferenceDrafts=()=>{try{setSavedPreferenceDrafts(recoverablePreferenceDrafts());}catch{setError("无法读取本机设置草稿，请勿关闭页面");}};
   const capturing = useRef<{resolve: () => void; reject: (error: Error) => void} | null>(null);
@@ -103,7 +110,7 @@ export default function AdvancedWorkspace() {
     if (urlRef.current.pathname !== `/advanced-charts/${id}`) navigate(next, { replace });
   };
 
-  const [, setRows] = useState<Workspace[]>([]),
+  const [workspaceRows, setRows] = useState<Workspace[]>([]),
     [active, setActive] = useState<Workspace | null>(null);
   const [workspaceOpening,setWorkspaceOpening]=useState(true);
   const [historyPlansOpen, setHistoryPlansOpen] = useState(false);
@@ -127,6 +134,28 @@ export default function AdvancedWorkspace() {
   const [pollErrors, setPollErrors] = useState<Record<string, string>>({});
   const [chartTheme, setChartTheme] = useState("dark");
   const [nativeReady, setNativeReady] = useState(false);
+  const [mobileDirectory,setMobileDirectory]=useState<{original_index:number;original_chart_id:string|null;symbol:string;resolution:string}[]>([]);
+  const [mobileChartState,setMobileChartState]=useState<any>(null);
+  const mobileChartStateRef=useRef<any>(null);
+  const [mobileChartSaving,setMobileChartSaving]=useState(false);
+  const mobileSaveWaiter=useRef<{resolve:()=>void;reject:(e:Error)=>void}|null>(null);
+  const saveMobileChart=()=>new Promise<void>((resolve,reject)=>{
+    if(mobileSaveWaiter.current){reject(Error('图格正在保存'));return;}
+    mobileSaveWaiter.current={resolve,reject};setMobileChartSaving(true);
+    post({type:'mobile-chart-save'});
+  });
+  const [mobileTab,setMobileTab]=useState<'chart'|'watchlist'|'alerts'|'more'>('chart');
+  const [mobilePanel,setMobilePanel]=useState<'watchlist'|'more'|null>(null);
+  const [mobileAlertReturn,setMobileAlertReturn]=useState<string|null>(null);
+  const mobileAlertReturnRef=useRef<string|null>(null);
+  const [mobileWatchlists,setMobileWatchlists]=useState<any[]>([]);
+  const [mobileActiveWatchlist,setMobileActiveWatchlist]=useState("");
+  const [mobileFlags,setMobileFlags]=useState<Record<string,string>>({});
+  const [mobilePreferenceBusy,setMobilePreferenceBusy]=useState(false);
+  const mobilePreferenceBusyRef=useRef(false);
+  const [mobilePreferenceRows,setMobilePreferenceRows]=useState<any[]>([]);
+  const [mobileSearchResults,setMobileSearchResults]=useState<{ticker:string;label:string}[]>([]);
+  const mobilePreferenceWaiters=useRef(new Map<string,{resolve:(value:any)=>void;reject:(error:Error)=>void}>());
   const alertUiSession = useRef("");
   const historyCapabilities = useRef<HistoryCapabilities | null>(null);
   const nativeLoadEpoch = useRef(0);
@@ -172,9 +201,6 @@ export default function AdvancedWorkspace() {
   const flushWaiters = useRef<
     { resolve: () => void; reject: (e: Error) => void }[]
   >([]);
-  // Browser zoom narrows CSS pixels on a desktop. It must not remove editing
-  // and management; coarse-pointer devices retain the existing read-only view.
-  const mobile = matchMedia("(pointer:coarse)").matches;
   const queue = useRef<Promise<void>>(Promise.resolve()),
     blocked = useRef(false),
     inflight = useRef(0);
@@ -204,6 +230,8 @@ export default function AdvancedWorkspace() {
       }, 15000);
     });
   const select = (row: Workspace) => {
+    mobileChartStateRef.current=null;
+    mobileAlertReturnRef.current=null;setMobileAlertReturn(null);setMobileChartState(null);
     setChartTime("UTC", "UTC（图表初始化前）");
     setNativeReady(false);setNotificationReady(false);setNotificationFailed(false);
     setPollErrors({});
@@ -275,6 +303,10 @@ export default function AdvancedWorkspace() {
     return list;
   }
   useEffect(() => {
+    if(mobile){
+      const protect=(event:BeforeUnloadEvent)=>{if(mobileChartStateRef.current?.dirty){event.preventDefault();event.returnValue='';}};
+      addEventListener('beforeunload',protect);return()=>removeEventListener('beforeunload',protect);
+    }
     const protect = (event: BeforeUnloadEvent) => {
       if (mobile || !unsaved.current) return;
       event.preventDefault();
@@ -299,6 +331,13 @@ export default function AdvancedWorkspace() {
     return () => removeEventListener("keydown", save);
   }, [mobile]);
   useEffect(() => {
+    if(mobile)return app.registerGuard({
+      dirty:()=>!!mobileChartStateRef.current?.dirty,
+      shouldBlock:pathname=>pathname!==`/advanced-charts/${current.current?.id}`,
+      save:saveMobileChart,
+      discard:()=>{mobileChartStateRef.current={...mobileChartStateRef.current,dirty:false};post({type:'mobile-chart-discard'});},
+      preserve:()=>mobileChartStateRef.current?.dirty ? Promise.reject(Error('手机图格尚未保存，请先保存或明确放弃修改')) : Promise.resolve(),
+    });
     return app.registerGuard({
       dirty: () => !mobile && unsaved.current,
       shouldBlock: pathname => pathname !== `/advanced-charts/${current.current?.id}`,
@@ -359,7 +398,7 @@ export default function AdvancedWorkspace() {
   useEffect(()=>{if(nativeReady)post({type:'app-state',pending:noticeState.unread});
     if(notificationReady)post({type:'notice-center-state',session:alertUiSession.current,workspace_id:current.current?.id,state:noticeState});
   },[nativeReady,notificationReady,noticeState]);
-  useEffect(()=>{if(nativeReady && new URLSearchParams(appLocation.search).get('panel')==='alerts') { const signal=new URLSearchParams(appLocation.search).get('signal'); if(signal)post({type:'chart-alert-event-open',signal_id:signal}); }},[nativeReady,appLocation.search]);
+  useEffect(()=>{const params=new URLSearchParams(appLocation.search);if(nativeReady && params.get('panel')==='alerts' && !params.has('mobile_return')) { const signal=params.get('signal'); if(signal)post({type:'chart-alert-event-open',signal_id:signal}); }},[nativeReady,appLocation.search]);
   useEffect(()=>{
     if(!noticeOpen || !noticeEvent)return;
     let alive=true;
@@ -440,10 +479,35 @@ export default function AdvancedWorkspace() {
         return;
       const m = e.data,
         source = e.source as Window;
+      if (m.type === "mobile-preference-save-result" && typeof m.request === "string") {
+        const waiter=mobilePreferenceWaiters.current.get(m.request); if(!waiter)return;
+        mobilePreferenceWaiters.current.delete(m.request); m.error ? waiter.reject(Error(m.error)) : waiter.resolve(m.result); return;
+      }
       const reply = (value: object) =>
         source.postMessage({ channel,
           ...(typeof m.history_client==='string' && m.history_client.length<=64
             ? {history_client:m.history_client} : {}), ...value }, origin);
+      if (mobile && ['mobile-alert-location-start','mobile-alert-location-complete','mobile-alert-return-complete'].includes(m.type)) {
+        const q=m;
+        if (!q || q.session!==alertUiSession.current || q.workspace_id!==current.current?.id) return;
+        if (m.type==='mobile-alert-location-start') {
+          if (!mobileAlertReturnRef.current) {
+            const from=urlRef.current.pathname+urlRef.current.search+urlRef.current.hash;
+            mobileAlertReturnRef.current=from;
+            setMobileAlertReturn(from);
+          }
+          setMobileTab('chart');setMobilePanel(null);
+          return;
+        }
+        if (m.type==='mobile-alert-location-complete') {setMobileTab('chart');setMobilePanel(null);return;}
+        setMobileTab('alerts');setMobilePanel(null);
+        if(mobileAlertReturnRef.current) {
+          const target=new URL(mobileAlertReturnRef.current,location.origin);
+          target.searchParams.set('mobile_return','1');
+          navigate(target.pathname+target.search+target.hash,{replace:true});
+        }
+        mobileAlertReturnRef.current=null;setMobileAlertReturn(null);return;
+      }
       if(m.type==='notice-source'){
         if(m.session!==alertUiSession.current||m.workspace_id!==current.current?.id||m.epoch!==nativeLoadEpoch.current||
           !m.fault||JSON.stringify(m.fault).length>16000||!['indicator','history','capacity','market','connection','chart_shell','data_center','preferences'].includes(m.fault.source_kind))return;
@@ -522,6 +586,48 @@ export default function AdvancedWorkspace() {
         } else if(url.searchParams.get("panel")==="alerts") {url.searchParams.delete("panel");url.searchParams.delete("signal");}
         navigate(url.pathname + url.search + url.hash, {replace:true}); return;
       }
+      if (m.type === "mobile-chart-directory" && Array.isArray(m.directory)) {
+        setMobileDirectory(m.directory.filter((row:any)=>Number.isSafeInteger(row?.original_index)&&typeof row?.symbol==='string'&&typeof row?.resolution==='string').slice(0,16));
+        return;
+      }
+      if (m.type === "mobile-chart-state" && m.state && m.state.workspace_id === current.current?.id) {
+        mobileChartStateRef.current=m.state;
+        setMobileChartState(m.state);
+        const index=m.state.selected?.original_index;
+        if(mobile && Number.isSafeInteger(index) && index>=0 && index<16 && !m.state.exploring) {
+          try {sessionStorage.setItem('mw-mobile-chart-selection:v1:'+m.state.workspace_id,String(index));}catch{}
+        }
+        return;
+      }
+      if(m.type==='mobile-chart-save-complete' && mobile && m.workspace_id===current.current?.id){
+        const waiter=mobileSaveWaiter.current;mobileSaveWaiter.current=null;setMobileChartSaving(false);
+        if(m.error){setError(m.error);waiter?.reject(Error(m.error));}
+        else{setStatus('图格已保存');setError('');waiter?.resolve();}
+        return;
+      }
+      if(m.type==='mobile-chart-save' && mobile){
+        const q=m.query,row=current.current,selected=mobileChartStateRef.current?.selected;
+        if(!q || !row || q.workspace_id!==row.id || q.revision!==row.revision ||
+          !selected || q.original_index!==selected.original_index || q.chart_id!==selected.original_chart_id ||
+          mobileChartStateRef.current?.exploring || !Number.isSafeInteger(m.id) || JSON.stringify(q).length>4_000_000){
+          reply({type:'result',id:m.id,error:'图格保存目标或版本已失效'});return;
+        }
+        const task=queue.current.then(async()=>{
+          if(current.current!==row)throw Error('工作区已切换，保存取消');
+          const state=mobileChartDocument.merge(row.document.state,q.original_index,q.single);
+          const primary=mobileChartDocument.directory(state)[0];
+          const result=await api<Workspace>('/advanced-charts/native-charts/save',{
+            id:row.id,name:row.name,symbol:primary.symbol,resolution:primary.resolution,
+            content:JSON.stringify(state),revision:row.revision,
+          });
+          if(current.current===row){current.current=result;setActive(result);setRows(rows=>rows.map(item=>item.id===result.id?result:item));}
+          return result;
+        });
+        queue.current=task.then(()=>{},()=>{});
+        try{reply({type:'result',id:m.id,result:await task});}
+        catch(error){reply({type:'result',id:m.id,error:String(error),errorDetails:apiErrorDetails(error)});}
+        return;
+      }
       if (m.type === "data-center-state" && typeof m.session === "string" && /^[a-f0-9-]{36}$/.test(m.session)) {
         centerSession.current = m.open === true ? m.session : null;
         const url = new URL(location.href);
@@ -536,7 +642,8 @@ export default function AdvancedWorkspace() {
       }
       if (m.type === "data-center-api") {
         const q = m.query;
-        if (mobile || !Number.isSafeInteger(m.id) || m.id <= 0 || !q || q.session !== centerSession.current || typeof q.path !== "string" || q.path.length > 4000 ||
+        if (!Number.isSafeInteger(m.id) || m.id <= 0 || !q || q.session !== centerSession.current || typeof q.path !== "string" || q.path.length > 4000 ||
+          (mobile && !mobileDataRequestAllowed(q.path, q.body)) ||
           JSON.stringify(q).length > 100000 || !/^\/market-data\/(?:center|datasets|history-catalog|date-boundary|composites|tasks|versions|series|resolve|capabilities|sources|live)(?:\/[A-Za-z0-9_-]+)*(?:\?[^#]*)?$/.test(q.path) && q.path !== "/charts/provider/configure") {
           reply({type:"result",id:m.id,error:"数据中心请求不允许",errorDetails:{status:403,code:"FORBIDDEN"}});return;
         }
@@ -611,9 +718,7 @@ export default function AdvancedWorkspace() {
             (path, body) => {
               if (
                 mobile &&
-                body !== undefined &&
-                path !== "/chart-alerts/capabilities" &&
-                !path.endsWith("/ack")
+                !mobileAlertRequestAllowed(path, body)
               )
                 throw Error("当前图表只读");
               return api(path, body);
@@ -993,6 +1098,12 @@ export default function AdvancedWorkspace() {
           const stored = (preferences as any[]).find(
             (preference) => preference?.kind === "setting" && preference?.name === "mw.watchlists.v1",
           )?.content?.value;
+          const watchlistRow = (preferences as any[]).find((preference:any) => preference?.kind === "setting" && preference?.name === "mw.watchlists.v1" && !preference?.tool);
+          const flagsRow = (preferences as any[]).find((preference:any) => preference?.kind === "setting" && preference?.name === "mw.symbol-flags.v1" && !preference?.tool);
+          setMobilePreferenceRows(preferences as any[]);
+          setMobileWatchlists(Array.isArray(stored?.lists) ? stored.lists : []);
+          setMobileActiveWatchlist(typeof stored?.active === "string" ? stored.active : stored?.lists?.[0]?.id || "");
+          setMobileFlags(flagsRow?.content?.value?.version === 1 && flagsRow?.content?.value?.flags && typeof flagsRow.content.value.flags === "object" ? flagsRow.content.value.flags : {});
           const active = Array.isArray(stored?.lists)
             ? stored.lists.find((list: any) => list?.id === stored.active) || stored.lists[0]
             : undefined;
@@ -1049,6 +1160,7 @@ export default function AdvancedWorkspace() {
             document: current.current?.document || {},
             workspace: current.current,
             readonly: mobile,
+            mobile_original_index: (()=>{try {return Number(sessionStorage.getItem('mw-mobile-chart-selection:v1:'+current.current?.id) || 0);}catch{return 0;}})(),
             catalog,
             preference_draft_keys: preferenceDrafts().map(draft=>draft.key),
             preferences: localStorage.getItem("mw.app-theme") ? [
@@ -1314,7 +1426,7 @@ export default function AdvancedWorkspace() {
             const rows = await api<any[]>("/advanced-charts/preferences");
             result = rows.find(row=>row.kind==="setting" && row.name==="mw.symbol-flags.v1" && !row.tool) || null;
           } else {
-            if (mobile || q.args?.kind !== "setting" || q.args?.name !== "mw.symbol-flags.v1" || q.args?.tool) throw Error("收藏保存请求不允许");
+            if ((mobile && !mobilePreferenceRequestAllowed('save',q.args,preferenceDrafts())) || q.args?.kind !== "setting" || q.args?.name !== "mw.symbol-flags.v1" || q.args?.tool) throw Error("收藏保存请求不允许");
             // The native producer owns the bounded 409 rebase/retry loop.
             result = await requestAPI("/advanced-charts/preferences/save", q.args);
           }
@@ -1323,7 +1435,7 @@ export default function AdvancedWorkspace() {
       } else if (m.type === "preferences") {
         const q = m.query;
         if (
-          (mobile && q?.op !== "read") ||
+          (mobile && !mobilePreferenceRequestAllowed(q?.op, q?.args, preferenceDrafts())) ||
           !q ||
           !["read", "save", "delete", "draftWrite", "draftDrop", "draftCheck", "draftFailed"].includes(q.op) ||
           JSON.stringify(q).length > 1_100_000
@@ -1340,10 +1452,11 @@ export default function AdvancedWorkspace() {
             reply({type:'result',id:m.id,result:preferenceDrafts().some(draft=>draft.storageKey===q.args.storageKey && draft.version===q.args.version && draft.key===q.args.key)});return;
           }
           if (q.op === 'draftWrite' || q.op === 'draftDrop' || q.op === 'draftFailed') {
-            if(q.op === 'draftWrite')putPreferenceDraft(q.args);
+            let storageKey;
+            if(q.op === 'draftWrite')storageKey=putPreferenceDraft(q.args);
             else if(q.op === 'draftFailed')failPreferenceDraft(q.args);
             else dropPreferenceDraft(q.args);
-            refreshPreferenceDrafts();reply({type:'result',id:m.id,result:{ok:true}});return;
+            refreshPreferenceDrafts();reply({type:'result',id:m.id,result:{ok:true,...(storageKey ? {storageKey} : {})}});return;
           }
           if (q.op === "read") {
             reply({type: "result", id: m.id, result: await api("/advanced-charts/preferences")});
@@ -1827,9 +1940,89 @@ export default function AdvancedWorkspace() {
       setError(String(e));
     }
   }
+  const mobilePreferenceSave = async (name:string, value:any) => {
+    if (!active?.id) throw Error("工作区尚未加载");
+    if (mobilePreferenceBusyRef.current) throw Error("正在保存设置，请稍候");
+    mobilePreferenceBusyRef.current=true;setMobilePreferenceBusy(true);
+    try {
+    const request=crypto.randomUUID();
+    const result=await new Promise<any>((resolve,reject)=>{mobilePreferenceWaiters.current.set(request,{resolve,reject});post({type:"mobile-preference-save",request,workspace_id:active.id,name,value});setTimeout(()=>{if(mobilePreferenceWaiters.current.delete(request))reject(Error("设置保存超时"));},15000);});
+    const rows=await api<any[]>("/advanced-charts/preferences"); setMobilePreferenceRows(rows); return rows.find((item:any)=>item?.kind === "setting" && item?.name === name && !item?.tool) || result;
+    } finally {mobilePreferenceBusyRef.current=false;setMobilePreferenceBusy(false);}
+  };
+  const updateMobileWatchlist = async (symbols:string[]) => {
+    const next = mobileWatchlists.map((list:any)=>list.id===mobileActiveWatchlist ? {...list,symbols} : list);
+    const saved = await mobilePreferenceSave("mw.watchlists.v1", {lists:next,active:mobileActiveWatchlist || next[0]?.id});
+    const value=saved?.content?.value || {lists:next,active:mobileActiveWatchlist};
+    setMobileWatchlists(value.lists || next); setMobileActiveWatchlist(value.active || mobileActiveWatchlist);
+  };
+  const addMobileTicker = async (ticker:string) => {
+    const list=mobileWatchlists.find((item:any)=>item.id===mobileActiveWatchlist) || mobileWatchlists[0];
+    if (!list) throw Error("没有可用的自选列表");
+    if (Array.isArray(list.symbols) && list.symbols.includes(ticker)) return;
+    await updateMobileWatchlist([...(Array.isArray(list.symbols) ? list.symbols : []),ticker]);
+  };
+  const changeMobileWatchlist = async (id:string) => {
+    const saved=await mobilePreferenceSave("mw.watchlists.v1",{lists:mobileWatchlists,active:id});
+    const value=saved?.content?.value;
+    setMobileWatchlists(value?.lists || mobileWatchlists);
+    setMobileActiveWatchlist(value?.active || id);
+  };
+  const updateMobileFlag = async (ticker:string,color:string|null) => {
+    const next={...mobileFlags}; if(color)next[ticker]=color;else delete next[ticker];
+    const saved=await mobilePreferenceSave("mw.symbol-flags.v1",{version:1,flags:next});
+    setMobileFlags(saved?.content?.value?.flags || next);
+  };
+  const openMobileAlerts=()=>{setMobileTab("alerts");setMobilePanel(null);post({type:"open-alerts"});};
+  const refreshMobileCharts=()=>post({type:"mobile-chart-directory-request"});
+  const searchMobile=async (query:string)=>{
+    if(query.length>80)return;
+    try {
+      const rows=await api<any[]>(`/market-data/series/search?query=${encodeURIComponent(query)}&kind=all&limit=20`);
+      setMobileSearchResults((Array.isArray(rows)?rows:[]).map((row:any)=>({ticker:String(row.ticker || row.symbol || ""),label:String(row.label || row.display_symbol || row.symbol || "")})).filter(row=>row.ticker && row.ticker.length<=150).slice(0,20));
+    } catch(error) { setFeedError(`品种搜索失败：${String(error)}`); }
+  };
   return (
-    <main className="advanced-workspace" data-theme={chartTheme}>
-      {mobile && <p className="advanced-readonly-note" role="note">手机只读看盘。编辑图表、绘图和告警请使用桌面浏览器；桌面工作区布局仍保留。</p>}
+    <main className="advanced-workspace" data-theme={chartTheme} data-mobile={mobile}
+      data-native-surface-open={mobile && (noticeOpen || new URLSearchParams(appLocation.search).has('data_center'))}>
+      {mobile && <MobileWorkspaceShell
+        tab={mobileTab}
+        onTab={tab=>{setMobileTab(tab); if(tab==='watchlist'||tab==='more')setMobilePanel(tab);else setMobilePanel(null);if(tab==='alerts')openMobileAlerts();else post({type:'mobile-alert-close'});}}
+        directory={mobileDirectory}
+        selectedIndex={!mobileChartState?.exploring && Number.isSafeInteger(mobileChartState?.selected?.original_index)?mobileChartState.selected.original_index:null}
+        exploring={!!mobileChartState?.exploring}
+        temporary={!!mobileChartState?.temporary}
+        chartDirty={!!mobileChartState?.dirty}
+        chartSaving={mobileChartSaving}
+        onSaveChart={()=>{void saveMobileChart().catch(()=>{});}}
+        onSelectChart={index=>{if(mobileChartSaving)return;if(mobileChartStateRef.current?.dirty && !window.confirm('当前图格修改尚未保存，放弃修改并切换？'))return;mobileAlertReturnRef.current=null;setMobileAlertReturn(null);setMobileTab('chart');setMobilePanel(null);post({type:'mobile-chart-select',original_index:index});}}
+        onOpenAlerts={()=>{setMobilePanel(null);openMobileAlerts();}}
+        onSystemMessages={()=>openNotices()}
+        onDataStatus={()=>post({type:"data-center-open",location:"/market-data?tab=sources"})}
+        onHistoryDetails={()=>setHistoryDetailsOpen(true)}
+        onHistoryCapacity={()=>post({type:"history-capacity-open"})}
+        onFullscreen={()=>post({type:'mobile-chart-fullscreen'})}
+        onRefresh={refreshMobileCharts}
+        workspaceName={active?.name || ""}
+        activeWorkspaceId={active?.id || ""}
+        workspaces={workspaceRows.map(row=>({id:row.id,name:row.name}))}
+        onWorkspace={id=>{const row=workspaceRows.find(item=>item.id===id);if(row)void app.confirmLeave().then(ok=>{if(ok)select(row);});}}
+        onOpenTicker={ticker=>{if(mobileChartSaving)return;if(mobileChartStateRef.current?.dirty && !window.confirm('当前图格修改尚未保存，放弃修改并查看行情？'))return;post({type:'mobile-chart-discard'});post({type:"mobile-chart-explore",symbol:ticker});}}
+        onSearch={searchMobile}
+        searchResults={mobileSearchResults}
+        onAddTicker={ticker=>addMobileTicker(ticker).catch(e=>{setFeedError(`自选保存失败：${String(e)}`);throw e;})}
+        watchlists={mobileWatchlists}
+        activeWatchlist={mobileActiveWatchlist}
+        onWatchlistChange={id=>{void changeMobileWatchlist(id).catch(e=>setFeedError(`自选列表切换失败：${String(e)}`));}}
+        onWatchlistEdit={symbols=>{void updateMobileWatchlist(symbols).catch(e=>setFeedError(`自选保存失败：${String(e)}`));}}
+        flags={mobileFlags}
+        saving={mobilePreferenceBusy}
+        onFlag={(ticker,color)=>void updateMobileFlag(ticker,color).catch(e=>setFeedError(`旗标保存失败：${String(e)}`))}
+        theme={chartTheme as "dark"|"light"}
+      />}
+      {mobile && mobileAlertReturn && <button className="mobile-alert-return" type="button" onClick={()=>{
+        post({type:'mobile-alert-return',workspace_id:current.current?.id,session:alertUiSession.current});
+      }}>返回告警与日志</button>}
       {resolveStates.length>0 && <aside className="advanced-history-failures" aria-label="图格行情解析状态">{resolveStates.map(item=><p key={item.index} role="status">图格 {item.index+1}：{item.message}{item.state==='error' && <button disabled={item.retryAt>resolveNow} onClick={()=>post({type:'retry-chart-resolve',...item})}>{item.retryAt>resolveNow ? `冷却 ${Math.ceil((item.retryAt-resolveNow)/1000)} 秒后重试` : '重试行情解析'}</button>}</p>)}</aside>}
       {historyDetailsOpen && (
         <div className="advanced-load-details" role="dialog" aria-modal="false" aria-label="历史加载详情">
@@ -1863,11 +2056,11 @@ export default function AdvancedWorkspace() {
       {!Object.keys(nativeLoads).length && !Object.keys(capacityNotices).length && !chartFailures.length && <p>当前没有进行中的加载任务。</p>}
         </div>
       )}
-      {!mobile && (savedPreferenceDrafts.length>0 || preferenceReopenRequired) && <div className="preference-draft-banner" role="status">
-        {savedPreferenceDrafts.length>0 && <><span>有 {savedPreferenceDrafts.length} 项设置草稿未保存</span><button onClick={()=>setPreferenceDraftsOpen(true)}>处理设置草稿</button></>}
+      {(visiblePreferenceDrafts.length>0 || preferenceReopenRequired) && <div className="preference-draft-banner" role="status">
+        {visiblePreferenceDrafts.length>0 && <><span>有 {visiblePreferenceDrafts.length} 项设置草稿未保存</span><button onClick={()=>setPreferenceDraftsOpen(true)}>处理设置草稿</button></>}
         {preferenceReopenRequired && <><span>设置已暂停自动保存；草稿处理后请重新打开图表继续修改。</span><button onClick={()=>location.reload()}>重新打开图表</button></>}
       </div>}
-      {preferenceDraftsOpen && <PreferenceDraftDialog drafts={savedPreferenceDrafts} onClose={()=>setPreferenceDraftsOpen(false)} onResolve={(draft,action,revision)=>new Promise<void>((resolve,reject)=>{
+      {preferenceDraftsOpen && <PreferenceDraftDialog drafts={visiblePreferenceDrafts} onClose={()=>setPreferenceDraftsOpen(false)} onResolve={(draft,action,revision)=>new Promise<void>((resolve,reject)=>{
         const request=crypto.randomUUID();
         const timer=setTimeout(()=>{preferenceRecovery.current.delete(request);reject(Error('处理尚未确认，草稿仍保留；请重新核对服务器设置'));},30000);
         preferenceRecovery.current.set(request,{resolve:()=>{clearTimeout(timer);resolve();},reject:error=>{clearTimeout(timer);reject(error);}});

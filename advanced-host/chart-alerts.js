@@ -10,6 +10,10 @@ function chartAlertBridge({
   frames,
   calculationOrigin = () => null,
   compositeRevision = () => null,
+  originalAssociation = () => null,
+  associationEnabled = () => true,
+  prepareLocate = async () => true,
+  located = () => {},
   rpc,
   movePrice,
   send,
@@ -58,6 +62,11 @@ function chartAlertBridge({
       getWidget().chart(i),
     );
   function chartIdentity(chart) {
+    const original = originalAssociation(chart);
+    if (original && original.original_chart_id) {
+      ids.set(chart, original.original_chart_id);
+      return original.original_chart_id;
+    }
     if (!ids.has(chart)) {
       const index = chartList().indexOf(chart);
       ids.set(chart, storedIds[index] || crypto.randomUUID());
@@ -65,7 +74,13 @@ function chartAlertBridge({
     return ids.get(chart);
   }
   function associatedChart(a, row) {
+    if (!associationEnabled()) return null;
     if (!a || a.workspace_id !== String(getWorkspace()?.id)) return null;
+    const original = originalAssociation();
+    if (original && ((a.chart_id && a.chart_id === original.original_chart_id) ||
+        (!a.chart_id && !original.original_chart_id && a.chart_index === original.original_index))) {
+      return chartList()[0] || null;
+    }
     const known = chartList().find(
       (chart) => chartIdentity(chart) === a.chart_id,
     );
@@ -313,6 +328,11 @@ function chartAlertBridge({
     return state;
   }
   function reset(state = {}) {
+    for (const [chart, fn] of bindings) {
+      chart.onSymbolChanged().unsubscribe(null, fn);
+      chart.onIntervalChanged().unsubscribe(null, fn);
+    }
+    bindings.clear();
     menuPoint = plusMenuPoint = null;
     ids = new Map();
     storedIds = Array.isArray(state._mwAlertCharts)
@@ -567,23 +587,44 @@ function chartAlertBridge({
       }
   }
   async function locate(row, event) {
-    const a = row.config.association,
-      chart = associatedChart(a, row);
-    if (!matches(chart, row)) {
+    let prepared;
+    try {
+      prepared = await prepareLocate(row, event);
+      if (prepared === false || disposed) return;
+    } catch (error) { fail(error); return; }
+    const temporary = prepared?.temporary === true;
+    const target = temporary ? {...row, config: prepared.config} : row;
+    const chart = temporary ? prepared.chart : associatedChart(row.config.association, row);
+    const current = () => !disposed && (!temporary || prepared.current());
+    if (!current()) return;
+    if (!matches(chart, target)) {
       fail(
         Error(
-          "关联图表当前为其他品种或周期；切回该系列后可定位，告警继续在后台运行",
+          temporary ? "告警行情来源、系列或周期不匹配，无法定位" : "关联图表当前为其他品种或周期；切回该系列后可定位，告警继续在后台运行",
         ),
       );
       return;
     }
     try {
-      await restoreDrawing(row, chart);
+      if (!temporary) await restoreDrawing(row, chart);
       if (event) {
         await chart.setVisibleRange({
           from: event.occurred_at / 1000 - 3600,
           to: event.occurred_at / 1000 + 3600,
-        });
+        }, {rejectByTimeout: 10000});
+        if (!current()) return;
+        if (temporary) {
+          // setVisibleRange resolves before the native time scale publishes
+          // its visible bars. Wait for that state before declaring no history.
+          const time = event.occurred_at / 1000, deadline = Date.now() + 3000;
+          while (current()) {
+            const bars = chart.getVisibleBarsRange();
+            if (bars && time >= bars.from && time <= chart.barTimeToEndOfPeriod(bars.to)) break;
+            if (Date.now() >= deadline) throw Error('触发时段的历史行情不可用，无法定位');
+            await new Promise(resolve => setTimeout(resolve, 25));
+          }
+          if (!current()) return;
+        }
         suppress++;
         try {
           const id = await chart.createShape(
@@ -593,16 +634,35 @@ function chartAlertBridge({
               text: `${row.name} · ${event.evidence.ordinal}`,
               disableSave: true,
               disableUndo: true,
-              lock: true,
+              lock: true, disableSelection: true,
             },
           );
+          if (!current()) {chart.removeEntity(id, {disableUndo:true});return;}
+          if (temporary) {
+            const point = chart.getShapeById(id).getPoints()[0], time = event.occurred_at / 1000;
+            if (!point || point.time > time || chart.barTimeToEndOfPeriod(point.time) <= time) {
+              chart.removeEntity(id, {disableUndo:true});
+              throw Error('触发时段缺少对应 K 线，无法精确定位');
+            }
+          }
           markers.set(event.id, id);
         } finally {
           suppress--;
         }
       }
+      if (!current()) return;
+      if (temporary) {
+        const threshold = event?.threshold ?? (target.config.condition?.right?.kind === 'constant' ? target.config.condition.right.value : undefined);
+        if (threshold !== undefined && threshold !== null && Number.isFinite(Number(threshold))) {
+          const id = await chart.createShape({time: event ? event.occurred_at / 1000 : chart.getVisibleRange().to, price: Number(threshold)},
+            {shape:'horizontal_line', text:event ? '触发时阈值' : row.name, disableSave:true, disableUndo:true, lock:true, disableSelection:true});
+          if (!current()) {chart.removeEntity(id, {disableUndo:true});return;}
+        }
+      }
+      if (!current()) return;
+      located(row, event);
     } catch (e) {
-      fail(e);
+      if (current()) fail(e);
     }
   }
   async function restoreDrawing(row, chart) {
@@ -777,9 +837,9 @@ function chartAlertBridge({
           });
       }
   }
-  function destroy() {
+  function destroy(options) {
     disposed = true;
-    priceLines?.destroy();
+    priceLines?.destroy(options);
     for (const [chart, fn] of bindings) {
       chart.onSymbolChanged().unsubscribe(null, fn);
       chart.onIntervalChanged().unsubscribe(null, fn);

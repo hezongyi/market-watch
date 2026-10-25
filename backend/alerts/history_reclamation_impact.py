@@ -25,6 +25,8 @@ from .storage import (
 
 
 def report(db, dataset, references):
+    from .history_retention import frame_content_ids
+
     instrument = db.get(Instrument, dataset.instrument_id)
     versions = list(db.scalars(select(HistoryVersion).where(
         HistoryVersion.dataset_id == dataset.id).order_by(HistoryVersion.start, HistoryVersion.id)))
@@ -37,21 +39,23 @@ def report(db, dataset, references):
     targets = [{"version_id": v.id, "start": v.start, "end": v.end,
         "published_at": v.published_at, "status": v.status,
         "observed_minutes": v.manifest.get("rows"),
+        "frames": v.manifest.get("frames", {}),
         "unknown_minutes": v.manifest.get("unknown_minutes"),
         "payload_available": v.id not in reclaimed,
         "disposition": "already_reclaimed" if v.id in reclaimed else "protected" if
             references["items"] or references["requires_archive"] else "delete_payload",
         "periods": [{"timeframe": a.timeframe, "status": a.status, "rows": a.count}
                     for a in artifacts if a.version_id == v.id]} for v in versions]
-    candidate_ids = select(HistoryChunk.content_id).where(
-        HistoryChunk.version_id.in_(target_ids), HistoryChunk.content_id.is_not(None)).distinct()
+    candidate_ids = set(db.scalars(select(HistoryChunk.content_id).where(
+        HistoryChunk.version_id.in_(target_ids), HistoryChunk.content_id.is_not(None)).distinct()))
+    candidate_ids.update(frame_content_ids(db, version_ids=target_ids))
     blobs = list(db.execute(select(SourceBlob.id, func.length(SourceBlob.content)).where(
         SourceBlob.id.in_(candidate_ids)).order_by(SourceBlob.id)))
     held_by_history = set(db.scalars(select(HistoryChunk.content_id).where(
         HistoryChunk.content_id.in_([b[0] for b in blobs]), HistoryChunk.version_id.notin_(target_ids))))
     held_by_cache = set(db.scalars(select(SourceFetch.content_id).where(
         SourceFetch.content_id.in_([b[0] for b in blobs]))))
-    held = held_by_history | held_by_cache
+    held = held_by_history | held_by_cache | (candidate_ids & frame_content_ids(db, exclude_versions=target_ids))
 
     def payload_sum(model, predicate):
         return db.scalar(select(func.coalesce(func.sum(func.length(model.content)), 0)).where(predicate))

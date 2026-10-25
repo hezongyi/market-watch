@@ -10,6 +10,7 @@ import uuid
 from contextlib import contextmanager
 from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 import yfinance as yf
@@ -401,6 +402,63 @@ def DecimalString(value):
         return format(number, "f") if number.is_finite() else None
     except (InvalidOperation, ValueError, TypeError):
         return None
+
+
+def archive_page(identity, start, end):
+    """Fixed managed inputs over the existing yfinance operation/parser path.
+
+    No platform cache is read or mutated. Explicit adjustment comes from the
+    immutable acquisition identity; platform auto-adjust defaults stay intact.
+    """
+    from .history_mode_artifacts import date_bounds
+    from .market_contracts import NativeBarRow, NativeCandleBatch, RequestResult, SourceIdentity
+
+    identity = SourceIdentity.model_validate(identity)
+    values, frame = identity.parameters, identity.parameters["timeframe"]
+    if frame not in YAHOO_INTERVALS or values["adjustment"] not in ("none", "supplier"):
+        raise ValueError("Yahoo 固定归档不支持此周期或价格口径")
+    if values["endpoint"] != "yfinance.Ticker.history" or values["rules"] != "yfinance-archive-v1":
+        raise ValueError("Yahoo 固定归档来源规则不匹配")
+    deadline = time.monotonic() + settings.provider_request_seconds
+    retention, span = history_policy(frame)
+    observed = now_ms()
+    request_start = max(start, observed - retention * 86400000) if retention else start
+    if span:
+        request_start = max(request_start, end - span * 86400000)
+    if request_start >= end:
+        return NativeCandleBatch(identity=identity, timeframe=frame, window_start=start,
+            window_end=end, checkpoint=end, observed_at=observed, rows=(),
+            result=RequestResult(status="empty_success"),
+            volume_kind=values["volume_kind"], volume_unit=values["volume_unit"])
+    meta = {"symbol": identity.provider_symbol, "timezone": values["timezone"],
+            "adjustment": "supplier", "volume_kind": values["volume_kind"]}
+    with _operation(deadline, stage="managed_archive") as session:
+        data = _history(yf.Ticker(meta["symbol"], session=session), meta, frame,
+                        request_start, end, deadline)
+        if "Volume" in data and any(pd.notna(value) and value < 0 for value in data["Volume"]):
+            raise ValueError("Yahoo 归档成交量不能为负数")
+        parsed = _rows(meta, frame, data, end)
+    output = []
+    for value in parsed:
+        label = datetime.fromtimestamp(value["start"] / 1000, UTC).astimezone(
+            ZoneInfo(values["timezone"]))
+        high = frame in ("D1", "W1", "MN")
+        left, right = date_bounds(label.date(), frame) if high else (value["start"], value["end"])
+        complete = value["complete"] or right <= min(end, observed)
+        if frame == "D1" and values["session"].startswith("0930-1600"):
+            right = int(label.replace(hour=16, minute=0).timestamp() * 1000)
+            complete = right <= min(end, observed)
+        if not start <= left < end:
+            continue
+        complete = complete and right <= min(end, observed)
+        output.append(NativeBarRow(timeframe=frame, start=left, end=right,
+            **{key: value[key] for key in ("open", "high", "low", "close", "volume")},
+            source_label=label.isoformat(), trading_date=label.date().isoformat() if high else None,
+            complete=complete, confirmation="session_elapsed" if complete else "unconfirmed"))
+    return NativeCandleBatch(identity=identity, timeframe=frame, window_start=start,
+        window_end=end, checkpoint=end, observed_at=observed, rows=tuple(output),
+        result=RequestResult(status="data" if output else "empty_success"),
+        volume_kind=values["volume_kind"], volume_unit=values["volume_unit"])
 
 
 def native_page(meta, frame, before, count, *, deadline=None, optional=0):

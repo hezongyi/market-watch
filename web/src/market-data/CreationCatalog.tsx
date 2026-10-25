@@ -202,12 +202,12 @@ export function CreationCatalog({
     observer.observe(sentinel.current);
     return () => observer.disconnect();
   }, [ui, loading, error, fallback]);
-  async function refreshDirectory() {
+  async function refreshDirectory(source: "oanda" | "fxcm" = "oanda") {
     if (busy) return;
     setBusy(true);
     setError("");
     try {
-      await api("/market-data/history-catalog/refresh", {});
+      await api("/market-data/history-catalog/refresh", { source });
       if (!alive.current) return;
       setOffset(0);
       refresh((v) => v + 1);
@@ -252,6 +252,17 @@ export function CreationCatalog({
           )}
         </div>
       )}
+      {!fixedSource && metadata.some(s => s.source === "fxcm") && (
+        <div className="dc-create-notice">
+          {metadata.find(s => s.source === "fxcm")?.connection_configured ? (
+            <>FXCM Demo · 当前账户目录
+              <button disabled={busy || disabled} onClick={() => void refreshDirectory("fxcm")}>
+                {busy ? "刷新中…" : "显式刷新 FXCM 品种目录"}
+              </button>
+            </>
+          ) : "FXCM Demo 历史连接未配置，请由管理员配置后再选择。"}
+        </div>
+      )}
       {error && <p role="alert">{error}</p>}
       {ui ? (
         <NativeSlot
@@ -261,7 +272,7 @@ export function CreationCatalog({
             mode: "select",
             title: fixedSource ? "选择实时品种" : "选择自建品种",
             settingsScope: fixedSource ? "mw.data-center.mapping" : "mw.data-center.creation",
-            allowedSources: fixedSource ? [fixedSource] : ["dukascopy", "oanda"],
+            allowedSources: fixedSource ? [fixedSource] : ["dukascopy", "oanda", "fxcm"],
             fixedSource,
             query: filters.query,
             source: fixedSource || filters.source,
@@ -297,7 +308,7 @@ export function CreationCatalog({
             >
               <option value="">全部来源</option>
               <option value="dukascopy">Dukascopy</option>
-              <option value="oanda">OANDA Practice</option>
+              <option value="oanda">OANDA Practice</option><option value="fxcm">FXCM Demo</option>
             </NativeSelect>}
           </div>
           <div className="dc-market-list" ref={list}>

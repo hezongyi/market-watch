@@ -28,12 +28,12 @@ function nativeAlertPriceLines({
       ? Number(raw)
       : null;
   }
-  function release(entry) {
+  function release(entry, unloading = false) {
     entry.dead = true;
     if (entry.raf) entry.view.cancelAnimationFrame(entry.raf);
     entry.cleanups.splice(0).forEach((fn) => fn());
     entry.resize?.disconnect();
-    entry.line?.remove();
+    if (!unloading) entry.line?.remove();
     entry.label?.remove();
     entry.dot?.remove();
   }
@@ -415,9 +415,10 @@ function nativeAlertPriceLines({
     clear() {
       for (const id of [...entries.keys()]) destroyEntry(id);
     },
-    destroy() {
+    destroy({unloading = false} = {}) {
       disposed = true;
-      this.clear();
+      for (const entry of entries.values()) release(entry, unloading);
+      entries.clear();
     },
     diagnostics: () => ({ entries: entries.size }),
   };

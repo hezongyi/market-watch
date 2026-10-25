@@ -7,9 +7,24 @@ from enum import StrEnum
 from typing import Literal
 
 import httpx
-from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    StrictInt,
+    StrictStr,
+    model_serializer,
+    model_validator,
+)
 
 from .volume import quantity
+
+HistoryMode = Literal["base_m1", "base_d1", "native_periods"]
+HistoryTimeframe = Literal["M1", "M5", "M15", "M30", "H1", "H4", "D1", "W1", "MN"]
+HISTORY_FRAMES = ("M1", "M5", "M15", "M30", "H1", "H4", "D1", "W1", "MN")
+_V2_IDENTITY_FIELDS = {
+    "identity_version", "mode", "base_frame", "source_family", "adjustment", "trading_date_rule",
+}
 
 
 class DatasetIdentity(BaseModel):
@@ -23,11 +38,59 @@ class DatasetIdentity(BaseModel):
     provider_symbol: str = Field(min_length=1, max_length=64)
     basis: str = Field(min_length=1, max_length=16)
     calendar_version: str = Field(min_length=1, max_length=80)
+    identity_version: Literal[1, 2] = 1
+    mode: HistoryMode = "base_m1"
+    base_frame: Literal["M1", "D1"] | None = "M1"
+    source_family: str | None = Field(default=None, min_length=1, max_length=80)
+    adjustment: Literal["none", "qfq", "hfq", "supplier"] | None = None
+    trading_date_rule: str | None = Field(default=None, min_length=1, max_length=80)
+
+    @model_validator(mode="after")
+    def validate_mode(self):
+        if self.identity_version == 1:
+            if (self.mode != "base_m1" or self.base_frame != "M1"
+                    or any(value is not None for value in (
+                        self.source_family, self.adjustment, self.trading_date_rule))):
+                raise ValueError("New history modes require a v2 identity")
+        elif (self.mode == "base_m1" or not self.source_family or not self.adjustment
+                or not self.trading_date_rule
+                or self.base_frame != ("D1" if self.mode == "base_d1" else None)):
+            raise ValueError("v2 identity requires explicit mode, base, source and trading-date rules")
+        if self.mode == "native_periods" and self.adjustment not in ("none", "supplier"):
+            raise ValueError("Window-limited native history cannot maintain adjusted old prices")
+        return self
+
+    @model_serializer(mode="wrap")
+    def serialize_identity(self, handler):
+        value = handler(self)
+        if self.identity_version == 1:
+            # The old seven-field canonical bytes and all persisted v1 JSON
+            # remain unchanged, including callers that serialize before hashing.
+            return {key: item for key, item in value.items() if key not in _V2_IDENTITY_FIELDS}
+        return value
 
     @property
     def key(self):
         content = json.dumps(self.model_dump(), sort_keys=True, separators=(",", ":"))
         return hashlib.sha256(content.encode()).hexdigest()
+
+
+class SourceIdentity(BaseModel):
+    """Exact supplier endpoint/period parameters, independent of dataset reducers."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+    source: str = Field(min_length=1, max_length=32)
+    channel: str = Field(min_length=1, max_length=64)
+    environment: str = Field(min_length=1, max_length=32)
+    account_scope: str = Field(pattern=r"^(public|sha256:[a-f0-9]{64})$", max_length=71)
+    provider_symbol: str = Field(min_length=1, max_length=64)
+    basis: str = Field(min_length=1, max_length=16)
+    parameters: dict
+
+    @property
+    def key(self):
+        return hashlib.sha256(json.dumps(self.model_dump(), sort_keys=True,
+                                        separators=(",", ":")).encode()).hexdigest()
 
 
 class RequestStatus(StrEnum):
@@ -254,3 +317,91 @@ class CandleBatch(BaseModel):
             # Observed minutes certify only themselves; empty is never coverage.
             "rows": [row.model_dump() for row in self.rows],
         }
+
+
+class NativeBarRow(BaseModel):
+    """A supplier period, never a minute disguised by its chart label.
+
+    start/end are normalized chart bounds. source_label and trading_date retain
+    the supplier's session assignment (especially futures night sessions).
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    timeframe: HistoryTimeframe
+    start: StrictInt = Field(ge=0)
+    end: StrictInt = Field(gt=0)
+    open: StrictStr
+    high: StrictStr
+    low: StrictStr
+    close: StrictStr
+    volume: StrictStr | None = None
+    source_label: StrictStr = Field(min_length=1, max_length=80)
+    trading_date: str | None = Field(default=None, pattern=r"^\d{4}-\d{2}-\d{2}$")
+    complete: bool = Field(strict=True)
+    confirmation: Literal["provider", "next_bar", "session_elapsed", "unconfirmed"]
+
+    @model_validator(mode="after")
+    def validate_bar(self):
+        from datetime import date
+
+        from .domain import Candle
+        from .storage import instant
+
+        if self.start >= self.end:
+            raise ValueError("Native bar must have nonempty explicit bounds")
+        if self.trading_date is not None:
+            date.fromisoformat(self.trading_date)
+        if self.timeframe in ("D1", "W1", "MN") and self.trading_date is None:
+            raise ValueError("Calendar periods require the supplier trading date")
+        if self.complete and self.confirmation == "unconfirmed":
+            raise ValueError("Observed prices do not certify a closed supplier bar")
+        try:
+            prices = [Decimal(getattr(self, key)) for key in ("open", "high", "low", "close")]
+        except InvalidOperation as error:
+            raise ValueError("Invalid Decimal price") from error
+        if any(price.is_finite() and price >= Decimal("1e14") for price in prices):
+            raise ValueError("Price exceeds storage range")
+        Candle(instant(self.start), instant(self.end), *prices,
+               complete=self.complete, volume=quantity(self.volume))
+        return self
+
+
+class NativeCandleBatch(BaseModel):
+    """Bounded native observations for exactly one immutable acquisition identity."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    identity: SourceIdentity
+    timeframe: HistoryTimeframe
+    window_start: StrictInt = Field(ge=0)
+    window_end: StrictInt = Field(gt=0)
+    observed_at: StrictInt = Field(ge=0)
+    result: RequestResult
+    volume_kind: Literal["quantity", "price_count", "tick_count", "base", "unavailable"]
+    volume_unit: str | None = Field(max_length=40)
+    rows: tuple[NativeBarRow, ...] = Field(default=(), max_length=100000)
+    checkpoint: StrictInt | None = Field(default=None, ge=0)
+
+    @model_validator(mode="after")
+    def validate_batch(self):
+        if not self.window_start < self.window_end:
+            raise ValueError("Native batch requires a fixed nonempty half-open request window")
+        if self.identity.parameters.get("timeframe") != self.timeframe:
+            raise ValueError("Native batch timeframe differs from acquisition identity")
+        if self.checkpoint is not None and not self.window_start <= self.checkpoint <= self.window_end:
+            raise ValueError("Checkpoint must lie in the request window")
+        if bool(self.rows) != (self.result.status == RequestStatus.DATA):
+            raise ValueError("Only data results may contain rows; data results must contain rows")
+        previous = -1
+        for row in self.rows:
+            quantity(row.volume, tick=self.volume_kind in ("price_count", "tick_count"))
+            if self.volume_kind == "unavailable" and row.volume is not None:
+                raise ValueError("Unavailable volume cannot contain a quantity")
+            if (row.timeframe != self.timeframe or row.start <= previous
+                    or not self.window_start <= row.start < self.window_end):
+                raise ValueError("Native rows must match frame/window and be strictly ordered")
+            if row.complete and row.end > self.observed_at:
+                raise ValueError("A future supplier interval cannot be confirmed")
+            previous = row.start
+        return self

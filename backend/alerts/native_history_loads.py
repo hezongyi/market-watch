@@ -15,6 +15,7 @@ from sqlalchemy.exc import IntegrityError
 
 from . import provider_cache as cache
 from .config import settings
+from .provider_capabilities import request_seconds
 from .provider_history_policy import CapacityExceeded, capacity
 from .storage import NativeHistoryLoad, now_ms, transaction, uid
 
@@ -192,7 +193,9 @@ def once():
             return False
         row.state = "filling"
         row.generation += 1
-        row.lease_until = now + int(settings.provider_request_seconds*1000) + 5000
+        source = "fxcm" if row.query_json.get("instrument", "").upper().startswith(("FXCM:", "MWP:FXCM:")) else None
+        budget = request_seconds(source)
+        row.lease_until = now + int(budget*1000) + 5000
         ident, generation, query = row.id, row.generation, row.query_json
         created_at = row.created_at
         pages, stalls = row.pages, row.stalls
@@ -220,7 +223,7 @@ def once():
         else:
             state = "filling"
         if state != "ready":
-            with read_context("step", time.monotonic()+settings.provider_request_seconds, progress, valid), lane("chart"):
+            with read_context("step", time.monotonic()+budget, progress, valid), lane("chart"):
                 cache.data(DataQuery.model_validate(query))
             state = "ready"
     except cache.LatestObservationPending:

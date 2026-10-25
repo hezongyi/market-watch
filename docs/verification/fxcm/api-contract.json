@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-25T04:01:00.152997+00:00",
+  "status": "isolated_local_application_acceptance_passed_remote_ci_pending",
+  "gate_passed": true,
+  "real_api_verified": true,
+  "application_adapter_implemented": true,
+  "source": "fxcm",
+  "scope": {
+    "platform_native_history": true,
+    "managed_bid_m1": true,
+    "quote_stream": false,
+    "trading": false,
+    "live_fallback": false,
+    "composite_source": false
+  },
+  "baseline": {
+    "tag": "v1.28.0",
+    "commit": "59ed3a3f3fc727da76d13149934d999ebee04218",
+    "branch": "feat/fxcm-platform-managed-20261024"
+  },
+  "transport": {
+    "selected": "official ForexConnect native Linux SDK 1.6.5; isolated native helper",
+    "candidate": "official ForexConnect native Linux SDK; no supported Python 3.11 wheel",
+    "current_account_access_verified": true,
+    "documentation": "https://github.com/fxcm/ForexConnectAPI",
+    "http_history_endpoint": null,
+    "authentication_contract_frozen": true,
+    "service_environment": "Demo; https://www.fxcorporate.com/Hosts.jsp"
+  },
+  "account": {
+    "available": true,
+    "basis": "Private credential fields present; Trading Station login and EULA LTD submission confirmed by user",
+    "scope_fingerprint": "927dcf9977ea211194d4c4de",
+    "history_permission_verified": true,
+    "eula_access_prerequisite_verified": true,
+    "eula_confirmation_basis": "user_reported_submission_not_independent_activation"
+  },
+  "runtime": {
+    "main_python_requirement": ">=3.11",
+    "probe_image": "python@sha256:2410faa698c7ac9bcfb9848ba6143a705d971e871dc92e5df40362a74117d375",
+    "probe_environment": "Linux amd64, CPython 3.11.16, glibc 2.36",
+    "pypi_release": "1.6.43",
+    "compatible_linux_python311_wheel": false,
+    "sdist_available": false,
+    "wheel_probe": "evidence/python311-probe.json",
+    "native_candidate": {
+      "version": "1.6.5",
+      "official_repository_commit": "4c536d29fc722996d4a4bc40be247376f8c83eb9",
+      "archive_url": "https://raw.githubusercontent.com/fxcm/ForexConnectAPI/4c536d29fc722996d4a4bc40be247376f8c83eb9/ForexConnectAPI-1.6.5-Linux-x86_64.tar.gz",
+      "archive_sha256": "a4c1ec512f0ede326afd0d63eb587c578b986b382cdd1e63900ce11a8c28f696",
+      "archive_bytes": 7324536,
+      "libraries_load": true,
+      "native_helper_built": true,
+      "probe": "evidence/native-loading-probe.json",
+      "abi_probe": "evidence/native-abi-probe.json",
+      "distribution_conditions_reviewed": true,
+      "redistribution_cleared": false
+    }
+  },
+  "no_stream": {
+    "documented_candidate": "O2GPriceUpdateMode::NoPrice plus no table manager",
+    "pre_login_behavior_verified": true,
+    "catalog_history_in_noprice_mode_verified": true,
+    "idle_no_quote_push_verified": false,
+    "login_attempted": true,
+    "native_idle_seconds_verified": 25,
+    "native_idle_process_exit_verified": true,
+    "application_idle_five_minutes_verified": true,
+    "configured_idle_evidence": "evidence/configured-idle-five-minutes.json",
+    "post_close_five_minutes_verified": true,
+    "post_close_idle_evidence": "evidence/post-close-idle-five-minutes.json"
+  },
+  "catalog": {
+    "actual_rows_obtained": true,
+    "eurusd_provider_symbol": "EUR/USD",
+    "gold_provider_symbol": "XAU/USD",
+    "precision": {
+      "EUR/USD": 5,
+      "XAU/USD": 2
+    },
+    "account_scope_filter_verified": false,
+    "row_count": 517,
+    "account_scope_filter_offline_tests_verified": true,
+    "account_scope_filter_real_application_verified": false
+  },
+  "candles": {
+    "required_native_frames": [
+      "M1",
+      "H1",
+      "D1"
+    ],
+    "verified_native_frames": [
+      "M1",
+      "H1",
+      "D1"
+    ],
+    "target_basis": "BID",
+    "bid_available_verified": true,
+    "timestamp_unit": "OLE DATE decoded to ISO UTC bar beginning",
+    "timezone": "UTC",
+    "native_interval_phase": "Preserve native start; observed D1 21:00Z; DST/full phase verification pending",
+    "volume_kind": "tick_count",
+    "source_completion_marker": "not_supplied",
+    "elapsed_completion_rule": "M1 start+60s; H1 start+1h; D1 next observed bar or conservative 25h; no source confirmation",
+    "history_coverage": "EUR/USD and XAU/USD, 2026-10-22 to 2026-10-24 only; no inception claim",
+    "page_size": 300,
+    "start_end_inclusivity": "SDK snapshot to may be inclusive (observed XAU/USD D1); validate then filter application [from,to)",
+    "next_cursor_rule": "oldest native start; no exhaustion from short/empty page",
+    "empty_page_exhaustion_proven": false,
+    "sample_checksums": [
+      {
+        "path": "evidence/application-adapter-probe.samples.jsonl",
+        "sha256": "a4d1710157eab3958947d6263ff0f89ba4a26707bee99766b82e07cdef928fb3"
+      }
+    ],
+    "managed_page_rule": "At most 300 M1 bars in a before snapshot with to=end-1ms, locally clipped to [start,end); successful empty interval advances checkpoint with unknown coverage, no closed-market or inception inference"
+  },
+  "limits": {
+    "initial_policy": {
+      "max_concurrency": 1,
+      "max_requests_per_second": 1,
+      "respect_lower_official_limit": true
+    },
+    "official_quota": null,
+    "cancellation_verified": false,
+    "recovery_verified": true,
+    "cancellation_unit_verified": true,
+    "cross_process_pacing_regression_verified": true,
+    "recovery_scope": "Durable queued task survived orderly worker stop/start, stayed paused, then resumed and published; no mid-request kill test"
+  },
+  "blockers": [],
+  "acceptance": {
+    "target": "task_owned_isolated_ubuntu_docker",
+    "compose_project": "mw-fxcm-history-20261024",
+    "configuration_validated": true,
+    "started": true,
+    "real_api_passed": true,
+    "real_api_scope": "native_direct_adapter_and_full_application_HTTP",
+    "browser_passed": true,
+    "managed_postgres_passed": true,
+    "managed_postgres_upstream": "recorded_samples_and_fixtures",
+    "application_end_to_end_passed": true,
+    "long_lived_mw_acceptance_modified": false,
+    "ui_url": "https://192.168.7.232:18910",
+    "chart_url": "https://192.168.7.232:18911",
+    "host": "quant-server",
+    "migration_passed": true,
+    "runtime_evidence": "evidence/acceptance-runtime.json",
+    "images": {
+      "api": "sha256:538d798b4907f6e868c1b27579dda029ff3e68a1f48318c2cec6537c2bfe279f",
+      "chart": "sha256:1c4ed3d6101b104257caded3da167684c52f9f5cf99aef3e2a5c60a9a7051b3d",
+      "web": "sha256:e568ececc4c4c02cc7fc0851f799877246cf151545163123a001b95415fed852"
+    },
+    "browser_evidence": "evidence/browser-result.json",
+    "browser_boundary": "Completed in stages; final fixed-version chart independently resumed after correcting legacy harness target",
+    "managed_chart_evidence": "evidence/managed-chart-result.json",
+    "managed_real_upstream_passed": true,
+    "daily_schedule_passed": true,
+    "daily_schedule_evidence": "evidence/daily-resume-result.json",
+    "daily_schedule_boundary": "Original natural due task failed on fully empty weekend request; fixed and resumed successfully; a fresh natural UTC due minute then auto-published. Original failed report retained.",
+    "post_close_idle_verified": true,
+    "post_close_idle_evidence": "evidence/post-close-idle-five-minutes.json",
+    "completion_boundary": "Local isolated application acceptance passed in stages; no single all-green full-suite/browser run or remote CI claim"
+  },
+  "forbidden_actions_performed": {
+    "trades": false,
+    "quote_subscriptions": false,
+    "production_changes": false,
+    "pull_request_created": false
+  },
+  "remaining_verification": [
+    "Remote CI",
+    "Native D1 phase across DST",
+    "Real account/environment switching (offline identity isolation verified)",
+    "Mid-request worker kill and actual cancellation (only orderly queued-task recovery and cancellation unit tests verified)",
+    "Official quota and SDK redistribution clearance"
+  ],
+  "application_adapter_real_verified": true,
+  "resource_authorization": "User explicitly authorized direct acceptance with current host resources; no other task stopped or resources deleted"
+}

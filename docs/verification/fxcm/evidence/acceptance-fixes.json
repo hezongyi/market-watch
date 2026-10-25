@@ -1,0 +1,74 @@
+{
+  "problems": [
+    {
+      "symptom": "XAU/USD D1 older page HTTP 422: FXCM历史柱无效",
+      "cause": "snapshot returned bar at exclusive application cutoff",
+      "observed_boundary_bar": {
+        "time": "2026-09-27T21:00:00Z",
+        "open": "4284.76",
+        "high": "4284.76",
+        "low": "4110.69",
+        "close": "4115.46",
+        "volume": 1115720
+      },
+      "fix": "validate all rows, then filter [start,end)",
+      "regression": "test_snapshot_inclusive_boundary_is_clipped_to_requested_range[M1,D1]",
+      "before": "2 failed",
+      "after": "passed in 30-test targeted suite; real XAU/USD D1 current and older pages both HTTP 200 / 20 bars"
+    },
+    {
+      "symptom": "real catalog ID to native workspace HTTP 422: 无效品种标识",
+      "cause": "FXCM prefix + 36 hex characters exceeded 40-character existing symbol limit",
+      "fix": "use 32 hexadecimal characters as other native source identities do; preserve account/symbol hash input",
+      "regression": "test_catalog_identity_opens_and_roundtrips_native_workspace",
+      "before": "1 failed",
+      "after": "passed in 30-test targeted suite"
+    },
+    {
+      "symptom": "charts/data HTTP 404 after refreshing catalog with retired IDs",
+      "cause": "platform catalog deduplication selected retired same-symbol ID before available current ID",
+      "fix": "filter unavailable FXCM catalog entries before same-symbol deduplication",
+      "regression": "test_available_catalog_identity_wins_over_retired_same_symbol",
+      "before": "1 failed: available False",
+      "after": "31 targeted tests passed in 8.09s"
+    },
+    {
+      "symptom": "native widget uppercased FXCM hash ID; follow-up resolve/subscribe failed",
+      "cause": "existing canonical hash identity rules covered YAHOO/DUKA/NATIVE but omitted FXCM",
+      "fix": "add FXCM to JS/Python identity canonicalization and normalize FXCM provider metadata lookups",
+      "regression": [
+        "test_catalog_identity_opens_and_roundtrips_native_workspace",
+        "web/tests/fxcm-series.cjs"
+      ],
+      "before": "HTTP resolve test failed 404; Node identity test failed with uppercase hash",
+      "after": "39 targeted tests passed; real native chart, dual chart shared task/cache and fixed history chart rendered successfully"
+    },
+    {
+      "symptom": "Natural daily task stalled on the first wholly empty weekend page; bounded request returned unavailable or timed out",
+      "cause": "Same-account differential: weekday bounded read and weekend cutoff snapshot succeed, fully empty bounded weekend interval fails. Inclusive cutoff also consumes a capacity slot in a full 300-minute page.",
+      "fix": "Managed M1 fetches a finite 300-bar snapshot from Unix epoch to end-1ms and clips locally to [start,end); successful no-observation windows remain unknown, without fabricating closure or candles. Failed upstream requests still fail.",
+      "regression": "test_managed_snapshot_handles_empty_windows_and_inclusive_capacity[weekend-empty,full-300-minutes]",
+      "before": "2 failed; natural daily acceptance failed after retries",
+      "after": "41 targeted tests passed in 12.38s; PostgreSQL 22 passed in 42.24s; real full-capacity 300 M1 timestamps and empty weekend checkpoint passed; natural schedule continuation recorded separately",
+      "evidence": [
+        "weekend-window-differential.json",
+        "weekend-window-after-fix.json",
+        "schedule-before-weekend-fix.json"
+      ]
+    }
+  ],
+  "harness_corrections": [
+    {
+      "cause": "TradingView shares identical pane series before the datafeed subscription boundary",
+      "verification": "Two ready H1 panes, one actual datafeed binding, same backend task and cache dataset"
+    },
+    {
+      "cause": "Harness selected legacy managed instrument rather than the immutable MWH version opened by the product",
+      "verification": "Published history chart resumed independently with MWH child version and Moving Average; browser-result records continuation"
+    },
+    {
+      "cause": "Deep-link dialog initialization was not a reliable harness entry",
+      "verification": "Opened dataCenter.open after native readiness as existing browser harnesses do; explicit FXCM directory refresh and platform UI passed"
+    }
+  ]
+}

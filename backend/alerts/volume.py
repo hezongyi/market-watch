@@ -37,6 +37,8 @@ def metadata(source, symbol):
     if source == 'binance':
         # The current supported Spot catalog contains only BTCUSDT.
         return dict(volume_kind='base', volume_unit='BTC' if symbol == 'BTCUSDT' else 'base asset')
+    if source == 'fxcm':
+        return {'volume_kind': 'tick_count', 'volume_unit': 'price_changes'}
     if source == 'oanda':
         return dict(volume_kind='tick', volume_unit='quotes')
     if source == 'dukascopy':

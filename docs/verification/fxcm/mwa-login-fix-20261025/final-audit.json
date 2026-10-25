@@ -1,0 +1,185 @@
+{
+  "observed_at_utc": "2026-10-25T09:14:31.680177+00:00",
+  "runtime_configuration_audit_passed": true,
+  "changed_services": [
+    "web"
+  ],
+  "other_service_identities_unchanged": true,
+  "protected_browser_identities_unchanged": true,
+  "services": [
+    {
+      "service": "web",
+      "container_id": "00f6f36ceffb6c25c1bb218a7eb4d9951993044cd8daa4b5e1e859dc8113cad9",
+      "image": "sha256:39fae9ae416a4d9993f25c3258f8726c9b72c3c7cd001026cd8ebf7e52c406ba",
+      "started": "2026-10-25T08:51:22.796563823Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "c07734d470dddf4fe9be6c972fa6e0cb9b12653af9149e924c11bff71476ed0e"
+    },
+    {
+      "service": "composite-aggregate-worker",
+      "container_id": "81ca89d4dbf5177632342e977fac9f62ba47a0b215dd302ef0b881a6458ac5b0",
+      "image": "sha256:1c4380792e7938872548810ccea40ff0b10744b82a11c5e5f7d42afb8d592320",
+      "started": "2026-10-25T08:19:43.330641018Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "513bc3ea4562795a8dfb353401c08c91b266e60b46953b10161580945b655c9d"
+    },
+    {
+      "service": "history-worker",
+      "container_id": "34d4bf26811a0bade264edbf63ade6df955f380983682153ab17d4f0944f6b81",
+      "image": "sha256:1c4380792e7938872548810ccea40ff0b10744b82a11c5e5f7d42afb8d592320",
+      "started": "2026-10-25T08:19:43.346922769Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "c4a2fce170e21b7fb26f2c0a08926abffc9da2ee5d4c9c18868b941d04b6351d"
+    },
+    {
+      "service": "realtime-worker",
+      "container_id": "491ff75bb63cd3c27255d1522f358efdcd3ebdedc9e9038bc691457cc2e506a4",
+      "image": "sha256:1c4380792e7938872548810ccea40ff0b10744b82a11c5e5f7d42afb8d592320",
+      "started": "2026-10-25T08:19:43.279506469Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "da96128188cf0ae23a5fb0a5a056dd99a18f2f2c2a3ff1f4d3903396b145569f"
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "container_id": "ae70c5813960ecad156202a87723f16e69c06ef8126b3efe28e2273e65506f47",
+      "image": "sha256:1c4380792e7938872548810ccea40ff0b10744b82a11c5e5f7d42afb8d592320",
+      "started": "2026-10-25T08:19:43.259477164Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "1739aed002a0b8db831a442045babc3dc99bd14c5c0bf5546e640406afa8108f"
+    },
+    {
+      "service": "pricing-worker",
+      "container_id": "d78cbac35d75fe0ad0ee30610a235dd70e3f2de38aa53e081e95c2a05e28e761",
+      "image": "sha256:1c4380792e7938872548810ccea40ff0b10744b82a11c5e5f7d42afb8d592320",
+      "started": "2026-10-25T08:19:43.318630226Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "8853664a1f7920e447dd9c3d997761f0a7e857020f5e1241f6f8e946a7a3b888"
+    },
+    {
+      "service": "chart-history-worker",
+      "container_id": "08019e05e284924e988ca0c45a2f67be5cc78abf4170cf84ab08e5c5241128c6",
+      "image": "sha256:1c4380792e7938872548810ccea40ff0b10744b82a11c5e5f7d42afb8d592320",
+      "started": "2026-10-25T08:19:43.25582777Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "e37ad8e809c6627ab46a9634721513b7446a9b013066b2380138360942871abf"
+    },
+    {
+      "service": "native-history-worker",
+      "container_id": "2f7aa1b8ce3b5d4ccdbedc56367d1cbeee06f08bfd570b17d17a41bead438774",
+      "image": "sha256:1c4380792e7938872548810ccea40ff0b10744b82a11c5e5f7d42afb8d592320",
+      "started": "2026-10-25T08:19:43.342175151Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "5f93901d3347533baae0c2507bab0e80f0b282ef981e59d0da0fef8861a67931"
+    },
+    {
+      "service": "market-stream-worker",
+      "container_id": "262f237e3a94f4732622a5b28a33fa7f371d3df21f1ea610bf55e48908aef249",
+      "image": "sha256:1c4380792e7938872548810ccea40ff0b10744b82a11c5e5f7d42afb8d592320",
+      "started": "2026-10-25T08:19:43.303002707Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "3e52efa11292c6032b0131c2d814ae9d4fb3364baa7120726bd79821cf585478"
+    },
+    {
+      "service": "projector",
+      "container_id": "b2717ac697705757d9bd80fa98735298a653f21bd8d135af076d40b5adf1896d",
+      "image": "sha256:1c4380792e7938872548810ccea40ff0b10744b82a11c5e5f7d42afb8d592320",
+      "started": "2026-10-25T08:19:43.313679775Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "7b12cff3c457a72a991940584794a0e65da3d60e2051a9e7241b08d84d9b5ade"
+    },
+    {
+      "service": "notify-worker",
+      "container_id": "3612355bc359446b98c4ddbfad8760e18df33f2ccad6d57047ad64ceafeb8af4",
+      "image": "sha256:1c4380792e7938872548810ccea40ff0b10744b82a11c5e5f7d42afb8d592320",
+      "started": "2026-10-25T08:19:43.351065393Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "25fcc9bb0c26c4a112384a027019e3a6e51f2cd6cb00d3cca7cf580c9281185a"
+    },
+    {
+      "service": "api",
+      "container_id": "199d3c7da27ec288cc02606e3ec0e43586c88681f913f1f8085bd373e7e0aa4b",
+      "image": "sha256:1c4380792e7938872548810ccea40ff0b10744b82a11c5e5f7d42afb8d592320",
+      "started": "2026-10-25T08:19:31.805617296Z",
+      "state": "running",
+      "health": "healthy",
+      "configuration_sha256": "6ecb0415c30a79bd9fd2aad859cfd73c694e9c827c08ba55824b1de1a53b6293"
+    },
+    {
+      "service": "chart",
+      "container_id": "d09b87d342df4517f4ef63d4941cfa7a794072df6e5dd3a549f790db756bf262",
+      "image": "sha256:63542f9ea64b9d094925806df97ac27a7fb68b7b199c70077d1800acf8c339ff",
+      "started": "2026-10-25T08:19:31.800043104Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "553cd70717d87a9fae6f7098d4aff9450890a68bf787ef807b99ce2efcf9253c"
+    },
+    {
+      "service": "gateway",
+      "container_id": "9492f307fdf9bfdbec7641c4e0b3554bed39340bc73a57448fdbd39e34d79ca9",
+      "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "started": "2026-10-19T06:05:49.728822361Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "60e8fc28aa17abc9a943a04aa1209a36c87f455ae78b120261462572a9113bfa"
+    },
+    {
+      "service": "postgres",
+      "container_id": "3de49cbde9a20c6640092181c04d35df41677566795cfecae18c0ab284b0aba8",
+      "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "started": "2026-10-18T06:31:25.191805014Z",
+      "state": "running",
+      "health": "healthy",
+      "configuration_sha256": "62769f769d559f78e75c8fdceaf11328cdf5169464f28524cba9f92329e77d3a"
+    }
+  ],
+  "protected_table_hashes": {
+    "advanced_chart_workspaces": {
+      "count": 17,
+      "sha256": "d3277680c039d2822ced96f33b927b070bfb5579ed6d728d9c9530ff4b29b954"
+    },
+    "chart_workspaces": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "chart_alerts": {
+      "count": 19,
+      "sha256": "9677c4cb1e35697b491d923bfccc89d59006bc447172cd23ec57a73d2841af8c"
+    },
+    "chart_indicator_templates": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "alembic_version": [
+      "ay52_history_modes"
+    ]
+  },
+  "original_notification_states_unchanged": true,
+  "new_notifications_since_fxcm_baseline": 0,
+  "advanced_chart_preferences": {
+    "before_fxcm_update": {
+      "count": 30,
+      "sha256": "959d581c8bba8531fdd2d1067ecbdb54dfa261d5af5963a6513e53015bbe4c34"
+    },
+    "current": {
+      "count": 30,
+      "sha256": "94d586e19e36d90f2f3ff584996f387ef1819b152a610d2e95ef01c86adba86f"
+    },
+    "unchanged": false,
+    "note": "Real browser bootstrapping writes widgetbar.layout-settings. No per-row pre-login snapshot exists; full preference byte equality and exact attribution are not claimed. No preference reset or database restoration was performed."
+  },
+  "generic_preferences": {
+    "unchanged": false,
+    "note": "Includes operational runtime state; no per-key pre-update equality claim."
+  }
+}

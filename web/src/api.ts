@@ -74,7 +74,7 @@ async function readFetch(path: string, init: RequestInit, signal?: AbortSignal) 
       // Native mandatory history has its own task budget and cancellation.
       let timeoutMs=30000;
       if(path==='/charts/data' && typeof init.body==='string') {
-        try {const body=JSON.parse(init.body);if(body.native_history && !body.native_reserve)timeoutMs=610000;}catch { /* ordinary read */ }
+        try {const body=JSON.parse(init.body);if(body.native_history && !body.native_reserve)timeoutMs=610000;else if(body.series_kind==="provider" && /^(MWP:)?FXCM:/i.test(body.instrument || ""))timeoutMs=70000;}catch { /* ordinary read */ }
       }
       const timer = readable ? setTimeout(() => controller.abort(new DOMException("读取超过时间预算","TimeoutError")),timeoutMs) : undefined;
       let response: Response;

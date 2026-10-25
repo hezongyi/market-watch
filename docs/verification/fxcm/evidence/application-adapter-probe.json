@@ -1,0 +1,63 @@
+{
+  "kind": "real_application_adapter",
+  "passed": true,
+  "connection": "Demo",
+  "price": "BID",
+  "application_acceptance_modified": false,
+  "pages": [
+    {
+      "symbol": "EUR/USD",
+      "frame": "M1",
+      "digits": 5,
+      "count": 300,
+      "first_start": 1792771200000,
+      "last_start": 1792789140000
+    },
+    {
+      "symbol": "EUR/USD",
+      "frame": "H1",
+      "digits": 5,
+      "count": 45,
+      "first_start": 1792627200000,
+      "last_start": 1792785600000
+    },
+    {
+      "symbol": "EUR/USD",
+      "frame": "D1",
+      "digits": 5,
+      "count": 1,
+      "first_start": 1792702800000,
+      "last_start": 1792702800000
+    },
+    {
+      "symbol": "XAU/USD",
+      "frame": "M1",
+      "digits": 2,
+      "count": 300,
+      "first_start": 1792770300000,
+      "last_start": 1792788240000
+    },
+    {
+      "symbol": "XAU/USD",
+      "frame": "H1",
+      "digits": 2,
+      "count": 44,
+      "first_start": 1792627200000,
+      "last_start": 1792785600000
+    },
+    {
+      "symbol": "XAU/USD",
+      "frame": "D1",
+      "digits": 2,
+      "count": 1,
+      "first_start": 1792702800000,
+      "last_start": 1792702800000
+    }
+  ],
+  "directory_count": 517,
+  "one_session_reused": true,
+  "idle_seconds": 25,
+  "idle_process_exited": true,
+  "elapsed_seconds": 49.26,
+  "samples_sha256": "a4d1710157eab3958947d6263ff0f89ba4a26707bee99766b82e07cdef928fb3"
+}

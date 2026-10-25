@@ -1,0 +1,117 @@
+{
+  "scope": "task-owned application project, nine running containers; test PostgreSQL excluded",
+  "boundary": "Docker stats are sparse instantaneous samples, not isolated FXCM incremental cost or CPU duration. Database counters include all application workers; host has other concurrent workloads. Sums of container CPU percentages are relative to a logical CPU. Memory sum excludes host and may share pages.",
+  "configured_idle": {
+    "evidence": "configured-idle-five-minutes.json",
+    "samples": 10,
+    "elapsed_seconds": 306.15,
+    "cpu_percent_sum_range": [
+      7.51,
+      32.13
+    ],
+    "memory_mib_sum_range": [
+      661.31,
+      665.22
+    ],
+    "db_write_counter_delta": {
+      "tup_inserted": 25,
+      "tup_updated": 1014,
+      "tup_deleted": 1
+    },
+    "helpers_max": 0,
+    "active_slots_max": 0
+  },
+  "browser_demand_observation": {
+    "evidence": "final-browser-demand-samples.json",
+    "samples": 17,
+    "elapsed_seconds": 603.34,
+    "cpu_percent_sum_range": [
+      16.43,
+      73.61
+    ],
+    "memory_mib_sum_range": [
+      667.23,
+      863.27
+    ],
+    "db_write_counter_delta": {
+      "tup_inserted": 725,
+      "tup_updated": 11773,
+      "tup_deleted": 609
+    },
+    "helpers_max": 3,
+    "active_slots_max": 1
+  },
+  "browser_stages": [
+    {
+      "stage": "dual-chart-shared",
+      "at": "2026-10-25T03:29:29.945Z",
+      "cpu_percent_sum": 40.58,
+      "memory_mib_sum": 778.89
+    },
+    {
+      "stage": "managed-created",
+      "at": "2026-10-25T03:29:51.654Z",
+      "cpu_percent_sum": 50.13,
+      "memory_mib_sum": 775.89,
+      "db_write_counter_delta_from_previous_stage": {
+        "tup_inserted": 32,
+        "tup_updated": 1035,
+        "tup_deleted": 19
+      }
+    },
+    {
+      "stage": "managed-first-published",
+      "at": "2026-10-25T03:30:29.750Z",
+      "cpu_percent_sum": 38.17,
+      "memory_mib_sum": 792.54,
+      "db_write_counter_delta_from_previous_stage": {
+        "tup_inserted": 202,
+        "tup_updated": 535,
+        "tup_deleted": 41
+      },
+      "wall_seconds_from_created": 38.23
+    },
+    {
+      "stage": "managed-incremental-published",
+      "at": "2026-10-25T03:31:19.643Z",
+      "cpu_percent_sum": 17.48,
+      "memory_mib_sum": 795.6,
+      "db_write_counter_delta_from_previous_stage": {
+        "tup_inserted": 117,
+        "tup_updated": 541,
+        "tup_deleted": 21
+      },
+      "wall_seconds_from_first_published_includes_harness_checks": 49.88
+    }
+  ],
+  "post_close_idle": {
+    "evidence": "post-close-idle-five-minutes.json",
+    "samples": 10,
+    "elapsed_seconds": 305.81,
+    "cpu_percent_sum_range": [
+      8.85,
+      28.86
+    ],
+    "memory_mib_sum_range": [
+      684.82,
+      723.77
+    ],
+    "db_write_counter_delta": {
+      "tup_inserted": 0,
+      "tup_updated": 866,
+      "tup_deleted": 0
+    },
+    "helpers_max": 0,
+    "active_slots_max": 0,
+    "acceptance_checks": {
+      "no_new_upstream_admissions": true,
+      "helpers_absent_all_samples": true,
+      "source_fetch_count_unchanged": true,
+      "provider_bar_count_unchanged": true,
+      "no_active_fxcm_interests": true,
+      "no_active_streams": true,
+      "maintenance_paused_without_active_task": true,
+      "no_active_upstream_slot": true
+    }
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "observed_at": "2026-10-25T12:08:02.458Z",
+  "cases": [
+    {
+      "button": "商品代码搜索",
+      "opened_ms": 605,
+      "first_result_ms": 629,
+      "network": [
+        {
+          "event": "response",
+          "status": 200,
+          "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+          "at": 1792930082531,
+          "timing": {
+            "startTime": 1792930080303.778,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.499,
+            "responseStart": 2220.631,
+            "responseEnd": 2223.473
+          }
+        },
+        {
+          "event": "response",
+          "status": 200,
+          "url": "https://test.kookvv.com:8443/api/market-data/series/page?query=&kind=all&source=&calendar=&symbol_type=&cursor=&page_size=50&offset=0",
+          "at": 1792930083059,
+          "timing": {
+            "startTime": 1792930070013.143,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.607,
+            "responseStart": 12996.568,
+            "responseEnd": 13007.929
+          }
+        },
+        {
+          "event": "request",
+          "method": "GET",
+          "url": "https://test.kookvv.com:8443/api/market-data/series/page?query=USDCAD&kind=all&source=&calendar=&symbol_type=&cursor=&page_size=50&offset=0",
+          "at": 1792930083068
+        }
+      ]
+    },
+    {
+      "button": "添加商品代码",
+      "opened_ms": 223,
+      "first_result_ms": 239,
+      "network": [
+        {
+          "event": "response",
+          "status": 200,
+          "url": "https://test.kookvv.com:8443/api/market-data/resolve",
+          "at": 1792930083389,
+          "timing": {
+            "startTime": 1792930081034.2979,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.54,
+            "responseStart": 2240.54,
+            "responseEnd": 2253.446
+          }
+        },
+        {
+          "event": "response",
+          "status": 200,
+          "url": "https://test.kookvv.com:8443/api/market-data/resolve",
+          "at": 1792930083389,
+          "timing": {
+            "startTime": 1792930081034.427,
+            "domainLookupStart": -1,
+            "domainLookupEnd": -1,
+            "connectStart": -1,
+            "secureConnectionStart": -1,
+            "connectEnd": -1,
+            "requestStart": 0.503,
+            "responseStart": 2253.257,
+            "responseEnd": 2261.511
+          }
+        },
+        {
+          "event": "request",
+          "method": "POST",
+          "url": "https://test.kookvv.com:8443/api/charts/stream/subscribe",
+          "at": 1792930083413
+        },
+        {
+          "event": "request",
+          "method": "POST",
+          "url": "https://test.kookvv.com:8443/api/charts/stream/subscribe",
+          "at": 1792930083415
+        }
+      ]
+    },
+    {
+      "button": "商品代码搜索",
+      "opened_ms": 210,
+      "first_result_ms": 216,
+      "network": []
+    }
+  ],
+  "passed": true,
+  "logs": []
+}

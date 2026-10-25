@@ -1,0 +1,29 @@
+{
+  "completed_at_utc": "2026-10-25T04:01:00.152997+00:00",
+  "scope": "task-owned local application acceptance, completed in stages",
+  "local_acceptance_passed": true,
+  "daily_plan_left_paused": true,
+  "evidence": [
+    "browser-result.json",
+    "managed-chart-result.json",
+    "schedule-before-weekend-fix.json",
+    "daily-resume-result.json",
+    "weekend-window-differential.json",
+    "weekend-window-after-fix.json",
+    "post-close-idle-five-minutes.json",
+    "resource-summary.json",
+    "implementation-checks.json",
+    "secret-scan.json"
+  ],
+  "remote_ci_run": false,
+  "code_committed": false,
+  "pull_request_created": false,
+  "production_changed": false,
+  "remaining_boundaries": [
+    "Remote CI",
+    "Native D1 phase across DST",
+    "Real account/environment switching (offline identity isolation verified)",
+    "Mid-request worker kill and actual cancellation (only orderly queued-task recovery and cancellation unit tests verified)",
+    "Official quota and SDK redistribution clearance"
+  ]
+}

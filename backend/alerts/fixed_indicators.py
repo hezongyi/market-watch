@@ -128,7 +128,13 @@ def request(db, page, spec, *, stamp=None, input_policy=STRICT):
               if input_policy == OBSERVED else IndicatorState(spec))
     inst = db.get(Instrument, db.get(MarketDataset, version.dataset_id).instrument_id)
     phase = revision.rules["aggregation_calendar"] if revision else inst.calendar
-    origin = period(version.start, page["timeframe"], phase)[0]
+    if phase == "source_date" and not revision:
+        from .history_artifacts import published_artifact
+
+        artifact = published_artifact(db, version.id, page["timeframe"])
+        origin = artifact.manifest["blocks"][0]["start"]
+    else:
+        origin = period(version.start, page["timeframe"], phase)[0]
     value = page.get("input_revision", 0)
     target = version.end
     if revision:
@@ -208,6 +214,10 @@ def _context(db, run):
 
 
 def gap_before(previous_end, start, phase, profiles):
+    if phase == "source_date":
+        # Supplier observations exclude weekends/halts; elapsed calendar days
+        # do not establish a missing trading bar or reset a fixed indicator.
+        return False
     if previous_end is None or start <= previous_end:
         return False
     for left, right, profile in profiles:

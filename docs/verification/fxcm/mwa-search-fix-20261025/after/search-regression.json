@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "query": "EURUSD",
+  "observed_at_utc": "2026-10-25T09:43:28.957Z",
+  "responses": [
+    {
+      "url": "https://test.kookvv.com:8443/api/market-data/series/page?query=EURUSD&kind=all&source=&calendar=&symbol_type=&cursor=&page_size=50&offset=0",
+      "status": 200
+    }
+  ],
+  "dialog": "- dialog \"商品代码搜索\":\n  - text: 商品代码搜索\n  - button \"关闭商品代码搜索\"\n  - searchbox \"搜索\": EURUSD\n  - tablist:\n    - tab \"全部\" [selected]\n    - tab \"外汇\"\n    - tab \"股票\"\n    - tab \"加密\"\n    - tab \"指数\"\n    - tab \"基金\"\n    - tab \"期货\"\n    - tab \"金属\"\n    - tab \"其他\"\n  - text: 商品代码 描述\n  - button \"行情类型\": 全部行情\n  - button \"来源\": 全部来源\n  - text: EURUSD 欧元／美元 · 平台 · yahoo · 原生周期 forex YAHOO EURUSD EURUSD · 自建 · dukascopy · bid · ny17 forex DUKASCOPY EURUSD EURUSD · 组合 · dukascopy→OANDA Practice · bid · ny17 forex DUKASCOPY EURUSD 欧元 / 美元 · 平台 · oanda · 原生周期 forex OANDA EURUSD EURUSD · 自建 · fxcm · bid · utc0 forex FXCM EURUSD EUR/USD · 平台 · dukascopy · 原生周期 forex DUKASCOPY EURUSD EUR/USD · 平台 · FXCM · Bid · 原生周期 forex FXCM EURUSD EUR/USD · 平台 · OANDA Practice · Bid · 原生周期 forex OANDA 只需在图表上开始输入，即可拉出此搜索框",
+  "logs": [
+    "[log] 12 custom indicators loaded."
+  ]
+}

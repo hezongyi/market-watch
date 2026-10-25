@@ -1,0 +1,24 @@
+{
+  "completed_at_utc": "2026-10-25T08:31:12.346162+00:00",
+  "target": "mw-acceptance",
+  "project": "mw-issue75-v2-20261018",
+  "automated_acceptance_passed": true,
+  "manual_acceptance": "pending",
+  "images": {
+    "api": "sha256:1c4380792e7938872548810ccea40ff0b10744b82a11c5e5f7d42afb8d592320",
+    "chart": "sha256:63542f9ea64b9d094925806df97ac27a7fb68b7b199c70077d1800acf8c339ff",
+    "web": "sha256:e52d192d0bf77c4749546afc7876da942680a4958b60e9a8c1f72b8f5c724b4a"
+  },
+  "test_results": {
+    "backend": 84,
+    "postgres": 22,
+    "frontend": 19,
+    "typecheck": "passed",
+    "ruff": "25 files passed"
+  },
+  "daily_plan_left_paused": true,
+  "report": "/home/quant/repos/market-watch-fxcm-mwa-20261025/docs/verification/fxcm/mwa-20261025/README.md",
+  "checklist": "/home/quant/repos/market-watch-fxcm-mwa-20261025/docs/verification/fxcm/manual-acceptance-mwa.md",
+  "committed": false,
+  "production_changed": false
+}

@@ -1,0 +1,215 @@
+{
+  "observed_at_utc": "2026-10-25T12:22:46.401424+00:00",
+  "passed": true,
+  "changed_services": [
+    "api",
+    "chart",
+    "web",
+    "composite-aggregate-worker",
+    "history-worker",
+    "realtime-worker",
+    "chart-aggregation-worker",
+    "pricing-worker",
+    "chart-history-worker",
+    "native-history-worker",
+    "market-stream-worker",
+    "projector",
+    "notify-worker"
+  ],
+  "unchanged_infrastructure": true,
+  "configuration_changes": [
+    "backend helper bind source only"
+  ],
+  "protected_browsers_unchanged": true,
+  "protected_tables": {
+    "chart_workspaces": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "chart_alerts": {
+      "count": 19,
+      "sha256": "9677c4cb1e35697b491d923bfccc89d59006bc447172cd23ec57a73d2841af8c"
+    },
+    "chart_indicator_templates": {
+      "count": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "alembic_version": [
+      "ay52_history_modes"
+    ]
+  },
+  "workspace_preservation": {
+    "unchanged": false,
+    "before": {
+      "count": 17,
+      "sha256": "f2847df532df6b15ebaade0053db02cd981cdeaaaf333deff14d9bd4803b3ad5"
+    },
+    "after": {
+      "count": 17,
+      "sha256": "86a1b2fa639f9f74d5916fb4aebc788d869f4163c58782a07c0af3e1e19418c8"
+    },
+    "note": "Acceptance route initially omitted advanced-charts/native-charts/save; three autosaves changed the active test workspace. Corrected route now blocks it. Known pre-test USDOLLAR FXCM / D1 selection restored via revision-checked API; exact original viewport cannot be certified."
+  },
+  "original_notification_states_unchanged": true,
+  "preferences": {
+    "preferences": {
+      "before": {
+        "count": 137,
+        "sha256": "ea49612bebf2a760312741d77cf8655a2e8c6fe8e977d4d3ad907c9043c67fd1"
+      },
+      "after": {
+        "count": 142,
+        "sha256": "31eca3d03184ceb103a6263b5947f2979d01541b5e00da5822e209d3fb86509f"
+      },
+      "unchanged": false
+    },
+    "advanced_chart_preferences": {
+      "before": {
+        "count": 30,
+        "sha256": "6ec571e1476299cc5a746eb412880edce6e9f001e785f472b819c779758d0e61"
+      },
+      "after": {
+        "count": 30,
+        "sha256": "6ec571e1476299cc5a746eb412880edce6e9f001e785f472b819c779758d0e61"
+      },
+      "unchanged": true
+    }
+  },
+  "services": [
+    {
+      "service": "projector",
+      "container_id": "b2650b48b56f67e3ad9af61c0b2cfb915a23d73ac7881f8bfa385c7e8dde075f",
+      "image": "sha256:cb390cde5ea858642b5c712b6c0e663e784cb1426268511581ef012c8678f8f9",
+      "started": "2026-10-25T12:21:33.287940038Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "458b20388ab451a9ee2025714c45188757a2bc03ad0946f6a635707a303a6dd3"
+    },
+    {
+      "service": "chart-history-worker",
+      "container_id": "24044faff5c8ebc791e4f5169519245d3468d2b188db94d1b0d05e62245cec60",
+      "image": "sha256:cb390cde5ea858642b5c712b6c0e663e784cb1426268511581ef012c8678f8f9",
+      "started": "2026-10-25T12:21:33.272461485Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "209bf40c0e3ed8a6040cbba54ebdd60b6cca99360cf7b7d5a03413b8cab97d6b"
+    },
+    {
+      "service": "composite-aggregate-worker",
+      "container_id": "66b64b56ccb81da1fde99e53e4933bd84535b7720fd04f2def3a3d80a2bda16d",
+      "image": "sha256:cb390cde5ea858642b5c712b6c0e663e784cb1426268511581ef012c8678f8f9",
+      "started": "2026-10-25T12:21:33.273955807Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "3ea701ca4ad00cbcf8d2a9df5f88d56a84c386d430b82110d09562a405c929c5"
+    },
+    {
+      "service": "history-worker",
+      "container_id": "14d944ea959cbe95f1fec1b38ceb96be5edbe9cdc85116508636242f7e5e1a0a",
+      "image": "sha256:cb390cde5ea858642b5c712b6c0e663e784cb1426268511581ef012c8678f8f9",
+      "started": "2026-10-25T12:21:33.259313327Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "18042a04cd5f89c9b7138915f737142d76e242cc780eb0113130fa266f7e76eb"
+    },
+    {
+      "service": "native-history-worker",
+      "container_id": "52ddd3d17b37f97fa05b2b1f7c6d3ce1e7545dc7aaa7104c79284b53795be241",
+      "image": "sha256:cb390cde5ea858642b5c712b6c0e663e784cb1426268511581ef012c8678f8f9",
+      "started": "2026-10-25T12:21:33.286907211Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "2a7841789be54f3f79530854c466c4553e5b4ea56ff74daf4a74c260c4448414"
+    },
+    {
+      "service": "realtime-worker",
+      "container_id": "d97afad692d26464e1148682d2802c99190c2a1b1a1305aa30db4c27c222c1df",
+      "image": "sha256:cb390cde5ea858642b5c712b6c0e663e784cb1426268511581ef012c8678f8f9",
+      "started": "2026-10-25T12:21:33.287484654Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "db06dee62eba7060d8e66a0b68b1d6bd541e44e758fe2866aecb0e690218c786"
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "container_id": "400491ffede3c30d1ea065895127e1ac8f92cdc2961e8e75bd58ce41493cfef1",
+      "image": "sha256:cb390cde5ea858642b5c712b6c0e663e784cb1426268511581ef012c8678f8f9",
+      "started": "2026-10-25T12:21:33.274097066Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "141fabdfb8761ecbda896ad443f9f3c30707faf685c909af80082c510a6eca62"
+    },
+    {
+      "service": "pricing-worker",
+      "container_id": "b2447dff293c4c1d2c99cdddd5814a8947bcaa14ca1a132c49881c574b5f5180",
+      "image": "sha256:cb390cde5ea858642b5c712b6c0e663e784cb1426268511581ef012c8678f8f9",
+      "started": "2026-10-25T12:21:33.296454635Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "0273d29143265b7e72a975c09c7cfc0101a35019dd9419b09d44a1dea1d4872d"
+    },
+    {
+      "service": "notify-worker",
+      "container_id": "ba36e76e4ecb3a8ea89e12f630ab8205fbf404f05786829f85193716df4b6f33",
+      "image": "sha256:cb390cde5ea858642b5c712b6c0e663e784cb1426268511581ef012c8678f8f9",
+      "started": "2026-10-25T12:21:33.276023509Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "7ceaa613c888dc38cc646b8d36611fa833e8c211ea7049b4430c6326fbefaec0"
+    },
+    {
+      "service": "market-stream-worker",
+      "container_id": "4ae4f6e71eff99a33e724edb6f7800e68e33688a29a9c09d3206a1dc3d2cc70a",
+      "image": "sha256:cb390cde5ea858642b5c712b6c0e663e784cb1426268511581ef012c8678f8f9",
+      "started": "2026-10-25T12:21:33.266085741Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "d3c261bde67021a3d4ffcba8237344136df0e997f2755e39ec56e3b204207988"
+    },
+    {
+      "service": "api",
+      "container_id": "23820f3d6601ea77039258f01297c05f5c19dfe89724742dcc44cdb29a947be2",
+      "image": "sha256:cb390cde5ea858642b5c712b6c0e663e784cb1426268511581ef012c8678f8f9",
+      "started": "2026-10-25T12:21:21.435951356Z",
+      "state": "running",
+      "health": "healthy",
+      "configuration_sha256": "18db7a76e9ff010eefb66ba3dfe02bf909b7bc23d4329cf1ca0b0736fff3b2e4"
+    },
+    {
+      "service": "chart",
+      "container_id": "6efaebb44f715e4b7c60eea0c11f8ed6f5d886987fee70f31b07478e7ca8135e",
+      "image": "sha256:eb3b05138177d356538b01af2fda5f189a0e4212a5b6943e9bbecef9cf8c9865",
+      "started": "2026-10-25T12:06:35.096830177Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "553cd70717d87a9fae6f7098d4aff9450890a68bf787ef807b99ce2efcf9253c"
+    },
+    {
+      "service": "web",
+      "container_id": "1916465a9d76eddceb865e730fa0efbf8866827d6f0c900f43f3fdcb542e9ad4",
+      "image": "sha256:27d8a2537b0d401b9807e1e571f304a98b776d86bdcaa7c1c8e23ce4155e5606",
+      "started": "2026-10-25T11:32:15.460438361Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "c07734d470dddf4fe9be6c972fa6e0cb9b12653af9149e924c11bff71476ed0e"
+    },
+    {
+      "service": "gateway",
+      "container_id": "9492f307fdf9bfdbec7641c4e0b3554bed39340bc73a57448fdbd39e34d79ca9",
+      "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "started": "2026-10-19T06:05:49.728822361Z",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "60e8fc28aa17abc9a943a04aa1209a36c87f455ae78b120261462572a9113bfa"
+    },
+    {
+      "service": "postgres",
+      "container_id": "3de49cbde9a20c6640092181c04d35df41677566795cfecae18c0ab284b0aba8",
+      "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "started": "2026-10-18T06:31:25.191805014Z",
+      "state": "running",
+      "health": "healthy",
+      "configuration_sha256": "62769f769d559f78e75c8fdceaf11328cdf5169464f28524cba9f92329e77d3a"
+    }
+  ]
+}

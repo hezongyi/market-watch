@@ -35,7 +35,7 @@ def stamp(value):
 @pytest.fixture
 def adapter(monkeypatch):
     @contextmanager
-    def operation(deadline):
+    def operation(deadline, **kwargs):
         yield None
 
     monkeypatch.setattr(yahoo, "_operation", operation)
@@ -100,6 +100,25 @@ def test_stock_and_etf_adjusted_native_intervals(adapter):
         yahoo.native_page(meta, frame, storage.now_ms() + 1, 1, deadline=time.monotonic() + 2)
     assert [c["interval"] for c in calls] == list(YAHOO_INTERVALS.values())
     assert all(c["auto_adjust"] and not c["repair"] and not c["back_adjust"] for c in calls)
+
+
+def test_managed_archive_reuses_sdk_with_explicit_unadjusted_prices(adapter, monkeypatch):
+    from alerts.history_mode_sources import dataset_identity, source_identity
+
+    data, calls = adapter
+    data.loc[:, ["Open", "High", "Low", "Close"]] = [[10, 12, 9, 11], [11, 13, 10, 12]]
+    monkeypatch.setattr(yahoo, "now_ms", lambda: stamp("2020-04-22T02:00:00Z"))
+    info = {"timezone": "America/New_York", "session": "0930-1600:23456",
+            "volume_kind": "quantity", "volume_unit": "shares"}
+    identity = source_identity(dataset_identity("yahoo", "AAPL", "base_d1", "none"), "D1", info)
+    batch = yahoo.archive_page(identity, stamp("2020-04-20T00:00:00Z"), stamp("2020-04-22T00:00:00Z"))
+    assert len(batch.rows) == 2 and all(row.complete for row in batch.rows)
+    assert batch.rows[-1].end == stamp("2020-04-21T20:00:00Z")
+    assert batch.rows[-1].start == stamp("2020-04-21T00:00:00Z")
+    assert all(not call["auto_adjust"] and not call["back_adjust"] and not call["repair"] for call in calls)
+    data.iloc[0, data.columns.get_loc("Volume")] = -1
+    with pytest.raises(ValueError, match="成交量"):
+        yahoo.archive_page(identity, stamp("2020-04-20T00:00:00Z"), stamp("2020-04-22T00:00:00Z"))
 
 
 def test_local_id_and_scope():
