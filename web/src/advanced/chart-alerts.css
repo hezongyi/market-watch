@@ -861,23 +861,6 @@ html.theme-dark .mw-native-alert-shell {
 .chart-alert-panel {
   position: relative;
 }
-.chart-alert-panel[data-mobile="true"] {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1000;
-}
-.chart-alert-panel[data-mobile="true"] .alert-panel-content {
-  flex-basis: 0;
-}
-.chart-alert-panel[data-mobile="true"] .alert-panel-tabs .alert-mobile-close {
-  margin-left: auto;
-  flex: 0 0 auto;
-}
-.chart-alert-panel[data-mobile="true"] button {
-  min-height: 44px;
-}
 .alert-detail-drawer {
   position: absolute;
   inset: 0;

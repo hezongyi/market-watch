@@ -110,7 +110,7 @@ function nativePreferences(
     return row.content.value;
   };
   function save(kind, name, value, tool = "", recoveryDraft = null) {
-    if (readonly && !durability?.allowSave?.(kind, name, tool, "save")) return Promise.reject(unsaved(Error("手机只读，不保存修改")));
+    if (readonly) return Promise.reject(unsaved(Error("手机只读，不保存修改")));
     const k = key(kind, name, tool);
     if (!recoveryDraft && (resolving.has(k) || resolved.has(k))) return Promise.reject(unsaved(Error("设置草稿正在处理或已处理；重新打开图表后继续修改")));
     if (!recoveryDraft && restored.has(k)) return Promise.reject(unsaved(Error("此设置有尚未处理的本地草稿")));
@@ -198,7 +198,7 @@ function nativePreferences(
     return task;
   }
   function remove(kind, name, tool = "", recoveryDraft = null) {
-    if (readonly && !durability?.allowSave?.(kind, name, tool, "delete")) return Promise.reject(unsaved(Error("手机只读，不保存修改")));
+    if (readonly) return Promise.reject(unsaved(Error("手机只读，不保存修改")));
     const k = key(kind,name,tool);
     if (!recoveryDraft && (resolving.has(k) || resolved.has(k))) return Promise.reject(unsaved(Error("设置草稿正在处理或已处理；重新打开图表后继续修改")));
     if (!recoveryDraft && restored.has(k)) return Promise.reject(unsaved(Error("此设置有尚未处理的本地草稿")));

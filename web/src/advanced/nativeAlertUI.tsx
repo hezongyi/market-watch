@@ -123,7 +123,6 @@ async function attach({
   };
   type State = {
     target: HTMLElement | null;
-    panelOpen: boolean;
     context: AlertContext | null;
     focusEvent?: { id: string; revision: number };
     theme: string;
@@ -136,7 +135,6 @@ async function attach({
   function App() {
     const [state, setState] = useState<State>({
       target,
-      panelOpen: shell.isOpen?.() === true,
       alertUnread: noticeState?.alertUnread,
       context: null,
       theme: "dark",
@@ -149,7 +147,7 @@ async function attach({
       if (!disposed) setState((previous) => ({ ...previous, ...patch }));
     };
     return (
-      <NativeControls.Provider value={readonly ? null : shell.control}>
+      <NativeControls.Provider value={shell.control}>
         <ChartAlertsPanel
           workspaceId={scope.workspace_id}
           context={state.context}
@@ -164,11 +162,11 @@ async function attach({
           request={call}
           activeInstrument={state.instrument}
           nativeDialog={shell.openDialog}
-          mountTarget={readonly ? state.panelOpen && state.target ? state.target.ownerDocument.body : null : state.target}
+          mountTarget={state.target}
           initialDraft={initialDraft}
           persistDraft={persistDraft}
           associationNotices={state.notices}
-          onClose={()=>{if(readonly)update({panelOpen:false});shell.close();}}
+          onClose={shell.close}
           onRequest={() => bridge.create()}
           onRows={(rows) => bridge.setRows(rows)}
           onLocate={(row, event) => bridge.locate(row, event)}
@@ -187,7 +185,6 @@ async function attach({
     const opened = shell.isOpen?.();
     if (opened !== undefined && opened !== lastPanel) {
       lastPanel = opened;
-      if(readonly)update({panelOpen:opened});
       panelChanged?.(opened);
     }
     const reason = bridge.creationReason?.() || "";
@@ -200,8 +197,7 @@ async function attach({
     }
   }, 250);
   return {
-    open: ()=>{if(readonly)update({panelOpen:true});shell.open();},
-    close: ()=>{if(readonly)update({panelOpen:false});shell.close();},
+    open: shell.open,
     movePrice: async (row: AlertRow, price: string, presentation?: PricePresentation) => {
       if (disposed || readonly || row.config.association?.workspace_id !== scope.workspace_id)
         throw Error("告警当前不可编辑");

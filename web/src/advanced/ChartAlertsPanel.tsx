@@ -118,22 +118,15 @@ function ScopedChartAlertsPanel({
   const { zone } = useChartTime();
   const date = (stamp: number) => formatTimestamp(stamp, zone);
   const draftKey = "mw-chart-alert-draft:" + workspaceId;
-  const viewKey = 'mw-mobile-alert-view:v1:' + workspaceId;
-  const [restoredView] = useState<Record<string,any>>(()=>{
-    if (!readonly) return {};
-    try {const value=JSON.parse(sessionStorage.getItem(viewKey) || '{}');return value && typeof value==='object' && !Array.isArray(value) ? value : {};}
-    catch {return {};}
-  });
-  const viewString = (key:string, fallback=''):string => typeof restoredView[key]==='string' ? restoredView[key] : fallback;
   const { rows, events, error, setError, refresh, commit } = useAlertData(
     request,
     onRows,
   );
   useEffect(() => { if (updatedRow) commit(updatedRow); }, [updatedRow, commit]);
-  const [tab, setTab] = useState(viewString('tab','alerts')),
-    [search, setSearch] = useState(viewString('search')),
-    [status, setStatus] = useState(viewString('status')),
-    [currentOnly, setCurrentOnly] = useState(restoredView.currentOnly===true);
+  const [tab, setTab] = useState("alerts"),
+    [search, setSearch] = useState(""),
+    [status, setStatus] = useState(""),
+    [currentOnly, setCurrentOnly] = useState(false);
   const [feedback, setFeedback] = useState(""),
     [busy, setBusy] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false),
@@ -301,30 +294,18 @@ function ScopedChartAlertsPanel({
     });
     setFormOpen(true);
   }
-  const [searchOpen, setSearchOpen] = useState(restoredView.searchOpen===true),
-    [eventSort, setEventSort] = useState(viewString('eventSort','newest')),
-    [sort, setSort] = useState(viewString('sort','created')),
-    [selected, setSelected] = useState<string | null>(viewString('selected') || null);
-  const [detail, setDetail] = useState<string | null>(viewString('detail') || null);
-  const [showHandled, setShowHandled] = useState(restoredView.showHandled===true);
+  const [searchOpen, setSearchOpen] = useState(false),
+    [eventSort, setEventSort] = useState("newest"),
+    [sort, setSort] = useState("created"),
+    [selected, setSelected] = useState<string | null>(null);
+  const [detail, setDetail] = useState<string | null>(null);
+  const [showHandled, setShowHandled] = useState(false);
   const [cleared, setCleared] = useState(new Set<string>());
   const [cleanupError, setCleanupError] = useState("");
   const [cleanup, setCleanup] = useState<AlertEvent[] | null>(null);
   const observed = useRef(new Set<string>());
   const observing = useRef(new Set<string>());
   const contentRef = useRef<HTMLDivElement>(null);
-  const scrollPosition = useRef(Number.isFinite(restoredView.scrollTop) ? restoredView.scrollTop : 0);
-  const restoredScroll = useRef<HTMLElement|null>(null);
-  const persistView = () => {
-    if (!readonly) return;
-    try {sessionStorage.setItem(viewKey,JSON.stringify({tab,search,status,currentOnly,searchOpen,eventSort,sort,selected,detail,showHandled,scrollTop:scrollPosition.current}));}catch{}
-  };
-  useEffect(persistView,[readonly,tab,search,status,currentOnly,searchOpen,eventSort,sort,selected,detail,showHandled]);
-  useEffect(()=>{
-    const node=contentRef.current;
-    if(!readonly || !node || restoredScroll.current===node || (!rows.length && !events.length))return;
-    restoredScroll.current=node;node.scrollTop=scrollPosition.current;
-  },[readonly,mountTarget,rows.length,events.length]);
   const cleanupRunning = useRef(false);
   const [cleaning, setCleaning] = useState(false);
   async function clearEvents(snapshot: AlertEvent[]) {
@@ -594,7 +575,6 @@ function ScopedChartAlertsPanel({
     <aside
       className="chart-alert-panel"
       data-theme={theme}
-      data-mobile={readonly || undefined}
       aria-label="告警与日志"
     >
       <div
@@ -645,7 +625,6 @@ function ScopedChartAlertsPanel({
             )}
           </button>
         ))}
-        {readonly && <button className="alert-mobile-close" aria-label="关闭告警面板" onClick={onClose}>关闭</button>}
       </div>
       <div className="alert-panel-toolbar">
         {tab === "alerts" && (
@@ -831,7 +810,6 @@ function ScopedChartAlertsPanel({
       <div
         id={tab === "alerts" ? "chart-alert-list" : "chart-alert-events"}
         role="tabpanel"
-        onScroll={()=>{scrollPosition.current=contentRef.current?.scrollTop || 0;persistView();}}
         ref={contentRef}
         aria-label={tab === "alerts" ? `${visible.length} 个警报` : "交易日志"}
         className="alert-panel-content"
@@ -905,7 +883,7 @@ function ScopedChartAlertsPanel({
                             ? "恢复"
                             : "重新启用（新一轮）"
                       }
-                      disabled={(readonly && row.status === "completed") || busy === row.id}
+                      disabled={readonly || busy === row.id}
                       onClick={() =>
                         action(
                           row,

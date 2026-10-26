@@ -1,0 +1,132 @@
+{
+  "checked_at": "2026-10-26T00:16:53.330345+00:00",
+  "classification": "F0",
+  "base": "1293f8a4380e544f67448b88691c4296f6ec2e45",
+  "local_checks": [
+    {
+      "command": "node --test tests/alert-price-edit.test.cjs tests/chart-alerts-bridge.test.cjs tests/chart-alert-ui-rpc.test.cjs",
+      "exit_code": 0,
+      "seconds": 0.75,
+      "log": "unit-0.log"
+    },
+    {
+      "command": "node tests/fxcm-request-timeouts.cjs",
+      "exit_code": 0,
+      "seconds": 0.06,
+      "log": "unit-1.log"
+    },
+    {
+      "command": "node tests/fxcm-resolution-fallback.cjs",
+      "exit_code": 0,
+      "seconds": 0.11,
+      "log": "unit-2.log"
+    },
+    {
+      "command": "node tests/native-search-local-cache.cjs",
+      "exit_code": 0,
+      "seconds": 0.19,
+      "log": "unit-3.log"
+    },
+    {
+      "command": "node tests/fxcm-series.cjs",
+      "exit_code": 0,
+      "seconds": 0.12,
+      "log": "unit-4.log"
+    },
+    {
+      "command": "node tests/advanced-preferences.cjs",
+      "exit_code": 0,
+      "seconds": 0.16,
+      "log": "unit-5.log"
+    },
+    {
+      "command": "node tests/advanced-preferences-conflict.cjs",
+      "exit_code": 0,
+      "seconds": 0.07,
+      "log": "unit-6.log"
+    },
+    {
+      "command": "node tests/advanced-watchlists.cjs",
+      "exit_code": 0,
+      "seconds": 0.45,
+      "log": "unit-7.log"
+    },
+    {
+      "command": "node tests/symbol-flags.cjs",
+      "exit_code": 0,
+      "seconds": 0.16,
+      "log": "unit-8.log"
+    },
+    {
+      "command": "npm run build",
+      "exit_code": 0,
+      "seconds": 30.44,
+      "log": "build-0.log"
+    },
+    {
+      "command": "node scripts/build-alert-ui.mjs /home/quant/repos/.reports/market-watch/20261026-remove-abandoned-mobile/alert-ui",
+      "exit_code": 0,
+      "seconds": 0.53,
+      "log": "build-1.log"
+    },
+    {
+      "command": "node tests/alert-price-drag.browser.cjs",
+      "exit_code": 0,
+      "seconds": 3.13,
+      "log": "browser-0.log"
+    },
+    {
+      "command": "node tests/native-alert-price-lines.browser.cjs",
+      "exit_code": 0,
+      "seconds": 1.6,
+      "log": "browser-1.log"
+    },
+    {
+      "command": "node tests/alert-reference-ui.browser.cjs",
+      "exit_code": 0,
+      "seconds": 18.59,
+      "log": "browser-2.log"
+    },
+    {
+      "command": "node tests/alert-editing.browser.cjs",
+      "exit_code": 0,
+      "seconds": 21.78,
+      "log": "browser-3.log"
+    },
+    {
+      "command": "node tests/alert-axis-menu.browser.cjs",
+      "exit_code": 0,
+      "seconds": 5.16,
+      "log": "browser-4.log"
+    }
+  ],
+  "licensed_native_workspace": {
+    "passed": true,
+    "cases": [
+      "Full shipped host opens native dialog through validated parent context; draft resides in parent localStorage",
+      "Native Save As binds a fresh UI session and correctly scoped API; old workspace draft remains available",
+      "Native layout load restores A draft, rejects late B response, retains one renderer and keeps iframe alive",
+      "Version conflict preserves edited input and exposes native-window feedback",
+      "Native Yahoo failure → 3 bounded attempts → chart-scoped feedback/disabled alert → explicit same-symbol recovery → real datafeed bars and D1",
+      "Native H4 source switch migrates unsupported Yahoo interval to H1 and displays bars",
+      "Saved desktop two-chart layout → portrait/landscape read-only single chart with H1/D1 switches and no writes → desktop restores both charts"
+    ],
+    "page_errors": 0,
+    "unexpected_requests": 0,
+    "data": "routed synthetic API and candles; actual licensed widget; no deployed instance writes"
+  },
+  "scope": {
+    "backend_migrations_adapters_unchanged": true,
+    "non_bridge_mobile_paths_restored_to_rc2": 27,
+    "fxcm_bridge_changes_retained": true
+  },
+  "docker_r1": {
+    "available_disk_gib": 11.68,
+    "required_disk_gib": 23,
+    "docker_acceptance_started": false,
+    "reason": "Disk below repository R1 preview startup threshold"
+  },
+  "remote_ci_run": false,
+  "merged_to_integration": false,
+  "rc4_created_or_pushed": false
+}

@@ -113,7 +113,7 @@ function history(q) {
         (globalThis.__messages ||= []).push(e.data);
     }),
   );
-  await page.route(APP + "/**", async (route) => {
+  const routeApp = async (route) => {
     const req = route.request(),
       url = new URL(req.url()),
       body = req.method() === "POST" ? req.postDataJSON() : undefined;
@@ -186,6 +186,8 @@ function history(q) {
       return reply({ ...row, content: JSON.stringify(row.document.state) });
     }
     if (url.pathname === "/api/advanced-charts/catalog") return reply({});
+    if (url.pathname === "/api/market-data/series/page")
+      return reply({ items: [], next_cursor: null });
     if (url.pathname === "/api/advanced-charts/preferences") return reply([]);
     if (url.pathname === "/api/advanced-charts/preferences/migrate")
       return reply({ ok: true });
@@ -304,8 +306,8 @@ function history(q) {
     }
     unexpected.push(url.pathname);
     return reply({ detail: "Unexpected fixture path " + url.pathname }, 404);
-  });
-  await page.route(CHART + "/**", async (route) => {
+  };
+  const routeChart = async (route) => {
     const url = new URL(route.request().url());
     if (url.pathname === "/")
       return route.fulfill({
@@ -336,7 +338,9 @@ function history(q) {
           ? { contentType: "text/css" }
           : {}),
     });
-  });
+  };
+  await page.route(APP + "/**", routeApp);
+  await page.route(CHART + "/**", routeChart);
   try {
     await page.goto(APP + "/");
     const iframe = page.locator('iframe[title="专业图表工作区"]');
@@ -371,7 +375,7 @@ function history(q) {
     await dialog.getByRole("button", { name: "消息", exact: true }).click();
     await dialog.getByLabel("警报名称").fill("工作区 A 的草稿");
     await dialog.getByRole("button", { name: "应用到草稿" }).click();
-    await dialog.getByRole("button", { name: "取消（保留草稿）" }).click();
+    await dialog.getByRole("button", { name: "取消", exact: true }).click();
     await dialog.waitFor({ state: "detached" });
     await page.waitForFunction(
       () =>
@@ -401,7 +405,7 @@ function history(q) {
       .click();
     await dialog.waitFor();
     await dialog.getByLabel("比较值", { exact: true }).fill("1.13");
-    await dialog.getByRole("button", { name: "创建告警", exact: true }).click();
+    await dialog.getByRole("button", { name: "创建", exact: true }).click();
     await dialog.waitFor({ state: "detached" });
     assert.equal(rows[0].config.association.workspace_id, bId);
     report.cases.push(
@@ -442,7 +446,7 @@ function history(q) {
       "工作区 A 的草稿",
     );
     await page.keyboard.press("Escape");
-    await dialog.getByRole("button", { name: "创建告警", exact: true }).click();
+    await dialog.getByRole("button", { name: "创建", exact: true }).click();
     await dialog.waitFor({ state: "detached" });
     assert.equal(rows[1].config.association.workspace_id, a.id);
     assert.equal(
@@ -461,14 +465,14 @@ function history(q) {
       .click();
     await dialog.waitFor();
     await dialog.getByLabel("比较值", { exact: true }).fill("1.14");
-    await dialog.getByRole("button", { name: "保存新版本" }).click();
+    await dialog.getByRole("button", { name: "保存", exact: true }).click();
     await dialog.getByRole("alert").filter({ hasText: "版本冲突" }).waitFor();
     assert.equal(
       await dialog.getByLabel("比较值", { exact: true }).inputValue(),
       "1.14",
     );
     await page.screenshot({ path: path.join(output, "conflict.png") });
-    await dialog.getByRole("button", { name: "取消（保留草稿）" }).click();
+    await dialog.getByRole("button", { name: "取消", exact: true }).click();
     report.cases.push(
       "Version conflict preserves edited input and exposes native-window feedback",
     );
@@ -504,6 +508,64 @@ function history(q) {
     await expect.poll(()=>requests.some(r=>r.path==='/api/charts/stream/subscribe' && r.body.query?.instrument==='YAHOO:'+'b'.repeat(32) && r.body.query.timeframe==='H1' && r.body.history_accepted),{timeout:30000,message:'native Yahoo H4 fallback accepts H1 history'}).toBe(true);
     report.cases.push('Native H4 source switch migrates unsupported Yahoo interval to H1 and displays bars');
     await page.screenshot({ path: path.join(output, "workspace.png") });
+
+    // The removed mobile workspace must leave the existing read-only viewer
+    // intact. Use a saved desktop layout and the real shipped parent/host;
+    // all business data and writes here belong to this isolated route fixture.
+    await host.evaluate(() => widget.setLayout("2h"));
+    await host.waitForFunction(() => !loading && widget.chartsCount() === 2 &&
+      Array.from({ length: 2 }, (_, i) => widget.chart(i).dataReady()).every(Boolean));
+    const desktopState = await host.evaluate(() => captureWorkspaceState());
+    a.document.state = desktopState;
+    const savedBefore = JSON.stringify(workspaces);
+    const mobileRequestStart = requests.length;
+    const mobileContext = await browser.newContext({
+      viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true,
+    });
+    try {
+      const mobile = await mobileContext.newPage();
+      mobile.on("pageerror", (e) => errors.push(e.stack || String(e)));
+      await mobile.route(APP + "/**", routeApp);
+      await mobile.route(CHART + "/**", routeChart);
+      // An unsaved desktop draft must not be restored or overwritten by mobile.
+      await mobile.addInitScript(() => localStorage.setItem(
+        "mw-tv-draft:workspace-a", "preserve-desktop-draft"));
+      for (const viewport of [{ width: 390, height: 844 }, { width: 915, height: 412 }]) {
+        await mobile.setViewportSize(viewport);
+        await mobile.goto(APP + "/");
+        await expect(mobile.getByRole("note")).toContainText("手机只读看盘");
+        await mobile.locator('iframe[title="专业图表工作区"]').waitFor();
+        const mobileHost = mobile.frames().find((f) => f.url().startsWith(CHART + "/"));
+        assert.ok(mobileHost);
+        await mobileHost.waitForFunction(() => typeof ready !== "undefined" && ready && !loading &&
+          widget.chartsCount() === 1 && widget.activeChart().dataReady(), null, { timeout: 60000 });
+        assert.equal(await mobile.locator(".mobile-bottom-nav,.mobile-chart-save").count(), 0);
+        await mobileHost.evaluate(() => widget.activeChart().setResolution("1D"));
+        await mobileHost.waitForFunction(() => widget.activeChart().resolution() === "1D" &&
+          widget.activeChart().dataReady());
+        await mobileHost.evaluate(() => widget.activeChart().setResolution("60"));
+        await mobileHost.waitForFunction(() => widget.activeChart().resolution() === "60" &&
+          widget.activeChart().dataReady());
+        await mobile.screenshot({ path: path.join(output, `readonly-${viewport.width}.png`) });
+        assert.equal(await mobile.evaluate(() => localStorage.getItem("mw-tv-draft:workspace-a")),
+          "preserve-desktop-draft");
+        assert.equal(JSON.stringify(workspaces), savedBefore, "mobile preserves desktop documents and revisions");
+      }
+      const writes = requests.slice(mobileRequestStart).filter((r) => r.body && (
+        r.path === "/api/advanced-charts/native-charts/save" ||
+        r.path.startsWith("/api/advanced-charts/preferences/") ||
+        r.path.startsWith("/api/chart-alerts/") && !r.path.endsWith("/capabilities") ||
+        r.path === "/api/chart-alerts"));
+      assert.deepEqual(writes, [], "mobile viewing and period switches do not write settings, layouts, or alerts");
+    } finally {
+      await mobileContext.close();
+    }
+    await page.reload();
+    await iframe.waitFor();
+    const restoredHost = page.frames().find((f) => f.url().startsWith(CHART + "/"));
+    await restoredHost.waitForFunction(() => typeof ready !== "undefined" && ready && !loading && widget.chartsCount() === 2 &&
+      Array.from({ length: 2 }, (_, i) => widget.chart(i).dataReady()).every(Boolean), null, { timeout: 60000 });
+    report.cases.push("Saved desktop two-chart layout → portrait/landscape read-only single chart with H1/D1 switches and no writes → desktop restores both charts");
     assert.deepEqual(errors, []);
     assert.deepEqual(unexpected, []);
     assert.ok(
