@@ -35,7 +35,7 @@
     "network_or_database_access": false
   },
   "full_backend_suite_rerun": false,
-  "mwa_updated": false,
+  "mwa_updated": true,
   "push": false,
   "pr_created": false,
   "production_release": false,
@@ -67,7 +67,7 @@
   },
   "docker_oracle_result": "frozen-oracle-image.json",
   "source_fix_passed": true,
-  "mwa_acceptance": "awaiting_user_reply_to_pre_acceptance_request",
+  "mwa_acceptance": "closed_by_user_with_browser_acceptance_blocked",
   "review": {
     "risk": "F0",
     "self_review_passed": true,
@@ -75,5 +75,26 @@
     "existing_tests_modified": false,
     "schema_changes": false,
     "all_existing_gap_and_incomplete_assertions_retained": true
-  }
+  },
+  "closed_by_user": true,
+  "user_decision": "直接收口了",
+  "browser_acceptance_passed": false,
+  "mwa_deployment": {
+    "host": "quant-server",
+    "project": "mw-issue75-v2-20261018",
+    "api_only": true,
+    "image": "sha256:da302a85235d426d62f4f34bfcd209baf8376f80e545bf3950daf4d27232d9df",
+    "runtime_modules_match": 181,
+    "protected_audit_passed": true,
+    "audit_baseline_scope": "RRS task only; earlier equity differences retained",
+    "api_url": "https://test.kookvv.com:8443",
+    "chart_origin": "https://chart-test.kookvv.com:8443"
+  },
+  "acceptance_limitations": [
+    "Three browser attempts failed before RRS creation; latest OANDA history connection failed and historical navigation did not complete",
+    "D1/H1/H4 live drawings and browser pagination not verified",
+    "Full backend suite not rerun",
+    "Earlier equity workspace/preference differences remain unassigned"
+  ],
+  "closed_at_utc": "2026-10-26T02:41:15.947210+00:00"
 }

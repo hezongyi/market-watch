@@ -1,0 +1,34 @@
+{
+  "started_at": "2026-10-26T02:34:13.136Z",
+  "passed": false,
+  "errors": [],
+  "http_errors": [],
+  "cases": [],
+  "stage": "EURUSD-historical-range",
+  "blockedWrites": [
+    {
+      "path": "/api/advanced-charts/preferences/migrate",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    }
+  ],
+  "initial": {
+    "symbol": "MWP:BTCUSDT",
+    "resolution": "1"
+  },
+  "failure": "Error: frame.evaluate: Error: Rejected by timeout\n    at https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/library.e2f8b3a016c9e1a0b7a5.js:779:808",
+  "stack": "frame.evaluate: Error: Rejected by timeout\n    at https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/library.e2f8b3a016c9e1a0b7a5.js:779:808\n    at /home/quant/repos/market-watch-rrs-sparse-fix-20261026/web/tests/rrs-native-history.acceptance.cjs:85:14",
+  "finished_at": "2026-10-26T02:34:42.426Z",
+  "verdict_scope": "Failed before RRS study creation; no RRS chart assertions ran"
+}

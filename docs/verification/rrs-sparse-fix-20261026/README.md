@@ -1,6 +1,6 @@
 # RRS原生稀疏历史修复
 
-修复已通过本地162项相关回归；当前mwa未更新。本次为独立补丁，风险F0，无schema、持久格式或worker链路变化；本次执行结果以summary.json和本文末尾Docker记录为准。
+修复已通过本地162项相关回归，已按用户授权更新mwa API；用户随后要求“直接收口了”。本轮按修复与部署完成交付，真实图表验收因OANDA连接失败未完成，不记为通过。本次为独立补丁，风险F0，无schema、持久格式或worker链路变化；本次执行结果以summary.json和本文末尾Docker记录为准。
 
 ## 根因与修复
 
@@ -31,7 +31,7 @@ PYTHONPATH=backend:backend/tests /home/quant/repos/market-watch-history-modes-in
 - 独立工作树/home/quant/repos/market-watch-rrs-sparse-fix-20261026，分支fix/rrs-sparse-history-20261026，基线53fb056a。
 - 产品提交4325e69d；此前接入交付分支未改动。精确运行文件摘要见 [summary.json](summary.json)。
 - 本机Ubuntu quant-server，任务/项目mw-rrs-sparse-fix-20261026。磁盘余量低于完整preview启动门槛，采用无网络、无数据库、无持久卷的有界短时Docker计算smoke；不新开完整实例、不操作其他任务数据库。
-- 本次未更新长期mwa。现有入口仍为https://test.kookvv.com:8443，原数据、配置和浏览器现场保持。既有工作区/偏好未归因差异属于前轮留证，不在本轮改写或恢复。
+- 本次仅更新长期mwa API，其余14服务保持原容器。入口https://test.kookvv.com:8443，图表https://chart-test.kookvv.com:8443；原数据、配置和浏览器现场保持。既有工作区/偏好未归因差异属于前轮留证，不在本轮改写或恢复。
 - 无PR、外部Issue、推送、main合并或生产发布。
 
 
@@ -41,4 +41,29 @@ PYTHONPATH=backend:backend/tests /home/quant/repos/market-watch-history-modes-in
 
 在Ubuntu运行单个短时容器，network=none、只读rootfs、384MiB/1CPU、无数据库和持久卷；仅只读挂载冻结快照和oracle验证器。1957根真实日线复算与本机结果完全一致，误差0，1696个有效阈值、81框、49标签，翻页一致。见 [镜像内结果](frozen-oracle-image.json)。容器以--rm结束，没有留下运行中的新服务；此结果不代表HTTP/浏览器或mwa更新验收。
 
-候选代码修复完成。按用户此前验收前申请的要求，已询问是否将该独立补丁更新到mwa做实图验收；未获得该次回复前不替换长期实例。162项定向回归和有界Docker计算smoke均通过，没有为本次补丁重复运行全量后端或创建完整preview。
+上段离线smoke发生于mwa更新前，docker-smoke.json内mwa_updated:false仅描述当时状态；随后用户明确授权“更新 mwa 并验收”，实际部署及结果如下。
+
+
+## mwa更新与用户收口决定
+
+已在Ubuntu quant-server的既有Compose project `mw-issue75-v2-20261018`替换API，运行镜像为上述r1，构建源码4325e69d且dirty=false。API内181个Python模块与候选源码一致，15服务运行、API/PG健康。10个worker保留r12 `sha256:3b6e18e3aadb83cec807532d804b2e4555cc05f3644facc6204f8f0e3566edb5`；Chart/Web及其他基础设施未替换。原生history任务的最终结果在API重新读取并计算，故本轮不为历史采集扩大worker更新范围。
+
+更新前快照见[mwa-before.json](mwa-before.json)，最终保护检查见[mwa-audit.json](mwa-audit.json)：本次更新前所有被监测的工作区、偏好、告警、模板及通知原行无变更或删除，配置/schema/受保护浏览器保持。此审计以新RRS任务操作前为基线，不改写前轮股票接入任务1工作区、3偏好的未知归因差异。两个既有长期manager仅同步API镜像字段，见[manager-sync.json](manager-sync.json)；原始rollback与私有备份保留。
+
+真实浏览器使用临时context、可信HTTPS，阻止保存用户工作区及偏好，市场行情请求没有mock。三次尝试均未到达RRS指标创建/绘图断言：第一次EURUSD D1最新数据加载超时，第二次历史区间导航超时，第三次历史timeframe未能完成加载。原生worker日志显示OANDA的代理TLS连接出现ConnectError/ConnectTimeout，三次采集均无页面推进，最终HISTORY_TIMEOUT；另一次无凭据的连通探针中，既有代理与直连均ConnectError。没有修改代理或重试策略。失败报告及截图保留于browser-attempt1/、browser-attempt2/、browser-attempt3/，原始抓取与日志仅私有保留。
+
+库内已有EURUSD D1/H1/H4历史，但浏览器初始最新需求未完成，正常历史导航也未完成。不能把缓存存在、离线复算通过、HTTP成功或进程健康记为实际图表验收通过。本轮D1/H1/H4框和标签、真实图表分页仍未验收；162项定向回归和冻结真实1957根日线复算结果保持。未执行本轮完整后端套件。
+
+用户了解进度与连接阻塞后要求“直接收口了”，据此停止补验，按“修复与部署完成、实时浏览器验收受阻”的边界交付。OANDA连接问题保留为独立后续事项，不继续扩大本轮范围。没有推送、PR、main合并或生产发布；长期实例、真实数据、配置和保护浏览器继续保留。
+
+管理命令（每次选择一个）：
+
+```bash
+python3 /home/quant/repos/.rrs-sparse-fix-20261026/operate.py status
+python3 /home/quant/repos/.rrs-sparse-fix-20261026/operate.py start
+python3 /home/quant/repos/.rrs-sparse-fix-20261026/operate.py stop
+```
+
+start/stop只作用于API；status查看原project。不要运行prepare/update重复覆盖候选。当前API精确回退配置私有保留在`/home/quant/repos/.rrs-sparse-fix-20261026/rollback-compose.json`，本轮未执行回退、迁移、seed、恢复、清库或资源删除。
+
+任务退役清单只读查询返回“Exact project has no containers”：有界smoke已自行退出，未执行--apply；候选镜像正被长期mwa引用，不删除镜像或任何长期资源。见[退役盘点](retirement-inventory.json)。

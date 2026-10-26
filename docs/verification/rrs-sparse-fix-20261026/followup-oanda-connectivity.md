@@ -1,0 +1,7 @@
+# OANDA连接后续记录
+
+本轮RRS补丁已部署；用户要求直接收口，不继续扩大排查。mwa原生历史worker的EURUSD D1请求在代理TLS连接阶段ConnectError/ConnectTimeout，无采集页推进，最终HISTORY_TIMEOUT。无凭据的HTTPS连接探针中现有代理与直连均ConnectError，不能进一步断言服务端限制、代理路由或上游故障中的具体原因。
+
+三次浏览器尝试均未到达RRS创建和绘图断言，正常历史区间导航也未完成。本轮无代理/认证配置修改，不以重试、伪数据或绕过契约取得绿色。后续如用户要求继续，应先核对OANDA实际连接与正常最新历史加载，再补验EURUSD D1、H1/H4框和标签及日线翻页。参考本目录browser-attempt1/至browser-attempt3/。
+
+162项回归和冻结真实日线oracle验证通过只证明本次计算修复，不替代上述浏览器验收。
