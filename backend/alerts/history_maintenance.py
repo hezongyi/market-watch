@@ -268,18 +268,26 @@ def finish_run(db, version_id):
             requested -= missing
     published = set(db.scalars(select(HistoryArtifact.timeframe).where(
         HistoryArtifact.version_id == version_id, HistoryArtifact.status == "published")))
+    unavailable = set(db.scalars(select(HistoryArtifact.timeframe).where(
+        HistoryArtifact.version_id == version_id, HistoryArtifact.status == "unavailable")))
+    requested -= unavailable
     if not requested <= published:
         return False
     run.completed_at = now_ms()
     plan = db.get(DatasetMaintenance, version.dataset_id)
     if plan.active_version_id == version_id:
         plan.active_version_id = None
-        plan.last_success, plan.updated_at = run.completed_at, now_ms()
+        if not unavailable:
+            plan.last_success = run.completed_at
+        plan.updated_at = now_ms()
     return True
 
 
 def task_status(db, version):
     run = db.get(HistoryRun, version.id)
+    if version.status == "published" and db.scalar(select(HistoryArtifact.id).where(
+            HistoryArtifact.version_id == version.id, HistoryArtifact.status == "unavailable").limit(1)):
+        return "partial"
     if version.status != "published" or not run or run.completed_at is not None:
         return "partial" if version.status == "published" and version.manifest.get("result") == "partial" else version.status
     return "deriving" if run.desired_state == "running" else run.desired_state

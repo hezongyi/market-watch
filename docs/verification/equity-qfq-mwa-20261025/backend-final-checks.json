@@ -1,0 +1,61 @@
+{
+  "at": "2026-10-26T00:56:52.058129+00:00",
+  "full_suite_clean": false,
+  "full_run": {
+    "passed": 3120,
+    "failed": 20,
+    "skipped": 3,
+    "warnings": 75,
+    "seconds": 3655.08,
+    "scope": "The original full run retained the source and tests loaded before later fixes; not a final-r12 full run",
+    "evidence": "backend-ci-final.log"
+  },
+  "failed_nodes_recheck": {
+    "passed": 16,
+    "failed": 8,
+    "warnings": 7,
+    "seconds": 35.79,
+    "original_failures_resolved": 12,
+    "new_native_load_regressions_passed": 4,
+    "evidence": "failed-nodes-current.log"
+  },
+  "baseline_comparison": {
+    "commit": "ba5407b218c0d5ffb5b946cb83bba4af67f3965e",
+    "same_environment_and_isolated_postgres": true,
+    "failed": 8,
+    "seconds": 8.28,
+    "exact_failed_node_equality": true,
+    "evidence": "known-failures-baseline.log"
+  },
+  "remaining_baseline_failures": [
+    "backend/tests/test_provider_squeeze_history.py::test_native_squeeze_keeps_default_lookback_across_absent_periods[H1]",
+    "backend/tests/test_provider_squeeze_history.py::test_native_squeeze_keeps_default_lookback_across_absent_periods[H4]",
+    "backend/tests/test_provider_squeeze_history.py::test_native_squeeze_keeps_default_lookback_across_absent_periods[D1]",
+    "backend/tests/test_provider_squeeze_history.py::test_native_squeeze_still_resets_on_explicit_invalid_input[invalid0]",
+    "backend/tests/test_provider_squeeze_history.py::test_native_squeeze_still_resets_on_explicit_invalid_input[invalid1]",
+    "backend/tests/test_series_search_pagination.py::test_provider_pages_reach_full_directory_and_mixed_kind_fairness",
+    "backend/tests/test_series_search_pagination.py::test_all_cursor_covers_each_kind_filters_before_paging_and_rejects_changed_query",
+    "backend/tests/test_series_search_pagination_postgres.py::test_all_kind_cursor_and_asset_filter"
+  ],
+  "scope_regressions_resolved": true,
+  "new_fix_checks": [
+    {
+      "evidence": "native-busy-green.log",
+      "passed": 141
+    },
+    {
+      "evidence": "native-busy-pg.log",
+      "passed": 1
+    },
+    {
+      "evidence": "metadata-query-green.log",
+      "passed": 34
+    },
+    {
+      "evidence": "source-migration-green.log",
+      "passed": 1
+    }
+  ],
+  "note": "No xfail, skip or weakened query budget added to hide these failures; old full run preserved. Baseline squeeze gap behavior and outdated catalog mocks remain outside this stock-source change.",
+  "public_log_normalization": "Credential URLs redacted when present and trailing whitespace removed; exact private originals retained; failures and results unchanged"
+}

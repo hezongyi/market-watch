@@ -1,0 +1,242 @@
+{
+  "started_at": "2026-10-26T00:16:57.434Z",
+  "base": "https://test.kookvv.com:8443",
+  "passed": false,
+  "scope": "Deployed real API and native UI; no intercepted data, no source price repair; preserves all created data",
+  "checks": [],
+  "cases": [
+    {
+      "name": "sina-a",
+      "rendered": {
+        "symbol": "MWP:AKSHARE:90D538524B028B1708C53834C49BD624",
+        "ready": true,
+        "range": {
+          "from": 1773705600,
+          "to": 1793548800
+        }
+      },
+      "ui": "Tradingview是交互式的，并且具有与屏幕阅读器一起使用的命令。以下是可用于在平台上交互的键盘命令列表\n\n开始使用键盘导航模式。按Alt + Z\n快速搜索。按Ctrl + K\n更改商品。开始输入商品名称\n更改时间周期。按数字或逗号\n指标、指标和策略。按斜线\n开放式布局。按下句号\nSZSE:000001\n1分\n5分\n15分\n30分\n1小时\n4小时\n天\n周\n月\n指标\n数据中心\n历史模式验收 2026-10-26T00:16:57.434Z\n保存\n99+\nSZSE:000001 · 平台行情 · 新浪前复权 · 来源量\n1天\nSZSE\n开=\n11.27\n高=\n11.35\n低=\n11.17\n收=\n11.20\n-0.10 (−0.88%)\n00:17:35 UTC\nlog\n自动\n自选表\n商品\n最新价\n涨跌\n涨跌%\nBTCUSDT\nEURUSD\nXAUUSD\nCOMPOSITE\nAKSHARE:90D538524B028B1708C53834C49BD624\n账户管理器",
+      "passed": true
+    },
+    {
+      "name": "sina-hk",
+      "rendered": {
+        "symbol": "MWP:AKSHARE:430FEA2075D156A988CC93ABDA28CB5E",
+        "ready": true,
+        "range": {
+          "from": 1773964800,
+          "to": 1793548800
+        }
+      },
+      "ui": "Tradingview是交互式的，并且具有与屏幕阅读器一起使用的命令。以下是可用于在平台上交互的键盘命令列表\n\n开始使用键盘导航模式。按Alt + Z\n快速搜索。按Ctrl + K\n更改商品。开始输入商品名称\n更改时间周期。按数字或逗号\n指标、指标和策略。按斜线\n开放式布局。按下句号\nHKEX:00700\n1分\n5分\n15分\n30分\n1小时\n4小时\n天\n周\n月\n指标\n数据中心\n历史模式验收 2026-10-26T00:16:57.434Z\n保存\n99+\nHKEX:00700 · 平台行情 · 新浪前复权 · 来源量\n1天\nHKEX\n开=\n381.80\n高=\n388.80\n低=\n378.00\n收=\n386.00\n+3.60 (+0.94%)\n00:18:27 UTC\nlog\n自动\n自选表\n商品\n最新价\n涨跌\n涨跌%\nBTCUSDT\n80,054.01\n−100.08\n−0.12%\nEURUSD\n1.12215\nGBPUSD\n1.33690\nXAUUSD\n3,995.205\nUSDCAD\n1.40457\n0.00001\n0.00%\nCOMPOSITE\nEURUSD\n1.12026\n0.00000\n0.00%\nUSDCAD\n1.40037\n0.00000\n0.00%\nXAUUSD\n3,995.205\n0.000\n0.00%\nAKSHARE:430FEA2075D156A988CC93ABDA28CB5E\n开市\n账户管理器",
+      "passed": true
+    }
+  ],
+  "errors": [
+    "frame.waitForFunction: Timeout 90000ms exceeded."
+  ],
+  "console": [
+    "Failed to load resource: the server responded with a status of 500 ()",
+    "Failed to load resource: the server responded with a status of 500 ()",
+    "Failed to load resource: net::ERR_HTTP2_PROTOCOL_ERROR",
+    "Failed to load resource: the server responded with a status of 500 ()",
+    "Failed to load resource: the server responded with a status of 500 ()",
+    "Failed to load resource: the server responded with a status of 500 ()"
+  ],
+  "network_errors": [
+    {
+      "status": 500,
+      "path": "/api/market-data/series/page"
+    },
+    {
+      "status": 500,
+      "path": "/api/market-data/quotes"
+    },
+    {
+      "status": 500,
+      "path": "/api/charts/history-loads/28479ddf-d222-4e75-b85c-4f6f370dde40/result"
+    },
+    {
+      "status": 500,
+      "path": "/api/signals/pending-count"
+    },
+    {
+      "status": 500,
+      "path": "/api/chart-alerts/events"
+    }
+  ],
+  "data_requests": [
+    {
+      "at": 1792973830077,
+      "phase": "start"
+    },
+    {
+      "at": 1792973832400,
+      "phase": "end",
+      "status": 200
+    },
+    {
+      "at": 1792973842129,
+      "phase": "end",
+      "status": 200
+    },
+    {
+      "at": 1792973880596,
+      "phase": "start"
+    },
+    {
+      "at": 1792973899492,
+      "phase": "end",
+      "status": 200
+    },
+    {
+      "at": 1792973906917,
+      "phase": "end",
+      "status": 200
+    },
+    {
+      "at": 1792973909220,
+      "phase": "end",
+      "status": 200
+    },
+    {
+      "at": 1792973919749,
+      "phase": "start"
+    },
+    {
+      "at": 1792973922708,
+      "phase": "end",
+      "status": 200
+    },
+    {
+      "at": 1792973923984,
+      "phase": "end",
+      "status": 200
+    },
+    {
+      "at": 1792973925226,
+      "phase": "end",
+      "status": 200
+    },
+    {
+      "at": 1792973940676,
+      "phase": "end",
+      "status": 500
+    }
+  ],
+  "failed_requests": [
+    {
+      "at": 1792973847034,
+      "path": "/api/charts/history-loads/dbb9a023-db8b-4bb1-ab95-3b14fe5035f6/cancel",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792973850758,
+      "path": "/api/notification-center/events",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792973865406,
+      "path": "/api/market-data/quotes",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792973867551,
+      "path": "/api/notification-center/events",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792973878058,
+      "path": "/api/notification-center/events",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792973880115,
+      "path": "/api/notification-center/observations",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792973880615,
+      "path": "/api/market-data/quotes",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792973908685,
+      "path": "/api/notification-center/events",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792973910750,
+      "path": "/api/notification-center/observations",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792973912101,
+      "path": "/api/market-data/quotes",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792973914223,
+      "path": "/api/charts/history-loads/ce4f0ce2-d827-4951-b1ca-26733c493c5f/cancel",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792973924550,
+      "path": "/api/notification-center/observations",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792973940193,
+      "path": "/api/charts/stream/events",
+      "reason": "net::ERR_HTTP2_PROTOCOL_ERROR"
+    },
+    {
+      "at": 1792973945672,
+      "path": "/api/charts/history-loads/28479ddf-d222-4e75-b85c-4f6f370dde40/cancel",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792973959116,
+      "path": "/api/notification-center/events",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792973961151,
+      "path": "/api/notification-center/observations",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792973970051,
+      "path": "/api/market-data/quotes",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792973971714,
+      "path": "/api/notification-center/observations",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792973985123,
+      "path": "/api/notification-center/observations",
+      "reason": "net::ERR_ABORTED"
+    }
+  ],
+  "blocked_writes": [
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/migrate"
+    },
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/save"
+    }
+  ],
+  "workspace_id": "6b30a6a5-de70-44c0-a1d2-8f8a8f24bca4",
+  "failure_state": {
+    "symbol": "MWP:TENCENT:SZSE:000001",
+    "resolution": "1D",
+    "ready": false
+  },
+  "failure_ui": "Tradingview是交互式的，并且具有与屏幕阅读器一起使用的命令。以下是可用于在平台上交互的键盘命令列表\n\n开始使用键盘导航模式。按Alt + Z\n快速搜索。按Ctrl + K\n更改商品。开始输入商品名称\n更改时间周期。按数字或逗号\n指标、指标和策略。按斜线\n开放式布局。按下句号\nSZSE:000001\n1分\n5分\n15分\n30分\n1小时\n4小时\n天\n周\n月\n指标\n数据中心\n历史模式验收 2026-10-26T00:16:57.434Z\n保存\n99+\nSZSE:000001 · 平台行情 · 腾讯前复权 · 来源量\n1天\nSZSE\n开=\n∅\n高=\n∅\n低=\n∅\n收=\n∅\n∅ (∅%)\n00:19:57 UTC\nlog\n自动\n自选表\n商品\n最新价\n涨跌\n涨跌%\nBTCUSDT\n80,114.00\n−40.09\n−0.05%\nEURUSD\n1.12215\nGBPUSD\n1.33690\nXAUUSD\n3,995.205\nUSDCAD\n1.40457\n0.00001\n0.00%\nCOMPOSITE\nEURUSD\n1.12026\n0.00000\n0.00%\nUSDCAD\n1.40037\n0.00000\n0.00%\nXAUUSD\n3,995.205\n0.000\n0.00%\nTENCENT:SZSE:000001\n开市\n账户管理器",
+  "finished_at": "2026-10-26T00:19:59.813Z"
+}

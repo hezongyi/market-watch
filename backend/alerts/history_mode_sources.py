@@ -16,6 +16,10 @@ def dataset_identity(source, symbol, mode, adjustment):
 
         info = symbol_rules(symbol)
         family, rule = info["source_family"], info["trading_date_rule"]
+        if info["source_family"] == "eastmoney-a":
+            # Managed A/H equity archives have an explicit Sina identity.
+            # Legacy platform and EastMoney datasets keep their old identity.
+            family = "sina-a"
         if adjustment not in ("none", "qfq", "hfq"):
             raise ValueError("AKShare 不支持此价格口径")
     else:

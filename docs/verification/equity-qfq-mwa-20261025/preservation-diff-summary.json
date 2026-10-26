@@ -1,0 +1,80 @@
+{
+  "strict_preservation_passed": false,
+  "attribution": "unconfirmed; no user answer yet",
+  "action": "preserve current state, no restoration/reset or baseline exemption",
+  "changed_original_rows": [
+    {
+      "table": "advanced_chart_workspaces",
+      "id": "900b8bef-aab3-4a10-a6f5-dd09f7a71310",
+      "name": "历史模式验收 2026-10-25T00:29:05.982Z",
+      "kind": null,
+      "previous_revision": 16,
+      "current_revision": 17,
+      "previous_updated_at": 1792930844569,
+      "current_updated_at": 1792936571398,
+      "changed_paths": [
+        ".document.state._mwDrawingProjection.charts.0.symbol",
+        ".document.state._mwViewports.0.offset",
+        ".document.state._mwViewports.0.range.from",
+        ".document.state._mwViewports.0.range.to",
+        ".document.state._mwViewports.0.spacing",
+        ".document.state._mwViewports.0.symbol",
+        ".document.state._mwViewports.0.width",
+        ".document.state.charts.0.panes.0.rightAxisesState.0.state.logFormula.coordOffset",
+        ".document.state.charts.0.panes.0.rightAxisesState.0.state.logFormula.logicalOffset",
+        ".document.state.charts.0.panes.0.sources.0.formattingDeps.pricescale",
+        ".document.state.charts.0.panes.0.sources.0.state.shortName",
+        ".document.state.charts.0.panes.0.sources.0.state.symbol",
+        ".document.state.charts.0.timeScale.m_barSpacing",
+        ".document.symbol",
+        ".revision",
+        ".updated_at"
+      ]
+    },
+    {
+      "table": "advanced_chart_preferences",
+      "id": "595de8fb51d52acbd483cd8eb6062230bca63f3796470a1c7483d24323366163",
+      "name": "savedwatch.ZGh4PktlATaS",
+      "kind": "setting",
+      "previous_revision": 25,
+      "current_revision": 26,
+      "previous_updated_at": 1792922168182,
+      "current_updated_at": 1792937971500,
+      "changed_paths": [
+        ".content.value",
+        ".revision",
+        ".updated_at"
+      ]
+    },
+    {
+      "table": "advanced_chart_preferences",
+      "id": "7360a983eb95135f162008f2fb5cbc0e41a75e6f3d1420f22bc97fef2ef0839c",
+      "name": "mw.watchlists.v1",
+      "kind": "setting",
+      "previous_revision": 25,
+      "current_revision": 26,
+      "previous_updated_at": 1792922172312,
+      "current_updated_at": 1792937974067,
+      "changed_paths": [
+        ".content.value.lists.0.symbols",
+        ".revision",
+        ".updated_at"
+      ]
+    },
+    {
+      "table": "advanced_chart_preferences",
+      "id": "17e6eb41131be1b64529180cb44b254d12d8449ac562d2664ae875e2db46f5ae",
+      "name": "widgetbar.layout-settings",
+      "kind": "setting",
+      "previous_revision": 497,
+      "current_revision": 499,
+      "previous_updated_at": 1792931018607,
+      "current_updated_at": 1792936531664,
+      "changed_paths": [
+        ".content.value",
+        ".revision",
+        ".updated_at"
+      ]
+    }
+  ]
+}

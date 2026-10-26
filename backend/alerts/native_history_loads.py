@@ -17,6 +17,7 @@ from . import provider_cache as cache
 from .config import settings
 from .provider_capabilities import request_seconds
 from .provider_history_policy import CapacityExceeded, capacity
+from .source_history_store import AcquisitionBusy
 from .storage import NativeHistoryLoad, now_ms, transaction, uid
 
 log = logging.getLogger(__name__)
@@ -193,7 +194,8 @@ def once():
             return False
         row.state = "filling"
         row.generation += 1
-        source = "fxcm" if row.query_json.get("instrument", "").upper().startswith(("FXCM:", "MWP:FXCM:")) else None
+        ticker = row.query_json.get("instrument", "").upper().removeprefix("MWP:")
+        source = "fxcm" if ticker.startswith("FXCM:") else "akshare" if ticker.startswith(("AKSHARE:", "TENCENT:")) else None
         budget = request_seconds(source)
         row.lease_until = now + int(budget*1000) + 5000
         ident, generation, query = row.id, row.generation, row.query_json
@@ -210,6 +212,7 @@ def once():
     progress = {"attempts": 0, "pages": 0, "advanced": False}
     state, failure = "waiting", None
     waiting_latest = False
+    waiting_acquisition = False
     fill_started = time.monotonic()
     try:
         if pages >= settings.native_history_task_pages:
@@ -228,6 +231,8 @@ def once():
             state = "ready"
     except cache.LatestObservationPending:
         state, waiting_latest = "waiting", True
+    except AcquisitionBusy:
+        state, waiting_acquisition = "waiting", True
     except cache.HistoryPending:
         state = "waiting"
         if not progress["advanced"] and stalls >= 2:
@@ -247,9 +252,9 @@ def once():
             NativeHistoryLoad.id == ident, NativeHistoryLoad.generation == generation,
             NativeHistoryLoad.state == "filling", NativeHistoryLoad.lease_until > now_ms())
             .values(state=state, error_json=failure,
-                    lease_until=now_ms()+1000 if waiting_latest else 0,
+                    lease_until=now_ms()+1000 if waiting_latest or waiting_acquisition else 0,
                     pages=pages+progress["pages"],
-                    stalls=0 if progress["advanced"] else stalls if waiting_latest else stalls+1))
+                    stalls=0 if progress["advanced"] else stalls if waiting_latest or waiting_acquisition else stalls+1))
         if result.rowcount and state in ('failed', 'ready'):
             from .notification_sources import native_result
             native_result(db, ident)
@@ -259,6 +264,7 @@ def once():
         "claim_ms": round(claim_ms, 2), "fill_ms": round(fill_ms, 2),
         "persist_ms": round((time.monotonic() - persist_started) * 1000, 2),
         "state": state, "committed": bool(result.rowcount), "waiting_latest": waiting_latest,
+        "waiting_acquisition": waiting_acquisition,
         "pages": progress["pages"], "timings_ms": progress.get("timings_ms", {}),
     }, sort_keys=True))
     return True

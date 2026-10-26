@@ -336,6 +336,11 @@ class NativeBarRow(BaseModel):
     low: StrictStr
     close: StrictStr
     volume: StrictStr | None = None
+    # Same-source adjustment evidence is immutable with this observation but is
+    # kept separate from the raw OHLCV values.
+    adjustment_basis: dict | None = None
+    source_ohlc: dict[str, str] | None = None
+    price_normalization: str | None = None
     source_label: StrictStr = Field(min_length=1, max_length=80)
     trading_date: str | None = Field(default=None, pattern=r"^\d{4}-\d{2}-\d{2}$")
     complete: bool = Field(strict=True)

@@ -1,0 +1,189 @@
+{
+  "at": "2026-10-26T01:01:00.601520+00:00",
+  "passed": false,
+  "strict_existing_row_equality": false,
+  "failures": [
+    "advanced_chart_workspaces existing rows changed: 1, deleted: 0",
+    "advanced_chart_preferences existing rows changed: 3, deleted: 0"
+  ],
+  "services": [
+    {
+      "service": "notify-worker",
+      "id": "c637b1ae0a80827803942cf5100a3fed76d3b1dfd15daf5b9a8b6460b78b4ec5",
+      "image": "sha256:3b6e18e3aadb83cec807532d804b2e4555cc05f3644facc6204f8f0e3566edb5",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "87e55c595366fa8ce3f0924475e3e8b6cb75913ab95385efbc473799b26ae39d"
+    },
+    {
+      "service": "projector",
+      "id": "d79bee704875f6059d71c388eb7c6df5f5a7f20160ddf9bfc88ca28a7571f1f1",
+      "image": "sha256:3b6e18e3aadb83cec807532d804b2e4555cc05f3644facc6204f8f0e3566edb5",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "7556551f7ad5b07cb0c568e2b0db7cb287c4dae9d83fa80b7a212fe3b20318b0"
+    },
+    {
+      "service": "history-worker",
+      "id": "8de548ac21e9c8a5c3a5a8408bef7a4e4416198523a24fcf20de7d05715418e6",
+      "image": "sha256:3b6e18e3aadb83cec807532d804b2e4555cc05f3644facc6204f8f0e3566edb5",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "1bdbda940f0284be04342cb506a11d42b25aa1cfdec1dd88c63466694cc96c52"
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "id": "98923fdbc0275f07c4aeb69be2fd71fc74bb48a9f52bdf9d49ed248478f7ca45",
+      "image": "sha256:3b6e18e3aadb83cec807532d804b2e4555cc05f3644facc6204f8f0e3566edb5",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "dc6f49045c22787c7dcb54f7ab2e7648037d57d30ee22053e45acacb195e1700"
+    },
+    {
+      "service": "market-stream-worker",
+      "id": "cd8938cac3663983361623a9dc882ca2b245d52d6746c7996edb17dcc118ad65",
+      "image": "sha256:3b6e18e3aadb83cec807532d804b2e4555cc05f3644facc6204f8f0e3566edb5",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "18a3495665c7f274430a0965b7b1d469c466aa1a92bf3440c65698a9575b1351"
+    },
+    {
+      "service": "native-history-worker",
+      "id": "615606c0250875d8b8342692fd4ddbbafce886ec7c58eaab5ad8c769778fb149",
+      "image": "sha256:3b6e18e3aadb83cec807532d804b2e4555cc05f3644facc6204f8f0e3566edb5",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "ad767d5ffca5fd46f230a0d86d17e1a4b7529cf8ec1577819ef14a03ee6aa4a6"
+    },
+    {
+      "service": "composite-aggregate-worker",
+      "id": "8da6545615c71c841f84be7c77b33cbccb3f8ab82d7d9af74d5e4d658062d09a",
+      "image": "sha256:3b6e18e3aadb83cec807532d804b2e4555cc05f3644facc6204f8f0e3566edb5",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "cdde02fcdfcc430e165c3eadd9f4992dc4ffdcc3f665c0c064a57a545b179555"
+    },
+    {
+      "service": "chart-history-worker",
+      "id": "6091bdf1910b909f144a2de4628dd763f411963bfe98431aa703aada4bfc3964",
+      "image": "sha256:3b6e18e3aadb83cec807532d804b2e4555cc05f3644facc6204f8f0e3566edb5",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "40ce53f1042c96fd26e8747fa429f103d8c3a66f57467ac5a20a6d9a8d9837d1"
+    },
+    {
+      "service": "realtime-worker",
+      "id": "e988a933e3083fc8f988a90e39312cece69ff97952555fddb762fe3eb6611bcb",
+      "image": "sha256:3b6e18e3aadb83cec807532d804b2e4555cc05f3644facc6204f8f0e3566edb5",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "bf178363b06930d05a61c703cfbb25a9c8e4899bf4cf9d5b9a3d46468bd2479e"
+    },
+    {
+      "service": "pricing-worker",
+      "id": "5648ce62349a49d820945029f7a946b8fe6f62c82536c9816c2422ac9d50541c",
+      "image": "sha256:3b6e18e3aadb83cec807532d804b2e4555cc05f3644facc6204f8f0e3566edb5",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "d9acc8f414f1f0182ac8b96feb341293816e77aedaefcc07801dd2307f2baf9c"
+    },
+    {
+      "service": "api",
+      "id": "c0193a648f08237f8df238bd6300608a5f2f25a2a8bd52d73419c50173499207",
+      "image": "sha256:3b6e18e3aadb83cec807532d804b2e4555cc05f3644facc6204f8f0e3566edb5",
+      "state": "running",
+      "health": "healthy",
+      "configuration_sha256": "6c7904f16cef2cfcb9a3b6564d80864d37ed0851e0110855ef676265cacbb88b"
+    },
+    {
+      "service": "chart",
+      "id": "02470afd7bf89138380d404676c573fde8f3653b26fd1ace7c121d017f5da303",
+      "image": "sha256:2f33dd0cfd919ba89ac52e2045a208221cb92ec35cfdf7a0efd50d5600118617",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "b50ff0137f0779a09ea10ee21a9275d7cbc48f4166777d49daf7fc7b5d1f3fb0"
+    },
+    {
+      "service": "web",
+      "id": "718f4aae95929b5bff1fe2f8a1f35a74e0661c6273fc1bcebb70497861344e51",
+      "image": "sha256:71910560705b119475861c1af6a5435ae0e581e263ea495da36dcb4ef5d9a201",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "f3589fdb23eaf5ba8f3ea52bce8ee56ac72c5288a91cdf8a1f9da8e7c0ba1835"
+    },
+    {
+      "service": "gateway",
+      "id": "9492f307fdf9bfdbec7641c4e0b3554bed39340bc73a57448fdbd39e34d79ca9",
+      "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "state": "running",
+      "health": null,
+      "configuration_sha256": "d69f682780aa9ddb41a705fae51de012e1b7e70da5463a199bd7358e52ee5353"
+    },
+    {
+      "service": "postgres",
+      "id": "3de49cbde9a20c6640092181c04d35df41677566795cfecae18c0ab284b0aba8",
+      "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "state": "running",
+      "health": "healthy",
+      "configuration_sha256": "ff77d186151f9df0c25e954ee7cddfa597de313dd339de746945b35cac11cba4"
+    }
+  ],
+  "schema": [
+    "ay52_history_modes"
+  ],
+  "protected_business_rows": {
+    "advanced_chart_workspaces": {
+      "existing_rows": 17,
+      "unchanged": false,
+      "changed_ids": [
+        "900b8bef-aab3-4a10-a6f5-dd09f7a71310"
+      ],
+      "deleted_ids": [],
+      "new_rows": 27
+    },
+    "chart_workspaces": {
+      "existing_rows": 0,
+      "unchanged": true,
+      "changed_ids": [],
+      "deleted_ids": [],
+      "new_rows": 0
+    },
+    "advanced_chart_preferences": {
+      "existing_rows": 30,
+      "unchanged": false,
+      "changed_ids": [
+        "595de8fb51d52acbd483cd8eb6062230bca63f3796470a1c7483d24323366163",
+        "7360a983eb95135f162008f2fb5cbc0e41a75e6f3d1420f22bc97fef2ef0839c",
+        "17e6eb41131be1b64529180cb44b254d12d8449ac562d2664ae875e2db46f5ae"
+      ],
+      "deleted_ids": [],
+      "new_rows": 0
+    },
+    "chart_alerts": {
+      "existing_rows": 19,
+      "unchanged": true,
+      "changed_ids": [],
+      "deleted_ids": [],
+      "new_rows": 0
+    },
+    "chart_indicator_templates": {
+      "existing_rows": 0,
+      "unchanged": true,
+      "changed_ids": [],
+      "deleted_ids": [],
+      "new_rows": 0
+    },
+    "notifications": {
+      "existing_rows": 8,
+      "unchanged": true,
+      "changed_ids": [],
+      "deleted_ids": [],
+      "new_rows": 0
+    }
+  },
+  "protected_browsers_unchanged": true,
+  "configuration_unchanged": true,
+  "postgres_gateway_unchanged": true,
+  "preferences_note": "Operational preferences may change naturally; whole generic preferences-table byte equality is not claimed.",
+  "preservation_note": "One previously existing task workspace selection/view changed at 2026-10-25T13:56:11Z (revision 16 to 17, FXCM USDOLLAR D1 to BTCUSDT). Attribution is unconfirmed; current scene preserved without reset, restore, baseline replacement or exemption."
+}

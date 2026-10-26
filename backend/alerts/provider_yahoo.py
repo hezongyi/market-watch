@@ -73,7 +73,8 @@ class _Session(requests.Session):
                         "chart": {
                             "error": chart.get("error"),
                             "result": [
-                                {"meta": item.get("meta", {}), "timestamp": item.get("timestamp")}
+                                {"meta": item.get("meta", {}), "timestamp": item.get("timestamp"),
+                                 "independent_adjclose": bool(item.get("indicators", {}).get("adjclose"))}
                                 for item in chart.get("result") or []
                             ],
                         }
@@ -373,6 +374,17 @@ def _rows(meta, frame, data, before):
             if meta.get("volume_kind") != "unavailable" and value is not None and value > 0
             else None
         )
+        adjustment_basis = None
+        if meta.get("adjustment") == "supplier" and "Adj Close" in data.columns:
+            adjusted_close = DecimalString(row.get("Adj Close"))
+            close = DecimalString(row.get("Close"))
+            if adjusted_close is not None and close is not None:
+                from decimal import Decimal
+
+                ratio = DecimalString(Decimal(adjusted_close) / Decimal(close)) if Decimal(close) > 0 else None
+                if ratio is not None and Decimal(ratio) > 0:
+                    adjustment_basis = {"kind": "yahoo_adj_close_ratio", "value": ratio,
+                                        "rule": "adj-close-divided-by-close-v1"}
         result.append(
             {
                 "start": start,
@@ -385,6 +397,7 @@ def _rows(meta, frame, data, before):
                 "complete": False,
                 "volume": volume,
                 "volume_complete": False,
+                "adjustment_basis": adjustment_basis,
             }
         )
     # Successor source bars prove that the previous source interval has ended.
@@ -419,7 +432,9 @@ def archive_page(identity, start, end):
         raise ValueError("Yahoo 固定归档不支持此周期或价格口径")
     if values["endpoint"] != "yfinance.Ticker.history" or values["rules"] != "yfinance-archive-v1":
         raise ValueError("Yahoo 固定归档来源规则不匹配")
-    deadline = time.monotonic() + settings.provider_request_seconds
+    # Managed probes may parse decades of daily observations in one finite
+    # response; do not give them the small interactive quote budget.
+    deadline = time.monotonic() + max(30, settings.provider_request_seconds)
     retention, span = history_policy(frame)
     observed = now_ms()
     request_start = max(start, observed - retention * 86400000) if retention else start
@@ -435,6 +450,12 @@ def archive_page(identity, start, end):
     with _operation(deadline, stage="managed_archive") as session:
         data = _history(yf.Ticker(meta["symbol"], session=session), meta, frame,
                         request_start, end, deadline)
+        # yfinance fabricates an Adj Close column from Close if Yahoo omits
+        # indicators.adjclose. Only the transport response proves its origin.
+        response = getattr(session, "chart_response", None)
+        results = response[1].get("chart", {}).get("result", []) if response else []
+        if not results or not results[0].get("independent_adjclose"):
+            data = data.drop(columns=["Adj Close"], errors="ignore")
         if "Volume" in data and any(pd.notna(value) and value < 0 for value in data["Volume"]):
             raise ValueError("Yahoo 归档成交量不能为负数")
         parsed = _rows(meta, frame, data, end)
@@ -453,6 +474,7 @@ def archive_page(identity, start, end):
         complete = complete and right <= min(end, observed)
         output.append(NativeBarRow(timeframe=frame, start=left, end=right,
             **{key: value[key] for key in ("open", "high", "low", "close", "volume")},
+            adjustment_basis=(value.get("adjustment_basis")),
             source_label=label.isoformat(), trading_date=label.date().isoformat() if high else None,
             complete=complete, confirmation="session_elapsed" if complete else "unconfirmed"))
     return NativeCandleBatch(identity=identity, timeframe=frame, window_start=start,

@@ -23,11 +23,15 @@ def test_mapping_notes_upgrade_preserves_existing_mapping_and_composite(postgres
     config = Config(str(root / "alembic.ini"))
     config.set_main_option("script_location", str(root / "migrations"))
     monkeypatch.setattr(settings, "database_url", postgres_alerts.url.render_as_string(hide_password=False))
-    command.upgrade(config, "aw50_notice_center")
+    # The fixture publisher uses the current history worker, which requires
+    # the later period tables. Isolate the mapping-note upgrade on that shape;
+    # the real pre-period schema upgrade has its own history-modes PG contract.
+    command.upgrade(config, "head")
     # Some fresh-install migrations use current metadata. Model the actual
     # deployed pre-ax51 table set rather than accidentally testing create_all.
     with postgres_alerts.begin() as connection:
         connection.execute(text("DROP TABLE IF EXISTS market_realtime_mapping_notes"))
+    command.stamp(config, "aw50_notice_center")
     factory = sessionmaker(postgres_alerts, expire_on_commit=False)
     monkeypatch.setattr(storage, "Session", factory)
     monkeypatch.setattr(settings, "fx_source", "dukascopy")

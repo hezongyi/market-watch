@@ -349,3 +349,78 @@ def test_frame_target_can_precede_top_level_and_explicit_backfill_keeps_requeste
                               end=stamp("2023-11-01"), request_id="explicit").id
         frame = db.get(HistoryFrameRun, (explicit, "D1"))
         assert frame.start == stamp("2023-10-01") and frame.end == stamp("2023-11-01")
+
+
+@pytest.mark.parametrize('family,kind,first_value,revised_value,expected_first,expected_second', [
+    ('sina-a', 'sina_qfq_factor', '2', '4', '5', '2.5'),
+    ('sina-hk', 'sina_qfq_factor', '0.5', '0.25', '5.0', '2.50'),
+    ('yfinance', 'yahoo_adj_close_ratio', '0.5', '0.25', '5.0', '2.50'),
+])
+def test_qfq_basis_revision_freezes_raw_and_old_artifacts(database, family, kind,
+        first_value, revised_value, expected_first, expected_second):
+    import json
+
+    from alerts.history_artifacts import chart_page
+    from alerts.series_access import metadata
+    from alerts.source_history_store import raw_chunk
+
+    parent = mode_identity(source_family=family)
+    with database.begin() as db:
+        dataset, _ = register_mode(db, parent)
+        link_frame_source(db, dataset, 'D1', native_identity('D1', parent))
+        configure(db, dataset.id, target_start=stamp('2024-01-01'), timeframes=['D1'],
+            timezone='Asia/Shanghai', daily_minute=1080)
+    def rows(value):
+        return [day('2024-01-02', close='10', adjustment_basis={'kind': kind, 'value': value})]
+    first = run(database, parent.key, '2024-01-04', Adapter({'D1': rows(first_value)}))
+    second = run(database, parent.key, '2024-01-05', Adapter({'D1': rows(revised_value)}), 'revision')
+    with database.begin() as db:
+        assert read_artifact(db, first, 'D1')[0]['close'] == expected_first
+        assert read_artifact(db, second, 'D1')[0]['close'] == expected_second
+        for version, value in [(first, first_value), (second, revised_value)]:
+            raw = json.loads(raw_chunk(db, db.scalar(select(HistoryChunk).where(HistoryChunk.version_id == version))))
+            assert raw[0]['close'] == '10' and raw[0]['adjustment_basis']['value'] == value
+            assert chart_page(db, version, 'D1')['adjustment_view'] == 'qfq'
+            assert metadata(db, version, 'history')['adjustment_view'] == 'qfq'
+
+
+def test_missing_qfq_basis_is_terminal_visible_and_does_not_starve_healthy_artifacts(database):
+    from alerts.history_artifacts import artifact_report
+    from alerts.storage import DatasetMaintenance
+    parent = mode_identity(source_family='yfinance')
+    with database.begin() as db:
+        dataset, _ = register_mode(db, parent)
+        link_frame_source(db, dataset, 'D1', native_identity('D1', parent))
+        configure(db, dataset.id, target_start=stamp('2024-01-01'), timeframes=['D1'],
+            timezone='Asia/Shanghai', daily_minute=1080)
+    missing = run(database, parent.key, '2024-01-04', Adapter({'D1': [day('2024-01-02')]}))
+    healthy_dataset = prepare(database)
+    healthy = run(database, healthy_dataset, '2024-01-05', Adapter({'D1': [day('2024-01-02')]}))
+    with database.begin() as db:
+        report = artifact_report(db, missing)[0]
+        assert report['status'] == 'unavailable' and report['manifest']['raw_preserved']
+        assert db.get(DatasetMaintenance, parent.key).active_version_id is None
+        assert read_artifact(db, healthy, 'D1')
+
+
+def test_pending_legacy_artifact_resumes_using_its_original_rule(database):
+    from alerts.storage import HistoryArtifact
+    parent = mode_identity(source_family='yfinance')
+    with database.begin() as db:
+        dataset, _ = register_mode(db, parent)
+        link_frame_source(db, dataset, 'D1', native_identity('D1', parent))
+        configure(db, dataset.id, target_start=stamp('2024-01-01'), timeframes=['D1'],
+            timezone='Asia/Shanghai', daily_minute=1080)
+        version = create_run(db, dataset.id, end=stamp('2024-01-04'), request_id='old').id
+    for _ in range(5):
+        if not import_page(Adapter({'D1': [day('2024-01-02')]}), version_id=version):
+            break
+    with database.begin() as db:
+        artifact = db.scalar(select(HistoryArtifact).where(HistoryArtifact.version_id == version))
+        artifact.rule_version = 'source-trading-date-artifact-v1'
+    while artifact_tick(version):
+        pass
+    with database.begin() as db:
+        row = read_artifact(db, version, 'D1')[0]
+        assert row['close'] == '11'
+        assert row['rule_version'] == 'source-trading-date-artifact-v1'

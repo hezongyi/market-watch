@@ -27,6 +27,7 @@ def test_catalog_chinese_search_is_local_and_keeps_supplier_code(database, monke
     from alerts.provider_yahoo import stable_id
 
     monkeypatch.setattr(settings, 'yahoo_enabled', True)
+    yahoo_catalog.seed()  # The fixture suppresses provider startup seeding.
     def unexpected_search(query):
         raise AssertionError('Known Chinese names should not require remote search')
     monkeypatch.setattr(yahoo_catalog, 'search', unexpected_search)
@@ -61,6 +62,7 @@ def test_catalog_partial_match_does_not_hide_new_equity(
     from alerts.config import settings
 
     monkeypatch.setattr(settings, "yahoo_enabled", True)
+    yahoo_catalog.seed()  # Catalog reads must not initialize provider state.
     monkeypatch.setattr(yahoo_catalog, "_SEARCH", {})
     searched = []
 

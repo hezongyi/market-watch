@@ -1,0 +1,85 @@
+{
+  "started_at": "2026-10-26T00:58:54.131Z",
+  "base": "https://test.kookvv.com:8443",
+  "passed": true,
+  "scope": "Deployed real API and native UI; no intercepted data, no source price repair; preserves all created data",
+  "checks": [
+    "Managed Sina A/H and Yahoo charts render real qfq daily candles; Yahoo dataset detail shows usable daily artifact"
+  ],
+  "cases": [
+    {
+      "name": "sina-a",
+      "version": "4c5f2cb9-d7b6-44e3-9b2c-91f1ccd29170",
+      "rendered": {
+        "symbol": "MWH:4C5F2CB9-D7B6-44E3-9B2C-91F1CCD29170",
+        "ready": true,
+        "range": {
+          "from": 1773705600,
+          "to": 1793548800
+        }
+      },
+      "adjustment_view": "qfq",
+      "ui": "Tradingview是交互式的，并且具有与屏幕阅读器一起使用的命令。以下是可用于在平台上交互的键盘命令列表\n\n开始使用键盘导航模式。按Alt + Z\n快速搜索。按Ctrl + K\n更改商品。开始输入商品名称\n更改时间周期。按数字或逗号\n指标、指标和策略。按斜线\n开放式布局。按下句号\nSZSE:000001\n1分\n5分\n15分\n30分\n1小时\n4小时\n天\n周\n月\n指标\n数据中心\n历史模式验收 2026-10-26T00:58:54.131Z\n保存\n99+\nSZSE:000001 · 自建行情 · 前复权 · 本数据集同源依据计算 · 来源量\n1天\nAKSHARE\n开=\n11.27\n高=\n11.35\n低=\n11.17\n收=\n11.20\n-0.10 (−0.88%)\n00:59:22 UTC\nlog\n自动\n自选表\n商品\n最新价\n涨跌\n涨跌%\nBTCUSDT\nEURUSD\nXAUUSD\nCOMPOSITE\n4C5F2CB9-D7B6-44E3-9B2C-91F1CCD29170\n开市\n账户管理器",
+      "passed": true
+    },
+    {
+      "name": "sina-hk",
+      "version": "a0f00e6e-b3ae-466d-abb0-1f27358da78d",
+      "rendered": {
+        "symbol": "MWH:A0F00E6E-B3AE-466D-ABB0-1F27358DA78D",
+        "ready": true,
+        "range": {
+          "from": 1773964800,
+          "to": 1793548800
+        }
+      },
+      "adjustment_view": "qfq",
+      "ui": "Tradingview是交互式的，并且具有与屏幕阅读器一起使用的命令。以下是可用于在平台上交互的键盘命令列表\n\n开始使用键盘导航模式。按Alt + Z\n快速搜索。按Ctrl + K\n更改商品。开始输入商品名称\n更改时间周期。按数字或逗号\n指标、指标和策略。按斜线\n开放式布局。按下句号\nHKEX:00700\n1分\n5分\n15分\n30分\n1小时\n4小时\n天\n周\n月\n指标\n数据中心\n历史模式验收 2026-10-26T00:58:54.131Z\n保存\n99+\nHKEX:00700 · 自建行情 · 前复权 · 本数据集同源依据计算 · 来源量\n1天\nAKSHARE\n开=\n381.80\n高=\n388.80\n低=\n378.00\n收=\n386.00\n+3.60 (+0.94%)\n00:59:55 UTC\nlog\n自动\n自选表\n商品\n最新价\n涨跌\n涨跌%\nBTCUSDT\nEURUSD\nXAUUSD\nCOMPOSITE\nA0F00E6E-B3AE-466D-ABB0-1F27358DA78D\n开市\n账户管理器",
+      "passed": true
+    },
+    {
+      "name": "yahoo-us",
+      "version": "731e970b-5166-4d7e-a521-b707784c7e50",
+      "rendered": {
+        "symbol": "MWH:731E970B-5166-4D7E-A521-B707784C7E50",
+        "ready": true,
+        "range": {
+          "from": 1774483200,
+          "to": 1793505600
+        }
+      },
+      "adjustment_view": "qfq",
+      "ui": "Tradingview是交互式的，并且具有与屏幕阅读器一起使用的命令。以下是可用于在平台上交互的键盘命令列表\n\n开始使用键盘导航模式。按Alt + Z\n快速搜索。按Ctrl + K\n更改商品。开始输入商品名称\n更改时间周期。按数字或逗号\n指标、指标和策略。按斜线\n开放式布局。按下句号\nAAPL\n1分\n5分\n15分\n30分\n1小时\n4小时\n天\n周\n月\n指标\n数据中心\n历史模式验收 2026-10-26T00:58:54.131Z\n99+\n苹果公司 · AAPL · 自建行情 · 前复权 · 本数据集同源依据计算 · 来源量\n1天\nYAHOO\n开=\n349.12\n高=\n351.73\n低=\n345.75\n收=\n347.73\n-0.49 (−0.14%)\n01:00:10 UTC\nlog\n自动\n自选表\n商品\n最新价\n涨跌\n涨跌%\nBTCUSDT\nEURUSD\n1.12215\nGBPUSD\n1.33690\nXAUUSD\n3,995.205\nUSDCAD\n1.40457\n0.00001\n0.00%\nCOMPOSITE\nEURUSD\nUSDCAD\nXAUUSD\n731E970B-5166-4D7E-A521-B707784C7E50\n开市\n账户管理器",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "console": [
+    "Failed to load resource: the server responded with a status of 500 ()"
+  ],
+  "network_errors": [
+    {
+      "status": 500,
+      "path": "/api/chart-alerts"
+    }
+  ],
+  "blocked_writes": [
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/migrate"
+    },
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/save"
+    }
+  ],
+  "workspace_id": "3eb35d12-376f-4c49-a953-a9c84169ae01",
+  "yahoo_detail": {
+    "dataset_id": "1de909844cec998226e338b48542e7d9b4176b4a7016065426488f77a8d9c72c",
+    "usable_timeframes": [
+      "D1"
+    ],
+    "ui": "自建行情\n平台行情\n组合行情\n任务与记录\n来源状态\n交易日历\n返回数据中心列表\nY1EB44D625\n\nYahoo · LAST · 来源交易日 · AAPL\n\n可用\n每日维护\n可用到 2026/10/25 21:59 UTC\n更多操作\n概览\n覆盖与质量\n发布版本\n维护设置\n组合与引用\n周期\n状态\n观测柱\n覆盖完整柱\n\n日周月\n\n日线\nD1\n已发布\n更新成功\n2024/01/02 00:00 UTC — 2026/10/23 20:00 UTC\n日线产物详情\n706\n706\n\n最近尝试：2026/10/25 22:00 UTC；最近成功：2026/10/25 22:00 UTC\n\n查看此行情的维护任务与记录\n选择行情查看版本与周期。 Esc 关闭窗口。"
+  },
+  "finished_at": "2026-10-26T01:00:22.600Z"
+}

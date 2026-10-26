@@ -1,0 +1,32 @@
+{
+  "risk": "F1",
+  "standards": {
+    "agent": "equity_standards_review",
+    "result": "passed",
+    "final_scope": "Native AcquisitionBusy waiting and AKShare/Tencent request budgets; one-query timeframe/manifest metadata; historical migration fixtures with explicit empty-table assertions",
+    "blocking_findings": []
+  },
+  "spec": {
+    "agent": "equity_spec_review",
+    "result": "passed",
+    "final_scope": "Original A01-A17 + qfq; native shared-source waits/budgets; qfq/raw metadata query semantics; current evidence limits",
+    "blocking_findings": [],
+    "pending_reporting_items": [],
+    "reporting_completed": [
+      "Actual full-run and failed-node rerun results recorded without a full-green claim",
+      "Final r12 managed and r11 unchanged-platform evidence scoped correctly",
+      "Strict audit false retained with unknown attribution"
+    ]
+  },
+  "resolved_earlier": [
+    "Missing-basis artifacts must not starve subsequent artifacts or maintenance",
+    "Legacy v1 artifact resumes original raw rule",
+    "Persisted v1 acquisition rule remains readable and maintainable"
+  ],
+  "incremental_reviews": {
+    "native_worker": "Standards and Spec passed, no blocker",
+    "metadata_query": "Standards and Spec passed, no blocker",
+    "source_migration_fixture": "Standards passed; preserves populated rows, repeatability and backup guard"
+  },
+  "overall_acceptance": "incomplete: strict preservation audit false and 8 baseline test failures retained; business scope and final r12 managed verification passed"
+}

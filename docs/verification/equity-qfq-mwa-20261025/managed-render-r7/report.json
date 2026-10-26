@@ -1,0 +1,23 @@
+{
+  "started_at": "2026-10-25T13:41:05.559Z",
+  "base": "https://test.kookvv.com:8443",
+  "passed": false,
+  "scope": "Deployed real API and native UI; no intercepted data, no source price repair; preserves all created data",
+  "checks": [],
+  "cases": [],
+  "errors": [
+    "frame.waitForFunction: Timeout 90000ms exceeded.\n    at /home/quant/repos/market-watch-equity-qfq-mwa-20261025/web/tests/equity-managed-render.browser.cjs:84:20"
+  ],
+  "blocked_writes": [
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/migrate"
+    },
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/save"
+    }
+  ],
+  "workspace_id": "241c3415-bc8a-4283-8097-11efad6d267e",
+  "finished_at": "2026-10-25T13:43:23.497Z"
+}

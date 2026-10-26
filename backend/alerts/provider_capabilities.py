@@ -44,7 +44,11 @@ def page_capacity(source):
 
 def request_seconds(source):
     # A cold ForexConnect session needs login plus one finite snapshot.
-    return 65 if source == "fxcm" else settings.provider_request_seconds
+    if source == "fxcm":
+        return 65
+    # AKShare starts a disposable SDK process and Sina serves a full daily
+    # snapshot. Keep the chart wait bounded by that adapter's 30-second budget.
+    return max(30, settings.provider_request_seconds) if source == "akshare" else settings.provider_request_seconds
 
 
 def fresh_seconds(source):

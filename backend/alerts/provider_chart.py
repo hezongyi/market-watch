@@ -94,6 +94,10 @@ def metadata(ident, *, deadline=None, cached_only=False):
     if ident.startswith("AKSHARE:"):
         from .akshare_catalog import chart_metadata
 
+        return chart_metadata("AKSHARE:" + ident[8:].lower())
+    if ident.startswith("TENCENT:"):
+        from .akshare_catalog import chart_metadata
+
         return chart_metadata(ident)
     with transaction() as db:
         from sqlalchemy import select
@@ -513,7 +517,7 @@ def quote_page(meta):
            identity.get("environment"), identity.get("account_scope"))
     from .provider_cache import LatestObservationPending
     try:
-        page = cached_page(meta, "M1", before, 1, latest=True, quote=True)
+        page = cached_page(meta, "D1" if meta["source"] == "akshare" else "M1", before, 1, latest=True, quote=True)
     except LatestObservationPending as waiting:
         # The account collector owns this refresh. Reading its old snapshot is
         # neither another supplier request nor proof of failure or recovery.
@@ -555,6 +559,9 @@ def quote_previous_close(meta, latest):
         page = cached_page(meta, "D1", latest["start"] + 1, 3, quote=True, cache_seconds=300)
         complete = [bar for bar in page["bars"] if bar["complete"] and bar["end"] <= latest["start"]]
         return Decimal(complete[-1]["close"]) if complete else None
+    if meta["source"] == "akshare":
+        page = cached_page(meta, "D1", latest["start"], 1, quote=True, cache_seconds=300)
+        return Decimal(page["bars"][-1]["close"]) if page["bars"] else None
     current_label = label(latest["start"], "D1", meta["calendar"])
     session_start = (latest["start"] // 86400000 * 86400000 if meta["source"] == "dukascopy" else
         ms(session_bounds(instant(latest["start"]), Calendar(meta["calendar"]))[0]))

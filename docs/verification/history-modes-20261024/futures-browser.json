@@ -1,0 +1,44 @@
+{
+  "started_at": "2026-10-25T00:29:05.982Z",
+  "base": "https://192.168.7.232:18280",
+  "passed": true,
+  "scope": "Deployed real API and native UI; no intercepted data, no source price repair; preserves all created data",
+  "checks": [
+    "Real UI creates D1/native histories; independent artifacts, no M1 requests, task completes and chart reads"
+  ],
+  "cases": [
+    {
+      "source": "akshare",
+      "symbol": "SHFE:RB0",
+      "mode": "native_periods",
+      "dataset_id": "5f440ae8fddd094eb6860913491561e450333683af2e1344bc5fa5f138dea6c3",
+      "version_id": "930cb6ad-1a3d-4018-89ab-8c7935feb307",
+      "requested": [
+        "M5",
+        "D1"
+      ],
+      "periods": [
+        {
+          "timeframe": "D1",
+          "rows": 275,
+          "start": 1756684800000,
+          "end": 1792740600000,
+          "freshness": "success"
+        },
+        {
+          "timeframe": "M5",
+          "rows": 1022,
+          "start": 1790229600000,
+          "end": 1792767300000,
+          "freshness": "success"
+        }
+      ],
+      "request_count": 2,
+      "chart_bars": 100,
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "workspace_id": "900b8bef-aab3-4a10-a6f5-dd09f7a71310",
+  "finished_at": "2026-10-25T00:31:11.515Z"
+}

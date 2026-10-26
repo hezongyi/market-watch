@@ -1,0 +1,27 @@
+{
+  "started_at": "2026-10-25T13:12:21.917Z",
+  "base": "https://test.kookvv.com:8443",
+  "passed": false,
+  "scope": "Deployed real API and native UI; no intercepted data, no source price repair; preserves all created data",
+  "checks": [],
+  "cases": [],
+  "errors": [
+    "Cannot read properties of undefined (reading 'evaluate')"
+  ],
+  "blocked_writes": [
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/migrate"
+    },
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/save"
+    },
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/native-charts/save"
+    }
+  ],
+  "workspace_id": "e2abf557-b758-4c57-b59d-3d21e1b0f133",
+  "finished_at": "2026-10-25T13:12:59.638Z"
+}

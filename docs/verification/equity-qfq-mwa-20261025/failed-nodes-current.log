@@ -1,0 +1,221 @@
+.........FFFFF.FF.F.....                                                 [100%]
+=================================== FAILURES ===================================
+_____ test_native_squeeze_keeps_default_lookback_across_absent_periods[H1] _____
+
+timeframe = 'H1'
+
+    @pytest.mark.parametrize("timeframe", ["H1", "H4", "D1"])
+    def test_native_squeeze_keeps_default_lookback_across_absent_periods(timeframe):
+        rows = native_rows(timeframe)
+        expected, segments = literal_pine(rows, 10, 252, 5)
+        actual = provider_result(rows, timeframe)
+        values = matrix(actual)
+>       assert values[-1][2] is not None, "calendar gaps must not restart the 252-ratio warmup"
+E       AssertionError: calendar gaps must not restart the 252-ratio warmup
+E       assert None is not None
+
+backend/tests/test_provider_squeeze_history.py:44: AssertionError
+_____ test_native_squeeze_keeps_default_lookback_across_absent_periods[H4] _____
+
+timeframe = 'H4'
+
+    @pytest.mark.parametrize("timeframe", ["H1", "H4", "D1"])
+    def test_native_squeeze_keeps_default_lookback_across_absent_periods(timeframe):
+        rows = native_rows(timeframe)
+        expected, segments = literal_pine(rows, 10, 252, 5)
+        actual = provider_result(rows, timeframe)
+        values = matrix(actual)
+>       assert values[-1][2] is not None, "calendar gaps must not restart the 252-ratio warmup"
+E       AssertionError: calendar gaps must not restart the 252-ratio warmup
+E       assert None is not None
+
+backend/tests/test_provider_squeeze_history.py:44: AssertionError
+_____ test_native_squeeze_keeps_default_lookback_across_absent_periods[D1] _____
+
+timeframe = 'D1'
+
+    @pytest.mark.parametrize("timeframe", ["H1", "H4", "D1"])
+    def test_native_squeeze_keeps_default_lookback_across_absent_periods(timeframe):
+        rows = native_rows(timeframe)
+        expected, segments = literal_pine(rows, 10, 252, 5)
+        actual = provider_result(rows, timeframe)
+        values = matrix(actual)
+>       assert values[-1][2] is not None, "calendar gaps must not restart the 252-ratio warmup"
+E       AssertionError: calendar gaps must not restart the 252-ratio warmup
+E       assert None is not None
+
+backend/tests/test_provider_squeeze_history.py:44: AssertionError
+_____ test_native_squeeze_still_resets_on_explicit_invalid_input[invalid0] _____
+
+invalid = {'gap_before': True}
+
+    @pytest.mark.parametrize("invalid", [{"gap_before": True}, {"complete": False}])
+    def test_native_squeeze_still_resets_on_explicit_invalid_input(invalid):
+        rows = native_rows("D1")
+        rows[400].update(invalid)
+        result = provider_result(rows, "D1", identity=str(invalid))
+        values = matrix(result)
+>       assert values[399][2] is not None
+E       assert None is not None
+
+backend/tests/test_provider_squeeze_history.py:73: AssertionError
+_____ test_native_squeeze_still_resets_on_explicit_invalid_input[invalid1] _____
+
+invalid = {'complete': False}
+
+    @pytest.mark.parametrize("invalid", [{"gap_before": True}, {"complete": False}])
+    def test_native_squeeze_still_resets_on_explicit_invalid_input(invalid):
+        rows = native_rows("D1")
+        rows[400].update(invalid)
+        result = provider_result(rows, "D1", identity=str(invalid))
+        values = matrix(result)
+>       assert values[399][2] is not None
+E       assert None is not None
+
+backend/tests/test_provider_squeeze_history.py:73: AssertionError
+_______ test_provider_pages_reach_full_directory_and_mixed_kind_fairness _______
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffabf85d8d0>
+
+    def test_provider_pages_reach_full_directory_and_mixed_kind_fairness(database, monkeypatch):
+        large_catalog(database, count=2)
+        provider = [
+            {
+                "id": f"OANDA:T{i:04}",
+                "symbol": f"T{i:04}",
+                "source": "oanda",
+                "label": f"Ticker{i}",
+                "available": True,
+                "supported": True,
+            }
+            for i in range(600)
+        ]
+        monkeypatch.setattr(market_data, "instrument_catalog", lambda query, limit=None: provider)
+>       first = market_data.search_series_page(kind="provider", page_size=250)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend/tests/test_series_search_pagination.py:199:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend/alerts/market_data.py:816: in search_series_page
+    rows = _provider_series(query, source=source, symbol_type=symbol_type)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+query = '', source = None, symbol_type = ''
+
+    def _provider_series(query, *, source=None, symbol_type=""):
+        from .chart_series import encode
+        from .history_catalog import account_scope
+
+        if source not in (None, "dukascopy", "oanda", "binance", "yahoo", "akshare", "fxcm"):
+            raise HTTPException(422, "未知平台来源")
+        result = [{**row, "series_kind": "provider", "ticker": encode(row["id"], "provider"),
+            "description": "平台 · " + row["source"] + " · 原生周期"}
+>           for row in (instrument_catalog(query, limit=None, source=source, managed_status=False) if source != "fxcm" else []) if not row["id"].startswith("MD:")]
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: test_provider_pages_reach_full_directory_and_mixed_kind_fairness.<locals>.<lambda>() got an unexpected keyword argument 'source'
+
+backend/alerts/market_data.py:893: TypeError
+_ test_all_cursor_covers_each_kind_filters_before_paging_and_rejects_changed_query _
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffab85f2f90>
+
+    def test_all_cursor_covers_each_kind_filters_before_paging_and_rejects_changed_query(database, monkeypatch):
+        from alerts import market_data
+        from test_series_access import fixture
+        from fastapi import HTTPException
+        import pytest
+
+        fixture(database, monkeypatch)
+        providers = [{"id": f"OANDA:T{i:04}", "symbol": f"T{i:04}", "source": "oanda",
+                      "label": f"Ticker{i}", "asset_type": "CURRENCY" if i % 2 else "EQUITY",
+                      "available": True, "supported": True} for i in range(600)]
+        monkeypatch.setattr(market_data, "instrument_catalog", lambda query, limit=None: providers)
+        rows, cursor = [], None
+        for _ in range(80):
+>           page = market_data.search_series_page(kind="all", page_size=13, cursor=cursor)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend/tests/test_series_search_pagination.py:282:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend/alerts/market_data.py:809: in search_series_page
+    return _all_series_page(query, page_size=page_size, source=source, calendar=calendar,
+backend/alerts/market_data.py:855: in _all_series_page
+    providers = _provider_series(query, source=source, symbol_type=symbol_type) if positions[0] is not None and not calendar else []
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+query = '', source = None, symbol_type = ''
+
+    def _provider_series(query, *, source=None, symbol_type=""):
+        from .chart_series import encode
+        from .history_catalog import account_scope
+
+        if source not in (None, "dukascopy", "oanda", "binance", "yahoo", "akshare", "fxcm"):
+            raise HTTPException(422, "未知平台来源")
+        result = [{**row, "series_kind": "provider", "ticker": encode(row["id"], "provider"),
+            "description": "平台 · " + row["source"] + " · 原生周期"}
+>           for row in (instrument_catalog(query, limit=None, source=source, managed_status=False) if source != "fxcm" else []) if not row["id"].startswith("MD:")]
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: test_all_cursor_covers_each_kind_filters_before_paging_and_rejects_changed_query.<locals>.<lambda>() got an unexpected keyword argument 'source'
+
+backend/alerts/market_data.py:893: TypeError
+____________________ test_all_kind_cursor_and_asset_filter _____________________
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine([redacted-credentials]@127.0.0.1:18889/equity_test), autoflush=True, expire_on_commit=False), Engine([redacted-credentials]@127.0.0.1:18889/equity_test))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ffab851c950>
+
+    def test_all_kind_cursor_and_asset_filter(provider_pg, monkeypatch):
+>       all_cursor(provider_pg[0], monkeypatch)
+
+backend/tests/test_series_search_pagination_postgres.py:41:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend/tests/test_series_search_pagination.py:282: in test_all_cursor_covers_each_kind_filters_before_paging_and_rejects_changed_query
+    page = market_data.search_series_page(kind="all", page_size=13, cursor=cursor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/market_data.py:809: in search_series_page
+    return _all_series_page(query, page_size=page_size, source=source, calendar=calendar,
+backend/alerts/market_data.py:855: in _all_series_page
+    providers = _provider_series(query, source=source, symbol_type=symbol_type) if positions[0] is not None and not calendar else []
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+query = '', source = None, symbol_type = ''
+
+    def _provider_series(query, *, source=None, symbol_type=""):
+        from .chart_series import encode
+        from .history_catalog import account_scope
+
+        if source not in (None, "dukascopy", "oanda", "binance", "yahoo", "akshare", "fxcm"):
+            raise HTTPException(422, "未知平台来源")
+        result = [{**row, "series_kind": "provider", "ticker": encode(row["id"], "provider"),
+            "description": "平台 · " + row["source"] + " · 原生周期"}
+>           for row in (instrument_catalog(query, limit=None, source=source, managed_status=False) if source != "fxcm" else []) if not row["id"].startswith("MD:")]
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: test_all_cursor_covers_each_kind_filters_before_paging_and_rejects_changed_query.<locals>.<lambda>() got an unexpected keyword argument 'source'
+
+backend/alerts/market_data.py:893: TypeError
+=============================== warnings summary ===============================
+backend/tests/test_composite_mapping_postgres.py::test_mapping_notes_upgrade_preserves_existing_mapping_and_composite
+backend/tests/test_composite_mapping_postgres.py::test_mapping_notes_upgrade_preserves_existing_mapping_and_composite
+backend/tests/test_composite_mapping_postgres.py::test_mapping_notes_upgrade_preserves_existing_mapping_and_composite
+backend/tests/test_composite_mapping_postgres.py::test_mapping_notes_upgrade_preserves_existing_mapping_and_composite
+backend/tests/test_notification_center_postgres.py::test_av49_to_aw50_is_additive_repeatable_and_retains_demands
+backend/tests/test_notification_center_postgres.py::test_av49_to_aw50_is_additive_repeatable_and_retains_demands
+backend/tests/test_notification_center_postgres.py::test_av49_to_aw50_is_additive_repeatable_and_retains_demands
+  /home/quant/repos/market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED backend/tests/test_provider_squeeze_history.py::test_native_squeeze_keeps_default_lookback_across_absent_periods[H1]
+FAILED backend/tests/test_provider_squeeze_history.py::test_native_squeeze_keeps_default_lookback_across_absent_periods[H4]
+FAILED backend/tests/test_provider_squeeze_history.py::test_native_squeeze_keeps_default_lookback_across_absent_periods[D1]
+FAILED backend/tests/test_provider_squeeze_history.py::test_native_squeeze_still_resets_on_explicit_invalid_input[invalid0]
+FAILED backend/tests/test_provider_squeeze_history.py::test_native_squeeze_still_resets_on_explicit_invalid_input[invalid1]
+FAILED backend/tests/test_series_search_pagination.py::test_provider_pages_reach_full_directory_and_mixed_kind_fairness
+FAILED backend/tests/test_series_search_pagination.py::test_all_cursor_covers_each_kind_filters_before_paging_and_rejects_changed_query
+FAILED backend/tests/test_series_search_pagination_postgres.py::test_all_kind_cursor_and_asset_filter
+8 failed, 16 passed, 7 warnings in 35.79s

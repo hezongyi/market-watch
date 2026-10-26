@@ -1198,6 +1198,8 @@ def quote_snapshot(body: QuoteQuery):
                 latest.get("start") if latest else None, meta,
                 event_end=latest.get("end") if latest else None,
             )
+            quote_frame = "D1" if meta["source"] == "akshare" else "M1"
+            quote_time_type = "source_d1" if quote_frame == "D1" else "source_m1"
             fetch_status = page.get("fetch_status", "ok")
             read_at = page.get("read_at", page.get("as_of"))
             values = {"short_name": shown, "description": shown + " · 平台行情" + (" · " + meta["price_description"] if meta.get("price_description") else ""),
@@ -1205,7 +1207,7 @@ def quote_snapshot(body: QuoteQuery):
                       "fetched_at": page.get("as_of"), "read_at": read_at, "fetch_status": fetch_status,
                       **{key:page[key] for key in ("wait_reason", "last_success_at", "cache_age_ms") if key in page},
                       **({'error_evidence': page['error_evidence']} if page.get('error_evidence') else {}),
-                      "time_type": "source_m1" if latest else None, "resolution": "M1"}
+                      "time_type": quote_time_type if latest else None, "resolution": quote_frame}
             if latest:
                 values["lp"] = float(latest["close"])
                 values.update(quote_time=None, data_start=latest.get("start"), data_end=latest.get("end"))
@@ -1228,8 +1230,8 @@ def quote_snapshot(body: QuoteQuery):
             result.append({"s": "ok", "n": ticker, "v": values, **session,
                            **conflict, "fetched_at": page.get("as_of"), "read_at": read_at,
                            "fetch_status": fetch_status, "data_start": latest.get("start") if latest else None,
-                           "data_end": latest.get("end") if latest else None, "time_type": "source_m1" if latest else None,
-                           "resolution": "M1"})
+                           "data_end": latest.get("end") if latest else None, "time_type": quote_time_type if latest else None,
+                           "resolution": quote_frame})
         except Exception as error:
             from .market_notices import error_evidence
             observed_now = now_ms()

@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "symbol": "SZSE:000001",
+      "endpoint": "stock_zh_a_daily",
+      "raw_rows": 8458,
+      "factor_events": 33,
+      "supplier_qfq_rows": 8458,
+      "checked_ohlc": 2712,
+      "maximum_absolute_error": "0.00499371639911907563458998",
+      "tolerance": "0.011",
+      "basis_values": 7,
+      "first": "2024-01-02",
+      "last": "2026-10-23",
+      "elapsed_seconds": 15.01,
+      "passed": true
+    },
+    {
+      "symbol": "SSE:600519",
+      "endpoint": "stock_zh_a_daily",
+      "raw_rows": 6027,
+      "factor_events": 33,
+      "supplier_qfq_rows": 6027,
+      "checked_ohlc": 2712,
+      "maximum_absolute_error": "0.004998436319243015714465",
+      "tolerance": "0.011",
+      "basis_values": 6,
+      "first": "2024-01-02",
+      "last": "2026-10-23",
+      "elapsed_seconds": 14.617,
+      "passed": true
+    },
+    {
+      "symbol": "HKEX:00700",
+      "endpoint": "stock_hk_daily",
+      "raw_rows": 5499,
+      "factor_events": 28,
+      "supplier_qfq_rows": 5496,
+      "checked_ohlc": 2764,
+      "maximum_absolute_error": "0.00004999910",
+      "tolerance": "0.0001",
+      "basis_values": 4,
+      "first": "2024-01-02",
+      "last": "2026-10-23",
+      "elapsed_seconds": 13.485,
+      "passed": true,
+      "note": "Recorded live maximum also passes tighter HK-specific tolerance; no new upstream observation."
+    }
+  ]
+}

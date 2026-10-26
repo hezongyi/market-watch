@@ -1078,7 +1078,13 @@ async def query_chart(body: DataQuery, disconnected=None, deadline=None, retain_
 
     cancelled = threading.Event()
     token = CANCELLED.set(cancelled)
-    source = "fxcm" if body.series_kind == "provider" and body.instrument.upper().startswith(("FXCM:", "MWP:FXCM:")) else None
+    source = None
+    if body.series_kind == "provider":
+        ident = body.instrument.removeprefix("MWP:").upper()
+        if ident.startswith("FXCM:"):
+            source = "fxcm"
+        elif ident.startswith(("AKSHARE:", "TENCENT:")):
+            source = "akshare"
     deadline = min(deadline or float("inf"), time.monotonic() + request_seconds(source))
     deadline_token = DEADLINE.set(deadline)
     task = asyncio.create_task(asyncio.to_thread(data_sync, body))

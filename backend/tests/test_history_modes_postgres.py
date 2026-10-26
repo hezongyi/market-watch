@@ -89,3 +89,21 @@ def test_postgres_pre_modes_migration_keeps_m1_payload(provider_pg):
         upgrade(connection)
         with pytest.raises(RuntimeError, match="Retain archived"):
             migration.downgrade()
+
+
+@pytest.mark.parametrize("family,kind,first,revised,expected_first,expected_second", [
+    ("sina-a", "sina_qfq_factor", "2", "4", "5", "2.5"),
+    ("sina-hk", "sina_qfq_factor", "0.5", "0.25", "5.0", "2.50"),
+    ("yfinance", "yahoo_adj_close_ratio", "0.5", "0.25", "5.0", "2.50"),
+])
+def test_postgres_qfq_basis_revision(provider_pg, family, kind, first, revised, expected_first, expected_second):
+    contracts.test_qfq_basis_revision_freezes_raw_and_old_artifacts(
+        provider_pg[0], family, kind, first, revised, expected_first, expected_second)
+
+
+@pytest.mark.parametrize("contract", [
+    contracts.test_missing_qfq_basis_is_terminal_visible_and_does_not_starve_healthy_artifacts,
+    contracts.test_pending_legacy_artifact_resumes_using_its_original_rule,
+], ids=lambda contract: contract.__name__)
+def test_postgres_qfq_unavailable_and_upgrade(provider_pg, contract):
+    contract(provider_pg[0])
