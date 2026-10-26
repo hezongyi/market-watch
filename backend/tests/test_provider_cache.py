@@ -228,7 +228,7 @@ def test_fresh_short_history_boundary_reuses_recent_tail_without_refetch(databas
 
 
 def native_body(**kwargs):
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     return DataQuery(instrument=META['id'], series_kind='provider', timeframe='M5',
                      native_history={'chart_count': 1, 'focused': True}, **kwargs)
 
@@ -240,7 +240,7 @@ def native_body(**kwargs):
 def test_native_buffer_keeps_volume_and_revalidates_volume_only_corrections(
     database, monkeypatch, source, kind, unit, amount
 ):
-    from alerts.chart_api import DataQuery, HistoryObservation
+    from alerts.chart_query import DataQuery, HistoryObservation
     meta = META if source == 'oanda' else {
         **META, 'id': 'BTCUSDT', 'symbol': 'BTCUSDT', 'source': source,
         'basis': 'last', 'calendar': 'utc0',
@@ -420,7 +420,7 @@ def test_reduced_optional_budgets_keep_demand_and_native_loaded_extra_in_backend
 @pytest.mark.parametrize('charts,focused,expected', [(1,True,2500),(2,True,1500),
                                                   (4,True,1500),(4,False,500),(8,None,1500)])
 def test_native_multichart_response_budget_and_focus(database, monkeypatch, charts, focused, expected):
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     monkeypatch.setattr(upstream, 'metadata', lambda _: META)
     monkeypatch.setattr(settings, 'provider_native_history_buffer', True)
     seed(META, 'M5', 5000000, page(0, 5000000, boundary=True))

@@ -12,7 +12,7 @@ const ctx=vm.createContext({URL,URLSearchParams,Map,Set,Promise,Date,Intl,Error,
   location:{search:'?parent=http://localhost&marketPolling=1'},parent:{postMessage(){}},
   crypto:{randomUUID:()=> 'test'},addEventListener(){},setTimeout,clearTimeout,
   responses,events,queries});
-for(const name of ['series.js','price-format.js','bridge.js'])
+for(const name of ['series.js','price-format.js','chart-runtime.js'])
   vm.runInContext(fs.readFileSync(path.join(repo,'advanced-host',name),'utf8'),ctx);
 (async()=>{
   await vm.runInContext(`(async()=>{

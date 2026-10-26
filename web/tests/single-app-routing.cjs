@@ -17,6 +17,7 @@ function load(file, require) {
 }
 const center = load("src/market-data/location.ts");
 const { safeNext, pageName } = load("src/app/navigation.ts", () => center);
+assert.equal(safeNext('/advanced-charts/?panel=notifications&event=s%3A123'),'/advanced-charts?panel=notifications&event=s%3A123');
 for (const next of [
   "https://evil.invalid/x",
   "//evil.invalid/x",
@@ -30,16 +31,16 @@ for (const next of [
   "/%2f%2fevil.invalid",
   "javascript:alert(1)",
   "/settings/unknown",
+  "/replay?dataset_version=123",
+  "/replay/run-1",
+  "/legacy/monitoring",
+  "/chart-workspaces/legacy-1",
 ])
   assert.equal(safeNext(next), "/advanced-charts", next);
 for (const next of [
   "/advanced-charts/abc-123?panel=alerts#main",
   "/signals?signal=abc#notification",
-  "/replay?dataset_version=123",
-  "/replay/run-1",
   "/settings/account",
-  "/legacy/monitoring",
-  "/chart-workspaces/legacy-1",
 ])
   assert.equal(safeNext(next), next);
 assert.equal(

@@ -17,6 +17,7 @@ from sqlalchemy.exc import IntegrityError
 
 from ..capabilities.context import CapabilityError
 from ..config import settings
+from ..query_errors import QueryError
 from ..storage import AgentCredential, AgentOperation, Audit, now_ms, transaction
 
 logger = logging.getLogger(__name__)
@@ -41,7 +42,8 @@ def reauthorize(db, ctx, capability):
 def intent_hash(body):
     return hashlib.sha256(
         json.dumps(
-            body.model_dump(exclude={"idempotency_key"}), sort_keys=True, separators=(",", ":")
+            body.model_dump(mode="json", exclude={"idempotency_key"}),
+            sort_keys=True, separators=(",", ":")
         ).encode()
     ).hexdigest()
 
@@ -204,7 +206,7 @@ class Adapter:
                 )
             except CapabilityError as exc:
                 error = exc
-            except HTTPException as exc:
+            except (HTTPException, QueryError) as exc:
                 code = {
                     404: "DATA_UNAVAILABLE",
                     409: "BUSINESS_CONFLICT",

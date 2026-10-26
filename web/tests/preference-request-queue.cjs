@@ -1,8 +1,8 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
-const source=fs.readFileSync('../advanced-host/bridge.js','utf8');
+const source=fs.readFileSync('../advanced-host/chart-runtime.js','utf8');
 const code=source.slice(source.indexOf('const requests = [];'),source.indexOf('function dateAt('));
 const sent=[],ctx=vm.createContext({Map,Promise,Error,send:value=>sent.push(value),setTimeout:()=>1,clearTimeout(){}});
-vm.runInContext('const pending=new Map();let seq=0;'+code,ctx);
+vm.runInContext(`const pending=new Map();let seq=0;const adapter={};const call=(type,query,context)=>{send({type,query,...context});return new Promise(()=>{});};const application={market:call,workspace:call,session:call};`+code,ctx);
 vm.runInContext(`
  for(let i=0;i<4;i++) request({op:'slow-history'},'data');
  request({op:'draftWrite'},'preferences');

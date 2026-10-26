@@ -614,3 +614,5 @@ async function nativeAlertShell(
     }),
   };
 }
+// The separately bundled React panels call this pinned native boundary.
+globalThis.nativeAlertShell = nativeAlertShell;

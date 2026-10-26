@@ -13,7 +13,7 @@ function harness({binding={revision:'fixed-1',inputRevision:7,calculationStart:1
  class Clock extends Date{static now(){return clock;}}
  const context={MWNativeIndicatorResults:adapter,queueMicrotask,crypto:require("node:crypto"),Date:Clock,setTimeout,clearTimeout,setInterval:()=>1,clearInterval(){},
   indicatorKey:(ticker,res)=>ticker+'|'+res,indicatorBindings:new Map(),indicatorCoordinator:undefined,decode:()=>({series_kind:'composite'})};
- const bridge=fs.readFileSync(root+'/advanced-host/bridge.js','utf8');
+ const bridge=fs.readFileSync(root+'/advanced-host/chart-runtime.js','utf8');
  const bindingSource=bridge.slice(bridge.indexOf('function rememberIndicatorBinding('),bridge.indexOf('function startIndicatorCoordinator('));
  vm.runInNewContext(bindingSource+fs.readFileSync(root+'/advanced-host/indicator-coordinator.js','utf8'),context);
  context.indicatorBindings.set(chart.symbol()+'|5',binding);
@@ -33,7 +33,7 @@ function page(specs,pendingPeriod=null,value=10){
    series:[{key:'value',values:spec.params.period===pendingPeriod?[]:bars.map(b=>({time:b.start,value}))}]}))};
 }
 (async()=>{
- const bridge=fs.readFileSync(root+'/advanced-host/bridge.js','utf8');
+ const bridge=fs.readFileSync(root+'/advanced-host/chart-runtime.js','utf8');
  const canonicalContext={atob:s=>Buffer.from(s,'base64').toString('utf8')};
  vm.runInNewContext(fs.readFileSync(root+'/advanced-host/series.js','utf8')+';const decode=MWSeries.decode;'+bridge.slice(bridge.indexOf('function indicatorKey('),bridge.indexOf('let studyTemplates,')),
   canonicalContext);

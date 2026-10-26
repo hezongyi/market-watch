@@ -24,7 +24,7 @@ const context = vm.createContext({
   setTimeout,
   clearTimeout,
 });
-for (const file of ["series.js", "bar-range-mapping.js", "bridge.js"]) {
+for (const file of ["series.js", "bar-range-mapping.js", "chart-runtime.js"]) {
   vm.runInContext(
     fs.readFileSync(path.join(__dirname, "../../advanced-host", file), "utf8"),
     context,

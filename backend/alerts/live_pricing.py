@@ -26,7 +26,6 @@ from .storage import (
     MarketDataset,
     Preference,
     PricingOwner,
-    Watch,
     now_ms,
     transaction,
     uid,
@@ -287,31 +286,12 @@ def renew(ownership, *, now=None):
         return False
 
 
-def required_recovery_minutes(watches):
-    from .domain import TIMEFRAMES
-    from .indicators import get_indicator
 
-    minutes = settings.oanda_recovery_minutes
-    for watch in watches:
-        rule = watch.rule
-        if rule["timeframe"] == "tick":
-            continue
-        lookback = (get_indicator(rule["indicator"], rule["indicator_version"]).lookback(
-            rule["indicator_params"]) + 2 if rule["kind"] == "indicator" else rule["consecutive"] + 2)
-        minutes = max(minutes, int(lookback * TIMEFRAMES[rule["timeframe"]] / 60 * 1.6))
-        if rule["kind"] == "previous_day":
-            minutes = max(minutes, 5 * 1440)
-    return minutes
+
 
 
 def recovery_requirements(identities):
-    with transaction() as db:
-        result = {}
-        for identity in identities.values():
-            dataset = db.get(MarketDataset, identity.key)
-            result[identity.key] = required_recovery_minutes(db.scalars(select(Watch).where(
-                Watch.instrument_id == dataset.instrument_id, Watch.status == "active")))
-        return result
+    return {identity.key: settings.oanda_recovery_minutes for identity in identities.values()}
 
 
 def begin_connection(ownership, identities, *, now=None):
@@ -352,11 +332,7 @@ def begin_connection(ownership, identities, *, now=None):
             cutoff = confirmation_cutoff(stamp)
             dataset = db.get(MarketDataset, identity.key)
             db.get(Instrument, dataset.instrument_id).enabled = True
-            watches = list(db.scalars(select(Watch).where(Watch.instrument_id == dataset.instrument_id,
-                                                        Watch.status == "active")))
-            # Reserve a calendar span; actual observation readiness is still
-            # checked by each rule evaluator and never inferred from its size.
-            required_minutes = required_recovery_minutes(watches)
+            required_minutes = settings.oanda_recovery_minutes
             state.recovery_cursor = max(0, min(
                 state.confirmed_end - 2 * 60000 if state.confirmed_end else cutoff,
                 cutoff - required_minutes * 60000))
@@ -366,10 +342,6 @@ def begin_connection(ownership, identities, *, now=None):
             state.revision += 1
             db.add(Audit(kind="pricing_connection", details={"dataset": identity.key,
                 "epoch": owner.epoch, "effective_at": stamp, "state": "recovering"}))
-            for watch in watches:
-                if watch.rule.get("timeframe") == "tick":
-                    watch.state = {}
-                watch.paused_reason = "行情连接恢复中，等待同源数据补齐"
         return owner.epoch
 
 
@@ -445,23 +417,6 @@ def publish_event(ownership, epoch, event, identities, *, now=None):
         accept(db, state, event, stamp=stamp, profile=inst.calendar_profile)
         inst.last_received = event.received_at
         inst.quality = "receiving" if state.ready else "recovering"
-        if (not event.tradeable or event.bid is None or event.ask is None or
-                event.ask is not None and event.bid is not None and Decimal(event.ask) < Decimal(event.bid) or
-                previous and event.source_time - previous["source_time"] > 15000):
-            for watch in db.scalars(select(Watch).where(Watch.instrument_id == inst.id,
-                                                       Watch.status == "active")):
-                if watch.rule["timeframe"] == "tick":
-                    watch.state = {}
-                    watch.paused_reason = "报价期间缺少连续观测，重新建立同源判断前态"
-        from .live_confirmation import health
-
-        if (state.ready and not state.error and not health(db, state).get("error") and session_status(event.identity.model_dump(), inst.calendar_profile, stamp)['market_session'] != 'closed'
-                and event.tradeable and event.bid is not None and event.ask is not None
-                and Decimal(event.ask) >= Decimal(event.bid)
-                and 0 <= stamp - event.source_time <= 15000):
-            from .service import evaluate_quote
-
-            evaluate_quote(db, inst, event.source_time, Decimal(event.bid), Decimal(event.ask))
         return "accepted"
 
 
@@ -504,7 +459,6 @@ def publish_rest_batch(ownership, epoch, batch, identities, *, now=None, demand_
             return 'rejected_provider_maintenance'
         owner.expires = stamp + settings.oanda_stream_lease_seconds * 1000
         from .display_observations import accept_rest
-        from .service import evaluate_close_sample
 
         for identity in identities.values():
             state = db.get(LiveState, identity.key)
@@ -542,20 +496,6 @@ def publish_rest_batch(ownership, epoch, batch, identities, *, now=None, demand_
             state.received_at = sample.received_at
             state.heartbeat_at = sample.received_at
             state.revision += 1
-            # A forming candle observed while the source is still recovering
-            # is display-only.  Advancing a tick rule here would create a new
-            # baseline from a potentially incomplete prefix and could emit a
-            # crossing before the confirmation gate has been rebuilt.  The
-            # next ready-generation sample will establish/evaluate it.
-            from .live_confirmation import health
-
-            if sample.recovery == "ready" and state.ready and not health(db, state).get("error"):
-                evaluate_close_sample(
-                    db, inst, sample.received_at, sample.close,
-                    received_at=sample.received_at, sequence=sample.sequence,
-                    source_identity=sample.spec.identity.model_dump(mode='json'),
-                    interval_ms=sample.interval_ms,
-                )
     return 'accepted'
 
 
@@ -652,9 +592,6 @@ def disconnected(ownership, epoch, identities, result, *, now=None, intentional=
                     db.add(Audit(kind="pricing_idle", details={"dataset": identity.key,
                         "epoch": epoch, "effective_at": stamp}))
                     continue
-                for watch in db.scalars(select(Watch).where(Watch.instrument_id == inst.id,
-                                                            Watch.status == "active")):
-                    watch.paused_reason = "主行情不可用；备用尚未接入，暂停依赖缺失数据的判断"
                 db.add(Audit(kind="pricing_health", details={"dataset": identity.key,
                     "epoch": epoch, "state": "unavailable", "error": result.status,
                     "effective_at": stamp}))
@@ -793,19 +730,12 @@ def commit_confirmation(ownership, epoch, batch, *, now=None, operation="candles
         from .composite_inputs import apply_minutes
         from .confirmed_minutes import record
         from .market import ingest
-        from .storage import Bar
 
         # Legacy empty confirmations carry no checkpoint and no M1 to pin.
         # Preserve their independently reviewed closure path without inventing
         # canonical minutes or a query checkpoint. Data confirmations stay strict.
         if batch.rows:
             apply_minutes(db, record(db, batch))
-        previous_rows = {row.start: row for row in db.scalars(select(Bar).where(
-            Bar.instrument_id == inst.id, Bar.timeframe == "M1",
-            Bar.start >= batch.window_start, Bar.start < batch.window_end))}
-        revised = any(row.timestamp in previous_rows and any(
-            getattr(previous_rows[row.timestamp], name) != Decimal(getattr(row, name))
-            for name in ("open", "high", "low", "close")) for row in batch.rows)
         ingest(db, inst, batch.ingestion_payload())
         # Measure completed ingestion, rather than the entry into the fenced
         # transaction. An explicit test clock remains deterministic.
@@ -866,11 +796,6 @@ def commit_confirmation(ownership, epoch, batch, *, now=None, operation="candles
                 'window_start': late.start, 'window_end': late.start+60000}, stamp=stamp)
         if not state.ready and batch.window_end >= confirmation_cutoff(stamp):
             if current_confirmed or metric.expected is False:
-                from .service import rewarm_watch
-
-                for watch in db.scalars(select(Watch).where(Watch.instrument_id == inst.id,
-                                                            Watch.status == "active")):
-                    rewarm_watch(db, watch, until=state.recovery_started)
                 state.ready = True
                 state.connection = "connected"
                 inst.error = None
@@ -879,18 +804,6 @@ def commit_confirmation(ownership, epoch, batch, *, now=None, operation="candles
                 db.add(Audit(kind="pricing_recovered", details={"dataset": batch.identity.key,
                     "epoch": epoch, "confirmed_end": state.confirmed_end,
                     "effective_at": stamp, "historical_notifications": "suppressed"}))
-        if state.ready and not state.error and not health(db, state).get('error') and current_confirmed and session_status(batch.identity.model_dump(), inst.calendar_profile, stamp)['market_session'] != 'closed':
-            from .service import evaluate_watch, rewarm_watch
-
-            emit_after = max(state.recovery_started, stamp - 30000)
-            for watch in db.scalars(select(Watch).where(Watch.instrument_id == inst.id,
-                                                       Watch.status == "active")):
-                if watch.rule["timeframe"] != "tick":
-                    # Recent source revisions repair input state without replaying
-                    # expired notification events. Only the fresh tail can notify.
-                    if revised:
-                        rewarm_watch(db, watch, until=emit_after)
-                    evaluate_watch(db, watch.id, emit_after=emit_after)
         if confirmation_audit is not None:
             db.flush()
             evaluated_at = now_ms() if now is None else stamp
@@ -898,7 +811,7 @@ def commit_confirmation(ownership, epoch, batch, *, now=None, operation="candles
                 "evaluation_completed_at": evaluated_at,
                 "m1_to_evaluation_ms": evaluated_at - batch.window_end,
                 "processing_ms": evaluated_at - stamp,
-                "timing_scope": "ingestion and watch computation flushed; excludes transaction commit and delivery"}
+                "timing_scope": "confirmed ingestion flushed; ChartAlert evaluates independently; excludes transaction commit and delivery"}
         if operation != "candles":
             return
         if current_confirmed or metric.expected is False:
@@ -1001,9 +914,7 @@ def snapshots(*, now=None):
             result[-1]["candle_ready"] = bool(available and connected and state.ready and not state.error and not confirmation.get("error")
                 and (valid_candle if rest_sample else True))
             result[-1]["precision"] = inst.precision
-            result[-1]["alert_readiness"] = [{"watch_id": watch.id, "reason": watch.paused_reason,
-                "status": watch.status} for watch in db.scalars(select(Watch).where(
-                    Watch.instrument_id == inst.id, Watch.status == "active"))]
+
         return result
 
 

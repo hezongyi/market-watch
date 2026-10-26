@@ -1,5 +1,9 @@
 # Market-watch 行情
 
+当前候选架构（2026-10-26）：`web/src/advanced/ChartApplicationPage.tsx` 通过 `web/src/runtime/` 直接挂载 `advanced-host/chart-runtime.js`；只有图表库内部 iframe，无外层业务宿主和消息桥。`web` 构建唯一业务静态产物，Web 同源转发 API/MCP/SSE。HTTP 与 MCP 共用 `chart_alert_application`，唯一告警执行链为 API 持有的 `alert_monitor` → `chart_alert_worker`，组合行情适配器仍保留。`chart_query` 提供协议无关查询和取消；HTTP 层转换 `QueryError`。旧 Watch/演练只保留历史 ORM、迁移、引用与确认，不再创建、执行或投递。阶段 5 查询提取独立提交；schema 与已有草稿键不变。源码、测试、限制及回退见 [完成审计](docs/verification/single-frontend-20261026/completion-audit.md)。
+
+以下 2026-10-07 内容为当时交付背景，不代表当前候选或生产状态。
+
 当前交付状态（2026-10-07）：完整A–E与Ubuntu实现验收通过，见docs/verification/three-layer/completion-audit.md。
 当前交付约束（2026-10-07）：用户因快速迭代要求实现验收后暂不做长期质量观察。
 完整三层实现与Ubuntu真实功能/回归/并发/短时恢复验收已完成；不启动新48小时观察，

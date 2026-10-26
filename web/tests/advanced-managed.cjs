@@ -4,7 +4,7 @@ const ctx=vm.createContext({URL,URLSearchParams,Map,Set,Promise,Date,Intl,Error,
  location:{search:'?parent=http://localhost'},parent:{postMessage:m=>events.push(m)},
  crypto:{randomUUID:()=> 'test'},atob:s=>Buffer.from(s,'base64').toString('utf8'),btoa:s=>Buffer.from(s).toString('base64'),
  addEventListener(){},setTimeout,clearTimeout});
-for(const file of ['series.js','bridge.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+file,'utf8'),ctx);
+for(const file of ['series.js','chart-runtime.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+file,'utf8'),ctx);
 (async()=>{
  await vm.runInContext(`(async()=>{
   globalThis.calls=[];globalThis.currentReady=false;

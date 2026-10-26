@@ -5,7 +5,7 @@ const APP=process.env.APP_ORIGIN||'http://127.0.0.1:16202', CHART=process.env.CH
 const ROOT='../docs/verification/yahoo';
 (async()=>{
  const started_at=new Date().toISOString();
- const source_sha256=Object.fromEntries(['../advanced-host/bridge.js','../advanced-host/series.js','../backend/alerts/market_data.py','../backend/alerts/market_names.py','../backend/alerts/yahoo_aliases.py'].map(path=>[path,crypto.createHash('sha256').update(fs.readFileSync(path)).digest('hex')]));
+ const source_sha256=Object.fromEntries(['../advanced-host/chart-runtime.js','../advanced-host/series.js','../backend/alerts/market_data.py','../backend/alerts/market_names.py','../backend/alerts/yahoo_aliases.py'].map(path=>[path,crypto.createHash('sha256').update(fs.readFileSync(path)).digest('hex')]));
  const browser=await chromium.launch({headless:true});
  const page=await browser.newPage({viewport:{width:1440,height:900}});
  const pages=[],errors=[],requests=[];

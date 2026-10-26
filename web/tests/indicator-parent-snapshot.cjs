@@ -1,7 +1,7 @@
 // Exercise the shipped parent message branch, including validation and HTTP body.
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const ts=require('typescript');
-const source=fs.readFileSync('src/advanced/AdvancedWorkspace.tsx','utf8');
+const source=fs.readFileSync('src/advanced/ChartApplicationPage.tsx','utf8');
 const start=source.indexOf('} else if (m.type === "data") {');
 const end=source.indexOf('} else if (m.type === "snapshot") {',start);
 assert.ok(start>0 && end>start);

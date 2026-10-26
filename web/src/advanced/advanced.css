@@ -21,11 +21,12 @@
 .advanced-workspace a:focus-visible {
   outline: 2px solid #599bff;
 }
-.advanced-workspace iframe {
+.advanced-workspace .advanced-chart {
   flex: 1;
   width: 100%;
   border: 0;
   min-height: 0;
+  position:relative;
 }
 .advanced-workspace section {
   padding: 32px;

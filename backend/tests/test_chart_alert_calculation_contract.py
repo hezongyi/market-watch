@@ -8,7 +8,7 @@ from alerts.chart_alert_service import create, current_version
 from alerts.chart_alert_service import lifecycle as apply_lifecycle
 from alerts.chart_alert_values import operand_values
 from alerts.chart_alert_worker import evaluate, stored_rows
-from alerts.chart_api import DataQuery
+from alerts.chart_query import DataQuery
 from alerts.storage import (
     ChartAlert,
     ChartPublication,

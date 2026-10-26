@@ -3,7 +3,7 @@ const { chromium, expect } = require('@playwright/test');
 const fs = require('node:fs'), path = require('node:path'), assert = require('node:assert/strict');
 const root = path.resolve(__dirname, '../..');
 const library = path.resolve(process.env.MW_PROBE_LIBRARY || path.join(root, 'advanced-host/charting_library'));
-const source = fs.readFileSync(path.join(root, 'advanced-host/bridge.js'), 'utf8');
+const source = fs.readFileSync(path.join(root, 'advanced-host/chart-runtime.js'), 'utf8');
 const binding = source.slice(source.indexOf('const timezoneBindings = new Map();'), source.indexOf('\nfunction marketQuery('));
 const fixture = `
 let callbacks=0;

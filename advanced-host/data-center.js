@@ -1,14 +1,14 @@
 /* Native dialog host. Authenticated operations remain in the trusted app. */
-function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, suspendIndicators, managementRequest, searchSymbols, occurrence=()=>{}, timezone = () => widget.activeChart().getTimezoneApi().getTimezone().id }) {
+function chartDataCenter({ widget, workspace, epoch, send, resolve, suspendIndicators, managementRequest, searchSymbols, occurrence=()=>{}, timezone = () => widget.activeChart().getTimezoneApi().getTimezone().id }) {
   const probe = widget.createButton({ align: "left", useTradingViewStyle: false });
   const doc = probe.ownerDocument;
   widget.removeButton(probe);
-  const session = crypto.randomUUID(), channel = "mw-data-center-v1";
+  const session = crypto.randomUUID();
   const resolutions = {M1:"1",M5:"5",M15:"15",M30:"30",H1:"60",H4:"240",D1:"1D",W1:"1W",MN:"1M"};
   const dialog = { open: false };
   const nativeUi = chartNativeUi(widget, doc, searchSymbols);
   const listeners = new Set();
-  let nativeRoot, businessRoot, fallback, fallbackFrame, ui, opening = false, openGeneration = 0, assetPromise;
+  let nativeRoot, businessRoot, failure, ui, opening = false, openGeneration = 0, assetPromise;
   const readControllers = new Set();
   const style = doc.createElement("style");
   style.textContent = `.mw-data-center-native{width:min(1120px,calc(100vw - 32px))!important;max-width:none!important}.mw-data-center-wrapper{width:100%;height:min(720px,calc(100dvh - 32px))}.mw-data-center-business{flex:1;min-height:0;position:relative}.mw-data-center-title{display:flex;align-items:center;gap:10px}.mw-data-center-title svg{width:24px;height:24px}.mw-data-center-button{padding:0 12px!important}.mw-data-center-button .js-button-text{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:100%}.mw-data-center-button svg{width:20px;height:20px;display:block;flex-shrink:0}.mw-data-center-button[aria-expanded=true]{background:#2b2b2b}html:not(.theme-dark) .mw-data-center-button[aria-expanded=true]{background:#f2f2f2}`;
@@ -81,7 +81,6 @@ function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, s
   const observer = new MutationObserver(decorate);
   observer.observe(doc.body, { subtree: true, childList: true }); decorate();
   const childPost = value => {
-    if(fallbackFrame?.contentWindow) fallbackFrame.contentWindow.postMessage({channel,session,...value},appOrigin);
     for (const receive of [...listeners]) receive(value);
   };
   const current = () => !!target && !target.invalid && !disposed && workspace()?.id === target.workspace && epoch() === target.epoch &&
@@ -137,27 +136,26 @@ function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, s
         const oldBusiness=businessRoot,oldNative=nativeRoot;businessRoot=null;nativeRoot=null;listeners.clear();
         oldBusiness?.dispose();oldNative?.unmount();
         if(openingWorkspace!==workspace()?.id || openingEpoch!==epoch()) return;
-        target={id:crypto.randomUUID(),workspace:workspace().id,epoch:epoch(),index:widget.activeChartIndex(),chart:widget.activeChart(),
-          symbol:widget.activeChart().symbol(),resolution:widget.activeChart().resolution(),layout:widget.layout()};
-        pendingLocation=location;dialog.open=true;opening=false;childReady=false;
-        send({type:"data-center-state",open:true,session,location:location || remembered || "/market-data"});
-        fallback=doc.createElement("dialog");fallback.setAttribute("aria-label","数据中心兼容窗口");
-        fallback.style.cssText="position:fixed;inset:0;margin:auto;padding:0;border:1px solid #777;border-radius:6px;width:min(1120px,calc(100vw - 32px));height:min(720px,calc(100dvh - 32px));max-width:none;max-height:none";
-        fallbackFrame=doc.createElement("iframe");fallbackFrame.title="数据中心";
-        fallbackFrame.style.cssText="width:100%;height:100%;border:0;display:block";
-        fallbackFrame.src=appOrigin+"/chart-data-center?session="+session;
-        fallback.addEventListener("cancel",event=>{event.preventDefault();childPost({type:"request-close"});});
-        fallback.append(fallbackFrame);doc.body.append(fallback);fallback.showModal();decorate();
-        send({type:"error",error:"原生界面适配暂不可用，已打开数据中心兼容窗口："+String(error.message||error)});
+        dialog.open=false;target=null;childReady=false;
+        failure?.remove();failure=doc.createElement("div");
+        failure.className="mw-data-center-load";failure.setAttribute("role","alert");
+        const text=doc.createElement("span");text.textContent="数据中心暂不可用："+String(error.message||error);
+        const again=doc.createElement("button");again.textContent="重试数据中心";
+        again.onclick=()=>{failure.remove();failure=null;assetPromise=undefined;void open(location);};
+        const dismiss=doc.createElement("button");dismiss.textContent="关闭";dismiss.onclick=()=>{failure.remove();failure=null;lastFocus?.focus?.();};
+        failure.append(text,again,dismiss);doc.body.append(failure);again.focus();
+        send({type:"data-center-state",open:false,session});
+        occurrence({source_kind:"data_center",attempt_id:session,code:"NATIVE_CENTER_UNAVAILABLE",title:"数据中心接入失败",message:String(error.message||error)});
+
       }
     } finally { if(generation===openGeneration) opening=false; }
   }
   function close() {
-    if (!dialog.open && !opening) return;
+    if (!dialog.open && !opening && !failure) return;
     ++openGeneration; opening=false; dialog.open=false;
     ui?.cancelPopups();
     for(const controller of readControllers) controller.abort();readControllers.clear();
-    fallback?.remove();fallback=null;fallbackFrame=null;
+    failure?.remove();failure=null;
     const oldBusiness=businessRoot,oldNative=nativeRoot;businessRoot=null;nativeRoot=null;listeners.clear();
     queueMicrotask(()=>{oldBusiness?.dispose();oldNative?.unmount();
       if(!dialog.open) doc.defaultView.requestAnimationFrame(()=>{if(!dialog.open)(button||lastFocus)?.focus();});
@@ -252,18 +250,12 @@ function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, s
       remembered=m.location; send({type:"data-center-state",open:true,session,location:remembered});
     }
     else if(m.type==="apply" && typeof m.id==="string" && m.id.length<=40 && typeof m.ticker==="string" && m.ticker.length<=90) void apply(m);
-    else if(m.type==="replay" && /^\/replay(?:\?dataset_version=[a-f0-9-]{36})?$/.test(m.path)){send({type:"data-center-replay",path:m.path,session});close();}
   }
-  const fallbackMessage=event=>{
-    if(event.origin===appOrigin && event.source===fallbackFrame?.contentWindow && event.data?.channel===channel && event.data.session===session)
-      handleMessage(event.data);
-  };
-  addEventListener("message",fallbackMessage);
   // Business controls live in independent React roots. The vendor shell's
   // keyboard controller cannot enumerate their tab stops; use DOM tab order
   // inside this shell while native menus/pickers retain their own controller.
   const modalKeys=event=>{
-    if(!dialog.open || fallback || event.defaultPrevented || event.key!=="Tab") return;
+    if(!dialog.open || event.defaultPrevented || event.key!=="Tab") return;
     const root=doc.querySelector('[data-name="mw-data-center-dialog"]');
     if(!root || root.querySelector(".dc-unsaved")) return;
     const active=doc.activeElement;
@@ -283,5 +275,5 @@ function chartDataCenter({ widget, appOrigin, workspace, epoch, send, resolve, s
   const invalidate = () => { if (dialog.open && target) target.invalid = true; clearOperation(); };
   const events = ["layout_changed", "chart_load_requested", "activeChartChanged"];
   for (const name of events) widget.subscribe(name, invalidate);
-  return { open, nativeUi, refreshTimezone() { if(dialog.open) childPost({type:"timezone",timezone:timezone()}); }, dispose() { disposed = true; close(); clearOperation(); observer.disconnect();removeEventListener("message",fallbackMessage);doc.removeEventListener("keydown",modalKeys,true); style.remove(); noticeStyle.remove(); widget.removeButton(buttonId); widget.unsubscribe("chart_theme_changed",theme); for (const name of events) widget.unsubscribe(name,invalidate); } };
+  return { open, nativeUi, refreshTimezone() { if(dialog.open) childPost({type:"timezone",timezone:timezone()}); }, dispose() { disposed = true; close(); clearOperation(); observer.disconnect();doc.removeEventListener("keydown",modalKeys,true); style.remove(); noticeStyle.remove(); widget.removeButton(buttonId); widget.unsubscribe("chart_theme_changed",theme); for (const name of events) widget.unsubscribe(name,invalidate); } };
 }

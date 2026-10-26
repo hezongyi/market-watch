@@ -1,10 +1,9 @@
 from alerts import api as api_module
-from alerts.service import create_watch, evaluate_watch
 from alerts.storage import DeviceReceipt
 from argon2 import PasswordHasher
 from fastapi.testclient import TestClient
 from sqlalchemy import select
-from test_service import seed
+from test_notify import pending
 
 
 def test_pair_sync_receipt_ack_and_revoke(database, monkeypatch):
@@ -12,10 +11,7 @@ def test_pair_sync_receipt_ack_and_revoke(database, monkeypatch):
         api_module.settings, "admin_password_hash", PasswordHasher().hash("test-password-only")
     )
     monkeypatch.setattr(api_module.settings, "cookie_secure", False)
-    with database.begin() as db:
-        seed(db)
-        w = create_watch(db, "EURUSD", "test", {"kind": "pullback"}, armed_at=28_800_000)
-        evaluate_watch(db, w.id)
+    pending(database)
     with TestClient(api_module.app) as client:
         login = client.post("/api/login", json={"password": "test-password-only"}).json()
         client.headers["x-csrf-token"] = login["csrf"]

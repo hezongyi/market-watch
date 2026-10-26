@@ -205,7 +205,7 @@ def test_temporary_window_preserves_cached_prices_and_never_sets_earliest(databa
 def test_cached_minutes_remain_pageable_at_rolling_window(
     database, monkeypatch, buffer, total, count, delivered
 ):
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
 
     monkeypatch.setattr(settings, "provider_native_history_buffer", buffer)
     monkeypatch.setattr(cache.upstream, "metadata", lambda ident: META)

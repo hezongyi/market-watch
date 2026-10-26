@@ -3,8 +3,8 @@
 import copy
 
 import pytest
-from alerts.chart_api import DataQuery, data_sync
 from alerts.chart_indicators import calculate
+from alerts.chart_query import DataQuery, data_sync
 from alerts.indicator_state import IndicatorState
 from alerts.observed_indicators import ObservedState, output_row, status
 from alerts.storage import FixedIndicatorRun

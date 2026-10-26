@@ -74,7 +74,7 @@ assert.equal(t.offsetLabel(stamp, "Asia/Kolkata"), "UTC+5:30");
 assert.equal(t.offsetLabel(stamp, "Asia/Kathmandu"), "UTC+5:45");
 assert.equal(t.offsetLabel(stamp, "America/St_Johns"), "UTC-2:30");
 // Exercise the real bridge publisher and rebind/dispose functions against chart subscriptions.
-const source = fs.readFileSync("../advanced-host/bridge.js", "utf8");
+const source = fs.readFileSync("../advanced-host/chart-runtime.js", "utf8");
 const functions = source.slice(
   source.indexOf("function publishNotificationTimezone("),
   source.indexOf("function marketQuery("),

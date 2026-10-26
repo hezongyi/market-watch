@@ -16,7 +16,7 @@ async function resolve(source, frames, resolution = "60", kind = "provider") {
     metadata: {source, frames, symbol: "fixture", name: "fixture", basis: "last", calendar: "source_date",
       precision: 4, asset_type: "EQUITY", timezone: "Asia/Shanghai", session: "24x7"},
   });
-  for (const name of ["series.js", "price-format.js", "composite-display-batches.js", "bridge.js"]) {
+  for (const name of ["series.js", "price-format.js", "composite-display-batches.js", "chart-runtime.js"]) {
     vm.runInContext(fs.readFileSync(path.join(root, "advanced-host", name), "utf8"), ctx);
   }
   await vm.runInContext(`(async () => {

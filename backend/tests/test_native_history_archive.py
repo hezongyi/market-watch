@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 
 import pytest
 from alerts import fixed_indicators
-from alerts.chart_api import DataQuery, data_sync
+from alerts.chart_query import DataQuery, data_sync
 from alerts.history_artifacts import artifact_tick, read_artifact
 from alerts.history_maintenance import configure, create_run, plan_report, task_control
 from alerts.history_mode_artifacts import date_bounds

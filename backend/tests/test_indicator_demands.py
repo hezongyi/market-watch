@@ -3,7 +3,7 @@
 import pytest
 from alerts import fixed_indicators as jobs
 from alerts import indicator_demands as demands
-from alerts.chart_api import DataQuery, data_sync
+from alerts.chart_query import DataQuery, data_sync
 from alerts.storage import FixedIndicatorRun, IndicatorDemand, IndicatorSchedule
 from sqlalchemy import select
 from test_fixed_indicators import history

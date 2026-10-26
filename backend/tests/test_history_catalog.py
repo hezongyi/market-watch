@@ -99,7 +99,8 @@ def test_history_catalogue_does_not_enter_native_routes_or_get_disabled_by_legac
         assert db.get(MarketCatalog, ident).available
         with pytest.raises(HTTPException, match="自建来源目录"):
             market_data.resolve(db, ident)
-    with pytest.raises(HTTPException, match="自建来源目录"):
+    from alerts.query_errors import QueryError
+    with pytest.raises(QueryError, match="自建来源目录"):
         provider_chart.metadata(ident)
     monkeypatch.setattr(settings, "yahoo_enabled", False)
     assert ident not in {row["id"] for row in market_data.instrument_catalog()}

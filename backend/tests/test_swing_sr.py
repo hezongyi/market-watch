@@ -234,7 +234,7 @@ def test_catalog_display_and_strength_contract():
 
 def test_fixed_history_job_presentation_is_full_origin_when_paging(database, monkeypatch):
     from alerts import fixed_indicators as jobs
-    from alerts.chart_api import DataQuery, data_sync
+    from alerts.chart_query import DataQuery, data_sync
     from test_fixed_indicators import drain, history
 
     version = history(database, monkeypatch)
@@ -255,7 +255,7 @@ def test_fixed_history_job_presentation_is_full_origin_when_paging(database, mon
 def test_provider_page_keeps_full_statistics_and_source_chart_labels(database, monkeypatch):
     from alerts import provider_cache as cache
     from alerts import provider_chart as upstream
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     from test_provider_cache import META, seed
 
     rows = synthetic([2, 4, 2, 5, 2, 4, 2, 5, 2, 4, 2, 5, 2])
@@ -290,7 +290,7 @@ def test_provider_page_keeps_full_statistics_and_source_chart_labels(database, m
 
 def test_published_page_keeps_full_statistics(database):
     from alerts import managed_dataset
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     from alerts.storage import ChartPublication, ChartPublishedBar
 
     rows = synthetic([2, 4, 2, 5, 2, 4, 2, 5, 2, 4, 2, 5, 2])

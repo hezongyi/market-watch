@@ -2,14 +2,16 @@
 import copy
 
 import pytest
-from alerts import live_pricing as live, fixed_indicators as fixed, series_access
-from alerts.chart_api import DataQuery
+from alerts import fixed_indicators as fixed
+from alerts import live_pricing as live
+from alerts import series_access
 from alerts.chart_indicators import calculate
+from alerts.chart_query import DataQuery
 from alerts.market_contracts import DatasetIdentity, QuoteEvent
-from alerts.storage import CompositeRevision, MarketDataset, RealtimeMapping, FixedIndicatorRun
-from test_composite_chart import populated
+from alerts.storage import CompositeRevision, FixedIndicatorRun, MarketDataset, RealtimeMapping
 from test_composite_aggregates import drain as aggregate
-from test_fixed_indicators import drain, add_tail
+from test_composite_chart import populated
+from test_fixed_indicators import add_tail, drain
 from test_market_contracts import minute
 
 

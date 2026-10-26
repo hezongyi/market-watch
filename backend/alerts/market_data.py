@@ -22,6 +22,7 @@ from .market import stored_coverage
 from .market_calendar import session_status
 from .market_names import chinese_name, display_code, matches_code, pair_query
 from .providers import fetch_oanda_catalog
+from .query_errors import QueryError
 from .quote_presentation import describe, fixed_snapshot
 from .storage import (
     Bar,
@@ -574,7 +575,7 @@ def router(authenticated):
                 return metadata(body.instrument)
             except (YahooError, TimeoutError, httpx.HTTPError) as error:
                 raise resolve_error(error) from None
-            except HTTPException as error:
+            except (HTTPException, QueryError) as error:
                 if error.status_code == 404:
                     raise HTTPException(404, {"code": "unknown_symbol", "status": "unknown_symbol",
                                                "message": "品种不存在，请刷新品种目录",
@@ -890,7 +891,9 @@ def _provider_series(query, *, source=None, symbol_type=""):
         raise HTTPException(422, "未知平台来源")
     result = [{**row, "series_kind": "provider", "ticker": encode(row["id"], "provider"),
         "description": "平台 · " + row["source"] + " · 原生周期"}
-        for row in (instrument_catalog(query, limit=None, source=source, managed_status=False) if source != "fxcm" else []) if not row["id"].startswith("MD:")]
+        for row in (instrument_catalog(query, limit=None, source=source, managed_status=False)
+                    if source not in ("fxcm", "akshare") else [])
+        if not row["id"].startswith("MD:") and row["source"] != "akshare"]
     with transaction() as db:
         for row in db.scalars(select(MarketCatalog).where(MarketCatalog.source == "oanda",
                 MarketCatalog.id.startswith("HC:"), MarketCatalog.available.is_(True),
@@ -908,13 +911,17 @@ def _provider_series(query, *, source=None, symbol_type=""):
                 "source": "oanda", "asset_type": row.asset_type, "available": True,
                 "supported": row.calendar in ("ny17", "utc0"), "precision": row.precision,
                 "description": "平台 · OANDA Practice · Bid · 原生周期"})
-    if source in (None, "fxcm"):
-        from .platform_catalog import entries as platform_entries
+    from .platform_catalog import entries as platform_entries
+    for native_source in ("akshare", "fxcm"):
+        if source not in (None, native_source):
+            continue
         with transaction() as db:
-            for row in platform_entries(db, source="fxcm", query=query):
+            for row in platform_entries(db, source=native_source, query=query):
                 result.append({**row, "symbol": row["provider_symbol"],
                     "series_kind": "provider", "ticker": encode(row["id"], "provider"),
-                    "supported": True, "description": "平台 · FXCM · Bid · 原生周期"})
+                    "supported": True, "description": "平台 · " + (
+                        "FXCM · Bid" if native_source == "fxcm" else row.get("provider_name", "AKShare"))
+                        + " · 原生周期"})
     from .search_types import symbol_type as asset_type
     for row in result:
         row["type"] = asset_type(row.get("asset_type", ""))
@@ -1253,7 +1260,7 @@ def quote_snapshot(body: QuoteQuery):
             if body.client:
                 try:
                     inst = resolve(db, ident)
-                except HTTPException:
+                except (HTTPException, QueryError):
                     result.append(
                         {"s": "error", "n": ident, "v": {"description": "品种暂不可用"}}
                     )

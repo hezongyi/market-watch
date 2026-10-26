@@ -1,6 +1,6 @@
 // Actual recovery and native reload entry; the busy branch cannot start work.
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
-const source=fs.readFileSync('../advanced-host/bridge.js','utf8');
+const source=fs.readFileSync('../advanced-host/chart-runtime.js','utf8');
 const reports=[],traces=[],chart={symbol:()=> 'MWP:XAUUSD',resolution:()=> '1D',dataReady:()=>false,
  getTimeScale:()=>({rightOffset:()=>0})};
 let starts=0,onDeferred;

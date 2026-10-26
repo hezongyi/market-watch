@@ -271,7 +271,7 @@ def test_published_internal_revision_outside_tail_is_eventually_visible(database
 
 
 def test_published_history_check_tracks_corrections_inside_frozen_session(database):
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     from alerts.managed_dataset import data
 
     end = START + 20 * MINUTE

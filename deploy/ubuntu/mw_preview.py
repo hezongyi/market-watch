@@ -44,7 +44,7 @@ def service(image, memory, cpu):
 
 def gateway_config(ui):
     if ui:
-        return 'resolver 127.0.0.11 valid=5s ipv6=off;\nupstream preview_web { zone preview_web 64k; server web:80 resolve; }\nupstream preview_chart { zone preview_chart 64k; server chart-origin:80 resolve; }\nserver { listen 443 ssl; ssl_certificate /certs/cert.pem; ssl_certificate_key /certs/key.pem;\nlocation / { proxy_pass http://preview_web; proxy_set_header Host $http_host;\nproxy_set_header X-Forwarded-Proto https; proxy_http_version 1.1;\nproxy_set_header Connection ""; proxy_buffering off; proxy_read_timeout 3600s; } }\nserver { listen 444 ssl; ssl_certificate /certs/cert.pem; ssl_certificate_key /certs/key.pem;\nlocation / { proxy_pass http://preview_chart; } }\n'
+        return 'resolver 127.0.0.11 valid=5s ipv6=off;\nupstream preview_web { zone preview_web 64k; server web:80 resolve; }\nserver { listen 443 ssl; ssl_certificate /certs/cert.pem; ssl_certificate_key /certs/key.pem;\nlocation / { proxy_pass http://preview_web; proxy_set_header Host $http_host;\nproxy_set_header X-Forwarded-Proto https; proxy_http_version 1.1;\nproxy_set_header Connection ""; proxy_buffering off; proxy_read_timeout 3600s; } }\n'
     return 'resolver 127.0.0.11 valid=5s ipv6=off;\nupstream preview_api { zone preview_api 64k; server api:8000 resolve; }\nserver { listen 80;\nlocation / { proxy_pass http://preview_api; proxy_set_header Host $http_host;\nproxy_set_header X-Forwarded-Proto http; proxy_http_version 1.1;\nproxy_set_header Connection ""; proxy_buffering off; proxy_read_timeout 3600s; } }\n'
 
 
@@ -149,9 +149,8 @@ def compose(record, private, pg_image):
     if record["ui"]:
         web = service(record["web_image"], "64m", 0.05)
         web["depends_on"] = {"api": {"condition": "service_healthy"}}
-        chart = service(record["chart_image"], "64m", 0.05)
         tls.update(
-            ports=[f"127.0.0.1:{record['port']}:443", f"127.0.0.1:{record['chart_port']}:444"],
+            ports=[f"127.0.0.1:{record['port']}:443"],
             volumes=[
                 str(Path(record["directory"]) / name) + ":" + target + ":ro"
                 for name, target in [
@@ -160,9 +159,9 @@ def compose(record, private, pg_image):
                     ("key.pem", "/certs/key.pem"),
                 ]
             ],
-            depends_on=["web", "chart-origin"],
+            depends_on=["web"],
         )
-        services.update(web=web, **{"chart-origin": chart, "tls": tls})
+        services.update(web=web, tls=tls)
     return {
         "name": record["project"],
         "services": services,
@@ -212,19 +211,15 @@ def prepare(docker, args, m):
         requested = (
             str(Path(args.repo).resolve()),
             args.port,
-            args.chart_port,
             args.api_image,
             args.web_image,
-            args.chart_image,
             sorted(set(args.worker)),
         )
         saved = (
             record["repo"],
             record["port"],
-            record["chart_port"],
             record["api_image"],
             record["web_image"],
-            record["chart_image"],
             record["workers"],
         )
         if requested != saved:
@@ -232,16 +227,9 @@ def prepare(docker, args, m):
         return {"task": args.task, "state": "reused", "url": record["url"]}
     if directory.exists():
         raise ValueError("Partial preview directory preserved; inspect it before retrying")
-    if not 1024 <= args.port <= 65535 or (args.chart_port and not 1024 <= args.chart_port <= 65535):
+    if not 1024 <= args.port <= 65535:
         raise ValueError("Ports must be within 1024..65535")
-    ui = bool(args.web_image or args.chart_image or args.chart_port)
-    if ui and (
-        not args.web_image
-        or not args.chart_image
-        or not args.chart_port
-        or args.chart_port == args.port
-    ):
-        raise ValueError("UI requires web/chart images and distinct TLS/chart ports")
+    ui = bool(args.web_image)
     if len(set(args.worker)) > 3:
         raise ValueError("R1W supports at most three necessary workers")
     if any(
@@ -279,12 +267,10 @@ def prepare(docker, args, m):
         "repo": str(repo),
         "directory": str(directory),
         "port": args.port,
-        "chart_port": args.chart_port,
         "ui": ui,
         "workers": sorted(set(args.worker)),
         "api_image": args.api_image,
         "web_image": args.web_image,
-        "chart_image": args.chart_image,
         "database": "preview",
         "initial_database": "preview",
         "reset_history": [],
@@ -342,14 +328,6 @@ def validate_images(docker, record, m):
             "Config": {"Image": spec["image"], "Labels": {"com.docker.compose.service": name}},
         }
         m.validate_retirement_image(record["task"], record["project"], container, image)
-        if (
-            name == "web"
-            and (image["Config"].get("Labels") or {}).get(m.PREFIX + "chart-origin")
-            != f"https://localhost:{record['chart_port']}"
-        ):
-            raise ValueError(
-                "Web image must be built for this preview chart origin with mw-docker build"
-            )
         # Pin every service to the actual validated bytes, never a mutable tag.
         spec["image"] = image["Id"]
     return config
@@ -423,7 +401,7 @@ def preflight(docker, record, m):
         if c["State"]["Running"]
     }
     if "tls" not in live:
-        for port in [record["port"]] + ([record["chart_port"]] if record["ui"] else []):
+        for port in [record["port"]]:
             try:
                 with socket.socket() as sock:
                     # A just-stopped gateway can leave accepted sockets in

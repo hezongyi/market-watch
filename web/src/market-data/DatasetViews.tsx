@@ -1,7 +1,6 @@
 import { DetailDisclosure, DetailPanel, useDetailPanel } from "./DetailPanel";
 import { NativeSelect } from "./NativeControls";
 import { OpenChart } from "./OpenChart";
-import { Link } from "./router";
 import { Feedback, Pager } from "./Center";
 import { useSnapshot } from "./useSnapshot";
 import { VersionComparison } from "./VersionComparison";
@@ -132,7 +131,7 @@ function VersionDetails({version:v,refresh,compare}: {version:Version;refresh:nu
     <h3>周期产物</h3><Feedback error={artifacts.error} loading={artifacts.loading} empty={!artifacts.data}/>
     {artifacts.data?.map(p=><p key={p.id}>{p.timeframe} · {names[p.status] || p.status} · 观测 {p.rows} / 完整 {p.complete_rows}</p>)}
     {v.status === "published" && <div className="dc-detail-actions">
-      {v.payload_available !== false && <><OpenChart ticker={`MWH:${v.id}`} frame={artifacts.data?.find(p => p.rows > 0)?.timeframe} label="打开此版本"/>{(!v.manifest?.mode || v.manifest.mode === "base_m1") && <Link to={`/replay?dataset_version=${v.id}`}>用于回测</Link>}</>}
+      {v.payload_available !== false && <><OpenChart ticker={`MWH:${v.id}`} frame={artifacts.data?.find(p => p.rows > 0)?.timeframe} label="打开此版本"/></>}
       <button onClick={compare}>与前版差异</button>
     </div>}
   </>;

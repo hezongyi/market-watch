@@ -2,10 +2,10 @@
 
 import time
 
-from fastapi import HTTPException
 from sqlalchemy import select
 
 from .fxcm_history import FRAMES, FxcmHistory, account_scope, configured
+from .query_errors import QueryError
 from .storage import MarketCatalog, now_ms, transaction
 
 CALENDAR = "fxcm_native"
@@ -19,13 +19,13 @@ def close_session():
 
 def metadata(ident):
     if not configured():
-        raise HTTPException(422, "FXCM历史连接未启用或未配置")
+        raise QueryError(422, "FXCM历史连接未启用或未配置")
     scope = account_scope()
     with transaction() as db:
         row = db.get(MarketCatalog, ident)
         if (row is None or row.source != "fxcm" or not row.available
                 or row.metadata_json.get("history_account_scope") != scope):
-            raise HTTPException(404, "未知当前账户FXCM品种，请显式刷新目录")
+            raise QueryError(404, "未知当前账户FXCM品种，请显式刷新目录")
         return {"id": row.id, "symbol": row.symbol, "name": row.label,
             "source": "fxcm", "basis": "bid", "series_kind": "provider",
             "account_scope": scope, "precision": row.precision,

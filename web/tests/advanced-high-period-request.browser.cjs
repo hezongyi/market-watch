@@ -106,7 +106,7 @@ const fs = require("fs");
     ),
   );
   if (process.env.MARKET_WATCH_LOADING_BUDGET_PROBE === "1") {
-    await page.route("**/bridge.js*", async (route) => {
+    await page.route("**/chart-runtime.js*", async (route) => {
       const response = await route.fetch();
       const source = await response.text();
       const condition = " || !chart.dataReady()";

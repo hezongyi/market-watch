@@ -7,7 +7,7 @@ const context=vm.createContext({URL,URLSearchParams,Map,Set,Promise,Date,Intl,Er
  document:{createElement:()=>({}),head:{append(){}}},
  location:{search:'?parent=http://localhost'},parent:{postMessage(){}},
  crypto:{randomUUID:()=> 'test'},addEventListener(){},setTimeout:fn=>timers.push(fn),clearTimeout(){}});
-for(const file of ['series.js','composite-display-batches.js','bridge.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+file,'utf8'),context);
+for(const file of ['series.js','composite-display-batches.js','chart-runtime.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+file,'utf8'),context);
 const run=code=>vm.runInContext(code,context);
 (async()=>{
  run(`refreshNotificationTimezone=()=>{};watchlistLayout=null;

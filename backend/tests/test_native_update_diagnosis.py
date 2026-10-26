@@ -4,7 +4,7 @@ from types import SimpleNamespace
 import pytest
 from alerts import market_stream as stream
 from alerts import provider_cache as cache
-from alerts.chart_api import DataQuery
+from alerts.chart_query import DataQuery
 from alerts.provider_acceptance import receipts
 from indicator_assertions import stable_indicators
 from test_provider_cache import META, seed
@@ -86,7 +86,7 @@ def test_provider_study_page_uses_the_same_frozen_prices_during_repair(provider_
         indicators=[{"name": indicator,
                      "params": {"period": 2} if indicator == "SUPERTREND_PINE_V1" else {}}])
     if native:
-        from alerts.chart_api import NativeHistory
+        from alerts.chart_query import NativeHistory
         query = query.model_copy(update={"native_history": NativeHistory(chart_count=1, screen_bars=160)})
     original = cache.data(query)
     real_read = cache.read

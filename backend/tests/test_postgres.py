@@ -6,10 +6,11 @@ from decimal import Decimal as D
 
 import pytest
 from alerts import notify, storage
-from alerts.service import create_watch, evaluate_watch
-from alerts.storage import Bar, Outbox, SignalRow, Watch
+from alerts.chart_alert_service import consume, create
+from alerts.storage import Bar, ChartAlert, Outbox, SignalRow
 from sqlalchemy import create_engine, func, select, text
 from sqlalchemy.orm import sessionmaker
+from test_chart_alert_service import config, sample
 
 URL = os.getenv("TEST_POSTGRES_URL")
 pytestmark = pytest.mark.skipif(
@@ -31,26 +32,12 @@ def test_postgres_concurrent_trigger_and_outbox_lease(monkeypatch):
         factory = sessionmaker(isolated, expire_on_commit=False)
         monkeypatch.setattr(storage, "Session", factory)
         with factory.begin() as db:
-            for i, p in enumerate([(10, 11, 8, 9), (9, 10, 7, 8), (8, 12, 7, 11)]):
-                db.add(
-                    Bar(
-                        instrument_id="EURUSD",
-                        timeframe="H4",
-                        start=i * 14400000,
-                        end=(i + 1) * 14400000,
-                        open=D(p[0]),
-                        high=D(p[1]),
-                        low=D(p[2]),
-                        close=D(p[3]),
-                        complete=True,
-                    )
-                )
-            db.flush()
-            ident = create_watch(db, "EURUSD", "race", {"kind": "pullback"}, armed_at=28800000).id
+            ident = create(db, "race", config(notify_ntfy=True), at=0).id
+            consume(db, ident, sample(0, 9), detected_at=0)
 
         def trigger(_):
             with factory.begin() as db:
-                return bool(evaluate_watch(db, ident))
+                return bool(consume(db, ident, sample(1, 11), detected_at=300001))
 
         with ThreadPoolExecutor(max_workers=4) as pool:
             results = list(pool.map(trigger, range(4)))
@@ -58,29 +45,7 @@ def test_postgres_concurrent_trigger_and_outbox_lease(monkeypatch):
         with factory.begin() as db:
             assert db.scalar(select(func.count()).select_from(SignalRow)) == 1
             assert db.scalar(select(func.count()).select_from(Outbox)) == 1
-            assert db.get(Watch, ident).status == "triggered"
-        from alerts import api as api_module
-
-        run = api_module.new_replay(
-            api_module.ReplayInput(
-                instrument_id="EURUSD",
-                timeframe="H4",
-                start=28800000,
-                end=43200000,
-            )
-        )
-        assert run["warmup_bar_count"] == 2
-        api_module.replay_watch(
-            run["id"],
-            api_module.WatchInput(
-                instrument_id="EURUSD",
-                name="compressed PG history",
-                kind="pullback",
-                timeframe="H4",
-            ),
-        )
-        simulated = api_module.step(run["id"], api_module.StepInput(count=1))
-        assert len(simulated["signals"]) == 1
+            assert db.get(ChartAlert, ident).count == 1
         monkeypatch.setattr(notify.settings, "delivery_enabled", True)
         monkeypatch.setattr(notify.settings, "ntfy_topic", "test-only-no-send")
         with ThreadPoolExecutor(max_workers=4) as pool:

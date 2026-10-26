@@ -23,7 +23,7 @@ running = _running
 
 
 def assert_maintenance_fence(factory, ownership, epoch, identities, monkeypatch):
-    from alerts.service import create_watch
+    from legacy_records import archived_watch
 
     monkeypatch.setattr(settings, 'oanda_account_id', 'test-account')
     first, other = identities['EUR_USD'], identities['XAU_USD']
@@ -31,7 +31,7 @@ def assert_maintenance_fence(factory, ownership, epoch, identities, monkeypatch)
         live.commit_confirmation(ownership, epoch, candles(identity), now=125000)
     with factory.begin() as db:
         inst = db.get(MarketDataset, first.key).instrument_id
-        create_watch(db, inst, 'Maintenance crossing', {'kind': 'price', 'timeframe': 'tick',
+        archived_watch(db, inst, 'Maintenance crossing', {'kind': 'price', 'timeframe': 'tick',
             'direction': 'buy', 'level': '1.25'}, armed_at=0, use_history=False)
     live.publish_event(ownership, epoch, quote(first, epoch, source=126000, bid='1.20'),
                        identities, now=126000)

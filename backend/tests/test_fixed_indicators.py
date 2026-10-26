@@ -4,8 +4,8 @@ import copy
 
 import pytest
 from alerts import fixed_indicators as jobs
-from alerts.chart_api import DataQuery, data_sync
 from alerts.chart_indicators import calculate
+from alerts.chart_query import DataQuery, data_sync
 from alerts.composite_chart import chart_page
 from alerts.composite_inputs import apply_minutes
 from alerts.confirmed_minutes import record

@@ -5,17 +5,16 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 
 import pytest
-from sqlalchemy import event, func, select
-from sqlalchemy.exc import OperationalError
-
-from alerts import chart_api, market_data
+from alerts import chart_query as chart_api
+from alerts import market_data
 from alerts.history_retention import reclaim
 from alerts.storage import CompositeRevision, Instrument, MarketDataset, MarketDemand
+from sqlalchemy import event, func, select
+from sqlalchemy.exc import OperationalError
 from test_composite_chart import populated
 from test_history_retention import prepared
 from test_market_contracts import identity
 from test_market_datasets import register
-from test_provider_postgres import provider_pg
 
 pytestmark = pytest.mark.skipif(
     not os.getenv("TEST_POSTGRES_URL"), reason="Requires isolated Ubuntu PostgreSQL"
@@ -58,7 +57,8 @@ def test_same_key_first_registration_commits_both_requests(provider_pg, monkeypa
             instrument_id = db.get(MarketComposite, composite_id).instrument_id
         body = chart_api.DataQuery(instrument="MWC:" + composite_id, timeframe="M1",
             limit=3, client="parallel-reader", composite_revision_id=revision_id)
-        read = lambda: chart_api.data_sync(body)
+        def read():
+            return chart_api.data_sync(body)
     else:
         revision_id = None
         with factory.begin() as db:

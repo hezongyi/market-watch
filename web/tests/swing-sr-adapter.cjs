@@ -101,7 +101,7 @@ const bridgeContext=vm.createContext({document:{createElement:()=>({}),head:{app
   parent:bridgeParent,crypto:{randomUUID:()=> 'fixture'},
   addEventListener:(name,handler)=>{handlers[name]=handler},setTimeout,clearTimeout,
   btoa:value=>Buffer.from(value).toString('base64'),atob:value=>Buffer.from(value,'base64').toString()});
-for(const file of ['series.js','composite-display-batches.js','swing-sr-display.js','bridge.js'])
+for(const file of ['series.js','composite-display-batches.js','swing-sr-display.js','chart-runtime.js'])
   vm.runInContext(fs.readFileSync(path.join(root,'advanced-host',file),'utf8'),bridgeContext);
 bridgeContext.testRequests=[];
 bridgeContext.page=page(params,p);

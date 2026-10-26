@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 import pytest
 import test_nr_breakout as contracts
 from alerts import fixed_indicators as jobs
-from alerts.chart_api import DataQuery, data_sync
+from alerts.chart_query import DataQuery, data_sync
 from alerts.storage import FixedIndicatorRun
 from test_fixed_indicators import drain, history
 from test_provider_postgres import provider_pg as _provider_pg

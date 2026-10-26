@@ -10,7 +10,7 @@ const root=path.resolve(__dirname,'../../advanced-host');
   await page.route('https://mw-notices.invalid/**',r=>{
    const u=new URL(r.request().url());
    if(u.pathname==='/')return r.fulfill({contentType:'text/html',body:'<iframe src="/host?parent=https://mw-notices.invalid" style="width:100%;height:90vh"></iframe>'});
-   if(u.pathname==='/host')return r.fulfill({contentType:'text/html; charset=utf-8',body:'<body><input aria-label="图表搜索"><script src="/chart-notices.js"></script><script src="/bridge.js"></script><script>ready=true; window.noticeCalls=0; window.confirmCalls=0; widget={showNoticeDialog(){noticeCalls++},showConfirmDialog(args){confirmCalls++;window.confirm=args.callback}};</script></body>'});
+   if(u.pathname==='/host')return r.fulfill({contentType:'text/html; charset=utf-8',body:'<body><input aria-label="图表搜索"><script src="/chart-notices.js"></script><script src="/chart-runtime.js"></script><script>ready=true; window.noticeCalls=0; window.confirmCalls=0; widget={showNoticeDialog(){noticeCalls++},showConfirmDialog(args){confirmCalls++;window.confirm=args.callback}};</script></body>'});
    return r.fulfill({contentType:'text/javascript; charset=utf-8',body:fs.readFileSync(path.join(root,u.pathname.slice(1)),'utf8')});
   });
   await page.goto('https://mw-notices.invalid/');

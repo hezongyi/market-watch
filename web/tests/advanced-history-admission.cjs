@@ -51,8 +51,8 @@ async function flush() { for(let index=0;index<12;index++) await tick(); }
     })},
     crypto:{randomUUID:()=> 'history-admission-test'},
     addEventListener:(name,fn)=>{if(name==='message')handlers.push(fn);},setTimeout,clearTimeout});
-  for(const file of ['series.js','composite-display-batches.js','bridge.js'])
-    vm.runInContext(fs.readFileSync('../advanced-host/'+file,'utf8'),ctx);
+  for(const file of ['series.js','composite-display-batches.js','chart-runtime.js'])
+    vm.runInContext(require("./fixtures/direct-runtime.cjs").read('../advanced-host/'+file,'utf8'),ctx);
   const run = code => vm.runInContext(code,ctx);
   // The conditional keeps this regression red-capable on the pre-fix loader.
   const unsubscribe = exports.subscribeHistoryLoadCapacity?.(available=>

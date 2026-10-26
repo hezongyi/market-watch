@@ -5,9 +5,9 @@ from alerts import provider_cache as cache
 from alerts import provider_chart as upstream
 from alerts import provider_yahoo as yahoo
 from alerts import storage, yahoo_catalog
-from alerts.chart_api import DataQuery
+from alerts.chart_query import DataQuery
 from alerts.config import settings
-from fastapi import HTTPException
+from alerts.query_errors import QueryError
 from test_provider_cache import page, seed
 
 
@@ -61,7 +61,7 @@ def test_unresolved_yahoo_reserve_fails_without_provider_io(database, monkeypatc
                                      precision=8, calendar='yahoo', available=True,
                                      metadata_json=details, updated_at=0))
     monkeypatch.setattr(yahoo, 'metadata', lambda *a, **k: pytest.fail('reserve refreshed metadata'))
-    with pytest.raises(HTTPException) as error:
+    with pytest.raises(QueryError) as error:
         cache.data(DataQuery(instrument=ident, series_kind='provider', timeframe='M5',
                             before=1000000, native_history={'chart_count': 1},
                             native_reserve={'screen_bars': 50, 'batch_screens': 1}))

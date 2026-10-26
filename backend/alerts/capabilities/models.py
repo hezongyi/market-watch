@@ -4,8 +4,6 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from ..business import WatchInput
-
 
 class Input(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -150,9 +148,6 @@ class IndicatorsQuery(BarsQuery):
         return self
 
 
-class AlertQuery(PageQuery):
-    instrument: str | None = Field(default=None, max_length=80)
-    status: Literal["active", "cancelled", "triggered", "paused"] | None = None
 
 
 class SignalsQuery(PageQuery):
@@ -161,28 +156,22 @@ class SignalsQuery(PageQuery):
 
 
 class WorkspacesQuery(PageQuery):
-    engine: Literal["native", "legacy"] = "native"
+    engine: Literal["native"] = "native"
 
 
 class DrawingsQuery(Input):
     workspace_id: str = Field(min_length=1, max_length=40)
-    engine: Literal["native", "legacy"] = "native"
+    engine: Literal["native"] = "native"
 
 
 class WriteInput(Input):
     idempotency_key: str = Field(min_length=1, max_length=100)
 
 
-class AgentWatchInput(WatchInput):
-    model_config = ConfigDict(extra="forbid")
 
 
-class CreateAlert(WriteInput):
-    watch: AgentWatchInput
 
 
-class CancelAlert(WriteInput):
-    watch_id: str = Field(min_length=1, max_length=40)
 
 
 class AckNotification(WriteInput):
@@ -360,17 +349,8 @@ class CatalogResult(BaseModel):
     policy: str
 
 
-class WatchResult(Record):
-    id: str
-    instrument_id: str
-    name: str
-    rule: dict
-    status: str
 
 
-class AlertsResult(BaseModel):
-    items: list[WatchResult]
-    next_offset: int | None
 
 
 class SignalResult(Record):

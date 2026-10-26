@@ -13,7 +13,6 @@ from .storage import (
     Bar,
     ImportJob,
     Instrument,
-    Watch,
     candle_dict,
     instant,
     ms,
@@ -58,12 +57,13 @@ def apply_profile(db, instrument_id, data, *, apply=False):
         return {"changed": False, "revision": profile["revision"]}
     if profile["revision"] == old.get("revision"):
         raise ValueError("A changed profile requires a new revision")
-    if db.scalar(
-        select(Watch.id)
-        .where(Watch.instrument_id == instrument_id, Watch.status == "active")
-        .limit(1)
-    ):
-        raise ValueError("Cancel active watches before changing their calendar")
+    from .storage import ChartAlert, ChartAlertVersion
+
+    if db.scalar(select(ChartAlert.id).join(ChartAlertVersion, (
+            ChartAlert.id == ChartAlertVersion.alert_id) & (ChartAlert.version == ChartAlertVersion.version))
+            .where(ChartAlert.status == "active",
+                ChartAlertVersion.config["instrument"].as_string() == instrument_id).limit(1)):
+        raise ValueError("Pause active ChartAlerts before changing their calendar")
     for closure in closures_from(profile):
         if db.scalar(
             select(Bar.id)

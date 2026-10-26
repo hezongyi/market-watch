@@ -49,7 +49,7 @@ const fs = require("fs");
       body: fs.readFileSync(process.env.MARKET_WATCH_PROGRESSIVE_SOURCE, "utf8"),
     }));
   if (process.env.MARKET_WATCH_BRIDGE_SOURCE)
-    await page.route("**/bridge.js*", route => route.fulfill({
+    await page.route("**/chart-runtime.js*", route => route.fulfill({
       contentType: "application/javascript",
       body: fs.readFileSync(process.env.MARKET_WATCH_BRIDGE_SOURCE, "utf8"),
     }));

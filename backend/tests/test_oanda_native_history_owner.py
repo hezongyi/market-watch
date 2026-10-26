@@ -4,7 +4,7 @@ import time
 import pytest
 from alerts import provider_cache as cache
 from alerts import provider_chart as upstream
-from alerts.chart_api import DataQuery
+from alerts.chart_query import DataQuery
 from alerts.config import settings
 from alerts.native_history_loads import read_context
 from alerts.storage import ProviderDataset, ProviderInterest

@@ -1,4 +1,3 @@
-import { Link } from "./router";
 import { OpenChart } from "./OpenChart";
 import { useSnapshot } from "./useSnapshot";
 import { Feedback } from "./Center";
@@ -35,7 +34,7 @@ export function VersionComparison({version, refresh}: {version: string; refresh:
           <td>{time(v.published_at)}<span>{time(v.start)} 至 {time(v.end)}</span></td>
           <td>{v.manifest.rows ?? "—"} / {v.manifest.unknown_minutes ?? "—"}</td>
           <td>{v.periods.map(p => `${p.timeframe} · ${names[p.status] || p.status} (${p.rows})`).join("； ")}
-            {v.payload_available ? <span><OpenChart ticker={`MWH:${v.id}`} label="打开此版本" /> · <Link to={`/replay?dataset_version=${v.id}`}>用于回测</Link></span> : <span>价格已回收，仅保留清单</span>}
+            {v.payload_available ? <span><OpenChart ticker={`MWH:${v.id}`} label="打开此版本" /> · </span> : <span>价格已回收，仅保留清单</span>}
           </td>
         </tr>)}</tbody>
       </table></div>

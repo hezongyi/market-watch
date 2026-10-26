@@ -5,7 +5,7 @@ import pytest
 from alerts import native_history_loads as loads
 from alerts import provider_cache as cache
 from alerts import provider_chart as upstream
-from alerts.chart_api import DataQuery
+from alerts.chart_query import DataQuery
 from alerts.config import settings
 from alerts.storage import NativeHistoryLoad
 from sqlalchemy import event

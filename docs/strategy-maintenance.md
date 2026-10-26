@@ -1,41 +1,20 @@
-# Python 策略维护
+# ChartAlert 与指标维护
 
-## 当前接口
+当前源码的后台告警实现只有 ChartAlert。旧 `domain.Rule/State/advance`、旧 `WatchInput`、SMA-cross 插件及演练执行入口已经退出；历史记录与 ORM 保留，不应按旧接口新增功能。
 
-策略规则和状态位于 `backend/alerts/domain.py`。`Rule` 为不可变参数，`State` 为可持久化状态，`advance(rule, state, candle, previous_day=..., armed_at=...)` 接收一根完成的 K 线，更新状态并返回可选信号。实时监控与演练调用同一函数。
+## 代码边界
 
-当前支持 pullback、previous_day、price、indicator 四种规则，版本为 `1`。新建监控和演练监控均保存版本；不支持的版本显式报错，不能静默套用当前逻辑。旧记录没有 version 时沿用版本 1。
+- `chart_alert_domain.py`：条件、观测和纯判定；`chart_alert_service.py`：`AlertConfig`、版本、生命周期和事件/通知事务。
+- `chart_alert_application.py`：HTTP/MCP 共用的来源绑定、关联验证、用例组织、序列化和查询；两个 Adapter 分别转换协议错误，不互相调用。
+- `chart_alert_worker.py` 与 `composite_alerts.py`：读取已支持来源的输入并推进同一规则。`alert_monitor.py` 由 API 生命周期持有；API 停机期间判定暂停。
+- `chart_indicators.py`：指标目录、参数校验及 `register(name, metadata, calculator)`；`indicator_state.py` 等保留递归计算起点和检查点。通用行情读取在 `chart_query.py`，供 HTTP/MCP/worker 共享。
 
-## 修改参数
+## 修改规则与指标
 
-优先通过页面修改周期、方向、连续根数、价格阈值和触及/穿越方式。已开启监控的规则保留快照；调整时取消旧监控并新建，使用新的开启时间。
+先固定具体业务需求与既有数值，再修改对应模块。不要在纯判定函数中下载行情、发送通知或读取系统时钟；数据身份、价格精度、算法版本和恢复语义需保持可核验。新算法版本不得悄悄改写既有规则的计算含义。
 
-## 修改逻辑
+配置修改走原生表单或 [ChartAlert MCP](native-mcp-usage.md)：创建提供稳定 `request_id`，编辑检查 `version`，生命周期检查 `version`、`control_revision` 和 `request_id`。MCP 写入另有 `idempotency_key`；条件、来源、固定历史和画线关联仍由服务端校验。
 
-1. 修改 `domain.py` 的规则校验、状态或推进函数；数据下载、数据库和通知不应进入策略函数。
-2. 新语义需要新增版本分派并保留旧版本执行路径，不能直接改变版本 1 的结果。
-3. 新增状态字段时同时检查 `storage.py` 的状态序列化；旧状态必须有明确迁移或兼容默认值。
-4. 新增策略种类时更新 `Rule`、API `WatchInput`、页面表单/说明，以及信号原因映射。
-5. 用指定历史区间演练验证，再运行相关测试。必须包含开启前不通知、买卖镜像、等号边界、缺口暂停、持久化恢复与实时/回放一致性。
+验证至少覆盖等号/上下穿、开始前不通知、临时/完成柱、重复观察、版本冲突、暂停恢复、次数与事件/Outbox 原子性。涉及行情时增加相同身份下 HTTP/MCP/worker 与图表读数的回归；涉及持久状态时使用独立 Ubuntu PostgreSQL 验证恢复和兼容性。测试位置为 `backend/tests/test_chart_alert_*`、`test_composite_alerts*` 和对应指标测试。
 
-## 指标插件接口
-
-`backend/alerts/indicators.py` 提供有限窗口指标接口与 `(名称, 版本)` 注册表。当前使用固定版本 TA-Lib 0.6.8 / NumPy 2.4.6，实现 `sma_cross` 版本 `1`；页面可设快慢周期（2 ≤ 快 < 慢 ≤ 500）、K 线周期和方向。
-
-- `validate(params)` 校验并返回完整参数，默认值也固定保存在监控记录中。
-- `lookback(params)` 指定计算一次读数所需的连续完整收盘价数量。
-- `calculate(closes, params)` 接收按时间排序的收盘价字符串列表，返回 `Reading(value, reference)`。两者必须是有限数值且单位相同。
-- 框架比较相邻两次读数的 `value - reference`：从 ≤0 到 >0 触发买入，从 ≥0 到 <0 触发卖出；相等不触发。没有上一读数时只建立基准。
-- SMA 使用 TA-Lib 的 float64 运算；订单价格与 K 线存储仍为 Decimal。信号保存指标读数、版本、参数和触发 K 线，便于复核。
-- 窗口和上一次读数随监控持久化；重启不丢失交叉基准。历史预热只消费历史信号，不发送通知；关闭预热时从开启后积累。
-- 实时与演练复用相同入口。有限窗口接口适合 SMA 等；EMA、Wilder RSI 等递归指标需要另行实现明确的种子、累积状态与恢复协议，不能用任意截断窗口冒充全历史递归计算。
-
-新增插件：实现上述三个方法并注册新名称/版本，为网页补充参数表单与说明。插件不能读取未来数据、网络或系统时钟。修改算法时保留旧版本入口；补充已知读数、上下穿、等号、不完整数据、预热、持久化和实时/演练一致性测试。当前窗口仅含收盘价，依赖高低价/成交量的指标需扩展输入协议并版本化。
-
-示例 API 参数（登录并通过 CSRF 后，实时和演练监控均适用）：
-
-```json
-{"instrument_id":"EURUSD","name":"M5 双均线","kind":"indicator","timeframe":"M5","direction":"both","indicator":"sma_cross","indicator_version":"1","indicator_params":{"fast":10,"slow":20},"use_history":true}
-```
-
-网页不执行任意 Python 源码。策略代码在仓库中编辑、测试和部署，参数通过网页配置。
+网页不执行用户任意 Python 源码。当前候选的范围、验证和回退见 [完成审计](verification/single-frontend-20261026/completion-audit.md)。

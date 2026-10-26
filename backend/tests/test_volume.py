@@ -233,31 +233,26 @@ def test_volume_only_import_does_not_run_price_watch_evaluation(database, monkey
         market.ingest(db,db.get(Instrument,'BTCUSDT'),{'rows':rows},received_at=305000)
         db.add(ImportJob(instrument_id='BTCUSDT',start=0,end=300000,cursor=0))
         db.add(Watch(instrument_id='BTCUSDT',name='price',rule={'kind':'price','timeframe':'M1','level':'11'},armed_at=0,status='active'))
-    called=[]
-    monkeypatch.setattr(market,'evaluate_watch',lambda *a:called.append(a))
     assert market.import_once(fetcher=lambda *a:dict(source='binance',basis='last',rows=[{**r,'volume':'2'} for r in rows]),defer_aggregation=True)
-    assert called==[]
+    with database() as db:
+        assert db.scalar(select(Watch)).status == "active"
 
 
-def test_volume_only_live_ingest_keeps_independent_tick_quotes(database, monkeypatch):
+def test_volume_only_live_ingest_does_not_keep_retired_quote_demand(database, monkeypatch):
     from alerts import market
-    from alerts.service import create_watch, evaluate_quote
     from alerts.storage import Watch
+    from legacy_records import archived_watch
 
     rows = [dict(timestamp=i * 60000, open=10, high=11, low=9, close=10)
             for i in range(5)]
     with database.begin() as db:
         inst = db.get(Instrument, 'EURUSD')
         market.ingest(db, inst, {'rows': rows}, received_at=305000)
-        evaluate_quote(db, inst, 305000, D('9'), D('9.1'))
-        watch = create_watch(db, 'EURUSD', 'live tick',
+        watch = archived_watch(db, 'EURUSD', 'live tick',
                              {'kind': 'price', 'timeframe': 'tick', 'level': '10',
                               'direction': 'buy'}, armed_at=306000)
         watch_id = watch.id
-    historical_evaluations = []
     calls = []
-    monkeypatch.setattr(market, 'evaluate_watch',
-                        lambda *args: historical_evaluations.append(args))
 
     def fetch(source, symbol, *args, **kwargs):
         calls.append(kwargs.get('mode', 'M1'))
@@ -266,10 +261,10 @@ def test_volume_only_live_ingest_keeps_independent_tick_quotes(database, monkeyp
         return {'rows': [{**row, 'volume': '2'} for row in rows]}
 
     market.once('EURUSD', fetcher=fetch)
-    assert historical_evaluations == []
-    assert calls == ['M1', 'quote']
+    assert calls == ['M1']
     with database.begin() as db:
-        assert db.get(Watch, watch_id).status == 'triggered'
+        assert db.get(Watch, watch_id).status == 'active'
+        assert db.get(Watch, watch_id).state == {'saved': 'historical evidence'}
 
 
 def test_old_published_volume_revision_ignores_new_live_coverage_edges(database):

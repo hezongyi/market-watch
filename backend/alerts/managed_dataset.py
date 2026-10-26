@@ -664,9 +664,9 @@ def data(body):
             db.connection(execution_options={"isolation_level": "REPEATABLE READ"})
         inst = db.get(Instrument, body.instrument)
         if inst is None:
-            from fastapi import HTTPException
+            from .query_errors import QueryError
 
-            raise HTTPException(404, "品种不存在")
+            raise QueryError(404, "品种不存在")
         pub = db.get(ChartPublication, (inst.id, body.timeframe))
         before = body.before or now_ms() + 1
         # Recursive algorithms use only the selected published dataset prefix;

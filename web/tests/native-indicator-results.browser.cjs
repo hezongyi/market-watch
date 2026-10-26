@@ -26,7 +26,7 @@ print(json.dumps(dict(catalog={k:public_catalog()[k] for k in ["LWMA","SWING_SR_
   await page.route('**/*',r=>{
    const u=new URL(r.request().url());if(u.origin!==origin)return r.fulfill({status:204,body:''});
    if(u.pathname==='/product') {
-    const fixture=html.replace('<script src="/indicators.js">','<script src="/series.js"></script><script src="/swing-sr-display.js"></script><script src="/composite-display-batches.js"></script><script src="/bridge.js"></script><script src="/indicators.js">')
+    const fixture=html.replace('<script src="/indicators.js">','<script src="/series.js"></script><script src="/swing-sr-display.js"></script><script src="/composite-display-batches.js"></script><script src="/chart-runtime.js"></script><script src="/indicators.js">')
       .replaceAll('subscriptions','fixtureSubscriptions').replace('const feed=','const fixtureFeed=').replace('datafeed:feed','datafeed:fixtureFeed')
       .replace('const widget=new TradingView.widget(','widget=new TradingView.widget(').replace('let ready=false;','ready=false;');
     return r.fulfill({contentType:'text/html; charset=utf-8',body:fixture});

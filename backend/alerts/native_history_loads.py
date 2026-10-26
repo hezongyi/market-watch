@@ -152,7 +152,7 @@ def status(owner, ident, cancel=False):
 
 
 def result(owner, ident):
-    from .chart_api import DataQuery
+    from .chart_query import DataQuery
     with transaction() as db:
         row = owned(db, owner, ident)
         refresh(row)
@@ -176,7 +176,7 @@ def result(owner, ident):
 
 
 def once():
-    from .chart_api import DataQuery
+    from .chart_query import DataQuery
     from .market_resources import lane
     claim_started = time.monotonic()
     with transaction() as db:

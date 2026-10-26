@@ -7,7 +7,7 @@ const path = require("node:path");
 const assets = process.env.MAXIMIZE_ASSETS;
 assert.ok(assets, "Set MAXIMIZE_ASSETS to a privately built advanced-host asset directory");
 const origin = "https://mw-maximize-bridge.invalid";
-const output = process.env.MAXIMIZE_BRIDGE_OUTPUT || "/tmp/mw-chart-maximize-bridge.json";
+const output = process.env.MAXIMIZE_BRIDGE_OUTPUT || "/tmp/mw-chart-maximize-chart-runtime.json";
 const report = { environment:"Ubuntu Playwright routed built host with real bridge and synthetic parent RPC", cases:[], errors:[] };
 let row = { id:"maximize-bridge", name:"Double-click bridge fixture", revision:0,
   document:{engine:"tv31",schemaVersion:1,symbol:"MWP:BTCUSDT",series_kind:"provider",interval:"60"} };

@@ -12,6 +12,7 @@ type Live = {
   market_session: "closed" | "scheduled_open" | "unknown"; calendar_verified: boolean;
   next_session_at: number | null; authentication_hold: boolean; connection_error: string | null;
   error: string | null; connection: string; quote_ready: boolean; candle_ready: boolean; recovery_ready: boolean;
+  observation_mode?: "candle_close_sample" | "stream_quote"; sample_ready?: boolean;
   quote: { source_time?: number } | null; received_at: number | null; heartbeat_at: number | null;
   last_confirmed_m1: number | null; next_probe_at: number | null;
   session_configuration?: {profile_reason?: string | null; reviewed_start?: string | null; reviewed_end?: string | null};
@@ -47,13 +48,18 @@ function Session({ row }: { row: Live }) {
     {reason && reasons[reason] ? <small>{reasons[reason]}</small> : null}
   </>;
 }
+function observationReady(row: Live) {
+  return row.observation_mode === "candle_close_sample" ? row.sample_ready : row.quote_ready;
+}
 function overview(provider: Provider, rows: Live[]) {
   if (provider.configured === false) return "来源未配置";
   if (provider.authentication_hold || rows.some(row => row.authentication_hold)) return "鉴权暂停";
   if (provider.error) return errors[provider.error] || "后台记录实时供源异常";
   if (!rows.length) return "尚无实时采集记录";
   if (rows.every(row => row.market_session === "closed")) return "闭市";
-  if (rows.every(row => row.quote_ready && row.candle_ready)) return "实时报价与完成 K 线已就绪";
+  if (rows.every(row => observationReady(row) && row.candle_ready))
+    return rows.some(row => row.observation_mode === "candle_close_sample")
+      ? "实时采样与完成 K 线已就绪" : "实时报价与完成 K 线已就绪";
   return "部分实时数据尚未就绪，请查看各品种状态";
 }
 
@@ -77,16 +83,16 @@ export function LiveProviderStatus() {
         {provider.configured === undefined && <p>配置状态未提供。</p>}
         {!rows.length && <p>当前账户暂无品种实时采集记录；读取此页面不会启动采集。</p>}
         {held && <p>鉴权暂停需检查账户和令牌配置，并等待后台账户与报价接口校验；刷新状态只读取结果，不会解除暂停。</p>}
-        <p>报价与完成 K 线分别按后台就绪结果展示；页面成功读取仅证明状态接口可读。</p>
+        <p>实时行情与完成 K 线分别按后台就绪结果展示；K 线采样不提供逐笔买卖报价。</p>
       </section>
       {rows.length > 0 && <section aria-labelledby="dc-source-symbols">
         <h2 id="dc-source-symbols">品种状态</h2>
         <table className="dc-source-table" aria-label="OANDA 品种实时状态">
-          <thead><tr><th scope="col">商品代码</th><th scope="col">实时报价</th><th scope="col">最后报价时间</th><th scope="col">完成 K 线</th><th scope="col">最后确认分钟柱（结束）</th><th scope="col">交易时段</th></tr></thead>
+          <thead><tr><th scope="col">商品代码</th><th scope="col">实时行情</th><th scope="col">最后观测时间</th><th scope="col">完成 K 线</th><th scope="col">最后确认分钟柱（结束）</th><th scope="col">交易时段</th></tr></thead>
           <tbody>{rows.map(row => <tr key={row.dataset_id}>
             <th scope="row" data-label="商品代码">{row.logical_symbol}</th>
-            <td data-label="实时报价">{row.quote_ready ? "已就绪" : "未就绪"}<small>{row.quote_ready ? "可使用实时供源报价" : "实时报价尚未就绪"}</small></td>
-            <td data-label="最后报价时间"><time>{row.quote?.source_time ? statusTime(row.quote.source_time) : "尚无报价记录"}</time></td>
+            <td data-label="实时行情">{observationReady(row) ? "已就绪" : "未就绪"}<small>{row.observation_mode === "candle_close_sample" ? "K 线采样" : "逐笔买卖报价"}</small></td>
+            <td data-label="最后观测时间"><time>{row.observation_mode === "candle_close_sample" ? statusTime(row.received_at) : row.quote?.source_time ? statusTime(row.quote.source_time) : "尚无报价记录"}</time></td>
             <td data-label="完成 K 线">{row.candle_ready ? "已就绪" : "未就绪"}<small>{row.candle_ready ? "完成柱确认已就绪" : "完成 K 线尚未就绪"}</small></td>
             <td data-label="最后确认分钟柱（结束）"><time>{row.last_confirmed_m1 ? statusTime(row.last_confirmed_m1) : "尚无分钟柱记录"}</time></td>
             <td data-label="交易时段"><Session row={row} /></td>
@@ -114,7 +120,7 @@ export function LiveProviderStatus() {
             <div><dt>错误记录</dt><dd>{row.connection_error || row.error ? `${errors[row.connection_error || row.error || ""] || "后台记录实时数据异常"}（${row.connection_error || row.error}）` : "快照未记录错误"}</dd></div>
             <div><dt>品种错误观察时间</dt><dd>时间未提供</dd></div>
             <div><dt>来源心跳</dt><dd>{statusTime(row.heartbeat_at)}</dd></div>
-            <div><dt>最后报价接收时间</dt><dd>{statusTime(row.received_at)}</dd></div>
+            <div><dt>最后行情接收时间</dt><dd>{statusTime(row.received_at)}</dd></div>
             <div><dt>计划检查</dt><dd><ScheduledCheck at={row.next_probe_at} /></dd></div>
           </dl>
         </section>)}

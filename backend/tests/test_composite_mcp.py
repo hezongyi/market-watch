@@ -72,7 +72,7 @@ def test_indicator_discovery_and_composite_validation(mcp, monkeypatch):
     ident, revision, _ = indicator_fixture(factory, monkeypatch)
     tools = rpc(client, token, 'tools/list').json()['result']['tools']
     tool = next(t for t in tools if t['name'] == 'indicators_calculate')
-    assert len(tools) == 31
+    assert len(tools) == 34
     assert tool['inputSchema']['properties']['series_kind']['enum'] == ['managed', 'provider', 'composite', 'history']
     for field in ('composite_revision_id', 'input_revision', 'provisional'):
         assert field in tool['inputSchema']['properties']

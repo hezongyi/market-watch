@@ -301,7 +301,7 @@ def export_page(db, body):
     """Export one fixed input snapshot without maintenance or first-use demand."""
     from fastapi import HTTPException
 
-    from .chart_api import DataQuery
+    from .chart_query import DataQuery
 
     before, bars, indicators = body.end, [], {}
     revision, inputs = body.composite_revision_id, body.input_revision

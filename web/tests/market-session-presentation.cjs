@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const vm = require("node:vm");
-const source = fs.readFileSync("advanced-host/bridge.js", "utf8");
+const source = fs.readFileSync("advanced-host/chart-runtime.js", "utf8");
 let timezone = "UTC";
 const context = {
   Intl, Date, Number, compactQuote: null,

@@ -1,0 +1,47 @@
+{
+  "observed_at": "2026-10-26T11:50:07.307759+00:00",
+  "available_bytes": 11279020032,
+  "minimum_with_workers_bytes": 27917287424,
+  "shortfall_bytes": 16638267392,
+  "five_minute_load": 3.94873046875,
+  "compose_projects": [
+    {
+      "Name": "mw-history-modes-pg-20261024",
+      "Status": "running(1)",
+      "ConfigFiles": "/home/quant/repos/market-watch-history-modes-integration-20261024/deploy/ubuntu/history-modes.acceptance.yaml"
+    },
+    {
+      "Name": "mw-issue75-v2-20261018",
+      "Status": "running(15)",
+      "ConfigFiles": "/home/quant/repos/.mwa-symbol-sources-20261026/pool-adjustment/candidate-compose.json,/home/quant/repos/.mwa-symbol-sources-20261026/candidate-compose.json,/home/quant/repos/.mwa-oanda-live-20261026/candidate-compose.json,/home/quant/repos/.mw-issue75-v2-tool-state/runtime/compose.json,/home/quant/repos/.mw-issue75-v2-tool-state/runtime/final-override.json,/home/quant/repos/.mw-issue75-v2-tool-state/runtime/ui-override.json"
+    }
+  ],
+  "directory_usage": {
+    "/home/quant/repos/.archives": {
+      "bytes": 3890900992,
+      "partial": false
+    },
+    "/home/quant/repos/archives": {
+      "bytes": 4136460288,
+      "partial": false
+    },
+    "/home/quant/repos/.production": {
+      "bytes": 7336734720,
+      "partial": false
+    },
+    "/tmp": {
+      "bytes": 5333528576,
+      "partial": true
+    },
+    "/home/quant/.cache": {
+      "bytes": 986402816,
+      "partial": false
+    },
+    "/home/quant/.local/share/market-watch-docker/archives": {
+      "bytes": 1929396224,
+      "partial": false
+    }
+  },
+  "action": "Read-only inventory; no images, containers, volumes, archives or files removed.",
+  "checkpoint": "AGENTS.md resource coordination and plan section 9 stop condition. Expansion or user-coordinated cleanup required before R2."
+}

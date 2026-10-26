@@ -1,18 +1,8 @@
-"""Compressed immutable warmup, streamed without a large Python history list."""
+"""Read-only decoder for retained historical replay snapshots."""
 
 import gzip
 import json
 from io import BytesIO
-
-
-def pack_history(rows):
-    buffer = BytesIO()
-    count = 0
-    with gzip.GzipFile(fileobj=buffer, mode="wb", mtime=0) as stream:
-        for row in rows:
-            stream.write(json.dumps(row, separators=(",", ":")).encode() + b"\n")
-            count += 1
-    return buffer.getvalue(), count
 
 
 def history_rows(run, *, until=None):

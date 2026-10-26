@@ -75,7 +75,7 @@ def bind(db, config):
 
 
 def geometry_rows(db, composite_id, frame, points, *, revision_id=None, input_revision=None, now=None):
-    from .chart_api import DataQuery
+    from .chart_query import DataQuery
     from .series_access import chart_data
 
     cutoff, output = None, []

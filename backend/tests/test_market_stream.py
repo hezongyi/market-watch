@@ -26,9 +26,10 @@ def register(owner, client="page", listener="chart", generation=1, state=None):
 
 def test_external_indicator_prefix_is_consumer_state_not_shared_calculation(database):
     from types import SimpleNamespace
-    from alerts.chart_api import DataQuery
+
+    from alerts.chart_query import DataQuery
     from alerts.market_stream_api import Subscription
-    from alerts.storage import ProviderDataset, ProviderBar
+    from alerts.storage import ProviderBar, ProviderDataset
 
     query = DataQuery(instrument="OANDA:TEST", series_kind="provider", timeframe="M1")
     body = Subscription(client="page", listener="chart", generation=1, kind="bars", query=query,
@@ -57,7 +58,8 @@ def test_external_indicator_prefix_is_consumer_state_not_shared_calculation(data
 
 def test_published_external_prefix_uses_accepted_snapshot_and_preserves_tail(database):
     from types import SimpleNamespace
-    from alerts.chart_api import DataQuery
+
+    from alerts.chart_query import DataQuery
     from alerts.managed_dataset import published_history_check
     from alerts.storage import ChartPublication, ChartPublishedBar, Instrument
     query = DataQuery(instrument="BTCUSDT", series_kind="managed", timeframe="M1", published=True)

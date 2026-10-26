@@ -25,7 +25,7 @@ const assert = require("node:assert/strict");
       }),
     });
   });
-  if (process.env.MW_INACTIVITY_GAPS) await page.route('**/bridge.js', async route => {
+  if (process.env.MW_INACTIVITY_GAPS) await page.route('**/chart-runtime.js', async route => {
     const response = await route.fetch();
     const body = (await response.text()).replace('enabled_features: [', 'enabled_features: ["inactivity_gaps",');
     await route.fulfill({response, body});

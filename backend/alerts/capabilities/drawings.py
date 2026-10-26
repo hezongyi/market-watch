@@ -6,7 +6,7 @@ from decimal import Decimal
 from sqlalchemy import select
 
 from ..chart_series import decode
-from ..storage import AdvancedWorkspace, ChartWorkspace, Instrument, transaction
+from ..storage import AdvancedWorkspace, Instrument, transaction
 from .context import CapabilityError
 
 TYPES = {
@@ -45,7 +45,7 @@ FRAMES = {
 }
 
 
-def projection(document):
+def native_state(document):
     state = document.get("state", {})
     if not isinstance(state, dict):
         return None
@@ -57,11 +57,15 @@ def projection(document):
             state = json.loads(state["content"])
         except (ValueError, TypeError):
             return None
-    return state.get("_mwDrawingProjection") if isinstance(state, dict) else None
+    return state if isinstance(state, dict) else {}
+
+
+def projection(document):
+    return (native_state(document) or {}).get("_mwDrawingProjection")
 
 
 def workspaces(ctx, query):
-    model = AdvancedWorkspace if query.engine == "native" else ChartWorkspace
+    model = AdvancedWorkspace
     with transaction() as db:
         rows = db.scalars(
             select(model)
@@ -76,7 +80,7 @@ def workspaces(ctx, query):
                 "revision": row.revision,
                 "updated_at": row.updated_at,
                 "engine": query.engine,
-                "projection_available": query.engine == "legacy" or bool(projection(row.document)),
+                "projection_available": bool(projection(row.document)),
             }
             for row in rows[: query.limit]
         ]
@@ -134,69 +138,51 @@ def source_of(db, instrument, kind):
 
 
 def drawings(ctx, query):
-    model = AdvancedWorkspace if query.engine == "native" else ChartWorkspace
+    model = AdvancedWorkspace
     with transaction() as db:
         row = db.get(model, query.workspace_id)
         if not row:
             raise CapabilityError("WORKSPACE_NOT_FOUND", "Saved workspace does not exist")
         document = row.document
-        if query.engine == "native":
-            projected = projection(document)
-            if (
-                not isinstance(projected, dict)
-                or projected.get("version") != 1
-                or not isinstance(projected.get("charts"), list)
-            ):
+        projected = projection(document)
+        if (
+            not isinstance(projected, dict)
+            or projected.get("version") != 1
+            or not isinstance(projected.get("charts"), list)
+        ):
+            raise CapabilityError(
+                "UNSUPPORTED_CAPABILITY",
+                "Native workspace lacks a verified saved projection; resave it in the updated chart client",
+            )
+        charts = []
+        chart_ids = (native_state(document) or {}).get("_mwAlertCharts", [])
+        for index, chart in enumerate(projected["charts"]):
+            try:
+                instrument, kind = decode(chart["symbol"])
+                objects = chart["drawings"]
+                if not isinstance(objects, list) or not isinstance(chart["resolution"], str):
+                    raise ValueError()
+            except (TypeError, ValueError, KeyError):
                 raise CapabilityError(
-                    "UNSUPPORTED_CAPABILITY",
-                    "Native workspace lacks a verified saved projection; resave it in the updated chart client",
-                )
-            charts = []
-            for index, chart in enumerate(projected["charts"]):
-                try:
-                    instrument, kind = decode(chart["symbol"])
-                    objects = chart["drawings"]
-                    if not isinstance(objects, list) or not isinstance(chart["resolution"], str):
-                        raise ValueError()
-                except (TypeError, ValueError, KeyError):
-                    raise CapabilityError(
-                        "INVALID_DRAWING_PROJECTION", "Saved chart identity is invalid"
-                    ) from None
-                charts.append(
-                    {
-                        "chart_id": str(chart.get("chart_id", index)),
-                        "chart_index": index,
-                        "time_coordinate": "native_chart_time_ms",
-                        "instrument": instrument,
-                        "source": source_of(db, instrument, kind),
-                        "series_kind": kind,
-                        "timeframe": FRAMES.get(chart["resolution"], chart["resolution"]),
-                        "status": chart.get("status", "supported"),
-                        "drawings": [
-                            object_projection(item, True)
-                            for item in objects
-                            if isinstance(item, dict)
-                        ],
-                    }
-                )
-        else:
-            charts = []
-            for panel in document.get("panels", []):
-                instrument = panel["instrument"]
-                charts.append(
-                    {
-                        "chart_id": panel["id"],
-                        "instrument": instrument,
-                        "source": source_of(db, instrument, "managed"),
-                        "series_kind": "managed",
-                        "timeframe": panel["timeframe"],
-                        "time_coordinate": "utc_ms",
-                        "drawings": [
-                            object_projection(item, False)
-                            for item in document.get("drawings", {}).get(instrument, [])
-                        ],
-                    }
-                )
+                    "INVALID_DRAWING_PROJECTION", "Saved chart identity is invalid"
+                ) from None
+            charts.append(
+                {
+                    "chart_id": chart_ids[index] if index < len(chart_ids) else str(chart.get("chart_id", index)),
+                    "chart_index": index,
+                    "time_coordinate": "native_chart_time_ms",
+                    "instrument": instrument,
+                    "source": source_of(db, instrument, kind),
+                    "series_kind": kind,
+                    "timeframe": FRAMES.get(chart["resolution"], chart["resolution"]),
+                    "status": chart.get("status", "supported"),
+                    "drawings": [
+                        object_projection(item, True)
+                        for item in objects
+                        if isinstance(item, dict)
+                    ],
+                }
+            )
         return {
             "workspace_id": row.id,
             "revision": row.revision,

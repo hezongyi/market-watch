@@ -2,10 +2,11 @@
 import pytest
 from alerts import live_pricing as live
 from alerts import series_access
-from alerts.chart_api import DataQuery
+from alerts.chart_query import DataQuery
 from alerts.market_contracts import DatasetIdentity, QuoteEvent
 from alerts.storage import CompositeRevision, MarketDataset, RealtimeMapping
 from test_composite_chart import populated
+
 
 @pytest.mark.parametrize('transition', ['minute_rollover', 'quote_age_16s', 'reconnect'])
 @pytest.mark.parametrize('cached', [False, True])
@@ -50,10 +51,10 @@ def test_observed_m1_does_not_vanish_before_rest_confirmation(database, monkeypa
 
 
 def test_exact_price_snapshot_survives_later_tick_and_confirmation(database, monkeypatch):
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
+    from alerts.composite_chart import chart_page
     from alerts.composite_inputs import apply_minutes
     from alerts.confirmed_minutes import record
-    from alerts.composite_chart import chart_page
     from test_market_contracts import batch, minute
 
     composite, revision_id, seam = populated(database, monkeypatch)
@@ -97,8 +98,9 @@ def test_exact_price_snapshot_survives_later_tick_and_confirmation(database, mon
 @pytest.mark.parametrize('extremes', ['expand', 'shrink'])
 def test_older_observed_confirmation_resets_only_for_price_change(database, monkeypatch, revised, extremes):
     from types import SimpleNamespace
+
     from alerts import market_stream as stream
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     from alerts.composite_chart import chart_page
     from test_fixed_indicators import add_tail
     from test_market_contracts import minute
@@ -150,7 +152,9 @@ def test_older_observed_confirmation_resets_only_for_price_change(database, monk
 
 @pytest.mark.parametrize('exhausted', [False, True, 'tasks', 'bytes', 'failures'])
 def test_display_replay_budget_uses_shared_background_job(database, monkeypatch, exhausted):
-    from alerts import display_indicators, display_indicator_jobs as display_jobs, fixed_indicators as fixed
+    from alerts import display_indicator_jobs as display_jobs
+    from alerts import display_indicators
+    from alerts import fixed_indicators as fixed
     from alerts.composite_chart import chart_page
     from test_composite_aggregates import drain as aggregate
     from test_fixed_indicators import drain
@@ -232,9 +236,8 @@ def test_real_observed_supertrend_suffix_matches_complete_price_sequence(databas
     from alerts import fixed_indicators as fixed
     from alerts.chart_indicators import calculate
     from alerts.composite_chart import chart_page
-    from alerts.indicator_state import IndicatorState
     from test_composite_aggregates import drain as aggregate
-    from test_fixed_indicators import drain, add_tail
+    from test_fixed_indicators import add_tail, drain
     from test_market_contracts import minute
 
     composite, revision_id, seam = populated(database, monkeypatch)
@@ -278,8 +281,8 @@ def test_real_observed_supertrend_suffix_matches_complete_price_sequence(databas
 def test_display_capacity_freezes_append_and_old_backfill_demand_survives_empty(database, monkeypatch):
     from alerts import display_observations as observations
     from alerts.market_contracts import RequestResult
-    from test_market_contracts import batch
     from alerts.storage import LiveState
+    from test_market_contracts import batch
 
     composite, revision_id, seam = populated(database, monkeypatch)
     with database.begin() as db:
@@ -386,7 +389,8 @@ def test_legacy_quote_handover_never_copies_uncertified_forming(database, monkey
 
 
 def test_terminal_display_task_explicit_retry(database, monkeypatch):
-    from alerts import composite_series, display_indicator_jobs as jobs
+    from alerts import composite_series
+    from alerts import display_indicator_jobs as jobs
     from alerts.storage import DisplayIndicatorTask, DisplaySnapshot, FixedIndicatorRun
     healthy = composite_series.read_window
     test_display_replay_budget_uses_shared_background_job(database, monkeypatch, 'failures')
@@ -417,9 +421,11 @@ def test_terminal_display_task_explicit_retry(database, monkeypatch):
 
 
 def test_batched_terminal_display_tasks_retry_together(database, monkeypatch):
-    from alerts import composite_series, display_indicator_jobs as jobs, fixed_indicators as fixed
+    from alerts import composite_series
+    from alerts import display_indicator_jobs as jobs
+    from alerts import fixed_indicators as fixed
     from alerts.composite_chart import chart_page
-    from alerts.storage import DisplayIndicatorTask, FixedIndicatorRun, DisplaySnapshot
+    from alerts.storage import DisplayIndicatorTask, DisplaySnapshot, FixedIndicatorRun
     healthy = composite_series.read_window
     test_display_replay_budget_uses_shared_background_job(database, monkeypatch, 'failures')
     monkeypatch.setattr(composite_series, 'read_window', healthy)
@@ -450,9 +456,10 @@ def test_batched_terminal_display_tasks_retry_together(database, monkeypatch):
 
 
 def test_mixed_stale_display_retry_survives_transaction_rollback(database, monkeypatch):
-    from alerts import display_indicator_jobs as jobs, fixed_indicators as fixed
-    from alerts.storage import DisplayIndicatorTask, FixedIndicatorRun, DisplaySnapshot
+    from alerts import display_indicator_jobs as jobs
+    from alerts import fixed_indicators as fixed
     from alerts.composite_chart import chart_page
+    from alerts.storage import DisplayIndicatorTask, DisplaySnapshot, FixedIndicatorRun
     test_batched_terminal_display_tasks_retry_together(database, monkeypatch)
     with database.begin() as db:
         tasks = list(db.query(DisplayIndicatorTask))
@@ -482,9 +489,9 @@ def test_mixed_stale_display_retry_survives_transaction_rollback(database, monke
 
 
 def test_display_retry_crosses_api_error_boundary(database, monkeypatch):
-    from fastapi import HTTPException
-    from alerts.chart_api import data_sync
     from alerts import display_indicator_jobs as jobs
+    from alerts.chart_query import data_sync
+    from alerts.query_errors import QueryError
     retry = {'a' * 64: 'b' * 64}
     body = DataQuery(instrument='composite', series_kind='composite', timeframe='M1',
         display_snapshot_id='c' * 64, display_retry=retry,
@@ -495,7 +502,7 @@ def test_display_retry_crosses_api_error_boundary(database, monkeypatch):
         error.display_retry = retry
         raise error
     monkeypatch.setattr(series_access, 'chart_data', failure)
-    with pytest.raises(HTTPException) as caught:
+    with pytest.raises(QueryError) as caught:
         data_sync(body)
     assert caught.value.status_code == 422
     assert caught.value.detail['display_retry'] == retry

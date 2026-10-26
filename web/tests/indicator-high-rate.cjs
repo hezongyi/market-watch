@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const provider=process.argv.includes('--provider');
 const credential=provider?'provider_snapshot_id':'display_snapshot_id';
-const bridge=fs.readFileSync('../advanced-host/bridge.js','utf8');
+const bridge=fs.readFileSync('../advanced-host/chart-runtime.js','utf8');
 const callbacks=[],batches=[],reads=[],held=[],reports=[];
 let token,scope={generation:1,name:'LWMA',resolution:'1',first:60000,last:60000,count:1},coordinator;
 const sub={symbol:'MWC:test',res:'1',last:0,marketListener:'listener',marketGeneration:1,marketSequence:0,
@@ -14,7 +14,7 @@ const adapter={scope:()=>({...scope}),attach:(_,__,identity)=>({generation:1,ide
  applyBatch:async(_,batch)=>{if(!batch.current())return false;batches.push(batch);return true;}};
 const context={crypto:require('node:crypto').webcrypto,MWNativeIndicatorResults:adapter,queueMicrotask,Date,setTimeout,clearTimeout,
  setInterval:()=>1,clearInterval(){},addEventListener:(type,handler)=>{if(type==='message')context.handle=handler;},
- send:()=>{},parent:{},parentOrigin:'https://parent.test',ready:false,loading:false,
+ disposed:false,send:()=>{},parent:{},parentOrigin:'https://parent.test',ready:false,loading:false,
  quoteSubscriptions:new Map(),subscriptions,marketHistoryState:state,indicatorBindings:bindings,
  indicatorKey:(s,r)=>s+'|'+r,decode:()=>({symbol:'test',series_kind:provider?'provider':'composite'}),
  stamp:bar=>bar.start,barsOf:event=>event.bars.map(bar=>({...bar,time:bar.start})),observeRangeBars(){},
@@ -38,13 +38,12 @@ if(fs.existsSync('../advanced-host/composite-display-batches.js')){
  assert.ok(a>=0 && b>a,'test must execute actual price acceptance helper');
  vm.runInNewContext(bridge.slice(a,b),context);
 }
-const start=bridge.lastIndexOf('addEventListener("message", async (e) => {');
-const end=bridge.indexOf('\nsend({ type: "loaded" });',start);
+const start=bridge.indexOf('async function update(m) {');
+const end=bridge.indexOf('\nfunction disposeChart()',start);
 vm.runInNewContext(bridge.slice(start,end),context);
 async function flush(){for(let i=0;i<40;i++)await Promise.resolve();}
-async function event(sequence,minute,close=sequence){await context.handle({source:context.parent,origin:context.parentOrigin,
- data:{channel:'mw-chart-v1',type:'market-event',event:{listener:'listener',generation:1,sequence,type:'bars',
- [credential]:'snapshot-'+sequence,initial_input_revision:1,bars:[{start:minute*60000,open:1,high:close,low:1,close}]}}});await flush();}
+async function event(sequence,minute,close=sequence){await context.update({type:'market-event',event:{listener:'listener',generation:1,sequence,type:'bars',
+ [credential]:'snapshot-'+sequence,initial_input_revision:1,bars:[{start:minute*60000,open:1,high:close,low:1,close}]}});await flush();}
 (async()=>{
  try{
   await event(1,1);assert.deepEqual(reads,['snapshot-1']);

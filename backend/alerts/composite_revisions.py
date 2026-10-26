@@ -129,9 +129,8 @@ def create(db, composite_id, body):
         mapping_id=mapping.id, parent_revision_id=parent.id, seam=body.seam, rules=rules, request_id=body.request_id)
     db.add(revision)
     db.flush()
-    from .composite_watches import impact
 
-    warmups, impacted = {}, impact(db, composite.id)
+    warmups, impacted = {}, []
     for saved, alert in affected_rules(db, composite.id):
         impacted.append({"id": alert.id, "name": alert.name, "rule_version": alert.version,
             "revision_id": saved.market_identity["composite_revision_id"], "migration": "keeps_fixed_revision"})
@@ -141,13 +140,6 @@ def create(db, composite_id, body):
         for indicator in config.indicators():
             spec = indicator.model_dump(exclude={"output"})
             warmups[key([config.timeframe, spec])] = {"timeframe": config.timeframe, "spec": spec}
-    from .composite_watches import affected
-
-    for _, watch in affected(db, composite.id):
-        if watch.rule["kind"] == "indicator":
-            for parameter in ("fast", "slow"):
-                spec = {"name": "SMA", "version": "1", "params": {"period": watch.rule["indicator_params"][parameter]}}
-                warmups[key([watch.rule["timeframe"], spec])] = {"timeframe": watch.rule["timeframe"], "spec": spec}
     db.add(CompositeRevisionChange(revision_id=revision.id, request_hash=request_hash, reason=body.reason,
         manifest={"request": body.model_dump(), "cutoff": cutoff, "history_checksum": version.manifest["checksum"],
             "warmups": list(warmups.values()), "affected_rules": impacted, "indicator_algorithm": ALGORITHM,
@@ -287,13 +279,12 @@ def activate(db, composite_id, revision_id, body):
     if db.get(MarketDataset, mapping.target_dataset_id).identity["account_scope"] != account_scope():
         raise ValueError("实时账户已改变，不能启用旧映射")
     stamp = now_ms()
-    from .composite_watches import impact
 
     activation = CompositeActivation(revision_id=revision.id, previous_revision_id=composite.active_revision_id,
         request_id=body.request_id, input_revision=progress["input_revision"], event_boundary=stamp // 60000 * 60000,
         at=stamp, evidence={"preparation": progress, "affected_rules": [
             {"id": alert.id, "revision_id": saved.market_identity["composite_revision_id"],
-                "migration": "keeps_fixed_revision"} for saved, alert in affected_rules(db, composite.id)] + impact(db, composite.id)})
+                "migration": "keeps_fixed_revision"} for saved, alert in affected_rules(db, composite.id)]})
     db.add(activation)
     composite.active_revision_id, revision.activated_at = revision.id, stamp
     db.flush()

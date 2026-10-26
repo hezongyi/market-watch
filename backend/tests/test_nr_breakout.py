@@ -232,8 +232,8 @@ def test_yahoo_overnight_session_and_source_weekly_holiday_boundaries():
 @pytest.mark.parametrize("policy", ["strict_confirmed_v1", "observed_display_v1"])
 def test_fixed_worker_checkpoint_and_historical_pagination_match_batch(database, monkeypatch, policy):
     from alerts import fixed_indicators as jobs
-    from alerts.chart_api import DataQuery, data_sync
     from alerts.chart_calculation_history import calculation_rows
+    from alerts.chart_query import DataQuery, data_sync
     from alerts.history_artifacts import read_artifact
     from alerts.storage import FixedIndicatorRun
     from test_fixed_indicators import drain, history
@@ -266,7 +266,7 @@ def test_fixed_worker_checkpoint_and_historical_pagination_match_batch(database,
 @pytest.mark.parametrize("policy", ["strict_confirmed_v1", "observed_display_v1"])
 def test_source_date_daily_fixed_worker_and_pagination_match_pine(database, monkeypatch, policy):
     from alerts import fixed_indicators as jobs
-    from alerts.chart_api import DataQuery, data_sync
+    from alerts.chart_query import DataQuery, data_sync
     from alerts.history_artifacts import read_artifact
     from test_fixed_indicators import drain
     from test_native_history_archive import Adapter, day, prepare, run

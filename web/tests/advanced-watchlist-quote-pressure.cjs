@@ -10,8 +10,8 @@ const ctx = vm.createContext({URL, URLSearchParams, Map, Promise, Date, Intl, Er
   crypto:{randomUUID:()=> 'quote-pressure'},
   addEventListener:(name,fn)=>{if(name==='message')handlers.push(fn);},
   setTimeout,clearTimeout,queueMicrotask,requestAnimationFrame:fn=>setImmediate(fn)});
-for(const file of ['series.js','price-format.js','composite-display-batches.js','bridge.js'])
-  vm.runInContext(fs.readFileSync('../advanced-host/'+file,'utf8'),ctx);
+for(const file of ['series.js','price-format.js','composite-display-batches.js','chart-runtime.js'])
+  vm.runInContext(require("./fixtures/direct-runtime.cjs").read('../advanced-host/'+file,'utf8'),ctx);
 const run = code => vm.runInContext(code,ctx);
 const flush = async () => { for(let n=0;n<8;n++) await new Promise(r=>setImmediate(r)); };
 (async()=>{

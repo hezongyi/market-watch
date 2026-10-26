@@ -644,7 +644,9 @@ def test_system_center_groups_occurrences_excludes_trades_and_reads_only_snapsho
         assert db.get(NoticeEvent, newer.event_id).viewed_at is None
         assert db.get(NoticeEvent, first.event_id).handled_at is None
         assert center.read_system(db, center.SUBJECT, SystemRead(profile=PROFILE, through=cutoff, epoch=epoch))['read'] == 0
-        assert '?panel=alerts&signal=' in center.resolve_signal(db, signal_id)['destination']
+        resolved = center.resolve_signal(db, signal_id)
+        assert '?panel=notifications&event=' in resolved['destination']
+        assert resolved['destination'].startswith('/advanced-charts?')
         with pytest.raises(HTTPException) as error:
             center.read_system(db, center.SUBJECT, SystemRead(profile=PROFILE, through=cutoff, epoch='obsolete'))
         assert error.value.status_code == 409

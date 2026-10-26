@@ -13,7 +13,7 @@ const assert = require("node:assert/strict");
     viewport: { width: 1600, height: 950 },
   });
   if(process.env.MARKET_WATCH_BRIDGE_SOURCE)
-    await page.route('**/bridge.js*',route=>route.fulfill({contentType:'application/javascript',
+    await page.route('**/chart-runtime.js*',route=>route.fulfill({contentType:'application/javascript',
       body:fs.readFileSync(process.env.MARKET_WATCH_BRIDGE_SOURCE,'utf8')}));
   await page.goto("https://localhost:15443/");
   await page

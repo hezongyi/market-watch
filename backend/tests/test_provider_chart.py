@@ -466,14 +466,14 @@ def test_earliest_probe_uses_positive_epoch_and_does_not_write_managed_data(data
     {'chart_count': 1, 'historical_navigation': 1},
 ])
 def test_native_history_context_rejects_coercion(context):
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     from pydantic import ValidationError
     with pytest.raises(ValidationError):
         DataQuery(instrument='BTCUSDT', series_kind='provider', timeframe='M5', native_history=context)
 
 
 def test_optional_history_context_is_provider_only_and_unknown_fields_stay_ignored():
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     from pydantic import ValidationError
     base = {'instrument': 'BTCUSDT', 'timeframe': 'M5', 'countBack': 200}
     with pytest.raises(ValidationError):
@@ -489,7 +489,7 @@ def test_optional_history_context_is_provider_only_and_unknown_fields_stay_ignor
                                          ('binance',1200),('oanda',3999)])
 def test_cold_optional_does_not_add_candles_http(source, count, database, monkeypatch):
     from alerts import provider_cache as cache
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     monkeypatch.setattr(settings, 'oanda_token', 'test-only')
     meta = {**META, 'source': source, 'symbol': 'BTCUSDT' if source == 'binance' else 'EUR_CHF',
             'calendar': 'utc0' if source == 'binance' else 'ny17'}
@@ -578,7 +578,7 @@ def test_high_period_optional_stops_after_mandatory_http(source, frame, monkeypa
 @pytest.mark.parametrize('field,value', [('countBack',True),('countBack','200'),('countBack',200.0),
                                        ('before','1000000'),('from',False),('firstDataRequest',1)])
 def test_native_history_rejects_number_and_time_coercion(field, value):
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     from pydantic import ValidationError
     with pytest.raises(ValidationError):
         DataQuery(**{'instrument':'BTCUSDT','series_kind':'provider','timeframe':'M5',

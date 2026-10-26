@@ -3,9 +3,9 @@
 import math
 
 import pytest
-from alerts.chart_api import DataQuery
 from alerts.chart_calculation_history import calculation_rows
 from alerts.chart_indicators import calculate
+from alerts.chart_query import DataQuery
 from alerts.managed_dataset import data
 from alerts.storage import ChartPublication, ChartPublishedBar, Instrument
 from sqlalchemy import select

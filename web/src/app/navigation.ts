@@ -2,7 +2,7 @@ import { centerLocation } from "../market-data/location";
 
 const workspace = "[a-zA-Z0-9-]{1,40}";
 const businessPath = new RegExp(
-  `^(?:/advanced-charts(?:/${workspace})?|/signals|/replay(?:/${workspace})?|/settings(?:/(?:notifications|sound|system|account))?|/legacy/monitoring|/chart-workspaces(?:/${workspace})?)$`,
+  `^(?:/advanced-charts(?:/${workspace})?|/signals|/settings(?:/(?:notifications|sound|system|account))?)$`,
 );
 export const defaultChart = "/advanced-charts";
 /** A continuation is a bounded, known business location, never an endpoint. */
@@ -25,6 +25,7 @@ export function safeNext(value: string | null): string {
         ? defaultChart
         : allowed;
     }
+    if (url.pathname === "/advanced-charts/") url.pathname = "/advanced-charts";
     if (!businessPath.test(url.pathname)) return defaultChart;
     return url.pathname + url.search + url.hash;
   } catch {
@@ -35,10 +36,7 @@ export function pageName(path: string) {
   if (path.startsWith("/advanced-charts")) return "图表";
   if (path === "/login") return "登录";
   if (path === "/signals") return "通知";
-  if (path.startsWith("/replay")) return "历史演练";
   if (path.startsWith("/settings")) return "设置";
-  if (path === "/legacy/monitoring") return "旧版监控";
-  if (path.startsWith("/chart-workspaces")) return "旧图表工作区";
   return "页面不存在";
 }
 export function chartReturn() {

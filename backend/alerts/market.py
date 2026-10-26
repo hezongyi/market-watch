@@ -21,7 +21,6 @@ from .coverage import covers_interval
 from .domain import Candle, aggregate, bucket_bounds, calendar_for, scheduled_open
 from .market_datasets import validate_ingestion
 from .providers import fetch_binance, fetch_oanda
-from .service import evaluate_quote, evaluate_watch
 from .storage import (
     Audit,
     Bar,
@@ -29,7 +28,6 @@ from .storage import (
     Instrument,
     MarketCoverage,
     Preference,
-    Watch,
     bootstrap,
     instant,
     ms,
@@ -575,36 +573,6 @@ def once(symbol=None, start=None, end=None, *, include_viewers=False, fetcher=No
                         details={"instrument": instrument_id, "minutes": count},
                     )
                 )
-            with transaction() as db:
-                for watch_id in db.scalars(
-                    select(Watch.id).where(
-                        Watch.status == "active", Watch.instrument_id == instrument_id,
-                        ingestion.price_changed
-                    )
-                ).all():
-                    evaluate_watch(db, watch_id)
-            if not start:
-                with transaction() as db:
-                    needs_quotes = any(
-                        w.rule.get("timeframe") == "tick"
-                        for w in db.scalars(
-                            select(Watch).where(
-                                Watch.status == "active", Watch.instrument_id == instrument_id,
-                            )
-                        )
-                    )
-                if needs_quotes:
-                    quotes = fetch(source, provider_symbol, mode="quote")
-                    with transaction() as db:
-                        inst = db.get(Instrument, instrument_id)
-                        for raw in quotes["rows"]:
-                            evaluate_quote(
-                                db,
-                                inst,
-                                int(raw["timestamp"]),
-                                Decimal(str(raw["bidPrice"])),
-                                Decimal(str(raw["askPrice"])),
-                            )
             if not start:
                 with transaction() as db:
                     inst = db.get(Instrument, instrument_id)
@@ -766,7 +734,7 @@ def import_once(*, chart_only=False, fetcher=None, defer_aggregation=False,
                         raise ValueError("交易时段返回空数据，保留补数游标等待重试")
                     t += timedelta(minutes=1)
             inst = db.get(Instrument, job.instrument_id)
-            ingestion = ingest(db, inst, payload, defer_aggregation=defer_aggregation, report_changes=True)
+            ingest(db, inst, payload, defer_aggregation=defer_aggregation)
             if not fully_queried_oanda:
                 # A nonempty response is not proof that the requested slice is complete.
                 present = set(
@@ -809,12 +777,6 @@ def import_once(*, chart_only=False, fetcher=None, defer_aggregation=False,
                         },
                     )
                 )
-            for watch_id in db.scalars(
-                select(Watch.id).where(
-                    Watch.instrument_id == job.instrument_id, Watch.status == "active", ingestion.price_changed
-                )
-            ).all():
-                evaluate_watch(db, watch_id)
     except (RuntimeError, ValueError, TimeoutError, subprocess.TimeoutExpired, OSError, httpx.HTTPError) as e:
         with transaction() as db:
             # Planner/control paths lock the instrument before updating jobs.

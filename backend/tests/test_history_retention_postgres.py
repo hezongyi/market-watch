@@ -6,9 +6,8 @@ from concurrent.futures import ThreadPoolExecutor
 
 import pytest
 import test_history_retention as contracts
-from alerts.history_replay import create_replay
-from alerts.history_retention import reclaim
-from alerts.storage import Instrument
+from alerts.history_retention import lock_reference_values, reclaim
+from alerts.storage import AdvancedWorkspace
 from test_market_contracts import identity
 from test_provider_postgres import provider_pg as _provider_pg
 
@@ -29,11 +28,11 @@ def test_postgres_retention_contract(provider_pg, contract):
     contract(factory)
 
 
-def test_reclamation_wins_then_new_replay_reference_is_rejected(provider_pg, monkeypatch):
+def test_reclamation_wins_then_new_workspace_reference_is_rejected(provider_pg, monkeypatch):
     import alerts.history_retention as retention
 
     factory, _ = provider_pg
-    ident, instrument = contracts.prepared(factory, frames=("M1", "H4", "D1"))
+    ident, _ = contracts.prepared(factory, frames=("M1", "H4", "D1"))
     held, release, replay_started = threading.Event(), threading.Event(), threading.Event()
     original = retention.references
 
@@ -52,7 +51,10 @@ def test_reclamation_wins_then_new_replay_reference_is_rejected(provider_pg, mon
     def reference():
         with factory.begin() as db:
             replay_started.set()
-            return create_replay(db, db.get(Instrument, instrument), ident, "M1", 0, 120000)
+            lock_reference_values(db, {"history_version_id": ident})
+            db.add(AdvancedWorkspace(name="saved history", document={"history_version_id":ident}))
+            db.flush()
+            return True
 
     with ThreadPoolExecutor(max_workers=2) as pool:
         clearing = pool.submit(clear)
@@ -67,12 +69,15 @@ def test_reclamation_wins_then_new_replay_reference_is_rejected(provider_pg, mon
 
 def test_new_reference_wins_then_reclamation_is_rejected(provider_pg):
     factory, _ = provider_pg
-    ident, instrument = contracts.prepared(factory, frames=("M1", "H4", "D1"))
+    ident, _ = contracts.prepared(factory, frames=("M1", "H4", "D1"))
     held, release, clear_started = threading.Event(), threading.Event(), threading.Event()
 
     def reference():
         with factory.begin() as db:
-            run = create_replay(db, db.get(Instrument, instrument), ident, "M1", 0, 120000)
+            lock_reference_values(db, {"history_version_id": ident})
+            run = AdvancedWorkspace(name="saved history", document={"history_version_id":ident})
+            db.add(run)
+            db.flush()
             held.set()
             assert release.wait(5)
             return run.id

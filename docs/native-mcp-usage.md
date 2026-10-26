@@ -1,6 +1,6 @@
 # 原生 MCP 使用与开发
 
-实现分支 `feat/native-mcp`，基线 `3c18f60`。模块使用官方 Python SDK `mcp==2.3.0` 的公开 low-level Server handlers；SDK 负责 JSON-RPC 和 Streamable HTTP，能力注册表负责业务 schema、权限和调度。P1 和 P2 已实现；Docker HTTPS 与实际 Codex 分析验收尚待运行，不能据本文宣称实例已部署。
+当前候选使用同源 `/mcp`，HTTP/MCP 共用 ChartAlert 应用层；工具和查询契约如下。SDK 负责 JSON-RPC 和 Streamable HTTP，能力注册表负责业务 schema、权限和调度。单前端 Ubuntu 验收与 CI 见 [完成审计](verification/single-frontend-20261026/completion-audit.md)。本文后半段旧 `feat/native-mcp` 实例地址及启动过程为历史验收，不是本候选的启动指令。
 
 ## 接入
 
@@ -41,19 +41,19 @@ python -m alerts.mcp.credentials revoke --hash HASH_FROM_LIST
 | `market:read` | `market_list_instruments`、`market_get_quote`、`market_get_bars`、`system_get_status` |
 | `analysis:read` | `indicators_list` |
 | `analysis:read` + `market:read` | `indicators_calculate` |
-| `alerts:read` | `alerts_list`、`alerts_get_signals` |
+| `alerts:read` | `chart_alerts_list`、`chart_alerts_get`、`chart_alerts_events`、只读历史 `alerts_get_signals` |
 | `charts:read` | `charts_list_workspaces`、`charts_get_drawings` |
-| `alerts:write` | `alerts_create`、`alerts_cancel`、`notifications_ack` |
+| `alerts:write` | `chart_alerts_create`、`chart_alerts_edit`、`chart_alerts_lifecycle`、`notifications_ack` |
 | `market:read` + `market:write` | `history_create_dataset`、`history_configure_maintenance`、`history_control_maintenance`、`history_submit_task`、`history_control_task`、`history_change_aggregation`、`history_request_artifacts`、`history_reclaim_dataset` |
 
 - 报价和通用 K 线输入使用基础品种 ID，`series_kind` 明确选择 `managed` 或 `provider`。指标另外支持 `history` 和 `composite`，见下文。先发现品种；不能把来源 ID 当成券商可交易映射。管理系列的品种发现沿用网页启用品种目录，平台系列沿用网页市场目录。
 - 价格、OHLC 是十进制字符串，时间为毫秒。报价保留网页的 bid/last trade/M1 close 标签；OANDA/Binance 平台报价首期取有限 M1 数据并明确标为 `M1 close`。Yahoo 使用网页共用的市场报价快照，并返回延迟字段。来源不可用返回错误。
 - `market_open`（已知时）与 `is_stale` 分开表达休市和陈旧。报价年龄不等于交易可用性。平台报价未获得休市状态时不推断市场正在交易。
-- K 线默认 300，最多 2000；批量指标 1–12。`before` 是排他的毫秒游标；`next_before` 可继续分页。`cursor_coordinate` 明确管理系列的 UTC start 与平台系列的 native chart time，日/周/月不可混用。所有 bars 与 indicators 来自 `chart_api.query_chart/data_sync`；网页仍使用同一入口。指标保留完整历史前缀与预热；自建历史和组合默认按实际有效 K 线连续计算，严格模式才因缺口重置。
+- K 线默认 300，最多 2000；批量指标 1–12。`before` 是排他的毫秒游标；`next_before` 可继续分页。`cursor_coordinate` 明确管理系列的 UTC start 与平台系列的 native chart time，日/周/月不可混用。所有 bars 与 indicators 来自 `chart_query.query_chart/data_sync`；网页仍使用同一入口。指标保留完整历史前缀与预热；自建历史和组合默认按实际有效 K 线连续计算，严格模式才因缺口重置。
 - 返回页面保留原有 coverage、cache revision、history revalidation、原始历史起点等字段。管理系列使用 `history_revision`，平台系列使用 `cache_revision`；未知起点不伪造。`gaps`、`incomplete_count` 和 `coverage_scope=returned_page` 仅描述当前页面；Yahoo 的 exchange calendar 不由 NY17/UTC0 判断，返回 `gap_assessment=unknown_calendar`、原始 `interval_breaks` 和 `quality=calendar_unverified`，不把休市间隔冒称缺失数据。这些字段不承诺完整历史覆盖。原生图表时间坐标和 K 线 UTC 起止时间可能因 D/W/M 标签不同。
 - 旧管理系列指标历史超过 200000 根时拒绝计算（已发布查询统计 `chart_published_bars`，普通管理查询统计实际源周期 candles），避免截短历史后产生不同数值。Provider 保持项目既有缓存填充、超时和取消策略；不创建持久历史维护订阅。三层固定历史/组合采用后台完整初始化和检查点；自建维护通过单独授权的八个写工具管理。
 - 默认单请求体 64 KiB、每凭据每分钟 60 次协议请求（包括发现/初始化）、最多 4 个业务调用并行、最多 8 个待处理调用、20 秒调用等待预算。数据库配额跨进程；计算并行额度按 API 进程。同步工作未退出时占用业务 slot，客户端断连设置取消标记。当前部署使用一个 API 进程。
-- 告警及通知使用网页现有一次性模型与规则；不把并行开发的新告警模型当成已集成。signals 只包含网页共用视图的最新 500 条。审计保存 agent、请求 ID、能力名、资源和结果，不保存原始凭据或完整请求正文。
+- 告警使用网页相同的 `AlertConfig`、条件校验、数据集绑定和版本事务；`alerts_create`、`alerts_cancel`、`alerts_list` 已退出注册。创建需稳定 `request_id` 和 `idempotency_key`；编辑需当前 `version`；生命周期需 `version`、`control_revision` 和稳定 `request_id`。association 可省略，指定时必须关联真实已保存图格/对象。告警事件最多 500 条，历史 signals 只读查询最多 500 条。审计保存 agent、请求 ID、能力名、资源和结果，不保存原始凭据或完整请求正文。
 - 无计划 CRUD、计划表、形态扫描引擎或交易工具。Agent 根据 OHLC、可选指标和画线在对话中分析，区分事实、计算、推断，并征询用户意见。
 
 ## 自建历史维护写入
@@ -72,7 +72,7 @@ python -m alerts.mcp.credentials revoke --hash HASH_FROM_LIST
 
 原生图表库公开 `getAllShapes()/getShapeById().getPoints()` 在保存时生成 `state._mwDrawingProjection`，包含图表索引、symbol、resolution、对象 ID、稳定类型 ID、时间/价格锚点。投影和 vendor state 一起保存并沿用工作区 revision；保存期间图表编辑变化会拒绝该次快照并提示重试。加载时剥离投影扩展，不传给 vendor。不解析私有 vendor sources，不返回 options、正文或任意 vendor 文档。
 
-首期白名单：`horizontal_line`、`trend_line`、`ray`、`rectangle`、`fib_retracement`、`text`、`parallel_channel`、`long_position`、`short_position`。实际验收目前覆盖水平线、趋势线和矩形；未知对象返回 `supported=false` 及空 anchors，不能宣称已解释它。价格坐标必须有限；原生水平线允许 price-only 锚点。原生时间标为 `native_chart_time_ms`，旧版 lightweight 工作区标为 `utc_ms`。
+首期白名单：`horizontal_line`、`trend_line`、`ray`、`rectangle`、`fib_retracement`、`text`、`parallel_channel`、`long_position`、`short_position`。实际验收目前覆盖水平线、趋势线和矩形；未知对象返回 `supported=false` 及空 anchors，不能宣称已解释它。价格坐标必须有限；原生水平线允许 price-only 锚点。原生时间标为 `native_chart_time_ms`。旧 lightweight 工作区的 MCP 活动读取入口已退役，`engine=legacy` 会被明确拒绝，不能把旧 ID 当原生工作区使用。
 
 旧原生工作区没有投影时返回 `UNSUPPORTED_CAPABILITY`，需通过更新后的页面重新保存；未保存改动不可见。缺失工作区返回 `WORKSPACE_NOT_FOUND`。工作区列表不包含文档正文。
 
@@ -84,7 +84,7 @@ python -m alerts.mcp.credentials revoke --hash HASH_FROM_LIST
 
 算法扩展沿用 `chart_indicators.register()`，通用指标工具自动发现。重复算法 ID 拒绝注册；需要稳定 ID/版本、参数、输出和历史要求。测试已通过真实 SDK 协议验证新增动作发现，并验证新增指标发现/计算。
 
-## Ubuntu Docker 验收运行步骤
+## 历史原生 MCP 实例验收记录（不用于当前候选启动）
 
 工作目录 `/home/quant/repos/market-watch-native-mcp`。验收实例已在 Ubuntu 22.04.5 主机 `quant-server` 的 Docker 29.1.3 实际运行。独立 project 为 `mw-native-mcp-acceptance`，PostgreSQL 14，网络 `mw-native-mcp-acceptance_default`，volume `mw-native-mcp-acceptance_native-mcp-pg`。地址为 `https://localhost:18543/`、MCP `https://localhost:18543/mcp`、图表 origin `https://localhost:18544/`，仅绑定 Ubuntu 本机回环地址。
 
@@ -160,7 +160,7 @@ docker compose --env-file /tmp/mw-native-mcp-acceptance/compose.env \
 
 provider 查询可传 `calculation_origin` 固定递归历史起点；从响应 `page.calculation_origin` 读取并在后续分页/轮询复用，避免更早缓存回填改变EMA/RSI等的起点。managed published仍使用 `dataset_start` 对齐其已发布历史。
 
-共用信号查询现在同时返回旧策略与图表告警事件：旧策略的 `watch_id` 有值、`chart_alert_id` 为空；图表事件相反。逐事件通知确认不改变告警次数、规则版本或运行轮次。MCP `alerts_create`/`alerts_cancel` 保持原有旧策略接口，不推断它们可以创建或编辑新版图表规则。
+共用信号查询现在同时返回旧策略与图表告警事件：旧策略的 `watch_id` 有值、`chart_alert_id` 为空；图表事件相反。逐事件通知确认不改变告警次数、规则版本或运行轮次。MCP 使用上表的六个 `chart_alerts_*` 工具管理当前规则；旧 Watch 工具已退役，历史事件确认不会重新激活旧规则或重投递。
 
 ## 已发布历史版本的指标
 

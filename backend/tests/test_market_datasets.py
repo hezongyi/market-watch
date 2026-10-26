@@ -10,8 +10,8 @@ from alerts.chart_series import decode, display_symbol, encode, is_gold
 from alerts.market import ingest
 from alerts.market_contracts import RequestResult
 from alerts.market_datasets import legacy_inventory, process_price_row, register_dataset
+from alerts.query_errors import QueryError
 from alerts.storage import Bar, Instrument, MarketCoverage, MarketDataset
-from fastapi import HTTPException
 from sqlalchemy import create_engine, inspect, select, text
 from test_market_contracts import batch, identity, minute
 
@@ -179,7 +179,7 @@ def test_qualified_gold_keeps_gold_calendar_and_cannot_be_native_alias(database)
         ident = gold.id
     assert is_gold(ident) and is_gold("OANDA:XAU_USD")
     assert not is_gold("EURUSD")
-    with pytest.raises(HTTPException) as error:
+    with pytest.raises(QueryError) as error:
         provider_chart.metadata(ident)
     assert error.value.status_code == 422
 

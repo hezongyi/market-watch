@@ -5,7 +5,6 @@ from alerts import api
 from alerts.data_center import dataset_detail
 from alerts.history_artifacts import artifact_tick, request_artifacts
 from alerts.history_maintenance import configure, create_run
-from alerts.history_replay import create_replay
 from alerts.history_retention import reclaim, references
 from alerts.history_versions import import_page, snapshot_rows, version_report
 from alerts.storage import (
@@ -21,6 +20,7 @@ from alerts.storage import (
     SourceFetch,
 )
 from fastapi.testclient import TestClient
+from legacy_records import create_replay
 from sqlalchemy import delete, func, select
 from test_history_maintenance import Adapter
 from test_market_contracts import identity

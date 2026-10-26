@@ -2,7 +2,6 @@ import asyncio
 import hashlib
 import json
 import secrets
-from collections import deque
 from contextlib import asynccontextmanager
 from typing import Literal
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -11,21 +10,20 @@ import httpx
 from argon2 import PasswordHasher
 from argon2.exceptions import VerificationError
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field, model_validator
 from sqlalchemy import delete, func, select
 
 from . import business
-from .business import WatchInput
 from .calendar_profile import closures_from
 from .chart_alert_message import signal_message, signal_title
 from .chart_series import is_gold
 from .config import settings
-from .domain import TIMEFRAMES, calendar_for, previous_session
+from .domain import calendar_for, previous_session
 from .logging_config import configure_api_logging
 from .notify import DEFAULTS
-from .replay_history import history_rows, pack_history
-from .service import acknowledge, add_replay_watch, replay_step
+from .query_errors import QueryError
+from .service import acknowledge
 from .storage import (
     AckGrant,
     Audit,
@@ -38,11 +36,9 @@ from .storage import (
     Notification,
     Outbox,
     Preference,
-    Replay,
     SignalRow,
     WeeklyHistoryRequest,
     bootstrap,
-    candle_dict,
     instant,
     now_ms,
     transaction,
@@ -85,6 +81,12 @@ async def lifespan(app):
 
 configure_api_logging()
 app = FastAPI(title="守望 · Market Watch", lifespan=lifespan)
+
+
+@app.exception_handler(QueryError)
+async def query_error_response(request: Request, error: QueryError):
+    return JSONResponse(status_code=error.status_code, content={"detail": error.detail}, headers=error.headers)
+
 
 
 def digest(token):
@@ -211,7 +213,7 @@ def candles(instrument: str, timeframe: str = "H4", before: int | None = None, l
 
 @app.get("/api/watches", dependencies=[Depends(authenticated)])
 def watches():
-    return business.watches()
+    raise HTTPException(410, "旧 Watch 已退役，请使用 ChartAlert")
 
 
 @app.get("/api/session-range", dependencies=[Depends(authenticated)])
@@ -244,13 +246,13 @@ def session_range(instrument: str, at: int | None = None):
 
 
 @app.post("/api/watches", dependencies=[Depends(authenticated)], status_code=201)
-def new_watch(body: WatchInput):
-    return business.new_watch(body)
+def new_watch():
+    raise HTTPException(410, "旧 Watch 已退役，请使用 ChartAlert")
 
 
 @app.post("/api/watches/{watch_id}/cancel", dependencies=[Depends(authenticated)])
 def cancel_watch(watch_id: str):
-    return business.cancel_watch(watch_id)
+    raise HTTPException(410, "旧 Watch 已退役，历史记录保留")
 
 
 @app.get("/api/signals", dependencies=[Depends(authenticated)])
@@ -275,6 +277,10 @@ def retry_notification(notification_id: str):
         task = db.scalar(
             select(Outbox).where(Outbox.notification_id == notification_id).with_for_update()
         )
+        from .retire_legacy import current_signal
+
+        if not current_signal(db.get(SignalRow, note.signal_id)):
+            raise HTTPException(410, "旧告警或未知来源的通知不再允许重投递")
         if note.ack_at is not None or not task or task.status != "blocked":
             raise HTTPException(409, "只有未确认且因凭据错误暂停的通知可以手动重试")
         task.status = "pending"
@@ -395,6 +401,7 @@ def readyz(response: Response):
 
 @app.get("/api/health", dependencies=[Depends(authenticated)])
 def health():
+    from .chart_alert_health import summary as chart_alert_health
     from .worker_health import services
 
     with transaction() as db:
@@ -454,6 +461,7 @@ def health():
         return {
             "time": now_ms(),
             "pending_notifications": pending,
+            "chart_alerts": chart_alert_health(db),
             "backup": backup_health(db),
             "market_incidents": market_incidents(db),
             "last_notification_test": last_test_result,
@@ -647,7 +655,8 @@ def sync_device(device_id=Depends(device_auth)):
         pending = db.execute(
             select(Notification, SignalRow)
             .join(SignalRow, SignalRow.id == Notification.signal_id)
-            .where(Notification.ack_at.is_(None))
+            .where(Notification.ack_at.is_(None), SignalRow.chart_alert_id.is_not(None),
+                SignalRow.watch_id.is_(None), Notification.status != "retired")
             .order_by(Notification.created_at)
         ).all()
         acked = db.scalars(
@@ -703,7 +712,7 @@ def device_ack(notification_id: str, device_id=Depends(device_auth)):
             raise HTTPException(404, "通知不存在")
 
 
-class ReplayInput(BaseModel):
+class ImportInput(BaseModel):
     instrument_id: str = Field(min_length=1, max_length=40, pattern=r"^[A-Za-z0-9:_-]+$")
     dataset_version: str | None = Field(default=None, max_length=36)
     timeframe: str = "H4"
@@ -712,7 +721,7 @@ class ReplayInput(BaseModel):
 
 
 @app.post("/api/imports", dependencies=[Depends(authenticated)], status_code=201)
-def create_import(body: ReplayInput):
+def create_import(body: ImportInput):
     if (
         body.start < 0
         or body.end <= body.start
@@ -800,232 +809,33 @@ def imports_summary():
                     for row in weekly]}
 
 
-def replay_dict(run, *, full_history=False):
-    visible = [b for b in run.bars if b["end"] <= run.cursor]
-    return {
-        **{
-            k: getattr(run, k)
-            for k in [
-                "id",
-                "instrument_id",
-                "timeframe",
-                "start",
-                "end",
-                "cursor",
-                "watches",
-                "signals",
-            ]
-        },
-        "bars": list(history_rows(run)) if full_history else visible[-2000:],
-        "chart_bar_limit": 2000,
-        "warmup_bar_count": run.warmup_count or 0,
-        "chart_history_limited": (run.warmup_count or 0) > 500 or len(visible) > 2000,
-        "calendar_profile": run.calendar_profile or {},
-        "dataset_version": run.dataset_version,
-        "input_manifest": run.input_manifest or {},
-        "finished": not any(run.cursor < b["end"] <= run.end for b in run.bars),
-    }
 
 
-@app.get("/api/replays", dependencies=[Depends(authenticated)])
-def list_replays():
-    with transaction() as db:
-        runs = db.scalars(select(Replay).order_by(Replay.created_at.desc()).limit(100)).all()
-        return [
-            {
-                k: getattr(run, k)
-                for k in [
-                    "id",
-                    "instrument_id",
-                    "timeframe",
-                    "start",
-                    "end",
-                    "cursor",
-                    "created_at",
-                ]
-            }
-            for run in runs
-        ]
 
 
-@app.get("/api/replays/{run_id}/export", dependencies=[Depends(authenticated)])
-def export_replay(run_id: str):
-    with transaction() as db:
-        run = db.get(Replay, run_id)
-        if not run:
-            raise HTTPException(404, "演练不存在")
-        data = replay_dict(run, full_history=True)
-        data["export_version"] = 1
-        data["simulated"] = True
-        return Response(
-            json.dumps(data, ensure_ascii=False),
-            media_type="application/json",
-            headers={"Content-Disposition": f'attachment; filename="replay-{run.id}.json"'},
-        )
 
 
-@app.post("/api/replays", dependencies=[Depends(authenticated)], status_code=201)
-def new_replay(body: ReplayInput):
-    from .chart_data import FRAMES
-
-    if body.timeframe not in (FRAMES if body.dataset_version else TIMEFRAMES) or body.end <= body.start:
-        raise HTTPException(422, "请选择有效的周期与日期范围")
-    with transaction() as db:
-        from .history_replay import create_replay
-        from .storage import MarketDataset
-
-        instrument = db.get(Instrument, body.instrument_id)
-        if not instrument:
-            raise HTTPException(404, "未知品种")
-        explicit = db.scalar(select(MarketDataset.id).where(
-            MarketDataset.instrument_id == body.instrument_id))
-        if explicit or body.dataset_version:
-            if not body.dataset_version:
-                raise HTTPException(422, "显式数据集回测必须指定不可变历史版本")
-            try:
-                run = create_replay(db, instrument, body.dataset_version, body.timeframe, body.start, body.end)
-                return replay_dict(run)
-            except ValueError as error:
-                raise HTTPException(422, str(error)) from None
-        # Warmup bars precede selected range, but future is never sent to the browser.
-        bars = db.scalars(
-            select(Bar)
-            .where(
-                Bar.instrument_id == body.instrument_id,
-                Bar.timeframe == body.timeframe,
-                Bar.end > body.start,
-                Bar.end <= body.end,
-            )
-            .order_by(Bar.start.desc())
-            .limit(20001)
-        ).all()[::-1]
-        if len(bars) > 20000:
-            raise HTTPException(422, "回放超过 20000 根，请缩小日期范围")
-        if not any(b.end > body.start for b in bars):
-            raise HTTPException(422, "所选范围还没有历史数据，请先导入")
-        warmup = db.scalars(
-            select(Bar)
-            .where(
-                Bar.instrument_id == body.instrument_id,
-                Bar.timeframe == body.timeframe,
-                Bar.end <= body.start,
-            )
-            .order_by(Bar.start)
-            .execution_options(yield_per=1000)
-        )
-        context = deque(maxlen=500)
-
-        def warmup_rows():
-            for row in warmup:
-                snapshot = candle_dict(row.candle())
-                context.append(snapshot)
-                yield snapshot
-
-        warmup_snapshot, warmup_count = pack_history(warmup_rows())
-        days = db.scalars(
-            select(Bar)
-            .where(
-                Bar.instrument_id == body.instrument_id, Bar.timeframe == "D1", Bar.end <= body.end
-            )
-            .order_by(Bar.start)
-        ).all()
-        run = Replay(
-            instrument_id=body.instrument_id,
-            calendar_profile=db.get(Instrument, body.instrument_id).calendar_profile,
-            timeframe=body.timeframe,
-            start=body.start,
-            end=body.end,
-            cursor=body.start,
-            bars=[*context, *[candle_dict(b.candle()) for b in bars]],
-            warmup_snapshot=warmup_snapshot,
-            warmup_count=warmup_count,
-            days=[candle_dict(b.candle()) for b in days],
-            watches=[],
-            signals=[],
-        )
-        db.add(run)
-        db.flush()
-        return replay_dict(run)
 
 
-@app.get("/api/replays/{run_id}", dependencies=[Depends(authenticated)])
-def get_replay(run_id: str):
-    with transaction() as db:
-        run = db.get(Replay, run_id)
-        if not run:
-            raise HTTPException(404, "演练不存在")
-        return replay_dict(run)
 
 
-class StepInput(BaseModel):
-    count: int = Field(default=1, ge=1, le=1000)
 
 
-@app.post("/api/replays/{run_id}/step", dependencies=[Depends(authenticated)])
-def step(run_id: str, body: StepInput):
-    with transaction() as db:
-        run = db.scalar(select(Replay).where(Replay.id == run_id).with_for_update())
-        if not run:
-            raise HTTPException(404, "演练不存在")
-        replay_step(run, db.get(Instrument, run.instrument_id).calendar, body.count)
-        return replay_dict(run)
 
 
-@app.post("/api/replays/{run_id}/watches", dependencies=[Depends(authenticated)])
-def replay_watch(run_id: str, body: WatchInput):
-    with transaction() as db:
-        run = db.scalar(select(Replay).where(Replay.id == run_id).with_for_update())
-        if not run:
-            raise HTTPException(404, "演练不存在")
-        if body.instrument_id != run.instrument_id:
-            raise HTTPException(422, "品种与演练不一致")
-        try:
-            add_replay_watch(
-                run,
-                body.name,
-                body.rule(),
-                db.get(Instrument, run.instrument_id).calendar,
-                use_history=body.use_history,
-            )
-        except ValueError as e:
-            raise HTTPException(422, str(e))
-        return replay_dict(run)
 
 
-class SeekInput(BaseModel):
-    cursor: int
 
 
-@app.post("/api/replays/{run_id}/seek", dependencies=[Depends(authenticated)], status_code=201)
-def seek(run_id: str, body: SeekInput):
-    with transaction() as db:
-        old = db.get(Replay, run_id)
-        if not old:
-            raise HTTPException(404, "演练不存在")
-        if not old.start <= body.cursor <= old.end:
-            raise HTTPException(422, "定位时间超出范围")
-        run = Replay(
-            instrument_id=old.instrument_id,
-            dataset_version=old.dataset_version,
-            input_manifest=old.input_manifest,
-            calendar_profile=old.calendar_profile,
-            timeframe=old.timeframe,
-            start=old.start,
-            end=old.end,
-            cursor=body.cursor,
-            bars=old.bars,
-            warmup_snapshot=old.warmup_snapshot,
-            warmup_count=old.warmup_count,
-            days=old.days,
-            watches=[],
-            signals=[],
-        )
-        db.add(run)
-        db.flush()
-        return replay_dict(run)
 
 
 # Standalone chart module: same authentication, no strategy API changes.
+@app.api_route("/api/replays", methods=["GET", "POST"], dependencies=[Depends(authenticated)])
+@app.api_route("/api/replays/{path:path}", methods=["GET", "POST", "PUT", "DELETE"], dependencies=[Depends(authenticated)])
+def retired_replay(path: str = ""):
+    raise HTTPException(410, "历史演练已退役；既有记录保留，不再执行")
+
+
 from .chart_api import router as chart_router  # noqa: E402
 
 app.include_router(chart_router(authenticated))

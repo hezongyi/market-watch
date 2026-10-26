@@ -3,7 +3,7 @@ const fs = require("node:fs");
 const vm = require("node:vm");
 const { webcrypto } = require("node:crypto");
 const bridge = fs.readFileSync(
-  process.env.MW_BRIDGE_BASE || "../advanced-host/bridge.js",
+  process.env.MW_BRIDGE_BASE || "../advanced-host/chart-runtime.js",
   "utf8",
 );
 const producers = bridge.slice(

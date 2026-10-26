@@ -5,8 +5,8 @@ from types import SimpleNamespace
 import pytest
 from alerts import fixed_indicator_display as display
 from alerts import fixed_indicators as jobs
-from alerts.chart_api import DataQuery, data_sync
 from alerts.chart_indicators import CATALOG
+from alerts.chart_query import DataQuery, data_sync
 from alerts.storage import FixedIndicatorRun
 from sqlalchemy import event
 from test_fixed_indicators import drain, history

@@ -105,7 +105,7 @@ def test_calendar_derivation_and_mapping_keep_old_rule_and_series_identity(datab
     from alerts.aggregation_policy import change_aggregation
     from alerts.chart_alert_service import create as create_alert
     from alerts.chart_alert_service import current_version
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     from alerts.composite_definitions import first_use, save_mapping
     from alerts.history_artifacts import artifact_tick
     from alerts.history_versions import import_page

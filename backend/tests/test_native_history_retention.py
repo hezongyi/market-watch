@@ -1,7 +1,7 @@
 """Native checkpoint content remains reachable independently of source cache."""
 
 import pytest
-from alerts.chart_api import DataQuery, data_sync
+from alerts.chart_query import DataQuery, data_sync
 from alerts.history_maintenance import configure, create_run
 from alerts.history_retention import reclaim, references
 from alerts.history_versions import import_page

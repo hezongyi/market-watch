@@ -12,7 +12,7 @@ pytestmark = pytest.mark.skipif(not os.getenv("TEST_POSTGRES_URL"), reason="Requ
 
 @pytest.mark.parametrize("contract", [
     contracts.test_first_use_and_management_create_no_demand_but_actual_chart_renews_shared_target,
-    contracts.test_active_strategy_keeps_target_after_browser_closes_and_pausing_releases_it,
+    contracts.test_retired_watch_never_creates_persistent_demand,
     contracts.test_current_chart_alert_version_and_expiry_own_persistent_demand,
     contracts.test_empty_residents_and_account_catalog_other_assets_idle_cleanly,
     contracts.test_pinned_chart_revision_leases_coexist_renew_and_expire_independently,

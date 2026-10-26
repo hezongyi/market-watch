@@ -158,9 +158,6 @@ def labels_for(args):
         PREFIX + "built-at": built.isoformat(),
         PREFIX + "expires-at": expires if args.purpose in ("development", "acceptance") else "",
     }
-    for value in getattr(args, "build_arg", []):
-        if value.startswith("VITE_ADVANCED_CHART_ORIGIN="):
-            labels[PREFIX + "chart-origin"] = value.split("=", 1)[1]
     register(args.task, project, args.purpose)
     return labels
 
@@ -216,7 +213,9 @@ def base_contexts(docker, files, mode):
             archive = Path(tmp) / (str(i) + ".tar")
             layout = Path(tmp) / str(i)
             layout.mkdir()
-            docker.run("image", "save", "--output", str(archive), ref)
+            docker.run(
+                "image", "save", "--platform", "linux/amd64", "--output", str(archive), ref
+            )
             with tarfile.open(archive) as tar:
                 for member in tar:
                     name = member.name
@@ -232,9 +231,31 @@ def base_contexts(docker, files, mode):
                         shutil.copyfileobj(src, out)
             archive.unlink()
             index = read(layout / "index.json")
-            if not index or len(index["manifests"]) != 1:
-                raise ValueError("Expected one OCI base manifest")
-            digest = index["manifests"][0]["digest"]
+            all_manifests = (index or {}).get("manifests", [])
+            manifests = [
+                item
+                for item in all_manifests
+                if item.get("platform", {}).get("os") == "linux"
+                and item.get("platform", {}).get("architecture") == "amd64"
+            ]
+            if not manifests and len(all_manifests) == 1:
+                # Docker may omit platform metadata for an already-selected single image.
+                manifests = all_manifests
+            if len(manifests) != 1:
+                raise ValueError("Expected one linux/amd64 OCI base manifest")
+            descriptor = manifests[0]
+            manifest_path = layout / "blobs" / "sha256" / descriptor["digest"].split(":", 1)[1]
+            if not manifest_path.is_file():
+                raise ValueError("Missing linux/amd64 OCI base manifest blob")
+            save(
+                layout / "index.json",
+                {
+                    "schemaVersion": 2,
+                    "mediaType": "application/vnd.oci.image.index.v1+json",
+                    "manifests": [descriptor],
+                },
+            )
+            digest = descriptor["digest"]
             result[ref] = f"oci-layout://{layout}@{digest}"
         yield result
 
@@ -246,13 +267,13 @@ def build(docker, args):
     context = (
         Path(args.context).resolve()
         if args.context
-        else (repo / {"api": ".", "web": "web", "chart": "."}[args.component])
+        else (repo / {"api": ".", "web": "."}[args.component])
     )
     file = (
         Path(args.file).resolve()
         if args.file
-        else repo / "advanced-host/Dockerfile"
-        if args.component == "chart" and not args.context
+        else repo / "web/Dockerfile"
+        if args.component == "web" and not args.context
         else context / "Dockerfile"
     )
     cmd = [
@@ -961,7 +982,7 @@ def parser():
         s.add_argument("--retain-days", type=int, default=7)
         s.add_argument("--base-source", choices=["local", "registry"], default="local")
         if name == "build":
-            s.add_argument("--component", choices=["api", "web", "chart"], default="api")
+            s.add_argument("--component", choices=["api", "web"], default="api")
             s.add_argument("--context")
             s.add_argument("--file")
             s.add_argument("--tag", required=True)
@@ -996,9 +1017,7 @@ def parser():
     s.add_argument("--repo", default=".")
     s.add_argument("--api-image", help="Task-owned API image tag (prepare)")
     s.add_argument("--web-image", help="Optional task-owned web image (prepare)")
-    s.add_argument("--chart-image", help="Optional task-owned licensed chart image (prepare)")
     s.add_argument("--port", type=int, default=18443, help="API HTTP or UI HTTPS loopback port")
-    s.add_argument("--chart-port", type=int, help="Distinct chart HTTPS port for UI preview")
     s.add_argument("--worker", action="append", default=[], choices=sorted(preview_module().WORKERS))
     s.add_argument("--apply", action="store_true", help="Explicitly reset into a new DB; retain old DB")
     return p

@@ -2,8 +2,8 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const repo = require('node:path').resolve(__dirname, '../..');
-const bridge = fs.readFileSync(repo + '/advanced-host/bridge.js', 'utf8');
-const wrapperStart = bridge.indexOf('  layouts.saveChart = async (data) => {');
+const bridge = fs.readFileSync(repo + '/advanced-host/chart-runtime.js', 'utf8');
+const wrapperStart = bridge.indexOf('  captureWorkspaceState = async () => {');
 const wrapperEnd = bridge.indexOf('  const viewportBindings', wrapperStart);
 assert.ok(wrapperStart >= 0 && wrapperEnd > wrapperStart);
 const dirtyStart = bridge.indexOf('function markWorkspaceDirty()');
@@ -16,7 +16,7 @@ const context = vm.createContext({
   busySaveNoticeShown: false, initialNativeSave: false, workspace: {id:'example'},
   editRevision: 0, workspaceEpoch: 0, dirty: true, nativeReadonly: false,
   ready: true, loading: false, grid: {value:'dotted'}, offset:10, messages:[],
-  setTimeout, requestAnimationFrame: fn => setTimeout(fn,0),
+  chartThemeName:()=>"Dark", setTimeout, requestAnimationFrame: fn => setTimeout(fn,0),
 });
 vm.runInContext(`
   const send = value => messages.push(value);
@@ -24,7 +24,7 @@ vm.runInContext(`
   const chart = {symbol:()=> 'MWP:EURUSD', resolution:()=> '1D',
     getVisibleRange:()=>({from:100,to:200}),getTimeScale:()=>scale};
   const sync = {value:()=>false, setValue:()=>{}};
-  const widget = {chartsCount:()=>1,chart:()=>chart,dateRangeSync:()=>sync,
+  const widget = {getTheme:()=>"Dark",chartsCount:()=>1,chart:()=>chart,dateRangeSync:()=>sync,
     timeSync:()=>sync,save:callback=> {globalThis.finishCapture = callback;}};
   const saveLayout = async data => {globalThis.saved = data; return 'example';};
 `, context);

@@ -5,8 +5,8 @@ const context=vm.createContext({document:{createElement:()=>({}),head:{append(){
   Map,Set,Promise,Date,Intl,Error,location:{search:'?parent=http://localhost'},
   parent:{postMessage:m=>messages.push(m)},crypto:{randomUUID:()=>Math.random().toString()},
   addEventListener(){},setTimeout,clearTimeout,queueMicrotask});
-for(const file of ['series.js','price-format.js','composite-display-batches.js','bridge.js'])
-  vm.runInContext(fs.readFileSync(path.resolve(__dirname,'../../advanced-host',file),'utf8'),context);
+for(const file of ['series.js','price-format.js','composite-display-batches.js','chart-runtime.js'])
+  vm.runInContext(require("./fixtures/direct-runtime.cjs").read(path.resolve(__dirname,'../../advanced-host',file),'utf8'),context);
 (async()=>{
   vm.runInContext(`
     globalThis.rows=[];
