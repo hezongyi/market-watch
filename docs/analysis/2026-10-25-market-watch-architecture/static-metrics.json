@@ -1,0 +1,465 @@
+{
+  "head": "1293f8a4380e544f67448b88691c4296f6ec2e45",
+  "counts": {
+    "backend": {
+      "files": 181,
+      "lines": 42354,
+      "largest": [
+        {
+          "path": "backend/alerts/storage.py",
+          "lines": 1718
+        },
+        {
+          "path": "backend/alerts/market_data.py",
+          "lines": 1357
+        },
+        {
+          "path": "backend/alerts/chart_api.py",
+          "lines": 1107
+        },
+        {
+          "path": "backend/alerts/api.py",
+          "lines": 1064
+        },
+        {
+          "path": "backend/alerts/live_pricing.py",
+          "lines": 1049
+        },
+        {
+          "path": "backend/alerts/provider_cache.py",
+          "lines": 1005
+        },
+        {
+          "path": "backend/alerts/market.py",
+          "lines": 902
+        },
+        {
+          "path": "backend/alerts/notification_center.py",
+          "lines": 771
+        }
+      ]
+    },
+    "frontend": {
+      "files": 99,
+      "lines": 24762,
+      "largest": [
+        {
+          "path": "web/src/advanced/AdvancedWorkspace.tsx",
+          "lines": 2149
+        },
+        {
+          "path": "web/src/charts/Workspace.tsx",
+          "lines": 1623
+        },
+        {
+          "path": "web/src/main.tsx",
+          "lines": 1473
+        },
+        {
+          "path": "web/src/notifications/runtime.ts",
+          "lines": 1470
+        },
+        {
+          "path": "web/src/advanced/ChartAlertDialog.tsx",
+          "lines": 1342
+        },
+        {
+          "path": "web/src/advanced/ChartAlertsPanel.tsx",
+          "lines": 1200
+        },
+        {
+          "path": "web/src/notifications/Panel.tsx",
+          "lines": 907
+        },
+        {
+          "path": "web/src/market-data/DatasetCreate.tsx",
+          "lines": 756
+        }
+      ]
+    },
+    "chart_host": {
+      "files": 45,
+      "lines": 15447,
+      "largest": [
+        {
+          "path": "advanced-host/bridge.js",
+          "lines": 3482
+        },
+        {
+          "path": "advanced-host/native-navigation.js",
+          "lines": 948
+        },
+        {
+          "path": "advanced-host/chart-alerts.js",
+          "lines": 882
+        },
+        {
+          "path": "advanced-host/indicator-picker.js",
+          "lines": 753
+        },
+        {
+          "path": "advanced-host/native-indicator-dialog.js",
+          "lines": 740
+        },
+        {
+          "path": "advanced-host/bar-range-mapping.js",
+          "lines": 698
+        },
+        {
+          "path": "advanced-host/native-alert-shell.js",
+          "lines": 616
+        },
+        {
+          "path": "advanced-host/symbol-flags.js",
+          "lines": 546
+        }
+      ]
+    },
+    "backend_tests": {
+      "files": 265,
+      "lines": 45965,
+      "largest": [
+        {
+          "path": "backend/tests/test_market_data.py",
+          "lines": 1047
+        },
+        {
+          "path": "backend/tests/test_native_mcp.py",
+          "lines": 949
+        },
+        {
+          "path": "backend/tests/test_chart_alert_offsets.py",
+          "lines": 892
+        },
+        {
+          "path": "backend/tests/test_provider_chart.py",
+          "lines": 876
+        },
+        {
+          "path": "backend/tests/test_managed_dataset.py",
+          "lines": 822
+        },
+        {
+          "path": "backend/tests/test_provider_yahoo.py",
+          "lines": 720
+        },
+        {
+          "path": "backend/tests/test_notification_center.py",
+          "lines": 718
+        },
+        {
+          "path": "backend/tests/test_chart_workspace.py",
+          "lines": 621
+        }
+      ]
+    },
+    "migrations": {
+      "files": 57,
+      "lines": 2157,
+      "largest": [
+        {
+          "path": "migrations/versions/6be9ffe49143_initial_monitoring_schema.py",
+          "lines": 223
+        },
+        {
+          "path": "migrations/versions/aw50_notice_center.py",
+          "lines": 121
+        },
+        {
+          "path": "migrations/versions/af33_composite_inputs.py",
+          "lines": 72
+        },
+        {
+          "path": "migrations/versions/m14_provider_cache.py",
+          "lines": 69
+        },
+        {
+          "path": "migrations/versions/ae32_composite_definitions.py",
+          "lines": 62
+        },
+        {
+          "path": "migrations/versions/av49_indicator_demands.py",
+          "lines": 60
+        },
+        {
+          "path": "migrations/versions/ay52_history_modes.py",
+          "lines": 60
+        },
+        {
+          "path": "migrations/versions/y26_source_series.py",
+          "lines": 60
+        }
+      ]
+    }
+  },
+  "model_tables": 102,
+  "all": {
+    "edges": 1101,
+    "largest_scc_size": 87,
+    "largest_scc": [
+      "alerts.publication_jobs",
+      "alerts.coverage_projection",
+      "alerts.volume_jobs",
+      "alerts.quote_presentation",
+      "alerts.platform_catalog",
+      "alerts.provider_errors",
+      "alerts.chart_geometry_mapping",
+      "alerts.chart_alert_values",
+      "alerts.chart_alert_worker",
+      "alerts.composite_preparation",
+      "alerts.aggregation_policy",
+      "alerts.chart_alert_offsets",
+      "alerts.chart_alert_service",
+      "alerts.composite_revisions",
+      "alerts.display_indicator_jobs",
+      "alerts.display_indicators",
+      "alerts.confirmed_minutes",
+      "alerts.composite_inputs",
+      "alerts.live_pricing",
+      "alerts.indicator_demands",
+      "alerts.native_history_loads",
+      "alerts.observed_indicators",
+      "alerts.fixed_indicator_display",
+      "alerts.chart_api",
+      "alerts.composite_aggregates",
+      "alerts.composite_matching",
+      "alerts.composite_definitions",
+      "alerts.series_access",
+      "alerts.fixed_indicators",
+      "alerts.native_history_archive",
+      "alerts.managed_indicator_inputs",
+      "alerts.managed_dataset",
+      "alerts.history_derivation",
+      "alerts.history_versions",
+      "alerts.history_sources",
+      "alerts.history_mode_maintenance",
+      "alerts.history_maintenance",
+      "alerts.history_artifacts",
+      "alerts.composite_chart",
+      "alerts.providers",
+      "alerts.provider_indicator_inputs",
+      "alerts.chart_calculation_history",
+      "alerts.display_snapshots",
+      "alerts.provider_display_snapshots",
+      "alerts.provider_dukascopy",
+      "alerts.market_calendar",
+      "alerts.akshare_catalog",
+      "alerts.provider_transport",
+      "alerts.provider_capabilities",
+      "alerts.market_datasets",
+      "alerts.history_mode_artifacts",
+      "alerts.provider_akshare",
+      "alerts.fxcm_history",
+      "alerts.provider_fxcm",
+      "alerts.yahoo_catalog",
+      "alerts.oanda_candles",
+      "alerts.provider_chart",
+      "alerts.native_series",
+      "alerts.indicator_state",
+      "alerts.provider_history_policy",
+      "alerts.provider_cache",
+      "alerts.provider_yahoo",
+      "alerts.history_mode_sources",
+      "alerts.history_catalog",
+      "alerts.composite_quotes",
+      "alerts.composite_watches",
+      "alerts.alert_monitor",
+      "alerts.provider_service",
+      "alerts.market_data",
+      "alerts.chart_history_plan",
+      "alerts.publication_schedule",
+      "alerts.chart_aggregation",
+      "alerts.bar_batch",
+      "alerts.market",
+      "alerts.chart_data",
+      "alerts.source_registry",
+      "alerts.source_history_store",
+      "alerts.composite_price_confirmation",
+      "alerts.oanda_stream",
+      "alerts.oanda_rest_batch",
+      "alerts.display_observations",
+      "alerts.composite_series",
+      "alerts.nr_breakout",
+      "alerts.swing_sr",
+      "alerts.chart_indicators",
+      "alerts.chart_alert_domain",
+      "alerts.composite_alerts"
+    ],
+    "top_incoming": [
+      [
+        "alerts.storage",
+        127
+      ],
+      [
+        "alerts.config",
+        55
+      ],
+      [
+        "alerts.domain",
+        33
+      ],
+      [
+        "alerts.market_contracts",
+        27
+      ],
+      [
+        "alerts.chart_data",
+        27
+      ],
+      [
+        "alerts.calendar_profile",
+        26
+      ],
+      [
+        "alerts.source_history_store",
+        25
+      ],
+      [
+        "alerts.chart_series",
+        20
+      ],
+      [
+        "alerts.source_registry",
+        20
+      ],
+      [
+        "alerts.provider_cache",
+        20
+      ]
+    ],
+    "top_outgoing": [
+      [
+        "alerts.market_data",
+        31
+      ],
+      [
+        "alerts.api",
+        29
+      ],
+      [
+        "alerts.chart_api",
+        27
+      ],
+      [
+        "alerts.composite_alerts",
+        22
+      ],
+      [
+        "alerts.provider_chart",
+        22
+      ],
+      [
+        "alerts.history_versions",
+        22
+      ],
+      [
+        "alerts.history_api",
+        21
+      ],
+      [
+        "alerts.market",
+        20
+      ],
+      [
+        "alerts.capabilities.actions",
+        20
+      ],
+      [
+        "alerts.fixed_indicators",
+        19
+      ]
+    ]
+  },
+  "top": {
+    "edges": 602,
+    "largest_scc_size": 2,
+    "largest_scc": [
+      "alerts.notification_sources",
+      "alerts.storage"
+    ],
+    "top_incoming": [
+      [
+        "alerts.storage",
+        116
+      ],
+      [
+        "alerts.config",
+        41
+      ],
+      [
+        "alerts.domain",
+        25
+      ],
+      [
+        "alerts.market_contracts",
+        24
+      ],
+      [
+        "alerts.calendar_profile",
+        23
+      ],
+      [
+        "alerts.chart_data",
+        22
+      ],
+      [
+        "alerts.source_history_store",
+        20
+      ],
+      [
+        "alerts.chart_series",
+        15
+      ],
+      [
+        "alerts.source_registry",
+        13
+      ],
+      [
+        "alerts.market_resources",
+        13
+      ]
+    ],
+    "top_outgoing": [
+      [
+        "alerts.api",
+        20
+      ],
+      [
+        "alerts.market_data",
+        12
+      ],
+      [
+        "alerts.capabilities.history",
+        11
+      ],
+      [
+        "alerts.provider_cache",
+        11
+      ],
+      [
+        "alerts.composite_alerts",
+        10
+      ],
+      [
+        "alerts.chart_api",
+        10
+      ],
+      [
+        "alerts.composite_definitions",
+        10
+      ],
+      [
+        "alerts.history_versions",
+        10
+      ],
+      [
+        "alerts.market",
+        10
+      ],
+      [
+        "alerts.chart_alert_worker",
+        10
+      ]
+    ]
+  }
+}
