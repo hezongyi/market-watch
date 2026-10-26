@@ -195,7 +195,8 @@ def test_provider_pages_reach_full_directory_and_mixed_kind_fairness(database, m
         }
         for i in range(600)
     ]
-    monkeypatch.setattr(market_data, "instrument_catalog", lambda query, limit=None: provider)
+    monkeypatch.setattr(market_data, "instrument_catalog",
+                        lambda query, *, limit=None, source=None, managed_status=True: provider)
     first = market_data.search_series_page(kind="provider", page_size=250)
     second = market_data.search_series_page(
         kind="provider", page_size=250, offset=first["next_offset"]
@@ -267,16 +268,17 @@ def test_composite_pages_use_known_mapping_without_scanning_other_products(datab
 
 
 def test_all_cursor_covers_each_kind_filters_before_paging_and_rejects_changed_query(database, monkeypatch):
-    from alerts import market_data
-    from test_series_access import fixture
-    from fastapi import HTTPException
     import pytest
+    from alerts import market_data
+    from fastapi import HTTPException
+    from test_series_access import fixture
 
     fixture(database, monkeypatch)
     providers = [{"id": f"OANDA:T{i:04}", "symbol": f"T{i:04}", "source": "oanda",
                   "label": f"Ticker{i}", "asset_type": "CURRENCY" if i % 2 else "EQUITY",
                   "available": True, "supported": True} for i in range(600)]
-    monkeypatch.setattr(market_data, "instrument_catalog", lambda query, limit=None: providers)
+    monkeypatch.setattr(market_data, "instrument_catalog",
+                        lambda query, *, limit=None, source=None, managed_status=True: providers)
     rows, cursor = [], None
     for _ in range(80):
         page = market_data.search_series_page(kind="all", page_size=13, cursor=cursor)

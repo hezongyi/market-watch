@@ -483,7 +483,7 @@
     "backend/tests/test_series_access.py": "cd9f0e6dfd479d8aa92a1237f60d9cf5d44dc0748180d596302183ae6c78f744",
     "backend/tests/test_series_access_postgres.py": "b20a750bdb2673981639f3ad5d2f23a545762353bd2e090a1f815edc27ef5963",
     "backend/tests/test_series_search_mcp.py": "a9699aecf64b716fdd561987bc554e1eec92a7c823addd6ce46b6ee1dd35a7cc",
-    "backend/tests/test_series_search_pagination.py": "43ae78244607c23d8825888f941fc1ee6f0e23c4dec81d3e3376a71d06e8a974",
+    "backend/tests/test_series_search_pagination.py": "7352c01ce21648b3c864b548e9a78a49cc84a388a24b5b49e403d08f278d4539",
     "backend/tests/test_series_search_pagination_postgres.py": "b428d41de53cee178335a85860d31f16218cfc5d024892041ca954fb811f7a1f",
     "backend/tests/test_service.py": "67294e2ff639e1557603de17bacc45a680bf9907fd09c4fa79adc1afd19c6f91",
     "backend/tests/test_shared_quote_waiting.py": "0da69c0820dc11ea4e72be90eceaf21e966389158522641fddcdfd27fe91ca3d",
@@ -645,9 +645,11 @@
   "product_tree_sha256": "ca55d8c3a5169ba312cd79d7d1539f4f678e2be41b99d7a668f7655c7a7d4e27",
   "note": "Build baseline plus dirty task changes, not a clean source commit. Licensed vendor assets excluded. Final runtime module and served chart source equality checked independently; Web product inputs unchanged.",
   "final_candidate": "API r12, Chart r10, Web r1; exact IDs in candidate-images.json",
-  "source_tree_sha256": "6fca86b6d990edba83aea84bb00c45e41cdc37505958fc6db2a2289880ccf1d3",
+  "source_tree_sha256": "777f32178fb9657e7c51cf16b2e38cc469fd51ad16fd5f7f536d1ac5221b9221",
   "hash_recipe": "sha256 of sorted compact JSON path-to-sha256 map; product excludes /tests/ and scripts/acceptance/",
   "test_and_evidence_changes_after_api_build": [
-    "No product edits after r12 build; subsequent reporting and evidence only"
-  ]
+    "Catalog pagination test mocks now accept existing source/managed_status keyword arguments; original assertions retained",
+    "Additional PostgreSQL, old-binary reader and preservation-attribution evidence and documentation"
+  ],
+  "source_snapshot_note": "Current source/test manifest includes the stated post-build test changes; product hash and deployed runtime modules remain unchanged"
 }

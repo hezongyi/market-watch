@@ -26,7 +26,8 @@
   "incremental_reviews": {
     "native_worker": "Standards and Spec passed, no blocker",
     "metadata_query": "Standards and Spec passed, no blocker",
-    "source_migration_fixture": "Standards passed; preserves populated rows, repeatability and backup guard"
+    "source_migration_fixture": "Standards passed; preserves populated rows, repeatability and backup guard",
+    "catalog_test_fixtures": "Standards passed: explicit existing keyword parameters added, pagination/filter/fairness/duplicate/HTTP assertions retained"
   },
-  "overall_acceptance": "incomplete: strict preservation audit false and 8 baseline test failures retained; business scope and final r12 managed verification passed"
+  "overall_acceptance": "incomplete: strict preservation audit false and 5 RRS baseline test failures pending scope confirmation; catalog fixtures corrected, plan-required PG and old-reader checks passed"
 }

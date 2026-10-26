@@ -1,5 +1,5 @@
 {
-  "at": "2026-10-26T01:01:42.207290+00:00",
+  "at": "2026-10-26T01:18:31.065876+00:00",
   "stock_source_and_qfq_business_scope_passed": true,
   "overall_acceptance_passed": false,
   "images": {
@@ -49,11 +49,19 @@
   "strict_preservation_audit_passed": false,
   "preservation_evidence": "runtime-audit.json",
   "outstanding": [
-    "8 remaining baseline test failures reproduced unchanged",
+    "5 remaining RRS baseline failures; changing that separate task requires user scope confirmation",
     "1 prior workspace and 3 prior preference rows changed, attribution unconfirmed"
   ],
   "source_matches_runtime": true,
   "production_release": false,
   "main_merge": false,
-  "push": false
+  "push": false,
+  "followup": {
+    "product_images_unchanged": true,
+    "catalog_pagination_tests_passed": 11,
+    "plan_required_postgres_passed": 62,
+    "old_binary_read_comparison": "legacy-reader-compat.json",
+    "preservation_log_investigation": "preservation-write-window.json",
+    "completion_audit": "plan-completion-audit.md"
+  }
 }
