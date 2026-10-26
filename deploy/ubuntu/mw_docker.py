@@ -213,7 +213,9 @@ def base_contexts(docker, files, mode):
             archive = Path(tmp) / (str(i) + ".tar")
             layout = Path(tmp) / str(i)
             layout.mkdir()
-            docker.run("image", "save", "--output", str(archive), ref)
+            docker.run(
+                "image", "save", "--platform", "linux/amd64", "--output", str(archive), ref
+            )
             with tarfile.open(archive) as tar:
                 for member in tar:
                     name = member.name
@@ -229,9 +231,31 @@ def base_contexts(docker, files, mode):
                         shutil.copyfileobj(src, out)
             archive.unlink()
             index = read(layout / "index.json")
-            if not index or len(index["manifests"]) != 1:
-                raise ValueError("Expected one OCI base manifest")
-            digest = index["manifests"][0]["digest"]
+            all_manifests = (index or {}).get("manifests", [])
+            manifests = [
+                item
+                for item in all_manifests
+                if item.get("platform", {}).get("os") == "linux"
+                and item.get("platform", {}).get("architecture") == "amd64"
+            ]
+            if not manifests and len(all_manifests) == 1:
+                # Docker may omit platform metadata for an already-selected single image.
+                manifests = all_manifests
+            if len(manifests) != 1:
+                raise ValueError("Expected one linux/amd64 OCI base manifest")
+            descriptor = manifests[0]
+            manifest_path = layout / "blobs" / "sha256" / descriptor["digest"].split(":", 1)[1]
+            if not manifest_path.is_file():
+                raise ValueError("Missing linux/amd64 OCI base manifest blob")
+            save(
+                layout / "index.json",
+                {
+                    "schemaVersion": 2,
+                    "mediaType": "application/vnd.oci.image.index.v1+json",
+                    "manifests": [descriptor],
+                },
+            )
+            digest = descriptor["digest"]
             result[ref] = f"oci-layout://{layout}@{digest}"
         yield result
 

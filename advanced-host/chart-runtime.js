@@ -24,6 +24,16 @@ function indicatorKey(ticker,res){
   return MWSeries.encode(id.symbol,id.series_kind)+'|'+res;
 }
 let studyTemplates, restoreAlertsPanel = false;
+let alertAttachQueue = Promise.resolve();
+function ignoreTeardownFailure(cleanup) {
+  try { cleanup(); } catch {}
+}
+function destroyNativeAlertUIs() {
+  ignoreTeardownFailure(() => noticeUI?.destroy());
+  noticeUI = undefined;
+  ignoreTeardownFailure(() => alertUI?.destroy());
+  alertUI = undefined;
+}
 function showNextNotice() {
   if (!ready || noticeDialogOpen) return;
   const notice = activeNotices.find(entry => entry.recover && !acknowledgedNotices.has(entry.key));
@@ -2414,12 +2424,11 @@ function boot(
   nativeMode = true;
   nativeReadonly = readonly;
   let currentNativeWorkspace = workspace;
-  let attachingAlerts = 0, alertAttachQueue = Promise.resolve(), alertUIStopped = false;
+  let attachingAlerts = 0, alertUIStopped = false;
   invalidateAlertUI = () => {
     attachingAlerts++;
     publishNotificationTimezone("UTC", "UTC（图表初始化前）");
-    noticeUI?.destroy(); noticeUI = undefined;
-    alertUI?.destroy(); alertUI = undefined;
+    destroyNativeAlertUIs();
   };
   // Serialize private widgetbar mutations. A cancelled attach must finish and
   // restore its shell before a newer session can install another one.
@@ -3337,21 +3346,25 @@ async function update(m) {
 
 function disposeChart() {
   resolveDisposed=true; chartResolves.clear();
-  compositeDisplayBatches.dispose();
-  activePreferences?.dispose();
-  indicatorCoordinator?.dispose();
-  ordinaryNotices?.dispose();
-  noticeUI?.destroy();
-  alertUI?.destroy();
-  alertBridge?.destroy();
-  watchlistLayout?.dispose();
-  symbolFlags?.dispose(); activeTab?.dispose();
-  unbindActiveChartEvent();
-  for (const [api, changed] of timezoneBindings) api.onTimezoneChanged().unsubscribe(null, changed);
+  ignoreTeardownFailure(() => compositeDisplayBatches.dispose());
+  ignoreTeardownFailure(() => activePreferences?.dispose());
+  ignoreTeardownFailure(() => indicatorCoordinator?.dispose());
+  ignoreTeardownFailure(() => ordinaryNotices?.dispose());
+  destroyNativeAlertUIs();
+  ignoreTeardownFailure(() => alertBridge?.destroy());
+  ignoreTeardownFailure(() => watchlistLayout?.dispose());
+  ignoreTeardownFailure(() => symbolFlags?.dispose());
+  ignoreTeardownFailure(() => activeTab?.dispose());
+  ignoreTeardownFailure(unbindActiveChartEvent);
+  for (const [api, changed] of timezoneBindings)
+    ignoreTeardownFailure(() => api.onTimezoneChanged().unsubscribe(null, changed));
   timezoneBindings.clear();
-  for (const [chart, changed] of timezoneSymbolBindings) chart.onSymbolChanged().unsubscribe(null, changed);
+  for (const [chart, changed] of timezoneSymbolBindings)
+    ignoreTeardownFailure(() => chart.onSymbolChanged().unsubscribe(null, changed));
   timezoneSymbolBindings.clear();
-  globalThis.MWChartMaximize?.dispose();barRangeMapping?.dispose();syncCoordinator?.dispose();
+  ignoreTeardownFailure(() => globalThis.MWChartMaximize?.dispose());
+  ignoreTeardownFailure(() => barRangeMapping?.dispose());
+  ignoreTeardownFailure(() => syncCoordinator?.dispose());
 }
 
 
@@ -3371,13 +3384,9 @@ const adapter = {
     }
     pending.clear();requests.splice(0).forEach(entry=>entry.reject(Object.assign(Error("图表已关闭"),{code:"HISTORY_CANCELLED"})));
     clearInterval(poll);clearInterval(progressivePoll);
-    dataCenter?.dispose();
-    // A native alert/notification attach can still be resolving when the host
-    // route is torn down (for example after session expiry). Keep the vendor
-    // widget alive until that serialized attach chain has observed the stop
-    // fence; removing it immediately makes the pinned library dereference its
-    // torn-down tradingViewApi/matchMedia objects.
-    void alertAttachQueue.catch(()=>{}).finally(()=>{try{widget?.remove();}catch{}});
+    ignoreTeardownFailure(() => dataCenter?.dispose());
+    // The owner removes this runtime's iframe after dispose. Calling the vendor
+    // widget's remove() here can touch APIs already torn down with that iframe.
   },
 };
 return adapter;

@@ -1,6 +1,10 @@
 import copy
 import datetime as dt
+import hashlib
 import importlib.util
+import io
+import json
+import tarfile
 import tempfile
 import unittest
 from pathlib import Path
@@ -78,6 +82,82 @@ class BuildDefaultsTests(unittest.TestCase):
                 selected = Path(cmd[cmd.index("--file") + 1]) if "--file" in cmd else directory / "Dockerfile"
                 self.assertEqual(selected, dockerfile)
                 bases.assert_called_once_with(docker, [dockerfile], "local")
+
+    def test_local_base_export_selects_host_manifest_from_oci_index(self):
+        layer = b"layer"
+        config = b"{}"
+
+        def descriptor(data, media_type):
+            digest = hashlib.sha256(data).hexdigest()
+            return {"digest": "sha256:" + digest, "size": len(data), "mediaType": media_type}
+
+        layer_desc = descriptor(layer, "application/vnd.oci.image.layer.v1.tar")
+        config_desc = descriptor(config, "application/vnd.oci.image.config.v1+json")
+        manifest = json.dumps(
+            {
+                "schemaVersion": 2,
+                "mediaType": "application/vnd.oci.image.manifest.v1+json",
+                "config": config_desc,
+                "layers": [layer_desc],
+            }
+        ).encode()
+        manifest_desc = descriptor(manifest, "application/vnd.oci.image.manifest.v1+json")
+        manifest_desc["platform"] = {"os": "linux", "architecture": "amd64"}
+        index = {
+            "schemaVersion": 2,
+            "mediaType": "application/vnd.oci.image.index.v1+json",
+            "manifests": [
+                manifest_desc,
+                {
+                    "digest": "sha256:" + "a" * 64,
+                    "size": 1,
+                    "mediaType": "application/vnd.oci.image.manifest.v1+json",
+                    "platform": {"os": "unknown", "architecture": "unknown"},
+                },
+            ],
+        }
+
+        def add_file(archive, name, content):
+            entry = tarfile.TarInfo(name)
+            entry.size = len(content)
+            archive.addfile(entry, io.BytesIO(content))
+
+        def save_image(*args, **kwargs):
+            output = Path(args[args.index("--output") + 1])
+            with tarfile.open(output, "w") as archive:
+                add_file(archive, "index.json", json.dumps(index).encode())
+                add_file(archive, "oci-layout", b'{"imageLayoutVersion":"1.0.0"}')
+                add_file(archive, "blobs/sha256/" + manifest_desc["digest"].split(":")[1], manifest)
+                add_file(archive, "blobs/sha256/" + config_desc["digest"].split(":")[1], config)
+                add_file(archive, "blobs/sha256/" + layer_desc["digest"].split(":")[1], layer)
+            return SimpleNamespace(returncode=0)
+
+        def docker_run(*args, **kwargs):
+            if args[:2] == ("image", "inspect"):
+                return SimpleNamespace(returncode=0)
+            return save_image(*args, **kwargs)
+
+        docker = mock.Mock()
+        docker.run.side_effect = docker_run
+        with tempfile.TemporaryDirectory() as state, mock.patch.object(m, "STATE", Path(state)):
+            dockerfile = Path(state) / "Dockerfile"
+            dockerfile.write_text("FROM node:22-bookworm-slim\n")
+            with m.base_contexts(docker, [dockerfile], "local") as contexts:
+                source = contexts["node:22-bookworm-slim"]
+                layout, digest = source.removeprefix("oci-layout://").split("@")
+                saved_index = json.loads((Path(layout) / "index.json").read_text())
+                self.assertEqual(len(saved_index["manifests"]), 1)
+                self.assertEqual(saved_index["manifests"][0]["digest"], digest)
+                self.assertTrue((Path(layout) / "blobs" / "sha256" / digest.split(":")[1]).is_file())
+
+            index["manifests"] = [{
+                key: value for key, value in manifest_desc.items() if key != "platform"
+            }]
+            with m.base_contexts(docker, [dockerfile], "local") as contexts:
+                self.assertIn("node:22-bookworm-slim", contexts)
+        save_args = docker.run.call_args.args
+        self.assertIn("--platform", save_args)
+        self.assertIn("linux/amd64", save_args)
 
 
 class ImageSafetyTests(unittest.TestCase):

@@ -22,7 +22,8 @@ vm.runInContext(require("./fixtures/direct-runtime.cjs").read('../advanced-host/
  assert.equal(events.filter(e=>e.query?.args.page==='current').length,1);
  assert.equal(vm.runInContext('results.filter(e=>e==="HISTORY_CANCELLED").length',context),4);
  const current=events.find(e=>e.query?.args.page==='current').id;
- vm.runInContext('disposeChart=()=>{};adapter.dispose()',context);
+ vm.runInContext(`noticeUI={destroy(){throw Error('already detached')}};alertUI={destroy(){throw Error('already detached')}};indicatorCoordinator={dispose(){throw Error('vendor API already detached')}};dataCenter={dispose(){throw Error('vendor API already detached')}};`,context);
+ assert.doesNotThrow(()=>vm.runInContext('adapter.dispose()',context),'native widget teardown errors must not abort session disposal');
  assert.ok(events.some(e=>e.type==='cancel-request' && e.id===current),'disposing the replaced workspace must abort its current HTTP request');
  assert.equal(vm.runInContext('pending.size',context),0);
  console.log('Four obsolete in-flight histories release slots within 180ms; current request starts');

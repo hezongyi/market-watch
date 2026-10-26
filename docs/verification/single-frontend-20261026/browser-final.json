@@ -1,0 +1,21 @@
+{
+  "host": "quant-server Ubuntu local Docker",
+  "compose_project": "mw-single-frontend-20261026",
+  "base_url": "https://localhost:19643",
+  "api_image_id": "sha256:d0bd32ff8abac0edd498b03d2f7dd05616b3c989b633c41b4eed1376e81ccb67",
+  "web_image_id": "sha256:384b8d1c4a5647f83b08f7d4bba0a73fa0d151eb8ce11ff98373baa41ef8228b",
+  "result": "passed",
+  "page_errors": [],
+  "checks": [
+    "same-origin direct chart mount with only vendor internal iframe",
+    "native data center opens from keyboard without iframe fallback",
+    "native save preserves layout identities",
+    "native alert form checkpoints layout and creates a bound shared ChartAlert",
+    "settings load independently of chart resources",
+    "saved workspace refreshes at original application URL",
+    "mobile readonly view",
+    "historical notification stays readonly and modern phone link resolves to current application",
+    "expired session disposes chart and returns to safe login"
+  ],
+  "skips": []
+}
