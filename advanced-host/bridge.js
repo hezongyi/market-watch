@@ -1402,6 +1402,7 @@ const feed = {
       () =>
         cb({
           exchanges: [{value:"",name:"全部来源",desc:"全部行情来源"},
+            {value:"AKSHARE",name:"AKShare（新浪 / 腾讯）",desc:"新浪、腾讯行情（AKShare）"},
             ...["Dukascopy","OANDA","Binance","Yahoo","FXCM"].map(name=>({value:name.toUpperCase(),name,desc:name+" 行情来源"}))],
           symbols_types: [{name:"全部",value:""},{name:"外汇",value:"forex"},{name:"股票",value:"stock"},
             {name:"加密",value:"crypto"},{name:"指数",value:"index"},{name:"基金",value:"fund"},

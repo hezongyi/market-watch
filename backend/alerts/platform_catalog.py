@@ -44,7 +44,7 @@ def entries(db, *, query="", source=None, asset=None):
         items[key] = {"id": "OANDA:" + row.symbol if scoped else row.id,
             "source": row.source, "provider_symbol": row.symbol, "label": row.label, "asset_type": row.asset_type,
             **({"provider_name": "新浪 (AKShare)"} if row.source == "akshare" and
-               row.metadata_json.get("source_family") in ("eastmoney-a", "sina-a", "sina-hk") else {}),
+               row.metadata_json.get("source_family") in ("eastmoney-a", "sina-a", "sina-hk", "sina-futures") else {}),
             "asset_class": {"EQUITY":"equity","STOCK":"equity","ETF":"etf","FUND":"etf","FUTURE":"future","FUTURES":"future","CRYPTO":"crypto"}.get(row.asset_type,asset_class(row.asset_type, row.symbol)), "precision": row.precision,
             "history_precision": row.precision, "precision_status": "source_catalog",
             "available": row.available and (row.source != "yahoo" or settings.yahoo_enabled)

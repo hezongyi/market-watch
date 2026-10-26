@@ -1,10 +1,9 @@
 """Platform listing retains supported legacy identities without opening demand."""
 
-from sqlalchemy import func, select
-
 from alerts.config import settings
 from alerts.platform_catalog import catalog
 from alerts.storage import Instrument, MarketCatalog, MarketDemand, ProviderInterest
+from sqlalchemy import func, select
 
 
 def test_platform_includes_legacy_binance_and_prefers_catalog_identity(database):
@@ -92,3 +91,22 @@ def test_dukascopy_stocks_are_found_with_category_query_and_source(database):
             historical = history_catalog(db, source="dukascopy", query=query, symbol_type="stock")["items"]
             assert symbol in {row["provider_symbol"] for row in historical}
         assert not db.new and not db.dirty
+
+
+def test_symbol_search_includes_sina_and_tencent_from_platform_catalog(database, monkeypatch):
+    from alerts.akshare_catalog import seed
+    from alerts.market_data import search_series_page
+
+    monkeypatch.setattr(settings, 'akshare_enabled', True)
+    seed()
+    for kind in ('provider', 'all'):
+        page = search_series_page('000001', kind=kind, source='akshare', symbol_type='stock')
+        rows = page['items']
+        assert len(rows) == 2
+        assert {r['provider_name'] for r in rows} == {'新浪 (AKShare)', '腾讯 (AKShare)'}
+        assert any(r['ticker'] == 'MWP:TENCENT:SZSE:000001' for r in rows)
+        assert all(r['type'] == 'stock' and r['available'] for r in rows)
+        assert all(r['provider_name'] in r['description'] for r in rows)
+    with database() as db:
+        assert db.scalar(select(func.count()).select_from(MarketDemand)) == 0
+        assert db.scalar(select(func.count()).select_from(ProviderInterest)) == 0
