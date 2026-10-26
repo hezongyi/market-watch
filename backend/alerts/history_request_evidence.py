@@ -38,8 +38,9 @@ def finish(attempt, result, *, batch=None, read_kind=None, accepted=False):
         attempt.checkpoint, attempt.observed_at, attempt.observations = batch.checkpoint, batch.observed_at, len(batch.rows)
 
 
-def record(row):
-    return {key: getattr(row, key) for key in FIELDS}
+def record(row, *, include_frame=False):
+    fields = {key: getattr(row, key) for key in FIELDS}
+    return fields | {"timeframe": row.timeframe} if include_frame else fields
 
 
 def query(version_id):
@@ -47,16 +48,20 @@ def query(version_id):
 
 
 def snapshot(db, version_id):
-    rows = [record(row) for row in db.scalars(query(version_id).order_by(HistoryReadAttempt.started_at, HistoryReadAttempt.id))]
+    version = db.get(HistoryVersion, version_id)
+    native = version.manifest.get("schema") == "managed-period-snapshot-v2"
+    rows = [record(row, include_frame=native) for row in db.scalars(
+        query(version_id).order_by(HistoryReadAttempt.started_at, HistoryReadAttempt.id))]
     encoded = json.dumps(rows, sort_keys=True, separators=(",", ":")).encode()
-    return {"schema": "bounded-m1-read-v1", "count": len(rows),
+    return {"schema": "bounded-period-read-v2" if native else "bounded-m1-read-v1", "count": len(rows),
             "failed": sum(row["result"] not in SUCCESS | LOCAL | {"started"} for row in rows),
             "ids": [row["id"] for row in rows], "checksum": hashlib.sha256(encoded).hexdigest(),
             "scope": "version read attempts; supplier requests, shared cache and parent reuse distinguished"}
 
 
 def report(db, version_id, *, page=1, page_size=25):
-    if not db.get(HistoryVersion, version_id):
+    version = db.get(HistoryVersion, version_id)
+    if not version:
         raise ValueError("历史版本不存在")
     if page < 1 or not 1 <= page_size <= 100:
         raise ValueError("无效的请求记录分页")
@@ -66,7 +71,8 @@ def report(db, version_id, *, page=1, page_size=25):
         ~HistoryReadAttempt.result.in_(SUCCESS | LOCAL | {"started"})).subquery()))
     rows = db.scalars(attempts.order_by(HistoryReadAttempt.started_at.desc(), HistoryReadAttempt.id)
                       .offset((page - 1) * page_size).limit(page_size))
-    return {"version_id": version_id, "items": [record(row) for row in rows], "total": total,
+    native = version.manifest.get("schema") == "managed-period-snapshot-v2"
+    return {"version_id": version_id, "items": [record(row, include_frame=native) for row in rows], "total": total,
             "failed": failed, "page": page, "page_size": page_size,
             "evidence_available": bool(total),
             "scope": "read attempts, not missing-minute classification; failed ranges may later be observed"}

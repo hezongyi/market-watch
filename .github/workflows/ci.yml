@@ -174,6 +174,9 @@ jobs:
         working-directory: web
         run: |
           node tests/swing-fixed-identity.cjs
+          node tests/squeeze-contract.cjs
+          node tests/nr-breakout-display.cjs
+          node tests/nr-breakout-restart.cjs
           node tests/indicator-high-rate.cjs
           node tests/indicator-high-rate.cjs --provider
           node tests/indicator-shared-read.cjs
@@ -181,6 +184,8 @@ jobs:
           node tests/indicator-display-snapshot.cjs
           node tests/indicator-snapshot-recovery.cjs
           node tests/display-recovery-lifecycle.cjs
+          node tests/display-recovery-deferred.cjs
+          node tests/snapshot-error-evidence.cjs
           node tests/provider-credential-recovery.cjs
           node tests/issue89-sampling.cjs
           node tests/issue89-native-lifecycle.cjs
@@ -205,6 +210,7 @@ jobs:
           node tests/advanced-inflight-cancellation.cjs
           node tests/advanced-provider-request-lifetime.cjs
           node tests/preference-request-queue.cjs
+          node tests/preference-draft-banner.cjs
           node tests/advanced-watchlist-prewarm.cjs
           node tests/advanced-watchlist-metadata.cjs
           node tests/advanced-startup-metadata.cjs
@@ -244,6 +250,11 @@ jobs:
           node tests/symbol-flags.browser.cjs
           node tests/system-history.browser.cjs
           node tests/alert-editing.browser.cjs
+          node tests/squeeze-alert.browser.cjs
+          node tests/alert-reference-ui.browser.cjs
+          node tests/native-alert-price-lines.browser.cjs
+          node --test tests/alert-price-edit.test.cjs
+          node tests/alert-price-drag.browser.cjs
           node tests/notice-page-exit.browser.cjs
 
   compose_checks:

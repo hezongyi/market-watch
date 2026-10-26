@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "instrument": "XAUUSD",
+  "timeframe": "H1",
+  "source": "OANDA",
+  "basis": "bid",
+  "calendar": "ny17",
+  "origin": 1786330800000,
+  "scope": "Independent literal Pine assignment order over complete frozen real HTTP OHLC, NY17 daily grouping, within platform-marked input segments; no actual TradingView Pine execution/export claim",
+  "checks": [
+    {
+      "params": {
+        "timeframe": "D",
+        "pattern_type": "NR4/NR7"
+      },
+      "bars": 1258,
+      "numeric_values": 9330,
+      "nulls": 7024,
+      "signals": 32,
+      "patterns": 17,
+      "platform_gap_resets": 1,
+      "max_absolute_error": 0.0
+    },
+    {
+      "params": {
+        "timeframe": "D",
+        "pattern_type": "NR4"
+      },
+      "bars": 1258,
+      "numeric_values": 9330,
+      "nulls": 7024,
+      "signals": 32,
+      "patterns": 17,
+      "platform_gap_resets": 1,
+      "max_absolute_error": 0.0
+    },
+    {
+      "params": {
+        "timeframe": "D",
+        "pattern_type": "NR7"
+      },
+      "bars": 1258,
+      "numeric_values": 8980,
+      "nulls": 7374,
+      "signals": 27,
+      "patterns": 14,
+      "platform_gap_resets": 1,
+      "max_absolute_error": 0.0
+    }
+  ]
+}

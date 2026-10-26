@@ -1,0 +1,192 @@
+{
+  "observed_at_utc": "2026-10-25T04:11:46.025534+00:00",
+  "host": "quant-server",
+  "project": "mw-issue75-v2-20261018",
+  "deployment_performed": false,
+  "candidate": {
+    "worktree": "/home/quant/repos/market-watch-fxcm-history-20261024",
+    "head": "59ed3a3f3fc727da76d13149934d999ebee04218",
+    "dirty_product_manifest_sha256": "8f66c3500f67f80d43c14c5e77285888759b212ebb9ab5c7fbc2c878625295b6",
+    "files": {
+      ".env.example": "8a12568c59b4d0f3ca28e601d80c9de43ba9829b814c9324fab212c26e182f06",
+      "adapters/fxcm/history.cpp": "e40a1c0f8d25fb011804c1fb422d16a02319bb95d425261a1453cd068bd45293",
+      "advanced-host/bridge.js": "9c8fc6123141171d92c2c6f47a190aa128bcb0fd030439ffcfc7beb233154744",
+      "advanced-host/series.js": "4ce7eefefb196a53b8ea443d3ab7219c8dda9fd19f6271ac8e5606f669c788d1",
+      "advanced-host/watchlist-layout.js": "c1851b9a06fa2d426907301e1e66735029d5383928c3776581d5a64791b8518d",
+      "backend/alerts/aggregation_policy.py": "f0ab6e29a651140478f9616157df4a03c77f69292ca26eb9c7165b5a229f5cd7",
+      "backend/alerts/chart_api.py": "5c259284f83fd540a5fb166244579d75fc0a875ed707766c3b07224e17afa3f8",
+      "backend/alerts/chart_series.py": "31d12002509b8d8a976d3136ee9ae2d342c9f953596c94f659d22c5b0ca9f3bd",
+      "backend/alerts/config.py": "f610d1326e4d4fea1bcc93d8b5d179897b696c3d217fd93161d2ee812bd2f237",
+      "backend/alerts/fxcm_history.py": "891643feb9b53b3bf891dfe7ae939c6a0e296cfd4a498c6127cb3924d5271da8",
+      "backend/alerts/history_api.py": "44e0109d519ec2d2b1f9bc5dd7c4af46818bbde2fc49099aae32182ca079f498",
+      "backend/alerts/history_catalog.py": "69e7c52f0df6e77b9ec2fb85817a57feaaf0eae1a9edc3acce1432829b61287d",
+      "backend/alerts/history_creation_check.py": "f98b84385d09973b321b2de55ef1fdf059792de8961edcfe1286b1af22227c3b",
+      "backend/alerts/history_sources.py": "08968c766453dd7d46540c1851d3de891570fb70a1165fcfd704934e99a84cb0",
+      "backend/alerts/history_versions.py": "fbb03df2f609050007cc8ceceee8c62341187f057489f452b8210b73950ae86e",
+      "backend/alerts/market_calendar.py": "14d4b4e95fa65f70155a46f059311eeacff980afd9f8cbb2baeacc495063cfc0",
+      "backend/alerts/market_data.py": "d59acdd483cedd4098402fddea3a7c13ac0c526413c57e237331b7acbf91eb52",
+      "backend/alerts/market_resources.py": "ae5ae6a07803e98c769a28a159312aac7332e48ab5fb78b668f4311c227ea583",
+      "backend/alerts/native_history_loads.py": "48e9ae00354f905aa3afc0a8418db5ae9aa0fef5553ad58f71d907cba886efe8",
+      "backend/alerts/platform_catalog.py": "a43163c5e078be2bb3b6680ea639f72190dec386f4c70fec6eb53ff96a0e58d0",
+      "backend/alerts/provider_cache.py": "6dcaea1b5fc69e6f8679c7eb79447cf003e35b290faf7c4e1d37d397af462af7",
+      "backend/alerts/provider_capabilities.py": "31678b52dbf5d7909e64df51b2547c71e1c6ad6797b3921c60173268075e0d2f",
+      "backend/alerts/provider_chart.py": "d7cc6c00167c554b5b84228ca28fc56b0359d7a4a50d021f1b56b86ad58c7842",
+      "backend/alerts/provider_fxcm.py": "25cfbc29868c7286e0543c70281266de595e7f18e9855e20765f5a45fce42211",
+      "backend/alerts/provider_service.py": "4ecf71598c17d906332b4cbb7e30896f16d7e9b70537ecc8f5b783259b99d6fe",
+      "backend/alerts/provider_transport.py": "fdde98ee4b8b9d19082cc83e8b2dd41650bea88b669f12b0e4e91b9b90c36106",
+      "backend/alerts/series_access.py": "8460a9a84eacf7943f66a9b42ff0a111bddfad03aa8c807648b1daa6de51c546",
+      "backend/alerts/source_history_store.py": "e0379d6b4cd763b7677331b7f0fb6be73cf91d5d4a655a5dec417a417382dbdc",
+      "backend/alerts/source_registry.py": "b5c6bbc2c99fc49756d13f6e00b74acd430eaa625da7d733d6d4053e2ab57170",
+      "backend/alerts/volume.py": "3a1f2e081af3a2ed83fdb878a404452ffa388aeb9b874e702548215a0736a081",
+      "backend/tests/test_fxcm_history.py": "eed8c2a3e4835018e7c9f47260a6f44fd4732febefc6e2f68ff4d7bcd524e14c",
+      "backend/tests/test_fxcm_managed_postgres.py": "5576bbddd38ead4f0268d32f966cbe34c252743db0d7382f7876cb6a19e70ed8",
+      "backend/tests/test_provider_fxcm.py": "240a4e290d61c13be7e396d6293882efa43d887ed0403976fb651f9614644a36",
+      "web/src/api.ts": "ee429a66e139673f077ac5e442f66f79f4ea745f19b4d5fed8762e1499ec916b",
+      "web/src/instrumentPresentation.ts": "b3dda36bdb849fa888e370791bf7e3bf7af568799344b8e0ec6efd1c71a280bd",
+      "web/src/market-data/CalendarView.tsx": "40918479a29365acde078c44df68b071fb075bc9c969e5e3844d3f88706d5f00",
+      "web/src/market-data/CreationCatalog.tsx": "16a5890ee34e76ad20c13d9952f5252ab57e4722133c44e054be242f48788054",
+      "web/src/market-data/DatasetCreate.tsx": "01dc4d5deff8329a65de5d8c722a20753d0ce070a810bca4d4ddc9615ed0dd0f",
+      "web/src/market-data/ManagedMarket.tsx": "51ba8b1cdaaca15512f827f1bdfa4dd1fc6db38d99e0d4a8389a8644c98eeaa3",
+      "web/src/market-data/PlatformMarket.tsx": "e4fd6072bc6e20e4cb8639b96846c4581a265cfa3266974585fe1406c69c6b46",
+      "web/src/market-data/SeriesPicker.tsx": "9c6179a52a47a967d07d0beef81a7af06ff2a601df46bec563962a73b02b15d0",
+      "web/src/market-data/Tasks.tsx": "ae60a819c5dd31790f6338fe20156cf3151391f57e302248707e7bfd6e3a17c3",
+      "web/src/market-data/api.ts": "b059ea24b9c67224f0e2bfdad5993dc74489e093dc0e11404cb0047bb9bb5377",
+      "web/src/market-data/location.ts": "bd6c12af0f3a29e2da05bd56f81f33d80eb84236ca590cf8c4899766c20557d2",
+      "web/src/market-data/types.ts": "b791f77633511874ad3271f29111755ace84afaf558edf998e564d9752ed295b"
+    },
+    "previously_accepted_api_image": "sha256:538d798b4907f6e868c1b27579dda029ff3e68a1f48318c2cec6537c2bfe279f",
+    "original_web_build_origin_is_target": false
+  },
+  "live_services": [
+    {
+      "service": "chart",
+      "container_id": "11826c97e1bfe3ade351bb629b94c8c092b168a4a05ae2601e941b4953e81d2f",
+      "image": "sha256:f2f1ba6952b62fb9bbb493fa1dfac02c37783fc004af6e15aa48fce5d4d922b4",
+      "started_at": "2026-10-25T04:09:02.579969008Z",
+      "status": "running",
+      "health": null
+    },
+    {
+      "service": "web",
+      "container_id": "166a5a8dd9b7f831a2a6df1ed3e8b2bfe6df54296919bd4d74b02643892ca4d5",
+      "image": "sha256:d0394b2d7685052d8c77173e6bbb3c11c8db4add526c6641f906b49b2209cea9",
+      "started_at": "2026-10-25T03:43:08.461649557Z",
+      "status": "running",
+      "health": null
+    },
+    {
+      "service": "history-worker",
+      "container_id": "c7e7f21dd917de58b75b56df16759f5122d543d207e4f5d401fa21c5401a6893",
+      "image": "sha256:7beee58f3729ef8d782b65bd64021f36d33a35d38834dfc029e5d70b99c000cf",
+      "started_at": "2026-10-24T23:59:02.547667537Z",
+      "status": "running",
+      "health": null
+    },
+    {
+      "service": "realtime-worker",
+      "container_id": "3bf319201c2f91ae4e77d60f53c6ebe6979728e6a7df61ec330ff125879ed953",
+      "image": "sha256:7beee58f3729ef8d782b65bd64021f36d33a35d38834dfc029e5d70b99c000cf",
+      "started_at": "2026-10-24T23:59:02.679859943Z",
+      "status": "running",
+      "health": null
+    },
+    {
+      "service": "chart-aggregation-worker",
+      "container_id": "4d14df8015d540ada9487d93568c5a24e654b3fff8dfb77d31dd7868b40f769c",
+      "image": "sha256:7beee58f3729ef8d782b65bd64021f36d33a35d38834dfc029e5d70b99c000cf",
+      "started_at": "2026-10-24T23:59:02.660964314Z",
+      "status": "running",
+      "health": null
+    },
+    {
+      "service": "chart-history-worker",
+      "container_id": "2c767db92428e9d6a297c7622b9a26d87848c0f0eeb21f5f3b3e14baa3d9cd87",
+      "image": "sha256:7beee58f3729ef8d782b65bd64021f36d33a35d38834dfc029e5d70b99c000cf",
+      "started_at": "2026-10-24T23:59:02.580638199Z",
+      "status": "running",
+      "health": null
+    },
+    {
+      "service": "market-stream-worker",
+      "container_id": "28a29cf5cc03f30f2274fef645939875535f705d616defdbbac2adbcdab8502f",
+      "image": "sha256:7beee58f3729ef8d782b65bd64021f36d33a35d38834dfc029e5d70b99c000cf",
+      "started_at": "2026-10-24T23:59:02.630238608Z",
+      "status": "running",
+      "health": null
+    },
+    {
+      "service": "projector",
+      "container_id": "274e6e888e5a9fbce419c9d76a6aef45f18779fe5b74af8879e4203d4c7f62bf",
+      "image": "sha256:7beee58f3729ef8d782b65bd64021f36d33a35d38834dfc029e5d70b99c000cf",
+      "started_at": "2026-10-24T23:59:02.597130653Z",
+      "status": "running",
+      "health": null
+    },
+    {
+      "service": "composite-aggregate-worker",
+      "container_id": "93b61fd4aaa327da9201ca4c29087ec5ea0e05726b5bcd44c509fd9131cf7c3c",
+      "image": "sha256:7beee58f3729ef8d782b65bd64021f36d33a35d38834dfc029e5d70b99c000cf",
+      "started_at": "2026-10-24T23:59:02.602904137Z",
+      "status": "running",
+      "health": null
+    },
+    {
+      "service": "pricing-worker",
+      "container_id": "7bbb297fe490ecc5c6b0fff7ac81fc7ccb761ccea3711029a6e600a6cbb5ad80",
+      "image": "sha256:7beee58f3729ef8d782b65bd64021f36d33a35d38834dfc029e5d70b99c000cf",
+      "started_at": "2026-10-24T23:59:02.671114004Z",
+      "status": "running",
+      "health": null
+    },
+    {
+      "service": "notify-worker",
+      "container_id": "385c93a8200b56a78f94382ec15d23a1491da521dab3cdc4d9ee65aee77e4efc",
+      "image": "sha256:7beee58f3729ef8d782b65bd64021f36d33a35d38834dfc029e5d70b99c000cf",
+      "started_at": "2026-10-24T23:59:02.664916685Z",
+      "status": "running",
+      "health": null
+    },
+    {
+      "service": "native-history-worker",
+      "container_id": "8957d0f8411747238f0e59a75ff7e362bec58b3ba19bace42dfec3a3e64442f9",
+      "image": "sha256:7beee58f3729ef8d782b65bd64021f36d33a35d38834dfc029e5d70b99c000cf",
+      "started_at": "2026-10-24T23:59:02.679382403Z",
+      "status": "running",
+      "health": null
+    },
+    {
+      "service": "api",
+      "container_id": "14708d86586c9535d2b1d934c42586b14fc9c27e437a37d93ab2270a3f1f938c",
+      "image": "sha256:7beee58f3729ef8d782b65bd64021f36d33a35d38834dfc029e5d70b99c000cf",
+      "started_at": "2026-10-25T00:22:31.561895288Z",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "service": "gateway",
+      "container_id": "9492f307fdf9bfdbec7641c4e0b3554bed39340bc73a57448fdbd39e34d79ca9",
+      "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "started_at": "2026-10-19T06:05:49.728822361Z",
+      "status": "running",
+      "health": null
+    },
+    {
+      "service": "postgres",
+      "container_id": "3de49cbde9a20c6640092181c04d35df41677566795cfecae18c0ab284b0aba8",
+      "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "started_at": "2026-10-18T06:31:25.191805014Z",
+      "status": "running",
+      "health": "healthy"
+    }
+  ],
+  "blockers": [
+    "Another session updated Chart at 2026-10-25T04:09:02Z for mobile-workspace; await user coordination before modifying the instance."
+  ],
+  "required_compatibility": [
+    "Preserve mobile-workspace changes in target Chart/Web.",
+    "Preserve target history-modes backend implementation and schema compatibility; do not blindly replace with the older-baseline FXCM image.",
+    "Build Web for target Chart origin https://192.168.7.232:18281.",
+    "Add FXCM private configuration and SDK/helper read-only mounts without replacing existing configuration."
+  ],
+  "manual_checklist": "../manual-acceptance-mwa.md"
+}

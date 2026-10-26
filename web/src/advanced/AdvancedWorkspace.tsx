@@ -1,4 +1,4 @@
-import {preferenceDrafts,putPreferenceDraft,dropPreferenceDraft,workspaceDraftKey,workspaceDraft,putWorkspaceDraft,workspaceDraftEntries,dropWorkspaceDraft,type PreferenceDraft} from "./localDrafts";
+import {preferenceDrafts,recoverablePreferenceDrafts,putPreferenceDraft,failPreferenceDraft,dropPreferenceDraft,workspaceDraftKey,workspaceDraft,putWorkspaceDraft,workspaceDraftEntries,dropWorkspaceDraft,type PreferenceDraft} from "./localDrafts";
 import {PreferenceDraftDialog} from "./PreferenceDraftDialog";
 import {useNotices,useNoticeState} from "../notifications/context";
 import {setChartTime} from "../time/ChartTimeContext";
@@ -67,11 +67,11 @@ export default function AdvancedWorkspace() {
   const openNotices=(event?:string)=>{const url=new URL(location.href);url.searchParams.set('panel','notifications');if(event)url.searchParams.set('event',event);else url.searchParams.delete('event');navigate(url.pathname+url.search+url.hash,{replace:true});};
   const app = useApp(), appRef = useRef(app); appRef.current = app;
   const urlRef = useRef(appLocation); urlRef.current = appLocation;
-  const [savedPreferenceDrafts,setSavedPreferenceDrafts]=useState<PreferenceDraft[]>(()=>{try{return preferenceDrafts();}catch{return [];}});
+  const [savedPreferenceDrafts,setSavedPreferenceDrafts]=useState<PreferenceDraft[]>(()=>{try{return recoverablePreferenceDrafts();}catch{return [];}});
   const [preferenceDraftsOpen,setPreferenceDraftsOpen]=useState(false);
   const [preferenceReopenRequired,setPreferenceReopenRequired]=useState(()=>savedPreferenceDrafts.length>0);
   const preferenceRecovery=useRef(new Map<string,{resolve:()=>void;reject:(error:Error)=>void}>());
-  const refreshPreferenceDrafts=()=>{try{setSavedPreferenceDrafts(preferenceDrafts());}catch{setError("无法读取本机设置草稿，请勿关闭页面");}};
+  const refreshPreferenceDrafts=()=>{try{setSavedPreferenceDrafts(recoverablePreferenceDrafts());}catch{setError("无法读取本机设置草稿，请勿关闭页面");}};
   const capturing = useRef<{resolve: () => void; reject: (error: Error) => void} | null>(null);
   const titleTimer = useRef<ReturnType<typeof setTimeout> | null>(null), titleText = useRef(""), titleQuote = useRef(""), titleLast = useRef(0), titleIdentity = useRef("");
   const titleHistorical = useRef(false);
@@ -379,7 +379,7 @@ export default function AdvancedWorkspace() {
       post({type:'history-load-capacity',available});
     });
     const subscriptionScopes = new WeakMap<object, {workspace: string; session: string; epoch: number}>();
-    const observeSubscription = (args: any, kind: 'market' | 'connection' | 'subscription', error: unknown | null, attempt: string, lifecycle?: 'ended') => {
+    const observeSubscription = (args: any, kind: 'market' | 'connection' | 'subscription', error: unknown | null, attempt: string, lifecycle?: 'ended', transportEvidence?: Record<string, string | number | boolean | null>) => {
       const scope = subscriptionScopes.get(args);
       if (!scope || (!lifecycle && (scope.workspace !== current.current?.id || scope.session !== alertUiSession.current || scope.epoch !== nativeLoadEpoch.current))) return;
       const query = args.query || args;
@@ -394,7 +394,8 @@ export default function AdvancedWorkspace() {
           generation: shared ? 0 : args.generation ?? 0, instrument: shared ? '' : query.instrument || '',
           timeframe: shared ? '' : query.timeframe || '', consumer: shared ? 'stream' : args.kind || 'bars'},
         evidence: {operation: shared ? 'sse_transport' : kind === 'subscription' ? 'subscription_register' : 'market_read',
-          error_type: failed?.name || '', code: failed?.code || '', http_status: failed?.status || null}};
+          error_type: failed?.name || '', code: failed?.code || '', http_status: failed?.status || null,
+          ...(shared ? transportEvidence : {})}};
       if (error == null) void notices.resolve(fault); else void notices.report(fault);
     };
     const provider = providerSubscriptions(
@@ -671,6 +672,12 @@ export default function AdvancedWorkspace() {
                   control_revision: q.control_revision,
                   request_id: q.request_id,
                   action: "drawing_deleted",
+                });
+              else if (q.op === "lifecycle" && q.action === "archive" && !a.object_kind &&
+                row.config.condition.left.kind === "price" && row.config.condition.right?.kind === "constant")
+                result = await api(`/chart-alerts/${q.alert_id}/lifecycle`, {
+                  version: q.version, control_revision: q.control_revision,
+                  request_id: q.request_id, action: "archive",
                 });
               else if (q.op === "edit" && q.line && a.object_kind === "drawing")
                 result = await api(`/chart-alerts/${q.alert_id}/edit`, {
@@ -1318,7 +1325,7 @@ export default function AdvancedWorkspace() {
         if (
           (mobile && q?.op !== "read") ||
           !q ||
-          !["read", "save", "delete", "draftWrite", "draftDrop", "draftCheck"].includes(q.op) ||
+          !["read", "save", "delete", "draftWrite", "draftDrop", "draftCheck", "draftFailed"].includes(q.op) ||
           JSON.stringify(q).length > 1_100_000
         ) {
           reply({ type: "result", id: m.id, error: "设置请求不允许" });
@@ -1332,8 +1339,10 @@ export default function AdvancedWorkspace() {
           if (q.op === 'draftCheck') {
             reply({type:'result',id:m.id,result:preferenceDrafts().some(draft=>draft.storageKey===q.args.storageKey && draft.version===q.args.version && draft.key===q.args.key)});return;
           }
-          if (q.op === 'draftWrite' || q.op === 'draftDrop') {
-            if(q.op === 'draftWrite')putPreferenceDraft(q.args);else dropPreferenceDraft(q.args);
+          if (q.op === 'draftWrite' || q.op === 'draftDrop' || q.op === 'draftFailed') {
+            if(q.op === 'draftWrite')putPreferenceDraft(q.args);
+            else if(q.op === 'draftFailed')failPreferenceDraft(q.args);
+            else dropPreferenceDraft(q.args);
             refreshPreferenceDrafts();reply({type:'result',id:m.id,result:{ok:true}});return;
           }
           if (q.op === "read") {

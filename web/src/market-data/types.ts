@@ -13,8 +13,16 @@ export const names: Record<string, string> = {
   needs_maintenance: "待维护",
   dukascopy: "Dukascopy",
   oanda: "OANDA Practice",
+  fxcm: "FXCM Demo",
   binance: "Binance",
   yahoo: "Yahoo",
+  akshare: "AKShare",
+  partial: "部分成功",
+  failed: "失败",
+  stale: "保留上次数据",
+  unavailable: "尚无可用数据",
+  success: "更新成功",
+  inherited: "沿用上次数据",
 };
 export function time(value?: number | null) {
   return value == null
@@ -30,8 +38,10 @@ export function time(value?: number | null) {
       }).format(new Date(value)) + " UTC";
 }
 export function phase(value: string) {
-  return value === "ny17" ? "NY17" : "UTC0";
+  return value === "source_date" ? "来源交易日" : value === "ny17" ? "NY17" : "UTC0";
 }
+export const modeNames: Record<string, string> = {base_m1: "M1 基础派生", base_d1: "D1 基础派生", native_periods: "原生多周期"};
+export type FrameRule = {schedule: string; interval_minutes: number; target_start?: number; overlap_bars: number; next_due?: number; last_success?: number};
 export type Period = {
   id: string;
   timeframe: string;
@@ -43,6 +53,9 @@ export type Period = {
   available_rows?: number;
   available_start?: number;
   available_end?: number;
+  freshness?: string;
+  observed_at?: number;
+  last_success?: number;
 };
 export type Plan = {
   configured: boolean;
@@ -61,6 +74,7 @@ export type Plan = {
   active_version_id?: string;
   task_status?: string;
   task_error?: string;
+  frame_plan?: Record<string, FrameRule>;
 };
 export type Dataset = {
   id: string;
@@ -76,6 +90,8 @@ export type Dataset = {
     basis: string;
     provider_symbol: string;
     environment: string;
+    mode?: string;
+    adjustment?: string;
   };
   maintenance: Plan;
   available_start?: number;
@@ -85,6 +101,10 @@ export type Dataset = {
   usable_timeframes: string[];
   periods: Period[];
   availability: string;
+  mode?: string;
+  input_timeframes?: string[];
+  selectable_timeframes?: string[];
+  frames?: Record<string, {status: string; first?: number; last?: number; observed_at?: number; last_success?: number}>;
 };
 export type Task = {
   id: string;
@@ -102,6 +122,8 @@ export type Task = {
   next_at?: number | null;
   desired_state?: string;
   controllable: boolean;
+  mode?: string;
+  frames?: {timeframe: string; status: string; cursor: number; start: number; end: number; error?: string}[];
   dataset: Dataset;
   derivation?: {
     stage: string; published_periods: number; total_periods: number;

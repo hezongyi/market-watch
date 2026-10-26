@@ -3,7 +3,6 @@ import {
   formatTimestamp,
   dayKey,
   clockTime,
-  offsetLabel,
   formatAlertMessage,
 } from "../time/chartTime";
 import { AlertEventTrace } from "../notifications/AlertEventTrace";
@@ -35,11 +34,18 @@ import {
   X,
   Pause,
   Play,
-  Pencil,
+  Settings2,
+  Eraser,
   Trash2,
   Clock3,
   Bell,
 } from "lucide-react";
+import { AlertLogCleanup } from "./AlertLogCleanup";
+import {
+  AlertSummary,
+  alertCode,
+  alertState,
+} from "./alertPresentation";
 import { AlertMenu } from "./AlertMenu";
 import type { AlertApi } from "./chartAlertUiApi";
 import type { NativeAlertDialog } from "./nativeAlertUI";
@@ -49,9 +55,18 @@ export type AlertDraft = {
   requestId: string;
   editing: { id: string; version: number } | null;
   displayLabel?: string;
+  displayCode?: string;
+  automaticName?: boolean;
 };
-export function ChartAlertsPanel(props: Parameters<typeof ScopedChartAlertsPanel>[0]) {
-  return <ScopedChartAlertsPanel key={`${props.workspaceId}:${props.open}`} {...props} />;
+export function ChartAlertsPanel(
+  props: Parameters<typeof ScopedChartAlertsPanel>[0],
+) {
+  return (
+    <ScopedChartAlertsPanel
+      key={`${props.workspaceId}:${props.open}`}
+      {...props}
+    />
+  );
 }
 function ScopedChartAlertsPanel({
   workspaceId,
@@ -74,7 +89,11 @@ function ScopedChartAlertsPanel({
   focusEvent,
   noticeRequest,
   creationUnavailable,
+  alertUnread,
+  updatedRow,
 }: {
+  updatedRow?: AlertRow;
+  alertUnread?: number;
   creationUnavailable?: string;
   focusEvent?: { id: string; revision: number };
   noticeRequest?: NoticeTransport;
@@ -99,7 +118,11 @@ function ScopedChartAlertsPanel({
   const { zone } = useChartTime();
   const date = (stamp: number) => formatTimestamp(stamp, zone);
   const draftKey = "mw-chart-alert-draft:" + workspaceId;
-  const { rows, events, error, setError, refresh, commit } = useAlertData(request, onRows);
+  const { rows, events, error, setError, refresh, commit } = useAlertData(
+    request,
+    onRows,
+  );
+  useEffect(() => { if (updatedRow) commit(updatedRow); }, [updatedRow, commit]);
   const [tab, setTab] = useState("alerts"),
     [search, setSearch] = useState(""),
     [status, setStatus] = useState(""),
@@ -117,6 +140,33 @@ function ScopedChartAlertsPanel({
       }
     });
   const mounted = useRef(true);
+  const quickStarted = useRef(new Set<string>());
+  const quickFlights = useRef(new Set<string>());
+  const [quickFailure, setQuickFailure] = useState<{ context: AlertContext; error: string } | null>(null);
+  const [quickBusy, setQuickBusy] = useState(false);
+  async function quickCreate(value: AlertContext) {
+    if (readonly || quickFlights.current.has(value.request_id)) return;
+    quickFlights.current.add(value.request_id);
+    setQuickBusy(true);
+    setQuickFailure(null);
+    try {
+      if (!value.price || value.line || value.indicator || !Number.isFinite(Number(value.price)) || Number(value.price) <= 0)
+        throw Error("价格轴未提供有效价格，请重新点击加号");
+      const saved = await request<AlertRow>("/chart-alerts", {
+        request_id: value.request_id, config: freshDraft(value),
+      });
+      if (mounted.current) {
+        commit(saved);
+        setTab("alerts");
+        setFeedback(`已创建：${saved.name}`);
+      }
+    } catch (e) {
+      if (mounted.current) setQuickFailure({ context: value, error: errorMessage(e) });
+    } finally {
+      quickFlights.current.delete(value.request_id);
+      if (mounted.current) setQuickBusy(quickFlights.current.size > 0);
+    }
+  }
   const pendingActions = useRef(
     new Map<
       string,
@@ -147,11 +197,21 @@ function ScopedChartAlertsPanel({
   }, [refresh]);
   useEffect(() => {
     if (!context || readonly) return;
+    if (context.quick_create) {
+      if (!quickStarted.current.has(context.request_id)) {
+        quickStarted.current.add(context.request_id);
+        void quickCreate(context);
+      }
+      return;
+    }
     setDraft({
       config: freshDraft(context),
       requestId: context.request_id,
       editing: null,
       displayLabel: context.display_label,
+      displayCode: context.display_identity?.code,
+      automaticName:
+        !!context.display_identity?.code && !context.line && !context.indicator,
     });
     setFormOpen(true);
   }, [context?.request_id]);
@@ -222,10 +282,15 @@ function ScopedChartAlertsPanel({
             name: row.name + " 副本",
             association: null,
           }
-        : {...structuredClone(row.config), condition: normalizeCondition(row.config.condition)},
+        : {
+            ...structuredClone(row.config),
+            condition: normalizeCondition(row.config.condition),
+          },
       requestId: crypto.randomUUID(),
       editing: copy ? null : { id: row.id, version: row.version },
       displayLabel: row.display_label || row.name,
+      displayCode: row.display_identity?.code,
+      automaticName: false,
     });
     setFormOpen(true);
   }
@@ -233,6 +298,132 @@ function ScopedChartAlertsPanel({
     [eventSort, setEventSort] = useState("newest"),
     [sort, setSort] = useState("created"),
     [selected, setSelected] = useState<string | null>(null);
+  const [detail, setDetail] = useState<string | null>(null);
+  const [showHandled, setShowHandled] = useState(false);
+  const [cleared, setCleared] = useState(new Set<string>());
+  const [cleanupError, setCleanupError] = useState("");
+  const [cleanup, setCleanup] = useState<AlertEvent[] | null>(null);
+  const observed = useRef(new Set<string>());
+  const observing = useRef(new Set<string>());
+  const contentRef = useRef<HTMLDivElement>(null);
+  const cleanupRunning = useRef(false);
+  const [cleaning, setCleaning] = useState(false);
+  async function clearEvents(snapshot: AlertEvent[]) {
+    if (!noticeRequest || cleanupRunning.current || readonly) return;
+    cleanupRunning.current = true;
+    setCleanupError("");
+    setCleaning(true);
+    let failures = 0;
+    const pending = [...snapshot];
+    await Promise.all(
+      Array.from({ length: Math.min(4, pending.length) }, async () => {
+        while (pending.length && mounted.current) {
+          const event = pending.shift()!;
+          try {
+            await noticeRequest({
+              action: "observe",
+              event_id: event.notice!.id,
+              kind: "viewed",
+              wait_for_sync: true,
+            });
+            await noticeRequest({
+              action: "observe",
+              event_id: event.notice!.id,
+              kind: "handled",
+              wait_for_sync: true,
+            });
+            if (mounted.current)
+              setCleared((previous) => new Set([...previous, event.id]));
+          } catch {
+            failures++;
+          }
+        }
+      }),
+    );
+    cleanupRunning.current = false;
+    if (!mounted.current) return;
+    setCleaning(false);
+    setCleanup(null);
+    if (failures)
+      setCleanupError(`${failures} 条日志未移除，请重试；手机提醒未改变`);
+    else
+      setFeedback("已从默认日志列表移除，仍可显示已清理日志；手机提醒未改变");
+    void refresh();
+  }
+  useEffect(() => {
+    if (
+      !open ||
+      tab !== "events" ||
+      detail ||
+      formOpen ||
+      cleanup ||
+      !noticeRequest ||
+      !contentRef.current
+    )
+      return;
+    const root = contentRef.current,
+      view = root.ownerDocument.defaultView!;
+    if (!view.IntersectionObserver) return;
+    let active = true;
+    const observer = new view.IntersectionObserver(
+      (entries) => {
+        if (!active) return;
+        for (const entry of entries) {
+          const id = (entry.target as HTMLElement).dataset.noticeId;
+          if (
+            !entry.isIntersecting ||
+            entry.intersectionRatio < 0.5 ||
+            !id ||
+            observed.current.has(id) ||
+            observing.current.has(id) ||
+            root.ownerDocument.visibilityState !== "visible"
+          )
+            continue;
+          observing.current.add(id);
+          void noticeRequest({
+            action: "observe",
+            event_id: id,
+            kind: "viewed",
+            wait_for_sync: true,
+          })
+            .then(() => {
+              if (active) observed.current.add(id);
+            })
+            .catch((e) => {
+              if (active) setError(errorMessage(e));
+            })
+            .finally(() => observing.current.delete(id));
+        }
+      },
+      { root, threshold: 0.5 },
+    );
+    const observeVisible = () => {
+      observer.disconnect();
+      for (const node of root.querySelectorAll<HTMLElement>("[data-notice-id]"))
+        observer.observe(node);
+    };
+    observeVisible();
+    root.ownerDocument.addEventListener("visibilitychange", observeVisible);
+    return () => {
+      active = false;
+      observer.disconnect();
+      root.ownerDocument.removeEventListener(
+        "visibilitychange",
+        observeVisible,
+      );
+    };
+  }, [
+    open,
+    tab,
+    detail,
+    formOpen,
+    cleanup,
+    events,
+    showHandled,
+    cleared,
+    mountTarget,
+    noticeRequest,
+  ]);
   const searchInput = useRef<HTMLInputElement>(null);
   const visible = rows.filter(
     (row) =>
@@ -263,9 +454,9 @@ function ScopedChartAlertsPanel({
   }, [focusEvent, selected, events, mountTarget]);
   const filteredEvents = events.filter(
     (event) =>
+      (showHandled || (!event.notice?.handled_at && !cleared.has(event.id))) &&
       (!search ||
-        eventPresentation(event).search
-          .includes(search.toLowerCase())) &&
+        eventPresentation(event).search.includes(search.toLowerCase())) &&
       (!currentOnly ||
         (event.evidence.config.instrument ===
           (activeInstrument || context)?.instrument &&
@@ -289,6 +480,97 @@ function ScopedChartAlertsPanel({
     const day = dayKey(event.occurred_at, zone);
     grouped.set(day, [...(grouped.get(day) || []), event]);
   }
+  const rowDetails = (row: AlertRow) => (
+    <div className="alert-row-detail">
+      <p>{row.display_label}</p>
+      <p>{row.condition_summary}</p>
+      <p>
+        {row.config.source} · {row.config.timeframe} ·{" "}
+        {row.config.mode === "close" ? "收盘确认" : "盘中观察"}
+      </p>
+      <p>
+        {statuses[row.status]} · 已触发 {row.count} / {row.max_triggers} 次
+      </p>
+      <p className={`alert-health alert-health-${row.health}`}>
+        {healthNames[row.health]}
+        {row.health_reason ? "：" + row.health_reason : ""}
+      </p>
+      {row.config.series_kind === "composite" &&
+        typeof row.runtime.quote_health === "string" && (
+          <p>
+            当前报价：
+            {row.runtime.quote_health === "ready" ? "正常" : "暂不可用或已过期"}
+          </p>
+        )}
+      {row.config.condition.offset && offsetSnapshot(row.runtime.offset) && (
+        <p>{offsetSnapshot(row.runtime.offset)}</p>
+      )}
+      <p>
+        版本 {row.version} · 生效 {date(row.effective_at)}
+      </p>
+      {events.find((event) => event.alert_id === row.id) && (
+        <p>
+          最近触发{" "}
+          {date(events.find((event) => event.alert_id === row.id)!.occurred_at)}
+        </p>
+      )}
+      <button onClick={() => onLocate(row)}>定位图表</button>
+    </div>
+  );
+  const eventDetails = (event: AlertEvent) => (
+    <div className="alert-row-detail">
+      <p>{eventPresentation(event).summary}</p>
+      <p>事件时间 {date(event.occurred_at)}</p>
+      <p>检测时间 {date(event.detected_at)}</p>
+      <p>
+        实际值 {event.evidence.left} · 比较值 {event.threshold} · 市场价格{" "}
+        {event.price}
+      </p>
+      {offsetSnapshot(event.evidence.observation.offset) && (
+        <p>{offsetSnapshot(event.evidence.observation.offset)}</p>
+      )}
+      <p>
+        规则版本 {event.evidence.rule_version} · 第 {event.evidence.ordinal} 次
+      </p>
+      <p>
+        {event.ack_at
+          ? "已确认"
+          : deliveryNames[event.notification_status] ||
+            deliveryNames[event.delivery_status] ||
+            event.notification_status}
+      </p>
+      <details>
+        <summary>查看消息和当时证据</summary>
+        <p className="alert-message-text">
+          {formatAlertMessage(event.message, event.occurred_at, zone)}
+        </p>
+        <pre>{JSON.stringify(event.evidence.observation, null, 2)}</pre>
+      </details>
+      {noticeRequest && (
+        <AlertEventTrace signalId={event.id} request={noticeRequest} />
+      )}
+      <p className="nc-muted">
+        查看记录不会停止手机提醒；显式停止无法撤回已在途发送。
+      </p>
+      <div className="alert-inline-actions">
+        <button
+          disabled={!rows.some((row) => row.id === event.alert_id)}
+          onClick={() => {
+            const row = rows.find((row) => row.id === event.alert_id);
+            if (row) onLocate(row, event);
+          }}
+        >
+          定位触发位置
+        </button>
+        <button
+          disabled={!!event.ack_at || busy === event.id}
+          onClick={() => ack(event)}
+        >
+          {event.ack_at ? "已停止后续提醒" : "停止后续手机提醒"}
+        </button>
+      </div>
+    </div>
+  );
   const panel = open && mountTarget !== null && (
     <aside
       className="chart-alert-panel"
@@ -309,11 +591,15 @@ function ScopedChartAlertsPanel({
               value === "alerts" ? "chart-alert-list" : "chart-alert-events"
             }
             tabIndex={tab === value ? 0 : -1}
-            onClick={() => setTab(value)}
+            onClick={() => {
+              setTab(value);
+              setDetail(null);
+            }}
             onKeyDown={(event) => {
               if (["ArrowLeft", "ArrowRight"].includes(event.key)) {
                 event.preventDefault();
                 setTab(value === "alerts" ? "events" : "alerts");
+                setDetail(null);
                 (
                   event.currentTarget.parentElement!.children[
                     1 - index
@@ -322,7 +608,21 @@ function ScopedChartAlertsPanel({
               }
             }}
           >
-            {value === "alerts" ? "警报" : "日志"}
+            {value === "alerts" ? (
+              "警报"
+            ) : (
+              <>
+                日志
+                {!!alertUnread && (
+                  <span
+                    className="alert-unread-badge"
+                    aria-label={`${alertUnread} 条未读交易日志`}
+                  >
+                    {alertUnread > 99 ? "99+" : alertUnread}
+                  </span>
+                )}
+              </>
+            )}
           </button>
         ))}
       </div>
@@ -337,7 +637,34 @@ function ScopedChartAlertsPanel({
             <Plus size={20} aria-hidden />
           </button>
         )}
-        {tab === "alerts" && creationUnavailable && <small role="status">{creationUnavailable}</small>}
+        {tab === "alerts" && creationUnavailable && (
+          <small role="status">{creationUnavailable}</small>
+        )}
+        {tab === "events" && (
+          <button
+            aria-label="清理当前日志"
+            disabled={
+              readonly ||
+              cleaning ||
+              !noticeRequest ||
+              !filteredEvents.some(
+                (e) => e.notice && !e.notice.handled_at && !cleared.has(e.id),
+              )
+            }
+            onClick={() =>
+              setCleanup(
+                filteredEvents
+                  .filter(
+                    (e) =>
+                      e.notice && !e.notice.handled_at && !cleared.has(e.id),
+                  )
+                  .slice(0, 100),
+              )
+            }
+          >
+            <Eraser size={19} aria-hidden />
+          </button>
+        )}
         <span className="alert-toolbar-spacer" />
         <button
           aria-label="搜索告警"
@@ -411,7 +738,13 @@ function ScopedChartAlertsPanel({
                       run: () => setStatus(key),
                     })),
                 ]
-              : []),
+              : [
+                  {
+                    label: "显示已清理日志",
+                    checked: showHandled,
+                    run: () => setShowHandled(!showHandled),
+                  },
+                ]),
             {
               label: "恢复草稿",
               disabled: !draft || readonly,
@@ -464,14 +797,21 @@ function ScopedChartAlertsPanel({
           {feedback}
         </p>
       )}
-      {error && (
+      {quickBusy && <p className="alert-feedback" role="status">正在创建价格告警…</p>}
+      {quickFailure && <p className="alert-error" role="alert">
+        创建未确认：{quickFailure.error}{" "}
+        <button disabled={quickBusy} onClick={() => void quickCreate(quickFailure.context)}>重试创建</button>
+      </p>}
+      {(error || cleanupError) && (
         <p className="alert-error" role="alert">
-          {error}
+          {cleanupError || error}
         </p>
       )}
       <div
         id={tab === "alerts" ? "chart-alert-list" : "chart-alert-events"}
         role="tabpanel"
+        ref={contentRef}
+        aria-label={tab === "alerts" ? `${visible.length} 个警报` : "交易日志"}
         className="alert-panel-content"
       >
         {tab === "alerts" ? (
@@ -485,46 +825,55 @@ function ScopedChartAlertsPanel({
                 </button>
               </div>
             )}
-            {!!visible.length && (
-              <p className="alert-list-count">{visible.length} 个警报</p>
-            )}
             {visible.map((row) => (
               <article
                 key={row.id}
                 className={`chart-alert-card ${selected === row.id ? "alert-selected" : ""}`}
               >
-                <button
-                  className="alert-row-summary"
-                  aria-expanded={selected === row.id}
-                  onClick={() =>
-                    setSelected(selected === row.id ? null : row.id)
-                  }
-                  title={row.name + " · " + row.condition_summary}
-                >
-                  <span className="alert-row-title">
-                    {row.name || row.condition_summary}
-                  </span>
-                  <span className="alert-row-subtitle">
-                    <Clock3 size={12} aria-hidden />
-                    <span
-                      className="alert-row-identity"
-                      title={row.display_label || row.name}
-                    >
-                      {row.display_label || row.name}
+                <AlertSummary row={row} zone={zone} theme={theme}>
+                  <button
+                    className="alert-row-summary"
+                    aria-pressed={selected === row.id}
+                    onClick={() => {
+                      setSelected(row.id);
+                      onLocate(row);
+                    }}
+                    onDoubleClick={() => {
+                      if (!readonly) edit(row);
+                    }}
+                  >
+                    <span className="alert-row-title">
+                      {row.name || row.condition_summary}
                     </span>
-                    <span className={`alert-state alert-state-${row.status}`}>
-                      {row.status === "active" && row.health !== "ready"
-                        ? healthNames[row.health]
-                        : statuses[row.status]}
-                    </span>
-                    {row.config.expires_at && (
-                      <span className="alert-row-expiry">
-                        到期 {date(row.config.expires_at)}
+                    <span className="alert-row-subtitle">
+                      <span
+                        className="alert-row-identity"
+                        title={row.display_label || row.name}
+                      >
+                        {alertCode(row, row.name)}
                       </span>
-                    )}
-                  </span>
-                </button>
-                <div className="alert-row-actions">
+                      <span className="alert-row-separator" aria-hidden>•</span>
+                      <span
+                        className={`alert-state alert-state-${row.status} ${row.status === "active" && row.health !== "ready" ? "alert-state-unhealthy" : ""}`}
+                      >
+                        {alertState(row)}
+                      </span>
+                      {row.last_triggered_at != null && (
+                        <>
+                          <span className="alert-row-separator" aria-hidden>•</span>
+                          <span className="alert-row-time alert-rule-time">
+                            {dayKey(row.last_triggered_at, zone)} {clockTime(row.last_triggered_at, zone)}
+                          </span>
+                        </>
+                      )}
+                    </span>
+                  </button>
+                </AlertSummary>
+                <div
+                  className="alert-row-actions"
+                  onClick={(e) => e.stopPropagation()}
+                  onDoubleClick={(e) => e.stopPropagation()}
+                >
                   {["active", "paused", "completed"].includes(row.status) && (
                     <button
                       aria-label={
@@ -558,12 +907,23 @@ function ScopedChartAlertsPanel({
                     disabled={readonly || busy === row.id}
                     onClick={() => edit(row)}
                   >
-                    <Pencil size={15} aria-hidden />
+                    <Settings2 size={15} aria-hidden />
+                  </button>
+                  <button
+                    aria-label="删除"
+                    disabled={readonly || busy === row.id}
+                    onClick={() => void action(row, "archive")}
+                  >
+                    <Trash2 size={15} aria-hidden />
                   </button>
                   <AlertMenu
                     label={`${row.name} 行操作`}
                     items={[
                       { label: "定位图表", run: () => onLocate(row) },
+                      {
+                        label: "查看详情",
+                        run: () => setDetail(detail === row.id ? null : row.id),
+                      },
                       {
                         label: "复制为草稿",
                         run: () => edit(row, true),
@@ -611,49 +971,6 @@ function ScopedChartAlertsPanel({
                 {associationNotices[row.id] && (
                   <p className="alert-error">{associationNotices[row.id]}</p>
                 )}
-                {selected === row.id && (
-                  <div className="alert-row-detail">
-                    <p>{row.condition_summary}</p>
-                    <p>
-                      {row.config.source} · {row.config.timeframe} ·{" "}
-                      {row.config.mode === "close" ? "收盘确认" : "盘中观察"}
-                    </p>
-                    <p>
-                      {statuses[row.status]} · 已触发 {row.count} /{" "}
-                      {row.max_triggers} 次
-                    </p>
-                    <p className={`alert-health alert-health-${row.health}`}>
-                      {healthNames[row.health]}
-                      {row.health_reason ? "：" + row.health_reason : ""}
-                    </p>
-                    {row.config.series_kind === "composite" &&
-                      typeof row.runtime.quote_health === "string" && (
-                        <p>
-                          当前报价：
-                          {row.runtime.quote_health === "ready"
-                            ? "正常"
-                            : "暂不可用或已过期"}
-                        </p>
-                      )}
-                    {row.config.condition.offset &&
-                      offsetSnapshot(row.runtime.offset) && (
-                        <p>{offsetSnapshot(row.runtime.offset)}</p>
-                      )}
-                    <p>
-                      版本 {row.version} · 生效 {date(row.effective_at)}
-                    </p>
-                    {events.find((event) => event.alert_id === row.id) && (
-                      <p>
-                        最近触发{" "}
-                        {date(
-                          events.find((event) => event.alert_id === row.id)!
-                            .occurred_at,
-                        )}
-                      </p>
-                    )}
-                    <button onClick={() => onLocate(row)}>定位图表</button>
-                  </div>
-                )}
               </article>
             ))}
           </>
@@ -667,115 +984,88 @@ function ScopedChartAlertsPanel({
             )}
             {[...grouped].map(([day, entries]) => (
               <section key={day} className="alert-event-day">
-                <h3>{day}</h3>
+                <h3>
+                  {day.slice(0, 4) === dayKey(Date.now(), zone).slice(0, 4)
+                    ? `${Number(day.slice(5, 7))}月${Number(day.slice(8, 10))}日`
+                    : `${day.slice(0, 4)}年${Number(day.slice(5, 7))}月${Number(day.slice(8, 10))}日`}
+                </h3>
                 {entries.map((event) => (
                   <article
                     key={event.id}
                     data-signal-id={event.id}
+                    data-notice-id={
+                      event.notice && !event.notice.viewed_at
+                        ? event.notice.id
+                        : undefined
+                    }
                     className={`chart-alert-card ${selected === event.id ? "alert-selected" : ""}`}
                   >
-                    <button
-                      className="alert-row-summary"
-                      aria-expanded={selected === event.id}
-                      onClick={() =>
-                        setSelected(selected === event.id ? null : event.id)
-                      }
-                    >
-                      <span className="alert-row-title">
-                        {eventPresentation(event).name}
-                      </span>
-                      <span className="alert-row-subtitle">
-                        <span
-                          className="alert-row-identity"
-                          title={
-                            event.display_label || event.evidence.config.name
-                          }
-                        >
-                          {event.display_label || event.evidence.config.name}
+                    <AlertSummary event={event} zone={zone} theme={theme}>
+                      <button
+                        className="alert-row-summary"
+                        aria-pressed={selected === event.id}
+                        onClick={() => {
+                          setSelected(event.id);
+                          const row = rows.find(
+                            (row) => row.id === event.alert_id,
+                          );
+                          if (row) onLocate(row, event);
+                        }}
+                        onDoubleClick={() =>
+                          setDetail(detail === event.id ? null : event.id)
+                        }
+                      >
+                        <span className="alert-row-title">
+                          {eventPresentation(event).name}
                         </span>
-                        <span className="alert-row-time">
-                          {clockTime(event.occurred_at, zone)}{" "}
-                          {offsetLabel(event.occurred_at, zone)}
-                          {event.evidence.late ? " · 迟到" : ""}
+                        <span className="alert-row-subtitle">
+                          <span
+                            className="alert-row-identity"
+                            title={event.display_label}
+                          >
+                            {alertCode(event, event.evidence.config.name)}
+                          </span>
+                          <span className="alert-row-separator" aria-hidden>•</span>
+                          <span className="alert-row-time">
+                            {clockTime(event.occurred_at, zone)}
+                            {event.evidence.late ? " · 迟到" : ""}
+                          </span>
                         </span>
-                      </span>
-                    </button>
-                    {selected === event.id && (
-                      <div className="alert-row-detail">
-                        <p>{eventPresentation(event).summary}</p>
-                        <p>事件时间 {date(event.occurred_at)}</p>
-                        <p>检测时间 {date(event.detected_at)}</p>
-                        <p>
-                          实际值 {event.evidence.left} · 比较值{" "}
-                          {event.threshold} · 市场价格 {event.price}
-                        </p>
-                        {offsetSnapshot(event.evidence.observation.offset) && (
-                          <p>
-                            {offsetSnapshot(event.evidence.observation.offset)}
-                          </p>
-                        )}
-                        <p>
-                          规则版本 {event.evidence.rule_version} · 第{" "}
-                          {event.evidence.ordinal} 次
-                        </p>
-                        <p>
-                          {event.ack_at
-                            ? "已确认"
-                            : deliveryNames[event.notification_status] ||
-                              deliveryNames[event.delivery_status] ||
-                              event.notification_status}
-                        </p>
-                        <details>
-                          <summary>查看消息和当时证据</summary>
-                          <p className="alert-message-text">
-                            {formatAlertMessage(
-                              event.message,
-                              event.occurred_at,
-                              zone,
-                            )}
-                          </p>
-                          <pre>
-                            {JSON.stringify(
-                              event.evidence.observation,
-                              null,
-                              2,
-                            )}
-                          </pre>
-                        </details>
-                        {noticeRequest && (
-                          <AlertEventTrace
-                            signalId={event.id}
-                            request={noticeRequest}
-                          />
-                        )}
-                        <p className="nc-muted">
-                          查看记录不会停止手机提醒；显式停止无法撤回已在途发送。
-                        </p>
-                        <div className="alert-inline-actions">
-                          <button
-                            disabled={
-                              !rows.some((row) => row.id === event.alert_id)
-                            }
-                            onClick={() => {
-                              const row = rows.find(
-                                (row) => row.id === event.alert_id,
-                              );
-                              if (row) onLocate(row, event);
-                            }}
-                          >
-                            定位触发位置
-                          </button>
-                          <button
-                            disabled={!!event.ack_at || busy === event.id}
-                            onClick={() => ack(event)}
-                          >
-                            {event.ack_at
-                              ? "已停止后续提醒"
-                              : "停止后续手机提醒"}
-                          </button>
-                        </div>
-                      </div>
-                    )}
+                      </button>
+                    </AlertSummary>
+                    <div className="alert-row-actions">
+                      <button
+                        aria-label="从日志列表移除"
+                        title={
+                          !event.notice
+                            ? "记录尚未投影或已超出整理保留期"
+                            : "从默认日志列表移除；不停止手机提醒"
+                        }
+                        disabled={
+                          readonly ||
+                          cleaning ||
+                          !noticeRequest ||
+                          !event.notice ||
+                          !!event.notice.handled_at ||
+                          cleared.has(event.id)
+                        }
+                        onClick={() => setCleanup([event])}
+                      >
+                        <Trash2 size={15} aria-hidden />
+                      </button>
+                      <AlertMenu
+                        label="日志详情"
+                        items={[
+                          {
+                            label: "查看详情",
+                            run: () =>
+                              setDetail(detail === event.id ? null : event.id),
+                          },
+                        ]}
+                      >
+                        <MoreHorizontal size={15} aria-hidden />
+                      </AlertMenu>
+                    </div>
                   </article>
                 ))}
               </section>
@@ -783,6 +1073,31 @@ function ScopedChartAlertsPanel({
           </>
         )}
       </div>
+      {detail && (
+        <section
+          className="alert-detail-drawer"
+          aria-label="告警详情"
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              e.stopPropagation();
+              setDetail(null);
+            }
+          }}
+        >
+          <button autoFocus onClick={() => setDetail(null)}>
+            关闭详情
+          </button>
+          {tab === "alerts"
+            ? rows
+                .filter((row) => row.id === detail)
+                .map((row) => <div key={row.id}>{rowDetails(row)}</div>)
+            : events
+                .filter((event) => event.id === detail)
+                .map((event) => (
+                  <div key={event.id}>{eventDetails(event)}</div>
+                ))}
+        </section>
+      )}
     </aside>
   );
   return (
@@ -792,11 +1107,28 @@ function ScopedChartAlertsPanel({
         : mountTarget === undefined
           ? panel
           : null}
+      {cleanup && (
+        <AlertLogCleanup
+          ownerDocument={mountTarget?.ownerDocument || document}
+          count={cleanup.length}
+          busy={cleaning}
+          theme={theme}
+          onClose={() => setCleanup(null)}
+          onConfirm={() => void clearEvents(cleanup)}
+        />
+      )}
       {formOpen && draft && (
         <ChartAlertDialog
           key={draft.requestId}
           initial={draft.config}
           displayLabel={draft.displayLabel}
+          displayCode={draft.displayCode}
+          automaticName={draft.automaticName === true}
+          onAutomaticName={(automaticName) =>
+            setDraft((previous) =>
+              previous ? { ...previous, automaticName } : null,
+            )
+          }
           requestId={draft.requestId}
           editing={draft.editing}
           request={request}
@@ -822,7 +1154,14 @@ function ScopedChartAlertsPanel({
             setDraft((previous) => (previous ? { ...previous, config } : null))
           }
           onClose={() => setFormOpen(false)}
-          onReload={(row) => {commit(row);setDraft(previous=>previous ? {...previous,editing:{id:row.id,version:row.version}} : null);}}
+          onReload={(row) => {
+            commit(row);
+            setDraft((previous) =>
+              previous
+                ? { ...previous, editing: { id: row.id, version: row.version } }
+                : null,
+            );
+          }}
           onSaved={(row) => {
             commit(row);
             setDraft(null);

@@ -1,0 +1,58 @@
+{
+  "started_at": "2026-10-25T13:44:53.569Z",
+  "base": "https://test.kookvv.com:8443",
+  "passed": true,
+  "scope": "Deployed real API and native UI; no intercepted data, no source price repair; preserves all created data",
+  "checks": [
+    "Managed A/H source charts render real qfq daily candles"
+  ],
+  "cases": [
+    {
+      "name": "sina-a",
+      "version": "4c5f2cb9-d7b6-44e3-9b2c-91f1ccd29170",
+      "rendered": {
+        "symbol": "MWH:4C5F2CB9-D7B6-44E3-9B2C-91F1CCD29170",
+        "ready": true,
+        "range": {
+          "from": 1773705600,
+          "to": 1793548800
+        }
+      },
+      "adjustment_view": "qfq",
+      "ui": "Tradingview是交互式的，并且具有与屏幕阅读器一起使用的命令。以下是可用于在平台上交互的键盘命令列表\n\n开始使用键盘导航模式。按Alt + Z\n快速搜索。按Ctrl + K\n更改商品。开始输入商品名称\n更改时间周期。按数字或逗号\n指标、指标和策略。按斜线\n开放式布局。按下句号\nSZSE:000001\n1分\n5分\n15分\n30分\n1小时\n4小时\n天\n周\n月\n指标\n数据中心\n历史模式验收 2026-10-25T13:44:53.569Z\n99+\nSZSE:000001 · 自建行情 · 前复权 · 本数据集同源依据计算 · 来源量\n1天\nAKSHARE\n开=\n11.27\n高=\n11.35\n低=\n11.17\n收=\n11.20\n-0.10 (−0.88%)\n13:47:40 UTC\nlog\n自动\n自选表\n商品\n最新价\n涨跌\n涨跌%\nBTCUSDT\n80,394.72\n−493.44\n−0.61%\nEURUSD\n1.12026\n−0.00135\n−0.12%\nGBPUSD\n1.33712\n−0.00283\n−0.21%\nXAUUSD\n3,995.205\n−29.020\n−0.72%\nUSDCAD\n1.40457\n0.00001\n0.00%\nCOMPOSITE\nEURUSD\n1.12026\n0.00000\n0.00%\nUSDCAD\n1.40037\n0.00000\n0.00%\nXAUUSD\n3,995.205\n0.000\n0.00%\nUSDOLLAR\n12,746\n5\n0.04%\n4C5F2CB9-D7B6-44E3-9B2C-91F1CCD29170\n开市\n账户管理器\n系统消息\n关闭即时通知\n图表行情请求失败\n\nEURUSD\n\nError: 行情请求超时\n\n2026-10-25\n13:47:22\nUTC+0",
+      "passed": true
+    },
+    {
+      "name": "sina-hk",
+      "version": "a0f00e6e-b3ae-466d-abb0-1f27358da78d",
+      "rendered": {
+        "symbol": "MWH:A0F00E6E-B3AE-466D-ABB0-1F27358DA78D",
+        "ready": true,
+        "range": {
+          "from": 1773964800,
+          "to": 1793548800
+        }
+      },
+      "adjustment_view": "qfq",
+      "ui": "Tradingview是交互式的，并且具有与屏幕阅读器一起使用的命令。以下是可用于在平台上交互的键盘命令列表\n\n开始使用键盘导航模式。按Alt + Z\n快速搜索。按Ctrl + K\n更改商品。开始输入商品名称\n更改时间周期。按数字或逗号\n指标、指标和策略。按斜线\n开放式布局。按下句号\nHKEX:00700\n1分\n5分\n15分\n30分\n1小时\n4小时\n天\n周\n月\n指标\n数据中心\n历史模式验收 2026-10-25T13:44:53.569Z\n99+\nHKEX:00700 · 自建行情 · 前复权 · 本数据集同源依据计算 · 来源量\n1天\nAKSHARE\n开=\n381.80\n高=\n388.80\n低=\n378.00\n收=\n386.00\n+3.60 (+0.94%)\n13:47:58 UTC\nlog\n自动\n自选表\n商品\n最新价\n涨跌\n涨跌%\nBTCUSDT\n80,421.59\n−466.57\n−0.58%\nEURUSD\n1.12026\n−0.00135\n−0.12%\nGBPUSD\n1.33712\n−0.00283\n−0.21%\nXAUUSD\n3,995.205\n−29.020\n−0.72%\nUSDCAD\n1.40457\n0.00001\n0.00%\nCOMPOSITE\nEURUSD\n1.12026\n0.00000\n0.00%\nUSDCAD\n1.40037\n0.00000\n0.00%\nXAUUSD\n3,995.205\n0.000\n0.00%\nUSDOLLAR\n12,746\n5\n0.04%\nA0F00E6E-B3AE-466D-ABB0-1F27358DA78D\n开市\n账户管理器\n系统消息\n关闭即时通知\n图表行情请求失败\n\n固定历史（名称不可用）· 2a673b63\n\nError: 行情请求超时\n\n2026-10-25\n13:47:22\nUTC+0",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "blocked_writes": [
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/migrate"
+    },
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/save"
+    },
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/save"
+    }
+  ],
+  "workspace_id": "89918f31-57d2-4b46-a594-759345f62aa5",
+  "finished_at": "2026-10-25T13:47:59.881Z"
+}

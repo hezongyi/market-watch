@@ -1,0 +1,14 @@
+{
+  "command": "mw-docker retire --task mw-rrs-sparse-fix-20261026 --project mw-rrs-sparse-fix-20261026",
+  "exit_code": 1,
+  "output": "Exact project has no containers",
+  "apply_executed": false,
+  "mwa_retired": false,
+  "candidate_image_in_use": true,
+  "preserved": [
+    "long-term mwa project and volumes",
+    "protected browser",
+    "candidate and rollback images",
+    "private snapshots and historical backups"
+  ]
+}

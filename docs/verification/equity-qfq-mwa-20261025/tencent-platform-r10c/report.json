@@ -1,0 +1,120 @@
+{
+  "started_at": "2026-10-26T00:31:33.598Z",
+  "base": "https://test.kookvv.com:8443",
+  "passed": false,
+  "scope": "Deployed real API and native UI; no intercepted data, no source price repair; preserves all created data",
+  "checks": [],
+  "cases": [],
+  "errors": [
+    "frame.waitForFunction: Timeout 120000ms exceeded."
+  ],
+  "console": [],
+  "network_errors": [],
+  "data_requests": [
+    {
+      "at": 1792974703109,
+      "phase": "start",
+      "instrument": "TENCENT:SZSE:000001",
+      "timeframe": "D1",
+      "count": 167,
+      "limit": 167
+    },
+    {
+      "at": 1792974706272,
+      "phase": "end",
+      "instrument": "TENCENT:SZSE:000001",
+      "timeframe": "D1",
+      "status": 200
+    },
+    {
+      "at": 1792974712147,
+      "phase": "end",
+      "status": 200
+    },
+    {
+      "at": 1792974714530,
+      "phase": "end",
+      "status": 200
+    }
+  ],
+  "failed_requests": [
+    {
+      "at": 1792974722464,
+      "path": "/api/notification-center/observations",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974730427,
+      "path": "/api/notification-center/events",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974732445,
+      "path": "/api/notification-center/observations",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974740789,
+      "path": "/api/notification-center/events",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974742821,
+      "path": "/api/notification-center/observations",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974754441,
+      "path": "/api/notification-center/observations",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974766633,
+      "path": "/api/notification-center/observations",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974781510,
+      "path": "/api/notification-center/observations",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974807804,
+      "path": "/api/notification-center/observations",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974813723,
+      "path": "/api/notification-center/observations",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974823987,
+      "path": "/api/notification-center/observations",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974832063,
+      "path": "/api/notification-center/observations",
+      "reason": "net::ERR_ABORTED"
+    }
+  ],
+  "blocked_writes": [
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/migrate"
+    },
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/save"
+    }
+  ],
+  "workspace_id": "7d6080e5-6abf-4ecd-9481-b708d38c65da",
+  "failure_state": {
+    "symbol": "MWP:TENCENT:SZSE:000001",
+    "resolution": "1D",
+    "ready": false
+  },
+  "failure_ui": "Tradingview是交互式的，并且具有与屏幕阅读器一起使用的命令。以下是可用于在平台上交互的键盘命令列表\n\n开始使用键盘导航模式。按Alt + Z\n快速搜索。按Ctrl + K\n更改商品。开始输入商品名称\n更改时间周期。按数字或逗号\n指标、指标和策略。按斜线\n开放式布局。按下句号\nSZSE:000001\n1分\n5分\n15分\n30分\n1小时\n4小时\n天\n周\n月\n指标\n数据中心\n保存\n保存\n99+\nSZSE:000001 · 平台行情 · 腾讯前复权 · 来源量\n1天\nSZSE\n开=\n∅\n高=\n∅\n低=\n∅\n收=\n∅\n∅ (∅%)\n00:34:08 UTC\nlog\n自动\n自选表\n商品\n最新价\n涨跌\n涨跌%\nBTCUSDT\n80,340.00\n185.91\n0.23%\nEURUSD\n1.12215\n0.00137\n0.12%\nGBPUSD\n1.33690\n0.00067\n0.05%\nXAUUSD\n3,995.205\n−0.710\n−0.02%\nUSDCAD\n1.40457\n0.00001\n0.00%\nCOMPOSITE\nEURUSD\n1.12026\n0.00000\n0.00%\nUSDCAD\n1.40037\n0.00000\n0.00%\nXAUUSD\n3,995.205\n0.000\n0.00%\nSZSE:000001\nSZSE:000001 · 平台行情 · 腾讯前复权\nAKSHARE\n11.20\n−0.10\n−0.88%\n开市\n账户管理器",
+  "finished_at": "2026-10-26T00:34:09.953Z"
+}

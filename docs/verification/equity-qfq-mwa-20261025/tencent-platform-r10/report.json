@@ -1,0 +1,161 @@
+{
+  "started_at": "2026-10-26T00:24:18.473Z",
+  "base": "https://test.kookvv.com:8443",
+  "passed": false,
+  "scope": "Deployed real API and native UI; no intercepted data, no source price repair; preserves all created data",
+  "checks": [],
+  "cases": [],
+  "errors": [
+    "frame.waitForFunction: Timeout 120000ms exceeded."
+  ],
+  "console": [
+    "Failed to load resource: the server responded with a status of 500 ()"
+  ],
+  "network_errors": [
+    {
+      "status": 500,
+      "path": "/api/signals/pending-count"
+    }
+  ],
+  "data_requests": [
+    {
+      "at": 1792974275451,
+      "phase": "start"
+    },
+    {
+      "at": 1792974283104,
+      "phase": "end",
+      "status": 200
+    },
+    {
+      "at": 1792974286737,
+      "phase": "end",
+      "status": 200
+    },
+    {
+      "at": 1792974290825,
+      "phase": "end",
+      "status": 200
+    }
+  ],
+  "failed_requests": [
+    {
+      "at": 1792974270601,
+      "path": "/api/market-data/resolve",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974270601,
+      "path": "/api/market-data/resolve",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974270601,
+      "path": "/api/market-data/resolve",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974270601,
+      "path": "/api/market-data/resolve",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974289919,
+      "path": "/api/notification-center/events",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974291926,
+      "path": "/api/notification-center/observations",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974301007,
+      "path": "/api/notification-center/observations",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974306576,
+      "path": "/api/charts/stream/events",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974306719,
+      "path": "/api/market-data/quotes",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974317116,
+      "path": "/api/notification-center/events",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974319182,
+      "path": "/api/notification-center/observations",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974336672,
+      "path": "/api/market-data/quotes",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974338306,
+      "path": "/api/notification-center/events",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974340348,
+      "path": "/api/notification-center/observations",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974353073,
+      "path": "/api/notification-center/events",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974355105,
+      "path": "/api/notification-center/observations",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974366645,
+      "path": "/api/notification-center/events",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974368676,
+      "path": "/api/notification-center/observations",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974397577,
+      "path": "/api/notification-center/observations",
+      "reason": "net::ERR_ABORTED"
+    },
+    {
+      "at": 1792974418704,
+      "path": "/api/notification-center/observations",
+      "reason": "net::ERR_ABORTED"
+    }
+  ],
+  "blocked_writes": [
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/migrate"
+    },
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/save"
+    }
+  ],
+  "workspace_id": "c33cb0fc-e975-4e5f-9cbe-e2d2974f9392",
+  "failure_state": {
+    "symbol": "MWP:TENCENT:SZSE:000001",
+    "resolution": "1D",
+    "ready": false
+  },
+  "failure_ui": "Tradingview是交互式的，并且具有与屏幕阅读器一起使用的命令。以下是可用于在平台上交互的键盘命令列表\n\n开始使用键盘导航模式。按Alt + Z\n快速搜索。按Ctrl + K\n更改商品。开始输入商品名称\n更改时间周期。按数字或逗号\n指标、指标和策略。按斜线\n开放式布局。按下句号\nSZSE:000001\n1分\n5分\n15分\n30分\n1小时\n4小时\n天\n周\n月\n指标\n数据中心\n保存\n保存\n99+\nSZSE:000001 · 平台行情 · 腾讯前复权 · 来源量\n1天\nSZSE\n开=\n∅\n高=\n∅\n低=\n∅\n收=\n∅\n∅ (∅%)\n00:27:04 UTC\nlog\n自动\n自选表\n商品\n最新价\n涨跌\n涨跌%\nBTCUSDT\n80,231.96\n77.87\n0.10%\nEURUSD\n1.12215\nGBPUSD\n1.33690\nXAUUSD\n3,995.205\nUSDCAD\n1.40457\n0.00001\n0.00%\nCOMPOSITE\nEURUSD\n1.12026\n0.00000\n0.00%\nUSDCAD\n1.40037\n0.00000\n0.00%\nXAUUSD\n3,995.205\n0.000\n0.00%\nSZSE:000001\nSZSE:000001 · 平台行情 · 腾讯前复权\nAKSHARE\n11.20\n−0.10\n−0.88%\n开市\n账户管理器",
+  "finished_at": "2026-10-26T00:27:06.279Z"
+}

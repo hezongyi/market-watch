@@ -190,7 +190,8 @@ def test_empty_success_cannot_restore_open_market_and_failed_attempts_remain_in_
     empty = candles(identity, rows=(), result=RequestResult(status="empty_success"))
     live.commit_confirmation(ownership, epoch, empty, now=135000)
     report = live.measurements(identity.key)
-    assert report["failed_attempts"] == 2 and report["missing"] == 1
+    assert report["failed_attempts"] == 2 and report["missing"] == 0
+    assert report["unknown"] == 2
     state = next(row for row in live.snapshots(now=135000) if row["dataset_id"] == identity.key)
     assert not state["recovery_ready"]
 

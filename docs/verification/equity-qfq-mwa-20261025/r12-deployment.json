@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-26T00:58:43.264488+00:00",
+  "passed": true,
+  "backend_image": "sha256:3b6e18e3aadb83cec807532d804b2e4555cc05f3644facc6204f8f0e3566edb5",
+  "tag": "market-watch-api:equity-qfq-mwa-20261025-r12",
+  "updated": [
+    "projector",
+    "chart-history-worker",
+    "composite-aggregate-worker",
+    "history-worker",
+    "native-history-worker",
+    "realtime-worker",
+    "chart-aggregation-worker",
+    "pricing-worker",
+    "notify-worker",
+    "market-stream-worker",
+    "api"
+  ],
+  "nonimage_configuration_unchanged": true,
+  "unselected_container_ids_unchanged": true,
+  "schema_migration": false
+}

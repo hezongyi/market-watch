@@ -1,0 +1,3498 @@
+{
+  "h4": {
+    "chart": {
+      "symbol": "MWP:FXCM:941424CA250383292AB3A5B2D04E2623",
+      "resolution": "60",
+      "ready": true
+    },
+    "network": [
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926240123
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/market-data/resolve",
+        "at": 1792926240130
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/market-data/resolve",
+        "at": 1792926240140
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/market-data/quotes",
+        "at": 1792926240149
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926240161
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926240173
+      },
+      {
+        "event": "failure",
+        "url": "https://test.kookvv.com:8443/api/market-data/quotes",
+        "error": "net::ERR_ABORTED",
+        "at": 1792926240337
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODEyOX2VOqS591-E0Zu0zRXzuys6D_hlRv_Ag-ObcZ2vvcVYiw",
+        "at": 1792926240892,
+        "timing": {
+          "startTime": 1792926238787.7368,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.547,
+          "responseStart": 2101.673,
+          "responseEnd": 2105.079
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926241026
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/market-data/resolve",
+        "at": 1792926241506,
+        "timing": {
+          "startTime": 1792926240141.331,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.335,
+          "responseStart": 1361.769,
+          "responseEnd": 1365.528
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926241507
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926241889,
+        "timing": {
+          "startTime": 1792926240174.2131,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.541,
+          "responseStart": 1712.507,
+          "responseEnd": 1751.302
+        }
+      },
+      {
+        "event": "failure",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "error": "net::ERR_ABORTED",
+        "at": 1792926243026
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926243883
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODEzNH39caeugBlnParXkWTO2tN4Ekh4zukD2opMBwfROkbP5g",
+        "at": 1792926245029
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926245141
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/market-data/resolve",
+        "at": 1792926245580,
+        "timing": {
+          "startTime": 1792926240131.666,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.48,
+          "responseStart": 5445.509,
+          "responseEnd": 5454.877
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926245693,
+        "timing": {
+          "startTime": 1792926241508.296,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.56,
+          "responseStart": 4101.658,
+          "responseEnd": 4104.338
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926245693
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/subscribe",
+        "at": 1792926245694
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/market-data/quotes",
+        "at": 1792926245694
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926245695
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926246816,
+        "timing": {
+          "startTime": 1792926240124.922,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.679,
+          "responseStart": 6685.727,
+          "responseEnd": 6690.038
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926250798,
+        "timing": {
+          "startTime": 1792926240162.926,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.59,
+          "responseStart": 10633.021,
+          "responseEnd": 10644.262
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926250807
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926251198,
+        "timing": {
+          "startTime": 1792926245142.0833,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.445,
+          "responseStart": 6053.852,
+          "responseEnd": 6061.678
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926251205
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926251208,
+        "timing": {
+          "startTime": 1792926243885.145,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.463,
+          "responseStart": 7317.956,
+          "responseEnd": 7322.464
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926251211
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926252791,
+        "timing": {
+          "startTime": 1792926245702.6938,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.671,
+          "responseStart": 7085.798,
+          "responseEnd": 7100.332
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODEzNH39caeugBlnParXkWTO2tN4Ekh4zukD2opMBwfROkbP5g",
+        "at": 1792926254408,
+        "timing": {
+          "startTime": 1792926245030.4001,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.488,
+          "responseStart": 9375.29,
+          "responseEnd": 9386.011
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926254495,
+        "timing": {
+          "startTime": 1792926245699.049,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.775,
+          "responseStart": 8786.928,
+          "responseEnd": 8824.499
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/subscribe",
+        "at": 1792926254591,
+        "timing": {
+          "startTime": 1792926245699.2112,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 2.212,
+          "responseStart": 8888.558,
+          "responseEnd": 8925.379
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926254602
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926254898,
+        "timing": {
+          "startTime": 1792926250808.97,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.606,
+          "responseStart": 4086.811,
+          "responseEnd": 4104.398
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926255140
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926255311,
+        "timing": {
+          "startTime": 1792926251212.1409,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.392,
+          "responseStart": 4097.147,
+          "responseEnd": 4102.413
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926255685
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/notification-center/health",
+        "at": 1792926256604
+      },
+      {
+        "event": "failure",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "error": "net::ERR_ABORTED",
+        "at": 1792926256605
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926257821,
+        "timing": {
+          "startTime": 1792926255141.3499,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.34,
+          "responseStart": 2677.88,
+          "responseEnd": 2692.004
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926257900,
+        "timing": {
+          "startTime": 1792926251206.9458,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 1.123,
+          "responseStart": 6691.661,
+          "responseEnd": 6701.899
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926257910
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926260140
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/health",
+        "at": 1792926260601,
+        "timing": {
+          "startTime": 1792926256608.387,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.465,
+          "responseStart": 3990.103,
+          "responseEnd": 3998.449
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926260889,
+        "timing": {
+          "startTime": 1792926255686.405,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.512,
+          "responseStart": 5199.231,
+          "responseEnd": 5202.738
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926261071,
+        "timing": {
+          "startTime": 1792926257911.785,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.854,
+          "responseStart": 3157.501,
+          "responseEnd": 3164.834
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926261094
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926261133,
+        "timing": {
+          "startTime": 1792926261098.8591,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 1.69,
+          "responseStart": 32.466,
+          "responseEnd": 41.123
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926261153,
+        "timing": {
+          "startTime": 1792926260142.5203,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.401,
+          "responseStart": 1007.542,
+          "responseEnd": 1011.569
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE0MX0MIvhNY7X4-9FCUHruY8Tlm3fC1h_mvJsCAYrznIIinQ",
+        "at": 1792926262612
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE0MX0MIvhNY7X4-9FCUHruY8Tlm3fC1h_mvJsCAYrznIIinQ",
+        "at": 1792926264712,
+        "timing": {
+          "startTime": 1792926262613.62,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.478,
+          "responseStart": 2095.808,
+          "responseEnd": 2098.946
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926264797
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926265140
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926265143
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926265685
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926265901,
+        "timing": {
+          "startTime": 1792926265145.082,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.511,
+          "responseStart": 753.459,
+          "responseEnd": 759.727
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926265991,
+        "timing": {
+          "startTime": 1792926265141.852,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.376,
+          "responseStart": 846.417,
+          "responseEnd": 849.9
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926266000,
+        "timing": {
+          "startTime": 1792926265686.242,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.464,
+          "responseStart": 310.661,
+          "responseEnd": 313.984
+        }
+      },
+      {
+        "event": "failure",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "error": "net::ERR_ABORTED",
+        "at": 1792926266797
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/market-data/quotes",
+        "at": 1792926267198,
+        "timing": {
+          "startTime": 1792926245699.374,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 2.807,
+          "responseStart": 21496.146,
+          "responseEnd": 21532.111
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/market-data/quotes",
+        "at": 1792926267200
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE0OH29D8hIP7qoIBkuZ_0lFTI-rgLa5zMC7v4iGrim7CrCoQ",
+        "at": 1792926268811
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926270141
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926270141
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE0OH29D8hIP7qoIBkuZ_0lFTI-rgLa5zMC7v4iGrim7CrCoQ",
+        "at": 1792926271187,
+        "timing": {
+          "startTime": 1792926268812.7598,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.542,
+          "responseStart": 2371.326,
+          "responseEnd": 2375.097
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926271247
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926271323,
+        "timing": {
+          "startTime": 1792926270142.811,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.973,
+          "responseStart": 1178.046,
+          "responseEnd": 1183.931
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926271413,
+        "timing": {
+          "startTime": 1792926270142.5723,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.537,
+          "responseStart": 1266.55,
+          "responseEnd": 1270.667
+        }
+      },
+      {
+        "event": "failure",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "error": "net::ERR_ABORTED",
+        "at": 1792926273249
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926275140
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926275141
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE0OX0hufASetGm2u_w49L2IZ-Ei-fYKUL0i9vBnORY0e9S2g",
+        "at": 1792926275278
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926275523,
+        "timing": {
+          "startTime": 1792926275142.437,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.353,
+          "responseStart": 377.841,
+          "responseEnd": 386.48
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926275599,
+        "timing": {
+          "startTime": 1792926275141.982,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.579,
+          "responseStart": 455.338,
+          "responseEnd": 461.635
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926275685
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926275704,
+        "timing": {
+          "startTime": 1792926275686.73,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.432,
+          "responseStart": 14.315,
+          "responseEnd": 18.158
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE0OX0hufASetGm2u_w49L2IZ-Ei-fYKUL0i9vBnORY0e9S2g",
+        "at": 1792926275777,
+        "timing": {
+          "startTime": 1792926275280.222,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.635,
+          "responseStart": 493.452,
+          "responseEnd": 497.739
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926275841
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926275890,
+        "timing": {
+          "startTime": 1792926275842.59,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.407,
+          "responseStart": 41.235,
+          "responseEnd": 44.606
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926275890
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926276586,
+        "timing": {
+          "startTime": 1792926275891.917,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.684,
+          "responseStart": 691.035,
+          "responseEnd": 694.56
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926276590
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/market-data/quotes",
+        "at": 1792926277193,
+        "timing": {
+          "startTime": 1792926267202.082,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.506,
+          "responseStart": 9974.35,
+          "responseEnd": 9977.905
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/market-data/quotes",
+        "at": 1792926277207
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/market-data/resolve",
+        "at": 1792926277211
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/subscribe",
+        "at": 1792926277212
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/subscribe",
+        "at": 1792926277988,
+        "timing": {
+          "startTime": 1792926277215.076,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.432,
+          "responseStart": 769.483,
+          "responseEnd": 776.246
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/market-data/resolve",
+        "at": 1792926277994,
+        "timing": {
+          "startTime": 1792926277214.863,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.574,
+          "responseStart": 775.478,
+          "responseEnd": 782.479
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/subscribe",
+        "at": 1792926278000
+      },
+      {
+        "event": "failure",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "error": "net::ERR_ABORTED",
+        "at": 1792926278593
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/market-data/quotes",
+        "at": 1792926279475,
+        "timing": {
+          "startTime": 1792926277208.566,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.403,
+          "responseStart": 2264.81,
+          "responseEnd": 2269.65
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/market-data/quotes",
+        "at": 1792926279482
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926279486
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/subscribe",
+        "at": 1792926279486
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/market-data/resolve",
+        "at": 1792926279488
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/subscribe",
+        "at": 1792926279491
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/subscribe",
+        "at": 1792926279492
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/subscribe",
+        "at": 1792926279493
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/subscribe",
+        "at": 1792926279508
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/subscribe",
+        "at": 1792926279511
+      },
+      {
+        "event": "failure",
+        "url": "https://test.kookvv.com:8443/api/market-data/quotes",
+        "error": "net::ERR_ABORTED",
+        "at": 1792926279578
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/market-data/quotes",
+        "at": 1792926279579
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/subscribe",
+        "at": 1792926279708,
+        "timing": {
+          "startTime": 1792926278001.935,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.44,
+          "responseStart": 1703.96,
+          "responseEnd": 1712.404
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926279709
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/market-data/quotes",
+        "at": 1792926279794,
+        "timing": {
+          "startTime": 1792926279580.1409,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.456,
+          "responseStart": 212.468,
+          "responseEnd": 216.504
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926279810,
+        "timing": {
+          "startTime": 1792926279491.405,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 2.454,
+          "responseStart": 314.113,
+          "responseEnd": 324.636
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/subscribe",
+        "at": 1792926279826,
+        "timing": {
+          "startTime": 1792926279510.225,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.428,
+          "responseStart": 311.16,
+          "responseEnd": 319.718
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926279826
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/subscribe",
+        "at": 1792926279891,
+        "timing": {
+          "startTime": 1792926279516.575,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 3.827,
+          "responseStart": 370.438,
+          "responseEnd": 384.641
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/subscribe",
+        "at": 1792926279895,
+        "timing": {
+          "startTime": 1792926279494.3318,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.672,
+          "responseStart": 398.55,
+          "responseEnd": 406.916
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926279896
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926279918,
+        "timing": {
+          "startTime": 1792926279711.937,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.451,
+          "responseStart": 203.591,
+          "responseEnd": 207.537
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/market-data/resolve",
+        "at": 1792926280018,
+        "timing": {
+          "startTime": 1792926279491.7942,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 2.362,
+          "responseStart": 523.28,
+          "responseEnd": 532.352
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926280022
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926280025
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/subscribe",
+        "at": 1792926280048,
+        "timing": {
+          "startTime": 1792926279494.471,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.613,
+          "responseStart": 549.985,
+          "responseEnd": 556.829
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926280052
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/subscribe",
+        "at": 1792926280095,
+        "timing": {
+          "startTime": 1792926279493.639,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 1.127,
+          "responseStart": 596.825,
+          "responseEnd": 606.88
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926280107
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/subscribe",
+        "at": 1792926280114,
+        "timing": {
+          "startTime": 1792926279491.55,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 2.391,
+          "responseStart": 610.192,
+          "responseEnd": 621.268
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926280114,
+        "timing": {
+          "startTime": 1792926279827.517,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.951,
+          "responseStart": 274.294,
+          "responseEnd": 280.114
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926280115
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926280134,
+        "timing": {
+          "startTime": 1792926279898.794,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 1.07,
+          "responseStart": 230.701,
+          "responseEnd": 235.157
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926280141
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926280143
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926280156,
+        "timing": {
+          "startTime": 1792926280024.811,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.397,
+          "responseStart": 119.482,
+          "responseEnd": 129.108
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926280158,
+        "timing": {
+          "startTime": 1792926280027.7168,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.375,
+          "responseStart": 116.652,
+          "responseEnd": 128.017
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926280170,
+        "timing": {
+          "startTime": 1792926280111.358,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 3.58,
+          "responseStart": 54.428,
+          "responseEnd": 72.494
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926280189,
+        "timing": {
+          "startTime": 1792926280053.15,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.531,
+          "responseStart": 130.445,
+          "responseEnd": 135.112
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/unsubscribe",
+        "at": 1792926280218,
+        "timing": {
+          "startTime": 1792926280116.7878,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.387,
+          "responseStart": 98.065,
+          "responseEnd": 106.043
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926280260,
+        "timing": {
+          "startTime": 1792926280143.346,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.468,
+          "responseStart": 115.197,
+          "responseEnd": 137.391
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926280301,
+        "timing": {
+          "startTime": 1792926280145.4612,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 4.368,
+          "responseStart": 153.615,
+          "responseEnd": 166.942
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE1MX1qW5qohAOtnTvSLQxPR2PVz0Jjqu-yUWckdZAhWzn0tQ",
+        "at": 1792926280601
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE1MX1qW5qohAOtnTvSLQxPR2PVz0Jjqu-yUWckdZAhWzn0tQ",
+        "at": 1792926282925,
+        "timing": {
+          "startTime": 1792926280602.164,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.547,
+          "responseStart": 2302.752,
+          "responseEnd": 2313.098
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926283168
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926283932,
+        "timing": {
+          "startTime": 1792926283174.295,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.691,
+          "responseStart": 507.748,
+          "responseEnd": 517.135
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads",
+        "at": 1792926284049
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/advanced-charts/preferences",
+        "at": 1792926284091
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926284129
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926285145
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926285147
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/advanced-charts/preferences",
+        "at": 1792926285293,
+        "timing": {
+          "startTime": 1792926284093.89,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.808,
+          "responseStart": 1163.771,
+          "responseEnd": 1175.327
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926285735
+      },
+      {
+        "event": "failure",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "error": "net::ERR_ABORTED",
+        "at": 1792926286125
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE2MH1dSjnzV9A60_TGsngXCMaZwz04UBeDNYYg5-y05LtmhA",
+        "at": 1792926288231
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads",
+        "at": 1792926288930,
+        "timing": {
+          "startTime": 1792926284052.4941,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 12.851,
+          "responseStart": 4837.803,
+          "responseEnd": 4876.954
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads/439ad05d-38b2-4fd8-958f-6540d2967962/result",
+        "at": 1792926289147
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926292106,
+        "timing": {
+          "startTime": 1792926285742.077,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.466,
+          "responseStart": 6350.895,
+          "responseEnd": 6373.421
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926292185,
+        "timing": {
+          "startTime": 1792926285163.112,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.557,
+          "responseStart": 7014.673,
+          "responseEnd": 7041.316
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926292197
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926292244,
+        "timing": {
+          "startTime": 1792926285162.953,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.607,
+          "responseStart": 7075.705,
+          "responseEnd": 7110.746
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926292271
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926292754,
+        "timing": {
+          "startTime": 1792926292276.8882,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.484,
+          "responseStart": 474.874,
+          "responseEnd": 492.169
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads/439ad05d-38b2-4fd8-958f-6540d2967962/result",
+        "at": 1792926293207,
+        "timing": {
+          "startTime": 1792926289175.7432,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.754,
+          "responseStart": 4026.783,
+          "responseEnd": 4059.382
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926293318,
+        "timing": {
+          "startTime": 1792926292198.863,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.464,
+          "responseStart": 1116.43,
+          "responseEnd": 1127.254
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads/439ad05d-38b2-4fd8-958f-6540d2967962/result",
+        "at": 1792926293492
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE2MH1dSjnzV9A60_TGsngXCMaZwz04UBeDNYYg5-y05LtmhA",
+        "at": 1792926293905,
+        "timing": {
+          "startTime": 1792926288247.123,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.591,
+          "responseStart": 5649.346,
+          "responseEnd": 5753.711
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/events",
+        "at": 1792926294010
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads/439ad05d-38b2-4fd8-958f-6540d2967962/result",
+        "at": 1792926294116,
+        "timing": {
+          "startTime": 1792926293493.804,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.502,
+          "responseStart": 618.937,
+          "responseEnd": 622.818
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads/439ad05d-38b2-4fd8-958f-6540d2967962/result",
+        "at": 1792926294511
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926295142
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926295143
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926295686
+      },
+      {
+        "event": "failure",
+        "url": "https://test.kookvv.com:8443/api/notification-center/events",
+        "error": "net::ERR_ABORTED",
+        "at": 1792926296011
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926296029
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads/439ad05d-38b2-4fd8-958f-6540d2967962/result",
+        "at": 1792926296288,
+        "timing": {
+          "startTime": 1792926294513.994,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.512,
+          "responseStart": 1768.943,
+          "responseEnd": 1775.358
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926296698,
+        "timing": {
+          "startTime": 1792926295145.005,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.57,
+          "responseStart": 1550.015,
+          "responseEnd": 1555.787
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926296795,
+        "timing": {
+          "startTime": 1792926295145.1152,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.523,
+          "responseStart": 1641.452,
+          "responseEnd": 1657.466
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads/439ad05d-38b2-4fd8-958f-6540d2967962/result",
+        "at": 1792926296837
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/notification-center/health",
+        "at": 1792926298029
+      },
+      {
+        "event": "failure",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "error": "net::ERR_ABORTED",
+        "at": 1792926298032
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926298386,
+        "timing": {
+          "startTime": 1792926295687.9512,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.873,
+          "responseStart": 2695.04,
+          "responseEnd": 2698.954
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads/439ad05d-38b2-4fd8-958f-6540d2967962/result",
+        "at": 1792926299326,
+        "timing": {
+          "startTime": 1792926296838.624,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.573,
+          "responseStart": 2483.713,
+          "responseEnd": 2487.274
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads/439ad05d-38b2-4fd8-958f-6540d2967962/result",
+        "at": 1792926300098
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926300141
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926300141
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/health",
+        "at": 1792926300586,
+        "timing": {
+          "startTime": 1792926298031.523,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 1.035,
+          "responseStart": 2548.976,
+          "responseEnd": 2556.546
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads/439ad05d-38b2-4fd8-958f-6540d2967962/result",
+        "at": 1792926300981,
+        "timing": {
+          "startTime": 1792926300108.4138,
+          "domainLookupStart": 0.721,
+          "domainLookupEnd": 0.727,
+          "connectStart": 0.727,
+          "secureConnectionStart": 0.936,
+          "connectEnd": 21.296,
+          "requestStart": 21.45,
+          "responseStart": 863.113,
+          "responseEnd": 879.465
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926301007,
+        "timing": {
+          "startTime": 1792926300142.644,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.916,
+          "responseStart": 856.29,
+          "responseEnd": 865.009
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926301397,
+        "timing": {
+          "startTime": 1792926300142.271,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.517,
+          "responseStart": 1252.104,
+          "responseEnd": 1258.931
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads/439ad05d-38b2-4fd8-958f-6540d2967962/result",
+        "at": 1792926302060
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE2NH32w3qMzoOg1Lmb3uAADbIk1Hjj8bE_QpyOV0PTQ2HiLg",
+        "at": 1792926302609
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads/439ad05d-38b2-4fd8-958f-6540d2967962/result",
+        "at": 1792926302700,
+        "timing": {
+          "startTime": 1792926302062.125,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.764,
+          "responseStart": 634.01,
+          "responseEnd": 639.691
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads/439ad05d-38b2-4fd8-958f-6540d2967962/result",
+        "at": 1792926304214
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE2NH32w3qMzoOg1Lmb3uAADbIk1Hjj8bE_QpyOV0PTQ2HiLg",
+        "at": 1792926304917,
+        "timing": {
+          "startTime": 1792926302610.059,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.441,
+          "responseStart": 2305.247,
+          "responseEnd": 2308.357
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926305014
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads/439ad05d-38b2-4fd8-958f-6540d2967962/result",
+        "at": 1792926305019,
+        "timing": {
+          "startTime": 1792926304222.5708,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.56,
+          "responseStart": 784.176,
+          "responseEnd": 807.667
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926305142
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926305146
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926305686
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads/439ad05d-38b2-4fd8-958f-6540d2967962/result",
+        "at": 1792926306515
+      },
+      {
+        "event": "failure",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "error": "net::ERR_ABORTED",
+        "at": 1792926307003
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE2OX1zXZDXEGVzquUHuPQQ2IjOV57sMqf_necJyH9W5I7SUQ",
+        "at": 1792926309008
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926309563,
+        "timing": {
+          "startTime": 1792926305149.847,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.392,
+          "responseStart": 4410.74,
+          "responseEnd": 4420.295
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926309601,
+        "timing": {
+          "startTime": 1792926305144.0872,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.49,
+          "responseStart": 4453.572,
+          "responseEnd": 4459.631
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926309601,
+        "timing": {
+          "startTime": 1792926305687.862,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.802,
+          "responseStart": 3909.875,
+          "responseEnd": 3914.844
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads/439ad05d-38b2-4fd8-958f-6540d2967962/result",
+        "at": 1792926309930,
+        "timing": {
+          "startTime": 1792926306516.814,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.48,
+          "responseStart": 3410.427,
+          "responseEnd": 3414.024
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926310143
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926310146
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads/439ad05d-38b2-4fd8-958f-6540d2967962/result",
+        "at": 1792926311433
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926313909,
+        "timing": {
+          "startTime": 1792926310148.0942,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.531,
+          "responseStart": 3759.399,
+          "responseEnd": 3870.651
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926315140
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926315685
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE2OX1zXZDXEGVzquUHuPQQ2IjOV57sMqf_necJyH9W5I7SUQ",
+        "at": 1792926315991,
+        "timing": {
+          "startTime": 1792926309009.814,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.494,
+          "responseStart": 6979.223,
+          "responseEnd": 6982.228
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926316089
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926316610,
+        "timing": {
+          "startTime": 1792926310144.846,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.432,
+          "responseStart": 6462.983,
+          "responseEnd": 6467.409
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926316615
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads/439ad05d-38b2-4fd8-958f-6540d2967962/result",
+        "at": 1792926316681,
+        "timing": {
+          "startTime": 1792926311434.1719,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.431,
+          "responseStart": 5243.101,
+          "responseEnd": 5246.464
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926316796,
+        "timing": {
+          "startTime": 1792926315141.716,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.544,
+          "responseStart": 1641.93,
+          "responseEnd": 1645.898
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926316801,
+        "timing": {
+          "startTime": 1792926315686.9521,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.495,
+          "responseStart": 1107.421,
+          "responseEnd": 1111.682
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926317088,
+        "timing": {
+          "startTime": 1792926316094.049,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.542,
+          "responseStart": 976.121,
+          "responseEnd": 984.571
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926317100
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads/439ad05d-38b2-4fd8-958f-6540d2967962/result",
+        "at": 1792926318188
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926318238,
+        "timing": {
+          "startTime": 1792926316616.6812,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 2.166,
+          "responseStart": 1613.707,
+          "responseEnd": 1623.571
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads/439ad05d-38b2-4fd8-958f-6540d2967962/result",
+        "at": 1792926318513,
+        "timing": {
+          "startTime": 1792926318189.461,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.529,
+          "responseStart": 320.726,
+          "responseEnd": 326.411
+        }
+      },
+      {
+        "event": "failure",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "error": "net::ERR_ABORTED",
+        "at": 1792926319097
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads/439ad05d-38b2-4fd8-958f-6540d2967962/result",
+        "at": 1792926320033
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926320141
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926320142
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads/439ad05d-38b2-4fd8-958f-6540d2967962/result",
+        "at": 1792926320725,
+        "timing": {
+          "startTime": 1792926320036.199,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.52,
+          "responseStart": 686.947,
+          "responseEnd": 713.43
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads/439ad05d-38b2-4fd8-958f-6540d2967962/cancel",
+        "at": 1792926320738
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/subscribe",
+        "at": 1792926320780
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/reserve",
+        "at": 1792926320817
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE3NH1kl0wUKIa0nMz0QRJon-_HkLfLNARaGvK2yl_2xULl7w",
+        "at": 1792926321097
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926321350,
+        "timing": {
+          "startTime": 1792926320143.3088,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.588,
+          "responseStart": 1204.511,
+          "responseEnd": 1211.02
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926321541,
+        "timing": {
+          "startTime": 1792926320143.4119,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.552,
+          "responseStart": 1394.884,
+          "responseEnd": 1399.535
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/reserve",
+        "at": 1792926322791,
+        "timing": {
+          "startTime": 1792926320818.4312,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.377,
+          "responseStart": 1969.99,
+          "responseEnd": 1985.278
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/history-loads/439ad05d-38b2-4fd8-958f-6540d2967962/cancel",
+        "at": 1792926323275,
+        "timing": {
+          "startTime": 1792926320739.764,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.532,
+          "responseStart": 2532.03,
+          "responseEnd": 2540.204
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/subscribe",
+        "at": 1792926323480,
+        "timing": {
+          "startTime": 1792926320781.909,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 4.526,
+          "responseStart": 2693.24,
+          "responseEnd": 2700.948
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/subscribe",
+        "at": 1792926323485
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE3NH1kl0wUKIa0nMz0QRJon-_HkLfLNARaGvK2yl_2xULl7w",
+        "at": 1792926323583,
+        "timing": {
+          "startTime": 1792926321098.085,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.471,
+          "responseStart": 2481.278,
+          "responseEnd": 2493.216
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926323694
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926325140
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926325142
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/subscribe",
+        "at": 1792926325595,
+        "timing": {
+          "startTime": 1792926323487.234,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.569,
+          "responseStart": 2105.229,
+          "responseEnd": 2111.606
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926325685
+      },
+      {
+        "event": "failure",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "error": "net::ERR_ABORTED",
+        "at": 1792926325697
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926325810,
+        "timing": {
+          "startTime": 1792926325141.797,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.567,
+          "responseStart": 666.966,
+          "responseEnd": 670.117
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/charts/stream/accept",
+        "at": 1792926326886
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926327609,
+        "timing": {
+          "startTime": 1792926325144.5698,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.51,
+          "responseStart": 2462.014,
+          "responseEnd": 2467.514
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE3Nn2vHxlqSo9YskndED0qwybIgbhVPiYY4q6_i8YYmnHPqA",
+        "at": 1792926327711
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926328113,
+        "timing": {
+          "startTime": 1792926325686.136,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.425,
+          "responseStart": 2424.095,
+          "responseEnd": 2427.444
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE3Nn2vHxlqSo9YskndED0qwybIgbhVPiYY4q6_i8YYmnHPqA",
+        "at": 1792926328511,
+        "timing": {
+          "startTime": 1792926327712.6,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.877,
+          "responseStart": 796.179,
+          "responseEnd": 801.331
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926328596
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/charts/stream/accept",
+        "at": 1792926328914,
+        "timing": {
+          "startTime": 1792926326888.572,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.703,
+          "responseStart": 2023.36,
+          "responseEnd": 2028.776
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926330140
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926330141
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926330500,
+        "timing": {
+          "startTime": 1792926328597.491,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.503,
+          "responseStart": 1897.27,
+          "responseEnd": 1901.826
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926330508
+      },
+      {
+        "event": "failure",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "error": "net::ERR_ABORTED",
+        "at": 1792926332509
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/notification-center/health",
+        "at": 1792926332510
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926335684
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926335718,
+        "timing": {
+          "startTime": 1792926330141.541,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.394,
+          "responseStart": 5569.052,
+          "responseEnd": 5572.2
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926335723
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926335731,
+        "timing": {
+          "startTime": 1792926330142.0469,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.263,
+          "responseStart": 5584.401,
+          "responseEnd": 5591.415
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926335736
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926337097,
+        "timing": {
+          "startTime": 1792926335685.996,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.731,
+          "responseStart": 1406.828,
+          "responseEnd": 1410.616
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926337309,
+        "timing": {
+          "startTime": 1792926335737.497,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.401,
+          "responseStart": 1569.475,
+          "responseEnd": 1572.811
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/health",
+        "at": 1792926338699,
+        "timing": {
+          "startTime": 1792926332511.9573,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.686,
+          "responseStart": 6184.259,
+          "responseEnd": 6194.435
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926339084,
+        "timing": {
+          "startTime": 1792926335724.289,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.503,
+          "responseStart": 3357.999,
+          "responseEnd": 3368.077
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926340140
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926340141
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE3N33Ag97IE4OFgjF7jmJRxoUSWfSm0RWM7yJcECWhSnzCHQ",
+        "at": 1792926340742
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926342219,
+        "timing": {
+          "startTime": 1792926340141.834,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.589,
+          "responseStart": 2074.693,
+          "responseEnd": 2101.869
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926342281,
+        "timing": {
+          "startTime": 1792926340142.339,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.368,
+          "responseStart": 2136.807,
+          "responseEnd": 2140.05
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE3N33Ag97IE4OFgjF7jmJRxoUSWfSm0RWM7yJcECWhSnzCHQ",
+        "at": 1792926342582,
+        "timing": {
+          "startTime": 1792926340743.696,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.298,
+          "responseStart": 1835.855,
+          "responseEnd": 1838.651
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926342648
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926342683,
+        "timing": {
+          "startTime": 1792926342649.0732,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.492,
+          "responseStart": 30.466,
+          "responseEnd": 33.676
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926342687
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926342801,
+        "timing": {
+          "startTime": 1792926342689.123,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.49,
+          "responseStart": 109.895,
+          "responseEnd": 114.2
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926342804
+      },
+      {
+        "event": "failure",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "error": "net::ERR_ABORTED",
+        "at": 1792926344805
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/advanced-charts/native-charts/save",
+        "at": 1792926345155
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926345155
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926345156
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926345695
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926345885,
+        "timing": {
+          "startTime": 1792926345157.688,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.371,
+          "responseStart": 721.75,
+          "responseEnd": 744.151
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE4MX0QxZJMOP_6fJBuBW8unIOqGwpo-oMKQQeTgaj0ehO6KA",
+        "at": 1792926346810
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926346999,
+        "timing": {
+          "startTime": 1792926345697.0308,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.423,
+          "responseStart": 1299.181,
+          "responseEnd": 1302.509
+        }
+      },
+      {
+        "event": "response",
+        "status": 409,
+        "url": "https://test.kookvv.com:8443/api/advanced-charts/native-charts/save",
+        "at": 1792926347088,
+        "timing": {
+          "startTime": 1792926345156.603,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.477,
+          "responseStart": 1926.817,
+          "responseEnd": 1934.234
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926347143,
+        "timing": {
+          "startTime": 1792926345157.131,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.896,
+          "responseStart": 1972.978,
+          "responseEnd": 1980.26
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE4MX0QxZJMOP_6fJBuBW8unIOqGwpo-oMKQQeTgaj0ehO6KA",
+        "at": 1792926348894,
+        "timing": {
+          "startTime": 1792926346812.164,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 2.431,
+          "responseStart": 2078.857,
+          "responseEnd": 2085.022
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/events",
+        "at": 1792926348944
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926350140
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926350141
+      },
+      {
+        "event": "response",
+        "status": 202,
+        "url": "https://test.kookvv.com:8443/api/notification-center/events",
+        "at": 1792926350599,
+        "timing": {
+          "startTime": 1792926348945.993,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.451,
+          "responseStart": 1650.331,
+          "responseEnd": 1654.378
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926350610
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926350832,
+        "timing": {
+          "startTime": 1792926350142.658,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.338,
+          "responseStart": 681.528,
+          "responseEnd": 685.048
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926350889,
+        "timing": {
+          "startTime": 1792926350141.977,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.832,
+          "responseStart": 741.029,
+          "responseEnd": 745.445
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926351918,
+        "timing": {
+          "startTime": 1792926350611.05,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.425,
+          "responseStart": 1305.008,
+          "responseEnd": 1307.765
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926351922
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926353883,
+        "timing": {
+          "startTime": 1792926351923.025,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.461,
+          "responseStart": 1955.841,
+          "responseEnd": 1959.024
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926353888
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926355141
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926355142
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926355685
+      },
+      {
+        "event": "failure",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "error": "net::ERR_ABORTED",
+        "at": 1792926355890
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926357430,
+        "timing": {
+          "startTime": 1792926355143.12,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.66,
+          "responseStart": 2273.543,
+          "responseEnd": 2282.678
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926357433,
+        "timing": {
+          "startTime": 1792926355144.292,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 2.139,
+          "responseStart": 2278.504,
+          "responseEnd": 2288.457
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926357778,
+        "timing": {
+          "startTime": 1792926355688.076,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.539,
+          "responseStart": 2085.561,
+          "responseEnd": 2090.744
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE4Nn0uwyODFK5pSl3gqbS6LHcCYsvPQcF-YfuCSoihKCc_sQ",
+        "at": 1792926357893
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926360141
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926360142
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE4Nn0uwyODFK5pSl3gqbS6LHcCYsvPQcF-YfuCSoihKCc_sQ",
+        "at": 1792926363279,
+        "timing": {
+          "startTime": 1792926357894.7659,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.521,
+          "responseStart": 5380.601,
+          "responseEnd": 5383.838
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926363421
+      },
+      {
+        "event": "failure",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "error": "net::ERR_ABORTED",
+        "at": 1792926365418
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926365685
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926366095,
+        "timing": {
+          "startTime": 1792926360143.1738,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.628,
+          "responseStart": 5944.227,
+          "responseEnd": 5952.841
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926366108
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926366183,
+        "timing": {
+          "startTime": 1792926360143.2952,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.575,
+          "responseStart": 6037.042,
+          "responseEnd": 6051.765
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926366198
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926367394,
+        "timing": {
+          "startTime": 1792926366109.767,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.411,
+          "responseStart": 1282.238,
+          "responseEnd": 1301.623
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/signals/pending-count",
+        "at": 1792926367407,
+        "timing": {
+          "startTime": 1792926365687.8638,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.689,
+          "responseStart": 1715.908,
+          "responseEnd": 1720.801
+        }
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE5MX12G7tvgm4Goo5bbIKckRftO3T6k5lDzWIYLl1FQ1MgGA",
+        "at": 1792926367421
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926367611,
+        "timing": {
+          "startTime": 1792926366199.3257,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.369,
+          "responseStart": 1409.846,
+          "responseEnd": 1421.053
+        }
+      },
+      {
+        "event": "response",
+        "status": 200,
+        "url": "https://test.kookvv.com:8443/api/notification-center/changes?after=eyJlcG9jaCI6IjNhZTIxMzJhLTRhMDctNGZiZC1iYWM4LTc2ZDY4MTliODE1NyIsImtpbmQiOiJjaGFuZ2VzIiwic2VxIjo0ODE5MX12G7tvgm4Goo5bbIKckRftO3T6k5lDzWIYLl1FQ1MgGA",
+        "at": 1792926368982,
+        "timing": {
+          "startTime": 1792926367423.012,
+          "domainLookupStart": -1,
+          "domainLookupEnd": -1,
+          "connectStart": -1,
+          "secureConnectionStart": -1,
+          "connectEnd": -1,
+          "requestStart": 0.56,
+          "responseStart": 1556.287,
+          "responseEnd": 1560.304
+        }
+      },
+      {
+        "event": "request",
+        "method": "POST",
+        "url": "https://test.kookvv.com:8443/api/notification-center/observations",
+        "at": 1792926369041
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts",
+        "at": 1792926370140
+      },
+      {
+        "event": "request",
+        "method": "GET",
+        "url": "https://test.kookvv.com:8443/api/chart-alerts/events",
+        "at": 1792926370141
+      }
+    ],
+    "errors": []
+  },
+  "logs": [
+    "[error] Failed to load resource: the server responded with a status of 409 ()",
+    "[warning] 2026-10-25T11:05:47.128Z:Chart.SaveloadAdapter.Library:{\"code\":\"WORKSPACE_REVISION_CONFLICT\",\"status\":409,\"fieldErrors\":[],\"retryable\":false}"
+  ]
+}

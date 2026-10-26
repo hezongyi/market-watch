@@ -253,7 +253,16 @@ const MWNativeIndicatorResultsAdapter = (() => {
     const records=sessions.get(binding.engine);
     if(records?.get(binding.session+'|'+binding.source)===binding)records.delete(binding.session+'|'+binding.source);
   }
-  return {configure,start,attach,scope,applyBatch,invalidate,detach,
+  function centerDrawingText(chart,id){
+    // v31's public Text overrides expose no alignment. Keep this tiny pinned
+    // rendering seam beside the existing native adapter, rather than moving
+    // Python's absolute price/time anchor to approximate a centered label.
+    const source=chart._chartWidget.model().model().dataSourceForId(id),view=source?._paneView;
+    if(!enabled || source?.name?.()!=='Text' || !view ||
+       !('_horzAlign' in view) || !('_vertAlign' in view))throw Error('原生居中信号文字契约不兼容');
+    view._horzAlign='center';view._vertAlign='middle';view._forceTextAlign=true;
+  }
+  return {configure,start,attach,scope,applyBatch,invalidate,detach,centerDrawingText,
     subscribe(listener){listeners.add(listener);return ()=>listeners.delete(listener);},
     enabled:name=>enabled && !!catalog[name]};
 })();

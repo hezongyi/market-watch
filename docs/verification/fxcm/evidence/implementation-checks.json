@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-25T04:01:00.152997+00:00",
+  "baseline": {
+    "tag": "v1.28.0",
+    "commit": "59ed3a3f3fc727da76d13149934d999ebee04218",
+    "branch": "feat/fxcm-platform-managed-20261024"
+  },
+  "real_upstream_evidence": {
+    "native_session": "passed; evidence/native-session-probe.json",
+    "native_history": "passed; 517 catalog rows; EUR/USD and XAU/USD BID M1/H1/D1 plus M1 pagination; evidence/native-history-probe.json",
+    "application_adapter": "passed; one session reuse, 25-second idle exit, 49.26 seconds; evidence/application-adapter-probe.json",
+    "sample_sha256": "a4d1710157eab3958947d6263ff0f89ba4a26707bee99766b82e07cdef928fb3",
+    "application_browser": "passed in stages; native/dual/embedded catalog, managed import/increment/version immutability/idempotency, fixed history chart and Moving Average; browser-result.json and managed-chart-result.json",
+    "daily_schedule": "passed in stages; original failure retained, fixed task resumed and published, fresh natural UTC 03:53 due task automatically published; daily-resume-result.json",
+    "weekend_capacity": "passed; actual empty weekend checkpoint and contiguous 300-bar weekday page; weekend-window-after-fix.json",
+    "post_close_idle": "passed; 305.81 seconds, 10 samples, helper/interest/stream/active-slot all zero, maintenance paused, no new admissions or cache growth"
+  },
+  "tests": {
+    "fxcm_history_provider_and_resources": {
+      "result": "passed",
+      "passed": 41,
+      "scope": "FXCM history, provider, resource limits, workspace and series access; includes weekend empty window and inclusive 300-bar capacity regressions",
+      "seconds": 12.38
+    },
+    "fxcm_managed_postgres_and_maintenance": {
+      "result": "passed",
+      "passed": 22,
+      "scope": "task-owned PostgreSQL managed history, maintenance and source cache",
+      "seconds": 42.24
+    },
+    "postgres_replay_for_full_suite_environment_gap": {
+      "result": "passed",
+      "passed": 38,
+      "seconds": 82.08,
+      "scope": "tests which the non-PostgreSQL full-suite environment could not collect because TEST_POSTGRES_URL was absent"
+    },
+    "full_backend_pytest": {
+      "result": "environment-incomplete",
+      "summary": "2244 passed, 622 skipped, 35 warnings, 38 errors in 809.72s",
+      "boundary": "all 38 errors were KeyError: TEST_POSTGRES_URL; the affected tests were subsequently run against the task-owned PostgreSQL environment and passed"
+    },
+    "source_compatibility": {
+      "result": "passed",
+      "passed": 63,
+      "seconds": 5.48,
+      "scope": "platform_catalog, history_catalog, history_sources, source_registry, provider_dukascopy, providers; recorded/fixture inputs"
+    }
+  },
+  "static_and_targeted_checks": {
+    "ruff_changed_python": "passed for 32 changed or new Python files",
+    "compileall_changed_python": "passed for 32 changed or new Python files",
+    "git_diff_check": "passed",
+    "native_helper_wall_wextra": "passed",
+    "node_syntax": [
+      "advanced-host/bridge.js passed",
+      "web/tests/fxcm-platform-managed.browser.cjs passed",
+      "web/tests/fxcm-maintenance.browser.cjs passed",
+      "web/tests/fxcm-daily-resume.browser.cjs passed",
+      "web/tests/fxcm-managed-chart.browser.cjs passed"
+    ],
+    "node_tests": [
+      "fxcm-request-timeouts.cjs passed",
+      "advanced-inflight-cancellation.cjs passed",
+      "advanced-native-reserve-scheduler.cjs passed",
+      "fxcm-series.cjs passed"
+    ],
+    "web_production_build": "task image builds passed; existing >500KB bundle warning",
+    "compose_configuration": "passed"
+  },
+  "independent_review": {
+    "standards": "one P1 found, fixed and independently rechecked; no open findings",
+    "spec": "one P2 found, fixed and independently rechecked; no open findings",
+    "record": "../review.md",
+    "boundary": "Independent review predates the five real-acceptance fixes, including weekend/capacity handling; these were self-reviewed and regression tested, see review.md"
+  },
+  "isolated_acceptance": {
+    "project": "mw-fxcm-history-20261024",
+    "state": "local application acceptance passed in stages; instance and data retained; daily plan paused",
+    "long_lived_mw_acceptance_modified": false,
+    "production_or_unraid_modified": false,
+    "blocker": null,
+    "resource_authorization": "User explicitly authorized direct acceptance with current resources"
+  },
+  "not_yet_verified": [
+    "Remote CI",
+    "Native D1 phase across DST",
+    "Real account/environment switching (offline identity isolation verified)",
+    "Mid-request worker kill and actual cancellation (only orderly queued-task recovery and cancellation unit tests verified)",
+    "Official quota and SDK redistribution clearance"
+  ]
+}

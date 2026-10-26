@@ -9,7 +9,7 @@ import test_data_center as center
 import test_history_request_evidence as contracts
 from alembic.migration import MigrationContext
 from alembic.operations import Operations
-from sqlalchemy import inspect
+from sqlalchemy import MetaData, Table, inspect
 from test_provider_postgres import provider_pg as _provider_pg
 
 provider_pg = _provider_pg
@@ -45,8 +45,15 @@ def test_postgres_request_evidence_additive_migration_and_data_loss_guard(provid
         migration.upgrade()
         assert "market_history_read_attempts" in inspect(conn).get_table_names()
     ident, _ = contracts.create(factory)
-    contracts.history.import_page(contracts.Adapter([contracts.batch(checkpoint=120000)]), version_id=ident)
     with engine.begin() as conn:
+        # Exercise ad31's historical table shape; today's worker expects columns
+        # introduced by later migrations and cannot write this older schema.
+        attempts = Table("market_history_read_attempts", MetaData(), autoload_with=conn)
+        conn.execute(attempts.insert().values(
+            id="00000000-0000-0000-0000-000000000001", version_id=ident,
+            start=0, end=120000, started_at=1, finished_at=2,
+            read_kind="supplier_request", result="data", accepted=True,
+        ))
         migration.op = Operations(MigrationContext.configure(conn))
         with pytest.raises(RuntimeError, match="backup"):
             migration.downgrade()

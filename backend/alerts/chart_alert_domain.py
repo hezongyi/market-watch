@@ -18,7 +18,7 @@ class Contract(BaseModel):
 
 
 class Indicator(Contract):
-    name: Literal["SMA", "EMA", "RSI", "MACD"]
+    name: Literal["SMA", "EMA", "RSI", "MACD", "ROLLING_RANGE_SQUEEZE"]
     version: Literal["1"] = "1"
     params: dict = Field(default_factory=dict)
     output: str = "value"
@@ -33,6 +33,8 @@ class Indicator(Contract):
 
     @property
     def unit(self):
+        if self.name == "ROLLING_RANGE_SQUEEZE":
+            return {"sma": "price", "signal": "boolean", "pct_rank": "percent"}.get(self.output, "ratio")
         return "rsi" if self.name == "RSI" else "price_delta" if self.name == "MACD" else "price"
 
 

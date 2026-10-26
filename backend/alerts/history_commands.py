@@ -23,6 +23,11 @@ def creation_request(body):
         dataset.pop("catalog_id", None)
     if maintenance.get("expected_configuration_revision") is None:
         maintenance.pop("expected_configuration_revision", None)
+    for key, default in (("mode", "base_m1"), ("adjustment", "none"), ("timeframes", None)):
+        if dataset.get(key, default) == default:
+            dataset.pop(key, None)
+    if not maintenance.get("frame_plan"):
+        maintenance.pop("frame_plan", None)
     return {**body, "create_only": body.get("create_only", False), "dataset": dataset, "maintenance": maintenance}
 
 
@@ -59,8 +64,18 @@ def create_managed(db, body):
 
     body = ManagedRequest.model_validate(body)
     raw = history_dataset_identity(source=body.dataset.source, provider_symbol=body.dataset.provider_symbol,
-        asset_class=body.dataset.asset_class, aggregation_calendar=body.dataset.aggregation_calendar)
-    identity = collection_identity(raw)
+        asset_class=body.dataset.asset_class, aggregation_calendar=body.dataset.aggregation_calendar,
+        mode=body.dataset.mode, adjustment=body.dataset.adjustment)
+    if raw.identity_version == 2:
+        from .history_mode_sources import local_details, source_identity, validate_frames
+
+        info, _ = local_details(db, raw.source, raw.provider_symbol)
+        selected = validate_frames(raw, info, body.maintenance.timeframes)
+        if body.dataset.timeframes is not None and body.dataset.timeframes != selected:
+            raise ValueError("创建与维护的周期选择必须一致")
+        identity = source_identity(raw, "D1" if raw.mode == "base_d1" else selected[0], info)
+    else:
+        identity = collection_identity(raw)
     db.execute(_insert(db)(SourceSeries).values(id=identity.key, identity=identity.model_dump())
         .on_conflict_do_nothing(index_elements=["id"]))
     db.scalar(select(SourceSeries).where(SourceSeries.id == identity.key).with_for_update())
@@ -75,7 +90,10 @@ def create_managed(db, body):
         return {"dataset": dataset_detail(db, raw.key), "task": version_report(db, version.id)}
     if body.create_only and db.get(DatasetMaintenance, raw.key) is not None:
         raise CreationConflict(raw.key)
-    row, _ = register_history_dataset(db, **body.dataset.model_dump())
+    registration = body.dataset.model_dump()
+    if raw.identity_version == 2:
+        registration["timeframes"] = body.maintenance.timeframes
+    row, _ = register_history_dataset(db, **registration)
     configure(db, row.id, **body.maintenance.model_dump())
     version = create_run(db, row.id, request_id=body.request_id)
     version.manifest = {**version.manifest, "maintenance": {
@@ -125,8 +143,8 @@ def control_task(db, version_id, action):
     from .history_versions import version_report
 
     TaskControl(action=action)
-    task_control(db, version_id, action)
-    return version_report(db, version_id)
+    version = task_control(db, version_id, action)
+    return version_report(db, version.id)
 
 
 def change_aggregation(db, dataset_id, body):

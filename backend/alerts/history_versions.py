@@ -50,9 +50,13 @@ def create_version(db, dataset_id, start, end):
     dataset = db.get(MarketDataset, dataset_id)
     if not dataset:
         raise ValueError("Unknown dataset")
-    history_identity(dataset.identity)
     if not 0 <= start < end <= (now_ms() - 5000) // 60000 * 60000 or start % 60000 or end % 60000:
         raise ValueError("Historical version requires fixed past UTC minute boundaries")
+    if dataset.identity.get("identity_version", 1) == 2:
+        from .native_history_archive import create
+
+        return create(db, dataset, start, end)
+    history_identity(dataset.identity)
     dataset_row = db.get(MarketDataset, dataset_id)
     instrument = db.get(Instrument, dataset_row.instrument_id)
     version = HistoryVersion(dataset_id=dataset_id, start=start, end=end, cursor=start,
@@ -84,11 +88,15 @@ def _unknown(rows, start, end):
 
 
 def claim(version_id=None):
+    from .storage import HistoryFrameRun
+
     with transaction() as db:
         stamp = now_ms()
         query = select(HistoryVersion).where(
             HistoryVersion.status.in_(("pending", "running", "retrying")),
             HistoryVersion.lease_until <= stamp, HistoryVersion.next_at <= stamp,
+            ~select(HistoryFrameRun.version_id).where(
+                HistoryFrameRun.version_id == HistoryVersion.id).exists(),
             ~select(HistoryRun.version_id).where(HistoryRun.version_id == HistoryVersion.id,
                 HistoryRun.desired_state != "running").exists())
         if version_id:
@@ -102,6 +110,8 @@ def claim(version_id=None):
         version.lease_token = uid()
         version.lease_until = stamp + 60000
         dataset = db.get(MarketDataset, version.dataset_id)
+        if dataset.identity["source"] == "fxcm":
+            version.lease_until = stamp + 70000
         end = bounded_refresh(db, version, page_end(dataset.identity, version.cursor,
                          min(version.end, month_end(version.cursor))))
         start_read(db, version.id, version.lease_token, version.cursor, end)
@@ -109,7 +119,8 @@ def claim(version_id=None):
 
 
 def publish(db, version):
-    chunks = db.scalars(select(HistoryChunk).where(HistoryChunk.version_id == version.id)
+    chunks = db.scalars(select(HistoryChunk).where(HistoryChunk.version_id == version.id,
+                                                 HistoryChunk.timeframe == "M1")
                         .order_by(HistoryChunk.start)).all()
     cursor = version.start
     count = 0
@@ -181,6 +192,10 @@ def controlled_stop(db, version):
 
 
 def import_page(adapter, *, version_id=None):
+    from .native_history_archive import import_page as native_import_page
+
+    if native_import_page(adapter, version_id=version_id):
+        return True
     with transaction() as db:
         query = select(HistoryVersion.id).where(HistoryVersion.status == "deriving")
         if version_id:
@@ -330,7 +345,7 @@ def version_report(db, ident):
 
     # Times come from persisted events. Legacy mutation timestamps remain
     # unknown; poll time and lease deadlines are not task update timestamps.
-    from .storage import HistoryArtifact, HistoryReadAttempt
+    from .storage import HistoryArtifact, HistoryFrameRun, HistoryReadAttempt
 
     started_at = db.scalar(select(func.min(HistoryReadAttempt.started_at)).where(
         HistoryReadAttempt.version_id == version.id))
@@ -352,6 +367,12 @@ def version_report(db, ident):
             "completed_at": run.completed_at if run else None,
             "parent_version_id": run.parent_version_id if run else None,
             "refresh_start": run.refresh_start if run else None, "refresh_end": run.refresh_end if run else None,
+            "mode": version.manifest.get("mode", "base_m1"),
+            "frames": [{key: getattr(frame, key) for key in (
+                "timeframe", "start", "end", "cursor", "status", "attempts", "retry_at",
+                "observed_at", "last_success", "error")}
+                for frame in db.scalars(select(HistoryFrameRun).where(HistoryFrameRun.version_id == ident)
+                    .order_by(HistoryFrameRun.timeframe))],
             "derivation": derivation_progress(db, version)}
 
 
@@ -360,6 +381,8 @@ def snapshot_rows(db, ident, *, start=None, end=None):
     version = db.get(HistoryVersion, ident)
     if not version or version.status != "published":
         raise ValueError("A published historical dataset version is required")
+    if version.manifest.get("schema") == "managed-period-snapshot-v2":
+        raise ValueError("This history mode has no implicit M1 input; read its fixed period artifact")
     db.scalar(select(MarketDataset.id).where(MarketDataset.id == version.dataset_id)
               .with_for_update(read=True))
     if db.get(HistoryReclamation, ident):
@@ -369,6 +392,7 @@ def snapshot_rows(db, ident, *, start=None, end=None):
     if not version.start <= left < right <= version.end:
         raise ValueError("Historical version does not cover requested query partition")
     query = select(HistoryChunk).where(HistoryChunk.version_id == ident,
+        HistoryChunk.timeframe == "M1",
         HistoryChunk.start < right, HistoryChunk.end > left).order_by(HistoryChunk.start)
     for chunk in db.scalars(query.execution_options(yield_per=1)):
         raw = raw_chunk(db, chunk)

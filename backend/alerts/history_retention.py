@@ -22,6 +22,7 @@ from .storage import (
     ChartWorkspace,
     CompositeRevision,
     CompositeWatchBinding,
+    DatasetFrameSource,
     DatasetMaintenance,
     DatasetReclamation,
     FixedIndicatorBlock,
@@ -29,6 +30,7 @@ from .storage import (
     HistoryArtifact,
     HistoryArtifactBlock,
     HistoryChunk,
+    HistoryFrameRun,
     HistoryReclamation,
     HistoryRun,
     HistoryVersion,
@@ -97,6 +99,8 @@ def reference_values(row):
         return {"dataset_id": row.dataset_id, "parent_version_id": row.parent_version_id}
     if isinstance(row, HistoryChunk):
         return {"version_id": row.version_id}
+    if isinstance(row, HistoryFrameRun):
+        return {"version_id": row.version_id, "parent_version_id": row.inherited_version_id}
     if isinstance(row, (MarketDemand, ChartHistoryPlan, WeeklyHistoryRequest)):
         return row.instrument_id
     return None
@@ -123,7 +127,10 @@ def guard_reference_writes(db):
                 continue
         documents.append(reference_values(row))
     lock_reference_values(db, documents)
-    content_ids = sorted({row.content_id for row in db.new if isinstance(row, HistoryChunk) and row.content_id})
+    content_ids = {row.content_id for row in db.new if isinstance(row, HistoryChunk) and row.content_id}
+    content_ids.update(blob for row in set(db.new) | set(db.dirty) if isinstance(row, HistoryFrameRun)
+                       for blob in (row.facts or {}).get("pages", []))
+    content_ids = sorted(content_ids)
     if content_ids:
         found = set(db.scalars(select(SourceBlob.id).where(SourceBlob.id.in_(content_ids))
                                .order_by(SourceBlob.id).with_for_update()))
@@ -206,7 +213,7 @@ def references(db, dataset_id):
     stamp = now_ms()
     for version in db.scalars(select(HistoryVersion).where(HistoryVersion.dataset_id == dataset_id)):
         run = db.get(HistoryRun, version.id)
-        if version.lease_until > stamp or version.status not in ("published", "cancelled") or (
+        if version.lease_until > stamp or version.status not in ("published", "cancelled", "failed") or (
                 run and run.completed_at is None and run.desired_state != "cancelled"):
             add("task", version.id, "维护或周期派生任务尚未结束")
     for demand in db.scalars(select(MarketDemand).where(MarketDemand.instrument_id == dataset.instrument_id,
@@ -229,6 +236,7 @@ def references(db, dataset_id):
         add("demand", dataset.instrument_id, "图表持续维护计划")
     # New FK-backed modules (e.g. composites) cannot be accidentally omitted.
     owned = {DatasetMaintenance.__table__.name, DatasetReclamation.__table__.name,
+             DatasetFrameSource.__table__.name, HistoryFrameRun.__table__.name,
              HistoryVersion.__table__.name, HistoryRun.__table__.name, FixedIndicatorRun.__table__.name,
              "market_history_read_attempts"}
     for table in MarketDataset.metadata.sorted_tables:
@@ -284,6 +292,7 @@ def reclaim(db, dataset_id, request_id, *, expected_review_revision=None):
     indicator_runs = select(FixedIndicatorRun.id).where(FixedIndicatorRun.history_version_id.in_(versions))
     candidates = list(db.scalars(select(HistoryChunk.content_id).where(
         HistoryChunk.version_id.in_(versions), HistoryChunk.content_id.is_not(None)).distinct()))
+    candidates.extend(frame_content_ids(db, version_ids=versions))
     summary = {"dataset_id": dataset_id, "request_id": request_id, "versions": len(versions), "deleted": {}}
     for model, predicate in (
         (FixedIndicatorBlock, FixedIndicatorBlock.run_id.in_(indicator_runs)),
@@ -291,6 +300,7 @@ def reclaim(db, dataset_id, request_id, *, expected_review_revision=None):
         (HistoryArtifactBlock, HistoryArtifactBlock.artifact_id.in_(artifacts)),
         (HistoryArtifact, HistoryArtifact.version_id.in_(versions)),
         (HistoryChunk, HistoryChunk.version_id.in_(versions)),
+        (HistoryFrameRun, HistoryFrameRun.version_id.in_(versions)),
         (Bar, Bar.instrument_id == dataset.instrument_id),
         (MarketCoverage, MarketCoverage.instrument_id == dataset.instrument_id),
         (ChartPublishedBar, ChartPublishedBar.instrument_id == dataset.instrument_id),
@@ -303,9 +313,10 @@ def reclaim(db, dataset_id, request_id, *, expected_review_revision=None):
     # Lock content candidates in the same order as source-store writers. New
     # references FK/lock them; cached acquisition pointers count as real reachability.
     removed = 0
+    pending_content = frame_content_ids(db)
     for blob_id in db.scalars(select(SourceBlob.id).where(SourceBlob.id.in_(candidates))
                           .order_by(SourceBlob.id).with_for_update()):
-        if db.scalar(select(HistoryChunk.id).where(HistoryChunk.content_id == blob_id).limit(1)) or db.scalar(
+        if blob_id in pending_content or db.scalar(select(HistoryChunk.id).where(HistoryChunk.content_id == blob_id).limit(1)) or db.scalar(
                 select(SourceFetch.id).where(SourceFetch.content_id == blob_id).limit(1)):
             continue
         db.execute(delete(SourceBlob).where(SourceBlob.id == blob_id).execution_options(synchronize_session=False))
@@ -320,3 +331,12 @@ def reclaim(db, dataset_id, request_id, *, expected_review_revision=None):
     db.add(DatasetReclamation(dataset_id=dataset_id, request_id=request_id, reclaimed_at=stamp, summary=summary))
     db.flush()
     return summary
+
+
+def frame_content_ids(db, *, version_ids=None, exclude_versions=None):
+    query = select(HistoryFrameRun.facts)
+    if version_ids is not None:
+        query = query.where(HistoryFrameRun.version_id.in_(version_ids))
+    if exclude_versions is not None:
+        query = query.where(HistoryFrameRun.version_id.notin_(exclude_versions))
+    return {blob for facts in db.scalars(query) for blob in facts.get("pages", [])}

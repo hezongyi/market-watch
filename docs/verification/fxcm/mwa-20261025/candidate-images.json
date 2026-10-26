@@ -1,0 +1,26 @@
+{
+  "images": {
+    "api": "sha256:1c4380792e7938872548810ccea40ff0b10744b82a11c5e5f7d42afb8d592320",
+    "chart": "sha256:63542f9ea64b9d094925806df97ac27a7fb68b7b199c70077d1800acf8c339ff",
+    "web": "sha256:e52d192d0bf77c4749546afc7876da942680a4958b60e9a8c1f72b8f5c724b4a"
+  },
+  "services": [
+    "web",
+    "chart",
+    "history-worker",
+    "realtime-worker",
+    "chart-aggregation-worker",
+    "chart-history-worker",
+    "market-stream-worker",
+    "projector",
+    "composite-aggregate-worker",
+    "pricing-worker",
+    "notify-worker",
+    "native-history-worker",
+    "api"
+  ],
+  "project": "mw-issue75-v2-20261018",
+  "base_commit": "8dd4faf2b5db2a46829d65b9873882b1f09fabc2",
+  "dirty": true,
+  "schema_change": false
+}

@@ -1,0 +1,151 @@
+{
+  "label": "post-browser-demand-state",
+  "duration_seconds": 0,
+  "completed": false,
+  "snapshots": [
+    {
+      "slot": {
+        "active": [],
+        "requests": [
+          {
+            "kind": "history",
+            "at": 1792899324066
+          }
+        ],
+        "cooldown_strikes": 1,
+        "cooldown_until": 1792898843599
+      },
+      "source_fetches": 2,
+      "provider_bars": 1719,
+      "provider_interests": 3,
+      "fxcm_interest_latest_expiry": 1792899725906,
+      "fxcm_active_interests": 3,
+      "active_streams": 5,
+      "maintenance": [
+        {
+          "paused": false,
+          "active": null,
+          "next_at": 1792973700000,
+          "frequency": "once"
+        }
+      ],
+      "versions": 2,
+      "db_writes": {
+        "tup_inserted": 10115,
+        "tup_updated": 28013,
+        "tup_deleted": 1017
+      },
+      "helpers": 1,
+      "stats": [
+        {
+          "BlockIO": "3.83MB / 16.4kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-chart-1",
+          "ID": "289763a81684",
+          "MemPerc": "4.80%",
+          "MemUsage": "6.148MiB / 128MiB",
+          "Name": "mw-fxcm-history-20261024-chart-1",
+          "NetIO": "1.54MB / 14.6MB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "32.8kB / 0B",
+          "CPUPerc": "0.32%",
+          "Container": "mw-fxcm-history-20261024-native-history-worker-1",
+          "ID": "432fd0869d20",
+          "MemPerc": "14.51%",
+          "MemUsage": "111.4MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-native-history-worker-1",
+          "NetIO": "7.91MB / 3.6MB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "2.26MB / 803kB",
+          "CPUPerc": "5.04%",
+          "Container": "mw-fxcm-history-20261024-market-stream-worker-1",
+          "ID": "ab6f3d723cb9",
+          "MemPerc": "15.31%",
+          "MemUsage": "117.6MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-market-stream-worker-1",
+          "NetIO": "37.5MB / 20MB",
+          "PIDs": "8"
+        },
+        {
+          "BlockIO": "1.95MB / 0B",
+          "CPUPerc": "2.82%",
+          "Container": "mw-fxcm-history-20261024-history-worker-1",
+          "ID": "c8e546790f12",
+          "MemPerc": "14.17%",
+          "MemUsage": "108.8MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-history-worker-1",
+          "NetIO": "2.37MB / 1.73MB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "49.2kB / 1.25MB",
+          "CPUPerc": "1.75%",
+          "Container": "mw-fxcm-history-20261024-chart-history-worker-1",
+          "ID": "0169355ca118",
+          "MemPerc": "13.66%",
+          "MemUsage": "104.9MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-chart-history-worker-1",
+          "NetIO": "4.65MB / 3.92MB",
+          "PIDs": "4"
+        },
+        {
+          "BlockIO": "87.2MB / 0B",
+          "CPUPerc": "6.72%",
+          "Container": "mw-fxcm-history-20261024-api-1",
+          "ID": "d38a192b098c",
+          "MemPerc": "26.80%",
+          "MemUsage": "205.8MiB / 768MiB",
+          "Name": "mw-fxcm-history-20261024-api-1",
+          "NetIO": "257MB / 30MB",
+          "PIDs": "28"
+        },
+        {
+          "BlockIO": "360kB / 32.8kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-tls-1",
+          "ID": "c3aa40fbd13e",
+          "MemPerc": "9.83%",
+          "MemUsage": "6.289MiB / 64MiB",
+          "Name": "mw-fxcm-history-20261024-tls-1",
+          "NetIO": "40.2MB / 40.5MB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "12.5MB / 16.4kB",
+          "CPUPerc": "0.00%",
+          "Container": "mw-fxcm-history-20261024-web-1",
+          "ID": "da23a82aec14",
+          "MemPerc": "12.32%",
+          "MemUsage": "7.883MiB / 64MiB",
+          "Name": "mw-fxcm-history-20261024-web-1",
+          "NetIO": "6.61MB / 18.2MB",
+          "PIDs": "5"
+        },
+        {
+          "BlockIO": "84.8MB / 769MB",
+          "CPUPerc": "16.72%",
+          "Container": "mw-fxcm-history-20261024-postgres-1",
+          "ID": "c83a168b6c87",
+          "MemPerc": "25.33%",
+          "MemUsage": "129.7MiB / 512MiB",
+          "Name": "mw-fxcm-history-20261024-postgres-1",
+          "NetIO": "103MB / 464MB",
+          "PIDs": "15"
+        }
+      ],
+      "host": {
+        "disk_available": 15297482752,
+        "load": [
+          4.63623046875,
+          5.08154296875,
+          5.5283203125
+        ]
+      },
+      "at": "2026-10-25T03:35:27.862715+00:00"
+    }
+  ]
+}

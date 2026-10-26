@@ -1,6 +1,6 @@
 // Replay the actual resolver with colliding native/Python names and stable IDs.
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
-const source=fs.readFileSync('advanced-host/native-indicator-dialog.js','utf8');
+const source=fs.readFileSync(require('node:path').resolve(__dirname,'../../advanced-host/native-indicator-dialog.js'),'utf8');
 const resolver=source.slice(source.indexOf('  function entryFor(row)'),source.indexOf('  function annotate(row)'));
 const ids=['SMA','EMA','LWMA','BBANDS','RSI','MACD','ATR','STOCH','SWING_SR_V1','SUPERTREND_PINE_V1'];
 const entries=[{name:'MACD',id:'MACD',label:'MACD',source:'内置',aliases:[]},

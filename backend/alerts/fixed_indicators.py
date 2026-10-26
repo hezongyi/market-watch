@@ -128,7 +128,13 @@ def request(db, page, spec, *, stamp=None, input_policy=STRICT):
               if input_policy == OBSERVED else IndicatorState(spec))
     inst = db.get(Instrument, db.get(MarketDataset, version.dataset_id).instrument_id)
     phase = revision.rules["aggregation_calendar"] if revision else inst.calendar
-    origin = period(version.start, page["timeframe"], phase)[0]
+    if phase == "source_date" and not revision:
+        from .history_artifacts import published_artifact
+
+        artifact = published_artifact(db, version.id, page["timeframe"])
+        origin = artifact.manifest["blocks"][0]["start"]
+    else:
+        origin = period(version.start, page["timeframe"], phase)[0]
     value = page.get("input_revision", 0)
     target = version.end
     if revision:
@@ -208,6 +214,10 @@ def _context(db, run):
 
 
 def gap_before(previous_end, start, phase, profiles):
+    if phase == "source_date":
+        # Supplier observations exclude weekends/halts; elapsed calendar days
+        # do not establish a missing trading bar or reset a fixed indicator.
+        return False
     if previous_end is None or start <= previous_end:
         return False
     for left, right, profile in profiles:
@@ -303,8 +313,8 @@ def calculate_inputs(run, rows, phase, profiles, *, seam=None, initial_state=Non
     engine = IndicatorState(run.spec, run.state if initial_state is None else initial_state)
     output = []
     for source in rows:
-        row = dict(source)
-        if run.spec["name"] == "SWING_SR_V1":
+        row = {**source, "indicator_calendar": phase, "indicator_timeframe": run.timeframe}
+        if run.spec["name"] in ("SWING_SR_V1", "ROLLING_RANGE_SQUEEZE", "NR4_NR7_BREAKOUT_V1"):
             from .series_access import fixed_label
 
             row["chart_time"] = fixed_label(row, run.timeframe, phase)
@@ -421,10 +431,12 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='di
                     'checkpoint' if run.cursor > page['origin'] or run.parent_id else 'miss',
                 'calculation_steps': 0}
         display = None
-        if run.spec["name"] == "SWING_SR_V1":
+        if run.spec["name"] in ("SWING_SR_V1", "ROLLING_RANGE_SQUEEZE"):
+            from .rolling_range_squeeze import SqueezeState
             from .swing_sr import SwingState
 
-            display = SwingState(run.spec["params"], run.state["state"] or None).presentation()
+            display_engine = SqueezeState if run.spec["name"] == "ROLLING_RANGE_SQUEEZE" else SwingState
+            display = display_engine(run.spec["params"], run.state["state"] or None).presentation()
             display["history_complete"] = run.status == "complete"
             display["history_revision"] = run.id
         tail = page["bars"]
@@ -478,8 +490,9 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='di
                     break
                 if rows and bar["start"] <= rows[-1]["start"]:
                     raise ValueError("Indicator tail overlaps fixed output")
-                row = {**bar, "gap_before": gap_before(engine.state.get("last_end"), bar["start"], phase, profiles)}
-                if display is not None:
+                row = {**bar, "indicator_calendar": phase, "indicator_timeframe": run.timeframe,
+                       "gap_before": gap_before(engine.state.get("last_end"), bar["start"], phase, profiles)}
+                if display is not None or run.spec["name"] == "NR4_NR7_BREAKOUT_V1":
                     from .series_access import fixed_label
 
                     row["chart_time"] = fixed_label(row, run.timeframe, phase)

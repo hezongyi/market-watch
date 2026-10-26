@@ -1,0 +1,48 @@
+{
+  "checked_at_utc": "2026-10-24T23:17:24.184702+00:00",
+  "kind": "finite_real_demo_session_probe",
+  "discovery_endpoint_candidate": "https://www.fxcorporate.com/Hosts.jsp",
+  "discovery_endpoint_current_account_verified": true,
+  "connection": "Demo",
+  "eula_submission_basis": "user_confirmed_LTD",
+  "elapsed_seconds": 34.37,
+  "exit_code": 0,
+  "summary": {
+    "connected": true,
+    "history_requests": 8,
+    "login_failed_callback": false,
+    "price_subscription_calls": 0,
+    "update_callbacks": 14,
+    "offer_updates": 0,
+    "trade_updates": 0,
+    "session_statuses": [
+      1,
+      3,
+      5,
+      0
+    ],
+    "trading_calls": 0,
+    "noprice_retained": true,
+    "account_updates": 0,
+    "other_updates": 0,
+    "table_manager_absent": true,
+    "result": "finite_history_probe_completed",
+    "noprice_configured_before_login": true
+  },
+  "raw_sdk_logs_retained": false,
+  "credential_transport": "private_host_file_to_process_stdin",
+  "application_acceptance_started": false,
+  "existing_acceptance_instance_modified": false,
+  "result": "finite_history_probe_completed",
+  "market_records_by_kind": {
+    "frame": 14,
+    "instrument": 517,
+    "history_page": 8,
+    "candle": 1291
+  },
+  "history_interval": {
+    "start": "2026-10-22T00:00:00Z",
+    "end": "2026-10-24T00:00:00Z"
+  },
+  "report_correction": "Top-level result aligned with recorded native summary; no additional API call."
+}

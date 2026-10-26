@@ -1,0 +1,59 @@
+{
+  "ignoreHTTPSErrors": false,
+  "login": {
+    "responses": [
+      200
+    ],
+    "url": "https://test.kookvv.com:8443/advanced-charts/900b8bef-aab3-4a10-a6f5-dd09f7a71310",
+    "frames": [
+      "https://test.kookvv.com:8443/advanced-charts/900b8bef-aab3-4a10-a6f5-dd09f7a71310",
+      "https://chart-test.kookvv.com:8443/?parent=https%3A%2F%2Ftest.kookvv.com%3A8443",
+      "blob:https://chart-test.kookvv.com:8443/4dad2a9d-571b-4ae0-a79b-83d1e6502934"
+    ],
+    "errors": [],
+    "failures": [
+      {
+        "url": "https://test.kookvv.com:8443/api/market-data/quotes",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://test.kookvv.com:8443/api/market-data/quotes",
+        "error": "net::ERR_ABORTED"
+      }
+    ],
+    "status": "已加载 · 行情按需更新",
+    "chart": {
+      "symbol": "MWP:XAUUSD",
+      "resolution": "240",
+      "ready": true
+    },
+    "native": "- contentinfo:\n  - paragraph: Tradingview是交互式的，并且具有与屏幕阅读器一起使用的命令。以下是可用于在平台上交互的键盘命令列表\n  - list:\n    - listitem: 开始使用键盘导航模式。按Alt + Z\n    - listitem: 快速搜索。按Ctrl + K\n    - listitem: 更改商品。开始输入商品名称\n    - listitem: 更改时间周期。按数字或逗号\n    - listitem: 指标、指标和策略。按斜线\n    - listitem: 开放式布局。按下句号\n- toolbar:\n  - button \"商品代码搜索\": XAUUSD\n  - button \"对比或叠加商品\"\n  - radiogroup:\n    - radio \"1 分钟\": 1分\n    - radio \"5 分钟\": 5分\n    - radio \"15 分钟\": 15分\n    - radio \"30 分钟\": 30分\n    - radio \"1 小时\": 1小时\n    - radio \"4 小时\" [checked]: 4小时\n    - radio \"1 日\": 天\n    - radio \"1 周\": 周\n    - radio \"1 月\": 月\n  - button \"图表周期\"\n  - button \"K线图\"\n  - button \"指标模板\"\n  - button \"指标\"\n  - button \"数据中心\"\n  - button [disabled]\n  - button [disabled]\n  - button \"布局设置\"\n  - button \"所有更改已保存\" [disabled]: 历史模式验收 2026-10-25T00:29:05.982Z 保存\n  - button \"管理布局\"\n  - button \"快速搜索\"\n  - button \"设置\"\n  - button \"全屏模式\"\n  - button \"生成快照\"\n  - button \"系统消息，410 条未读\"\n- toolbar:\n  - button \"十字线\"\n  - button \"游标\" [pressed]\n  - button \"趋势线\"\n  - button \"趋势线工具\"\n  - button \"斐波那契回撤\"\n  - button \"江恩和斐波那契工具\"\n  - button \"XABCD 形态\"\n  - button \"形态\"\n  - button \"多头\"\n  - button \"预测和测量工具\"\n  - button \"笔刷\"\n  - button \"几何形状\"\n  - button \"文字\"\n  - button \"注释工具\"\n  - button \"图标\"\n  - button \"图标\"\n  - button \"测量\"\n  - button \"放大\"\n  - button \"磁铁模式将放置在价格K线附近的绘图吸附到最近的OHLC值\"\n  - button \"磁铁\"\n  - button \"继续绘图\"\n  - button \"锁定所有绘图\"\n  - button \"隐藏所有图形\"\n  - button \"隐藏选项\"\n  - button \"移除0个绘图\"\n  - button \"移除选项\"\n- button \"隐藏绘图工具栏\":\n  - img\n- 'region \"图表 #1\"':\n  - toolbar:\n    - button \"变更品种\": XAUUSD · 平台行情 · bid · OANDA 报价量\n    - text: ·\n    - button \"变更周期\": 4小时\n    - text: · OANDA\n    - button \"更多\":\n      - img\n    - button \"休市\"\n    - text: 开= 4,174.185 高= 4,189.615 低= 4,168.685 收= 4,188.815 +14.630 (+0.35%)\n- toolbar:\n  - button \"1周时间周期内的5年\": 5年\n  - button \"1周时间周期内的1年\": 1年\n  - button \"1小时时间周期内的3个月\": 3个月\n  - button \"30分钟时间周期内的1个月\": 1个月\n  - button \"5分钟时间周期内的5天\": 5天\n  - button \"1分钟时间周期内的1天\": 1天\n  - button \"前往到\"\n  - button \"时区\": 08:57:16 UTC\n  - button \"切换为百分比坐标\"\n  - button \"切换为对数坐标\": log\n  - button \"切换为自动坐标\" [pressed]: 自动\n- button \"自选表\"\n- button \"添加商品代码\"\n- button \"自选列表列设置\"\n- button \"商品\"\n- button \"最新价\"\n- button \"涨跌\"\n- button \"涨跌%\"\n- button \"按旗标排序\"\n- text: BTCUSDT 80,404.59 −483.57 −0.60%\n- button \"MWP:BTCUSDT · 添加颜色收藏\"\n- text: EURUSD 1.12026 −0.00135 −0.12%\n- button \"MWP:EURUSD · 添加颜色收藏\"\n- text: GBPUSD 1.33712 −0.00283 −0.21%\n- button \"MWP:OANDA:GBP_USD · 添加颜色收藏\"\n- text: XAUUSD 3,995.205 −29.020 −0.72%\n- button \"MWP:XAUUSD · 添加颜色收藏\"\n- text: USDCAD 1.40457 0.00001 0.00%\n- button \"MWH:2a673b63-2922-497e-bec9-d0231be55934 · 添加颜色收藏\"\n- text: COMPOSITE EURUSD 1.12026 0.00000 0.00%\n- button \"MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb · 绿色收藏\" [pressed]\n- text: USDCAD 1.40037 0.00000 0.00%\n- button \"MWC:54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982 · 添加颜色收藏\"\n- text: XAUUSD 3,995.205 0.000 0.00%\n- button \"MWC:4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6 · 黄色收藏\" [pressed]\n- text: XAUUSD XAUUSD · 平台行情 OANDA 3,995.205 −29.020 −0.72% 休市\n- toolbar:\n  - button \"观察清单和详情\" [pressed]\n  - button \"警报\"\n  - button \"数据窗口\"\n  - button \"显示对象树\"\n- img\n- toolbar:\n  - button \"打开交易面板\": 账户管理器\n  - button \"打开面板\"\n  - button \"最大化面板\"\n- alert\n- button \"图表菜单\""
+  },
+  "refresh": {
+    "url": "https://test.kookvv.com:8443/advanced-charts/900b8bef-aab3-4a10-a6f5-dd09f7a71310",
+    "status": "已加载 · 行情按需更新",
+    "chart": {
+      "symbol": "MWP:XAUUSD",
+      "resolution": "240",
+      "ready": true
+    },
+    "errors": [],
+    "failures": [],
+    "networkFailed": [],
+    "quoteResponses": [
+      {
+        "url": "https://test.kookvv.com:8443/api/market-data/quotes",
+        "status": 200
+      },
+      {
+        "url": "https://test.kookvv.com:8443/api/market-data/quotes",
+        "status": 200
+      },
+      {
+        "url": "https://test.kookvv.com:8443/api/market-data/quotes",
+        "status": 200
+      }
+    ],
+    "native": "- contentinfo:\n  - paragraph: Tradingview是交互式的，并且具有与屏幕阅读器一起使用的命令。以下是可用于在平台上交互的键盘命令列表\n  - list:\n    - listitem: 开始使用键盘导航模式。按Alt + Z\n    - listitem: 快速搜索。按Ctrl + K\n    - listitem: 更改商品。开始输入商品名称\n    - listitem: 更改时间周期。按数字或逗号\n    - listitem: 指标、指标和策略。按斜线\n    - listitem: 开放式布局。按下句号\n- toolbar:\n  - button \"商品代码搜索\": XAUUSD\n  - button \"对比或叠加商品\"\n  - radiogroup:\n    - radio \"1 分钟\": 1分\n    - radio \"5 分钟\": 5分\n    - radio \"15 分钟\": 15分\n    - radio \"30 分钟\": 30分\n    - radio \"1 小时\": 1小时\n    - radio \"4 小时\" [checked]: 4小时\n    - radio \"1 日\": 天\n    - radio \"1 周\": 周\n    - radio \"1 月\": 月\n  - button \"图表周期\"\n  - button \"K线图\"\n  - button \"指标模板\"\n  - button \"指标\"\n  - button \"数据中心\"\n  - button [disabled]\n  - button [disabled]\n  - button \"布局设置\"\n  - button \"所有更改已保存\" [disabled]: 历史模式验收 2026-10-25T00:29:05.982Z 保存\n  - button \"管理布局\"\n  - button \"快速搜索\"\n  - button \"设置\"\n  - button \"全屏模式\"\n  - button \"生成快照\"\n  - button \"系统消息，410 条未读\"\n- toolbar:\n  - button \"十字线\"\n  - button \"游标\" [pressed]\n  - button \"趋势线\"\n  - button \"趋势线工具\"\n  - button \"斐波那契回撤\"\n  - button \"江恩和斐波那契工具\"\n  - button \"XABCD 形态\"\n  - button \"形态\"\n  - button \"多头\"\n  - button \"预测和测量工具\"\n  - button \"笔刷\"\n  - button \"几何形状\"\n  - button \"文字\"\n  - button \"注释工具\"\n  - button \"图标\"\n  - button \"图标\"\n  - button \"测量\"\n  - button \"放大\"\n  - button \"磁铁模式将放置在价格K线附近的绘图吸附到最近的OHLC值\"\n  - button \"磁铁\"\n  - button \"继续绘图\"\n  - button \"锁定所有绘图\"\n  - button \"隐藏所有图形\"\n  - button \"隐藏选项\"\n  - button \"移除0个绘图\"\n  - button \"移除选项\"\n- button \"隐藏绘图工具栏\":\n  - img\n- 'region \"图表 #1\"':\n  - toolbar:\n    - button \"变更品种\": XAUUSD · 平台行情 · bid · OANDA 报价量\n    - text: ·\n    - button \"变更周期\": 4小时\n    - text: · OANDA\n    - button \"更多\":\n      - img\n    - button \"休市\"\n    - text: 开= 4,000.675 高= 4,002.195 低= 3,990.905 收= 3,995.205 −5.570 (−0.14%)\n- toolbar:\n  - button \"1周时间周期内的5年\": 5年\n  - button \"1周时间周期内的1年\": 1年\n  - button \"1小时时间周期内的3个月\": 3个月\n  - button \"30分钟时间周期内的1个月\": 1个月\n  - button \"5分钟时间周期内的5天\": 5天\n  - button \"1分钟时间周期内的1天\": 1天\n  - button \"前往到\"\n  - button \"时区\": 08:58:01 UTC\n  - button \"切换为百分比坐标\"\n  - button \"切换为对数坐标\": log\n  - button \"切换为自动坐标\" [pressed]: 自动\n- button \"自选表\"\n- button \"添加商品代码\"\n- button \"自选列表列设置\"\n- button \"商品\"\n- button \"最新价\"\n- button \"涨跌\"\n- button \"涨跌%\"\n- button \"按旗标排序\"\n- text: BTCUSDT 80,404.59 −483.57 −0.60%\n- button \"MWP:BTCUSDT · 添加颜色收藏\"\n- text: EURUSD 1.12026 −0.00135 −0.12%\n- button \"MWP:EURUSD · 添加颜色收藏\"\n- text: GBPUSD 1.33712 −0.00283 −0.21%\n- button \"MWP:OANDA:GBP_USD · 添加颜色收藏\"\n- text: XAUUSD 3,995.205 −29.020 −0.72%\n- button \"MWP:XAUUSD · 添加颜色收藏\"\n- text: USDCAD 1.40457 0.00001 0.00%\n- button \"MWH:2a673b63-2922-497e-bec9-d0231be55934 · 添加颜色收藏\"\n- text: COMPOSITE EURUSD 1.12026 0.00000 0.00%\n- button \"MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb · 绿色收藏\" [pressed]\n- text: USDCAD 1.40037 0.00000 0.00%\n- button \"MWC:54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982 · 添加颜色收藏\"\n- text: XAUUSD 3,995.205 0.000 0.00%\n- button \"MWC:4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6 · 黄色收藏\" [pressed]\n- text: XAUUSD XAUUSD · 平台行情 OANDA 3,995.205 −29.020 −0.72% 休市\n- toolbar:\n  - button \"观察清单和详情\" [pressed]\n  - button \"警报\"\n  - button \"数据窗口\"\n  - button \"显示对象树\"\n- img\n- toolbar:\n  - button \"打开交易面板\": 账户管理器\n  - button \"打开面板\"\n  - button \"最大化面板\"\n- alert\n- button \"图表菜单\""
+  }
+}

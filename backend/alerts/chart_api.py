@@ -1012,7 +1012,10 @@ def data_sync(body: DataQuery):
             if cached_result and time.monotonic() - cached_result[0] < 15:
                 result = cached_result[1]
             else:
-                result = calculate(all_rows, spec, provisional=body.provisional)
+                from .chart_calculation_history import calculation_rows
+
+                result = calculate(calculation_rows(all_rows, {"calendar": inst.calendar},
+                    inst.id, body.timeframe), spec, provisional=body.provisional)
                 if "presentation" in result:
                     result["presentation"] = result["presentation"] | {
                         "history_revision": revision, "history_complete": True}
@@ -1062,18 +1065,27 @@ def data_sync(body: DataQuery):
         detail = {"code": e.code, "message": str(e)} if hasattr(e, "code") else str(e)
         if hasattr(e, "display_retry"):
             detail["display_retry"] = e.display_retry
+        if hasattr(e, 'snapshot_evidence'):
+            detail['snapshot_evidence'] = e.snapshot_evidence
         headers = {'X-MW-Attempt-Ref': e.attempt_ref} if hasattr(e, 'attempt_ref') else None
         raise HTTPException(422, detail, headers=headers) from e
 
 
 async def query_chart(body: DataQuery, disconnected=None, deadline=None, retain_work=False):
     """One cancellable query path shared by browser and MCP adapters."""
-    from .config import settings
     from .provider_cache import CANCELLED, DEADLINE
+    from .provider_capabilities import request_seconds
 
     cancelled = threading.Event()
     token = CANCELLED.set(cancelled)
-    deadline = min(deadline or float("inf"), time.monotonic() + settings.provider_request_seconds)
+    source = None
+    if body.series_kind == "provider":
+        ident = body.instrument.removeprefix("MWP:").upper()
+        if ident.startswith("FXCM:"):
+            source = "fxcm"
+        elif ident.startswith(("AKSHARE:", "TENCENT:")):
+            source = "akshare"
+    deadline = min(deadline or float("inf"), time.monotonic() + request_seconds(source))
     deadline_token = DEADLINE.set(deadline)
     task = asyncio.create_task(asyncio.to_thread(data_sync, body))
     try:

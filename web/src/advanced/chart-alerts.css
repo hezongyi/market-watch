@@ -1,16 +1,18 @@
 /* Business controls inside genuine v31.1.0 widgetbar / notice shells. */
 .chart-alert-panel,
 .chart-alert-dialog,
+.alert-summary-tooltip,
 .alert-menu {
-  --alert-bg: #1e1e1e;
-  --alert-surface: #2b2b2b;
+  --alert-bg: #000000;
+  --alert-surface: #1a1a1a;
   --alert-text: #dbdbdb;
   --alert-muted: #a6a6a6;
   --alert-border: #434343;
-  --alert-divider: #303030;
+  --alert-divider: #252525;
   --alert-accent: #6ca8ee;
   --alert-error: #ffaaa4;
-  --alert-hover: #343434;
+  --alert-action: #ff9800;
+  --alert-hover: #1a1a1a;
   color: var(--alert-text);
   background: var(--alert-bg);
   font:
@@ -23,6 +25,7 @@
 }
 .chart-alert-panel[data-theme="light"],
 .chart-alert-dialog[data-theme="light"],
+.alert-summary-tooltip[data-theme="light"],
 html:not(.theme-dark) .alert-menu {
   --alert-bg: #fff;
   --alert-surface: #f5f5f5;
@@ -32,14 +35,19 @@ html:not(.theme-dark) .alert-menu {
   --alert-divider: #e0e3eb;
   --alert-accent: #2962ff;
   --alert-error: #b52828;
+  --alert-action: #a65c00;
   --alert-hover: #f0f3fa;
 }
+.chart-alert-panel[data-theme="light"] {
+  --alert-bg: var(--tv-color-pane-background, var(--color-pane-bg, #fff));
+}
 .chart-alert-panel {
+  --alert-bg: var(--tv-color-pane-background, var(--color-pane-bg, #0f0f0f));
   height: 100%;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  background: var(--tv-color-pane-background, var(--alert-bg));
+  background: var(--alert-bg);
 }
 .chart-alert-panel button,
 .chart-alert-dialog button,
@@ -81,18 +89,18 @@ html:not(.theme-dark) .alert-menu {
 }
 .alert-panel-tabs {
   display: flex;
-  margin: 12px 12px 4px;
+  margin: 8px 17px 4px;
   background: var(--alert-surface);
   padding: 2px;
   border-radius: 5px;
 }
 .alert-panel-tabs button {
   flex: 1;
-  min-height: 28px;
+  min-height: 30px;
   border-radius: 4px;
 }
 .alert-panel-tabs [aria-selected="true"] {
-  background: #4a4a4a;
+  background: #464646;
   color: #fff;
   box-shadow: 0 1px 4px #0004;
 }
@@ -102,6 +110,8 @@ html:not(.theme-dark) .alert-menu {
 }
 .alert-panel-toolbar {
   display: flex;
+  box-sizing: border-box;
+  min-height: 38px;
   align-items: center;
   gap: 2px;
   padding: 0 8px 4px;
@@ -132,7 +142,7 @@ html:not(.theme-dark) .alert-menu {
   flex-direction: column;
   gap: 2px;
   border-radius: 0;
-  min-height: 54px;
+  min-height: 55px;
   padding: 8px 12px;
 }
 .alert-row-title {
@@ -143,11 +153,11 @@ html:not(.theme-dark) .alert-menu {
 }
 .alert-row-subtitle {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 4px;
   color: var(--alert-muted);
-  font-size: 11px;
+  font-size: 12px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -158,7 +168,7 @@ html:not(.theme-dark) .alert-menu {
   flex-shrink: 0;
 }
 .alert-row-identity {
-  flex: 1;
+  flex: 0 1 auto;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -178,7 +188,7 @@ html:not(.theme-dark) .alert-menu {
 .alert-state-paused,
 .alert-state-completed,
 .alert-state-expired {
-  color: #d4a148;
+  color: var(--alert-action);
 }
 [data-theme="light"] .alert-state-active {
   color: #147d70;
@@ -186,7 +196,7 @@ html:not(.theme-dark) .alert-menu {
 [data-theme="light"] .alert-state-paused,
 [data-theme="light"] .alert-state-completed,
 [data-theme="light"] .alert-state-expired {
-  color: #946414;
+  color: var(--alert-action);
 }
 .alert-row-actions {
   position: absolute;
@@ -194,7 +204,7 @@ html:not(.theme-dark) .alert-menu {
   top: 2px;
   display: flex;
   opacity: 0;
-  background: var(--alert-bg);
+  background: var(--alert-hover);
   border-radius: 4px;
 }
 .alert-row-actions button {
@@ -353,6 +363,9 @@ html:not(.theme-dark) .alert-menu {
   width: min(480px, calc(100vw - 24px)) !important;
   min-width: 0 !important;
   max-height: calc(100dvh - 24px) !important;
+}
+html.theme-dark .mw-native-alert-shell {
+  background: #131313;
 }
 .mw-native-alert-shell > [data-name="close"] {
   position: absolute;
@@ -551,6 +564,33 @@ html:not(.theme-dark) .alert-menu {
 }
 .alert-advanced-options summary {
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.mw-native-alert-shell .alert-advanced-options:not([open]) {
+  border: 0;
+  padding: 0;
+}
+.mw-native-alert-shell .alert-advanced-options > summary {
+  position: absolute;
+  right: 54px;
+  top: 14px;
+  width: 28px;
+  height: 28px;
+  justify-content: center;
+  border-radius: 4px;
+  color: var(--alert-muted);
+}
+.mw-native-alert-shell .alert-advanced-options > summary:hover {
+  background: var(--alert-hover);
+}
+.mw-native-alert-shell .alert-advanced-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
 }
 .alert-advanced-options label {
   margin-top: 10px;
@@ -669,30 +709,194 @@ html:not(.theme-dark) .alert-menu {
   border-color: var(--alert-error);
 }
 
-/* Pinned widgetbar tokens, verified against the native watchlist. Dialog
-   surfaces intentionally keep their own native palette. */
-.chart-alert-panel,
-.chart-alert-panel[data-theme="light"] {
-  --alert-bg: var(--color-pane-bg);
-  --alert-surface: var(--color-pane-secondary-bg);
-  --alert-text: var(--color-text-primary);
-  --alert-muted: var(--color-text-secondary);
-  --alert-divider: var(--color-divider-line-primary);
-  --alert-border: var(--color-divider-line-primary);
-  --alert-hover: var(--color-item-hover-bg);
-  background: var(--alert-bg);
+/* Editor surface is separate from the native widgetbar panel. */
+.chart-alert-dialog {
+  --alert-bg: #131313;
 }
-.chart-alert-panel .alert-panel-tabs {
-  background: transparent;
-  border-radius: 0;
-  border-bottom: 1px solid var(--alert-divider);
-  padding: 0;
+.chart-alert-dialog[data-theme="light"] {
+  --alert-bg: #fff;
 }
-.chart-alert-panel .alert-panel-tabs [aria-selected="true"] {
+.alert-summary-anchor {
+  min-width: 0;
+}
+.alert-symbol-icon {
+  flex: 0 0 18px;
+  vertical-align: middle;
+}
+.chart-alert-card:has(.alert-row-summary:hover),
+.chart-alert-card:focus-within,
+.chart-alert-card.alert-selected {
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 2px #8a8a8a;
   background: var(--alert-hover);
-  color: var(--alert-text);
-  box-shadow: none;
 }
-.chart-alert-panel .alert-row-actions {
+.chart-alert-panel .alert-row-summary:hover {
+  background: transparent;
+}
+.chart-alert-panel .alert-row-subtitle {
+  min-height: 18px;
+}
+.alert-row-actions {
+  z-index: 1;
+}
+.chart-alert-card:hover .alert-row-title,
+.chart-alert-card:focus-within .alert-row-title {
+  padding-right: 106px;
+}
+.chart-alert-card.alert-selected .alert-row-title {
+  padding-right: 106px;
+}
+.alert-row-actions > .alert-menu-anchor {
+  display: inline-flex;
+}
+.alert-state-unhealthy {
+  color: #e3ae56;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+[data-theme="light"] .alert-state-unhealthy {
+  color: #865508;
+}
+.alert-unread-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f23645;
+  color: #fff;
+  min-width: 14px;
+  height: 14px;
+  border-radius: 8px;
+  padding: 0 3px;
+  font-size: 10px;
+  line-height: 14px;
+}
+.alert-summary-tooltip {
+  position: fixed;
+  z-index: 10020;
+  box-sizing: border-box;
+  width: 250px;
+  max-width: calc(100vw - 16px);
+  max-height: calc(100vh - 16px);
+  overflow: auto;
+  pointer-events: none;
+  background: #2b2b2b;
+  color: #e2e2e2;
+  border-radius: 3px;
+  padding: 12px 16px;
+  font:
+    12px/1.6 -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Microsoft YaHei",
+    sans-serif;
+  box-shadow: 0 4px 12px #0004;
+  overflow-wrap: anywhere;
+}
+.alert-summary-tooltip strong {
+  font-weight: 600;
+}
+.alert-summary-tooltip p {
+  margin: 0;
+}
+.alert-summary-tooltip[data-theme="light"] {
+  background: #f2f2f2;
+  color: #202124;
+  border: 1px solid #c5c5c5;
+}
+.alert-add-condition {
+  margin: -4px 0 12px 132px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  color: var(--alert-muted);
+}
+.chart-alert-dialog .alert-add-condition button {
+  padding-left: 0;
+  color: var(--alert-accent);
+}
+.chart-alert-dialog .alert-add-condition [aria-disabled="true"] {
+  cursor: help;
+}
+.alert-atr-active {
+  border-left: 2px solid var(--alert-accent);
+  padding-left: 8px;
+}
+.chart-alert-dialog h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mw-native-alert-shell [class^="main-"] > [class^="title-"] {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 92px !important;
+}
+.alert-summary-fields .mw-native-select [class*="container-"] {
+  border-color: transparent;
+  background: transparent;
+}
+.chart-alert-dialog footer .alert-delete {
+  border: 0;
+}
+.chart-alert-dialog.alert-cleanup-dialog {
+  padding: 16px;
+  width: 440px;
+  max-width: calc(100vw - 32px);
+  overflow: auto;
+}
+.alert-cleanup-dialog h2 {
+  font-size: 16px;
+}
+.alert-cleanup-dialog footer {
+  padding: 12px 0 0;
+}
+@media (max-width: 500px) {
+  .alert-add-condition {
+    margin-left: 84px;
+  }
+}
+
+.chart-alert-panel {
+  position: relative;
+}
+.alert-detail-drawer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
   background: var(--alert-bg);
+  overflow: auto;
+  padding: 12px 0;
+}
+.alert-detail-drawer > button {
+  margin-left: 12px;
+}
+
+.alert-rule-time {
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.alert-condition-action {
+  color: var(--alert-action);
+}
+.alert-row-separator {
+  font-size: 12px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+.chart-alert-panel .alert-row-actions > button,
+.chart-alert-panel .alert-row-actions > .alert-menu-wrap > button {
+  color: var(--alert-muted);
+  background: transparent;
+}
+.chart-alert-panel .alert-row-actions > button:hover:not(:disabled),
+.chart-alert-panel .alert-row-actions > .alert-menu-wrap > button:hover:not(:disabled),
+.chart-alert-panel .alert-row-actions > button:focus-visible,
+.chart-alert-panel .alert-row-actions > .alert-menu-wrap > button:focus-visible {
+  color: var(--alert-text);
+  background: var(--alert-border);
 }

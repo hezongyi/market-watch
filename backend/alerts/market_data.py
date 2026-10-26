@@ -56,8 +56,9 @@ DAY = 86400000
 def refresh_catalog():
     items = fetch_oanda_catalog()
     with transaction() as db:
-        for old in db.scalars(select(MarketCatalog).where(MarketCatalog.source == "oanda",
-                ~MarketCatalog.id.startswith("HC:"))):
+        for old in db.scalars(select(MarketCatalog).where(
+            MarketCatalog.source == "oanda", ~MarketCatalog.id.startswith("HC:")
+        )):
             old.available = False
         for item in items:
             symbol = item["name"]
@@ -80,6 +81,8 @@ def resolve(db, ident):
     entry = db.get(MarketCatalog, ident)
     if entry and entry.id.startswith("HC:"):
         raise HTTPException(422, "自建来源目录仅用于登记历史，不作为平台或实时身份")
+    if entry and entry.source == "fxcm":
+        raise HTTPException(422, "FXCM仅支持平台原生或显式自建历史，不支持实时身份")
     if entry and entry.source == "yahoo":
         raise HTTPException(422, "Yahoo 品种仅支持平台系列，不创建历史维护任务")
     if entry and not entry.available:
@@ -797,8 +800,8 @@ def search_series_page(query="", *, kind="history", page_size=25, offset=0, sour
     from .search_types import TYPES
     if (kind not in ("all", "provider", "history", "composite") or symbol_type not in TYPES
             or not 1 <= page_size <= 250 or not 0 <= offset <= 1000000
-            or source not in (None, "dukascopy", "oanda", "binance", "yahoo")
-            or calendar not in (None, "ny17", "utc0")):
+            or source not in (None, "dukascopy", "oanda", "binance", "yahoo", "akshare", "fxcm")
+            or calendar not in (None, "ny17", "utc0", "source_date")):
         raise HTTPException(422, "无效行情搜索分页或筛选")
     if kind == "all":
         if offset:
@@ -816,8 +819,6 @@ def search_series_page(query="", *, kind="history", page_size=25, offset=0, sour
         return {"items": items, "total": len(rows), "offset": offset, "page_size": page_size,
             "has_more": has_more, "next_offset": offset + len(items) if has_more else None}
     from .series_access import search_page
-    if source == "yahoo":
-        return {"items": [], "has_more": False, "next_offset": None}
     try:
         with transaction() as db:
             return search_page(db, query, kind=kind, page_size=page_size, offset=offset,
@@ -859,7 +860,7 @@ def _all_series_page(query, *, page_size, source, calendar, symbol_type, cursor)
         for i, kind in enumerate(("history", "composite"), 1):
             pages.append(search_page(db, query, kind=kind, page_size=page_size, offset=positions[i],
                          source=source, calendar=calendar, symbol_type=symbol_type)
-                         if positions[i] is not None and source != "yahoo" else {"items": [], "next_offset": None})
+                         if positions[i] is not None else {"items": [], "next_offset": None})
     for i, page in enumerate(pages):
         if not page["items"]:
             positions[i] = page["next_offset"]
@@ -885,14 +886,15 @@ def _provider_series(query, *, source=None, symbol_type=""):
     from .chart_series import encode
     from .history_catalog import account_scope
 
-    if source not in (None, "dukascopy", "oanda", "binance", "yahoo"):
+    if source not in (None, "dukascopy", "oanda", "binance", "yahoo", "akshare", "fxcm"):
         raise HTTPException(422, "未知平台来源")
     result = [{**row, "series_kind": "provider", "ticker": encode(row["id"], "provider"),
         "description": "平台 · " + row["source"] + " · 原生周期"}
-        for row in instrument_catalog(query, limit=None) if not row["id"].startswith("MD:")]
+        for row in (instrument_catalog(query, limit=None, source=source, managed_status=False) if source != "fxcm" else []) if not row["id"].startswith("MD:")]
     with transaction() as db:
         for row in db.scalars(select(MarketCatalog).where(MarketCatalog.source == "oanda",
-                MarketCatalog.id.startswith("HC:"), MarketCatalog.available.is_(True))):
+                MarketCatalog.id.startswith("HC:"), MarketCatalog.available.is_(True),
+                MarketCatalog.source.in_(("oanda",) if source in (None, "oanda") else ()))):
             if row.metadata_json.get("history_account_scope") != account_scope():
                 continue
             if not matches_code(query, row.symbol, row.source, row.asset_type, row.label):
@@ -906,6 +908,13 @@ def _provider_series(query, *, source=None, symbol_type=""):
                 "source": "oanda", "asset_type": row.asset_type, "available": True,
                 "supported": row.calendar in ("ny17", "utc0"), "precision": row.precision,
                 "description": "平台 · OANDA Practice · Bid · 原生周期"})
+    if source in (None, "fxcm"):
+        from .platform_catalog import entries as platform_entries
+        with transaction() as db:
+            for row in platform_entries(db, source="fxcm", query=query):
+                result.append({**row, "symbol": row["provider_symbol"],
+                    "series_kind": "provider", "ticker": encode(row["id"], "provider"),
+                    "supported": True, "description": "平台 · FXCM · Bid · 原生周期"})
     from .search_types import symbol_type as asset_type
     for row in result:
         row["type"] = asset_type(row.get("asset_type", ""))
@@ -938,7 +947,7 @@ def _rank_catalog(rows, query):
     groups = defaultdict(lambda: defaultdict(list))
     for row in rows:
         row["display_symbol"] = display_code(row["symbol"], row["source"], row.get("asset_type"))
-        codes = [row["display_symbol"].casefold(), row["display_symbol"].replace("/", "").casefold(), row.get("symbol", "").casefold(), row.get("logical_symbol", "").casefold(),
+        codes = [row["display_symbol"].casefold(), row["display_symbol"].replace("/", "").casefold(), row.get("symbol", "").casefold(), (row.get("logical_symbol") or "").casefold(),
                  row.get("symbol", "").replace("_", "").replace("/", "").replace("-", "").casefold()]
         rank = 0 if term and term in codes else 1 if term and any(c.startswith(term) for c in codes) else 2
         groups[rank][row["source"]].append(row)
@@ -952,19 +961,20 @@ def _rank_catalog(rows, query):
     return result
 
 
-def instrument_catalog(query: str = "", *, limit=250):
+def instrument_catalog(query: str = "", *, limit=250, source=None, managed_status=True):
     from .config import settings
     from .provider_dukascopy import catalog as dukascopy_catalog
-    from .yahoo_catalog import search, seed
-    seed()
-    dukascopy = dukascopy_catalog(query)
+    from .yahoo_catalog import search
+    # Provider startup owns seeding. Searches only read the maintained catalog.
+    dukascopy = dukascopy_catalog(query) if source in (None, "dukascopy") else []
     search_status = "local"
-    if query.strip() and settings.yahoo_enabled:
+    if query.strip() and settings.yahoo_enabled and source in (None, "yahoo"):
         # Exact codes/names and known Chinese aliases remain local. A
         # Latin substring (GS in ^GSPC, MS in MSFT) cannot rule out a new ticker.
         term = pair_query(query) or query.strip().upper()
         with transaction() as db:
-            local = list(db.scalars(select(MarketCatalog).where(~MarketCatalog.id.startswith("HC:")))) + list(db.scalars(select(Instrument)))
+            local = list(db.scalars(select(MarketCatalog).where(~MarketCatalog.id.startswith("HC:"),
+                *([MarketCatalog.source == source] if source else [])))) + list(db.scalars(select(Instrument)))
             known = any(term in {row["symbol"].upper(), row["logical_symbol"], row["display_symbol"]}
                         for row in dukascopy) or any(
                 term in {x.symbol.upper(), x.label.upper(), display_code(x.symbol, x.source,
@@ -987,17 +997,18 @@ def instrument_catalog(query: str = "", *, limit=250):
                 "asset_type": x.asset_type,
                 "precision": x.precision,
                 "supported": bool(x.calendar),
-                "available": x.available and (x.source != "yahoo" or settings.yahoo_enabled),
-                "series_kinds": ["provider"] if x.source == "yahoo" else ["provider", "managed"],
+                "available": x.available and (x.source != "yahoo" or settings.yahoo_enabled) and (x.source != "akshare" or settings.akshare_enabled),
+                "series_kinds": ["provider"] if x.source in ("yahoo", "akshare") else ["provider", "managed"],
                 "english_name": (x.metadata_json or {}).get("english_name", ""),
                 "exchange": (x.metadata_json or {}).get("exchange"),
                 "currency": (x.metadata_json or {}).get("currency"),
                 "search_status": search_status,
             }
-            for x in db.scalars(select(MarketCatalog).where(~MarketCatalog.id.startswith("HC:")))
+            for x in db.scalars(select(MarketCatalog).where(~MarketCatalog.id.startswith("HC:"), MarketCatalog.source != "fxcm",
+                *([MarketCatalog.source == source] if source else [])))
         }
         for inst in db.scalars(
-            select(Instrument).where(Instrument.source.in_(["oanda", "binance"]))
+            select(Instrument).where(Instrument.source.in_(["oanda", "binance"] if not source else [source] if source in ("oanda", "binance") else []))
         ):
             entries.setdefault(
                 inst.id,
@@ -1014,11 +1025,11 @@ def instrument_catalog(query: str = "", *, limit=250):
                 },
             )
         from .storage import ChartPublication
-        plans = {p.instrument_id: p for p in db.scalars(select(ChartHistoryPlan))}
+        plans = {p.instrument_id: p for p in db.scalars(select(ChartHistoryPlan))} if managed_status else {}
         published = {p.instrument_id for p in db.scalars(select(ChartPublication).where(
-            ChartPublication.complete_count > 0))}
+            ChartPublication.complete_count > 0))} if managed_status else set()
         failures = set(db.scalars(select(ImportJob.instrument_id).where(
-            ImportJob.chart_plan.is_(True), ImportJob.status == 'failed')))
+            ImportJob.chart_plan.is_(True), ImportJob.status == 'failed'))) if managed_status else set()
         for entry in entries.values():
             localized = chinese_name(entry['source'], entry['symbol'])
             entry['chinese_name'] = localized or ''
@@ -1187,6 +1198,8 @@ def quote_snapshot(body: QuoteQuery):
                 latest.get("start") if latest else None, meta,
                 event_end=latest.get("end") if latest else None,
             )
+            quote_frame = "D1" if meta["source"] == "akshare" else "M1"
+            quote_time_type = "source_d1" if quote_frame == "D1" else "source_m1"
             fetch_status = page.get("fetch_status", "ok")
             read_at = page.get("read_at", page.get("as_of"))
             values = {"short_name": shown, "description": shown + " · 平台行情" + (" · " + meta["price_description"] if meta.get("price_description") else ""),
@@ -1194,7 +1207,7 @@ def quote_snapshot(body: QuoteQuery):
                       "fetched_at": page.get("as_of"), "read_at": read_at, "fetch_status": fetch_status,
                       **{key:page[key] for key in ("wait_reason", "last_success_at", "cache_age_ms") if key in page},
                       **({'error_evidence': page['error_evidence']} if page.get('error_evidence') else {}),
-                      "time_type": "source_m1" if latest else None, "resolution": "M1"}
+                      "time_type": quote_time_type if latest else None, "resolution": quote_frame}
             if latest:
                 values["lp"] = float(latest["close"])
                 values.update(quote_time=None, data_start=latest.get("start"), data_end=latest.get("end"))
@@ -1217,8 +1230,8 @@ def quote_snapshot(body: QuoteQuery):
             result.append({"s": "ok", "n": ticker, "v": values, **session,
                            **conflict, "fetched_at": page.get("as_of"), "read_at": read_at,
                            "fetch_status": fetch_status, "data_start": latest.get("start") if latest else None,
-                           "data_end": latest.get("end") if latest else None, "time_type": "source_m1" if latest else None,
-                           "resolution": "M1"})
+                           "data_end": latest.get("end") if latest else None, "time_type": quote_time_type if latest else None,
+                           "resolution": quote_frame})
         except Exception as error:
             from .market_notices import error_evidence
             observed_now = now_ms()

@@ -1,0 +1,23 @@
+{
+  "started_at": "2026-10-25T13:30:35.857Z",
+  "base": "https://test.kookvv.com:8443",
+  "passed": false,
+  "scope": "Deployed real API and native UI; no intercepted data, no source price repair; preserves all created data",
+  "checks": [],
+  "cases": [],
+  "errors": [
+    "frame.evaluate: Target page, context or browser has been closed"
+  ],
+  "blocked_writes": [
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/migrate"
+    },
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/save"
+    }
+  ],
+  "workspace_id": "a2015dea-2b0b-4027-8eb3-e736fb8d54ee",
+  "finished_at": "2026-10-25T13:33:27.093Z"
+}

@@ -14,9 +14,9 @@ HOURS = 'https://www.oanda.com/sg-en/trading/hours-of-operation/'
 
 
 def generate(scope, start, end, symbols):
-    supported = {'EUR_USD': 17, 'XAU_USD': 18}
+    supported = {'EUR_USD': 17, 'GBP_USD': 17, 'XAU_USD': 18}
     if not symbols or set(symbols) - supported.keys():
-        raise ValueError('Reviewed SG hours support only EUR_USD and XAU_USD here')
+        raise ValueError('Reviewed SG hours support only EUR_USD, GBP_USD and XAU_USD here')
     if (end - start).total_seconds() > 7*86400:
         raise ValueError('Re-review this operational profile at least weekly')
     result = {}
@@ -40,7 +40,7 @@ if __name__ == '__main__':
     parser.add_argument('--account-scope', required=True, help='Opaque sha256 scope of the configured SG account')
     parser.add_argument('--reviewed-start', required=True)
     parser.add_argument('--reviewed-end', required=True)
-    parser.add_argument('--symbols', default='EUR_USD,XAU_USD')
+    parser.add_argument('--symbols', default='EUR_USD,XAU_USD,GBP_USD')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     result = generate(args.account_scope, datetime.fromisoformat(args.reviewed_start),

@@ -23,7 +23,7 @@ log = logging.getLogger(__name__)
 
 
 def _calendar(meta):
-    return {k: meta.get(k) for k in ('calendar', 'calendar_profile')}
+    return {k: meta.get(k) for k in ('calendar', 'calendar_profile', 'timezone', 'session')}
 
 
 def capture(db, page, *, full_series=True):
@@ -99,6 +99,8 @@ def resolve(db, ident, dataset_id):
         error = DisplaySnapshotError('DISPLAY_SNAPSHOT_EXPIRED',
                                      '平台展示快照已过期或历史已修订，请重新读取价格快照')
         error.attempt_ref = uuid.uuid4().hex
+        error.snapshot_evidence = {'reason': reason, 'attempt_ref': error.attempt_ref,
+            'credential_ref': hashlib.sha256(ident.encode()).hexdigest()[:16]}
         # Per-attempt correlation plus a one-way credential reference; never log
         # tokens, supplier/account identities, candle values or calendar payloads.
         log.info('provider-display-snapshot-rejected %s', json.dumps({

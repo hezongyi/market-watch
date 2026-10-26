@@ -6,9 +6,18 @@ from .domain import Calendar
 from .storage import instant
 
 
-def calculation_rows(rows, meta, instrument):
-    result = [dict(row) for row in rows]
-    if meta["calendar"] not in ("ny17", "utc0"):
+def calculation_rows(rows, meta, instrument, timeframe=None, *, infer_gaps=True):
+    result = [{**row, "indicator_calendar": meta["calendar"],
+               "indicator_timezone": meta.get("timezone"), "indicator_session": meta.get("session"),
+               "indicator_timeframe": timeframe} for row in rows]
+    if timeframe and meta["calendar"] in ("ny17", "utc0"):
+        from .provider_chart import label
+
+        for row in result:
+            row.setdefault("chart_time", label(row["start"], timeframe, meta["calendar"]))
+    # Observed-bar indicators count existing candles, including across holidays.
+    # Keep explicit invalid/gap flags; do not invent resets from elapsed time.
+    if not infer_gaps or meta["calendar"] not in ("ny17", "utc0"):
         return result
     calendar = Calendar(meta["calendar"])
     closures = closures_from(meta.get("calendar_profile"))

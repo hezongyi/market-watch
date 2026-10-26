@@ -127,3 +127,56 @@ def test_lifecycle_http_requires_revision_and_replays_same_request_once(database
         assert client.post(path, json=intent).json()["run"] == 2
         assert client.post(path, json={**intent, "request_id": "stale-restart"}).status_code == 409
         assert client.post(path, json={**intent, "action": "pause"}).status_code == 409
+
+
+def test_reference_identity_and_log_cleanup_preserve_frozen_evidence_and_phone_state(database, monkeypatch):
+    from alerts import notification_center as center
+    from alerts.chart_alert_service import edit
+    from alerts.storage import NoticeEvent, Notification, Outbox, SignalRow
+    from test_notification_center import drain, observe, trigger
+
+    signal_id = trigger(database)
+    with TestClient(api_module.app) as client:
+        login(client, monkeypatch)
+        before = client.get("/api/chart-alerts/events").json()[0]
+        assert before["notice"] is None
+        assert before["display_identity"]["code"] == "EURUSD"
+        assert before["display_identity"]["series_kind"] == "managed"
+        frozen = before["evidence"]
+        drain(database)
+        projected = client.get("/api/chart-alerts/events").json()[0]
+        notice = projected["notice"]
+        assert notice["id"] == center.signal_event_id(signal_id)
+        assert notice["first_seq"] > 0 and notice["viewed_at"] is None
+        page = client.get("/api/notification-center/events").json()
+        assert page["alert_unread"] == 1
+        original_system_unread = page["system_unread"]
+        with database.begin() as db:
+            alert = db.get(ChartAlert, projected["alert_id"])
+            edit(db, alert.id, alert.version, config(name="new live name", notify_ntfy=True))
+        listed = client.get("/api/chart-alerts").json()[0]
+        assert listed["last_triggered_at"] == projected["occurred_at"]
+        assert listed["name"] == "new live name"
+        with database() as db:
+            task = db.scalar(select(Outbox))
+            original_task = {c.name: getattr(task, c.name) for c in Outbox.__table__.columns}
+            n = db.get(Notification, projected["notification_id"])
+            original_notification = {c.name: getattr(n, c.name) for c in Notification.__table__.columns}
+        for kind in ("viewed", "handled"):
+            payload = observe(notice["id"], kind).model_dump(mode="json")
+            assert client.post("/api/notification-center/observations", json=payload).status_code == 200
+        cleaned = client.get("/api/chart-alerts/events").json()[0]
+        assert cleaned["evidence"] == frozen
+        assert cleaned["notice"]["viewed_at"] and cleaned["notice"]["handled_at"]
+        assert cleaned["display_identity"] == projected["display_identity"]
+        page = client.get("/api/notification-center/events").json()
+        assert page["alert_unread"] == 0 and page["system_unread"] == original_system_unread
+        changes = client.get("/api/notification-center/changes", params={"after": page["after"]}).json()
+        assert changes["alert_unread"] == 0
+        with database() as db:
+            assert db.get(SignalRow, signal_id).evidence == frozen
+            assert db.get(NoticeEvent, notice["id"])
+            task = db.scalar(select(Outbox))
+            assert {c.name: getattr(task, c.name) for c in Outbox.__table__.columns} == original_task
+            n = db.get(Notification, projected["notification_id"])
+            assert {c.name: getattr(n, c.name) for c in Notification.__table__.columns} == original_notification

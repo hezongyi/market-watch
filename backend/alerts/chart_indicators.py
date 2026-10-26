@@ -1,6 +1,7 @@
 """Versioned chart indicator catalog; Python is the numerical source of truth."""
 
 import math
+import re
 from copy import deepcopy
 
 import numpy as np
@@ -179,6 +180,11 @@ def _validate_metadata(name, meta):
     if not isinstance(schema, dict) or set(schema) != set(params):
         raise ValueError(f"{name}: parameter schema must match params")
     for key, rule in schema.items():
+        if isinstance(rule, dict) and rule.get("type") == "bool":
+            if type(rule.get("default")) is not bool or rule["default"] != params[key]:
+                raise ValueError(f"{name}: invalid boolean parameter {key}")
+            _validate_parameter(name, key, params[key], rule)
+            continue
         if isinstance(rule, dict) and rule.get("type") == "enum":
             options = rule.get("options")
             if (not isinstance(options, list) or not options
@@ -206,7 +212,7 @@ def _validate_metadata(name, meta):
     if meta.get("result_format") not in (None, "series_presentation_v1"):
         raise ValueError(f"{name}: unknown result format")
     profile = meta.get("render_profile")
-    if profile not in (None, "swing_sr_v1", "supertrend_pine_v1"):
+    if profile not in (None, "swing_sr_v1", "supertrend_pine_v1", "rolling_range_squeeze_v1", "nr_breakout_v1"):
         raise ValueError(f"{name}: invalid render_profile")
     if (profile == "swing_sr_v1") != bool(meta.get("result_format")):
         raise ValueError(f"{name}: Swing render profile requires the extended result contract")
@@ -222,11 +228,13 @@ def _validate_metadata(name, meta):
     for item in display:
         if (not isinstance(item, dict) or not isinstance(item.get("id"), str)
                 or item["id"] in seen or not isinstance(item.get("name"), str)
-                or item.get("type") not in ("bool", "text")):
+                or item.get("type") not in ("bool", "text", "color")):
             raise ValueError(f"{name}: invalid display input")
         seen.add(item["id"])
         if item["type"] == "bool":
             valid = type(item.get("default")) is bool
+        elif item["type"] == "color":
+            valid = _valid_color(item.get("default"))
         else:
             options = item.get("options")
             valid = (isinstance(options, list) and bool(options)
@@ -237,6 +245,10 @@ def _validate_metadata(name, meta):
 
 
 def _validate_parameter(name, key, value, rule):
+    if rule["type"] == "bool":
+        if type(value) is not bool:
+            raise ValueError(f"{name}: {key} 应为布尔值")
+        return
     if rule["type"] == "enum":
         if not isinstance(value, str) or value not in rule["options"]:
             raise ValueError(f"{name}: {key} 应为 {' / '.join(rule['options'])}")
@@ -312,6 +324,11 @@ def validate(spec):
     return name, params
 
 
+def _valid_color(value):
+    return isinstance(value, str) and bool(re.fullmatch(
+        r"#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?|rgba?\([\d.,%\s]+\)", value))
+
+
 def validate_display(name, supplied):
     """Display settings never enter numerical specs or cache identities."""
     declarations = CATALOG[name].get("display_inputs", [])
@@ -323,6 +340,7 @@ def validate_display(name, supplied):
     for key, value in result.items():
         rule = rules[key]
         if (rule["type"] == "bool" and type(value) is not bool
+                or rule["type"] == "color" and not _valid_color(value)
                 or rule["type"] == "text" and value not in rule["options"]):
             raise ValueError(f"{name}: invalid display input {key}")
     return result
@@ -401,12 +419,16 @@ def _run(name, arrays, params):
 
 
 def calculate(rows, spec, *, provisional=False):
+    name, p = validate(spec)
+    if name == "ROLLING_RANGE_SQUEEZE":
+        from .rolling_range_squeeze import calculate_rows
+
+        return calculate_rows(rows, p, provisional=provisional)
     # The live last candle is recomputed from the confirmed prefix. Never
     # mutate the caller's rows or advance a recursive accumulator on a tick.
     provisional_time = rows[-1]["start"] if provisional and rows and not rows[-1]["complete"] else None
     if provisional_time is not None:
         rows = [*rows[:-1], {**rows[-1], "complete": True}]
-    name, p = validate(spec)
     try:
         arrays = {
             key: np.array([float(r[key]) if r["complete"] else np.nan for r in rows])
@@ -434,7 +456,13 @@ def calculate(rows, spec, *, provisional=False):
     for start, end in spans:
         start, end = int(start), int(end)
         span = {key: values[start:end] for key, values in arrays.items()}
-        values, display = _run(name, span, p)
+        if name == "NR4_NR7_BREAKOUT_V1":
+            from .nr_breakout import calculate as nr_calculate
+
+            values = nr_calculate(rows[start:end], p)
+            display = None
+        else:
+            values, display = _run(name, span, p)
         for key, output in values.items():
             outputs[key][start:end] = output
         if extended:
@@ -507,3 +535,15 @@ from .supertrend_pine import NAME as _SUPERTREND_NAME  # noqa: E402
 from .supertrend_pine import calculate as _supertrend_calculate  # noqa: E402
 
 register(_SUPERTREND_NAME, _SUPERTREND_METADATA, _supertrend_calculate)
+
+from .rolling_range_squeeze import METADATA as _SQUEEZE_METADATA  # noqa: E402
+from .rolling_range_squeeze import NAME as _SQUEEZE_NAME  # noqa: E402
+from .rolling_range_squeeze import calculate_vectors as _squeeze_calculate  # noqa: E402
+
+register(_SQUEEZE_NAME, _SQUEEZE_METADATA, _squeeze_calculate)
+
+from .nr_breakout import METADATA as _NR_METADATA  # noqa: E402
+from .nr_breakout import NAME as _NR_NAME  # noqa: E402
+from .nr_breakout import calculate as _nr_calculate  # noqa: E402
+
+register(_NR_NAME, _NR_METADATA, _nr_calculate)

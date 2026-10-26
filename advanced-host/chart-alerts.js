@@ -11,6 +11,7 @@ function chartAlertBridge({
   calculationOrigin = () => null,
   compositeRevision = () => null,
   rpc,
+  movePrice,
   send,
   fail,
 }) {
@@ -27,11 +28,30 @@ function chartAlertBridge({
     generations = new Map(),
     previewChanges = new Map(),
     reconciliations = new Map();
+  const priceLines = typeof nativeAlertPriceLines === "function" ? nativeAlertPriceLines({
+    readonly,
+    move: typeof movePrice === "function" ? async (row, price, presentation) => {
+      if (readonly || disposed || isLoading()) throw Error("告警当前不可编辑");
+      const saved = await movePrice(row, price, presentation);
+      if (!disposed) replace(saved);
+      return saved;
+    } : undefined,
+    current: (row, chart, epoch) => !disposed && !isLoading() && epoch === generation(chart) && matches(chart,row) && associatedChart(row.config.association,row) === chart,
+    archive: async row => {
+      if (readonly || disposed) throw Error("告警当前不可编辑");
+      const saved = await rpc({op:"lifecycle",alert_id:row.id,version:row.version,
+        control_revision:row.control_revision,request_id:crypto.randomUUID(),action:"archive",
+        object_id:row.config.association?.object_id,chart_id:row.config.association?.chart_id,
+        workspace_id:row.config.association?.workspace_id});
+      replace(saved);
+    },
+    report: (row,text) => associationNotice(row,text),
+  }) : null;
   const failedEdits = new Set();
   const recoveredSlots = new Map();
   let pointerDown = false;
   let pointerChart = null;
-  let menuPoint = null;
+  let menuPoint = null, plusMenuPoint = null;
   const generation = (chart) => `${getEpoch()}:${generations.get(chart) || 0}`;
   const chartList = () =>
     Array.from({ length: getWidget()?.chartsCount() || 0 }, (_, i) =>
@@ -85,6 +105,8 @@ function chartAlertBridge({
       series_kind: identity.series_kind,
       timeframe: frames[chart.resolution()],
       source: meta.source,
+      display_identity: {code: meta.display_symbol || meta.logical_symbol || meta.symbol || meta.name || identity.symbol,
+        series_kind: identity.series_kind, source: meta.source, basis: meta.basis, timeframe: frames[chart.resolution()]},
       display_label: [meta.display_symbol || meta.symbol || meta.logical_symbol || meta.name || identity.symbol,
         ({provider:'平台行情',managed:'自建行情',composite:'组合行情',history:'固定历史'})[identity.series_kind],
         meta.price_description || meta.basis, frames[chart.resolution()]].filter(Boolean).join(' · '),
@@ -175,20 +197,21 @@ function chartAlertBridge({
       .getAllStudies()
       .find((item) => String(item.id) === String(nativeId));
     const name = String(entry?.name || "").match(
-      /(?:MWPython|守望 Python |PY )(SMA|EMA|RSI|MACD)(?:@|$)/,
+      /(?:MWPython|守望 Python |PY )(SMA|EMA|RSI|MACD|ROLLING_RANGE_SQUEEZE)(?:@|$)/,
     )?.[1];
-    if (!name) throw Error("仅支持已映射的守望 Python SMA、EMA、RSI、MACD");
+    if (!name) throw Error("仅支持已映射的守望 Python SMA、EMA、RSI、MACD、ROLLING_RANGE_SQUEEZE");
     const params = Object.fromEntries(
       chart
         .getStudyById(nativeId)
         .getInputValues()
+        .filter(input=>name!=='ROLLING_RANGE_SQUEEZE' || ['k','lookback','low_pct','confirm_on_close'].includes(input.id))
         .map((input) => [input.id, input.value]),
     );
     return {
       name,
       version: "1",
       params,
-      output: name === "MACD" ? "macd" : "value",
+      output: name === "ROLLING_RANGE_SQUEEZE" ? "signal" : name === "MACD" ? "macd" : "value",
     };
   }
   async function create({
@@ -196,6 +219,7 @@ function chartAlertBridge({
     price,
     object,
     context: initialContext,
+    quick = false,
   } = {}) {
     if (disposed) return;
     if (readonly) {fail(Error("只读图表不能创建告警"));return;}
@@ -209,6 +233,10 @@ function chartAlertBridge({
         const presented = context.price_presentation || chartAlertPricePresentation(chart, price);
         context.price = presented.value;
         context.price_presentation = presented;
+      }
+      if (quick) {
+        if (!context.price) throw Error("价格轴未提供有效价格");
+        context.quick_create = true;
       }
       if (object?.type === "shape") {
         context.association.object_id = crypto.randomUUID();
@@ -231,10 +259,13 @@ function chartAlertBridge({
   }
   async function menu(items, actionsFactory, params) {
     if (readonly || disposed) return items;
-    const chart =
-      params.detail?.type === "priceScale"
+    const plus = params.menuName === "CrosshairMenuView" ? plusMenuPoint : null;
+    plusMenuPoint = null;
+    if (params.menuName === "CrosshairMenuView" && !plus) return items;
+    const chart = plus?.chart ||
+      (params.detail?.type === "priceScale"
         ? chartList()[params.detail.chartIndex]
-        : getWidget().activeChart();
+        : getWidget().activeChart());
     const object = params.detail;
     if (!chart || (object?.type === "priceScale" && object.paneIndex !== 0))
       return items;
@@ -245,20 +276,20 @@ function chartAlertBridge({
       return items;
     let context;
     try {
-      context = snapshot(chart);
+      context = plus ? structuredClone(plus.context) : snapshot(chart);
     } catch (error) {
       return [actionsFactory.createAction({actionId:"mw-chart-alert-unavailable",label:`创建告警不可用：${error.message}`,
         disabled:true,onExecute:()=>fail(error)}),...items];
     }
     // Capture the initiating chart now; executing a menu item never re-reads
     // whichever pane became active during an asynchronous native operation.
-    const price =
+    const price = plus ? plus.price :
       (!object || object.type === "series") && menuPoint?.chart === chart
         ? menuPoint.price
         : undefined;
     menuPoint = null;
     if (Number.isFinite(price)) {
-      try {context.price_presentation = chartAlertPricePresentation(chart, price);}
+      try {context.price_presentation ||= chartAlertPricePresentation(chart, price);}
       catch (error) {fail(error);return items;}
     }
     const item = actionsFactory.createAction({
@@ -269,9 +300,11 @@ function chartAlertBridge({
           : object?.type === "study"
             ? "在此指标上创建告警…"
             : Number.isFinite(price)
-              ? `在 ${context.price_presentation.text} 创建价格告警…`
+              ? plus
+                ? `在 ${context.price_presentation.text} 创建告警`
+                : `在 ${context.price_presentation.text} 创建价格告警…`
               : "创建主价格系列告警…",
-      onExecute: () => create({ chart, object, price, context }),
+      onExecute: () => create({ chart, object, price, context, quick: !!plus }),
     });
     return [item, ...items];
   }
@@ -280,6 +313,7 @@ function chartAlertBridge({
     return state;
   }
   function reset(state = {}) {
+    menuPoint = plusMenuPoint = null;
     ids = new Map();
     storedIds = Array.isArray(state._mwAlertCharts)
       ? state._mwAlertCharts.slice(0, 8)
@@ -289,6 +323,7 @@ function chartAlertBridge({
     markers.clear();
     failedEdits.clear();
     recoveredSlots.clear();
+    priceLines?.clear();
   }
   function matches(chart, row) {
     return (
@@ -508,11 +543,16 @@ function chartAlertBridge({
       pointerChart = null;
     });
     getWidget().subscribe("onPlusClick", (p) => {
-      if (
-        p.symbol &&
-        MWSeries.same(p.symbol, getWidget().activeChart().symbol())
-      )
-        create({ price: p.price });
+      plusMenuPoint = menuPoint = null;
+      const chart = getWidget().activeChart();
+      if (readonly || disposed || !p.symbol || !MWSeries.same(p.symbol, chart.symbol())) return;
+      try {
+        if (!Number.isFinite(p.price) || p.price <= 0) throw Error("价格轴未提供有效价格");
+        const context = snapshot(chart);
+        context.price_presentation = chartAlertPricePresentation(chart, p.price);
+        // The native plus opens CrosshairMenuView; only its alert action creates.
+        plusMenuPoint = { chart, price: p.price, context };
+      } catch (error) { fail(error); }
     });
     refresh();
   }
@@ -724,6 +764,7 @@ function chartAlertBridge({
           ? previous
           : row;
       });
+    priceLines?.sync(rows.map(row => {const chart=associatedChart(row.config.association,row);return {row,chart,epoch:generation(chart)};}));
     for (const row of rows)
       if (!reconciliations.has(row.id)) {
         const task = reconcile(row);
@@ -738,6 +779,7 @@ function chartAlertBridge({
   }
   function destroy() {
     disposed = true;
+    priceLines?.destroy();
     for (const [chart, fn] of bindings) {
       chart.onSymbolChanged().unsubscribe(null, fn);
       chart.onIntervalChanged().unsubscribe(null, fn);
@@ -772,6 +814,7 @@ function chartAlertBridge({
       return {instrument: identity.symbol, series_kind: identity.series_kind};
     },
     diagnostics: () => ({
+      priceLines: priceLines?.diagnostics(),
       charts: chartList().map((chart) => chartIdentity(chart)),
       rows: rows.map((row) => ({ id: row.id, version: row.version })),
     }),

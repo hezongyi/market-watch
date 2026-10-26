@@ -1,0 +1,31 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+___________ test_shared_source_acquisition_busy_waits_then_completes ___________
+backend/tests/test_native_history_loads.py:182: in test_shared_source_acquisition_busy_waits_then_completes
+    assert loads.status('owner', ident)['state'] == 'waiting'
+E   AssertionError: assert 'failed' == 'waiting'
+E
+E     - waiting
+E     + failed
+------------------------------ Captured log call -------------------------------
+WARNING  alerts.provider_cache:provider_cache.py:693 Provider read failed source=oanda frame=M5 count=4000 type=AcquisitionBusy status=None elapsed_ms=14.37 timings_ms={'lease_wait': 3.67}
+WARNING  alerts.native_history_loads:native_history_loads.py:241 History page failed type=AcquisitionBusy
+_____ test_akshare_native_task_uses_source_request_budget[AKSHARE:fixture] _____
+backend/tests/test_native_history_loads.py:199: in test_akshare_native_task_uses_source_request_budget
+    assert sources == ['akshare']
+E   AssertionError: assert [None] == ['akshare']
+E
+E     At index 0 diff: None != 'akshare'
+E     Use -v to get more diff
+___ test_akshare_native_task_uses_source_request_budget[TENCENT:SZSE:000001] ___
+backend/tests/test_native_history_loads.py:199: in test_akshare_native_task_uses_source_request_budget
+    assert sources == ['akshare']
+E   AssertionError: assert [None] == ['akshare']
+E
+E     At index 0 diff: None != 'akshare'
+E     Use -v to get more diff
+=========================== short test summary info ============================
+FAILED backend/tests/test_native_history_loads.py::test_shared_source_acquisition_busy_waits_then_completes
+FAILED backend/tests/test_native_history_loads.py::test_akshare_native_task_uses_source_request_budget[AKSHARE:fixture]
+FAILED backend/tests/test_native_history_loads.py::test_akshare_native_task_uses_source_request_budget[TENCENT:SZSE:000001]
+3 failed, 14 deselected in 4.81s

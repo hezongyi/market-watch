@@ -1,0 +1,41 @@
+# Task-owned PG only. Do not start until the user approves acceptance.
+# Keep the private password outside the repository; do not point this at mwa.
+name: mw-history-modes-pg-20261024
+services:
+  pg:
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+    pull_policy: never
+    environment:
+      POSTGRES_USER: mw_history_modes
+      POSTGRES_DB: history_modes
+      POSTGRES_PASSWORD: ${MW_HISTORY_MODES_PG_PASSWORD:?Set a task-owned password in a private env file}
+    ports:
+      - "127.0.0.1:${MW_HISTORY_MODES_PG_PORT:-18754}:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    networks:
+      - pg-test
+    mem_limit: 512m
+    cpus: 0.5
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} && test \"$$(PGOPTIONS='-c jit=on' psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -Atqc \"SELECT current_setting('server_version_num') = '140024' AND pg_jit_available()\")\" = t"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    labels:
+      io.market-watch.task: mw-history-modes-20261024
+      io.market-watch.purpose: acceptance
+networks:
+  pg-test:
+    # Keep the task network isolated by Compose project while allowing the
+    # explicitly declared loopback port to be published for host-side tests.
+volumes:
+  pg-data:
+    labels:
+      io.market-watch.task: mw-history-modes-20261024
+      io.market-watch.purpose: acceptance

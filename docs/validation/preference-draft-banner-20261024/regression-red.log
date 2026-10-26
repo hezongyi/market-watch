@@ -1,0 +1,22 @@
+AssertionError [ERR_ASSERTION]: banner must classify recoverable drafts separately from ordinary writes
++ actual - expected
+
++ 'undefined'
+- 'function'
+
+    at /home/quant/repos/market-watch-nr4-nr7-mwa-v3-20261024/web/tests/preference-draft-banner.cjs:10:26
+    at Object.<anonymous> (/home/quant/repos/market-watch-nr4-nr7-mwa-v3-20261024/web/tests/preference-draft-banner.cjs:39:3)
+    at Module._compile (node:internal/modules/cjs/loader:1781:14)
+    at Object..js (node:internal/modules/cjs/loader:1913:10)
+    at Module.load (node:internal/modules/cjs/loader:1505:32)
+    at Function._load (node:internal/modules/cjs/loader:1309:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+    at node:internal/main/run_main_module:36:49 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 'undefined',
+  expected: 'function',
+  operator: 'strictEqual',
+  diff: 'simple'
+}

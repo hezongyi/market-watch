@@ -1,0 +1,56 @@
+{
+  "started_at": "2026-10-25T13:15:25.983Z",
+  "base": "https://test.kookvv.com:8443",
+  "passed": false,
+  "scope": "Deployed real API and native UI; no intercepted data, no source price repair; preserves all created data",
+  "checks": [],
+  "cases": [
+    {
+      "source": "akshare",
+      "symbol": "SZSE:000001",
+      "mode": "native_periods",
+      "dataset_id": "d8e0b67e3c79085fc3dfdee42e3276df2e01a502082e4553906b7a090b66b28e",
+      "version_id": "4c5f2cb9-d7b6-44e3-9b2c-91f1ccd29170",
+      "requested": [
+        "D1"
+      ],
+      "periods": [
+        {
+          "timeframe": "D1",
+          "rows": 678,
+          "start": 1704153600000,
+          "end": 1792739400000,
+          "freshness": "success"
+        }
+      ],
+      "request_count": 1,
+      "rendered": {
+        "symbol": "MWH:4C5F2CB9-D7B6-44E3-9B2C-91F1CCD29170",
+        "ready": true,
+        "range": {
+          "from": 1773705600,
+          "to": 1793548800
+        }
+      },
+      "chart_bars": 100,
+      "adjustment_view": "qfq",
+      "price_description": "前复权 · 本数据集同源依据计算",
+      "passed": true
+    }
+  ],
+  "errors": [
+    "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false"
+  ],
+  "blocked_writes": [
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/migrate"
+    },
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/save"
+    }
+  ],
+  "workspace_id": "31d737a1-f19f-4467-96e9-27604aa1805f",
+  "finished_at": "2026-10-25T13:17:50.010Z"
+}

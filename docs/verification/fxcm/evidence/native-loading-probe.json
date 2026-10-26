@@ -1,0 +1,40 @@
+{
+  "checked_at_utc": "2026-10-24T08:25:53.421376+00:00",
+  "kind": "offline_native_library_loading_probe",
+  "runtime": {
+    "python": "3.11.16",
+    "system": "Linux",
+    "machine": "x86_64",
+    "libc": [
+      "glibc",
+      "2.36"
+    ],
+    "pointer_bits": 64
+  },
+  "libraries": [
+    {
+      "library": "libForexConnect.so",
+      "sha256": "63c33f4110cc61e3420e2955cf222ff8bf2ae893f3831f35371d8542b918f1ea",
+      "ldd_exit_code": 0,
+      "ldd": "\tlinux-vdso.so.1 (0x00007ffe4bb85000)\n\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f5d56695000)\n\tlibgsexpat.so => <sdk>/lib/libgsexpat.so (0x00007f5d55e00000)\n\tlibfxtp.so => <sdk>/lib/libfxtp.so (0x00007f5d55a00000)\n\tlibfxmsg.so => <sdk>/lib/libfxmsg.so (0x00007f5d55400000)\n\tlibgstool3.so => <sdk>/lib/libgstool3.so (0x00007f5d55000000)\n\tliblog4cplus.so => <sdk>/lib/liblog4cplus.so (0x00007f5d54c00000)\n\tlibrt.so.1 => /lib/x86_64-linux-gnu/librt.so.1 (0x00007f5d5668e000)\n\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f5d549e6000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f5d55d20000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f5d5666c000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f5d54804000)\n\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007f5d56665000)\n\tlibhttplib.so => <sdk>/lib/libhttplib.so (0x00007f5d54200000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f5d5669e000)\n",
+      "load_exit_code": 0,
+      "load_stdout": "loaded\n",
+      "load_stderr": ""
+    },
+    {
+      "library": "libpricehistorymgr.so",
+      "sha256": "a46d43ae928bfda142b4e0aed7c9c6ed8c43163b92dea558585a0b256182cb2d",
+      "ldd_exit_code": 0,
+      "ldd": "\tlinux-vdso.so.1 (0x00007ffde9fde000)\n\tlibgstool3.so => <sdk>/lib/libgstool3.so (0x00007fce4d200000)\n\tlibgsexpat.so => <sdk>/lib/libgsexpat.so (0x00007fce4ce00000)\n\tlibquotesmgr2.so.2.8 => <sdk>/lib/libquotesmgr2.so.2.8 (0x00007fce4ca00000)\n\tlibForexConnect.so => <sdk>/lib/libForexConnect.so (0x00007fce4c600000)\n\tlibrt.so.1 => /lib/x86_64-linux-gnu/librt.so.1 (0x00007fce4da05000)\n\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007fce4d9fe000)\n\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007fce4c3e6000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fce4d91e000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fce4d8fe000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fce4c204000)\n\tlibsqlite3.8.so => <sdk>/lib/libsqlite3.8.so (0x00007fce4be00000)\n\tlibhttplib.so => <sdk>/lib/libhttplib.so (0x00007fce4b800000)\n\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007fce4d8f5000)\n\tlibfxtp.so => <sdk>/lib/libfxtp.so (0x00007fce4b400000)\n\tlibfxmsg.so => <sdk>/lib/libfxmsg.so (0x00007fce4ae00000)\n\tliblog4cplus.so => <sdk>/lib/liblog4cplus.so (0x00007fce4aa00000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007fce4da0e000)\n",
+      "load_exit_code": 0,
+      "load_stdout": "loaded\n",
+      "load_stderr": ""
+    }
+  ],
+  "result": "libraries_loaded",
+  "session_created": false,
+  "upstream_login_attempted": false,
+  "market_data_verified": false,
+  "native_helper_built": false,
+  "redistribution_rights_verified": false
+}

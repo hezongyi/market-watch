@@ -15,6 +15,7 @@ const assetTypes: Record<string, string> = { stock: "equity", fund: "etf", futur
 const symbolTypes = categories.map(([value, name]) => ({ value, name }));
 type Instrument = {
   id: string; source: string; provider_symbol: string; display_symbol: string; label: string;
+  provider_name?: string;
   asset_class: string; available: boolean; updated_at: number | null; history_precision: number | null;
   logical_symbol?: string;
   capabilities: { native_periods: string[]; history_m1: boolean; native_confirmation: string };
@@ -62,7 +63,7 @@ export function PlatformMarket() {
       const type = Object.entries(assetTypes).find(([, value]) => value === row.asset_class)?.[0] || row.asset_class;
       return { symbol: row.display_symbol || row.provider_symbol, ticker, full_name: ticker,
         description: row.label, exchange: row.source.toUpperCase(), type,
-        category: categories.find(([value]) => value === type)?.[1] || "其他", sourceName: names[row.source] || row.source, rowId: rowId(row.id),
+        category: categories.find(([value]) => value === type)?.[1] || "其他", sourceName: row.provider_name || names[row.source] || row.source, rowId: rowId(row.id),
         available: row.available && row.capabilities.native_periods.length > 0 };
     });
     setRevision(value => value + 1);
@@ -88,12 +89,12 @@ export function PlatformMarket() {
     }} /> : <PlatformFallback key={refresh} query={query} source={source} asset={asset}
       filter={(key, value) => { const next = new URLSearchParams(params); next.set(key, value); next.delete("page"); setDetail(null); setParams(next); }} onDetails={row => { setDetail(row); panel.open(); }} />}
     {detail && panel.opened && <DetailPanel title={`${detail.display_symbol || detail.provider_symbol} · ${detail.label}`} close={() => { setDetail(null); panel.close(); }}>
-      <p>来源：{names[detail.source] || detail.source} · 原生周期：{detail.capabilities.native_periods.join(" · ") || "尚未接入"}</p>
+      <p>来源：{detail.provider_name || names[detail.source] || detail.source} · 原生周期：{detail.capabilities.native_periods.join(" · ") || "尚未接入"}</p>
       <p>M1 历史：{detail.capabilities.history_m1 ? "支持" : "未开放"} · 目录更新时间：{time(detail.updated_at)}</p>
       {detail.capabilities.native_confirmation === "not_supplied" && <p>来源未提供确认标记；按周期结束时间显示。</p>}
       <div className="dc-actions">
         {detail.available && detail.source === "oanda" && <Link to={centerLink(`/market-data/platform/configure?instrument=${encodeURIComponent(detail.id)}`, params, rowId(detail.id))}>配置原生参数</Link>}
-        {["dukascopy", "oanda"].includes(detail.source) && detail.capabilities.history_m1 && (!detail.logical_symbol || detail.logical_symbol.length <= 10) &&
+        {["dukascopy", "oanda", "fxcm"].includes(detail.source) && detail.capabilities.history_m1 && (!detail.logical_symbol || detail.logical_symbol.length <= 10) &&
           <Link to={centerLink(`/market-data/datasets/new?source=${detail.source}&symbol=${encodeURIComponent(detail.provider_symbol)}${detail.history_precision == null ? "" : `&precision=${detail.history_precision}`}`, params, rowId(detail.id))}>添加为自建行情</Link>}
         <button onClick={() => { setDetail(null); panel.close(); setRefresh(value => value + 1); }}>刷新目录</button>
       </div>
@@ -135,7 +136,7 @@ function FallbackRows({query, source, asset, onDetails}: {query:string;source:st
   }, [loading, error, remaining]);
   return <div className="dc-platform-fallback-list dc-table" ref={list}>
       {items.map(row => <div className="dc-platform-fallback-row" key={row.id} id={rowId(row.id)} tabIndex={-1}>
-        <strong>{row.display_symbol || row.provider_symbol}</strong><span>{row.label}</span><span>{names[row.source]}</span><div>
+        <strong>{row.display_symbol || row.provider_symbol}</strong><span>{row.label}</span><span>{row.provider_name || names[row.source]}</span><div>
           {row.available && !!row.capabilities.native_periods.length && <OpenChart ticker={`MWP:${row.id}`} frame={row.capabilities.native_periods.includes("H1") ? "H1" : row.capabilities.native_periods[0]} label="打开图表" />}
           <button onClick={() => onDetails(row)}>详情</button></div></div>)}
       <div ref={sentinel} role={error ? "alert" : "status"} className="mw-platform-status">{error ? <>{error}<button onClick={() => setRetry(value => value + 1)}>重试</button></> : loading ? "正在加载…" : !items.length ? "没有符合筛选的行情" : !remaining ? "已全部加载" : ""}</div>

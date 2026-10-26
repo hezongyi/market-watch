@@ -5,8 +5,10 @@ from sqlalchemy import case, func, or_, select
 from .history_maintenance import plan_report
 from .market_names import code_search
 from .storage import (
+    DatasetFrameSource,
     DatasetMaintenance,
     HistoryArtifact,
+    HistoryArtifactBlock,
     HistoryRun,
     HistoryVersion,
     Instrument,
@@ -48,14 +50,37 @@ def dataset_detail(db, dataset_id):
             "timeframe": frame, "status": "published", "rows": artifact.count,
             "complete_rows": artifact.complete_count})
         parent = db.get(HistoryVersion, artifact.version_id)
+        bounds = (parent.start, parent.end)
+        if dataset.identity.get("identity_version") == 2:
+            bounds = db.execute(select(func.min(HistoryArtifactBlock.start), func.max(HistoryArtifactBlock.end))
+                .where(HistoryArtifactBlock.artifact_id == artifact.id)).one()
         p.update(available_version_id=artifact.version_id, available_rows=artifact.count,
-                 available_start=parent.start, available_end=parent.end)
+                 available_start=bounds[0], available_end=bounds[1])
+        if dataset.identity.get("identity_version") == 2:
+            input_frame = "D1" if dataset.identity["mode"] == "base_d1" else frame
+            p.update(parent.manifest.get("frames", {}).get(input_frame, {}))
+            p["freshness"] = parent.manifest.get("frames", {}).get(input_frame, {}).get("status")
+            p["status"] = artifact.status
     periods = [by_frame[frame] for frame in sorted(by_frame)]
     ready = sorted(available)
+    inputs = list(db.scalars(select(DatasetFrameSource.timeframe)
+        .where(DatasetFrameSource.dataset_id == dataset.id)))
+    selectable = inputs
+    if dataset.identity.get("identity_version") == 2:
+        from .history_mode_sources import available_frames, local_details
+
+        try:
+            info, _ = local_details(db, dataset.identity["source"], dataset.identity["provider_symbol"])
+            selectable = list(dict.fromkeys([*inputs, *available_frames(info, dataset.identity["adjustment"])]))
+        except ValueError:
+            pass  # Saved inputs remain editable while a source is disabled.
     return {**dataset_report(dataset, db.get(Instrument, dataset.instrument_id)), "maintenance": maintenance,
         "latest_version_id": published, "available_start": version.start if version else None,
         "available_end": version.end if version else None,
         "unknown_minutes": version.manifest.get("unknown_minutes") if version else None,
+        "mode": dataset.identity.get("mode", "base_m1"),
+        "input_timeframes": inputs, "selectable_timeframes": selectable,
+        "frames": version.manifest.get("frames", {}) if version else {},
         "periods": periods, "usable_timeframes": ready,
         "availability": "available" if ready else "preparing" if maintenance.get("active_version_id") else "needs_maintenance"}
 
@@ -112,7 +137,8 @@ def _task_query(*, dataset_id=None, query="", source=None, status="all"):
         (HistoryVersion.status == "published") & HistoryRun.version_id.is_not(None)
         & HistoryRun.completed_at.is_(None),
         case((HistoryRun.desired_state == "running", "deriving"), else_=HistoryRun.desired_state)
-    ), else_=HistoryVersion.status)
+    ), ((HistoryVersion.status == "published") &
+        (HistoryVersion.manifest["result"].as_string() == "partial"), "partial"), else_=HistoryVersion.status)
     if dataset_id:
         base = base.where(HistoryVersion.dataset_id == dataset_id)
     if query:
@@ -120,8 +146,8 @@ def _task_query(*, dataset_id=None, query="", source=None, status="all"):
     if source:
         base = base.where(Instrument.source == source)
     groups = {"active": ("pending", "running", "deriving", "retrying", "configuration_error"),
-              "attention": ("retrying", "configuration_error"),
-              "history": ("published", "cancelled"), "paused": ("paused",)}
+              "attention": ("retrying", "configuration_error", "partial", "failed"),
+              "history": ("published", "cancelled", "partial", "failed"), "paused": ("paused",)}
     if status != "all":
         base = base.where(state.in_(groups[status]))
     return base
@@ -206,8 +232,8 @@ def coverage_report(db, version_id, *, page=1, page_size=25):
     import json
 
     from .history_quality import classify
-    from .source_history_store import raw_chunk
     from .market_datasets import version_price_rows
+    from .source_history_store import raw_chunk
     from .storage import HistoryChunk, HistoryReclamation
 
     version = db.get(HistoryVersion, version_id)
@@ -224,6 +250,12 @@ def coverage_report(db, version_id, *, page=1, page_size=25):
     items = []
     for chunk in db.scalars(query.order_by(HistoryChunk.start).offset((page - 1) * page_size).limit(page_size)):
         rows = version_price_rows(json.loads(raw_chunk(db, chunk)), version.manifest)
+        if version.manifest.get("schema") == "managed-period-snapshot-v2":
+            items.append({"timeframe": chunk.timeframe, "start": chunk.start, "end": chunk.end,
+                "observed_at": chunk.observed_at, "result": chunk.result, "observed_bars": len(rows),
+                "complete_bars": sum(bool(row["complete"]) for row in rows),
+                "coverage_policy": "observed_source_bars"})
+            continue
         items.append({"start": chunk.start, "end": chunk.end, "observed_at": chunk.observed_at,
             "result": chunk.result, **classify(version, rows, chunk.unknown)})
     return {"version_id": version.id, "items": items, "total": total, "page": page, "page_size": page_size}

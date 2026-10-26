@@ -27,6 +27,7 @@ def aware(value: datetime) -> datetime:
 class Calendar(StrEnum):
     NY17 = "ny17"
     UTC0 = "utc0"
+    SOURCE_DATE = "source_date"
 
 
 @dataclass(frozen=True)
@@ -41,6 +42,10 @@ def calendar_phase(calendar):
 
 def calendar_from(phase, profile=None, *, explicit=False):
     phase = Calendar(phase)
+    if phase == Calendar.SOURCE_DATE:
+        if not profile or not profile.get("trading_date"):
+            raise ValueError("Source trading-date calendar requires explicit exchange rules")
+        return phase
     session = session_from(profile)
     return SourceCalendar(phase, session) if explicit or session is not None else phase
 
@@ -84,6 +89,8 @@ class Candle:
 def session_bounds(moment: datetime, calendar: Calendar) -> tuple[datetime, datetime]:
     moment = aware(moment)
     calendar = calendar_phase(calendar)
+    if calendar == Calendar.SOURCE_DATE:
+        raise ValueError("Source trading-date bars cannot be inferred from M1 sessions")
     zone = NY if calendar == Calendar.NY17 else UTC
     local = moment.astimezone(zone)
     start = local.replace(
@@ -109,6 +116,8 @@ def scheduled_open(
 ) -> bool:
     """Weekly schedule plus explicitly confirmed half-open closure intervals."""
     moment = aware(moment)
+    if calendar_phase(calendar) == Calendar.SOURCE_DATE:
+        raise ValueError("Source trading-date calendars do not certify minute coverage")
     if any(c.start <= moment < c.end for c in closures):
         return False
     if isinstance(calendar, SourceCalendar):

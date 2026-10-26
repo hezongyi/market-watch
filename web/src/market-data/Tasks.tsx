@@ -96,7 +96,7 @@ export function Tasks() {
             onChange={(event) => change("source", event.target.value)}
           >
             <option value="">全部来源</option>
-            {["dukascopy", "oanda", "binance", "yahoo"].map((source) => (
+            {["dukascopy", "oanda", "fxcm", "binance", "yahoo"].map((source) => (
               <option key={source} value={source}>
                 {names[source]}
               </option>

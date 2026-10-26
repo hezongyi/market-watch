@@ -56,6 +56,7 @@ test("read, capability, geometry, create, edit, lifecycle and ack have bounded a
   for (const value of [
     query("/chart-alerts"),
     query("/chart-alerts/events"),
+    query(`/chart-alerts/${id}`),
     query("/chart-alerts/capabilities", { instrument: "EURUSD" }),
     query("/chart-alerts/geometry", { instrument: "EURUSD", points: [] }),
     query("/chart-alerts", {
@@ -69,7 +70,7 @@ test("read, capability, geometry, create, edit, lifecycle and ack have bounded a
       (await chartAlertUiRequest(value, scope, () => true, api)).ok,
       true,
     );
-  assert.equal(calls.length, 8);
+  assert.equal(calls.length, 9);
 });
 test("workspace change suppresses delayed response and refuses subsequent calls", async () => {
   let current = true,

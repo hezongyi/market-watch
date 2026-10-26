@@ -70,7 +70,7 @@ export default function SeriesPicker({ kind, selected, onSelect }: {
     <label>查找{title}<NativeInput type="search" value={query} maxLength={100}
       onChange={e => { setQuery(e.target.value); resetPages(); }} placeholder="品种或准确来源代码" /></label>
     <label>历史来源<NativeSelect aria-label="历史来源" value={source} onChange={e => { setSource(e.target.value); resetPages(); }}>
-      <option value="">全部来源</option><option value="dukascopy">Dukascopy</option><option value="oanda">OANDA</option><option value="binance">Binance</option>
+      <option value="">全部来源</option><option value="dukascopy">Dukascopy</option><option value="oanda">OANDA</option><option value="fxcm">FXCM Demo</option><option value="binance">Binance</option>
     </NativeSelect></label>
     <label>聚合日界<NativeSelect aria-label="聚合日界" value={calendar} onChange={e => { setCalendar(e.target.value); resetPages(); }}>
       <option value="">全部日界</option><option value="ny17">NY17</option><option value="utc0">UTC 00:00</option>

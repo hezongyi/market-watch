@@ -1,0 +1,19 @@
+{
+  "passed": false,
+  "started_at": "2026-10-25T03:35:30.978Z",
+  "recovery": {
+    "version": "4b087aeb-6c44-43dd-b549-a3b298b3ae61",
+    "paused_after_restart": true,
+    "resumed_published": true,
+    "mode": "orderly_stop_durable_queued_task_not_mid_request_kill"
+  },
+  "stage": "failed",
+  "daily": {
+    "due_at": 1792899480000,
+    "clock": "natural_UTC_minute",
+    "latest_before_due": "4b087aeb-6c44-43dd-b549-a3b298b3ae61",
+    "paused_due_did_not_run": true
+  },
+  "error": "Natural due daily task did not publish",
+  "finished_at": "2026-10-25T03:43:13.692Z"
+}

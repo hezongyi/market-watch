@@ -53,6 +53,7 @@ class Settings(BaseSettings):
     binance_proxy: str = ""
     binance_connection_mode: Literal["configured", "direct"] = "configured"
     yahoo_enabled: bool = False
+    akshare_enabled: bool = False
     yahoo_proxy: str = Field(default="", repr=False)
     yahoo_poll_seconds: int = Field(default=60, ge=15, le=900)
     yahoo_metadata_ttl_seconds: int = Field(default=86400, ge=60, le=86400)
@@ -61,6 +62,10 @@ class Settings(BaseSettings):
     yahoo_minute_retention_days: int = Field(default=60, ge=1, le=60)
     yahoo_hour_retention_days: int = Field(default=730, ge=1, le=730)
     fx_source: Literal["dukascopy", "oanda"] = "dukascopy"
+    fxcm_enabled: bool = False
+    fxcm_credentials_file: str = Field(default="", repr=False)
+    fxcm_helper_path: str = ""
+    fxcm_sdk_path: str = ""
     oanda_token: str = Field(default="", repr=False)
     oanda_account_id: str = Field(default="", repr=False)
     oanda_proxy: str = ""

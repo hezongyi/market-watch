@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "archive": "application-before.dump (private)",
+  "bytes": 403397226,
+  "sha256": "da6b7dc792e66493ef15e9850a14d631f8245ff1420c1a0abe8dcbe604c995cc",
+  "restore_container": "mw-equity-qfq-pg-20261025",
+  "restore_database": "application_restore",
+  "schema": "public",
+  "alembic_version": "ay52_history_modes",
+  "table_count": 103,
+  "counts": {
+    "advanced_chart_workspaces": 17,
+    "chart_alerts": 19,
+    "chart_indicator_templates": 0,
+    "market_datasets": 132,
+    "market_history_versions": 23,
+    "market_history_chunks": 1326,
+    "market_history_artifacts": 172
+  },
+  "note": "before.dump was a separate default database archive; not application backup evidence."
+}

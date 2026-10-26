@@ -1,0 +1,754 @@
+{
+  "passed": true,
+  "result": {
+    "symbol": "MWP:FXCM:941424CA250383292AB3A5B2D04E2623",
+    "resolution": "240",
+    "ready": true,
+    "range": {
+      "from": 1791234000,
+      "to": 1792900800
+    }
+  },
+  "elapsed_ms": 82924,
+  "network": [
+    {
+      "event": "request",
+      "method": "POST",
+      "url": "https://test.kookvv.com:8443/api/charts/data",
+      "at": 1792928930763
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/market-data/resolve",
+      "at": 1792928934895,
+      "timing": {
+        "startTime": 1792928930748.2131,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.427,
+        "responseStart": 4143.989,
+        "responseEnd": 4148.729
+      }
+    },
+    {
+      "event": "request",
+      "method": "POST",
+      "url": "https://test.kookvv.com:8443/api/market-data/resolve",
+      "at": 1792928934898
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/data",
+      "at": 1792928935077,
+      "timing": {
+        "startTime": 1792928930773.562,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.489,
+        "responseStart": 4300.811,
+        "responseEnd": 4316.304
+      }
+    },
+    {
+      "event": "request",
+      "method": "POST",
+      "url": "https://test.kookvv.com:8443/api/charts/data",
+      "at": 1792928935156
+    },
+    {
+      "event": "request",
+      "method": "POST",
+      "url": "https://test.kookvv.com:8443/api/market-data/resolve",
+      "at": 1792928935432
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/market-data/resolve",
+      "at": 1792928935790,
+      "timing": {
+        "startTime": 1792928934899.841,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.403,
+        "responseStart": 887.233,
+        "responseEnd": 891.02
+      }
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/data",
+      "at": 1792928937389,
+      "timing": {
+        "startTime": 1792928935157.614,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.443,
+        "responseStart": 2228.757,
+        "responseEnd": 2238.305
+      }
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/market-data/resolve",
+      "at": 1792928945013,
+      "timing": {
+        "startTime": 1792928935434.754,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.921,
+        "responseStart": 9575.998,
+        "responseEnd": 9582.962
+      }
+    },
+    {
+      "event": "request",
+      "method": "POST",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads",
+      "at": 1792928945496
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads",
+      "at": 1792928950500,
+      "timing": {
+        "startTime": 1792928945497.9028,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.431,
+        "responseStart": 4998.374,
+        "responseEnd": 5003.242
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928950705
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928951921,
+      "timing": {
+        "startTime": 1792928950708.221,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.571,
+        "responseStart": 1210.074,
+        "responseEnd": 1216.405
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928952202
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928954176,
+      "timing": {
+        "startTime": 1792928952204.156,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.547,
+        "responseStart": 1967.606,
+        "responseEnd": 1971.292
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928954573
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928956303,
+      "timing": {
+        "startTime": 1792928954576.508,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.716,
+        "responseStart": 1723.662,
+        "responseEnd": 1732.509
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928956854
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928957074,
+      "timing": {
+        "startTime": 1792928956855.287,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.565,
+        "responseStart": 216.218,
+        "responseEnd": 219.341
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928957845
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928958102,
+      "timing": {
+        "startTime": 1792928957845.9978,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.432,
+        "responseStart": 253.108,
+        "responseEnd": 256.851
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928959178
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928961081,
+      "timing": {
+        "startTime": 1792928959180.4768,
+        "domainLookupStart": 0.416,
+        "domainLookupEnd": 0.42,
+        "connectStart": 0.42,
+        "secureConnectionStart": 0.609,
+        "connectEnd": 17.702,
+        "requestStart": 17.901,
+        "responseStart": 1897.933,
+        "responseEnd": 1902.358
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928962589
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928962697,
+      "timing": {
+        "startTime": 1792928962590.174,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.486,
+        "responseStart": 101.573,
+        "responseEnd": 105.818
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928964205
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928964819,
+      "timing": {
+        "startTime": 1792928964206.4731,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.545,
+        "responseStart": 610.364,
+        "responseEnd": 615.037
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928966322
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928967279,
+      "timing": {
+        "startTime": 1792928966324.1628,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.437,
+        "responseStart": 951.55,
+        "responseEnd": 955.945
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928968781
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928969327,
+      "timing": {
+        "startTime": 1792928968783.4138,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.766,
+        "responseStart": 540.904,
+        "responseEnd": 545.572
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928970828
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928971198,
+      "timing": {
+        "startTime": 1792928970831.4587,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.555,
+        "responseStart": 363.78,
+        "responseEnd": 369.2
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928972703
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928974111,
+      "timing": {
+        "startTime": 1792928972705.7,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.377,
+        "responseStart": 1390.601,
+        "responseEnd": 1395.826
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928975622
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928976214,
+      "timing": {
+        "startTime": 1792928975623.773,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.483,
+        "responseStart": 587.773,
+        "responseEnd": 591.058
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928977715
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928980292,
+      "timing": {
+        "startTime": 1792928977716.9841,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.423,
+        "responseStart": 2570.718,
+        "responseEnd": 2574.857
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928981794
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928983201,
+      "timing": {
+        "startTime": 1792928981795.82,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.517,
+        "responseStart": 1403.147,
+        "responseEnd": 1407.791
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928984703
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928985190,
+      "timing": {
+        "startTime": 1792928984704.8381,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.496,
+        "responseStart": 480.719,
+        "responseEnd": 484.905
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928986691
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928987413,
+      "timing": {
+        "startTime": 1792928986693.2268,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.44,
+        "responseStart": 717.697,
+        "responseEnd": 721.849
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928988921
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928989124,
+      "timing": {
+        "startTime": 1792928988922.637,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.454,
+        "responseStart": 199.004,
+        "responseEnd": 202.648
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928990625
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928992481,
+      "timing": {
+        "startTime": 1792928990626.497,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.422,
+        "responseStart": 1851.651,
+        "responseEnd": 1854.995
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928993986
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928995071,
+      "timing": {
+        "startTime": 1792928993987.137,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.429,
+        "responseStart": 1081.672,
+        "responseEnd": 1084.854
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928996576
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928997525,
+      "timing": {
+        "startTime": 1792928996577.404,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.549,
+        "responseStart": 941.275,
+        "responseEnd": 944.924
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792928999026
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792929001977,
+      "timing": {
+        "startTime": 1792928999027.1257,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.562,
+        "responseStart": 2947.514,
+        "responseEnd": 2951.049
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792929003481
+    },
+    {
+      "event": "request",
+      "method": "POST",
+      "url": "https://test.kookvv.com:8443/api/market-data/resolve",
+      "at": 1792929005026
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/market-data/resolve",
+      "at": 1792929006582,
+      "timing": {
+        "startTime": 1792929005027.528,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.661,
+        "responseStart": 1550.077,
+        "responseEnd": 1555.048
+      }
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792929006633,
+      "timing": {
+        "startTime": 1792929003483.263,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.449,
+        "responseStart": 3145.477,
+        "responseEnd": 3150.406
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792929008134
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792929008312,
+      "timing": {
+        "startTime": 1792929008135.3901,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.407,
+        "responseStart": 173.946,
+        "responseEnd": 176.725
+      }
+    },
+    {
+      "event": "request",
+      "method": "GET",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792929009813
+    },
+    {
+      "event": "response",
+      "status": 200,
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/result",
+      "at": 1792929013614,
+      "timing": {
+        "startTime": 1792929009814.895,
+        "domainLookupStart": -1,
+        "domainLookupEnd": -1,
+        "connectStart": -1,
+        "secureConnectionStart": -1,
+        "connectEnd": -1,
+        "requestStart": 0.508,
+        "responseStart": 3797.668,
+        "responseEnd": 3807.134
+      }
+    },
+    {
+      "event": "request",
+      "method": "POST",
+      "url": "https://test.kookvv.com:8443/api/charts/history-loads/f0628435-83ae-44c9-8660-4c54093692dc/cancel",
+      "at": 1792929013623
+    }
+  ],
+  "ui": "- contentinfo:\n  - paragraph: Tradingview是交互式的，并且具有与屏幕阅读器一起使用的命令。以下是可用于在平台上交互的键盘命令列表\n  - list:\n    - listitem: 开始使用键盘导航模式。按Alt + Z\n    - listitem: 快速搜索。按Ctrl + K\n    - listitem: 更改商品。开始输入商品名称\n    - listitem: 更改时间周期。按数字或逗号\n    - listitem: 指标、指标和策略。按斜线\n    - listitem: 开放式布局。按下句号\n- toolbar:\n  - button \"商品代码搜索\": EUR/USD\n  - button \"对比或叠加商品\"\n  - radiogroup:\n    - radio \"1 分钟\": 1分\n    - radio \"5 分钟\": 5分\n    - radio \"15 分钟\": 15分\n    - radio \"30 分钟\": 30分\n    - radio \"1 小时\": 1小时\n    - radio \"4 小时\" [checked]: 4小时\n    - radio \"1 日\": 天\n    - radio \"1 周\": 周\n    - radio \"1 月\": 月\n  - button \"图表周期\"\n  - button \"K线图\"\n  - button \"指标模板\"\n  - button \"指标\"\n  - button \"数据中心\"\n  - button \"复原 变更品种\"\n  - button [disabled]\n  - button \"布局设置\"\n  - button \"所有更改已保存\" [disabled]: 历史模式验收 2026-10-25T00:29:05.982Z 保存\n  - button \"管理布局\"\n  - button \"快速搜索\"\n  - button \"设置\"\n  - button \"全屏模式\"\n  - button \"生成快照\"\n  - button \"系统消息，486 条未读\"\n- toolbar:\n  - button \"十字线\"\n  - button \"游标\" [pressed]\n  - button \"趋势线\"\n  - button \"趋势线工具\"\n  - button \"斐波那契回撤\"\n  - button \"江恩和斐波那契工具\"\n  - button \"XABCD 形态\"\n  - button \"形态\"\n  - button \"多头\"\n  - button \"预测和测量工具\"\n  - button \"笔刷\"\n  - button \"几何形状\"\n  - button \"文字\"\n  - button \"注释工具\"\n  - button \"图标\"\n  - button \"图标\"\n  - button \"测量\"\n  - button \"放大\"\n  - button \"磁铁模式将放置在价格K线附近的绘图吸附到最近的OHLC值\"\n  - button \"磁铁\"\n  - button \"继续绘图\"\n  - button \"锁定所有绘图\"\n  - button \"隐藏所有图形\"\n  - button \"隐藏选项\"\n  - button \"移除0个绘图\"\n  - button \"移除选项\"\n- button \"隐藏绘图工具栏\":\n  - img\n- 'region \"图表 #1\"':\n  - toolbar:\n    - button \"变更品种\": EUR/USD · 平台行情 · Bid · FXCM原生周期 · 交易时段未核实 · 价格变动次数\n    - text: ·\n    - button \"变更周期\": 4小时\n    - text: · FXCM\n    - button \"更多\":\n      - img\n    - button \"开市\"\n    - text: 开= 1.11583 高= 1.11606 低= 1.11519 收= 1.11542 −0.00041 (−0.04%)\n- toolbar:\n  - button \"1周时间周期内的5年\": 5年\n  - button \"1周时间周期内的1年\": 1年\n  - button \"1小时时间周期内的3个月\": 3个月\n  - button \"30分钟时间周期内的1个月\": 1个月\n  - button \"5分钟时间周期内的5天\": 5天\n  - button \"1分钟时间周期内的1天\": 1天\n  - button \"前往到\"\n  - button \"时区\": 11:50:12 UTC\n  - button \"切换为百分比坐标\"\n  - button \"切换为对数坐标\": log\n  - button \"切换为自动坐标\" [pressed]: 自动\n- button \"自选表\"\n- button \"添加商品代码\"\n- button \"自选列表列设置\"\n- button \"商品\"\n- button \"最新价\"\n- button \"涨跌\"\n- button \"涨跌%\"\n- button \"按旗标排序\"\n- text: BTCUSDT 80,560.01 −328.15 −0.41%\n- button \"MWP:BTCUSDT · 添加颜色收藏\"\n- text: EURUSD 1.12026 −0.00135 −0.12%\n- button \"MWP:EURUSD · 添加颜色收藏\"\n- text: GBPUSD 1.33712 −0.00283 −0.21%\n- button \"MWP:OANDA:GBP_USD · 添加颜色收藏\"\n- text: XAUUSD 3,995.205 −29.020 −0.72%\n- button \"MWP:XAUUSD · 添加颜色收藏\"\n- text: USDCAD 1.40457 0.00001 0.00%\n- button \"MWH:2a673b63-2922-497e-bec9-d0231be55934 · 添加颜色收藏\"\n- text: COMPOSITE EURUSD 1.12026 0.00000 0.00%\n- button \"MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb · 绿色收藏\" [pressed]\n- text: USDCAD 1.40037 0.00000 0.00%\n- button \"MWC:54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982 · 添加颜色收藏\"\n- text: XAUUSD 3,995.205 0.000 0.00%\n- button \"MWC:4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6 · 黄色收藏\" [pressed]\n- text: USDOLLAR 12,746 5 0.04%\n- button \"MWP:FXCM:5694cca1d1fb5ae46cfbed22ef5ef6af · 添加颜色收藏\"\n- text: EUR/USD EUR/USD · 平台行情 · Bid · FXCM原生周期 · 交易时段未核实 FXCM 开市\n- toolbar:\n  - button \"观察清单和详情\" [pressed]\n  - button \"警报\"\n  - button \"数据窗口\"\n  - button \"显示对象树\"\n- img\n- toolbar:\n  - button \"打开交易面板\": 账户管理器\n  - button \"打开面板\"\n  - button \"最大化面板\"\n- alert\n- button \"图表菜单\"",
+  "errors": [],
+  "logs": []
+}

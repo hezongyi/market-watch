@@ -21,7 +21,11 @@ let invalidateAlertUI = () => {};
 // Lazy loading keeps ordinary datafeed consumers independent of the renderer.
 let swingSnapshots;
 function swingStore() {return swingSnapshots ||= swingSnapshotStore();}
-let swingDisplay, indicatorCoordinator;
+let swingDisplay, indicatorCoordinator, squeezeSnapshots, squeezeDisplay;
+function squeezeStore() {return squeezeSnapshots ||= squeezeSnapshotStore();}
+function publishSqueeze(ticker,res,page,ticket) {
+  squeezeStore().publish(ticker,res,page,ticket ?? squeezeStore().ticket());squeezeDisplay?.refresh();
+}
 const indicatorBindings=new Map();
 const indicatorDependencyOrigins=new Map();
 function indicatorKey(ticker,res){
@@ -110,6 +114,7 @@ function acceptMarketBars(sub,event) {
   if(event.as_of!=null && event.as_of<(sub.displayAsOf ?? -Infinity))return;
   sub.displayAsOf=event.as_of ?? sub.displayAsOf;
   const identity=decode(sub.symbol);
+  if(identity.spec?.name==='ROLLING_RANGE_SQUEEZE') publishSqueeze(MWSeries.encode(identity.symbol,identity.series_kind),sub.res,event);
   if(identity.spec?.name==='SWING_SR_V1') {
     if(!swingStore().publish(MWSeries.encode(identity.symbol,identity.series_kind),sub.res,event,swingStore().ticket()))return;
     swingDisplay?.refresh();
@@ -358,7 +363,8 @@ function indicatorFault(consumer,error,attempt_id){
     context:{chart_index:consumer.index,consumer:consumer.id,instrument:consumer.chart.symbol(),timeframe:consumer.chart.resolution()},
     evidence:{reason_code:error?.code||'INDICATOR_FAILED',params:consumer.params,algorithm_version:consumer.meta.version,
       input_revision:binding.inputRevision,visible_from:scope?.first,visible_to:scope?.last,
-      calculation_origin:binding.calculationStart,accepted_scope:consumer.acceptedScope||null}};
+      calculation_origin:binding.calculationStart,accepted_scope:consumer.acceptedScope||null,
+      ...(error?.dependency ? {dependency:error.dependency} : {})}};
 }
 function releaseIndicatorConsumers(consumers) {
   // Cancellation fences are cumulative. Merge only unsent releases for this
@@ -386,9 +392,13 @@ function releaseIndicatorConsumers(consumers) {
   }
 }
 function startIndicatorCoordinator(catalog) {
+  const nrDrawings=typeof chartNRBreakoutDisplay==='function' ? chartNRBreakoutDisplay({
+    report:error=>send({type:'error',error:'NR4/NR7 绘制失败：'+String(error)}),
+  }) : undefined;
   indicatorCoordinator=chartIndicatorCoordinator(widget,catalog,{
+    drawings:nrDrawings,
     read:(symbol,res,args,current)=>query(symbol,res,args,Date.now()+30000,current),
-    recover:(ticker,res,token)=>recoverDisplaySnapshot(ticker,res,token),
+    recover:(ticker,res,token,error)=>recoverDisplaySnapshot(ticker,res,token,false,error?.snapshot_evidence),
     identity:{
       binding:(ticker,res)=>{
         const id=decode(ticker),key=indicatorKey(ticker,res),base=indicatorBindings.get(key);
@@ -420,7 +430,7 @@ function startIndicatorCoordinator(catalog) {
     occurrence:(error,consumer,attempt)=>{if(!['HISTORY_CANCELLED','DISPLAY_SNAPSHOT_EXPIRED'].includes(error.code))emitNotice(indicatorFault(consumer,error,attempt));},
     recovered:consumer=>emitNotice(indicatorFault(consumer),true),
     report:error=>{if(error.code!=='HISTORY_CANCELLED')send({type:'error',error:'指标读取失败：'+String(error)});},
-    presentation:(ticker,res,page)=>{swingStore().publish(ticker,res,page,swingStore().ticket());swingDisplay?.refresh();},
+    presentation:(ticker,res,page)=>{publishSqueeze(ticker,res,page);swingStore().publish(ticker,res,page,swingStore().ticket());swingDisplay?.refresh();},
     leases:leases=>{if(leases.length)void request({client:clientId,leases},'indicator-demand-update').catch(error=>send({type:'error',error:String(error)}));},
     release:releaseIndicatorConsumers,
     demand:rows=>{
@@ -442,38 +452,45 @@ function providerRecoveryRows(chart) {
   data.each((_,row)=>{rows.push(row.slice(0,6));});
   return rows.length===data.size() ? rows : null;
 }
-async function refreshProviderDisplayCredential(ticker,res,token,charts,current) {
+async function refreshProviderDisplayCredential(ticker,res,token,charts,current,evidence={}) {
   const key=indicatorKey(ticker,res),binding=indicatorBindings.get(key);
-  if(!binding || binding.providerSnapshot!==token)return false;
+  if(!binding || binding.providerSnapshot!==token){evidence.refresh_reason='binding_superseded';return false;}
   const accepted=charts.map(({chart})=>({chart,rows:providerRecoveryRows(chart)}));
-  if(accepted.some(item=>!item.rows))return false;
+  if(accepted.some(item=>!item.rows)){evidence.refresh_reason='native_rows_unavailable';return false;}
   let refreshed;
   for(const {rows} of accepted) {
     const page=await query(ticker,res,{before:rows.at(-1)[0]*1000+1,
       limit:rows.length,indicators:[]},Date.now()+10000,current);
     if(!current())return false;
     // A stream update can already have replaced the rejected credential.
-    if(indicatorBindings.get(key)?.providerSnapshot!==token)return true;
+    if(indicatorBindings.get(key)?.providerSnapshot!==token){evidence.refresh_reason='credential_superseded';return true;}
     if(!page.provider_snapshot_id || !Number.isSafeInteger(page.cache_revision) ||
-      page.cache_revision!==binding.tailVersion)return false;
+      page.cache_revision!==binding.tailVersion){evidence.refresh_reason='credential_or_revision_changed';return false;}
     const prices=barsOf(page,res,ticker);
     if(prices.length!==rows.length || prices.some((bar,index)=>{
       const row=rows[index];
       return bar.time!==row[0]*1000 || ['open','high','low','close'].some((name,i)=>bar[name]!==row[i+1]) ||
         (bar.volume ?? 0)!==(row[5] ?? 0);
-    }))return false;
+    })){evidence.refresh_reason='price_rows_changed';return false;}
     if(!refreshed || prices.at(-1).time>=barsOf(refreshed,res,ticker).at(-1).time)refreshed=page;
   }
   if(!current())return false;
-  if(indicatorBindings.get(key)?.providerSnapshot!==token)return true;
+  if(indicatorBindings.get(key)?.providerSnapshot!==token){evidence.refresh_reason='credential_superseded';return true;}
   // Pagination, navigation or a native restart during the read invalidates the
   // comparison. No credential may be rebound under a different accepted page.
-  if(accepted.some(({chart,rows})=>JSON.stringify(providerRecoveryRows(chart))!==JSON.stringify(rows)))return false;
+  if(accepted.some(({chart,rows})=>JSON.stringify(providerRecoveryRows(chart))!==JSON.stringify(rows))){evidence.refresh_reason='native_rows_changed';return false;}
   rememberIndicatorBinding(ticker,res,refreshed);
+  evidence.refresh_reason='compared_equal';
   return true;
 }
 const displayRecoveries=new Map();
-async function recoverDisplaySnapshot(ticker,res,token,retry=false){
+function resumeDeferredDisplayRecoveries(){
+  for(const entry of displayRecoveries.values()){
+    entry.prune();
+    if(entry.state==='deferred')entry.resume?.();
+  }
+}
+async function recoverDisplaySnapshot(ticker,res,token,retry=false,failureEvidence={}){
   const key=indicatorKey(ticker,res),previous=displayRecoveries.get(key);
   const binding=indicatorBindings.get(key);
   const boundToken=binding?.displaySnapshot ?? binding?.providerSnapshot;
@@ -485,7 +502,12 @@ async function recoverDisplaySnapshot(ticker,res,token,retry=false){
   const epoch=workspaceEpoch;
   const charts=ready ? Array.from({length:widget.chartsCount()},(_,index)=>({index,chart:widget.chart(index)}))
     .filter(({chart})=>chartUsesSymbol(chart,ticker,res)) : [];
-  const entry={token,attempt_id:crypto.randomUUID(),state:'preparing',prune(){
+  const trace=(phase,reason)=>{
+    entry.evidence={...entry.evidence,reload_phase:phase,reload_reason:reason,reload_starts:entry.attempts};
+    if(phase==='cancelled')entry.evidence.cancel_reason=reason;
+    console.info('display-snapshot-recovery',JSON.stringify(entry.evidence));
+  };
+  const entry={token,attempt_id:crypto.randomUUID(),state:'preparing',attempts:0,evidence:{},prune(){
     for(let offset=charts.length-1;offset>=0;offset--){
       const {index,chart}=charts[offset];
       if(epoch===workspaceEpoch && index<widget.chartsCount() &&
@@ -494,6 +516,7 @@ async function recoverDisplaySnapshot(ticker,res,token,retry=false){
       if(epoch===workspaceEpoch)send({type:'chart-indicator-state',epoch,index,id:'display-snapshot:'+key,name:'行情快照',state:'removed',error:''});
     }
     if(!charts.length && displayRecoveries.get(key)===entry){
+      entry.state='cancelled';trace('cancelled',epoch===workspaceEpoch ? 'viewer_removed' : 'stale_native_generation');entry.resume?.();
       displayRecoveries.delete(key);send({type:'feed-poll-state',key:'display:'+key,error:''});
     }
   }};
@@ -502,15 +525,23 @@ async function recoverDisplaySnapshot(ticker,res,token,retry=false){
   const notify=(state,error='')=>{for(const {index,chart} of charts)
     if(index<widget.chartsCount() && (widget.chart(index)._chartWidget || widget.chart(index))===(chart._chartWidget || chart) && (state==='removed' || chartUsesSymbol(chart,ticker,res)))
       send({type:'chart-indicator-state',epoch,index,id:'display-snapshot:'+key,name:'行情快照',state,error});};
+  previous?.resume?.();
   displayRecoveries.set(key,entry);
+  entry.evidence={attempt_ref:entry.attempt_id,native_generation:epoch,refresh_reason:'not_attempted',reload_starts:0};
   entry.promise=(async()=>{
+    if(!current())return;
+    const hash=await crypto.subtle.digest('SHA-256',Uint8Array.from(token,character=>character.charCodeAt(0)));
+    entry.evidence={...entry.evidence,credential_ref:Array.from(new Uint8Array(hash)).slice(0,8).map(n=>n.toString(16).padStart(2,'0')).join(''),
+      snapshot_reason:failureEvidence?.reason || 'unknown',rejected_attempt_ref:failureEvidence?.attempt_ref || null,
+      native_generation:epoch,refresh_reason:'not_attempted',reload_starts:0};
     if(!current())return;
     notify('preparing');
     // Failed native resets can leave old model rows after detaching the source.
     // Explicit retry must restart it; unchanged prices alone cannot restore it.
     if(ticker.startsWith('MWP:') && !(retry && previous?.state==='error')) {
       try {
-        if(await refreshProviderDisplayCredential(ticker,res,token,charts,current)) {
+        if(await refreshProviderDisplayCredential(ticker,res,token,charts,current,entry.evidence)) {
+          trace('restored',entry.evidence.refresh_reason);
           if(current()) {
             entry.state='ready';notify('ready');emitNotice({source_kind:'indicator',attempt_id:entry.attempt_id,code:'SNAPSHOT_RECOVERY_FAILED',title:'图表快照已恢复',message:'当前有效图格已成功恢复',context:{instrument:ticker,timeframe:res,consumer:'snapshot'}},true);send({type:'feed-poll-state',key:'display:'+key,error:''});
           }
@@ -518,6 +549,7 @@ async function recoverDisplaySnapshot(ticker,res,token,retry=false){
         }
       } catch(error) {
         if(!current())return;
+        entry.evidence.refresh_reason='comparison_request_failed';
         // A failed comparison read cannot certify unchanged prices. Retain
         // the existing bounded full recovery and its visible retry state.
       }
@@ -529,11 +561,21 @@ async function recoverDisplaySnapshot(ticker,res,token,retry=false){
       sub.marketGeneration=++marketGeneration;sub.marketSequence=0;
     }
     cache.clear();
-    for(let attempt=0;attempt<3 && current();attempt++){
+    while(entry.attempts<3 && current()){
       try{
-        const restored=await reloadHistory(ticker,res,chart=>current() && charts.some(item=>(item.chart._chartWidget || item.chart)===(chart._chartWidget || chart)));
+        const result=await reloadHistory(ticker,res,chart=>current() && charts.some(item=>(item.chart._chartWidget || item.chart)===(chart._chartWidget || chart)),true);
         if(!current())return;
-        if(restored){
+        if(result.status==='deferred'){
+          entry.state='deferred';trace('deferred',result.reason);
+          await new Promise(resolve=>{entry.resume=()=>{entry.resume=null;resolve();};});
+          if(!current())return;
+          const active=indicatorBindings.get(key),activeToken=active?.displaySnapshot ?? active?.providerSnapshot;
+          if(activeToken!=null && activeToken!==token){entry.state='cancelled';trace('cancelled','credential_superseded');return;}
+          entry.state='preparing';continue;
+        }
+        if(result.status==='cancelled'){entry.state='cancelled';trace('cancelled',result.reason);return;}
+        entry.attempts++;trace(result.status,result.reason);
+        if(result.status==='restored'){
           for(const sub of subscriptions.values())if(indicatorKey(sub.symbol,sub.res)===key){
             sub.needsHistoryReload=false;registerMarketBar(sub);
           }
@@ -542,21 +584,26 @@ async function recoverDisplaySnapshot(ticker,res,token,retry=false){
         }
       }catch(error){
         if(!current())return;
-        if(attempt===2)throw error;
+        entry.attempts++;trace('failed','reload_exception');
+        if(entry.attempts===3)throw error;
       }
-      if(attempt<2)await new Promise(resolve=>setTimeout(resolve,1000*2**attempt));
+      if(entry.attempts<3)await new Promise(resolve=>setTimeout(resolve,1000*2**(entry.attempts-1)));
     }
     if(current())throw Error('展示快照恢复失败，请重试指标');
   })();
-  const cancel=()=>{if(!current() && displayRecoveries.get(key)===entry){
-    displayRecoveries.delete(key);if(epoch===workspaceEpoch)notify('removed');
+  const cancel=()=>{if(!current()){
+    if(entry.state!=='cancelled'){entry.state='cancelled';trace('cancelled',epoch!==workspaceEpoch ? 'stale_native_generation' : displayRecoveries.get(key)!==entry ? 'recovery_superseded' : 'viewer_removed');}
+    if(displayRecoveries.get(key)===entry){displayRecoveries.delete(key);if(epoch===workspaceEpoch)notify('removed');}
   }};
   entry.promise.then(cancel,error=>{if(current()){
+    error.code='SNAPSHOT_RECOVERY_FAILED';error.dependency={code:'SNAPSHOT_RECOVERY_FAILED',attempt_ref:entry.attempt_id,...entry.evidence};
     entry.state='error';notify('error',String(error));
-    emitNotice({source_kind:'indicator',attempt_id:entry.attempt_id,code:'SNAPSHOT_RECOVERY_FAILED',title:'图表快照恢复失败',message:String(error),context:{instrument:ticker,timeframe:res,consumer:'snapshot'},evidence:{input_revision:binding?.inputRevision,calculation_origin:binding?.calculationStart}});
+    emitNotice({source_kind:'indicator',attempt_id:entry.attempt_id,code:'SNAPSHOT_RECOVERY_FAILED',title:'图表快照恢复失败',message:String(error),context:{instrument:ticker,timeframe:res,consumer:'snapshot'},evidence:{...entry.evidence,input_revision:binding?.inputRevision,calculation_origin:binding?.calculationStart}});
     send({type:'feed-poll-state',key:'display:'+key,error:String(error)});
   }else cancel();});
-  if(displayRecoveries.size>64)displayRecoveries.delete(displayRecoveries.keys().next().value);
+  if(displayRecoveries.size>64){
+    const oldest=displayRecoveries.keys().next().value;displayRecoveries.get(oldest).resume?.();displayRecoveries.delete(oldest);
+  }
   return entry.promise;
 }
 function acceptMarketHistory(ticker,res,page,window = '', acceptedRows) {
@@ -603,7 +650,7 @@ async function recoverMarketBar(sub) {
   } finally {sub.marketRecovering=false;}
 }
 function synchronizeMarketVisibility() {
-  for(const recovery of displayRecoveries.values())recovery.prune();
+  resumeDeferredDisplayRecoveries();
   if(marketPollingFallback || !ready || loading) return;
   for(const sub of subscriptions.values()) {
     if(!sub.marketListener) continue;
@@ -863,7 +910,7 @@ function drain() {
       send({type:"cancel-request",id});
       reject(Object.assign(Error("行情请求超时"),{code:"HISTORY_TIMEOUT"}));
       drain();
-    }, query.native_history && !query.native_reserve ? ((globalThis.MW_HISTORY_CAPABILITIES?.task_seconds || 600)+10)*1000 : 30000);
+    }, query.native_history && !query.native_reserve ? ((globalThis.MW_HISTORY_CAPABILITIES?.task_seconds || 600)+10)*1000 : (query.series_kind === "provider" && /^(MWP:)?FXCM:/i.test(query.instrument || "")) || (type === "data-center-api" && query.path === "/market-data/history-catalog/refresh" && query.body?.source === "fxcm") ? 70000 : 30000);
     const entry = {resolve,reject,timer,cancellationTimer:null,...requestPolicy.describe(selected)};
     pending.set(id, entry);
     if (isCurrent) {
@@ -1065,7 +1112,7 @@ function reportHistoryFailures() {
   }
   send({type:'chart-history-failures',epoch:workspaceEpoch,failures});
 }
-globalThis.addEventListener('mw-history-state',()=>setTimeout(reportHistoryFailures,0));
+globalThis.addEventListener('mw-history-state',()=>{setTimeout(reportHistoryFailures,0);resumeDeferredDisplayRecoveries();});
 
 function query(ticker, res, args, expires = Infinity, current = () => true, scheduling = {}) {
   const { symbol, spec, series_kind } = decode(ticker);
@@ -1087,6 +1134,7 @@ function query(ticker, res, args, expires = Infinity, current = () => true, sche
   const old = cache.get(key);
   if (!q.indicators?.length && (series_kind === 'managed' || spec) && old && Date.now() - old.time < 1000) return old.promise;
   const epoch = workspaceEpoch;
+  const squeezeTicket = spec?.name==='ROLLING_RANGE_SQUEEZE' ? squeezeStore().ticket() : null;
   const swingTicket = spec?.name==='SWING_SR_V1' ? swingStore().ticket() : null;
   // Native owns the lifetime of its period caches. A temporary period switch
   // does not cancel a getBars callback that it can reuse when switching back.
@@ -1104,6 +1152,7 @@ function query(ticker, res, args, expires = Infinity, current = () => true, sche
         alertCompositeRevisions.set(MWSeries.encode(symbol,series_kind)+'|'+res,page.revision_id);
       if (epoch===workspaceEpoch && spec && Number.isSafeInteger(page.calculation_origin ?? page.origin))
         alertCalculationOrigins.set(MWSeries.encode(symbol,series_kind)+'|'+res,page.calculation_origin ?? page.origin);
+      if(epoch===workspaceEpoch && spec?.name==='ROLLING_RANGE_SQUEEZE') publishSqueeze(MWSeries.encode(symbol,series_kind),res,page,squeezeTicket);
       if(epoch===workspaceEpoch && spec?.name==='SWING_SR_V1') {
         swingStore().publish(MWSeries.encode(symbol,series_kind),res,page,swingTicket);
         swingDisplay?.refresh();
@@ -1165,17 +1214,36 @@ function seriesPresentationRows(symbols) {
 // Vendor start counts returned rows; backend cursors count qualified candidates.
 // Keep that translation local to each immutable query, with bounded memory.
 const nativeSearchPages = new Map();
+const nativeSearchResults = new Map();
+const nativeSearchWarming = new Map();
+const nativeSearchTTL = 300000;
+function clearNativeSearchCache() {
+  nativeSearchResults.clear();
+  nativeSearchWarming.clear();
+}
+function warmNativeSearch(query) {
+  const key=JSON.stringify([workspaceEpoch,query]);
+  if(Date.now()-(nativeSearchWarming.get(key) || 0)<nativeSearchTTL)return;
+  nativeSearchWarming.set(key,Date.now());
+  while(nativeSearchWarming.size>20)nativeSearchWarming.delete(nativeSearchWarming.keys().next().value);
+  // Only the maintained directory is searched. Candle demand remains on use.
+  searchNativeSymbols({userInput:query,start:0}).catch(()=>{});
+}
 async function searchNativeSymbols(options) {
   const epoch = workspaceEpoch;
   const kind = options.kind || "all";
-  const key = JSON.stringify([kind,options.userInput,options.exchange,options.symbolType,epoch]);
+  const key = JSON.stringify([kind,options.userInput || "",options.exchange || "",options.symbolType || "",epoch]);
   const start = options.start || 0;
   let pages = nativeSearchPages.get(key);
   if (!pages || start === 0) {pages=new Map([[0,null]]);nativeSearchPages.set(key,pages);}
   while(nativeSearchPages.size>20) nativeSearchPages.delete(nativeSearchPages.keys().next().value);
   if (!pages.has(start)) throw Error("搜索分页已失效，请重新搜索");
+  if(options.signal?.aborted)throw Object.assign(Error("搜索已取消"),{name:"AbortError"});
   let position=pages.get(start),page;
-  for(let scan=0;scan<5;scan++) {
+  const cached=start===0 ? nativeSearchResults.get(key) : null;
+  if(cached && cached.expires>Date.now()) {
+    page=cached.page;position=cached.position;
+  } else for(let scan=0;scan<5;scan++) {
     page=await request({op:"searchPage",args:{kind,query:options.userInput || "",page_size:50,
       source:options.exchange ? options.exchange.toLowerCase() : undefined,
       symbol_type:options.symbolType || "",...(kind === "all" ? {cursor:position || undefined} : {offset:position || 0})}},"market",()=>epoch===workspaceEpoch && !options.signal?.aborted);
@@ -1183,6 +1251,13 @@ async function searchNativeSymbols(options) {
     if(page.items.length || position == null) break;
   }
   if(epoch!==workspaceEpoch) throw Error("工作区已切换");
+  if(options.signal?.aborted)throw Object.assign(Error("搜索已取消"),{name:"AbortError"});
+  if(start===0 && !cached) {
+    nativeSearchResults.set(key,{page,position,expires:Date.now()+nativeSearchTTL});
+    while(nativeSearchResults.size>20)nativeSearchResults.delete(nativeSearchResults.keys().next().value);
+  } else if(start===0 && cached && cached.expires<=Date.now()) {
+    nativeSearchResults.set(key,{page,position,expires:Date.now()+nativeSearchTTL});
+  }
   if(position != null) pages.set(start+page.items.length,position);
   while(pages.size>256) pages.delete(pages.keys().next().value);
   return {items:page.items.map(s=>({symbol:s.display_symbol || s.symbol,ticker:s.ticker,
@@ -1274,6 +1349,7 @@ const feed = {
     quoteSubscriptions.set(id, quoteSub);
     rememberQuoteRows([]);
     if(!marketPollingFallback) for(const ticker of all) {
+      if(decode(ticker).series_kind === 'provider' && /^(AKSHARE|TENCENT):/.test(decode(ticker).symbol)) continue;
       const listener=crypto.randomUUID(),generation=++marketGeneration;
       quoteSub.listeners.push({listener,generation,ticker,sequence:0});
       send({type:'market-subscribe',args:{client:clientId,listener,generation,
@@ -1326,7 +1402,7 @@ const feed = {
       () =>
         cb({
           exchanges: [{value:"",name:"全部来源",desc:"全部行情来源"},
-            ...["Dukascopy","OANDA","Binance","Yahoo"].map(name=>({value:name.toUpperCase(),name,desc:name+" 行情来源"}))],
+            ...["Dukascopy","OANDA","Binance","Yahoo","FXCM"].map(name=>({value:name.toUpperCase(),name,desc:name+" 行情来源"}))],
           symbols_types: [{name:"全部",value:""},{name:"外汇",value:"forex"},{name:"股票",value:"stock"},
             {name:"加密",value:"crypto"},{name:"指数",value:"index"},{name:"基金",value:"fund"},
             {name:"期货",value:"futures"},{name:"金属",value:"commodity"},{name:"其他",value:"other"}],
@@ -1381,7 +1457,7 @@ const feed = {
         ticker,
         // Informational estimate only; actual pagination remains backend-owned.
         mw_historyPageBars: meta.native_page_capacity || (meta.source === "binance" ? 1000 : 4000),
-        description: (meta.source === "yahoo" ? meta.name + " · " + (meta.display_symbol || meta.symbol) : meta.display_symbol || meta.symbol || MWSeries.display(symbol)) + (series_kind === "provider" ? " · 平台行情 · " : series_kind === "composite" ? " · 组合行情 · " : " · 自建行情 · ") + (meta.price_description || meta.basis) + (meta.volume_kind === "tick" ? " · OANDA 报价量" : meta.volume_kind === "base" ? " · 成交量 / " + meta.volume_unit : meta.volume_kind === "quantity" ? " · 来源量" : " · 量不可用"),
+        description: (meta.source === "yahoo" ? meta.name + " · " + (meta.display_symbol || meta.symbol) : meta.display_symbol || meta.symbol || MWSeries.display(symbol)) + (series_kind === "provider" ? " · 平台行情 · " : series_kind === "composite" ? " · 组合行情 · " : " · 自建行情 · ") + (meta.price_description || meta.basis) + (meta.volume_kind === "tick" ? " · OANDA 报价量" : meta.volume_kind === "tick_count" ? " · 价格变动次数" : meta.volume_kind === "base" ? " · 成交量 / " + meta.volume_unit : meta.volume_kind === "quantity" ? " · 来源量" : " · 量不可用"),
         exchange: meta.exchange || meta.source.toUpperCase(),
         listed_exchange: meta.exchange || meta.source.toUpperCase(),
         mw_range_source: meta.source,
@@ -1391,29 +1467,37 @@ const feed = {
         timezone: meta.timezone || (meta.calendar === "utc0" ? "Etc/UTC" : "America/New_York"),
         minmov: 1,
         pricescale: 10 ** meta.precision,
-        has_intraday: true,
+        has_intraday: !meta.frames || meta.frames.some(f => !["D1","W1","MN"].includes(f)),
         intraday_multipliers: meta.frames ? meta.frames.filter(f => !["D1","W1","MN"].includes(f)).map(f=>Object.keys(frames).find(r=>frames[r]===f)) : ["1", "5", "15", "30", "60", "240"],
-        has_daily: true,
+        has_daily: !meta.frames || meta.frames.includes("D1"),
         daily_multipliers: ["1"],
-        has_weekly_and_monthly: true,
+        has_weekly_and_monthly: !meta.frames || meta.frames.some(f => ["W1","MN"].includes(f)),
         weekly_multipliers: ["1"],
         monthly_multipliers: ["1"],
         supported_resolutions: meta.frames ? resolutions.filter(r=>meta.frames.includes(frames[r])) : resolutions,
         // Synthetic study feeds always carry the null/gap marker in volume.
         visible_plots_set: decode(ticker).spec || meta.volume_kind && meta.volume_kind !== "unavailable" ? "ohlcv" : "ohlc",
-        volume_precision: meta.volume_kind === "tick" ? 0 : 8,
+        volume_precision: ["tick", "tick_count"].includes(meta.volume_kind) ? 0 : 8,
         format: "price",
-        data_status: meta.delay_seconds > 0 ? "delayed_streaming" : "streaming",
+        mw_stream: meta.stream !== false,
+        data_status: meta.stream === false ? "endofday" : meta.delay_seconds > 0 ? "delayed_streaming" : "streaming",
         ...(meta.delay_seconds > 0 ? {delay:meta.delay_seconds} : {}),
         ...(meta.currency ? {currency_code:meta.currency} : {}),
         has_empty_bars: false,
       });
+      setTimeout(()=>{
+        if(operation.current()) {
+          warmNativeSearch(meta.display_symbol || meta.symbol || MWSeries.display(symbol));
+          warmNativeSearch("");
+        }
+      },0);
       // The library keeps the old interval on a source switch even if the
       // newly resolved symbol excludes it. Use its public chart method.
-      if(meta.source === "yahoo") setTimeout(()=>{
+      if(meta.frames?.length) setTimeout(()=>{
+        const fallback = meta.frames.includes("H1") ? "60" : resolutions.find(r=>meta.frames.includes(frames[r]));
         for(const target of operation.targets) {
           if(resolveCurrent(target) && !meta.frames.includes(frames[target.resolution]))
-            target.chart.setResolution("60",{doNotActivateChart:true});
+            target.chart.setResolution(fallback,{doNotActivateChart:true});
         }
       },0);
     } catch (e) {
@@ -1673,6 +1757,7 @@ const feed = {
   subscribeBars: (s, res, cb, id, reset) => {
     feed.unsubscribeBars(id);
     const identity=decode(s.ticker);
+    if(s.mw_stream === false) return;
     if(identity.symbol.startsWith("YAHOO:") && s.supported_resolutions && !s.supported_resolutions.includes(res)) return;
     const historyKey=s.ticker+'|'+res+(identity.series_kind==='provider' ? '|'+(s.mw_window || '') : '');
     const guardedReset = () => {barRangeMapping?.invalidate(s.ticker,res,s.mw_window); reset();};
@@ -1752,6 +1837,7 @@ function hasProviderWindowViewer(work) {
 }
 let historyReloading = false;
 globalThis.setInterval?.(()=>{
+  resumeDeferredDisplayRecoveries();
   for(const sub of subscriptions.values())if(sub.reviewPending && !sub.resetReview &&
      Date.now()>=(sub.reviewRetryAt||0)) {
     sub.reviewRetryAt=Date.now()+30000;
@@ -1880,10 +1966,17 @@ async function flushProviderCorrections() {
     finally {work.reloading=false;}
   }
 }
-async function reloadHistory(symbol, res, relevant = () => true) {
-  if (!ready || loading || historyReloading || globalThis.MWNativeNavigation?.busy() || rangeGuard?.busy() || edgeGuard?.busy()) return false;
+async function reloadHistory(symbol, res, relevant = () => true, detailed = false) {
+  // Existing callers need a success flag; snapshot recovery also needs to know
+  // whether native work actually started before spending its failure budget.
+  const result=(status,reason)=>detailed ? {status,reason} : status==='restored';
+  if(!ready)return result('cancelled','workspace_not_ready');
+  const blocked=loading ? 'workspace_loading' : historyReloading ? 'history_reload_busy' :
+    globalThis.MWNativeNavigation?.busy() ? 'navigation_busy' : rangeGuard?.busy() ? 'range_busy' : edgeGuard?.busy() ? 'edge_busy' : null;
+  if(blocked)return result('deferred',blocked);
   if (Array.from({length:widget.chartsCount()},(_,i)=>widget.chart(i)).some(chart=>
-      chartUsesSymbol(chart,symbol,res) && relevant(chart) && globalThis.MWNativeNavigation?.interacting(chart))) return false;
+      chartUsesSymbol(chart,symbol,res) && relevant(chart) && globalThis.MWNativeNavigation?.interacting(chart))) return result('deferred','user_interacting');
+  if(!Array.from({length:widget.chartsCount()},(_,i)=>widget.chart(i)).some(chart=>chartUsesSymbol(chart,symbol,res) && relevant(chart)))return result('cancelled','viewer_removed');
   historyReloading = true;
   edgeGuard?.retry();
   const epoch = workspaceEpoch;
@@ -1899,7 +1992,9 @@ async function reloadHistory(symbol, res, relevant = () => true) {
       if (window) {
         // Native resetCache and resetData both mutate the same source. Rebuild
         // an isolated historical source once, with a fresh validated seed.
-        if (!await MWNativeNavigation.refreshChartWindow(chart)) return false;
+        const restored=await MWNativeNavigation.refreshChartWindow(chart);
+        if(epoch!==workspaceEpoch || !relevant(chart) || !chartUsesSymbol(chart,symbol,res))return result('cancelled','stale_native_generation');
+        if (!restored) return result('failed','window_refresh_failed');
         continue;
       }
       const rangeKey=symbol+'|'+res+'|'+window;
@@ -1918,10 +2013,11 @@ async function reloadHistory(symbol, res, relevant = () => true) {
         if (!notified && !window) widget.resetCache();
       },()=>epoch===workspaceEpoch && chartUsesSymbol(chart,symbol,res));
       } finally { refreshingHistoryRanges.delete(rangeKey); }
-      if (!restored) return false;
+      if(epoch!==workspaceEpoch || !relevant(chart) || !chartUsesSymbol(chart,symbol,res))return result('cancelled','stale_native_generation');
+      if (!restored) return result('failed','native_reset_failed');
     }
-    return true;
-  } finally { historyReloading=false; }
+    return result('restored','native_reset_complete');
+  } finally { historyReloading=false;Promise.resolve().then(resumeDeferredDisplayRecoveries); }
 }
 async function refreshManagedHistory(instrument) {
   if(!ready || loading) return;
@@ -2337,14 +2433,14 @@ function boot(
     try {
       refreshNotificationTimezone();
       const instance = await MWNativeAlerts.attach({widget, scope: {workspace_id: workspaceId, session}, readonly,
-        initialDraft: alertUIDraft,
+        initialDraft: alertUIDraft, noticeState,
         noticeRequest: query => request({workspace_id:workspaceId,session,...query}, 'notice-center-rpc', () => attempt === attachingAlerts && session === alertUISession),
         persistDraft: draft => send({type:'chart-alert-ui-draft', workspace_id: workspaceId, session, draft}),
         panelChanged: (open,signal_id) => {restoreAlertsPanel = open; send({type:'alerts-panel-state',workspace_id:workspaceId,open,signal_id});},
         bridge: alertBridge, request: query => request(query, 'chart-alert-ui-rpc', () => attempt === attachingAlerts && session === alertUISession),
         report: error => send({type:'error', error:String(error)})});
       if (attempt !== attachingAlerts || session !== alertUISession || alertUIStopped) {instance.destroy();return;}
-      alertUI = instance; instance.theme(widget.getTheme());
+      alertUI = instance; instance.theme(widget.getTheme()); if(noticeState)instance.noticeState(noticeState);
       if (restoreAlertsPanel) instance.open();
       if (alertOpenSignal) {instance.event(alertOpenSignal);alertOpenSignal=undefined;}
       try {
@@ -2374,8 +2470,13 @@ function boot(
       return target && resolveCurrent(target) && target.state!=='ready' ? target.message : null;
     },
     calculationOrigin:(ticker,res)=>alertCalculationOrigins.get(MWSeries.encode(MWSeries.decode(ticker).symbol,MWSeries.decode(ticker).series_kind)+'|'+res) ??
+      indicatorBindings.get(indicatorKey(ticker,res))?.calculationStart ??
       (MWSeries.decode(ticker).series_kind === "managed" ? managedSessions.get(MWSeries.decode(ticker).symbol+'|'+res)?.start : null),
     compositeRevision:(ticker,res)=>alertCompositeRevisions.get(MWSeries.encode(MWSeries.decode(ticker).symbol,'composite')+'|'+res) ?? null,
+    movePrice:(row,price,presentation)=>{
+      if (!alertUI) throw Error("请等待告警界面就绪后改价");
+      return alertUI.movePrice(row,price,presentation);
+    },
     rpc:query=>request(query,"chart-alert-rpc"),send: message => {
       if (message.type === 'chart-alert-association') alertUI?.association(message.alert_id, message.text);
       else send(message);
@@ -2528,6 +2629,7 @@ function boot(
     (context, scope) => reportPreferenceOutcome(null, context, scope),
     capturePreferenceScope,
     {blocked:globalThis.MWPreferenceDraftKeys || [], put: draft => request({op:'draftWrite',args:draft},'preferences'),
+     failed: draft => request({op:'draftFailed',args:{key:draft.key,version:draft.version,storageKey:draft.storageKey}},'preferences'),
      current: draft => request({op:'draftCheck',args:draft},'preferences'),
      abandoned: context => emitNotice({source_kind:'preferences',attempt_id:crypto.randomUUID(),code:'PREFERENCE_SAVE_FAILED',
        title:'设置草稿已放弃',message:'已明确采用服务器设置；原写入未成功',observation_ended:true,
@@ -2552,6 +2654,7 @@ function boot(
   maintenanceAsked.clear();
   dataCenter?.dispose();
   swingDisplay?.dispose();
+  squeezeDisplay?.dispose();
   studyTemplates?.dispose();
   indicatorPicker?.dispose();
   barRangeMapping?.dispose();
@@ -2665,7 +2768,11 @@ function boot(
         timezone: () => {const chart=widget.activeChart(),zone=chart.getTimezoneApi().getTimezone().id;
           return zone === "exchange" ? presentationFor(chart.symbol())?.timezone || "UTC" : zone;},
         suspendIndicators: () => indicatorPicker?.close(),
-        managementRequest: (args, signal) => request(args, "data-center-api", () => !signal.aborted),
+        managementRequest: async (args, signal) => {
+          const result=await request(args, "data-center-api", () => !signal.aborted);
+          if(args.body || args.method && args.method !== "GET")clearNativeSearchCache();
+          return result;
+        },
         resolve: args => request({op:"resolve",args},"market")});
     })
     .catch((e) => send({ type: "error", error: String(e) }));
@@ -2714,6 +2821,9 @@ function boot(
           identity:symbol=>{const id=decode(symbol);return MWSeries.encode(id.symbol,id.series_kind);},
           chartTime:(time,chart)=>stamp({start:time,end:time+86400000},chart.resolution(),decode(chart.symbol()).symbol),
           report:error=>send({type:'error',error:'Swing 显示失败：'+String(error)})});
+        squeezeDisplay = chartSqueezeDisplay(widget,squeezeStore(),{
+          identity:symbol=>{const id=decode(symbol);return MWSeries.encode(id.symbol,id.series_kind);},
+          report:error=>send({type:'error',error:'Rolling Range Squeeze 显示失败：'+String(error)})});
         alertBridge.attach();
         chartMenu = chartThemeMenu(widget, (e) =>
           send({ type: "error", error: String(e) }),
@@ -2964,7 +3074,7 @@ addEventListener("message", async (e) => {
     drain();
     return;
   }
-  if(m.type==='notice-center-state' && m.session===alertUISession && m.workspace_id===alertUIWorkspace){noticeState=m.state;noticeUI?.update(m.state);return;}
+  if(m.type==='notice-center-state' && m.session===alertUISession && m.workspace_id===alertUIWorkspace){noticeState=m.state;noticeUI?.update(m.state);alertUI?.noticeState(m.state);return;}
   if(m.type==='notice-center-open'){noticeOpenEvent=typeof m.event_id==='string'?m.event_id:'';if(noticeUI){noticeUI.open(noticeOpenEvent || undefined);noticeOpenEvent=undefined;}return;}
   if(m.type==='chart-alert-event-open' && typeof m.signal_id==='string' && /^[a-f0-9-]{36}$/.test(m.signal_id)) {
     if(alertUI)alertUI.event(m.signal_id);else {alertOpenSignal=m.signal_id;restoreAlertsPanel=true;}
@@ -3110,6 +3220,7 @@ addEventListener("message", async (e) => {
             !sub.needsHistoryReload && !sub.historical);
         return;
       }
+      if(identity.spec?.name==='ROLLING_RANGE_SQUEEZE') publishSqueeze(MWSeries.encode(identity.symbol,identity.series_kind),sub.res,event);
       if(identity.spec?.name==='SWING_SR_V1') {
         swingStore().publish(MWSeries.encode(identity.symbol,identity.series_kind),sub.res,event,swingStore().ticket());
         swingDisplay?.refresh();

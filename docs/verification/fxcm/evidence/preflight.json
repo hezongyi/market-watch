@@ -1,0 +1,37 @@
+{
+  "recorded_at_utc": "2026-10-24T08:29:45.120492+00:00",
+  "host": "quant-server",
+  "docker_info": "Ubuntu 22.04.5 LTS",
+  "docker_version": "29.1.3",
+  "compose_projects": [
+    {
+      "Name": "mw-confirmation-snapshot-test-20261024",
+      "Status": "running(1)",
+      "ConfigFiles": "/home/quant/repos/.mwa-confirmation-snapshot-20261024/test-pg.json"
+    },
+    {
+      "Name": "mw-issue75-v2-20261018",
+      "Status": "running(15)",
+      "ConfigFiles": "/home/quant/repos/.mw-issue75-v2-tool-state/runtime/integrated-compose.json,/home/quant/repos/.mwa-confirmation-snapshot-20261024/candidate-override.json,/home/quant/repos/.mw-issue75-v2-tool-state/runtime/compose.json,/home/quant/repos/.mw-issue75-v2-tool-state/runtime/final-override.json,/home/quant/repos/.mw-issue75-v2-tool-state/runtime/ui-override.json"
+    }
+  ],
+  "probe_image": "python@sha256:2410faa698c7ac9bcfb9848ba6143a705d971e871dc92e5df40362a74117d375",
+  "probe_resource_limits": {
+    "memory_mib": 256,
+    "cpus": 0.5,
+    "pids": 64,
+    "network": "none",
+    "root_filesystem": "read-only",
+    "sdk_mount": "read-only",
+    "credentials_mounted": false
+  },
+  "acceptance_updated": false,
+  "acceptance_started_by_this_task": false,
+  "ports_18910_18911_listening": false,
+  "resource_snapshot_at_initial_inspection": {
+    "available_memory_gib_approx": 7.3,
+    "disk_available_gib_approx": 32,
+    "swap_used_gib_approx": 3.1
+  },
+  "resource_snapshot_scope": "Point-in-time read-only inventory, not a reservation or performance baseline"
+}

@@ -1,0 +1,38 @@
+{
+  "recorded_at_utc": "2026-10-24T08:29:45.120492+00:00",
+  "worktree_head": "59ed3a3f3fc727da76d13149934d999ebee04218",
+  "application_changes": false,
+  "baseline_pytest": {
+    "command": "PYTHONPATH=backend /home/quant/repos/market-watch/.venv/bin/python -m pytest -q backend/tests/test_history_sources.py backend/tests/test_provider_dukascopy.py backend/tests/test_platform_catalog.py backend/tests/test_source_registry.py backend/tests/test_history_maintenance.py",
+    "exit_code": 0,
+    "passed": 63,
+    "warnings": 1,
+    "seconds": 20.9,
+    "warning": "StarletteDeprecationWarning: httpx TestClient integration deprecated",
+    "scope": "Existing baseline with simulated upstream/in-memory SQLite; not FXCM or PostgreSQL verification"
+  },
+  "ruff": {
+    "command": "/home/quant/repos/market-watch/.venv/bin/ruff check scripts/probe_fxcm_runtime.py scripts/probe_fxcm_native.py",
+    "exit_code": 0
+  },
+  "native_abi_probe": {
+    "command": "docker run --rm --network none --read-only --tmpfs /tmp:rw,exec,nosuid,size=64m -v <official-sdk>:/opt/fxcm:ro -v scripts/fxcm_native_abi_probe.cpp:/src/fxcm_native_abi_probe.cpp:ro market-watch-fxcm-probe:20261024 sh -ceu 'g++ -std=c++17 -O2 -I/opt/fxcm/include -L/opt/fxcm/lib /src/fxcm_native_abi_probe.cpp -Wl,-rpath,/opt/fxcm/lib -lForexConnect -o /tmp/fxcm_native_abi_probe && LD_LIBRARY_PATH=/opt/fxcm/lib /tmp/fxcm_native_abi_probe'",
+    "exit_code": 0,
+    "passed": true,
+    "scope": "Offline session creation/release and setter/getter ABI only; no login or market data"
+  },
+  "account_preflight": {
+    "evidence": "evidence/account-preflight.json",
+    "credential_content_read": false,
+    "account_materials_present": false,
+    "result": "external_account_materials_still_unavailable"
+  },
+  "not_run": [
+    "FXCM authenticated requests",
+    "FXCM adapter tests (adapter intentionally not implemented before gate)",
+    "PostgreSQL FXCM integration",
+    "Browser acceptance",
+    "Full CI",
+    "Load acceptance"
+  ]
+}

@@ -35,6 +35,7 @@ class Profile(BaseModel):
     revision: str = Field(min_length=1, max_length=100)
     closures: list[Closure] = Field(default_factory=list, max_length=1000)
     source_session: "SourceSession | None" = None
+    trading_date: "TradingDateRules | None" = None
 
     @model_validator(mode="after")
     def nonoverlapping(self):
@@ -97,6 +98,23 @@ class SourceSession(BaseModel):
         return self
 
 
+class TradingDateRules(BaseModel):
+    """Supplier-assigned trading days; chart labels are UTC dates, not sessions."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+    timezone: str = Field(min_length=1, max_length=80)
+    market: str = Field(min_length=1, max_length=40)
+    rule: str = Field(min_length=1, max_length=80)
+    week_start: Literal[0] = 0
+    chart_label: Literal["utc-trading-date"] = "utc-trading-date"
+    close_minute: int = Field(ge=0, lt=1440)
+
+    @model_validator(mode="after")
+    def valid(self):
+        ZoneInfo(self.timezone)
+        return self
+
+
 Profile.model_rebuild()
 
 
@@ -136,4 +154,6 @@ def normalized_profile(value: dict) -> dict:
     }
     if profile.source_session is not None:
         normalized["source_session"] = profile.source_session.model_dump(mode="json")
+    if profile.trading_date is not None:
+        normalized["trading_date"] = profile.trading_date.model_dump(mode="json")
     return normalized

@@ -1,0 +1,29 @@
+{
+  "probe_scope": "Unauthenticated HTTPS GET to OANDA practice root from running API; effective proxy unchanged",
+  "results": [
+    {
+      "route": "configured_proxy",
+      "error": "ConnectError",
+      "seconds": 4.44
+    },
+    {
+      "route": "direct",
+      "error": "ConnectError",
+      "seconds": 3.43
+    }
+  ],
+  "worker_evidence": {
+    "source": "oanda",
+    "timeframe": "D1",
+    "count": 145,
+    "attempts_per_turn": 2,
+    "turns": 3,
+    "errors": [
+      "ConnectError",
+      "ConnectTimeout"
+    ],
+    "pages_committed": 0,
+    "terminal": "HISTORY_TIMEOUT"
+  },
+  "specific_root_cause_unconfirmed": true
+}

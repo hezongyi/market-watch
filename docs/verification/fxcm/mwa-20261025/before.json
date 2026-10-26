@@ -1,0 +1,137 @@
+[
+  {
+    "service": "web",
+    "container_id": "8ac4c3d1353e704773aa0848c1f253c8fab6f847ebbfee508681375fd6401f4e",
+    "image": "sha256:e24c6027fa994ea9f45264c69f7872a6801682fdeebafab61d024153e6b552c5",
+    "started": "2026-10-25T07:59:02.087312576Z",
+    "state": "running",
+    "health": null,
+    "configuration_sha256": "c07734d470dddf4fe9be6c972fa6e0cb9b12653af9149e924c11bff71476ed0e"
+  },
+  {
+    "service": "chart",
+    "container_id": "ea31192d5bc35f2302d3c1d95144cb7407e9ea11c3e0b32c8483148371ea85f1",
+    "image": "sha256:ed8e8dda951fa3ba76d3c36fc241ca95fa1556375794ac639db860b02aa9cff5",
+    "started": "2026-10-25T07:59:02.079885972Z",
+    "state": "running",
+    "health": null,
+    "configuration_sha256": "553cd70717d87a9fae6f7098d4aff9450890a68bf787ef807b99ce2efcf9253c"
+  },
+  {
+    "service": "history-worker",
+    "container_id": "c7e7f21dd917de58b75b56df16759f5122d543d207e4f5d401fa21c5401a6893",
+    "image": "sha256:7beee58f3729ef8d782b65bd64021f36d33a35d38834dfc029e5d70b99c000cf",
+    "started": "2026-10-24T23:59:02.547667537Z",
+    "state": "running",
+    "health": null,
+    "configuration_sha256": "df9a64700bbf4d0d422d6fb36c773356a505a77feb4383c81cb0864b27eb6c05"
+  },
+  {
+    "service": "realtime-worker",
+    "container_id": "3bf319201c2f91ae4e77d60f53c6ebe6979728e6a7df61ec330ff125879ed953",
+    "image": "sha256:7beee58f3729ef8d782b65bd64021f36d33a35d38834dfc029e5d70b99c000cf",
+    "started": "2026-10-24T23:59:02.679859943Z",
+    "state": "running",
+    "health": null,
+    "configuration_sha256": "e79901651c02fb357fe2c797dd238d611def9c187a1ece410328d22717705f23"
+  },
+  {
+    "service": "chart-aggregation-worker",
+    "container_id": "4d14df8015d540ada9487d93568c5a24e654b3fff8dfb77d31dd7868b40f769c",
+    "image": "sha256:7beee58f3729ef8d782b65bd64021f36d33a35d38834dfc029e5d70b99c000cf",
+    "started": "2026-10-24T23:59:02.660964314Z",
+    "state": "running",
+    "health": null,
+    "configuration_sha256": "dc84ec5d51dc4c8f4e8fc2e648c4396f21729da6dae3614a8d69bf266fe63114"
+  },
+  {
+    "service": "chart-history-worker",
+    "container_id": "2c767db92428e9d6a297c7622b9a26d87848c0f0eeb21f5f3b3e14baa3d9cd87",
+    "image": "sha256:7beee58f3729ef8d782b65bd64021f36d33a35d38834dfc029e5d70b99c000cf",
+    "started": "2026-10-24T23:59:02.580638199Z",
+    "state": "running",
+    "health": null,
+    "configuration_sha256": "1f0914326ae64c3eb34fa6b4bfb83604ebc0b50f666e6f06e8ffa7a70183720a"
+  },
+  {
+    "service": "market-stream-worker",
+    "container_id": "28a29cf5cc03f30f2274fef645939875535f705d616defdbbac2adbcdab8502f",
+    "image": "sha256:7beee58f3729ef8d782b65bd64021f36d33a35d38834dfc029e5d70b99c000cf",
+    "started": "2026-10-24T23:59:02.630238608Z",
+    "state": "running",
+    "health": null,
+    "configuration_sha256": "ab009ba2652616f49d909074b00396fa3412b6a1ebbee40b5d292411fbc13b5b"
+  },
+  {
+    "service": "projector",
+    "container_id": "274e6e888e5a9fbce419c9d76a6aef45f18779fe5b74af8879e4203d4c7f62bf",
+    "image": "sha256:7beee58f3729ef8d782b65bd64021f36d33a35d38834dfc029e5d70b99c000cf",
+    "started": "2026-10-24T23:59:02.597130653Z",
+    "state": "running",
+    "health": null,
+    "configuration_sha256": "184ab8afd39ededafaefdf64b6b912c33d14e72febda034007655a24452dd80a"
+  },
+  {
+    "service": "composite-aggregate-worker",
+    "container_id": "93b61fd4aaa327da9201ca4c29087ec5ea0e05726b5bcd44c509fd9131cf7c3c",
+    "image": "sha256:7beee58f3729ef8d782b65bd64021f36d33a35d38834dfc029e5d70b99c000cf",
+    "started": "2026-10-24T23:59:02.602904137Z",
+    "state": "running",
+    "health": null,
+    "configuration_sha256": "5c8402cfcf601632c5e3ef2f1c4cab355f86c8fdc601e29f5a9407308f2cbda4"
+  },
+  {
+    "service": "pricing-worker",
+    "container_id": "7bbb297fe490ecc5c6b0fff7ac81fc7ccb761ccea3711029a6e600a6cbb5ad80",
+    "image": "sha256:7beee58f3729ef8d782b65bd64021f36d33a35d38834dfc029e5d70b99c000cf",
+    "started": "2026-10-24T23:59:02.671114004Z",
+    "state": "running",
+    "health": null,
+    "configuration_sha256": "46b658c151c797185fa94a496be812e753fe049a764b4c79af07de75614fbfcc"
+  },
+  {
+    "service": "notify-worker",
+    "container_id": "385c93a8200b56a78f94382ec15d23a1491da521dab3cdc4d9ee65aee77e4efc",
+    "image": "sha256:7beee58f3729ef8d782b65bd64021f36d33a35d38834dfc029e5d70b99c000cf",
+    "started": "2026-10-24T23:59:02.664916685Z",
+    "state": "running",
+    "health": null,
+    "configuration_sha256": "c51ae84d43f237f559edb2a41aab99aae3e92bfa334f4dfe611d989ae6d25f4b"
+  },
+  {
+    "service": "native-history-worker",
+    "container_id": "8957d0f8411747238f0e59a75ff7e362bec58b3ba19bace42dfec3a3e64442f9",
+    "image": "sha256:7beee58f3729ef8d782b65bd64021f36d33a35d38834dfc029e5d70b99c000cf",
+    "started": "2026-10-24T23:59:02.679382403Z",
+    "state": "running",
+    "health": null,
+    "configuration_sha256": "14625e8a7cce8c8558ac3019a0a29a98066b899c0997db29e0851f4c06aca6aa"
+  },
+  {
+    "service": "api",
+    "container_id": "14708d86586c9535d2b1d934c42586b14fc9c27e437a37d93ab2270a3f1f938c",
+    "image": "sha256:7beee58f3729ef8d782b65bd64021f36d33a35d38834dfc029e5d70b99c000cf",
+    "started": "2026-10-25T00:22:31.561895288Z",
+    "state": "running",
+    "health": "healthy",
+    "configuration_sha256": "b0fd71eb282074a4d94e5086cfb7d11e2160313961d42227d85d1df40070a424"
+  },
+  {
+    "service": "gateway",
+    "container_id": "9492f307fdf9bfdbec7641c4e0b3554bed39340bc73a57448fdbd39e34d79ca9",
+    "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+    "started": "2026-10-19T06:05:49.728822361Z",
+    "state": "running",
+    "health": null,
+    "configuration_sha256": "60e8fc28aa17abc9a943a04aa1209a36c87f455ae78b120261462572a9113bfa"
+  },
+  {
+    "service": "postgres",
+    "container_id": "3de49cbde9a20c6640092181c04d35df41677566795cfecae18c0ab284b0aba8",
+    "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+    "started": "2026-10-18T06:31:25.191805014Z",
+    "state": "running",
+    "health": "healthy",
+    "configuration_sha256": "62769f769d559f78e75c8fdceaf11328cdf5169464f28524cba9f92329e77d3a"
+  }
+]

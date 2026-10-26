@@ -100,6 +100,20 @@ def request_artifacts(db, version, frames):
         raise ValueError("请选择支持的自建周期")
     if version.status != "published":
         raise ValueError("周期产物需要已发布M1父版本")
+    dataset = db.get(MarketDataset, version.dataset_id)
+    if dataset.identity.get("identity_version", 1) == 2:
+        from .history_mode_artifacts import RULE
+
+        allowed = ({"D1", "W1", "MN"} if dataset.identity["mode"] == "base_d1"
+                   else set(version.manifest.get("frames", {})))
+        if any(frame not in allowed for frame in frames):
+            raise ValueError("所选周期不属于此数据集模式的已固定输入")
+        # Unavailable first-run periods are facts, never empty successful artifacts.
+        frames = [frame for frame in frames if version.manifest["frames"].get(
+            "D1" if dataset.identity["mode"] == "base_d1" else frame, {}).get("rows", 0)]
+        rule = RULE
+    else:
+        rule = RULE_VERSION
     db.scalar(select(MarketDataset).where(MarketDataset.id == version.dataset_id).with_for_update())
     if db.get(HistoryReclamation, version.id):
         raise ValueError("历史版本价格数据已回收，不能重新派生产物")
@@ -108,9 +122,9 @@ def request_artifacts(db, version, frames):
 
     insert = postgres_insert if db.get_bind().dialect.name == "postgresql" else sqlite_insert
     for frame in set(frames):
-        key = hashlib.sha256(f"{version.id}|{frame}|{RULE_VERSION}".encode()).hexdigest()
+        key = hashlib.sha256(f"{version.id}|{frame}|{rule}".encode()).hexdigest()
         db.execute(insert(HistoryArtifact).values(id=key, version_id=version.id, timeframe=frame,
-            rule_version=RULE_VERSION, status="pending", cursor=version.start,
+            rule_version=rule, status="pending", cursor=version.start,
             accumulator={}, count=0, complete_count=0,
             manifest={"progress": {"processed_rows": 0, "work_seconds": 0}})
             .on_conflict_do_nothing(index_elements=["version_id", "timeframe"]))
@@ -213,12 +227,27 @@ def artifact_tick(version_id=None):
             raise ValueError("Immutable artifact parent is not published")
         dataset = db.get(MarketDataset, version.dataset_id)
         instrument = db.get(Instrument, dataset.instrument_id)
+        if dataset.identity.get("identity_version", 1) == 2:
+            from .history_mode_artifacts import QfqUnavailable, artifact_step
+
+            try:
+                artifact_step(db, artifact, version, dataset, instrument)
+            except QfqUnavailable as error:
+                artifact.status, artifact.updated_at = "unavailable", now_ms()
+                artifact.manifest = {**artifact.manifest, "adjustment_view": "unavailable",
+                    "error": str(error), "raw_preserved": True}
+            db.flush()
+            from .history_maintenance import finish_run
+
+            finish_run(db, version.id)
+            return True
         state, output = dict(artifact.accumulator), []
         progress = dict(artifact.manifest.get("progress", {}))
         previous_rows = progress.get("processed_rows", 0 if artifact.cursor == version.start else None)
         processed = 0
         reused = _reuse_period_block(db, artifact, version)
         chunk = None if reused else db.scalar(select(HistoryChunk).where(HistoryChunk.version_id == version.id,
+            HistoryChunk.timeframe == "M1",
             HistoryChunk.end > artifact.cursor).order_by(HistoryChunk.start).limit(1))
         if reused:
             output, artifact.cursor = reused
@@ -387,6 +416,9 @@ def chart_page(db, version_id, frame, *, before=None, count=2000):
     rows = read_artifact(db, version_id, frame, end=before, limit=count + 1, newest_first=True)
     more = len(rows) > count
     bars = rows[-count:]
+    artifact = published_artifact(db, version_id, frame)
     return {"version_id": version_id, "timeframe": frame, "bars": bars,
             "next_before": bars[0]["start"] if more else None,
-            "rule_version": RULE_VERSION}
+            "rule_version": artifact.rule_version,
+            "adjustment_view": artifact.manifest.get("adjustment_view", "raw"),
+            "adjustment_rule": artifact.manifest.get("adjustment_rule")}

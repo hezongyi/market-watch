@@ -123,6 +123,8 @@ def pooled_client(source):
     if source == 'yahoo':
         raise ValueError('Yahoo SDK 会话只能在 Adapter 操作生命周期内取得')
     from .market_resources import LANE
+    if source == 'fxcm':
+        raise ValueError('FXCM uses native helper, not HTTP transport')
     proxy = (settings.oanda_proxy if source == 'oanda' else settings.market_proxy
              if source == 'dukascopy' else settings.effective_binance_proxy)
     key = (source, proxy, LANE.get() or 'chart')
@@ -281,7 +283,9 @@ def start(busy):
 
 
 def close_clients():
+    from .provider_fxcm import close_session as close_fxcm
     from .provider_yahoo import close_session
+    close_fxcm()
     close_session()
     _STOP.set()
     for thread in _THREADS:

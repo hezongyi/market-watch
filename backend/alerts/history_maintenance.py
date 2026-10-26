@@ -13,6 +13,7 @@ from sqlalchemy import select
 
 from .chart_data import FRAMES
 from .history_sources import history_identity
+from .market_contracts import DatasetIdentity
 from .source_history_store import raw_chunk, store_blob
 from .source_registry import collection_identity
 from .storage import (
@@ -57,16 +58,23 @@ def configuration_revision(plan):
         return hashlib.sha256(b"unconfigured-maintenance-v1").hexdigest()
     fields = ("target_start", "timeframes", "frequency", "timezone", "daily_minute",
               "overlap_minutes", "paused", "archived")
-    return hashlib.sha256(json.dumps({key: getattr(plan, key) for key in fields},
+    values = {key: getattr(plan, key) for key in fields}
+    if plan.frame_plan:
+        values["frame_plan"] = {frame: {key: value for key, value in rules.items()
+            if key not in ("next_due", "last_success")} for frame, rules in plan.frame_plan.items()}
+    return hashlib.sha256(json.dumps(values,
         sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
 
 def configure(db, dataset_id, *, target_start, timeframes, frequency="daily", timezone="UTC",
-              daily_minute=15, overlap_minutes=2880, expected_configuration_revision=None):
+              daily_minute=15, overlap_minutes=2880, expected_configuration_revision=None,
+              frame_plan=None):
     dataset = db.scalar(select(MarketDataset).where(MarketDataset.id == dataset_id).with_for_update())
     if not dataset:
         raise ValueError("数据集不存在")
-    history_identity(dataset.identity)
+    native = dataset.identity.get("identity_version", 1) == 2
+    if not native:
+        history_identity(dataset.identity)
     if not 0 <= target_start < (now_ms() - 5000) // 60000 * 60000 or target_start % 60000:
         raise ValueError("历史起点必须是已结束的UTC分钟边界")
     if not timeframes or any(f not in FRAMES for f in timeframes):
@@ -78,27 +86,56 @@ def configure(db, dataset_id, *, target_start, timeframes, frequency="daily", ti
     if (expected_configuration_revision is not None and
             expected_configuration_revision != configuration_revision(plan)):
         raise MaintenanceConflict("维护配置已被其他窗口修改；你的输入已保留，请载入最新配置后重新核对。")
+    if native:
+        from .history_mode_maintenance import configure_frames
+
+        normalized_frames = [frame for frame in FRAMES if frame in timeframes]
+        inputs = {"D1"} if dataset.identity["mode"] == "base_d1" else set(normalized_frames)
+        from .storage import DatasetFrameSource
+
+        bound = set(db.scalars(select(DatasetFrameSource.timeframe).where(
+            DatasetFrameSource.dataset_id == dataset.id)))
+        if inputs - bound:
+            from .history_mode_sources import local_details, source_identity, validate_frames
+            from .source_registry import link_frame_source
+
+            parent = DatasetIdentity.model_validate(dataset.identity)
+            info, _ = local_details(db, parent.source, parent.provider_symbol)
+            validate_frames(parent, info, normalized_frames)
+            for frame in inputs - bound:
+                link_frame_source(db, dataset, frame, source_identity(parent, frame, info))
+        new_frames = configure_frames(db, dataset, normalized_frames, frame_plan or {},
+            plan, target_start=target_start, timezone=timezone, daily_minute=daily_minute)
+    else:
+        if frame_plan:
+            raise ValueError("M1 基础派生不使用原生周期维护配置")
+        normalized_frames = [f for f in FRAMES if f in set(timeframes) | {"M1"}]
+        new_frames = {}
     if plan is None:
         latest = latest_version(db, dataset_id)
         plan = DatasetMaintenance(dataset_id=dataset_id, latest_version_id=latest.id if latest else None)
         db.add(plan)
     plan.target_start = target_start
-    plan.timeframes = [f for f in FRAMES if f in set(timeframes) | {"M1"}]
+    plan.timeframes = normalized_frames
+    plan.frame_plan = new_frames
     plan.frequency, plan.timezone, plan.daily_minute = frequency, timezone, daily_minute
     plan.overlap_minutes, plan.next_at, plan.updated_at = overlap_minutes, next_at, now_ms()
+    if native and frequency == "daily":
+        plan.next_at = min(rule["next_due"] for rule in new_frames.values())
     db.flush()
     published = db.get(HistoryVersion, plan.latest_version_id) if plan.latest_version_id else latest_version(db, dataset_id)
-    if published:
+    if published and not native:
         from .history_artifacts import request_artifacts
 
         request_artifacts(db, published, plan.timeframes)
     return plan
 
 
-def create_run(db, dataset_id, *, kind="update", start=None, end=None, request_id):
+def create_run(db, dataset_id, *, kind="update", start=None, end=None, request_id,
+               requested_frames=None):
     from .history_versions import create_version
 
-    db.scalar(select(MarketDataset).where(MarketDataset.id == dataset_id).with_for_update())
+    dataset = db.scalar(select(MarketDataset).where(MarketDataset.id == dataset_id).with_for_update())
     plan = db.get(DatasetMaintenance, dataset_id)
     if not plan:
         raise ValueError("请先配置自建行情维护计划")
@@ -106,7 +143,10 @@ def create_run(db, dataset_id, *, kind="update", start=None, end=None, request_i
         raise ValueError("不支持的任务类型或提交标识")
     # Hash submitted intent before resolving defaults: retrying a timed-out
     # request must retrieve the same fixed cutoff, even on the next UTC minute.
-    digest = hashlib.sha256(json.dumps({"kind": kind, "start": start, "end": end},
+    intent = {"kind": kind, "start": start, "end": end}
+    if requested_frames is not None:
+        intent["frames"] = sorted(requested_frames)
+    digest = hashlib.sha256(json.dumps(intent,
                                       sort_keys=True).encode()).hexdigest()
     existing = db.scalar(select(HistoryRun).where(HistoryRun.dataset_id == dataset_id,
                                                 HistoryRun.request_id == request_id))
@@ -120,8 +160,9 @@ def create_run(db, dataset_id, *, kind="update", start=None, end=None, request_i
     cutoff = (now_ms() - 5000) // 60000 * 60000
     if kind != "update" and (start is None or end is None):
         raise ValueError("补数与复查必须指定固定区间")
-    left = start if start is not None else max(plan.target_start,
-        parent.end - plan.overlap_minutes * 60000 if parent else plan.target_start)
+    native = dataset.identity.get("identity_version", 1) == 2
+    left = start if start is not None else (plan.target_start if native else max(plan.target_start,
+        parent.end - plan.overlap_minutes * 60000 if parent else plan.target_start))
     right = cutoff if end is None else end
     if not 0 <= left < right <= cutoff or left % 60000 or right % 60000:
         raise ValueError("任务需要已结束的UTC分钟区间")
@@ -132,9 +173,15 @@ def create_run(db, dataset_id, *, kind="update", start=None, end=None, request_i
             if kind == "update" and run.kind == "update" and run.refresh_end == right and start is None:
                 return active
             raise ValueError("已有维护任务，请先完成或取消该任务")
-    ident = create_version(db, dataset_id,
-        min(left, plan.target_start, parent.start if parent else left),
-        max(right, parent.end if parent else right))
+    if native:
+        from .native_history_archive import create
+
+        ident = create(db, dataset, left, right, requested_frames=requested_frames,
+                       use_frame_targets=kind == "update" and start is None)
+    else:
+        ident = create_version(db, dataset_id,
+            min(left, plan.target_start, parent.start if parent else left),
+            max(right, parent.end if parent else right))
     version = db.get(HistoryVersion, ident)
     version.manifest = {**(version.manifest or {}), "maintenance": {"parent_version": parent.id if parent else None,
         "refresh_start": left, "refresh_end": right, "kind": kind, "timeframes": plan.timeframes}}
@@ -151,6 +198,7 @@ def reusable_page(db, version, run):
     if not run or not run.parent_version_id or run.refresh_start <= version.cursor < run.refresh_end:
         return None
     source = db.scalar(select(HistoryChunk).where(HistoryChunk.version_id == run.parent_version_id,
+        HistoryChunk.timeframe == "M1",
         HistoryChunk.start <= version.cursor, HistoryChunk.end > version.cursor).limit(1))
     if not source:
         return None
@@ -211,22 +259,37 @@ def finish_run(db, version_id):
     if not run or run.completed_at is not None or run.desired_state != "running":
         return False
     requested = set(version.manifest.get("maintenance", {}).get("timeframes", ["M1"]))
+    if version.manifest.get("schema") == "managed-period-snapshot-v2":
+        missing = {frame for frame, facts in version.manifest["frames"].items()
+                   if facts["status"] == "unavailable"}
+        if version.manifest["mode"] == "base_d1" and "D1" in missing:
+            requested = set()
+        else:
+            requested -= missing
     published = set(db.scalars(select(HistoryArtifact.timeframe).where(
         HistoryArtifact.version_id == version_id, HistoryArtifact.status == "published")))
+    unavailable = set(db.scalars(select(HistoryArtifact.timeframe).where(
+        HistoryArtifact.version_id == version_id, HistoryArtifact.status == "unavailable")))
+    requested -= unavailable
     if not requested <= published:
         return False
     run.completed_at = now_ms()
     plan = db.get(DatasetMaintenance, version.dataset_id)
     if plan.active_version_id == version_id:
         plan.active_version_id = None
-        plan.last_success, plan.updated_at = run.completed_at, now_ms()
+        if not unavailable:
+            plan.last_success = run.completed_at
+        plan.updated_at = now_ms()
     return True
 
 
 def task_status(db, version):
     run = db.get(HistoryRun, version.id)
+    if version.status == "published" and db.scalar(select(HistoryArtifact.id).where(
+            HistoryArtifact.version_id == version.id, HistoryArtifact.status == "unavailable").limit(1)):
+        return "partial"
     if version.status != "published" or not run or run.completed_at is not None:
-        return version.status
+        return "partial" if version.status == "published" and version.manifest.get("result") == "partial" else version.status
     return "deriving" if run.desired_state == "running" else run.desired_state
 
 
@@ -239,8 +302,17 @@ def task_control(db, version_id, action):
         raise ValueError("维护任务不存在")
     if action not in ("pause", "resume", "retry", "cancel"):
         raise ValueError("不支持的任务操作")
+    if version.status == "failed" and action not in ("retry", "cancel"):
+        raise ValueError("失败任务请显式重试或创建新任务")
     run = db.get(HistoryRun, version_id)
     if version.status == "published":
+        if action == "retry" and version.manifest.get("result") == "partial":
+            from .storage import uid
+
+            failed = [frame for frame, facts in version.manifest["frames"].items()
+                      if facts["status"] in ("stale", "unavailable")]
+            return create_run(db, version.dataset_id,
+                request_id=f"retry:{version.id}:{uid()}", requested_frames=failed)
         if run.completed_at is not None:
             raise ValueError("已发布版本不可改写；请新建复查任务")
         if run.desired_state == "cancelled":
@@ -283,6 +355,17 @@ def task_control(db, version_id, action):
             raise ValueError("任务仍在安全停止中，请稍后恢复")
         run.desired_state = "running"
         version.status, version.error, version.next_at = "pending", None, 0
+        if version.manifest.get("schema") == "managed-period-snapshot-v2" and action == "retry":
+            from .storage import HistoryFrameRun
+
+            plan = db.get(DatasetMaintenance, version.dataset_id)
+            if plan.archived or plan.active_version_id not in (None, version.id):
+                raise ValueError("已有其他维护任务或已归档，请先处理当前状态")
+            plan.active_version_id = version.id
+            for frame in db.scalars(select(HistoryFrameRun).where(HistoryFrameRun.version_id == version.id,
+                    HistoryFrameRun.status.in_(("stale", "unavailable")))):
+                frame.status, frame.error, frame.retry_at = "pending", None, 0
+            run.completed_at = None
     if version.status == "cancelled":
         plan = db.get(DatasetMaintenance, version.dataset_id)
         if plan.active_version_id == version.id:
@@ -330,8 +413,18 @@ def schedule_tick():
         plan = db.get(DatasetMaintenance, dataset.id)
         if plan.active_version_id or plan.paused or plan.archived or plan.next_at > now_ms():
             return False
-        create_run(db, dataset.id, request_id=f"daily:{plan.next_at}")
-        plan.next_at = next_daily(now_ms(), plan.daily_minute, plan.timezone)
+        if dataset.identity.get("identity_version", 1) == 2:
+            from .history_mode_maintenance import advance_schedule, due_frames
+
+            due = due_frames(plan, now_ms())
+            if not due:
+                plan.next_at = min(rule["next_due"] for rule in plan.frame_plan.values())
+                return True
+            create_run(db, dataset.id, request_id=f"periodic:{plan.next_at}", requested_frames=due)
+            advance_schedule(plan, due, now_ms())
+        else:
+            create_run(db, dataset.id, request_id=f"daily:{plan.next_at}")
+            plan.next_at = next_daily(now_ms(), plan.daily_minute, plan.timezone)
         return True
 
 
@@ -343,6 +436,7 @@ def plan_report(db, dataset_id):
     active = db.get(HistoryVersion, plan.active_version_id) if plan.active_version_id else None
     return {"configured": True, "configuration_revision": configuration_revision(plan),
         "target_start": plan.target_start, "timeframes": plan.timeframes,
+        "frame_plan": plan.frame_plan,
         "frequency": plan.frequency, "timezone": plan.timezone, "daily_minute": plan.daily_minute,
         "overlap_minutes": plan.overlap_minutes, "paused": plan.paused, "archived": plan.archived,
         "next_at": plan.next_at if plan.frequency == "daily" and not plan.paused and not plan.archived else None,

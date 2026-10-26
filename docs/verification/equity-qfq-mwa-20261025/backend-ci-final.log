@@ -1,0 +1,1527 @@
+.................................................s...................... [  2%]
+........................................................................ [  4%]
+........................................................................ [  6%]
+........................................................................ [  9%]
+........................................................................ [ 11%]
+........................................................................ [ 13%]
+........................................................................ [ 16%]
+..................................F..................................... [ 18%]
+........................................................................ [ 20%]
+........................................................................ [ 22%]
+........................................................................ [ 25%]
+........................................................................ [ 27%]
+........................................................................ [ 29%]
+........................................................................ [ 32%]
+........................................................................ [ 34%]
+........................................................................ [ 36%]
+........................................................................ [ 38%]
+............F........................................................... [ 41%]
+........................................................................ [ 43%]
+........................................................................ [ 45%]
+........................................................................ [ 48%]
+...............................................FFFFFF................... [ 50%]
+........................................................................ [ 52%]
+........................................................................ [ 54%]
+........................................................................ [ 57%]
+........................................................................ [ 59%]
+........................................................................ [ 61%]
+........................................................................ [ 64%]
+.F...................................................................... [ 66%]
+........................................................................ [ 68%]
+........................................................................ [ 71%]
+........................................................................ [ 73%]
+........................................................................ [ 75%]
+........................................................................ [ 77%]
+........................................................................ [ 80%]
+........................................................................ [ 82%]
+..............................................FFFFF..................... [ 84%]
+........................................................................ [ 87%]
+..................................s..................................... [ 89%]
+.......................................................FF.F..F.F........ [ 91%]
+.............................................................F.......... [ 93%]
+........................................................................ [ 96%]
+........................................................................ [ 98%]
+..............................................                           [100%]
+=================================== FAILURES ===================================
+_____ test_mapping_notes_upgrade_preserves_existing_mapping_and_composite ______
+
+self = <sqlalchemy.engine.base.Connection object at 0x7fcc4186d750>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x7fcc2bdec250>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x7fcc4186c250>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x7fcc4186ced0>
+parameters = [{'lease_until_1': 1792972883200, 'next_at_1': 1792972883200, 'desired_state_1': 'running', 'id_1': 'a0ff58b2-acad-4824-a409-bc23f73c1808', ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Unpack[TupleAny]]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+
+        effective_parameters: Optional[_AnyExecuteParams]
+
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+
+        evt_handled: bool = False
+        try:
+            if self._has_events or self.engine._has_events:
+                for fn in self.dispatch.before_cursor_execute:
+                    str_statement, effective_parameters = fn(
+                        self,
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                        context.executemany,
+                    )
+
+            if self._echo:
+                self._log_info(str_statement)
+
+                stats = context._get_cache_stats()
+
+                if not self.engine.hide_parameters:
+                    self._log_info(
+                        "[%s] %r",
+                        stats,
+                        sql_util._repr_params(
+                            effective_parameters,
+                            batches=10,
+                            ismulti=context.executemany,
+                        ),
+                    )
+                else:
+                    self._log_info(
+                        "[%s] [SQL parameters hidden due to "
+                        "hide_parameters=True]",
+                        stats,
+                    )
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=18889 database=equity_test) at 0x7fcc483c1240>
+query = 'SELECT market_history_versions.updated_at, market_history_versions.id, market_history_versions.dataset_id, market_his...ns.next_at, market_history_versions.created_at \n LIMIT %(param_1)s::INTEGER FOR UPDATE OF market_datasets SKIP LOCKED'
+params = {'lease_until_1': 1792972883200, 'next_at_1': 1792972883200, 'desired_state_1': 'running', 'id_1': 'a0ff58b2-acad-4824-a409-bc23f73c1808', ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.UndefinedTable: relation "market_history_frame_runs" does not exist
+E           LINE 4: FROM market_history_frame_runs
+E                        ^
+
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/psycopg/cursor.py:117: UndefinedTable
+
+The above exception was the direct cause of the following exception:
+
+postgres_alerts = Engine([redacted-credentials]@127.0.0.1:18889/equity_test?options=-csearch_path%3Dchart_alert_test_862d62f995974022a32bd23377e83692)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcc41552f90>
+
+    def test_mapping_notes_upgrade_preserves_existing_mapping_and_composite(postgres_alerts, monkeypatch):
+        root = Path(__file__).resolve().parents[2]
+        config = Config(str(root / "alembic.ini"))
+        config.set_main_option("script_location", str(root / "migrations"))
+        monkeypatch.setattr(settings, "database_url", postgres_alerts.url.render_as_string(hide_password=False))
+        command.upgrade(config, "aw50_notice_center")
+        # Some fresh-install migrations use current metadata. Model the actual
+        # deployed pre-ax51 table set rather than accidentally testing create_all.
+        with postgres_alerts.begin() as connection:
+            connection.execute(text("DROP TABLE IF EXISTS market_realtime_mapping_notes"))
+        factory = sessionmaker(postgres_alerts, expire_on_commit=False)
+        monkeypatch.setattr(storage, "Session", factory)
+        monkeypatch.setattr(settings, "fx_source", "dukascopy")
+        catalog_id = prepare(factory, monkeypatch)
+>       publish(factory)
+
+backend/tests/test_composite_mapping_postgres.py:35:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend/tests/test_composite_definitions.py:49: in publish
+    import_page(Adapter([batch(window_end=end, checkpoint=end, rows=(minute(), minute(60000),
+backend/alerts/history_versions.py:208: in import_page
+    ownership = retry_conflicts(lambda: claim(version_id))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/transaction_retry.py:19: in retry_conflicts
+    return operation()
+           ^^^^^^^^^^^
+backend/alerts/history_versions.py:208: in <lambda>
+    ownership = retry_conflicts(lambda: claim(version_id))
+                                        ^^^^^^^^^^^^^^^^^
+backend/alerts/history_versions.py:104: in claim
+    candidate = db.scalar(query.join(MarketDataset).order_by(HistoryVersion.next_at, HistoryVersion.created_at)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2534: in scalar
+    return self._execute_internal(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2363: in _execute_internal
+    compile_state_cls.orm_execute_statement(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/orm/context.py:316: in orm_execute_statement
+    result = conn.execute(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1448: in execute
+    return meth(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:533: in _execute_on_connection
+    return connection._execute_clauseelement(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1668: in _execute_clauseelement
+    ret = self._execute_context(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1822: in _execute_context
+    return self._exec_single_context(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1962: in _exec_single_context
+    self._handle_dbapi_exception(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2332: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: in _exec_single_context
+    self.dialect.do_execute(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=18889 database=equity_test) at 0x7fcc483c1240>
+query = 'SELECT market_history_versions.updated_at, market_history_versions.id, market_history_versions.dataset_id, market_his...ns.next_at, market_history_versions.created_at \n LIMIT %(param_1)s::INTEGER FOR UPDATE OF market_datasets SKIP LOCKED'
+params = {'lease_until_1': 1792972883200, 'next_at_1': 1792972883200, 'desired_state_1': 'running', 'id_1': 'a0ff58b2-acad-4824-a409-bc23f73c1808', ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedTable) relation "market_history_frame_runs" does not exist
+E           LINE 4: FROM market_history_frame_runs
+E                        ^
+E           [SQL: SELECT market_history_versions.updated_at, market_history_versions.id, market_history_versions.dataset_id, market_history_versions.start, market_history_versions."end", market_history_versions.cursor, market_history_versions.status, market_history_versions.created_at, market_history_versions.published_at, market_history_versions.manifest, market_history_versions.lease_token, market_history_versions.lease_until, market_history_versions.attempts, market_history_versions.next_at, market_history_versions.error
+E           FROM market_history_versions JOIN market_datasets ON market_datasets.id = market_history_versions.dataset_id
+E           WHERE market_history_versions.status IN (%(status_1_1)s::VARCHAR, %(status_1_2)s::VARCHAR, %(status_1_3)s::VARCHAR) AND market_history_versions.lease_until <= %(lease_until_1)s::BIGINT AND market_history_versions.next_at <= %(next_at_1)s::BIGINT AND NOT (EXISTS (SELECT market_history_frame_runs.version_id
+E           FROM market_history_frame_runs
+E           WHERE market_history_frame_runs.version_id = market_history_versions.id)) AND NOT (EXISTS (SELECT market_history_runs.version_id
+E           FROM market_history_runs
+E           WHERE market_history_runs.version_id = market_history_versions.id AND market_history_runs.desired_state != %(desired_state_1)s::VARCHAR)) AND market_history_versions.id = %(id_1)s::VARCHAR ORDER BY market_history_versions.next_at, market_history_versions.created_at
+E            LIMIT %(param_1)s::INTEGER FOR UPDATE OF market_datasets SKIP LOCKED]
+E           [parameters: {'lease_until_1': 1792972883200, 'next_at_1': 1792972883200, 'desired_state_1': 'running', 'id_1': 'a0ff58b2-acad-4824-a409-bc23f73c1808', 'param_1': 1, 'status_1_1': 'pending', 'status_1_2': 'running', 'status_1_3': 'retrying'}]
+E           (Background on this error at: https://sqlalche.me/e/21/f405)
+
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/psycopg/cursor.py:117: ProgrammingError
+____ test_postgres_request_evidence_additive_migration_and_data_loss_guard _____
+
+self = <sqlalchemy.engine.base.Connection object at 0x7fcc1b200310>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x7fcc4451c910>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x7fcc1b21f550>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x7fcc1b21f450>
+parameters = [{'version_id_1': '2aab6567-6e0b-435f-be8d-5f97478bf04d'}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Unpack[TupleAny]]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+
+        effective_parameters: Optional[_AnyExecuteParams]
+
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+
+        evt_handled: bool = False
+        try:
+            if self._has_events or self.engine._has_events:
+                for fn in self.dispatch.before_cursor_execute:
+                    str_statement, effective_parameters = fn(
+                        self,
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                        context.executemany,
+                    )
+
+            if self._echo:
+                self._log_info(str_statement)
+
+                stats = context._get_cache_stats()
+
+                if not self.engine.hide_parameters:
+                    self._log_info(
+                        "[%s] %r",
+                        stats,
+                        sql_util._repr_params(
+                            effective_parameters,
+                            batches=10,
+                            ismulti=context.executemany,
+                        ),
+                    )
+                else:
+                    self._log_info(
+                        "[%s] [SQL parameters hidden due to "
+                        "hide_parameters=True]",
+                        stats,
+                    )
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=18889 database=equity_test) at 0x7fcc23512500>
+query = 'SELECT market_history_read_attempts.id, market_history_read_attempts.version_id, market_history_read_attempts.timefra...rket_history_read_attempts.version_id = %(version_id_1)s::VARCHAR AND market_history_read_attempts.finished_at IS NULL'
+params = {'version_id_1': '2aab6567-6e0b-435f-be8d-5f97478bf04d'}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.UndefinedColumn: column market_history_read_attempts.timeframe does not exist
+E           LINE 1: ...mpts.id, market_history_read_attempts.version_id, market_his...
+E                                                                        ^
+
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/psycopg/cursor.py:117: UndefinedColumn
+
+The above exception was the direct cause of the following exception:
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine([redacted-credentials]@127.0.0.1:18889/equity_test), autoflush=True, expire_on_commit=False), Engine([redacted-credentials]@127.0.0.1:18889/equity_test))
+
+    def test_postgres_request_evidence_additive_migration_and_data_loss_guard(provider_pg):
+        factory, engine = provider_pg
+        path = Path(__file__).resolve().parents[2] / "migrations/versions/ad31_history_read_attempts.py"
+        spec = importlib.util.spec_from_file_location("read_evidence_migration", path)
+        migration = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(migration)
+        with engine.begin() as conn:
+            from alerts.storage import HistoryReadAttempt
+            HistoryReadAttempt.__table__.drop(conn)
+            migration.op = Operations(MigrationContext.configure(conn))
+            migration.upgrade()
+            assert "market_history_read_attempts" in inspect(conn).get_table_names()
+        ident, _ = contracts.create(factory)
+>       contracts.history.import_page(contracts.Adapter([contracts.batch(checkpoint=120000)]), version_id=ident)
+
+backend/tests/test_history_request_evidence_postgres.py:48:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend/alerts/history_versions.py:208: in import_page
+    ownership = retry_conflicts(lambda: claim(version_id))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/transaction_retry.py:19: in retry_conflicts
+    return operation()
+           ^^^^^^^^^^^
+backend/alerts/history_versions.py:208: in <lambda>
+    ownership = retry_conflicts(lambda: claim(version_id))
+                                        ^^^^^^^^^^^^^^^^^
+backend/alerts/history_versions.py:117: in claim
+    start_read(db, version.id, version.lease_token, version.cursor, end)
+backend/alerts/history_request_evidence.py:23: in start
+    for pending in db.scalars(select(HistoryReadAttempt).where(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2594: in scalars
+    return self._execute_internal(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2363: in _execute_internal
+    compile_state_cls.orm_execute_statement(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/orm/context.py:316: in orm_execute_statement
+    result = conn.execute(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1448: in execute
+    return meth(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:533: in _execute_on_connection
+    return connection._execute_clauseelement(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1668: in _execute_clauseelement
+    ret = self._execute_context(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1822: in _execute_context
+    return self._exec_single_context(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1962: in _exec_single_context
+    self._handle_dbapi_exception(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2332: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: in _exec_single_context
+    self.dialect.do_execute(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=18889 database=equity_test) at 0x7fcc23512500>
+query = 'SELECT market_history_read_attempts.id, market_history_read_attempts.version_id, market_history_read_attempts.timefra...rket_history_read_attempts.version_id = %(version_id_1)s::VARCHAR AND market_history_read_attempts.finished_at IS NULL'
+params = {'version_id_1': '2aab6567-6e0b-435f-be8d-5f97478bf04d'}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.ProgrammingError: (psycopg.errors.UndefinedColumn) column market_history_read_attempts.timeframe does not exist
+E           LINE 1: ...mpts.id, market_history_read_attempts.version_id, market_his...
+E                                                                        ^
+E           [SQL: SELECT market_history_read_attempts.id, market_history_read_attempts.version_id, market_history_read_attempts.timeframe, market_history_read_attempts.start, market_history_read_attempts."end", market_history_read_attempts.started_at, market_history_read_attempts.finished_at, market_history_read_attempts.read_kind, market_history_read_attempts.result, market_history_read_attempts.checkpoint, market_history_read_attempts.observed_at, market_history_read_attempts.observations, market_history_read_attempts.accepted
+E           FROM market_history_read_attempts
+E           WHERE market_history_read_attempts.version_id = %(version_id_1)s::VARCHAR AND market_history_read_attempts.finished_at IS NULL]
+E           [parameters: {'version_id_1': '2aab6567-6e0b-435f-be8d-5f97478bf04d'}]
+E           (Background on this error at: https://sqlalche.me/e/21/f405)
+
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/psycopg/cursor.py:117: ProgrammingError
+_ test_catalog_chinese_search_is_local_and_keeps_supplier_code[\u82f9\u679c-AAPL] _
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcc1bd02590>
+query = '苹果', expected = 'AAPL'
+
+    @pytest.mark.parametrize('query,expected', [
+        ('欧元', 'EURUSD'), ('黄金', 'XAUUSD'), ('比特币', 'BTCUSDT'),
+        ('苹果', 'AAPL'), ('英伟达', 'NVDA'),
+    ])
+    def test_catalog_chinese_search_is_local_and_keeps_supplier_code(database, monkeypatch, query, expected):
+        from alerts import yahoo_catalog
+        from alerts.config import settings
+        from alerts.provider_yahoo import stable_id
+
+        monkeypatch.setattr(settings, 'yahoo_enabled', True)
+        def unexpected_search(query):
+            raise AssertionError('Known Chinese names should not require remote search')
+        monkeypatch.setattr(yahoo_catalog, 'search', unexpected_search)
+        with database.begin() as db:
+            for ident in ('EURUSD', 'XAUUSD'):
+                row = db.get(Instrument, ident)
+                row.source = 'oanda'
+                row.symbol = {'EURUSD':'EUR_USD', 'XAUUSD':'XAU_USD'}[ident]
+                row.label = row.symbol  # supplier labels may contain no Chinese
+        api_module.app.dependency_overrides[api_module.authenticated] = lambda: 'test'
+        try:
+            with TestClient(api_module.app) as client:
+>               response = client.get('/api/market-data/catalog', params={'query':query})
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend/tests/test_market_data.py:42:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/httpx2/_client.py:1113: in get
+    return self.request(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/testclient.py:463: in request
+    return super().request(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/httpx2/_client.py:797: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/httpx2/_client.py:980: in send
+    response = self._send_handling_auth(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/httpx2/_client.py:1008: in _send_handling_auth
+    response = self._send_handling_redirects(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/httpx2/_client.py:1043: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/httpx2/_client.py:1076: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/testclient.py:360: in handle_request
+    raise exc
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/testclient.py:357: in handle_request
+    portal.call(self.app, scope, receive, send)
+../market-watch-history-modes-20261024/.venv/lib/python3.11/site-packages/anyio/from_thread.py:340: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniforge3/envs/planck/lib/python3.11/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+../../miniforge3/envs/planck/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+../market-watch-history-modes-20261024/.venv/lib/python3.11/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/fastapi/applications.py:1163: in __call__
+    await super().__call__(scope, receive, send)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/routing.py:676: in __call__
+    await self.middleware_stack(scope, receive, send)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/fastapi/routing.py:2734: in app
+    await route.handle(scope, receive, send)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/fastapi/routing.py:1780: in handle
+    await self.original_router.handle(scope, receive, send)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/fastapi/routing.py:2789: in handle
+    await included_router._handle_selected(scope, receive, send)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/fastapi/routing.py:1800: in _handle_selected
+    await original_route.handle(scope, receive, send)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/fastapi/routing.py:1279: in handle
+    await app(scope, receive, send)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/fastapi/routing.py:158: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/fastapi/routing.py:144: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/fastapi/routing.py:706: in app
+    raw_response = await run_endpoint_function(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/fastapi/routing.py:354: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/concurrency.py:34: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../market-watch-history-modes-20261024/.venv/lib/python3.11/site-packages/anyio/to_thread.py:65: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+../market-watch-history-modes-20261024/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:2706: in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+../market-watch-history-modes-20261024/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:1100: in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/market_data.py:558: in catalog
+    return instrument_catalog(query)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/market_data.py:989: in instrument_catalog
+    search_status = search(query)
+                    ^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+query = '苹果'
+
+    def unexpected_search(query):
+>       raise AssertionError('Known Chinese names should not require remote search')
+E       AssertionError: Known Chinese names should not require remote search
+
+backend/tests/test_market_data.py:31: AssertionError
+_ test_catalog_chinese_search_is_local_and_keeps_supplier_code[\u82f1\u4f1f\u8fbe-NVDA] _
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcc2818a110>
+query = '英伟达', expected = 'NVDA'
+
+    @pytest.mark.parametrize('query,expected', [
+        ('欧元', 'EURUSD'), ('黄金', 'XAUUSD'), ('比特币', 'BTCUSDT'),
+        ('苹果', 'AAPL'), ('英伟达', 'NVDA'),
+    ])
+    def test_catalog_chinese_search_is_local_and_keeps_supplier_code(database, monkeypatch, query, expected):
+        from alerts import yahoo_catalog
+        from alerts.config import settings
+        from alerts.provider_yahoo import stable_id
+
+        monkeypatch.setattr(settings, 'yahoo_enabled', True)
+        def unexpected_search(query):
+            raise AssertionError('Known Chinese names should not require remote search')
+        monkeypatch.setattr(yahoo_catalog, 'search', unexpected_search)
+        with database.begin() as db:
+            for ident in ('EURUSD', 'XAUUSD'):
+                row = db.get(Instrument, ident)
+                row.source = 'oanda'
+                row.symbol = {'EURUSD':'EUR_USD', 'XAUUSD':'XAU_USD'}[ident]
+                row.label = row.symbol  # supplier labels may contain no Chinese
+        api_module.app.dependency_overrides[api_module.authenticated] = lambda: 'test'
+        try:
+            with TestClient(api_module.app) as client:
+>               response = client.get('/api/market-data/catalog', params={'query':query})
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend/tests/test_market_data.py:42:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/httpx2/_client.py:1113: in get
+    return self.request(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/testclient.py:463: in request
+    return super().request(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/httpx2/_client.py:797: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/httpx2/_client.py:980: in send
+    response = self._send_handling_auth(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/httpx2/_client.py:1008: in _send_handling_auth
+    response = self._send_handling_redirects(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/httpx2/_client.py:1043: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/httpx2/_client.py:1076: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/testclient.py:360: in handle_request
+    raise exc
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/testclient.py:357: in handle_request
+    portal.call(self.app, scope, receive, send)
+../market-watch-history-modes-20261024/.venv/lib/python3.11/site-packages/anyio/from_thread.py:340: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../miniforge3/envs/planck/lib/python3.11/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+../../miniforge3/envs/planck/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+../market-watch-history-modes-20261024/.venv/lib/python3.11/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/fastapi/applications.py:1163: in __call__
+    await super().__call__(scope, receive, send)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/routing.py:676: in __call__
+    await self.middleware_stack(scope, receive, send)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/fastapi/routing.py:2734: in app
+    await route.handle(scope, receive, send)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/fastapi/routing.py:1780: in handle
+    await self.original_router.handle(scope, receive, send)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/fastapi/routing.py:2789: in handle
+    await included_router._handle_selected(scope, receive, send)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/fastapi/routing.py:1800: in _handle_selected
+    await original_route.handle(scope, receive, send)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/fastapi/routing.py:1279: in handle
+    await app(scope, receive, send)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/fastapi/routing.py:158: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/fastapi/routing.py:144: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/fastapi/routing.py:706: in app
+    raw_response = await run_endpoint_function(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/fastapi/routing.py:354: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/starlette/concurrency.py:34: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../market-watch-history-modes-20261024/.venv/lib/python3.11/site-packages/anyio/to_thread.py:65: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+../market-watch-history-modes-20261024/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:2706: in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+../market-watch-history-modes-20261024/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:1100: in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/market_data.py:558: in catalog
+    return instrument_catalog(query)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/market_data.py:989: in instrument_catalog
+    search_status = search(query)
+                    ^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+query = '英伟达'
+
+    def unexpected_search(query):
+>       raise AssertionError('Known Chinese names should not require remote search')
+E       AssertionError: Known Chinese names should not require remote search
+
+backend/tests/test_market_data.py:31: AssertionError
+_____ test_catalog_partial_match_does_not_hide_new_equity[False-GS-^GSPC] ______
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcc1a80bf90>
+query = 'GS', existing = '^GSPC', remote_fails = False
+
+    @pytest.mark.parametrize("query,existing", [("GS", "^GSPC"), ("MS", "MSFT")])
+    @pytest.mark.parametrize("remote_fails", [False, True])
+    def test_catalog_partial_match_does_not_hide_new_equity(
+        database, monkeypatch, query, existing, remote_fails
+    ):
+        from alerts import provider_yahoo, yahoo_catalog
+        from alerts.config import settings
+
+        monkeypatch.setattr(settings, "yahoo_enabled", True)
+        monkeypatch.setattr(yahoo_catalog, "_SEARCH", {})
+        searched = []
+
+        def search_metadata(term, **kwargs):
+            searched.append(term)
+            if remote_fails:
+                raise TimeoutError("Yahoo search unavailable")
+            return [{"symbol": query, "quoteType": "EQUITY", "exchange": "NYQ",
+                     "longname": "Goldman Sachs" if query == "GS" else "Morgan Stanley"}]
+
+        monkeypatch.setattr(provider_yahoo, "search_metadata", search_metadata)
+        api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+        try:
+            with TestClient(api_module.app) as client:
+                response = client.get("/api/market-data/catalog", params={"query": query})
+                assert response.status_code == 200
+                rows = response.json()
+                assert searched == [query]
+>               assert any(row["symbol"] == existing for row in rows)
+E               assert False
+E                +  where False = any(<generator object test_catalog_partial_match_does_not_hide_new_equity.<locals>.<genexpr> at 0x7fcc1af54900>)
+
+backend/tests/test_market_data.py:82: AssertionError
+______ test_catalog_partial_match_does_not_hide_new_equity[False-MS-MSFT] ______
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcc1a7aba50>
+query = 'MS', existing = 'MSFT', remote_fails = False
+
+    @pytest.mark.parametrize("query,existing", [("GS", "^GSPC"), ("MS", "MSFT")])
+    @pytest.mark.parametrize("remote_fails", [False, True])
+    def test_catalog_partial_match_does_not_hide_new_equity(
+        database, monkeypatch, query, existing, remote_fails
+    ):
+        from alerts import provider_yahoo, yahoo_catalog
+        from alerts.config import settings
+
+        monkeypatch.setattr(settings, "yahoo_enabled", True)
+        monkeypatch.setattr(yahoo_catalog, "_SEARCH", {})
+        searched = []
+
+        def search_metadata(term, **kwargs):
+            searched.append(term)
+            if remote_fails:
+                raise TimeoutError("Yahoo search unavailable")
+            return [{"symbol": query, "quoteType": "EQUITY", "exchange": "NYQ",
+                     "longname": "Goldman Sachs" if query == "GS" else "Morgan Stanley"}]
+
+        monkeypatch.setattr(provider_yahoo, "search_metadata", search_metadata)
+        api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+        try:
+            with TestClient(api_module.app) as client:
+                response = client.get("/api/market-data/catalog", params={"query": query})
+                assert response.status_code == 200
+                rows = response.json()
+                assert searched == [query]
+>               assert any(row["symbol"] == existing for row in rows)
+E               assert False
+E                +  where False = any(<generator object test_catalog_partial_match_does_not_hide_new_equity.<locals>.<genexpr> at 0x7fcc432a99a0>)
+
+backend/tests/test_market_data.py:82: AssertionError
+______ test_catalog_partial_match_does_not_hide_new_equity[True-GS-^GSPC] ______
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcc1930ab10>
+query = 'GS', existing = '^GSPC', remote_fails = True
+
+    @pytest.mark.parametrize("query,existing", [("GS", "^GSPC"), ("MS", "MSFT")])
+    @pytest.mark.parametrize("remote_fails", [False, True])
+    def test_catalog_partial_match_does_not_hide_new_equity(
+        database, monkeypatch, query, existing, remote_fails
+    ):
+        from alerts import provider_yahoo, yahoo_catalog
+        from alerts.config import settings
+
+        monkeypatch.setattr(settings, "yahoo_enabled", True)
+        monkeypatch.setattr(yahoo_catalog, "_SEARCH", {})
+        searched = []
+
+        def search_metadata(term, **kwargs):
+            searched.append(term)
+            if remote_fails:
+                raise TimeoutError("Yahoo search unavailable")
+            return [{"symbol": query, "quoteType": "EQUITY", "exchange": "NYQ",
+                     "longname": "Goldman Sachs" if query == "GS" else "Morgan Stanley"}]
+
+        monkeypatch.setattr(provider_yahoo, "search_metadata", search_metadata)
+        api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+        try:
+            with TestClient(api_module.app) as client:
+                response = client.get("/api/market-data/catalog", params={"query": query})
+                assert response.status_code == 200
+                rows = response.json()
+                assert searched == [query]
+>               assert any(row["symbol"] == existing for row in rows)
+E               assert False
+E                +  where False = any(<generator object test_catalog_partial_match_does_not_hide_new_equity.<locals>.<genexpr> at 0x7fcc196c7ca0>)
+
+backend/tests/test_market_data.py:82: AssertionError
+______ test_catalog_partial_match_does_not_hide_new_equity[True-MS-MSFT] _______
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcc1dfa0d10>
+query = 'MS', existing = 'MSFT', remote_fails = True
+
+    @pytest.mark.parametrize("query,existing", [("GS", "^GSPC"), ("MS", "MSFT")])
+    @pytest.mark.parametrize("remote_fails", [False, True])
+    def test_catalog_partial_match_does_not_hide_new_equity(
+        database, monkeypatch, query, existing, remote_fails
+    ):
+        from alerts import provider_yahoo, yahoo_catalog
+        from alerts.config import settings
+
+        monkeypatch.setattr(settings, "yahoo_enabled", True)
+        monkeypatch.setattr(yahoo_catalog, "_SEARCH", {})
+        searched = []
+
+        def search_metadata(term, **kwargs):
+            searched.append(term)
+            if remote_fails:
+                raise TimeoutError("Yahoo search unavailable")
+            return [{"symbol": query, "quoteType": "EQUITY", "exchange": "NYQ",
+                     "longname": "Goldman Sachs" if query == "GS" else "Morgan Stanley"}]
+
+        monkeypatch.setattr(provider_yahoo, "search_metadata", search_metadata)
+        api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
+        try:
+            with TestClient(api_module.app) as client:
+                response = client.get("/api/market-data/catalog", params={"query": query})
+                assert response.status_code == 200
+                rows = response.json()
+                assert searched == [query]
+>               assert any(row["symbol"] == existing for row in rows)
+E               assert False
+E                +  where False = any(<generator object test_catalog_partial_match_does_not_hide_new_equity.<locals>.<genexpr> at 0x7fcc1e62af80>)
+
+backend/tests/test_market_data.py:82: AssertionError
+_________ test_av49_to_aw50_is_additive_repeatable_and_retains_demands _________
+
+postgres_alerts = Engine([redacted-credentials]@127.0.0.1:18889/equity_test?options=-csearch_path%3Dchart_alert_test_c6ad7743dc634a5188a7e3db5d4ea27f)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcc20e91b90>
+
+    def test_av49_to_aw50_is_additive_repeatable_and_retains_demands(postgres_alerts, monkeypatch):
+        from alerts.config import settings
+        root = Path(__file__).resolve().parents[2]
+        config = Config(str(root/'alembic.ini'))
+        config.set_main_option('script_location', str(root/'migrations'))
+        monkeypatch.setattr(settings, 'database_url', postgres_alerts.url.render_as_string(hide_password=False))
+        command.upgrade(config, 'av49_indicator_demands')
+        before = set(inspect(postgres_alerts).get_table_names())
+        command.upgrade(config, 'head')
+        command.upgrade(config, 'head')
+        after = set(inspect(postgres_alerts).get_table_names())
+        assert before <= after
+>       assert len(after-before) == 9
+E       AssertionError: assert 11 == 9
+E        +  where 11 = len(({'ack_grants', 'advanced_chart_preferences', 'advanced_chart_workspaces', 'agent_credentials', 'agent_operations', 'alembic_version', ...} - {'ack_grants', 'advanced_chart_preferences', 'advanced_chart_workspaces', 'agent_credentials', 'agent_operations', 'alembic_version', ...}))
+
+backend/tests/test_notification_center_postgres.py:112: AssertionError
+_____ test_native_squeeze_keeps_default_lookback_across_absent_periods[H1] _____
+
+timeframe = 'H1'
+
+    @pytest.mark.parametrize("timeframe", ["H1", "H4", "D1"])
+    def test_native_squeeze_keeps_default_lookback_across_absent_periods(timeframe):
+        rows = native_rows(timeframe)
+        expected, segments = literal_pine(rows, 10, 252, 5)
+        actual = provider_result(rows, timeframe)
+        values = matrix(actual)
+>       assert values[-1][2] is not None, "calendar gaps must not restart the 252-ratio warmup"
+E       AssertionError: calendar gaps must not restart the 252-ratio warmup
+E       assert None is not None
+
+backend/tests/test_provider_squeeze_history.py:44: AssertionError
+_____ test_native_squeeze_keeps_default_lookback_across_absent_periods[H4] _____
+
+timeframe = 'H4'
+
+    @pytest.mark.parametrize("timeframe", ["H1", "H4", "D1"])
+    def test_native_squeeze_keeps_default_lookback_across_absent_periods(timeframe):
+        rows = native_rows(timeframe)
+        expected, segments = literal_pine(rows, 10, 252, 5)
+        actual = provider_result(rows, timeframe)
+        values = matrix(actual)
+>       assert values[-1][2] is not None, "calendar gaps must not restart the 252-ratio warmup"
+E       AssertionError: calendar gaps must not restart the 252-ratio warmup
+E       assert None is not None
+
+backend/tests/test_provider_squeeze_history.py:44: AssertionError
+_____ test_native_squeeze_keeps_default_lookback_across_absent_periods[D1] _____
+
+timeframe = 'D1'
+
+    @pytest.mark.parametrize("timeframe", ["H1", "H4", "D1"])
+    def test_native_squeeze_keeps_default_lookback_across_absent_periods(timeframe):
+        rows = native_rows(timeframe)
+        expected, segments = literal_pine(rows, 10, 252, 5)
+        actual = provider_result(rows, timeframe)
+        values = matrix(actual)
+>       assert values[-1][2] is not None, "calendar gaps must not restart the 252-ratio warmup"
+E       AssertionError: calendar gaps must not restart the 252-ratio warmup
+E       assert None is not None
+
+backend/tests/test_provider_squeeze_history.py:44: AssertionError
+_____ test_native_squeeze_still_resets_on_explicit_invalid_input[invalid0] _____
+
+invalid = {'gap_before': True}
+
+    @pytest.mark.parametrize("invalid", [{"gap_before": True}, {"complete": False}])
+    def test_native_squeeze_still_resets_on_explicit_invalid_input(invalid):
+        rows = native_rows("D1")
+        rows[400].update(invalid)
+        result = provider_result(rows, "D1", identity=str(invalid))
+        values = matrix(result)
+>       assert values[399][2] is not None
+E       assert None is not None
+
+backend/tests/test_provider_squeeze_history.py:73: AssertionError
+_____ test_native_squeeze_still_resets_on_explicit_invalid_input[invalid1] _____
+
+invalid = {'complete': False}
+
+    @pytest.mark.parametrize("invalid", [{"gap_before": True}, {"complete": False}])
+    def test_native_squeeze_still_resets_on_explicit_invalid_input(invalid):
+        rows = native_rows("D1")
+        rows[400].update(invalid)
+        result = provider_result(rows, "D1", identity=str(invalid))
+        values = matrix(result)
+>       assert values[399][2] is not None
+E       assert None is not None
+
+backend/tests/test_provider_squeeze_history.py:73: AssertionError
+_______ test_page_reads_only_selected_metadata_and_http_is_authenticated _______
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+
+    def test_page_reads_only_selected_metadata_and_http_is_authenticated(database):
+        large_catalog(database)
+        statements = []
+        engine = database.kw["bind"]
+
+        def capture(conn, cursor, statement, parameters, context, executemany):
+            statements.append(statement)
+
+        event.listen(engine, "before_cursor_execute", capture)
+        try:
+            with database.begin() as db:
+                assert len(search_page(db, page_size=5)["items"]) == 5
+>           assert len(statements) <= 1 + 7 * 5
+E           AssertionError: assert 41 <= (1 + (7 * 5))
+E            +  where 41 = len(['SELECT anon_1.dataset_id, anon_1.version_id, anon_1.source, anon_1.symbol, anon_1.mapping_id, anon_1.match_rank, ano..._history_artifacts.version_id = ? AND market_history_artifacts.status = ? AND market_history_artifacts.count > ?', ...])
+
+backend/tests/test_series_search_pagination.py:165: AssertionError
+_______ test_provider_pages_reach_full_directory_and_mixed_kind_fairness _______
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcc23c42f90>
+
+    def test_provider_pages_reach_full_directory_and_mixed_kind_fairness(database, monkeypatch):
+        large_catalog(database, count=2)
+        provider = [
+            {
+                "id": f"OANDA:T{i:04}",
+                "symbol": f"T{i:04}",
+                "source": "oanda",
+                "label": f"Ticker{i}",
+                "available": True,
+                "supported": True,
+            }
+            for i in range(600)
+        ]
+        monkeypatch.setattr(market_data, "instrument_catalog", lambda query, limit=None: provider)
+>       first = market_data.search_series_page(kind="provider", page_size=250)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend/tests/test_series_search_pagination.py:199:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend/alerts/market_data.py:816: in search_series_page
+    rows = _provider_series(query, source=source, symbol_type=symbol_type)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+query = '', source = None, symbol_type = ''
+
+    def _provider_series(query, *, source=None, symbol_type=""):
+        from .chart_series import encode
+        from .history_catalog import account_scope
+
+        if source not in (None, "dukascopy", "oanda", "binance", "yahoo", "akshare", "fxcm"):
+            raise HTTPException(422, "未知平台来源")
+        result = [{**row, "series_kind": "provider", "ticker": encode(row["id"], "provider"),
+            "description": "平台 · " + row["source"] + " · 原生周期"}
+>           for row in (instrument_catalog(query, limit=None, source=source, managed_status=False) if source != "fxcm" else []) if not row["id"].startswith("MD:")]
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: test_provider_pages_reach_full_directory_and_mixed_kind_fairness.<locals>.<lambda>() got an unexpected keyword argument 'source'
+
+backend/alerts/market_data.py:893: TypeError
+_ test_all_cursor_covers_each_kind_filters_before_paging_and_rejects_changed_query _
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcc124eef50>
+
+    def test_all_cursor_covers_each_kind_filters_before_paging_and_rejects_changed_query(database, monkeypatch):
+        from alerts import market_data
+        from test_series_access import fixture
+        from fastapi import HTTPException
+        import pytest
+
+        fixture(database, monkeypatch)
+        providers = [{"id": f"OANDA:T{i:04}", "symbol": f"T{i:04}", "source": "oanda",
+                      "label": f"Ticker{i}", "asset_type": "CURRENCY" if i % 2 else "EQUITY",
+                      "available": True, "supported": True} for i in range(600)]
+        monkeypatch.setattr(market_data, "instrument_catalog", lambda query, limit=None: providers)
+        rows, cursor = [], None
+        for _ in range(80):
+>           page = market_data.search_series_page(kind="all", page_size=13, cursor=cursor)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend/tests/test_series_search_pagination.py:282:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend/alerts/market_data.py:809: in search_series_page
+    return _all_series_page(query, page_size=page_size, source=source, calendar=calendar,
+backend/alerts/market_data.py:855: in _all_series_page
+    providers = _provider_series(query, source=source, symbol_type=symbol_type) if positions[0] is not None and not calendar else []
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+query = '', source = None, symbol_type = ''
+
+    def _provider_series(query, *, source=None, symbol_type=""):
+        from .chart_series import encode
+        from .history_catalog import account_scope
+
+        if source not in (None, "dukascopy", "oanda", "binance", "yahoo", "akshare", "fxcm"):
+            raise HTTPException(422, "未知平台来源")
+        result = [{**row, "series_kind": "provider", "ticker": encode(row["id"], "provider"),
+            "description": "平台 · " + row["source"] + " · 原生周期"}
+>           for row in (instrument_catalog(query, limit=None, source=source, managed_status=False) if source != "fxcm" else []) if not row["id"].startswith("MD:")]
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: test_all_cursor_covers_each_kind_filters_before_paging_and_rejects_changed_query.<locals>.<lambda>() got an unexpected keyword argument 'source'
+
+backend/alerts/market_data.py:893: TypeError
+_____________________ test_sql_cost_and_authenticated_page _____________________
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine([redacted-credentials]@127.0.0.1:18889/equity_test), autoflush=True, expire_on_commit=False), Engine([redacted-credentials]@127.0.0.1:18889/equity_test))
+
+    def test_sql_cost_and_authenticated_page(provider_pg):
+>       bounded_queries(provider_pg[0])
+
+backend/tests/test_series_search_pagination_postgres.py:33:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+database = sessionmaker(class_='Session', bind=Engine([redacted-credentials]@127.0.0.1:18889/equity_test), autoflush=True, expire_on_commit=False)
+
+    def test_page_reads_only_selected_metadata_and_http_is_authenticated(database):
+        large_catalog(database)
+        statements = []
+        engine = database.kw["bind"]
+
+        def capture(conn, cursor, statement, parameters, context, executemany):
+            statements.append(statement)
+
+        event.listen(engine, "before_cursor_execute", capture)
+        try:
+            with database.begin() as db:
+                assert len(search_page(db, page_size=5)["items"]) == 5
+>           assert len(statements) <= 1 + 7 * 5
+E           AssertionError: assert 41 <= (1 + (7 * 5))
+E            +  where 41 = len(['SELECT anon_1.dataset_id, anon_1.version_id, anon_1.source, anon_1.symbol, anon_1.mapping_id, anon_1.match_rank, ano...arket_history_artifacts.status = %(status_1)s::VARCHAR AND market_history_artifacts.count > %(count_1)s::INTEGER', ...])
+
+backend/tests/test_series_search_pagination.py:165: AssertionError
+____________________ test_all_kind_cursor_and_asset_filter _____________________
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine([redacted-credentials]@127.0.0.1:18889/equity_test), autoflush=True, expire_on_commit=False), Engine([redacted-credentials]@127.0.0.1:18889/equity_test))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fcc23fe1f10>
+
+    def test_all_kind_cursor_and_asset_filter(provider_pg, monkeypatch):
+>       all_cursor(provider_pg[0], monkeypatch)
+
+backend/tests/test_series_search_pagination_postgres.py:41:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend/tests/test_series_search_pagination.py:282: in test_all_cursor_covers_each_kind_filters_before_paging_and_rejects_changed_query
+    page = market_data.search_series_page(kind="all", page_size=13, cursor=cursor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/market_data.py:809: in search_series_page
+    return _all_series_page(query, page_size=page_size, source=source, calendar=calendar,
+backend/alerts/market_data.py:855: in _all_series_page
+    providers = _provider_series(query, source=source, symbol_type=symbol_type) if positions[0] is not None and not calendar else []
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+query = '', source = None, symbol_type = ''
+
+    def _provider_series(query, *, source=None, symbol_type=""):
+        from .chart_series import encode
+        from .history_catalog import account_scope
+
+        if source not in (None, "dukascopy", "oanda", "binance", "yahoo", "akshare", "fxcm"):
+            raise HTTPException(422, "未知平台来源")
+        result = [{**row, "series_kind": "provider", "ticker": encode(row["id"], "provider"),
+            "description": "平台 · " + row["source"] + " · 原生周期"}
+>           for row in (instrument_catalog(query, limit=None, source=source, managed_status=False) if source != "fxcm" else []) if not row["id"].startswith("MD:")]
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: test_all_cursor_covers_each_kind_filters_before_paging_and_rejects_changed_query.<locals>.<lambda>() got an unexpected keyword argument 'source'
+
+backend/alerts/market_data.py:893: TypeError
+____ test_source_migration_preserves_old_bars_versions_and_unmapped_legacy _____
+
+self = <sqlalchemy.engine.base.Connection object at 0x7fcc15d32a90>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x7fcc12d15810>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x7fcc22d49410>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x7fcc2b157dd0>
+parameters = [{}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Unpack[TupleAny]]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+
+        effective_parameters: Optional[_AnyExecuteParams]
+
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+
+        evt_handled: bool = False
+        try:
+            if self._has_events or self.engine._has_events:
+                for fn in self.dispatch.before_cursor_execute:
+                    str_statement, effective_parameters = fn(
+                        self,
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                        context.executemany,
+                    )
+
+            if self._echo:
+                self._log_info(str_statement)
+
+                stats = context._get_cache_stats()
+
+                if not self.engine.hide_parameters:
+                    self._log_info(
+                        "[%s] %r",
+                        stats,
+                        sql_util._repr_params(
+                            effective_parameters,
+                            batches=10,
+                            ismulti=context.executemany,
+                        ),
+                    )
+                else:
+                    self._log_info(
+                        "[%s] [SQL parameters hidden due to "
+                        "hide_parameters=True]",
+                        stats,
+                    )
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=18889 database=equity_test) at 0x7fcc20121a80>
+query = 'DROP TABLE market_source_series', params = {}, prepare = None
+binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.DependentObjectsStillExist: cannot drop table market_source_series because other objects depend on it
+E           DETAIL:  constraint market_dataset_frame_sources_source_id_fkey on table market_dataset_frame_sources depends on table market_source_series
+E           constraint market_history_frame_runs_source_id_fkey on table market_history_frame_runs depends on table market_source_series
+E           HINT:  Use DROP ... CASCADE to drop the dependent objects too.
+
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/psycopg/cursor.py:117: DependentObjectsStillExist
+
+The above exception was the direct cause of the following exception:
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine([redacted-credentials]@127.0.0.1:18889/equity_test), autoflush=True, expire_on_commit=False), Engine([redacted-credentials]@127.0.0.1:18889/equity_test))
+
+    def test_source_migration_preserves_old_bars_versions_and_unmapped_legacy(provider_pg):
+        factory, engine = provider_pg
+        with factory.begin() as db:
+            register(db)
+            register(db, identity(calendar_version="utc0-v1"))
+            register(db, identity(channel="node"))
+            version_id = create_version(db, identity().key, 0, 120000)
+        import_page(Adapter([batch(checkpoint=120000)]), version_id=version_id)
+        with factory.begin() as db:
+            old_rows = list(snapshot_rows(db, version_id))
+            manifest = db.get(HistoryVersion, version_id).manifest
+            old_datasets = list(db.execute(select(MarketDataset.id, MarketDataset.identity).order_by(MarketDataset.id)))
+        with engine.begin() as conn:
+            # Reproduce pre-z27 inline snapshots before testing y26 independently.
+            conn.execute(text("UPDATE market_history_chunks SET content = "
+                "(SELECT content FROM market_source_blobs WHERE id = content_id), content_id = NULL"))
+            conn.execute(text("DROP TABLE market_source_fetches"))
+            conn.execute(text("DROP TABLE market_source_blobs"))
+            conn.execute(text("DROP TABLE market_dataset_sources"))
+            # af33 tables did not exist at y26; retain all populated history rows.
+            for model in (CompositeMinute, CompositeMinuteInput, SourceMinute, SourceMinuteRevision):
+                assert conn.scalar(select(func.count()).select_from(model)) == 0
+                model.__table__.drop(conn)
+>           conn.execute(text("DROP TABLE market_source_series"))
+
+backend/tests/test_source_registry_postgres.py:57:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1448: in execute
+    return meth(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:533: in _execute_on_connection
+    return connection._execute_clauseelement(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1668: in _execute_clauseelement
+    ret = self._execute_context(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1822: in _execute_context
+    return self._exec_single_context(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1962: in _exec_single_context
+    self._handle_dbapi_exception(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2332: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: in _exec_single_context
+    self.dialect.do_execute(
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <psycopg.Cursor [closed] [IDLE] (host=127.0.0.1 port=18889 database=equity_test) at 0x7fcc20121a80>
+query = 'DROP TABLE market_source_series', params = {}, prepare = None
+binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.InternalError: (psycopg.errors.DependentObjectsStillExist) cannot drop table market_source_series because other objects depend on it
+E           DETAIL:  constraint market_dataset_frame_sources_source_id_fkey on table market_dataset_frame_sources depends on table market_source_series
+E           constraint market_history_frame_runs_source_id_fkey on table market_history_frame_runs depends on table market_source_series
+E           HINT:  Use DROP ... CASCADE to drop the dependent objects too.
+E           [SQL: DROP TABLE market_source_series]
+E           (Background on this error at: https://sqlalche.me/e/21/2j85)
+
+../market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/psycopg/cursor.py:117: InternalError
+=============================== warnings summary ===============================
+backend/tests/test_alerts_mcp_migration.py: 25 warnings
+backend/tests/test_chart_alert_migration.py: 10 warnings
+backend/tests/test_chart_alert_postgres.py: 20 warnings
+backend/tests/test_composite_definitions_postgres.py: 3 warnings
+backend/tests/test_composite_mapping_postgres.py: 1 warning
+backend/tests/test_market_datasets_postgres.py: 3 warnings
+backend/tests/test_notification_center_postgres.py: 3 warnings
+backend/tests/test_publication_migration_postgres.py: 10 warnings
+  /home/quant/repos/market-watch-history-modes-integration-20261024/.venv/lib/python3.11/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED backend/tests/test_composite_mapping_postgres.py::test_mapping_notes_upgrade_preserves_existing_mapping_and_composite
+FAILED backend/tests/test_history_request_evidence_postgres.py::test_postgres_request_evidence_additive_migration_and_data_loss_guard
+FAILED backend/tests/test_market_data.py::test_catalog_chinese_search_is_local_and_keeps_supplier_code[\u82f9\u679c-AAPL]
+FAILED backend/tests/test_market_data.py::test_catalog_chinese_search_is_local_and_keeps_supplier_code[\u82f1\u4f1f\u8fbe-NVDA]
+FAILED backend/tests/test_market_data.py::test_catalog_partial_match_does_not_hide_new_equity[False-GS-^GSPC]
+FAILED backend/tests/test_market_data.py::test_catalog_partial_match_does_not_hide_new_equity[False-MS-MSFT]
+FAILED backend/tests/test_market_data.py::test_catalog_partial_match_does_not_hide_new_equity[True-GS-^GSPC]
+FAILED backend/tests/test_market_data.py::test_catalog_partial_match_does_not_hide_new_equity[True-MS-MSFT]
+FAILED backend/tests/test_notification_center_postgres.py::test_av49_to_aw50_is_additive_repeatable_and_retains_demands
+FAILED backend/tests/test_provider_squeeze_history.py::test_native_squeeze_keeps_default_lookback_across_absent_periods[H1]
+FAILED backend/tests/test_provider_squeeze_history.py::test_native_squeeze_keeps_default_lookback_across_absent_periods[H4]
+FAILED backend/tests/test_provider_squeeze_history.py::test_native_squeeze_keeps_default_lookback_across_absent_periods[D1]
+FAILED backend/tests/test_provider_squeeze_history.py::test_native_squeeze_still_resets_on_explicit_invalid_input[invalid0]
+FAILED backend/tests/test_provider_squeeze_history.py::test_native_squeeze_still_resets_on_explicit_invalid_input[invalid1]
+FAILED backend/tests/test_series_search_pagination.py::test_page_reads_only_selected_metadata_and_http_is_authenticated
+FAILED backend/tests/test_series_search_pagination.py::test_provider_pages_reach_full_directory_and_mixed_kind_fairness
+FAILED backend/tests/test_series_search_pagination.py::test_all_cursor_covers_each_kind_filters_before_paging_and_rejects_changed_query
+FAILED backend/tests/test_series_search_pagination_postgres.py::test_sql_cost_and_authenticated_page
+FAILED backend/tests/test_series_search_pagination_postgres.py::test_all_kind_cursor_and_asset_filter
+FAILED backend/tests/test_source_registry_postgres.py::test_source_migration_preserves_old_bars_versions_and_unmapped_legacy
+20 failed, 3120 passed, 3 skipped, 75 warnings in 3655.08s (1:00:55)

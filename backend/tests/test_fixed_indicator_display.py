@@ -108,6 +108,34 @@ def test_all_catalog_foreground_values_dependencies_and_presentation_match_worke
         assert actual["presentation"] == canonical["presentation"]
 
 
+@pytest.mark.parametrize("policy", ["strict_confirmed_v1", "observed_display_v1"])
+@pytest.mark.parametrize("name", ["EMA", "SWING_SR_V1", "ROLLING_RANGE_SQUEEZE", "NR4_NR7_BREAKOUT_V1"])
+def test_source_date_foreground_matches_worker_without_m1_calendar(database, name, policy):
+    from test_native_history_archive import Adapter, day, prepare, run
+
+    dataset = prepare(database, mode="native_periods", outputs=("D1",))
+    version = run(database, dataset, "2024-01-09", Adapter({"D1": [
+        day("2024-01-02", high="14", low="6", close="10"),
+        day("2024-01-04", high="13", low="7", close="10"),
+        day("2024-01-05", high="12", low="8", close="10"),
+        day("2024-01-08", high="15", low="5", close="10"),
+    ]}))
+    spec = {"name": name}
+    body = DataQuery(instrument=version, series_kind="history", timeframe="D1", limit=2,
+        indicators=[spec], client="source-date-display", indicator_input_policy=policy,
+        indicator_consumers=[{"id": "study", "generation": 1, "spec": spec}])
+    result = data_sync(body)
+    actual = result["indicators"][0]
+    assert actual["calculation"]["visible_complete"]
+    assert actual["calculation"]["execution"]["path"] == "bounded-fixed-replay"
+    drain(actual["calculation"]["run_id"])
+    canonical = data_sync(body.model_copy(update={"client": None, "indicator_consumers": []}))["indicators"][0]
+    assert actual["series"] == canonical["series"]
+    assert actual["dependencies"] == canonical["dependencies"]
+    if "presentation" in actual:
+        assert actual["presentation"] == canonical["presentation"]
+
+
 def test_shared_inputs_distinct_specs_result_hits_and_bounded_fallback(database, monkeypatch):
     version = history(database, monkeypatch, count=300)
     first = data_sync(query(version, {"name": "EMA", "params": {"period": 19}}))

@@ -1,0 +1,25 @@
+{
+  "at": "2026-10-26T00:58:43.259233+00:00",
+  "passed": true,
+  "selected_images_only": true,
+  "services": [
+    "projector",
+    "chart-history-worker",
+    "composite-aggregate-worker",
+    "history-worker",
+    "native-history-worker",
+    "realtime-worker",
+    "chart-aggregation-worker",
+    "pricing-worker",
+    "notify-worker",
+    "market-stream-worker",
+    "api",
+    "chart",
+    "web"
+  ],
+  "backend": "sha256:3b6e18e3aadb83cec807532d804b2e4555cc05f3644facc6204f8f0e3566edb5",
+  "chart": "sha256:2f33dd0cfd919ba89ac52e2045a208221cb92ec35cfdf7a0efd50d5600118617",
+  "web": "sha256:71910560705b119475861c1af6a5435ae0e581e263ea495da36dcb4ef5d9a201",
+  "nonimage_configuration_unchanged": true,
+  "rollback_unchanged": true
+}

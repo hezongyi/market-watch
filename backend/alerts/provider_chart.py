@@ -81,6 +81,9 @@ def metadata(ident, *, deadline=None, cached_only=False):
             return configured_metadata("NATIVE:" + ident[7:].lower())
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
+    if ident.startswith("FXCM:"):
+        from .provider_fxcm import metadata as fxcm_metadata
+        return fxcm_metadata("FXCM:" + ident[5:].lower())
     if ident.startswith("DUKA:"):
         from .provider_dukascopy import metadata as dukascopy_metadata
         return dukascopy_metadata(ident)
@@ -88,6 +91,14 @@ def metadata(ident, *, deadline=None, cached_only=False):
         from .provider_cache import DEADLINE
         from .yahoo_catalog import chart_metadata
         return chart_metadata(ident, deadline=deadline or DEADLINE.get(), cached_only=cached_only)
+    if ident.startswith("AKSHARE:"):
+        from .akshare_catalog import chart_metadata
+
+        return chart_metadata("AKSHARE:" + ident[8:].lower())
+    if ident.startswith("TENCENT:"):
+        from .akshare_catalog import chart_metadata
+
+        return chart_metadata(ident)
     with transaction() as db:
         from sqlalchemy import select
 
@@ -267,9 +278,16 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
     if meta["source"] == "yahoo":
         from .provider_yahoo import native_page as yahoo_page
         return yahoo_page(meta, frame, before, count, deadline=deadline, optional=optional)
+    if meta["source"] == "fxcm":
+        from .provider_fxcm import native_page as fxcm_page
+        return fxcm_page(meta, frame, before, count, client=client, deadline=deadline, optional=optional)
     if meta["source"] == "dukascopy":
         from .provider_dukascopy import native_page as dukascopy_page
         return dukascopy_page(meta, frame, before, count, client=client, deadline=deadline, optional=optional)
+    if meta["source"] == "akshare":
+        from .provider_akshare import platform_page
+
+        return platform_page(meta, frame, before, count, deadline=deadline)
     if frame not in source_frames(meta["source"]) or not 1 <= count <= (4000 if meta["source"] == "oanda" else 1000):
         raise ValueError("无效平台周期或根数")
     source = meta["source"]
@@ -392,7 +410,8 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
 
 
 def cached_page(meta, frame, before, count, *, latest=False, quote=False, deadline=None, cache_seconds=None):
-    deadline = deadline or time.monotonic() + 23
+    from .provider_capabilities import request_seconds
+    deadline = deadline or time.monotonic() + max(23, request_seconds(meta["source"]))
     # In REST-batch mode an active native subscription is owned by the shared
     # account worker. Do not let a foreground latest/quote read open a second
     # single-instrument OANDA request while that owner is refreshing the
@@ -498,7 +517,7 @@ def quote_page(meta):
            identity.get("environment"), identity.get("account_scope"))
     from .provider_cache import LatestObservationPending
     try:
-        page = cached_page(meta, "M1", before, 1, latest=True, quote=True)
+        page = cached_page(meta, "D1" if meta["source"] == "akshare" else "M1", before, 1, latest=True, quote=True)
     except LatestObservationPending as waiting:
         # The account collector owns this refresh. Reading its old snapshot is
         # neither another supplier request nor proof of failure or recovery.
@@ -536,6 +555,13 @@ def quote_previous_close(meta, latest):
         page = cached_page(meta, "D1", current_label, 2, quote=True, cache_seconds=300)
         complete = [bar for bar in page["bars"] if bar["complete"] and bar["end"] <= session_boundary]
         return Decimal(complete[-1]["close"]) if complete else None
+    if meta["source"] == "fxcm":
+        page = cached_page(meta, "D1", latest["start"] + 1, 3, quote=True, cache_seconds=300)
+        complete = [bar for bar in page["bars"] if bar["complete"] and bar["end"] <= latest["start"]]
+        return Decimal(complete[-1]["close"]) if complete else None
+    if meta["source"] == "akshare":
+        page = cached_page(meta, "D1", latest["start"], 1, quote=True, cache_seconds=300)
+        return Decimal(page["bars"][-1]["close"]) if page["bars"] else None
     current_label = label(latest["start"], "D1", meta["calendar"])
     session_start = (latest["start"] // 86400000 * 86400000 if meta["source"] == "dukascopy" else
         ms(session_bounds(instant(latest["start"]), Calendar(meta["calendar"]))[0]))
@@ -557,7 +583,7 @@ def earliest_m1(meta, *, client=None):
     """Probe the actual first native M1; never infer it from an empty time slice."""
     from .market_resources import lane
 
-    if meta.get("native_series_id") or meta["source"] in ("yahoo", "dukascopy"):
+    if meta.get("native_series_id") or meta["source"] in ("yahoo", "dukascopy", "fxcm"):
         raise ValueError("此平台身份不建立自建维护任务，请在数据中心明确添加来源历史")
     namespace = (
         hashlib.sha256(settings.oanda_account_id.encode()).hexdigest()

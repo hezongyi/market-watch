@@ -52,13 +52,14 @@ def test_observed_policy_accepts_fixed_confirmed_revision():
 
 SWING = {"name": "SWING_SR_V1", "params": {"high_strength": 5, "low_strength": 5}}
 SUPER = {"name": "SUPERTREND_PINE_V1", "params": {"period": 7, "multiplier": 2}}
+NR = {"name": "NR4_NR7_BREAKOUT_V1", "params": {"timeframe": "5"}}
 
 
 def observed_prices(count=400):
     return [{**row, "open": row["close"]} for row in prices(count)]
 
 
-@pytest.mark.parametrize("spec", [*SPECS, SWING, SUPER])
+@pytest.mark.parametrize("spec", [*SPECS, SWING, SUPER, NR])
 def test_observed_sequence_matches_shared_formula_and_checkpoint(spec):
     rows = observed_prices()
     original = copy.deepcopy(rows)
@@ -83,7 +84,7 @@ def test_observed_sequence_matches_shared_formula_and_checkpoint(spec):
         ObservedState(spec, IndicatorState(spec).checkpoint())
 
 
-@pytest.mark.parametrize("spec", [SPEC, SWING, SUPER])
+@pytest.mark.parametrize("spec", [SPEC, SWING, SUPER, NR])
 def test_forming_updates_are_retractable_and_confirmation_advances_once(spec):
     rows = observed_prices(100)
     engine = ObservedState(spec)

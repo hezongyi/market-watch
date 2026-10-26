@@ -432,3 +432,42 @@ def test_native_multichart_response_budget_and_focus(database, monkeypatch, char
     assert result['mandatory_count'] == 500
     larger = body.model_copy(update={'count_back':4500})
     assert len(cache.data(larger)['bars']) == 4500, 'multichart budget never trims mandatory demand'
+
+
+def test_fxcm_cold_snapshot_is_fresh_when_response_arrives(database, monkeypatch):
+    """A login longer than freshness must not trigger endless tail requests."""
+    meta = {**META, 'id':'FXCM:COLD', 'source':'fxcm', 'account_scope':'test'}
+    clock = [1000000]
+    monkeypatch.setattr(cache, 'now_ms', lambda: clock[0])
+    monkeypatch.setattr(settings, 'provider_fresh_seconds', 15)
+    monkeypatch.setattr(cache, 'fresh_seconds', lambda _: 15)
+    monkeypatch.setattr(settings, 'provider_native_history_buffer', False)
+    monkeypatch.setattr(upstream, 'metadata', lambda _: meta)
+    calls = []
+    def fetch(meta, frame, before, count, **kwargs):
+        calls.append(count)
+        clock[0] += 20000
+        return {**page(before-count*1000, before), 'as_of':clock[0]}
+    monkeypatch.setattr(upstream, 'native_page', fetch)
+    body = native_body(before=1000000, countBack=10)
+    body = body.model_copy(update={'instrument':meta['id']})
+    result = cache.data(body)
+    assert len(result['bars']) == 10
+    assert len(calls) == 1, 'one successful current snapshot must satisfy demand'
+
+
+def test_native_recent_coverage_fills_missing_history_before_polling_again(database, monkeypatch):
+    """A moving future chart margin must not starve historical backfill."""
+    clock = [1000000]
+    monkeypatch.setattr(cache, 'now_ms', lambda: clock[0])
+    monkeypatch.setattr(upstream, 'metadata', lambda _: META)
+    monkeypatch.setattr(settings, 'provider_native_history_buffer', False)
+    seed(META, 'M5', 999000, page(969000, 999000), latest=True)
+    calls = []
+    def fetch(meta, frame, before, count, **kwargs):
+        calls.append((before, count))
+        return page(before-count*1000, before)
+    monkeypatch.setattr(upstream, 'native_page', fetch)
+    result = cache.data(native_body(before=1060000, countBack=100))
+    assert calls == [(969000, 70)], 'recent readable coverage should backfill, not poll the tail'
+    assert len(result['bars']) == 100

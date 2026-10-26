@@ -5,30 +5,11 @@ original IDs; this module adds explicit links instead of reinterpreting them.
 Capability reads do not register datasets, create demand or contact a provider.
 """
 
-import hashlib
-import json
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 
-from .market_contracts import DatasetIdentity
-
-
-class SourceIdentity(BaseModel):
-    model_config = ConfigDict(frozen=True, extra="forbid")
-    source: str = Field(min_length=1, max_length=32)
-    channel: str = Field(min_length=1, max_length=64)
-    environment: str = Field(min_length=1, max_length=32)
-    account_scope: str = Field(pattern=r"^(public|sha256:[a-f0-9]{64})$", max_length=71)
-    provider_symbol: str = Field(min_length=1, max_length=64)
-    basis: str = Field(min_length=1, max_length=16)
-    parameters: dict
-
-    @property
-    def key(self):
-        return hashlib.sha256(json.dumps(self.model_dump(), sort_keys=True,
-                                        separators=(",", ":")).encode()).hexdigest()
+from .market_contracts import DatasetIdentity, SourceIdentity
 
 
 def collection_identity(identity):
@@ -58,6 +39,8 @@ def collection_identity(identity):
         parameters = {"granularity": "M1", "offer_side": "BID"}
     elif signature == ("oanda", "v20", "practice", "bid"):
         parameters = {"granularity": "M1", "price": "B", "smooth": False}
+    elif signature == ("fxcm", "forexconnect", "demo", "bid"):
+        parameters = {"granularity": "m1", "price": "BID", "candle_open": "PreviousClose"}
     elif signature == ("binance", "rest", "public", "last"):
         parameters = {"interval": "1m", "market": "spot"}
     else:
@@ -106,6 +89,14 @@ def capabilities(source: str):
                 "native_bases": ["bid", "ask", "mid"], "native_parameters": dict(DEFAULTS),
                 "history_range": "account/product dependent; per-symbol range requires querying",
                 "volume_kind": "price_count", "volume_unit": "quotes"}
+    if source == "fxcm":
+        return {"source": source, "native_periods": list(FRAMES),
+                "native_status": "supported_when_enabled", "history_m1": True,
+                "confirmation_m1": True, "stream": False, "channel": "forexconnect",
+                "environment": "demo", "bases": ["bid"], "native_confirmation": "not_supplied",
+                "native_completion": "elapsed_native_interval",
+                "history_range": "account/product dependent; no inception boundary verified",
+                "volume_kind": "tick_count", "volume_unit": "price_changes"}
     if source == "binance":
         return {"source": source, "native_periods": list(FRAMES), "native_status": "supported",
                 "history_m1": True, "confirmation_m1": True, "stream": False,
@@ -114,9 +105,15 @@ def capabilities(source: str):
                 "volume_kind": "base", "volume_unit": "source_base"}
     if source == "yahoo":
         return {"source": source, "native_periods": list(YAHOO_INTERVALS),
+                "supported_modes": ["base_d1", "native_periods"], "base_frames": ["D1"],
                 "native_status": "supported_when_enabled", "history_m1": False,
                 "confirmation_m1": False, "stream": False, "bases": ["last"],
                 "history_range": "interval-specific retention; native adapter only"}
+    if source == "akshare":
+        return {"source": source, "native_periods": [], "native_status": "symbol_probe_required",
+                "supported_modes": ["base_d1", "native_periods"], "base_frames": ["D1"],
+                "history_m1": False, "confirmation_m1": False, "stream": False,
+                "bases": ["last"], "history_range": "verified symbol/endpoint/adjustment intersection"}
     raise ValueError("未知来源")
 
 
@@ -124,6 +121,10 @@ def link_dataset(db, dataset, *, unsupported: Literal["reject", "retain"] = "ret
     """Atomic idempotent link. Unknown legacy channels keep their old meaning."""
     from .storage import DatasetSource, SourceSeries
 
+    if DatasetIdentity.model_validate(dataset.identity).identity_version == 2:
+        # A v2 dataset is linked explicitly per input period. Never synthesize
+        # a legacy M1 binding to make old callers accept a new history mode.
+        return None
     try:
         identity = collection_identity(dataset.identity)
     except ValueError:
@@ -144,6 +145,39 @@ def link_dataset(db, dataset, *, unsupported: Literal["reject", "retain"] = "ret
     return series
 
 
+def link_frame_source(db, dataset, frame, identity):
+    from .market_contracts import HISTORY_FRAMES
+    from .storage import DatasetFrameSource, SourceSeries
+
+    parent = DatasetIdentity.model_validate(dataset.identity)
+    identity = SourceIdentity.model_validate(identity)
+    if (parent.identity_version != 2 or frame not in HISTORY_FRAMES
+            or parent.mode == "base_d1" and frame != "D1"):
+        raise ValueError("Dataset mode does not directly collect this period")
+    expected = {key: getattr(parent, key) for key in (
+        "source", "channel", "environment", "account_scope", "provider_symbol", "basis")}
+    if any(getattr(identity, key) != value for key, value in expected.items()):
+        raise ValueError("Native acquisition identity differs from dataset")
+    parameters = identity.parameters
+    if (parameters.get("timeframe") != frame or parameters.get("adjustment") != parent.adjustment
+            or parameters.get("source_family") != parent.source_family
+            or parameters.get("trading_date_rule") != parent.trading_date_rule
+            or any(not parameters.get(key) for key in ("endpoint", "session", "timezone", "rules"))):
+        raise ValueError("Native acquisition requires exact endpoint, frame and session rules")
+    insert = _insert(db)
+    db.execute(insert(SourceSeries).values(id=identity.key, identity=identity.model_dump())
+               .on_conflict_do_nothing(index_elements=["id"]))
+    series = db.get(SourceSeries, identity.key)
+    if SourceIdentity.model_validate(series.identity) != identity:
+        raise ValueError("来源采集身份冲突")
+    db.execute(insert(DatasetFrameSource).values(dataset_id=dataset.id, timeframe=frame,
+        source_id=series.id).on_conflict_do_nothing(index_elements=["dataset_id", "timeframe"]))
+    link = db.get(DatasetFrameSource, (dataset.id, frame))
+    if link.source_id != series.id:
+        raise ValueError("已有周期不能重新绑定到其他采集身份")
+    return series
+
+
 def _insert(db):
     from sqlalchemy.dialects.postgresql import insert as postgres_insert
     from sqlalchemy.dialects.sqlite import insert as sqlite_insert
@@ -152,11 +186,17 @@ def _insert(db):
 
 
 def source_report(db, dataset_id):
-    from .storage import DatasetSource, MarketDataset, SourceSeries
+    from .storage import DatasetFrameSource, DatasetSource, MarketDataset, SourceSeries
 
     dataset = db.get(MarketDataset, dataset_id)
     if not dataset:
         raise ValueError("数据集不存在")
+    if dataset.identity.get("identity_version", 1) == 2:
+        frames = [{"timeframe": link.timeframe, "source_id": link.source_id,
+                   "identity": db.get(SourceSeries, link.source_id).identity}
+                  for link in db.scalars(select(DatasetFrameSource).where(
+                      DatasetFrameSource.dataset_id == dataset.id).order_by(DatasetFrameSource.timeframe))]
+        return {"status": "linked_periods", "mode": dataset.identity["mode"], "frames": frames}
     link = db.get(DatasetSource, dataset_id)
     if not link:
         return {"status": "unmapped_legacy", "source_id": None}

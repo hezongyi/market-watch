@@ -2,6 +2,7 @@ import type { Instrument } from "./api";
 
 const sources: Record<string, string> = {
   oanda: "OANDA",
+  fxcm: "FXCM Demo",
   dukascopy: "Dukascopy",
   binance: "Binance",
   yahoo: "Yahoo",

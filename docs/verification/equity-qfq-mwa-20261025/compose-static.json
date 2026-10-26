@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "mode": "CI-equivalent static config: byte-identical source copies in private directory with dummy .env; no repository env overwrite and no deployment",
+  "results": [
+    {
+      "file": "compose.yaml",
+      "source_sha256": "4d96de4052d9a211aef69b21aadd809a7fab5348822dfb19220602173a60adb1",
+      "exit_code": 0,
+      "error": null
+    },
+    {
+      "file": "compose.production.yaml",
+      "source_sha256": "2c5c1c806195a0d4f7530698c82204e3019a8b8ba402ed97ec676583e7fbeb8f",
+      "exit_code": 0,
+      "error": null
+    },
+    {
+      "file": "compose.acceptance.yaml",
+      "source_sha256": "43caed461f26fe5b33691a53d3727a01ca290133dcaa8d9847e47cf5dbce26a9",
+      "exit_code": 0,
+      "error": null
+    },
+    {
+      "file": "deploy/ubuntu/single-app.acceptance.yaml",
+      "source_sha256": "531c9b85805bec0fcb63d27436e2f414545737a33a2f2655647b676fd0a8e61c",
+      "exit_code": 0,
+      "error": null
+    },
+    {
+      "file": "deploy/ubuntu/history-modes.acceptance.yaml",
+      "source_sha256": "2ddaebb9264bbf48323d14fec89b0a744ea1c0bd47a087b4df4d1398c77797b1",
+      "exit_code": 0,
+      "error": null
+    }
+  ]
+}

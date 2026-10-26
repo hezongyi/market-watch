@@ -17,7 +17,7 @@ from . import provider_chart as upstream
 from .chart_indicators import history_requirement
 from .config import settings
 from .market_resources import lane
-from .provider_capabilities import enabled_sources, page_capacity, poll_seconds
+from .provider_capabilities import enabled_sources, page_capacity, poll_seconds, request_seconds
 from .provider_capabilities import frames as source_frames
 from .storage import (
     ChartAlert,
@@ -60,6 +60,10 @@ def _activate(db, client, key, before, count, *, latest=False):
     # Serialize activations even when the interest row has not been created
     # yet. Workers lock only the interest during their short CAS writeback.
     focus = db.scalar(select(ProviderDataset).where(ProviderDataset.id == key).with_for_update())
+    if focus.source == "akshare":
+        # A foreground read already fetched the selected period. Do not turn
+        # that view into cross-period/depth prewarming or durable maintenance.
+        return
     # One latest and one historical focus per dataset/client; requests for
     # other panes remain separate. Fixed anchor targets do not chase now.
     listener = "read:" + key + (":latest" if latest else ":history")
@@ -176,6 +180,8 @@ def subscribe(
     client, listener, instrument, frame, cursor=0, revision=0, observed_at=0, indicators=None
 ):
     meta = upstream.metadata(instrument)
+    if meta["source"] == "akshare":
+        raise ValueError("AKShare 平台仅按需读取，不创建实时订阅")
     if frame not in source_frames(meta["source"]):
         raise ValueError("此源不支持该原生周期")
     key = cache.ensure(meta, frame)
@@ -335,6 +341,7 @@ def events(client, cursors):
                         "indicators": [],
                         "dataset_id": dataset.id,
                         "_calculation": (frozen, dict(dataset.metadata_json)),
+                        "_indicator_timeframe": dataset.timeframe,
                         "revision": dataset.revision,
                         "cursor": new_last,
                         "as_of": dataset.updated_at,
@@ -350,9 +357,10 @@ def events(client, cursors):
     for event in result:
         publish(event)
         frozen, meta = event.pop("_calculation", ([], {}))
+        timeframe = event.pop("_indicator_timeframe", None)
         for spec, inputs in frozen:
             calculated = compute(inputs, meta, meta["id"], spec,
-                first=event["bars"][0]["start"], provisional=True)
+                first=event["bars"][0]["start"], provisional=True, timeframe=timeframe)
             if "presentation" in calculated:
                 calculated["presentation"] = calculated["presentation"] | {
                     "history_revision": str(event["revision"]), "history_complete": True}
@@ -551,7 +559,7 @@ def warm_step(source, after=None):
                 target["frame"],
                 before,
                 min(cap, max(1, missing)),
-                time.monotonic() + settings.provider_request_seconds,
+                time.monotonic() + request_seconds(source),
                 kind="history",
             )
             state = cache.snapshot(key, target["before"], target["count"])
@@ -645,6 +653,8 @@ def start():
     _STOP.clear()
     from .yahoo_catalog import seed
     seed()
+    from .akshare_catalog import seed as akshare_seed
+    akshare_seed()
     _EXECUTOR = ThreadPoolExecutor(max_workers=2*len(enabled_sources())+2, thread_name_prefix="provider")
 
     def warmer(source):

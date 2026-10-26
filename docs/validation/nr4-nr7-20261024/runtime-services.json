@@ -1,0 +1,137 @@
+[
+  {
+    "service": "chart",
+    "id": "780a942543a0e4e3f21063c80d93550ca9f98b938f00e6b9115c53e74a828710",
+    "image": "sha256:34dd43689ce32c132e7a5c62b07ad06bc86afa04f0d05b08d8926daa1ccf321f",
+    "state": "running",
+    "health": null,
+    "restarts": 0,
+    "configurationUnchanged": true
+  },
+  {
+    "service": "realtime-worker",
+    "id": "cbc6c856eeca14d197da544d0b39afbb1e9ff10252effb613a28f8183a187f2d",
+    "image": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+    "state": "running",
+    "health": null,
+    "restarts": 0,
+    "configurationUnchanged": true
+  },
+  {
+    "service": "projector",
+    "id": "239346a00d9288efab59733d3a6ddd8501137a8af5a60a3c328f7abfe3750ab4",
+    "image": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+    "state": "running",
+    "health": null,
+    "restarts": 0,
+    "configurationUnchanged": true
+  },
+  {
+    "service": "notify-worker",
+    "id": "7d3b5f24ef602de384caaa6a3b3715bf3f6f4db6402a6685fcce2d2d2e9f1d21",
+    "image": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+    "state": "running",
+    "health": null,
+    "restarts": 0,
+    "configurationUnchanged": true
+  },
+  {
+    "service": "native-history-worker",
+    "id": "5c46dc5e8af2e1514fd3aba6f8a700206a6fa53a6282140d1f66dad00406b82d",
+    "image": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+    "state": "running",
+    "health": null,
+    "restarts": 0,
+    "configurationUnchanged": true
+  },
+  {
+    "service": "pricing-worker",
+    "id": "1ca32d184cdf49c312f8fbe42039651fb939707c3309c3cdadd9053715b4790b",
+    "image": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+    "state": "running",
+    "health": null,
+    "restarts": 0,
+    "configurationUnchanged": true
+  },
+  {
+    "service": "chart-aggregation-worker",
+    "id": "b4ff3870f22f09ae41e22b1195741b5cade6d919f4249b9258ab0b708f41f474",
+    "image": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+    "state": "running",
+    "health": null,
+    "restarts": 0,
+    "configurationUnchanged": true
+  },
+  {
+    "service": "composite-aggregate-worker",
+    "id": "0cdf45ef1b1d2285ca2ce1ad40de1f9d3635ffcb8e649ff20dd9ec7f766c00c7",
+    "image": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+    "state": "running",
+    "health": null,
+    "restarts": 0,
+    "configurationUnchanged": true
+  },
+  {
+    "service": "market-stream-worker",
+    "id": "f07fd7f0dacf5a1c08eb2cb7bf1fb7cd369ea55a572a436464e929ea52da9dd0",
+    "image": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+    "state": "running",
+    "health": null,
+    "restarts": 0,
+    "configurationUnchanged": true
+  },
+  {
+    "service": "history-worker",
+    "id": "9e286aed495c9c632d1b15b36fbd172165f7e4220ccfb399e72125b8a4407b78",
+    "image": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+    "state": "running",
+    "health": null,
+    "restarts": 0,
+    "configurationUnchanged": true
+  },
+  {
+    "service": "chart-history-worker",
+    "id": "a7f91e5341f6de87399fc329ce10189b995ec3b746ba6b51b858dedb3a851aff",
+    "image": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+    "state": "running",
+    "health": null,
+    "restarts": 0,
+    "configurationUnchanged": true
+  },
+  {
+    "service": "api",
+    "id": "834fa62c033fac2b8675ec0bf4b432376aebd027de9e17959fcc4ceb200b3455",
+    "image": "sha256:089fbb3cb00aa453b30053661ad77cb5000b86bea8738782d2df086e311b8772",
+    "state": "running",
+    "health": "healthy",
+    "restarts": 0,
+    "configurationUnchanged": true
+  },
+  {
+    "service": "web",
+    "id": "d843061a4af32d55eeec524b14619bded7e71ed2e19f7438a5f5cc8ac91141e5",
+    "image": "sha256:af3de39e8cab597c70837df98ebd95aada4b0d0534c0620ecab268c02de5a0de",
+    "state": "running",
+    "health": null,
+    "restarts": 0,
+    "configurationUnchanged": true
+  },
+  {
+    "service": "gateway",
+    "id": "9492f307fdf9bfdbec7641c4e0b3554bed39340bc73a57448fdbd39e34d79ca9",
+    "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+    "state": "running",
+    "health": null,
+    "restarts": 0,
+    "configurationUnchanged": true
+  },
+  {
+    "service": "postgres",
+    "id": "3de49cbde9a20c6640092181c04d35df41677566795cfecae18c0ab284b0aba8",
+    "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+    "state": "running",
+    "health": "healthy",
+    "restarts": 0,
+    "configurationUnchanged": true
+  }
+]

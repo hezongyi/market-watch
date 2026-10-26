@@ -172,6 +172,35 @@ def test_independent_demands_get_fair_page_turns(history, monkeypatch):
     assert cache.identity(META, 'M5') != cache.identity({**META, 'symbol': 'OTHER'}, 'M5')
 
 
+def test_shared_source_acquisition_busy_waits_then_completes(history, monkeypatch):
+    from alerts.source_history_store import AcquisitionBusy
+
+    ident = loads.submit('owner', 'source-busy', body(4000))['load']['id']
+    original = upstream.native_page
+    def busy(*args, **kwargs):
+        raise AcquisitionBusy('source_page_in_progress')
+    monkeypatch.setattr(upstream, 'native_page', busy)
+    loads.once()
+    assert loads.status('owner', ident)['state'] == 'waiting'
+    with history.begin() as db:
+        row = db.get(NativeHistoryLoad, ident)
+        assert row.stalls == 0 and row.error_json is None
+        row.lease_until = 0  # Advance the retry without sleeping in the test.
+    monkeypatch.setattr(upstream, 'native_page', original)
+    loads.once()
+    assert loads.status('owner', ident)['state'] == 'ready'
+    assert len(loads.result('owner', ident)['result']['bars']) == 4000
+
+
+@pytest.mark.parametrize('instrument', ['AKSHARE:fixture', 'TENCENT:SZSE:000001'])
+def test_akshare_native_task_uses_source_request_budget(history, monkeypatch, instrument):
+    sources = []
+    monkeypatch.setattr(loads, 'request_seconds', lambda source: sources.append(source) or 30)
+    loads.submit('owner', 'source-budget', body(4000).model_copy(update={'instrument': instrument}))
+    loads.once()
+    assert sources == ['akshare']
+
+
 @pytest.mark.parametrize('latest', [False, True])
 def test_successful_empty_pages_fail_after_bounded_no_progress(history, monkeypatch, latest):
     monkeypatch.setattr(upstream, 'native_page', lambda *a, **k: {'bars': [], 'history_boundary': False})

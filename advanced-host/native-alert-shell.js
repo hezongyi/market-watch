@@ -325,7 +325,7 @@ async function nativeAlertShell(
     cancelOpening?.();
     dialog?.close();
   }
-  function openDialog({ title, onClose }) {
+  function openDialog({ title, symbol, onClose }) {
     if (disposed) return Promise.reject(Error("图表已销毁"));
     closeDialog();
     const focus = doc.activeElement;
@@ -421,6 +421,22 @@ async function nativeAlertShell(
         body.replaceChildren();
         footer.hidden = true;
         const titleNode = shell.querySelector('[class*="title-"]');
+        function setTitle(value, code) {
+          const index = code ? value.lastIndexOf(code) : -1;
+          titleNode.replaceChildren();
+          if (index < 0) titleNode.textContent = value;
+          else {
+            const holder = doc.createElement("span");
+            holder.style.cssText = "display:inline-flex;align-items:center;gap:6px";
+            const svg = doc.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.setAttribute("width", "18");svg.setAttribute("height", "18");svg.setAttribute("viewBox", "0 0 18 18");svg.setAttribute("aria-hidden", "true");
+            svg.innerHTML = code === "EURUSD" ? '<circle cx="11" cy="6" r="5" fill="#e8e8e8"/><path d="M7 3h8M6 5h10M7 7h8" stroke="#d64653"/><circle cx="6" cy="11" r="6" fill="#1978c8"/><path d="M3 11h6M6 8v6" stroke="#f3d65e"/>' : '<circle cx="11" cy="6" r="5" fill="#64748b"/><circle cx="6" cy="11" r="6" fill="#1978c8"/><path d="m3 13 2-3 2 2 3-4" stroke="white" fill="none"/>';
+            holder.append(svg,doc.createTextNode(value.slice(index)));
+            titleNode.append(doc.createTextNode(value.slice(0,index)),holder);
+          }
+          shell.setAttribute("aria-label", value);
+        }
+        setTitle(title, symbol);
         resize = () => handle?.recenter();
         handle = {
           shell,
@@ -437,10 +453,7 @@ async function nativeAlertShell(
             handle.busy = value;
             close.disabled = value;
           },
-          setTitle: (value) => {
-            titleNode.textContent = value;
-            shell.setAttribute("aria-label", value);
-          },
+          setTitle,
           recenter: () => {
             const outer = shell.parentElement;
             outer.style.transform = `translate(${Math.max(8, (doc.defaultView.innerWidth - outer.offsetWidth) / 2)}px, ${Math.max(8, (doc.defaultView.innerHeight - outer.offsetHeight) / 2)}px)`;
@@ -496,6 +509,23 @@ async function nativeAlertShell(
       find();
     });
   }
+  let badgeCount, badgeNode;
+  const badgeObserver = page === "alerts" ? new doc.defaultView.MutationObserver(updateBadge) : null;
+  function updateBadge() {
+    const button = doc.querySelector('button[data-name="alerts"][aria-pressed]');
+    if (!button || disposed) return;
+    if (!badgeCount) {badgeNode?.remove(); badgeNode = null; return;}
+    if (!badgeNode?.isConnected || badgeNode.parentElement !== button) {
+      badgeNode?.remove(); badgeNode = doc.createElement("span");
+      badgeNode.dataset.name = "mw-alert-log-badge";
+      badgeNode.style.cssText = "position:absolute;right:2px;top:1px;min-width:14px;height:14px;padding:0 3px;box-sizing:border-box;border-radius:8px;background:#f23645;color:white;font:10px/14px Arial;text-align:center;pointer-events:none";
+      button.style.position = "relative";button.append(badgeNode);
+    }
+    const text = badgeCount > 99 ? "99+" : String(badgeCount);
+    if (badgeNode.textContent !== text) badgeNode.textContent = text;
+    badgeNode.setAttribute("aria-label", `${badgeCount} 条未读交易日志`);
+  }
+  badgeObserver?.observe(doc.body, {childList:true, subtree:true});
   return {
     isOpen: () =>
       page !== null &&
@@ -515,6 +545,7 @@ async function nativeAlertShell(
         bar.layout.onTabClick(bar.layout.getActivePage());
     },
     openDialog,
+    setBadge: count => {badgeCount = count; updateBadge();},
     overlayBounds: (anchor) => {
       const width = doc.defaultView.innerWidth,
         height = doc.defaultView.innerHeight;
@@ -522,6 +553,12 @@ async function nativeAlertShell(
       const toolbar = doc
         .querySelector(".innerWrap-OhqNVIYA")
         ?.getBoundingClientRect();
+      // Pinned v31 layout: the center area ends above the bottom tools and
+      // before the widgetbar. Keep native DOM knowledge in this adapter.
+      const center = doc.querySelector(".layout__area--center")?.getBoundingClientRect();
+      const charts = Array.from(doc.querySelectorAll(".chart-container"),
+        node => node.getBoundingClientRect()).filter(rect => rect.width && rect.height);
+      const chartBottom = charts.length ? Math.max(...charts.map(rect => rect.bottom)) : height;
       return {
         width,
         height,
@@ -529,6 +566,13 @@ async function nativeAlertShell(
           (toolbar?.bottom || anchor?.getBoundingClientRect().bottom || 40) + 8,
         panelLeft:
           !bar.layout.minimized && panel?.width > 60 ? panel.left : width,
+        chartBounds: {
+          left: Math.max(0, center?.left || 0),
+          top: Math.max(0, center?.top ?? toolbar?.bottom ?? 40),
+          right: Math.min(width, center?.right ?? width,
+            !bar.layout.minimized && panel?.width > 60 ? panel.left : width),
+          bottom: Math.min(height, center?.bottom ?? height, chartBottom),
+        },
       };
     },
     control: (kind, container, props) => {
@@ -549,6 +593,7 @@ async function nativeAlertShell(
       if (disposed) return;
       disposed = true;
       closeDialog();
+      badgeObserver?.disconnect(); badgeNode?.remove();
       for (const node of nodes) {
         unmount(node);
         node.remove();

@@ -1,6 +1,6 @@
 """Explicit managed dataset registration. Legacy histories are never rebound."""
 
-from decimal import Context, Decimal, InvalidOperation, ROUND_HALF_UP, localcontext
+from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation, localcontext
 
 from sqlalchemy import func, select
 
@@ -8,7 +8,6 @@ from .calendar_profile import closures_from, normalized_profile, session_from
 from .chart_series import display_symbol
 from .market_contracts import CandleBatch, DatasetIdentity, MarketRequestError, RequestResult
 from .storage import Bar, Instrument, MarketDataset
-
 
 PRICE_RULE_VERSION = "dataset-precision-half-up-v1"
 _STORAGE_LIMIT = Decimal("1e14")
@@ -110,8 +109,15 @@ def register_dataset(db, identity, *, logical_symbol, label, calendar, precision
         raise ValueError("Logical symbol must be a canonical display code")
     if len(logical_symbol) > 10 or not 0 <= precision <= 10:
         raise ValueError("Unsupported logical symbol or price precision")
-    if calendar not in ("ny17", "utc0"):
+    if calendar not in ("ny17", "utc0", "source_date"):
         raise ValueError("Unsupported aggregation calendar")
+    if identity.identity_version == 2:
+        rules = profile.get("trading_date")
+        if (calendar != "source_date" or not rules
+                or rules["rule"] != identity.trading_date_rule):
+            raise ValueError("New history modes require explicit source trading-date rules")
+    elif calendar == "source_date":
+        raise ValueError("Legacy M1 datasets cannot use source trading-date calendars")
     if volume_kind not in ("quantity", "price_count", "tick_count", "base", "unavailable"):
         raise ValueError("Unsupported volume kind")
     if volume_unit is not None and not 0 < len(volume_unit) <= 40:

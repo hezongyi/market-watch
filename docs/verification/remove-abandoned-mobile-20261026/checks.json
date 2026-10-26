@@ -1,0 +1,187 @@
+{
+  "checked_at": "2026-10-26T00:42:53.263158+00:00",
+  "classification": "F0",
+  "base": "1293f8a4380e544f67448b88691c4296f6ec2e45",
+  "local_checks": [
+    {
+      "command": "node --test tests/alert-price-edit.test.cjs tests/chart-alerts-bridge.test.cjs tests/chart-alert-ui-rpc.test.cjs",
+      "exit_code": 0,
+      "seconds": 0.75,
+      "log": "unit-0.log"
+    },
+    {
+      "command": "node tests/fxcm-request-timeouts.cjs",
+      "exit_code": 0,
+      "seconds": 0.06,
+      "log": "unit-1.log"
+    },
+    {
+      "command": "node tests/fxcm-resolution-fallback.cjs",
+      "exit_code": 0,
+      "seconds": 0.11,
+      "log": "unit-2.log"
+    },
+    {
+      "command": "node tests/native-search-local-cache.cjs",
+      "exit_code": 0,
+      "seconds": 0.19,
+      "log": "unit-3.log"
+    },
+    {
+      "command": "node tests/fxcm-series.cjs",
+      "exit_code": 0,
+      "seconds": 0.12,
+      "log": "unit-4.log"
+    },
+    {
+      "command": "node tests/advanced-preferences.cjs",
+      "exit_code": 0,
+      "seconds": 0.16,
+      "log": "unit-5.log"
+    },
+    {
+      "command": "node tests/advanced-preferences-conflict.cjs",
+      "exit_code": 0,
+      "seconds": 0.07,
+      "log": "unit-6.log"
+    },
+    {
+      "command": "node tests/advanced-watchlists.cjs",
+      "exit_code": 0,
+      "seconds": 0.45,
+      "log": "unit-7.log"
+    },
+    {
+      "command": "node tests/symbol-flags.cjs",
+      "exit_code": 0,
+      "seconds": 0.16,
+      "log": "unit-8.log"
+    },
+    {
+      "command": "npm run build",
+      "exit_code": 0,
+      "seconds": 30.44,
+      "log": "build-0.log"
+    },
+    {
+      "command": "node scripts/build-alert-ui.mjs /home/quant/repos/.reports/market-watch/20261026-remove-abandoned-mobile/alert-ui",
+      "exit_code": 0,
+      "seconds": 0.53,
+      "log": "build-1.log"
+    },
+    {
+      "command": "node tests/alert-price-drag.browser.cjs",
+      "exit_code": 0,
+      "seconds": 3.13,
+      "log": "browser-0.log"
+    },
+    {
+      "command": "node tests/native-alert-price-lines.browser.cjs",
+      "exit_code": 0,
+      "seconds": 1.6,
+      "log": "browser-1.log"
+    },
+    {
+      "command": "node tests/alert-reference-ui.browser.cjs",
+      "exit_code": 0,
+      "seconds": 18.59,
+      "log": "browser-2.log"
+    },
+    {
+      "command": "node tests/alert-editing.browser.cjs",
+      "exit_code": 0,
+      "seconds": 21.78,
+      "log": "browser-3.log"
+    },
+    {
+      "command": "node tests/alert-axis-menu.browser.cjs",
+      "exit_code": 0,
+      "seconds": 5.16,
+      "log": "browser-4.log"
+    }
+  ],
+  "licensed_native_workspace": {
+    "passed": true,
+    "cases": [
+      "Full shipped host opens native dialog through validated parent context; draft resides in parent localStorage",
+      "Native Save As binds a fresh UI session and correctly scoped API; old workspace draft remains available",
+      "Native layout load restores A draft, rejects late B response, retains one renderer and keeps iframe alive",
+      "Version conflict preserves edited input and exposes native-window feedback",
+      "Native Yahoo failure → 3 bounded attempts → chart-scoped feedback/disabled alert → explicit same-symbol recovery → real datafeed bars and D1",
+      "Native H4 source switch migrates unsupported Yahoo interval to H1 and displays bars",
+      "Saved desktop two-chart layout → portrait/landscape read-only single chart with H1/D1 switches and no writes → desktop restores both charts"
+    ],
+    "page_errors": 0,
+    "unexpected_requests": 0,
+    "data": "routed synthetic API and candles; actual licensed widget; no deployed instance writes"
+  },
+  "scope": {
+    "backend_migrations_adapters_unchanged": true,
+    "non_bridge_mobile_paths_restored_to_rc2": 27,
+    "fxcm_bridge_changes_retained": true
+  },
+  "docker_r1": {
+    "passed": true,
+    "docker_acceptance_started": true,
+    "host": "quant-server",
+    "task": "mw-remove-mobile-20261026",
+    "project": "mw-remove-mobile-20261026",
+    "url": "https://localhost:18865",
+    "chart_origin": "https://localhost:18866/",
+    "source_commit": "2f26a71ebe075ecd0f7ce2196689c3f12c72ca0a",
+    "source_dirty": false,
+    "pg_version": "14.24",
+    "dataset": "d1-v1-ef528135a493",
+    "fixture": "Isolated D1_BTCUSDT synthetic candles; this one synthetic instrument enabled for UI/alert smoke; synthetic-only watchlist; no supplier credentials or workers",
+    "seed_limit": "D1_EURUSD uses dukascopy metadata, unsupported by current managed frontend; use the already seeded binance fixture instead. No application or generic seed/tool changes.",
+    "cases": [
+      "Real application login and seeded managed workspace access",
+      "Desktop two-chart layout saved to actual API/PostgreSQL and restored on reload",
+      "Desktop native alert create/edit persists actual alert and increments version through task API",
+      "Mobile 390x844: read-only single chart, M1/H1 switching, no changes to saved layouts/preferences/alerts or draft",
+      "Mobile 915x412: read-only single chart, M1/H1 switching, no changes to saved layouts/preferences/alerts or draft",
+      "Desktop draft unchanged after mobile sessions; reopening restores both saved chart panes"
+    ],
+    "page_errors": 0,
+    "mobile_writes": 0,
+    "unexpected_failed_responses": 0,
+    "notification_projection_404": {
+      "count": 2,
+      "reason": "Notification projection worker is not included in this five-service R1; browser runtime explicitly defers observations/projection acknowledgements on 404. No notification delivery or projection acceptance claimed.",
+      "handling": "web/src/notifications/runtime.ts explicitly postpones observation/projection acknowledgement retries on 404"
+    },
+    "resource_exception": {
+      "at": "2026-10-26T00:30:01.372456+00:00",
+      "available_disk_gib": 10.56,
+      "available_memory_gib": 7.48,
+      "load_average": [
+        10.44970703125,
+        11.736328125,
+        9.92138671875
+      ],
+      "exception": [
+        "disk headroom",
+        "host load"
+      ],
+      "task": "mw-remove-mobile-20261026"
+    },
+    "shared_resource_thresholds_modified": false,
+    "isolation_checked": true,
+    "service_images": {
+      "web": "sha256:92da6a896a63ffba24fb1c255667f59d32922c3686ac5ec1b09f9ae4a5614f36",
+      "api": "sha256:c77e8d377a5a6628fa5339665d663fce9dd9f9069a7042b0a44946ca36bb4874",
+      "chart-origin": "sha256:162bed41c0bf4b03511c830781a357bf6c71684b7a2753d8d686431dc12e3dc7"
+    },
+    "runtime_state": "running; task data preserved",
+    "evidence_directory": "/home/quant/repos/.reports/market-watch/20261026-remove-abandoned-mobile/docker-r1"
+  },
+  "remote_ci_run": false,
+  "delivery": {
+    "integration_branch": "market-watch-integration-20261024",
+    "candidate_tag": "v1.29.0-rc.4",
+    "main_merge": false,
+    "long_lived_acceptance_updated": false,
+    "production_updated": false,
+    "remote_receipt": "/home/quant/repos/.reports/market-watch/20261026-remove-abandoned-mobile/docker-r1/delivery.json"
+  }
+}

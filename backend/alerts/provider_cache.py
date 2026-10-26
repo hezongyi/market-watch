@@ -24,7 +24,14 @@ from .chart_indicators import calculate, history_requirement
 from .config import settings
 from .market_resources import LANE, lane
 from .provider_acceptance import receipts as provider_receipts
-from .provider_capabilities import SOURCES, frames, fresh_seconds, page_capacity, versions
+from .provider_capabilities import (
+    SOURCES,
+    frames,
+    fresh_seconds,
+    page_capacity,
+    request_seconds,
+    versions,
+)
 from .provider_changes import ChangeSummary
 from .provider_history_policy import CapacityExceeded, capacity, optional_bars
 from .storage import ProviderBar, ProviderDataset, ProviderInterest, now_ms, transaction, uid
@@ -128,6 +135,7 @@ def identity(meta, frame):
     environment = (
         hashlib.sha256(settings.oanda_account_id.encode()).hexdigest()
         if meta["source"] == "oanda"
+        else meta["account_scope"] if meta["source"] == "fxcm"
         else "yahoo-anonymous" if meta["source"] == "yahoo" else meta["source"] + "-public"
     )
     return hashlib.sha256(
@@ -140,6 +148,7 @@ def identity(meta, frame):
                 meta["basis"],
                 meta["calendar"],
                 *versions(meta),
+                *(["fxcm-native-month-fragments-v1"] if meta["source"] == "fxcm" and frame == "MN" else []),
             ]
         ).encode()
     ).hexdigest()
@@ -158,7 +167,7 @@ def merge_ranges(ranges):
 
 
 def ensure(meta, frame):
-    if frame not in frames(meta["source"]):
+    if frame not in meta.get("frames", frames(meta["source"])):
         raise ValueError("此源不支持该原生周期")
     key = identity(meta, frame)
     stored_meta = meta
@@ -265,7 +274,7 @@ def snapshot_transaction(key, before, count, *, observation=None, bounded_limit=
             **({k: metadata.metadata_json.get(k) for k in
                 ("source", "symbol", "adjustment", "price_description", "volume_kind", "volume_unit",
                  "completion_basis", "session_verified")}
-               if metadata.source in ("yahoo", "dukascopy") else {}),
+               if metadata.source in ("yahoo", "dukascopy", "akshare", "fxcm") else {}),
             "window_limit": window_limit, "history_window": window or None,
             "availability": "window_limit" if window_limit else "available",
             "bars": rows if planning else rows[-count:],
@@ -296,7 +305,7 @@ def snapshot(key, before, count, *, observation=None, bounded_limit=None):
         return state
 
 
-def claim(key):
+def claim(key, source=None):
     with budget_transaction() as db:
         now = now_ms()
         token = uid()
@@ -308,7 +317,7 @@ def claim(key):
             )
             .values(
                 lease_token=token,
-                lease_until=now + max(30000, int(settings.provider_request_seconds*1000)+5000),
+                lease_until=now + max(30000, int(request_seconds(source)*1000)+5000),
                 generation=ProviderDataset.generation + 1,
             )
             .returning(ProviderDataset.generation)
@@ -518,7 +527,7 @@ def fetch_page(key, meta, frame, before, count, deadline, *, kind="chart", lates
     lease_started = time.monotonic()
     while time.monotonic() < deadline:
         check_cancelled()
-        lease = claim(key)
+        lease = claim(key, meta["source"])
         if lease:
             break
         time.sleep(0.05)
@@ -546,6 +555,11 @@ def fetch_page(key, meta, frame, before, count, deadline, *, kind="chart", lates
         with lane(kind):
             kwargs = {"optional": optional} if optional else {}
             page = upstream.native_page(meta, frame, before, count, deadline=deadline, **kwargs)
+        if meta["source"] == "fxcm":
+            # ForexConnect may spend longer than the freshness TTL logging in.
+            # Its adapter stamps as_of after reading the finite snapshot, so
+            # a successful cold response must age from that observation.
+            observed_at = page.get("as_of", observed_at)
         if revalidate:
             page = {**page, "revalidation":True}
         check_cancelled()
@@ -602,7 +616,7 @@ def revalidate_history(key, meta, frame, before, count, deadline):
 def _read(meta, frame, before, count, *, latest=False, deadline=None, on_ready=None):
     if frame not in frames(meta["source"]) or not 1 <= count <= 20000:
         raise ValueError("平台请求根数须在1至20000之间")
-    deadline = deadline or DEADLINE.get() or time.monotonic() + settings.provider_request_seconds
+    deadline = deadline or DEADLINE.get() or time.monotonic() + request_seconds(meta["source"])
     key = ensure(meta, frame)
     shared_latest = meta["source"] == "oanda" and rest_batch_owner_active(key)
     revalidate_history(key, meta, frame, before, count, deadline)
@@ -711,7 +725,7 @@ def _native_read(meta, body, before, count, prefix, latest, on_ready=None):
     """Discover demand using real bars and coverage; optional history is PG-only
     except for spare capacity in a mandatory upstream request.
     """
-    if body.timeframe not in frames(meta["source"]):
+    if body.timeframe not in meta.get("frames", frames(meta["source"])):
         raise ValueError("无效平台周期")
     history_limit = capacity()
     if count + prefix > history_limit:
@@ -719,7 +733,7 @@ def _native_read(meta, body, before, count, prefix, latest, on_ready=None):
     if body.from_time is not None and body.from_time >= (body.before or before):
         raise ValueError("原生历史区间须满足from<to")
     from_time = body.from_time if body.from_time is not None and body.from_time < before else None
-    deadline = DEADLINE.get() or time.monotonic() + settings.provider_request_seconds
+    deadline = DEADLINE.get() or time.monotonic() + request_seconds(meta["source"])
     key = ensure(meta, body.timeframe)
     shared_latest = latest and meta["source"] == "oanda" and rest_batch_owner_active(key)
     if READ_MODE.get() != "cache":
@@ -793,7 +807,7 @@ def _native_read(meta, body, before, count, prefix, latest, on_ready=None):
         previous = observation_progress
         if no_progress >= 3:
             raise TimeoutError("平台历史分页未推进，请重试")
-        tail = latest and not shared_latest and bool(bars) and (not fresh or not connected)
+        tail = latest and not shared_latest and bool(bars) and (not fresh or not readable)
         if tail:
             elapsed = max(0, now_ms() - bars[-1]["start"])
             amount = min(cap, max(3, elapsed // upstream.FRAME_MS[body.timeframe] + 3))
@@ -945,10 +959,11 @@ def data(body):
         if frozen is not None:
             from .provider_indicator_inputs import compute
             result = compute(frozen, meta, body.instrument, spec,
-                             first=first, provisional=body.provisional, telemetry=execution)
+                             first=first, provisional=body.provisional, telemetry=execution, timeframe=body.timeframe)
         else:
-            result = calculate(calculation_rows(prefix, meta, body.instrument), spec,
-                               provisional=body.provisional)
+            prepared = calculation_rows(prefix, meta, body.instrument, body.timeframe,
+                                        infer_gaps=spec["name"] != "ROLLING_RANGE_SQUEEZE")
+            result = calculate(prepared, spec, provisional=body.provisional)
             execution.update(result_cache='miss', calculation_steps=len(prefix))
         from .indicator_state import IndicatorState
 

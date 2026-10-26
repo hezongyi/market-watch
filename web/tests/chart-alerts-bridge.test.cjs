@@ -6,7 +6,7 @@ const { test } = require("node:test"),
   path = require("node:path");
 const root = path.resolve(__dirname, "../..");
 const tick = () => new Promise((r) => setTimeout(r, 5));
-function fixture() {
+function fixture({ readonly = false } = {}) {
   const subscriptions = {},
     shapes = new Map(),
     messages = [],
@@ -52,6 +52,8 @@ function fixture() {
   }
   const chart = {
     symbol: () => symbol,
+    priceFormatter: () => ({format: price => price.toFixed(5)}),
+    symbolExt: () => ({}),
     resolution: () => resolution,
     chartType: () => 1,
     dataReady: () => true,
@@ -88,6 +90,7 @@ function fixture() {
       same: (a, b) => a === b,
     },
   });
+  vm.runInContext(fs.readFileSync(path.join(root, "advanced-host/price-format.js"), "utf8"), ctx);
   vm.runInContext(
     fs.readFileSync(path.join(root, "advanced-host/chart-alerts.js"), "utf8"),
     ctx,
@@ -100,8 +103,9 @@ function fixture() {
     getWorkspace: () => ({ id: "fixture" }),
     getEpoch: () => epoch,
     isLoading: () => loading,
-    readonly: false,
+    readonly,
     metadata: () => ({ source }),
+    calculationOrigin: () => 60000,
     frames: { 60: "H1", 5: "M5" },
     send: (m) => messages.push(structuredClone(m)),
     fail: (e) => failures.push(String(e)),
@@ -386,4 +390,81 @@ test('visible create paths explain loading and unresolved metadata', async () =>
   const g=fixture();g.switchSource(null);await g.api.create();
   assert.ok(g.failures.length,'metadata missing creates visible feedback');
   assert.equal(g.messages.filter(m=>m.type==='chart-alert-context').length,0);
+});
+
+test('squeeze alert captures calculation parameters and boolean, excluding display colors', async () => {
+  const f=fixture();
+  f.chart.getAllStudies=()=>[{id:'squeeze',name:'守望 Python ROLLING_RANGE_SQUEEZE'}];
+  f.chart.getStudyById=()=>({getInputValues:()=>Object.entries({
+    k:3,lookback:20,low_pct:0.1,confirm_on_close:false,first_fill_color:'#ff0000',sma_color:'#00ff00',
+  }).map(([id,value])=>({id,value}))});
+  await f.api.create({object:{type:'study',id:'squeeze'}});
+  assert.deepEqual(f.failures,[]);
+  const context=f.messages.find(m=>m.type==='chart-alert-context').context;
+  assert.deepEqual(context.indicator,{name:'ROLLING_RANGE_SQUEEZE',version:'1',
+    params:{k:3,lookback:20,low_pct:0.1,confirm_on_close:false},output:'signal'});
+  assert.equal(context.calculation_origin,60000);
+});
+
+
+test('price-axis plus opens selection; only its alert action creates at captured display price', async () => {
+  const f = fixture();
+  f.subscriptions.onPlusClick({symbol: 'BTCUSDT', price: 1.1195149});
+  await tick();
+  assert.equal(f.messages.filter(m => m.type === 'chart-alert-context').length, 0, 'plus itself never creates');
+  const items = await f.api.menu([], {createAction: value => value}, {menuName:'CrosshairMenuView'});
+  assert.equal(items.length, 1);assert.match(items[0].label, /1\.11951.*创建告警/);
+  assert.equal(f.messages.filter(m => m.type === 'chart-alert-context').length, 0, 'opening menu never creates');
+  await items[0].onExecute();
+  const contexts = f.messages.filter(m => m.type === 'chart-alert-context');
+  assert.equal(contexts.length, 1);
+  assert.equal(contexts[0].context.quick_create, true);
+  assert.equal(contexts[0].context.price, '1.11951');
+  assert.equal(contexts[0].context.price_presentation.text, '1.11951');
+  assert.equal(contexts[0].context.association.workspace_id, 'fixture');
+  assert.equal(f.calls.filter(q => ['edit', 'lifecycle'].includes(q.op)).length, 0);
+});
+
+test('price-axis plus rejects invalid price, loading, missing metadata and readonly charts', async () => {
+  for (const change of [f => {}, f => f.layoutLoad(), f => f.switchSource(null)]) {
+    const f = fixture(); change(f);
+    for (const price of [0, -1, NaN, Infinity]) f.subscriptions.onPlusClick({symbol: 'BTCUSDT', price});
+    if (f.failures.length === 0) assert.fail('invalid plus click must explain failure');
+    assert.equal(f.messages.filter(m => m.type === 'chart-alert-context').length, 0);
+  }
+  for (const change of [f => f.layoutLoad(), f => f.switchSource(null)]) {
+    const f = fixture(); change(f); f.subscriptions.onPlusClick({symbol: 'BTCUSDT', price: 100});
+    assert.equal(f.messages.filter(m => m.type === 'chart-alert-context').length, 0);
+    assert.ok(f.failures.length);
+  }
+  const f = fixture({readonly: true}); f.subscriptions.onPlusClick?.({symbol: 'BTCUSDT', price: 100});
+  assert.equal(f.messages.filter(m => m.type === 'chart-alert-context').length, 0);
+  const other = fixture(); other.subscriptions.onPlusClick({symbol: 'ETHUSDT', price: 100});
+  assert.equal(other.messages.filter(m => m.type === 'chart-alert-context').length, 0);
+});
+
+
+test('dismissed plus menus never create or affect an ordinary menu', async () => {
+  const f=fixture(); f.subscriptions.onPlusClick({symbol:'BTCUSDT',price:120});
+  await f.api.menu([], {createAction:v=>v}, {menuName:'CrosshairMenuView'});
+  assert.equal(f.messages.filter(m=>m.type==='chart-alert-context').length,0);
+  const normal=await f.api.menu([], {createAction:v=>v}, {menuName:'MainSeriesContextMenu',detail:{type:'series'}});
+  await normal[0].onExecute();
+  const c=f.messages.find(m=>m.type==='chart-alert-context').context;
+  assert.equal(c.quick_create,undefined);assert.equal(c.price,undefined);
+});
+
+test('plus selection rejects changed chart and missing/invalid captured price', async () => {
+  for(const change of ['switchSymbol','switchInterval','layoutLoad']){
+    const f=fixture();f.subscriptions.onPlusClick({symbol:'BTCUSDT',price:120});
+    const items=await f.api.menu([], {createAction:v=>v}, {menuName:'CrosshairMenuView'});
+    f[change]();await items[0].onExecute();
+    assert.equal(f.messages.filter(m=>m.type==='chart-alert-context').length,0,change);
+    assert.ok(f.failures.length,change);
+  }
+  for(const p of [undefined,0,NaN]){
+    const f=fixture();if(p!==undefined)f.subscriptions.onPlusClick({symbol:'BTCUSDT',price:p});
+    const native={native:true};const items=await f.api.menu([native], {createAction:v=>v}, {menuName:'CrosshairMenuView'});
+    assert.deepEqual(items,[native]);
+  }
 });

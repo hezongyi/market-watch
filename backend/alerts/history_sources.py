@@ -14,7 +14,7 @@ class HistoryConfigurationError(ValueError):
 def history_identity(raw):
     identity = DatasetIdentity.model_validate(raw)
     collection_identity(identity)
-    if identity.source not in ("dukascopy", "oanda"):
+    if identity.source not in ("dukascopy", "oanda", "fxcm"):
         raise ValueError("此来源尚未支持自建历史版本")
     if identity.source == "dukascopy" and identity.account_scope != "public":
         raise ValueError("Dukascopy公共历史必须使用public账户范围")
@@ -24,7 +24,7 @@ def history_identity(raw):
 def page_end(identity, start, end):
     """Bound a request before entering the adapter, independent of calendar phase."""
     identity = history_identity(identity)
-    minutes = 4000 if identity.source == "oanda" else 31 * 1440
+    minutes = 300 if identity.source == "fxcm" else 4000 if identity.source == "oanda" else 31 * 1440
     return min(end, start + minutes * 60000)
 
 
@@ -41,8 +41,15 @@ class HistorySources:
             if not settings.oanda_token or not settings.oanda_account_id or identity.account_scope != scope:
                 if source not in self.adapters:
                     raise HistoryConfigurationError("oanda_history_configuration")
+        if source == "fxcm" and source not in self.adapters:
+            from .fxcm_history import account_scope, configured
+            if not configured() or identity.account_scope != account_scope():
+                raise HistoryConfigurationError("fxcm_history_configuration")
         if source not in self.adapters:
-            if source == "dukascopy":
+            if source == "fxcm":
+                from .fxcm_history import FxcmHistory
+                self.adapters[source] = FxcmHistory()
+            elif source == "dukascopy":
                 from .dukascopy_history import DukascopyHistory
 
                 self.adapters[source] = DukascopyHistory(proxy=settings.market_proxy)
@@ -53,6 +60,25 @@ class HistorySources:
                     account_id=settings.oanda_account_id, proxy=settings.oanda_proxy)
             self.owned.add(source)
         return self.adapters[source].page(identity, start, end)
+
+    def native_page(self, identity, start, end):
+        from .market_contracts import SourceIdentity
+
+        identity = SourceIdentity.model_validate(identity)
+        if identity.source == "yahoo":
+            from .provider_yahoo import archive_page
+
+            if "yahoo" in self.adapters:
+                return self.adapters["yahoo"].native_page(identity, start, end)
+            return archive_page(identity, start, end)
+        if identity.source == "akshare":
+            if "akshare" not in self.adapters:
+                from .provider_akshare import AKShareHistory
+
+                self.adapters["akshare"] = AKShareHistory()
+                self.owned.add("akshare")
+            return self.adapters["akshare"].native_page(identity, start, end)
+        raise HistoryConfigurationError("native_history_configuration")
 
     def close(self):
         for source in self.owned:

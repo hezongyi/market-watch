@@ -1,0 +1,16 @@
+AssertionError [ERR_ASSERTION]: native restart plus prepend must restore the latest NR box
++ actual - expected
+
+  [
+    0,
+-   4
+  ]
+
+    at eval (eval at <anonymous> ([stdin]:3:1), <anonymous>:52:10) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: [Array],
+  expected: [Array],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}

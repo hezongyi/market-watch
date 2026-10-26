@@ -10,6 +10,9 @@ from test_native_history_loads import (
 from test_native_history_loads import (
     test_result_poll_preserves_progress_and_final_page_count as check_result_poll,
 )
+from test_native_history_loads import (
+    test_shared_source_acquisition_busy_waits_then_completes as check_source_busy,
+)
 from test_provider_cache import META, page
 from test_provider_postgres import provider_pg as provider_pg
 
@@ -30,3 +33,11 @@ def test_result_poll_progress_and_final_pages(provider_pg, monkeypatch):
     monkeypatch.setattr(upstream, 'metadata', lambda _: META)
     monkeypatch.setattr(upstream, 'native_page', lambda m, f, b, n, **k: page(b-n*1000, b))
     check_result_poll(factory)
+
+
+def test_shared_source_busy_retries_without_terminal_failure(provider_pg, monkeypatch):
+    factory, _ = provider_pg
+    monkeypatch.setattr(settings, 'native_history_max_bars', 80000)
+    monkeypatch.setattr(upstream, 'metadata', lambda _: META)
+    monkeypatch.setattr(upstream, 'native_page', lambda m, f, b, n, **k: page(b-n*1000, b))
+    check_source_busy(factory, monkeypatch)

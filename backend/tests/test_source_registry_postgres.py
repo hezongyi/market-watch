@@ -10,7 +10,9 @@ from alerts.history_versions import create_version, import_page, snapshot_rows
 from alerts.storage import (
     CompositeMinute,
     CompositeMinuteInput,
+    DatasetFrameSource,
     DatasetSource,
+    HistoryFrameRun,
     HistoryVersion,
     MarketDataset,
     SourceBlob,
@@ -50,8 +52,9 @@ def test_source_migration_preserves_old_bars_versions_and_unmapped_legacy(provid
         conn.execute(text("DROP TABLE market_source_fetches"))
         conn.execute(text("DROP TABLE market_source_blobs"))
         conn.execute(text("DROP TABLE market_dataset_sources"))
-        # af33 tables did not exist at y26; retain all populated history rows.
-        for model in (CompositeMinute, CompositeMinuteInput, SourceMinute, SourceMinuteRevision):
+        # These later tables did not exist at y26; retain all populated history rows.
+        for model in (HistoryFrameRun, DatasetFrameSource, CompositeMinute,
+                      CompositeMinuteInput, SourceMinute, SourceMinuteRevision):
             assert conn.scalar(select(func.count()).select_from(model)) == 0
             model.__table__.drop(conn)
         conn.execute(text("DROP TABLE market_source_series"))
@@ -61,7 +64,8 @@ def test_source_migration_preserves_old_bars_versions_and_unmapped_legacy(provid
         m.upgrade()
         SourceBlob.__table__.create(conn)
         SourceFetch.__table__.create(conn)
-        for model in (SourceMinuteRevision, SourceMinute, CompositeMinuteInput, CompositeMinute):
+        for model in (SourceMinuteRevision, SourceMinute, CompositeMinuteInput,
+                      CompositeMinute, DatasetFrameSource, HistoryFrameRun):
             model.__table__.create(conn)
         with conn.begin_nested():
             with pytest.raises(RuntimeError, match="backup"):

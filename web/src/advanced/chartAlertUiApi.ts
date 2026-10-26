@@ -28,7 +28,8 @@ export async function chartAlertUiRequest(
   if (typeof q.path !== "string") throw Error("无效告警请求路径");
   const write = q.body !== undefined;
   const readPath =
-    q.path === "/chart-alerts" || q.path === "/chart-alerts/events";
+    q.path === "/chart-alerts" || q.path === "/chart-alerts/events" ||
+    new RegExp(`^/chart-alerts/${uuid}$`).test(q.path);
   const writePath =
     q.path === "/chart-alerts" ||
     q.path === "/chart-alerts/capabilities" ||

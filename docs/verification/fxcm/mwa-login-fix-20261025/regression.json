@@ -1,0 +1,858 @@
+{
+  "passed": true,
+  "observed_at_utc": "2026-10-25T09:13:19.217Z",
+  "ignoreHTTPSErrors": false,
+  "baseURL": "https://test.kookvv.com:8443",
+  "chartOrigin": "https://chart-test.kookvv.com:8443",
+  "loginResponses": [
+    200
+  ],
+  "phases": [
+    {
+      "name": "regression-login",
+      "url": "https://test.kookvv.com:8443/advanced-charts/900b8bef-aab3-4a10-a6f5-dd09f7a71310",
+      "frames": [
+        "https://test.kookvv.com:8443/advanced-charts/900b8bef-aab3-4a10-a6f5-dd09f7a71310",
+        "https://chart-test.kookvv.com:8443/?parent=https%3A%2F%2Ftest.kookvv.com%3A8443",
+        "blob:https://chart-test.kookvv.com:8443/133a37e5-08f1-46b3-80cd-e6210a41522c"
+      ],
+      "status": "已加载 · 行情按需更新",
+      "charts": [
+        {
+          "symbol": "MWP:XAUUSD",
+          "resolution": "240",
+          "ready": true
+        }
+      ],
+      "failures": [
+        {
+          "url": "https://test.kookvv.com:8443/api/market-data/quotes",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://test.kookvv.com:8443/api/charts/stream/events?client=850f00ba-bb27-4fe2-9d0d-e0a7868c33e6",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://test.kookvv.com:8443/api/market-data/quotes",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "https://test.kookvv.com:8443/api/charts/history-loads/3b4ddf92-bf1a-4a41-bc86-70a180198ad2/cancel",
+          "error": "net::ERR_ABORTED"
+        }
+      ],
+      "quoteResponses": [
+        200,
+        200
+      ],
+      "canceledReadMessages": [
+        {
+          "type": "cancel-request",
+          "id": 4,
+          "op": "quotes"
+        },
+        {
+          "type": "cancel-request",
+          "id": 5,
+          "op": "quotes"
+        }
+      ],
+      "recoveredResources": [],
+      "resourceRecoveryEvidence": [],
+      "styles": [
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/23308.30febcf44ed37ac44457.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/83159.fbb750fd312778403036.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/82593.6a08fc3d7286497dfb5c.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/43946.9831f80c5744716ce514.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/34663.c6bb312e84fe5f5d7ace.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/1355.eaddeff6b33b6ef1b484.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/10162.84454d9522365162b47f.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/70221.a35afd2176ea6f1cf8db.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/55578.362fa6a7ab1f3e3b06c4.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/50779.89b41c884d5213432809.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/69437.2948ab6dbdff9ed7521d.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/57296.cffada78ccaf26c745ae.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/16639.d806fb47537c11ca4025.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/43296.a9f9476cfccebb241395.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/88638.73dc27555ae7d6fe6658.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/88090.4cf624bc12fb215eb8bc.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/63458.0dacb9bf3649da7e2a0b.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/51326.ef930db5ef4b533a7904.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/13885.227359fe461ff7db045b.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/72414.6707a4012bf5cd2d92e6.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/39231.4c4149f8d99af1a4bf36.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/66894.a33c76f5549cc7102e61.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/86062.a8b17c5d88bfc065c1d7.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/18316.fbb750fd312778403036.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/90130.39e6202ba00cf6f84f33.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/61309.30433d848f8e9fdd4e0e.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/17039.2020d73e26d49ab4f152.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/96868.2fb5f6f3eb739c16078d.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/9876.4db113a94ddabe52ea7c.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/99942.7fb8be8c332650e84371.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/85715.8b652352c5fa37697ca2.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/15043.49b83eeebe4037b3d646.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/15211.005052e314b2de339c3c.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/47649.ae1ef6aa1cbb9375826c.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/85376.10fd79bdcf7d87919e93.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/32972.502a2bfaa4b3396033c4.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/62224.c354edad3b1c411c325d.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/40939.0bd961e2a4b54f16d070.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/16687.bfb3f04bc4010c693f88.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/85431.840e3808e3ae0de87347.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/75866.9ce134321e5f7ed1c4ad.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/11798.3b6e6a44133a66f3f38a.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/83899.bb51b63e079c12f34d9d.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/13804.994a27332cd6fb7d9250.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/71954.e5232e0eb892021a5cad.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/70814.d9b617031ddcb9f1c25c.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/34430.ef0bd3010b1c05e755bc.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/85786.d08b322ccf5a089c2724.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/16245.7c8021aaa4581206bf5d.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/63214.85a354988ef1aba52418.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/97085.e8cb5e4798d2a95fd51a.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/52485.0013c1de7f3983cb0702.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/50160.e2da57e52d49f6d7a278.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/85997.6ebc9854b0db5bfacff5.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/18566.5b77c805ba0a2936e5c4.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/93732.e2e2ad7de327b6a9266d.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/1644.ec13e683352881af5b51.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/93274.4c73acc985e2db926fde.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/10767.cc048c527ae0ed545dde.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/80202.783319ebb0c35b72cd16.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/45295.5590f61c6ca6a343b817.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/74776.046655fecc28d4543a62.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/41707.35fc60bac7bba7427820.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/13654.5aab6690df9cc823979b.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/74219.b1fdfb8c01fa2ccc3563.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/10627.267c6b3976ed72c9c3bf.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/47081.586fdfa9fc67a5bf4d60.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/16651.7b0d640d46a06eec0b92.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/84551.f2e1edd6097be38e73da.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/4500.388f05210735cc1ee824.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/39983.f5f264bb4298497c0f97.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/8117.801d73756f943dcb4a7f.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/32327.d047694e43d46e5c8cd4.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/60451.b5acda22a891bd0b8b78.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/55921.8577632fdab29ee53ddf.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/5840.f520a97183687f9dfabe.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/36282.5842e2a91f45177846c7.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/31892.cadd6c828bd2c0930e97.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/46853.1871485f1e39c0f64252.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/23819.86d4f770693fe6935bba.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/16468.3e4f89ce6749c1e5f8df.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/55287.82c987befbfc614cdc0b.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/87202.e197bd2cf8e6d2360b6f.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/48194.053cede951b9d64dea44.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/66998.ca7edaed1ed119c20a86.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/69921.5c8b1b079e22afe0d4f1.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/88887.8bacf5f9fc03193bdafe.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/53796.5221e147c4eb0d224a86.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/alert-ui.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/alert-ui.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/2371.3fc94a1aa7a1e03d91e4.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/alert-ui.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/2371.3fc94a1aa7a1e03d91e4.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/chart-menu.css",
+          "loaded": true
+        }
+      ],
+      "nativeUI": "- contentinfo:\n  - paragraph: Tradingview是交互式的，并且具有与屏幕阅读器一起使用的命令。以下是可用于在平台上交互的键盘命令列表\n  - list:\n    - listitem: 开始使用键盘导航模式。按Alt + Z\n    - listitem: 快速搜索。按Ctrl + K\n    - listitem: 更改商品。开始输入商品名称\n    - listitem: 更改时间周期。按数字或逗号\n    - listitem: 指标、指标和策略。按斜线\n    - listitem: 开放式布局。按下句号\n- toolbar:\n  - button \"商品代码搜索\": XAUUSD\n  - button \"对比或叠加商品\"\n  - radiogroup:\n    - radio \"1 分钟\": 1分\n    - radio \"5 分钟\": 5分\n    - radio \"15 分钟\": 15分\n    - radio \"30 分钟\": 30分\n    - radio \"1 小时\": 1小时\n    - radio \"4 小时\" [checked]: 4小时\n    - radio \"1 日\": 天\n    - radio \"1 周\": 周\n    - radio \"1 月\": 月\n  - button \"图表周期\"\n  - button \"K线图\"\n  - button \"指标模板\"\n  - button \"指标\"\n  - button \"数据中心\"\n  - button [disabled]\n  - button [disabled]\n  - button \"布局设置\"\n  - button \"所有更改已保存\" [disabled]: 历史模式验收 2026-10-25T00:29:05.982Z 保存\n  - button \"管理布局\"\n  - button \"快速搜索\"\n  - button \"设置\"\n  - button \"全屏模式\"\n  - button \"生成快照\"\n  - button \"系统消息，414 条未读\"\n- toolbar:\n  - button \"十字线\"\n  - button \"游标\" [pressed]\n  - button \"趋势线\"\n  - button \"趋势线工具\"\n  - button \"斐波那契回撤\"\n  - button \"江恩和斐波那契工具\"\n  - button \"XABCD 形态\"\n  - button \"形态\"\n  - button \"多头\"\n  - button \"预测和测量工具\"\n  - button \"笔刷\"\n  - button \"几何形状\"\n  - button \"文字\"\n  - button \"注释工具\"\n  - button \"图标\"\n  - button \"图标\"\n  - button \"测量\"\n  - button \"放大\"\n  - button \"磁铁模式将放置在价格K线附近的绘图吸附到最近的OHLC值\"\n  - button \"磁铁\"\n  - button \"继续绘图\"\n  - button \"锁定所有绘图\"\n  - button \"隐藏所有图形\"\n  - button \"隐藏选项\"\n  - button \"移除0个绘图\"\n  - button \"移除选项\"\n- button \"隐藏绘图工具栏\":\n  - img\n- 'region \"图表 #1\"':\n  - toolbar:\n    - button \"变更品种\": XAUUSD · 平台行情 · bid · OANDA 报价量\n    - text: ·\n    - button \"变更周期\": 4小时\n    - text: · OANDA\n    - button \"更多\":\n      - img\n    - button \"休市\"\n    - text: 开= 4,174.185 高= 4,189.615 低= 4,168.685 收= 4,188.815 +14.630 (+0.35%)\n- toolbar:\n  - button \"1周时间周期内的5年\": 5年\n  - button \"1周时间周期内的1年\": 1年\n  - button \"1小时时间周期内的3个月\": 3个月\n  - button \"30分钟时间周期内的1个月\": 1个月\n  - button \"5分钟时间周期内的5天\": 5天\n  - button \"1分钟时间周期内的1天\": 1天\n  - button \"前往到\"\n  - button \"时区\": 09:13:30 UTC\n  - button \"切换为百分比坐标\"\n  - button \"切换为对数坐标\": log\n  - button \"切换为自动坐标\" [pressed]: 自动\n- button \"自选表\"\n- button \"添加商品代码\"\n- button \"自选列表列设置\"\n- button \"商品\"\n- button \"最新价\"\n- button \"涨跌\"\n- button \"涨跌%\"\n- button \"按旗标排序\"\n- text: BTCUSDT\n- button \"MWP:BTCUSDT · 添加颜色收藏\"\n- text: EURUSD\n- button \"MWP:EURUSD · 添加颜色收藏\"\n- button \"MWP:OANDA:GBP_USD · 添加颜色收藏\"\n- text: XAUUSD\n- button \"MWP:XAUUSD · 添加颜色收藏\"\n- button \"MWH:2a673b63-2922-497e-bec9-d0231be55934 · 添加颜色收藏\"\n- text: COMPOSITE\n- button \"MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb · 绿色收藏\" [pressed]\n- button \"MWC:54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982 · 添加颜色收藏\"\n- button \"MWC:4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6 · 黄色收藏\" [pressed]\n- text: XAUUSD\n- toolbar:\n  - button \"观察清单和详情\" [pressed]\n  - button \"警报\"\n  - button \"数据窗口\"\n  - button \"显示对象树\"\n- img\n- toolbar:\n  - button \"打开交易面板\": 账户管理器\n  - button \"打开面板\"\n  - button \"最大化面板\"\n- alert\n- button \"图表菜单\"",
+      "logs": []
+    },
+    {
+      "name": "regression-refresh",
+      "url": "https://test.kookvv.com:8443/advanced-charts/900b8bef-aab3-4a10-a6f5-dd09f7a71310",
+      "frames": [
+        "https://test.kookvv.com:8443/advanced-charts/900b8bef-aab3-4a10-a6f5-dd09f7a71310",
+        "https://chart-test.kookvv.com:8443/?parent=https%3A%2F%2Ftest.kookvv.com%3A8443",
+        "blob:https://chart-test.kookvv.com:8443/99dba52c-ada0-4ac9-b620-811a2666ae57"
+      ],
+      "status": "已加载 · 行情按需更新",
+      "charts": [
+        {
+          "symbol": "MWP:XAUUSD",
+          "resolution": "240",
+          "ready": true
+        }
+      ],
+      "failures": [],
+      "quoteResponses": [
+        200
+      ],
+      "canceledReadMessages": [],
+      "recoveredResources": [],
+      "resourceRecoveryEvidence": [],
+      "styles": [
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/23308.30febcf44ed37ac44457.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/83159.fbb750fd312778403036.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/82593.6a08fc3d7286497dfb5c.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/43946.9831f80c5744716ce514.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/34663.c6bb312e84fe5f5d7ace.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/1355.eaddeff6b33b6ef1b484.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/10162.84454d9522365162b47f.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/70221.a35afd2176ea6f1cf8db.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/55578.362fa6a7ab1f3e3b06c4.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/50779.89b41c884d5213432809.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/69437.2948ab6dbdff9ed7521d.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/57296.cffada78ccaf26c745ae.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/16639.d806fb47537c11ca4025.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/43296.a9f9476cfccebb241395.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/88638.73dc27555ae7d6fe6658.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/88090.4cf624bc12fb215eb8bc.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/63458.0dacb9bf3649da7e2a0b.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/51326.ef930db5ef4b533a7904.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/13885.227359fe461ff7db045b.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/72414.6707a4012bf5cd2d92e6.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/39231.4c4149f8d99af1a4bf36.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/66894.a33c76f5549cc7102e61.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/86062.a8b17c5d88bfc065c1d7.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/18316.fbb750fd312778403036.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/90130.39e6202ba00cf6f84f33.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/61309.30433d848f8e9fdd4e0e.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/17039.2020d73e26d49ab4f152.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/96868.2fb5f6f3eb739c16078d.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/9876.4db113a94ddabe52ea7c.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/99942.7fb8be8c332650e84371.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/85715.8b652352c5fa37697ca2.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/15043.49b83eeebe4037b3d646.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/15211.005052e314b2de339c3c.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/47649.ae1ef6aa1cbb9375826c.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/85376.10fd79bdcf7d87919e93.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/32972.502a2bfaa4b3396033c4.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/62224.c354edad3b1c411c325d.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/40939.0bd961e2a4b54f16d070.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/16687.bfb3f04bc4010c693f88.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/85431.840e3808e3ae0de87347.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/75866.9ce134321e5f7ed1c4ad.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/11798.3b6e6a44133a66f3f38a.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/83899.bb51b63e079c12f34d9d.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/13804.994a27332cd6fb7d9250.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/71954.e5232e0eb892021a5cad.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/70814.d9b617031ddcb9f1c25c.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/34430.ef0bd3010b1c05e755bc.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/85786.d08b322ccf5a089c2724.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/16245.7c8021aaa4581206bf5d.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/63214.85a354988ef1aba52418.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/97085.e8cb5e4798d2a95fd51a.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/52485.0013c1de7f3983cb0702.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/50160.e2da57e52d49f6d7a278.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/85997.6ebc9854b0db5bfacff5.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/18566.5b77c805ba0a2936e5c4.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/93732.e2e2ad7de327b6a9266d.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/1644.ec13e683352881af5b51.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/93274.4c73acc985e2db926fde.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/10767.cc048c527ae0ed545dde.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/80202.783319ebb0c35b72cd16.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/45295.5590f61c6ca6a343b817.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/74776.046655fecc28d4543a62.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/41707.35fc60bac7bba7427820.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/13654.5aab6690df9cc823979b.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/74219.b1fdfb8c01fa2ccc3563.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/10627.267c6b3976ed72c9c3bf.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/47081.586fdfa9fc67a5bf4d60.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/16651.7b0d640d46a06eec0b92.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/84551.f2e1edd6097be38e73da.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/4500.388f05210735cc1ee824.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/39983.f5f264bb4298497c0f97.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/8117.801d73756f943dcb4a7f.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/32327.d047694e43d46e5c8cd4.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/60451.b5acda22a891bd0b8b78.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/55921.8577632fdab29ee53ddf.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/5840.f520a97183687f9dfabe.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/36282.5842e2a91f45177846c7.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/31892.cadd6c828bd2c0930e97.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/46853.1871485f1e39c0f64252.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/23819.86d4f770693fe6935bba.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/16468.3e4f89ce6749c1e5f8df.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/55287.82c987befbfc614cdc0b.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/87202.e197bd2cf8e6d2360b6f.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/48194.053cede951b9d64dea44.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/66998.ca7edaed1ed119c20a86.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/69921.5c8b1b079e22afe0d4f1.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/88887.8bacf5f9fc03193bdafe.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/53796.5221e147c4eb0d224a86.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/alert-ui.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/alert-ui.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/2371.3fc94a1aa7a1e03d91e4.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/alert-ui.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/charting_library_91bf3b2668480f58/bundles/2371.3fc94a1aa7a1e03d91e4.css",
+          "loaded": true
+        },
+        {
+          "href": "https://chart-test.kookvv.com:8443/chart-menu.css",
+          "loaded": true
+        }
+      ],
+      "nativeUI": "- contentinfo:\n  - paragraph: Tradingview是交互式的，并且具有与屏幕阅读器一起使用的命令。以下是可用于在平台上交互的键盘命令列表\n  - list:\n    - listitem: 开始使用键盘导航模式。按Alt + Z\n    - listitem: 快速搜索。按Ctrl + K\n    - listitem: 更改商品。开始输入商品名称\n    - listitem: 更改时间周期。按数字或逗号\n    - listitem: 指标、指标和策略。按斜线\n    - listitem: 开放式布局。按下句号\n- toolbar:\n  - button \"商品代码搜索\": XAUUSD\n  - button \"对比或叠加商品\"\n  - radiogroup:\n    - radio \"1 分钟\": 1分\n    - radio \"5 分钟\": 5分\n    - radio \"15 分钟\": 15分\n    - radio \"30 分钟\": 30分\n    - radio \"1 小时\": 1小时\n    - radio \"4 小时\" [checked]: 4小时\n    - radio \"1 日\": 天\n    - radio \"1 周\": 周\n    - radio \"1 月\": 月\n  - button \"图表周期\"\n  - button \"K线图\"\n  - button \"指标模板\"\n  - button \"指标\"\n  - button \"数据中心\"\n  - button [disabled]\n  - button [disabled]\n  - button \"布局设置\"\n  - button \"所有更改已保存\" [disabled]: 历史模式验收 2026-10-25T00:29:05.982Z 保存\n  - button \"管理布局\"\n  - button \"快速搜索\"\n  - button \"设置\"\n  - button \"全屏模式\"\n  - button \"生成快照\"\n  - button \"系统消息，414 条未读\"\n- toolbar:\n  - button \"十字线\"\n  - button \"游标\" [pressed]\n  - button \"趋势线\"\n  - button \"趋势线工具\"\n  - button \"斐波那契回撤\"\n  - button \"江恩和斐波那契工具\"\n  - button \"XABCD 形态\"\n  - button \"形态\"\n  - button \"多头\"\n  - button \"预测和测量工具\"\n  - button \"笔刷\"\n  - button \"几何形状\"\n  - button \"文字\"\n  - button \"注释工具\"\n  - button \"图标\"\n  - button \"图标\"\n  - button \"测量\"\n  - button \"放大\"\n  - button \"磁铁模式将放置在价格K线附近的绘图吸附到最近的OHLC值\"\n  - button \"磁铁\"\n  - button \"继续绘图\"\n  - button \"锁定所有绘图\"\n  - button \"隐藏所有图形\"\n  - button \"隐藏选项\"\n  - button \"移除0个绘图\"\n  - button \"移除选项\"\n- button \"隐藏绘图工具栏\":\n  - img\n- 'region \"图表 #1\"':\n  - toolbar:\n    - button \"变更品种\": XAUUSD · 平台行情 · bid · OANDA 报价量\n    - text: ·\n    - button \"变更周期\": 4小时\n    - text: · OANDA\n    - button \"更多\":\n      - img\n    - button \"休市\"\n    - text: 开= 4,000.675 高= 4,002.195 低= 3,990.905 收= 3,995.205 −5.570 (−0.14%)\n- toolbar:\n  - button \"1周时间周期内的5年\": 5年\n  - button \"1周时间周期内的1年\": 1年\n  - button \"1小时时间周期内的3个月\": 3个月\n  - button \"30分钟时间周期内的1个月\": 1个月\n  - button \"5分钟时间周期内的5天\": 5天\n  - button \"1分钟时间周期内的1天\": 1天\n  - button \"前往到\"\n  - button \"时区\": 09:13:39 UTC\n  - button \"切换为百分比坐标\"\n  - button \"切换为对数坐标\": log\n  - button \"切换为自动坐标\" [pressed]: 自动\n- button \"自选表\"\n- button \"添加商品代码\"\n- button \"自选列表列设置\"\n- button \"商品\"\n- button \"最新价\"\n- button \"涨跌\"\n- button \"涨跌%\"\n- button \"按旗标排序\"\n- text: BTCUSDT\n- button \"MWP:BTCUSDT · 添加颜色收藏\"\n- text: EURUSD\n- button \"MWP:EURUSD · 添加颜色收藏\"\n- button \"MWP:OANDA:GBP_USD · 添加颜色收藏\"\n- text: XAUUSD\n- button \"MWP:XAUUSD · 添加颜色收藏\"\n- button \"MWH:2a673b63-2922-497e-bec9-d0231be55934 · 添加颜色收藏\"\n- text: COMPOSITE\n- button \"MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb · 绿色收藏\" [pressed]\n- button \"MWC:54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982 · 添加颜色收藏\"\n- button \"MWC:4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6 · 黄色收藏\" [pressed]\n- text: XAUUSD\n- toolbar:\n  - button \"观察清单和详情\" [pressed]\n  - button \"警报\"\n  - button \"数据窗口\"\n  - button \"显示对象树\"\n- img\n- toolbar:\n  - button \"打开交易面板\": 账户管理器\n  - button \"打开面板\"\n  - button \"最大化面板\"\n- alert\n- button \"图表菜单\"",
+      "logs": []
+    }
+  ],
+  "pageErrors": [],
+  "badResponses": [],
+  "anonymousSessionChecks": [
+    {
+      "url": "https://test.kookvv.com:8443/api/session",
+      "status": 401
+    }
+  ],
+  "stage": "regression-refresh: OHLC"
+}

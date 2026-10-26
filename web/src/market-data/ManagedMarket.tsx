@@ -80,7 +80,7 @@ export function ManagedMarket() {
             <option value="">全部来源</option>
             {Object.entries(names)
               .filter(([key]) =>
-                ["dukascopy", "oanda", "binance", "yahoo"].includes(key),
+                ["dukascopy", "oanda", "fxcm", "binance", "yahoo"].includes(key),
               )
               .map(([key, name]) => (
                 <option key={key} value={key}>
