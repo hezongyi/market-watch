@@ -28,7 +28,11 @@
     "metadata_query": "Standards and Spec passed, no blocker",
     "source_migration_fixture": "Standards passed; preserves populated rows, repeatability and backup guard",
     "catalog_test_fixtures": "Standards passed: explicit existing keyword parameters added, pagination/filter/fairness/duplicate/HTTP assertions retained",
-    "completion_evidence": "Spec passed: no additional independently actionable omissions; old-reader scope and A03 limitations accurate; remaining gates are 5 RRS failures and unconfirmed preservation attribution"
+    "completion_evidence": "Spec passed: no additional independently actionable omissions; old-reader scope and A03 limitations accurate; remaining gates are 5 RRS failures and unconfirmed preservation attribution",
+    "user_confirmed_closure": {
+      "standards": "passed, no blocker; confidentiality, JSON, links and original failures retained",
+      "spec": "passed, no blocker; latest user decision applied without narrowing other implementation requirements or claiming original checks green"
+    }
   },
-  "overall_acceptance": "incomplete: strict preservation audit false and 5 RRS baseline test failures pending scope confirmation; catalog fixtures corrected, plan-required PG and old-reader checks passed"
+  "overall_acceptance": "completed under user-confirmed delivery basis; 5 RRS failures and strict audit false remain recorded, no full-green claim"
 }
