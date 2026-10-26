@@ -1,7 +1,7 @@
 import pytest
 from alerts import api as api_module
 from alerts import native_history_loads as loads
-from alerts.chart_api import DataQuery
+from alerts.chart_query import DataQuery
 from alerts.config import settings
 from alerts.provider_history_policy import capabilities, capacity, save_capacity
 from fastapi.testclient import TestClient

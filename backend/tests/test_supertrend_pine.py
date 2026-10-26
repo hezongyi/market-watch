@@ -266,7 +266,7 @@ def test_shared_plot_calculations_do_not_repeat_core_and_revision_invalidates(mo
 def test_native_provider_page_reads_fixed_prefix_revises_and_matches_batch(database, monkeypatch, method):
     from alerts import provider_cache as cache
     from alerts import provider_chart as upstream
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     from test_provider_cache import META, seed
 
     monkeypatch.setattr(upstream, "metadata", lambda instrument: META)
@@ -296,7 +296,7 @@ def test_native_provider_page_reads_fixed_prefix_revises_and_matches_batch(datab
 @pytest.mark.parametrize("method", ["wilder", "sma"])
 def test_fixed_jobs_restore_checkpoint_share_specs_and_keep_pagination_stable(database, monkeypatch, method):
     from alerts import fixed_indicators as jobs
-    from alerts.chart_api import DataQuery, data_sync
+    from alerts.chart_query import DataQuery, data_sync
     from alerts.history_artifacts import read_artifact
     from alerts.storage import FixedIndicatorBlock, FixedIndicatorRun
     from sqlalchemy import select

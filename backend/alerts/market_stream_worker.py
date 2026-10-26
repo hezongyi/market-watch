@@ -10,7 +10,7 @@ from concurrent.futures import ThreadPoolExecutor
 from sqlalchemy import func, select
 
 from . import market_stream as stream
-from .chart_api import DataQuery, data_sync
+from .chart_query import DataQuery, data_sync
 from .chart_series import encode
 from .composite_realtime import CurrentBuckets
 from .config import settings

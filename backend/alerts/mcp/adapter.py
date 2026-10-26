@@ -17,6 +17,7 @@ from sqlalchemy.exc import IntegrityError
 
 from ..capabilities.context import CapabilityError
 from ..config import settings
+from ..query_errors import QueryError
 from ..storage import AgentCredential, AgentOperation, Audit, now_ms, transaction
 
 logger = logging.getLogger(__name__)
@@ -205,7 +206,7 @@ class Adapter:
                 )
             except CapabilityError as exc:
                 error = exc
-            except HTTPException as exc:
+            except (HTTPException, QueryError) as exc:
                 code = {
                     404: "DATA_UNAVAILABLE",
                     409: "BUSINESS_CONFLICT",

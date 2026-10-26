@@ -132,7 +132,7 @@ def test_concurrent_first_display_read_adopts_legacy_without_lock_upgrade(provid
 
     from alerts import display_observations, series_access
     from alerts import live_pricing as live
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     from alerts.market_contracts import DatasetIdentity, QuoteEvent
     from alerts.storage import CompositeRevision, MarketDataset, RealtimeMapping
     from sqlalchemy import text

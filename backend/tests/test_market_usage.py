@@ -161,7 +161,7 @@ def switched_targets(database, monkeypatch):
 
 
 def test_pinned_chart_revision_leases_coexist_renew_and_expire_independently(database, monkeypatch):
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     from alerts.market_usage import composite_targets, wanted_instruments
     from alerts.series_access import chart_data
 

@@ -493,7 +493,7 @@ def test_long_history_indicator_warmup_and_future_append(database):
 
 
 def test_indicator_cpu_work_releases_database_connection(database, monkeypatch):
-    from alerts import chart_api
+    from alerts import chart_query as chart_api
     from sqlalchemy import event
 
     with database.begin() as db:

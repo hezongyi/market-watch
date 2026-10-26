@@ -54,7 +54,7 @@ def test_delayed_fixture_observation_satisfies_native_first_read(database, monke
     from alerts import provider_cache as cache
     from alerts import provider_chart as upstream
     from alerts import storage
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     from sqlalchemy import select
 
     clock = [stamp('2026-10-21T14:15+00:00')]

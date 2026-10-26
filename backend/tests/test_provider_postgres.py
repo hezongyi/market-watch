@@ -304,7 +304,7 @@ def test_snapshot_housekeeping_skips_a_locked_dataset(provider_pg):
 @pytest.mark.parametrize('locked', ['dataset', 'interest'])
 def test_optional_activation_does_not_block_cached_native_delivery(provider_pg, monkeypatch, locked):
     from alerts import provider_service as service
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     from alerts.storage import ProviderInterest
     from test_provider_cache import seed
     factory, _ = provider_pg
@@ -340,7 +340,7 @@ def test_optional_activation_does_not_block_cached_native_delivery(provider_pg, 
 @pytest.mark.parametrize('native', [False, True])
 def test_ready_history_activation_reuses_snapshot_connection(provider_pg, monkeypatch, native):
     from alerts import provider_service as service
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     from test_provider_cache import seed
     _, engine = provider_pg
     seed(META, 'M5', 100000, page(90000, 100000))
@@ -376,7 +376,7 @@ def test_ready_history_activation_reuses_snapshot_connection(provider_pg, monkey
 
 
 def test_native_capacity_policy_never_checks_out_inside_snapshot(provider_pg, monkeypatch):
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     from test_provider_cache import seed
     _, engine = provider_pg
     # Use the same private test schema with only one connection available.
@@ -486,7 +486,7 @@ def test_concurrent_yahoo_catalog_initialization_is_idempotent(provider_pg, monk
 
 
 def test_small_native_demand_materializes_bounded_rows_in_large_pg_cache(provider_pg, monkeypatch):
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     from alerts.config import settings
     _, engine = provider_pg
     monkeypatch.setattr(settings, 'native_history_max_bars', 80000)
@@ -516,7 +516,7 @@ def test_small_native_demand_materializes_bounded_rows_in_large_pg_cache(provide
 
 def test_frozen_snapshot_does_not_lock_source_and_compute_holds_no_connection(provider_pg, monkeypatch):
     from alerts import provider_indicator_inputs as engine
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     from test_provider_cache import seed
 
     factory, pg = provider_pg
@@ -540,7 +540,7 @@ def test_frozen_snapshot_does_not_lock_source_and_compute_holds_no_connection(pr
 
 def test_provider_snapshot_survives_cross_process_tail_revision(provider_pg, monkeypatch):
     from alerts import provider_indicator_inputs as engine
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     from test_provider_cache import seed
 
     _, pg = provider_pg

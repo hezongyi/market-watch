@@ -133,7 +133,7 @@ def test_empty_cache_is_pending_and_canceling_observation_restarts_grace(databas
 
 
 def test_pending_worker_rechecks_only_cache_with_bounded_delay(database, waiting):
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     from alerts.market_stream_worker import Calculator
     from alerts.provider_cache import identity
     work = {'id':'a'*64, 'query':DataQuery(instrument=META['id'],series_kind='provider',
@@ -153,7 +153,7 @@ def test_pending_worker_rechecks_only_cache_with_bounded_delay(database, waiting
 
 
 def test_pending_worker_without_notice_tracking_keeps_normal_cadence(database, waiting, monkeypatch):
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     from alerts.market_stream_worker import Calculator
     from alerts.provider_cache import identity
     monkeypatch.setattr(settings, 'notification_center_sources_enabled', False)

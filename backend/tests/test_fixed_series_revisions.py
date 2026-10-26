@@ -1,6 +1,6 @@
 """Loaded-prefix corrections redraw charts; new tail input does not reset history."""
 
-from alerts.chart_api import DataQuery, data_sync
+from alerts.chart_query import DataQuery, data_sync
 from alerts.composite_inputs import apply_minutes
 from alerts.confirmed_minutes import record
 from alerts.market_contracts import DatasetIdentity

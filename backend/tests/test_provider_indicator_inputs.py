@@ -3,9 +3,9 @@
 import pytest
 from alerts import provider_cache as cache
 from alerts import provider_chart as upstream
-from alerts.chart_api import DataQuery
 from alerts.chart_calculation_history import calculation_rows
 from alerts.chart_indicators import calculate
+from alerts.chart_query import DataQuery
 from indicator_assertions import stable_indicators
 from sqlalchemy import event
 from test_provider_cache import META, page, seed

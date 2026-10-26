@@ -4,13 +4,13 @@ import threading
 import time
 from concurrent.futures import Future
 
-from fastapi import HTTPException
 from sqlalchemy import delete, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 
 from .config import settings
 from .market_names import display_code
+from .query_errors import QueryError
 from .storage import (
     MarketCatalog,
     ProviderBar,
@@ -121,12 +121,12 @@ def chart_metadata(ident, *, deadline=None, cached_only=False):
     from .provider_yahoo import display_precision
     ident = decode(ident)[0]
     if not settings.yahoo_enabled:
-        raise HTTPException(422, "Yahoo 行情源未启用")
+        raise QueryError(422, "Yahoo 行情源未启用")
     deadline = deadline or time.monotonic() + settings.provider_request_seconds
     with transaction() as db:
         row = db.get(MarketCatalog, ident)
         if row is None or row.source != "yahoo":
-            raise HTTPException(404, "未知 Yahoo 品种")
+            raise QueryError(404, "未知 Yahoo 品种")
         symbol, name, details, precision = (
             row.symbol,
             row.label,
@@ -137,7 +137,7 @@ def chart_metadata(ident, *, deadline=None, cached_only=False):
             now_ms() - row.updated_at >= settings.yahoo_metadata_ttl_seconds * 1000 or not details
         )
     if cached_only and not details.get('adjustment'):
-        raise HTTPException(503, 'Yahoo 本地元信息尚未就绪，请先加载图表')
+        raise QueryError(503, 'Yahoo 本地元信息尚未就绪，请先加载图表')
     if expired and not cached_only:
         with _LOCK:
             future = _INFLIGHT.get(ident)

@@ -6,7 +6,7 @@ import json
 
 import pytest
 from alerts import api
-from alerts.chart_api import DataQuery, data_sync
+from alerts.chart_query import DataQuery, data_sync
 from alerts.chart_series import decode, encode
 from alerts.composite_definitions import save_mapping
 from alerts.history_retention import lock_reference_values, references

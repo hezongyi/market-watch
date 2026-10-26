@@ -10,7 +10,7 @@ import httpx
 from argon2 import PasswordHasher
 from argon2.exceptions import VerificationError
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field, model_validator
 from sqlalchemy import delete, func, select
 
@@ -22,6 +22,7 @@ from .config import settings
 from .domain import calendar_for, previous_session
 from .logging_config import configure_api_logging
 from .notify import DEFAULTS
+from .query_errors import QueryError
 from .service import acknowledge
 from .storage import (
     AckGrant,
@@ -80,6 +81,12 @@ async def lifespan(app):
 
 configure_api_logging()
 app = FastAPI(title="守望 · Market Watch", lifespan=lifespan)
+
+
+@app.exception_handler(QueryError)
+async def query_error_response(request: Request, error: QueryError):
+    return JSONResponse(status_code=error.status_code, content={"detail": error.detail}, headers=error.headers)
+
 
 
 def digest(token):

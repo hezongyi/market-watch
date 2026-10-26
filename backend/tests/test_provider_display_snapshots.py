@@ -3,7 +3,7 @@
 import pytest
 from alerts import provider_cache as cache
 from alerts import provider_chart as upstream
-from alerts.chart_api import DataQuery
+from alerts.chart_query import DataQuery
 from alerts.display_snapshots import DisplaySnapshotError
 from test_provider_cache import META, page, seed
 from test_provider_indicator_inputs import SPEC, stable_indicators

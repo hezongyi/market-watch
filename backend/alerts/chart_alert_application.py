@@ -19,6 +19,7 @@ from .chart_alert_service import (
     edit,
     lifecycle,
 )
+from .query_errors import QueryError
 from .storage import (
     ChartAlert,
     ChartAlertVersion,
@@ -65,7 +66,7 @@ def capabilities(body):
         native = metadata(body.instrument, cached_only=True)
         provider = {"source": native["source"], "series_kind": "provider", "basis": native["basis"],
                     "calendar": native["calendar"], "enabled": body.timeframe in frames(native["source"])}
-    except (ProviderHTTPError, ValueError):
+    except (ProviderHTTPError, QueryError, ValueError):
         provider = None
     sources = [row for row in (managed, provider) if row]
     for row in sources:
@@ -106,7 +107,7 @@ def dataset_for(config):
     from .provider_chart import metadata
     try:
         meta = metadata(config.instrument)
-    except ProviderHTTPError as exc:
+    except (ProviderHTTPError, QueryError) as exc:
         raise ValueError(str(exc.detail)) from exc
     if meta["source"] != config.source:
         raise ValueError("图表来源已改变，请重新读取图表上下文")

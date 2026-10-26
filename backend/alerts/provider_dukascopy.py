@@ -12,14 +12,13 @@ from decimal import Decimal, InvalidOperation
 from functools import lru_cache
 from types import SimpleNamespace
 
-from fastapi import HTTPException
-
 from .chart_data import FRAMES
 from .dukascopy_history import DukascopyHistory
+from .market_names import display_code, matches_code
 from .market_resources import cooldown, request_slot
+from .query_errors import QueryError
 from .storage import instant, ms, now_ms
 from .volume import encoded
-from .market_names import display_code, matches_code
 
 INTERVALS = dict(zip(FRAMES, ("1MIN", "5MIN", "15MIN", "30MIN", "1HOUR", "4HOUR", "1DAY", "1WEEK", "1MONTH")))
 WIDTHS = dict(zip(FRAMES[:-1], (60000, 300000, 900000, 1800000, 3600000, 14400000, 86400000, 604800000)))
@@ -75,7 +74,7 @@ class NativeRateLimited(NativeDataError):
 def metadata(ident):
     row = next((row for row in catalog() if row["id"] == ident), None)
     if row is None:
-        raise HTTPException(404, "未知Dukascopy来源品种，请重新搜索")
+        raise QueryError(404, "未知Dukascopy来源品种，请重新搜索")
     return {**row, "name": row["label"], "basis": "bid", "series_kind": "provider",
         "calendar": CALENDAR, "timezone": "Etc/UTC", "session": "24x7",
         "session_verified": False, "calendar_version": "dukascopy-spot-v1", "volume_kind": "quantity", "volume_unit": "source_quantity",

@@ -207,7 +207,8 @@ def test_tencent_never_appears_for_hk_and_metadata_matches_catalog(database, mon
 def test_chart_wait_uses_akshare_sdk_budget(monkeypatch, instrument):
     import asyncio
 
-    from alerts import chart_api, provider_capabilities
+    from alerts import chart_query as chart_api
+    from alerts import provider_capabilities
     budgets = []
     monkeypatch.setattr(provider_capabilities, "request_seconds", lambda source: budgets.append(source) or 1)
     monkeypatch.setattr(chart_api, "data_sync", lambda body: {"bars": []})

@@ -195,13 +195,13 @@ def test_rejection_reason_is_bounded_and_redacted(store, monkeypatch, caplog, re
 
 
 def test_rejection_attempt_matches_http_diagnostic_header(store, monkeypatch, caplog):
-    from alerts.chart_api import DataQuery, data_sync
-    from fastapi import HTTPException
+    from alerts.chart_query import DataQuery, data_sync
+    from alerts.query_errors import QueryError
 
     monkeypatch.setattr(upstream, 'metadata', lambda _: META)
     seed(META, 'M1', 1000000, page(0, 1000000, boundary=True))
     with caplog.at_level(logging.INFO, logger=snapshots.__name__):
-        with pytest.raises(HTTPException) as error:
+        with pytest.raises(QueryError) as error:
             data_sync(DataQuery(instrument=META['id'], series_kind='provider',
                 timeframe='M1', before=1000000, limit=200, indicators=[SPEC],
                 provider_snapshot_id='0' * 64))

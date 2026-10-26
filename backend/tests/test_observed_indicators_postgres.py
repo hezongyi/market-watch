@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 import pytest
 import test_observed_indicators as contracts
 from alerts import fixed_indicators as jobs
-from alerts.chart_api import DataQuery, data_sync
+from alerts.chart_query import DataQuery, data_sync
 from alerts.observed_indicators import OBSERVED
 from alerts.storage import FixedIndicatorRun
 from sqlalchemy import func, select

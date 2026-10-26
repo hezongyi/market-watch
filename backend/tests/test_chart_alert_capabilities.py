@@ -92,6 +92,17 @@ def test_permissions_schema_source_binding_and_missing_association(mcp):
         assert db.scalar(select(func.count()).select_from(storage.AgentOperation)) == 0
 
 
+def test_managed_only_capabilities_survive_provider_metadata_rejection(mcp):
+    client, _, database = mcp
+    with database.begin() as db:
+        db.add(storage.Instrument(id="managed-only", symbol="managed-only", source="dukascopy",
+            label="Managed archive", basis="bid", calendar="ny17", precision=5, enabled=True))
+    response = client.post("/api/chart-alerts/capabilities", json={
+        "instrument":"managed-only", "series_kind":"managed", "timeframe":"M5"})
+    assert response.status_code == 200
+    assert [(row["source"], row["series_kind"]) for row in response.json()["sources"]] == [("dukascopy", "managed")]
+
+
 def test_duplicate_observations_have_one_event_and_outbox_across_adapters(mcp):
     from alerts.chart_alert_service import consume
 

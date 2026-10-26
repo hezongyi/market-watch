@@ -11,7 +11,6 @@ from decimal import Decimal
 from zoneinfo import ZoneInfo
 
 import httpx
-from fastapi import HTTPException
 
 from .chart_data import FRAMES, bounds
 from .config import settings
@@ -30,6 +29,7 @@ from .provider_transport import (
     warm_connections,
 )
 from .provider_transport import close_clients as close_clients
+from .query_errors import QueryError
 from .storage import Instrument, MarketCatalog, MarketDataset, instant, ms, now_ms, transaction
 from .volume import encoded
 from .volume import metadata as volume_metadata
@@ -80,7 +80,7 @@ def metadata(ident, *, deadline=None, cached_only=False):
         try:
             return configured_metadata("NATIVE:" + ident[7:].lower())
         except ValueError as error:
-            raise HTTPException(422, str(error)) from None
+            raise QueryError(422, str(error)) from None
     if ident.startswith("FXCM:"):
         from .provider_fxcm import metadata as fxcm_metadata
         return fxcm_metadata("FXCM:" + ident[5:].lower())
@@ -103,7 +103,7 @@ def metadata(ident, *, deadline=None, cached_only=False):
         from sqlalchemy import select
 
         if db.scalar(select(MarketDataset.id).where(MarketDataset.instrument_id == ident)):
-            raise HTTPException(422, "显式数据集仅支持自建系列，不转换为平台原生身份")
+            raise QueryError(422, "显式数据集仅支持自建系列，不转换为平台原生身份")
         entry = db.get(MarketCatalog, ident)
         if entry is None and ident.startswith("OANDA:"):
             from .history_catalog import account_scope
@@ -112,11 +112,11 @@ def metadata(ident, *, deadline=None, cached_only=False):
                 MarketCatalog.id.startswith("HC:")))
                 if row.metadata_json.get("history_account_scope") == account_scope()), None)
         if entry and entry.id.startswith("HC:") and not ident.startswith("OANDA:"):
-            raise HTTPException(422, "自建来源目录仅用于登记历史，不作为平台原生身份")
+            raise QueryError(422, "自建来源目录仅用于登记历史，不作为平台原生身份")
         inst = db.get(Instrument, ident)
         if entry:
             if not entry.available:
-                raise HTTPException(422, "此品种已不在当前账户目录中")
+                raise QueryError(422, "此品种已不在当前账户目录中")
             source, symbol, label = entry.source, entry.symbol, entry.label
             calendar, precision = entry.calendar, entry.precision
         elif inst:
@@ -126,9 +126,9 @@ def metadata(ident, *, deadline=None, cached_only=False):
                 source = "oanda"
                 symbol = {"EURUSD": "EUR_USD", "XAUUSD": "XAU_USD"}[ident]
         else:
-            raise HTTPException(404, "未知品种，请刷新品种目录")
+            raise QueryError(404, "未知品种，请刷新品种目录")
     if source not in ("oanda", "binance") or calendar not in ("ny17", "utc0"):
-        raise HTTPException(422, "该品种的平台周期或交易日历尚未接入")
+        raise QueryError(422, "该品种的平台周期或交易日历尚未接入")
     from .market_names import display_code
     result = {
         "id": ident,
@@ -483,7 +483,7 @@ def cached_page(meta, frame, before, count, *, latest=False, quote=False, deadli
     try:
         acquired = slot.acquire(timeout=max(0, deadline - time.monotonic()))
         if not acquired:
-            raise HTTPException(503, "平台行情请求繁忙，请稍后重试")
+            raise QueryError(503, "平台行情请求繁忙，请稍后重试")
         from .market_resources import lane
 
         with lane("history" if quote else "chart"):

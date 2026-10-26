@@ -10,6 +10,7 @@ from sqlalchemy import delete, select, update
 
 from .chart_indicators import public_catalog
 from .chart_series import decode, encode
+from .query_errors import QueryError
 from .storage import AdvancedPreference, AdvancedWorkspace, Preference, now_ms, transaction
 
 
@@ -300,7 +301,7 @@ def router(authenticated):
                     from .provider_chart import metadata
 
                     rows[0]['initial_symbol'] = {'ticker': ticker, 'metadata': metadata(symbol)}
-            except (HTTPException, ValueError, TimeoutError, RuntimeError):
+            except (HTTPException, QueryError, ValueError, TimeoutError, RuntimeError):
                 # The normal native resolve path reports unavailable/invalid
                 # symbols. Never replace the workspace or its series here.
                 pass

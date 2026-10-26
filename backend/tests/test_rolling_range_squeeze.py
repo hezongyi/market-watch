@@ -199,7 +199,7 @@ def test_catalog_and_boolean_color_contract():
 
 @pytest.mark.parametrize('policy',['strict_confirmed_v1','observed_display_v1'])
 def test_fixed_history_worker_pagination_and_durable_presentation(database,monkeypatch,policy):
-    from alerts.chart_api import DataQuery, data_sync
+    from alerts.chart_query import DataQuery, data_sync
     from test_fixed_indicators import drain, history
 
     version=history(database,monkeypatch,count=1100)
@@ -219,7 +219,7 @@ def test_fixed_history_worker_pagination_and_durable_presentation(database,monke
 def test_provider_snapshot_old_viewport_keeps_full_boxes(database,monkeypatch):
     from alerts import provider_cache as cache
     from alerts import provider_chart as upstream
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     from test_provider_cache import META, seed
 
     rows=bars(310)
@@ -251,7 +251,7 @@ def test_observed_missing_minutes_continue_sequence_and_keep_quality():
 
 def test_published_viewport_keeps_full_presentation(database):
     from alerts import managed_dataset
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     from alerts.storage import ChartPublication, ChartPublishedBar
 
     rows = bars(90)

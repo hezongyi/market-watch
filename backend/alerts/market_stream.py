@@ -465,8 +465,8 @@ def events(session_hash, client, cursors):
 
 def delivery(db, task, sub, payload, cursors):
     """Consumer windows are checked independently of shared current-bar work."""
-    from .chart_api import DataQuery
-    from .chart_api import history_check as managed_check
+    from .chart_query import DataQuery
+    from .chart_query import history_check as managed_check
     from .series_access import history_check as fixed_check
     from .storage import Instrument, ProviderBar, ProviderDataset
 

@@ -431,7 +431,7 @@ def test_indicator_registration_discovered_and_calculated(mcp, monkeypatch):
 
 def test_provider_data_contract_and_shared_query(mcp, monkeypatch):
     from alerts import provider_chart
-    from alerts.chart_api import DataQuery, data_sync
+    from alerts.chart_query import DataQuery, data_sync
 
     client, token, _ = mcp
     monkeypatch.setattr(
@@ -489,7 +489,7 @@ def test_deadline_and_disconnect_set_cancellation(database, monkeypatch):
     import asyncio
     import threading
 
-    from alerts import chart_api
+    from alerts import chart_query as chart_api
     from alerts.provider_cache import CANCELLED
 
     stopped = threading.Event()
@@ -848,7 +848,7 @@ def test_mcp_provisional_indicator_is_explicit_and_matches_browser_when_opted_in
 
 def test_mcp_provider_fixed_origin_matches_browser_after_earlier_backfill(mcp, monkeypatch):
     from alerts import provider_cache, provider_chart
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     from alerts.storage import ProviderBar
 
     client, token, database = mcp
@@ -868,7 +868,7 @@ def test_mcp_provider_fixed_origin_matches_browser_after_earlier_backfill(mcp, m
                                complete=True,payload=row,observed_at=2400000))
     query={'instrument':'BTCUSDT','series_kind':'provider','timeframe':'M1','before':2400000,
            'limit':5,'calculation_origin':600000,'indicators':[{'name':'EMA','params':{'period':3}}]}
-    from alerts.chart_api import data_sync
+    from alerts.chart_query import data_sync
     web = data_sync(DataQuery(**query))
     result=call(client,token,'indicators_calculate',query)
     assert not result.get('isError'),result

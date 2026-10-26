@@ -1,11 +1,10 @@
 """Actual PostgreSQL commit/publication/consumer acceptance at period handoff."""
 import pytest
-
-from alerts import market_stream as stream, provider_cache as cache
-from alerts.chart_api import DataQuery
+from alerts import market_stream as stream
+from alerts import provider_cache as cache
+from alerts.chart_query import DataQuery
 from test_market_stream import session
 from test_provider_cache import META, seed
-from test_provider_postgres import provider_pg
 
 
 def setup(provider_pg, monkeypatch, frame="M1"):
@@ -177,7 +176,7 @@ def test_accept_http_requires_auth_csrf_and_current_published_receipt(provider_p
 
 def test_shared_task_acceptance_is_independent_for_each_consumer(provider_pg, monkeypatch):
     clock, row, older, key, owner, registered, cursors = setup(provider_pg, monkeypatch)
-    initial = publish(key, owner, cursors)
+    publish(key, owner, cursors)
     stream.register(owner, "slow-page", "chart", 1,
         {"kind": "bars", "series_kind": "provider", "dataset_id": key},
         DataQuery(instrument=META["id"], series_kind="provider", timeframe="M1").model_dump(),

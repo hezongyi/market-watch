@@ -10,7 +10,7 @@ import test_fixed_indicators as contracts
 from alembic.migration import MigrationContext
 from alembic.operations import Operations
 from alerts import fixed_indicators as jobs
-from alerts.chart_api import DataQuery, data_sync
+from alerts.chart_query import DataQuery, data_sync
 from alerts.storage import FixedIndicatorBlock, FixedIndicatorRun
 from sqlalchemy import inspect
 from test_provider_postgres import provider_pg as _provider_pg

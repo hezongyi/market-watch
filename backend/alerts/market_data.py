@@ -22,6 +22,7 @@ from .market import stored_coverage
 from .market_calendar import session_status
 from .market_names import chinese_name, display_code, matches_code, pair_query
 from .providers import fetch_oanda_catalog
+from .query_errors import QueryError
 from .quote_presentation import describe, fixed_snapshot
 from .storage import (
     Bar,
@@ -574,7 +575,7 @@ def router(authenticated):
                 return metadata(body.instrument)
             except (YahooError, TimeoutError, httpx.HTTPError) as error:
                 raise resolve_error(error) from None
-            except HTTPException as error:
+            except (HTTPException, QueryError) as error:
                 if error.status_code == 404:
                     raise HTTPException(404, {"code": "unknown_symbol", "status": "unknown_symbol",
                                                "message": "品种不存在，请刷新品种目录",
@@ -1259,7 +1260,7 @@ def quote_snapshot(body: QuoteQuery):
             if body.client:
                 try:
                     inst = resolve(db, ident)
-                except HTTPException:
+                except (HTTPException, QueryError):
                     result.append(
                         {"s": "error", "n": ident, "v": {"description": "品种暂不可用"}}
                     )

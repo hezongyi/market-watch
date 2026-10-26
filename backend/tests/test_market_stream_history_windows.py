@@ -3,7 +3,7 @@
 import pytest
 from alerts import api, market, provider_cache, provider_chart
 from alerts import market_stream as stream
-from alerts.chart_api import DataQuery
+from alerts.chart_query import DataQuery
 from alerts.managed_dataset import join, publish_frame
 from alerts.market_stream_worker import Calculator
 from alerts.storage import Instrument, LoginSession

@@ -1,7 +1,7 @@
 import pytest
 from alerts import provider_cache as cache
 from alerts import provider_chart as upstream
-from alerts.chart_api import DataQuery
+from alerts.chart_query import DataQuery
 from test_provider_cache import META, page, seed
 
 

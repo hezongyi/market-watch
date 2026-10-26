@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 from alerts import live_pricing
 from alerts import market_stream as stream
-from alerts.chart_api import DataQuery
+from alerts.chart_query import DataQuery
 from alerts.history_artifacts import artifact_tick
 from alerts.market_stream_api import Subscription, resolve
 from alerts.market_stream_worker import Calculator

@@ -57,7 +57,7 @@ def test_published_indicator_prefix_proof_matches_inputs_during_concurrent_repai
     from types import SimpleNamespace
 
     from alerts import managed_dataset, managed_indicator_inputs
-    from alerts.chart_api import DataQuery
+    from alerts.chart_query import DataQuery
     from alerts.storage import ChartPublication, ChartPublishedBar, Instrument
 
     factory, _ = provider_pg

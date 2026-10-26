@@ -6,9 +6,10 @@ from fastapi import HTTPException
 from sqlalchemy import func, select
 
 from .. import business
-from ..chart_api import DataQuery, query_chart
 from ..chart_indicators import public_catalog
+from ..chart_query import DataQuery, query_chart
 from ..config import settings
+from ..query_errors import QueryError
 from ..storage import Bar, ChartAlert, ChartPublishedBar, Instrument, SignalRow, now_ms, transaction
 from .context import CapabilityError
 from .models import (
@@ -127,7 +128,7 @@ async def bars(ctx, query):
             deadline=ctx.deadline,
             retain_work=True,
         )
-    except HTTPException as error:
+    except (HTTPException, QueryError) as error:
         if fixed and isinstance(error.detail, dict):
             code = error.detail.get("code")
             if code in ("DATA_UNAVAILABLE", "INDICATOR_DEMAND_CAPACITY", "DISPLAY_SNAPSHOT_CAPACITY"):
