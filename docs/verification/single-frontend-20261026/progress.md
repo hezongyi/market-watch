@@ -14,6 +14,8 @@
 
 最终浏览器验收发现 pinned 图表控件在会话过期销毁时可能对已拆除的 vendor API 执行清理并中断 React 路由；运行时逐项记录 teardown 异常并继续清理，由所属 iframe 生命周期释放 widget，同时保留未完成告警接入的停止栅栏。`advanced-inflight-cancellation.cjs` 覆盖异常可见性及后续清理。受管 Ubuntu 构建还暴露 Docker 多平台 OCI 索引问题；`mw_docker.py` 现在只导出 linux/amd64，并过滤 attestation，同时兼容无 platform descriptor 的单镜像索引，新增归档回归测试。Ubuntu 本机 `quant-server` 的最终候选：API `sha256:d0bd32ff8abac0edd498b03d2f7dd05616b3c989b633c41b4eed1376e81ccb67`，Web `sha256:65b5adf54412d39760536a3f7624f22094acc00a670db0b4b45a35decaee1117`；隔离地址 `https://localhost:19643`，PG14.24 `127.0.0.1:19644`。PostgreSQL、API、Web 与所需 worker 均健康。浏览器结果见 `browser-final.json`，HTTP/MCP 结果见 `acceptance.json`。build/browser/HTTP 验收、`.venv/bin/python -m pytest -q tests/ops`（98 passed/67 subtests）、Ruff 与 `git diff --check` 通过；PostgreSQL 仅有 Alembic config deprecation 与容器只读 pytest cache warning。分支已推送，Draft PR #99 已创建；最新运行时提交 `497ec2e2` 已通过销毁异常诊断回归、`test:single-frontend -- --unit`、Ruff 和基线差异空白检查；对应 Web 候选重建并复跑九项浏览器验收通过，零 page errors。PR CI 状态以 #99 的最新 checks 为准，尚未合并或生产发布。
 
+补充 CI 收尾：取消的旧 run 日志暴露显式黄金数据集测试仍期待 HTTP 异常；共享查询已迁移到 `QueryError`，现已同步断言。该文件 38 passed、Ruff 通过；旧 run 中另一项 provider 连接复用测试在隔离 PostgreSQL 中单项及整文件 21 passed，等待最终 PR CI 全量结果。
+
 启动/停止（仓库根目录执行；停止保留 volume）：
 
 ```bash
