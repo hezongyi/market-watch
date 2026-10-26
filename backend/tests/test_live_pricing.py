@@ -482,3 +482,30 @@ def test_indicator_recovery_reports_insufficient_warmup_and_keeps_normal_confirm
         assert watch.state["indicator_reading"] is not None
         assert watch.paused_reason is None
         assert db.scalar(select(SignalRow)) is None
+
+
+def test_confirmation_with_unrelated_uncollectable_dataset_retires_only_same_source(running):
+    """Mixed-provider catalogs must not roll back OANDA confirmation commits."""
+    from alerts.market_contracts import DatasetIdentity
+    from alerts.market_datasets import register_dataset
+    from alerts.storage import ObservedMinute
+
+    factory, ownership, epoch, identities = running
+    identity = identities["EUR_USD"]
+    other = identities["XAU_USD"]
+    unsupported = DatasetIdentity(source="yahoo", channel="query", environment="public",
+                                 provider_symbol="AAPL", basis="last", account_scope="public",
+                                 calendar_version="utc0-v1")
+    with factory.begin() as db:
+        register_dataset(db, unsupported, logical_symbol="AAPL", label="Apple", calendar="utc0",
+                         precision=2, volume_kind="quantity", volume_unit="shares")
+        for dataset_id in [identity.key, other.key, unsupported.key]:
+            db.add(ObservedMinute(dataset_id=dataset_id, start=60000, epoch=epoch,
+                                  observed_at=120000, sequence=1, content={"start": 60000}))
+    live.commit_confirmation(ownership, epoch, candles(identity), now=125000)
+    with factory.begin() as db:
+        assert db.get(ObservedMinute, (identity.key, 60000, epoch)) is None
+        assert db.get(ObservedMinute, (other.key, 60000, epoch)) is not None
+        assert db.get(ObservedMinute, (unsupported.key, 60000, epoch)) is not None
+        assert db.get(LiveState, identity.key).confirmed_end == 120000
+        assert len(list(db.scalars(select(Bar).where(Bar.timeframe == "M1")))) == 2

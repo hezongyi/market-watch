@@ -190,12 +190,18 @@ def retire_confirmed(db, source_id, starts):
     Display snapshots must copy their overlay content before returning a token;
     they may not reference these mutable rows after this transaction commits.
     """
-    from .source_registry import collection_identity
-    from .storage import CompositeMinute, CompositeRevision, MarketDataset, RealtimeMapping
+    from .storage import (
+        CompositeMinute,
+        CompositeRevision,
+        DatasetSource,
+        MarketDataset,
+        RealtimeMapping,
+    )
 
-    for dataset in db.scalars(select(MarketDataset)):
-        if collection_identity(dataset.identity).key != source_id:
-            continue
+    datasets = select(MarketDataset).join(
+        DatasetSource, DatasetSource.dataset_id == MarketDataset.id
+    ).where(DatasetSource.source_id == source_id)
+    for dataset in db.scalars(datasets):
         revisions = list(db.scalars(select(CompositeRevision).join(RealtimeMapping,
             CompositeRevision.mapping_id == RealtimeMapping.id).where(
                 RealtimeMapping.target_dataset_id == dataset.id)))
