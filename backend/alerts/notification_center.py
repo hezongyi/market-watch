@@ -680,7 +680,7 @@ def resolve_signal(db, ident):
     workspace = (version.config.get('association') or {}).get('workspace_id')
     from urllib.parse import quote
     return {'domain': 'pro_chart', 'event_id': signal_event_id(ident), 'destination': '/advanced-charts/' + quote(workspace or '', safe='') +
-        '?panel=alerts&signal=' + quote(ident, safe='')}
+        '?panel=notifications&event=' + quote(signal_event_id(ident), safe='')}
 
 
 def backfill(db, *, limit=100):

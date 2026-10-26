@@ -6,7 +6,7 @@ function setup(){
   location:{search:'?parent=http://localhost'},parent:{postMessage:m=>messages.push(m)},
   crypto:{randomUUID:()=> 'listener'},addEventListener:(name,fn)=>{if(name==='message')handlers.push(fn)},setTimeout,clearTimeout,
   requestAnimationFrame:callback=>setImmediate(callback)});
- for(const f of ['series.js','bridge.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+f,'utf8'),ctx);
+ for(const f of ['series.js','chart-runtime.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+f,'utf8'),ctx);
  vm.runInContext(`globalThis.delivered=[];globalThis.failures=[];globalThis.reloads=0;
   ready=true;globalThis.currentRes='5';
   const chart={resolution:()=>currentRes,symbol:()=> 'MWP:BTCUSDT',getAllStudies:()=>[]};

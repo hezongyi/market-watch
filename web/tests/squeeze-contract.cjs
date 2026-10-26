@@ -32,7 +32,7 @@ assert.equal(indicatorUnit({...indicator,output:'sma'}),'price');
 const incompatible=normalizeCondition({...draft.condition,right:{kind:'price'},offset:{kind:'atr'}});
 assert.equal(incompatible.right.kind,'constant');assert.equal(incompatible.offset,undefined);
 // Exercise the shipped host callback with an actual coordinator-only origin.
-const originExpression=fs.readFileSync(path.join(root,'advanced-host/bridge.js'),'utf8')
+const originExpression=fs.readFileSync(path.join(root,'advanced-host/chart-runtime.js'),'utf8')
  .match(/calculationOrigin:\(ticker,res\)=>([\s\S]*?),\n\s*compositeRevision:/)[1];
 const origins=new Map(),bindings=new Map(),sessions=new Map();
 const series={decode:t=>({symbol:t.split(':')[1],series_kind:t.split(':')[0]}),encode:(s,k)=>k+':'+s};

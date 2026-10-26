@@ -30,16 +30,16 @@ for (const next of [
   "/%2f%2fevil.invalid",
   "javascript:alert(1)",
   "/settings/unknown",
+  "/replay?dataset_version=123",
+  "/replay/run-1",
+  "/legacy/monitoring",
+  "/chart-workspaces/legacy-1",
 ])
   assert.equal(safeNext(next), "/advanced-charts", next);
 for (const next of [
   "/advanced-charts/abc-123?panel=alerts#main",
   "/signals?signal=abc#notification",
-  "/replay?dataset_version=123",
-  "/replay/run-1",
   "/settings/account",
-  "/legacy/monitoring",
-  "/chart-workspaces/legacy-1",
 ])
   assert.equal(safeNext(next), next);
 assert.equal(

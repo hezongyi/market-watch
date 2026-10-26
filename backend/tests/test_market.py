@@ -3,41 +3,8 @@ from decimal import Decimal as D
 
 from alerts.domain import Calendar, previous_session
 from alerts.market import ingest
-from alerts.service import create_watch, evaluate_quote
-from alerts.storage import Bar, Instrument, SignalRow
+from alerts.storage import Bar, Instrument
 from sqlalchemy import select
-
-
-def test_quotes_start_after_arm_dedupe_and_cross(database):
-    with database.begin() as db:
-        inst = db.get(Instrument, "EURUSD")
-        evaluate_quote(db, inst, 1000, D("9"), D("9.1"))
-        w = create_watch(
-            db,
-            "EURUSD",
-            "instant",
-            {"kind": "price", "timeframe": "tick", "level": "10", "direction": "buy"},
-            armed_at=1500,
-        )
-        evaluate_quote(db, inst, 2000, D("11"), D("11.1"))
-        evaluate_quote(db, inst, 2000, D("11"), D("11.1"))
-        assert w.status == "triggered"
-        s = db.scalar(select(SignalRow))
-        assert s.occurred_at == 2000 and s.evidence["observation_gap_ms"] == 1000
-
-
-def test_missing_quote_baseline_does_not_immediately_trigger(database):
-    with database.begin() as db:
-        inst = db.get(Instrument, "EURUSD")
-        w = create_watch(
-            db,
-            "EURUSD",
-            "instant",
-            {"kind": "price", "timeframe": "tick", "level": "10"},
-            armed_at=1500,
-        )
-        evaluate_quote(db, inst, 2000, D("11"), D("11.1"))
-        assert w.status == "active"
 
 
 def test_monday_previous_session_is_friday_and_missing_day_not_skipped(database):
@@ -209,20 +176,6 @@ def test_import_worker_does_not_poll_live_prices(database, monkeypatch):
     assert calls == ["import"]
 
 
-def test_future_quote_cannot_seed_monitor_at_earlier_arm_time(database):
-    from alerts.storage import Quote
-
-    with database.begin() as db:
-        db.add(Quote(instrument_id="EURUSD", at=3000, bid=D("9"), ask=D("9.1")))
-        db.flush()
-        watch = create_watch(
-            db,
-            "EURUSD",
-            "future baseline",
-            {"kind": "price", "timeframe": "tick", "level": "10", "direction": "buy"},
-            armed_at=2000,
-        )
-        assert watch.state == {}
 
 
 def test_historical_ingest_cannot_clear_live_error_and_recovery_is_audited(database, monkeypatch):

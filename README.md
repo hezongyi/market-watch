@@ -102,7 +102,7 @@ API异常退出自动恢复、HTTPS浏览器登录及手机确认已验证；锁
 
 ## 复用项目
 
-TA-Lib Python（BSD-2-Clause）、NumPy（BSD-3-Clause）、FastAPI（MIT）、React（MIT）、Lightweight Charts（Apache-2.0，图表保留官方 attribution）、dukascopy-node（MIT）、ntfy。图表由 [TradingView Lightweight Charts](https://www.tradingview.com/lightweight-charts/) 提供。锁文件固定实际安装依赖。
+TA-Lib Python（BSD-2-Clause）、NumPy（BSD-3-Clause）、FastAPI（MIT）、React（MIT）、dukascopy-node（MIT）、ntfy。业务入口统一为 Advanced Charts；许可图表库需在本机单独安装，不随源码分发。旧 Watch、兼容图表和历史演练已退役，历史记录保留。锁文件固定实际安装依赖。
 
 ## 专业图表工作区（v1.1.0）
 
@@ -117,3 +117,5 @@ TA-Lib Python（BSD-2-Clause）、NumPy（BSD-3-Clause）、FastAPI（MIT）、R
 ## Ubuntu Docker 构建与资源回收
 
 本机使用专用BuildKit、任务归属标签和验收结束退役流程，缓存回收目标8 GiB；每日记录容量，低于20 GiB本地告警。构建与维护命令见 [Ubuntu Docker 生命周期](deploy/ubuntu/README.md)。
+
+当前前端构建和 Ubuntu 隔离验收见 [单前端验收记录](docs/verification/single-frontend-20261026/progress.md)，实现边界见 [收敛方案](docs/single-frontend-chartalert-consolidation-plan-20261026.md)。

@@ -32,14 +32,11 @@ builder默认选中可以防止普通构建继续使用legacy builder，但不�
 ```bash
 mw-docker build --repo . --component api --tag market-watch-api:issue-42 \
   --task mw-issue42 --project mw-issue42 --purpose acceptance
-mw-docker build --repo . --component chart --tag market-watch-chart-origin:issue-42 \
-  --task mw-issue42 --project mw-issue42 --purpose acceptance
 mw-docker build --repo . --component web --tag market-watch-web:issue-42 \
-  --task mw-issue42 --project mw-issue42 --purpose acceptance \
-  --build-arg VITE_ADVANCED_CHART_ORIGIN=https://localhost:17444
+  --task mw-issue42 --project mw-issue42 --purpose acceptance
 ```
 
-chart 默认使用仓库根目录 context 和 `advanced-host/Dockerfile`，以编译共享告警 UI；显式 `--context`/`--file` 仍可覆盖默认值。旧版独立图表工作树可指定 `--context advanced-host --file advanced-host/Dockerfile`。
+web 使用仓库根 context 和 `web/Dockerfile`，合并图表原生适配器与 React 业务界面。`advanced-host/charting_library` 必须在本机准备固定版本许可库；构建在 staging 应用指纹补丁，不修改来源库。CI 的 `build:ui` 只验证公开业务资源，完整图表构建与浏览器验收在 Ubuntu 私有候选中执行。
 
 默认将本机已有基础镜像临时导出为OCI输入，按digest交给BuildKit；构建结束删除临时输入，不长期保留镜像tar。这样无需再次访问Docker Hub。基础镜像缺失时明确失败，先在Ubuntu导入/拉取；网络可用时可显式使用`--base-source registry`。ARG形式的FROM和inline Dockerfile需使用registry模式。
 
@@ -56,7 +53,7 @@ docker compose --env-file /private/issue42.env -p mw-issue42 \
   -f compose.yaml -f /private/issue42.override.yaml up -d --no-build
 ```
 
-更换项目请使用新的task；已结束任务不能复用。只有本机许可库已准备完整时才构建chart。已有Dockerfile保持依赖安装在源码COPY之前；本次不修改应用、数据库结构及图表资源产物。
+更换项目请使用新的task；已结束任务不能复用。只有本机许可库已准备完整时才构建完整 web。已有Dockerfile保持依赖安装在源码COPY之前；本次不修改应用、数据库结构及图表资源产物。
 
 ## 轻量验收与任务 PG 复用
 
@@ -79,7 +76,7 @@ python3 deploy/ubuntu/mw_docker.py preview stop --task mw-issue42 --project mw-i
 
 私有状态保存在 `~/.local/share/market-watch-docker/previews/<TASK>/`，包括 `preview.json`、`credentials.json`、`compose.json`、固定 seed、启动时固定实际 image ID 的 `run.json` 和脱敏的 `last-run.json`。目录 0700、凭据 0600；登录密码从私有文件本地读取，不提交或粘贴到 PR。相同参数再次 `prepare` 不改文件；参数变化拒绝覆盖，使用新 task，或在原 tag 下重构建同任务镜像后 `up`。种子文件变化应新建 task，不静默改已有 dataset。
 
-需要 UI 时在 `prepare` 追加 `--web-image market-watch-web:issue-42 --chart-image market-watch-chart-origin:issue-42 --chart-port 17444`；先按上文构建两镜像，web 构建参数必须为 `VITE_ADVANCED_CHART_ORIGIN=https://localhost:17444` 且写入图表 origin 标签。UI 的两个独立端口都只绑定回环；证书自签名。当前主机旧工具不写该新标签，UI 入口须在工具版本对齐后使用，不能跳过标签检查。按需追加 `--worker chart-history` 等，最多三个必要 worker；本轮 UI/worker 仅通过 Compose 展开，尚无真实业务链验收证据。
+需要 UI 时在 `prepare` 追加 `--web-image market-watch-web:issue-42`；唯一 HTTPS 端口由 `--port` 指定，只绑定回环。证书保存在任务私有目录。按需追加 `--worker chart-history` 等，最多三个必要 worker。完整 R2 参见 `single-frontend.acceptance.yaml` 与本任务验收记录。
 
 ```bash
 # reset 默认只展示计划；显式 apply 在同一 PG 中新建任务数据库。

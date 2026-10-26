@@ -1,21 +1,18 @@
 """Authenticated chart APIs with optimistic concurrency and bounded input."""
 
 import asyncio
-import copy
 import hashlib
 import json
-import math
 import re
 import threading
 import time
 from collections import OrderedDict
 from typing import Literal
-from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse, Response, StreamingResponse
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
-from sqlalchemy import delete, func, select, update
+from sqlalchemy import delete, func, select
 
 from .calendar_profile import closures_from
 from .chart_data import FRAMES, chart_rows, future_grid
@@ -28,12 +25,10 @@ from .native_series import OandaParameters
 from .storage import (
     Bar,
     ChartTemplate,
-    ChartWorkspace,
     Instrument,
     instant,
     now_ms,
     transaction,
-    uid,
 )
 from .volume import metadata as volume_metadata
 
@@ -48,13 +43,8 @@ class NativeConfiguration(BaseModel):
     parameters: OandaParameters
 
 
-class Save(Create):
-    revision: int = Field(ge=1)
-    document: dict
 
 
-class Revision(BaseModel):
-    revision: int = Field(ge=1)
 
 
 class Template(Create):
@@ -302,124 +292,8 @@ def history_check(db, inst, source, visible, body):
     }
 
 
-def checked(document):
-    from .storage import MarketDataset
-
-    with transaction() as db:
-        managed_symbols = {"EURUSD", "XAUUSD", "BTCUSDT"}
-        managed_symbols.update(db.scalars(select(MarketDataset.instrument_id)))
-        from .history_retention import string_values
-        from .series_access import metadata
-
-        for value in string_values(document):
-            if value.startswith(("MWH:", "MWC:")):
-                ident, kind = decode(value)
-                metadata(db, ident, kind)
-                managed_symbols.add(value)
-    if len(json.dumps(document, allow_nan=False)) > 2_000_000:
-        raise ValueError("工作区过大")
-    if document.get("schemaVersion") != 1:
-        raise ValueError("不支持的工作区格式")
-    if document.get("layout") not in ("1", "2h", "2v", "3top", "3bottom", "4"):
-        raise ValueError("未知布局")
-    panels = document.get("panels", [])
-    if not isinstance(panels, list) or not all(isinstance(p, dict) for p in panels):
-        raise ValueError("无效图表列表")
-    for axis in ("splitX", "splitY"):
-        v = document.get(axis, 0.5)
-        if isinstance(v, bool) or not isinstance(v, (int, float)) or not 0.2 <= v <= 0.8:
-            raise ValueError("分屏比例无效")
-    if (
-        not {"1": 1, "2h": 2, "2v": 2, "3top": 3, "3bottom": 3, "4": 4}[document["layout"]]
-        <= len(panels)
-        <= 4
-    ):
-        raise ValueError("图表数量无效")
-    if len({p.get("id") for p in panels}) != len(panels):
-        raise ValueError("图表ID重复")
-    for p in panels:
-        if not isinstance(p.get("id"), str) or not p["id"]:
-            raise ValueError("缺少图表ID")
-        try:
-            if p.get("timezone", "native") != "native":
-                ZoneInfo(p["timezone"])
-        except (ZoneInfoNotFoundError, KeyError, TypeError) as exc:
-            raise ValueError("未知显示时区") from exc
-        view = p.get("range")
-        if view and (
-            not isinstance(view, dict)
-            or not all(
-                isinstance(view.get(k), (int, float)) and math.isfinite(view[k])
-                for k in ("from", "to")
-            )
-            or view["from"] >= view["to"]
-        ):
-            raise ValueError("无效时间视区")
-        if p.get("instrument") not in managed_symbols:
-            raise ValueError("未知品种")
-        if p.get("timeframe") not in FRAMES:
-            raise ValueError("未知周期")
-        if len(p.get("indicators", [])) > 12:
-            raise ValueError("每图最多12个指标")
-        for i in p.get("indicators", []):
-            validate(i)
-    drawings = document.get("drawings", {})
-    if not isinstance(drawings, dict) or sum(len(v) for v in drawings.values()) > 1000:
-        raise ValueError("画线数量超出限制")
-    for symbol, objects in drawings.items():
-        if (
-            symbol not in managed_symbols
-            or not isinstance(objects, list)
-            or not all(isinstance(o, dict) for o in objects)
-        ):
-            raise ValueError("无效画线品种")
-        if len({o.get("id") for o in objects}) != len(objects):
-            raise ValueError("画线ID重复")
-        for obj in objects:
-            if not isinstance(obj.get("id"), str) or not isinstance(obj.get("options", {}), dict):
-                raise ValueError("无效画线对象")
-            for point in obj.get("points", []):
-                if not all(
-                    isinstance(point.get(k), (int, float))
-                    and math.isfinite(point[k])
-                    and point[k] > 0
-                    for k in ("timestamp", "price")
-                ):
-                    raise ValueError("无效画线坐标")
-            if obj.get("toolType") not in (
-                "HorizontalLine",
-                "TrendLine",
-                "Ray",
-                "Rectangle",
-                "FibRetracement",
-                "Text",
-                "ParallelChannel",
-                "LongShortPosition",
-            ):
-                raise ValueError("未知画线类型")
-            required = {
-                "HorizontalLine": 1,
-                "Text": 1,
-                "ParallelChannel": 3,
-                "LongShortPosition": 3,
-            }.get(obj["toolType"], 2)
-            if len(obj.get("points", [])) != required:
-                raise ValueError("画线锚点数量无效")
-            if obj["toolType"] == "LongShortPosition":
-                entry, stop, target = (p["price"] for p in obj["points"])
-                if (stop - entry) * (target - entry) >= 0:
-                    raise ValueError("止损与止盈必须分居入场价两侧")
-    return document
 
 
-def serialized(row):
-    return {
-        "id": row.id,
-        "name": row.name,
-        "document": row.document,
-        "revision": row.revision,
-        "updated_at": row.updated_at,
-    }
 
 
 _CACHE = OrderedDict()
@@ -679,98 +553,10 @@ def router(authenticated):
             },
         )
 
-    @r.get("/workspaces")
-    def listing():
-        with transaction() as db:
-            return [
-                serialized(x)
-                for x in db.scalars(
-                    select(ChartWorkspace).order_by(ChartWorkspace.updated_at.desc())
-                )
-            ]
-
-    @r.post("/workspaces")
-    def create(body: Create):
-        with transaction() as db:
-            row = ChartWorkspace(
-                name=body.name,
-                document={
-                    "schemaVersion": 1,
-                    "layout": "1",
-                    "sync": True,
-                    "drawings": {},
-                    "panels": [
-                        {
-                            "id": uid(),
-                            "instrument": "XAUUSD",
-                            "timeframe": "H4",
-                            "indicators": [],
-                            "timezone": "native",
-                            "follow": True,
-                        }
-                    ],
-                },
-            )
-            db.add(row)
-            db.flush()
-            return serialized(row)
-
-    @r.post("/workspaces/{id}/save")
-    def save(id: str, body: Save):
-        try:
-            checked(body.document)
-        except (ValueError, TypeError, KeyError, AttributeError) as e:
-            raise HTTPException(422, str(e)) from e
-        with transaction() as db:
-            if not db.get(ChartWorkspace, id):
-                raise HTTPException(404, "工作区不存在")
-            from .history_retention import lock_reference_values
-
-            try:
-                lock_reference_values(db, body.document)
-            except ValueError as error:
-                raise HTTPException(409, str(error)) from None
-            res = db.execute(
-                update(ChartWorkspace)
-                .where(ChartWorkspace.id == id, ChartWorkspace.revision == body.revision)
-                .values(
-                    name=body.name,
-                    document=body.document,
-                    revision=body.revision + 1,
-                    updated_at=now_ms(),
-                )
-            )
-            if res.rowcount != 1:
-                raise HTTPException(409, "工作区已在其他窗口修改，请重新加载或另存副本")
-            db.expire_all()
-            return serialized(db.get(ChartWorkspace, id))
-
-    @r.post("/workspaces/{id}/copy")
-    def duplicate(id: str, body: Save):
-        try:
-            document = copy.deepcopy(checked(body.document))
-        except (ValueError, TypeError, KeyError, AttributeError) as e:
-            raise HTTPException(422, str(e)) from e
-        for objects in document.get("drawings", {}).values():
-            for obj in objects:
-                obj["id"] = uid()
-        with transaction() as db:
-            row = ChartWorkspace(name=body.name, document=document)
-            db.add(row)
-            db.flush()
-            return serialized(row)
-
-    @r.post("/workspaces/{id}/delete")
-    def remove(id: str, body: Revision):
-        with transaction() as db:
-            res = db.execute(
-                delete(ChartWorkspace).where(
-                    ChartWorkspace.id == id, ChartWorkspace.revision == body.revision
-                )
-            )
-            if res.rowcount != 1:
-                raise HTTPException(409, "工作区已变更，请刷新列表")
-        return {"ok": True}
+    @r.api_route("/workspaces", methods=["GET", "POST"])
+    @r.api_route("/workspaces/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
+    def retired_workspace(path: str = ""):
+        raise HTTPException(410, "兼容图表工作区已退役，历史文档保留；请使用 Advanced Charts")
 
     @r.get("/templates")
     def templates():

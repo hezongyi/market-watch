@@ -3,7 +3,7 @@ const handlers=[],messages=[];
 const ctx=vm.createContext({URL,URLSearchParams,Map,Set,Promise,Date,Intl,Error,
  location:{search:'?parent=http://localhost'},parent:{postMessage:m=>messages.push(m)},
  crypto:{randomUUID:()=> 'listener'},addEventListener:(name,fn)=>{if(name==='message')handlers.push(fn)},setTimeout,clearTimeout});
-for(const f of ['series.js','bridge.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+f,'utf8'),ctx);
+for(const f of ['series.js','chart-runtime.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+f,'utf8'),ctx);
 (async()=>{
  vm.runInContext(`globalThis.reloads=0;globalThis.reviews=[];globalThis.changed=false;globalThis.available=true;globalThis.active=true;
   ready=true;const chart={resolution:()=> '5',symbol:()=> 'MWP:BTCUSDT',getAllStudies:()=>[]};

@@ -16,7 +16,7 @@ const ctx = vm.createContext({URL, URLSearchParams, Map, Set, Promise, Date, Int
   location: {search: '?parent=http://localhost&marketPolling=1'}, parent: {postMessage() {}},
   crypto: {randomUUID: () => 'test'}, addEventListener() {}, setTimeout, clearTimeout,
   events, responses});
-for (const name of ['series.js', 'bridge.js'])
+for (const name of ['series.js', 'chart-runtime.js'])
   vm.runInContext(fs.readFileSync(path.join(repo, 'advanced-host', name), 'utf8'), ctx);
 (async () => {
   await vm.runInContext(`(async()=>{

@@ -4,7 +4,7 @@ export type AlertApi = typeof api;
 export type AlertUiScope = { workspace_id: string; session: string };
 const uuid = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}";
 
-// Invoked only after window, origin and channel validation in AdvancedWorkspace.
+// Invoked through the direct application Interface with a current workspace scope.
 // A chart renderer cannot choose arbitrary authenticated URLs or API methods.
 export async function chartAlertUiRequest(
   query: unknown,

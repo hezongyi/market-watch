@@ -180,7 +180,7 @@ export function DatasetReferences({
               <div className="dc-reference-list">{current.items.filter(item=>item.kind===kind).map((item,i)=><div className="dc-reference-row" key={`${item.id}:${i}`}>
                 <div>{item.detail}<small>阻止当前删除操作</small></div>
                 <DetailDisclosure title={<>引用详情</>}><dl className="dc-detail-facts"><div><dt>引用类型</dt><dd>{item.kind}</dd></div><div><dt>对象身份</dt><dd>{item.id}</dd></div><div><dt>实际引用说明</dt><dd>{item.detail}</dd></div></dl><p>该接口未提供独立版本字段；版本信息以实际引用说明为准。</p></DetailDisclosure>
-                {item.kind === "replay" ? <Link to="/replay">查看历史演练</Link> : item.kind === "task" ? <Link to={`/market-data?tab=tasks&status=all&dataset_id=${id}`}>查看任务</Link> : null}
+                {item.kind === "replay" ? <span>历史演练记录已保留，活动功能已退役</span> : item.kind === "task" ? <Link to={`/market-data?tab=tasks&status=all&dataset_id=${id}`}>查看任务</Link> : null}
               </div>)}</div>
             </section>) : <p>当前未发现阻止回收的引用。</p>}
           </section>

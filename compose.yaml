@@ -91,7 +91,7 @@ services:
       api: {condition: service_healthy}
     restart: unless-stopped
   web:
-    build: ./web
+    build: {context: ., dockerfile: web/Dockerfile}
     ports: ["127.0.0.1:8080:80"]
     depends_on:
       api: {condition: service_healthy}

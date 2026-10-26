@@ -62,8 +62,7 @@ class BuildDefaultsTests(unittest.TestCase):
     def test_default_component_sources_and_dockerfile(self):
         for component, directory, dockerfile in (
             ("api", ROOT, ROOT / "Dockerfile"),
-            ("web", ROOT / "web", ROOT / "web/Dockerfile"),
-            ("chart", ROOT, ROOT / "advanced-host/Dockerfile"),
+            ("web", ROOT, ROOT / "web/Dockerfile"),
         ):
             with self.subTest(component=component):
                 args = SimpleNamespace(repo=str(ROOT), component=component, context=None,

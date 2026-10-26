@@ -17,7 +17,7 @@ const context = vm.createContext({
   clearTimeout,
 });
 vm.runInContext(fs.readFileSync("../advanced-host/series.js", "utf8"), context);
-vm.runInContext(fs.readFileSync("../advanced-host/bridge.js", "utf8"), context);
+vm.runInContext(fs.readFileSync("../advanced-host/chart-runtime.js", "utf8"), context);
 vm.runInContext(
   `
 let localBars = [], calls = 0, emptyCompletions = 0;

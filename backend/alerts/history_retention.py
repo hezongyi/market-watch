@@ -84,7 +84,7 @@ def reference_values(row):
     if isinstance(row, Watch):
         return {"instrument_id": row.instrument_id, "rule": row.rule}
     if isinstance(row, CompositeWatchBinding):
-        return row.market_identity
+        return {"market_identity": row.market_identity, "history_version_id": row.history_version_id}
     if isinstance(row, ChartAlertVersion):
         return {"config": row.config, "market_identity": row.market_identity, "dataset_id": row.dataset_id}
     if isinstance(row, (ChartWorkspace, AdvancedWorkspace)):

@@ -65,24 +65,18 @@ services:
     logging: *logs
     depends_on:
       api: {condition: service_healthy}
-  chart:
-    image: ${MW_CHART_IMAGE:?task-owned licensed chart image required}
-    mem_limit: 128m
-    cpus: 0.25
-    logging: *logs
-    depends_on: [web]
   tls:
     image: nginx:1.28-alpine
     mem_limit: 64m
     cpus: 0.1
     logging: *logs
-    ports: ['18282:443', '18283:444']
+    ports: ['127.0.0.1:18282:443']
     volumes:
       - './single-app-tls.conf:/etc/nginx/conf.d/default.conf:ro'
       - type: bind
         source: ${MW_ACCEPTANCE_PRIVATE:?private directory required}/tls
         target: /tls
         read_only: true
-    depends_on: [web, chart]
+    depends_on: [web]
 volumes:
   postgres-data:

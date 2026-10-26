@@ -1,0 +1,15 @@
+{
+  "base_url": "https://localhost:19643",
+  "synthetic": true,
+  "checks": [
+    "same-origin login with Secure HttpOnly session",
+    "one application entry and pinned same-origin chart resources",
+    "retired activities reject writes",
+    "ChartAlert tools replace Watch tools",
+    "HTTP/MCP mutual reads, idempotent creation, readonly write rejection",
+    "cross-adapter edit and lifecycle",
+    "business health available",
+    "logout revokes business access"
+  ],
+  "health_endpoint": "/api/health"
+}

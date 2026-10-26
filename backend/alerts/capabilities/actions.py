@@ -9,17 +9,13 @@ from .. import business
 from ..chart_api import DataQuery, query_chart
 from ..chart_indicators import public_catalog
 from ..config import settings
-from ..storage import Bar, ChartPublishedBar, Instrument, SignalRow, Watch, now_ms, transaction
+from ..storage import Bar, ChartAlert, ChartPublishedBar, Instrument, SignalRow, now_ms, transaction
 from .context import CapabilityError
 from .models import (
     AckNotification,
-    AlertQuery,
-    AlertsResult,
     BarsQuery,
     BarsResult,
-    CancelAlert,
     CatalogResult,
-    CreateAlert,
     DrawingsQuery,
     DrawingsResult,
     Empty,
@@ -33,7 +29,6 @@ from .models import (
     SignalsQuery,
     SignalsResult,
     StatusResult,
-    WatchResult,
     WorkspacesQuery,
     WorkspacesResult,
 )
@@ -306,12 +301,6 @@ def indicators(ctx, query):
     }
 
 
-def alerts(ctx, query):
-    rows = business.watches(query.limit + 1, query.offset, query.instrument, query.status)
-    return {
-        "items": rows[: query.limit],
-        "next_offset": query.offset + query.limit if len(rows) > query.limit else None,
-    }
 
 
 def signals(ctx, query):
@@ -327,7 +316,7 @@ def signals(ctx, query):
 
 def system(ctx, query):
     with transaction() as db:
-        active = db.scalar(select(func.count()).select_from(Watch).where(Watch.status == "active"))
+        active = db.scalar(select(func.count()).select_from(ChartAlert).where(ChartAlert.status == "active"))
         recent = db.scalar(
             select(func.count())
             .select_from(SignalRow)
@@ -343,12 +332,8 @@ def system(ctx, query):
     }
 
 
-def create(ctx, query, db):
-    return business.new_watch_in(db, query.watch)
 
 
-def cancel(ctx, query, db):
-    return business.cancel_watch_in(db, query.watch_id)
 
 
 def ack(ctx, query, db):
@@ -360,6 +345,9 @@ def build_registry():
     from .history import register_history
 
     registry = Registry()
+    from .chart_alerts import register_chart_alerts
+
+    register_chart_alerts(registry)
     definitions = [
         (
             "market_list_instruments",
@@ -402,16 +390,8 @@ def build_registry():
             bars,
         ),
         (
-            "alerts_list",
-            "Read existing one-shot alerts, paginated and filtered.",
-            AlertQuery,
-            AlertsResult,
-            "alerts:read",
-            alerts,
-        ),
-        (
             "alerts_get_signals",
-            "Read the newest 500 signal/notification results with pagination and filters.",
+            "Read historical signal/notification records, including retired Watch evidence; no rule execution or restoration. Newest 500 with pagination and filters.",
             SignalsQuery,
             SignalsResult,
             "alerts:read",
@@ -427,7 +407,7 @@ def build_registry():
         ),
         (
             "charts_list_workspaces",
-            "List saved native or legacy workspaces and projection availability. No unsaved browser state.",
+            "List saved native workspaces and projection availability. No unsaved browser state.",
             WorkspacesQuery,
             WorkspacesResult,
             "charts:read",
@@ -440,22 +420,6 @@ def build_registry():
             DrawingsResult,
             "charts:read",
             drawings,
-        ),
-        (
-            "alerts_create",
-            "Create one-shot alert with existing business validation. Required stable idempotency key; same key with different intent conflicts.",
-            CreateAlert,
-            WatchResult,
-            "alerts:write",
-            create,
-        ),
-        (
-            "alerts_cancel",
-            "Cancel an existing alert using an idempotency key.",
-            CancelAlert,
-            WatchResult,
-            "alerts:write",
-            cancel,
         ),
         (
             "notifications_ack",

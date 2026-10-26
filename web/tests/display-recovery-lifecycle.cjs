@@ -1,5 +1,5 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
-const bridge=fs.readFileSync('../advanced-host/bridge.js','utf8');
+const bridge=fs.readFileSync('../advanced-host/chart-runtime.js','utf8');
 const start=bridge.indexOf('const displayRecoveries=new Map();'),end=bridge.indexOf('function acceptMarketHistory',start);
 let busy=true,attempts=0,registered=0,onReload,ticker='MWC:test';
 const reports=[],chart={symbol:()=> ticker,resolution:()=> '1'},sub={symbol:'MWC:test',res:'1'};

@@ -1,10 +1,10 @@
-from datetime import UTC, datetime, timedelta
+from datetime import datetime
 from decimal import Decimal as D
 
 import pytest
-from alerts import api as api_module
 from alerts.calendar_admin import apply_profile
 from alerts.calendar_profile import closures_from, normalized_profile
+from alerts.chart_alert_service import create
 from alerts.domain import (
     Calendar,
     Candle,
@@ -14,16 +14,9 @@ from alerts.domain import (
     shortened_h4,
 )
 from alerts.market import ingest, queue_recovery
-from alerts.service import (
-    add_replay_watch,
-    create_watch,
-    evaluate_watch,
-    previous_day,
-    replay_day,
-    replay_step,
-)
-from alerts.storage import Audit, Bar, ImportJob, Instrument, Replay, candle_dict, ms
+from alerts.storage import Audit, ImportJob, Instrument, ms
 from sqlalchemy import select
+from test_chart_alert_service import config
 
 
 def dt(value):
@@ -103,11 +96,11 @@ def test_admin_preview_apply_and_conflict_guards(database):
         changed = profile(end="2026-01-06T23:00:00+00:00")
         with pytest.raises(ValueError, match="revision"):
             apply_profile(db, "EURUSD", changed, apply=True)
-        w = create_watch(db, "EURUSD", "guard", {"kind": "price", "level": "10"}, use_history=False)
+        w = create(db, "calendar-guard", config())
         changed["revision"] = "test-v2"
-        with pytest.raises(ValueError, match="active watches"):
+        with pytest.raises(ValueError, match="active ChartAlerts"):
             apply_profile(db, "EURUSD", changed, apply=True)
-        w.status = "cancelled"
+        w.status = "paused"
         db.flush()
         raw = {
             "rows": [
@@ -138,116 +131,10 @@ def test_no_repair_queued_for_confirmed_closed_empty_window(database):
         assert db.scalar(select(ImportJob)) is None
 
 
-def test_live_and_replay_previous_day_use_snapshot(database):
-    start = dt("2026-01-04T22:00:00+00:00")
-    day = Candle(start, start + timedelta(days=1), D(9), D(10), D(8), D(9))
-    event = Candle(
-        dt("2026-01-06T22:00:00+00:00"), dt("2026-01-06T22:05:00+00:00"), D(9), D(11), D(8), D(11)
-    )
-    with database.begin() as db:
-        inst = db.get(Instrument, "EURUSD")
-        inst.calendar_profile = profile()
-        db.add(
-            Bar(
-                instrument_id=inst.id,
-                timeframe="D1",
-                start=ms(day.start),
-                end=ms(day.end),
-                open=day.open,
-                high=day.high,
-                low=day.low,
-                close=day.close,
-                complete=True,
-            )
-        )
-        db.flush()
-        assert previous_day(db, inst, event).high == D(10)
-        assert replay_day([candle_dict(day)], event, "ny17", profile=profile()) == day
-        assert replay_day([candle_dict(day)], event, "ny17") is None
 
 
-def test_shortened_h4_skipped_and_state_reset_in_live_and_replay(database):
-    start = datetime(2026, 1, 5, tzinfo=UTC)
-    p = profile((start + timedelta(hours=6)).isoformat(), (start + timedelta(hours=8)).isoformat())
-    bars = [
-        Candle(
-            start + timedelta(hours=4 * i),
-            start + timedelta(hours=4 * (i + 1)),
-            D(v),
-            D(v),
-            D(v),
-            D(v),
-        )
-        for i, v in enumerate([9, 11, 12])
-    ]
-    config = {"kind": "price", "timeframe": "H4", "level": "10"}
-    assert shortened_h4(bars[1], "H4", closures_from(p))
-    assert not shortened_h4(bars[1], "M5", closures_from(p))
-    with database.begin() as db:
-        inst = db.get(Instrument, "BTCUSDT")
-        inst.calendar_profile = p
-        for b in bars:
-            db.add(
-                Bar(
-                    instrument_id=inst.id,
-                    timeframe="H4",
-                    start=ms(b.start),
-                    end=ms(b.end),
-                    open=b.open,
-                    high=b.high,
-                    low=b.low,
-                    close=b.close,
-                    complete=True,
-                )
-            )
-        db.flush()
-        watch = create_watch(db, inst.id, "skip", config, armed_at=ms(bars[0].end))
-        assert evaluate_watch(db, watch.id) is None
-        assert watch.status == "active" and watch.state["previous"]["close"] == "12.0000000000"
-        run = Replay(
-            instrument_id=inst.id,
-            timeframe="H4",
-            start=ms(bars[0].end),
-            end=ms(bars[-1].end),
-            cursor=ms(bars[0].end),
-            bars=[candle_dict(b) for b in bars],
-            days=[],
-            watches=[],
-            signals=[],
-            calendar_profile=p,
-        )
-        add_replay_watch(run, "skip", config, "utc0")
-        replay_step(run, "utc0", 2)
-        assert run.signals == [] and run.watches[0]["status"] == "active"
 
 
-def test_replay_api_copies_calendar_when_created_and_branched(database):
-    start = datetime(2026, 1, 5, tzinfo=UTC)
-    with database.begin() as db:
-        inst = db.get(Instrument, "BTCUSDT")
-        inst.calendar_profile = profile()
-        db.add(
-            Bar(
-                instrument_id=inst.id,
-                timeframe="M5",
-                start=ms(start),
-                end=ms(start) + 300000,
-                open=D(10),
-                high=D(11),
-                low=D(9),
-                close=D(10),
-                complete=True,
-            )
-        )
-    run = api_module.new_replay(
-        api_module.ReplayInput(
-            instrument_id="BTCUSDT", timeframe="M5", start=ms(start), end=ms(start) + 300000
-        )
-    )
-    with database.begin() as db:
-        db.get(Instrument, "BTCUSDT").calendar_profile = {}
-    branch = api_module.seek(run["id"], api_module.SeekInput(cursor=ms(start)))
-    assert branch["calendar_profile"] == run["calendar_profile"] == profile()
 
 
 def test_maintenance_explains_gap_without_shortening_h4():

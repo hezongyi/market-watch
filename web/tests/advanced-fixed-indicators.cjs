@@ -13,7 +13,7 @@ const ctx=vm.createContext({URL,URLSearchParams,Map,Set,Promise,Date,Intl,Error,
   location:{search:'?parent=http://localhost'},parent,
   crypto:{randomUUID:()=> 'test'},addEventListener:(name,callback)=>handlers[name]=callback,setTimeout,clearTimeout,
   atob:s=>Buffer.from(s,'base64').toString('utf8'),btoa:s=>Buffer.from(s).toString('base64'),responses,events});
-for(const name of ['series.js','price-format.js','bridge.js'])vm.runInContext(fs.readFileSync(path.join(repo,'advanced-host',name),'utf8'),ctx);
+for(const name of ['series.js','price-format.js','chart-runtime.js'])vm.runInContext(fs.readFileSync(path.join(repo,'advanced-host',name),'utf8'),ctx);
 (async()=>{
   await vm.runInContext(`(async()=>{
     ready=true;

@@ -41,7 +41,8 @@ def reauthorize(db, ctx, capability):
 def intent_hash(body):
     return hashlib.sha256(
         json.dumps(
-            body.model_dump(exclude={"idempotency_key"}), sort_keys=True, separators=(",", ":")
+            body.model_dump(mode="json", exclude={"idempotency_key"}),
+            sort_keys=True, separators=(",", ":")
         ).encode()
     ).hexdigest()
 

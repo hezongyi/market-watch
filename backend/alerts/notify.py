@@ -12,6 +12,7 @@ from sqlalchemy import or_, select
 
 from .chart_alert_message import signal_message, signal_title
 from .config import settings
+from .retire_legacy import current_signal
 from .storage import (
     AckGrant,
     Audit,
@@ -65,7 +66,9 @@ def claim():
         )
         candidate = db.execute(
             select(Outbox.id, Outbox.notification_id)
-            .where(eligible)
+            .join(Notification, Notification.id == Outbox.notification_id)
+            .join(SignalRow, SignalRow.id == Notification.signal_id)
+            .where(eligible, SignalRow.chart_alert_id.is_not(None), SignalRow.watch_id.is_(None))
             .order_by(Outbox.next_at)
             .limit(1)
         ).first()
@@ -86,7 +89,8 @@ def claim():
         )
         if not row:
             return None
-        if note.ack_at:
+        signal = db.get(SignalRow, note.signal_id)
+        if note.ack_at or not current_signal(signal) or note.status == "retired":
             row.status = "cancelled"
             return None
         pref = db.get(Preference, "notifications")
@@ -111,7 +115,7 @@ def claim():
             "title": signal_title(signal),
             "message": signal_message(signal) if signal.evidence.get("chart_alert") else f"价格 {signal.price} / 阈值 {signal.threshold}\n发生时间 {occurred}\n信号 {signal.id}\n请使用“确认”停止后续提醒。",
             "priority": 1 if config["mode"] == "companion" else config["priority"],
-            "click": f"{settings.public_url}/signals?signal={signal.id}",
+            "click": f"{settings.public_url}/advanced-charts?panel=notifications&signal={signal.id}",
             "actions": [
                 {
                     "action": "http",
@@ -158,7 +162,7 @@ def deliver_once(client=None):
             # Record the HTTP outcome, but a newer lease owns task state.
             return True
         row.lease_until = None
-        if note.ack_at:
+        if note.ack_at or note.status == "retired" or row.status == "cancelled" or not current_signal(db.get(SignalRow, note.signal_id)):
             row.status = "cancelled"
         elif accepted:
             row.status = "accepted"

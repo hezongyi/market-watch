@@ -188,7 +188,7 @@ export function DatasetDetail() {
           <div className="dc-dataset-hero-actions" aria-label="行情快捷操作">
             {chosen?.status === "published" && chosen.payload_available !== false && <OpenChart ticker={`MWH:${chosen.id}`} label="打开图表"/>}
             <details ref={more} className="dc-more"><summary>更多操作</summary><div className="dc-more-actions">
-              {chosen?.status === "published" && chosen.payload_available !== false && <Link to={`/replay?dataset_version=${chosen.id}`} onClick={closeMore}>用于回测</Link>}
+
               {dataset.maintenance.configured && <button disabled={busy} onClick={()=>{closeMore();void act(`/market-data/datasets/${id}/tasks`,{request_id:crypto.randomUUID()});}}>立即更新</button>}
               <div className="dc-more-danger"><button className="dc-danger-action" disabled={busy} onClick={()=>{closeMore();const next=new URLSearchParams(params);next.set("section","references");next.set("view","delete");setParams(next);}}>删除历史数据</button></div>
             </div></details>

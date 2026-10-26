@@ -167,10 +167,6 @@ services:
     depends_on:
       api: {condition: service_healthy}
     restart: unless-stopped
-  chart-origin:
-    image: ${MW_CHART_IMAGE:?Set the immutable chart-origin release image}
-    ports: ["192.168.7.33:18083:80"]
-    restart: unless-stopped
   backup:
     image: ${MW_BACKUP_IMAGE:?Set the immutable backup release image}
     env_file: .env

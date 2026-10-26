@@ -196,6 +196,7 @@ export type Watch = {
   state: Record<string, any>;
 };
 export type Signal = {
+  retired?: boolean;
   id: string;
   instrument_id: string;
   direction: string;

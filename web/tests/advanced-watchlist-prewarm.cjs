@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),ts=require('typescript');
-const source=fs.readFileSync('src/advanced/AdvancedWorkspace.tsx','utf8');
+const source=fs.readFileSync('src/advanced/ChartApplicationPage.tsx','utf8');
 const start=source.indexOf('          const stored = (preferences as any[])');
 const end=source.indexOf('          historyCapabilities.current = capabilities;',start);
 assert(start>=0&&end>start);

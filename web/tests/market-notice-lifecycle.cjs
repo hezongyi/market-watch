@@ -1,5 +1,5 @@
 const fs = require('node:fs'), vm = require('node:vm'), crypto = require('node:crypto'), assert = require('node:assert/strict');
-const source = fs.readFileSync('../advanced-host/bridge.js', 'utf8');
+const source = fs.readFileSync('../advanced-host/chart-runtime.js', 'utf8');
 const notify = source.slice(source.indexOf('function marketRequestNotice('), source.indexOf('function indicatorFault('));
 const start = source.indexOf("  if(m.type==='market-event') {");
 const branch = source.slice(start, source.indexOf('    const sub=[...subscriptions.values()]', start)) + '  }';

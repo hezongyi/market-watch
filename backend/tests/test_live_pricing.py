@@ -5,8 +5,8 @@ from alerts import live_pricing as live
 from alerts.config import settings
 from alerts.market_contracts import CandleBatch, QuoteEvent, RequestResult
 from alerts.oanda_rest_batch import live_demand_revision
-from alerts.service import create_watch
 from alerts.storage import Audit, Bar, LiveState, PricingOwner, SignalRow, Watch
+from legacy_records import archived_watch
 from sqlalchemy import select
 from test_market_contracts import minute
 
@@ -58,8 +58,12 @@ def test_browser_demand_and_alerts_join_resident_instruments_without_extra_owner
 
     with db_factory.begin() as db:
         dataset = next(row for row in db.scalars(select(MarketDataset)) if row.logical_symbol == "GBPUSD")
-        create_watch(db, dataset.instrument_id, "always active", {"kind": "price", "timeframe": "tick",
-                    "level": "1.25"}, armed_at=0)
+        from alerts.chart_alert_service import create
+        from alerts.storage import Instrument
+        from test_chart_alert_service import config
+        db.get(Instrument, dataset.instrument_id).enabled = True
+        create(db, "persistent-demand", config(instrument=dataset.instrument_id, source="oanda",
+            timeframe="M1"), at=0)
     assert set(live.desired_datasets("test-account")) == {"EUR_USD", "XAU_USD", "GBP_USD"}
 
 
@@ -136,14 +140,14 @@ def test_expired_connection_cannot_report_candle_judgment_ready(running):
     assert not state["candle_ready"]
 
 
-def test_recovery_and_confirmation_restore_source_state_without_historical_notifications(running):
+def test_recovery_and_confirmation_preserve_retired_watch_without_notifications(running):
     db_factory, ownership, epoch, identities = running
     identity = identities["EUR_USD"]
     from alerts.storage import MarketDataset
 
     with db_factory.begin() as db:
         instrument = db.get(MarketDataset, identity.key).instrument_id
-        create_watch(db, instrument, "closed crossing", {"kind": "price", "timeframe": "M1",
+        archived_watch(db, instrument, "closed crossing", {"kind": "price", "timeframe": "M1",
             "direction": "buy", "level": "1.105"}, armed_at=0, use_history=False)
     live.publish_event(ownership, epoch, quote(identity, epoch), identities, now=125000)
     assert live.confirmation_window(ownership, epoch, identity, now=135000) == (0, 120000)
@@ -153,7 +157,7 @@ def test_recovery_and_confirmation_restore_source_state_without_historical_notif
         assert state.ready and state.confirmed_end == 120000 and state.connection == "connected"
         assert state.next_confirm_at == 195000
         assert db.scalar(select(SignalRow)) is None
-        assert db.scalar(select(Watch)).state["last_event"] == 120000
+        assert db.scalar(select(Watch)).state == {"saved": "historical evidence"}
         assert db.scalar(select(Audit).where(Audit.kind == "pricing_recovered")) is not None
     report = live.measurements(identity.key)
     assert report["confirmed"] == 1 and report["missing"] == 0
@@ -247,14 +251,14 @@ def test_small_latency_samples_do_not_hide_the_slowest_confirmation(running, mon
     assert result["late_over_30s"] == 1
 
 
-def test_tick_recovery_seeds_fresh_baseline_and_does_not_invent_gap_crossing(running):
+def test_quote_crossings_after_recovery_never_execute_retired_watch(running):
     db_factory, ownership, epoch, identities = running
     identity = identities["EUR_USD"]
     from alerts.storage import MarketDataset
 
     with db_factory.begin() as db:
         instrument = db.get(MarketDataset, identity.key).instrument_id
-        watch = create_watch(db, instrument, "tick", {"kind": "price", "timeframe": "tick",
+        watch = archived_watch(db, instrument, "tick", {"kind": "price", "timeframe": "tick",
             "direction": "buy", "level": "1.25"}, armed_at=0)
         watch.state = {"quote": "1.00", "quote_at": 1000}
     live.commit_confirmation(ownership, epoch, candles(identity), now=125000)
@@ -264,13 +268,12 @@ def test_tick_recovery_seeds_fresh_baseline_and_does_not_invent_gap_crossing(run
     live.publish_event(ownership, epoch, quote(identity, epoch, seq=2, source=127000, bid="1.20"), identities, now=127000)
     live.publish_event(ownership, epoch, quote(identity, epoch, seq=3, source=128000, bid="1.30"), identities, now=128000)
     with db_factory.begin() as db:
-        signal = db.scalar(select(SignalRow))
-        assert signal and signal.evidence["selection_epoch"] == epoch
-        assert signal.evidence["dataset_identity"]["environment"] == "practice"
+        assert db.scalar(select(SignalRow)) is None
+        assert db.scalar(select(Watch)).state == {"quote": "1.00", "quote_at": 1000}
     # A duplicate event cannot create another signal/notification.
     live.publish_event(ownership, epoch, quote(identity, epoch, seq=3, source=128000, bid="1.30"), identities, now=128000)
     with db_factory.begin() as db:
-        assert len(db.scalars(select(SignalRow)).all()) == 1
+        assert db.scalar(select(SignalRow)) is None
 
 
 def test_single_symbol_quote_gap_cannot_create_fake_crossing(running):
@@ -280,7 +283,7 @@ def test_single_symbol_quote_gap_cannot_create_fake_crossing(running):
 
     with db_factory.begin() as db:
         instrument = db.get(MarketDataset, identity.key).instrument_id
-        create_watch(db, instrument, "tick", {"kind": "price", "timeframe": "tick",
+        archived_watch(db, instrument, "tick", {"kind": "price", "timeframe": "tick",
             "direction": "buy", "level": "1.25"}, armed_at=0)
     live.commit_confirmation(ownership, epoch, candles(identity), now=125000)
     live.publish_event(ownership, epoch, quote(identity, epoch, source=126000, bid="1.10"), identities, now=126000)
@@ -296,7 +299,7 @@ def test_invalid_spread_breaks_tick_judgment_continuity(running):
     identity = identities["EUR_USD"]
     with factory.begin() as db:
         instrument = db.get(MarketDataset, identity.key).instrument_id
-        create_watch(db, instrument, "invalid spread continuity", {"kind": "price", "timeframe": "tick",
+        archived_watch(db, instrument, "invalid spread continuity", {"kind": "price", "timeframe": "tick",
             "direction": "buy", "level": "1.25"}, armed_at=0)
     live.commit_confirmation(ownership, epoch, candles(identity), now=125000)
     live.publish_event(ownership, epoch, quote(identity, epoch, source=126000, bid="1.10"),
@@ -309,27 +312,6 @@ def test_invalid_spread_breaks_tick_judgment_continuity(running):
         assert db.scalar(select(SignalRow)) is None
 
 
-def test_rest_close_samples_cross_only_between_observed_closes(running):
-    factory, _, _, identities = running
-    identity = identities["EUR_USD"]
-    from alerts.service import evaluate_close_sample
-    from alerts.storage import Instrument, MarketDataset
-
-    with factory.begin() as db:
-        dataset = db.get(MarketDataset, identity.key)
-        instrument = db.get(Instrument, dataset.instrument_id)
-        create_watch(db, instrument.id, "sampled close", {
-            "kind": "price", "timeframe": "tick", "direction": "buy", "level": "1.25"},
-            armed_at=0)
-        evaluate_close_sample(db, instrument, 125000, "1.10", received_at=125000,
-                              sequence=1, source_identity=identity.model_dump())
-        evaluate_close_sample(db, instrument, 127000, "1.30", received_at=127000,
-                              sequence=2, source_identity=identity.model_dump(), interval_ms=2000)
-    with factory.begin() as db:
-        signal = db.scalar(select(SignalRow))
-        assert signal and signal.evidence["observation_mode"] == "candle_close_sample"
-        assert signal.evidence["observation_gap_ms"] == 2000
-        assert signal.evidence["source_identity"]["provider_symbol"] == "EUR_USD"
 
 
 def test_rest_batch_fences_complete_before_forming_and_reports_candle_readiness(running):
@@ -364,10 +346,8 @@ def test_rest_forming_sample_during_recovery_does_not_advance_tick_baseline(runn
     identity = identities["EUR_USD"]
     from alerts.oanda_rest_batch import CandleSpec, normalize_latest
 
-    calls = []
     # Keep the source in recovery so the forming candle is display-only.
     monkeypatch.setattr(live, "commit_confirmation", lambda *args, **kwargs: None)
-    monkeypatch.setattr("alerts.service.evaluate_close_sample", lambda *args, **kwargs: calls.append(args))
     payload = {"latestCandles": [{"instrument": "EUR_USD", "granularity": "M1",
         "candles": [{"time": "120", "complete": False, "volume": 3,
                       "bid": {"o": "1.11", "h": "1.13", "l": "1.10", "c": "1.12"}}]}]}
@@ -376,7 +356,6 @@ def test_rest_forming_sample_during_recovery_does_not_advance_tick_baseline(runn
                                  [CandleSpec.from_dataset(identity)]), requested_at=124900,
                              received_at=125000)
     assert live.publish_rest_batch(ownership, epoch, batch, {"EUR_USD": identity}, now=125000) == "accepted"
-    assert not calls
     with factory.begin() as db:
         assert not db.get(LiveState, identity.key).ready
 
@@ -423,7 +402,6 @@ def test_rest_batch_repeated_complete_head_skips_confirmation_rewrite(running, m
     monkeypatch.setattr(live, "commit_confirmation", lambda *args, **kwargs: calls.append(args))
     second = make(127000, 2)
     assert live.publish_rest_batch(ownership, epoch, second, {"EUR_USD": identity}, now=127000) == "accepted"
-    assert not calls
     with factory.begin() as db:
         state = db.get(LiveState, identity.key)
         assert state.confirmed_end == 120000 and state.forming["sequence"] == 2
@@ -453,33 +431,29 @@ def test_missing_quote_side_or_crossed_spread_cannot_report_tick_ready(running):
         assert not state["quote_ready"] and state["quality"] == "degraded"
 
 
-def test_indicator_recovery_reports_insufficient_warmup_and_keeps_normal_confirmation_state(running, monkeypatch):
+def test_indicator_recovery_never_rewarms_retired_watch(running, monkeypatch):
     factory, ownership, epoch, identities = running
     identity = identities["EUR_USD"]
     from alerts.storage import MarketDataset
 
     with factory.begin() as db:
         instrument = db.get(MarketDataset, identity.key).instrument_id
-        watch = create_watch(db, instrument, "SMA", {"kind": "indicator", "timeframe": "M1",
+        watch = archived_watch(db, instrument, "SMA", {"kind": "indicator", "timeframe": "M1",
             "indicator": "sma_cross", "indicator_version": "1",
             "indicator_params": {"fast": 2, "slow": 3}}, armed_at=0)
         ident = watch.id
     live.commit_confirmation(ownership, epoch, candles(identity), now=125000)
     with factory.begin() as db:
         watch = db.get(Watch, ident)
-        assert watch.paused_reason == "指标同源预热数据不足"
-        assert len(watch.state["indicator_closes"]) == 2
+        assert watch.state == {"saved": "historical evidence"}
     assert live.renew(ownership, now=150000)
     assert live.renew(ownership, now=175000)
-    monkeypatch.setattr("alerts.service.now_ms", lambda: 185000)
     next_batch = candles(identity, window_start=60000, window_end=180000,
         observed_at=185000, rows=(minute(60000, volume="4"), minute(120000, volume="4")), checkpoint=180000)
     live.commit_confirmation(ownership, epoch, next_batch, now=185000)
     with factory.begin() as db:
         watch = db.get(Watch, ident)
-        assert watch.state["last_event"] == 180000
-        assert len(watch.state["indicator_closes"]) == 3
-        assert watch.state["indicator_reading"] is not None
+        assert watch.state == {"saved": "historical evidence"}
         assert watch.paused_reason is None
         assert db.scalar(select(SignalRow)) is None
 

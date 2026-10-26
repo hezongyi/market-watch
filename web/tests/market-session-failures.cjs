@@ -1,6 +1,6 @@
 // Exercise the production quote event branch and polling loop, including fences.
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
-const source=fs.readFileSync('advanced-host/bridge.js','utf8');
+const source=fs.readFileSync('advanced-host/chart-runtime.js','utf8');
 const row={s:'ok',n:'A',v:{lp:4000,description_base:'A',market_session:'closed',session_reason:'周末',
   data_start:1791579540000,data_end:1791579600000,quote_time:null,time_type:'source_m1',read_at:200,revision_id:'bound'}};
 let delivered=[];

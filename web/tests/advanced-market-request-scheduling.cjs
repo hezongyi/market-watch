@@ -12,8 +12,8 @@ function harness() {
     crypto:{randomUUID:()=> 'test'},
     MWNativeReserve:{configure:read=>{reserveRead=read;},enabled:()=>false},
     addEventListener:(name,fn)=>{if(name==='message') handlers.push(fn);}, setTimeout, clearTimeout});
-  for (const file of ['series.js','composite-display-batches.js','bridge.js'])
-    vm.runInContext(fs.readFileSync('../advanced-host/'+file,'utf8'),ctx);
+  for (const file of ['series.js','composite-display-batches.js','chart-runtime.js'])
+    vm.runInContext(require("./fixtures/direct-runtime.cjs").read('../advanced-host/'+file,'utf8'),ctx);
   const run = code => vm.runInContext(code,ctx);
   const sent = () => messages.filter(m=>['data','indicator-demand-release','indicator-demand-update'].includes(m.type));
   async function finish(message) {

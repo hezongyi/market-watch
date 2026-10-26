@@ -19,7 +19,7 @@ const ctx = vm.createContext({
   MWNativeReserve: {configure: read => {reserveRead=read;},delivered() {}},
   requestAnimationFrame: callback => setImmediate(callback),
 });
-for (const file of ['series.js', 'native-navigation.js', 'bridge.js'])
+for (const file of ['series.js', 'native-navigation.js', 'chart-runtime.js'])
   vm.runInContext(fs.readFileSync(path.join(__dirname, '../../advanced-host', file), 'utf8'), ctx);
 const run = source => vm.runInContext(source, ctx);
 const tick = () => new Promise(resolve => setTimeout(resolve, 160));

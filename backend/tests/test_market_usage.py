@@ -45,7 +45,7 @@ def test_first_use_and_management_create_no_demand_but_actual_chart_renews_share
     assert not live.desired_datasets(settings.oanda_account_id)
 
 
-def test_active_strategy_keeps_target_after_browser_closes_and_pausing_releases_it(database, monkeypatch):
+def test_retired_watch_never_creates_persistent_demand(database, monkeypatch):
     _, ticker = ready(database, monkeypatch)
     with database.begin() as db:
         watch = Watch(instrument_id=ticker, name="persistent", status="active", rule={"timeframe": "M1"},
@@ -53,7 +53,7 @@ def test_active_strategy_keeps_target_after_browser_closes_and_pausing_releases_
         db.add(watch)
         db.flush()
         ident = watch.id
-    assert set(live.desired_datasets(settings.oanda_account_id)) == {"EUR_USD"}
+    assert not live.desired_datasets(settings.oanda_account_id)
     with database.begin() as db:
         db.get(Watch, ident).status = "paused"
     assert not live.desired_datasets(settings.oanda_account_id)

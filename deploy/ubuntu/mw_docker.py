@@ -158,9 +158,6 @@ def labels_for(args):
         PREFIX + "built-at": built.isoformat(),
         PREFIX + "expires-at": expires if args.purpose in ("development", "acceptance") else "",
     }
-    for value in getattr(args, "build_arg", []):
-        if value.startswith("VITE_ADVANCED_CHART_ORIGIN="):
-            labels[PREFIX + "chart-origin"] = value.split("=", 1)[1]
     register(args.task, project, args.purpose)
     return labels
 
@@ -246,13 +243,13 @@ def build(docker, args):
     context = (
         Path(args.context).resolve()
         if args.context
-        else (repo / {"api": ".", "web": "web", "chart": "."}[args.component])
+        else (repo / {"api": ".", "web": "."}[args.component])
     )
     file = (
         Path(args.file).resolve()
         if args.file
-        else repo / "advanced-host/Dockerfile"
-        if args.component == "chart" and not args.context
+        else repo / "web/Dockerfile"
+        if args.component == "web" and not args.context
         else context / "Dockerfile"
     )
     cmd = [
@@ -961,7 +958,7 @@ def parser():
         s.add_argument("--retain-days", type=int, default=7)
         s.add_argument("--base-source", choices=["local", "registry"], default="local")
         if name == "build":
-            s.add_argument("--component", choices=["api", "web", "chart"], default="api")
+            s.add_argument("--component", choices=["api", "web"], default="api")
             s.add_argument("--context")
             s.add_argument("--file")
             s.add_argument("--tag", required=True)
@@ -996,9 +993,7 @@ def parser():
     s.add_argument("--repo", default=".")
     s.add_argument("--api-image", help="Task-owned API image tag (prepare)")
     s.add_argument("--web-image", help="Optional task-owned web image (prepare)")
-    s.add_argument("--chart-image", help="Optional task-owned licensed chart image (prepare)")
     s.add_argument("--port", type=int, default=18443, help="API HTTP or UI HTTPS loopback port")
-    s.add_argument("--chart-port", type=int, help="Distinct chart HTTPS port for UI preview")
     s.add_argument("--worker", action="append", default=[], choices=sorted(preview_module().WORKERS))
     s.add_argument("--apply", action="store_true", help="Explicitly reset into a new DB; retain old DB")
     return p

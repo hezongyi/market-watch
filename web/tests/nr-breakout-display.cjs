@@ -3,7 +3,7 @@ const context=vm.createContext({});
 vm.runInContext(fs.readFileSync(require('node:path').join(__dirname,'../../advanced-host/nr-breakout-display.js'),'utf8'),context);
 const {nrBreakoutObjects:objects,chartNRBreakoutDisplay:renderer}=context;
 assert.match(fs.readFileSync(require('node:path').join(__dirname,'../../advanced-host/build-assets.mjs'),'utf8'),/'nr-breakout-display\.js'/,'production bundle must include the renderer');
-assert.match(fs.readFileSync(require('node:path').join(__dirname,'../../advanced-host/Dockerfile'),'utf8'),/COPY[^\n]*advanced-host\/nr-breakout-display\.js/,'Docker assets stage must copy the renderer');
+assert.match(fs.readFileSync(require('node:path').join(__dirname,'../Dockerfile'),'utf8'),/COPY advanced-host\/ \/app\/advanced-host\//,'Docker assets stage must copy the renderer');
 const inputs={show_signals:true,signal_size:'Small',up_color:'#089981',down_color:'#f23645',
   nr4_color:'rgba(102,187,106,.3)',nr7_color:'rgba(255,238,88,.3)',range_color:'#787b86'};
 const row=(time,start,end,signal=null)=>({time,drawing:{range_start:start,range_end:end,range_high:12,range_low:8,

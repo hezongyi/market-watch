@@ -2,7 +2,6 @@ import json
 import os
 import stat
 import uuid
-from decimal import Decimal
 
 import pytest
 from alerts import api as api_module
@@ -84,7 +83,8 @@ def test_postgres_credentials_are_passed_in_environment_only(monkeypatch):
     reason="Requires an isolated PostgreSQL server and matching dump/restore tools",
 )
 def test_postgres_dump_restore_of_signal_and_outbox(tmp_path, monkeypatch):
-    from alerts.service import create_watch, evaluate_watch
+    from alerts.chart_alert_service import consume, create
+    from test_chart_alert_service import config, sample
 
     url = make_url(os.environ["TEST_POSTGRES_URL"])
     name = "backup_source_" + uuid.uuid4().hex
@@ -100,25 +100,9 @@ def test_postgres_dump_restore_of_signal_and_outbox(tmp_path, monkeypatch):
             storage.bootstrap(engine)
             factory = sessionmaker(engine, expire_on_commit=False)
             with factory.begin() as db:
-                for i, prices in enumerate([(10, 11, 8, 9), (9, 10, 7, 8), (8, 12, 7, 11)]):
-                    db.add(
-                        storage.Bar(
-                            instrument_id="EURUSD",
-                            timeframe="H4",
-                            start=i * 14400000,
-                            end=(i + 1) * 14400000,
-                            open=Decimal(prices[0]),
-                            high=Decimal(prices[1]),
-                            low=Decimal(prices[2]),
-                            close=Decimal(prices[3]),
-                            complete=True,
-                        )
-                    )
-                db.flush()
-                watch = create_watch(
-                    db, "EURUSD", "restore-check", {"kind": "pullback"}, armed_at=28800000
-                )
-                assert evaluate_watch(db, watch.id)
+                rule = create(db, "restore-check", config(notify_ntfy=True), at=0)
+                consume(db, rule.id, sample(0, 9), detected_at=0)
+                assert consume(db, rule.id, sample(1, 11), detected_at=300001)
                 db.add(
                     storage.AdvancedWorkspace(
                         id="restore-workspace",

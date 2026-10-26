@@ -6,18 +6,16 @@ from .storage import (
     ChartAlert,
     ChartAlertVersion,
     CompositeRevision,
-    CompositeWatchBinding,
     MarketComposite,
     MarketDemand,
     RealtimeMapping,
-    Watch,
     now_ms,
 )
 
 
 def wanted_instruments(db, *, now=None):
     stamp = now_ms() if now is None else now
-    wanted = set(db.scalars(select(Watch.instrument_id).where(Watch.status == "active")))
+    wanted = set()
     wanted.update(db.scalars(select(MarketDemand.instrument_id).where(MarketDemand.expires > stamp)))
     versions = db.scalars(select(ChartAlertVersion).join(ChartAlert, (
         ChartAlertVersion.alert_id == ChartAlert.id) & (ChartAlertVersion.version == ChartAlert.version)
@@ -32,12 +30,6 @@ def composite_targets(db, wanted):
     # activation for charts; keep that exact target subscribed independently.
     stamp = now_ms()
     targets, head_consumers = set(), set()
-    for watch, binding in db.execute(select(Watch, CompositeWatchBinding).outerjoin(
-            CompositeWatchBinding, Watch.id == CompositeWatchBinding.watch_id).where(Watch.status == "active")):
-        if binding:
-            targets.add(binding.market_identity["target_dataset_id"])
-        else:
-            head_consumers.add(watch.instrument_id)
     for version in db.scalars(select(ChartAlertVersion).join(ChartAlert, (
         ChartAlertVersion.alert_id == ChartAlert.id) & (ChartAlertVersion.version == ChartAlert.version)
     ).where(ChartAlert.status == "active", or_(ChartAlert.expires_at.is_(None), ChartAlert.expires_at > stamp))):

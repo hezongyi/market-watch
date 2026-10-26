@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const assert = require('node:assert/strict');
 const root = path.resolve(__dirname, '../..');
-const parent = fs.readFileSync(path.join(root, 'web/src/advanced/AdvancedWorkspace.tsx'), 'utf8');
+const parent = fs.readFileSync(path.join(root, 'web/src/advanced/ChartApplicationPage.tsx'), 'utf8');
 const start = parent.indexOf('        const body = m.query;', parent.indexOf('m.type === "account-password"'));
 const end = parent.indexOf('      } else if (m.type === "style-template-name")', start);
 assert.ok(start > 0 && end > start);

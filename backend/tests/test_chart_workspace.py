@@ -97,45 +97,6 @@ def test_indicators_and_warmup():
     assert result["series"][0]["values"][-1]["value"] is None
 
 
-def test_workspaces_conflict_copy_and_auth(database):
-    api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
-    try:
-        with TestClient(api_module.app) as client:
-            w = client.post("/api/charts/workspaces", json={"name": "A"}).json()
-            doc = w["document"]
-            doc["drawings"] = {
-                "XAUUSD": [
-                    {
-                        "id": "line1",
-                        "toolType": "TrendLine",
-                        "points": [
-                            {"timestamp": 100, "price": 10},
-                            {"timestamp": 200, "price": 12},
-                        ],
-                        "options": {},
-                    }
-                ]
-            }
-            body = {"name": "A", "document": doc, "revision": 1}
-            assert (
-                client.post(f"/api/charts/workspaces/{w['id']}/save", json=body).status_code == 200
-            )
-            assert (
-                client.post(f"/api/charts/workspaces/{w['id']}/save", json=body).status_code == 409
-            )
-            copied = client.post(
-                f"/api/charts/workspaces/{w['id']}/copy", json={**body, "name": "B"}
-            ).json()
-            assert copied["document"]["drawings"]["XAUUSD"][0]["id"] != "line1"
-            assert len(client.get("/api/charts/workspaces").json()) == 2
-            body["document"]["panels"][0]["timeframe"] = "invalid"
-            assert (
-                client.post(f"/api/charts/workspaces/{w['id']}/save", json=body).status_code == 422
-            )
-    finally:
-        api_module.app.dependency_overrides.clear()
-    with TestClient(api_module.app) as client:
-        assert client.get("/api/charts/workspaces").status_code == 401
 
 
 def test_month_from_daily_and_half_hour(database):
@@ -217,23 +178,6 @@ def test_indicator_plugin_and_gap():
         CALCULATORS.pop(name, None)
 
 
-@pytest.mark.parametrize("value", [None, [None], "broken", {"x": None}])
-def test_malformed_document_returns_422(database, value):
-    api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
-    try:
-        with TestClient(api_module.app) as client:
-            w = client.post("/api/charts/workspaces", json={"name": "validate"}).json()
-            for field in ("panels", "drawings"):
-                doc = {**w["document"], field: value}
-                assert (
-                    client.post(
-                        f"/api/charts/workspaces/{w['id']}/save",
-                        json={"name": "validate", "revision": 1, "document": doc},
-                    ).status_code
-                    == 422
-                )
-    finally:
-        api_module.app.dependency_overrides.clear()
 
 
 def test_gold_week_without_maintenance_coverage_is_incomplete(database):
@@ -378,30 +322,6 @@ def test_indicator_pages_have_one_origin_and_revision_invalidates(database):
         api_module.app.dependency_overrides.clear()
 
 
-def test_invalid_position_and_layout(database):
-    from alerts.chart_api import checked
-
-    document = {
-        "schemaVersion": 1,
-        "layout": "4",
-        "panels": [{"id": "p", "instrument": "EURUSD", "timeframe": "M5", "indicators": []}],
-        "drawings": {},
-    }
-    with pytest.raises(ValueError, match="图表数量"):
-        checked(document)
-    document["layout"] = "1"
-    document["drawings"] = {
-        "EURUSD": [
-            {
-                "id": "rr",
-                "toolType": "LongShortPosition",
-                "points": [{"timestamp": 100, "price": p} for p in [100, 110, 120]],
-                "options": {},
-            }
-        ]
-    }
-    with pytest.raises(ValueError, match="止损"):
-        checked(document)
 
 
 @pytest.mark.parametrize("indicators", [[], [{"name": "EMA", "params": {"period": 2}}]])

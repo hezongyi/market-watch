@@ -6,9 +6,15 @@ def test_isolated_store_and_revision(database):
     api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
     try:
         with TestClient(api_module.app) as client:
-            old = client.post("/api/charts/workspaces", json={"name": "legacy"}).json()
+            from alerts.storage import ChartWorkspace
+            with database.begin() as db:
+                archived = ChartWorkspace(name="legacy", document={"schemaVersion": 1, "panels": []})
+                db.add(archived)
+                db.flush()
+                old = {"id": archived.id}
+            assert client.post("/api/charts/workspaces", json={"name": "legacy"}).status_code == 410
             new = client.post("/api/advanced-charts/workspaces", json={"name": "new"}).json()
-            assert new["id"] not in [x["id"] for x in client.get("/api/charts/workspaces").json()]
+            assert client.get("/api/charts/workspaces").status_code == 410
             assert old["id"] not in [
                 x["id"] for x in client.get("/api/advanced-charts/workspaces").json()
             ]
@@ -55,7 +61,8 @@ def test_isolated_store_and_revision(database):
                 ).status_code
                 == 200
             )
-            assert len(client.get("/api/charts/workspaces").json()) == 1
+            with database() as db:
+                assert db.get(ChartWorkspace, old["id"]).document == {"schemaVersion": 1, "panels": []}
     finally:
         api_module.app.dependency_overrides.clear()
 
@@ -107,7 +114,7 @@ def test_native_save_load_copy_and_legacy_revision_conflict(database):
             ).json()
             assert duplicate["id"] != row["id"]
             assert len(client.get("/api/advanced-charts/native-charts").json()) == 2
-            assert client.get("/api/charts/workspaces").json() == []
+            assert client.get("/api/charts/workspaces").status_code == 410
             assert (
                 client.post(
                     "/api/advanced-charts/native-charts/save", json={**payload, "content": "[]"}

@@ -118,7 +118,10 @@ def test_timeframe_remapping_keeps_saved_drawing_monitoring(database, monkeypatc
                          "right": {"kind": "line", "line": line}})
             saved = client.post("/api/chart-alerts", json={
                 "request_id": name, "config": cfg.model_dump(mode="json")})
-            assert saved.status_code == 201
+            if name == "old":
+                assert saved.status_code == 422
+                continue
+            assert saved.status_code == 201, saved.text
             with database.begin() as db:
                 evaluate(db, saved.json()["id"], now=43_200_001)
                 assert db.get(ChartAlert, saved.json()["id"]).health == expected

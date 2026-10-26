@@ -17,8 +17,8 @@ const assert = require("node:assert/strict");
       path: '../advanced-host/viewports.js', contentType: 'application/javascript',
     }));
   if (process.env.MARKET_WATCH_CANDIDATE_BRIDGE === "1")
-    await page.route('**/bridge.js',route=>route.fulfill({
-      path:'../advanced-host/bridge.js',contentType:'application/javascript',
+    await page.route('**/chart-runtime.js',route=>route.fulfill({
+      path:'../advanced-host/chart-runtime.js',contentType:'application/javascript',
     }));
   const errors = [];
   let phase = "initialization";

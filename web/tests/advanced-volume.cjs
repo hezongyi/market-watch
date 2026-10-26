@@ -3,7 +3,7 @@ const ctx=vm.createContext({URL,URLSearchParams,Map,Promise,Date,Intl,Error,
  location:{search:'?parent=http://localhost'},parent:{postMessage(){}},crypto:{randomUUID:()=> 'volume'},
  addEventListener(){},setTimeout,clearTimeout,atob:s=>Buffer.from(s,'base64').toString('utf8'),
  btoa:s=>Buffer.from(s).toString('base64')});
-for(const file of ['series.js','bridge.js','indicators.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+file,'utf8'),ctx);
+for(const file of ['series.js','chart-runtime.js','indicators.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+file,'utf8'),ctx);
 ctx.page={bars:[{start:0,end:60000,open:'10',high:'11',low:'9',close:'10',volume:'12.25'},
  {start:60000,end:120000,open:'10',high:'11',low:'9',close:'10',volume:'0'},
  {start:120000,end:180000,open:'10',high:'11',low:'9',close:'10',volume:null}],

@@ -2,17 +2,18 @@ from datetime import UTC, datetime
 
 import httpx
 from alerts import notify
-from alerts.service import acknowledge, create_watch, evaluate_watch
+from alerts.chart_alert_service import consume, create
+from alerts.service import acknowledge
 from alerts.storage import AckGrant, DeliveryAttempt, Notification, Outbox, Preference
 from sqlalchemy import select
-from test_service import seed
+from test_chart_alert_service import config, sample
 
 
 def pending(database):
     with database.begin() as db:
-        seed(db)
-        watch = create_watch(db, "EURUSD", "test", {"kind": "pullback"}, armed_at=28_800_000)
-        evaluate_watch(db, watch.id)
+        rule = create(db, "delivery-fixture", config(notify_ntfy=True), at=0)
+        consume(db, rule.id, sample(0, 9), detected_at=0)
+        consume(db, rule.id, sample(1, 11), detected_at=300001)
         db.flush()
         return db.scalar(select(Notification)).id
 
@@ -151,13 +152,13 @@ def test_manual_retry_only_blocked_and_never_acknowledged(database):
     assert error.value.status_code == 409
 
 
-def test_strategy_retry_and_phone_action_round_trip(database, monkeypatch):
-    """Actual strategy/outbox/API path; only the external ntfy HTTP service is simulated."""
+def test_chart_alert_retry_and_phone_action_round_trip(database, monkeypatch):
+    """Actual ChartAlert/outbox/API path; only the external ntfy HTTP service is simulated."""
     import json
     from urllib.parse import urlsplit
 
     from alerts import api as api_module
-    from alerts.storage import SignalRow, Watch
+    from alerts.storage import ChartAlert, SignalRow
     from fastapi.testclient import TestClient
 
     note_id = pending(database)
@@ -203,8 +204,9 @@ def test_strategy_retry_and_phone_action_round_trip(database, monkeypatch):
         assert db.get(Notification, note_id).ack_at is not None
         assert db.scalar(select(Outbox)).status == "cancelled"
         assert len(db.scalars(select(SignalRow)).all()) == 1
-        watch = db.scalar(select(Watch))
-        assert watch.status == "triggered" and evaluate_watch(db, watch.id) is None
+        rule = db.scalar(select(ChartAlert))
+        assert rule.count == 1
+        assert consume(db, rule.id, sample(1, 11), detected_at=300001) is None
         assert len(db.scalars(select(DeliveryAttempt)).all()) == 2
     assert not notify.deliver_once(client)
     assert len(bodies) == 2

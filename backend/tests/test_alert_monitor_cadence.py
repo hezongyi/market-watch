@@ -1,21 +1,17 @@
 from threading import Event
 
 import pytest
-from alerts import alert_monitor, chart_alert_worker, composite_watches
+from alerts import alert_monitor, chart_alert_worker
 
 
 @pytest.mark.parametrize('cost,expected', [(.3, [0, .75, 1.5]), (1.3, [0, 1.5, 3])])
-def test_shared_monitor_deadlines_include_watch_and_coalesce_overruns(monkeypatch, cost, expected):
+def test_chart_monitor_deadlines_coalesce_overruns(monkeypatch, cost, expected):
     stop = Event()
-    clock, starts, watches, reports = [0.0], [], [], []
+    clock, starts, reports = [0.0], [], []
 
     def step(**kwargs):
         starts.append(clock[0])
-        clock[0] += cost / 2
-
-    def watch():
-        watches.append(clock[0])
-        clock[0] += cost / 2
+        clock[0] += cost
 
     def wait(seconds):
         assert seconds > 0, 'No catch-up storm or overloaded busy loop'
@@ -24,31 +20,25 @@ def test_shared_monitor_deadlines_include_watch_and_coalesce_overruns(monkeypatc
             stop.set()
 
     monkeypatch.setattr(chart_alert_worker, 'step', step)
-    monkeypatch.setattr(composite_watches, 'step', watch)
     monkeypatch.setattr(stop, 'wait', wait)
-    alert_monitor.run(stop, monotonic=lambda: clock[0], on_turn=reports.append)
+    alert_monitor.run(stop, monotonic=lambda: clock[0], on_turn=reports.append, report_health=lambda *args, **kwargs: None)
     assert starts == expected
-    assert len(watches) == 3
     assert all(row['overrun'] == (cost > .75) for row in reports)
 
 
-def test_monitor_errors_back_off_without_running_watch(monkeypatch):
+def test_monitor_errors_back_off(monkeypatch):
     stop, clock, turns = Event(), [0.0], []
 
     def failed(**kwargs):
         raise ValueError('test failure')
-
-    def watch():
-        pytest.fail('Failed chart round must not start watch')
 
     def wait(seconds):
         assert seconds >= .75
         stop.set()
 
     monkeypatch.setattr(chart_alert_worker, 'step', failed)
-    monkeypatch.setattr(composite_watches, 'step', watch)
     monkeypatch.setattr(stop, 'wait', wait)
-    alert_monitor.run(stop, monotonic=lambda: clock[0], on_turn=turns.append)
+    alert_monitor.run(stop, monotonic=lambda: clock[0], on_turn=turns.append, report_health=lambda *args, **kwargs: None)
     assert turns[0]['error'] == 'ValueError'
 
 

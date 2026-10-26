@@ -1,6 +1,6 @@
 // Exercise the real parent message handler and document.title writer together.
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),ts=require('typescript');
-const source=fs.readFileSync('src/advanced/AdvancedWorkspace.tsx','utf8');
+const source=fs.readFileSync('src/advanced/ChartApplicationPage.tsx','utf8');
 const writer=source.slice(source.indexOf('  const updateTitle ='),source.indexOf('  const remember ='));
 const start=source.indexOf('      if (m.type === "active-quote") {');
 const end=source.indexOf('      if (m.type === "alerts-panel-state"',start);

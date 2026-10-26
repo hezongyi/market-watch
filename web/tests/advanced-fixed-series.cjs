@@ -5,7 +5,7 @@ const ctx=vm.createContext({URL,URLSearchParams,Map,Set,Promise,Date,Intl,Error,
  location:{search:'?parent=http://localhost'},parent:{postMessage:m=>events.push(m)},
  crypto:{randomUUID:()=> 'test'},atob:s=>Buffer.from(s,'base64').toString('utf8'),
  addEventListener(){},setTimeout,clearTimeout,queueMicrotask});
-for(const file of ['series.js','price-format.js','bridge.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+file,'utf8'),ctx);
+for(const file of ['series.js','price-format.js','chart-runtime.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+file,'utf8'),ctx);
 (async()=>{
  await vm.runInContext(`(async()=>{
   globalThis.calls=[];
@@ -56,7 +56,7 @@ for(const file of ['series.js','price-format.js','bridge.js'])vm.runInContext(fs
  assert.equal(ctx.quoteRows[0].v.lp,undefined,'Naming a composite must not fabricate a quote');
  assert.equal(ctx.quoteRows[0].n,ctx.compositeTicker.toUpperCase());
  // Exercise the metadata callback actually supplied to the native alert bridge.
- const source=fs.readFileSync('../advanced-host/bridge.js','utf8');
+ const source=fs.readFileSync('../advanced-host/chart-runtime.js','utf8');
  const metadata=source.match(/metadata:(ticker=>[^\n]+),frames,/)[1];
  const nativeMetadata=vm.runInContext(metadata,ctx);
  vm.runInContext("alertSourceMetadata.set(compositeTicker,{source:'composite'})",ctx);

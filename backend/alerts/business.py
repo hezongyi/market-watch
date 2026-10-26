@@ -1,19 +1,15 @@
 """Shared browser and agent business Interface; no request or session identity."""
 
-from typing import Literal
 
 from fastapi import HTTPException
-from pydantic import BaseModel, Field, model_validator
 from sqlalchemy import select
 
 from .calendar_profile import closures_from
 from .chart_series import is_gold
 from .domain import TIMEFRAMES, calendar_for, scheduled_open
-from .service import acknowledge, create_watch
+from .service import acknowledge
 from .storage import (
-    Audit,
     Bar,
-    CompositeWatchBinding,
     DeviceReceipt,
     Instrument,
     MarketDataset,
@@ -21,80 +17,11 @@ from .storage import (
     Outbox,
     Quote,
     SignalRow,
-    Watch,
     candle_dict,
     instant,
     now_ms,
-    rule_from,
     transaction,
 )
-
-
-def watch_dict(w):
-    from sqlalchemy.orm import object_session
-
-    result = {
-        k: getattr(w, k)
-        for k in (
-            "id",
-            "instrument_id",
-            "name",
-            "rule",
-            "state",
-            "status",
-            "armed_at",
-            "paused_reason",
-            "warmup_start",
-        )
-    }
-    db = object_session(w)
-    binding = db.get(CompositeWatchBinding, w.id) if db else None
-    if binding:
-        from .composite_watches import describe
-
-        result.update(describe(binding))
-    return result
-
-
-class WatchInput(BaseModel):
-    instrument_id: str = Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9:_-]+$")
-    series_kind: Literal["legacy", "composite"] = "legacy"
-    composite_revision_id: str | None = Field(default=None, min_length=36, max_length=36)
-    seam_policy: Literal["reject", "accept_raw"] = "reject"
-    name: str = Field(min_length=1, max_length=100)
-    kind: Literal["pullback", "previous_day", "price", "indicator"]
-    timeframe: str = "H4"
-    direction: Literal["buy", "sell", "both"] = "both"
-    consecutive: int = Field(default=2, ge=2, le=100)
-    level: str | None = None
-    touch: bool = False
-    use_history: bool = True
-    indicator: str = "sma_cross"
-    indicator_version: str = "1"
-    indicator_params: dict = Field(default_factory=dict)
-
-    def rule(self):
-        return {
-            k: getattr(self, k)
-            for k in [
-                "kind",
-                "timeframe",
-                "direction",
-                "consecutive",
-                "level",
-                "touch",
-                "indicator",
-                "indicator_version",
-                "indicator_params",
-            ]
-        }
-
-    @model_validator(mode="after")
-    def check_rule(self):
-        rule_from(self.rule())
-        if self.series_kind == "legacy" and (self.composite_revision_id or self.seam_policy != "reject"):
-            raise ValueError("固定组合修订和接缝政策只适用于组合行情")
-        return self
 
 
 def instruments():
@@ -213,52 +140,14 @@ def candles(instrument: str, timeframe: str = "H4", before: int | None = None, l
         ]
 
 
-def watches(limit=None, offset=0, instrument=None, status=None):
-    with transaction() as db:
-        query = select(Watch).order_by(Watch.created_at.desc(), Watch.id)
-        if instrument:
-            query = query.where(Watch.instrument_id == instrument)
-        if status:
-            query = query.where(Watch.status == status)
-        if limit is not None:
-            query = query.offset(offset).limit(limit)
-        return [watch_dict(w) for w in db.scalars(query)]
 
 
-def new_watch(body: WatchInput):
-    with transaction() as db:
-        return new_watch_in(db, body)
 
 
-def new_watch_in(db, body):
-    try:
-        if body.series_kind == "composite":
-            from .composite_watches import create
-
-            return watch_dict(create(db, body.instrument_id, body.name, body.rule(),
-                revision_id=body.composite_revision_id, seam_policy=body.seam_policy, use_history=body.use_history))
-        return watch_dict(
-            create_watch(
-                db, body.instrument_id, body.name, body.rule(), use_history=body.use_history
-            )
-        )
-    except ValueError as e:
-        raise HTTPException(422, str(e))
 
 
-def cancel_watch(watch_id):
-    with transaction() as db:
-        return cancel_watch_in(db, watch_id)
 
 
-def cancel_watch_in(db, watch_id):
-    w = db.scalar(select(Watch).where(Watch.id == watch_id).with_for_update())
-    if not w:
-        raise HTTPException(404, "监控不存在")
-    if w.status == "active":
-        w.status = "cancelled"
-        db.add(Audit(kind="watch_cancelled", details={"watch_id": watch_id}))
-    return watch_dict(w)
 
 
 def signals(signal_id: str | None = None):
@@ -303,7 +192,9 @@ def signals(signal_id: str | None = None):
                     select(Outbox.status).where(Outbox.notification_id == n.id)
                 )
                 == "blocked"
-                and n.ack_at is None,
+                and s.chart_alert_id is not None and s.watch_id is None and n.ack_at is None,
+                "retired": s.watch_id is not None and s.chart_alert_id is None,
+                "reminder_status": "退役停止提醒" if s.watch_id is not None and s.chart_alert_id is None else n.status,
             }
             for s, n in rows
         ]

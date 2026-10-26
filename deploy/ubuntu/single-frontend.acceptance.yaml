@@ -1,0 +1,98 @@
+# Task-only Ubuntu R2. Private env/certificates live outside the checkout.
+x-limits: &limits
+  restart: "no"
+  mem_limit: 512m
+  cpus: 0.5
+  logging: {driver: json-file, options: {max-size: 10m, max-file: '3'}}
+x-app: &app
+  <<: *limits
+  image: ${MW_API_IMAGE:?}
+  env_file: ${MW_PRIVATE_DIR:?}/backend.env
+  environment:
+    ALERTS_DATABASE_EXPECTED_VERSION: "140024"
+  depends_on:
+    postgres: {condition: service_healthy}
+services:
+  postgres:
+    <<: *limits
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+    mem_limit: 768m
+    environment:
+      POSTGRES_DB: acceptance
+      POSTGRES_USER: acceptance
+      POSTGRES_PASSWORD: ${MW_DATABASE_PASSWORD:?}
+    volumes: [postgres-data:/var/lib/postgresql/data]
+    ports: ['127.0.0.1:19644:5432']
+    networks: [default, edge]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U acceptance -d acceptance && test \"$$(PGOPTIONS='-c jit=on' psql -U acceptance -d acceptance -Atqc \"SELECT current_setting('server_version_num') = '140024' AND pg_jit_available()\")\" = t"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+  migrate:
+    <<: *app
+    command: [alembic, upgrade, head]
+  api:
+    <<: *app
+    mem_limit: 768m
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/readyz', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  web:
+    <<: *limits
+    image: ${MW_WEB_IMAGE:?}
+    mem_limit: 96m
+    cpus: 0.1
+    depends_on:
+      api: {condition: service_healthy}
+  tls:
+    <<: *limits
+    image: nginx:1.28-alpine@sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592
+    mem_limit: 64m
+    cpus: 0.1
+    ports: ['127.0.0.1:19643:443']
+    volumes:
+      - ${MW_PRIVATE_DIR:?}/tls.conf:/etc/nginx/conf.d/default.conf:ro
+      - ${MW_PRIVATE_DIR:?}/cert.pem:/certs/cert.pem:ro
+      - ${MW_PRIVATE_DIR:?}/key.pem:/certs/key.pem:ro
+    depends_on: [web]
+    networks: [default, edge]
+  market-stream:
+    <<: *app
+    command: [python, -m, alerts.market_stream_worker]
+  notification-projector:
+    <<: *app
+    command: [python, -m, alerts.notification_center_worker]
+  chart-history:
+    <<: *app
+    command: [python, -m, alerts.chart_history_worker]
+  native-history:
+    <<: *app
+    command: [python, -m, alerts.native_history_loads]
+  fixture:
+    <<: *app
+    profiles: [verify]
+    environment:
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
+      MW_ACCEPTANCE_TASK: mw-single-frontend-20261026
+    working_dir: /candidate
+    volumes: ['${MW_REPO:?}:/candidate:ro']
+    command: [python, scripts/single_frontend_fixture.py, seed]
+  verify:
+    <<: *app
+    mem_limit: 1536m
+    cpus: 1
+    profiles: [verify]
+    working_dir: /candidate
+    env_file: ${MW_PRIVATE_DIR:?}/verify.env
+    volumes: ['${MW_REPO:?}:/candidate:ro']
+    command: [python, -m, pytest, -q, backend/tests/test_chart_alert_postgres.py]
+volumes:
+  postgres-data: {}
+networks:
+  default: {internal: true}
+  edge: {}

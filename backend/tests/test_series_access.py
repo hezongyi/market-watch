@@ -6,7 +6,7 @@ import json
 
 import pytest
 from alerts import api
-from alerts.chart_api import DataQuery, checked, data_sync
+from alerts.chart_api import DataQuery, data_sync
 from alerts.chart_series import decode, encode
 from alerts.composite_definitions import save_mapping
 from alerts.history_retention import lock_reference_values, references
@@ -73,25 +73,6 @@ def test_search_resolve_watchlist_are_pure_and_first_data_read_is_idempotent(dat
         api.app.dependency_overrides.clear()
 
 
-def test_fixed_history_stays_on_version_after_daily_head_and_retains_workspace_reference(database, monkeypatch):
-    parent = fixture(database, monkeypatch)
-    ticker = encode(parent, "history")
-    publish(database, end=259320000)
-    page = data_sync(DataQuery(instrument=ticker, timeframe="M1", limit=2, client="history-chart"))
-    assert page["version_id"] == parent
-    with database.begin() as db:
-        assert db.scalar(select(MarketDemand)) is None and db.scalar(select(MarketComposite)) is None
-        db.add(AdvancedWorkspace(name="fixed history", document={"symbol": ticker.upper()}))
-    with database.begin() as db:
-        assert any(item["kind"] == "workspace" for item in references(db, identity().key)["items"])
-        assert metadata(db, parent, "history")["history_version_id"] == parent
-        assert search(db, "EURUSD", kind="history")[0]["id"] != parent
-    document = {"schemaVersion": 1, "layout": "1", "panels": [
-        {"id": "fixed", "instrument": ticker, "timeframe": "M1", "indicators": []}], "drawings": {}}
-    checked(document)
-    with database.begin() as db:
-        with pytest.raises(ValueError, match="不存在"):
-            lock_reference_values(db, {"symbol": "MWH:ffffffff-ffff-ffff-ffff-ffffffffffff"})
 
 
 def test_fixed_chart_never_silently_computes_indicator_on_page_prefix(database, monkeypatch):
@@ -271,3 +252,21 @@ def test_revision_and_input_are_selected_before_metadata(database, monkeypatch):
     assert result['basis'] == 'bid' and result['precision'] == 5 and result['calendar'] == 'ny17'
     assert result['bars'][-1]['start'] == seam + 540000
     assert result['indicators'][0]['calculation']['input_evidence']['input_revision'] == 1
+
+
+def test_fixed_history_stays_on_version_after_daily_head_and_retains_workspace_reference(database, monkeypatch):
+    parent = fixture(database, monkeypatch)
+    ticker = encode(parent, "history")
+    publish(database, end=259320000)
+    page = data_sync(DataQuery(instrument=ticker, timeframe="M1", limit=2, client="history-chart"))
+    assert page["version_id"] == parent
+    with database.begin() as db:
+        assert db.scalar(select(MarketDemand)) is None and db.scalar(select(MarketComposite)) is None
+        db.add(AdvancedWorkspace(name="fixed history", document={"symbol": ticker.upper()}))
+    with database.begin() as db:
+        assert any(item["kind"] == "workspace" for item in references(db, identity().key)["items"])
+        assert metadata(db, parent, "history")["history_version_id"] == parent
+        assert search(db, "EURUSD", kind="history")[0]["id"] != parent
+    with database.begin() as db:
+        with pytest.raises(ValueError, match="不存在"):
+            lock_reference_values(db, {"symbol": "MWH:ffffffff-ffff-ffff-ffff-ffffffffffff"})

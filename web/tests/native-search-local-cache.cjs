@@ -3,7 +3,7 @@ let now=100000;class Clock extends Date {static now(){return now;}}
 const ctx=vm.createContext({URL,URLSearchParams,Map,Set,Promise,Date:Clock,Intl,Error,
  document:{createElement:()=>({}),head:{append(){}}},location:{search:'?parent=http://localhost'},
  parent:{postMessage(){}},crypto:{randomUUID:()=> 'test'},addEventListener(){},setTimeout,clearTimeout});
-for(const file of ['series.js','composite-display-batches.js','bridge.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+file,'utf8'),ctx);
+for(const file of ['series.js','composite-display-batches.js','chart-runtime.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+file,'utf8'),ctx);
 const run=code=>vm.runInContext(code,ctx);
 (async()=>{
  const config=await run('new Promise(resolve=>feed.onReady(resolve))');

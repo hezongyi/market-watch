@@ -4,7 +4,7 @@ const messages=[],handlers=[];
 const ctx=vm.createContext({document:{createElement:()=>({}),head:{append:()=>{}}},URL,URLSearchParams,Map,Promise,Date,Intl,Error,
  location:{search:'?parent=http://localhost'},parent:{postMessage:m=>messages.push(m)},
  crypto:{randomUUID:()=> 'test'},addEventListener:(name,fn)=>{if(name==='message')handlers.push(fn)},setTimeout,clearTimeout});
-for(const f of ['series.js','composite-display-batches.js','bridge.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+f,'utf8'),ctx);
+for(const f of ['series.js','composite-display-batches.js','chart-runtime.js'])vm.runInContext(require("./fixtures/direct-runtime.cjs").read('../advanced-host/'+f,'utf8'),ctx);
 const sent=()=>messages.filter(m=>m.type==='data');
 async function finish(name){const m=sent().find(m=>m.query.name===name);assert.ok(m,name+' not dispatched');
  await handlers[0]({source:ctx.parent,origin:'http://localhost',data:{channel:'mw-chart-v1',type:'result',id:m.id,result:{}}});}

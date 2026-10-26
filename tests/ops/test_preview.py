@@ -77,8 +77,6 @@ class PreviewTests(unittest.TestCase):
                     purpose="acceptance",
                 ).items()
             }
-            if service == "web":
-                labels[m.PREFIX + "chart-origin"] = "https://localhost:18002"
         return {
             "Id": "sha256:" + hashlib.sha256(ref.encode()).hexdigest(),
             "Config": {"Labels": labels},
@@ -157,10 +155,10 @@ class PreviewTests(unittest.TestCase):
             ui=True,
             workers=["chart-history", "native-history"],
             web_image="market-watch-web:test",
-            chart_image="market-watch-chart:test",
-            chart_port=18002,
         )
         config = p.compose(record, private, m.PG14_IMAGE)
+        self.assertNotIn("chart-origin", config["services"])
+        self.assertNotIn("preview_chart", p.gateway_config(True))
         for name, item in config["services"].items():
             self.assertIn("mem_limit", item)
             self.assertIn("cpus", item)
@@ -175,7 +173,7 @@ class PreviewTests(unittest.TestCase):
                     self.assertEqual(item["environment"][key], "false")
                 self.assertEqual(item["environment"]["ALERTS_DATABASE_JIT"], "inherit")
         self.assertEqual(
-            config["services"]["tls"]["ports"], ["127.0.0.1:18001:443", "127.0.0.1:18002:444"]
+            config["services"]["tls"]["ports"], ["127.0.0.1:18001:443"]
         )
         self.assertEqual(
             config["services"]["native-history-worker"]["command"][-1],

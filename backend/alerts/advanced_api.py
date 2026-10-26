@@ -8,10 +8,27 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import delete, select, update
 
-from .chart_api import Create, Revision, Save, serialized
 from .chart_indicators import public_catalog
 from .chart_series import decode, encode
 from .storage import AdvancedPreference, AdvancedWorkspace, Preference, now_ms, transaction
+
+
+class Create(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
+
+
+class Save(Create):
+    document: dict
+    revision: int = Field(ge=1)
+
+
+class Revision(BaseModel):
+    revision: int = Field(ge=1)
+
+
+def serialized(row):
+    return {"id": row.id, "name": row.name, "document": row.document,
+            "revision": row.revision, "updated_at": row.updated_at}
 
 
 class PreferenceWrite(BaseModel):

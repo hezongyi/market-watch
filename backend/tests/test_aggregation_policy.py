@@ -7,10 +7,10 @@ import pytest
 from alerts import api
 from alerts.aggregation_policy import change_aggregation, register_history_dataset, resolve_calendar
 from alerts.domain import bucket_bounds, calendar_for
-from alerts.history_replay import create_replay
 from alerts.history_versions import import_page, snapshot_rows
 from alerts.storage import HistoryVersion, Instrument, Replay
 from fastapi.testclient import TestClient
+from legacy_records import create_replay
 from test_history_versions import Adapter, create
 from test_market_contracts import batch
 

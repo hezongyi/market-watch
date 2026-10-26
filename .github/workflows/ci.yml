@@ -50,6 +50,7 @@ jobs:
     timeout-minutes: 30
     env:
       TEST_POSTGRES_URL: postgresql+psycopg://ci:ci@127.0.0.1:5432/ci
+      CHART_ALERT_TEST_DATABASE_URL: postgresql+psycopg://ci:ci@127.0.0.1:5432/ci
     services:
       postgres:
         image: postgres:14.24-bookworm
@@ -168,7 +169,7 @@ jobs:
         working-directory: web
         run: |
           npm ci
-          npm run build
+          npm run build:ui
 
       - name: Indicator runtime regressions
         working-directory: web
@@ -197,7 +198,7 @@ jobs:
           node tests/advanced-refresh-interaction.cjs
           node tests/advanced-viewports.cjs
 
-      - name: Watchlist bridge regressions
+      - name: Chart runtime regressions
         working-directory: web
         run: |
           node tests/advanced-history-loading.cjs
@@ -256,6 +257,7 @@ jobs:
           node --test tests/alert-price-edit.test.cjs
           node tests/alert-price-drag.browser.cjs
           node tests/notice-page-exit.browser.cjs
+          npm run test:single-frontend -- --unit
 
   compose_checks:
     name: Compose checks
@@ -267,7 +269,6 @@ jobs:
       POSTGRES_PASSWORD: ci-only-placeholder
       MW_API_IMAGE: market-watch-api:ci
       MW_WEB_IMAGE: market-watch-web:ci
-      MW_CHART_IMAGE: market-watch-chart-origin:ci
       MW_BACKUP_IMAGE: market-watch-backup:ci
     steps:
       - name: Check out source
@@ -282,7 +283,6 @@ jobs:
           POSTGRES_PASSWORD=ci-only-placeholder
           MW_API_IMAGE=market-watch-api:ci
           MW_WEB_IMAGE=market-watch-web:ci
-          MW_CHART_IMAGE=market-watch-chart-origin:ci
           MW_BACKUP_IMAGE=market-watch-backup:ci
           MW_PRODUCTION_DATABASE_JIT=off
           EOF
@@ -303,6 +303,12 @@ jobs:
           MW_ADMIN_PASSWORD_HASH=ci-only-placeholder \
           MW_ACCEPTANCE_PRIVATE="$acceptance_dir" \
             docker compose -f deploy/ubuntu/single-app.acceptance.yaml config --quiet
+
+          cp "$acceptance_dir/api.env" "$acceptance_dir/backend.env"
+          cp "$acceptance_dir/api.env" "$acceptance_dir/verify.env"
+          MW_DATABASE_PASSWORD=ci-only-placeholder \
+          MW_PRIVATE_DIR="$acceptance_dir" MW_REPO="$GITHUB_WORKSPACE" \
+            docker compose -f deploy/ubuntu/single-frontend.acceptance.yaml config --quiet
 
   required:
     # Keep the protected contexts, including when heavy jobs are skipped.

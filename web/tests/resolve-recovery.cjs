@@ -30,8 +30,8 @@ const ctx = vm.createContext({
   clearTimeout,
   chart,
 });
-for (const file of ["series.js", "composite-display-batches.js", "bridge.js"])
-  vm.runInContext(fs.readFileSync("../advanced-host/" + file, "utf8"), ctx);
+for (const file of ["series.js", "composite-display-batches.js", "chart-runtime.js"])
+  vm.runInContext(require("./fixtures/direct-runtime.cjs").read("../advanced-host/" + file, "utf8"), ctx);
 vm.runInContext(
   `widget={chartsCount:()=>1,chart:()=>chart};ready=true;workspaceEpoch=1;globalThis.resolved=[];globalThis.errors=[];`,
   ctx,

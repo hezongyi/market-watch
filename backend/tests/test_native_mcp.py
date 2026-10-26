@@ -2,7 +2,6 @@
 
 import json
 import time
-from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
 from decimal import Decimal
 
@@ -102,7 +101,7 @@ def test_initialize_discovery_and_call(mcp):
     assert response.status_code == 200
     assert response.json()["result"]["serverInfo"]["name"] == "Market Watch"
     tools = rpc(client, token, "tools/list").json()["result"]["tools"]
-    assert len(tools) == 31
+    assert len(tools) == 34
     assert any(tool["name"] == "composite_get_quote" for tool in tools)
     assert any(tool["name"] == "history_get_creation" for tool in tools)
     assert all(
@@ -135,8 +134,8 @@ def test_authentication_scopes_expiry_revoke(mcp):
     assert rpc(client, "invalid", "tools/list").status_code == 401
     read = issue("read-agent", ["market:read"], storage.now_ms() + 600000)
     names = [t["name"] for t in rpc(client, read, "tools/list").json()["result"]["tools"]]
-    assert "alerts_create" not in names and "indicators_calculate" not in names
-    result = call(client, read, "alerts_create", {"idempotency_key": "blocked", "watch": {}})
+    assert "chart_alerts_create" not in names and "indicators_calculate" not in names
+    result = call(client, read, "chart_alerts_create", {"idempotency_key": "blocked", "config": {}})
     assert result["isError"] and result["structuredContent"]["error"]["code"] == "FORBIDDEN"
     with database.begin() as db:
         db.get(storage.AgentCredential, digest(read)).expires_at = storage.now_ms() - 1
@@ -197,46 +196,6 @@ def test_unavailable_limits_and_insufficient_history(mcp):
     )
 
 
-def test_atomic_idempotent_alerts_and_audit(mcp):
-    client, token, database = mcp
-    body = {
-        "idempotency_key": "create-1",
-        "watch": {
-            "instrument_id": "EURUSD",
-            "name": "MCP",
-            "kind": "price",
-            "level": "1.2",
-            "use_history": False,
-        },
-    }
-    first = call(client, token, "alerts_create", body)
-    assert not first.get("isError"), first
-    second = call(client, token, "alerts_create", body)
-    assert first["structuredContent"] == second["structuredContent"]
-    with ThreadPoolExecutor(max_workers=4) as pool:
-        bodies = list(pool.map(lambda _: call(client, token, "alerts_create", body), range(4)))
-    assert all(row["structuredContent"] == first["structuredContent"] for row in bodies)
-    conflict = call(
-        client, token, "alerts_create", {**body, "watch": {**body["watch"], "level": "1.3"}}
-    )
-    assert (
-        conflict["isError"]
-        and conflict["structuredContent"]["error"]["code"] == "IDEMPOTENCY_CONFLICT"
-    )
-    ident = first["structuredContent"]["id"]
-    cancel = call(
-        client, token, "alerts_cancel", {"idempotency_key": "cancel-1", "watch_id": ident}
-    )
-    assert cancel["structuredContent"]["status"] == "cancelled"
-    with database.begin() as db:
-        assert db.scalar(select(func.count()).select_from(storage.Watch)) == 1
-        details = [
-            r.details
-            for r in db.scalars(select(storage.Audit).where(storage.Audit.kind == "agent_call"))
-        ]
-        assert all(r["agent_id"] == "acceptance-agent" for r in details)
-        assert token not in json.dumps(details)
-        assert any(r.get("resource") == ident and r["action"] == "alerts_create" for r in details)
 
 
 def test_saved_drawings_identity_unknown_and_old_document(mcp):
@@ -338,7 +297,7 @@ def test_registration_schema_and_automatic_protocol_exposure(mcp, monkeypatch):
     assert not asyncio.run(run()).is_error
     with pytest.raises(ValueError, match="frozen"):
         registry.register(cap)
-    assert len(build_registry().visible(frozenset(SCOPES))) == 31
+    assert len(build_registry().visible(frozenset(SCOPES))) == 34
 
 
 def test_host_origin_body_quota_and_disable(mcp, monkeypatch):
@@ -604,18 +563,10 @@ def test_official_sdk_client_transport(database, monkeypatch):
 
 def test_notification_ack_and_signals_share_browser_rules(mcp):
     client, token, database = mcp
-    body = {
-        "idempotency_key": "ack-watch",
-        "watch": {
-            "instrument_id": "EURUSD",
-            "name": "Acknowledgement fixture",
-            "kind": "price",
-            "level": "1.2",
-            "use_history": False,
-        },
-    }
-    watch = call(client, token, "alerts_create", body)["structuredContent"]
+    from legacy_records import archived_watch
     with database.begin() as db:
+        record = archived_watch(db, "EURUSD", "Acknowledgement history", {"kind": "price", "level": "1.2"})
+        watch = {"id": record.id}
         signal = storage.SignalRow(
             watch_id=watch["id"],
             instrument_id="EURUSD",
@@ -869,7 +820,7 @@ def test_chart_alert_events_share_mcp_browser_signals_and_independent_ack(mcp):
     with database() as db:
         assert db.get(storage.ChartAlert, alert_id).count == 2
     # Legacy creation/cancellation remains its original one-shot watch contract.
-    assert client.get('/api/watches').json() == []
+    assert client.get('/api/watches').status_code == 410
 
 
 def test_mcp_provisional_indicator_is_explicit_and_matches_browser_when_opted_in(mcp):
@@ -947,3 +898,13 @@ def test_provider_calculation_evidence_and_quality_survive_output_model(mcp, mon
         'timeframe': 'M1', 'indicators': [{'name': 'EMA', 'params': {'period': 2}}]})
     assert not result['isError'], result
     assert result['structuredContent']['page'] == page
+
+
+def test_retired_watch_tools_are_absent_and_cannot_write(mcp):
+    client, token, database = mcp
+    names = {tool["name"] for tool in rpc(client, token, "tools/list").json()["result"]["tools"]}
+    assert not names.intersection({"alerts_create", "alerts_cancel", "alerts_list"})
+    for name in ("alerts_create", "alerts_cancel", "alerts_list"):
+        assert call(client, token, name, {})["isError"]
+    with database() as db:
+        assert db.scalar(select(func.count()).select_from(storage.Watch)) == 0
