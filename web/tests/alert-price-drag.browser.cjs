@@ -181,6 +181,18 @@ const { chromium } = require("@playwright/test"),
     const label = frame.locator('[data-name="mw-alert-price-label"]');
     async function down() {
       await label.waitFor();
+      // Restoring the native price schedules its label position on the next
+      // animation frame. Wait for that projection before sampling drag coords.
+      await frame.waitForFunction(() => {
+        const label = document.querySelector('[data-name="mw-alert-price-label"]');
+        const canvas = document.querySelector("canvas");
+        if (!label || !canvas) return false;
+        const bounds = label.getBoundingClientRect();
+        const price = t.lines.at(-1).getPrice();
+        const y = canvas.getBoundingClientRect().top +
+          (t.inverted ? (price - 60) * 10 : (100 - price) * 10);
+        return Math.abs(bounds.top + bounds.height / 2 - y) < 0.5;
+      });
       const b = await label.boundingBox();
       await page.mouse.move(b.x + 25, b.y + b.height / 2);
       await page.mouse.down();
