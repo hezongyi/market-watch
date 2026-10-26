@@ -961,8 +961,9 @@ def data(body):
             result = compute(frozen, meta, body.instrument, spec,
                              first=first, provisional=body.provisional, telemetry=execution, timeframe=body.timeframe)
         else:
-            result = calculate(calculation_rows(prefix, meta, body.instrument, body.timeframe), spec,
-                               provisional=body.provisional)
+            prepared = calculation_rows(prefix, meta, body.instrument, body.timeframe,
+                                        infer_gaps=spec["name"] != "ROLLING_RANGE_SQUEEZE")
+            result = calculate(prepared, spec, provisional=body.provisional)
             execution.update(result_cache='miss', calculation_steps=len(prefix))
         from .indicator_state import IndicatorState
 
