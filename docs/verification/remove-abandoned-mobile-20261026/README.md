@@ -1,6 +1,6 @@
 # 撤出误集成的移动端工作区（2026-10-26）
 
-状态：代码修正完成，本地验证通过；Ubuntu Docker R1 尚未开始，受磁盘空间限制。未合回集成分支，未创建或推送 rc.4，未更新长期验收实例或生产。
+状态：撤出修正、本地验证及 Ubuntu Docker R1 已完成，交付候选为 `v1.29.0-rc.4`。长期验收实例、main 和生产未更新。Docker 构建源码为 `2f26a71e`；其后交付提交只补充本验收记录。
 
 ## 目标与范围
 
@@ -36,14 +36,34 @@
 - 新增专项以真实图表库加载桌面双图，分别验证 390×844 与 915×412 手机单图、H1/D1 切换、桌面草稿保持、布局/偏好/告警写请求为零、保存文档及 revision 不变，桌面重开仍为双图。
 - 代码范围、27 个路径与 rc.2 比对、bridge 保留差异、JS 语法及 git diff --check 通过；结果汇总见 [checks.json](checks.json)。
 
-浏览器测试使用本地源码、真实许可图表库及明确标注的合成 API/行情，不能替代 Docker R1 或真实 FXCM 上游认证。尚未构建 Docker 镜像、运行远程 CI 或更新任何现有实例。
+上述本地浏览器测试使用源码、真实许可图表库及合成 API/行情；下述 Docker R1 另行使用实际构建的 Web/API/Chart 与独立 PostgreSQL，业务响应未被浏览器替换。远程 CI、真实 FXCM 上游认证及通知投影/投递链不在本次验收结果中。
 
-## Docker R1 资源阻塞
+## Ubuntu Docker R1
 
-Ubuntu `quant-server`，根分区及 Docker 数据同分区。启动前只读检查可用空间约 11.7 GiB，仓库 `deploy/ubuntu/README.md` 的轻量 UI R1 门槛为至少 23 GiB；因此未创建 Docker task、镜像、容器、网络或 volume。
+- 实际主机：Ubuntu `quant-server`，本机 Docker；task/project 为 `mw-remove-mobile-20261026`。
+- 实际地址：Web `https://localhost:18865`，Chart `https://localhost:18866`。均只绑定 `127.0.0.1`，使用任务自签证书。
+- 五服务：PG 14.24、API、Web、Chart、Nginx 网关；无 worker。独立 internal 网络、edge 网络、`mw-remove-mobile-20261026_postgres-data` volume、`preview` 数据库和私有凭据，归属与镜像核验通过。
+- 镜像使用工作树构建工具、专用 BuildKit 顺序构建，源码 `2f26a71e`，dirty=false；三组件完整 image ID 见 [checks.json](checks.json)。共享工具和默认阈值未修改。
+- 首次受 23 GiB 磁盘门槛阻塞；用户随后明确批准“不受阀门限制，直接进行 docker r1 验收”。实际启动时可用磁盘 10.56 GiB、内存 7.48 GiB、5 分钟负载约 11.74。本任务私有启动脚本只对精确 task/project 的磁盘和负载预算门槛执行本次例外；保留内存、端口、镜像、网络/volume 归属和健康检查。
+- 数据为默认 `d1-v1-ef528135a493` 合成种子。其 Dukascopy EURUSD 不适用当前 managed 前端接口，因此改选已存在的 Binance `D1_BTCUSDT` 合成品种，只在本任务库启用它以完成告警 smoke，并把验收自选设为该合成品种。无真实供源凭据、不运行采集/通知 worker，不宣称上游数据或告警实际触发验证通过。
 
-计划任务/project：`mw-remove-mobile-20261026`。需要 PG + API + Web + Chart + 网关，不新增 worker，使用独立网络、数据库、volume 和凭据。候选回环端口 Web `18865`、Chart `18866`，启动前重新检查端口、内存、磁盘和项目冲突。配置使用本 worktree 的 `deploy/ubuntu/mw_docker.py` 和 `preview`，不复用其他任务的可写数据库。
+实际浏览器 R1 六组通过：登录及种子工作区读取；桌面双图保存到实际数据库并刷新恢复；原生告警创建、编辑和版本递增；390×844 与 915×412 手机只读单图及 M1/H1 切换；手机期间工作区文档/revision、偏好、告警、草稿不变；返回桌面仍恢复双图。页面异常 0、手机写入 0、未预期失败响应 0。截图确认手机只读提示、单图显示和移除后的入口状态。
 
-目前没有可访问的本任务 Docker 地址，也没有本任务启动/停止操作已执行。资源达到门槛后，用仓库工具按上述 task/project 构建三组件并 prepare/up，记录实际镜像、地址和启停命令；完成只读单图、桌面多图保存、告警交互和供源兼容 smoke。合成数据验证不能冒称真实 FXCM 上游取数通过；本次不新增上游性能认证。
+五服务 R1 不含通知投影 worker；通知观测/投影确认出现两条 404“尚待投影”，`notifications/runtime.ts` 已明确按 404 延后重试。此行为单独留证，不冒称全请求无 4xx 或通知链验收通过。首轮脚本旧登录按钮、通用种子不适用及上次工作区选择问题均留档，最终脚本修正后实际重跑通过。
 
-验收通过后再合回 `market-watch-integration-20261024`，创建并推送 `v1.29.0-rc.4`；现有 `v1.29.0-rc.3` 不移动。验收前如集成分支前进，先核对新增内容及兼容性，不 reset 或覆盖其他任务。长期验收实例如需更新应单独明确执行，不因本地分支修正自动换版。
+实例保持运行，保留所有任务数据。私有凭据不写入文档或 Git；完整日志、截图、脚本和脱敏运行清单位于 `/home/quant/repos/.reports/market-watch/20261026-remove-abandoned-mobile/docker-r1/`。
+
+从本修正工作树执行：
+
+```bash
+# 本次用户授权的资源门槛例外，严格限定本任务；保留数据重启。
+python3 /home/quant/repos/.reports/market-watch/20261026-remove-abandoned-mobile/docker-r1/preview-resource-exception.py preview up --task mw-remove-mobile-20261026 --project mw-remove-mobile-20261026
+# 只读状态。
+python3 deploy/ubuntu/mw_docker.py preview status --task mw-remove-mobile-20261026 --project mw-remove-mobile-20261026
+# 只停止本任务，保留数据库和 volume。
+python3 deploy/ubuntu/mw_docker.py preview stop --task mw-remove-mobile-20261026 --project mw-remove-mobile-20261026
+# 重跑实际浏览器 R1；读取私有凭据，只写本任务合成数据。
+node /home/quant/repos/.reports/market-watch/20261026-remove-abandoned-mobile/docker-r1/acceptance.cjs
+```
+
+交付分支为 `market-watch-integration-20261024`，下一候选 `v1.29.0-rc.4`；现有 rc.3 不移动。远端 tag 的实际 peeled commit 留在本机 `docker-r1/delivery.json`。不合并 main，不更新长期验收实例，不部署生产，不清理其他任务资源。
