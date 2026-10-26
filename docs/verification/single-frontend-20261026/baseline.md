@@ -18,7 +18,7 @@
 - 原 web origin：`mw.last-workspace.v1`；sessionStorage `mw.chart-return.v1`；工作区草稿 `mw-tv-draft:<id>`、`mw-tv-draft:v2:admin:<writer>:<id>`、`mw-tv-draft:v3:admin:<writer>:<id>`。v3 envelope `{draftVersion:3,version,at,baseRevision,document}`。
 - 偏好草稿 `mw-preference-draft:v1:admin:<writer>:<key>`，包含版本、操作、base、value；告警草稿 `mw-chart-alert-draft:<workspace>`。
 - 通知 IndexedDB `mw-professional-notices-v1`，声音 `mw.web-sound`，生命周期 `mw-notice-document-ended:<document>`；通知设置草稿 `mw.notifications-draft.v1`；主题 `mw.app-theme`。
-- 保存布局由 AdvancedWorkspace.document 持久化，原生投影 `_mwDrawingProjection`；保留 workspace/chart/drawing ID 与 association。宿主私有 origin 状态继续盘点，不搬动原应用 origin。
+- 保存布局由 AdvancedWorkspace.document 持久化，原生投影 `_mwDrawingProjection`；保留 workspace/chart/drawing ID 与 association。旧 bridge 不读写 localStorage/sessionStorage/IndexedDB，原生偏好/模板经父应用客户端保存；无需搬动原宿主私有持久状态，最终沿用原应用 origin。
 
 ## 必须保留
 
@@ -34,4 +34,4 @@ CI 入口 `.github/workflows/ci.yml`：后端 pytest+ops+changed Ruff、PG14.24 
 
 ## 当前进度
 
-本文件保留执行前盘点；当前实现与验收见 progress.md / results.md。未操作生产。
+本文件保留执行前盘点；当前实现与验收见 progress.md / completion-audit.md。未操作生产。
