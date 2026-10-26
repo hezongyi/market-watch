@@ -1,0 +1,97 @@
+Managed history frame capabilities, source-date visibility and valid fallback passed
+PASS one startup metadata deadline, cancellation, bounded concurrency and warm names
+Native hash identity casing passed
+Ten Python identities, colliding native MACD, versioned Supertrend, stale title and unknown identity passed
+PASS squeeze snapshot isolation, revision/origin fences and source alert defaults
+Provider subscription transport: ordered cancellation, shared stream, stale events and unmount passed
+Watchlist restore avoids empty native collection; retry and readonly passed
+native adapters: queued writes, namespaces, reload, conflict and readonly passed
+PASS multi-window preference merge, idempotence, conflict retention, bounded retries, deletion and opaque templates
+TAP version 13
+# Subtest: drag previews do not write; mouse up serializes successive versions
+ok 1 - drag previews do not write; mouse up serializes successive versions
+  ---
+  duration_ms: 86.352715
+  type: 'test'
+  ...
+# Subtest: timeout queries committed version; failures preserve position until explicit restore
+ok 2 - timeout queries committed version; failures preserve position until explicit restore
+  ---
+  duration_ms: 44.728932
+  type: 'test'
+  ...
+# Subtest: explicit removal pauses; symbol, interval and layout changes never pause
+ok 3 - explicit removal pauses; symbol, interval and layout changes never pause
+  ---
+  duration_ms: 72.836011
+  type: 'test'
+  ...
+# Subtest: source changes fence drawing edits and menu contexts are captured at open
+ok 4 - source changes fence drawing edits and menu contexts are captured at open
+  ---
+  duration_ms: 24.084138
+  type: 'test'
+  ...
+# Subtest: style changes preserve the rule when serialized geometry order or price formatting differs
+ok 5 - style changes preserve the rule when serialized geometry order or price formatting differs
+  ---
+  duration_ms: 36.741407
+  type: 'test'
+  ...
+# Subtest: native history events submit restored geometry without resuming a paused alert
+ok 6 - native history events submit restored geometry without resuming a paused alert
+  ---
+  duration_ms: 76.24401
+  type: 'test'
+  ...
+# Subtest: price-axis presentation changes cannot silently replace the saved coordinate system
+ok 7 - price-axis presentation changes cannot silently replace the saved coordinate system
+  ---
+  duration_ms: 49.274898
+  type: 'test'
+  ...
+# Subtest: visible create paths explain loading and unresolved metadata
+ok 8 - visible create paths explain loading and unresolved metadata
+  ---
+  duration_ms: 3.069864
+  type: 'test'
+  ...
+# Subtest: squeeze alert captures calculation parameters and boolean, excluding display colors
+ok 9 - squeeze alert captures calculation parameters and boolean, excluding display colors
+  ---
+  duration_ms: 2.285156
+  type: 'test'
+  ...
+# Subtest: price-axis plus opens selection; only its alert action creates at captured display price
+ok 10 - price-axis plus opens selection; only its alert action creates at captured display price
+  ---
+  duration_ms: 9.764747
+  type: 'test'
+  ...
+# Subtest: price-axis plus rejects invalid price, loading, missing metadata and readonly charts
+ok 11 - price-axis plus rejects invalid price, loading, missing metadata and readonly charts
+  ---
+  duration_ms: 18.989218
+  type: 'test'
+  ...
+# Subtest: dismissed plus menus never create or affect an ordinary menu
+ok 12 - dismissed plus menus never create or affect an ordinary menu
+  ---
+  duration_ms: 1.788569
+  type: 'test'
+  ...
+# Subtest: plus selection rejects changed chart and missing/invalid captured price
+ok 13 - plus selection rejects changed chart and missing/invalid captured price
+  ---
+  duration_ms: 35.581491
+  type: 'test'
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 612.437608

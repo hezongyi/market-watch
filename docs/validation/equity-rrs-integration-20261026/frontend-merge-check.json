@@ -1,0 +1,55 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "command": "node tests/history-mode-frames.cjs",
+      "exit_code": 0,
+      "seconds": 0.17
+    },
+    {
+      "command": "node tests/advanced-watchlist-prewarm.cjs",
+      "exit_code": 0,
+      "seconds": 0.51
+    },
+    {
+      "command": "node tests/fxcm-series.cjs",
+      "exit_code": 0,
+      "seconds": 0.19
+    },
+    {
+      "command": "node tests/native-indicator-identity.cjs",
+      "exit_code": 0,
+      "seconds": 0.22
+    },
+    {
+      "command": "node tests/squeeze-contract.cjs",
+      "exit_code": 0,
+      "seconds": 0.46
+    },
+    {
+      "command": "node tests/advanced-provider-subscriptions.cjs",
+      "exit_code": 0,
+      "seconds": 1.44
+    },
+    {
+      "command": "node tests/advanced-watchlists.cjs",
+      "exit_code": 0,
+      "seconds": 0.45
+    },
+    {
+      "command": "node tests/advanced-preferences.cjs",
+      "exit_code": 0,
+      "seconds": 0.12
+    },
+    {
+      "command": "node tests/advanced-preferences-conflict.cjs",
+      "exit_code": 0,
+      "seconds": 0.16
+    },
+    {
+      "command": "node --test tests/chart-alerts-bridge.test.cjs",
+      "exit_code": 0,
+      "seconds": 0.73
+    }
+  ]
+}
