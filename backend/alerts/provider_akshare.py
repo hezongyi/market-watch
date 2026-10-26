@@ -8,7 +8,7 @@ import subprocess
 import sys
 import time
 from datetime import UTC, datetime
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from zoneinfo import ZoneInfo
 
 from .config import settings
@@ -23,7 +23,8 @@ from .market_contracts import (
 )
 from .storage import now_ms
 
-RULES = "akshare-1.19.3-source-label-v1"
+LEGACY_RULES = "akshare-1.19.3-source-label-v1"
+RULES = "akshare-1.19.3-source-label-hk-precision-v2"
 MINUTES = {"M1": "1", "M5": "5", "M15": "15", "M30": "30", "H1": "60"}
 PERIODS = {"D1": "daily", "W1": "weekly", "MN": "monthly"}
 EXCHANGES = {"SSE", "SZSE", "BSE", "HKEX", "SHFE", "DCE", "CZCE", "CFFEX", "INE", "GFEX"}
@@ -35,7 +36,7 @@ class AKShareRequestError(MarketRequestError):
         self.error_type = error_type if re.fullmatch(r"[A-Za-z0-9_]{1,80}", error_type) else "Unknown"
 
 
-def symbol_rules(symbol):
+def symbol_rules(symbol, source_family=None):
     exchange, _, code = symbol.partition(":")
     if exchange not in EXCHANGES:
         raise ValueError("AKShare 品种需要明确交易所")
@@ -45,6 +46,11 @@ def symbol_rules(symbol):
     elif exchange in ("SSE", "SZSE", "BSE"):
         valid = re.fullmatch(r"\d{6}", code)
         family, timezone, unit, close = "eastmoney-a", "Asia/Shanghai", "lots", 15 * 60 + 10
+        if source_family in ("sina-a", "tencent-a"):
+            if exchange == "BSE":
+                raise ValueError("新浪/腾讯 A 股接口当前仅接入沪深市场")
+            family = source_family
+            unit = "shares" if family == "sina-a" else "lots"
     else:
         valid = re.fullmatch(r"[A-Z]{1,3}\d{1,4}", code)
         family, timezone, unit, close = "sina-futures", "Asia/Shanghai", "contracts", 15 * 60 + 30
@@ -55,8 +61,8 @@ def symbol_rules(symbol):
         "trading_date_rule": "supplier-trading-date-v1", "session": family + "-regular"}
 
 
-def endpoint(symbol, frame, adjustment="none"):
-    info = symbol_rules(symbol)
+def endpoint(symbol, frame, adjustment="none", source_family=None):
+    info = symbol_rules(symbol, source_family)
     daily = frame in PERIODS
     if adjustment not in ("none", "qfq", "hfq"):
         raise ValueError("AKShare 不支持此复权口径")
@@ -70,6 +76,14 @@ def endpoint(symbol, frame, adjustment="none"):
         if adjustment != "none" or daily and frame != "D1":
             raise ValueError("期货原生接口只提供 D1 和已接入的小周期，不提供原生周月线")
         return "futures_zh_daily_sina" if daily else "futures_zh_minute_sina"
+    if info["source_family"] == "sina-a":
+        if frame != "D1":
+            raise ValueError("新浪 A 股接口只提供 D1")
+        return "stock_zh_a_daily"
+    if info["source_family"] == "tencent-a":
+        if frame != "D1":
+            raise ValueError("腾讯 A 股接口只提供 D1")
+        return "stock_zh_a_hist_tx"
     if frame == "M1" and adjustment != "none":
         raise ValueError("M1 接口不支持复权")
     prefix = "stock_hk_hist" if info["exchange"] == "HKEX" else "stock_zh_a_hist"
@@ -78,8 +92,8 @@ def endpoint(symbol, frame, adjustment="none"):
 
 def collection_identity(parent, frame):
     parent = DatasetIdentity.model_validate(parent)
-    info = symbol_rules(parent.provider_symbol)
-    name = endpoint(parent.provider_symbol, frame, parent.adjustment)
+    info = symbol_rules(parent.provider_symbol, parent.source_family)
+    name = endpoint(parent.provider_symbol, frame, parent.adjustment, parent.source_family)
     if parent.source_family != info["source_family"] or parent.trading_date_rule != info["trading_date_rule"]:
         raise ValueError("AKShare 已固定的来源或交易日规则不匹配")
     return SourceIdentity(**{key: getattr(parent, key) for key in (
@@ -131,10 +145,21 @@ def invoke(endpoint_name, parameters, *, deadline=None):
 
 
 def request_parameters(source, start, end):
-    frame, info = source.parameters["timeframe"], symbol_rules(source.provider_symbol)
+    frame, info = source.parameters["timeframe"], symbol_rules(
+        source.provider_symbol, source.parameters["source_family"])
     values = {"symbol": info["code"]}
-    if info["source_family"] == "sina-hk":
+    if info["source_family"] in ("sina-hk", "sina-a"):
         values["adjust"] = "" if source.parameters["adjustment"] == "none" else source.parameters["adjustment"]
+        if info["source_family"] == "sina-a":
+            values["symbol"] = ("sh" if info["exchange"] == "SSE" else "sz") + info["code"]
+        return values
+    if info["source_family"] == "tencent-a":
+        zone = ZoneInfo(info["timezone"])
+        left = datetime.fromtimestamp(start / 1000, UTC).astimezone(zone)
+        right = datetime.fromtimestamp(end / 1000, UTC).astimezone(zone)
+        values.update(symbol=("sh" if info["exchange"] == "SSE" else "sz") + info["code"],
+            adjust="" if source.parameters["adjustment"] == "none" else source.parameters["adjustment"],
+            start_date=left.strftime("%Y%m%d"), end_date=right.strftime("%Y%m%d"))
         return values
     if info["source_family"] == "sina-futures":
         if frame in MINUTES:
@@ -151,7 +176,8 @@ def request_parameters(source, start, end):
 
 
 def parse_records(source, records, *, start, end, observed_at):
-    frame, info = source.parameters["timeframe"], symbol_rules(source.provider_symbol)
+    frame, info = source.parameters["timeframe"], symbol_rules(
+        source.provider_symbol, source.parameters["source_family"])
     zone = ZoneInfo(info["timezone"])
     normalized = []
     for record in records:
@@ -182,8 +208,22 @@ def parse_records(source, records, *, start, end, observed_at):
             if values[key] is None:
                 raise ValueError("AKShare OHLC 缺失")
             values[key] = str(Decimal(values[key]))
+        evidence = {}
+        if info["source_family"] == "sina-hk" and source.parameters["rules"] == RULES:
+            # Sina's HK decoder emits occasional 0.00001 dust beyond an OHLC
+            # extreme. Canonicalize only that verified precision defect, keep
+            # the exact SDK values alongside it, and reject larger anomalies.
+            prices = {key: Decimal(values[key]) for key in ("open", "high", "low", "close")}
+            upper, lower = max(prices["open"], prices["close"]), min(prices["open"], prices["close"])
+            if prices["high"] < upper or prices["low"] > lower:
+                rounded = {key: price.quantize(Decimal("0.0001")) for key, price in prices.items()}
+                dust = max(upper - prices["high"], prices["low"] - lower)
+                if dust <= Decimal("0.00001") and rounded["high"] >= max(rounded["open"], rounded["close"]) and rounded["low"] <= min(rounded["open"], rounded["close"]):
+                    evidence = {"source_ohlc": {key: values[key] for key in prices},
+                                "price_normalization": "sina-hk-decoder-dust-4dp-v1"}
+                    values.update({key: format(price, "f") for key, price in rounded.items()})
         values["volume"] = str(Decimal(values["volume"])) if values["volume"] is not None else None
-        normalized.append({"timeframe": frame, "start": left, "end": right, **values,
+        normalized.append({"timeframe": frame, "start": left, "end": right, **values, **evidence,
             "source_label": label, "trading_date": trading_date, "complete": False,
             "confirmation": "unconfirmed"})
     normalized.sort(key=lambda row: row["start"])
@@ -203,17 +243,64 @@ def parse_records(source, records, *, start, end, observed_at):
     return tuple(NativeBarRow.model_validate(row) for row in normalized)
 
 
+def parse_sina_factors(records, rows):
+    """Attach the effective event factor to raw daily rows without changing OHLC."""
+    events = {}
+    for record in records:
+        label = record.get("date") or record.get("日期")
+        value = record.get("qfq_factor")
+        if not label or value is None:
+            raise ValueError("新浪前复权因子字段缺失")
+        day = str(label)[:10]
+        datetime.strptime(day, "%Y-%m-%d")
+        try:
+            factor = Decimal(str(value))
+        except InvalidOperation:
+            raise ValueError("新浪前复权因子不是数值") from None
+        if not factor.is_finite() or factor <= 0 or day in events and events[day] != factor:
+            raise ValueError("新浪前复权因子无效或日期冲突")
+        events[day] = factor
+    events = sorted(events.items())
+    if not events:
+        raise ValueError("新浪未返回有效前复权因子")
+    output = []
+    for row in rows:
+        day = row.trading_date
+        applicable = [factor for event_day, factor in events if event_day <= day]
+        if not applicable:
+            raise ValueError("新浪前复权因子未覆盖行情日期")
+        value = format(applicable[-1], "f")
+        output.append(row.model_copy(update={"adjustment_basis": {
+            "kind": "sina_qfq_factor", "value": value, "effective_date": max(
+                event_day for event_day, factor in events if event_day <= day),
+            "rule": "sina-factor-forward-v1"}}))
+    return tuple(output)
+
+
 class AKShareHistory:
     def native_page(self, identity, start, end, *, deadline=None):
         identity = SourceIdentity.model_validate(identity)
         frame = identity.parameters["timeframe"]
-        expected = endpoint(identity.provider_symbol, frame, identity.parameters["adjustment"])
-        if identity.parameters["endpoint"] != expected or identity.parameters["rules"] != RULES:
+        expected = endpoint(identity.provider_symbol, frame, identity.parameters["adjustment"],
+                            identity.parameters["source_family"])
+        if identity.parameters["endpoint"] != expected or identity.parameters["rules"] not in (LEGACY_RULES, RULES):
             raise ValueError("AKShare endpoint rules differ from the fixed acquisition identity")
         records = invoke(expected, request_parameters(identity, start, end), deadline=deadline)
         observed = now_ms()
         rows = parse_records(identity, records, start=start, end=end, observed_at=observed)
-        info = symbol_rules(identity.provider_symbol)
+        if frame == "D1" and identity.parameters["adjustment"] == "none" and identity.parameters["source_family"] in ("sina-a", "sina-hk"):
+            info = symbol_rules(identity.provider_symbol, identity.parameters["source_family"])
+            factor_endpoint = "stock_zh_a_daily" if info["source_family"] == "sina-a" else "stock_hk_daily"
+            factor_symbol = (("sh" if info["exchange"] == "SSE" else "sz") + info["code"]
+                             if info["source_family"] == "sina-a" else info["code"])
+            try:
+                factors = invoke(factor_endpoint, {"symbol": factor_symbol, "adjust": "qfq-factor"}, deadline=deadline)
+                rows = parse_sina_factors(factors, rows)
+            except (MarketRequestError, ValueError, TimeoutError):
+                # Preserve valid raw observations. The qfq artifact refuses
+                # rows without a valid basis, with a visible unavailable state.
+                pass
+        info = symbol_rules(identity.provider_symbol, identity.parameters["source_family"])
         return NativeCandleBatch(identity=identity, timeframe=frame, window_start=start,
             window_end=end, checkpoint=end, observed_at=observed,
             rows=rows, result=RequestResult(status="data" if rows else "empty_success"),
@@ -232,6 +319,15 @@ def platform_page(meta, frame, before, count, *, deadline=None):
         raise ValueError("此品种尚未验证所选原生周期")
     parent = dataset_identity("akshare", meta["symbol"], "native_periods", "none")
     source = collection_identity(parent, frame)
+    if meta["source_family"] == "tencent-a":
+        parameters = {**source.parameters, "source_family": "tencent-a",
+            "endpoint": endpoint(meta["symbol"], frame, "qfq", "tencent-a"),
+            "adjustment": "qfq", "session": "tencent-a-regular"}
+        source = source.model_copy(update={"parameters": parameters})
+    if meta["source_family"] in ("sina-a", "sina-hk"):
+        parameters = {**source.parameters, "adjustment": "qfq",
+            "endpoint": endpoint(meta["symbol"], frame, "qfq", source.parameters["source_family"])}
+        source = source.model_copy(update={"parameters": parameters})
     observed = now_ms()
     right = min(before, observed)
     if frame in PERIODS:
@@ -250,7 +346,7 @@ def platform_page(meta, frame, before, count, *, deadline=None):
             for row in batch.rows if row.start < before]
     visible = bars[-count:]
     return {"bars": visible, "has_more": bool(bars), "history_boundary": False,
-        "coverage": [[visible[0]["chart_time"], right]] if visible else [],
+        "coverage": [[visible[0]["chart_time"], min(before, observed)]] if visible else [],
         "availability": "observed_window", "series_kind": "provider", "basis": "last",
         "calendar": "source_date", "precision": meta["precision"], "indicators": [],
         "volume_kind": "quantity", "volume_unit": meta["volume_unit"], "as_of": batch.observed_at}

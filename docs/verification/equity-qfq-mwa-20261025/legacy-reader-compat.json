@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "old_source_commit": "7fc4fbb84e613e12e4540d7582ea78d137bfcdbd",
+  "scope": "Unmodified old and current Python readers on restored application database, legacy M1 fixed version only",
+  "same_legacy_identity_raw_and_chart_values": true,
+  "readers": {
+    "old": {
+      "dataset_id": "e3aaae7f238e6a55ca937c1d01b1225c1ccf2b6c6225f18744d11fd73b5436d3",
+      "version_id": "03259003-c7b0-4cfc-8c2b-2f23a60215c6",
+      "identity_key_unchanged": true,
+      "version_checksum": "951e2b763298906bffc0d969618d52e3bdf44d55c0558a12dee0d3728b053049",
+      "sample_raw_rows": 256,
+      "sample_raw_sha256": "660ec81e77cc3e9565796c043591db4ffe5e992d439602b8e7360d1367ce24c0",
+      "m1_chart_rows": 100,
+      "m1_chart_sha256": "697f22df64cd131c8a32e680f6102842ccb0ffab4b240ccaa9f5907942d5571e",
+      "accepts_new_mode_identity": false,
+      "sql_statement_classes": [
+        "SELECT"
+      ],
+      "mutating_statements": 0,
+      "database": "application_restore",
+      "transaction_rolled_back": true
+    },
+    "current": {
+      "dataset_id": "e3aaae7f238e6a55ca937c1d01b1225c1ccf2b6c6225f18744d11fd73b5436d3",
+      "version_id": "03259003-c7b0-4cfc-8c2b-2f23a60215c6",
+      "identity_key_unchanged": true,
+      "version_checksum": "951e2b763298906bffc0d969618d52e3bdf44d55c0558a12dee0d3728b053049",
+      "sample_raw_rows": 256,
+      "sample_raw_sha256": "660ec81e77cc3e9565796c043591db4ffe5e992d439602b8e7360d1367ce24c0",
+      "m1_chart_rows": 100,
+      "m1_chart_sha256": "697f22df64cd131c8a32e680f6102842ccb0ffab4b240ccaa9f5907942d5571e",
+      "accepts_new_mode_identity": true,
+      "sql_statement_classes": [
+        "SELECT"
+      ],
+      "mutating_statements": 0,
+      "database": "application_restore",
+      "transaction_rolled_back": true
+    }
+  },
+  "limits": [
+    "No writable old-binary rollback or worker execution was tested",
+    "Old binary rejects new-mode dataset identities; do not run old workers to maintain new-mode or qfq-v2 tasks"
+  ],
+  "live_mwa_modified": false,
+  "database_writes": false
+}

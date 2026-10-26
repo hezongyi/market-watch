@@ -43,6 +43,8 @@ def entries(db, *, query="", source=None, asset=None):
             continue
         items[key] = {"id": "OANDA:" + row.symbol if scoped else row.id,
             "source": row.source, "provider_symbol": row.symbol, "label": row.label, "asset_type": row.asset_type,
+            **({"provider_name": "新浪 (AKShare)"} if row.source == "akshare" and
+               row.metadata_json.get("source_family") in ("eastmoney-a", "sina-a", "sina-hk") else {}),
             "asset_class": {"EQUITY":"equity","STOCK":"equity","ETF":"etf","FUND":"etf","FUTURE":"future","FUTURES":"future","CRYPTO":"crypto"}.get(row.asset_type,asset_class(row.asset_type, row.symbol)), "precision": row.precision,
             "history_precision": row.precision, "precision_status": "source_catalog",
             "available": row.available and (row.source != "yahoo" or settings.yahoo_enabled)
@@ -53,6 +55,15 @@ def entries(db, *, query="", source=None, asset=None):
             "verified_frames": row.metadata_json.get("verified_frames", row.metadata_json.get("archive_verified_frames", {})),
             "logical_symbol": (None if row.source not in ("akshare", "yahoo") else
                 logical_symbol(row.source, row.symbol))}
+        if row.source == "akshare" and row.symbol.startswith(("SSE:", "SZSE:", "HKEX:")):
+            items[key]["capabilities"] = {**items[key]["capabilities"], "native_periods": ["D1"]}
+        if row.source == "akshare" and row.symbol.startswith(("SSE:", "SZSE:")):
+            tencent_id = "TENCENT:" + row.symbol
+            items[("akshare-tencent", row.symbol)] = {**items[key], "id": tencent_id,
+                "label": row.label + " · 腾讯", "provider_name": "腾讯 (AKShare)",
+                "logical_symbol": None,
+                "capabilities": {**items[key]["capabilities"], "native_periods": ["D1"],
+                    "supported_modes": []}}
     # Bootstrap/legacy native identities live in instruments, before a source
     # catalog refresh. Retain those IDs so listing and chart resolution agree.
     for row in db.scalars(select(Instrument).where(Instrument.source.in_(("oanda", "binance") if not source else (source,) if source in ("oanda", "binance") else ()),

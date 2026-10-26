@@ -1,0 +1,50 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "dataset_id": "d8e0b67e3c79085fc3dfdee42e3276df2e01a502082e4553906b7a090b66b28e",
+      "version_id": "4c5f2cb9-d7b6-44e3-9b2c-91f1ccd29170",
+      "symbol": "SZSE:000001",
+      "family": "sina-a",
+      "raw_adjustment": "none",
+      "rows": 678,
+      "changed_close_rows": 662,
+      "source_ohlc_retained_rows": 0,
+      "basis_kinds": [
+        "sina_qfq_factor"
+      ],
+      "qfq_rule": "source-trading-date-artifact-qfq-v2",
+      "passed": true
+    },
+    {
+      "dataset_id": "6753849330d397aa9c9967f23df41612353c8377eed8c1702ad75a1405427631",
+      "version_id": "a0f00e6e-b3ae-466d-abb0-1f27358da78d",
+      "symbol": "HKEX:00700",
+      "family": "sina-hk",
+      "raw_adjustment": "none",
+      "rows": 691,
+      "changed_close_rows": 580,
+      "source_ohlc_retained_rows": 7,
+      "basis_kinds": [
+        "sina_qfq_factor"
+      ],
+      "qfq_rule": "source-trading-date-artifact-qfq-v2",
+      "passed": true
+    },
+    {
+      "dataset_id": "1de909844cec998226e338b48542e7d9b4176b4a7016065426488f77a8d9c72c",
+      "version_id": "731e970b-5166-4d7e-a521-b707784c7e50",
+      "symbol": "AAPL",
+      "family": "yfinance",
+      "raw_adjustment": "none",
+      "rows": 706,
+      "changed_close_rows": 652,
+      "source_ohlc_retained_rows": 0,
+      "basis_kinds": [
+        "yahoo_adj_close_ratio"
+      ],
+      "qfq_rule": "source-trading-date-artifact-qfq-v2",
+      "passed": true
+    }
+  ]
+}

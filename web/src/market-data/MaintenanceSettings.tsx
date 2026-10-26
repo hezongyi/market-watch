@@ -2,7 +2,8 @@ import { NativeInput, NativeSelect } from "./NativeControls";
 import { useRef, useState } from "react";
 import { useDirtyForm, useActionLock } from "./router";
 import { api, ApiError } from "./api";
-import { frames, time, type Dataset, type Plan } from "./types";
+import { frames, time, type Dataset, type Plan, type FrameRule } from "./types";
+import { FrameSchedules, editableFramePlan } from "./FrameSchedules";
 
 function tradingDate(start: number, calendar: string) {
   const date = new Intl.DateTimeFormat("en-CA", {
@@ -23,6 +24,9 @@ export function MaintenanceSettings({
   onSaved: () => void;
 }) {
   const plan = dataset.maintenance;
+  const mode = dataset.identity.mode || "base_m1", native = mode !== "base_m1";
+  const availableFrames = mode === "base_d1" ? ["D1", "W1", "MN"] : native ? frames.filter(frame => (dataset.selectable_timeframes || dataset.input_timeframes || plan.timeframes).includes(frame)) : frames;
+  const [framePlan, setFramePlan] = useState<Record<string, FrameRule>>(plan.frame_plan || {});
   const [day, setDay] = useState(
     plan.configured
       ? tradingDate(plan.target_start, dataset.aggregation_calendar)
@@ -39,7 +43,7 @@ export function MaintenanceSettings({
     [error, setError] = useState(""),
     [notice, setNotice] = useState("");
   const [saved, setSaved] = useState(0);
-  useDirtyForm("maintenance-settings", [day, periods, frequency, timezone, clock, overlap], saved);
+  useDirtyForm("maintenance-settings", [day, periods, frequency, timezone, clock, overlap, framePlan], saved);
   const revision = useRef(plan.configuration_revision);
   const actionLock = useActionLock();
   const [conflict, setConflict] = useState<Plan | null>(null);
@@ -51,6 +55,7 @@ export function MaintenanceSettings({
     setTimezone(conflict.timezone || "UTC");
     setClock(`${String(Math.floor((conflict.daily_minute ?? 15) / 60)).padStart(2, "0")}:${String((conflict.daily_minute ?? 15) % 60).padStart(2, "0")}`);
     setOverlap(conflict.overlap_minutes ?? 2880);
+    setFramePlan(conflict.frame_plan || {});
     revision.current = conflict.configuration_revision;
     setConflict(null); setError("");
     setNotice("已载入最新维护设置，请核对后保存。");
@@ -74,11 +79,12 @@ export function MaintenanceSettings({
         timezone,
         daily_minute: hour * 60 + minute,
         overlap_minutes: overlap,
+        ...(native ? {frame_plan: editableFramePlan(framePlan, mode === "base_d1" ? ["D1"] : periods)} : {}),
       });
       revision.current = saved.configuration_revision;
       setConflict(null);
       setNotice(
-        "维护配置已保存；新增周期将在后台派生。已有运行任务保留原固定范围。",
+        native ? "维护配置已保存，后续任务按所选周期执行；已有任务保留固定范围。" : "维护配置已保存；新增周期将在后台派生。已有运行任务保留原固定范围。",
       );
       setSaved(value => value + 1);
       onSaved();
@@ -112,11 +118,11 @@ export function MaintenanceSettings({
       <fieldset>
         <legend>维护周期</legend>
         <div className="dc-checks">
-          {frames.map((frame) => (
+          {availableFrames.map((frame) => (
             <label key={frame}>
               <NativeInput
                 type="checkbox"
-                disabled={frame === "M1"}
+                disabled={!native && frame === "M1"}
                 checked={periods.includes(frame)}
                 onChange={(e) =>
                   setPeriods(
@@ -163,6 +169,8 @@ export function MaintenanceSettings({
           </label>
         </div>
       )}
+      {native && frequency === "daily" && <FrameSchedules frames={mode === "base_d1" ? ["D1"] : periods} value={framePlan} change={setFramePlan}/>}
+      {!native && <>
       <details className="dc-advanced-fields"><summary>高级维护设置</summary>
         <label>
           重叠复查窗口（分钟）
@@ -176,6 +184,7 @@ export function MaintenanceSettings({
         </label>
         <p>有限窗口用于检查近期修订；更早区间可单独提交补数或复查。</p>
       </details>
+      </>}
       </fieldset>
       {error && (
         <p role="alert" className="error">

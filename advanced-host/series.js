@@ -21,7 +21,7 @@ const MWSeries = (() => {
     }
     const series_kind = ticker.startsWith(prefix) ? "provider" : "managed";
     let symbol = series_kind === "provider" ? ticker.slice(prefix.length) : ticker;
-    if (/^(YAHOO|DUKA|NATIVE|FXCM):[A-Fa-f0-9]{32}$/.test(symbol)) {
+    if (/^(YAHOO|AKSHARE|DUKA|NATIVE|FXCM):[A-Fa-f0-9]{32}$/.test(symbol)) {
       const parts=symbol.split(":");symbol=parts[0]+":"+parts[1].toLowerCase();
     }
     if (!/^[A-Za-z0-9:_-]{1,40}$/.test(symbol)) throw Error("无效品种标识");

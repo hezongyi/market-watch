@@ -228,9 +228,14 @@ def artifact_tick(version_id=None):
         dataset = db.get(MarketDataset, version.dataset_id)
         instrument = db.get(Instrument, dataset.instrument_id)
         if dataset.identity.get("identity_version", 1) == 2:
-            from .history_mode_artifacts import artifact_step
+            from .history_mode_artifacts import QfqUnavailable, artifact_step
 
-            artifact_step(db, artifact, version, dataset, instrument)
+            try:
+                artifact_step(db, artifact, version, dataset, instrument)
+            except QfqUnavailable as error:
+                artifact.status, artifact.updated_at = "unavailable", now_ms()
+                artifact.manifest = {**artifact.manifest, "adjustment_view": "unavailable",
+                    "error": str(error), "raw_preserved": True}
             db.flush()
             from .history_maintenance import finish_run
 
@@ -414,4 +419,6 @@ def chart_page(db, version_id, frame, *, before=None, count=2000):
     artifact = published_artifact(db, version_id, frame)
     return {"version_id": version_id, "timeframe": frame, "bars": bars,
             "next_before": bars[0]["start"] if more else None,
-            "rule_version": artifact.rule_version}
+            "rule_version": artifact.rule_version,
+            "adjustment_view": artifact.manifest.get("adjustment_view", "raw"),
+            "adjustment_rule": artifact.manifest.get("adjustment_rule")}

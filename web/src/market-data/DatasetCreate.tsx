@@ -8,7 +8,8 @@ import { NativeInput, NativeSelect } from "./NativeControls";
 import { centerReturn } from "./navigation";
 import { Link, useSearchParams, useDirtyForm, useActionLock } from "./router";
 import { api, ApiError } from "./api";
-import { frames, names, phase, time, type Dataset } from "./types";
+import { frames, names, phase, time, modeNames, type Dataset, type FrameRule } from "./types";
+import { FrameSchedules, editableFramePlan } from "./FrameSchedules";
 import { OpenChart } from "./OpenChart";
 
 type Check = {
@@ -41,7 +42,7 @@ const defaults: Record<string, string> = {
 };
 export function DatasetCreate() {
   const [params] = useSearchParams();
-  const initialSource = ["dukascopy", "oanda", "fxcm"].includes(
+  const initialSource = ["dukascopy", "oanda", "fxcm", "yahoo", "akshare"].includes(
     params.get("source") || "",
   )
     ? params.get("source")!
@@ -63,6 +64,12 @@ export function DatasetCreate() {
   const [day, setDay] = useState(""),
     [periods, setPeriods] = useState(["M1", "H4", "D1"]),
     [frequency, setFrequency] = useState("daily");
+  const [mode, setMode] = useState("base_m1"), [adjustment, setAdjustment] = useState("none");
+  const [verified, setVerified] = useState<Record<string, string[]>>({}), [probing, setProbing] = useState(false);
+  const [framePlan, setFramePlan] = useState<Record<string, FrameRule>>({});
+  const native = mode !== "base_m1";
+  const allowedFrames = native ? (mode === "base_d1" ? ((verified[adjustment] || []).includes("D1") ? ["D1", "W1", "MN"] : []) : frames.filter(frame => (verified[adjustment] || []).includes(frame))) : frames;
+  const inputFrames = mode === "base_d1" ? ["D1"] : periods;
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -91,6 +98,7 @@ export function DatasetCreate() {
     asset_class: asset,
     precision: /^(?:[0-9]|10)$/.test(precision) ? Number(precision) : null,
     aggregation_calendar: calendar || null,
+    ...(native ? {mode, adjustment, timeframes: periods} : {}),
     ...(selected ? { catalog_id: selected.catalog_id } : {}),
   };
   const signature = JSON.stringify({ ...dataset, start_date: day || null }),
@@ -113,6 +121,7 @@ export function DatasetCreate() {
       day,
       periods,
       frequency,
+      mode, adjustment, framePlan,
     ],
     result ? "saved" : "draft",
   );
@@ -123,6 +132,14 @@ export function DatasetCreate() {
     setLogical(item.logical_symbol);
     setAsset(item.asset_class);
     setCalendar(defaults[item.asset_class] || "");
+    const modern = ["yahoo", "akshare"].includes(item.source);
+    const nextMode = item.default_mode || (modern ? "base_d1" : "base_m1");
+    setMode(nextMode); setAdjustment("none"); setVerified(item.verified_frames || {}); setFramePlan({});
+    if (modern) {
+      setCalendar("source_date"); setDay(item.default_start_date || (item.source === "akshare" && item.provider_symbol.startsWith("HKEX:") ? "" : "2000-01-01"));
+      const available = item.verified_frames?.none || [];
+      setPeriods(nextMode === "base_d1" ? (available.includes("D1") ? ["D1", "W1", "MN"] : []) : frames.filter(frame => available.includes(frame)));
+    } else setPeriods(["M1", "H4", "D1"]);
     setPrecision(item.precision == null ? "" : String(item.precision));
     setError("");
     setFieldErrors({});
@@ -165,7 +182,7 @@ export function DatasetCreate() {
       !symbol ||
       !calendar ||
       !/^[A-Z0-9]{1,10}$/.test(logical) ||
-      !/^[A-Za-z0-9/_.-]{1,64}$/.test(symbol)
+      !/^[A-Za-z0-9/_.:^=-]{1,64}$/.test(symbol)
     ) {
       setChecking(false);
       return;
@@ -231,12 +248,13 @@ export function DatasetCreate() {
     const fields: Record<string, string> = {};
     if (!/^[A-Z0-9]{1,10}$/.test(logical))
       fields["create-logical"] = "填写 1–10 位大写字母或数字的品种标识。";
-    if (!/^[A-Za-z0-9/_.-]{1,64}$/.test(symbol))
+    if (!/^[A-Za-z0-9/_.:^=-]{1,64}$/.test(symbol))
       fields["create-symbol"] = "填写准确来源代码。";
     if (!/^(?:[0-9]|10)$/.test(precision))
       fields["create-precision"] = "请确认 0–10 位的价格精度。";
     if (!day) fields["create-day"] = "选择起始交易日期。";
     if (!calendar) fields["create-calendar"] = "明确选择日线划分规则。";
+    if (!periods.length) fields["create-mode"] = "请先验证来源能力并选择至少一个周期。";
     if (Object.keys(fields).length) {
       fail("请补全以下字段。", fields);
       return false;
@@ -244,6 +262,7 @@ export function DatasetCreate() {
     return true;
   }
   async function submit() {
+    if (probing) return;
     if (
       !uncertain &&
       (!validate() ||
@@ -264,13 +283,14 @@ export function DatasetCreate() {
         target_start: currentCheck!.start,
         timeframes: periods,
         frequency,
-        timezone: "UTC",
-        daily_minute: 15,
+        timezone: native ? selected?.timezone || "UTC" : "UTC",
+        daily_minute: native ? 18 * 60 : 15,
+        ...(native ? {frame_plan: editableFramePlan(framePlan, inputFrames)} : {}),
       },
     };
     const lookup = () =>
       api<{ found: boolean; dataset?: Dataset; task?: Result["task"] }>(
-        `/market-data/center/creations/${body.request_id}?${new URLSearchParams({ source: body.dataset.source, provider_symbol: body.dataset.provider_symbol, asset_class: body.dataset.asset_class, aggregation_calendar: body.dataset.aggregation_calendar })}`,
+        `/market-data/center/creations/${body.request_id}?${new URLSearchParams({ source: body.dataset.source, provider_symbol: body.dataset.provider_symbol, asset_class: body.dataset.asset_class, aggregation_calendar: body.dataset.aggregation_calendar, mode: body.dataset.mode || "base_m1", adjustment: body.dataset.adjustment || "none" })}`,
       );
     const reconcile = async () => {
       const known = await lookup();
@@ -314,6 +334,7 @@ export function DatasetCreate() {
     }
   }
   function manualMode() {
+    setMode("base_m1"); setAdjustment("none"); setCalendar("ny17"); setSource("dukascopy");
     setManual(true);
     setSelected(null);
     setSymbol("");
@@ -336,6 +357,7 @@ export function DatasetCreate() {
     setDay("");
     setPeriods(["M1", "H4", "D1"]);
     setFrequency("daily");
+    setMode("base_m1"); setAdjustment("none"); setFramePlan({}); setVerified({});
     setError("");
     setFieldErrors({});
     setCheck(null);
@@ -346,6 +368,25 @@ export function DatasetCreate() {
     request.current = crypto.randomUUID();
   }
   const title = selected?.display_symbol || logical || symbol || "待选择品种";
+  function changeMode(next: string) {
+    setMode(next);
+    const valid = verified[adjustment] || [];
+    setPeriods(next === "base_d1" ? (valid.includes("D1") ? ["D1", "W1", "MN"] : []) : frames.filter(frame => valid.includes(frame)));
+    setFramePlan({});
+    if (next === "native_periods" && !["none", "supplier"].includes(adjustment)) { setAdjustment("none"); setPeriods(frames.filter(frame => (verified.none || []).includes(frame))); }
+  }
+  async function probe() {
+    if (probing) return;
+    setProbing(true); setError("");
+    try {
+      const candidates = mode === "base_d1" ? ["D1"] : source === "yahoo" ? ["M1", "M5", "M15", "H1", "D1", "W1", "MN"] : ["M1", "M5", "M15", "M30", "H1", "D1", "W1", "MN"];
+      const result = await api<{frames:string[]}>("/market-data/history-catalog/probe", {source, provider_symbol:symbol, adjustment, timeframes:candidates, start: Date.parse(`${day || "2000-01-01"}T00:00:00Z`)});
+      setVerified(old => ({...old, [adjustment]: result.frames}));
+      setPeriods(mode === "base_d1" ? (result.frames.includes("D1") ? ["D1", "W1", "MN"] : []) : result.frames);
+      if (!result.frames.length) setError("本次未验证到有效闭合行情。请检查来源或调整起点后重试；不会创建任务。");
+      retryCheck(v => v+1);
+    } catch(e) { setError(String(e)); } finally { setProbing(false); }
+  }
   const ready =
     currentCheck?.status === "ready" &&
     currentCheck.start != null &&
@@ -464,7 +505,7 @@ export function DatasetCreate() {
               {title} · {names[source]}
             </h2>
             <button
-              disabled={busy || uncertain}
+              disabled={busy || uncertain || probing}
               onClick={() => {
                 setStep(1);
                 setError("");
@@ -476,7 +517,7 @@ export function DatasetCreate() {
           <div className="dc-create-config-scroll">
             <div className="dc-create-config-grid">
               <div className="dc-create-fields">
-                <fieldset disabled={busy || uncertain}>
+                <fieldset disabled={busy || uncertain || probing}>
                   <legend>品种信息</legend>
                   {manual ? (
                     <>
@@ -545,7 +586,7 @@ export function DatasetCreate() {
                       <dt>资产类别</dt>
                       <dd>{assetNames[asset] || asset}</dd>
                       <dt>报价</dt>
-                      <dd>Bid</dd>
+                      <dd>{native ? "Last / Trade" : "Bid"}</dd>
                     </dl>
                   )}
                   {selected?.precision != null ? (
@@ -569,7 +610,20 @@ export function DatasetCreate() {
                   )}
                   <p>超出设定精度的价格自动四舍五入；未超精度的价格保持原值。</p>
                 </fieldset>
-                <fieldset disabled={busy || uncertain}>
+                {native && <fieldset disabled={busy || uncertain || probing}>
+                  <legend>维护模式</legend>
+                  <label>模式<NativeSelect id="create-mode" aria-label="维护模式" value={mode} onChange={e => changeMode(e.target.value)}><option value="base_d1">D1 基础派生</option><option value="native_periods">原生多周期</option></NativeSelect></label>
+                  <label>价格口径<NativeSelect aria-label="价格口径" value={adjustment} onChange={e => {
+                    const next = e.target.value, valid = verified[next] || [];
+                    setAdjustment(next); setFramePlan({});
+                    setPeriods(mode === "base_d1" ? (valid.includes("D1") ? ["D1", "W1", "MN"] : []) : frames.filter(frame => valid.includes(frame)));
+                  }}><option value="none">原始价格（股票图表按依据前复权）</option></NativeSelect></label>
+                  <p>{mode === "base_d1" ? "只读取日线，按来源交易日派生周线与月线。" : "各周期直接读取原生行情，独立保存覆盖范围，不自动派生。"}</p>
+                  <button type="button" onClick={() => void probe()}>{probing ? "正在验证所选品种…" : "验证来源周期能力"}</button>
+                  <p role="status">已验证：{(verified[adjustment] || []).join(" · ") || "尚无；请显式验证"}。本次观察不承诺供应商永久窗口。</p>
+                  {fieldError("create-mode")}
+                </fieldset>}
+                <fieldset disabled={busy || uncertain || probing}>
                   <legend>历史范围与日线划分</legend>
                   <label>
                     起始交易日期
@@ -587,11 +641,13 @@ export function DatasetCreate() {
                     <NativeSelect
                       {...inputProps("create-calendar")}
                       value={calendar}
+                      disabled={native}
                       onChange={(e) => setCalendar(e.target.value)}
                     >
                       <option value="">请选择日线划分</option>
                       <option value="ny17">纽约当地 17:00（随夏令时）</option>
                       <option value="utc0">UTC 00:00</option>
+                      {native && <option value="source_date">来源交易日</option>}
                     </NativeSelect>
                     {fieldError("create-calendar")}
                   </label>
@@ -600,7 +656,7 @@ export function DatasetCreate() {
                       ? "交易日期从前一天纽约当地 17:00 开始。"
                       : calendar === "utc0"
                         ? "交易日期从当日 UTC 00:00 开始。"
-                        : "该类别需要明确选择日线划分规则。"}
+                        : native ? "按供应商交易日期标注，不推断期货夜盘交易日。" : "该类别需要明确选择日线划分规则。"}
                   </p>
                   <p>
                     对应起始时刻：
@@ -609,15 +665,15 @@ export function DatasetCreate() {
                       : time(currentCheck.start)}
                   </p>
                 </fieldset>
-                <fieldset disabled={busy || uncertain}>
+                <fieldset disabled={busy || uncertain || probing}>
                   <legend>需要的周期</legend>
                   <div className="dc-checks">
-                    {frames.map((frame) => (
+                    {allowedFrames.map((frame) => (
                       <label key={frame}>
                         <NativeInput
                           type="checkbox"
                           checked={periods.includes(frame)}
-                          disabled={frame === "M1"}
+                          disabled={!native && frame === "M1"}
                           onChange={(e) => {
                             // The native control and business form use separate
                             // React roots. Capture before controlled restoration.
@@ -633,9 +689,9 @@ export function DatasetCreate() {
                       </label>
                     ))}
                   </div>
-                  <p>M1 是基础数据，其他周期按所选日线规则生成。</p>
+                  <p>{native ? "仅显示已验证来源与项目白名单的交集；未选择的周期不会请求。" : "M1 是基础数据，其他周期按所选日线规则生成。"}</p>
                 </fieldset>
-                <fieldset disabled={busy || uncertain}>
+                <fieldset disabled={busy || uncertain || probing}>
                   <legend>后续更新</legend>
                   <label>
                     维护计划
@@ -643,10 +699,11 @@ export function DatasetCreate() {
                       value={frequency}
                       onChange={(e) => setFrequency(e.target.value)}
                     >
-                      <option value="daily">每日更新 · 00:15 UTC</option>
+                      <option value="daily">{native ? `按周期计划 · 默认每日 18:00 ${selected?.timezone || "UTC"}` : "每日更新 · 00:15 UTC"}</option>
                       <option value="once">仅下载本次</option>
                     </NativeSelect>
                   </label>
+                  {native && frequency === "daily" && <FrameSchedules frames={inputFrames} value={framePlan} change={setFramePlan}/>}
                   <p>
                     首次任务按提交时确定历史截止点。
                     {frequency === "daily"
@@ -663,7 +720,8 @@ export function DatasetCreate() {
                   <dt>来源</dt>
                   <dd>{names[source]}</dd>
                   <dt>报价</dt>
-                  <dd>Bid</dd>
+                  <dd>{native ? "Last / Trade" : "Bid"}</dd>
+                  <dt>模式</dt><dd>{modeNames[mode]}</dd>
                   <dt>日线划分</dt>
                   <dd>{calendar ? phase(calendar) : "待选择"}</dd>
                   <dt>价格精度</dt>
@@ -684,7 +742,7 @@ export function DatasetCreate() {
                   </dd>
                   <dt>后续更新</dt>
                   <dd>
-                    {frequency === "daily" ? "每日 00:15 UTC" : "仅下载本次"}
+                    {frequency === "daily" ? (native ? "按各周期维护计划" : "每日 00:15 UTC") : "仅下载本次"}
                   </dd>
                 </dl>
                 <div role="status">
@@ -720,7 +778,7 @@ export function DatasetCreate() {
           </div>
           <div className="dc-create-actionbar">
             <button
-              disabled={busy || uncertain}
+              disabled={busy || uncertain || probing}
               onClick={() => {
                 setStep(1);
                 setError("");
@@ -739,7 +797,7 @@ export function DatasetCreate() {
             </Link>
             <button
               className="primary"
-              disabled={busy || (!uncertain && !ready)}
+              disabled={busy || probing || (!uncertain && (!ready || !periods.length))}
               onClick={() => void submit()}
             >
               {busy

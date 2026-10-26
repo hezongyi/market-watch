@@ -65,14 +65,18 @@ def _metadata(db, ident, kind, *, composite_context=None, selected_revision=None
             raise SeriesUnavailable("固定历史版本不存在、尚未发布或已回收")
         dataset = db.get(MarketDataset, version.dataset_id)
         inst = db.get(Instrument, dataset.instrument_id)
-        frames = list(db.scalars(select(HistoryArtifact.timeframe).where(
+        artifacts = list(db.execute(select(HistoryArtifact.timeframe, HistoryArtifact.manifest).where(
             HistoryArtifact.version_id == version.id, HistoryArtifact.status == "published",
             HistoryArtifact.count > 0)))
+        frames = [artifact.timeframe for artifact in artifacts]
         if not frames:
             raise SeriesUnavailable("固定历史周期产物尚未发布")
         binding = {"version_id": version.id, "history_version_id": version.id,
                    "dataset_id": dataset.id, "history_checksum": version.manifest["checksum"]}
         volume_kind, volume_unit = dataset.volume_kind, dataset.volume_unit
+        views = {artifact.manifest.get("adjustment_view", "raw") for artifact in artifacts}
+        binding["adjustment_view"] = "qfq" if views == {"qfq"} else "raw"
+        binding["price_description"] = "前复权 · 本数据集同源依据计算" if views == {"qfq"} else "原始采集价格"
     elif kind == "composite":
         dataset_id, mapping_id, composite = composite_context or composite_definition(db, ident)
         if composite:

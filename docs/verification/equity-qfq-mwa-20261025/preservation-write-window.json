@@ -1,0 +1,60 @@
+{
+  "window_utc": [
+    "2026-10-25T13:53:00Z",
+    "2026-10-25T14:22:00Z"
+  ],
+  "source": "Existing mwa gateway logs, read-only",
+  "private_raw_sha256": "71dfaeef3e96fa8fc253d91d62b2d6b71ff84009d16a32b1b2c750f69e41acb4",
+  "log_lines": 1551,
+  "write_events": [
+    {
+      "at": "2026-10-25T13:55:31.687551917Z",
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/save",
+      "status": 200,
+      "headless_agent": false
+    },
+    {
+      "at": "2026-10-25T13:56:11.496633083Z",
+      "method": "POST",
+      "path": "/api/advanced-charts/native-charts/save",
+      "status": 200,
+      "headless_agent": false
+    },
+    {
+      "at": "2026-10-25T14:12:40.278948267Z",
+      "method": "POST",
+      "path": "/api/advanced-charts/native-charts/save",
+      "status": 200,
+      "headless_agent": true
+    },
+    {
+      "at": "2026-10-25T14:13:02.577445233Z",
+      "method": "POST",
+      "path": "/api/advanced-charts/native-charts/save",
+      "status": 200,
+      "headless_agent": true
+    },
+    {
+      "at": "2026-10-25T14:19:31.581438561Z",
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/save",
+      "status": 200,
+      "headless_agent": false
+    },
+    {
+      "at": "2026-10-25T14:19:34.077512317Z",
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/save",
+      "status": 200,
+      "headless_agent": false
+    }
+  ],
+  "attribution": "unconfirmed",
+  "limitations": [
+    "Access log does not contain mutation request bodies or document/preference identifiers for these save endpoints",
+    "Browser user-agent cannot distinguish the human or session that initiated the write",
+    "Timing and endpoint matches do not prove which changed rows were written"
+  ],
+  "existing_rows_modified_by_this_check": false
+}

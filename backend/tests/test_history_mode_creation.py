@@ -14,7 +14,14 @@ from test_native_history_archive import day, drain, stamp
 
 class Adapter(BaseAdapter):
     def native_page(self, identity, start, end):
-        return super().native_page(identity, start, end).model_copy(update={"volume_unit": "lots"})
+        from alerts.provider_akshare import symbol_rules
+
+        batch = super().native_page(identity, start, end)
+        family = identity.parameters["source_family"]
+        rows = [row.model_copy(update={"adjustment_basis": {
+            "kind": "sina_qfq_factor", "value": "1"}}) for row in batch.rows] if family == "sina-a" else batch.rows
+        return batch.model_copy(update={"rows": tuple(rows), "volume_unit": symbol_rules(
+            identity.provider_symbol, family)["volume_unit"]})
 
 
 @pytest.fixture
@@ -67,9 +74,10 @@ def test_d1_creation_pure_preflight_idempotency_and_real_period_ranges(client, d
 
 def test_native_whitelist_intersection_rejects_unverified_requests(client, database):
     with database.begin() as db:
-        row = db.get(MarketCatalog, stable_id("SZSE:000001"))
+        row = db.get(MarketCatalog, stable_id("SHFE:RB0"))
         row.metadata_json = {**row.metadata_json, "verified_frames": {"none": ["M3", "M5", "M15"]}}
-    data = body(mode="native_periods")
+    data = body(mode="native_periods", provider_symbol="SHFE:RB0", logical_symbol="SFRB0",
+        catalog_id=stable_id("SHFE:RB0"), asset_class="future")
     data["maintenance"]["timeframes"] = ["M5", "M15"]
     response = client.post("/api/market-data/center/datasets", json=data)
     assert response.status_code == 201, response.text
@@ -84,13 +92,14 @@ def test_newly_verified_period_requires_explicit_saved_selection(client, databas
     from alerts.storage import DatasetFrameSource, DatasetMaintenance
     from sqlalchemy import select
 
-    draft = body(mode="native_periods")
+    draft = body(mode="native_periods", provider_symbol="SHFE:RB0", logical_symbol="SFRB0",
+        catalog_id=stable_id("SHFE:RB0"), asset_class="future")
     draft["maintenance"]["timeframes"] = ["D1"]
     created = client.post("/api/market-data/center/datasets", json=draft)
     assert created.status_code == 201, created.text
     ident = created.json()["dataset"]["id"]
     with database.begin() as db:
-        row = db.get(MarketCatalog, stable_id("SZSE:000001"))
+        row = db.get(MarketCatalog, stable_id("SHFE:RB0"))
         row.metadata_json = {**row.metadata_json, "verified_frames": {"none": ["D1", "M5", "M3"]}}
     detail = client.get(f"/api/market-data/center/datasets/{ident}")
     assert detail.status_code == 200

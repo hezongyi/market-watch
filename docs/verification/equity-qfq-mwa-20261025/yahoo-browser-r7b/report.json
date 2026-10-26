@@ -1,0 +1,34 @@
+{
+  "started_at": "2026-10-25T13:44:22.719Z",
+  "base": "https://test.kookvv.com:8443",
+  "passed": false,
+  "scope": "Deployed real API and native UI; no intercepted data, no source price repair; preserves all created data",
+  "checks": [],
+  "cases": [
+    {
+      "source": "yahoo",
+      "symbol": "AAPL",
+      "mode": "native_periods",
+      "dataset_id": "1de909844cec998226e338b48542e7d9b4176b4a7016065426488f77a8d9c72c",
+      "version_id": "731e970b-5166-4d7e-a521-b707784c7e50",
+      "requested": [
+        "D1"
+      ]
+    }
+  ],
+  "errors": [
+    "HTTP 500 /market-data/versions/731e970b-5166-4d7e-a521-b707784c7e50"
+  ],
+  "blocked_writes": [
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/migrate"
+    },
+    {
+      "method": "POST",
+      "path": "/api/advanced-charts/preferences/save"
+    }
+  ],
+  "workspace_id": "3c4c1521-4251-46bf-bdbf-2be179fe07be",
+  "finished_at": "2026-10-25T13:46:07.729Z"
+}

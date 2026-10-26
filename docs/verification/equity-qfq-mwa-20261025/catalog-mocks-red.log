@@ -1,0 +1,131 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_______ test_provider_pages_reach_full_directory_and_mixed_kind_fairness _______
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f13522af950>
+
+    def test_provider_pages_reach_full_directory_and_mixed_kind_fairness(database, monkeypatch):
+        large_catalog(database, count=2)
+        provider = [
+            {
+                "id": f"OANDA:T{i:04}",
+                "symbol": f"T{i:04}",
+                "source": "oanda",
+                "label": f"Ticker{i}",
+                "available": True,
+                "supported": True,
+            }
+            for i in range(600)
+        ]
+        monkeypatch.setattr(market_data, "instrument_catalog", lambda query, limit=None: provider)
+>       first = market_data.search_series_page(kind="provider", page_size=250)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend/tests/test_series_search_pagination.py:199:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend/alerts/market_data.py:816: in search_series_page
+    rows = _provider_series(query, source=source, symbol_type=symbol_type)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+query = '', source = None, symbol_type = ''
+
+    def _provider_series(query, *, source=None, symbol_type=""):
+        from .chart_series import encode
+        from .history_catalog import account_scope
+
+        if source not in (None, "dukascopy", "oanda", "binance", "yahoo", "akshare", "fxcm"):
+            raise HTTPException(422, "未知平台来源")
+        result = [{**row, "series_kind": "provider", "ticker": encode(row["id"], "provider"),
+            "description": "平台 · " + row["source"] + " · 原生周期"}
+>           for row in (instrument_catalog(query, limit=None, source=source, managed_status=False) if source != "fxcm" else []) if not row["id"].startswith("MD:")]
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: test_provider_pages_reach_full_directory_and_mixed_kind_fairness.<locals>.<lambda>() got an unexpected keyword argument 'source'
+
+backend/alerts/market_data.py:893: TypeError
+_ test_all_cursor_covers_each_kind_filters_before_paging_and_rejects_changed_query _
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f1352c26690>
+
+    def test_all_cursor_covers_each_kind_filters_before_paging_and_rejects_changed_query(database, monkeypatch):
+        from alerts import market_data
+        from test_series_access import fixture
+        from fastapi import HTTPException
+        import pytest
+
+        fixture(database, monkeypatch)
+        providers = [{"id": f"OANDA:T{i:04}", "symbol": f"T{i:04}", "source": "oanda",
+                      "label": f"Ticker{i}", "asset_type": "CURRENCY" if i % 2 else "EQUITY",
+                      "available": True, "supported": True} for i in range(600)]
+        monkeypatch.setattr(market_data, "instrument_catalog", lambda query, limit=None: providers)
+        rows, cursor = [], None
+        for _ in range(80):
+>           page = market_data.search_series_page(kind="all", page_size=13, cursor=cursor)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend/tests/test_series_search_pagination.py:282:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend/alerts/market_data.py:809: in search_series_page
+    return _all_series_page(query, page_size=page_size, source=source, calendar=calendar,
+backend/alerts/market_data.py:855: in _all_series_page
+    providers = _provider_series(query, source=source, symbol_type=symbol_type) if positions[0] is not None and not calendar else []
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+query = '', source = None, symbol_type = ''
+
+    def _provider_series(query, *, source=None, symbol_type=""):
+        from .chart_series import encode
+        from .history_catalog import account_scope
+
+        if source not in (None, "dukascopy", "oanda", "binance", "yahoo", "akshare", "fxcm"):
+            raise HTTPException(422, "未知平台来源")
+        result = [{**row, "series_kind": "provider", "ticker": encode(row["id"], "provider"),
+            "description": "平台 · " + row["source"] + " · 原生周期"}
+>           for row in (instrument_catalog(query, limit=None, source=source, managed_status=False) if source != "fxcm" else []) if not row["id"].startswith("MD:")]
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: test_all_cursor_covers_each_kind_filters_before_paging_and_rejects_changed_query.<locals>.<lambda>() got an unexpected keyword argument 'source'
+
+backend/alerts/market_data.py:893: TypeError
+____________________ test_all_kind_cursor_and_asset_filter _____________________
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine([redacted-credentials]@127.0.0.1:18889/equity_test), autoflush=True, expire_on_commit=False), Engine([redacted-credentials]@127.0.0.1:18889/equity_test))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f1352d0f9d0>
+
+    def test_all_kind_cursor_and_asset_filter(provider_pg, monkeypatch):
+>       all_cursor(provider_pg[0], monkeypatch)
+
+backend/tests/test_series_search_pagination_postgres.py:41:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend/tests/test_series_search_pagination.py:282: in test_all_cursor_covers_each_kind_filters_before_paging_and_rejects_changed_query
+    page = market_data.search_series_page(kind="all", page_size=13, cursor=cursor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/market_data.py:809: in search_series_page
+    return _all_series_page(query, page_size=page_size, source=source, calendar=calendar,
+backend/alerts/market_data.py:855: in _all_series_page
+    providers = _provider_series(query, source=source, symbol_type=symbol_type) if positions[0] is not None and not calendar else []
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+query = '', source = None, symbol_type = ''
+
+    def _provider_series(query, *, source=None, symbol_type=""):
+        from .chart_series import encode
+        from .history_catalog import account_scope
+
+        if source not in (None, "dukascopy", "oanda", "binance", "yahoo", "akshare", "fxcm"):
+            raise HTTPException(422, "未知平台来源")
+        result = [{**row, "series_kind": "provider", "ticker": encode(row["id"], "provider"),
+            "description": "平台 · " + row["source"] + " · 原生周期"}
+>           for row in (instrument_catalog(query, limit=None, source=source, managed_status=False) if source != "fxcm" else []) if not row["id"].startswith("MD:")]
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: test_all_cursor_covers_each_kind_filters_before_paging_and_rejects_changed_query.<locals>.<lambda>() got an unexpected keyword argument 'source'
+
+backend/alerts/market_data.py:893: TypeError
+=========================== short test summary info ============================
+FAILED backend/tests/test_series_search_pagination.py::test_provider_pages_reach_full_directory_and_mixed_kind_fairness
+FAILED backend/tests/test_series_search_pagination.py::test_all_cursor_covers_each_kind_filters_before_paging_and_rejects_changed_query
+FAILED backend/tests/test_series_search_pagination_postgres.py::test_all_kind_cursor_and_asset_filter
+3 failed in 3.31s

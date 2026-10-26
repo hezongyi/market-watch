@@ -32,6 +32,8 @@ def logical_symbol(symbol):
 
 def details(symbol, verified=None):
     info = symbol_rules(symbol)
+    if info["source_family"] == "eastmoney-a" and info["exchange"] != "BSE":
+        info = symbol_rules(symbol, "sina-a")
     frames = (verified or {}).get("none", [])
     return {**info, "symbol": symbol, "frames": [frame for frame in HISTORY_FRAMES if frame in frames],
         "verified_frames": verified or {}, "adjustment": "none", "volume_kind": "quantity",
@@ -56,7 +58,10 @@ def get_details(db, symbol):
     row = db.get(MarketCatalog, stable_id(symbol))
     if not row or not row.available or row.source != "akshare":
         raise ValueError("请先从 AKShare 品种目录选择有效代码")
-    return dict(row.metadata_json), row
+    info = dict(row.metadata_json)
+    if info.get("source_family") == "eastmoney-a" and not symbol.startswith("BSE:"):
+        info = {**info, **symbol_rules(symbol, "sina-a")}
+    return info, row
 
 
 def probe(symbol, frames, *, adjustment="none", start=1262304000000):
@@ -79,7 +84,7 @@ def probe(symbol, frames, *, adjustment="none", start=1262304000000):
             batch = AKShareHistory().native_page(source, start, now_ms())
             valid = [row for row in batch.rows if row.complete]
             results[frame] = {"status": "verified" if valid else "unavailable",
-                "endpoint": endpoint(symbol, frame, adjustment), "observed_at": batch.observed_at,
+                "endpoint": endpoint(symbol, frame, adjustment, identity.source_family), "observed_at": batch.observed_at,
                 "rows": len(valid), "first": valid[0].start if valid else None,
                 "last": valid[-1].end if valid else None, "requested_start": start}
         except Exception:
@@ -141,14 +146,29 @@ def chart_metadata(ident):
 
     if not settings.akshare_enabled:
         raise ValueError("AKShare 行情源未启用")
+    tencent = ident.startswith("TENCENT:")
+    symbol = ident.removeprefix("TENCENT:") if tencent else None
     with transaction() as db:
-        row = db.get(MarketCatalog, ident)
+        row = db.get(MarketCatalog, stable_id(symbol)) if tencent else db.get(MarketCatalog, ident)
         if not row or row.source != "akshare" or not row.available:
             raise ValueError("未知 AKShare 品种，请刷新目录")
         info = dict(row.metadata_json)
-        return {**info, "id": row.id, "name": row.label, "symbol": row.symbol,
+        if tencent:
+            if not row.symbol.startswith(("SSE:", "SZSE:")):
+                raise ValueError("腾讯平台接口当前仅支持沪深 A 股")
+            info.update(symbol_rules(row.symbol, "tencent-a"))
+        elif info["source_family"] == "eastmoney-a":
+            info.update(symbol_rules(row.symbol, "sina-a"))
+        return {**info, "id": ident if tencent else row.id,
+            "name": row.label + (" · 腾讯" if tencent else ""), "symbol": row.symbol,
             "display_symbol": row.symbol, "source": "akshare", "basis": "last",
             "calendar": "source_date", "series_kind": "provider", "series_kinds": ["provider"],
-            "frames": available_frames(info, "none"), "adjustment": "none",
-            "price_description": "AKShare 原生价格", "volume_kind": "quantity",
+            "frames": ["D1"] if info["source_family"] in ("sina-a", "sina-hk", "tencent-a") else available_frames(info, "none"),
+            "adjustment": "qfq" if info["source_family"] in ("sina-a", "sina-hk", "tencent-a") else "none",
+            "price_description": ("腾讯前复权" if tencent else "新浪前复权")
+                if info["source_family"] in ("sina-a", "sina-hk", "tencent-a") else "AKShare 原生价格",
+            "volume_kind": "quantity", "asset_type": "FUTURE" if info["source_family"] == "sina-futures" else "EQUITY",
+            # These are source-date candles; the acquisition session identity
+            # is not a TradingView session expression or verified intraday calendar.
+            "session": "24x7", "session_verified": False,
             "volume_unit": info.get("volume_unit"), "stream": False}

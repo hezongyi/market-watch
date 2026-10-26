@@ -1,0 +1,208 @@
+{
+  "passed": true,
+  "observed_at": 1792972808317,
+  "endpoint": "futures_zh_minute_sina",
+  "parameters": {
+    "symbol": "RB0",
+    "period": "5"
+  },
+  "observed_rows": 1023,
+  "sample_day": "2026-10-23",
+  "source_samples": [
+    {
+      "datetime": "2026-10-23 09:05:00",
+      "open": "3044.0",
+      "high": "3048.0",
+      "low": "3040.0",
+      "close": "3045.0",
+      "volume": "1590",
+      "hold": "1837902"
+    },
+    {
+      "datetime": "2026-10-23 09:10:00",
+      "open": "3044.0",
+      "high": "3045.0",
+      "low": "3044.0",
+      "close": "3044.0",
+      "volume": "30",
+      "hold": "1838619"
+    },
+    {
+      "datetime": "2026-10-23 10:15:00",
+      "open": "3041.0",
+      "high": "3042.0",
+      "low": "3039.0",
+      "close": "3041.0",
+      "volume": "2868",
+      "hold": "1841222"
+    },
+    {
+      "datetime": "2026-10-23 10:35:00",
+      "open": "3041.0",
+      "high": "3047.0",
+      "low": "3037.0",
+      "close": "3046.0",
+      "volume": "9130",
+      "hold": "1838732"
+    },
+    {
+      "datetime": "2026-10-23 11:30:00",
+      "open": "3042.0",
+      "high": "3043.0",
+      "low": "3041.0",
+      "close": "3042.0",
+      "volume": "2386",
+      "hold": "1830504"
+    },
+    {
+      "datetime": "2026-10-23 13:35:00",
+      "open": "3049.0",
+      "high": "3051.0",
+      "low": "3046.0",
+      "close": "3047.0",
+      "volume": "46",
+      "hold": "1827474"
+    },
+    {
+      "datetime": "2026-10-23 15:00:00",
+      "open": "3048.0",
+      "high": "3048.0",
+      "low": "3047.0",
+      "close": "3047.0",
+      "volume": "286",
+      "hold": "1827860"
+    }
+  ],
+  "normalized_samples": [
+    {
+      "timeframe": "M5",
+      "start": 1792717200000,
+      "end": 1792717500000,
+      "open": "3044.0",
+      "high": "3048.0",
+      "low": "3040.0",
+      "close": "3045.0",
+      "volume": "1590",
+      "adjustment_basis": null,
+      "source_ohlc": null,
+      "price_normalization": null,
+      "source_label": "2026-10-23 09:05:00",
+      "trading_date": null,
+      "complete": true,
+      "confirmation": "next_bar"
+    },
+    {
+      "timeframe": "M5",
+      "start": 1792717500000,
+      "end": 1792717800000,
+      "open": "3044.0",
+      "high": "3045.0",
+      "low": "3044.0",
+      "close": "3044.0",
+      "volume": "30",
+      "adjustment_basis": null,
+      "source_ohlc": null,
+      "price_normalization": null,
+      "source_label": "2026-10-23 09:10:00",
+      "trading_date": null,
+      "complete": true,
+      "confirmation": "next_bar"
+    },
+    {
+      "timeframe": "M5",
+      "start": 1792721400000,
+      "end": 1792721700000,
+      "open": "3041.0",
+      "high": "3042.0",
+      "low": "3039.0",
+      "close": "3041.0",
+      "volume": "2868",
+      "adjustment_basis": null,
+      "source_ohlc": null,
+      "price_normalization": null,
+      "source_label": "2026-10-23 10:15:00",
+      "trading_date": null,
+      "complete": true,
+      "confirmation": "next_bar"
+    },
+    {
+      "timeframe": "M5",
+      "start": 1792722600000,
+      "end": 1792722900000,
+      "open": "3041.0",
+      "high": "3047.0",
+      "low": "3037.0",
+      "close": "3046.0",
+      "volume": "9130",
+      "adjustment_basis": null,
+      "source_ohlc": null,
+      "price_normalization": null,
+      "source_label": "2026-10-23 10:35:00",
+      "trading_date": null,
+      "complete": true,
+      "confirmation": "next_bar"
+    },
+    {
+      "timeframe": "M5",
+      "start": 1792725900000,
+      "end": 1792726200000,
+      "open": "3042.0",
+      "high": "3043.0",
+      "low": "3041.0",
+      "close": "3042.0",
+      "volume": "2386",
+      "adjustment_basis": null,
+      "source_ohlc": null,
+      "price_normalization": null,
+      "source_label": "2026-10-23 11:30:00",
+      "trading_date": null,
+      "complete": true,
+      "confirmation": "next_bar"
+    },
+    {
+      "timeframe": "M5",
+      "start": 1792733400000,
+      "end": 1792733700000,
+      "open": "3049.0",
+      "high": "3051.0",
+      "low": "3046.0",
+      "close": "3047.0",
+      "volume": "46",
+      "adjustment_basis": null,
+      "source_ohlc": null,
+      "price_normalization": null,
+      "source_label": "2026-10-23 13:35:00",
+      "trading_date": null,
+      "complete": true,
+      "confirmation": "next_bar"
+    },
+    {
+      "timeframe": "M5",
+      "start": 1792738500000,
+      "end": 1792738800000,
+      "open": "3048.0",
+      "high": "3048.0",
+      "low": "3047.0",
+      "close": "3047.0",
+      "volume": "286",
+      "adjustment_basis": null,
+      "source_ohlc": null,
+      "price_normalization": null,
+      "source_label": "2026-10-23 15:00:00",
+      "trading_date": null,
+      "complete": false,
+      "confirmation": "unconfirmed"
+    }
+  ],
+  "interpretation": "09:05 first daytime label and 15:00 terminal daytime label; no 09:00 or 15:05 labels. Relative to SHFE 09:00 open and 15:00 close, labels are interval ends.",
+  "scope": "RB0 M5 observed daytime boundary; not a verification of every market or night-session trading-date assignment.",
+  "official_session_source": {
+    "url": "https://www.shfe.com.cn/services/calenderandholidays/tradinghours/",
+    "http_status": 200,
+    "content_sha256": "ebb4a872fc0ce4d9fa1f654c58a89dd00bc1100dd7b3de1e305bbc80ecc66058",
+    "excerpts": [
+      "期货： 螺纹钢、热轧卷板、燃料油、石油沥青、天然橡胶、合成胶、纸浆、胶版印刷纸、 20 号胶、低硫燃料油 期权： 螺纹钢期权、热轧卷板期权、燃料油期权、石油沥青期权、天胶期权、合成胶期权、纸浆期权、胶版印刷纸期权、20号胶期权、低硫燃料油期权 夜盘 集合竞价申报 &nbsp; 20:55-20:59 集合竞价撮合 &nbsp; 20:59-21:00 连续竞价交易&nbsp; 21:00-23:00 日盘 集合竞价申报 &nbsp; 08:55-08:59 集合竞价撮合 &nbsp; 08:59-09:00 连续竞价交易 &nbsp; 09:00-10:15 连续竞价交易 &nbsp; 10:30-11:30 连续竞价交易 &nbsp; 13:30-15:00 期货： 线材、集运指数（欧线） 日盘 集合竞价申报 &nbsp; 08:55-08:59 集合竞价撮合 &nbsp; 08:59-09:00 连续竞价交易&nbsp; 09:00-10:15 连续竞价交易 &nbsp; 10:30-11:30 连续竞价交易 &nbsp; 13:30-15:00 注：某交易日夜盘交易时段从上个工作日的 21:00 开始 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; params.docId=''; params.doctitle=''; params.channelId='2351'; params.channelName='栏目banner'; params.siteId='13'; params.siteName='上期所'; 首页 > 服务 > 交易日历 > 交易时间 交易时间 &nbsp; 各品种交易时"
+    ],
+    "verified_at_utc": "2026-10-26T00:01:40.118480+00:00"
+  }
+}

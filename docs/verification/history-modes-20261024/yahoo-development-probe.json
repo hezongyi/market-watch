@@ -1,0 +1,41 @@
+{
+  "source": "yahoo",
+  "provider_symbol": "AAPL",
+  "adjustment": "none",
+  "frames": [
+    "M5",
+    "D1",
+    "W1",
+    "MN"
+  ],
+  "results": {
+    "D1": {
+      "status": "verified",
+      "observed_at": 1792837373098,
+      "rows": 6743,
+      "first": 946857600000,
+      "last": 1792785600000
+    },
+    "M5": {
+      "status": "verified",
+      "observed_at": 1792837376128,
+      "rows": 3354,
+      "first": 1787664600000,
+      "last": 1792785600000
+    },
+    "W1": {
+      "status": "verified",
+      "observed_at": 1792837377025,
+      "rows": 1398,
+      "first": 946857600000,
+      "last": 1792368000000
+    },
+    "MN": {
+      "status": "verified",
+      "observed_at": 1792837377896,
+      "rows": 321,
+      "first": 946684800000,
+      "last": 1790812800000
+    }
+  }
+}

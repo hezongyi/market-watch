@@ -11,6 +11,7 @@ ENDPOINTS = {
     "stock_zh_a_hist", "stock_zh_a_hist_min_em", "stock_hk_hist", "stock_hk_hist_min_em",
     "futures_zh_daily_sina", "futures_zh_minute_sina", "stock_info_a_code_name",
     "stock_hk_spot_em", "stock_hk_spot", "futures_display_main_sina", "stock_hk_daily",
+    "stock_zh_a_daily", "stock_zh_a_hist_tx",
 }
 
 

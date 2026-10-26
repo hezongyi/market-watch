@@ -18,6 +18,11 @@ export type CatalogItem = {
   label: string;
   asset_class: string;
   precision: number | null;
+  supported_modes?: string[];
+  verified_frames?: Record<string, string[]>;
+  default_mode?: string;
+  default_start_date?: string;
+  timezone?: string;
 };
 type CatalogPage = {
   items: CatalogItem[];
@@ -34,6 +39,9 @@ const categories = [
   ["forex", "外汇"],
   ["commodity", "金属"],
   ["index", "指数"],
+  ["stock", "股票"],
+  ["fund", "基金"],
+  ["futures", "期货"],
   ["crypto", "加密"],
   ["other", "其他"],
 ] as const;
@@ -272,7 +280,7 @@ export function CreationCatalog({
             mode: "select",
             title: fixedSource ? "选择实时品种" : "选择自建品种",
             settingsScope: fixedSource ? "mw.data-center.mapping" : "mw.data-center.creation",
-            allowedSources: fixedSource ? [fixedSource] : ["dukascopy", "oanda", "fxcm"],
+            allowedSources: fixedSource ? [fixedSource] : ["dukascopy", "oanda", "fxcm", "yahoo", "akshare"],
             fixedSource,
             query: filters.query,
             source: fixedSource || filters.source,
@@ -308,7 +316,10 @@ export function CreationCatalog({
             >
               <option value="">全部来源</option>
               <option value="dukascopy">Dukascopy</option>
-              <option value="oanda">OANDA Practice</option><option value="fxcm">FXCM Demo</option>
+              <option value="oanda">OANDA Practice</option>
+              <option value="fxcm">FXCM Demo</option>
+              <option value="yahoo">Yahoo</option>
+              <option value="akshare">AKShare</option>
             </NativeSelect>}
           </div>
           <div className="dc-market-list" ref={list}>

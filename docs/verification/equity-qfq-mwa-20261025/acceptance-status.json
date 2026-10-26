@@ -1,0 +1,91 @@
+{
+  "at": "2026-10-26T01:48:00.384074+00:00",
+  "stock_source_and_qfq_business_scope_passed": true,
+  "overall_acceptance_passed": true,
+  "images": {
+    "tags": {
+      "api": "market-watch-api:equity-qfq-mwa-20261025-r12",
+      "chart": "market-watch-chart-origin:equity-qfq-mwa-20261025-r10",
+      "web": "market-watch-web:equity-qfq-mwa-20261025-r1"
+    },
+    "images": {
+      "api": "sha256:3b6e18e3aadb83cec807532d804b2e4555cc05f3644facc6204f8f0e3566edb5",
+      "chart": "sha256:2f33dd0cfd919ba89ac52e2045a208221cb92ec35cfdf7a0efd50d5600118617",
+      "web": "sha256:71910560705b119475861c1af6a5435ae0e581e263ea495da36dcb4ef5d9a201"
+    },
+    "selected": [
+      "projector",
+      "chart-history-worker",
+      "composite-aggregate-worker",
+      "history-worker",
+      "native-history-worker",
+      "realtime-worker",
+      "chart-aggregation-worker",
+      "pricing-worker",
+      "notify-worker",
+      "market-stream-worker",
+      "api",
+      "chart",
+      "web"
+    ],
+    "schema_change": false
+  },
+  "platform_browser": {
+    "evidence": "platform-browser-r11/report.json",
+    "passed": true,
+    "cases": 4,
+    "product_delta_to_r12": [
+      "backend/alerts/series_access.py"
+    ],
+    "rerun_on_r12": false
+  },
+  "managed_browser": {
+    "evidence": "managed-render-r12/report.json",
+    "passed": true,
+    "cases": 3
+  },
+  "backend_full_suite_clean": false,
+  "backend_result": "backend-final-checks.json",
+  "strict_preservation_audit_passed": false,
+  "preservation_evidence": "runtime-audit.json",
+  "outstanding": [],
+  "source_matches_runtime": true,
+  "production_release": false,
+  "main_merge": false,
+  "push": false,
+  "followup": {
+    "product_images_unchanged": true,
+    "catalog_pagination_tests_passed": 11,
+    "plan_required_postgres_passed": 62,
+    "old_binary_read_comparison": "legacy-reader-compat.json",
+    "preservation_log_investigation": "preservation-write-window.json",
+    "completion_audit": "plan-completion-audit.md"
+  },
+  "delivery_status": "completed_with_recorded_followups",
+  "overall_acceptance_basis": "User accepted delivery by verified integration business evidence; existing RRS failures and unconfirmed UI-state changes recorded separately. Full-suite and strict-audit results remain false.",
+  "closure_decision": "closure-decision.md",
+  "original_plan_unmodified_gates_all_passed": false,
+  "non_blocking_followups": [
+    {
+      "id": "rrs-native-sparse-history",
+      "status": "recorded_unfixed",
+      "record": "followups/rrs-native-sparse-history.md",
+      "remaining_failed_tests": 5
+    },
+    {
+      "id": "workspace-preference-attribution",
+      "status": "recorded_attribution_unconfirmed",
+      "record": "followups/workspace-preference-attribution.md",
+      "workspace_rows_changed": 1,
+      "preference_rows_changed": 3
+    }
+  ],
+  "latest_runtime_audit_at": "2026-10-26T01:46:20.875400+00:00",
+  "final_manifest_verification": {
+    "source_and_test_files": 638,
+    "mismatches": 0,
+    "product_images_unchanged": true
+  },
+  "closure_verification": "closure-verification.json",
+  "final_closure_reviews_passed": true
+}

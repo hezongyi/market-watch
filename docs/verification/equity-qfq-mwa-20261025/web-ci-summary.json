@@ -1,0 +1,382 @@
+{
+  "passed": true,
+  "completed": 75,
+  "total": 75,
+  "results": [
+    {
+      "command": "node tests/swing-fixed-identity.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.04
+    },
+    {
+      "command": "node tests/squeeze-contract.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.22
+    },
+    {
+      "command": "node tests/nr-breakout-display.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.13
+    },
+    {
+      "command": "node tests/nr-breakout-restart.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.18
+    },
+    {
+      "command": "node tests/indicator-high-rate.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.12
+    },
+    {
+      "command": "node tests/indicator-high-rate.cjs --provider",
+      "exit_code": 0,
+      "elapsed_seconds": 0.07
+    },
+    {
+      "command": "node tests/indicator-shared-read.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.12
+    },
+    {
+      "command": "node tests/composite-display-batches.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.07
+    },
+    {
+      "command": "node tests/indicator-display-snapshot.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.07
+    },
+    {
+      "command": "node tests/indicator-snapshot-recovery.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.07
+    },
+    {
+      "command": "node tests/display-recovery-lifecycle.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.12
+    },
+    {
+      "command": "node tests/display-recovery-deferred.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.12
+    },
+    {
+      "command": "node tests/snapshot-error-evidence.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.59
+    },
+    {
+      "command": "node tests/provider-credential-recovery.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.12
+    },
+    {
+      "command": "node tests/issue89-sampling.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.12
+    },
+    {
+      "command": "node tests/issue89-native-lifecycle.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.12
+    },
+    {
+      "command": "node tests/advanced-history-empty-failure.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.12
+    },
+    {
+      "command": "node tests/advanced-capacity-boundary.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.23
+    },
+    {
+      "command": "node tests/advanced-continuous-navigation.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.12
+    },
+    {
+      "command": "node tests/advanced-refresh-range-cancellation.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.12
+    },
+    {
+      "command": "node tests/advanced-refresh-failure.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.17
+    },
+    {
+      "command": "node tests/advanced-refresh-interaction.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.17
+    },
+    {
+      "command": "node tests/advanced-viewports.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.32
+    },
+    {
+      "command": "node tests/advanced-history-loading.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 2.71
+    },
+    {
+      "command": "node tests/advanced-market-request-scheduling.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.12
+    },
+    {
+      "command": "node tests/advanced-history-admission.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.52
+    },
+    {
+      "command": "node tests/advanced-watchlist-quote-pressure.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.12
+    },
+    {
+      "command": "node tests/advanced-quote-snapshot-sharing.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.27
+    },
+    {
+      "command": "node tests/advanced-indicator-release-batches.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.12
+    },
+    {
+      "command": "node tests/advanced-native-reserve-scheduler.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.07
+    },
+    {
+      "command": "node tests/advanced-inflight-cancellation.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.27
+    },
+    {
+      "command": "node tests/advanced-provider-request-lifetime.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.43
+    },
+    {
+      "command": "node tests/preference-request-queue.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.07
+    },
+    {
+      "command": "node tests/preference-draft-banner.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.58
+    },
+    {
+      "command": "node tests/advanced-watchlist-prewarm.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.53
+    },
+    {
+      "command": "node tests/advanced-watchlist-metadata.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.17
+    },
+    {
+      "command": "node tests/advanced-startup-metadata.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 30.17
+    },
+    {
+      "command": "node tests/resolve-recovery.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.07
+    },
+    {
+      "command": "node tests/multi-chart-resolve-init.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.12
+    },
+    {
+      "command": "node tests/api-read-recovery.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.73
+    },
+    {
+      "command": "node --test tests/chart-alerts-bridge.test.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 3.54
+    },
+    {
+      "command": "node --test tests/mobile-chart-view.test.cjs tests/mobile-workspace-policy.test.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.33
+    },
+    {
+      "command": "node tests/advanced-market-stream.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 1.18
+    },
+    {
+      "command": "node tests/advanced-provider-subscriptions.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.52
+    },
+    {
+      "command": "node tests/advanced-watchlists.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.43
+    },
+    {
+      "command": "node tests/composite-mapping.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.23
+    },
+    {
+      "command": "node tests/single-app-routing.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.52
+    },
+    {
+      "command": "node tests/chart-tab.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.12
+    },
+    {
+      "command": "node tests/chart-tab-title.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.32
+    },
+    {
+      "command": "TZ=Asia/Shanghai node tests/chart-time.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.16
+    },
+    {
+      "command": "TZ=America/Los_Angeles node tests/chart-time.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.17
+    },
+    {
+      "command": "node tests/symbol-flags.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.06
+    },
+    {
+      "command": "node tests/notifications-runtime.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.17
+    },
+    {
+      "command": "node tests/notifications-persistence.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.17
+    },
+    {
+      "command": "node tests/advanced-preferences.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.07
+    },
+    {
+      "command": "node tests/advanced-preferences-conflict.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.06
+    },
+    {
+      "command": "node tests/native-preference-notice.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.07
+    },
+    {
+      "command": "node tests/market-notice-lifecycle.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.07
+    },
+    {
+      "command": "node tests/provider-notice-lifecycle.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.53
+    },
+    {
+      "command": "node tests/native-chunk-recovery.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.47
+    },
+    {
+      "command": "node tests/mobile-workspace-shell.browser.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 4.24
+    },
+    {
+      "command": "node tests/advanced-watchlist-layout.browser.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 2.29
+    },
+    {
+      "command": "node tests/advanced-watchlist-names.browser.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 1.65
+    },
+    {
+      "command": "node tests/symbol-flags.browser.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 2.05
+    },
+    {
+      "command": "node tests/system-history.browser.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 1.64
+    },
+    {
+      "command": "node tests/alert-editing.browser.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 20.62
+    },
+    {
+      "command": "node tests/squeeze-alert.browser.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 2.87
+    },
+    {
+      "command": "node tests/alert-reference-ui.browser.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 19.07
+    },
+    {
+      "command": "node tests/native-alert-price-lines.browser.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 1.45
+    },
+    {
+      "command": "node --test tests/alert-price-edit.test.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.54
+    },
+    {
+      "command": "node tests/alert-price-drag.browser.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 2.82
+    },
+    {
+      "command": "node tests/notice-page-exit.browser.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 1.31
+    },
+    {
+      "command": "node tests/history-mode-frames.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.12
+    },
+    {
+      "command": "node tests/native-indicator-identity.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.07
+    },
+    {
+      "command": "node tests/fxcm-series.cjs",
+      "exit_code": 0,
+      "elapsed_seconds": 0.12
+    }
+  ]
+}

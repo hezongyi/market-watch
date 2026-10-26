@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "image": "sha256:da302a85235d426d62f4f34bfcd209baf8376f80e545bf3950daf4d27232d9df",
+  "tag": "market-watch-api:rrs-sparse-fix-20261026-r1",
+  "image_provenance": {
+    "io.market-watch.built-at": "2026-10-26T02:07:53.250236+00:00",
+    "io.market-watch.commit": "4325e69d219218ef0ac22c979103fdaf94eae6b8",
+    "io.market-watch.dirty": "false",
+    "io.market-watch.expires-at": "2026-11-02T02:07:53.250236+00:00",
+    "io.market-watch.managed": "true",
+    "io.market-watch.project": "mw-rrs-sparse-fix-20261026",
+    "io.market-watch.purpose": "acceptance",
+    "io.market-watch.task": "mw-rrs-sparse-fix-20261026"
+  },
+  "changed_runtime_modules_match": 3,
+  "candidate_values_equal_local_result": true,
+  "network": "none",
+  "read_only_rootfs": true,
+  "memory_bytes": 402653184,
+  "cpus": 1,
+  "database_access": false,
+  "persistent_volumes": false,
+  "container_removed": true,
+  "mwa_updated": false,
+  "scope": "Bounded offline calculation smoke in the actual built API image; not an HTTP or browser deployment acceptance"
+}

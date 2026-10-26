@@ -1349,6 +1349,7 @@ const feed = {
     quoteSubscriptions.set(id, quoteSub);
     rememberQuoteRows([]);
     if(!marketPollingFallback) for(const ticker of all) {
+      if(decode(ticker).series_kind === 'provider' && /^(AKSHARE|TENCENT):/.test(decode(ticker).symbol)) continue;
       const listener=crypto.randomUUID(),generation=++marketGeneration;
       quoteSub.listeners.push({listener,generation,ticker,sequence:0});
       send({type:'market-subscribe',args:{client:clientId,listener,generation,
@@ -1466,11 +1467,11 @@ const feed = {
         timezone: meta.timezone || (meta.calendar === "utc0" ? "Etc/UTC" : "America/New_York"),
         minmov: 1,
         pricescale: 10 ** meta.precision,
-        has_intraday: true,
+        has_intraday: !meta.frames || meta.frames.some(f => !["D1","W1","MN"].includes(f)),
         intraday_multipliers: meta.frames ? meta.frames.filter(f => !["D1","W1","MN"].includes(f)).map(f=>Object.keys(frames).find(r=>frames[r]===f)) : ["1", "5", "15", "30", "60", "240"],
-        has_daily: true,
+        has_daily: !meta.frames || meta.frames.includes("D1"),
         daily_multipliers: ["1"],
-        has_weekly_and_monthly: true,
+        has_weekly_and_monthly: !meta.frames || meta.frames.some(f => ["W1","MN"].includes(f)),
         weekly_multipliers: ["1"],
         monthly_multipliers: ["1"],
         supported_resolutions: meta.frames ? resolutions.filter(r=>meta.frames.includes(frames[r])) : resolutions,
@@ -1478,7 +1479,8 @@ const feed = {
         visible_plots_set: decode(ticker).spec || meta.volume_kind && meta.volume_kind !== "unavailable" ? "ohlcv" : "ohlc",
         volume_precision: ["tick", "tick_count"].includes(meta.volume_kind) ? 0 : 8,
         format: "price",
-        data_status: meta.delay_seconds > 0 ? "delayed_streaming" : "streaming",
+        mw_stream: meta.stream !== false,
+        data_status: meta.stream === false ? "endofday" : meta.delay_seconds > 0 ? "delayed_streaming" : "streaming",
         ...(meta.delay_seconds > 0 ? {delay:meta.delay_seconds} : {}),
         ...(meta.currency ? {currency_code:meta.currency} : {}),
         has_empty_bars: false,
@@ -1755,6 +1757,7 @@ const feed = {
   subscribeBars: (s, res, cb, id, reset) => {
     feed.unsubscribeBars(id);
     const identity=decode(s.ticker);
+    if(s.mw_stream === false) return;
     if(identity.symbol.startsWith("YAHOO:") && s.supported_resolutions && !s.supported_resolutions.includes(res)) return;
     const historyKey=s.ticker+'|'+res+(identity.series_kind==='provider' ? '|'+(s.mw_window || '') : '');
     const guardedReset = () => {barRangeMapping?.invalidate(s.ticker,res,s.mw_window); reset();};

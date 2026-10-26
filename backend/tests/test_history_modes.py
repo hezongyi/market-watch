@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+from types import SimpleNamespace
 
 import pytest
 from alerts.market_contracts import DatasetIdentity, NativeBarRow, NativeCandleBatch, SourceIdentity
@@ -138,3 +139,43 @@ def test_chunk_partition_key_includes_actual_input_frame(database):
                 end=86400000, observed_at=86400000, count=1, checksum="a" * 64,
                 content=b"fixture", result="data"))
         db.flush()
+
+
+@pytest.mark.parametrize("family,kind,value,expected", [
+    ("sina-a", "sina_qfq_factor", "2", "5"),
+    ("sina-hk", "sina_qfq_factor", "0.5", "5.0"),
+    ("yfinance", "yahoo_adj_close_ratio", "0.5", "5.0"),
+])
+def test_qfq_projection_uses_market_specific_factor_direction(family, kind, value, expected):
+    from alerts.history_mode_artifacts import _qfq_row
+
+    dataset = SimpleNamespace(identity={"source_family": family, "adjustment": "none"},
+                              asset_class="equity")
+    row = {"open": "10", "high": "12", "low": "8", "close": "10",
+           "adjustment_basis": {"kind": kind, "value": value}}
+    adjusted = _qfq_row(row, dataset)
+    assert adjusted["close"] == expected
+    assert adjusted["adjustment_view"] == "qfq"
+    assert row["close"] == "10", "the raw observation stays unchanged"
+
+
+def test_yahoo_supplier_input_still_projects_qfq_from_saved_basis():
+    from alerts.history_mode_artifacts import _qfq_row
+
+    dataset = SimpleNamespace(identity={"source_family": "yfinance", "adjustment": "supplier"},
+                              asset_class="equity")
+    row = {"open": "10", "high": "12", "low": "8", "close": "10",
+           "adjustment_basis": {"kind": "yahoo_adj_close_ratio", "value": "0.5"}}
+    adjusted = _qfq_row(row, dataset)
+    assert adjusted["close"] == "5.0"
+    assert adjusted["adjustment_view"] == "qfq"
+    assert row["close"] == "10"
+
+
+def test_qfq_projection_refuses_a_missing_basis():
+    from alerts.history_mode_artifacts import _qfq_row
+
+    dataset = SimpleNamespace(identity={"source_family": "yfinance", "adjustment": "none"},
+                              asset_class="equity")
+    with pytest.raises(ValueError, match="前复权依据缺失"):
+        _qfq_row({"open": "1", "high": "1", "low": "1", "close": "1"}, dataset)

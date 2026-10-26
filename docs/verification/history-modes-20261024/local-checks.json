@@ -1,0 +1,91 @@
+{
+  "as_of": "2026-10-24T11:54:34.106898+00:00",
+  "source_worktree": "/home/quant/repos/market-watch-history-modes-20261024",
+  "candidate_worktree": "/home/quant/repos/market-watch-history-modes-integration-20261024",
+  "candidate_base": "8b7ee3eea8467866da89c0f3fc53989da5cc94e1",
+  "local_only_feature_suite": {
+    "cases": 2954,
+    "passed": 2279,
+    "skipped": 675,
+    "errors": 0,
+    "failures": 0,
+    "skip_reasons": {
+      "collection skipped": 1,
+      "Requires isolated Ubuntu PostgreSQL": 459,
+      "Requires an isolated PostgreSQL server and matching dump/restore tools": 1,
+      "requires isolated Ubuntu PostgreSQL acceptance database": 15,
+      "Requires isolated PostgreSQL": 60,
+      "Requires isolated TEST_POSTGRES_URL": 1,
+      "Requires Ubuntu isolated PostgreSQL": 4,
+      "Isolated Ubuntu PostgreSQL required": 6,
+      "Requires task-owned Ubuntu PostgreSQL 14.24": 18,
+      "Requires isolated Ubuntu Docker PostgreSQL": 13,
+      "Requires task-local PostgreSQL": 7,
+      "Local-only run: task-owned PostgreSQL acceptance not started": 38,
+      "Requires task-owned PostgreSQL": 36,
+      "Set TEST_POSTGRES_URL to an isolated test database": 5,
+      "Independent PG required": 11
+    }
+  },
+  "post_collection_focused_suite": {
+    "passed": 82,
+    "command": "PYTHONPATH=backend .venv/bin/python -m pytest backend/tests/{test_history_mode_creation,test_native_history_archive,test_native_history_retention,test_history_request_evidence,test_history_modes_migration,test_alerts_mcp_migration,test_provider_akshare,test_provider_yahoo}.py -q --disable-warnings"
+  },
+  "integration_focused_suite": {
+    "cases": 170,
+    "passed": 170,
+    "skipped": 0,
+    "errors": 0,
+    "failures": 0,
+    "skip_reasons": {}
+  },
+  "integration_node": {
+    "scope": "integration candidate 3ac6f743 plus history modes",
+    "commands": 63,
+    "passed": 63,
+    "failed": [],
+    "seconds": 74.92
+  },
+  "integration_frontend_build": "passed",
+  "changed_python_ruff": "passed",
+  "postgres_modes_contracts": {
+    "passed": 0,
+    "skipped": 20,
+    "executed": false
+  },
+  "deployed_acceptance_executed": true,
+  "remote_ci_executed": false,
+  "notes": [
+    "Suite scopes overlap; do not sum their pass counts.",
+    "PG skips are unexecuted gates, not successful verification.",
+    "No Docker instance was started or updated during these local checks.",
+    "2026-10-25 real mwa acceptance: SHFE:RB0 native M5/D1 passed in browser; A-share AkShare probe remained unavailable; private evidence is under /home/quant/repos/.mwa-history-modes-20261024/browser-futures-skip-probe."
+  ],
+  "integration_suite_base": "3ac6f743f947a1ae33bcdf55bb15efa031a7f760",
+  "latest_chart_fix": {
+    "commit": "4e5351cfd40b59914174119222e2f1786cba2abc",
+    "squeeze_contract": "passed",
+    "history_mode_frames": "passed",
+    "bridge_syntax": "passed"
+  },
+  "post_nr4_integration": {
+    "as_of": "2026-10-24T12:04:13.549944+00:00",
+    "base_commit": "8b7ee3eea8467866da89c0f3fc53989da5cc94e1",
+    "python": {
+      "passed": 230,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0
+    },
+    "frontend_build": "passed",
+    "changed_python_ruff": "passed",
+    "acceptance_executed": false,
+    "node": {
+      "base": "8b7ee3eea8467866da89c0f3fc53989da5cc94e1",
+      "commands": 64,
+      "passed": 64,
+      "failed": [],
+      "seconds": 73.29
+    }
+  }
+}

@@ -1,0 +1,63 @@
+[
+  {
+    "endpoint": "stock_hk_daily",
+    "period": null,
+    "status": "data",
+    "rows": 5499,
+    "samples": [
+      {
+        "date": "2004-06-16",
+        "open": "4.375",
+        "high": "4.625",
+        "low": "4.075",
+        "close": "4.15",
+        "volume": "439775000.0",
+        "amount": "0.0"
+      },
+      {
+        "date": "2004-06-17",
+        "open": "4.15",
+        "high": "4.375",
+        "low": "4.125",
+        "close": "4.225",
+        "volume": "83801500.0",
+        "amount": "355633000.0"
+      },
+      {
+        "date": "2026-10-22",
+        "open": "387.0",
+        "high": "391.2",
+        "low": "378.4",
+        "close": "382.39999",
+        "volume": "60791747.0",
+        "amount": "23240805253.0"
+      },
+      {
+        "date": "2026-10-23",
+        "open": "381.8",
+        "high": "388.8",
+        "low": "378.0",
+        "close": "386.0",
+        "volume": "33161473.0",
+        "amount": "12729501754.0"
+      }
+    ],
+    "seconds": 1.171
+  },
+  {
+    "endpoint": "stock_zh_a_hist",
+    "period": "weekly",
+    "status": "failed",
+    "exception": "AKShareRequestError",
+    "upstream_exception": "ConnectionError",
+    "seconds": 0.799
+  },
+  {
+    "endpoint": "stock_zh_a_hist",
+    "period": "monthly",
+    "status": "failed",
+    "exception": "AKShareRequestError",
+    "upstream_exception": "ConnectionError",
+    "seconds": 1.044
+  }
+]
