@@ -20,7 +20,11 @@ if(!base || !file)throw Error('Set MW_BASE_URL and MW_ACCEPTANCE_CREDENTIALS_FIL
   assert.equal(await page.locator('iframe[title="专业图表工作区"]').count(),0);
   assert.ok(requests.filter(url=>url.includes('/charting_library_')).every(url=>url.startsWith(base+'/')));
   checks.push('same-origin direct chart mount with only vendor internal iframe');
+  await page.route('**/data-center-native.js',route=>route.abort(),{times:1});
   await ui.getByRole('button',{name:'数据中心',exact:true}).focus();await ui.getByRole('button',{name:'数据中心',exact:true}).press('Enter');
+  await expect(ui.getByRole('button',{name:'重试数据中心',exact:true})).toBeFocused({timeout:30000});
+  assert.equal(await ui.locator('iframe').count(),0);
+  await ui.getByRole('button',{name:'重试数据中心',exact:true}).press('Enter');
   await expect(ui.locator('[data-name="mw-data-center-dialog"]')).toBeVisible({timeout:30000});
   assert.equal(await ui.locator('iframe').count(),0,'data center must not fall back to a business iframe');
   await page.screenshot({path:(process.env.MW_SCREENSHOT_DIR || '/tmp')+'/single-data-center.png'});
@@ -33,6 +37,16 @@ if(!base || !file)throw Error('Set MW_BASE_URL and MW_ACCEPTANCE_CREDENTIALS_FIL
   const saved=await page.evaluate(async()=> (await fetch('/api/advanced-charts/workspaces/D1_BTCUSDT')).json());
   const content=saved.document.state;assert.ok(content && (content._mwAlertCharts || JSON.parse(content.content || '{}')._mwAlertCharts));
   checks.push('native save preserves layout identities');
+  await ui.locator('button[data-name="alerts"]').click();
+  await ui.getByRole('button',{name:'创建告警',exact:true}).click();
+  const dialog=ui.getByRole('dialog',{name:/创建警报/});
+  await expect(dialog).toBeVisible();await dialog.getByLabel('比较值',{exact:true}).fill('63000');
+  const createdResponse=page.waitForResponse(r=>r.url()===base+'/api/chart-alerts' && r.request().method()==='POST');
+  await dialog.getByRole('button',{name:'创建',exact:true}).click();
+  const created=await createdResponse;assert.equal(created.status(),201,await created.text());
+  const alert=await created.json();assert.equal(alert.config.association.workspace_id,'D1_BTCUSDT');
+  assert.ok(content._mwAlertCharts.includes(alert.config.association.chart_id));
+  checks.push('native alert form checkpoints layout and creates a bound shared ChartAlert');
   const settings=await context.newPage();let chartLoads=0;
   await settings.route('**/chart-assets.json',route=>{chartLoads++;return route.abort();});
   await settings.goto(base+'/settings/account');await expect(settings.getByRole('heading',{name:'账户密码',exact:true})).toBeVisible();
@@ -44,6 +58,17 @@ if(!base || !file)throw Error('Set MW_BASE_URL and MW_ACCEPTANCE_CREDENTIALS_FIL
   await mobile.addCookies(await context.cookies());const phone=await mobile.newPage();await phone.goto(base+'/advanced-charts/D1_BTCUSDT');
   await expect(phone.getByText(/手机.*只读|桌面.*编辑/).first()).toBeVisible({timeout:60000});
   await phone.screenshot({path:(process.env.MW_SCREENSHOT_DIR || '/tmp')+'/single-mobile.png'});await mobile.close();checks.push('mobile readonly view');
+  const signals=await page.evaluate(async()=>(await fetch('/api/signals')).json());
+  const historical=signals.find(row=>!row.evidence?.chart_alert),modern=signals.find(row=>row.evidence?.chart_alert);
+  assert.ok(historical && modern,'mixed R2 signal fixture required');
+  await page.goto(base+'/signals?signal='+historical.id);await expect(page.getByRole('heading',{name:'历史通知',exact:true})).toBeVisible();
+  await expect(page.getByText('退役停止提醒',{exact:true})).toBeVisible();
+  await page.goto(base+'/signals?signal='+modern.id);await expect(page).toHaveURL(/advanced-charts.*panel=notifications/);
+  await expect.poll(()=>page.frames().filter(frame=>frame.url().startsWith('blob:')).length,{timeout:60000}).toBe(1);
+  checks.push('historical notification stays readonly and modern phone link resolves to current application');
+  await page.evaluate(() => window.dispatchEvent(new Event('mw-session-expired')));
+  await expect(page.getByLabel('管理员密码')).toBeVisible({timeout:20000});
+  assert.equal(page.frames().filter(frame=>frame.url().startsWith('blob:')).length,0);checks.push('expired session disposes chart and returns to safe login');
   assert.deepEqual(errors,[]);console.log(JSON.stringify({base_url:base,checks,errors}));
  } finally {await context.close();await browser.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

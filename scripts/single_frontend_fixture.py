@@ -11,6 +11,8 @@ from alerts.storage import (
     Bar,
     ChartAlert,
     Instrument,
+    Notification,
+    Outbox,
     Preference,
     SignalRow,
     Watch,
@@ -92,8 +94,24 @@ def run(action):
         alert = db.get(ChartAlert, ids['alert'])
         signals = list(db.scalars(select(SignalRow).where(SignalRow.chart_alert_id == alert.id)))
         background=db.get(ChartAlert,ids.get('background')) if ids.get('background') else None
+        old = db.get(Watch, ids['old_watch'])
+        old_note = db.get(Notification, ids['old_notification'])
+        if old.status == 'cancelled':
+            assert old.state == {'quote':'9','quote_at':100} and old.armed_at == 100
+            assert old_note.ack_at is None and old_note.status == 'retired'
+            assert db.get(Outbox, ids['old_outbox']).status == 'cancelled'
+        if action == 'ack':
+            from alerts.service import acknowledge
+            for signal in signals:
+                note = db.scalar(select(Notification).where(Notification.signal_id == signal.id))
+                acknowledge(db, note.id)
+        from alerts.chart_alert_health import summary
         return {**ids, 'background_count': background.count if background else None, 'background_checkpoint':background.state if background else None, 'count': alert.count, 'checkpoint': alert.state,
-                'old_status': db.get(Watch, ids['old_watch']).status,
+                'old_status': old.status, 'old_state':old.state, 'old_armed_at':old.armed_at,
+                'old_notification_status':old_note.status,'old_ack_at':old_note.ack_at,
+                'old_outbox_status':db.get(Outbox,ids['old_outbox']).status,
+                'modern_signals':len(signals), 'modern_outbox':len(list(db.scalars(select(Outbox).join(Notification).where(Notification.signal_id.in_([row.id for row in signals]))))),
+                'business_health': summary(db),
                 'signal': signals[0].id if signals else None, 'at': now_ms()}
 
 

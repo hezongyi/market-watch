@@ -3371,7 +3371,13 @@ const adapter = {
     }
     pending.clear();requests.splice(0).forEach(entry=>entry.reject(Object.assign(Error("图表已关闭"),{code:"HISTORY_CANCELLED"})));
     clearInterval(poll);clearInterval(progressivePoll);
-    dataCenter?.dispose();widget?.remove();
+    dataCenter?.dispose();
+    // A native alert/notification attach can still be resolving when the host
+    // route is torn down (for example after session expiry). Keep the vendor
+    // widget alive until that serialized attach chain has observed the stop
+    // fence; removing it immediately makes the pinned library dereference its
+    // torn-down tradingViewApi/matchMedia objects.
+    void alertAttachQueue.catch(()=>{}).finally(()=>{try{widget?.remove();}catch{}});
   },
 };
 return adapter;

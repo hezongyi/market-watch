@@ -79,6 +79,7 @@ services:
     environment:
       ALERTS_DATABASE_EXPECTED_VERSION: "140024"
       MW_ACCEPTANCE_TASK: mw-single-frontend-20261026
+      PYTHONPATH: /candidate/backend
     working_dir: /candidate
     volumes: ['${MW_REPO:?}:/candidate:ro']
     command: [python, scripts/single_frontend_fixture.py, seed]
@@ -89,6 +90,9 @@ services:
     profiles: [verify]
     working_dir: /candidate
     env_file: ${MW_PRIVATE_DIR:?}/verify.env
+    environment:
+      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
+      PYTHONPATH: /candidate/backend
     volumes: ['${MW_REPO:?}:/candidate:ro']
     command: [python, -m, pytest, -q, backend/tests/test_chart_alert_postgres.py]
 volumes:

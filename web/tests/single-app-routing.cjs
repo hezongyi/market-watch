@@ -17,6 +17,7 @@ function load(file, require) {
 }
 const center = load("src/market-data/location.ts");
 const { safeNext, pageName } = load("src/app/navigation.ts", () => center);
+assert.equal(safeNext('/advanced-charts/?panel=notifications&event=s%3A123'),'/advanced-charts?panel=notifications&event=s%3A123');
 for (const next of [
   "https://evil.invalid/x",
   "//evil.invalid/x",

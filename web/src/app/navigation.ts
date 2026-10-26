@@ -25,6 +25,7 @@ export function safeNext(value: string | null): string {
         ? defaultChart
         : allowed;
     }
+    if (url.pathname === "/advanced-charts/") url.pathname = "/advanced-charts";
     if (!businessPath.test(url.pathname)) return defaultChart;
     return url.pathname + url.search + url.hash;
   } catch {
