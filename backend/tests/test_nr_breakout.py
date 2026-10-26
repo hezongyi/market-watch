@@ -263,6 +263,64 @@ def test_fixed_worker_checkpoint_and_historical_pagination_match_batch(database,
         assert series["values"] == reference["values"][-34:-17]
 
 
+@pytest.mark.parametrize("policy", ["strict_confirmed_v1", "observed_display_v1"])
+def test_source_date_daily_fixed_worker_and_pagination_match_pine(database, monkeypatch, policy):
+    from alerts import fixed_indicators as jobs
+    from alerts.chart_api import DataQuery, data_sync
+    from alerts.history_artifacts import read_artifact
+    from test_fixed_indicators import drain
+    from test_native_history_archive import Adapter, day, prepare, run
+
+    dataset = prepare(database, mode="native_periods", outputs=("D1",))
+    source = [day(date, high=str(10 + width / 2), low=str(10 - width / 2), close="10")
+              for date, width in zip(("2024-01-02", "2024-01-04", "2024-01-05", "2024-01-08"),
+                                     (8, 7, 9, 6))]
+    version = run(database, dataset, "2024-01-09", Adapter({"D1": source}))
+    monkeypatch.setattr(jobs, "PAGE_SIZE", 2)
+    query = DataQuery(instrument=version, series_kind="history", timeframe="D1", limit=2,
+                      indicators=[SPEC], indicator_input_policy=policy)
+    pending = data_sync(query)
+    ident = pending["indicator_progress"][0]["run_id"]
+    drain(ident)
+    with database.begin() as db:
+        source = read_artifact(db, version, "D1", limit=1000)
+    expected = columns(calculate(source, SPEC))
+    actual = data_sync(query)
+    assert not actual["pending"]
+    for series in actual["indicators"][0]["series"]:
+        assert [point["value"] for point in series["values"]] == expected[series["key"]][-2:]
+    older = data_sync(query.model_copy(update={"before": actual["bars"][0]["start"]}))
+    assert older["indicator_progress"][0]["run_id"] == ident
+    for series in older["indicators"][0]["series"]:
+        assert [point["value"] for point in series["values"]] == expected[series["key"]][:-2]
+
+
+@pytest.mark.parametrize("timeframe,expected", [
+    ("W", ("2024-01-01", "2024-01-08")),
+    ("M", ("2024-01-01", "2024-02-01")),
+])
+def test_source_date_higher_pattern_uses_explicit_trading_date(timeframe, expected):
+    from alerts.nr_breakout import bucket
+
+    row = {"start": millis("2024-01-04T00:00:00+00:00"),
+           "end": millis("2024-01-04T07:10:00+00:00"), "trading_date": "2024-01-04",
+           "indicator_calendar": "source_date", "indicator_timeframe": "D1"}
+    assert bucket(row, {"timeframe": timeframe}) == tuple(
+        millis(date + "T00:00:00+00:00") for date in expected)
+
+
+def test_source_date_native_same_frame_keeps_source_boundaries_and_does_not_infer_night_date():
+    from alerts.nr_breakout import bucket
+
+    row = {"start": millis("2024-01-02T00:00:00+00:00"),
+           "end": millis("2024-01-09T00:00:00+00:00"),
+           "indicator_calendar": "source_date", "indicator_timeframe": "W1"}
+    assert bucket(row, {"timeframe": "W"}) == (row["start"], row["end"])
+    row.update(indicator_timeframe="M5", end=row["start"] + 300000)
+    with pytest.raises(ValueError, match="交易日"):
+        bucket(row, {"timeframe": "D"})
+
+
 @pytest.mark.parametrize("params", [{"timeframe": "H1"}, {"pattern_type": "NR5"}, {"timeframe": 60}, {"show_signals": False}])
 def test_invalid_params(params):
     with pytest.raises(ValueError):

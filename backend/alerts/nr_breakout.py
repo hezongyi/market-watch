@@ -63,7 +63,16 @@ def bucket(row, params):
         # Source W/M candles may start on a holiday-delayed trading day. Their
         # source boundaries, not a reconstructed Monday, define equal TF input.
         return row["start"], row["end"]
-    if row.get("indicator_calendar") == "yahoo":
+    if row.get("indicator_calendar") == "source_date":
+        from .history_mode_artifacts import date_bounds
+
+        # Managed daily and native high-period candles preserve an explicit
+        # supplier trading date. Never infer a futures night-session date from
+        # its minute timestamp when that source does not provide one.
+        if frame not in ("D1", "W1", "MN") or not row.get("trading_date"):
+            raise ValueError(f"{NAME}: 来源行情缺少此形态周期所需的明确交易日")
+        left, right = date_bounds(row["trading_date"], frame)
+    elif row.get("indicator_calendar") == "yahoo":
         left, right = yahoo_period(row, params["timeframe"])
     else:
         left, right = period(row["start"], frame, row.get("indicator_calendar", "utc0"))

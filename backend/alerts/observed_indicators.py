@@ -211,6 +211,7 @@ def calculate(run, rows, phase, profiles, *, seam=None, initial_state=None):
         row = {
             **source,
             "indicator_calendar": phase,
+            "indicator_timeframe": run.timeframe,
             "gap_before": gap_before(previous, source["start"], phase, profiles),
             "chart_time": fixed_label(source, run.timeframe, phase),
         }

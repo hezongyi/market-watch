@@ -61,7 +61,12 @@ def prepare(db, page, body):
         hit = entry.value is not None
         if not hit:
             reader = SimpleNamespace(**{column.name: getattr(run, column.name) for column in run.__table__.columns})
-            reader.cursor = jobs.period(version.start, run.timeframe, phase)[0]
+            if phase == "source_date" and not revision:
+                from .history_artifacts import published_artifact
+
+                reader.cursor = published_artifact(db, version.id, run.timeframe).manifest["blocks"][0]["start"]
+            else:
+                reader.cursor = jobs.period(version.start, run.timeframe, phase)[0]
             rows = []
             while reader.cursor < run.target_end:
                 inputs = jobs.input_rows(db, reader)
