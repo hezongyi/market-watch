@@ -26,7 +26,7 @@ function indicatorKey(ticker,res){
 let studyTemplates, restoreAlertsPanel = false;
 let alertAttachQueue = Promise.resolve();
 function ignoreTeardownFailure(cleanup) {
-  try { cleanup(); } catch {}
+  try { cleanup(); } catch (error) { console.warn("Chart cleanup failed", error); }
 }
 function destroyNativeAlertUIs() {
   ignoreTeardownFailure(() => noticeUI?.destroy());
@@ -2776,7 +2776,7 @@ function boot(
       if (!readonly) indicatorPicker = chartIndicatorPicker(widget, catalog, (e) =>
         send({type: "error", error: String(e)}), () => dataCenter?.nativeUi);
       // Public left-aligned buttons retain their creation order in the header.
-      if (!readonly) dataCenter = chartDataCenter({occurrence:emitNotice,widget, 
+      if (!readonly) dataCenter = chartDataCenter({occurrence:emitNotice,widget,
         workspace: () => currentNativeWorkspace, epoch: () => workspaceEpoch, send, searchSymbols: searchNativeSymbols,
         timezone: () => {const chart=widget.activeChart(),zone=chart.getTimezoneApi().getTimezone().id;
           return zone === "exchange" ? presentationFor(chart.symbol())?.timezone || "UTC" : zone;},

@@ -186,7 +186,7 @@ def events(db, alert_id: str | None = None, limit: int = 100):
     records = list(db.execute(query.order_by(
         SignalRow.occurred_at.desc(), SignalRow.created_at.desc()).limit(limit)))
     from .notification_center import SUBJECT
-    
+
     notices = {notice.source_id: notice for notice in db.scalars(select(NoticeEvent).where(
         NoticeEvent.subject == SUBJECT, NoticeEvent.source_domain == "pro_chart",
         NoticeEvent.source_kind == "chart_alert",

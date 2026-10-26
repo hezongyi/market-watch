@@ -13,7 +13,7 @@ export function marketRuntime({api,marketRequests,inflight,historyCapabilities,s
  current:Ref<{id:string}|null>;nativeLoadEpoch:Ref<number>;chart:Ref<ChartAdapter|null>;compositeEstablished:(instrument:string)=>void;updateChart:(value:ChartUpdate)=>void;
 }) {
 async function market(q:any,source:ChartAdapter,context:{id:number;history_client?:string}) {
-        
+
         const endpoints: Record<string, string> = {
           search: "/market-data/series/search",
           searchPage: "/market-data/series/page",
@@ -122,7 +122,7 @@ async function market(q:any,source:ChartAdapter,context:{id:number;history_clien
         }
       }
 async function data(q:any,source:ChartAdapter,context:{id:number;history_client?:string}) {
-        
+
         if (
           !q ||
           !validIndicatorRead(q.indicators) ||
