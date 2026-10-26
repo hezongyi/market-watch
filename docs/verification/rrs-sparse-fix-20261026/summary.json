@@ -1,0 +1,79 @@
+{
+  "base_commit": "53fb056a",
+  "product_commit": "4325e69d219218ef0ac22c979103fdaf94eae6b8",
+  "risk": "F0",
+  "classification": "Compatible provider RRS segmentation fix; no schema, persistent-format or background-task changes",
+  "restored_fix_commit": "b4e1326adb779a0b5c53e389681ac008dc75ea13",
+  "regression_introduced_by": "1c8a8ac818693aa3bcc1df28a62456a50f37cd20",
+  "changed_runtime_files": {
+    "backend/alerts/chart_calculation_history.py": "384f0e658df3a30c4f56b499d10b223f8b6f4a1922d77b16562149060b32adc8",
+    "backend/alerts/provider_indicator_inputs.py": "927476466644f36a1af7bdf8b3a9ce72a53497bc8ddb5c204bddf244a372e976",
+    "backend/alerts/provider_cache.py": "cbff643682d868aad3ca38ac10afd3c6a6bf64072ffc8139602caebb5ac0baff"
+  },
+  "tests_modified": false,
+  "regressions": {
+    "original_red_failures": 5,
+    "original_recheck_passed": 5,
+    "focused_files": 9,
+    "focused_passed": 162,
+    "focused_seconds": 67.32,
+    "evidence": "regression-green.log"
+  },
+  "frozen_real_capture": {
+    "passed": true,
+    "rows": 1957,
+    "snapshot_sha256": "60cbab58fa28a81e8557b65035a27fdc52f975208be5b39591f11bf6f428ad0d",
+    "timeframe": "D1",
+    "null_pattern_equal": true,
+    "max_abs_error": 0,
+    "threshold_non_null": 1696,
+    "boxes": 81,
+    "labels": 49,
+    "geometry_equal": true,
+    "paged_values_and_full_drawings_equal": true,
+    "independent_literal_oracle": true,
+    "network_or_database_access": false
+  },
+  "full_backend_suite_rerun": false,
+  "mwa_updated": false,
+  "push": false,
+  "pr_created": false,
+  "production_release": false,
+  "docker_smoke": {
+    "passed": true,
+    "image": "sha256:da302a85235d426d62f4f34bfcd209baf8376f80e545bf3950daf4d27232d9df",
+    "tag": "market-watch-api:rrs-sparse-fix-20261026-r1",
+    "image_provenance": {
+      "io.market-watch.built-at": "2026-10-26T02:07:53.250236+00:00",
+      "io.market-watch.commit": "4325e69d219218ef0ac22c979103fdaf94eae6b8",
+      "io.market-watch.dirty": "false",
+      "io.market-watch.expires-at": "2026-11-02T02:07:53.250236+00:00",
+      "io.market-watch.managed": "true",
+      "io.market-watch.project": "mw-rrs-sparse-fix-20261026",
+      "io.market-watch.purpose": "acceptance",
+      "io.market-watch.task": "mw-rrs-sparse-fix-20261026"
+    },
+    "changed_runtime_modules_match": 3,
+    "candidate_values_equal_local_result": true,
+    "network": "none",
+    "read_only_rootfs": true,
+    "memory_bytes": 402653184,
+    "cpus": 1,
+    "database_access": false,
+    "persistent_volumes": false,
+    "container_removed": true,
+    "mwa_updated": false,
+    "scope": "Bounded offline calculation smoke in the actual built API image; not an HTTP or browser deployment acceptance"
+  },
+  "docker_oracle_result": "frozen-oracle-image.json",
+  "source_fix_passed": true,
+  "mwa_acceptance": "awaiting_user_reply_to_pre_acceptance_request",
+  "review": {
+    "risk": "F0",
+    "self_review_passed": true,
+    "changed_production_files": 3,
+    "existing_tests_modified": false,
+    "schema_changes": false,
+    "all_existing_gap_and_incomplete_assertions_retained": true
+  }
+}
