@@ -87,6 +87,7 @@ jobs:
       - name: Ubuntu tooling checks
         run: |
           python -m ruff check deploy/ubuntu/mw_docker.py deploy/ubuntu/mw_preview.py deploy/ubuntu/d1_seed.py tests/ops/test_preview.py .github/scripts/ci_changes.py tests/ops/test_ci_changes.py
+          python -m ruff check scripts/runtime_market_baseline.py scripts/runtime_market_baseline_report.py scripts/runtime_market_inventory.py tests/ops/test_runtime_market_report.py
           python -m pytest -q tests/ops
 
       - name: Verify PostgreSQL service version
