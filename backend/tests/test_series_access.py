@@ -164,6 +164,22 @@ def test_fixed_export_rejects_actual_row_overflow_without_import_jobs(database, 
         api.app.dependency_overrides.clear()
 
 
+def test_export_page_overflow_raises_transport_neutral_query_error(monkeypatch):
+    from types import SimpleNamespace
+
+    from alerts.query_errors import QueryError
+    from alerts.series_access import export_page
+
+    page = {"bars": [{"start": i, "end": i + 1} for i in range(2001)],
+            "indicators": [], "pending": [], "next_before": None}
+    monkeypatch.setattr("alerts.series_access.chart_data", lambda *args, **kwargs: page)
+    body = SimpleNamespace(end=2002, instrument="history", series_kind="history",
+        timeframe="M1", indicators=[], composite_revision_id=None, input_revision=None, start=0)
+    with pytest.raises(QueryError) as error:
+        export_page(None, body)
+    assert error.value.status_code == 413
+
+
 def alternate_revision(factory, ident, old_id):
     """A deliberately different calendar, baseline, mapping and precision."""
     from alerts.storage import (

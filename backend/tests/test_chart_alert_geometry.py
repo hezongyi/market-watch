@@ -83,15 +83,14 @@ def test_authenticated_geometry_and_capability_api(database, monkeypatch):
             "instrument": "BTCUSDT", "series_kind": "managed", "timeframe": "M1",
         })
         assert capabilities.status_code == 200
-        assert capabilities.json()["sources"][0]["available"]
+        assert capabilities.json()["sources"][0]["available"] is False
+        assert "已退役" in capabilities.json()["sources"][0]["reason"]
         response = client.post("/api/chart-alerts/geometry", json=query().model_dump(mode="json"))
         assert response.status_code == 200 and response.json()["points"][1]["index"] == 2
 
 
-def test_timeframe_remapping_keeps_saved_drawing_monitoring(database, monkeypatch):
+def test_timeframe_remapping_stays_correct_while_legacy_alert_writes_are_rejected(database, monkeypatch):
     from alerts import api as api_module
-    from alerts.chart_alert_worker import evaluate
-    from alerts.storage import ChartAlert
     from fastapi.testclient import TestClient
     from test_chart_alert_api import login
 
@@ -112,19 +111,13 @@ def test_timeframe_remapping_keeps_saved_drawing_monitoring(database, monkeypatc
         assert original.status_code == mapped.status_code == 200
         assert [point["index"] for point in original.json()["points"]] == [0, 4]
         assert [point["index"] for point in mapped.json()["points"]] == [0, 1]
-        for name, line, expected in (("old", original.json(), "blocked"),
-                                     ("remapped", mapped.json(), "ready")):
+        for name, line in (("old", original.json()), ("remapped", mapped.json())):
             cfg = config(timeframe="H4", condition={"relation": "cross_up",
                          "right": {"kind": "line", "line": line}})
             saved = client.post("/api/chart-alerts", json={
                 "request_id": name, "config": cfg.model_dump(mode="json")})
-            if name == "old":
-                assert saved.status_code == 422
-                continue
-            assert saved.status_code == 201, saved.text
-            with database.begin() as db:
-                evaluate(db, saved.json()["id"], now=43_200_001)
-                assert db.get(ChartAlert, saved.json()["id"]).health == expected
+            assert saved.status_code == 422
+            assert "必须绑定组合行情" in saved.json()["detail"]
 
 
 def test_managed_daily_points_use_native_trading_date_labels(database):

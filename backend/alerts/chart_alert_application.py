@@ -71,7 +71,8 @@ def capabilities(body):
     sources = [row for row in (managed, provider) if row]
     for row in sources:
         row["atr_frames"] = list(frames(row["source"]) if row["series_kind"] == "provider" else FRAMES)
-        reason = ("此来源尚未确认告警交易日历" if row["calendar"] not in ("ny17", "utc0")
+        reason = ("旧来源告警已退役，仅支持查看、暂停或归档" if row["series_kind"] != "composite"
+                  else "此来源尚未确认告警交易日历" if row["calendar"] not in ("ny17", "utc0")
                   else "来源或周期暂不可用" if not row["enabled"] else None)
         row["available"], row["reason"] = reason is None, reason
         seconds = poll_seconds(row["source"]) if row["series_kind"] == "provider" else 15
@@ -228,18 +229,30 @@ def judgments(db, alert_id: str, before: int | None = None, limit: int = 100):
 def new(db, body: Create, *, dataset_id=None):
     existing = db.scalar(select(ChartAlert).where(ChartAlert.request_id == body.request_id))
     if existing is None:
+        require_executable_source(body.config)
         validate_association(db, body.config)
         validate_geometry(db, body.config, dataset_id=dataset_id)
     return alert_dict(db, create(db, body.request_id, body.config, dataset_id=dataset_id))
 
 
 def update(db, alert_id: str, body: Edit, *, dataset_id=None):
+    require_executable_source(body.config)
     validate_association(db, body.config)
     validate_geometry(db, body.config, dataset_id=dataset_id)
     return alert_dict(db, edit(db, alert_id, body.version, body.config, dataset_id=dataset_id))
 
 
+def require_executable_source(config):
+    if config.series_kind != "composite":
+        raise ValueError("新建或编辑的告警必须绑定组合行情；旧来源告警仅可查看、停用或归档")
+
+
 def action(db, alert_id: str, body: Action):
+    alert = db.get(ChartAlert, alert_id)
+    if alert:
+        config = AlertConfig.model_validate(current_version(db, alert).config)
+        if config.series_kind != "composite" and body.action not in ("pause", "archive"):
+            raise ValueError("旧来源告警仅可暂停或归档")
     return alert_dict(db, lifecycle(db, alert_id, body.version, body.action,
         expected_revision=body.control_revision, request_id=body.request_id))
 

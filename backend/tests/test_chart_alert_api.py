@@ -1,11 +1,9 @@
 from alerts import api as api_module
-from alerts.chart_alert_domain import Observation
-from alerts.chart_alert_service import consume
 from alerts.storage import ChartAlert, ChartAlertVersion
 from argon2 import PasswordHasher
 from fastapi.testclient import TestClient
 from sqlalchemy import select
-from test_chart_alert_service import config, sample
+from test_chart_alert_service import config
 
 
 def login(client, monkeypatch):
@@ -17,41 +15,35 @@ def login(client, monkeypatch):
 
 
 def test_create_edit_conflict_and_event_confirmation_via_authenticated_http(database, monkeypatch):
+    from alerts.chart_alert_service import create
+
+    with database.begin() as db:
+        legacy_id = create(db, "legacy-http", config(), at=300_000).id
     with TestClient(api_module.app) as client:
         assert client.get("/api/chart-alerts").status_code == 401
         login(client, monkeypatch)
         body = {"request_id": "api-1", "config": config(notify_ntfy=True).model_dump(mode="json")}
         created = client.post("/api/chart-alerts", json=body)
-        assert created.status_code == 201
-        row = created.json()
-        assert row["display_label"].startswith("EURUSD · 自建行情 · bid · M5")
-        assert row["health"] == "warming" and row["count"] == 0
-        assert client.post("/api/chart-alerts", json=body).json()["id"] == row["id"]
-        changed = {**body, "config": config(name="different").model_dump(mode="json")}
-        assert client.post("/api/chart-alerts", json=changed).status_code == 409
+        assert created.status_code == 422
+        legacy = client.get(f"/api/chart-alerts/{legacy_id}")
+        assert legacy.status_code == 200
+        assert legacy.json()["display_label"].startswith("EURUSD · 自建行情 · bid · M5")
         client.headers.pop("x-csrf-token")
-        assert client.post(f"/api/chart-alerts/{row['id']}/lifecycle",
+        assert client.post(f"/api/chart-alerts/{legacy_id}/lifecycle",
                            json={"version": 1, "action": "pause"}).status_code == 403
         login(client, monkeypatch)
-        edited = client.post(f"/api/chart-alerts/{row['id']}/edit", json={
+        edited = client.post(f"/api/chart-alerts/{legacy_id}/edit", json={
             "version": 1, "config": config(name="updated").model_dump(mode="json"),
         })
-        assert edited.status_code == 200 and edited.json()["version"] == 2
-        assert client.post(f"/api/chart-alerts/{row['id']}/edit", json={
-            "version": 1, "config": config().model_dump(mode="json"),
-        }).status_code == 409
-        with database.begin() as db:
-            alert = db.get(ChartAlert, row["id"])
-            at = alert.effective_at
-            consume(db, alert.id, Observation("baseline", 1, at, sample(0, 9).left, sample(0, 9).right), detected_at=at)
-            consume(db, alert.id, Observation("live", 2, at + 1000, sample(0, 11).left, sample(0, 11).right), detected_at=at + 1001)
-        events = client.get("/api/chart-alerts/events").json()
-        assert len(events) == 1 and events[0]["evidence"]["rule_version"] == 2
-        assert events[0]["display_label"] == row["display_label"]
-        assert client.post(f"/api/notifications/{events[0]['notification_id']}/ack").status_code == 200
-        assert client.get("/api/chart-alerts/events").json()[0]["ack_at"] is not None
-        assert client.get("/api/signals").json()[0]["id"] == events[0]["id"]
-        assert client.get("/api/chart-alerts?search=updated&status=active").json()[0]["id"] == row["id"]
+        assert edited.status_code == 422
+        paused = client.post(f"/api/chart-alerts/{legacy_id}/lifecycle", json={
+            "version": 1, "control_revision": legacy.json()["control_revision"],
+            "request_id": "legacy-pause", "action": "pause"})
+        assert paused.status_code == 200 and paused.json()["status"] == "paused"
+        archived = client.post(f"/api/chart-alerts/{legacy_id}/lifecycle", json={
+            "version": 1, "control_revision": paused.json()["control_revision"],
+            "request_id": "legacy-archive", "action": "archive"})
+        assert archived.status_code == 200 and archived.json()["status"] == "archived"
 
 
 def test_invalid_contract_and_message_placeholders_are_rejected(database, monkeypatch):
@@ -68,7 +60,7 @@ def test_invalid_contract_and_message_placeholders_are_rejected(database, monkey
 
 
 def test_range_single_edits_persist_precision_and_keep_strict_contract(database, monkeypatch):
-    """Real saves complement the browser's normalized request-shape matrix."""
+    """Deprecated source rules reject every otherwise valid condition shape."""
     with TestClient(api_module.app) as client:
         login(client, monkeypatch)
         for interval in ("enter", "exit", "break_upper", "break_lower"):
@@ -79,22 +71,8 @@ def test_range_single_edits_persist_precision_and_keep_strict_contract(database,
                 payload["condition"] = bounds
                 created = client.post("/api/chart-alerts", json={
                     "request_id": f"matrix-{interval}-{single}", "config": payload})
-                assert created.status_code == 201, created.text
-                row = created.json()
-                path = f"/api/chart-alerts/{row['id']}/edit"
-                comparison = {"relation": single, "left": {"kind": "price"},
-                              "right": {"kind": "constant", "value": "0"}}
-                payload["condition"] = {**comparison, "lower": "1.12345", "upper": "2.123"}
-                assert client.post(path, json={"version": 1, "config": payload}).status_code == 422
-                payload["condition"] = comparison
-                saved = client.post(path, json={"version": 1, "config": payload})
-                assert saved.status_code == 200, saved.text
-                assert saved.json()["config"]["condition"]["right"]["value"] == "0"
-                payload["condition"] = bounds
-                saved = client.post(path, json={"version": 2, "config": payload})
-                assert saved.status_code == 200, saved.text
-                assert saved.json()["config"]["condition"]["lower"] == "1.12345"
-                assert saved.json()["config"]["condition"]["upper"] == "2.123"
+                assert created.status_code == 422
+                assert "必须绑定组合行情" in created.json()["detail"]
 
 
 def test_rule_versions_cannot_be_mutated_or_deleted(database):
@@ -113,20 +91,24 @@ def test_rule_versions_cannot_be_mutated_or_deleted(database):
 
 
 def test_lifecycle_http_requires_revision_and_replays_same_request_once(database, monkeypatch):
+    from alerts.chart_alert_service import create
+
+    with database.begin() as db:
+        ident = create(db, "http-lifecycle", config(), at=0).id
     with TestClient(api_module.app) as client:
         login(client, monkeypatch)
-        row = client.post("/api/chart-alerts", json={
-            "request_id": "http-lifecycle", "config": config().model_dump(mode="json"),
-        }).json()
-        path = f"/api/chart-alerts/{row['id']}/lifecycle"
+        path = f"/api/chart-alerts/{ident}/lifecycle"
+        row = client.get(f"/api/chart-alerts/{ident}").json()
         assert client.post(path, json={"version": 1, "action": "restart"}).status_code == 422
+        assert client.post(path, json={"version": 1, "control_revision": row["control_revision"],
+            "request_id": "legacy-restart", "action": "restart"}).status_code == 422
         intent = {"version": 1, "control_revision": row["control_revision"],
-                  "request_id": "restart-once", "action": "restart"}
-        first = client.post(path, json=intent)
-        assert first.status_code == 200 and first.json()["run"] == 2
-        assert client.post(path, json=intent).json()["run"] == 2
-        assert client.post(path, json={**intent, "request_id": "stale-restart"}).status_code == 409
-        assert client.post(path, json={**intent, "action": "pause"}).status_code == 409
+                  "request_id": "pause-once", "action": "pause"}
+        paused = client.post(path, json=intent)
+        assert paused.status_code == 200 and paused.json()["status"] == "paused"
+        assert client.post(path, json=intent).json()["status"] == "paused"
+        assert client.post(path, json={**intent, "request_id": "archive-once",
+            "control_revision": paused.json()["control_revision"], "action": "archive"}).json()["status"] == "archived"
 
 
 def test_reference_identity_and_log_cleanup_preserve_frozen_evidence_and_phone_state(database, monkeypatch):

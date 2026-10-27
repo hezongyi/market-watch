@@ -299,9 +299,8 @@ def history_check(db, page, body, meta):
 
 def export_page(db, body):
     """Export one fixed input snapshot without maintenance or first-use demand."""
-    from fastapi import HTTPException
-
     from .chart_query import DataQuery
+    from .query_errors import QueryError
 
     before, bars, indicators = body.end, [], {}
     revision, inputs = body.composite_revision_id, body.input_revision
@@ -323,14 +322,14 @@ def export_page(db, body):
                 accumulated["values"] = [value for value in series["values"]
                     if body.start <= value["time"] < body.end] + accumulated["values"]
         if len(bars) > 2000:
-            raise HTTPException(413, "单次最多导出2000根K线，请缩小日期范围")
+            raise QueryError(413, "单次最多导出2000根K线，请缩小日期范围")
         cursor = page["next_before"]
         if cursor is None or cursor <= body.start:
             return {**page, "bars": bars, "indicators": list(indicators.values())}
         if cursor >= before:
             raise ValueError("行情导出分页没有推进")
         before = cursor
-    raise HTTPException(413, "单次导出分页过多，请缩小日期范围")
+    raise QueryError(413, "单次导出分页过多，请缩小日期范围")
 
 
 def search_page(db, query="", *, kind="history", page_size=25, offset=0, source=None, calendar=None, symbol_type=""):
