@@ -13,6 +13,8 @@ Compose 自测发现短语法挂载会被 CI 的 fixture 变量解释为未声�
 
 输入事务提交后的观察时间还包含一次修订回读，故真实 commit 位于 `[issued, committed observer]` 区间内。报告保留该区间，匹配 sequence 时允许判断发生在 commit observer 之前；内部延迟主表使用 issued 起算的保守上界，另保留从 commit observer 起算的下界值（可能略负，表示观察滞后）。M1 发布也用 issued 起算上界；不把观测误差钳成零或当成漏处理。新增“首判早于提交观察点仍保留”的回归；三项报告回归均通过。正式当前 normal 原始日志只读扫描未发现早于提交观察点的有效首判，但报告必须覆盖这一可能竞争，不依赖本轮恰未触发。
 
+连续时钟试跑的按窗口 oracle 又发现一规则在中段多触发一次、提前完成，末段缺失；按类别总数会漏掉这个问题。根因是并发使用 `test_composite_alerts.forming`：先调用 live 提交默认 1.11，再另事务提交 1.119，读者可能在同一 source_time 看见两种价格。`backend/tests/test_runtime_market_baseline.py` 以独立 Session 在每次 commit 后观察真实状态，旧 helper 明确 red（读到 `('1.11', None)` 再读 `('1.119','1.119')`），新 sample_quote 单事务更新 QuoteEvent、owner freshness、LiveState 与既有 display_observations.accept，green 为 1 passed。该修改只模拟真实来源的一次完整输入，不更改判定逻辑或 age 门槛。已停止当时 task-owned probe（exit137，不计通过），保留 two-phase-source-helper 证据；PG 与其他项目未停止。后续所有正式场景使用同一修正后的 sampler 重测。
+
 事件延迟关联 input → SignalRow → NoticeEvent / Notification → MockTransport 接受，不输出确认令牌或通知正文。投影时刻是提交后的观察点，不是精确 SQL commit；同机 monotonic 可以相减，fixture 业务时间与 monotonic 不可混减。pool acquire 包含建连成本，SQL reads/writes 是语句分类，WITH 归 read 不等同磁盘 I/O；PG 全库计数另外记录，且本任务应用和回归库不同。
 
 这些改动只修正测量工具，不修改 v1.29.1 的生产算法、任务装配、schema 或资源配置。没有真实供源/ntfy 网络请求，没有访问生产。

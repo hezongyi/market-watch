@@ -14,6 +14,7 @@ import resource
 import time
 import traceback
 import uuid
+from decimal import Decimal
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
@@ -94,6 +95,41 @@ class HistoryAdapter:
                      checkpoint=checkpoint, observed_at=end + 5000,
                      volume_kind=contract["volume_kind"], volume_unit=contract["volume_unit"],
                      rows=tuple(minute(at, volume="3") for at in range(start, checkpoint, 60000)))
+
+
+def sample_quote(factory, revision, at, stamp, price):
+    from alerts.display_observations import accept
+    from alerts.live_pricing import account_key
+    from alerts.market_contracts import DatasetIdentity, QuoteEvent
+    from alerts.storage import (
+        CompositeRevision,
+        Instrument,
+        LiveState,
+        MarketDataset,
+        PricingOwner,
+        RealtimeMapping,
+    )
+
+    # The unit-test forming helper commits a default quote before the actual
+    # sample. Concurrent readers must see one coherent source transaction.
+    with factory.begin() as db:
+        rev = db.get(CompositeRevision, revision)
+        target = db.get(RealtimeMapping, rev.mapping_id).target_dataset_id
+        state = db.get(LiveState, target)
+        owner = db.get(PricingOwner, account_key(settings.oanda_account_id))
+        owner.expires = stamp + 60000
+        state.received_at = state.heartbeat_at = stamp
+        state.confirmed_end = at
+        dataset = db.get(MarketDataset, target)
+        sample = QuoteEvent(identity=DatasetIdentity.model_validate(dataset.identity),
+            bid=price, ask=str(Decimal(price) + Decimal(".001")), tradeable=True,
+            source_time=stamp, received_at=stamp, sequence=stamp, connection_epoch=state.epoch)
+        state.quote = sample.model_dump()
+        observed = accept(db, state, sample, stamp=stamp,
+                          profile=db.get(Instrument, dataset.instrument_id).calendar_profile)
+        if observed is None:
+            raise RuntimeError("Fixture source observation was not accepted")
+        state.forming = dict(observed.content)
 
 
 def worker(role, schema, clock_origin, stopped, revision, scenario, log, history_pause, tracked):
@@ -402,7 +438,6 @@ def scenario_run(name, samples, interval, history_pause):
             Outbox,
             SignalRow,
         )
-        from test_composite_alerts import forming
         from test_fixed_indicators import add_tail
         from test_market_contracts import minute
 
@@ -424,7 +459,7 @@ def scenario_run(name, samples, interval, history_pause):
                 (3, 14), (max(15, samples // 2 - 3), max(16, samples // 2 + 8)),
                 (max(25, samples - 3), samples)))
             price = "1.119" if high else "1.110"
-            forming(factory, revision, end, next_business, price=price)
+            sample_quote(factory, revision, end, next_business, price)
             with factory.begin() as db:
                 input_revision = db.get(CompositePreparation, revision).input_revision
             committed = time.monotonic()
