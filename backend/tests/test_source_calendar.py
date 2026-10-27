@@ -143,6 +143,12 @@ def test_only_account_bound_review_can_certify_live_closed_interior(database, mo
     stamp = ms(dt("2026-07-06T21:11:05+00:00"))
     monkeypatch.setattr(live, "now_ms", lambda: stamp)
     live.ensure_catalog([{"name": "EUR_USD", "type": "CURRENCY", "displayPrecision": 5}], "fixture-account")
+    from alerts.realtime_switch import set_enabled
+    from alerts.storage import MarketDataset
+    with live.transaction() as db:
+        dataset = next(row for row in db.scalars(select(MarketDataset))
+                       if row.identity.get("provider_symbol") == "EUR_USD")
+        set_enabled(db, dataset.instrument_id, True, now=stamp)
     ownership = live.claim("fixture-account")
     identities = live.desired_datasets("fixture-account")
     epoch = live.begin_connection(ownership, identities)

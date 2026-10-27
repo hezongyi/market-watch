@@ -45,13 +45,15 @@ def test_monitor_errors_back_off(monkeypatch):
 def test_each_alert_uses_its_read_time_and_reports_committed_state(database, monkeypatch):
     from alerts.chart_alert_service import AlertConfig, create
     from alerts.storage import ChartAlert
-    from test_chart_alert_worker import config
+    from test_composite_alerts import ready_config
 
+    config = ready_config(database, monkeypatch)
+    stamp = config.at
     with database.begin() as db:
-        ids=[create(db,'monitor-clock-'+str(i),AlertConfig.model_validate(config()),at=1000).id
+        ids=[create(db,'monitor-clock-'+str(i),AlertConfig.model_validate(config()),at=stamp).id
              for i in range(2)]
     seen, reports = [], []
-    clock=iter([2000,3000])
+    clock=iter([stamp+1000,stamp+2000])
     monkeypatch.setattr(chart_alert_worker,'now_ms',lambda:next(clock))
 
     def evaluate(db,ident,*,now,**kwargs):
@@ -66,15 +68,17 @@ def test_each_alert_uses_its_read_time_and_reports_committed_state(database, mon
 
     monkeypatch.setattr(chart_alert_worker,'evaluate',evaluate)
     chart_alert_worker.step(on_evaluated=committed)
-    assert seen==[2000,3000] and {row['alert_id'] for row in reports}==set(ids)
+    assert seen==[stamp+1000,stamp+2000] and {row['alert_id'] for row in reports}==set(ids)
 
 
 def test_observer_failure_does_not_rewrite_committed_health(database,monkeypatch):
     from alerts.chart_alert_service import create
     from alerts.storage import ChartAlert
-    from test_chart_alert_worker import config
+    from test_composite_alerts import ready_config
+    config = ready_config(database, monkeypatch)
+    stamp = config.at
     with database.begin() as db:
-        ident=create(db,'observer-error',config(),at=1000).id
+        ident=create(db,'observer-error',config(),at=stamp).id
     def evaluate(db,ident,**kwargs):
         db.get(ChartAlert,ident).health='ready'
     def observe(row):

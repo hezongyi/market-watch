@@ -51,6 +51,11 @@ def weekend(confirmation_database, monkeypatch):
     monkeypatch.setattr(settings, 'oanda_recovery_minutes', 2)
     live.ensure_catalog([{'name': 'EUR_USD', 'type': 'CURRENCY', 'displayPrecision': 5}],
                         'test-account')
+    from alerts.realtime_switch import set_enabled
+    with confirmation_database.begin() as db:
+        dataset = next(row for row in db.scalars(select(MarketDataset))
+                       if row.identity.get('provider_symbol') == 'EUR_USD')
+        set_enabled(db, dataset.instrument_id, True, now=STAMP)
     identity = live.desired_datasets('test-account')['EUR_USD']
     owner = live.claim('test-account', now=STAMP)
     epoch = live.begin_connection(owner, {'EUR_USD': identity}, now=STAMP)
@@ -63,6 +68,11 @@ def running(confirmation_database, monkeypatch):
     monkeypatch.setattr(settings, 'oanda_recovery_minutes', 2)
     monkeypatch.setattr('alerts.live_pricing.now_ms', lambda: 125000)
     live.ensure_catalog([{'name': 'EUR_USD', 'type': 'CURRENCY', 'displayPrecision': 5}], 'test-account')
+    from alerts.realtime_switch import set_enabled
+    with confirmation_database.begin() as db:
+        dataset = next(row for row in db.scalars(select(MarketDataset))
+                       if row.identity.get('provider_symbol') == 'EUR_USD')
+        set_enabled(db, dataset.instrument_id, True, now=125000)
     identities = live.desired_datasets('test-account')
     owner = live.claim('test-account', now=125000)
     epoch = live.begin_connection(owner, identities, now=125000)

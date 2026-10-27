@@ -36,7 +36,7 @@ def test_mapping_candidate_first_use_and_chart_api(database, monkeypatch):
             result = opened.json()
             repeated = client.post(base + "/composites/use", json=body)
             assert repeated.json()["id"] == result["id"]
-            assert result["usage"]["charts"] == 1 and result["health"]["strategy_readiness"] == "no_strategies"
+            assert result["usage"]["charts"] == 0 and result["health"]["strategy_readiness"] == "no_strategies"
             assert result["status"] == "preparing"
             assert client.get(base + "/center/composites").json()["total"] == 1
             assert client.get(base + f"/composites/{result['id']}").status_code == 200
@@ -46,7 +46,7 @@ def test_mapping_candidate_first_use_and_chart_api(database, monkeypatch):
             assert client.get(base + "/center/composites?query=%25").json()["total"] == 0
             assert client.get(base + "/center/composites?page_size=101").status_code == 422
             with database.begin() as db:
-                assert db.scalar(select(func.count()).select_from(MarketDemand)) == 1
+                assert db.scalar(select(func.count()).select_from(MarketDemand)) == 0
     finally:
         api.app.dependency_overrides.clear()
 

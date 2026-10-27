@@ -5,7 +5,7 @@ from alerts import live_pricing as live
 from alerts.config import settings
 from alerts.market_contracts import CandleBatch, QuoteEvent, RequestResult
 from alerts.oanda_rest_batch import live_demand_revision
-from alerts.storage import Audit, Bar, LiveState, PricingOwner, SignalRow, Watch
+from alerts.storage import Audit, Bar, LiveState, MarketDemand, PricingOwner, SignalRow, Watch
 from legacy_records import archived_watch
 from sqlalchemy import select
 from test_market_contracts import minute
@@ -20,6 +20,13 @@ def running(database, monkeypatch):
         {"name": "XAU_USD", "type": "METAL", "displayPrecision": 3},
         {"name": "GBP_USD", "type": "CURRENCY", "displayPrecision": 5},
     ], "test-account")
+    from alerts.realtime_switch import enabled, set_enabled
+    from alerts.storage import MarketDataset
+    with database.begin() as db:
+        for dataset in db.scalars(select(MarketDataset)):
+            instrument = dataset.instrument_id
+            set_enabled(db, instrument, True, now=125000)
+            assert enabled(db, instrument)
     identities = live.desired_datasets("test-account")
     ownership = live.claim("test-account", now=125000)
     epoch = live.begin_connection(ownership, identities, now=125000)
@@ -65,6 +72,33 @@ def test_browser_demand_and_alerts_join_resident_instruments_without_extra_owner
         create(db, "persistent-demand", config(instrument=dataset.instrument_id, source="oanda",
             timeframe="M1"), at=0)
     assert set(live.desired_datasets("test-account")) == {"EUR_USD", "XAU_USD", "GBP_USD"}
+
+
+def test_disabled_resident_is_not_owned_or_collected(running):
+    factory, _, _, identities = running
+    from alerts.realtime_switch import set_enabled
+    from alerts.storage import MarketDataset
+    with factory.begin() as db:
+        instrument = db.get(MarketDataset, identities['EUR_USD'].key).instrument_id
+        set_enabled(db, instrument, False, now=125001)
+    assert set(live.desired_datasets('test-account')) == {'XAU_USD'}
+
+
+def test_disabled_managed_oanda_chart_demand_cannot_create_or_keep_collection(running):
+    factory, _, _, identities = running
+    from alerts.market_data import renew_demand
+    from alerts.realtime_switch import set_enabled
+    from alerts.storage import Instrument, MarketDataset
+
+    with factory.begin() as db:
+        dataset = db.get(MarketDataset, identities['EUR_USD'].key)
+        instrument = db.get(Instrument, dataset.instrument_id)
+        set_enabled(db, instrument.id, False, now=125001)
+        renew_demand(db, 'managed-chart', instrument)
+        db.add(MarketDemand(id='stale-managed-chart', instrument_id=instrument.id,
+            composite_revision_id=None, expires=185000, updated_at=125001))
+
+    assert set(live.desired_datasets('test-account')) == {'XAU_USD'}
 
 
 def test_quotes_are_source_isolated_forming_has_no_fake_volume_and_duplicate_order_is_fenced(running):

@@ -108,6 +108,9 @@ def main():
             composite = first_use(db,value["history"],value["mapping"])
             revision = db.get(CompositeRevision,composite.active_revision_id)
             target = DatasetIdentity.model_validate(db.get(MarketDataset,value["target"]).identity)
+            from alerts.realtime_switch import set_enabled
+            history_id = db.get(HistoryVersion,revision.history_version_id).dataset_id
+            set_enabled(db,db.get(MarketDataset,history_id).instrument_id,True,now=now_ms())
             prep = db.get(CompositePreparation,revision.id)
             end = prep.cutoff
             apply_minutes(db,record(db,CandleBatch(identity=target,window_start=revision.seam,

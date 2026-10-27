@@ -35,7 +35,7 @@ class DatabaseComposeTests(unittest.TestCase):
                     values[name] = f'market-watch-{component}:fixture'
                 elif name.endswith('PORT'):
                     values[name] = '18000'
-                elif name.endswith(('DIR', 'ENV')) or name == 'MW_JIT_RESULTS':
+                elif name.endswith(('DIR', 'ENV', 'REPO')) or name == 'MW_JIT_RESULTS':
                     values[name] = str(fixture) if name.endswith('ENV') else directory
                 elif 'DATABASE_URL' in name or name == 'TEST_POSTGRES_URL':
                     values[name] = 'postgresql+psycopg://fixture@postgres/fixture'

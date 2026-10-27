@@ -34,12 +34,13 @@ from .storage import (
     PricingOwner,
     RealtimeMapping,
     instant,
+    now_ms,
 )
 
 CONTRACT = "composite-alert-input-v1"
 
 
-def bind(db, config):
+def bind(db, config, *, now=None):
     from .composite_definitions import first_use
     from .series_access import composite_definition
 
@@ -52,6 +53,8 @@ def bind(db, config):
     if not revision or revision.composite_id != composite.id:
         raise ValueError("组合修订不属于所选系列")
     version = db.get(HistoryVersion, revision.history_version_id)
+    require_live_eligibility(db, revision, now=now_ms() if now is None else now,
+                             timeframe=config.timeframe)
     mapping = db.get(RealtimeMapping, revision.mapping_id)
     target = db.get(MarketDataset, mapping.target_dataset_id)
     if target.identity["account_scope"] != account_scope():
@@ -72,6 +75,37 @@ def bind(db, config):
         "seam": revision.seam, "rules": revision.rules, "seam_policy": config.seam_policy,
         "calculation_algorithm": ALGORITHM, "contract": CONTRACT,
         "initial_input_revision": db.get(CompositePreparation, revision.id).input_revision}
+
+
+def require_live_eligibility(db, revision, *, now, timeframe, lock=True):
+    from .composite_quotes import live_snapshot
+    from .realtime_switch import enabled, revision_instrument_id
+    from .storage import CompositeAggregateTask, CompositePreparation, HistoryArtifact
+
+    instrument_id = revision_instrument_id(db, revision)
+    if not instrument_id:
+        raise ValueError("组合固定历史来源不存在")
+    if lock:
+        from .chart_history_plan import lock_plan_instrument
+        # Match evidence writers/evaluators before taking the instrument lock;
+        # acquiring the historical dataset first can invert the pair's order.
+        history = db.get(HistoryVersion, revision.history_version_id)
+        mapping = db.get(RealtimeMapping, revision.mapping_id)
+        list(db.scalars(select(MarketDataset.id).where(MarketDataset.id.in_(
+            {history.dataset_id, mapping.target_dataset_id})).order_by(MarketDataset.id).with_for_update()))
+        lock_plan_instrument(db, instrument_id)
+    if not enabled(db, instrument_id):
+        raise ValueError("该自建品种实时流已关闭，不能启动可执行告警")
+    if not live_snapshot(db, revision, now=now)["sample_ready"]:
+        raise ValueError("该组合实时来源尚未就绪，暂不能创建或恢复告警")
+    prep = db.get(CompositePreparation, revision.id)
+    task = db.get(CompositeAggregateTask, (revision.id, timeframe))
+    artifact = db.scalar(select(HistoryArtifact.id).where(
+        HistoryArtifact.version_id == revision.history_version_id,
+        HistoryArtifact.timeframe == timeframe, HistoryArtifact.status == "published").limit(1))
+    if (not prep or prep.status != "queried" or prep.error or not task or
+            task.applied_input_revision < prep.input_revision or not artifact):
+        raise ValueError("组合接缝或告警周期尚未准备就绪")
 
 
 def geometry_rows(db, composite_id, frame, points, *, revision_id=None, input_revision=None, now=None):
@@ -243,6 +277,14 @@ def evaluate(db, alert, version, config, now):
     # them in order before shared artifact reads, avoiding reader lock upgrades.
     list(db.scalars(select(MarketDataset.id).where(MarketDataset.id.in_(
         sorted({identity["dataset_id"], target.id}))).order_by(MarketDataset.id).with_for_update()))
+    from .realtime_switch import enabled
+
+    source_dataset = db.get(MarketDataset, identity["dataset_id"])
+    if not enabled(db, source_dataset.instrument_id):
+        alert.status, alert.control_revision = "paused", alert.control_revision + 1
+        alert.health, alert.health_reason = "blocked", "自建品种实时流已关闭；告警已暂停，启用后需明确恢复"
+        alert.updated_at = now
+        return []
     from .composite_quotes import (
         json_safe,
         live_snapshot,
@@ -257,11 +299,6 @@ def evaluate(db, alert, version, config, now):
     value = prep.input_revision
     runtime.update(composite_revision_id=revision.id, input_revision=value,
                    history_version_id=identity["history_version_id"], seam_policy=config.seam_policy)
-    if prep.status != "queried" or prep.error:
-        return wait(alert, runtime, "warming", "确认M1接续准备或恢复尚未完成")
-    task = db.get(CompositeAggregateTask, (revision.id, config.timeframe))
-    if not task or task.applied_input_revision < value:
-        return wait(alert, runtime, "warming", "所需周期尚未处理完整固定输入；等待聚合水位", reset=False)
     phase = revision.rules["aggregation_calendar"]
     target_inst = db.get(Instrument, target.instrument_id)
     profile = target_inst.calendar_profile
@@ -272,6 +309,19 @@ def evaluate(db, alert, version, config, now):
 
     is_open = session_status(target.identity, profile, now)['market_session'] != 'closed' and scheduled_open(
         instant(now), calendar_from(phase, profile, explicit=True), closures=closures_from(profile))
+    stale_input = live_view.get("received_age_ms") is None or live_view["received_age_ms"] > 15000
+    if live_view["observation_mode"] == "stream_quote":
+        stale_input = stale_input or live_view.get("quote_age_ms") is None or live_view["quote_age_ms"] > 15000
+    if is_open and stale_input:
+        alert.status, alert.control_revision = "paused", alert.control_revision + 1
+        alert.health, alert.health_reason = "blocked", "组合实时输入已过期；告警已暂停，恢复后需明确重启"
+        alert.updated_at = now
+        return []
+    if prep.status != "queried" or prep.error:
+        return wait(alert, runtime, "warming", "确认M1接续准备或恢复尚未完成")
+    task = db.get(CompositeAggregateTask, (revision.id, config.timeframe))
+    if not task or task.applied_input_revision < value:
+        return wait(alert, runtime, "warming", "所需周期尚未处理完整固定输入；等待聚合水位", reset=False)
     live = db.get(LiveState, target.id)
     owner = db.get(PricingOwner, account_key(settings.oanda_account_id))
     owned = bool(owner and owner.error not in ('unauthorized', 'provider_maintenance')

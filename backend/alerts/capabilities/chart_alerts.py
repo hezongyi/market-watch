@@ -85,12 +85,14 @@ def events(ctx, query):
 
 
 def create(ctx, query, db):
+    invoke(application.require_executable_source, query.config)
     key = invoke(application.dataset_for, query.config)
     return invoke(application.new, db, application.Create(
         request_id=query.request_id, config=query.config), dataset_id=key)
 
 
 def edit(ctx, query, db):
+    invoke(application.require_executable_source, query.config)
     key = invoke(application.dataset_for, query.config)
     return invoke(application.update, db, query.alert_id, application.Edit(
         version=query.version, config=query.config), dataset_id=key)

@@ -47,12 +47,25 @@ def capabilities(body):
         raise ValueError("未知判定周期")
     with transaction() as db:
         if body.series_kind == "composite":
+            from .composite_alerts import require_live_eligibility
+            from .series_access import composite_definition
             from .series_access import metadata as fixed_metadata
+            from .storage import CompositeRevision, now_ms
 
             meta = fixed_metadata(db, body.instrument, "composite")
+            _, _, composite = composite_definition(db, body.instrument)
+            revision = db.get(CompositeRevision, composite.active_revision_id) if composite else None
+            try:
+                if body.timeframe not in meta["frames"] or not revision:
+                    raise ValueError
+                require_live_eligibility(db, revision, now=now_ms(), timeframe=body.timeframe, lock=False)
+                available = True
+            except ValueError:
+                available = False
             return {"instrument": body.instrument, "timeframe": body.timeframe,
                 "sources": [{"source": "composite", "series_kind": "composite", "basis": meta["basis"], "atr_frames": meta["frames"],
-                    "calendar": meta["calendar"], "available": body.timeframe in meta["frames"], "reason": None,
+                    "calendar": meta["calendar"], "available": available,
+                    "reason": None if available else "实时流已关闭或来源不可用",
                     "observation_basis": "固定历史与确认M1接续；临时触价为显式抽样模式，断线后不追认未观测事件"}],
                 "modes": ["close", "intrabar"], "indicators": ["SMA", "EMA", "RSI", "MACD", "ROLLING_RANGE_SQUEEZE"],
                 "indicator_metadata": {name: meta for name, meta in public_catalog().items() if name in ("SMA", "EMA", "RSI", "MACD", "ROLLING_RANGE_SQUEEZE")},
@@ -71,9 +84,11 @@ def capabilities(body):
     sources = [row for row in (managed, provider) if row]
     for row in sources:
         row["atr_frames"] = list(frames(row["source"]) if row["series_kind"] == "provider" else FRAMES)
-        reason = ("此来源尚未确认告警交易日历" if row["calendar"] not in ("ny17", "utc0")
-                  else "来源或周期暂不可用" if not row["enabled"] else None)
-        row["available"], row["reason"] = reason is None, reason
+        existing_reason = ("此来源尚未确认告警交易日历" if row["calendar"] not in ("ny17", "utc0")
+                          else "来源或周期暂不可用" if not row["enabled"] else None)
+        row["available"] = False
+        retirement_reason = "旧来源告警已退役，仅支持查看、暂停或归档"
+        row["reason"] = (existing_reason + "；" if existing_reason else "") + retirement_reason
         seconds = poll_seconds(row["source"]) if row["series_kind"] == "provider" else 15
         row["observation_basis"] = f"抽样 K 线当前收盘值，约每 {seconds} 秒观察；不重建未观测路径"
     return {"instrument": body.instrument, "timeframe": body.timeframe, "sources": sources,
@@ -101,6 +116,8 @@ class Action(Contract):
 
 
 def dataset_for(config):
+    if isinstance(config, AlertConfig):
+        require_executable_source(config)
     if config.series_kind in ("managed", "composite"):
         return None
     from .provider_cache import ensure
@@ -226,6 +243,7 @@ def judgments(db, alert_id: str, before: int | None = None, limit: int = 100):
         for row in db.scalars(query.order_by(CompositeJudgment.created_at.desc(), CompositeJudgment.id).limit(limit))]
 
 def new(db, body: Create, *, dataset_id=None):
+    require_executable_source(body.config)
     existing = db.scalar(select(ChartAlert).where(ChartAlert.request_id == body.request_id))
     if existing is None:
         validate_association(db, body.config)
@@ -234,12 +252,23 @@ def new(db, body: Create, *, dataset_id=None):
 
 
 def update(db, alert_id: str, body: Edit, *, dataset_id=None):
+    require_executable_source(body.config)
     validate_association(db, body.config)
     validate_geometry(db, body.config, dataset_id=dataset_id)
     return alert_dict(db, edit(db, alert_id, body.version, body.config, dataset_id=dataset_id))
 
 
+def require_executable_source(config):
+    if config.series_kind != "composite":
+        raise ValueError("新建或编辑的告警必须绑定组合行情；旧来源告警仅可查看、停用或归档")
+
+
 def action(db, alert_id: str, body: Action):
+    alert = db.scalar(select(ChartAlert).where(ChartAlert.id == alert_id).with_for_update())
+    if alert:
+        config = AlertConfig.model_validate(current_version(db, alert).config)
+        if config.series_kind != "composite" and body.action not in ("pause", "archive"):
+            raise ValueError("旧来源告警仅可暂停或归档")
     return alert_dict(db, lifecycle(db, alert_id, body.version, body.action,
         expected_revision=body.control_revision, request_id=body.request_id))
 

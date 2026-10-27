@@ -1126,6 +1126,9 @@ def bootstrap(db_engine=engine):
                             precision=precision,
                         )
                     )
+            from .realtime_switch import initialize_defaults
+
+            initialize_defaults(db, now=now_ms())
 
 
 def _bootstrap_history_modes(connection):

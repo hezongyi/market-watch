@@ -10,6 +10,7 @@ from alerts import live_pricing as live
 from alerts.config import settings
 from alerts.history_retention import reclaim
 from alerts.market import ingest
+from alerts.realtime_switch import set_enabled
 from alerts.storage import (
     ChartHistoryPlan,
     ChartPublicationState,
@@ -45,6 +46,10 @@ def test_publisher_plan_progress_does_not_deadlock_confirmed_pricing(
     live.ensure_catalog([
         {"name": "EUR_USD", "type": "CURRENCY", "displayPrecision": 5},
     ], "deadlock-regression-account")
+    with factory.begin() as db:
+        dataset = next(row for row in db.scalars(select(MarketDataset))
+                       if row.identity.get("provider_symbol") == "EUR_USD")
+        set_enabled(db, dataset.instrument_id, True, now=125000)
     identities = live.desired_datasets("deadlock-regression-account")
     identity = identities["EUR_USD"]
     ownership = live.claim("deadlock-regression-account")
@@ -182,6 +187,10 @@ def test_plan_lifecycle_does_not_deadlock_confirmed_pricing(provider_pg, monkeyp
     monkeypatch.setattr(live, "now_ms", lambda: 125000)
     live.ensure_catalog([{"name": "EUR_USD", "type": "CURRENCY", "displayPrecision": 5}],
                         "plan-completion-account")
+    with factory.begin() as db:
+        dataset = next(row for row in db.scalars(select(MarketDataset))
+                       if row.identity.get("provider_symbol") == "EUR_USD")
+        set_enabled(db, dataset.instrument_id, True, now=125000)
     identities = live.desired_datasets("plan-completion-account")
     identity = identities["EUR_USD"]
     ownership = live.claim("plan-completion-account")
@@ -194,6 +203,9 @@ def test_plan_lifecycle_does_not_deadlock_confirmed_pricing(provider_pg, monkeyp
                 target_end=120000, cursor=120000,
                 status="cancelled" if action in ("resume", "reactivate") else "pending",
                 realtime_enabled=action != "reactivate"))
+            db.flush()
+            if action == "reactivate":
+                set_enabled(db, instrument_id, True, now=125000)
 
     confirmation_locked = threading.Event()
     plan_at_lock = threading.Event()
@@ -284,6 +296,7 @@ def test_plan_writer_reloads_a_preloaded_approved_range(provider_pg, action):
     factory, _ = provider_pg
     with factory.begin() as db:
         instrument_id = register(db).id
+        set_enabled(db, instrument_id, True, now=125000)
         db.add(ChartHistoryPlan(instrument_id=instrument_id, target_start=60000,
             target_end=120000, cursor=120000, status="pending", realtime_enabled=True))
 
@@ -295,7 +308,7 @@ def test_plan_writer_reloads_a_preloaded_approved_range(provider_pg, action):
             plan.realtime_enabled = False
         if action == "join":
             result = managed_dataset.join(stale, stale.get(Instrument, instrument_id), 60000, 185000)
-            assert result.status == "pending" and result.realtime_enabled
+            assert result.status == "pending" and not result.realtime_enabled
         else:
             result = chart_history_plan.control_plan(stale, instrument_id, "resume", 185000)
         assert result is preloaded

@@ -20,6 +20,12 @@ pytestmark = pytest.mark.skipif(not os.getenv('TEST_POSTGRES_URL'), reason='Isol
 
 def catalog(account='test-account'):
     live.ensure_catalog([{'name': 'EUR_USD', 'displayPrecision': 5}, {'name': 'XAU_USD', 'displayPrecision': 3}], account)
+    from alerts.realtime_switch import set_enabled
+    from alerts.storage import MarketDataset, transaction
+    with transaction() as db:
+        for dataset in db.scalars(select(MarketDataset)):
+            instrument = dataset.instrument_id
+            set_enabled(db, instrument, True, now=0)
     return live.desired_datasets(account)
 
 
@@ -73,6 +79,7 @@ class ControlledStop:
 
 def test_worker_startup401_maintenance_then_pricing_access_recovers_without_manual_reset(provider_pg, monkeypatch):
     factory, _ = provider_pg
+    catalog()
     clock, calls, collections = [125000], [], []
     monkeypatch.setattr(live, 'now_ms', lambda: clock[0])
     monkeypatch.setattr(oanda_worker, 'now_ms', lambda: clock[0])
@@ -122,6 +129,7 @@ def test_worker_verified_closure_has_no_stream_or_rest_poll_storm(provider_pg, m
         account_scope='sha256:' + hashlib.sha256(b'test-account').hexdigest(), provider_symbol=symbol,
         basis='bid', calendar_version=settings.oanda_calendar_version) for symbol in ('EUR_USD', 'XAU_USD')}
     monkeypatch.setattr(settings, 'oanda_calendar_profiles', {symbol: profile(identity) for symbol, identity in candidates.items()})
+    catalog()
     client, _ = client_for()
 
     def respond(request):

@@ -9,6 +9,7 @@ from alerts import live_pricing as live
 from alerts.config import settings
 from alerts.market_contracts import RequestResult
 from alerts.storage import Instrument, LiveState, MarketDataset, PricingOwner
+from sqlalchemy import select
 from test_live_pricing import candles, quote
 from test_market_contracts import minute
 from test_oanda_recovery import profile
@@ -52,6 +53,11 @@ def test_closed_boundary_open_recovery_requires_current_m1_on_postgres(provider_
     monkeypatch.setattr(live, "now_ms", lambda: stamp)
     monkeypatch.setattr(settings, "oanda_resident_symbols", "EUR_USD")
     live.ensure_catalog([{"name": "EUR_USD", "displayPrecision": 5}], "test-account")
+    from alerts.realtime_switch import set_enabled
+    with factory.begin() as db:
+        dataset = next(row for row in db.scalars(select(MarketDataset))
+                       if row.identity.get("provider_symbol") == "EUR_USD")
+        set_enabled(db, dataset.instrument_id, True, now=stamp)
     identities = live.desired_datasets("test-account")
     identity = identities["EUR_USD"]
     monkeypatch.setattr(settings, "oanda_live_session_profiles", {"EUR_USD": profile(identity)})

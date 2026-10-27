@@ -12,6 +12,9 @@ from test_market_contracts import batch, minute
 
 
 def populated(database, monkeypatch):
+    from alerts.realtime_switch import set_enabled
+    from alerts.storage import HistoryVersion
+
     revision_id = ready(database, monkeypatch)
     with database.begin() as db:
         revision = db.get(CompositeRevision, revision_id)
@@ -24,6 +27,8 @@ def populated(database, monkeypatch):
         apply_minutes(db, record(db, source))
         composite = revision.composite_id
         parent = revision.history_version_id
+        dataset = db.get(MarketDataset, db.get(HistoryVersion, parent).dataset_id)
+        set_enabled(db, dataset.instrument_id, True, now=seam)
     while artifact_tick(parent):
         pass
     return composite, revision_id, seam

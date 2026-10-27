@@ -22,8 +22,12 @@ docker compose --env-file /home/quant/.local/share/market-watch-runtime-20261026
   -p mw-runtime-20261026 -f deploy/ubuntu/runtime-market.baseline.yaml stop
 ```
 
-用户已于2026-10-27明确接受建议业务门槛，确认记录见 acceptance-thresholds.md。阶段0产物/验证完成，PR CI Backend 最终检查仍须核实后再标记签收；不涉及合并 main、正式发布、生产操作、真实 ntfy 投递或永久删除。
+用户已于2026-10-27明确接受建议业务门槛，确认记录见 acceptance-thresholds.md。阶段0门槛检查点与基线 CI 已通过 PR #100，阶段0完成。阶段1A 已由 PR #101 验证通过。当前 PR #102 是阶段1边界切片，最终 SHA `2e85bfc5` 的 Backend（3094 passed、3 skipped）、Web、Compose、分类检查全通过；该 PR 通过不代表阶段1的实时开关资格语义或后续阶段完成。不涉及合并 main、正式发布、生产操作、真实 ntfy 投递或永久删除。
 
 合同回归 127 passed；十个任务 PG 套件 150 passed、1 skipped（需要 v1.14.0 源码挂载的旧进程专项，不计通过）。运维检查 97 passed、68 subtests，三个应用依赖项在基线镜像另跑 3 passed；事件分母两项回归包含于运维检查。新脚本 ruff 通过。schema head `ay52_history_modes`。试跑校正与失效证据见 `probe-corrections.md`；正式采样采用连续业务时钟、61×2秒/场，包含四场及同资源快重建对照，测量期间不并跑性能/PG套件。
 
 正式五场采样均已结束。normal、busy、candidate(1s)、slow-source 各13个事件且按窗口 oracle 通过；aggressive candidate(0.05s) 只有12个，末段盘中窗口缺失。前四场仍各有1–2个未处理输入/规则对，完整分母已保留。candidate(1s) 28.20s 就绪。报告、原始 JSONL 压缩副本和只读实例盘点均已生成；candidate 更快但事件缺失，不能作为可接受预算。environment.json 记录其他 Docker 项目同时运行、host load约6–9。业务门槛已接受，阶段1可推进；阶段2仍须按固定门槛验收。
+
+2026-10-27：阶段 1 实时开关切片在独立 worktree `/home/quant/repos/market-watch-runtime-switch-20261027`、分支 `refactor/managed-realtime-switch-20261027` 推进。实现基于阶段 1 边界 Draft PR #102 当前代码 `210083f6`；持久配置复用 Preference，不改 schema。详情及 PG 隔离环境见 `stage-1-realtime-switch.md`。兼容初值为一次性持久快照，显式 off 优先；方案 §3.6 要求有效实时映射和活跃消费者同时存在，旧 `Instrument.enabled` / `ChartHistoryPlan.realtime_enabled` 单独存在不能使纯历史品种迁移开启。资格检查覆盖开关、来源新鲜度、接缝准备、规则周期发布及聚合水位。曾发现并修正 resident OANDA 无条件采集、未准备状态进入告警资格，以及历史 join 错误默认打开。
+
+最终阶段门槛复验：SQLite/隔离 PostgreSQL 跨模块合同 **270 passed**；Compose policy 测试 **4 passed、26 subtests passed**；ruff 与 `git diff --check` 通过。独立 Standards/Spec 复审针对迁移默认、未注册旧品种兼容、managed OANDA lease 和旧 collector 边界完成，无阻塞 findings。PR #103 上一轮 CI 的后端失败定位为 Compose 测试夹具将 `MW_SWITCH_REPO` 解析为 named volume；测试 helper 已修正，本地 Compose policy 测试通过。修正分支尚待提交推送并重跑 PR CI。此前无 `TEST_POSTGRES_URL` 的全后端运行 2436 passed、9 failed、661 skipped、38 setup errors，发生在早期代码且 PG fixture 缺环境变量，不作为最终证据。当前 PR #103 仍为 Draft；PR #102 保持独立前置门槛。实时开关阶段尚未收口，未合并、未打正式 tag、未部署生产。

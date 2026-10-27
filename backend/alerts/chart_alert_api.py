@@ -60,6 +60,7 @@ def router(authenticated):
     @api.post("", status_code=201)
     def new(body: Create):
         try:
+            application.require_executable_source(body.config)
             key = application.dataset_for(body.config)
             for attempt in range(2):
                 try:
@@ -74,6 +75,7 @@ def router(authenticated):
     @api.post("/{alert_id}/edit")
     def update(alert_id: str, body: Edit):
         try:
+            application.require_executable_source(body.config)
             key = application.dataset_for(body.config)
             return read_operation(application.update, alert_id, body, dataset_id=key)
         except ValueError as exc:

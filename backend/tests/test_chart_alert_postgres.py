@@ -83,6 +83,66 @@ def test_postgres_concurrent_lifecycle_retry_opens_one_run(postgres_alerts, monk
         assert db.scalar(select(func.count()).select_from(ChartAlertAction)) == 1
 
 
+def test_postgres_concurrent_monitors_retire_legacy_once_and_preserve_delivery(postgres_alerts, monkeypatch):
+    from alerts import storage
+    from alerts.chart_alert_worker import step
+
+    monkeypatch.setattr(storage.settings, "fx_source", "dukascopy")
+    bootstrap(postgres_alerts)
+    factory = sessionmaker(postgres_alerts, expire_on_commit=False)
+    monkeypatch.setattr(storage, "Session", factory)
+    with factory.begin() as db:
+        row = create(db, "retire-concurrent", config(notify_ntfy=True), at=0)
+        ident = row.id
+        consume(db, ident, sample(0, 9), detected_at=0)
+        consume(db, ident, sample(1, 11), detected_at=300000)
+        before = (row.version, row.run, row.count, row.control_revision, row.state, row.runtime)
+        event = db.scalar(select(SignalRow))
+        signal_id, evidence = event.id, event.evidence
+        task = db.scalar(select(Outbox))
+        delivery = {column.name: getattr(task, column.name) for column in Outbox.__table__.columns}
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        list(pool.map(lambda _: step(now=600000), range(4)))
+
+    with factory() as db:
+        row = db.get(ChartAlert, ident)
+        assert row.status == "paused" and "已退役" in row.health_reason
+        assert (row.version, row.run, row.count, row.state, row.runtime) == (
+            before[0], before[1], before[2], before[4], before[5])
+        assert row.control_revision == before[3] + 1
+        assert db.get(SignalRow, signal_id).evidence == evidence
+        assert db.scalar(select(func.count()).select_from(SignalRow)) == 1
+        task = db.scalar(select(Outbox))
+        assert {column.name: getattr(task, column.name) for column in Outbox.__table__.columns} == delivery
+
+
+def test_postgres_locked_rule_is_skipped_without_evaluation_observation(postgres_alerts, monkeypatch):
+    from alerts import chart_alert_worker, storage
+
+    monkeypatch.setattr(storage.settings, "fx_source", "dukascopy")
+    bootstrap(postgres_alerts)
+    factory = sessionmaker(postgres_alerts, expire_on_commit=False)
+    monkeypatch.setattr(storage, "Session", factory)
+    with factory.begin() as db:
+        ident = create(db, "locked-monitor", config(), at=0).id
+
+    observations = []
+    with factory.begin() as holder:
+        row = holder.scalar(select(ChartAlert).where(ChartAlert.id == ident).with_for_update())
+        assert row.status == "active"
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            pool.submit(chart_alert_worker.step, now=600000, on_evaluated=observations.append).result(timeout=10)
+        assert observations == []
+        assert row.status == "active" and row.control_revision == 1
+
+    chart_alert_worker.step(now=600000, on_evaluated=observations.append)
+    assert len(observations) == 1
+    assert observations[0]["alert_id"] == ident
+    assert observations[0]["status"] == "paused"
+    assert observations[0]["committed"] >= observations[0]["commit_started"]
+
+
 def test_postgres_populated_legacy_upgrade_preserves_foreign_keys(postgres_alerts):
     with postgres_alerts.begin() as connection:
         legacy(connection)

@@ -24,6 +24,9 @@ def fixture(database, monkeypatch):
     monkeypatch.setattr("alerts.composite_definitions.now_ms", lambda: 165725000)
     with database.begin() as db:
         save_mapping(db, identity().key, catalog, PROOF)
+        from alerts.realtime_switch import set_enabled
+        from alerts.storage import MarketDataset
+        set_enabled(db, db.get(MarketDataset, identity().key).instrument_id, True, now=165725000)
     return parent
 
 
@@ -160,6 +163,41 @@ def test_fixed_export_rejects_actual_row_overflow_without_import_jobs(database, 
             assert len(list(csv.DictReader(io.StringIO(valid.content.decode("utf-8-sig"))))) == 2000
             with database.begin() as db:
                 assert db.scalar(select(ImportJob)) is None and db.scalar(select(MarketDemand)) is None
+    finally:
+        api.app.dependency_overrides.clear()
+
+
+def test_export_page_overflow_raises_transport_neutral_query_error(monkeypatch):
+    from types import SimpleNamespace
+
+    from alerts.query_errors import QueryError
+    from alerts.series_access import export_page
+
+    page = {"bars": [{"start": i, "end": i + 1} for i in range(2001)],
+            "indicators": [], "pending": [], "next_before": None}
+    monkeypatch.setattr("alerts.series_access.chart_data", lambda *args, **kwargs: page)
+    body = SimpleNamespace(end=2002, instrument="history", series_kind="history",
+        timeframe="M1", indicators=[], composite_revision_id=None, input_revision=None, start=0)
+    with pytest.raises(QueryError) as error:
+        export_page(None, body)
+    assert error.value.status_code == 413
+
+
+def test_pending_fixed_export_commits_indicator_request_before_http_conflict(database, monkeypatch):
+    from alerts.storage import FixedIndicatorRun
+
+    parent = fixture(database, monkeypatch)
+    api.app.dependency_overrides[api.authenticated] = lambda: "test"
+    try:
+        with TestClient(api.app) as client:
+            response = client.post("/api/charts/export", json={
+                "instrument": parent, "series_kind": "history", "timeframe": "M1",
+                "start": 0, "end": 172920000,
+                "indicators": [{"name": "SMA", "version": "1", "params": {"period": 2}}]})
+            assert response.status_code == 409, response.text
+        with database() as db:
+            run = db.scalar(select(FixedIndicatorRun))
+            assert run is not None and run.status == "pending"
     finally:
         api.app.dependency_overrides.clear()
 

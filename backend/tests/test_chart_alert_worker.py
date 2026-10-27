@@ -156,7 +156,7 @@ def test_intrabar_history_revision_blocks_but_provisional_changes_do_not(databas
         assert "修订" in db.get(ChartAlert, ident).health_reason
 
 
-def test_provider_demands_survive_absent_browser_and_protect_dataset(database, monkeypatch):
+def test_legacy_provider_alert_is_paused_without_creating_provider_demand(database, monkeypatch):
     meta = {"id": "BTCUSDT", "source": "binance", "symbol": "BTCUSDT",
             "basis": "last", "calendar": "utc0", "precision": 2}
     key = provider_cache.ensure(meta, "M1")
@@ -181,15 +181,22 @@ def test_provider_demands_survive_absent_browser_and_protect_dataset(database, m
         return {}
 
     monkeypatch.setattr(provider_cache, "read", read)
+    # Provider acquisition can run before the monitor retires the active rule.
     provider_service.realtime_step("binance")
-    assert calls == [("BTCUSDT", "M1", True)]
+    assert calls == []
+    from alerts.chart_alert_worker import step
+    step(now=180_000)
     with database.begin() as db:
-        assert len(evaluate(db, ident, now=180_000)) == 1
-    monkeypatch.setattr(provider_service, "now_ms", lambda: 200 * 86_400_000)
-    provider_service.cleanup()
+        row = db.get(ChartAlert, ident)
+        assert row.status == "paused"
+        assert row.health == "blocked"
+        assert "已退役" in row.health_reason
+    provider_service.realtime_step("binance")
+    assert calls == []
     with database() as db:
+        assert db.get(ChartAlert, ident).status == "paused"
         assert db.get(ProviderDataset, key) is not None
-        assert db.scalar(select(func.count()).select_from(ProviderBar)) == 3
+        assert db.scalar(select(func.count()).select_from(ProviderBar)) == 0
 
 
 def test_price_outside_reversed_ray_reports_geometry_range_not_indicator_warmup(database):

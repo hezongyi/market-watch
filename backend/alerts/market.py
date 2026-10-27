@@ -24,6 +24,7 @@ from .providers import fetch_binance, fetch_oanda
 from .storage import (
     Audit,
     Bar,
+    ChartHistoryPlan,
     ImportJob,
     Instrument,
     MarketCoverage,
@@ -541,13 +542,28 @@ def once(symbol=None, start=None, end=None, *, include_viewers=False, fetcher=No
         clear_misrouted_composite_errors(db)
         viewers = set()
         if include_viewers:
-            from .storage import ChartHistoryPlan, ChartViewportDemand, MarketDemand
+            from .realtime_switch import enabled, revision_instrument_id
+            from .storage import (
+                ChartHistoryPlan,
+                ChartViewportDemand,
+                CompositeRevision,
+                MarketComposite,
+                MarketDemand,
+            )
+
             viewers.update(db.scalars(select(ChartHistoryPlan.instrument_id).where(
                 ChartHistoryPlan.realtime_enabled.is_(True))))
-            viewers.update(db.scalars(select(MarketDemand.instrument_id).where(
-                MarketDemand.expires > now_ms())))
-            viewers.update(db.scalars(select(ChartViewportDemand.instrument_id).where(
-                ChartViewportDemand.expires > now_ms())))
+            for ident, in db.execute(select(MarketDemand.instrument_id).where(MarketDemand.expires > now_ms())):
+                composite = db.scalar(select(MarketComposite).where(MarketComposite.instrument_id == ident))
+                if composite:
+                    revision = db.get(CompositeRevision, composite.active_revision_id)
+                    source_id = revision_instrument_id(db, revision) if revision else None
+                    if source_id and enabled(db, source_id):
+                        viewers.add(ident)
+                elif enabled(db, ident):
+                    viewers.add(ident)
+            viewers.update(ident for ident, in db.execute(select(ChartViewportDemand.instrument_id).where(
+                ChartViewportDemand.expires > now_ms())) if enabled(db, ident))
         instruments = [
             (i.id, i.symbol, i.source)
             for i in db.scalars(ordinary_instruments().order_by(Instrument.enabled.desc(), Instrument.id))
@@ -626,8 +642,13 @@ def import_once(*, chart_only=False, fetcher=None, defer_aggregation=False,
     with transaction() as db:
         from .storage import ChartAggregationJob
 
+        realtime_instruments = select(Instrument.id).outerjoin(
+            ChartHistoryPlan, ChartHistoryPlan.instrument_id == Instrument.id).where(
+                or_(ChartHistoryPlan.realtime_enabled.is_(True),
+                    ChartHistoryPlan.instrument_id.is_(None) & Instrument.enabled.is_(True)))
         if history_only and db.scalar(select(ImportJob.id).where(
-                ImportJob.priority == 0, ImportJob.status.in_(['pending', 'running'])).limit(1)):
+                ImportJob.priority == 0, ImportJob.instrument_id.in_(realtime_instruments),
+                ImportJob.status.in_(['pending', 'running'])).limit(1)):
             return False
         # One history downloader feeds the independent aggregation executor.
         # Bound ready CPU work without throttling live M1 ingestion. Failed
@@ -658,6 +679,7 @@ def import_once(*, chart_only=False, fetcher=None, defer_aggregation=False,
                 ),
                 ImportJob.next_at <= now_ms(),
                 ImportJob.priority == 0 if realtime_only else True,
+                or_(ImportJob.priority > 0, ImportJob.instrument_id.in_(realtime_instruments)),
                 ImportJob.priority > 0 if history_only else True,
                 ImportJob.priority >= 100 if chart_only else ImportJob.priority < 100,
                 or_(

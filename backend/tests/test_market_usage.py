@@ -24,6 +24,9 @@ def ready(database, monkeypatch):
     with database.begin() as db:
         mapping = save_mapping(db, identity().key, catalog, PROOF)
         composite = first_use(db, identity().key, mapping.id)
+        from alerts.realtime_switch import set_enabled
+        from alerts.storage import MarketDataset
+        set_enabled(db, db.get(MarketDataset, identity().key).instrument_id, True, now=0)
         return composite.id, composite.instrument_id
 
 
@@ -87,6 +90,10 @@ def test_empty_residents_and_account_catalog_other_assets_idle_cleanly(database,
     with database.begin() as db:
         instrument = db.scalar(select(Instrument).where(Instrument.symbol == "US30_USD"))
         assert instrument and not instrument.enabled
+        renew_demand(db, "index-chart", instrument)
+        assert not db.scalar(select(MarketDemand).where(MarketDemand.instrument_id == instrument.id))
+        from alerts.realtime_switch import set_enabled
+        set_enabled(db, instrument.id, True, now=125000)
         renew_demand(db, "index-chart", instrument)
     assert set(live.desired_datasets("catalog-test")) == {"US30_USD"}
 
@@ -166,6 +173,11 @@ def test_pinned_chart_revision_leases_coexist_renew_and_expire_independently(dat
     from alerts.series_access import chart_data
 
     ident, instrument, old, new, old_target, new_target = switched_targets(database, monkeypatch)
+    from alerts.realtime_switch import set_enabled
+    from alerts.storage import MarketDataset
+    with database.begin() as db:
+        set_enabled(db, db.get(MarketDataset, db.get(MarketComposite, ident).dataset_id).instrument_id,
+            True, now=200010000)
     clock = [200010000]
     monkeypatch.setattr("alerts.market_data.now_ms", lambda: clock[0])
     monkeypatch.setattr("alerts.market_usage.now_ms", lambda: clock[0])

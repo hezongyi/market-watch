@@ -160,7 +160,7 @@ def test_consume_rebase_retry_and_downward_precision(database):
         assert current_version(db, db.get(ChartAlert, ident)).config["condition"]["offset"]["multiplier"] == "0.5"
 
 
-def test_provider_second_frame_polled_shared_and_protected_without_browser(database, monkeypatch):
+def test_retired_provider_atr_does_not_poll_but_preserves_evidence_cache(database, monkeypatch):
     from alerts import provider_cache, provider_service
     from alerts.storage import ProviderDataset
 
@@ -179,7 +179,7 @@ def test_provider_second_frame_polled_shared_and_protected_without_browser(datab
     monkeypatch.setattr(provider_service, "now_ms", lambda: 180000)
     monkeypatch.setattr(provider_cache, "read", lambda meta, frame, *args, **kwargs: calls.append(frame))
     provider_service.realtime_step("binance")
-    assert calls == ["D1"], "ATR demand must run when the primary dataset is already fresh"
+    assert calls == [], "Retired alert ATR must not create provider acquisition demand"
     monkeypatch.setattr(provider_service, "now_ms", lambda: 200 * 86400000)
     provider_service.cleanup()
     with database.begin() as db:

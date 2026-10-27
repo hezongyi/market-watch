@@ -78,6 +78,8 @@ def _metadata(db, ident, kind, *, composite_context=None, selected_revision=None
         binding["adjustment_view"] = "qfq" if views == {"qfq"} else "raw"
         binding["price_description"] = "前复权 · 本数据集同源依据计算" if views == {"qfq"} else "原始采集价格"
     elif kind == "composite":
+        from .realtime_switch import enabled, revision_enabled
+
         dataset_id, mapping_id, composite = composite_context or composite_definition(db, ident)
         if composite:
             revision = selected_revision or db.get(CompositeRevision, composite.active_revision_id)
@@ -95,6 +97,8 @@ def _metadata(db, ident, kind, *, composite_context=None, selected_revision=None
         frames = FRAMES
         binding = {"composite_id": ident, "dataset_id": dataset.id, "mapping_id": mapping_id,
                    "history_version_id": version.id, "seam": seam, "created": composite is not None}
+        binding["realtime_enabled"] = (revision_enabled(db, revision) if composite
+                                        else enabled(db, dataset.instrument_id))
         # A mixed-source volume is not a uniform quantity for this series.
         volume_kind, volume_unit = "unavailable", None
     else:
@@ -153,7 +157,11 @@ def chart_data(db, body, *, realtime=None):
         if body.client:
             renew_demand(db, body.client, db.get(Instrument, composite.instrument_id),
                          composite_revision_id=selected.id)
-        if body.provisional and body.input_revision is None:
+        from .realtime_switch import revision_enabled
+        realtime_enabled = revision_enabled(db, selected)
+        if body.display_snapshot_id and not realtime_enabled:
+            raise ValueError("实时流已关闭，不能读取临时行情快照")
+        if body.provisional and body.input_revision is None and realtime_enabled:
             from .config import settings
             from .display_observations import handover_legacy
             from .live_pricing import account_key
@@ -192,14 +200,15 @@ def chart_data(db, body, *, realtime=None):
             if not body.provisional or body.input_revision is not None:
                 raise ValueError('展示快照必须按展示模式读取；固定确认输入请使用 input_revision')
             snapshot = resolve(db, body.display_snapshot_id, selected, body.timeframe, stamp)
-        elif body.provisional and body.input_revision is None:
+        elif body.provisional and body.input_revision is None and realtime_enabled:
             from .display_snapshots import capture
 
             snapshot = capture(db, selected, body.timeframe, stamp)
         page = composite_page(db, composite.id, body.timeframe, before=body.before, count=body.limit,
             revision_id=selected.id,
             input_revision=None if snapshot else selected_input,
-            provisional=body.provisional and body.input_revision is None, now=stamp, realtime=realtime,
+            provisional=body.provisional and body.input_revision is None and realtime_enabled, now=stamp,
+            realtime=realtime if realtime_enabled else None,
             display_snapshot=snapshot)
         parent = db.get(HistoryVersion, selected.history_version_id)
         page["history_checksum"] = parent.manifest["checksum"]
@@ -299,9 +308,8 @@ def history_check(db, page, body, meta):
 
 def export_page(db, body):
     """Export one fixed input snapshot without maintenance or first-use demand."""
-    from fastapi import HTTPException
-
     from .chart_query import DataQuery
+    from .query_errors import QueryError
 
     before, bars, indicators = body.end, [], {}
     revision, inputs = body.composite_revision_id, body.input_revision
@@ -323,14 +331,14 @@ def export_page(db, body):
                 accumulated["values"] = [value for value in series["values"]
                     if body.start <= value["time"] < body.end] + accumulated["values"]
         if len(bars) > 2000:
-            raise HTTPException(413, "单次最多导出2000根K线，请缩小日期范围")
+            raise QueryError(413, "单次最多导出2000根K线，请缩小日期范围")
         cursor = page["next_before"]
         if cursor is None or cursor <= body.start:
             return {**page, "bars": bars, "indicators": list(indicators.values())}
         if cursor >= before:
             raise ValueError("行情导出分页没有推进")
         before = cursor
-    raise HTTPException(413, "单次导出分页过多，请缩小日期范围")
+    raise QueryError(413, "单次导出分页过多，请缩小日期范围")
 
 
 def search_page(db, query="", *, kind="history", page_size=25, offset=0, source=None, calendar=None, symbol_type=""):

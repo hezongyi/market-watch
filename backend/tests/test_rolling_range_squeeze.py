@@ -322,10 +322,11 @@ def test_authenticated_alert_capabilities_and_boolean_rule_save(database, monkey
     from alerts import api as api_module
     from fastapi.testclient import TestClient
     from test_chart_alert_api import login
-    from test_chart_alert_service import config
-    from test_composite_chart import populated
+    from test_chart_alert_service import config as alert_config
+    from test_composite_alerts import ready_config
 
-    composite, _, _ = populated(database, monkeypatch)
+    config = ready_config(database, monkeypatch)
+    composite = config().instrument
     with TestClient(api_module.app) as client:
         login(client, monkeypatch)
         for instrument, kind in [('EURUSD', 'managed'), (composite, 'composite')]:
@@ -337,7 +338,8 @@ def test_authenticated_alert_capabilities_and_boolean_rule_save(database, monkey
             assert result['indicator_metadata'][NAME]['parameter_schema']['confirm_on_close']['type'] == 'bool'
         spec = dict(name=NAME, version='1', output='signal',
                     params=dict(k=1, lookback=20, low_pct=0.1, confirm_on_close=False))
-        payload = config(name='Rolling Range Squeeze', max_triggers=1,
+        payload = alert_config(name='Rolling Range Squeeze', max_triggers=1, instrument=composite,
+                         series_kind='composite', source='composite',
                          message='Rolling Range Squeeze triggered',
                          condition=dict(relation='above', left=dict(kind='indicator', indicator=spec),
                                         right=dict(kind='constant', value='0')))
