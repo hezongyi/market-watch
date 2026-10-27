@@ -1,0 +1,31 @@
+# Stage 1 synthetic contracts only; no host ports or external network.
+services:
+  postgres:
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+    labels: {market-watch.task: runtime-switch-20261027}
+    cpus: 1
+    mem_limit: 768m
+    env_file: ${MW_SWITCH_PRIVATE_DIR:?}/postgres.env
+    command: [postgres, -c, jit=off, -c, max_connections=40]
+    tmpfs: [/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U runtime_switch -d runtime_switch']
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  contracts:
+    image: sha256:995534fb1c8238b5a71f2155017bafe439000c6f0cb78708f17471d2c6542743
+    labels: {market-watch.task: runtime-switch-20261027}
+    cpus: 1
+    mem_limit: 1024m
+    env_file: ${MW_SWITCH_PRIVATE_DIR:?}/contracts.env
+    environment:
+      PYTHONPATH: /candidate/backend:/candidate/backend/tests
+      PYTHONDONTWRITEBYTECODE: '1'
+    working_dir: /candidate
+    volumes: ['${MW_SWITCH_REPO:?}:/candidate:ro']
+    depends_on:
+      postgres: {condition: service_healthy}
+    entrypoint: [python, -m, pytest, -q, -p, 'no:cacheprovider']
+networks:
+  default: {internal: true}

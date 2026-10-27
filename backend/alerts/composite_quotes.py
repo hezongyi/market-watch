@@ -9,6 +9,7 @@ from .history_catalog import account_scope
 from .live_pricing import account_key
 from .live_session import session_status
 from .quote_close import confirmed_daily_close
+from .realtime_switch import revision_enabled
 from .storage import (
     CompositePreparation,
     CompositeRevision,
@@ -39,6 +40,7 @@ def live_snapshot(db, revision, *, now=None):
     state = db.get(LiveState, target.id)
     owner = db.get(PricingOwner, account_key(settings.oanda_account_id))
     stamp = now_ms() if now is None else now
+    realtime_enabled = revision_enabled(db, revision)
     current = target.identity["account_scope"] == account_scope()
     session = session_status(target.identity, db.get(Instrument, target.instrument_id).calendar_profile, stamp)
     held = bool(current and owner and owner.error == 'unauthorized' or state and state.error == 'unauthorized')
@@ -46,7 +48,7 @@ def live_snapshot(db, revision, *, now=None):
     if current and owner and owner.error:
         probe = db.get(Preference, 'oanda_probe_status:' + owner.id) if held else None
         error = (probe.value.get('error') if probe else None) or owner.error
-    available = not held and error != 'provider_maintenance' and session['market_session'] != 'closed'
+    available = realtime_enabled and not held and error != 'provider_maintenance' and session['market_session'] != 'closed'
     quote = state.quote if state else {}
     forming = state.forming if state else {}
     rest_sample = forming.get("acquisition_mode") == "rest_batch"
@@ -72,7 +74,7 @@ def live_snapshot(db, revision, *, now=None):
     candle_ready = bool(available and owned and state and state.ready and not state.error
         and rest_sample and forming.get("close")
         and received_age is not None and 0 <= received_age <= 15000)
-    return {"current_account": current, "owned": owned,
+    return {"current_account": current, "owned": owned, "realtime_enabled": realtime_enabled,
         **session, 'authentication_hold': held, 'connection_error': error,
         "confirmation_error": confirmation.get("error"), "confirmation_health": confirmation,
         "error_evidence": {'sampling': sampling_evidence(db, state) if state else {}, 'confirmation': confirmation.get('evidence', {})},
@@ -97,6 +99,8 @@ def sampled_observation(live):
     tradeable flag.  Consumers should use this projection for intrabar logic so
     they cannot accidentally require quote semantics from candle-only data.
     """
+    if live.get("realtime_enabled") is False:
+        return None
     if (live.get("observation_mode") == "candle_close_sample" and live.get("owned")
             and 0 <= live.get("received_age_ms", 15001) <= 15000):
         forming = live.get("forming") or {}
@@ -241,6 +245,7 @@ def snapshot(db, composite, *, now=None, revision_id=None, input_revision=None):
     result = {"composite_id": composite.id, "revision_id": revision.id,
         "input_revision": prep.input_revision if input_revision is None else input_revision, "history_version_id": revision.history_version_id,
         "seam": revision.seam, "queried_at": stamp,
+        "realtime_enabled": live["realtime_enabled"],
         "quote_ready": live["quote_ready"], "candle_ready": live.get("candle_ready", False),
         "sample_ready": live.get("sample_ready", live["quote_ready"]),
         "observation_mode": live.get("observation_mode", "stream_quote"),

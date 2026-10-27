@@ -48,6 +48,7 @@ def date_start(inst, value):
 
 def join(db, inst, start, now):
     from .chart_history_plan import lock_plan_instrument
+    from .realtime_switch import configured
 
     end = (now - 5000) // 60000 * 60000
     if start < 0 or start % 60000 or start >= end:
@@ -60,7 +61,7 @@ def join(db, inst, start, now):
             target_start=start,
             target_end=end,
             cursor=end,
-            realtime_enabled=True,
+            realtime_enabled=configured(db, inst.id) if configured(db, inst.id) is not None else True,
             status="pending",
             updated_at=now,
         )
@@ -89,9 +90,8 @@ def join(db, inst, start, now):
         # Keep the original initialization endpoint stable. Future M1 is live work.
         if earlier or plan.status == "cancelled":
             plan.status = "pending"
-        plan.realtime_enabled = True
         plan.updated_at = now
-    inst.enabled = True
+    inst.enabled = plan.realtime_enabled
     db.flush()
     from .publication_schedule import INITIAL, request
     request(db, inst.id, reason=INITIAL, stamp=now, approved=True)

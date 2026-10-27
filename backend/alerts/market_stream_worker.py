@@ -85,7 +85,7 @@ class Calculator:
             return [revision.id, revision.rules, baseline.manifest, target.identity,
                     db.get(Instrument, target.instrument_id).calendar_profile,
                     prep.input_revision, prep.status, prep.cutoff, prep.confirmed_end,
-                    live["current_account"], live["owned"], live["connection"], live["quote_ready"],
+                    live["realtime_enabled"], live["current_account"], live["owned"], live["connection"], live["quote_ready"],
                     live.get("candle_ready", False), live.get("sample_ready", live["quote_ready"]),
                     live.get("observation_mode", "stream_quote"), live["confirmed_tail_ready"],
                     live["connection_epoch"], live["live_revision"],
@@ -241,7 +241,7 @@ class Calculator:
                 revision = db.get(CompositeRevision, page["revision_id"])
                 state = live_snapshot(db, revision)
                 page["status"] = {key: state[key] for key in (
-                    "quote_ready", "candle_ready", "sample_ready", "observation_mode",
+                    "realtime_enabled", "quote_ready", "candle_ready", "sample_ready", "observation_mode",
                     "confirmed_tail_ready", "owned", "connection", "connection_error", "current_account")}
         return {"type": "bars", **page}, 500
 

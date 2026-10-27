@@ -24,6 +24,9 @@ def fixture(database, monkeypatch):
     monkeypatch.setattr("alerts.composite_definitions.now_ms", lambda: 165725000)
     with database.begin() as db:
         save_mapping(db, identity().key, catalog, PROOF)
+        from alerts.realtime_switch import set_enabled
+        from alerts.storage import MarketDataset
+        set_enabled(db, db.get(MarketDataset, identity().key).instrument_id, True, now=165725000)
     return parent
 
 

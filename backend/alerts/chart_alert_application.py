@@ -47,12 +47,20 @@ def capabilities(body):
         raise ValueError("未知判定周期")
     with transaction() as db:
         if body.series_kind == "composite":
+            from .composite_quotes import live_snapshot
+            from .series_access import composite_definition
             from .series_access import metadata as fixed_metadata
+            from .storage import CompositeRevision
 
             meta = fixed_metadata(db, body.instrument, "composite")
+            _, _, composite = composite_definition(db, body.instrument)
+            revision = db.get(CompositeRevision, composite.active_revision_id) if composite else None
+            available = bool(body.timeframe in meta["frames"] and revision
+                and live_snapshot(db, revision)["sample_ready"])
             return {"instrument": body.instrument, "timeframe": body.timeframe,
                 "sources": [{"source": "composite", "series_kind": "composite", "basis": meta["basis"], "atr_frames": meta["frames"],
-                    "calendar": meta["calendar"], "available": body.timeframe in meta["frames"], "reason": None,
+                    "calendar": meta["calendar"], "available": available,
+                    "reason": None if available else "实时流已关闭或来源不可用",
                     "observation_basis": "固定历史与确认M1接续；临时触价为显式抽样模式，断线后不追认未观测事件"}],
                 "modes": ["close", "intrabar"], "indicators": ["SMA", "EMA", "RSI", "MACD", "ROLLING_RANGE_SQUEEZE"],
                 "indicator_metadata": {name: meta for name, meta in public_catalog().items() if name in ("SMA", "EMA", "RSI", "MACD", "ROLLING_RANGE_SQUEEZE")},

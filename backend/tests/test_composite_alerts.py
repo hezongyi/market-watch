@@ -18,6 +18,7 @@ from alerts.storage import (
     CompositePreparation,
     CompositeRevision,
     FixedIndicatorRun,
+    HistoryVersion,
     LiveState,
     MarketComposite,
     MarketDataset,
@@ -64,23 +65,37 @@ def live(database, revision, stamp, confirmed_end, *, epoch=1, connected=True):
 
 
 def armed(database, monkeypatch, **changes):
+    from alerts.realtime_switch import set_enabled
+
     monkeypatch.setattr(settings, "oanda_resident_symbols", "")
     composite, revision, seam = populated(database, monkeypatch)
     stamp = seam + 600010
     live(database, revision, stamp, seam + 600000)
     aggregate(revision, "M1")
     with database.begin() as db:
+        source_id = db.get(HistoryVersion,
+            db.get(CompositeRevision, revision).history_version_id).dataset_id
+        source_id = db.get(MarketDataset, source_id).instrument_id
+        set_enabled(db, source_id, True, now=stamp)
         ident = create(db, "composite-rule", config(composite, **changes), at=stamp).id
     return ident, composite, revision, seam, stamp
 
 
 def ready_config(database, monkeypatch):
+    from alerts.realtime_switch import set_enabled
+
     """A ready composite config factory for real HTTP and MCP write contracts."""
     monkeypatch.setattr(settings, "oanda_resident_symbols", "")
     composite, revision, seam = populated(database, monkeypatch)
     stamp = seam + 600010
     live(database, revision, stamp, seam + 600000)
     aggregate(revision, "M1")
+    with database.begin() as db:
+        source_id = db.get(MarketDataset,
+            db.get(HistoryVersion, db.get(CompositeRevision, revision).history_version_id).dataset_id).instrument_id
+        set_enabled(db, source_id, True, now=stamp)
+
+    monkeypatch.setattr("alerts.chart_alert_service.now_ms", lambda: stamp)
 
     def make(**changes):
         return config(composite, **{"composite_revision_id": revision, **changes})
@@ -211,6 +226,8 @@ def test_missing_confirmation_period_waterline_and_stale_owner_all_fence_rules(d
 
 
 def continuous(database, monkeypatch):
+    from alerts.realtime_switch import set_enabled
+
     monkeypatch.setattr(settings, "oanda_resident_symbols", "")
     catalog = prepare(database, monkeypatch)
     seam = 165600000
@@ -230,6 +247,10 @@ def continuous(database, monkeypatch):
     aggregate(revision, "M1")
     stamp = seam + 600010
     live(database, revision, stamp, seam + 600000)
+    with database.begin() as db:
+        source_id = db.get(MarketDataset,
+            db.get(HistoryVersion, db.get(CompositeRevision, revision).history_version_id).dataset_id).instrument_id
+        set_enabled(db, source_id, True, now=stamp)
     return ident, revision, seam, stamp
 
 
@@ -253,11 +274,13 @@ def test_complete_recursive_initialization_requires_explicit_raw_seam_policy(dat
 
 def test_seam_jump_itself_never_compares_prices_or_accepted_indicators(database, monkeypatch):
     composite, revision, seam, stamp = continuous(database, monkeypatch)
+    live(database, revision, seam - 1, seam)
     with database.begin() as db:
         ident = create(db, "seam-jump", config(composite), at=seam - 1).id
         alert = db.get(ChartAlert, ident)
         alert.state = {"sequence": seam, "left": "1.10", "right": "1.115", "count": 0}
         alert.runtime = {"last_start": seam - 60000, "confirmed_end": seam}
+    live(database, revision, stamp, seam + 600000)
     add_tail(database, revision, [minute(seam + 540000, volume="3", close="1.119")])
     aggregate(revision, "M1")
     with database.begin() as db:
@@ -451,6 +474,7 @@ def test_pure_capabilities_and_authenticated_fixed_creation_geometry_judgments(d
     from fastapi.testclient import TestClient
 
     ident, composite, revision, seam, stamp = armed(database, monkeypatch)
+    monkeypatch.setattr("alerts.chart_alert_service.now_ms", lambda: stamp)
     api.app.dependency_overrides[api.authenticated] = lambda: "test"
     try:
         with TestClient(api.app) as client:

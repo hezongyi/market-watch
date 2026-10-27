@@ -157,14 +157,14 @@ def bind_offset(db, config, identity, dataset_id):
         "origin": origin, "algorithm": ALGORITHM}}
 
 
-def market_identity(db, config: AlertConfig, dataset_id=None):
+def market_identity(db, config: AlertConfig, dataset_id=None, *, at=None):
     """Require the stored source identity; never silently fall back to another series."""
     if config.series_kind == "composite":
         from .composite_alerts import bind
 
         if dataset_id:
             raise ValueError("组合告警不能绑定平台缓存数据集")
-        return bind(db, config)
+        return bind(db, config, now=at)
     if config.series_kind == "managed":
         instrument = db.get(Instrument, config.instrument)
         if not instrument or not instrument.enabled or instrument.source != config.source:
@@ -211,7 +211,7 @@ def create(db, request_id: str, config: AlertConfig, *, dataset_id=None, at=None
     at = now_ms() if at is None else at
     if config.expires_at is not None and config.expires_at <= at:
         raise ValueError("到期时间必须晚于生效时间")
-    identity = bind_offset(db, config, market_identity(db, config, dataset_id), dataset_id)
+    identity = bind_offset(db, config, market_identity(db, config, dataset_id, at=at), dataset_id)
     alert = ChartAlert(request_id=request_id, request_hash=digest, name=config.name,
                        effective_at=at, max_triggers=config.max_triggers,
                        expires_at=config.expires_at)
@@ -240,7 +240,7 @@ def edit(db, alert_id, expected_version, config, *, dataset_id=None, at=None):
     at = now_ms() if at is None else at
     if config.expires_at is not None and config.expires_at <= at:
         raise ValueError("到期时间必须晚于生效时间")
-    identity = bind_offset(db, config, market_identity(db, config, dataset_id), dataset_id)
+    identity = bind_offset(db, config, market_identity(db, config, dataset_id, at=at), dataset_id)
     alert.version += 1
     alert.control_revision += 1
     alert.name, alert.max_triggers, alert.expires_at = config.name, config.max_triggers, config.expires_at
@@ -277,6 +277,15 @@ def lifecycle(db, alert_id, expected_version, action, *, expected_revision, requ
     elif action in ("resume", "restart", "rebaseline"):
         if alert.expires_at is not None and alert.expires_at <= at:
             raise ValueError("告警已到期，请先修改到期时间")
+        config = AlertConfig.model_validate(current_version(db, alert).config)
+        if config.series_kind == "composite":
+            from .composite_alerts import require_live_eligibility
+            from .storage import CompositeRevision
+
+            revision = db.get(CompositeRevision, current_version(db, alert).market_identity["composite_revision_id"])
+            if not revision:
+                raise ValueError("告警绑定的组合修订不存在")
+            require_live_eligibility(db, revision, now=at)
         if action == "restart":
             alert.run += 1
             alert.count = 0

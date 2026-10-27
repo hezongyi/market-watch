@@ -252,7 +252,7 @@ def renew_demand(db, client, inst, *, composite_revision_id=None):
     # Searching/selecting/refusing an unmaintained managed series does not
     # authorize even a temporary M1 maintenance lease.
     plan = db.get(ChartHistoryPlan, inst.id)
-    from .storage import CompositeRevision, MarketComposite, MarketDataset
+    from .storage import CompositeRevision, HistoryVersion, MarketComposite, MarketDataset
     dataset = db.scalar(select(MarketDataset).where(MarketDataset.instrument_id == inst.id))
     composite = db.scalar(select(MarketComposite).where(MarketComposite.instrument_id == inst.id))
     if composite_revision_id is not None:
@@ -260,6 +260,25 @@ def renew_demand(db, client, inst, *, composite_revision_id=None):
         if not composite or not revision or revision.composite_id != composite.id:
             raise ValueError("需求修订不属于所选组合行情")
     live_source = dataset and dataset.identity["source"] == "oanda"
+    from .realtime_switch import enabled
+
+    managed_id = inst.id
+    if composite_revision_id is not None:
+        version = db.get(HistoryVersion, revision.history_version_id)
+        source_dataset = db.get(MarketDataset, version.dataset_id) if version else None
+        if not source_dataset:
+            raise ValueError("组合固定历史数据集不存在")
+        managed_id = source_dataset.instrument_id
+    elif composite:
+        from .storage import CompositeRevision
+        active = db.get(CompositeRevision, composite.active_revision_id)
+        version = db.get(HistoryVersion, active.history_version_id) if active else None
+        source_dataset = db.get(MarketDataset, version.dataset_id) if version else None
+        if not source_dataset:
+            return
+        managed_id = source_dataset.instrument_id
+    if (composite or not live_source) and not enabled(db, managed_id):
+        return
     if not live_source and not composite and not inst.enabled and not (plan and plan.realtime_enabled):
         return
     ident = demand_id(client, inst.id, composite_revision_id=composite_revision_id)
@@ -535,6 +554,11 @@ class VolumeControlQuery(BaseModel):
     action: str
 
 
+class RealtimeControlQuery(BaseModel):
+    instrument: str = Field(min_length=1, max_length=80)
+    enabled: bool = Field(strict=True)
+
+
 def router(authenticated):
     r = APIRouter(prefix="/api/market-data", dependencies=[Depends(authenticated)])
 
@@ -553,6 +577,25 @@ def router(authenticated):
     @r.post("/quotes")
     def quotes(body: QuoteQuery):
         return quote_snapshot(body)
+
+    @r.get("/realtime")
+    def realtime_status(instrument: str):
+        from .realtime_switch import status
+        try:
+            with transaction() as db:
+                return status(db, instrument, now=now_ms())
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
+
+    @r.post("/realtime")
+    def realtime_control(body: RealtimeControlQuery):
+        from .realtime_switch import set_enabled, status
+        try:
+            with transaction() as db:
+                set_enabled(db, body.instrument, body.enabled, now=now_ms())
+                return status(db, body.instrument, now=now_ms())
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
 
     @r.get("/catalog")
     def catalog(query: str = ""):
@@ -1142,6 +1185,7 @@ def quote_snapshot(body: QuoteQuery):
                                 data_start=None if precise else sample_start,
                                 data_end=None if precise else sample_end,
                                 time_type="composite_snapshot",
+                                realtime_enabled=facts["realtime_enabled"],
                                 observation_type=("provider_quote" if precise else
                                                   "candle_close_sample" if candle_sample else "source_m1"),
                                 observation_mode=("stream_quote" if precise else
@@ -1155,6 +1199,8 @@ def quote_snapshot(body: QuoteQuery):
                                 "抽样Bid" if precise else
                                 "当前未闭合M1收盘采样" if candle_sample else
                                 "保存的确认M1收盘" if facts["price"] is not None else "等待报价")
+                            if not facts["realtime_enabled"]:
+                                values["description"] += " · 实时流已关闭"
 
                     # Watchlist metadata is pure, never a first-use command.
                     result.append({"s": "ok", "n": ticker, "v": values,
