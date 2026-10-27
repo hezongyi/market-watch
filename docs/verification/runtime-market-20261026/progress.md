@@ -22,8 +22,8 @@ docker compose --env-file /home/quant/.local/share/market-watch-runtime-20261026
   -p mw-runtime-20261026 -f deploy/ubuntu/runtime-market.baseline.yaml stop
 ```
 
-当前阶段 0 测量、清单和阈值建议已形成，待用户明确确认业务门槛后签收；确认前禁止依赖阈值的调度迁移。没有 main 合并、正式发布、生产操作、真实 ntfy 投递或永久删除。
+用户已于2026-10-27明确接受建议业务门槛，确认记录见 acceptance-thresholds.md。阶段0产物/验证完成，PR CI Backend 最终检查仍须核实后再标记签收；不涉及合并 main、正式发布、生产操作、真实 ntfy 投递或永久删除。
 
 合同回归 127 passed；十个任务 PG 套件 150 passed、1 skipped（需要 v1.14.0 源码挂载的旧进程专项，不计通过）。运维检查 97 passed、68 subtests，三个应用依赖项在基线镜像另跑 3 passed；事件分母两项回归包含于运维检查。新脚本 ruff 通过。schema head `ay52_history_modes`。试跑校正与失效证据见 `probe-corrections.md`；正式采样采用连续业务时钟、61×2秒/场，包含四场及同资源快重建对照，测量期间不并跑性能/PG套件。
 
-正式五场采样均已结束。normal、busy、candidate(1s)、slow-source 各13个事件且按窗口 oracle 通过；aggressive candidate(0.05s) 只有12个，末段盘中窗口缺失。前四场仍各有1–2个未处理输入/规则对，完整分母已保留。candidate(1s) 28.20s 就绪。报告、原始 JSONL 压缩副本和只读实例盘点均已生成；candidate 更快但事件缺失，不能作为可接受预算。environment.json 记录其他 Docker 项目同时运行、host load约6–9。阈值仍草案待用户确认，调度迁移未启动。
+正式五场采样均已结束。normal、busy、candidate(1s)、slow-source 各13个事件且按窗口 oracle 通过；aggressive candidate(0.05s) 只有12个，末段盘中窗口缺失。前四场仍各有1–2个未处理输入/规则对，完整分母已保留。candidate(1s) 28.20s 就绪。报告、原始 JSONL 压缩副本和只读实例盘点均已生成；candidate 更快但事件缺失，不能作为可接受预算。environment.json 记录其他 Docker 项目同时运行、host load约6–9。业务门槛已接受，阶段1可推进；阶段2仍须按固定门槛验收。
