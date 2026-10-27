@@ -1,6 +1,5 @@
-// Exercise the bridge message path while native history rebuilding is deferred.
+// Unified runtime updates invalidate mapping while native rebuilding is deferred.
 const assert = require("node:assert/strict");
-const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 const handlers = [];
@@ -24,9 +23,9 @@ const context = vm.createContext({
   setTimeout,
   clearTimeout,
 });
-for (const file of ["series.js", "bar-range-mapping.js", "chart-runtime.js"]) {
+for (const file of ["series.js", "composite-display-batches.js", "bar-range-mapping.js", "chart-runtime.js"]) {
   vm.runInContext(
-    fs.readFileSync(path.join(__dirname, "../../advanced-host", file), "utf8"),
+    require("./fixtures/direct-runtime.cjs").read(path.join(__dirname, "../../advanced-host", file), "utf8"),
     context,
   );
 }
@@ -38,32 +37,22 @@ vm.runInContext(
   mapper.observeBars({symbol:'MWP:EURUSD',resolution:'5',window:'old-window',ticket:oldTicket,
     bars:[{chart_time:100,start:80,end:160,high:2,low:1}]});
   ready=true;
-  globalThis.changed=false;
-  query=async()=>({cache_revision:20,as_of:2000,history_revalidation:{changed},bars:[]});
-  providerHistoryWork.set('MWP:EURUSD|5|old-window',{symbol:'MWP:EURUSD',res:'5',window:'old-window',observation:{first:80,last:160,revision:10,observed_at:1000}});
-
+  const chart={symbol:()=> 'MWP:EURUSD',resolution:()=> '5',getAllStudies:()=>[]};
+  widget={chartsCount:()=>1,chart:()=>chart};
   globalThis.MWNativeNavigation={busy:()=>true};
   subscriptions.set('fixture',{symbol:'MWP:EURUSD',res:'5',window:'old-window',
-    providerListener:'listener',historical:true});
+    marketListener:'listener',marketGeneration:1,marketSequence:0,historical:true});
 `,
   context,
 );
 (async () => {
   assert.equal(context.mapper.diagnostics().stores.length, 1);
-  await handlers[0]({
-    source: context.parent,
-    origin: "http://localhost",
-    data: {
-      channel: "mw-chart-v1",
-      type: "provider-event",
-      event: { listener: "listener", type: "reset", revision:11,as_of:1100 },
-    },
-  });
-  assert.equal(context.mapper.diagnostics().stores.length,1,"unchanged history review must retain metadata");
-  vm.runInContext("changed=true",context);
-  await handlers[0]({source:context.parent,origin:"http://localhost",data:{
-    channel:"mw-chart-v1",type:"provider-event",event:{listener:"listener",type:"reset",revision:21,as_of:2100}
-  }});
+  // A status event means the backend verified accepted history is unchanged.
+  await handlers[0]({data:{type:'market-event',event:{listener:'listener',generation:1,
+    sequence:1,type:'status',status:'history_current'}}});
+  assert.equal(context.mapper.diagnostics().stores.length,1,'unchanged history retains metadata');
+  await handlers[0]({data:{type:'market-event',event:{listener:'listener',generation:1,
+    sequence:2,type:'reset',reason:'history_changed'}}});
   assert.equal(
     context.mapper.diagnostics().stores.length,
     0,
@@ -85,8 +74,9 @@ vm.runInContext(
     0,
     "late accepted callback restored reset data",
   );
+  vm.runInContext("clearTimeout(subscriptions.get('fixture').marketRetry)",context);
   console.log(
-    "Unchanged reset preserves mapping; confirmed revision invalidates metadata and pending tickets during busy navigation",
+    "Unchanged history preserves mapping; confirmed revision invalidates metadata and pending tickets during busy navigation",
   );
 })().catch((error) => {
   console.error(error);

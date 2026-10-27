@@ -1,0 +1,41 @@
+# Independent stage-3A database; no host ports or external network.
+services:
+  postgres:
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+    cpus: 0.5
+    mem_limit: 512m
+    labels: {market-watch.task: runtime-chart-sse-20261027}
+    environment:
+      POSTGRES_DB: runtime_sse
+      POSTGRES_USER: runtime_sse
+      POSTGRES_HOST_AUTH_METHOD: trust
+    command: [postgres, -c, jit=off, -c, max_connections=30]
+    volumes: [sse-pg:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U runtime_sse -d runtime_sse]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  contracts:
+    image: sha256:995534fb1c8238b5a71f2155017bafe439000c6f0cb78708f17471d2c6542743
+    cpus: 1
+    mem_limit: 768m
+    labels: {market-watch.task: runtime-chart-sse-20261027}
+    working_dir: /candidate
+    volumes: ['${MW_RUNTIME_SSE_REPO:?}:/candidate:ro']
+    environment:
+      PYTHONPATH: /candidate/backend:/candidate/backend/tests
+      PYTHONDONTWRITEBYTECODE: '1'
+      TEST_POSTGRES_URL: postgresql+psycopg://runtime_sse@postgres/runtime_sse
+    depends_on:
+      postgres: {condition: service_healthy}
+    entrypoint: [python, -m, pytest, -q, -p, 'no:cacheprovider']
+    command:
+      - backend/tests/test_market_stream_postgres.py
+      - backend/tests/test_market_stream_history_postgres.py
+      - backend/tests/test_market_stream_lifecycle_postgres.py
+networks:
+  default: {internal: true}
+volumes:
+  sse-pg:
+    labels: {market-watch.task: runtime-chart-sse-20261027}

@@ -27,7 +27,7 @@ const watchdog=setTimeout(()=>{console.error('Provider subscription test timed o
   await flush();
   assert.equal(calls.length,1,'cancel waits for the in-flight registration');
   release();await Promise.all([first,cancel]);
-  assert.deepEqual(calls.map(c=>c.path),['/charts/provider/subscribe','/charts/provider/unsubscribe']);
+  assert.deepEqual(calls.map(c=>c.path),['/charts/stream/subscribe','/charts/stream/unsubscribe']);
   assert.equal(streams.length,0,'late registration never starts an abandoned stream');
   await transport.subscribe({client:'c',listener:'two'});
   await transport.subscribe({client:'c',listener:'three',history_tail_revision:'http-tail'});
@@ -109,7 +109,7 @@ const watchdog=setTimeout(()=>{console.error('Provider subscription test timed o
     ()=>{finalStreams.push(1);return {close(){},onmessage:null}},()=>{},()=>{});
   const opened=closing.subscribe({client:'old',listener:'gone'});
   await flush();const disposed=closing.dispose();finish();await opened;await disposed;
-  assert.deepEqual(finalCalls,['/charts/provider/subscribe','/charts/provider/unsubscribe']);
+  assert.deepEqual(finalCalls,['/charts/stream/subscribe','/charts/stream/unsubscribe']);
   assert.equal(finalStreams.length,0,'unmount drains pending registrations before releasing them');
   const facts=[],outageStreams=[];let requestFailure=true,releaseOld;
   const outages=factory(async()=>{if(requestFailure)throw Error('subscribe503')},()=>{
